@@ -1,15 +1,20 @@
 "use client";
 
 /**
- * 使用统计分析页面
- * 展示用户使用数据、趋势分析、资源消耗等
+ * 使用统计分析页面 - Supabase Dashboard 风格
+ * 带二级侧边栏导航的分析页面
  */
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
+import {
+  PageWithSidebar,
+  SidebarNavGroup,
+  SidebarNavItem,
+  CategoryHeader,
+} from "@/components/dashboard/page-layout";
 import {
   Tabs,
   TabsList,
@@ -17,20 +22,13 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 import {
-  Activity,
   ArrowDownRight,
   ArrowUpRight,
-  Bot,
   Calendar,
   ChevronDown,
-  Clock,
   Coins,
   Download,
-  MessageSquare,
   RefreshCw,
-  Sparkles,
-  Target,
-  Zap,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -46,6 +44,37 @@ import {
   Sparkline,
 } from "@/components/charts/simple-charts";
 
+// 侧边栏导航结构
+const navGroups = [
+  {
+    title: "OVERVIEW",
+    items: [
+      { id: "overview", label: "概览", href: "#overview" },
+      { id: "highlights", label: "使用快照", href: "#highlights" },
+    ],
+  },
+  {
+    title: "ANALYTICS",
+    items: [
+      { id: "trends", label: "使用趋势", href: "#trends" },
+      { id: "distribution", label: "模型分布", href: "#distribution" },
+      { id: "breakdown", label: "使用分解", href: "#breakdown" },
+    ],
+  },
+  {
+    title: "DETAILS",
+    items: [
+      { id: "features", label: "功能排名", href: "#features" },
+      { id: "daily", label: "每日统计", href: "#daily" },
+      { id: "activities", label: "最近活动", href: "#activities" },
+    ],
+  },
+  {
+    title: "INSIGHTS",
+    items: [{ id: "tips", label: "优化建议", href: "#tips" }],
+  },
+];
+
 // 时间范围选项
 const timeRanges = [
   { id: "7d", label: "最近 7 天" },
@@ -54,25 +83,7 @@ const timeRanges = [
   { id: "12m", label: "最近 12 个月" },
 ];
 
-const toneStyles = {
-  brand: {
-    iconBg: "bg-brand-200/60",
-    icon: "text-brand-500",
-    sparkline: "stroke-brand-500",
-  },
-  warning: {
-    iconBg: "bg-warning-200/60",
-    icon: "text-warning",
-    sparkline: "stroke-warning",
-  },
-  neutral: {
-    iconBg: "bg-surface-200",
-    icon: "text-foreground-light",
-    sparkline: "stroke-foreground-light",
-  },
-} as const;
-
-// 模拟统计数据 - Supabase 风格
+// 模拟统计数据 - 简化版
 const overviewStats = [
   {
     id: "conversations",
@@ -80,8 +91,6 @@ const overviewStats = [
     value: "2,847",
     change: 12.5,
     trend: "up" as const,
-    icon: MessageSquare,
-    tone: "brand" as const,
     sparkline: [30, 45, 38, 52, 48, 65, 72],
   },
   {
@@ -90,8 +99,6 @@ const overviewStats = [
     value: "1,256",
     change: 8.3,
     trend: "up" as const,
-    icon: Zap,
-    tone: "warning" as const,
     sparkline: [20, 35, 28, 42, 38, 55, 62],
   },
   {
@@ -100,8 +107,6 @@ const overviewStats = [
     value: "23",
     change: -2.1,
     trend: "down" as const,
-    icon: Bot,
-    tone: "neutral" as const,
     sparkline: [15, 18, 22, 19, 25, 23, 21],
   },
   {
@@ -110,8 +115,6 @@ const overviewStats = [
     value: "1.2M",
     change: 15.7,
     trend: "up" as const,
-    icon: Coins,
-    tone: "brand" as const,
     sparkline: [45, 52, 48, 65, 72, 85, 92],
   },
 ];
@@ -183,21 +186,9 @@ const optimizationTips = [
 ];
 
 const usageHighlights = [
-  {
-    label: "本月成本",
-    value: "¥1,284",
-    change: 12.4,
-  },
-  {
-    label: "活跃天数",
-    value: "19/30",
-    change: 4.3,
-  },
-  {
-    label: "自动化节省",
-    value: "¥312",
-    change: -8.1,
-  },
+  { label: "本月成本", value: "¥1,284", change: 12.4 },
+  { label: "活跃天数", value: "19/30", change: 4.3 },
+  { label: "自动化节省", value: "¥312", change: -8.1 },
 ];
 
 const usageBudget = {
@@ -275,9 +266,17 @@ const breakdownTabs = [
   },
 ];
 
+// 活动类型样式
+const activityTypeLabels = {
+  conversation: "对话",
+  workflow: "工作流",
+  agent: "Agent",
+} as const;
+
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeSection, setActiveSection] = useState("overview");
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -294,7 +293,8 @@ export default function AnalyticsPage() {
       usageTrendData.length
   );
   const growthRate =
-    ((usageTrendData[usageTrendData.length - 1].value - usageTrendData[0].value) /
+    ((usageTrendData[usageTrendData.length - 1].value -
+      usageTrendData[0].value) /
       usageTrendData[0].value) *
     100;
 
@@ -303,8 +303,7 @@ export default function AnalyticsPage() {
       dailyUsage.length
   );
   const avgWorkflows = Math.round(
-    dailyUsage.reduce((sum, item) => sum + item.workflows, 0) /
-      dailyUsage.length
+    dailyUsage.reduce((sum, item) => sum + item.workflows, 0) / dailyUsage.length
   );
   const totalConversations = dailyUsage.reduce(
     (sum, item) => sum + item.conversations,
@@ -318,244 +317,194 @@ export default function AnalyticsPage() {
     item.conversations > max.conversations ? item : max
   );
 
-  const activityStyles = {
-    conversation: {
-      icon: MessageSquare,
-      bg: "bg-surface-200",
-      iconColor: "text-foreground-light",
-      label: "对话",
-      badgeVariant: "secondary",
-    },
-    workflow: {
-      icon: Zap,
-      bg: "bg-brand-200/60",
-      iconColor: "text-brand-500",
-      label: "工作流",
-      badgeVariant: "success",
-    },
-    agent: {
-      icon: Bot,
-      bg: "bg-surface-200",
-      iconColor: "text-foreground-light",
-      label: "Agent",
-      badgeVariant: "outline",
-    },
-  } as const;
+  // 侧边栏内容
+  const sidebar = (
+    <nav className="space-y-1">
+      {navGroups.map((group) => (
+        <SidebarNavGroup key={group.title} title={group.title}>
+          {group.items.map((item) => (
+            <SidebarNavItem
+              key={item.id}
+              href={item.href}
+              label={item.label}
+              active={activeSection === item.id}
+            />
+          ))}
+        </SidebarNavGroup>
+      ))}
+    </nav>
+  );
 
   return (
-    <PageContainer>
-      <div className="page-section">
-        <div className="space-y-3">
-          <div className="page-caption">Analytics</div>
-          <PageHeader
-            title="使用统计"
-            description="追踪您的使用情况、成本变化与工作流效率，快速定位高消耗节点并优化资源分配。"
-            className="mb-0"
-            actions={(
-              <div className="flex flex-wrap items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 border-border/80 text-foreground-light hover:text-foreground"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      {selectedRange?.label}
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="bg-surface-100 border-border"
-                  >
-                    {timeRanges.map((range) => (
-                      <DropdownMenuItem
-                        key={range.id}
-                        onClick={() => setTimeRange(range.id)}
-                        className="text-foreground-light hover:text-foreground hover:bg-surface-200"
-                      >
-                        {range.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+    <PageWithSidebar
+      sidebar={sidebar}
+      sidebarTitle="Analytics"
+      sidebarWidth="narrow"
+    >
+      <div className="space-y-6 max-w-[960px]">
+        {/* 页面头部 */}
+        <div className="space-y-1">
+          <h1 className="text-xl font-medium text-foreground">使用统计</h1>
+          <p className="text-[13px] text-foreground-light">
+            追踪您的使用情况、成本变化与工作流效率
+          </p>
+        </div>
 
+        {/* 工具栏 */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
+          <div className="flex items-center gap-2 text-xs text-foreground-muted">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+            <span>实时监控</span>
+            <span className="text-foreground-lighter">·</span>
+            <span>更新于 2 分钟前</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleRefresh}
-                  className="border-border/80 text-foreground-light hover:text-foreground"
+                  className="h-8 gap-1.5 text-[12px] border-border text-foreground-light hover:text-foreground hover:bg-surface-100/60"
                 >
-                  <RefreshCw
-                    className={cn("w-4 h-4", isRefreshing && "animate-spin")}
-                  />
-                  刷新
+                  <Calendar className="w-3.5 h-3.5" />
+                  {selectedRange?.label}
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </Button>
-
-                <Button variant="secondary" size="sm">
-                  <Download className="w-4 h-4" />
-                  导出报告
-                </Button>
-              </div>
-            )}
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                size="xs"
-                className="border-border/70 text-foreground-light"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-surface-100 border-border"
               >
-                实时
-              </Badge>
-            </div>
-          </PageHeader>
-        </div>
+                {timeRanges.map((range) => (
+                  <DropdownMenuItem
+                    key={range.id}
+                    onClick={() => setTimeRange(range.id)}
+                    className="text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-100/60"
+                  >
+                    {range.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-      <div className="page-divider" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              className="h-8 gap-1.5 text-[12px] border-border text-foreground-light hover:text-foreground hover:bg-surface-100/60"
+            >
+              <RefreshCw
+                className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")}
+              />
+              刷新
+            </Button>
 
-      <div className="page-panel">
-        <div className="page-panel-header flex items-center justify-between">
-          <div>
-            <h2 className="page-panel-title">使用概览</h2>
-            <p className="page-panel-description">成本与活跃度快照</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 text-[12px] border-border text-foreground-light hover:text-foreground hover:bg-surface-100/60"
+            >
+              <Download className="w-3.5 h-3.5" />
+              导出
+            </Button>
           </div>
-          <Badge
-            variant="secondary"
-            className="bg-surface-200 text-foreground-muted text-[11px]"
-          >
-            最近 {selectedRange?.label}
-          </Badge>
         </div>
-        <div className="p-5">
-          <div className="page-grid md:grid-cols-3 md:gap-0 md:divide-x md:divide-border">
-            {usageHighlights.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center justify-between md:px-4 first:md:pl-0 last:md:pr-0"
-              >
-                <div>
-                  <p className="page-caption">{item.label}</p>
-                  <p className="text-sm font-medium text-foreground tabular-nums">
-                    {item.value}
+
+        {/* 使用快照 */}
+        <section id="highlights" className="space-y-3">
+          <CategoryHeader>使用快照</CategoryHeader>
+          <div className="rounded-md border border-border bg-surface-100 p-4">
+            <div className="grid grid-cols-3 gap-0 divide-x divide-border">
+              {usageHighlights.map((item) => (
+                <div key={item.label} className="px-4 first:pl-0 last:pr-0">
+                  <p className="text-[11px] text-foreground-muted uppercase tracking-wide mb-1">
+                    {item.label}
                   </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-foreground tabular-nums">
+                      {item.value}
+                    </p>
+                    <span
+                      className={cn(
+                        "text-[11px] tabular-nums",
+                        item.change >= 0
+                          ? "text-brand-500"
+                          : "text-destructive"
+                      )}
+                    >
+                      {item.change >= 0 ? "+" : ""}
+                      {item.change}%
+                    </span>
+                  </div>
                 </div>
-                <Badge
-                  variant={item.change >= 0 ? "success" : "error"}
-                  size="sm"
-                  className="text-[10px]"
-                >
-                  {item.change >= 0 ? "+" : ""}
-                  {item.change}%
-                </Badge>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* 概览 */}
-      <div className="page-panel">
-        <div className="page-panel-header flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="page-panel-title">概览</p>
-            <p className="page-panel-description">
-              最近 {selectedRange?.label} 内的关键指标
-            </p>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-foreground-light">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-brand-500" />
-              实时监控
-            </span>
-            <span>更新于 2 分钟前</span>
-          </div>
-        </div>
-        <div className="p-6">
-          <div className="page-grid md:grid-cols-2 lg:grid-cols-4">
+        {/* 概览统计 */}
+        <section id="overview" className="space-y-3">
+          <CategoryHeader>概览</CategoryHeader>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {overviewStats.map((stat) => {
-              const Icon = stat.icon;
-              const tone = toneStyles[stat.tone];
-              const TrendIcon = stat.trend === "up" ? ArrowUpRight : ArrowDownRight;
-
+              const TrendIcon =
+                stat.trend === "up" ? ArrowUpRight : ArrowDownRight;
               return (
                 <div
                   key={stat.id}
-                  className="rounded-md border border-border bg-surface-100 p-4 transition-supabase hover:border-border-strong"
+                  className="rounded-md border border-border bg-surface-100 p-4 transition-colors hover:border-border-strong"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "h-9 w-9 rounded-md flex items-center justify-center",
-                          tone.iconBg
-                        )}
-                      >
-                        <Icon className={cn("w-4 h-4", tone.icon)} />
-                      </div>
-                      <div>
-                        <p className="text-xs text-foreground-light">
-                          {stat.label}
-                        </p>
-                        <p className="text-stat-number text-foreground tabular-nums">
-                          {stat.value}
-                        </p>
-                      </div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                        {stat.label}
+                      </p>
+                      <p className="text-lg font-semibold text-foreground tabular-nums mt-0.5">
+                        {stat.value}
+                      </p>
                     </div>
-                    <Badge
-                      variant={stat.trend === "up" ? "success" : "error"}
-                      size="sm"
-                      className="text-[11px]"
+                    <span
+                      className={cn(
+                        "flex items-center text-[11px] tabular-nums",
+                        stat.trend === "up"
+                          ? "text-brand-500"
+                          : "text-destructive"
+                      )}
                     >
                       <TrendIcon className="w-3 h-3" />
                       {Math.abs(stat.change)}%
-                    </Badge>
+                    </span>
                   </div>
-                  <div className="mt-4 flex items-center justify-between text-xs text-foreground-muted">
-                    <span>较上期</span>
-                    <Sparkline
-                      data={stat.sparkline}
-                      color={tone.sparkline}
-                      width={110}
-                      height={26}
-                      showDot={false}
-                      className="opacity-90"
-                    />
-                  </div>
+                  <Sparkline
+                    data={stat.sparkline}
+                    color="stroke-brand-500"
+                    width={100}
+                    height={24}
+                    showDot={false}
+                    className="opacity-70"
+                  />
                 </div>
               );
             })}
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* 图表区域 */}
-      <div className="page-grid lg:grid-cols-3">
-        <div className="page-panel lg:col-span-2">
-          <div className="page-panel-header flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="page-panel-title flex items-center gap-2">
-                <Activity className="w-4 h-4 text-brand-500" />
-                使用趋势
-              </p>
-              <p className="page-panel-description">
-                {selectedRange?.label} 内的对话量变化
-              </p>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-foreground-light">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-brand-500" />
+        {/* 使用趋势 */}
+        <section id="trends" className="space-y-3">
+          <div className="flex items-center justify-between">
+            <CategoryHeader>使用趋势</CategoryHeader>
+            <div className="flex items-center gap-3 text-[11px] text-foreground-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
                 对话量
               </span>
-              <span className="text-foreground-muted">
-                平均 {averageUsage.toLocaleString()} / 月
-              </span>
+              <span>平均 {averageUsage.toLocaleString()} / 月</span>
             </div>
           </div>
-          <div className="p-6 pt-4">
+          <div className="rounded-md border border-border bg-surface-100 p-5">
             <SimpleLineChart
               data={usageTrendData}
-              height={260}
+              height={220}
               strokeColor="stroke-brand-500"
               fillColor="fill-brand-500/10"
               showDots={false}
@@ -563,16 +512,20 @@ export default function AnalyticsPage() {
             />
             <div className="mt-4 grid grid-cols-3 gap-3">
               <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">峰值</p>
+                <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                  峰值
+                </p>
                 <p className="text-sm font-medium text-foreground tabular-nums">
                   {peakPoint.value.toLocaleString()} · {peakPoint.label}
                 </p>
               </div>
               <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">增长</p>
+                <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                  增长
+                </p>
                 <p
                   className={cn(
-                    "text-sm font-medium",
+                    "text-sm font-medium tabular-nums",
                     growthRate >= 0 ? "text-brand-500" : "text-destructive"
                   )}
                 >
@@ -581,278 +534,266 @@ export default function AnalyticsPage() {
                 </p>
               </div>
               <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">最近</p>
+                <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                  最近
+                </p>
                 <p className="text-sm font-medium text-foreground tabular-nums">
-                  {usageTrendData[
-                    usageTrendData.length - 1
-                  ].value.toLocaleString()}
+                  {usageTrendData[usageTrendData.length - 1].value.toLocaleString()}
                 </p>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="page-panel">
-          <div className="page-panel-header">
-            <p className="page-panel-title flex items-center gap-2">
-              <Coins className="w-4 h-4 text-brand-500" />
-              Token 使用分布
-            </p>
-            <p className="page-panel-description">模型占比与成本权重</p>
-          </div>
-          <div className="p-6">
-            <div className="flex justify-center">
-              <SimplePieChart
-                data={tokenDistribution}
-                size={170}
-                donut
-                showLegend={false}
-              />
-            </div>
-            <div className="mt-6 space-y-3">
-              {tokenDistribution.map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-between text-xs"
-                >
-                  <span className="flex items-center gap-2 text-foreground">
-                    <span
-                      className={cn(
-                        "w-2.5 h-2.5 rounded-full bg-current",
-                        item.color
-                      )}
-                    />
-                    {item.label}
-                  </span>
-                  <span className="text-foreground-light tabular-nums">
-                    {item.value}%
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 rounded-md border border-border/70 bg-surface-75 px-3 py-3">
-              <div className="flex items-center justify-between text-xs text-foreground-light">
-                <span>本月预算</span>
-                <span className="tabular-nums">
-                  ¥{usageBudget.used} / ¥{usageBudget.limit}
-                </span>
-              </div>
-              <div className="mt-2 h-1.5 rounded-full bg-surface-300 overflow-hidden">
-                <div
-                  className="h-full bg-brand-500"
-                  style={{
-                    width: `${Math.min(
-                      (usageBudget.used / usageBudget.limit) * 100,
-                      100
-                    )}%`,
-                  }}
+        {/* 模型分布 */}
+        <section id="distribution" className="space-y-3">
+          <CategoryHeader>模型分布</CategoryHeader>
+          <div className="rounded-md border border-border bg-surface-100 p-5">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="flex justify-center">
+                <SimplePieChart
+                  data={tokenDistribution}
+                  size={160}
+                  donut
+                  showLegend={false}
                 />
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Tabs defaultValue="conversations" className="w-full">
-        <div className="page-panel">
-          <div className="page-panel-header flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="page-panel-title">使用分解</p>
-              <p className="page-panel-description">
-                追踪不同场景下的使用占比与结构变化
-              </p>
-            </div>
-            <TabsList
-              variant="underline"
-              size="sm"
-              className="w-full lg:w-auto justify-start"
-            >
-              {breakdownTabs.map((tab) => (
-                <TabsTrigger
-                  key={tab.id}
-                  value={tab.id}
-                  variant="underline"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-          <div className="p-6">
-            {breakdownTabs.map((tab) => (
-              <TabsContent key={tab.id} value={tab.id} className="mt-0">
-                <div className="page-grid lg:grid-cols-[1.4fr_1fr]">
-                  <div>
-                    <p className="text-xs text-foreground-light mb-3">
-                      {tab.description}
-                    </p>
-                    <SimpleBarChart
-                      data={tab.bars.map((item) => ({
-                        ...item,
-                        color: "bg-brand-500",
-                      }))}
-                      height={180}
-                      showValues={false}
-                    />
-                    <div className="mt-4 page-grid md:grid-cols-3">
-                      {tab.kpis.map((kpi) => (
-                        <div
-                          key={kpi.label}
-                          className="rounded-md bg-surface-75 px-3 py-2"
-                        >
-                          <p className="page-caption">{kpi.label}</p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-foreground tabular-nums">
-                              {kpi.value}
-                            </span>
-                            <Badge
-                              variant={kpi.change >= 0 ? "success" : "error"}
-                              size="xs"
-                              className="text-[10px]"
-                            >
-                              {kpi.change >= 0 ? "+" : ""}
-                              {kpi.change}%
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+              <div className="space-y-3">
+                {tokenDistribution.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between text-[12px]"
+                  >
+                    <span className="flex items-center gap-2 text-foreground">
+                      <span
+                        className={cn(
+                          "w-2 h-2 rounded-full bg-current",
+                          item.color
+                        )}
+                      />
+                      {item.label}
+                    </span>
+                    <span className="text-foreground-light tabular-nums">
+                      {item.value}%
+                    </span>
                   </div>
-                  <div className="space-y-3">
-                    <p className="page-caption">细分占比</p>
-                    {tab.segments.map((segment) => (
-                      <div
-                        key={segment.label}
-                        className="rounded-md border border-border/70 bg-surface-75 px-3 py-2"
-                      >
-                        <div className="flex items-center justify-between text-xs text-foreground-light">
-                          <span>{segment.label}</span>
-                          <span className="tabular-nums">
-                            {segment.value}%
-                          </span>
-                        </div>
-                        <div className="mt-2 h-1 rounded-full bg-surface-300 overflow-hidden">
-                          <div
-                            className="h-full bg-brand-500"
-                            style={{ width: `${segment.value}%` }}
-                          />
+                ))}
+                <div className="pt-3 mt-3 border-t border-border">
+                  <div className="flex items-center justify-between text-[11px] text-foreground-muted mb-2">
+                    <span>本月预算</span>
+                    <span className="tabular-nums">
+                      ¥{usageBudget.used} / ¥{usageBudget.limit}
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-surface-300 overflow-hidden">
+                    <div
+                      className="h-full bg-brand-500"
+                      style={{
+                        width: `${Math.min(
+                          (usageBudget.used / usageBudget.limit) * 100,
+                          100
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 使用分解 */}
+        <section id="breakdown" className="space-y-3">
+          <CategoryHeader>使用分解</CategoryHeader>
+          <Tabs defaultValue="conversations" className="w-full">
+            <div className="rounded-md border border-border bg-surface-100">
+              <div className="px-5 pt-4 pb-0 border-b border-border">
+                <TabsList
+                  variant="underline"
+                  size="sm"
+                  className="w-full justify-start"
+                >
+                  {breakdownTabs.map((tab) => (
+                    <TabsTrigger
+                      key={tab.id}
+                      value={tab.id}
+                      variant="underline"
+                      className="text-[12px]"
+                    >
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+              <div className="p-5">
+                {breakdownTabs.map((tab) => (
+                  <TabsContent key={tab.id} value={tab.id} className="mt-0">
+                    <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
+                      <div>
+                        <p className="text-[12px] text-foreground-light mb-3">
+                          {tab.description}
+                        </p>
+                        <SimpleBarChart
+                          data={tab.bars.map((item) => ({
+                            ...item,
+                            color: "bg-brand-500",
+                          }))}
+                          height={160}
+                          showValues={false}
+                        />
+                        <div className="mt-4 grid grid-cols-3 gap-3">
+                          {tab.kpis.map((kpi) => (
+                            <div
+                              key={kpi.label}
+                              className="rounded-md bg-surface-75 px-3 py-2"
+                            >
+                              <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                                {kpi.label}
+                              </p>
+                              <div className="flex items-center justify-between mt-0.5">
+                                <span className="text-sm font-medium text-foreground tabular-nums">
+                                  {kpi.value}
+                                </span>
+                                <span
+                                  className={cn(
+                                    "text-[10px] tabular-nums",
+                                    kpi.change >= 0
+                                      ? "text-brand-500"
+                                      : "text-destructive"
+                                  )}
+                                >
+                                  {kpi.change >= 0 ? "+" : ""}
+                                  {kpi.change}%
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </div>
-        </div>
-      </Tabs>
-
-      {/* 功能使用与每日统计 */}
-      <div className="page-grid lg:grid-cols-2">
-        <div className="page-panel">
-          <div className="page-panel-header">
-            <p className="page-panel-title flex items-center gap-2">
-              <Target className="w-4 h-4 text-foreground-light" />
-              功能使用排名
-            </p>
-            <p className="page-panel-description">
-              最近 {selectedRange?.label} 的使用热度
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="flex items-center justify-between pb-3 border-b border-border text-table-header">
-              <span>功能</span>
-              <span>使用次数</span>
-              <span>变化</span>
+                      <div className="space-y-2">
+                        <p className="text-[11px] text-foreground-muted uppercase tracking-wide mb-2">
+                          细分占比
+                        </p>
+                        {tab.segments.map((segment) => (
+                          <div
+                            key={segment.label}
+                            className="rounded-md bg-surface-75 px-3 py-2"
+                          >
+                            <div className="flex items-center justify-between text-[12px] text-foreground-light mb-1.5">
+                              <span>{segment.label}</span>
+                              <span className="tabular-nums">{segment.value}%</span>
+                            </div>
+                            <div className="h-1 rounded-full bg-surface-300 overflow-hidden">
+                              <div
+                                className="h-full bg-brand-500"
+                                style={{ width: `${segment.value}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+                ))}
+              </div>
             </div>
-            <div className="divide-y divide-border">
-              {featureUsage.map((feature, index) => (
-                <div
-                  key={feature.name}
-                  className="flex items-center gap-4 py-3"
-                >
-                  <span className="w-6 text-xs text-foreground-muted text-center">
-                    {index + 1}
-                  </span>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-foreground">
-                        {feature.name}
-                      </span>
-                      <span className="text-xs text-foreground-light tabular-nums">
-                        {feature.usage.toLocaleString()} 次
-                      </span>
-                    </div>
-                    <div className="h-1.5 bg-surface-300 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-brand-500 rounded-full"
-                        style={{
-                          width: `${(feature.usage / featureUsage[0].usage) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <Badge
-                    variant={feature.change >= 0 ? "success" : "error"}
-                    size="sm"
-                    className="text-[11px] tabular-nums"
+          </Tabs>
+        </section>
+
+        {/* 功能排名与每日统计 */}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* 功能排名 */}
+          <section id="features" className="space-y-3">
+            <CategoryHeader>功能排名</CategoryHeader>
+            <div className="rounded-md border border-border bg-surface-100">
+              <div className="px-4 py-2.5 border-b border-border flex items-center justify-between text-[11px] text-foreground-muted uppercase tracking-wide">
+                <span>功能</span>
+                <span>变化</span>
+              </div>
+              <div className="divide-y divide-border">
+                {featureUsage.map((feature, index) => (
+                  <div
+                    key={feature.name}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-surface-100/60 transition-colors"
                   >
-                    {feature.change >= 0 ? "+" : ""}
-                    {feature.change}%
-                  </Badge>
-                </div>
-              ))}
+                    <span className="w-5 text-[11px] text-foreground-muted text-center tabular-nums">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[12px] font-medium text-foreground truncate">
+                          {feature.name}
+                        </span>
+                        <span className="text-[11px] text-foreground-light tabular-nums ml-2">
+                          {feature.usage.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="h-1 bg-surface-300 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-brand-500 rounded-full"
+                          style={{
+                            width: `${(feature.usage / featureUsage[0].usage) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <span
+                      className={cn(
+                        "text-[11px] tabular-nums",
+                        feature.change >= 0
+                          ? "text-brand-500"
+                          : "text-destructive"
+                      )}
+                    >
+                      {feature.change >= 0 ? "+" : ""}
+                      {feature.change}%
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <div className="page-panel">
-          <div className="page-panel-header">
-            <p className="page-panel-title flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-foreground-light" />
-              每日使用统计
-            </p>
-            <p className="page-panel-description">过去一周的使用密度</p>
-          </div>
-          <div className="p-6">
-            <SimpleBarChart
-              data={dailyUsage.map((item) => ({
-                label: item.day,
-                value: item.conversations,
-                color: "bg-brand-500",
-              }))}
-              height={220}
-              showValues={false}
-            />
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">日均对话</p>
-                <p className="text-sm font-medium text-foreground tabular-nums">
-                  {avgConversations}
-                </p>
+          {/* 每日统计 */}
+          <section id="daily" className="space-y-3">
+            <CategoryHeader>每日统计</CategoryHeader>
+            <div className="rounded-md border border-border bg-surface-100 p-5">
+              <SimpleBarChart
+                data={dailyUsage.map((item) => ({
+                  label: item.day,
+                  value: item.conversations,
+                  color: "bg-brand-500",
+                }))}
+                height={180}
+                showValues={false}
+              />
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="rounded-md bg-surface-75 px-3 py-2">
+                  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                    日均对话
+                  </p>
+                  <p className="text-sm font-medium text-foreground tabular-nums">
+                    {avgConversations}
+                  </p>
+                </div>
+                <div className="rounded-md bg-surface-75 px-3 py-2">
+                  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                    日均工作流
+                  </p>
+                  <p className="text-sm font-medium text-foreground tabular-nums">
+                    {avgWorkflows}
+                  </p>
+                </div>
+                <div className="rounded-md bg-surface-75 px-3 py-2">
+                  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                    峰值日
+                  </p>
+                  <p className="text-sm font-medium text-foreground tabular-nums">
+                    {peakDay.day}
+                  </p>
+                </div>
               </div>
-              <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">日均工作流</p>
-                <p className="text-sm font-medium text-foreground tabular-nums">
-                  {avgWorkflows}
-                </p>
-              </div>
-              <div className="rounded-md bg-surface-75 px-3 py-2">
-                <p className="page-caption">峰值日</p>
-                <p className="text-sm font-medium text-foreground tabular-nums">
-                  {peakDay.day} · {peakDay.conversations}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 rounded-md border border-border/70 bg-surface-75 px-3 py-3">
-              <div className="flex items-center justify-between text-xs text-foreground-muted">
-                <span>对话 / 工作流</span>
-                <span className="tabular-nums">
-                  {totalConversations.toLocaleString()} /{" "}
-                  {totalWorkflows.toLocaleString()}
-                </span>
-              </div>
-              <div className="mt-2">
+              <div className="mt-4 pt-3 border-t border-border">
                 <ComparisonBar
                   value1={totalConversations}
                   value2={totalWorkflows}
@@ -863,115 +804,79 @@ export default function AnalyticsPage() {
                 />
               </div>
             </div>
-          </div>
+          </section>
         </div>
-      </div>
 
-      {/* 最近活动 */}
-      <div className="page-panel">
-        <div className="page-panel-header">
-          <p className="page-panel-title flex items-center gap-2">
-            <Clock className="w-4 h-4 text-warning" />
-            最近活动
-          </p>
-          <p className="page-panel-description">最近 2 小时内的高频动作</p>
-        </div>
-        <div className="px-6 pt-3 pb-2 flex items-center justify-between border-b border-border text-table-header">
-          <span>活动</span>
-          <span>消耗</span>
-        </div>
-        <div className="divide-y divide-border">
-          {recentActivities.map((activity, index) => {
-            const activityStyle = activityStyles[activity.type];
-            const ActivityIcon = activityStyle.icon;
-
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-between px-6 py-4 hover:bg-surface-75 transition-supabase"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "h-9 w-9 rounded-md flex items-center justify-center",
-                      activityStyle.bg
-                    )}
-                  >
-                    <ActivityIcon
-                      className={cn("w-4 h-4", activityStyle.iconColor)}
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-foreground">
+        {/* 最近活动 */}
+        <section id="activities" className="space-y-3">
+          <CategoryHeader>最近活动</CategoryHeader>
+          <div className="rounded-md border border-border bg-surface-100">
+            <div className="px-4 py-2.5 border-b border-border flex items-center justify-between text-[11px] text-foreground-muted uppercase tracking-wide">
+              <span>活动</span>
+              <span>Token 消耗</span>
+            </div>
+            <div className="divide-y divide-border">
+              {recentActivities.map((activity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-surface-100/60 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-1 h-8 rounded-full bg-brand-500/60" />
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-medium text-foreground truncate">
                         {activity.title}
                       </p>
-                      <Badge
-                        variant={activityStyle.badgeVariant}
-                        size="xs"
-                        className="text-[10px]"
-                      >
-                        {activityStyle.label}
-                      </Badge>
+                      <p className="text-[11px] text-foreground-muted">
+                        {activityTypeLabels[activity.type]} · {activity.time}
+                      </p>
                     </div>
-                    <p className="text-xs text-foreground-muted">
-                      {activity.time}
-                    </p>
                   </div>
+                  <span className="text-[12px] text-foreground-light tabular-nums flex items-center gap-1">
+                    <Coins className="w-3 h-3" />
+                    {activity.tokens.toLocaleString()}
+                  </span>
                 </div>
-                <Badge
-                  variant="secondary"
-                  size="sm"
-                  className="text-[11px] tabular-nums"
-                >
-                  <Coins className="w-3 h-3" />
-                  {activity.tokens.toLocaleString()} tokens
-                </Badge>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      {/* 使用建议 */}
-      <div className="page-panel border-brand-400/30 bg-brand-200/40">
-        <div className="page-panel-header border-b border-brand-400/20 bg-transparent">
-          <p className="page-panel-title flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-brand-500" />
-            使用优化建议
-          </p>
-          <p className="page-panel-description">
-            基于您的使用模式，我们发现以下优化机会
-          </p>
-        </div>
-        <div className="p-6">
-          <div className="page-grid md:grid-cols-3">
-            {optimizationTips.map((tip) => (
-              <div
-                key={tip.title}
-                className="rounded-md border border-border/70 bg-surface-100/60 p-4"
+        {/* 优化建议 */}
+        <section id="tips" className="space-y-3">
+          <CategoryHeader>优化建议</CategoryHeader>
+          <div className="rounded-md border border-border bg-surface-100 p-5">
+            <div className="grid md:grid-cols-3 gap-4">
+              {optimizationTips.map((tip) => (
+                <div
+                  key={tip.title}
+                  className="rounded-md border border-border/70 bg-surface-75 p-4"
+                >
+                  <p className="text-[11px] text-foreground-muted uppercase tracking-wide mb-2">
+                    {tip.impact}
+                  </p>
+                  <p className="text-[13px] font-medium text-foreground mb-1">
+                    {tip.title}
+                  </p>
+                  <p className="text-[12px] text-foreground-light">
+                    {tip.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center justify-between text-[12px] text-foreground-light pt-4 border-t border-border">
+              <span>预计可节省 15% - 25% 成本</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-[12px] border-brand-500/50 text-brand-500 hover:bg-brand-500/10"
               >
-                <p className="text-xs text-foreground-muted mb-2">
-                  {tip.impact}
-                </p>
-                <p className="text-sm font-medium text-foreground mb-1">
-                  {tip.title}
-                </p>
-                <p className="text-xs text-foreground-light">
-                  {tip.description}
-                </p>
-              </div>
-            ))}
+                查看详细建议
+              </Button>
+            </div>
           </div>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-foreground-light">
-            <span>预计可节省 15% - 25% 成本</span>
-            <Button variant="outline-primary" size="sm">
-              查看详细建议
-            </Button>
-          </div>
-        </div>
+        </section>
       </div>
-      </div>
-    </PageContainer>
+    </PageWithSidebar>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 对话历史/消息中心页面 - Supabase 风格重构
- * 移除内部 sidebar，采用顶部筛选和标签页设计
+ * 对话历史/消息中心页面 - Supabase 风格 + 极简文本侧边栏
+ * 采用 PageWithSidebar 三栏布局
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
@@ -12,7 +12,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
+import {
+  PageWithSidebar,
+  PageHeader,
+  SidebarNavGroup,
+  SidebarNavItem,
+  EmptyState,
+} from "@/components/dashboard/page-layout";
 import {
   MessageSquare,
   Search,
@@ -29,28 +35,19 @@ import {
   Edit3,
   Copy,
   Check,
-  Loader2,
   Brain,
-  Sparkles,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  Settings,
   LayoutGrid,
   LayoutList,
-  Calendar,
-  Filter,
   SortAsc,
   SortDesc,
   ChevronDown,
-  Zap,
-  Hash,
   Folder,
   FolderPlus,
   MessageCircle,
   Bot,
-  ArrowUpRight,
-  Layers,
   X,
   Upload,
 } from "lucide-react";
@@ -78,18 +75,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { conversationApi, conversationFolderApi } from "@/lib/api";
 import {
   ConversationFolderManageDialog,
@@ -104,14 +89,6 @@ import type {
 import { formatRelativeTime } from "@/types/conversation";
 import { toast } from "sonner";
 
-// 筛选选项
-const filterTabs = [
-  { id: "all", label: "全部", icon: Layers },
-  { id: "starred", label: "收藏", icon: Star },
-  { id: "pinned", label: "置顶", icon: Pin },
-  { id: "archived", label: "归档", icon: Archive },
-];
-
 // 排序选项
 const sortOptions = [
   { id: "updated", label: "最近更新", desc: true },
@@ -120,28 +97,8 @@ const sortOptions = [
   { id: "messages", label: "消息数", desc: true },
 ];
 
-// 视图类型
-type ViewType = "list" | "grid" | "timeline";
-
-// 模型图标映射
-const MODEL_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  "gpt-4": Brain,
-  "gpt-4-turbo": Brain,
-  "gpt-3.5-turbo": Brain,
-  "claude-3-opus": Sparkles,
-  "claude-3-sonnet": Sparkles,
-  "claude-3-haiku": Sparkles,
-};
-
-// 模型颜色映射 - Supabase 风格
-const MODEL_COLOR_MAP: Record<string, string> = {
-  "gpt-4": "bg-brand-500",
-  "gpt-4-turbo": "bg-brand-600",
-  "gpt-3.5-turbo": "bg-surface-300",
-  "claude-3-opus": "bg-surface-300",
-  "claude-3-sonnet": "bg-surface-300",
-  "claude-3-haiku": "bg-surface-300",
-};
+// 视图类型 - 移除 timeline
+type ViewType = "list" | "grid";
 
 // 骨架屏组件
 function ConversationSkeleton({ view }: { view: ViewType }) {
@@ -184,46 +141,7 @@ function ConversationSkeleton({ view }: { view: ViewType }) {
   );
 }
 
-// 对话预览卡片
-function ConversationPreview({ conversation }: { conversation: Conversation }) {
-  return (
-    <div className="w-80 p-4">
-      <div className="flex items-start gap-3 mb-3">
-        <div className={cn(
-          "w-10 h-10 rounded-lg flex items-center justify-center border border-border",
-          MODEL_COLOR_MAP[conversation.model] || "bg-surface-200"
-        )}>
-          <Bot className="w-5 h-5 text-background" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-foreground truncate">{conversation.title}</h4>
-          <p className="text-xs text-foreground-light font-mono">
-            {conversation.model} · {formatRelativeTime(conversation.updatedAt)}
-          </p>
-        </div>
-      </div>
-      
-      <div className="space-y-2 mb-3">
-        <p className="text-sm text-foreground-light line-clamp-3">
-          {conversation.preview || "暂无消息预览"}
-        </p>
-      </div>
-      
-      <div className="flex items-center justify-between text-xs text-foreground-muted border-t border-border pt-3">
-        <span className="flex items-center gap-1">
-          <MessageCircle className="w-3 h-3" />
-          {conversation.messageCount} 条消息
-        </span>
-        <span className="flex items-center gap-1">
-          <Zap className="w-3 h-3" />
-          {conversation.tokenUsage || 0} tokens
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// 对话卡片组件
+// 简化的对话卡片组件
 interface ConversationCardProps {
   conversation: Conversation;
   viewType: ViewType;
@@ -263,351 +181,291 @@ function ConversationCard({
   onDelete,
   onClick,
 }: ConversationCardProps) {
-  const ModelIcon = MODEL_ICON_MAP[conversation.model] || Brain;
-  const modelColor = MODEL_COLOR_MAP[conversation.model] || "bg-surface-200";
-
   // 网格视图
   if (viewType === "grid") {
     return (
-      <HoverCard>
-        <HoverCardTrigger asChild>
-          <div
-            className={cn(
-              "group relative p-4 rounded-lg cursor-pointer transition-all duration-200",
-              "bg-surface-100 border hover:bg-surface-75",
-              isSelected
-                ? "border-brand-500 ring-1 ring-brand-500/20"
-                : "border-border hover:border-border-strong",
-              isOperating && "opacity-60 pointer-events-none"
-            )}
-            onClick={() => isSelectionMode ? onSelect(conversation.id) : onClick(conversation.id)}
+      <div
+        className={cn(
+          "group relative p-4 rounded-lg cursor-pointer transition-colors duration-150",
+          "bg-surface-100 border hover:bg-surface-75",
+          isSelected
+            ? "border-brand-500 ring-1 ring-brand-500/20"
+            : "border-border hover:border-border-strong",
+          isOperating && "opacity-60 pointer-events-none"
+        )}
+        onClick={() => isSelectionMode ? onSelect(conversation.id) : onClick(conversation.id)}
+      >
+        {/* 选择复选框 */}
+        {isSelectionMode && (
+          <div 
+            className="absolute top-3 left-3 z-10"
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* 选择复选框 */}
-            {isSelectionMode && (
-              <div 
-                className="absolute top-3 left-3 z-10"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={() => onSelect(conversation.id)}
-                />
-              </div>
-            )}
-
-            {/* 状态指示器 */}
-            <div className="absolute top-3 right-3 flex items-center gap-1">
-              {conversation.pinned && (
-                <div className="p-1.5 rounded-md bg-brand-500/15 border border-brand-500/30">
-                  <Pin className="w-3 h-3 text-brand-500 fill-brand-500" />
-                </div>
-              )}
-              {conversation.starred && (
-                <div className="p-1.5 rounded-md bg-warning-200/40 border border-warning/30">
-                  <Star className="w-3 h-3 text-warning fill-warning" />
-                </div>
-              )}
-            </div>
-
-            {/* 模型图标 */}
-            <div className={cn(
-              "w-12 h-12 rounded-lg flex items-center justify-center mb-3 border border-border",
-              modelColor
-            )}>
-              <ModelIcon className="w-6 h-6 text-background" />
-            </div>
-
-            {/* 标题 */}
-            <h3 className="text-[14px] font-semibold text-foreground truncate mb-1 pr-8">
-              <HighlightText text={conversation.title} search={searchQuery} />
-            </h3>
-
-            {/* 预览 */}
-            <p className="text-[13px] text-foreground-light line-clamp-2 mb-3 min-h-[36px]">
-              {conversation.preview ? (
-                <HighlightText text={conversation.preview} search={searchQuery} />
-              ) : (
-                "暂无消息预览"
-              )}
-            </p>
-
-            {/* 元信息 */}
-            <div className="flex items-center justify-between text-xs text-foreground-muted">
-              <span className="flex items-center gap-1">
-                <MessageCircle className="w-3 h-3" />
-                {conversation.messageCount}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {formatRelativeTime(conversation.updatedAt)}
-              </span>
-            </div>
-
-            {/* 模型标签 */}
-            <div className="mt-3 pt-3 border-t border-border">
-              <Badge variant="secondary" className="text-[11px] bg-surface-200 text-foreground-light border border-border">
-                {conversation.model}
-              </Badge>
-            </div>
-
-            {/* 悬停操作按钮 */}
-            {!isSelectionMode && (
-              <div 
-                className="absolute bottom-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        className="p-2 rounded-md bg-surface-100 border border-border hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
-                        onClick={() => onToggleStar(conversation.id, conversation.starred)}
-                      >
-                        <Star className={cn("w-3.5 h-3.5", conversation.starred && "text-warning fill-warning")} />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>{conversation.starred ? "取消收藏" : "收藏"}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 rounded-md bg-surface-100 border border-border hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
-                      <MoreHorizontal className="w-3.5 h-3.5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-surface-100 border border-border rounded-lg">
-                    <DropdownMenuItem onClick={() => onRename(conversation)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      重命名
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Copy className="w-4 h-4 mr-2" />
-                      复制
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <FolderOpen className="w-4 h-4 mr-2" />
-                      移动到文件夹
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Download className="w-4 h-4 mr-2" />
-                      导出 JSON
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <DropdownMenuItem onClick={() => onArchive(conversation.id)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Archive className="w-4 h-4 mr-2" />
-                      归档
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive hover:bg-destructive-200" onClick={() => onDelete(conversation.id)}>
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      删除
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelect(conversation.id)}
+            />
           </div>
-        </HoverCardTrigger>
-        <HoverCardContent side="right" className="w-80 p-0 bg-surface-100 border border-border rounded-lg">
-          <ConversationPreview conversation={conversation} />
-        </HoverCardContent>
-      </HoverCard>
+        )}
+
+        {/* 状态指示器 */}
+        <div className="absolute top-3 right-3 flex items-center gap-1">
+          {conversation.pinned && (
+            <Pin className="w-3 h-3 text-brand-500 fill-brand-500" />
+          )}
+          {conversation.starred && (
+            <Star className="w-3 h-3 text-warning fill-warning" />
+          )}
+        </div>
+
+        {/* 模型图标 - 统一使用 surface 背景 */}
+        <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center mb-3">
+          <Bot className="w-5 h-5 text-foreground-light" />
+        </div>
+
+        {/* 标题 */}
+        <h3 className="text-[13px] font-medium text-foreground truncate mb-1 pr-8">
+          <HighlightText text={conversation.title} search={searchQuery} />
+        </h3>
+
+        {/* 预览 */}
+        <p className="text-[12px] text-foreground-light line-clamp-2 mb-3 min-h-[32px]">
+          {conversation.preview ? (
+            <HighlightText text={conversation.preview} search={searchQuery} />
+          ) : (
+            "暂无消息预览"
+          )}
+        </p>
+
+        {/* 元信息 */}
+        <div className="flex items-center justify-between text-[11px] text-foreground-muted">
+          <span className="flex items-center gap-1">
+            <MessageCircle className="w-3 h-3" />
+            {conversation.messageCount}
+          </span>
+          <span>{formatRelativeTime(conversation.updatedAt)}</span>
+        </div>
+
+        {/* 模型标签 */}
+        <div className="mt-3 pt-3 border-t border-border">
+          <Badge variant="secondary" className="text-[10px] bg-surface-200 text-foreground-muted border-0">
+            {conversation.model}
+          </Badge>
+        </div>
+
+        {/* 悬停操作按钮 */}
+        {!isSelectionMode && (
+          <div 
+            className="absolute bottom-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+              onClick={() => onToggleStar(conversation.id, conversation.starred)}
+            >
+              <Star className={cn("w-3.5 h-3.5", conversation.starred && "text-warning fill-warning")} />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
+                <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
+                  <Edit3 className="w-3.5 h-3.5 mr-2" />
+                  重命名
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
+                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  复制
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
+                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  移动到文件夹
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-[12px]">
+                  <Download className="w-3.5 h-3.5 mr-2" />
+                  导出
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem onClick={() => onArchive(conversation.id)} className="text-[12px]">
+                  <Archive className="w-3.5 h-3.5 mr-2" />
+                  归档
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-[12px] text-destructive" onClick={() => onDelete(conversation.id)}>
+                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  删除
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
     );
   }
 
-  // 列表视图
+  // 列表视图 - 简化样式
   return (
-    <HoverCard openDelay={500}>
-      <HoverCardTrigger asChild>
-        <div
-          className={cn(
-            "group relative p-4 rounded-lg cursor-pointer transition-all duration-200",
-            "bg-surface-100 border hover:bg-surface-75",
-            isSelected
-              ? "border-brand-500 ring-1 ring-brand-500/20"
-              : "border-border hover:border-border-strong",
-            isOperating && "opacity-60 pointer-events-none"
-          )}
-          onClick={() => isSelectionMode ? onSelect(conversation.id) : onClick(conversation.id)}
-        >
-          <div className="flex items-start gap-4">
-            {/* 选择框 */}
-            {isSelectionMode && (
-              <div className="pt-1" onClick={(e) => e.stopPropagation()}>
-                <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={() => onSelect(conversation.id)}
-                />
-              </div>
+    <div
+      className={cn(
+        "group p-4 rounded-lg cursor-pointer transition-colors duration-150",
+        "bg-surface-100 border hover:bg-surface-75",
+        isSelected
+          ? "border-brand-500 ring-1 ring-brand-500/20"
+          : "border-border hover:border-border-strong",
+        isOperating && "opacity-60 pointer-events-none"
+      )}
+      onClick={() => isSelectionMode ? onSelect(conversation.id) : onClick(conversation.id)}
+    >
+      <div className="flex items-start gap-4">
+        {/* 选择框 */}
+        {isSelectionMode && (
+          <div className="pt-1" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelect(conversation.id)}
+            />
+          </div>
+        )}
+
+        {/* AI 头像 - 简化 */}
+        <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center shrink-0">
+          <Bot className="w-5 h-5 text-foreground-light" />
+        </div>
+
+        {/* 内容 */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            {conversation.pinned && (
+              <Pin className="w-3 h-3 text-brand-500 fill-brand-500" />
             )}
-
-            {/* AI 头像 */}
-            <div className={cn(
-              "w-11 h-11 rounded-lg flex items-center justify-center shrink-0 border border-border",
-              modelColor
-            )}>
-              <ModelIcon className="w-5 h-5 text-background" />
-            </div>
-
-            {/* 内容 */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1.5">
-                {conversation.pinned && (
-                  <div className="p-1 rounded-sm bg-brand-500/15 border border-brand-500/30">
-                    <Pin className="w-3 h-3 text-brand-500 fill-brand-500" />
-                  </div>
-                )}
-                {conversation.starred && (
-                  <div className="p-1 rounded-sm bg-warning-200/40 border border-warning/30">
-                    <Star className="w-3 h-3 text-warning fill-warning" />
-                  </div>
-                )}
-                <span className="font-medium text-foreground truncate">
-                  <HighlightText text={conversation.title} search={searchQuery} />
-                </span>
-                <Badge variant="secondary" className="text-[11px] shrink-0 bg-surface-200 text-foreground-light border border-border">
-                  {conversation.model}
-                </Badge>
-              </div>
-
-              <p className="text-[13px] text-foreground-light line-clamp-1 mb-2">
-                {conversation.preview ? (
-                  <HighlightText text={conversation.preview} search={searchQuery} />
-                ) : (
-                  <span className="italic">暂无消息预览</span>
-                )}
-              </p>
-
-              <div className="flex items-center gap-4 text-xs text-foreground-muted">
-                <span className="flex items-center gap-1.5">
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  {conversation.messageCount} 条消息
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  {formatRelativeTime(conversation.updatedAt)}
-                </span>
-                {conversation.tokenUsage && (
-                  <span className="flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5" />
-                    {conversation.tokenUsage} tokens
-                  </span>
-                )}
-              </div>
-
-              {/* 标签 */}
-              {conversation.tags && conversation.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {conversation.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 rounded-md bg-surface-200 border border-border text-[11px] text-foreground-muted font-mono"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                  {conversation.tags.length > 3 && (
-                    <span className="text-xs text-foreground-muted">
-                      +{conversation.tags.length - 3}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 操作按钮 */}
-            {!isSelectionMode && (
-              <div
-                className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
-                        onClick={() => onToggleStar(conversation.id, conversation.starred)}
-                      >
-                        <Star className={cn("w-4 h-4", conversation.starred && "text-warning fill-warning")} />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>{conversation.starred ? "取消收藏" : "收藏"}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
-                        onClick={() => onTogglePin(conversation.id, conversation.pinned)}
-                      >
-                        <Pin className={cn("w-4 h-4", conversation.pinned && "text-brand-500 fill-brand-500")} />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>{conversation.pinned ? "取消置顶" : "置顶"}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-surface-100 border border-border rounded-lg">
-                    <DropdownMenuItem onClick={() => onRename(conversation)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      重命名
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Copy className="w-4 h-4 mr-2" />
-                      复制
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <FolderOpen className="w-4 h-4 mr-2" />
-                      移动到文件夹
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onShare(conversation.id)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Share2 className="w-4 h-4 mr-2" />
-                      分享
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Download className="w-4 h-4 mr-2" />
-                      导出 JSON
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onExport(conversation.id, "markdown")} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Download className="w-4 h-4 mr-2" />
-                      导出 Markdown
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <DropdownMenuItem onClick={() => onArchive(conversation.id)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Archive className="w-4 h-4 mr-2" />
-                      归档
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive hover:bg-destructive-200" onClick={() => onDelete(conversation.id)}>
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      删除
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+            {conversation.starred && (
+              <Star className="w-3 h-3 text-warning fill-warning" />
             )}
+            <span className="font-medium text-[13px] text-foreground truncate">
+              <HighlightText text={conversation.title} search={searchQuery} />
+            </span>
+            <Badge variant="secondary" className="text-[10px] shrink-0 bg-surface-200 text-foreground-muted border-0">
+              {conversation.model}
+            </Badge>
+          </div>
 
-            {/* 快速进入箭头 */}
-            {!isSelectionMode && (
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowUpRight className="w-4 h-4 text-foreground-muted group-hover:text-brand-500 transition-colors" />
-              </div>
+          <p className="text-[12px] text-foreground-light line-clamp-1 mb-2">
+            {conversation.preview ? (
+              <HighlightText text={conversation.preview} search={searchQuery} />
+            ) : (
+              <span className="italic">暂无消息预览</span>
             )}
+          </p>
+
+          <div className="flex items-center gap-4 text-[11px] text-foreground-muted">
+            <span className="flex items-center gap-1">
+              <MessageCircle className="w-3 h-3" />
+              {conversation.messageCount} 条消息
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {formatRelativeTime(conversation.updatedAt)}
+            </span>
           </div>
         </div>
-      </HoverCardTrigger>
-      <HoverCardContent side="right" className="w-80 p-0 bg-surface-100 border border-border rounded-lg">
-        <ConversationPreview conversation={conversation} />
-      </HoverCardContent>
-    </HoverCard>
+
+        {/* 操作按钮 - 悬停显示 */}
+        {!isSelectionMode && (
+          <div
+            className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+              onClick={() => onToggleStar(conversation.id, conversation.starred)}
+            >
+              <Star className={cn("w-4 h-4", conversation.starred && "text-warning fill-warning")} />
+            </button>
+            
+            <button
+              className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+              onClick={() => onTogglePin(conversation.id, conversation.pinned)}
+            >
+              <Pin className={cn("w-4 h-4", conversation.pinned && "text-brand-500 fill-brand-500")} />
+            </button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
+                <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
+                  <Edit3 className="w-3.5 h-3.5 mr-2" />
+                  重命名
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
+                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  复制
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
+                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  移动到文件夹
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onShare(conversation.id)} className="text-[12px]">
+                  <Share2 className="w-3.5 h-3.5 mr-2" />
+                  分享
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-[12px]">
+                  <Download className="w-3.5 h-3.5 mr-2" />
+                  导出 JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onExport(conversation.id, "markdown")} className="text-[12px]">
+                  <Download className="w-3.5 h-3.5 mr-2" />
+                  导出 Markdown
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem onClick={() => onArchive(conversation.id)} className="text-[12px]">
+                  <Archive className="w-3.5 h-3.5 mr-2" />
+                  归档
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-[12px] text-destructive" onClick={() => onDelete(conversation.id)}>
+                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  删除
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// 侧边栏筛选项组件 - 遵循极简文本风格
+interface FilterNavItemProps {
+  label: string;
+  count?: number;
+  active: boolean;
+  onClick: () => void;
+}
+
+function FilterNavItem({ label, count, active, onClick }: FilterNavItemProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full h-8 flex items-center justify-between px-3 rounded-md text-[12px] font-medium transition-colors duration-150",
+        active 
+          ? "bg-surface-100/70 text-foreground"
+          : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+      )}
+    >
+      <span>{label}</span>
+      {count !== undefined && count > 0 && (
+        <span className="text-[11px] text-foreground-muted">{count}</span>
+      )}
+    </button>
   );
 }
 
@@ -1014,669 +872,470 @@ export default function ConversationsPage() {
     
     return sorted;
   }, [conversations, sortBy, sortDesc]);
-  
-  // 按日期分组（用于时间线视图）
-  const groupedByDate = useMemo(() => {
-    const groups: Record<string, Conversation[]> = {};
-    
-    sortedConversations.forEach((conv) => {
-      const date = new Date(conv.updatedAt);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      let key: string;
-      if (date.toDateString() === today.toDateString()) {
-        key = "今天";
-      } else if (date.toDateString() === yesterday.toDateString()) {
-        key = "昨天";
-      } else if (date.getTime() > today.getTime() - 7 * 24 * 60 * 60 * 1000) {
-        key = "最近7天";
-      } else if (date.getTime() > today.getTime() - 30 * 24 * 60 * 60 * 1000) {
-        key = "最近30天";
-      } else {
-        key = date.toLocaleDateString("zh-CN", { year: "numeric", month: "long" });
-      }
-      
-      if (!groups[key]) {
-        groups[key] = [];
-      }
-      groups[key].push(conv);
-    });
-    
-    return groups;
-  }, [sortedConversations]);
 
-  // 获取当前文件夹名称
-  const currentFolderName = selectedFolder
-    ? folders.find((f) => f.id === selectedFolder)?.name
-    : null;
+  // 获取筛选标签
+  const getFilterLabel = () => {
+    switch (filter) {
+      case "starred": return "收藏";
+      case "pinned": return "置顶";
+      case "archived": return "归档";
+      default: return "全部对话";
+    }
+  };
+
+  // 侧边栏内容
+  const sidebarContent = (
+    <div className="space-y-6">
+      {/* 筛选导航 */}
+      <SidebarNavGroup title="筛选">
+        <div className="space-y-0.5">
+          <FilterNavItem
+            label="全部对话"
+            count={total}
+            active={filter === "all" && !selectedFolder}
+            onClick={() => {
+              setFilter("all");
+              setSelectedFolder(null);
+              setPage(1);
+            }}
+          />
+          <FilterNavItem
+            label="收藏"
+            active={filter === "starred"}
+            onClick={() => {
+              setFilter("starred");
+              setSelectedFolder(null);
+              setPage(1);
+            }}
+          />
+          <FilterNavItem
+            label="置顶"
+            active={filter === "pinned"}
+            onClick={() => {
+              setFilter("pinned");
+              setSelectedFolder(null);
+              setPage(1);
+            }}
+          />
+          <FilterNavItem
+            label="归档"
+            active={filter === "archived"}
+            onClick={() => {
+              setFilter("archived");
+              setSelectedFolder(null);
+              setPage(1);
+            }}
+          />
+        </div>
+      </SidebarNavGroup>
+
+      {/* 文件夹列表 */}
+      <SidebarNavGroup title="文件夹">
+        <div className="space-y-0.5">
+          {folders.map((folder) => (
+            <FilterNavItem
+              key={folder.id}
+              label={`${folder.icon || "📁"} ${folder.name}`}
+              count={folder.conversationCount}
+              active={selectedFolder === folder.id}
+              onClick={() => {
+                setSelectedFolder(folder.id);
+                setFilter("all");
+                setPage(1);
+              }}
+            />
+          ))}
+          <button
+            onClick={() => setFolderManageOpen(true)}
+            className="w-full h-8 flex items-center gap-2 px-3 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors duration-150"
+          >
+            <FolderPlus className="w-3.5 h-3.5" />
+            管理文件夹
+          </button>
+        </div>
+      </SidebarNavGroup>
+    </div>
+  );
 
   return (
-    <PageContainer fullWidth>
-      <div className="flex flex-col h-full">
-        {/* 页面头部 */}
-        <header className="shrink-0 border-b border-border bg-background-studio/95 backdrop-blur sticky top-0 z-20">
-          <div className="px-6 py-4">
-            {/* 标题行 */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-brand-500" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-foreground">对话中心</h1>
-                  <p className="text-sm text-foreground-light">
-                    {searchQuery
-                      ? `搜索 "${searchQuery}" · 找到 ${total} 个对话`
-                      : `共 ${total} 个对话`}
-                    {currentFolderName && ` · ${currentFolderName}`}
-                  </p>
-                </div>
-              </div>
+    <PageWithSidebar
+      sidebar={sidebarContent}
+      sidebarTitle="对话"
+      sidebarWidth="narrow"
+    >
+      {/* 页面头部 */}
+      <PageHeader
+        title="对话中心"
+        description={
+          searchQuery
+            ? `搜索 "${searchQuery}" · 找到 ${total} 个结果`
+            : `${getFilterLabel()} · 共 ${total} 个对话`
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 border-border text-foreground-light hover:text-foreground"
+              onClick={() => setImportDialogOpen(true)}
+            >
+              <Upload className="w-3.5 h-3.5 mr-1.5" />
+              导入
+            </Button>
+            <Button
+              size="sm"
+              className="h-8 bg-brand-500 hover:bg-brand-600 text-background"
+              onClick={handleCreateConversation}
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              新建对话
+            </Button>
+          </div>
+        }
+      />
 
-              {/* 操作按钮 */}
+      {/* 工具栏 */}
+      <div className="flex items-center gap-3 mb-4">
+        {/* 搜索框 */}
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
+          <Input
+            ref={searchInputRef}
+            type="text"
+            placeholder="搜索对话... (Ctrl+K)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-8 h-8 text-[12px] bg-surface-100 border-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* 视图切换 */}
+        <div className="flex items-center gap-0.5 p-0.5 bg-surface-100 border border-border rounded-md">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setViewType("list")}
+                  className={cn(
+                    "p-1.5 rounded transition-colors",
+                    viewType === "list"
+                      ? "bg-surface-200 text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
+                  )}
+                >
+                  <LayoutList className="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>列表视图</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setViewType("grid")}
+                  className={cn(
+                    "p-1.5 rounded transition-colors",
+                    viewType === "grid"
+                      ? "bg-surface-200 text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
+                  )}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>网格视图</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        {/* 排序 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 border-border text-foreground-light text-[12px]">
+              {sortDesc ? <SortDesc className="w-3.5 h-3.5" /> : <SortAsc className="w-3.5 h-3.5" />}
+              {sortOptions.find((s) => s.id === sortBy)?.label}
+              <ChevronDown className="w-3 h-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40 bg-surface-100 border-border">
+            <DropdownMenuLabel className="text-[11px] text-foreground-muted">排序方式</DropdownMenuLabel>
+            {sortOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.id}
+                onClick={() => {
+                  if (sortBy === option.id) {
+                    setSortDesc(!sortDesc);
+                  } else {
+                    setSortBy(option.id);
+                    setSortDesc(option.desc);
+                  }
+                }}
+                className="text-[12px]"
+              >
+                <span className="flex-1">{option.label}</span>
+                {sortBy === option.id && (
+                  sortDesc ? <SortDesc className="w-3.5 h-3.5" /> : <SortAsc className="w-3.5 h-3.5" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* 更多操作 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="h-8 w-8 border-border text-foreground-light">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40 bg-surface-100 border-border">
+            <DropdownMenuItem
+              onClick={() => setIsSelectionMode(true)}
+              className="text-[12px]"
+            >
+              <Check className="w-3.5 h-3.5 mr-2" />
+              批量选择
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => fetchConversations()}
+              className="text-[12px]"
+            >
+              <RefreshCw className="w-3.5 h-3.5 mr-2" />
+              刷新列表
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* 批量选择工具栏 */}
+      {isSelectionMode && (
+        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-surface-100 border border-border">
+          <Checkbox
+            checked={selectedConversations.size === conversations.length && conversations.length > 0}
+            onCheckedChange={toggleSelectAll}
+          />
+          <span className="text-[12px] text-foreground">
+            已选择 <span className="font-medium text-brand-500">{selectedConversations.size}</span> 项
+          </span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => handleBatchStar(true)}
+              disabled={selectedConversations.size === 0}
+            >
+              <Star className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={openBatchMoveToFolder}
+              disabled={selectedConversations.size === 0}
+            >
+              <FolderOpen className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleBatchArchive}
+              disabled={selectedConversations.size === 0}
+            >
+              <Archive className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive"
+              onClick={handleBatchDelete}
+              disabled={selectedConversations.size === 0}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-[12px] border-border"
+            onClick={() => {
+              setIsSelectionMode(false);
+              setSelectedConversations(new Set());
+            }}
+          >
+            取消
+          </Button>
+        </div>
+      )}
+
+      {/* 主内容区 */}
+      {loading ? (
+        // 骨架屏加载
+        <div className={cn(
+          viewType === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            : "space-y-2"
+        )}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ConversationSkeleton key={i} view={viewType} />
+          ))}
+        </div>
+      ) : error ? (
+        // 错误状态
+        <EmptyState
+          icon={<X className="w-6 h-6 text-destructive" />}
+          title="加载失败"
+          description={error}
+          action={{
+            label: "重新加载",
+            onClick: () => fetchConversations(),
+          }}
+        />
+      ) : sortedConversations.length === 0 ? (
+        // 空状态
+        <EmptyState
+          icon={<MessageSquare className="w-6 h-6" />}
+          title={searchQuery ? "没有找到匹配的对话" : "开始你的第一次对话"}
+          description={
+            searchQuery
+              ? `未找到包含 "${searchQuery}" 的对话`
+              : "与 AI 助手展开对话，探索无限可能"
+          }
+          action={{
+            label: searchQuery ? "清除搜索" : "开始新对话",
+            onClick: searchQuery ? () => setSearchQuery("") : handleCreateConversation,
+          }}
+        />
+      ) : (
+        <>
+          {/* 对话列表 */}
+          {viewType === "grid" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {sortedConversations.map((conversation) => (
+                <ConversationCard
+                  key={conversation.id}
+                  conversation={conversation}
+                  viewType="grid"
+                  isSelected={selectedConversations.has(conversation.id)}
+                  isSelectionMode={isSelectionMode}
+                  isOperating={operationLoading === conversation.id}
+                  searchQuery={searchQuery}
+                  onSelect={toggleSelect}
+                  onToggleStar={handleToggleStar}
+                  onTogglePin={handleTogglePin}
+                  onRename={openRenameDialog}
+                  onDuplicate={handleDuplicate}
+                  onMoveToFolder={openMoveToFolder}
+                  onShare={handleShare}
+                  onExport={handleExport}
+                  onArchive={handleArchive}
+                  onDelete={handleDelete}
+                  onClick={(id) => router.push(`/chat/${id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {sortedConversations.map((conversation) => (
+                <ConversationCard
+                  key={conversation.id}
+                  conversation={conversation}
+                  viewType="list"
+                  isSelected={selectedConversations.has(conversation.id)}
+                  isSelectionMode={isSelectionMode}
+                  isOperating={operationLoading === conversation.id}
+                  searchQuery={searchQuery}
+                  onSelect={toggleSelect}
+                  onToggleStar={handleToggleStar}
+                  onTogglePin={handleTogglePin}
+                  onRename={openRenameDialog}
+                  onDuplicate={handleDuplicate}
+                  onMoveToFolder={openMoveToFolder}
+                  onShare={handleShare}
+                  onExport={handleExport}
+                  onArchive={handleArchive}
+                  onDelete={handleDelete}
+                  onClick={(id) => router.push(`/chat/${id}`)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 分页 */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+              <div className="text-[12px] text-foreground-light">
+                共 <span className="font-medium text-foreground">{total}</span> 条对话
+              </div>
               <div className="flex items-center gap-2">
                 <Button
-                  className="bg-brand-500 hover:bg-brand-600 text-background h-9"
-                  onClick={handleCreateConversation}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  新建对话
-                </Button>
-                <Button
                   variant="outline"
-                  className="h-9 border-border text-foreground-light hover:text-foreground"
-                  onClick={() => setImportDialogOpen(true)}
+                  size="sm"
+                  className="h-8 text-[12px] border-border"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1 || loading}
                 >
-                  <Upload className="w-4 h-4 mr-2" />
-                  导入
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                  上一页
                 </Button>
-              </div>
-            </div>
-
-            {/* 搜索和筛选栏 */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* 搜索框 */}
-              <div className="relative flex-1 min-w-[240px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
-                <Input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="搜索对话... (⌘K)"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-8 h-9 bg-surface-100 border-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* 文件夹筛选 */}
-              <Select
-                value={selectedFolder || "all"}
-                onValueChange={(value) => {
-                  setSelectedFolder(value === "all" ? null : value);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[160px] h-9 bg-surface-100 border-border">
-                  <Folder className="w-4 h-4 mr-2 text-foreground-muted" />
-                  <SelectValue placeholder="全部文件夹" />
-                </SelectTrigger>
-                <SelectContent className="bg-surface-100 border-border">
-                  <SelectItem value="all">全部文件夹</SelectItem>
-                  {folders.map((folder) => (
-                    <SelectItem key={folder.id} value={folder.id}>
-                      {folder.icon || "📁"} {folder.name} ({folder.conversationCount})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* 状态筛选标签 */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-surface-100 border border-border">
-                {filterTabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => {
-                        setFilter(tab.id);
-                        setPage(1);
-                      }}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors",
-                        filter === tab.id
-                          ? "bg-surface-200 text-foreground"
-                          : "text-foreground-muted hover:text-foreground hover:bg-surface-75"
-                      )}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 分隔线 */}
-              <div className="w-px h-6 bg-border" />
-
-              {/* 视图切换 */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-surface-100 border border-border">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => setViewType("list")}
-                        className={cn(
-                          "p-1.5 rounded-md transition-colors",
-                          viewType === "list"
-                            ? "bg-surface-200 text-foreground"
-                            : "text-foreground-muted hover:text-foreground"
-                        )}
-                      >
-                        <LayoutList className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>列表视图</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => setViewType("grid")}
-                        className={cn(
-                          "p-1.5 rounded-md transition-colors",
-                          viewType === "grid"
-                            ? "bg-surface-200 text-foreground"
-                            : "text-foreground-muted hover:text-foreground"
-                        )}
-                      >
-                        <LayoutGrid className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>网格视图</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => setViewType("timeline")}
-                        className={cn(
-                          "p-1.5 rounded-md transition-colors",
-                          viewType === "timeline"
-                            ? "bg-surface-200 text-foreground"
-                            : "text-foreground-muted hover:text-foreground"
-                        )}
-                      >
-                        <Calendar className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>时间线视图</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              {/* 排序下拉 */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 gap-2 border-border text-foreground-light">
-                    {sortDesc ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />}
-                    {sortOptions.find((s) => s.id === sortBy)?.label}
-                    <ChevronDown className="w-3 h-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
-                  <DropdownMenuLabel className="text-foreground-muted">排序方式</DropdownMenuLabel>
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.id}
-                      onClick={() => {
-                        if (sortBy === option.id) {
-                          setSortDesc(!sortDesc);
-                        } else {
-                          setSortBy(option.id);
-                          setSortDesc(option.desc);
-                        }
-                      }}
-                      className="text-foreground-light hover:text-foreground hover:bg-surface-200"
-                    >
-                      <span className="flex-1">{option.label}</span>
-                      {sortBy === option.id && (
-                        sortDesc ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* 更多操作 */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-9 w-9 border-border text-foreground-light">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
-                  <DropdownMenuItem
-                    onClick={() => setIsSelectionMode(true)}
-                    className="text-foreground-light hover:text-foreground hover:bg-surface-200"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    批量选择
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => fetchConversations()}
-                    className="text-foreground-light hover:text-foreground hover:bg-surface-200"
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    刷新列表
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem
-                    onClick={() => setFolderManageOpen(true)}
-                    className="text-foreground-light hover:text-foreground hover:bg-surface-200"
-                  >
-                    <FolderPlus className="w-4 h-4 mr-2" />
-                    管理文件夹
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* 批量选择工具栏 */}
-            {isSelectionMode && (
-              <div className="flex items-center gap-3 mt-4 p-3 rounded-lg bg-surface-100 border border-border">
-                <Checkbox
-                  checked={selectedConversations.size === conversations.length && conversations.length > 0}
-                  onCheckedChange={toggleSelectAll}
-                />
-                <span className="text-sm text-foreground">
-                  已选择 <span className="font-semibold text-brand-500">{selectedConversations.size}</span> 项
-                </span>
-                <div className="flex-1" />
                 <div className="flex items-center gap-1">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-warning hover:text-warning hover:bg-warning-200/60"
-                          onClick={() => handleBatchStar(true)}
-                          disabled={selectedConversations.size === 0}
-                        >
-                          <Star className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>收藏选中</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-foreground-light hover:text-foreground"
-                          onClick={openBatchMoveToFolder}
-                          disabled={selectedConversations.size === 0}
-                        >
-                          <FolderOpen className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>移动到文件夹</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-foreground-light hover:text-foreground"
-                          onClick={handleBatchArchive}
-                          disabled={selectedConversations.size === 0}
-                        >
-                          <Archive className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>归档选中</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive-200/60"
-                          onClick={handleBatchDelete}
-                          disabled={selectedConversations.size === 0}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>删除选中</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        disabled={loading}
+                        className={cn(
+                          "w-8 h-8 rounded-md text-[12px] font-medium transition-colors",
+                          page === pageNum
+                            ? "bg-brand-500 text-background"
+                            : "text-foreground-muted hover:text-foreground hover:bg-surface-200"
+                        )}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-border text-foreground-light"
-                  onClick={() => {
-                    setIsSelectionMode(false);
-                    setSelectedConversations(new Set());
-                  }}
+                  className="h-8 text-[12px] border-border"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages || loading}
                 >
-                  取消
+                  下一页
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </div>
-            )}
-
-            {/* 当前筛选条件显示 */}
-            {(selectedFolder || searchQuery) && (
-              <div className="flex items-center gap-2 mt-3">
-                {selectedFolder && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-surface-200 text-foreground-light border border-border cursor-pointer hover:bg-surface-300"
-                    onClick={() => setSelectedFolder(null)}
-                  >
-                    <Folder className="w-3 h-3" />
-                    {currentFolderName}
-                    <X className="w-3 h-3" />
-                  </Badge>
-                )}
-                {searchQuery && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-surface-200 text-foreground-light border border-border cursor-pointer hover:bg-surface-300"
-                    onClick={() => setSearchQuery("")}
-                  >
-                    <Search className="w-3 h-3" />
-                    "{searchQuery}"
-                    <X className="w-3 h-3" />
-                  </Badge>
-                )}
-                <button
-                  onClick={() => {
-                    setSelectedFolder(null);
-                    setSearchQuery("");
-                    setFilter("all");
-                  }}
-                  className="text-xs text-foreground-muted hover:text-foreground"
-                >
-                  清除全部
-                </button>
+              <div className="text-[12px] text-foreground-muted">
+                第 <span className="font-medium text-brand-500">{page}</span> / {totalPages} 页
               </div>
-            )}
-          </div>
-        </header>
-
-        {/* 主内容区 */}
-        <main className="flex-1 overflow-auto bg-background-studio">
-          <div className="p-6">
-            {loading ? (
-              // 骨架屏加载
-              <div className={cn(
-                viewType === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                  : "space-y-3"
-              )}>
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <ConversationSkeleton key={i} view={viewType} />
-                ))}
-              </div>
-            ) : error ? (
-              // 错误状态
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-xl bg-destructive-200 border border-destructive/30 flex items-center justify-center mb-4">
-                  <X className="w-8 h-8 text-destructive" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">加载失败</h3>
-                <p className="text-sm text-foreground-light mb-6 max-w-md">{error}</p>
-                <Button onClick={() => fetchConversations()} className="bg-brand-500 hover:bg-brand-600 text-background">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  重新加载
-                </Button>
-              </div>
-            ) : sortedConversations.length === 0 ? (
-              // 空状态
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-xl bg-surface-200 border border-border flex items-center justify-center">
-                    <MessageSquare className="w-10 h-10 text-foreground-muted" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-background" />
-                  </div>
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {searchQuery ? "没有找到匹配的对话" : "开始你的第一次对话"}
-                </h3>
-                <p className="text-sm text-foreground-light mb-6 max-w-md">
-                  {searchQuery
-                    ? `未找到包含 "${searchQuery}" 的对话，尝试其他关键词`
-                    : "与 AI 助手展开对话，探索无限可能"}
-                </p>
-                <div className="flex items-center gap-3">
-                  <Button
-                    className="bg-brand-500 hover:bg-brand-600 text-background"
-                    onClick={handleCreateConversation}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    开始新对话
-                  </Button>
-                  {searchQuery && (
-                    <Button variant="outline" className="border-border" onClick={() => setSearchQuery("")}>
-                      清除搜索
-                    </Button>
-                  )}
-                </div>
-
-                {/* 功能提示卡片 */}
-                {!searchQuery && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-3xl w-full">
-                    <div className="p-4 rounded-lg bg-surface-100 border border-border hover:border-border-strong transition-colors group">
-                      <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center mb-3 group-hover:bg-surface-300">
-                        <Brain className="w-5 h-5 text-foreground-light" />
-                      </div>
-                      <h4 className="font-medium text-foreground mb-1">多模型支持</h4>
-                      <p className="text-sm text-foreground-light">支持 GPT-4、Claude 等主流 AI 模型</p>
-                    </div>
-                    <div className="p-4 rounded-lg bg-surface-100 border border-border hover:border-border-strong transition-colors group">
-                      <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center mb-3 group-hover:bg-surface-300">
-                        <FolderOpen className="w-5 h-5 text-brand-500" />
-                      </div>
-                      <h4 className="font-medium text-foreground mb-1">智能分类</h4>
-                      <p className="text-sm text-foreground-light">使用文件夹整理你的对话</p>
-                    </div>
-                    <div className="p-4 rounded-lg bg-surface-100 border border-border hover:border-border-strong transition-colors group">
-                      <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center mb-3 group-hover:bg-surface-300">
-                        <Download className="w-5 h-5 text-foreground-light" />
-                      </div>
-                      <h4 className="font-medium text-foreground mb-1">导出分享</h4>
-                      <p className="text-sm text-foreground-light">导出为 JSON 或 Markdown 格式</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                {/* 时间线视图 */}
-                {viewType === "timeline" ? (
-                  <div className="space-y-8">
-                    {Object.entries(groupedByDate).map(([dateKey, convs]) => (
-                      <div key={dateKey}>
-                        <div className="flex items-center gap-4 mb-4 sticky top-0 bg-background-studio py-2 z-10">
-                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-100 border border-border">
-                            <Calendar className="w-4 h-4 text-brand-500" />
-                            <span className="text-sm font-semibold text-foreground">{dateKey}</span>
-                            <Badge variant="secondary" className="text-[11px] bg-surface-200 text-foreground-light border border-border">
-                              {convs.length}
-                            </Badge>
-                          </div>
-                          <div className="flex-1 h-px bg-border" />
-                        </div>
-                        <div className="space-y-3 pl-4 border-l-2 border-border">
-                          {convs.map((conversation) => (
-                            <ConversationCard
-                              key={conversation.id}
-                              conversation={conversation}
-                              viewType="list"
-                              isSelected={selectedConversations.has(conversation.id)}
-                              isSelectionMode={isSelectionMode}
-                              isOperating={operationLoading === conversation.id}
-                              searchQuery={searchQuery}
-                              onSelect={toggleSelect}
-                              onToggleStar={handleToggleStar}
-                              onTogglePin={handleTogglePin}
-                              onRename={openRenameDialog}
-                              onDuplicate={handleDuplicate}
-                              onMoveToFolder={openMoveToFolder}
-                              onShare={handleShare}
-                              onExport={handleExport}
-                              onArchive={handleArchive}
-                              onDelete={handleDelete}
-                              onClick={(id) => router.push(`/chat/${id}`)}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : viewType === "grid" ? (
-                  // 网格视图
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {sortedConversations.map((conversation) => (
-                      <ConversationCard
-                        key={conversation.id}
-                        conversation={conversation}
-                        viewType="grid"
-                        isSelected={selectedConversations.has(conversation.id)}
-                        isSelectionMode={isSelectionMode}
-                        isOperating={operationLoading === conversation.id}
-                        searchQuery={searchQuery}
-                        onSelect={toggleSelect}
-                        onToggleStar={handleToggleStar}
-                        onTogglePin={handleTogglePin}
-                        onRename={openRenameDialog}
-                        onDuplicate={handleDuplicate}
-                        onMoveToFolder={openMoveToFolder}
-                        onShare={handleShare}
-                        onExport={handleExport}
-                        onArchive={handleArchive}
-                        onDelete={handleDelete}
-                        onClick={(id) => router.push(`/chat/${id}`)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  // 列表视图
-                  <div className="space-y-2">
-                    {sortedConversations.map((conversation) => (
-                      <ConversationCard
-                        key={conversation.id}
-                        conversation={conversation}
-                        viewType="list"
-                        isSelected={selectedConversations.has(conversation.id)}
-                        isSelectionMode={isSelectionMode}
-                        isOperating={operationLoading === conversation.id}
-                        searchQuery={searchQuery}
-                        onSelect={toggleSelect}
-                        onToggleStar={handleToggleStar}
-                        onTogglePin={handleTogglePin}
-                        onRename={openRenameDialog}
-                        onDuplicate={handleDuplicate}
-                        onMoveToFolder={openMoveToFolder}
-                        onShare={handleShare}
-                        onExport={handleExport}
-                        onArchive={handleArchive}
-                        onDelete={handleDelete}
-                        onClick={(id) => router.push(`/chat/${id}`)}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* 分页 */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
-                    <div className="text-sm text-foreground-light">
-                      共 <span className="font-semibold text-foreground">{total}</span> 条对话
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 border-border"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1 || loading}
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-1" />
-                        上一页
-                      </Button>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          let pageNum: number;
-                          if (totalPages <= 5) {
-                            pageNum = i + 1;
-                          } else if (page <= 3) {
-                            pageNum = i + 1;
-                          } else if (page >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                          } else {
-                            pageNum = page - 2 + i;
-                          }
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => setPage(pageNum)}
-                              disabled={loading}
-                              className={cn(
-                                "w-9 h-9 rounded-lg text-sm font-medium transition-colors",
-                                page === pageNum
-                                  ? "bg-brand-500 text-background"
-                                  : "text-foreground-muted hover:text-foreground hover:bg-surface-200"
-                              )}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 border-border"
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages || loading}
-                      >
-                        下一页
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </div>
-                    <div className="text-sm text-foreground-muted">
-                      第 <span className="font-semibold text-brand-500">{page}</span> / {totalPages} 页
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </main>
-      </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* 文件夹管理对话框 */}
       <ConversationFolderManageDialog
@@ -1706,16 +1365,16 @@ export default function ConversationsPage() {
 
       {/* 重命名对话框 */}
       <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-surface-100 border border-border">
+        <DialogContent className="sm:max-w-[400px] bg-surface-100 border-border">
           <DialogHeader>
-            <DialogTitle className="text-foreground">重命名对话</DialogTitle>
+            <DialogTitle className="text-[14px] text-foreground">重命名对话</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="输入新标题"
-              className="bg-surface-100 border-border focus:ring-brand-500/20"
+              className="h-9 text-[13px] bg-surface-100 border-border focus:ring-brand-500/20"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleRename();
@@ -1726,12 +1385,14 @@ export default function ConversationsPage() {
           <DialogFooter>
             <Button
               variant="outline"
+              size="sm"
               className="border-border text-foreground-light"
               onClick={() => setRenameDialogOpen(false)}
             >
               取消
             </Button>
             <Button
+              size="sm"
               onClick={handleRename}
               className="bg-brand-500 hover:bg-brand-600 text-background"
               disabled={!renameValue.trim() || operationLoading === renameTarget?.id}
@@ -1752,6 +1413,6 @@ export default function ConversationsPage() {
           setImportDialogOpen(false);
         }}
       />
-    </PageContainer>
+    </PageWithSidebar>
   );
 }

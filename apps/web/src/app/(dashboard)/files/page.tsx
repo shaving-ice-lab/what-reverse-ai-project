@@ -1,15 +1,21 @@
 "use client";
 
 /**
- * 文件库/知识库页面 - Supabase 风格
- * 管理上传的文件、知识库和向量数据
+ * 文件库/知识库页面 - 两栏布局
+ * 与 workflows 页面布局样式一致
+ * 左侧：文件夹筛选 + 知识库列表
+ * 右侧：概览 + 文件列表
  */
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { EmptyState, Card } from "@/components/dashboard/supabase-ui";
-import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
-import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/dashboard/supabase-ui";
+import {
+  PageWithSidebar,
+  SidebarNavGroup,
+} from "@/components/dashboard/page-layout";
+import { Button, ButtonGroup } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +33,7 @@ import {
   Search,
   Grid,
   List,
-  MoreHorizontal,
+  MoreVertical,
   File,
   FileText,
   FileImage,
@@ -41,16 +47,16 @@ import {
   Star,
   Database,
   Brain,
-  ChevronDown,
   Check,
   Eye,
   Edit3,
   Link as LinkIcon,
   RefreshCw,
-  Filter,
-  SortAsc,
+  ChevronDown,
   HardDrive,
   FolderPlus,
+  Settings,
+  LayoutGrid,
 } from "lucide-react";
 
 // 文件夹结构
@@ -209,22 +215,6 @@ const getFileIcon = (type: string) => {
   }
 };
 
-// 获取文件颜色
-const getFileColor = (type: string) => {
-  switch (type) {
-    case "document":
-      return "text-brand-500 bg-brand-200/70";
-    case "image":
-      return "text-foreground-light bg-surface-200";
-    case "code":
-      return "text-brand-500 bg-surface-200";
-    case "spreadsheet":
-      return "text-brand-500 bg-surface-200";
-    default:
-      return "text-foreground-muted bg-surface-200";
-  }
-};
-
 // 存储使用情况
 const storageUsage = {
   used: 2.4,
@@ -237,6 +227,121 @@ const storageUsage = {
   ],
 };
 
+// 侧边栏组件
+function FilesSidebar({
+  selectedFolder,
+  setSelectedFolder,
+  showKnowledgeBases,
+  setShowKnowledgeBases,
+}: {
+  selectedFolder: string;
+  setSelectedFolder: (folder: string) => void;
+  showKnowledgeBases: boolean;
+  setShowKnowledgeBases: (show: boolean) => void;
+}) {
+  const storagePercent = Math.min(
+    100,
+    Math.round((storageUsage.used / storageUsage.limit) * 100)
+  );
+
+  return (
+    <div className="space-y-1">
+      {/* 文件夹筛选 */}
+      <SidebarNavGroup title="文件夹">
+        {folders.map((folder) => (
+          <button
+            key={folder.id}
+            onClick={() => setSelectedFolder(folder.id)}
+            className={cn(
+              "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+              selectedFolder === folder.id
+                ? "bg-surface-100/70 text-foreground"
+                : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+            )}
+          >
+            <span className="flex items-center gap-2">
+              {folder.id === "all" ? (
+                <HardDrive className="w-3.5 h-3.5" />
+              ) : (
+                <Folder className="w-3.5 h-3.5" />
+              )}
+              {folder.name}
+            </span>
+            <span className="text-[11px] text-foreground-muted">
+              {folder.count}
+            </span>
+          </button>
+        ))}
+      </SidebarNavGroup>
+
+      {/* 新建文件夹 */}
+      <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors mt-2">
+        <Plus className="w-3.5 h-3.5" />
+        新建文件夹
+      </button>
+
+      {/* 分隔线 */}
+      <div className="h-px bg-border my-3" />
+
+      {/* 知识库 */}
+      <SidebarNavGroup title="知识库">
+        {knowledgeBases.map((kb) => (
+          <button
+            key={kb.id}
+            className="w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium text-foreground-light hover:bg-surface-100/60 hover:text-foreground transition-colors"
+          >
+            <span className="flex items-center gap-2 truncate">
+              <Brain className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{kb.name}</span>
+            </span>
+            {kb.status === "indexing" ? (
+              <RefreshCw className="w-3 h-3 animate-spin text-brand-500 shrink-0" />
+            ) : (
+              <span className="text-[11px] text-foreground-muted shrink-0">
+                {kb.fileCount}
+              </span>
+            )}
+          </button>
+        ))}
+        <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors">
+          <Plus className="w-3.5 h-3.5" />
+          新建知识库
+        </button>
+      </SidebarNavGroup>
+
+      {/* 分隔线 */}
+      <div className="h-px bg-border my-3" />
+
+      {/* 存储使用 */}
+      <div className="px-2 py-2">
+        <div className="flex items-center justify-between text-[11px] mb-2">
+          <span className="text-foreground-muted">存储使用</span>
+          <span className="text-foreground font-medium">
+            {storageUsage.used} / {storageUsage.limit} GB
+          </span>
+        </div>
+        <Progress value={storagePercent} size="sm" />
+        <div className="mt-2 space-y-1">
+          {storageUsage.breakdown.map((item) => (
+            <div
+              key={item.type}
+              className="flex items-center justify-between text-[10px] text-foreground-muted"
+            >
+              <span className="flex items-center gap-1.5">
+                <span className={cn("w-1.5 h-1.5 rounded-full", item.color)} />
+                {item.type}
+              </span>
+              <span>{item.size} GB</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type SortBy = "updated" | "name" | "size";
+
 export default function FilesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("all");
@@ -245,11 +350,13 @@ export default function FilesPage() {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [showKnowledgeBases, setShowKnowledgeBases] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
+  const [sortBy, setSortBy] = useState<SortBy>("updated");
 
   // 筛选文件
   const filteredFiles = files.filter((file) => {
-    const matchesSearch =
-      file.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = file.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesFolder =
       selectedFolder === "all" || file.folder === selectedFolder;
     return matchesSearch && matchesFolder;
@@ -268,9 +375,7 @@ export default function FilesPage() {
 
   // 全选
   const toggleSelectAll = () => {
-    if (filteredFiles.length === 0) {
-      return;
-    }
+    if (filteredFiles.length === 0) return;
     if (selectedFiles.size === filteredFiles.length) {
       setSelectedFiles(new Set());
     } else {
@@ -283,31 +388,74 @@ export default function FilesPage() {
     setSelectedFiles(new Set());
   };
 
-  const storagePercent = Math.min(
-    100,
-    Math.round((storageUsage.used / storageUsage.limit) * 100)
-  );
-
   const activeFolder = folders.find((folder) => folder.id === selectedFolder);
 
-  const listGridClass = isSelectionMode
-    ? "grid-cols-[24px_minmax(220px,2fr)_120px_140px_160px_120px]"
-    : "grid-cols-[minmax(240px,2fr)_120px_140px_160px_120px]";
+  // 统计数据
+  const stats = {
+    total: files.length,
+    indexed: files.filter((f) => f.indexed).length,
+    starred: files.filter((f) => f.starred).length,
+    knowledgeBases: knowledgeBases.length,
+    totalVectors: knowledgeBases.reduce((sum, kb) => sum + kb.vectorCount, 0),
+  };
+
+  const sortOptions: Array<{ value: SortBy; label: string }> = [
+    { value: "updated", label: "最近更新" },
+    { value: "name", label: "名称" },
+    { value: "size", label: "大小" },
+  ];
+
+  // 排序文件
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    switch (sortBy) {
+      case "name":
+        return a.name.localeCompare(b.name, "zh-Hans-CN");
+      case "size":
+        return (
+          parseFloat(b.size.replace(/[^\d.]/g, "")) -
+          parseFloat(a.size.replace(/[^\d.]/g, ""))
+        );
+      case "updated":
+      default:
+        return 0; // 保持原顺序（假设已按更新时间排序）
+    }
+  });
+
+  // 最近更新的文件
+  const mostRecentFile = files[0];
 
   return (
-    <PageContainer>
-      <div className="space-y-6">
-        <PageHeader
-          title="文件"
-          description="集中管理上传文件、知识库索引和向量数据。"
-          actions={
-            isSelectionMode ? (
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" size="sm">
+    <PageWithSidebar
+      sidebarTitle="文件"
+      sidebarWidth="narrow"
+      sidebar={
+        <FilesSidebar
+          selectedFolder={selectedFolder}
+          setSelectedFolder={setSelectedFolder}
+          showKnowledgeBases={showKnowledgeBases}
+          setShowKnowledgeBases={setShowKnowledgeBases}
+        />
+      }
+    >
+      <div className="space-y-6 max-w-[960px]">
+        {/* 页面头部 */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-[18px] font-semibold text-foreground">
+              文件管理
+            </h1>
+            <p className="text-[12px] text-foreground-light mt-1">
+              管理上传文件、知识库索引和向量数据
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {isSelectionMode ? (
+              <>
+                <span className="text-[12px] text-foreground-light">
                   已选择 {selectedFiles.size} 项
-                </Badge>
+                </span>
                 <Button variant="outline" size="sm" onClick={resetSelection}>
-                  取消选择
+                  取消
                 </Button>
                 <Button variant="outline" size="sm" leftIcon={<Download />}>
                   下载
@@ -315,245 +463,234 @@ export default function FilesPage() {
                 <Button variant="destructive" size="sm" leftIcon={<Trash2 />}>
                   删除
                 </Button>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button size="sm" leftIcon={<Upload />}>
-                  上传文件
-                </Button>
-                <Button variant="outline" size="sm" leftIcon={<FolderPlus />}>
-                  新建文件夹
-                </Button>
+              <>
                 <Button
                   variant="outline"
                   size="sm"
-                  leftIcon={<Check />}
+                  leftIcon={<FolderPlus className="h-3.5 w-3.5" />}
+                >
+                  新建文件夹
+                </Button>
+                <Button size="sm" leftIcon={<Upload className="h-3.5 w-3.5" />}>
+                  上传文件
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 概览面板 */}
+        <div className="page-panel">
+          <div className="page-panel-header">
+            <h2 className="page-panel-title">概览</h2>
+            <p className="page-panel-description">存储使用与关键指标</p>
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">
+                  总文件数
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  {stats.total}
+                </p>
+                <p className="text-[11px] text-foreground-muted">
+                  {stats.starred} 已收藏
+                </p>
+              </div>
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">
+                  已索引
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  {stats.indexed}
+                </p>
+                <p className="text-[11px] text-foreground-muted">
+                  {Math.round((stats.indexed / stats.total) * 100)}% 覆盖率
+                </p>
+              </div>
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">知识库</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {stats.knowledgeBases}
+                </p>
+                <p className="text-[11px] text-foreground-muted">
+                  {(stats.totalVectors / 1000).toFixed(1)}k 向量
+                </p>
+              </div>
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">
+                  存储使用
+                </p>
+                <p className="text-lg font-semibold text-brand-500">
+                  {Math.round((storageUsage.used / storageUsage.limit) * 100)}%
+                </p>
+                <p className="text-[11px] text-foreground-muted">
+                  {storageUsage.used} / {storageUsage.limit} GB
+                </p>
+              </div>
+            </div>
+
+            {/* 最近更新 */}
+            {mostRecentFile && (
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
+                    最近更新
+                  </span>
+                  <span className="text-[11px] text-foreground-muted">
+                    {mostRecentFile.updatedAt}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
+                      {(() => {
+                        const FileIcon = getFileIcon(mostRecentFile.type);
+                        return (
+                          <FileIcon className="w-3.5 h-3.5 text-foreground-light" />
+                        );
+                      })()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {mostRecentFile.starred && (
+                          <Star className="w-3.5 h-3.5 text-warning fill-current" />
+                        )}
+                        <span className="text-[13px] font-medium text-foreground truncate">
+                          {mostRecentFile.name}
+                        </span>
+                        {mostRecentFile.indexed && (
+                          <Badge variant="primary" size="xs">
+                            已索引
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-foreground-light">
+                        {mostRecentFile.size} · 上传于 {mostRecentFile.uploadedAt}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 ml-4"
+                    leftIcon={<Eye className="w-3.5 h-3.5" />}
+                  >
+                    预览
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 文件列表面板 */}
+        <div className="page-panel">
+          <div className="page-panel-header flex items-center justify-between">
+            <div>
+              <h2 className="page-panel-title">
+                {activeFolder?.name || "文件"}
+              </h2>
+              <p className="page-panel-description">
+                {sortedFiles.length} 个文件
+                {selectedFolder !== "all" && ` · ${activeFolder?.name}`}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {!isSelectionMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  leftIcon={<Check className="w-3.5 h-3.5" />}
                   onClick={() => setIsSelectionMode(true)}
                 >
                   选择
                 </Button>
-              </div>
-            )
-          }
-        >
-          <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <FolderOpen className="w-3.5 h-3.5" />
-              {activeFolder?.name || "全部文件"}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5" />
-              {storageUsage.used} / {storageUsage.limit} GB
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5" />
-              {filteredFiles.length} 个文件
-            </span>
-          </div>
-        </PageHeader>
-
-        <div className="page-divider" />
-
-        <div className="flex min-h-[640px] gap-6">
-          {/* 左侧边栏 */}
-          <aside className="w-[280px] shrink-0 space-y-4">
-        <div className="page-panel overflow-hidden">
-          <div className="p-4 border-b border-border space-y-2">
-            <Button size="sm" className="w-full" leftIcon={<Upload />}>
-              上传文件
-            </Button>
-            <Button variant="outline" size="sm" className="w-full" leftIcon={<FolderPlus />}>
-              新建文件夹
-            </Button>
-          </div>
-
-          <div className="p-3">
-            <div className="page-caption px-2 pb-2">文件夹</div>
-            <nav className="space-y-0.5">
-              {folders.map((folder) => (
-                <button
-                  key={folder.id}
-                  onClick={() => setSelectedFolder(folder.id)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-2.5 py-2 rounded-md text-[13px] transition-colors relative",
-                    selectedFolder === folder.id
-                      ? "bg-surface-200 text-foreground before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-[2px] before:rounded-full before:bg-brand-500"
-                      : "text-foreground-light hover:bg-surface-100 hover:text-foreground"
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    {folder.id === "all" ? (
-                      <HardDrive className="w-4 h-4" />
-                    ) : (
-                      <Folder className="w-4 h-4" />
-                    )}
-                    {folder.name}
-                  </span>
-                  <span className="text-xs text-foreground-muted">{folder.count}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="border-t border-border">
-            <button
-              onClick={() => setShowKnowledgeBases(!showKnowledgeBases)}
-              className="w-full flex items-center justify-between px-4 py-3 text-xs font-medium text-foreground-muted uppercase tracking-wider hover:text-foreground transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                <Brain className="w-4 h-4" />
-                知识库
-              </span>
-              <ChevronDown
-                className={cn(
-                  "w-4 h-4 transition-transform",
-                  !showKnowledgeBases && "-rotate-90"
-                )}
-              />
-            </button>
-
-            {showKnowledgeBases && (
-              <div className="p-3 space-y-2">
-                {knowledgeBases.map((kb) => (
-                  <Card
-                    key={kb.id}
-                    padding="sm"
-                    hover
-                    className="bg-surface-75/80"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[13px] font-medium text-foreground">
-                        {kb.name}
-                      </span>
-                      {kb.status === "indexing" ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-brand-500">
-                          <RefreshCw className="w-3 h-3 animate-spin" />
-                          索引中
-                        </span>
-                      ) : (
-                        <Badge variant="secondary" size="xs">
-                          活跃
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-foreground-light line-clamp-2 mt-1">
-                      {kb.description}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs text-foreground-muted mt-2">
-                      <span className="flex items-center gap-1">
-                        <File className="w-3 h-3" />
-                        {kb.fileCount}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Database className="w-3 h-3" />
-                        {(kb.vectorCount / 1000).toFixed(1)}k
-                      </span>
-                    </div>
-                  </Card>
-                ))}
+              )}
+              <ButtonGroup
+                attached
+                className="border border-border rounded-md overflow-hidden bg-surface-200/60"
+              >
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-center text-foreground-light hover:text-foreground"
-                  leftIcon={<Plus />}
-                >
-                  新建知识库
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="border-t border-border p-4">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-foreground-muted">存储使用</span>
-              <span className="text-foreground font-medium">
-                {storageUsage.used} / {storageUsage.limit} GB
-              </span>
-            </div>
-            <Progress value={storagePercent} size="sm" className="mt-2" />
-            <div className="mt-3 space-y-1">
-              {storageUsage.breakdown.map((item) => (
-                <span
-                  key={item.type}
-                  className="flex items-center justify-between text-xs text-foreground-muted"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className={cn("w-2 h-2 rounded-full", item.color)} />
-                    {item.type}
-                  </span>
-                  <span>{item.size} GB</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* 主内容区 */}
-      <main className="flex-1 min-w-0 flex flex-col gap-4">
-
-        <div className="page-panel flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="page-panel-header flex items-center justify-between gap-4">
-            <div>
-              <h2 className="page-panel-title">
-                {activeFolder?.name || "文件列表"}
-              </h2>
-              <p className="page-panel-description">
-                共 {filteredFiles.length} 个文件
-              </p>
-            </div>
-          </div>
-
-          <div className="px-4 py-3 border-b border-border bg-surface-75/70 flex flex-wrap items-center gap-3">
-            <div className="min-w-[220px] flex-1">
-              <Input
-                variant="search"
-                inputSize="sm"
-                leftIcon={<Search className="w-4 h-4" />}
-                placeholder="搜索文件..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" size="sm" leftIcon={<Filter />}>
-              筛选
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<SortAsc />}>
-              排序
-            </Button>
-            <div className="ml-auto flex items-center gap-2">
-              <div className="inline-flex items-center rounded-md border border-border bg-surface-100 p-0.5">
-                <button
-                  onClick={() => setViewMode("grid")}
                   className={cn(
-                    "p-1.5 rounded-sm transition-colors",
-                    viewMode === "grid"
-                      ? "bg-surface-200 text-foreground"
-                      : "text-foreground-muted hover:bg-surface-200 hover:text-foreground"
-                  )}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={cn(
-                    "p-1.5 rounded-sm transition-colors",
+                    "rounded-none h-7 px-2",
                     viewMode === "list"
                       ? "bg-surface-200 text-foreground"
-                      : "text-foreground-muted hover:bg-surface-200 hover:text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
                   )}
+                  onClick={() => setViewMode("list")}
                 >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
+                  <List className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "rounded-none h-7 px-2",
+                    viewMode === "grid"
+                      ? "bg-surface-200 text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
+                  )}
+                  onClick={() => setViewMode("grid")}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </Button>
+              </ButtonGroup>
             </div>
           </div>
 
+          {/* 工具栏 */}
+          <div className="px-4 py-3 border-b border-border flex items-center gap-3">
+            <Input
+              placeholder="搜索文件..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              variant="search"
+              inputSize="sm"
+              leftIcon={<Search className="h-3.5 w-3.5" />}
+              className="max-w-[240px]"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  rightIcon={<ChevronDown className="h-3 w-3" />}
+                  className="h-8"
+                >
+                  {sortOptions.find((option) => option.value === sortBy)?.label}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-36 bg-surface-100 border border-border rounded-md"
+              >
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setSortBy(option.value)}
+                    className={cn(
+                      "px-3 py-1.5 text-[12px] rounded-md mx-1 cursor-pointer",
+                      sortBy === option.value
+                        ? "bg-surface-200 text-foreground"
+                        : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
+                    )}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* 拖拽上传区域 */}
           <div
-            className={cn(
-              "relative flex-1 overflow-auto",
-              isDragging && "bg-surface-75/50"
-            )}
+            className={cn("relative", isDragging && "bg-surface-75/50")}
             onDragOver={(e) => {
               e.preventDefault();
               setIsDragging(true);
@@ -562,299 +699,295 @@ export default function FilesPage() {
             onDrop={(e) => {
               e.preventDefault();
               setIsDragging(false);
-              // 处理文件上传
             }}
           >
+            {/* 拖拽上传覆盖层 */}
             {isDragging && (
               <div className="absolute inset-4 z-20 rounded-md border-2 border-dashed border-brand-500 bg-background-overlay flex items-center justify-center pointer-events-none">
                 <div className="text-center">
-                  <Upload className="w-10 h-10 text-brand-500 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-foreground">
+                  <Upload className="w-8 h-8 text-brand-500 mx-auto mb-2" />
+                  <p className="text-[13px] font-medium text-foreground">
                     释放文件以上传
-                  </p>
-                  <p className="text-xs text-foreground-light mt-1">
-                    支持多种文件格式与批量上传
                   </p>
                 </div>
               </div>
             )}
 
-            {filteredFiles.length === 0 ? (
-              <EmptyState
-                icon={FolderOpen}
-                title={searchQuery ? "没有找到匹配的文件" : "还没有文件"}
-                description={
-                  searchQuery
-                    ? "尝试其他关键词或调整筛选条件。"
-                    : "拖拽文件到此处或点击上传开始构建知识库。"
-                }
-                action={
-                  searchQuery
-                    ? undefined
-                    : {
-                        label: "上传文件",
-                        onClick: () => undefined,
-                        icon: Upload,
-                      }
-                }
-              />
-            ) : viewMode === "list" ? (
-              <div className="min-w-[760px]">
-                <div
-                  className={cn(
-                    "grid items-center gap-3 px-4 py-2 text-table-header border-b border-border bg-surface-75/80",
-                    listGridClass
-                  )}
-                >
-                  {isSelectionMode && (
-                    <Checkbox
-                      aria-label="全选"
-                      checked={
-                        filteredFiles.length > 0 &&
-                        selectedFiles.size === filteredFiles.length
-                      }
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  )}
-                  <div>名称</div>
-                  <div>大小</div>
-                  <div>更新时间</div>
-                  <div>知识库</div>
-                  <div className="text-right">操作</div>
+            {/* 列表视图 */}
+            {sortedFiles.length > 0 && viewMode === "list" && (
+              <div>
+                {/* 表头 */}
+                <div className="hidden lg:grid grid-cols-[1fr_80px_100px_120px_80px] gap-4 px-4 py-2 border-b border-border text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
+                  {isSelectionMode && <span className="w-5" />}
+                  <span>文件名</span>
+                  <span>大小</span>
+                  <span>更新时间</span>
+                  <span>知识库</span>
+                  <span className="text-right">操作</span>
                 </div>
-
+                {/* 列表项 */}
                 <div className="divide-y divide-border">
-                  {filteredFiles.map((file) => {
+                  {sortedFiles.map((file) => {
                     const FileIcon = getFileIcon(file.type);
-                    const fileColor = getFileColor(file.type);
                     const isSelected = selectedFiles.has(file.id);
 
                     return (
                       <div
                         key={file.id}
                         className={cn(
-                          "group grid items-center gap-3 px-4 py-2.5 text-[13px] transition-colors",
-                          listGridClass,
-                          isSelected
-                            ? "bg-brand-200/25"
-                            : "hover:bg-surface-100",
-                          isSelectionMode ? "cursor-pointer" : "cursor-default"
+                          "group grid grid-cols-1 lg:grid-cols-[1fr_80px_100px_120px_80px] gap-4 px-4 py-3 hover:bg-surface-75/50 transition-colors",
+                          isSelected && "bg-brand-200/20",
+                          isSelectionMode && "cursor-pointer"
                         )}
                         onClick={() =>
                           isSelectionMode && toggleSelect(file.id)
                         }
                       >
-                        {isSelectionMode && (
-                          <Checkbox
-                            aria-label={`选择 ${file.name}`}
-                            checked={isSelected}
-                      onCheckedChange={() => toggleSelect(file.id)}
-                      onClick={(event) => event.stopPropagation()}
-                          />
-                        )}
+                        {/* 文件信息 */}
                         <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className={cn(
-                              "w-9 h-9 rounded-md flex items-center justify-center",
-                              fileColor
-                            )}
-                          >
-                            <FileIcon className="w-4 h-4" />
+                          {isSelectionMode && (
+                            <Checkbox
+                              aria-label={`选择 ${file.name}`}
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelect(file.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          )}
+                          <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
+                            <FileIcon className="w-3.5 h-3.5 text-foreground-light" />
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground truncate">
+                              {file.starred && (
+                                <Star className="w-3.5 h-3.5 text-warning fill-current shrink-0" />
+                              )}
+                              <span className="text-[13px] font-medium text-foreground truncate">
                                 {file.name}
                               </span>
-                              {file.starred && (
-                                <Star className="w-3.5 h-3.5 text-brand-500 fill-brand-500 shrink-0" />
-                              )}
                               {file.indexed && (
                                 <Badge variant="primary" size="xs">
-                                  已索引
+                                  索引
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-xs text-foreground-muted mt-0.5">
+                            <p className="text-[11px] text-foreground-light truncate">
                               上传于 {file.uploadedAt}
                             </p>
                           </div>
                         </div>
-                        <div className="text-foreground-light">{file.size}</div>
-                        <div className="text-foreground-light">
+
+                        {/* 大小 */}
+                        <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
+                          {file.size}
+                        </div>
+
+                        {/* 更新时间 */}
+                        <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
                           {file.updatedAt}
                         </div>
-                        <div>
-                          {file.knowledgeBase ? (
-                            <Badge variant="secondary" size="xs">
-                              {file.knowledgeBase}
-                            </Badge>
-                          ) : (
-                            <span className="text-xs text-foreground-muted">
-                              -
-                            </span>
-                          )}
+
+                        {/* 知识库 */}
+                        <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
+                          {file.knowledgeBase || "-"}
                         </div>
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={(event) => event.stopPropagation()}
-                            className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+
+                        {/* 操作 */}
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-foreground-muted hover:text-foreground h-7 w-7"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <Download className="w-4 h-4" />
-                          </button>
+                            <Download className="w-3.5 h-3.5" />
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button
-                                onClick={(event) => event.stopPropagation()}
-                                className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="text-foreground-muted hover:text-foreground h-7 w-7"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreHorizontal className="w-4 h-4" />
-                              </button>
+                                <MoreVertical className="w-3.5 h-3.5" />
+                              </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="w-48 bg-surface-100 border-border"
+                              className="w-40 bg-surface-100 border border-border rounded-md"
                             >
-                              <DropdownMenuItem icon={<Eye />}>
+                              <DropdownMenuItem
+                                icon={<Eye />}
+                                className="cursor-pointer"
+                              >
                                 预览
                               </DropdownMenuItem>
-                              <DropdownMenuItem icon={<Edit3 />}>
+                              <DropdownMenuItem
+                                icon={<Edit3 />}
+                                className="cursor-pointer"
+                              >
                                 重命名
                               </DropdownMenuItem>
-                              <DropdownMenuItem icon={<Star />}>
+                              <DropdownMenuItem
+                                icon={<Star />}
+                                className="cursor-pointer"
+                              >
                                 {file.starred ? "取消收藏" : "收藏"}
                               </DropdownMenuItem>
-                              <DropdownMenuItem icon={<Brain />}>
+                              <DropdownMenuItem
+                                icon={<Brain />}
+                                className="cursor-pointer"
+                              >
                                 添加到知识库
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem icon={<Share2 />}>
+                              <DropdownMenuItem
+                                icon={<Share2 />}
+                                className="cursor-pointer"
+                              >
                                 分享
                               </DropdownMenuItem>
-                              <DropdownMenuItem icon={<LinkIcon />}>
+                              <DropdownMenuItem
+                                icon={<LinkIcon />}
+                                className="cursor-pointer"
+                              >
                                 复制链接
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 destructive
                                 icon={<Trash2 />}
+                                className="cursor-pointer"
                               >
                                 删除
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
+
+                        {/* 移动端信息 */}
+                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted lg:hidden">
+                          <span>{file.size}</span>
+                          <span>{file.updatedAt}</span>
+                          {file.knowledgeBase && (
+                            <span>{file.knowledgeBase}</span>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
-            ) : (
-              <div className="page-grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-4">
-                {filteredFiles.map((file) => {
+            )}
+
+            {/* 网格视图 */}
+            {sortedFiles.length > 0 && viewMode === "grid" && (
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sortedFiles.map((file) => {
                   const FileIcon = getFileIcon(file.type);
-                  const fileColor = getFileColor(file.type);
                   const isSelected = selectedFiles.has(file.id);
 
                   return (
-                    <Card
+                    <div
                       key={file.id}
-                      hover
                       className={cn(
-                        "relative group",
-                        isSelected && "border-brand-400 bg-brand-200/20"
+                        "relative p-4 rounded-lg border border-border bg-surface-75/60 hover:border-border-strong hover:bg-surface-100/80 transition-colors group",
+                        isSelected && "border-brand-400 bg-brand-200/15"
                       )}
+                      onClick={() =>
+                        isSelectionMode && toggleSelect(file.id)
+                      }
                     >
-                      <div className="flex items-start justify-between">
-                        <div
-                          className={cn(
-                            "w-10 h-10 rounded-md flex items-center justify-center",
-                            fileColor
-                          )}
-                        >
-                          <FileIcon className="w-5 h-5" />
+                      {isSelectionMode && (
+                        <Checkbox
+                          aria-label={`选择 ${file.name}`}
+                          checked={isSelected}
+                          onCheckedChange={() => toggleSelect(file.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-3 right-3"
+                        />
+                      )}
+
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center">
+                          <FileIcon className="w-3.5 h-3.5 text-foreground-light" />
                         </div>
-                        {isSelectionMode && (
-                          <Checkbox
-                            aria-label={`选择 ${file.name}`}
-                            checked={isSelected}
-                            onCheckedChange={() => toggleSelect(file.id)}
-                            onClick={(event) => event.stopPropagation()}
-                          />
+                        {file.indexed && (
+                          <Badge variant="primary" size="xs">
+                            索引
+                          </Badge>
                         )}
                       </div>
 
-                      <div className="mt-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-[13px] font-medium text-foreground truncate">
-                            {file.name}
-                          </h4>
-                          {file.starred && (
-                            <Star className="w-3.5 h-3.5 text-brand-500 fill-brand-500 shrink-0" />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-foreground-muted">
-                          <span>{file.size}</span>
-                          <span>•</span>
-                          <span>{file.updatedAt}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {file.indexed && (
-                            <Badge variant="primary" size="xs">
-                              已索引
-                            </Badge>
-                          )}
-                          {file.knowledgeBase && (
-                            <Badge variant="secondary" size="xs">
-                              {file.knowledgeBase}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
+                      <h3 className="text-[13px] font-medium text-foreground mb-1 flex items-center gap-2">
+                        {file.starred && (
+                          <Star className="w-3.5 h-3.5 text-warning fill-current" />
+                        )}
+                        <span className="truncate">{file.name}</span>
+                      </h3>
 
-                      <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
-                          <Download className="w-4 h-4" />
-                        </button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="w-44 bg-surface-100 border-border"
+                      <p className="text-[11px] text-foreground-light mb-3">
+                        {file.size} · {file.updatedAt}
+                      </p>
+
+                      <div className="flex items-center justify-between text-[10px] text-foreground-muted">
+                        <span>{file.knowledgeBase || "未索引"}</span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            className="p-1 rounded hover:bg-surface-200 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <DropdownMenuItem icon={<Eye />}>
-                              预览
-                            </DropdownMenuItem>
-                            <DropdownMenuItem icon={<Edit3 />}>
-                              重命名
-                            </DropdownMenuItem>
-                            <DropdownMenuItem icon={<Star />}>
-                              {file.starred ? "取消收藏" : "收藏"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              destructive
-                              icon={<Trash2 />}
-                            >
-                              删除
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            className="p-1 rounded hover:bg-surface-200 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    </Card>
+                    </div>
                   );
                 })}
               </div>
             )}
+
+            {/* 空状态 */}
+            {sortedFiles.length === 0 && (
+              <div className="px-4 py-12 text-center">
+                <div className="w-12 h-12 rounded-md bg-surface-200/80 border border-border flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen className="w-5 h-5 text-foreground-muted" />
+                </div>
+                <h3 className="text-[13px] font-medium text-foreground mb-1">
+                  {searchQuery ? "没有找到匹配的文件" : "还没有文件"}
+                </h3>
+                <p className="text-[11px] text-foreground-light mb-4 max-w-xs mx-auto">
+                  {searchQuery
+                    ? "尝试使用其他关键词"
+                    : "拖拽文件到此处或点击上传开始构建知识库"}
+                </p>
+                {searchQuery ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedFolder("all");
+                    }}
+                  >
+                    清除筛选
+                  </Button>
+                ) : (
+                  <Button size="sm" leftIcon={<Upload className="w-3.5 h-3.5" />}>
+                    上传文件
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </main>
       </div>
-    </div>
-    </PageContainer>
+    </PageWithSidebar>
   );
 }

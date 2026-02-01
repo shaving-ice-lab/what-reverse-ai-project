@@ -2,7 +2,8 @@
 
 /**
  * 工作流列表页面
- * Supabase 风格：密度更高、层次清晰、面板化布局
+ * Supabase Settings 风格：侧边导航 + 右侧内容区面板化布局
+ * 参考 STYLE-TERMINAL-PIXEL.md 极简文本样式规范
  */
 
 import { useState } from "react";
@@ -23,16 +24,18 @@ import {
   Clock,
   CheckCircle,
   AlertTriangle,
-  Calendar,
   LayoutGrid,
   List,
   Folder,
   Star,
-  Sparkles,
   ChevronDown,
-  FolderOpen,
 } from "lucide-react";
-import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
+import {
+  PageWithSidebar,
+  SidebarNavItem,
+  SidebarNavGroup,
+  CategoryHeader,
+} from "@/components/dashboard/page-layout";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -154,7 +157,7 @@ const folders = [
   { name: "电商", count: 1 },
 ];
 
-// 获取状态信息 - Supabase 风格
+// 获取状态信息
 const getStatusInfo = (status: WorkflowStatus) => {
   switch (status) {
     case "active":
@@ -206,6 +209,135 @@ const getRelativeMinutes = (value: string) => {
   return Number.MAX_SAFE_INTEGER;
 };
 
+// 侧边栏导航组件
+function WorkflowSidebar({
+  statusFilter,
+  setStatusFilter,
+  selectedFolder,
+  setSelectedFolder,
+  stats,
+}: {
+  statusFilter: WorkflowStatus | "all";
+  setStatusFilter: (status: WorkflowStatus | "all") => void;
+  selectedFolder: string;
+  setSelectedFolder: (folder: string) => void;
+  stats: {
+    total: number;
+    active: number;
+    paused: number;
+    error: number;
+    draft: number;
+  };
+}) {
+  return (
+    <div className="space-y-1">
+      {/* 状态筛选 */}
+      <SidebarNavGroup title="状态">
+        <button
+          onClick={() => setStatusFilter("all")}
+          className={cn(
+            "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+            statusFilter === "all"
+              ? "bg-surface-100/70 text-foreground"
+              : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+          )}
+        >
+          <span>全部工作流</span>
+          <span className="text-[11px] text-foreground-muted">{stats.total}</span>
+        </button>
+        <button
+          onClick={() => setStatusFilter("active")}
+          className={cn(
+            "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+            statusFilter === "active"
+              ? "bg-surface-100/70 text-foreground"
+              : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+            运行中
+          </span>
+          <span className="text-[11px] text-foreground-muted">{stats.active}</span>
+        </button>
+        <button
+          onClick={() => setStatusFilter("paused")}
+          className={cn(
+            "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+            statusFilter === "paused"
+              ? "bg-surface-100/70 text-foreground"
+              : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-warning" />
+            已暂停
+          </span>
+          <span className="text-[11px] text-foreground-muted">{stats.paused}</span>
+        </button>
+        <button
+          onClick={() => setStatusFilter("error")}
+          className={cn(
+            "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+            statusFilter === "error"
+              ? "bg-surface-100/70 text-foreground"
+              : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+            异常
+          </span>
+          <span className="text-[11px] text-foreground-muted">{stats.error}</span>
+        </button>
+        <button
+          onClick={() => setStatusFilter("draft")}
+          className={cn(
+            "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+            statusFilter === "draft"
+              ? "bg-surface-100/70 text-foreground"
+              : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted" />
+            草稿
+          </span>
+          <span className="text-[11px] text-foreground-muted">{stats.draft}</span>
+        </button>
+      </SidebarNavGroup>
+
+      {/* 分隔线 */}
+      <div className="h-px bg-border my-3" />
+
+      {/* 文件夹筛选 */}
+      <SidebarNavGroup title="文件夹">
+        {folders.map((folder) => (
+          <button
+            key={folder.name}
+            onClick={() => setSelectedFolder(folder.name)}
+            className={cn(
+              "w-full flex items-center justify-between h-8 px-2 rounded-md text-[12px] font-medium transition-colors",
+              selectedFolder === folder.name
+                ? "bg-surface-100/70 text-foreground"
+                : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
+            )}
+          >
+            <span>{folder.name}</span>
+            <span className="text-[11px] text-foreground-muted">{folder.count}</span>
+          </button>
+        ))}
+      </SidebarNavGroup>
+
+      {/* 新建文件夹 */}
+      <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors mt-2">
+        <Plus className="w-3.5 h-3.5" />
+        新建文件夹
+      </button>
+    </div>
+  );
+}
+
 export default function WorkflowsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<WorkflowStatus | "all">("all");
@@ -240,84 +372,6 @@ export default function WorkflowsPage() {
     avgSuccessRate: totalRuns ? weightedSuccess / totalRuns : 0,
   };
 
-  const statItems = [
-    {
-      label: "总工作流",
-      value: stats.total.toLocaleString(),
-      helper: `${stats.starred} 已收藏`,
-      icon: Zap,
-    },
-    {
-      label: "运行中",
-      value: stats.active.toLocaleString(),
-      helper: `${stats.paused} 已暂停`,
-      icon: Play,
-    },
-    {
-      label: "执行次数",
-      value: stats.totalRuns.toLocaleString(),
-      helper: "累计运行",
-      icon: Activity,
-    },
-    {
-      label: "平均成功率",
-      value: `${stats.avgSuccessRate.toFixed(1)}%`,
-      helper: `${stats.error} 异常`,
-      icon: CheckCircle,
-      valueClassName: "text-brand-500",
-    },
-  ];
-
-  const statusPills: Array<{
-    key: WorkflowStatus | "all";
-    label: string;
-    count: number;
-    color: string;
-    bg: string;
-    border: string;
-  }> = [
-    {
-      key: "all",
-      label: "全部",
-      count: stats.total,
-      color: "text-foreground",
-      bg: "bg-surface-200/60",
-      border: "border-border",
-    },
-    {
-      key: "active",
-      label: "运行中",
-      count: stats.active,
-      color: "text-brand-500",
-      bg: "bg-brand-200/60",
-      border: "border-brand-400/30",
-    },
-    {
-      key: "paused",
-      label: "已暂停",
-      count: stats.paused,
-      color: "text-warning",
-      bg: "bg-warning-200/60",
-      border: "border-warning/30",
-    },
-    {
-      key: "error",
-      label: "异常",
-      count: stats.error,
-      color: "text-destructive",
-      bg: "bg-destructive-200/60",
-      border: "border-destructive/30",
-    },
-    {
-      key: "draft",
-      label: "草稿",
-      count: stats.draft,
-      color: "text-foreground-muted",
-      bg: "bg-surface-200/60",
-      border: "border-border",
-    },
-  ];
-
   const sortOptions: Array<{ value: SortBy; label: string }> = [
     { value: "updated", label: "最近更新" },
     { value: "name", label: "名称" },
@@ -347,594 +401,401 @@ export default function WorkflowsPage() {
     : null;
 
   return (
-    <PageContainer className="relative">
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-56 w-[70%] -translate-x-1/2 rounded-full bg-brand-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute top-16 right-[-10%] h-40 w-64 rounded-full bg-brand-500/5 blur-2xl" />
-      <div className="relative space-y-6">
-        <PageHeader
-          eyebrow="Automation Studio"
-          title="工作流"
-          icon={<Sparkles className="h-4 w-4" />}
-          description="统一管理触发器、执行与版本，快速定位关键自动化流程。"
-          badge={(
-            <Badge
-              variant="secondary"
-              size="sm"
-              className="bg-surface-200 text-foreground-light"
-            >
-              显示 {filteredWorkflows.length} / {stats.total}
-            </Badge>
-          )}
-          actions={(
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>
-                导入
-              </Button>
-              <Button size="sm" asChild leftIcon={<Plus className="h-4 w-4" />}>
-                <Link href="/workflows/new">创建工作流</Link>
-              </Button>
-            </div>
-          )}
+    <PageWithSidebar
+      sidebarTitle="工作流"
+      sidebarWidth="narrow"
+      sidebar={
+        <WorkflowSidebar
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          selectedFolder={selectedFolder}
+          setSelectedFolder={setSelectedFolder}
+          stats={stats}
         />
+      }
+    >
+      <div className="space-y-6 max-w-[960px]">
+        {/* 页面头部 */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-[18px] font-semibold text-foreground">工作流管理</h1>
+            <p className="text-[12px] text-foreground-light mt-1">
+              管理和监控所有自动化工作流
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>
+              导入
+            </Button>
+            <Button size="sm" asChild leftIcon={<Plus className="h-3.5 w-3.5" />}>
+              <Link href="/workflows/new">创建工作流</Link>
+            </Button>
+          </div>
+        </div>
 
-        <div className="page-divider" />
-
-        <section className="page-section">
-          <div className="page-panel overflow-hidden">
-            <div className="page-panel-header flex items-center justify-between">
-              <div>
-                <div className="page-caption">Overview</div>
-                <h2 className="page-panel-title">工作流概览</h2>
-                <p className="page-panel-description">关键指标与最近更新</p>
+        {/* 概览面板 */}
+        <div className="page-panel">
+          <div className="page-panel-header">
+            <h2 className="page-panel-title">概览</h2>
+            <p className="page-panel-description">关键指标与最近更新</p>
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">总工作流</p>
+                <p className="text-lg font-semibold text-foreground">{stats.total}</p>
+                <p className="text-[11px] text-foreground-muted">{stats.starred} 已收藏</p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-foreground-muted">
-                <Clock className="w-3.5 h-3.5" />
-                最近更新 {mostRecentWorkflow?.updatedAt ?? "—"}
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">运行中</p>
+                <p className="text-lg font-semibold text-foreground">{stats.active}</p>
+                <p className="text-[11px] text-foreground-muted">{stats.paused} 已暂停</p>
+              </div>
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">执行次数</p>
+                <p className="text-lg font-semibold text-foreground">{stats.totalRuns.toLocaleString()}</p>
+                <p className="text-[11px] text-foreground-muted">累计运行</p>
+              </div>
+              <div className="p-3 rounded-md border border-border bg-surface-75/60">
+                <p className="text-[11px] text-foreground-muted mb-1">平均成功率</p>
+                <p className="text-lg font-semibold text-brand-500">{stats.avgSuccessRate.toFixed(1)}%</p>
+                <p className="text-[11px] text-foreground-muted">{stats.error} 异常</p>
               </div>
             </div>
-            <div className="p-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-              <div className="page-grid grid-cols-2 lg:grid-cols-4">
-                {statItems.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-md border border-border bg-surface-75/80 p-4 flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-xs text-foreground-muted">{stat.label}</p>
-                      <p
-                        className={cn(
-                          "text-lg font-semibold",
-                          stat.valueClassName ?? "text-foreground"
-                        )}
-                      >
-                        {stat.value}
-                      </p>
-                      <p className="text-[11px] text-foreground-muted">{stat.helper}</p>
-                    </div>
-                    <div className="h-9 w-9 rounded-md bg-surface-200 flex items-center justify-center">
-                      <stat.icon className="h-4 w-4 text-foreground-light" />
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              <div className="rounded-lg border border-border bg-surface-75/80 p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-foreground">最近更新</h3>
-                  <span className="text-xs text-foreground-muted">自动同步</span>
+            {/* 最近更新 */}
+            {mostRecentWorkflow && (
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">最近更新</span>
+                  <span className="text-[11px] text-foreground-muted">{mostRecentWorkflow.updatedAt}</span>
                 </div>
-                {mostRecentWorkflow ? (
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
-                        <Zap className="w-4 h-4 text-foreground-light" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {mostRecentWorkflow.starred && (
-                            <Star className="w-4 h-4 text-warning fill-current" />
-                          )}
-                          <Link
-                            href={`/workflows/${mostRecentWorkflow.id}`}
-                            className="text-sm font-medium text-foreground hover:text-brand-500 transition-colors truncate"
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
+                      <Zap className="w-3.5 h-3.5 text-foreground-light" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {mostRecentWorkflow.starred && (
+                          <Star className="w-3.5 h-3.5 text-warning fill-current" />
+                        )}
+                        <Link
+                          href={`/workflows/${mostRecentWorkflow.id}`}
+                          className="text-[13px] font-medium text-foreground hover:text-brand-500 transition-colors truncate"
+                        >
+                          {mostRecentWorkflow.name}
+                        </Link>
+                        {recentStatusInfo && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
+                              recentStatusInfo.bg,
+                              recentStatusInfo.color,
+                              recentStatusInfo.border
+                            )}
                           >
-                            {mostRecentWorkflow.name}
-                          </Link>
-                          {recentStatusInfo && (
-                            <span
-                              className={cn(
-                                "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium",
-                                recentStatusInfo.bg,
-                                recentStatusInfo.color,
-                                recentStatusInfo.border
-                              )}
-                            >
-                              <recentStatusInfo.icon className="w-3 h-3" />
-                              {recentStatusInfo.label}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[13px] text-foreground-light line-clamp-2">
-                          {mostRecentWorkflow.description}
-                        </p>
+                            {recentStatusInfo.label}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
-                      <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-200/60 px-2 py-0.5">
-                        <FolderOpen className="w-3 h-3" />
-                        {mostRecentWorkflow.folder}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {mostRecentWorkflow.lastRun}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Activity className="w-3 h-3" />
-                        {mostRecentWorkflow.totalRuns} 次
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/workflows/${mostRecentWorkflow.id}`}>查看详情</Link>
-                      </Button>
-                      <Button size="sm" asChild>
-                        <Link href={`/editor/${mostRecentWorkflow.id}`}>打开编辑器</Link>
-                      </Button>
+                      <p className="text-[11px] text-foreground-light truncate">
+                        {mostRecentWorkflow.description}
+                      </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="text-[13px] text-foreground-muted">暂无更新记录</div>
-                )}
+                  <Button variant="outline" size="sm" asChild className="shrink-0 ml-4">
+                    <Link href={`/editor/${mostRecentWorkflow.id}`}>编辑</Link>
+                  </Button>
+                </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* 工作流列表面板 */}
+        <div className="page-panel">
+          <div className="page-panel-header flex items-center justify-between">
+            <div>
+              <h2 className="page-panel-title">工作流</h2>
+              <p className="page-panel-description">
+                {sortedWorkflows.length} 个工作流
+                {statusFilter !== "all" && ` · ${getStatusInfo(statusFilter).label}`}
+                {selectedFolder !== "全部" && ` · ${selectedFolder}`}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <ButtonGroup
+                attached
+                className="border border-border rounded-md overflow-hidden bg-surface-200/60"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "rounded-none h-7 px-2",
+                    viewMode === "list"
+                      ? "bg-surface-200 text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
+                  )}
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "rounded-none h-7 px-2",
+                    viewMode === "grid"
+                      ? "bg-surface-200 text-foreground"
+                      : "text-foreground-muted hover:text-foreground"
+                  )}
+                  onClick={() => setViewMode("grid")}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </Button>
+              </ButtonGroup>
             </div>
           </div>
-        </section>
 
-        <section className="page-section">
-          <div className="page-panel">
-            <div className="page-panel-header flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <div className="page-caption">Filters</div>
-                <h2 className="page-panel-title">筛选与排序</h2>
-                <p className="page-panel-description">按状态、目录或更新频率筛选</p>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-foreground-muted">
-                <Badge
-                  variant="secondary"
+          {/* 工具栏 */}
+          <div className="px-4 py-3 border-b border-border flex items-center gap-3">
+            <Input
+              placeholder="搜索工作流..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              variant="search"
+              inputSize="sm"
+              leftIcon={<Search className="h-3.5 w-3.5" />}
+              className="max-w-[240px]"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
                   size="sm"
-                  className="bg-surface-200 text-foreground-light"
+                  rightIcon={<ChevronDown className="h-3 w-3" />}
+                  className="h-8"
                 >
-                  当前 {sortedWorkflows.length} 项
-                </Badge>
-              </div>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
-                {statusPills.map((pill) => (
-                  <button
-                    key={pill.key}
-                    onClick={() => setStatusFilter(pill.key)}
+                  {sortOptions.find((option) => option.value === sortBy)?.label}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-36 bg-surface-100 border border-border rounded-md"
+              >
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setSortBy(option.value)}
                     className={cn(
-                      "flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] font-medium transition-colors",
-                      pill.bg,
-                      pill.border,
-                      pill.color,
-                      statusFilter === pill.key
-                        ? "ring-1 ring-brand-500/30"
-                        : "hover:bg-surface-200"
+                      "px-3 py-1.5 text-[12px] rounded-md mx-1 cursor-pointer",
+                      sortBy === option.value
+                        ? "bg-surface-200 text-foreground"
+                        : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
                     )}
                   >
-                    <span>{pill.label}</span>
-                    <span className="text-foreground">{pill.count}</span>
-                  </button>
+                    {option.label}
+                  </DropdownMenuItem>
                 ))}
-                <div className="ml-auto hidden sm:flex items-center gap-2 text-[11px] text-foreground-muted">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>最近更新</span>
-                  <span className="text-foreground">{mostRecentWorkflow?.updatedAt ?? "—"}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <Input
-                  placeholder="搜索工作流..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  variant="search"
-                  inputSize="default"
-                  leftIcon={<Search className="h-4 w-4" />}
-                  className="min-w-[220px] max-w-md flex-1"
-                />
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      leftIcon={<FolderOpen className="h-4 w-4" />}
-                      rightIcon={<ChevronDown className="h-3.5 w-3.5" />}
-                    >
-                      {selectedFolder}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-48 bg-surface-100 border border-border rounded-md"
-                  >
-                    {folders.map((folder) => (
-                      <DropdownMenuItem
-                        key={folder.name}
-                        onClick={() => setSelectedFolder(folder.name)}
-                        className={cn(
-                          "flex items-center justify-between px-3 py-2 text-sm rounded-md mx-1 cursor-pointer",
-                          selectedFolder === folder.name
-                            ? "bg-surface-200 text-foreground"
-                            : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
-                        )}
-                      >
-                        <span className="flex items-center gap-2">
-                          <Folder className="w-4 h-4" />
-                          {folder.name}
-                        </span>
-                        <span className="text-xs text-foreground-muted">{folder.count}</span>
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator className="bg-border mx-2" />
-                    <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
-                      <Plus className="w-4 h-4" />
-                      新建文件夹
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      leftIcon={<ArrowUpDown className="h-4 w-4" />}
-                      rightIcon={<ChevronDown className="h-3.5 w-3.5" />}
-                    >
-                      {sortOptions.find((option) => option.value === sortBy)?.label}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-40 bg-surface-100 border border-border rounded-md"
-                  >
-                    {sortOptions.map((option) => (
-                      <DropdownMenuItem
-                        key={option.value}
-                        onClick={() => setSortBy(option.value)}
-                        className={cn(
-                          "px-3 py-2 text-sm rounded-md mx-1 cursor-pointer",
-                          sortBy === option.value
-                            ? "bg-surface-200 text-foreground"
-                            : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
-                        )}
-                      >
-                        {option.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <div className="ml-auto">
-                  <ButtonGroup
-                    attached
-                    className="border border-border rounded-md overflow-hidden bg-surface-200/60"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "rounded-none h-9 px-3",
-                        viewMode === "list"
-                          ? "bg-surface-200 text-foreground"
-                          : "text-foreground-muted hover:text-foreground"
-                      )}
-                      onClick={() => setViewMode("list")}
-                    >
-                      <List className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "rounded-none h-9 px-3",
-                        viewMode === "grid"
-                          ? "bg-surface-200 text-foreground"
-                          : "text-foreground-muted hover:text-foreground"
-                      )}
-                      onClick={() => setViewMode("grid")}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </Button>
-                  </ButtonGroup>
-                </div>
-              </div>
-            </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-        </section>
 
-        <section className="page-section">
+          {/* 列表视图 */}
           {sortedWorkflows.length > 0 && viewMode === "list" && (
-            <div className="page-panel overflow-hidden">
-                <div className="hidden lg:grid grid-cols-[minmax(0,2.2fr)_140px_120px_120px_100px_110px] xl:grid-cols-[minmax(0,2.2fr)_140px_120px_120px_100px_110px_110px] gap-4 px-5 py-3 bg-surface-75/80 border-b border-border text-table-header">
-                  <span>工作流</span>
-                  <span>触发方式</span>
-                  <span>最近运行</span>
-                  <span>运行次数</span>
-                  <span>成功率</span>
-                  <span className="hidden xl:block">更新</span>
-                  <span className="text-right">操作</span>
-                </div>
-                <div className="divide-y divide-border">
-                  {sortedWorkflows.map((workflow) => {
-                    const statusInfo = getStatusInfo(workflow.status);
-                    const rowAccent =
-                      workflow.status === "active"
-                        ? "border-l-brand-500/40"
-                        : workflow.status === "paused"
-                          ? "border-l-warning/40"
-                          : workflow.status === "error"
-                            ? "border-l-destructive/40"
-                            : "border-l-transparent";
-                    return (
-                      <div
-                        key={workflow.id}
-                        className={cn(
-                          "group grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_140px_120px_120px_100px_110px] xl:grid-cols-[minmax(0,2.2fr)_140px_120px_120px_100px_110px_110px] gap-4 px-5 py-3.5 border-l-2 hover:bg-surface-75/80 transition-colors",
-                          rowAccent
-                        )}
-                      >
-                        <div className="flex flex-col gap-2 min-w-0">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
-                              <Zap className="w-4 h-4 text-foreground-light" />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                {workflow.starred && (
-                                  <Star className="w-4 h-4 text-warning fill-current" />
-                                )}
-                                <Link
-                                  href={`/workflows/${workflow.id}`}
-                                  className="text-sm font-medium text-foreground hover:text-brand-500 transition-colors truncate"
-                                >
-                                  {workflow.name}
-                                </Link>
-                                <span
-                                  className={cn(
-                                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border",
-                                    statusInfo.bg,
-                                    statusInfo.color,
-                                    statusInfo.border
-                                  )}
-                                >
-                                  <statusInfo.icon className="w-3 h-3" />
-                                  {statusInfo.label}
-                                </span>
-                              </div>
-                              <p className="text-[13px] text-foreground-light line-clamp-1">
-                                {workflow.description}
-                              </p>
-                              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-foreground-muted">
-                                <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-200/60 px-2 py-0.5">
-                                  <Folder className="w-3 h-3" />
-                                  {workflow.folder}
-                                </span>
-                                {workflow.tags.slice(0, 2).map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className="rounded-md border border-border bg-surface-200/60 px-2 py-0.5 text-[11px]"
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                                {workflow.tags.length > 2 && (
-                                  <span className="text-[11px] text-foreground-muted">
-                                    +{workflow.tags.length - 2}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted lg:hidden">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {workflow.trigger.includes("定时") ? "定时" : workflow.trigger}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {workflow.lastRun}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Zap className="w-3 h-3" />
-                              {workflow.totalRuns}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <CheckCircle className="w-3 h-3" />
-                              {workflow.successRate}%
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {workflow.updatedAt}
-                            </span>
-                          </div>
+            <div>
+              {/* 表头 */}
+              <div className="hidden lg:grid grid-cols-[1fr_100px_100px_80px_80px] gap-4 px-4 py-2 border-b border-border text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
+                <span>工作流</span>
+                <span>触发方式</span>
+                <span>最近运行</span>
+                <span>运行次数</span>
+                <span className="text-right">操作</span>
+              </div>
+              {/* 列表项 */}
+              <div className="divide-y divide-border">
+                {sortedWorkflows.map((workflow) => {
+                  const statusInfo = getStatusInfo(workflow.status);
+                  return (
+                    <div
+                      key={workflow.id}
+                      className="group grid grid-cols-1 lg:grid-cols-[1fr_100px_100px_80px_80px] gap-4 px-4 py-3 hover:bg-surface-75/50 transition-colors"
+                    >
+                      {/* 工作流信息 */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center shrink-0">
+                          <Zap className="w-3.5 h-3.5 text-foreground-light" />
                         </div>
-
-                        <div className="hidden lg:flex items-center text-xs text-foreground-light">
-                          {workflow.trigger.includes("定时") ? "定时" : workflow.trigger}
-                        </div>
-                        <div className="hidden lg:flex items-center text-xs text-foreground-light">
-                          {workflow.lastRun}
-                        </div>
-                        <div className="hidden lg:flex items-center text-xs text-foreground-light">
-                          {workflow.totalRuns}
-                        </div>
-                        <div className="hidden lg:flex items-center text-xs text-foreground-light">
-                          {workflow.successRate}%
-                        </div>
-                        <div className="hidden xl:flex items-center text-xs text-foreground-light">
-                          {workflow.updatedAt}
-                        </div>
-
-                        <div className="flex items-center justify-start lg:justify-end gap-1.5">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="text-foreground-muted hover:text-foreground"
-                            asChild
-                          >
-                            <Link href={`/editor/${workflow.id}`} aria-label="编辑工作流">
-                              <Edit className="w-4 h-4" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            {workflow.starred && (
+                              <Star className="w-3.5 h-3.5 text-warning fill-current shrink-0" />
+                            )}
+                            <Link
+                              href={`/workflows/${workflow.id}`}
+                              className="text-[13px] font-medium text-foreground hover:text-brand-500 transition-colors truncate"
+                            >
+                              {workflow.name}
                             </Link>
-                          </Button>
-                          {workflow.status === "active" ? (
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-foreground-muted hover:text-foreground"
-                              aria-label="暂停工作流"
+                            <span
+                              className={cn(
+                                "inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border shrink-0",
+                                statusInfo.bg,
+                                statusInfo.color,
+                                statusInfo.border
+                              )}
                             >
-                              <Pause className="w-4 h-4" />
-                            </Button>
-                          ) : workflow.status !== "draft" ? (
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-foreground-muted hover:text-foreground"
-                              aria-label="启用工作流"
-                            >
-                              <Play className="w-4 h-4" />
-                            </Button>
-                          ) : null}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                className="text-foreground-muted hover:text-foreground"
-                                aria-label="更多操作"
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="w-40 bg-surface-100 border border-border rounded-md"
-                            >
-                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
-                                <Copy className="w-4 h-4" />
-                                复制
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
-                                <Star className="w-4 h-4" />
-                                {workflow.starred ? "取消收藏" : "收藏"}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-border mx-2" />
-                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive-200 hover:text-destructive rounded-md mx-1 cursor-pointer">
-                                <Trash2 className="w-4 h-4" />
-                                删除
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                              {statusInfo.label}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-foreground-light truncate">
+                            {workflow.description}
+                          </p>
                         </div>
+                      </div>
+
+                      {/* 触发方式 */}
+                      <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
+                        {workflow.trigger.includes("定时") ? "定时" : workflow.trigger}
+                      </div>
+
+                      {/* 最近运行 */}
+                      <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
+                        {workflow.lastRun}
+                      </div>
+
+                      {/* 运行次数 */}
+                      <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
+                        {workflow.totalRuns}
+                      </div>
+
+                      {/* 操作 */}
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="text-foreground-muted hover:text-foreground h-7 w-7"
+                          asChild
+                        >
+                          <Link href={`/editor/${workflow.id}`} aria-label="编辑工作流">
+                            <Edit className="w-3.5 h-3.5" />
+                          </Link>
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-foreground-muted hover:text-foreground h-7 w-7"
+                              aria-label="更多操作"
+                            >
+                              <MoreVertical className="w-3.5 h-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-36 bg-surface-100 border border-border rounded-md"
+                          >
+                            {workflow.status === "active" ? (
+                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                                <Pause className="w-3.5 h-3.5" />
+                                暂停
+                              </DropdownMenuItem>
+                            ) : workflow.status !== "draft" ? (
+                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                                <Play className="w-3.5 h-3.5" />
+                                启用
+                              </DropdownMenuItem>
+                            ) : null}
+                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                              <Copy className="w-3.5 h-3.5" />
+                              复制
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                              <Star className="w-3.5 h-3.5" />
+                              {workflow.starred ? "取消收藏" : "收藏"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border mx-2" />
+                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-destructive hover:bg-destructive-200 hover:text-destructive rounded-md mx-1 cursor-pointer">
+                              <Trash2 className="w-3.5 h-3.5" />
+                              删除
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      {/* 移动端信息 */}
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted lg:hidden">
+                        <span>{workflow.trigger.includes("定时") ? "定时" : workflow.trigger}</span>
+                        <span>{workflow.lastRun}</span>
+                        <span>{workflow.totalRuns} 次运行</span>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
           )}
-          {sortedWorkflows.length > 0 && viewMode !== "list" && (
-            <div className="page-grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+          {/* 网格视图 */}
+          {sortedWorkflows.length > 0 && viewMode === "grid" && (
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {sortedWorkflows.map((workflow) => {
                 const statusInfo = getStatusInfo(workflow.status);
                 return (
                   <Link
                     key={workflow.id}
                     href={`/workflows/${workflow.id}`}
-                    className={cn(
-                      "page-panel p-5 transition-supabase group bg-surface-100/80",
-                      "hover:border-border-strong hover:bg-surface-75/80"
-                    )}
+                    className="block p-4 rounded-lg border border-border bg-surface-75/60 hover:border-border-strong hover:bg-surface-100/80 transition-colors group"
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-9 h-9 rounded-md bg-surface-200/80 border border-border flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-foreground-light" />
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-8 h-8 rounded-md bg-surface-200/80 border border-border flex items-center justify-center">
+                        <Zap className="w-3.5 h-3.5 text-foreground-light" />
                       </div>
                       <span
                         className={cn(
-                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border",
+                          "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border",
                           statusInfo.bg,
                           statusInfo.color,
                           statusInfo.border
                         )}
                       >
-                        <statusInfo.icon className="w-3 h-3" />
                         {statusInfo.label}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-foreground-muted mb-3">
-                      <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-200/60 px-2 py-0.5">
-                        <Folder className="w-3 h-3" />
-                        {workflow.folder}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {workflow.updatedAt}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-medium text-foreground mb-1 group-hover:text-brand-500 transition-colors flex items-center gap-2">
+                    <h3 className="text-[13px] font-medium text-foreground mb-1 group-hover:text-brand-500 transition-colors flex items-center gap-2">
                       {workflow.starred && (
-                        <Star className="w-4 h-4 text-warning fill-current" />
+                        <Star className="w-3.5 h-3.5 text-warning fill-current" />
                       )}
-                      {workflow.name}
+                      <span className="truncate">{workflow.name}</span>
                     </h3>
-                    <p className="text-[13px] text-foreground-light mb-4 line-clamp-2">
+                    <p className="text-[11px] text-foreground-light mb-3 line-clamp-2">
                       {workflow.description}
                     </p>
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {workflow.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-md border border-border bg-surface-200/60 px-2 py-0.5 text-[11px] text-foreground-muted"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-foreground-muted">
-                      <span className="flex items-center gap-1">
-                        <Zap className="w-3 h-3" />
-                        {workflow.totalRuns}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" />
-                        {workflow.successRate}%
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {workflow.lastRun}
-                      </span>
+                    <div className="flex items-center justify-between text-[10px] text-foreground-muted">
+                      <span>{workflow.totalRuns} 次运行</span>
+                      <span>{workflow.updatedAt}</span>
                     </div>
                   </Link>
                 );
               })}
             </div>
           )}
+
+          {/* 空状态 */}
           {sortedWorkflows.length === 0 && (
-            <div className="page-panel px-6 py-16 text-center border-dashed border-border bg-surface-100/60">
-              <div className="w-14 h-14 rounded-md bg-surface-200/80 border border-border flex items-center justify-center mx-auto mb-5">
-                <Zap className="w-6 h-6 text-foreground-muted" />
+            <div className="px-4 py-12 text-center">
+              <div className="w-12 h-12 rounded-md bg-surface-200/80 border border-border flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-5 h-5 text-foreground-muted" />
               </div>
-              <h3 className="text-base font-medium text-foreground mb-2">
+              <h3 className="text-[13px] font-medium text-foreground mb-1">
                 {searchQuery || statusFilter !== "all"
                   ? "没有找到匹配的工作流"
                   : "还没有创建工作流"}
               </h3>
-              <p className="text-[13px] text-foreground-light mb-6 max-w-sm mx-auto">
+              <p className="text-[11px] text-foreground-light mb-4 max-w-xs mx-auto">
                 {searchQuery || statusFilter !== "all"
                   ? "尝试使用其他关键词或筛选条件"
                   : "创建您的第一个工作流，开始自动化之旅"}
@@ -942,25 +803,27 @@ export default function WorkflowsPage() {
               {searchQuery || statusFilter !== "all" ? (
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => {
                     setSearchQuery("");
                     setStatusFilter("all");
+                    setSelectedFolder("全部");
                   }}
                 >
                   清除筛选
                 </Button>
               ) : (
-                <Link href="/workflows/new">
-                  <Button>
-                    <Plus className="mr-2 w-4 h-4" />
+                <Button size="sm" asChild>
+                  <Link href="/workflows/new">
+                    <Plus className="mr-1.5 w-3.5 h-3.5" />
                     创建工作流
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
             </div>
           )}
-        </section>
+        </div>
       </div>
-    </PageContainer>
+    </PageWithSidebar>
   );
 }

@@ -81,11 +81,12 @@ const fullBleedRoutes = [
   "/editor",
   "/chat",
   "/conversations",
-  "/creative/generate",
-  "/creative/document",
-  "/creative/task",
+  "/creative",
   "/review",
-  "/workflows/new",
+  "/workflows",
+  "/my-agents",
+  "/files",
+  "/analytics",
 ];
 
 // 模拟对话历史
