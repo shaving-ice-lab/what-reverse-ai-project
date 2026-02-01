@@ -88,6 +88,17 @@
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
+
+  /* ===== Terminal Overlay ===== */
+  --terminal-scanline-color: rgba(62, 207, 142, 0.12);
+  --terminal-scanline-opacity: 0.18;
+  --terminal-grid-color: rgba(62, 207, 142, 0.08);
+  --terminal-grid-opacity: 0.14;
+  --terminal-noise-color: rgba(255, 255, 255, 0.04);
+  --terminal-scanline-thickness: 1px;
+  --terminal-scanline-step: 4px;
+  --terminal-grid-size: 12px;
+  --terminal-noise-size: 6px;
 }
 
 @layer base {
@@ -98,7 +109,43 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    font-variant-ligatures: none;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  body::before {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--terminal-scanline-color) 0px,
+      var(--terminal-scanline-color) var(--terminal-scanline-thickness),
+      transparent var(--terminal-scanline-thickness),
+      transparent var(--terminal-scanline-step)
+    );
+    opacity: var(--terminal-scanline-opacity);
+    mix-blend-mode: soft-light;
+  }
+
+  body::after {
+    background-image:
+      linear-gradient(90deg, var(--terminal-grid-color) 1px, transparent 1px),
+      linear-gradient(0deg, var(--terminal-grid-color) 1px, transparent 1px),
+      radial-gradient(circle at 1px 1px, var(--terminal-noise-color) 1px, transparent 1px);
+    background-size:
+      var(--terminal-grid-size) var(--terminal-grid-size),
+      var(--terminal-grid-size) var(--terminal-grid-size),
+      var(--terminal-noise-size) var(--terminal-noise-size);
+    opacity: var(--terminal-grid-opacity);
+    mix-blend-mode: soft-light;
   }
 
   .font-mono,
@@ -425,6 +472,12 @@
     --color-brand-500: #2ea67a;
     --color-primary: #2ea67a;
     --color-primary-foreground: #ffffff;
+
+    --terminal-scanline-color: rgba(16, 32, 24, 0.08);
+    --terminal-scanline-opacity: 0.1;
+    --terminal-grid-color: rgba(16, 32, 24, 0.06);
+    --terminal-grid-opacity: 0.1;
+    --terminal-noise-color: rgba(0, 0, 0, 0.04);
   }
   
   /* 亮色模式滚动条 */
@@ -445,6 +498,24 @@
   }
 }
 
+@layer base {
+  body.terminal-soft {
+    --terminal-scanline-opacity: 0.08;
+    --terminal-grid-opacity: 0.06;
+    --terminal-scanline-step: 6px;
+    --terminal-grid-size: 18px;
+    --terminal-noise-size: 10px;
+  }
+
+  body.terminal-strong {
+    --terminal-scanline-opacity: 0.3;
+    --terminal-grid-opacity: 0.22;
+    --terminal-scanline-step: 3px;
+    --terminal-grid-size: 10px;
+    --terminal-noise-size: 5px;
+  }
+}
+
 @layer utilities {
   /* ===== Supabase 排版系统 ===== */
 
@@ -453,7 +524,7 @@
     font-size: 1.5rem;
     line-height: 2rem;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05em;
   }
 
   /* 章节标题 - 20px, semibold */
@@ -461,7 +532,7 @@
     font-size: 1.25rem;
     line-height: 1.75rem;
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.05em;
   }
 
   /* 卡片标题 - 16px, semibold */
@@ -602,6 +673,33 @@
 
   .page-description {
     @apply mt-1.5 text-[13px] leading-5 text-foreground-light;
+  }
+
+  .page-title,
+  .text-page-title,
+  .text-section-title,
+  .page-panel-title,
+  .dashboard-page h1:not([class*="text-"]),
+  .dashboard-page h2:not([class*="text-"]),
+  .dashboard-page h3:not([class*="text-"]) {
+    position: relative;
+    padding-left: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+
+  .page-title::before,
+  .text-page-title::before,
+  .text-section-title::before,
+  .page-panel-title::before,
+  .dashboard-page h1:not([class*="text-"])::before,
+  .dashboard-page h2:not([class*="text-"])::before,
+  .dashboard-page h3:not([class*="text-"])::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    color: var(--color-brand-500);
+    opacity: 0.9;
   }
 
   .page-toolbar {

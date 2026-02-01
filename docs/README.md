@@ -44,13 +44,15 @@
 |------|------|
 | [AI创意助手 API](./api/creative-assistant-api.md) | 创意助手完整 API 接口文档 |
 
-### UI/UX 设计
+### UI/UX 设计系统
 
 | 文档 | 描述 |
 |------|------|
-| [ui-prompts/README.md](./ui-prompts/README.md) | UI 设计规范索引 |
-| [ui-prompts/01-global-styles.md](./ui-prompts/01-global-styles.md) | 全局样式规范 |
-| [ui-prompts/08-workflow-editor.md](./ui-prompts/08-workflow-editor.md) | 工作流编辑器设计 |
+| [design-system/MASTER.md](../design-system/agentflow/MASTER.md) | 完整设计规范 (含 Tailwind 速查表) |
+| [design-system/pages/auth.md](../design-system/agentflow/pages/auth.md) | 认证页面设计规范 |
+| [design-system/pages/dashboard.md](../design-system/agentflow/pages/dashboard.md) | 仪表板设计规范 |
+| [design-system/pages/editor.md](../design-system/agentflow/pages/editor.md) | 编辑器设计规范 |
+| [design-system/pages/settings.md](../design-system/agentflow/pages/settings.md) | 设置页面设计规范 |
 
 ---
 
@@ -98,7 +100,7 @@
 
 ## 🔗 相关链接
 
-- **设计规范**: [design-system/agentflow/MASTER.md](../design-system/agentflow/MASTER.md)
+- **设计规范**: [design-system/agentflow/](../design-system/agentflow/) - 完整设计系统
 - **SDK 文档**: [packages/sdk/README.md](../packages/sdk/README.md)
 
 ---

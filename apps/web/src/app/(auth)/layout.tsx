@@ -14,15 +14,20 @@ export default function AuthLayout({
   return (
     <RequireGuest>
       <div className="min-h-screen flex flex-col bg-background relative overflow-hidden transition-colors duration-300">
-        {/* 微妙网格背景 */}
+        {/* 像素网格背景 */}
         <div 
-          className="absolute inset-0 opacity-30 dark:opacity-20"
+          className="absolute inset-0 opacity-35 dark:opacity-25"
           style={{
             backgroundImage: `
-              linear-gradient(to right, var(--color-border) 1px, transparent 1px),
-              linear-gradient(to bottom, var(--color-border) 1px, transparent 1px)
+              linear-gradient(90deg, var(--terminal-grid-color) 1px, transparent 1px),
+              linear-gradient(0deg, var(--terminal-grid-color) 1px, transparent 1px),
+              radial-gradient(circle at 1px 1px, var(--terminal-noise-color) 1px, transparent 1px)
             `,
-            backgroundSize: '48px 48px'
+            backgroundSize: `
+              var(--terminal-grid-size) var(--terminal-grid-size),
+              var(--terminal-grid-size) var(--terminal-grid-size),
+              var(--terminal-noise-size) var(--terminal-noise-size)
+            `
           }}
         />
         

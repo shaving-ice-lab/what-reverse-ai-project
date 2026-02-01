@@ -390,23 +390,23 @@ export default function DashboardLayout({
               data-collapsed={sidebarCollapsed}
               className={cn(
                 "flex flex-col transition-all duration-300 ease-out relative shrink-0 bg-background-studio border-r border-border overflow-hidden",
-                sidebarCollapsed ? "w-[52px]" : "w-[220px]"
+                sidebarCollapsed ? "w-[52px]" : "w-[188px]"
               )}
             >
               <div className="relative z-10 flex h-full flex-col">
                 {/* 新建按钮 */}
-                <div className={cn("shrink-0", sidebarCollapsed ? "px-2 pt-3 pb-2" : "px-3 pt-3 pb-2")}>
+                <div className={cn("shrink-0", sidebarCollapsed ? "px-1.5 pt-3 pb-2" : "px-2 pt-3 pb-2")}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link href="/conversations">
                         <button
-                        className={cn(
-                            "w-full flex items-center gap-2 rounded-md text-[11px] font-mono font-medium tracking-[0.12em] transition-colors",
+                          className={cn(
+                            "w-full flex items-center gap-2 rounded-md text-[12px] font-medium transition-colors",
                             sidebarCollapsed ? "h-8 justify-center" : "h-8 px-2",
-                            "text-foreground-muted hover:text-foreground hover:bg-surface-100/60"
+                            "text-foreground-light hover:text-foreground hover:bg-surface-100/60"
                           )}
                         >
-                          <Plus className="w-4 h-4" strokeWidth={2.5} />
+                          {sidebarCollapsed && <Plus className="w-4 h-4" strokeWidth={2.5} />}
                           {!sidebarCollapsed && <span>新建对话</span>}
                         </button>
                       </Link>
@@ -423,7 +423,7 @@ export default function DashboardLayout({
               <div
                 className={cn(
                   "flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin",
-                  sidebarCollapsed ? "px-2" : "px-3"
+                  sidebarCollapsed ? "px-1.5" : "px-2"
                 )}
               >
                 {/* 主导航 */}
@@ -455,10 +455,10 @@ export default function DashboardLayout({
                         <Link key={item.href} href={item.href}>
                           <button
                             className={cn(
-                              "w-full h-8 rounded-md flex items-center px-3 transition-colors text-[11px] font-mono tracking-[0.08em] relative before:content-['>'] before:inline-block before:mr-2 before:text-[10px] before:opacity-0",
+                              "w-full h-8 rounded-md flex items-center px-2 transition-colors text-[12px] font-medium",
                               active
-                                ? "bg-surface-100/70 text-foreground before:opacity-100 before:text-brand-500"
-                                : "text-foreground-muted hover:text-foreground hover:bg-surface-100/60 hover:before:opacity-50"
+                                ? "bg-surface-100/70 text-foreground"
+                                : "text-foreground-light hover:text-foreground hover:bg-surface-100/60"
                             )}
                           >
                             <span className="truncate">{item.title}</span>
@@ -498,10 +498,10 @@ export default function DashboardLayout({
                         <Link key={item.href} href={item.href}>
                           <button
                             className={cn(
-                              "w-full h-8 rounded-md flex items-center px-3 transition-colors text-[11px] font-mono tracking-[0.08em] relative before:content-['>'] before:inline-block before:mr-2 before:text-[10px] before:opacity-0",
+                              "w-full h-8 rounded-md flex items-center px-2 transition-colors text-[12px] font-medium",
                               active
-                                ? "bg-surface-100/70 text-foreground before:opacity-100 before:text-brand-500"
-                                : "text-foreground-muted hover:text-foreground hover:bg-surface-100/60 hover:before:opacity-50"
+                                ? "bg-surface-100/70 text-foreground"
+                                : "text-foreground-light hover:text-foreground hover:bg-surface-100/60"
                             )}
                           >
                             <span className="truncate">{item.title}</span>
@@ -519,7 +519,7 @@ export default function DashboardLayout({
                     <div>
                       <button
                         onClick={() => setShowHistory(!showHistory)}
-                        className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono tracking-[0.12em] text-foreground-muted transition-colors w-full hover:text-foreground"
+                        className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-foreground-muted transition-colors w-full hover:text-foreground"
                       >
                         <ChevronDown
                           className={cn("w-3 h-3 transition-transform", !showHistory && "-rotate-90")}
@@ -534,7 +534,7 @@ export default function DashboardLayout({
                               key={conv.id}
                               onClick={() => setActiveConversation(conv.id)}
                               className={cn(
-                                "w-full text-left px-2 py-1.5 rounded-md text-[11px] font-mono tracking-[0.04em] transition-colors relative",
+                                "w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative",
                                 activeConversation === conv.id
                                   ? "bg-surface-100/70 text-foreground"
                                   : "text-foreground-muted hover:bg-surface-100/60 hover:text-foreground"
@@ -557,7 +557,7 @@ export default function DashboardLayout({
               {/* 底部区域 */}
               <div className="mt-auto shrink-0">
                 {!sidebarCollapsed && (
-                  <div className="px-3 py-2">
+                  <div className="px-2 py-2">
                     <div className="p-2.5 rounded-md bg-surface-100 border border-border">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
@@ -578,15 +578,15 @@ export default function DashboardLayout({
                   </div>
                 )}
 
-                <div className="h-px mx-3 my-2 bg-border" />
+                <div className="h-px mx-2 my-2 bg-border" />
 
-                <div className={cn("py-2", sidebarCollapsed ? "px-2" : "px-3")}>
+                <div className={cn("py-2", sidebarCollapsed ? "px-1.5" : "px-2")}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                         className={cn(
-                          "w-full h-8 rounded-md flex items-center transition-colors text-[11px] font-mono tracking-[0.12em]",
+                          "w-full h-8 rounded-md flex items-center transition-colors text-[12px] font-medium",
                           sidebarCollapsed ? "justify-center" : "gap-2 px-2",
                           "text-foreground-muted hover:text-foreground hover:bg-surface-100/60"
                         )}

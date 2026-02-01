@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body 
-        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-mono antialiased terminal-strong`}
       >
         <Providers>{children}</Providers>
       </body>
