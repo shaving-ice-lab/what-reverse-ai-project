@@ -1,0 +1,479 @@
+{
+  "$schema": "../schemas/template.schema.json",
+  "id": "prd-generator",
+  "version": "1.0.0",
+  "name": "PRD文档生成器",
+  "nameEn": "PRD Document Generator",
+  "description": "输入产品想法，自动生成完整的产品需求文档（PRD），包含背景分析、用户故事、功能需求、原型建议",
+  "icon": "document-duplicate",
+  "category": "product",
+  "tags": ["产品需求", "PRD", "产品经理", "功能设计"],
+  
+  "metadata": {
+    "author": "AgentFlow",
+    "createdAt": "2026-01-29",
+    "updatedAt": "2026-01-29",
+    "usageCount": 0,
+    "rating": 0,
+    "estimatedTime": "4-6分钟"
+  },
+  
+  "inputs": {
+    "required": [
+      {
+        "id": "product_idea",
+        "label": "产品想法",
+        "type": "textarea",
+        "placeholder": "例如：一个AI写作助手，帮助自媒体创作者快速生成爆款文章",
+        "description": "描述你想做的产品，越详细越好",
+        "validation": {
+          "required": true,
+          "minLength": 20,
+          "maxLength": 2000
+        }
+      },
+      {
+        "id": "target_users",
+        "label": "目标用户",
+        "type": "textarea",
+        "placeholder": "例如：自媒体创作者、小红书博主、公众号运营者",
+        "validation": {
+          "required": true,
+          "minLength": 5
+        }
+      },
+      {
+        "id": "product_type",
+        "label": "产品类型",
+        "type": "select",
+        "options": [
+          { "value": "web", "label": "Web应用" },
+          { "value": "mobile", "label": "移动App" },
+          { "value": "desktop", "label": "桌面软件" },
+          { "value": "saas", "label": "SaaS平台" },
+          { "value": "mini_program", "label": "小程序" },
+          { "value": "browser_extension", "label": "浏览器插件" },
+          { "value": "api", "label": "API服务" }
+        ],
+        "defaultValue": "web"
+      }
+    ],
+    "optional": [
+      {
+        "id": "core_problem",
+        "label": "核心痛点",
+        "type": "textarea",
+        "placeholder": "用户目前遇到什么问题？现有方案有什么不足？"
+      },
+      {
+        "id": "competitors",
+        "label": "竞品/参考产品",
+        "type": "textarea",
+        "placeholder": "列出竞争对手或想参考的产品"
+      },
+      {
+        "id": "tech_constraints",
+        "label": "技术约束",
+        "type": "textarea",
+        "placeholder": "技术栈偏好、API限制、预算约束等"
+      },
+      {
+        "id": "timeline",
+        "label": "预期时间线",
+        "type": "select",
+        "options": [
+          { "value": "2weeks", "label": "2周内" },
+          { "value": "1month", "label": "1个月" },
+          { "value": "3months", "label": "3个月" },
+          { "value": "6months", "label": "6个月" },
+          { "value": "1year", "label": "1年以上" }
+        ]
+      },
+      {
+        "id": "monetization",
+        "label": "商业模式",
+        "type": "multiselect",
+        "options": [
+          { "value": "subscription", "label": "订阅制" },
+          { "value": "freemium", "label": "免费增值" },
+          { "value": "one_time", "label": "一次性付费" },
+          { "value": "ads", "label": "广告收入" },
+          { "value": "commission", "label": "交易抽成" },
+          { "value": "enterprise", "label": "企业定制" }
+        ]
+      }
+    ]
+  },
+  
+  "outputSections": [
+    {
+      "id": "overview",
+      "title": "产品概述",
+      "description": "产品背景、目标、定位",
+      "icon": "document-text",
+      "subsections": [
+        { "id": "background", "title": "项目背景", "format": "text" },
+        { "id": "goals", "title": "产品目标", "format": "list" },
+        { "id": "positioning", "title": "产品定位", "format": "text" },
+        { "id": "success_metrics", "title": "成功指标", "format": "kpi" }
+      ]
+    },
+    {
+      "id": "user_research",
+      "title": "用户研究",
+      "description": "用户画像、痛点、需求",
+      "icon": "users",
+      "subsections": [
+        { "id": "personas", "title": "用户画像", "format": "personas" },
+        { "id": "pain_points", "title": "用户痛点", "format": "list" },
+        { "id": "user_journey", "title": "用户旅程", "format": "journey" }
+      ]
+    },
+    {
+      "id": "competitive_analysis",
+      "title": "竞品分析",
+      "description": "竞品对比、差异化",
+      "icon": "chart-bar",
+      "subsections": [
+        { "id": "competitors", "title": "主要竞品", "format": "table" },
+        { "id": "differentiation", "title": "差异化定位", "format": "text" },
+        { "id": "opportunities", "title": "市场机会", "format": "list" }
+      ]
+    },
+    {
+      "id": "user_stories",
+      "title": "用户故事",
+      "description": "功能需求的用户故事形式",
+      "icon": "book-open",
+      "subsections": [
+        { "id": "epics", "title": "Epic列表", "format": "list" },
+        { "id": "stories", "title": "用户故事详情", "format": "stories" }
+      ]
+    },
+    {
+      "id": "functional_requirements",
+      "title": "功能需求",
+      "description": "核心功能、功能列表、优先级",
+      "icon": "puzzle",
+      "subsections": [
+        { "id": "core_features", "title": "核心功能", "format": "features" },
+        { "id": "feature_list", "title": "功能清单", "format": "table" },
+        { "id": "mvp_scope", "title": "MVP范围", "format": "list" }
+      ]
+    },
+    {
+      "id": "information_architecture",
+      "title": "信息架构",
+      "description": "页面结构、导航设计",
+      "icon": "sitemap",
+      "subsections": [
+        { "id": "sitemap", "title": "站点地图", "format": "tree" },
+        { "id": "navigation", "title": "导航结构", "format": "list" }
+      ]
+    },
+    {
+      "id": "wireframes",
+      "title": "原型建议",
+      "description": "关键页面的线框图描述",
+      "icon": "template",
+      "subsections": [
+        { "id": "key_pages", "title": "关键页面", "format": "wireframes" },
+        { "id": "interactions", "title": "交互说明", "format": "list" }
+      ]
+    },
+    {
+      "id": "technical_requirements",
+      "title": "技术需求",
+      "description": "技术架构、API设计",
+      "icon": "code",
+      "subsections": [
+        { "id": "architecture", "title": "技术架构建议", "format": "diagram" },
+        { "id": "api_design", "title": "API设计建议", "format": "api" },
+        { "id": "data_model", "title": "数据模型建议", "format": "schema" }
+      ]
+    },
+    {
+      "id": "roadmap",
+      "title": "开发路线图",
+      "description": "分阶段开发计划",
+      "icon": "calendar",
+      "subsections": [
+        { "id": "phases", "title": "阶段划分", "format": "timeline" },
+        { "id": "milestones", "title": "里程碑", "format": "milestones" }
+      ]
+    },
+    {
+      "id": "appendix",
+      "title": "附录",
+      "description": "术语表、参考资料",
+      "icon": "document",
+      "subsections": [
+        { "id": "glossary", "title": "术语表", "format": "table" },
+        { "id": "references", "title": "参考资料", "format": "list" }
+      ]
+    }
+  ],
+  
+  "workflow": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "position": { "x": 100, "y": 300 },
+        "data": { "label": "开始" }
+      },
+      {
+        "id": "input_analyzer",
+        "type": "llm",
+        "position": { "x": 300, "y": 300 },
+        "data": {
+          "label": "需求分析",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.3,
+            "systemPrompt": "你是一位资深产品经理。分析用户的产品想法，提取关键信息：\n\n1. productName: 建议的产品名称\n2. productType: 产品类型\n3. targetUsers: 目标用户群体\n4. coreValue: 核心价值主张\n5. keyFeatures: 关键功能关键词\n6. searchKeywords: 用于竞品研究的搜索关键词",
+            "userPrompt": "产品想法：{{start.product_idea}}\n目标用户：{{start.target_users}}\n产品类型：{{start.product_type}}\n核心痛点：{{start.core_problem}}\n竞品参考：{{start.competitors}}"
+          }
+        }
+      },
+      {
+        "id": "competitor_search",
+        "type": "web_search",
+        "position": { "x": 500, "y": 200 },
+        "data": {
+          "label": "竞品搜索",
+          "config": {
+            "queries": [
+              "{{input_analyzer.keyFeatures}} 产品 竞品分析",
+              "{{input_analyzer.coreValue}} 解决方案 工具",
+              "{{input_analyzer.targetUsers}} 常用工具 产品"
+            ],
+            "resultsPerQuery": 5
+          }
+        }
+      },
+      {
+        "id": "market_search",
+        "type": "web_search",
+        "position": { "x": 500, "y": 400 },
+        "data": {
+          "label": "市场调研",
+          "config": {
+            "queries": [
+              "{{input_analyzer.coreValue}} 市场规模 趋势",
+              "{{input_analyzer.targetUsers}} 需求 痛点"
+            ],
+            "resultsPerQuery": 5
+          }
+        }
+      },
+      {
+        "id": "overview",
+        "type": "llm",
+        "position": { "x": 700, "y": 150 },
+        "data": {
+          "label": "产品概述",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "生成产品概述章节，包含：\n1. 项目背景（问题、机会、为什么现在做）\n2. 产品目标（SMART原则）\n3. 产品定位（一句话定位）\n4. 成功指标（可衡量的KPI）",
+            "userPrompt": "产品想法：{{start.product_idea}}\n目标用户：{{start.target_users}}\n核心痛点：{{start.core_problem}}\n市场调研：{{market_search.results}}"
+          }
+        }
+      },
+      {
+        "id": "user_research",
+        "type": "llm",
+        "position": { "x": 700, "y": 300 },
+        "data": {
+          "label": "用户研究",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 2000,
+            "systemPrompt": "生成用户研究章节：\n1. 用户画像（2-3个典型persona，含姓名、背景、目标、痛点）\n2. 用户痛点列表（优先级排序）\n3. 用户旅程地图（关键阶段和触点）",
+            "userPrompt": "目标用户：{{start.target_users}}\n产品概述：{{overview.text}}"
+          }
+        }
+      },
+      {
+        "id": "competitive_analysis",
+        "type": "llm",
+        "position": { "x": 700, "y": 450 },
+        "data": {
+          "label": "竞品分析",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "生成竞品分析章节：\n1. 主要竞品列表（表格：名称、定位、优势、劣势）\n2. 差异化定位\n3. 市场机会",
+            "userPrompt": "产品定位：{{overview.text}}\n竞品参考：{{start.competitors}}\n竞品搜索：{{competitor_search.results}}"
+          }
+        }
+      },
+      {
+        "id": "user_stories",
+        "type": "llm",
+        "position": { "x": 900, "y": 200 },
+        "data": {
+          "label": "用户故事",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 2500,
+            "systemPrompt": "生成用户故事：\n1. Epic列表（3-5个大功能模块）\n2. 每个Epic下的用户故事（格式：作为[角色]，我想要[功能]，以便[价值]）\n3. 验收标准",
+            "userPrompt": "产品概述：{{overview.text}}\n用户画像：{{user_research.text}}"
+          }
+        }
+      },
+      {
+        "id": "functional_requirements",
+        "type": "llm",
+        "position": { "x": 900, "y": 400 },
+        "data": {
+          "label": "功能需求",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 2500,
+            "systemPrompt": "生成功能需求：\n1. 核心功能描述（3-5个核心功能）\n2. 功能清单（表格：功能、描述、优先级P0/P1/P2）\n3. MVP范围定义（首版必须包含的功能）",
+            "userPrompt": "用户故事：{{user_stories.text}}\n技术约束：{{start.tech_constraints}}\n时间线：{{start.timeline}}"
+          }
+        }
+      },
+      {
+        "id": "information_architecture",
+        "type": "llm",
+        "position": { "x": 1100, "y": 150 },
+        "data": {
+          "label": "信息架构",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.5,
+            "maxTokens": 1500,
+            "systemPrompt": "设计信息架构：\n1. 站点地图（树形结构）\n2. 导航结构（主导航、侧边导航）\n3. 页面清单",
+            "userPrompt": "功能需求：{{functional_requirements.text}}\n产品类型：{{start.product_type}}"
+          }
+        }
+      },
+      {
+        "id": "wireframes",
+        "type": "llm",
+        "position": { "x": 1100, "y": 300 },
+        "data": {
+          "label": "原型建议",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 2000,
+            "systemPrompt": "描述关键页面的原型设计：\n1. 关键页面列表（5-8个核心页面）\n2. 每个页面的布局描述（区域划分、元素说明）\n3. 关键交互说明",
+            "userPrompt": "信息架构：{{information_architecture.text}}\n功能需求：{{functional_requirements.text}}"
+          }
+        }
+      },
+      {
+        "id": "technical_requirements",
+        "type": "llm",
+        "position": { "x": 1100, "y": 450 },
+        "data": {
+          "label": "技术需求",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.5,
+            "maxTokens": 2000,
+            "systemPrompt": "设计技术方案建议：\n1. 技术架构（前端、后端、数据库建议）\n2. 核心API设计（RESTful风格）\n3. 数据模型建议（核心实体和关系）",
+            "userPrompt": "功能需求：{{functional_requirements.text}}\n产品类型：{{start.product_type}}\n技术约束：{{start.tech_constraints}}"
+          }
+        }
+      },
+      {
+        "id": "roadmap",
+        "type": "llm",
+        "position": { "x": 1300, "y": 250 },
+        "data": {
+          "label": "开发路线图",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.5,
+            "maxTokens": 1500,
+            "systemPrompt": "制定开发路线图：\n1. 阶段划分（MVP → V1.0 → V2.0）\n2. 每阶段的功能范围\n3. 里程碑和时间预估",
+            "userPrompt": "功能需求：{{functional_requirements.text}}\n时间线：{{start.timeline}}"
+          }
+        }
+      },
+      {
+        "id": "appendix",
+        "type": "llm",
+        "position": { "x": 1300, "y": 400 },
+        "data": {
+          "label": "附录",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.3,
+            "maxTokens": 1000,
+            "systemPrompt": "生成附录内容：\n1. 术语表（专业术语解释）\n2. 参考资料（竞品链接、调研来源）",
+            "userPrompt": "产品概述：{{overview.text}}\n竞品分析：{{competitive_analysis.text}}"
+          }
+        }
+      },
+      {
+        "id": "document_assembler",
+        "type": "template",
+        "position": { "x": 1500, "y": 300 },
+        "data": {
+          "label": "文档整合",
+          "config": {
+            "template": "# {{input_analyzer.productName}} - 产品需求文档\n\n> **版本**: v1.0  \n> **产品类型**: {{start.product_type}}  \n> **目标用户**: {{start.target_users}}  \n> **生成时间**: {{currentDateTime}}\n\n---\n\n## 文档目录\n\n1. [产品概述](#1-产品概述)\n2. [用户研究](#2-用户研究)\n3. [竞品分析](#3-竞品分析)\n4. [用户故事](#4-用户故事)\n5. [功能需求](#5-功能需求)\n6. [信息架构](#6-信息架构)\n7. [原型建议](#7-原型建议)\n8. [技术需求](#8-技术需求)\n9. [开发路线图](#9-开发路线图)\n10. [附录](#10-附录)\n\n---\n\n## 1. 产品概述\n\n{{overview.text}}\n\n---\n\n## 2. 用户研究\n\n{{user_research.text}}\n\n---\n\n## 3. 竞品分析\n\n{{competitive_analysis.text}}\n\n---\n\n## 4. 用户故事\n\n{{user_stories.text}}\n\n---\n\n## 5. 功能需求\n\n{{functional_requirements.text}}\n\n---\n\n## 6. 信息架构\n\n{{information_architecture.text}}\n\n---\n\n## 7. 原型建议\n\n{{wireframes.text}}\n\n---\n\n## 8. 技术需求\n\n{{technical_requirements.text}}\n\n---\n\n## 9. 开发路线图\n\n{{roadmap.text}}\n\n---\n\n## 10. 附录\n\n{{appendix.text}}\n\n---\n\n*本PRD由 AgentFlow AI 创意助手生成，请根据实际情况调整完善。*"
+          }
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "position": { "x": 1700, "y": 300 },
+        "data": { "label": "完成" }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "input_analyzer" },
+      { "id": "e2", "source": "input_analyzer", "target": "competitor_search" },
+      { "id": "e3", "source": "input_analyzer", "target": "market_search" },
+      { "id": "e4", "source": "market_search", "target": "overview" },
+      { "id": "e5", "source": "overview", "target": "user_research" },
+      { "id": "e6", "source": "competitor_search", "target": "competitive_analysis" },
+      { "id": "e7", "source": "overview", "target": "competitive_analysis" },
+      { "id": "e8", "source": "user_research", "target": "user_stories" },
+      { "id": "e9", "source": "user_stories", "target": "functional_requirements" },
+      { "id": "e10", "source": "functional_requirements", "target": "information_architecture" },
+      { "id": "e11", "source": "functional_requirements", "target": "wireframes" },
+      { "id": "e12", "source": "information_architecture", "target": "wireframes" },
+      { "id": "e13", "source": "functional_requirements", "target": "technical_requirements" },
+      { "id": "e14", "source": "functional_requirements", "target": "roadmap" },
+      { "id": "e15", "source": "overview", "target": "appendix" },
+      { "id": "e16", "source": "competitive_analysis", "target": "appendix" },
+      { "id": "e17", "source": "overview", "target": "document_assembler" },
+      { "id": "e18", "source": "user_research", "target": "document_assembler" },
+      { "id": "e19", "source": "competitive_analysis", "target": "document_assembler" },
+      { "id": "e20", "source": "user_stories", "target": "document_assembler" },
+      { "id": "e21", "source": "functional_requirements", "target": "document_assembler" },
+      { "id": "e22", "source": "information_architecture", "target": "document_assembler" },
+      { "id": "e23", "source": "wireframes", "target": "document_assembler" },
+      { "id": "e24", "source": "technical_requirements", "target": "document_assembler" },
+      { "id": "e25", "source": "roadmap", "target": "document_assembler" },
+      { "id": "e26", "source": "appendix", "target": "document_assembler" },
+      { "id": "e27", "source": "document_assembler", "target": "end" }
+    ]
+  },
+  
+  "example": {
+    "input": {
+      "product_idea": "一个AI写作助手，帮助自媒体创作者快速生成爆款文章标题和大纲",
+      "target_users": "自媒体创作者、小红书博主、公众号运营者",
+      "product_type": "web",
+      "core_problem": "创作者花太多时间想标题和构思内容结构，经常不知道写什么",
+      "competitors": "Jasper、Copy.ai、秘塔写作猫"
+    },
+    "outputPreview": "# AI写作助手 - 产品需求文档\n\n> **版本**: v1.0  \n> **产品类型**: Web应用\n\n---\n\n## 1. 产品概述\n\n### 1.1 项目背景\n\n随着自媒体行业的蓬勃发展..."
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "manifestVersion": 1,
+  "id": "hello-world",
+  "name": "Hello World",
+  "version": "1.0.0",
+  "description": "一个简单的示例插件，演示插件系统的基本用法",
+  "author": {
+    "name": "AgentFlow Team",
+    "email": "team@agentflow.dev"
+  },
+  "category": "utility",
+  "icon": "star",
+  "keywords": ["example", "hello", "demo"],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "permissions": [
+    "storage",
+    "notifications"
+  ],
+  "settings": [
+    {
+      "key": "greeting",
+      "title": "问候语",
+      "description": "自定义问候语",
+      "type": "string",
+      "default": "Hello"
+    },
+    {
+      "key": "showNotification",
+      "title": "显示通知",
+      "description": "激活时是否显示通知",
+      "type": "boolean",
+      "default": true
+    }
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "hello-world.sayHello",
+        "title": "Say Hello",
+        "category": "Hello World"
+      },
+      {
+        "id": "hello-world.showInfo",
+        "title": "Show Plugin Info",
+        "category": "Hello World"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onCommand:hello-world.sayHello"
+  ]
+}

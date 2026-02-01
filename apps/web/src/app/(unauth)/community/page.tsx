@@ -1,0 +1,333 @@
+"use client";
+
+/**
+ * 社区页面 - Manus 风格
+ */
+
+import Link from "next/link";
+import {
+  Users,
+  MessageSquare,
+  Star,
+  Heart,
+  Github,
+  Twitter,
+  Calendar,
+  ArrowRight,
+  ExternalLink,
+  Trophy,
+  Code,
+  BookOpen,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/layout/site-header";
+import { cn } from "@/lib/utils";
+
+// 社区统计
+const stats = [
+  { icon: Users, value: "50K+", label: "社区成员" },
+  { icon: Star, value: "1,000+", label: "开源贡献者" },
+  { icon: MessageSquare, value: "10K+", label: "讨论话题" },
+  { icon: Heart, value: "5K+", label: "工作流分享" },
+];
+
+// 社区平台
+const platforms = [
+  {
+    icon: Github,
+    name: "GitHub",
+    description: "参与开源项目开发",
+    href: "https://github.com/agentflow",
+    cta: "查看代码",
+  },
+  {
+    icon: MessageSquare,
+    name: "Discord",
+    description: "加入实时讨论社区",
+    href: "#",
+    cta: "加入 Discord",
+  },
+  {
+    icon: Twitter,
+    name: "Twitter",
+    description: "获取最新动态",
+    href: "#",
+    cta: "关注我们",
+  },
+];
+
+// 活动
+const events = [
+  {
+    title: "AgentFlow 月度分享会",
+    date: "每月第一个周三",
+    description: "社区成员分享最佳实践和使用技巧",
+    type: "线上",
+  },
+  {
+    title: "开发者工作坊",
+    date: "每季度",
+    description: "深入学习高级功能和 API 开发",
+    type: "线下",
+  },
+  {
+    title: "黑客松",
+    date: "每年两次",
+    description: "48 小时创意马拉松，赢取丰厚奖品",
+    type: "线上+线下",
+  },
+];
+
+// 贡献者
+const contributors = [
+  { name: "张明", avatar: "张", contributions: 156, badge: "Core Maintainer" },
+  { name: "李华", avatar: "李", contributions: 98, badge: "Top Contributor" },
+  { name: "王芳", avatar: "王", contributions: 67, badge: "Active Member" },
+  { name: "陈伟", avatar: "陈", contributions: 45, badge: "Active Member" },
+];
+
+// 资源
+const resources = [
+  {
+    icon: BookOpen,
+    title: "社区教程",
+    description: "由社区成员编写的实战教程",
+    href: "/docs/tutorials",
+  },
+  {
+    icon: Code,
+    title: "示例代码",
+    description: "开源的工作流示例和模板",
+    href: "/templates",
+  },
+  {
+    icon: Trophy,
+    title: "贡献指南",
+    description: "了解如何为项目做贡献",
+    href: "/docs/contributing",
+  },
+];
+
+export default function CommunityPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+
+      {/* Hero */}
+      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+            <Users className="h-4 w-4" />
+            加入全球社区
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+            AgentFlow 社区
+          </h1>
+
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
+            与全球 50,000+ 开发者和自动化爱好者一起学习、分享和成长
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button size="lg" className="rounded-full">
+              加入 Discord
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Link href="https://github.com/agentflow" target="_blank">
+              <Button size="lg" variant="outline" className="rounded-full">
+                <Github className="mr-2 h-4 w-4" />
+                GitHub
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="text-center p-6 rounded-2xl bg-card border border-border"
+              >
+                <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
+                <div className="text-2xl font-bold text-foreground mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Platforms */}
+      <section className="py-12 px-6 bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            加入社区平台
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {platforms.map((platform) => (
+              <a
+                key={platform.name}
+                href={platform.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "p-6 rounded-2xl text-center",
+                  "bg-card border border-border",
+                  "hover:border-primary/30 hover:shadow-lg",
+                  "transition-all duration-300 group"
+                )}
+              >
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <platform.icon className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">
+                  {platform.name}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {platform.description}
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-primary font-medium">
+                  {platform.cta}
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Events */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            社区活动
+          </h2>
+          <div className="space-y-4">
+            {events.map((event) => (
+              <div
+                key={event.title}
+                className="p-6 rounded-2xl bg-card border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Calendar className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      {event.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {event.description}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>{event.date}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-muted">
+                        {event.type}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="shrink-0">
+                  了解更多
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contributors */}
+      <section className="py-12 px-6 bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            优秀贡献者
+          </h2>
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {contributors.map((contributor) => (
+              <div
+                key={contributor.name}
+                className="p-5 rounded-2xl bg-card border border-border text-center"
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 text-xl font-bold text-primary">
+                  {contributor.avatar}
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">
+                  {contributor.name}
+                </h3>
+                <div className="text-xs text-primary mb-2">{contributor.badge}</div>
+                <div className="text-sm text-muted-foreground">
+                  {contributor.contributions} 贡献
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Resources */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            社区资源
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {resources.map((resource) => (
+              <Link
+                key={resource.title}
+                href={resource.href}
+                className={cn(
+                  "p-6 rounded-2xl",
+                  "bg-card border border-border",
+                  "hover:border-primary/30 hover:shadow-lg",
+                  "transition-all duration-300 group"
+                )}
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <resource.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                  {resource.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {resource.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 px-6 bg-muted/20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            开始您的社区之旅
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            加入我们，与全球开发者一起构建未来
+          </p>
+          <Button size="lg" className="rounded-full">
+            加入社区
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-border">
+        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
+          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}

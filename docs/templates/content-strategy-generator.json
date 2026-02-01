@@ -1,0 +1,449 @@
+{
+  "$schema": "../schemas/template.schema.json",
+  "id": "content-strategy-generator",
+  "version": "1.0.0",
+  "name": "自媒体内容策划",
+  "nameEn": "Content Strategy Generator",
+  "description": "输入你的领域和目标，自动生成完整的自媒体运营方案，包含账号定位、选题库、内容排期、变现路径",
+  "icon": "document-text",
+  "category": "content",
+  "tags": ["自媒体", "内容创作", "小红书", "抖音", "公众号"],
+  
+  "metadata": {
+    "author": "AgentFlow",
+    "createdAt": "2026-01-29",
+    "updatedAt": "2026-01-29",
+    "usageCount": 0,
+    "rating": 0,
+    "estimatedTime": "3-5分钟"
+  },
+  
+  "inputs": {
+    "required": [
+      {
+        "id": "niche",
+        "label": "内容领域",
+        "type": "textarea",
+        "placeholder": "例如：AI工具测评、职场提效、副业赚钱、育儿教育...",
+        "description": "你想做什么方向的内容",
+        "validation": {
+          "required": true,
+          "minLength": 2,
+          "maxLength": 500
+        }
+      },
+      {
+        "id": "platforms",
+        "label": "目标平台",
+        "type": "multiselect",
+        "options": [
+          { "value": "xiaohongshu", "label": "小红书" },
+          { "value": "douyin", "label": "抖音" },
+          { "value": "wechat", "label": "公众号" },
+          { "value": "bilibili", "label": "B站" },
+          { "value": "shipinhao", "label": "视频号" },
+          { "value": "zhihu", "label": "知乎" },
+          { "value": "weibo", "label": "微博" }
+        ],
+        "defaultValue": ["xiaohongshu", "douyin"]
+      },
+      {
+        "id": "monetization_goal",
+        "label": "变现目标",
+        "type": "select",
+        "options": [
+          { "value": "5000", "label": "月入5千" },
+          { "value": "10000", "label": "月入1万" },
+          { "value": "30000", "label": "月入3万" },
+          { "value": "50000", "label": "月入5万" },
+          { "value": "100000", "label": "月入10万+" }
+        ],
+        "defaultValue": "10000"
+      }
+    ],
+    "optional": [
+      {
+        "id": "available_time",
+        "label": "每日可投入时间",
+        "type": "select",
+        "options": [
+          { "value": "1", "label": "1小时以内" },
+          { "value": "2", "label": "1-2小时" },
+          { "value": "4", "label": "2-4小时" },
+          { "value": "8", "label": "全职投入" }
+        ],
+        "defaultValue": "2"
+      },
+      {
+        "id": "background",
+        "label": "个人背景",
+        "type": "textarea",
+        "placeholder": "你的专业背景、擅长技能、已有资源等"
+      },
+      {
+        "id": "content_style",
+        "label": "内容风格偏好",
+        "type": "multiselect",
+        "options": [
+          { "value": "educational", "label": "干货教学" },
+          { "value": "entertaining", "label": "轻松娱乐" },
+          { "value": "storytelling", "label": "故事叙述" },
+          { "value": "review", "label": "测评种草" },
+          { "value": "vlog", "label": "日常Vlog" }
+        ]
+      },
+      {
+        "id": "show_face",
+        "label": "是否愿意露脸",
+        "type": "select",
+        "options": [
+          { "value": "yes", "label": "愿意露脸" },
+          { "value": "no", "label": "不想露脸" },
+          { "value": "partial", "label": "偶尔可以" }
+        ],
+        "defaultValue": "partial"
+      },
+      {
+        "id": "competitors",
+        "label": "参考账号",
+        "type": "textarea",
+        "placeholder": "列出你想学习的对标账号"
+      }
+    ]
+  },
+  
+  "outputSections": [
+    {
+      "id": "positioning",
+      "title": "账号定位",
+      "titleEn": "Account Positioning",
+      "description": "人设定位、差异化、目标受众",
+      "icon": "user-circle",
+      "subsections": [
+        { "id": "persona", "title": "人设定位", "format": "text" },
+        { "id": "differentiation", "title": "差异化定位", "format": "text" },
+        { "id": "target_audience", "title": "目标受众画像", "format": "profile" },
+        { "id": "account_setup", "title": "账号设置建议", "format": "checklist" }
+      ]
+    },
+    {
+      "id": "content_pillars",
+      "title": "内容支柱",
+      "titleEn": "Content Pillars",
+      "description": "内容分类、选题方向",
+      "icon": "view-grid",
+      "subsections": [
+        { "id": "pillars", "title": "内容支柱划分", "format": "cards" },
+        { "id": "content_ratio", "title": "内容配比建议", "format": "pie" }
+      ]
+    },
+    {
+      "id": "topic_library",
+      "title": "选题库",
+      "titleEn": "Topic Library",
+      "description": "50+爆款选题",
+      "icon": "light-bulb",
+      "subsections": [
+        { "id": "hot_topics", "title": "热门选题（20个）", "format": "list" },
+        { "id": "evergreen_topics", "title": "常青选题（20个）", "format": "list" },
+        { "id": "trending_topics", "title": "热点结合选题（10个）", "format": "list" }
+      ]
+    },
+    {
+      "id": "title_templates",
+      "title": "爆款标题公式",
+      "titleEn": "Title Templates",
+      "description": "标题模板和案例",
+      "icon": "annotation",
+      "subsections": [
+        { "id": "formulas", "title": "标题公式", "format": "templates" },
+        { "id": "examples", "title": "标题案例", "format": "list" }
+      ]
+    },
+    {
+      "id": "content_calendar",
+      "title": "发布排期",
+      "titleEn": "Content Calendar",
+      "description": "发布频率和时间安排",
+      "icon": "calendar",
+      "subsections": [
+        { "id": "frequency", "title": "发布频率建议", "format": "table" },
+        { "id": "best_times", "title": "最佳发布时间", "format": "schedule" },
+        { "id": "weekly_plan", "title": "一周内容排期", "format": "calendar" }
+      ]
+    },
+    {
+      "id": "monetization",
+      "title": "变现路径",
+      "titleEn": "Monetization Path",
+      "description": "变现方式和收入预估",
+      "icon": "currency-dollar",
+      "subsections": [
+        { "id": "methods", "title": "变现方式", "format": "cards" },
+        { "id": "timeline", "title": "变现时间线", "format": "timeline" },
+        { "id": "revenue_model", "title": "收入模型预估", "format": "table" }
+      ]
+    },
+    {
+      "id": "growth_strategy",
+      "title": "增长策略",
+      "titleEn": "Growth Strategy",
+      "description": "涨粉技巧和互动策略",
+      "icon": "trending-up",
+      "subsections": [
+        { "id": "growth_hacks", "title": "涨粉技巧", "format": "list" },
+        { "id": "engagement", "title": "互动策略", "format": "list" },
+        { "id": "cross_platform", "title": "跨平台引流", "format": "diagram" }
+      ]
+    },
+    {
+      "id": "action_plan",
+      "title": "行动计划",
+      "titleEn": "Action Plan",
+      "description": "立即开始的任务清单",
+      "icon": "check-circle",
+      "subsections": [
+        { "id": "day_one", "title": "第一天任务", "format": "checklist" },
+        { "id": "first_week", "title": "第一周目标", "format": "goals" },
+        { "id": "first_month", "title": "首月里程碑", "format": "milestones" },
+        { "id": "tools", "title": "推荐工具", "format": "table" }
+      ]
+    }
+  ],
+  
+  "workflow": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "label": "开始",
+          "outputs": ["niche", "platforms", "monetization_goal", "available_time", "background", "content_style", "show_face", "competitors"]
+        }
+      },
+      {
+        "id": "input_analyzer",
+        "type": "llm",
+        "position": { "x": 300, "y": 300 },
+        "data": {
+          "label": "输入分析",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.3,
+            "systemPrompt": "分析用户的自媒体规划需求，提取关键信息并以JSON格式输出：\n\n1. niche: 具体细分领域\n2. platforms: 目标平台列表\n3. targetAudience: 目标受众特征\n4. contentStyle: 内容风格\n5. constraints: 限制条件（时间、露脸等）\n6. searchKeywords: 用于研究的搜索关键词",
+            "userPrompt": "内容领域：{{start.niche}}\n目标平台：{{start.platforms}}\n变现目标：{{start.monetization_goal}}元/月\n可投入时间：{{start.available_time}}小时/天\n个人背景：{{start.background}}\n内容风格：{{start.content_style}}\n是否露脸：{{start.show_face}}\n参考账号：{{start.competitors}}"
+          }
+        }
+      },
+      {
+        "id": "competitor_research",
+        "type": "web_search",
+        "position": { "x": 500, "y": 200 },
+        "data": {
+          "label": "竞品研究",
+          "config": {
+            "queries": [
+              "{{input_analyzer.niche}} 头部博主 账号分析",
+              "{{input_analyzer.niche}} 爆款内容 案例",
+              "{{input_analyzer.niche}} {{input_analyzer.platforms[0]}} 涨粉技巧"
+            ],
+            "resultsPerQuery": 5
+          }
+        }
+      },
+      {
+        "id": "trend_research",
+        "type": "web_search",
+        "position": { "x": 500, "y": 400 },
+        "data": {
+          "label": "趋势研究",
+          "config": {
+            "queries": [
+              "{{input_analyzer.niche}} 热门话题 2026",
+              "{{input_analyzer.niche}} 变现方式 案例",
+              "{{input_analyzer.platforms[0]}} 算法推荐 技巧"
+            ],
+            "resultsPerQuery": 5
+          }
+        }
+      },
+      {
+        "id": "positioning",
+        "type": "llm",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "label": "账号定位",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "你是一个自媒体定位专家。基于用户背景和市场研究，设计一个差异化的账号定位。\n\n要求：\n1. 人设要有记忆点\n2. 差异化要具体可执行\n3. 目标受众画像要详细\n4. 账号设置要具体（头像、昵称、简介建议）",
+            "userPrompt": "领域：{{input_analyzer.niche}}\n平台：{{input_analyzer.platforms}}\n背景：{{start.background}}\n风格：{{input_analyzer.contentStyle}}\n是否露脸：{{start.show_face}}\n\n竞品研究：{{competitor_research.results}}"
+          }
+        }
+      },
+      {
+        "id": "content_pillars",
+        "type": "llm",
+        "position": { "x": 700, "y": 400 },
+        "data": {
+          "label": "内容支柱",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1000,
+            "systemPrompt": "基于账号定位，设计3-5个内容支柱（核心内容分类）。\n\n要求：\n1. 每个支柱要有明确的价值主张\n2. 支柱之间要有互补性\n3. 给出内容配比建议",
+            "userPrompt": "账号定位：{{positioning.text}}\n可投入时间：{{start.available_time}}小时/天"
+          }
+        }
+      },
+      {
+        "id": "topic_library",
+        "type": "llm",
+        "position": { "x": 900, "y": 200 },
+        "data": {
+          "label": "选题库",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.8,
+            "maxTokens": 2500,
+            "systemPrompt": "生成50个具体的选题创意，分为三类：\n\n1. 热门选题（20个）：容易获得流量的话题\n2. 常青选题（20个）：长期有价值的内容\n3. 热点结合选题（10个）：可以结合时事热点的方向\n\n每个选题要具体到可以直接开始创作的程度。",
+            "userPrompt": "内容支柱：{{content_pillars.text}}\n趋势研究：{{trend_research.results}}"
+          }
+        }
+      },
+      {
+        "id": "title_templates",
+        "type": "llm",
+        "position": { "x": 900, "y": 400 },
+        "data": {
+          "label": "标题公式",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "生成10个爆款标题公式，每个公式：\n1. 公式模板（用[XX]表示变量）\n2. 3个具体案例\n3. 为什么有效的心理学原理",
+            "userPrompt": "领域：{{input_analyzer.niche}}\n平台：{{input_analyzer.platforms}}\n选题参考：{{topic_library.text}}"
+          }
+        }
+      },
+      {
+        "id": "content_calendar",
+        "type": "llm",
+        "position": { "x": 1100, "y": 200 },
+        "data": {
+          "label": "发布排期",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.5,
+            "maxTokens": 1500,
+            "systemPrompt": "制定内容发布排期计划：\n\n1. 各平台发布频率建议\n2. 最佳发布时间（具体到小时）\n3. 一周内容排期表（具体到每天发什么类型）",
+            "userPrompt": "平台：{{input_analyzer.platforms}}\n可投入时间：{{start.available_time}}小时/天\n内容支柱：{{content_pillars.text}}"
+          }
+        }
+      },
+      {
+        "id": "monetization",
+        "type": "llm",
+        "position": { "x": 1100, "y": 400 },
+        "data": {
+          "label": "变现路径",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "设计变现路径：\n\n1. 适合的变现方式（至少3种）\n2. 各阶段的变现时间线\n3. 收入模型预估（粉丝数→收入）",
+            "userPrompt": "领域：{{input_analyzer.niche}}\n变现目标：{{start.monetization_goal}}元/月\n趋势研究：{{trend_research.results}}"
+          }
+        }
+      },
+      {
+        "id": "growth_strategy",
+        "type": "llm",
+        "position": { "x": 1300, "y": 200 },
+        "data": {
+          "label": "增长策略",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "maxTokens": 1500,
+            "systemPrompt": "制定增长策略：\n\n1. 涨粉技巧（针对具体平台）\n2. 互动策略（如何提升互动率）\n3. 跨平台引流方案",
+            "userPrompt": "平台：{{input_analyzer.platforms}}\n定位：{{positioning.text}}\n竞品研究：{{competitor_research.results}}"
+          }
+        }
+      },
+      {
+        "id": "action_plan",
+        "type": "llm",
+        "position": { "x": 1300, "y": 400 },
+        "data": {
+          "label": "行动计划",
+          "config": {
+            "model": "gpt-4",
+            "temperature": 0.5,
+            "maxTokens": 1500,
+            "systemPrompt": "生成具体的行动计划：\n\n1. 第一天任务（5-7项具体任务）\n2. 第一周目标（可衡量）\n3. 首月里程碑\n4. 推荐工具列表（带用途说明）",
+            "userPrompt": "定位：{{positioning.text}}\n发布计划：{{content_calendar.text}}\n可投入时间：{{start.available_time}}小时/天"
+          }
+        }
+      },
+      {
+        "id": "document_assembler",
+        "type": "template",
+        "position": { "x": 1500, "y": 300 },
+        "data": {
+          "label": "文档整合",
+          "config": {
+            "template": "# {{input_analyzer.niche}} 自媒体运营方案\n\n> 目标：{{start.monetization_goal}}元/月 | 平台：{{start.platforms}}\n> \n> 生成时间：{{currentDateTime}}\n\n---\n\n## 目录\n\n1. [账号定位](#一账号定位)\n2. [内容支柱](#二内容支柱)\n3. [选题库](#三选题库)\n4. [爆款标题公式](#四爆款标题公式)\n5. [发布排期](#五发布排期)\n6. [变现路径](#六变现路径)\n7. [增长策略](#七增长策略)\n8. [行动计划](#八行动计划)\n\n---\n\n## 一、账号定位\n\n{{positioning.text}}\n\n---\n\n## 二、内容支柱\n\n{{content_pillars.text}}\n\n---\n\n## 三、选题库\n\n{{topic_library.text}}\n\n---\n\n## 四、爆款标题公式\n\n{{title_templates.text}}\n\n---\n\n## 五、发布排期\n\n{{content_calendar.text}}\n\n---\n\n## 六、变现路径\n\n{{monetization.text}}\n\n---\n\n## 七、增长策略\n\n{{growth_strategy.text}}\n\n---\n\n## 八、行动计划\n\n{{action_plan.text}}\n\n---\n\n*本方案由 AgentFlow AI 创意助手生成。执行过程中请根据数据反馈灵活调整。*"
+          }
+        }
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "position": { "x": 1700, "y": 300 },
+        "data": {
+          "label": "完成"
+        }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "input_analyzer" },
+      { "id": "e2", "source": "input_analyzer", "target": "competitor_research" },
+      { "id": "e3", "source": "input_analyzer", "target": "trend_research" },
+      { "id": "e4", "source": "competitor_research", "target": "positioning" },
+      { "id": "e5", "source": "positioning", "target": "content_pillars" },
+      { "id": "e6", "source": "content_pillars", "target": "topic_library" },
+      { "id": "e7", "source": "trend_research", "target": "topic_library" },
+      { "id": "e8", "source": "topic_library", "target": "title_templates" },
+      { "id": "e9", "source": "content_pillars", "target": "content_calendar" },
+      { "id": "e10", "source": "trend_research", "target": "monetization" },
+      { "id": "e11", "source": "competitor_research", "target": "growth_strategy" },
+      { "id": "e12", "source": "positioning", "target": "growth_strategy" },
+      { "id": "e13", "source": "content_calendar", "target": "action_plan" },
+      { "id": "e14", "source": "positioning", "target": "document_assembler" },
+      { "id": "e15", "source": "content_pillars", "target": "document_assembler" },
+      { "id": "e16", "source": "topic_library", "target": "document_assembler" },
+      { "id": "e17", "source": "title_templates", "target": "document_assembler" },
+      { "id": "e18", "source": "content_calendar", "target": "document_assembler" },
+      { "id": "e19", "source": "monetization", "target": "document_assembler" },
+      { "id": "e20", "source": "growth_strategy", "target": "document_assembler" },
+      { "id": "e21", "source": "action_plan", "target": "document_assembler" },
+      { "id": "e22", "source": "document_assembler", "target": "end" }
+    ]
+  },
+  
+  "example": {
+    "input": {
+      "niche": "AI工具测评和教学",
+      "platforms": ["xiaohongshu", "douyin"],
+      "monetization_goal": "30000",
+      "available_time": "2",
+      "background": "程序员，熟悉各种AI工具",
+      "content_style": ["educational", "review"],
+      "show_face": "no"
+    },
+    "outputPreview": "# AI工具测评和教学 自媒体运营方案\n\n> 目标：30000元/月 | 平台：小红书、抖音\n\n---\n\n## 一、账号定位\n\n### 人设定位\n**「AI工具猎手」**- 专门挖掘和测评各种实用AI工具的技术博主...\n\n..."
+  }
+}

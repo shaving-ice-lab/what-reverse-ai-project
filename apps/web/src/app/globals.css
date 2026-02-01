@@ -1,0 +1,663 @@
+@import "tailwindcss";
+
+/* ============================================
+   Supabase Dashboard Design System
+   完全复刻 Supabase 风格的颜色系统
+   ============================================ */
+
+@theme {
+  /* ===== 背景色 (Background) - 精确匹配 Supabase 截图 ===== */
+  --color-background: #111111;
+  --color-background-200: #181818;
+  --color-background-studio: #0f0f0f;
+  --color-background-alternative: #0b0b0b;
+  --color-background-overlay: rgba(0, 0, 0, 0.7);
+
+  /* ===== Surface 层级 - Supabase 卡片/表面 ===== */
+  --color-surface-75: #1a1a1a;
+  --color-surface-100: #1f1f1f;
+  --color-surface-200: #242424;
+  --color-surface-300: #2b2b2b;
+  --color-surface-400: #333333;
+
+  /* ===== 文字色 (Foreground) - Supabase 文字 ===== */
+  --color-foreground: #ededed;
+  --color-foreground-light: #b0b0b0;
+  --color-foreground-lighter: #7a7a7a;
+  --color-foreground-muted: #5a5a5a;
+
+  /* ===== 边框色 (Border) - Supabase 边框 ===== */
+  --color-border: #2a2a2a;
+  --color-border-muted: #242424;
+  --color-border-strong: #3a3a3a;
+  --color-border-stronger: #4a4a4a;
+
+  /* ===== 品牌绿色 (Brand) - Supabase 品牌色 ===== */
+  --color-brand-200: #1a3a2a;
+  --color-brand-300: #1f4a35;
+  --color-brand-400: #2a6348;
+  --color-brand-500: #3ECF8E;
+  --color-brand-600: #5fd9a3;
+  --color-brand: #3ECF8E;
+
+  /* ===== 主色 (Primary) ===== */
+  --color-primary: #3ECF8E;
+  --color-primary-foreground: #171717;
+
+  /* ===== 次要色 (Secondary) ===== */
+  --color-secondary: #262626;
+  --color-secondary-foreground: #ededed;
+
+  /* ===== 静音色 (Muted) ===== */
+  --color-muted: #262626;
+  --color-muted-foreground: #a3a3a3;
+
+  /* ===== 强调色 (Accent) ===== */
+  --color-accent: #262626;
+  --color-accent-foreground: #ededed;
+
+  /* ===== 卡片 (Card) ===== */
+  --color-card: #1f1f1f;
+  --color-card-foreground: #ededed;
+
+  /* ===== 弹窗 (Popover) ===== */
+  --color-popover: #1f1f1f;
+  --color-popover-foreground: #ededed;
+
+  /* ===== 破坏性 (Destructive) ===== */
+  --color-destructive: #ef4444;
+  --color-destructive-200: #3b1818;
+  --color-destructive-400: #dc2626;
+  --color-destructive-foreground: #ededed;
+
+  /* ===== 警告 (Warning) ===== */
+  --color-warning: #f59e0b;
+  --color-warning-200: #3b2e0a;
+  --color-warning-400: #d97706;
+
+  /* ===== 成功 (Success) - 使用 Brand 色 ===== */
+  --color-success: #3ECF8E;
+  --color-success-200: #1a3a2a;
+
+  /* ===== 输入框 (Input) ===== */
+  --color-input: #262626;
+  --color-ring: #3ECF8E;
+
+  /* ===== 圆角 (Radius) ===== */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-sans);
+  }
+
+  .font-mono,
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
+  }
+
+  ::selection {
+    background: rgba(62, 207, 142, 0.22);
+    color: #ededed;
+  }
+  
+  /* ===== 滚动条样式 - Supabase 风格 ===== */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #2e2e2e;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #404040;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* ===== 动画 - 淡入向上 ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fadeInUp {
+    animation: fadeInUp 300ms ease-out;
+  }
+
+  /* ===== 动画 - 淡入 ===== */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .animate-fade-in {
+    animation: fadeIn 200ms ease-out;
+  }
+  .animate-fadeIn {
+    animation: fadeIn 300ms ease-out;
+  }
+
+  /* ===== 动画 - 滚动 ===== */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-scroll {
+    animation: scroll 30s linear infinite;
+  }
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  /* ===== 动画 - 闪烁 (光标) ===== */
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  /* ===== 动画 - 柔和脉冲 ===== */
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+
+  /* ===== 滚动行为 ===== */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* ===== 动画 - 卡片悬浮 ===== */
+  @keyframes cardLift {
+    from {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    to {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+  }
+  .animate-card-lift {
+    animation: cardLift 200ms ease-out forwards;
+  }
+
+  /* ===== 动画 - 交错淡入 ===== */
+  @keyframes staggerFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-stagger-in {
+    animation: staggerFadeIn 300ms ease-out forwards;
+  }
+  .animate-stagger-in:nth-child(1) { animation-delay: 0ms; }
+  .animate-stagger-in:nth-child(2) { animation-delay: 50ms; }
+  .animate-stagger-in:nth-child(3) { animation-delay: 100ms; }
+  .animate-stagger-in:nth-child(4) { animation-delay: 150ms; }
+  .animate-stagger-in:nth-child(5) { animation-delay: 200ms; }
+  .animate-stagger-in:nth-child(6) { animation-delay: 250ms; }
+  .animate-stagger-in:nth-child(7) { animation-delay: 300ms; }
+  .animate-stagger-in:nth-child(8) { animation-delay: 350ms; }
+
+  /* ===== 动画 - 闪光 (加载) ===== */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* ===== 动画 - 缩放进入 ===== */
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .animate-scale-in {
+    animation: scaleIn 200ms ease-out;
+  }
+
+  /* ===== 动画 - 从右滑入 ===== */
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .animate-slide-in-right {
+    animation: slideInRight 300ms ease-out;
+  }
+
+  /* ===== 动画 - 从左滑入 ===== */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .animate-slide-in-left {
+    animation: slideInLeft 300ms ease-out;
+  }
+
+  /* ===== 动画 - 渐变文字 (品牌绿色) ===== */
+  @keyframes gradientFlow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  .animate-gradient-text {
+    background: linear-gradient(
+      90deg,
+      #3ECF8E,
+      #5fd9a3,
+      #3ECF8E
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientFlow 3s ease infinite;
+  }
+
+  /* ===== 发光效果 (品牌绿色) ===== */
+  .glow-brand {
+    box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+  }
+  .glow-brand-hover:hover {
+    box-shadow: 0 0 30px rgba(62, 207, 142, 0.4);
+  }
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+  }
+  .glow-primary-hover:hover {
+    box-shadow: 0 0 30px rgba(62, 207, 142, 0.4);
+  }
+
+  /* ===== Supabase 标准过渡 ===== */
+  .transition-supabase {
+    transition: all 150ms ease;
+  }
+
+  /* ===== 聚焦环 (品牌绿色) ===== */
+  .focus-ring-brand:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #171717, 0 0 0 4px #3ECF8E;
+  }
+
+}
+
+/* ===== 亮色主题 (可选) ===== */
+@layer base {
+  .light {
+    --color-background: #ffffff;
+    --color-background-200: #fafafa;
+    --color-background-studio: #f5f5f5;
+    --color-background-alternative: #f0f0f0;
+    
+    --color-surface-75: #fafafa;
+    --color-surface-100: #f5f5f5;
+    --color-surface-200: #eeeeee;
+    --color-surface-300: #e0e0e0;
+    --color-surface-400: #d0d0d0;
+    
+    --color-foreground: #1a1a1a;
+    --color-foreground-light: #525252;
+    --color-foreground-lighter: #737373;
+    --color-foreground-muted: #a3a3a3;
+    
+    --color-border: #e5e5e5;
+    --color-border-muted: #eeeeee;
+    --color-border-strong: #d4d4d4;
+    --color-border-stronger: #a3a3a3;
+    
+    --color-card: #ffffff;
+    --color-card-foreground: #1a1a1a;
+    
+    --color-popover: #ffffff;
+    --color-popover-foreground: #1a1a1a;
+    
+    --color-muted: #f5f5f5;
+    --color-muted-foreground: #737373;
+    
+    --color-secondary: #f5f5f5;
+    --color-secondary-foreground: #1a1a1a;
+    
+    --color-accent: #f5f5f5;
+    --color-accent-foreground: #1a1a1a;
+    
+    --color-input: #eeeeee;
+    
+    --color-brand-500: #2ea67a;
+    --color-primary: #2ea67a;
+    --color-primary-foreground: #ffffff;
+  }
+  
+  /* 亮色模式滚动条 */
+  .light ::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+  }
+  
+  .light ::-webkit-scrollbar-thumb:hover {
+    background: #a3a3a3;
+  }
+  
+  .light .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  .light .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+@layer utilities {
+  /* ===== Supabase 排版系统 ===== */
+
+  /* 页面标题 - 24px, semibold */
+  .text-page-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* 章节标题 - 20px, semibold */
+  .text-section-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* 卡片标题 - 16px, semibold */
+  .text-card-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+  }
+
+  /* 分类标签 - 11px, uppercase, tracking-wider */
+  .text-category {
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-foreground-light);
+  }
+
+  /* 表格头 - 12px, semibold */
+  .text-table-header {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-foreground-light);
+  }
+
+  /* 描述文本 - 14px, regular, gray */
+  .text-description {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-foreground-light);
+  }
+
+  /* 小文本 - 12px */
+  .text-small {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  /* 极小文本 - 11px */
+  .text-xs-custom {
+    font-size: 0.6875rem;
+    line-height: 0.875rem;
+  }
+
+  /* 统计数字 - 24px, semibold */
+  .text-stat-number {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* 大统计数字 - 32px, bold */
+  .text-stat-large {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* ===== Dashboard Page Shell ===== */
+  .dashboard-shell {
+    @apply h-full w-full bg-background-studio text-foreground;
+  }
+
+  .dashboard-content {
+    @apply w-full min-h-full;
+  }
+
+  .dashboard-shell[data-layout="standard"] .dashboard-content {
+    @apply mx-auto w-full max-w-[1280px] px-6 py-5;
+  }
+
+  .dashboard-shell[data-layout="full"] .dashboard-content {
+    @apply w-full h-full p-0;
+  }
+
+  .dashboard-page {
+    @apply min-h-full text-foreground;
+  }
+
+  .dashboard-shell[data-layout="standard"] .dashboard-page {
+    @apply space-y-5;
+  }
+
+  .dashboard-page > .min-h-screen {
+    @apply min-h-full bg-transparent;
+    padding: 0 !important;
+  }
+
+  /* ===== Supabase Panel Patterns ===== */
+  .page-panel {
+    @apply bg-surface-100 border border-border rounded-lg;
+  }
+
+  .page-panel-header {
+    @apply px-4 py-3 border-b border-border bg-surface-75/70;
+  }
+
+  .page-panel-title {
+    @apply text-[13px] font-medium text-foreground;
+  }
+
+  .page-panel-description {
+    @apply text-[12px] text-foreground-light;
+  }
+
+  .page-section {
+    @apply space-y-4;
+  }
+
+  .page-grid {
+    @apply grid gap-4 lg:gap-6;
+  }
+
+  .page-subtle {
+    @apply text-[12px] text-foreground-light;
+  }
+
+  .page-caption {
+    @apply text-[10px] font-medium uppercase tracking-wide text-foreground-muted;
+  }
+
+  /* ===== Page Header ===== */
+  .page-header {
+    @apply flex items-start justify-between gap-4;
+  }
+
+  .page-title {
+    @apply text-[1.25rem] leading-7 font-semibold tracking-[-0.015em] text-foreground;
+  }
+
+  .page-description {
+    @apply mt-1.5 text-[13px] leading-5 text-foreground-light;
+  }
+
+  .page-toolbar {
+    @apply flex items-center gap-2;
+  }
+
+  .page-divider {
+    @apply h-px bg-border;
+  }
+
+  /* ===== Dashboard Typography Defaults ===== */
+  .dashboard-page h1:not([class*="text-"]) {
+    @apply text-[1.25rem] leading-7 font-semibold tracking-[-0.015em] text-foreground;
+  }
+
+  .dashboard-page h2:not([class*="text-"]) {
+    @apply text-[1.125rem] leading-6 font-semibold tracking-[-0.01em] text-foreground;
+  }
+
+  .dashboard-page h3:not([class*="text-"]) {
+    @apply text-[0.9375rem] leading-6 font-semibold text-foreground;
+  }
+
+  .dashboard-page p:not([class*="text-"]) {
+    @apply text-[13px] leading-5 text-foreground-light;
+  }
+
+  /* 常见标题尺寸覆盖（避免页面内手写尺寸过大） */
+  .dashboard-page h1.text-2xl,
+  .dashboard-page h1.text-3xl,
+  .dashboard-page h1.text-4xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .dashboard-page h2.text-xl,
+  .dashboard-page h2.text-2xl,
+  .dashboard-page h3.text-xl {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .dashboard-page h3.text-lg,
+  .dashboard-page h4.text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+  }
+
+  .dashboard-page p.text-sm,
+  .dashboard-page span.text-sm {
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+  }
+}

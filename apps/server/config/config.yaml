@@ -1,0 +1,35 @@
+# AgentFlow Server Configuration
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  mode: "development"  # development, production
+
+database:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: "12345678"
+  name: "what-reverse"
+  charset: "utf8mb4"
+  max_open_conns: 100
+  max_idle_conns: 10
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  secret: "your-secret-key-change-in-production"
+  access_token_expire: "15m"
+  refresh_token_expire: "168h"
+
+ai:
+  openai_api_key: ""
+  anthropic_api_key: ""
+  default_model: "gpt-4"
+
+encryption:
+  key: "change-this-to-a-32-byte-secret!"  # 生产环境请修改此密钥

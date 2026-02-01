@@ -1,0 +1,548 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AgentFlow API",
+    "description": "AgentFlow - AI Agent 工作流平台 API 文档",
+    "termsOfService": "https://agentflow.app/terms",
+    "contact": {
+      "name": "AgentFlow Team",
+      "url": "https://agentflow.app",
+      "email": "support@agentflow.app"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "host": "localhost:8080",
+  "basePath": "/api/v1",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "健康检查接口",
+        "produces": ["application/json"],
+        "tags": ["System"],
+        "summary": "健康检查",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "ok" },
+                "version": { "type": "string", "example": "1.0.0" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "用户注册",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Auth"],
+        "summary": "用户注册",
+        "parameters": [
+          {
+            "description": "注册信息",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "description": "用户登录",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Auth"],
+        "summary": "用户登录",
+        "parameters": [
+          {
+            "description": "登录信息",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "刷新访问令牌",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Auth"],
+        "summary": "刷新 Token",
+        "parameters": [
+          {
+            "description": "刷新 Token",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefreshRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TokenResponse"
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "获取当前登录用户信息",
+        "produces": ["application/json"],
+        "tags": ["Users"],
+        "summary": "获取当前用户",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "更新当前用户信息",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Users"],
+        "summary": "更新当前用户",
+        "parameters": [
+          {
+            "description": "用户信息",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          }
+        }
+      }
+    },
+    "/workflows": {
+      "get": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "获取用户的工作流列表",
+        "produces": ["application/json"],
+        "tags": ["Workflows"],
+        "summary": "获取工作流列表",
+        "parameters": [
+          { "type": "integer", "description": "页码", "name": "page", "in": "query" },
+          { "type": "integer", "description": "每页数量", "name": "page_size", "in": "query" },
+          { "type": "string", "description": "搜索关键词", "name": "search", "in": "query" },
+          { "type": "string", "description": "状态过滤", "name": "status", "in": "query" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/WorkflowListResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "创建新的工作流",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Workflows"],
+        "summary": "创建工作流",
+        "parameters": [
+          {
+            "description": "工作流信息",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateWorkflowRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/WorkflowResponse"
+            }
+          }
+        }
+      }
+    },
+    "/workflows/{id}": {
+      "get": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "获取工作流详情",
+        "produces": ["application/json"],
+        "tags": ["Workflows"],
+        "summary": "获取工作流详情",
+        "parameters": [
+          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/WorkflowResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "更新工作流",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["Workflows"],
+        "summary": "更新工作流",
+        "parameters": [
+          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true },
+          {
+            "description": "工作流信息",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateWorkflowRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/WorkflowResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [{ "BearerAuth": [] }],
+        "description": "删除工作流",
+        "produces": ["application/json"],
+        "tags": ["Workflows"],
+        "summary": "删除工作流",
+        "parameters": [
+          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/agents": {
+      "get": {
+        "description": "获取 Agent 商店列表",
+        "produces": ["application/json"],
+        "tags": ["Agents"],
+        "summary": "获取 Agent 列表",
+        "parameters": [
+          { "type": "integer", "description": "页码", "name": "page", "in": "query" },
+          { "type": "integer", "description": "每页数量", "name": "page_size", "in": "query" },
+          { "type": "string", "description": "分类", "name": "category", "in": "query" },
+          { "type": "string", "description": "搜索关键词", "name": "search", "in": "query" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AgentListResponse"
+            }
+          }
+        }
+      }
+    },
+    "/agents/featured": {
+      "get": {
+        "description": "获取精选 Agent 列表",
+        "produces": ["application/json"],
+        "tags": ["Agents"],
+        "summary": "获取精选 Agent",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AgentListResponse"
+            }
+          }
+        }
+      }
+    },
+    "/agents/{slug}": {
+      "get": {
+        "description": "获取 Agent 详情",
+        "produces": ["application/json"],
+        "tags": ["Agents"],
+        "summary": "获取 Agent 详情",
+        "parameters": [
+          { "type": "string", "description": "Agent Slug", "name": "slug", "in": "path", "required": true }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AgentResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RegisterRequest": {
+      "type": "object",
+      "required": ["email", "username", "password"],
+      "properties": {
+        "email": { "type": "string", "example": "user@example.com" },
+        "username": { "type": "string", "example": "johndoe" },
+        "password": { "type": "string", "example": "password123" }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": { "type": "string", "example": "user@example.com" },
+        "password": { "type": "string", "example": "password123" }
+      }
+    },
+    "RefreshRequest": {
+      "type": "object",
+      "required": ["refresh_token"],
+      "properties": {
+        "refresh_token": { "type": "string" }
+      }
+    },
+    "AuthResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "example": true },
+        "data": {
+          "type": "object",
+          "properties": {
+            "user": { "$ref": "#/definitions/User" },
+            "access_token": { "type": "string" },
+            "refresh_token": { "type": "string" }
+          }
+        }
+      }
+    },
+    "TokenResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "example": true },
+        "data": {
+          "type": "object",
+          "properties": {
+            "access_token": { "type": "string" },
+            "refresh_token": { "type": "string" }
+          }
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "email": { "type": "string" },
+        "username": { "type": "string" },
+        "display_name": { "type": "string" },
+        "avatar_url": { "type": "string" },
+        "bio": { "type": "string" },
+        "plan": { "type": "string", "enum": ["free", "pro", "enterprise"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "data": { "$ref": "#/definitions/User" }
+      }
+    },
+    "UpdateUserRequest": {
+      "type": "object",
+      "properties": {
+        "display_name": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatar_url": { "type": "string" }
+      }
+    },
+    "Workflow": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "user_id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "definition": { "type": "object" },
+        "status": { "type": "string", "enum": ["draft", "active", "archived"] },
+        "run_count": { "type": "integer" },
+        "version": { "type": "integer" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "WorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "data": { "$ref": "#/definitions/Workflow" }
+      }
+    },
+    "WorkflowListResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "data": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Workflow" }
+        },
+        "meta": { "$ref": "#/definitions/Meta" }
+      }
+    },
+    "CreateWorkflowRequest": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "definition": { "type": "object" }
+      }
+    },
+    "UpdateWorkflowRequest": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "definition": { "type": "object" },
+        "status": { "type": "string" }
+      }
+    },
+    "Agent": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "category": { "type": "string" },
+        "pricing_type": { "type": "string", "enum": ["free", "paid", "freemium"] },
+        "price": { "type": "number" },
+        "use_count": { "type": "integer" },
+        "star_count": { "type": "integer" },
+        "avg_rating": { "type": "number" }
+      }
+    },
+    "AgentResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "data": { "$ref": "#/definitions/Agent" }
+      }
+    },
+    "AgentListResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "data": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Agent" }
+        },
+        "meta": { "$ref": "#/definitions/Meta" }
+      }
+    },
+    "Meta": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer" },
+        "page": { "type": "integer" },
+        "page_size": { "type": "integer" }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "example": false },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

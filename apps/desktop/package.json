@@ -1,0 +1,36 @@
+{
+  "name": "@agentflow/desktop",
+  "version": "0.1.0",
+  "description": "AgentFlow 桌面应用 - 基于 Tauri 的本地优先 AI Agent 工作流平台",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:debug": "tauri build --debug",
+    "tauri": "tauri",
+    "preview": "vite preview",
+    "icons": "tauri icon src-tauri/icons/app-icon.svg",
+    "icons:generate": "node scripts/generate-icons.js"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-fs": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "@tauri-apps/plugin-store": "^2.0.0",
+    "@tauri-apps/plugin-sql": "^2.0.0",
+    "@tauri-apps/plugin-http": "^2.0.0",
+    "@tauri-apps/plugin-notification": "^2.0.0",
+    "@tauri-apps/plugin-os": "^2.0.0",
+    "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-updater": "^2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "png-to-ico": "^2.1.8",
+    "sharp": "^0.33.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0"
+  }
+}

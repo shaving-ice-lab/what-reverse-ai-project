@@ -1,0 +1,85 @@
+{
+  "manifestVersion": 1,
+  "id": "http-tools",
+  "name": "HTTP Tools",
+  "version": "1.0.0",
+  "description": "HTTP 工具插件，提供 API 测试和请求记录功能",
+  "author": {
+    "name": "AgentFlow Team"
+  },
+  "category": "development",
+  "icon": "globe",
+  "keywords": ["http", "api", "testing", "request"],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "permissions": [
+    "network",
+    "storage",
+    "notifications",
+    "ui:panel"
+  ],
+  "nodes": [
+    {
+      "id": "http-request",
+      "path": "nodes/http-request.js"
+    },
+    {
+      "id": "json-parser",
+      "path": "nodes/json-parser.js"
+    }
+  ],
+  "settings": [
+    {
+      "key": "timeout",
+      "title": "请求超时",
+      "description": "HTTP 请求超时时间（毫秒）",
+      "type": "number",
+      "default": 30000
+    },
+    {
+      "key": "logRequests",
+      "title": "记录请求",
+      "description": "是否记录所有 HTTP 请求",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "maxLogSize",
+      "title": "最大日志数",
+      "description": "保留的最大请求日志数量",
+      "type": "number",
+      "default": 100
+    }
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "id": "http-tools.testRequest",
+        "title": "Test HTTP Request",
+        "category": "HTTP Tools"
+      },
+      {
+        "id": "http-tools.viewLogs",
+        "title": "View Request Logs",
+        "category": "HTTP Tools"
+      },
+      {
+        "id": "http-tools.clearLogs",
+        "title": "Clear Request Logs",
+        "category": "HTTP Tools"
+      }
+    ],
+    "views": [
+      {
+        "id": "http-tools.requestPanel",
+        "name": "HTTP 请求",
+        "icon": "globe",
+        "location": "panel"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onCommand:http-tools.testRequest",
+    "onNode:http-request"
+  ]
+}

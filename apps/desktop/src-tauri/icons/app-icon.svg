@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a365d"/>
+      <stop offset="50%" style="stop-color:#0d9488"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)"/>
+  
+  <!-- Flow connections -->
+  <path d="M160 180 Q256 140 352 180" stroke="#ffffff" stroke-width="8" fill="none" opacity="0.6"/>
+  <path d="M160 256 L352 256" stroke="#ffffff" stroke-width="8" fill="none" opacity="0.8"/>
+  <path d="M160 332 Q256 372 352 332" stroke="#ffffff" stroke-width="8" fill="none" opacity="0.6"/>
+  
+  <!-- Left node -->
+  <circle cx="140" cy="256" r="40" fill="url(#nodeGradient)"/>
+  <circle cx="140" cy="256" r="20" fill="#ffffff"/>
+  
+  <!-- Center node (larger, representing AI) -->
+  <circle cx="256" cy="256" r="50" fill="url(#nodeGradient)"/>
+  <path d="M256 226 L276 256 L256 286 L236 256 Z" fill="#ffffff"/>
+  
+  <!-- Right node -->
+  <circle cx="372" cy="256" r="40" fill="url(#nodeGradient)"/>
+  <polygon points="372,236 392,256 372,276 352,256" fill="#ffffff"/>
+  
+  <!-- Small accent nodes -->
+  <circle cx="180" cy="180" r="15" fill="#60a5fa" opacity="0.8"/>
+  <circle cx="332" cy="180" r="15" fill="#a78bfa" opacity="0.8"/>
+  <circle cx="180" cy="332" r="15" fill="#a78bfa" opacity="0.8"/>
+  <circle cx="332" cy="332" r="15" fill="#60a5fa" opacity="0.8"/>
+</svg>

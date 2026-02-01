@@ -1,0 +1,511 @@
+"use client";
+
+/**
+ * 新建工作流对话框 - 增强版 UI/UX
+ * 
+ * 特性：
+ * - 流畅的动画效果
+ * - 模板预览
+ * - 智能表单验证
+ * - 键盘快捷键
+ */
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { 
+  Loader2, 
+  Plus, 
+  Sparkles, 
+  FileCode, 
+  Bot, 
+  Webhook, 
+  Zap, 
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Layers,
+  MessageSquare,
+  Database,
+  GitBranch,
+  Code2,
+  Brain,
+  Wand2,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { workflowApi } from "@/lib/api/workflow";
+
+interface CreateWorkflowDialogProps {
+  trigger?: React.ReactNode;
+  folderId?: string;
+  onSuccess?: (workflowId: string) => void;
+}
+
+// 预设模板 - 增强版配置
+const templates = [
+  {
+    id: "blank",
+    name: "空白工作流",
+    description: "从零开始，完全自定义",
+    icon: Plus,
+    color: "#6366f1",
+    gradient: "from-indigo-500/20 to-purple-500/20",
+    nodeCount: 0,
+    popular: false,
+  },
+  {
+    id: "llm-chat",
+    name: "AI 对话",
+    description: "简单的 LLM 对话流程",
+    icon: MessageSquare,
+    color: "#8b5cf6",
+    gradient: "from-violet-500/20 to-purple-500/20",
+    nodeCount: 3,
+    popular: true,
+  },
+  {
+    id: "api-processor",
+    name: "API 数据处理",
+    description: "调用 API 并处理返回数据",
+    icon: Database,
+    color: "#f97316",
+    gradient: "from-orange-500/20 to-amber-500/20",
+    nodeCount: 5,
+    popular: false,
+  },
+  {
+    id: "auto-workflow",
+    name: "自动化工作流",
+    description: "条件判断和循环处理",
+    icon: GitBranch,
+    color: "#22c55e",
+    gradient: "from-emerald-500/20 to-green-500/20",
+    nodeCount: 6,
+    popular: true,
+  },
+  {
+    id: "code-generator",
+    name: "代码生成器",
+    description: "使用 AI 生成代码",
+    icon: Code2,
+    color: "#ec4899",
+    gradient: "from-pink-500/20 to-rose-500/20",
+    nodeCount: 4,
+    popular: false,
+  },
+  {
+    id: "ai-assistant",
+    name: "AI 助手",
+    description: "多轮对话智能助手",
+    icon: Brain,
+    color: "#06b6d4",
+    gradient: "from-cyan-500/20 to-teal-500/20",
+    nodeCount: 5,
+    popular: true,
+  },
+];
+
+export function CreateWorkflowDialog({
+  trigger,
+  folderId,
+  onSuccess,
+}: CreateWorkflowDialogProps) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"blank" | "template">("blank");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  
+  // 自动聚焦到名称输入框
+  useEffect(() => {
+    if (open && nameInputRef.current) {
+      setTimeout(() => nameInputRef.current?.focus(), 100);
+    }
+  }, [open, tab]);
+  
+  const handleCreate = async () => {
+    if (!name.trim()) {
+      setError("请输入工作流名称");
+      nameInputRef.current?.focus();
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await workflowApi.create({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        folderId,
+        templateId: tab === "template" ? selectedTemplate || undefined : undefined,
+      });
+      
+      setIsSuccess(true);
+      
+      // 短暂延迟显示成功状态
+      setTimeout(() => {
+        setOpen(false);
+        
+        if (onSuccess) {
+          onSuccess(response.workflow.id);
+        } else {
+          router.push(`/editor/${response.workflow.id}`);
+        }
+      }, 500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "创建失败");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // 延迟重置状态，避免关闭动画时内容闪烁
+      setTimeout(() => {
+        setName("");
+        setDescription("");
+        setSelectedTemplate(null);
+        setError(null);
+        setTab("blank");
+        setIsSuccess(false);
+      }, 200);
+    }
+  };
+
+  // 键盘快捷键
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      handleCreate();
+    }
+  };
+  
+  // 获取选中模板的详情
+  const selectedTemplateDetails = templates.find(t => t.id === selectedTemplate);
+  
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button 
+            size="sm"
+            className={cn(
+              "bg-primary",
+              "hover:bg-primary/90",
+              "hover:shadow-lg hover:shadow-primary/20",
+              "text-primary-foreground font-medium",
+              "transition-all duration-200"
+            )}
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            新建
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent 
+        className="sm:max-w-[580px] overflow-hidden"
+        onKeyDown={handleKeyDown}
+      >
+        {/* 成功状态覆盖层 */}
+        {isSuccess && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm animate-fadeIn">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-scaleIn">
+                <CheckCircle2 className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">创建成功！</h3>
+                <p className="text-sm text-muted-foreground mt-1">正在跳转到编辑器...</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <DialogHeader className="pb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/30">
+              <Wand2 className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">新建工作流</DialogTitle>
+              <DialogDescription className="mt-0.5">
+                创建一个新的 AI 工作流来自动化你的任务
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "blank" | "template")} className="mt-2">
+          <TabsList className="w-full h-11 p-1 bg-muted/50 rounded-xl">
+            <TabsTrigger 
+              value="blank" 
+              className="flex-1 h-9 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              空白创建
+            </TabsTrigger>
+            <TabsTrigger 
+              value="template" 
+              className="flex-1 h-9 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              <Layers className="w-4 h-4 mr-2" />
+              从模板
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="blank" className="space-y-4 mt-5 animate-fadeIn">
+            {/* 空白创建提示 */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">从空白开始</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    创建一个空白工作流，在编辑器中拖拽节点来构建你的自动化流程
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                工作流名称 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                ref={nameInputRef}
+                id="name"
+                placeholder="例如：客户数据分析流程"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (error) setError(null);
+                }}
+                className={cn(
+                  "h-11 rounded-xl transition-all",
+                  error && !name.trim() && "border-destructive focus:border-destructive focus:ring-destructive/20"
+                )}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                描述
+                <span className="text-xs text-muted-foreground font-normal">(可选)</span>
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="简单描述这个工作流的用途..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="resize-none rounded-xl"
+              />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="template" className="space-y-4 mt-5 animate-fadeIn">
+            {/* 模板选择网格 */}
+            <div className="grid grid-cols-2 gap-3">
+              {templates.map((template, index) => {
+                const Icon = template.icon;
+                const isSelected = selectedTemplate === template.id;
+                
+                return (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTemplate(template.id);
+                      if (!name || templates.some(t => t.name === name)) {
+                        setName(template.name);
+                      }
+                    }}
+                    className={cn(
+                      "group relative flex flex-col p-4 rounded-xl text-left transition-all duration-300",
+                      "border-2 cursor-pointer overflow-hidden",
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                        : "border-border/50 hover:border-primary/40 hover:bg-muted/50 hover:shadow-md"
+                    )}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                    }}
+                  >
+                    {/* 背景渐变 */}
+                    <div className={cn(
+                      "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                      template.gradient
+                    )} />
+                    
+                    {/* 热门标签 */}
+                    {template.popular && (
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
+                        热门
+                      </div>
+                    )}
+                    
+                    <div className="relative z-10">
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300",
+                          "group-hover:scale-110",
+                          isSelected && "scale-110"
+                        )}
+                        style={{ 
+                          backgroundColor: `${template.color}15`,
+                          color: template.color,
+                          border: `1px solid ${template.color}30`,
+                        }}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="text-sm font-semibold text-foreground mb-1">{template.name}</div>
+                      <div className="text-xs text-muted-foreground leading-relaxed">
+                        {template.description}
+                      </div>
+                      {template.nodeCount > 0 && (
+                        <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground/70">
+                          <Layers className="w-3 h-3" />
+                          {template.nodeCount} 个预设节点
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* 选中指示器 */}
+                    {isSelected && (
+                      <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* 名称输入 */}
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="template-name" className="text-sm font-medium">
+                工作流名称 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                ref={tab === "template" ? nameInputRef : undefined}
+                id="template-name"
+                placeholder="输入工作流名称"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (error) setError(null);
+                }}
+                className={cn(
+                  "h-11 rounded-xl transition-all",
+                  error && !name.trim() && "border-destructive focus:border-destructive focus:ring-destructive/20"
+                )}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        {/* 错误提示 */}
+        {error && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm animate-shake">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+        
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <div className="hidden sm:flex items-center text-xs text-muted-foreground mr-auto">
+            <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[10px] mr-1">⌘</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[10px] mr-1.5">Enter</kbd>
+            快速创建
+          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => setOpen(false)}
+            className="rounded-xl"
+          >
+            取消
+          </Button>
+          <Button 
+            onClick={handleCreate} 
+            disabled={isLoading || !name.trim()}
+            className={cn(
+              "min-w-[100px] rounded-xl",
+              "bg-primary",
+              "hover:bg-primary/90",
+              "hover:shadow-lg hover:shadow-primary/25",
+              "text-primary-foreground font-medium",
+              "transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                创建中
+              </>
+            ) : (
+              <>
+                创建工作流
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+        
+        {/* 动画样式 */}
+        <style jsx global>{`
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+          }
+          
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+          }
+          
+          .animate-shake {
+            animation: shake 0.3s ease-in-out;
+          }
+          
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+          }
+          
+          .animate-scaleIn {
+            animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+        `}</style>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -1,0 +1,176 @@
+"use client";
+
+/**
+ * 产品路线图页面
+ */
+
+import Link from "next/link";
+import {
+  Rocket,
+  CheckCircle,
+  Clock,
+  Lightbulb,
+  ArrowRight,
+  Star,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/layout/site-header";
+import { cn } from "@/lib/utils";
+
+// 路线图数据
+const roadmapItems = [
+  {
+    quarter: "Q1 2026",
+    status: "completed",
+    items: [
+      { title: "AI Agent 2.0", description: "全新的 AI 引擎，支持多模型协作", done: true },
+      { title: "可视化编辑器升级", description: "更流畅的拖拽体验", done: true },
+      { title: "企业级 SSO", description: "支持 SAML 和 OIDC 认证", done: true },
+    ],
+  },
+  {
+    quarter: "Q2 2026",
+    status: "in-progress",
+    items: [
+      { title: "移动端应用", description: "iOS 和 Android 原生应用", done: false },
+      { title: "高级分析仪表板", description: "深入的使用数据分析", done: false },
+      { title: "更多集成", description: "新增 50+ 第三方服务集成", done: false },
+    ],
+  },
+  {
+    quarter: "Q3 2026",
+    status: "planned",
+    items: [
+      { title: "AI 工作流生成器", description: "自然语言描述自动生成工作流", done: false },
+      { title: "团队协作增强", description: "实时协作编辑和评论", done: false },
+      { title: "模板市场 2.0", description: "更丰富的模板分类和搜索", done: false },
+    ],
+  },
+  {
+    quarter: "Q4 2026",
+    status: "exploring",
+    items: [
+      { title: "私有化部署增强", description: "更简单的部署流程", done: false },
+      { title: "多语言支持", description: "支持更多语言的界面", done: false },
+      { title: "高级自动化", description: "更复杂的条件和循环逻辑", done: false },
+    ],
+  },
+];
+
+const statusConfig = {
+  completed: { label: "已完成", color: "text-green-500", bg: "bg-green-500/10" },
+  "in-progress": { label: "进行中", color: "text-primary", bg: "bg-primary/10" },
+  planned: { label: "计划中", color: "text-blue-500", bg: "bg-blue-500/10" },
+  exploring: { label: "探索中", color: "text-purple-500", bg: "bg-purple-500/10" },
+};
+
+export default function RoadmapPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+
+      {/* Hero */}
+      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+            <Rocket className="h-4 w-4" />
+            产品规划
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+            产品路线图
+          </h1>
+
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            了解我们正在构建的功能，以及未来的计划。您的反馈将帮助我们确定优先级。
+          </p>
+        </div>
+      </section>
+
+      {/* Roadmap */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-8">
+            {roadmapItems.map((quarter) => {
+              const config = statusConfig[quarter.status as keyof typeof statusConfig];
+              return (
+                <div key={quarter.quarter} className="relative">
+                  {/* Quarter Header */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <h2 className="text-xl font-bold text-foreground">
+                      {quarter.quarter}
+                    </h2>
+                    <span className={cn("px-3 py-1 rounded-full text-xs font-medium", config.bg, config.color)}>
+                      {config.label}
+                    </span>
+                  </div>
+
+                  {/* Items */}
+                  <div className="space-y-3 pl-4 border-l-2 border-border">
+                    {quarter.items.map((item) => (
+                      <div
+                        key={item.title}
+                        className={cn(
+                          "p-4 rounded-xl ml-4",
+                          "bg-card border border-border",
+                          item.done && "border-green-500/30"
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          {item.done ? (
+                            <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                          ) : (
+                            <Clock className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
+                          )}
+                          <div>
+                            <h3 className={cn(
+                              "font-medium mb-1",
+                              item.done ? "text-foreground" : "text-foreground"
+                            )}>
+                              {item.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Feedback */}
+      <section className="py-16 px-6 bg-muted/20">
+        <div className="max-w-4xl mx-auto text-center">
+          <Lightbulb className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            有功能建议？
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            我们非常重视您的反馈，帮助我们构建更好的产品
+          </p>
+          <Link href="/contact?type=feature-request">
+            <Button size="lg" className="rounded-full">
+              提交建议
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-border">
+        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
+          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
