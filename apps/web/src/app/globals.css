@@ -601,7 +601,7 @@
 @layer components {
   /* ===== Dashboard Page Shell ===== */
   .dashboard-shell {
-    @apply h-full w-full bg-background-studio text-foreground;
+    @apply h-full w-full overflow-hidden bg-background-studio text-foreground;
   }
 
   .dashboard-content {
@@ -609,11 +609,15 @@
   }
 
   .dashboard-shell[data-layout="standard"] .dashboard-content {
-    @apply mx-auto w-full max-w-[1280px] px-6 py-5;
+    @apply mx-auto w-full max-w-[1280px] px-6 py-5 overflow-y-auto h-full;
   }
 
   .dashboard-shell[data-layout="full"] .dashboard-content {
     @apply w-full h-full p-0;
+  }
+
+  .dashboard-shell[data-layout="full"] .dashboard-page {
+    @apply h-full;
   }
 
   .dashboard-page {

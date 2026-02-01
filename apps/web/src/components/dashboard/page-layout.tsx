@@ -417,20 +417,20 @@ export function PageWithSidebar({
   className 
 }: PageWithSidebarProps) {
   const widthClass = {
-    narrow: "w-[200px]",
+    narrow: "w-[188px]",
     default: "w-[220px]",
     wide: "w-[240px]",
   };
 
   return (
-    <div className={cn("flex h-full", className)}>
+    <div className={cn("flex h-full overflow-hidden", className)}>
       {/* 侧边栏 */}
       <div className={cn(
         "shrink-0 border-r border-border bg-background-studio overflow-y-auto",
         widthClass[sidebarWidth]
       )}>
         {sidebarTitle && (
-          <div className="px-4 py-3 border-b border-border bg-surface-75/60">
+          <div className="px-4 py-3 border-b border-border bg-surface-75/60 sticky top-0 z-10">
             <h2 className="text-[12px] font-medium text-foreground">{sidebarTitle}</h2>
           </div>
         )}
@@ -439,9 +439,11 @@ export function PageWithSidebar({
         </div>
       </div>
       
-      {/* 主内容 */}
-      <div className="flex-1 overflow-y-auto px-6 py-5">
-        {children}
+      {/* 主内容 - 使用 overflow-y-auto 允许滚动 */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="px-6 py-5">
+          {children}
+        </div>
       </div>
     </div>
   );
