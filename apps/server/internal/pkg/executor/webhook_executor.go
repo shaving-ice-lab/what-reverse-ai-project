@@ -181,10 +181,18 @@ func getStringSlice(m map[string]interface{}, key string) []string {
 			result := make([]string, 0, len(v))
 			for _, item := range v {
 				if str, ok := item.(string); ok {
-					result = append(result, str)
+					str = strings.TrimSpace(str)
+					if str != "" {
+						result = append(result, str)
+					}
 				}
 			}
 			return result
+		case string:
+			v = strings.TrimSpace(v)
+			if v != "" {
+				return []string{v}
+			}
 		}
 	}
 	return nil

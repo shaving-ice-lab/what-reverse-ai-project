@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -25,6 +26,8 @@ type Engine struct {
 	log           logger.Logger
 	maxConcurrent int
 	timeout       time.Duration
+	dbProvider    DBProvider
+	dbAuthorizer  DBAuthorizer
 	mu            sync.RWMutex
 }
 
@@ -43,9 +46,17 @@ func DefaultEngineConfig() *EngineConfig {
 }
 
 // NewEngine 创建执行引擎
-func NewEngine(cfg *EngineConfig, log logger.Logger) *Engine {
+func NewEngine(cfg *EngineConfig, log logger.Logger, dbProvider DBProvider, dbAuthorizer DBAuthorizer) *Engine {
 	if cfg == nil {
 		cfg = DefaultEngineConfig()
+	} else {
+		defaultCfg := DefaultEngineConfig()
+		if cfg.MaxConcurrent <= 0 {
+			cfg.MaxConcurrent = defaultCfg.MaxConcurrent
+		}
+		if cfg.Timeout <= 0 {
+			cfg.Timeout = defaultCfg.Timeout
+		}
 	}
 
 	engine := &Engine{
@@ -54,6 +65,8 @@ func NewEngine(cfg *EngineConfig, log logger.Logger) *Engine {
 		log:           log,
 		maxConcurrent: cfg.MaxConcurrent,
 		timeout:       cfg.Timeout,
+		dbProvider:    dbProvider,
+		dbAuthorizer:  dbAuthorizer,
 	}
 
 	// 注册内置执行器
@@ -76,6 +89,11 @@ func NewEngine(cfg *EngineConfig, log logger.Logger) *Engine {
 	engine.RegisterExecutor(NewTextSplitExecutor())
 	engine.RegisterExecutor(NewMergeExecutor())
 	engine.RegisterExecutor(NewFilterExecutor())
+	engine.RegisterExecutor(NewDatabaseExecutor(NodeTypeDBSelect, "select", dbProvider, dbAuthorizer))
+	engine.RegisterExecutor(NewDatabaseExecutor(NodeTypeDBInsert, "insert", dbProvider, dbAuthorizer))
+	engine.RegisterExecutor(NewDatabaseExecutor(NodeTypeDBUpdate, "update", dbProvider, dbAuthorizer))
+	engine.RegisterExecutor(NewDatabaseExecutor(NodeTypeDBDelete, "delete", dbProvider, dbAuthorizer))
+	engine.RegisterExecutor(NewDatabaseExecutor(NodeTypeDBMigrate, "migrate", dbProvider, dbAuthorizer))
 	engine.RegisterExecutor(NewParallelExecutor())
 	engine.RegisterExecutor(NewParallelJoinExecutor())
 	engine.RegisterExecutor(NewDelayExecutor())
@@ -159,6 +177,9 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 		StartedAt:   startTime,
 		NodeResults: make(map[string]*NodeResult),
 	}
+	activeNodes := map[string]bool{
+		dag.StartNodeID: true,
+	}
 
 	totalNodes := len(dag.Nodes)
 	completedNodes := 0
@@ -168,6 +189,9 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 		if execCtx.IsCancelled() {
 			result.Status = ExecutionStatusCancelled
 			result.Error = ErrExecutionCancelled
+			if execCtx != nil {
+				result.TokenUsage = NormalizeTokenUsage(execCtx.TokenUsage)
+			}
 			e.emitEvent(&ExecutionEvent{
 				Type:        EventExecutionCancelled,
 				ExecutionID: execCtx.ExecutionID,
@@ -177,14 +201,56 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 			return result, ErrExecutionCancelled
 		}
 
+		// 根据依赖与分支控制筛选可执行节点
+		runnable := make([]string, 0, len(level))
+		for _, nodeID := range level {
+			predecessors := dag.GetPredecessors(nodeID)
+			shouldRun := len(predecessors) == 0 || activeNodes[nodeID]
+			if shouldRun {
+				runnable = append(runnable, nodeID)
+				continue
+			}
+
+			now := time.Now()
+			node := dag.GetNode(nodeID)
+			skipped := &NodeResult{
+				NodeID:     nodeID,
+				Status:     NodeStatusSkipped,
+				StartedAt:  now,
+				FinishedAt: now,
+			}
+			result.NodeResults[nodeID] = skipped
+			completedNodes++
+			if node != nil {
+				e.emitEvent(&ExecutionEvent{
+					Type:        EventNodeSkipped,
+					ExecutionID: execCtx.ExecutionID,
+					WorkflowID:  execCtx.WorkflowID,
+					NodeID:      nodeID,
+					NodeType:    node.Type,
+					Status:      string(skipped.Status),
+					Progress:    completedNodes * 100 / totalNodes,
+					TotalNodes:  totalNodes,
+					Timestamp:   now,
+				})
+			}
+		}
+
+		if len(runnable) == 0 {
+			continue
+		}
+
 		// 并发执行同一层级的节点
-		nodeResults, err := e.executeLevel(ctx, dag, level, execCtx)
+		nodeResults, err := e.executeLevel(ctx, dag, runnable, execCtx)
 		if err != nil {
 			return e.handleExecutionError(execCtx, startTime, err)
 		}
 
 		// 收集结果
 		for _, nodeResult := range nodeResults {
+			if nodeResult == nil {
+				continue
+			}
 			result.NodeResults[nodeResult.NodeID] = nodeResult
 			completedNodes++
 
@@ -207,6 +273,9 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 			if nodeResult.Status == NodeStatusFailed {
 				result.Status = ExecutionStatusFailed
 				result.Error = nodeResult.Error
+				if execCtx != nil {
+					result.TokenUsage = NormalizeTokenUsage(execCtx.TokenUsage)
+				}
 				e.emitEvent(&ExecutionEvent{
 					Type:        EventExecutionFailed,
 					ExecutionID: execCtx.ExecutionID,
@@ -216,6 +285,30 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 					Timestamp:   time.Now(),
 				})
 				return result, nodeResult.Error
+			}
+
+			// 更新可执行节点（依赖与分支控制）
+			outEdges := dag.OutEdges[nodeResult.NodeID]
+			if len(outEdges) == 0 {
+				continue
+			}
+			if nodeResult.NextHandle != "" {
+				matched := false
+				for _, edge := range outEdges {
+					if edge.SourceHandle == nodeResult.NextHandle {
+						activeNodes[edge.Target] = true
+						matched = true
+					}
+				}
+				if !matched {
+					for _, edge := range outEdges {
+						activeNodes[edge.Target] = true
+					}
+				}
+				continue
+			}
+			for _, edge := range outEdges {
+				activeNodes[edge.Target] = true
 			}
 		}
 	}
@@ -232,11 +325,22 @@ func (e *Engine) Execute(ctx context.Context, def *WorkflowDefinition, inputs ma
 		}
 	}
 
+	outputSchema := buildOutputSchema(dag, result.NodeResults)
+	if outputSchema != nil {
+		if result.Outputs == nil {
+			result.Outputs = make(map[string]interface{})
+		}
+		result.Outputs["output_schema"] = outputSchema
+	}
+
 	// 设置最终状态
 	finishTime := time.Now()
 	result.Status = ExecutionStatusCompleted
 	result.FinishedAt = finishTime
 	result.DurationMs = int(finishTime.Sub(startTime).Milliseconds())
+	if execCtx != nil {
+		result.TokenUsage = NormalizeTokenUsage(execCtx.TokenUsage)
+	}
 
 	// 发送完成事件
 	e.emitEvent(&ExecutionEvent{
@@ -340,8 +444,35 @@ func (e *Engine) executeNode(ctx context.Context, node *NodeDefinition, inputs m
 		}, err
 	}
 
-	// 执行
-	result, err := executor.Execute(ctx, node, inputs, execCtx)
+	// 执行（支持节点级超时与重试）
+	timeoutMs := getInt(node.Config, "timeout", 0)
+	retryCount := getInt(node.Config, "retryCount", 0)
+	retryDelayMs := getInt(node.Config, "retryDelay", 1000)
+
+	var (
+		result *NodeResult
+		err    error
+	)
+	executorToRun := executor
+	if retryCount > 0 {
+		retryConfig := DefaultRetryConfig()
+		retryConfig.MaxRetries = retryCount
+		retryConfig.InitialBackoff = time.Duration(retryDelayMs) * time.Millisecond
+		executorToRun = NewRetryableExecutor(executorToRun, retryConfig)
+	}
+
+	if timeoutMs > 0 {
+		result, err = SafeExecuteWithTimeout(
+			ctx,
+			executorToRun,
+			node,
+			inputs,
+			execCtx,
+			time.Duration(timeoutMs)*time.Millisecond,
+		)
+	} else {
+		result, err = SafeExecute(ctx, executorToRun, node, inputs, execCtx)
+	}
 	if result == nil {
 		result = &NodeResult{
 			NodeID:    node.ID,
@@ -372,6 +503,12 @@ func (e *Engine) executeNode(ctx context.Context, node *NodeDefinition, inputs m
 		result.Status = NodeStatusCompleted
 		// 保存输出到上下文
 		execCtx.SetNodeOutput(node.ID, result.Outputs)
+	}
+
+	if execCtx != nil {
+		if variableLogs := execCtx.GetVariableLogs(node.ID); len(variableLogs) > 0 {
+			result.Logs = append(result.Logs, variableLogs...)
+		}
 	}
 
 	return result, err
@@ -411,6 +548,10 @@ func (e *Engine) collectInputs(dag *DAG, node *NodeDefinition, execCtx *Executio
 
 func (e *Engine) handleExecutionError(execCtx *ExecutionContext, startTime time.Time, err error) (*ExecutionResult, error) {
 	finishTime := time.Now()
+	var usage TokenUsage
+	if execCtx != nil {
+		usage = NormalizeTokenUsage(execCtx.TokenUsage)
+	}
 
 	e.emitEvent(&ExecutionEvent{
 		Type:        EventExecutionFailed,
@@ -428,13 +569,64 @@ func (e *Engine) handleExecutionError(execCtx *ExecutionContext, startTime time.
 		StartedAt:   startTime,
 		FinishedAt:  finishTime,
 		DurationMs:  int(finishTime.Sub(startTime).Milliseconds()),
+		TokenUsage:  usage,
 	}, err
+}
+
+func buildOutputSchema(dag *DAG, nodeResults map[string]*NodeResult) map[string]interface{} {
+	if dag == nil || len(dag.Nodes) == 0 {
+		return nil
+	}
+	outputNodeIDs := make([]string, 0)
+	for nodeID, node := range dag.Nodes {
+		if node != nil && node.Type == NodeTypeOutput {
+			outputNodeIDs = append(outputNodeIDs, nodeID)
+		}
+	}
+	if len(outputNodeIDs) == 0 {
+		return nil
+	}
+
+	sort.Strings(outputNodeIDs)
+	items := make([]map[string]interface{}, 0, len(outputNodeIDs))
+	for _, nodeID := range outputNodeIDs {
+		result := nodeResults[nodeID]
+		if result == nil || result.Outputs == nil {
+			continue
+		}
+		node := dag.Nodes[nodeID]
+		outputs := result.Outputs
+		value := outputs["output"]
+		if value == nil {
+			value = outputs["value"]
+		}
+		items = append(items, map[string]interface{}{
+			"node_id":        nodeID,
+			"label":          node.Label,
+			"title":          outputs["title"],
+			"type":           outputs["type"],
+			"value":          value,
+			"show_timestamp": outputs["showTimestamp"],
+		})
+	}
+
+	if len(items) == 0 {
+		return nil
+	}
+	return map[string]interface{}{
+		"version": "1.0",
+		"items":   items,
+	}
 }
 
 // ParseWorkflowDefinition 解析工作流定义 JSON
 func ParseWorkflowDefinition(data []byte) (*WorkflowDefinition, error) {
+	normalized, err := normalizeWorkflowDefinitionJSON(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to normalize workflow definition: %w", err)
+	}
 	var def WorkflowDefinition
-	if err := json.Unmarshal(data, &def); err != nil {
+	if err := json.Unmarshal(normalized, &def); err != nil {
 		return nil, fmt.Errorf("failed to parse workflow definition: %w", err)
 	}
 	return &def, nil
@@ -442,6 +634,7 @@ func ParseWorkflowDefinition(data []byte) (*WorkflowDefinition, error) {
 
 // ParseWorkflowDefinitionFromMap 从 map 解析工作流定义
 func ParseWorkflowDefinitionFromMap(data map[string]interface{}) (*WorkflowDefinition, error) {
+	normalizeWorkflowDefinitionMap(data)
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err

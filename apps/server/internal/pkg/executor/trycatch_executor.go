@@ -113,11 +113,12 @@ func (e *TryCatchExecutor) Execute(ctx context.Context, node *NodeDefinition, in
 
 	// 设置错误变量
 	if errorVariable != "" && execCtx != nil {
-		execCtx.Variables[errorVariable] = map[string]interface{}{
+		errorPayload := map[string]interface{}{
 			"message": finalError.Error(),
 			"type":    "ExecutionError",
 		}
-		outputs[errorVariable] = execCtx.Variables[errorVariable]
+		execCtx.SetVariable(node.ID, errorVariable, errorPayload)
+		outputs[errorVariable] = errorPayload
 	}
 
 	// 设置回退值
@@ -189,10 +190,11 @@ func (w *TryCatchWrapper) Execute(ctx context.Context, node *NodeDefinition, inp
 
 	// 所有重试失败
 	if errorVariable != "" && execCtx != nil {
-		execCtx.Variables[errorVariable] = map[string]interface{}{
+		errorPayload := map[string]interface{}{
 			"message":  lastError.Error(),
 			"attempts": retryCount + 1,
 		}
+		execCtx.SetVariable(node.ID, errorVariable, errorPayload)
 	}
 
 	if continueOnError {

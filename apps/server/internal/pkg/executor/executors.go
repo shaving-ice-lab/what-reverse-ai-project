@@ -6,11 +6,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
-	"strconv"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/agentflow/server/internal/pkg/observability"
+	"github.com/agentflow/server/internal/pkg/security"
 )
 
 // ========================
@@ -85,7 +90,9 @@ func (e *VariableExecutor) Execute(ctx context.Context, node *NodeDefinition, in
 				value = interpolateVariables(strVal, inputs, execCtx)
 			}
 			outputs[name] = value
-			execCtx.Variables[name] = value
+			if execCtx != nil {
+				execCtx.SetVariable(node.ID, name, value)
+			}
 		}
 	case []interface{}:
 		// 兼容原有的数组配置
@@ -105,7 +112,9 @@ func (e *VariableExecutor) Execute(ctx context.Context, node *NodeDefinition, in
 				outputs[name] = value
 
 				// 更新全局变量
-				execCtx.Variables[name] = value
+				if execCtx != nil {
+					execCtx.SetVariable(node.ID, name, value)
+				}
 			}
 		}
 	}
@@ -204,11 +213,12 @@ func (e *ConditionExecutor) Execute(ctx context.Context, node *NodeDefinition, i
 
 	// 输出分支结果
 	return &NodeResult{
-		NodeID: node.ID,
-		Status: NodeStatusCompleted,
+		NodeID:     node.ID,
+		Status:     NodeStatusCompleted,
+		NextHandle: branch,
 		Outputs: map[string]interface{}{
 			"result":   result,
-			"branch":   branch,                           // 便于直接使用字符串分支
+			"branch":   branch,                                            // 便于直接使用字符串分支
 			"branches": map[string]bool{"true": result, "false": !result}, // 保持兼容的布尔映射
 		},
 	}, nil
@@ -454,29 +464,30 @@ func (e *LLMExecutor) GetType() NodeType {
 }
 
 func (e *LLMExecutor) Execute(ctx context.Context, node *NodeDefinition, inputs map[string]interface{}, execCtx *ExecutionContext) (*NodeResult, error) {
-	provider := getString(node.Config, "provider")
+	provider := strings.TrimSpace(getString(node.Config, "provider"))
+	if provider == "" {
+		provider = "openai"
+	}
 	model := getString(node.Config, "model")
 	systemPrompt := getString(node.Config, "systemPrompt")
 	userPrompt := getString(node.Config, "userPrompt")
+	fallbackText := getString(node.Config, "fallbackText")
+	fallbackProviders := getStringSlice(node.Config, "fallbackProviders")
+	fallbackModels := getStringSlice(node.Config, "fallbackModels")
 
 	// 变量插值
 	systemPrompt = interpolateVariables(systemPrompt, inputs, execCtx)
 	userPrompt = interpolateVariables(userPrompt, inputs, execCtx)
 
-	// 获取 API 密钥
-	apiKey := execCtx.APIKeys[provider]
-	if apiKey == "" {
-		// 尝试从配置获取
-		apiKey = getString(node.Config, "apiKey")
-	}
-
-	if apiKey == "" {
-		return nil, fmt.Errorf("API key not found for provider: %s", provider)
-	}
-
 	// 获取参数
 	temperature := getFloat(node.Config, "temperature", 0.7)
-	maxTokens := getInt(node.Config, "maxTokens", 2048)
+	maxTokens := getInt(node.Config, "maxTokens", 0)
+	if maxTokens == 0 {
+		maxTokens = getInt(node.Config, "max_tokens", 0)
+	}
+	if maxTokens == 0 {
+		maxTokens = 2048
+	}
 
 	// 构建消息
 	messages := []map[string]string{}
@@ -491,34 +502,507 @@ func (e *LLMExecutor) Execute(ctx context.Context, node *NodeDefinition, inputs 
 		"content": userPrompt,
 	})
 
-	// 根据 provider 调用不同的 API
-	var content string
-	var usage TokenUsage
-	var err error
+	routingStrategy := resolveLLMRoutingStrategy(node.Config)
+	routingModels := parseLLMRoutingModels(node.Config)
+	if routingStrategy == "" && len(routingModels) > 0 {
+		routingStrategy = "quality"
+	}
+	attempts := buildLLMAttempts(provider, fallbackProviders, model, fallbackModels, routingStrategy, routingModels)
+	metrics := observability.GetMetricsCollector()
+	var lastErr error
+	var attemptLogs []map[string]interface{}
+	hadFailure := false
+	for index, attempt := range attempts {
+		attemptStart := time.Now()
+		apiKey := resolveLLMAPIKey(attempt.Provider, node.Config, execCtx, provider)
+		if apiKey == "" {
+			lastErr = fmt.Errorf("API key not found for provider: %s", attempt.Provider)
+			hadFailure = true
+			attemptLogs = append(attemptLogs, map[string]interface{}{
+				"provider": attempt.Provider,
+				"model":    attempt.Model,
+				"status":   "skipped",
+				"error":    lastErr.Error(),
+			})
+			if metrics != nil {
+				metrics.RecordLLMRequest(attempt.Provider, attempt.Model, "skipped", 0, 0, 0, 0)
+			}
+			continue
+		}
+		content, usage, err := e.callProvider(ctx, attempt.Provider, apiKey, attempt.Model, messages, temperature, maxTokens)
+		durationMs := time.Since(attemptStart).Milliseconds()
+		if err != nil {
+			lastErr = err
+			hadFailure = true
+			attemptLogs = append(attemptLogs, map[string]interface{}{
+				"provider":    attempt.Provider,
+				"model":       attempt.Model,
+				"status":      "failed",
+				"duration_ms": durationMs,
+				"error":       err.Error(),
+			})
+			if metrics != nil {
+				metrics.RecordLLMRequest(attempt.Provider, attempt.Model, "failed", float64(durationMs)/1000.0, 0, 0, 0)
+			}
+			continue
+		}
+		review := security.ReviewAIOutput(content)
+		if !review.Allowed {
+			lastErr = security.NewUnsafeAIOutputError(review)
+			hadFailure = true
+			attemptLogs = append(attemptLogs, map[string]interface{}{
+				"provider":    attempt.Provider,
+				"model":       attempt.Model,
+				"status":      "blocked",
+				"duration_ms": durationMs,
+				"error":       lastErr.Error(),
+			})
+			if metrics != nil {
+				metrics.RecordLLMRequest(attempt.Provider, attempt.Model, "blocked", float64(durationMs)/1000.0, 0, 0, 0)
+			}
+			continue
+		}
+		normalizedUsage := NormalizeTokenUsage(usage)
+		if execCtx != nil {
+			execCtx.AddTokenUsage(normalizedUsage)
+		}
+		cost := computeLLMCost(attempt, normalizedUsage)
+		if execCtx != nil {
+			strategy := routingStrategy
+			if strategy == "" {
+				strategy = "default"
+			}
+			execCtx.RecordModelUsage(ctx, ModelUsageRecord{
+				WorkspaceID:      execCtx.WorkspaceID,
+				UserID:           execCtx.UserID,
+				ExecutionID:      execCtx.ExecutionID,
+				WorkflowID:       execCtx.WorkflowID,
+				NodeID:           node.ID,
+				Provider:         attempt.Provider,
+				Model:            attempt.Model,
+				Strategy:         strategy,
+				PromptTokens:     normalizedUsage.PromptTokens,
+				CompletionTokens: normalizedUsage.CompletionTokens,
+				TotalTokens:      normalizedUsage.TotalTokens,
+				CostAmount:       roundLLMCost(cost),
+				Currency:         "USD",
+			})
+		}
+		if execCtx != nil {
+			execCtx.RecordModelUsage(ctx, ModelUsageRecord{
+				WorkspaceID:      execCtx.WorkspaceID,
+				UserID:           execCtx.UserID,
+				ExecutionID:      execCtx.ExecutionID,
+				WorkflowID:       execCtx.WorkflowID,
+				NodeID:           node.ID,
+				Provider:         attempt.Provider,
+				Model:            attempt.Model,
+				Strategy:         routingStrategy,
+				PromptTokens:     normalizedUsage.PromptTokens,
+				CompletionTokens: normalizedUsage.CompletionTokens,
+				TotalTokens:      normalizedUsage.TotalTokens,
+				CostAmount:       roundLLMCost(cost),
+				Currency:         "USD",
+			})
+		}
+		if metrics != nil {
+			metrics.RecordLLMRequest(
+				attempt.Provider,
+				attempt.Model,
+				"success",
+				float64(durationMs)/1000.0,
+				int64(normalizedUsage.PromptTokens),
+				int64(normalizedUsage.CompletionTokens),
+				cost,
+			)
+		}
+		if hadFailure {
+			attemptLogs = append(attemptLogs, map[string]interface{}{
+				"provider":    attempt.Provider,
+				"model":       attempt.Model,
+				"status":      "success",
+				"duration_ms": durationMs,
+			})
+		}
+		outputs := map[string]interface{}{
+			"content":        content,
+			"text":           content,
+			"usage":          normalizedUsage,
+			"provider":       attempt.Provider,
+			"model":          attempt.Model,
+			"cost":           roundLLMCost(cost),
+			"cost_currency":  "USD",
+			"cost_estimated": attempt.CostEstimated,
+		}
+		if routingStrategy != "" {
+			outputs["routing_strategy"] = routingStrategy
+		}
+		if index > 0 {
+			outputs["fallback_used"] = true
+		}
+		if hadFailure && len(attemptLogs) > 0 {
+			outputs["attempts"] = attemptLogs
+		}
+		if outputSchema := resolveLLMOutputSchema(node.Config); outputSchema != nil {
+			parsed, parseErr := parseLLMJSONOutput(content)
+			if parseErr != nil {
+				return nil, fmt.Errorf("llm output is not valid json: %w", parseErr)
+			}
+			outputs["parsed"] = parsed
+			outputs["output_schema"] = outputSchema
+		}
+		return &NodeResult{
+			NodeID:  node.ID,
+			Status:  NodeStatusCompleted,
+			Outputs: outputs,
+		}, nil
+	}
 
+	if fallbackText != "" {
+		fallbackOutputs := map[string]interface{}{
+			"content":       fallbackText,
+			"text":          fallbackText,
+			"usage":         TokenUsage{},
+			"provider":      provider,
+			"model":         model,
+			"fallback_used": true,
+		}
+		if routingStrategy != "" {
+			fallbackOutputs["routing_strategy"] = routingStrategy
+		}
+		if len(attemptLogs) > 0 {
+			fallbackOutputs["attempts"] = attemptLogs
+		}
+		if outputSchema := resolveLLMOutputSchema(node.Config); outputSchema != nil {
+			parsed, parseErr := parseLLMJSONOutput(fallbackText)
+			if parseErr != nil {
+				return nil, fmt.Errorf("llm output is not valid json: %w", parseErr)
+			}
+			fallbackOutputs["parsed"] = parsed
+			fallbackOutputs["output_schema"] = outputSchema
+		}
+		if lastErr != nil {
+			fallbackOutputs["fallback_reason"] = lastErr.Error()
+		}
+		return &NodeResult{
+			NodeID:  node.ID,
+			Status:  NodeStatusCompleted,
+			Outputs: fallbackOutputs,
+		}, nil
+	}
+
+	if lastErr == nil {
+		lastErr = fmt.Errorf("LLM call failed without a specific error")
+	}
+	return nil, lastErr
+
+}
+
+type llmAttempt struct {
+	Provider            string
+	Model               string
+	QualityScore        float64
+	PromptCostPer1K     float64
+	CompletionCostPer1K float64
+	CostEstimated       bool
+	CostProvided        bool
+	QualityProvided     bool
+}
+
+func buildLLMAttempts(provider string, fallbackProviders []string, model string, fallbackModels []string, routingStrategy string, routingModels []llmAttempt) []llmAttempt {
+	attempts := make([]llmAttempt, 0)
+	if len(routingModels) > 0 {
+		attempts = append(attempts, routingModels...)
+	} else {
+		providers := uniqueStrings(append([]string{provider}, fallbackProviders...))
+		models := append([]string{model}, fallbackModels...)
+		if len(models) == 0 {
+			models = []string{model}
+		}
+		attempts = make([]llmAttempt, 0, len(providers)*len(models))
+		for _, candidateProvider := range providers {
+			for _, candidateModel := range models {
+				attempts = append(attempts, llmAttempt{
+					Provider: candidateProvider,
+					Model:    candidateModel,
+				})
+			}
+		}
+	}
+
+	normalized := make([]llmAttempt, 0, len(attempts))
+	for _, attempt := range attempts {
+		candidate := normalizeLLMAttempt(attempt)
+		if candidate.Model == "" {
+			continue
+		}
+		normalized = append(normalized, candidate)
+	}
+	if routingStrategy != "" {
+		orderLLMAttempts(normalized, routingStrategy)
+	}
+	return normalized
+}
+
+func resolveLLMRoutingStrategy(config map[string]interface{}) string {
+	if config == nil {
+		return ""
+	}
+	for _, key := range []string{"routingStrategy", "routing_strategy", "modelRouting", "model_routing"} {
+		if raw, ok := config[key]; ok {
+			if value, ok := raw.(string); ok {
+				return normalizeLLMRoutingStrategy(value)
+			}
+		}
+	}
+	return ""
+}
+
+func normalizeLLMRoutingStrategy(raw string) string {
+	normalized := strings.ToLower(strings.TrimSpace(raw))
+	switch normalized {
+	case "budget", "cost", "price", "budget_first", "cost_first", "price_first":
+		return "budget"
+	case "quality", "quality_first", "best":
+		return "quality"
+	default:
+		return ""
+	}
+}
+
+func parseLLMRoutingModels(config map[string]interface{}) []llmAttempt {
+	if config == nil {
+		return nil
+	}
+	for _, key := range []string{"routingModels", "routing_models", "modelCandidates", "model_candidates"} {
+		if raw, ok := config[key]; ok {
+			return parseLLMRoutingModelsValue(raw)
+		}
+	}
+	return nil
+}
+
+func parseLLMRoutingModelsValue(raw interface{}) []llmAttempt {
+	switch value := raw.(type) {
+	case []llmAttempt:
+		return value
+	case []interface{}:
+		results := make([]llmAttempt, 0, len(value))
+		for _, item := range value {
+			if candidate, ok := parseLLMRoutingModel(item); ok {
+				results = append(results, candidate)
+			}
+		}
+		return results
+	case []map[string]interface{}:
+		results := make([]llmAttempt, 0, len(value))
+		for _, item := range value {
+			if candidate, ok := parseLLMRoutingModel(item); ok {
+				results = append(results, candidate)
+			}
+		}
+		return results
+	default:
+		return nil
+	}
+}
+
+func parseLLMRoutingModel(raw interface{}) (llmAttempt, bool) {
+	m, ok := raw.(map[string]interface{})
+	if !ok {
+		return llmAttempt{}, false
+	}
+	provider := getStringFromMap(m, "provider", "vendor", "source")
+	model := getStringFromMap(m, "model", "name", "id")
+	if strings.TrimSpace(model) == "" {
+		return llmAttempt{}, false
+	}
+	attempt := llmAttempt{
+		Provider: strings.TrimSpace(provider),
+		Model:    strings.TrimSpace(model),
+	}
+	if quality, ok := getFloatFromMap(m, "quality", "quality_score", "qualityScore"); ok {
+		attempt.QualityScore = quality
+		attempt.QualityProvided = true
+	}
+	if promptCost, ok := getFloatFromMap(m, "prompt_cost_per_1k", "prompt_per_1k", "input_price", "inputPrice"); ok {
+		attempt.PromptCostPer1K = promptCost
+		attempt.CostProvided = true
+	}
+	if completionCost, ok := getFloatFromMap(m, "completion_cost_per_1k", "completion_per_1k", "output_price", "outputPrice"); ok {
+		attempt.CompletionCostPer1K = completionCost
+		attempt.CostProvided = true
+	}
+	return attempt, true
+}
+
+func normalizeLLMAttempt(attempt llmAttempt) llmAttempt {
+	attempt.Provider = strings.TrimSpace(attempt.Provider)
+	attempt.Model = strings.TrimSpace(attempt.Model)
+	if attempt.Provider == "" {
+		attempt.Provider = "openai"
+	}
+	if attempt.Model == "" {
+		return attempt
+	}
+	if attempt.QualityScore <= 0 && !attempt.QualityProvided {
+		attempt.QualityScore = estimateLLMQuality(attempt.Provider, attempt.Model)
+	}
+	if attempt.PromptCostPer1K == 0 && attempt.CompletionCostPer1K == 0 && !attempt.CostProvided {
+		pricing := estimateLLMPricing(attempt.Provider, attempt.Model)
+		attempt.PromptCostPer1K = pricing.PromptPer1K
+		attempt.CompletionCostPer1K = pricing.CompletionPer1K
+		attempt.CostEstimated = pricing.Estimated
+	}
+	return attempt
+}
+
+func orderLLMAttempts(attempts []llmAttempt, strategy string) {
+	if len(attempts) == 0 {
+		return
+	}
+	switch strategy {
+	case "budget":
+		sort.SliceStable(attempts, func(i, j int) bool {
+			costI := llmAttemptCostScore(attempts[i])
+			costJ := llmAttemptCostScore(attempts[j])
+			if costI == costJ {
+				return attempts[i].QualityScore > attempts[j].QualityScore
+			}
+			return costI < costJ
+		})
+	case "quality":
+		sort.SliceStable(attempts, func(i, j int) bool {
+			qualityI := attempts[i].QualityScore
+			qualityJ := attempts[j].QualityScore
+			if qualityI == qualityJ {
+				return llmAttemptCostScore(attempts[i]) < llmAttemptCostScore(attempts[j])
+			}
+			return qualityI > qualityJ
+		})
+	}
+}
+
+func llmAttemptCostScore(attempt llmAttempt) float64 {
+	if attempt.PromptCostPer1K == 0 && attempt.CompletionCostPer1K == 0 && !attempt.CostProvided && !attempt.CostEstimated {
+		return math.MaxFloat64
+	}
+	return attempt.PromptCostPer1K + attempt.CompletionCostPer1K
+}
+
+type llmPricing struct {
+	PromptPer1K     float64
+	CompletionPer1K float64
+	Estimated       bool
+}
+
+func estimateLLMPricing(provider, model string) llmPricing {
+	name := strings.ToLower(strings.TrimSpace(model))
+	switch {
+	case strings.Contains(name, "mini") || strings.Contains(name, "haiku") || strings.Contains(name, "3.5") || strings.Contains(name, "lite") || strings.Contains(name, "small"):
+		return llmPricing{PromptPer1K: 0.0005, CompletionPer1K: 0.0015, Estimated: true}
+	case strings.Contains(name, "4o") || strings.Contains(name, "turbo") || strings.Contains(name, "sonnet") || strings.Contains(name, "pro"):
+		return llmPricing{PromptPer1K: 0.01, CompletionPer1K: 0.03, Estimated: true}
+	case strings.Contains(name, "opus") || strings.Contains(name, "gpt-4"):
+		return llmPricing{PromptPer1K: 0.03, CompletionPer1K: 0.06, Estimated: true}
+	default:
+		_ = provider
+		return llmPricing{PromptPer1K: 0.002, CompletionPer1K: 0.004, Estimated: true}
+	}
+}
+
+func estimateLLMQuality(provider, model string) float64 {
+	name := strings.ToLower(strings.TrimSpace(model))
+	switch {
+	case strings.Contains(name, "opus") || (strings.Contains(name, "gpt-4") && !strings.Contains(name, "mini")):
+		return 0.95
+	case strings.Contains(name, "4o"):
+		return 0.9
+	case strings.Contains(name, "sonnet") || strings.Contains(name, "turbo") || strings.Contains(name, "pro"):
+		return 0.8
+	case strings.Contains(name, "3.5") || strings.Contains(name, "haiku") || strings.Contains(name, "mini") || strings.Contains(name, "lite"):
+		return 0.6
+	default:
+		_ = provider
+		return 0.7
+	}
+}
+
+func computeLLMCost(attempt llmAttempt, usage TokenUsage) float64 {
+	if usage.PromptTokens <= 0 && usage.CompletionTokens <= 0 {
+		return 0
+	}
+	promptCost := attempt.PromptCostPer1K * float64(usage.PromptTokens) / 1000.0
+	completionCost := attempt.CompletionCostPer1K * float64(usage.CompletionTokens) / 1000.0
+	return promptCost + completionCost
+}
+
+func roundLLMCost(cost float64) float64 {
+	if cost == 0 {
+		return 0
+	}
+	return math.Round(cost*1000000) / 1000000
+}
+
+func getStringFromMap(m map[string]interface{}, keys ...string) string {
+	for _, key := range keys {
+		if val, ok := m[key]; ok {
+			if str, ok := val.(string); ok {
+				str = strings.TrimSpace(str)
+				if str != "" {
+					return str
+				}
+			}
+		}
+	}
+	return ""
+}
+
+func getFloatFromMap(m map[string]interface{}, keys ...string) (float64, bool) {
+	for _, key := range keys {
+		if val, ok := m[key]; ok {
+			if parsed, err := toFloat64(val); err == nil {
+				return parsed, true
+			}
+		}
+	}
+	return 0, false
+}
+
+func resolveLLMAPIKey(provider string, nodeConfig map[string]interface{}, execCtx *ExecutionContext, primaryProvider string) string {
+	if execCtx != nil {
+		if apiKey := execCtx.APIKeys[provider]; strings.TrimSpace(apiKey) != "" {
+			return apiKey
+		}
+	}
+	if raw, ok := nodeConfig["apiKeys"]; ok {
+		if apiKeys, ok := raw.(map[string]interface{}); ok {
+			if val, ok := apiKeys[provider]; ok {
+				if apiKey, ok := val.(string); ok && strings.TrimSpace(apiKey) != "" {
+					return apiKey
+				}
+			}
+		}
+	}
+	if provider == primaryProvider || strings.TrimSpace(getString(nodeConfig, "provider")) == "" {
+		apiKey := getString(nodeConfig, "apiKey")
+		if strings.TrimSpace(apiKey) != "" {
+			return apiKey
+		}
+	}
+	return ""
+}
+
+func (e *LLMExecutor) callProvider(ctx context.Context, provider, apiKey, model string, messages []map[string]string, temperature float64, maxTokens int) (string, TokenUsage, error) {
 	switch provider {
 	case "openai":
-		content, usage, err = e.callOpenAI(ctx, apiKey, model, messages, temperature, maxTokens)
+		return e.callOpenAI(ctx, apiKey, model, messages, temperature, maxTokens)
 	case "anthropic":
-		content, usage, err = e.callAnthropic(ctx, apiKey, model, messages, temperature, maxTokens)
+		return e.callAnthropic(ctx, apiKey, model, messages, temperature, maxTokens)
 	default:
 		// 默认使用 OpenAI 兼容接口
-		content, usage, err = e.callOpenAI(ctx, apiKey, model, messages, temperature, maxTokens)
+		return e.callOpenAI(ctx, apiKey, model, messages, temperature, maxTokens)
 	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &NodeResult{
-		NodeID: node.ID,
-		Status: NodeStatusCompleted,
-		Outputs: map[string]interface{}{
-			"content": content,
-			"text":    content,
-			"usage":   usage,
-		},
-	}, nil
 }
 
 func (e *LLMExecutor) callOpenAI(ctx context.Context, apiKey, model string, messages []map[string]string, temperature float64, maxTokens int) (string, TokenUsage, error) {
@@ -654,6 +1138,52 @@ func (e *LLMExecutor) callAnthropic(ctx context.Context, apiKey, model string, m
 	}
 
 	return result.Content[0].Text, usage, nil
+}
+
+func resolveLLMOutputSchema(config map[string]interface{}) interface{} {
+	if config == nil {
+		return nil
+	}
+	if val, ok := config["outputSchema"]; ok {
+		return val
+	}
+	if val, ok := config["output_schema"]; ok {
+		return val
+	}
+	return nil
+}
+
+func parseLLMJSONOutput(content string) (interface{}, error) {
+	trimmed := strings.TrimSpace(content)
+	if trimmed == "" {
+		return nil, fmt.Errorf("empty output")
+	}
+	var parsed interface{}
+	if err := json.Unmarshal([]byte(trimmed), &parsed); err == nil {
+		return parsed, nil
+	}
+	if candidate := extractJSONCandidate(trimmed); candidate != "" {
+		if err := json.Unmarshal([]byte(candidate), &parsed); err == nil {
+			return parsed, nil
+		} else {
+			return nil, err
+		}
+	}
+	return nil, fmt.Errorf("output is not valid json")
+}
+
+func extractJSONCandidate(raw string) string {
+	start := strings.Index(raw, "{")
+	end := strings.LastIndex(raw, "}")
+	if start != -1 && end > start {
+		return raw[start : end+1]
+	}
+	start = strings.Index(raw, "[")
+	end = strings.LastIndex(raw, "]")
+	if start != -1 && end > start {
+		return raw[start : end+1]
+	}
+	return ""
 }
 
 // ========================
@@ -796,6 +1326,23 @@ func getString(m map[string]interface{}, key string) string {
 		}
 	}
 	return ""
+}
+
+func uniqueStrings(values []string) []string {
+	seen := make(map[string]struct{}, len(values))
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		value = strings.TrimSpace(value)
+		if value == "" {
+			continue
+		}
+		if _, ok := seen[value]; ok {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	return result
 }
 
 func getInt(m map[string]interface{}, key string, defaultVal int) int {

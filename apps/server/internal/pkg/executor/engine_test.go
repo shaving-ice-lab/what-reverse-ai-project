@@ -2,8 +2,11 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
+
+	"github.com/agentflow/server/internal/pkg/logger"
 )
 
 // TestDAGConstruction 测试 DAG 构建
@@ -109,12 +112,15 @@ func TestDAGExecutionLevels(t *testing.T) {
 
 // TestExecutionContext 测试执行上下文
 func TestExecutionContext(t *testing.T) {
-	ctx := NewExecutionContext("exec-123", "workflow-456", "user-789")
+	ctx := NewExecutionContext("exec-123", "workflow-456", "user-789", "workspace-123")
 
 	// 测试变量设置和获取
-	ctx.Variables["input"] = "test"
+	ctx.SetVariable("node-0", "input", "test")
 	if ctx.Variables["input"] != "test" {
 		t.Error("Failed to set/get variable")
+	}
+	if len(ctx.GetVariableLogs("node-0")) == 0 {
+		t.Error("Expected variable lifecycle logs to be recorded")
 	}
 
 	// 测试节点输出
@@ -148,7 +154,7 @@ func TestStartExecutor(t *testing.T) {
 		Type: NodeTypeStart,
 	}
 	inputs := map[string]interface{}{"input": "value"}
-	ctx := NewExecutionContext("exec-1", "wf-1", "user-1")
+	ctx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 	result, err := executor.Execute(context.Background(), node, inputs, ctx)
 	if err != nil {
@@ -178,7 +184,7 @@ func TestEndExecutor(t *testing.T) {
 		Type: NodeTypeEnd,
 	}
 	inputs := map[string]interface{}{"result": "final"}
-	ctx := NewExecutionContext("exec-1", "wf-1", "user-1")
+	ctx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 	result, err := executor.Execute(context.Background(), node, inputs, ctx)
 	if err != nil {
@@ -209,7 +215,7 @@ func TestVariableExecutor(t *testing.T) {
 			},
 		},
 	}
-	ctx := NewExecutionContext("exec-1", "wf-1", "user-1")
+	ctx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 	result, err := executor.Execute(context.Background(), node, nil, ctx)
 	if err != nil {
@@ -274,7 +280,7 @@ func TestConditionExecutor(t *testing.T) {
 				Type:   NodeTypeCondition,
 				Config: tc.config,
 			}
-			ctx := NewExecutionContext("exec-1", "wf-1", "user-1")
+			ctx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 			result, err := executor.Execute(context.Background(), node, tc.inputs, ctx)
 			if err != nil {
@@ -288,12 +294,207 @@ func TestConditionExecutor(t *testing.T) {
 	}
 }
 
+func TestBranchDependencyControl(t *testing.T) {
+	log, err := logger.New(false)
+	if err != nil {
+		t.Fatalf("Failed to init logger: %v", err)
+	}
+
+	engine := NewEngine(&EngineConfig{
+		MaxConcurrent: 2,
+		Timeout:       2 * time.Second,
+	}, log, nil, nil)
+
+	def := &WorkflowDefinition{
+		Nodes: []NodeDefinition{
+			{ID: "start", Type: NodeTypeStart},
+			{
+				ID:   "cond",
+				Type: NodeTypeCondition,
+				Config: map[string]interface{}{
+					"field":    "status",
+					"operator": "equals",
+					"value":    "active",
+				},
+			},
+			{
+				ID:   "true-node",
+				Type: NodeTypeVariable,
+				Config: map[string]interface{}{
+					"variables": map[string]interface{}{
+						"branch": "true",
+					},
+				},
+			},
+			{
+				ID:   "false-node",
+				Type: NodeTypeVariable,
+				Config: map[string]interface{}{
+					"variables": map[string]interface{}{
+						"branch": "false",
+					},
+				},
+			},
+			{ID: "end", Type: NodeTypeEnd},
+		},
+		Edges: []EdgeDefinition{
+			{ID: "e1", Source: "start", Target: "cond"},
+			{ID: "e2", Source: "cond", SourceHandle: "true", Target: "true-node"},
+			{ID: "e3", Source: "cond", SourceHandle: "false", Target: "false-node"},
+			{ID: "e4", Source: "true-node", Target: "end"},
+			{ID: "e5", Source: "false-node", Target: "end"},
+		},
+	}
+
+	execCtx := NewExecutionContext("exec-branch", "wf-branch", "user-1", "workspace-1")
+	result, err := engine.Execute(context.Background(), def, map[string]interface{}{"status": "active"}, execCtx)
+	if err != nil {
+		t.Fatalf("Expected execution to succeed, got error: %v", err)
+	}
+
+	trueResult := result.NodeResults["true-node"]
+	falseResult := result.NodeResults["false-node"]
+	if trueResult == nil || trueResult.Status != NodeStatusCompleted {
+		t.Fatalf("Expected true-node completed, got: %+v", trueResult)
+	}
+	if falseResult == nil || falseResult.Status != NodeStatusSkipped {
+		t.Fatalf("Expected false-node skipped, got: %+v", falseResult)
+	}
+}
+
+type flakyTestExecutor struct {
+	attempts  int
+	failUntil int
+}
+
+func (e *flakyTestExecutor) GetType() NodeType {
+	return NodeType("test_retry")
+}
+
+func (e *flakyTestExecutor) Execute(ctx context.Context, node *NodeDefinition, inputs map[string]interface{}, execCtx *ExecutionContext) (*NodeResult, error) {
+	e.attempts++
+	if e.attempts <= e.failUntil {
+		return nil, NewExecutionError(ErrCodeNetwork, "temporary failure", true).WithNode(node.ID, node.Type)
+	}
+	return &NodeResult{
+		NodeID:  node.ID,
+		Outputs: map[string]interface{}{"ok": true},
+	}, nil
+}
+
+type slowTestExecutor struct {
+	delay time.Duration
+}
+
+func (e *slowTestExecutor) GetType() NodeType {
+	return NodeType("test_timeout")
+}
+
+func (e *slowTestExecutor) Execute(ctx context.Context, node *NodeDefinition, inputs map[string]interface{}, execCtx *ExecutionContext) (*NodeResult, error) {
+	time.Sleep(e.delay)
+	return &NodeResult{
+		NodeID:  node.ID,
+		Outputs: map[string]interface{}{"ok": true},
+	}, nil
+}
+
+func TestNodeRetryConfig(t *testing.T) {
+	log, err := logger.New(false)
+	if err != nil {
+		t.Fatalf("Failed to init logger: %v", err)
+	}
+
+	engine := NewEngine(&EngineConfig{
+		MaxConcurrent: 1,
+		Timeout:       2 * time.Second,
+	}, log, nil, nil)
+
+	exec := &flakyTestExecutor{failUntil: 2}
+	engine.RegisterExecutor(exec)
+
+	def := &WorkflowDefinition{
+		Nodes: []NodeDefinition{
+			{ID: "start", Type: NodeTypeStart},
+			{
+				ID:   "retry-node",
+				Type: NodeType("test_retry"),
+				Config: map[string]interface{}{
+					"retryCount": 2,
+					"retryDelay": 1,
+				},
+			},
+			{ID: "end", Type: NodeTypeEnd},
+		},
+		Edges: []EdgeDefinition{
+			{ID: "e1", Source: "start", Target: "retry-node"},
+			{ID: "e2", Source: "retry-node", Target: "end"},
+		},
+	}
+
+	execCtx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
+	result, err := engine.Execute(context.Background(), def, map[string]interface{}{}, execCtx)
+	if err != nil {
+		t.Fatalf("Expected retry to succeed, got error: %v", err)
+	}
+	if result.Status != ExecutionStatusCompleted {
+		t.Fatalf("Expected execution to complete, got %s", result.Status)
+	}
+	if exec.attempts != 3 {
+		t.Fatalf("Expected 3 attempts, got %d", exec.attempts)
+	}
+}
+
+func TestNodeTimeoutConfig(t *testing.T) {
+	log, err := logger.New(false)
+	if err != nil {
+		t.Fatalf("Failed to init logger: %v", err)
+	}
+
+	engine := NewEngine(&EngineConfig{
+		MaxConcurrent: 1,
+		Timeout:       2 * time.Second,
+	}, log, nil, nil)
+
+	engine.RegisterExecutor(&slowTestExecutor{delay: 50 * time.Millisecond})
+
+	def := &WorkflowDefinition{
+		Nodes: []NodeDefinition{
+			{ID: "start", Type: NodeTypeStart},
+			{
+				ID:   "timeout-node",
+				Type: NodeType("test_timeout"),
+				Config: map[string]interface{}{
+					"timeout": 10,
+				},
+			},
+			{ID: "end", Type: NodeTypeEnd},
+		},
+		Edges: []EdgeDefinition{
+			{ID: "e1", Source: "start", Target: "timeout-node"},
+			{ID: "e2", Source: "timeout-node", Target: "end"},
+		},
+	}
+
+	execCtx := NewExecutionContext("exec-2", "wf-2", "user-2", "workspace-2")
+	result, err := engine.Execute(context.Background(), def, map[string]interface{}{}, execCtx)
+	if err == nil {
+		t.Fatalf("Expected timeout error, got nil")
+	}
+	var execErr *ExecutionError
+	if !errors.As(err, &execErr) || execErr.Code != ErrCodeTimeout {
+		t.Fatalf("Expected timeout ExecutionError, got: %v", err)
+	}
+	if result == nil || result.Status != ExecutionStatusFailed {
+		t.Fatalf("Expected failed execution result, got: %+v", result)
+	}
+}
+
 // TestExecutionTimeout 测试执行超时
 func TestExecutionTimeout(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 
-	execCtx := NewExecutionContext("exec-1", "wf-1", "user-1")
+	execCtx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 	// 模拟长时间运行的任务
 	select {
@@ -312,7 +513,7 @@ func TestExecutionTimeout(t *testing.T) {
 
 // TestExecutionCancellation 测试执行取消
 func TestExecutionCancellation(t *testing.T) {
-	execCtx := NewExecutionContext("exec-1", "wf-1", "user-1")
+	execCtx := NewExecutionContext("exec-1", "wf-1", "user-1", "workspace-1")
 
 	// 启动一个 goroutine 来取消执行
 	go func() {

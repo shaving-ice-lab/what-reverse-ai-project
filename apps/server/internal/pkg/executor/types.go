@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -46,6 +47,41 @@ const (
 	ExecutionStatusCancelled ExecutionStatus = "cancelled"
 )
 
+// ModelUsageRecord 模型用量记录
+type ModelUsageRecord struct {
+	WorkspaceID      string
+	UserID           string
+	ExecutionID      string
+	WorkflowID       string
+	NodeID           string
+	Provider         string
+	Model            string
+	Strategy         string
+	PromptTokens     int
+	CompletionTokens int
+	TotalTokens      int
+	CostAmount       float64
+	Currency         string
+}
+
+// ModelUsageRecorder 模型用量记录器
+type ModelUsageRecorder interface {
+	RecordModelUsage(ctx context.Context, record ModelUsageRecord)
+}
+
+// AuditEvent 执行审计事件
+type AuditEvent struct {
+	Action     string
+	TargetType string
+	TargetID   string
+	Metadata   map[string]interface{}
+}
+
+// AuditRecorder 审计记录器
+type AuditRecorder interface {
+	RecordAudit(ctx context.Context, execCtx *ExecutionContext, event AuditEvent)
+}
+
 // WorkflowDefinition 工作流定义
 type WorkflowDefinition struct {
 	Version  string                 `json:"version"`
@@ -60,6 +96,7 @@ type NodeDefinition struct {
 	Type     NodeType               `json:"type"`
 	Label    string                 `json:"label"`
 	Position Position               `json:"position"`
+	Data     map[string]interface{} `json:"data,omitempty"`
 	Config   map[string]interface{} `json:"config"`
 	Inputs   []PortDefinition       `json:"inputs"`
 	Outputs  []PortDefinition       `json:"outputs"`
@@ -99,14 +136,33 @@ type ExecutionContext struct {
 	// 用户 ID
 	UserID string
 
+	// 工作空间 ID
+	WorkspaceID string
+
+	// 触发类型与元信息
+	TriggerType string
+	TriggerData map[string]interface{}
+
 	// 全局变量
 	Variables map[string]interface{}
 
 	// 节点输出缓存 (nodeId -> outputs)
 	NodeOutputs map[string]map[string]interface{}
 
+	// Token 使用量汇总
+	TokenUsage TokenUsage
+
+	// 变量生命周期日志 (nodeId -> logs)
+	VariableLogs map[string][]LogEntry
+
 	// API 密钥 (provider -> key)
 	APIKeys map[string]string
+
+	// 模型用量记录器
+	ModelUsageRecorder ModelUsageRecorder
+
+	// 审计记录器
+	AuditRecorder AuditRecorder
 
 	// 取消通道
 	CancelChan chan struct{}
@@ -116,15 +172,17 @@ type ExecutionContext struct {
 }
 
 // NewExecutionContext 创建执行上下文
-func NewExecutionContext(executionID, workflowID, userID string) *ExecutionContext {
+func NewExecutionContext(executionID, workflowID, userID, workspaceID string) *ExecutionContext {
 	return &ExecutionContext{
-		ExecutionID: executionID,
-		WorkflowID:  workflowID,
-		UserID:      userID,
-		Variables:   make(map[string]interface{}),
-		NodeOutputs: make(map[string]map[string]interface{}),
-		APIKeys:     make(map[string]string),
-		CancelChan:  make(chan struct{}),
+		ExecutionID:  executionID,
+		WorkflowID:   workflowID,
+		UserID:       userID,
+		WorkspaceID:  workspaceID,
+		Variables:    make(map[string]interface{}),
+		NodeOutputs:  make(map[string]map[string]interface{}),
+		VariableLogs: make(map[string][]LogEntry),
+		APIKeys:      make(map[string]string),
+		CancelChan:   make(chan struct{}),
 	}
 }
 
@@ -143,6 +201,84 @@ func (c *ExecutionContext) GetVariable(path string) interface{} {
 	// 支持获取全局变量或节点输出
 	// 格式: {{nodeId.outputKey}} 或 {{variableName}}
 	return c.Variables[path]
+}
+
+// SetVariable 设置变量并记录生命周期日志
+func (c *ExecutionContext) SetVariable(nodeID, name string, value interface{}) {
+	if c == nil || name == "" {
+		return
+	}
+	if c.Variables == nil {
+		c.Variables = make(map[string]interface{})
+	}
+	previous, exists := c.Variables[name]
+	c.Variables[name] = value
+
+	action := "set"
+	if exists {
+		action = "update"
+	}
+	if nodeID == "" {
+		nodeID = "system"
+	}
+	if c.VariableLogs == nil {
+		c.VariableLogs = make(map[string][]LogEntry)
+	}
+	logEntry := LogEntry{
+		Level:     "variable",
+		Message:   fmt.Sprintf("%s variable %s", action, name),
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"name":   name,
+			"action": action,
+			"value":  value,
+		},
+	}
+	if exists {
+		logEntry.Data["previous"] = previous
+	}
+	c.VariableLogs[nodeID] = append(c.VariableLogs[nodeID], logEntry)
+}
+
+// RecordModelUsage 记录模型用量
+func (c *ExecutionContext) RecordModelUsage(ctx context.Context, record ModelUsageRecord) {
+	if c == nil || c.ModelUsageRecorder == nil {
+		return
+	}
+	c.ModelUsageRecorder.RecordModelUsage(ctx, record)
+}
+
+// RecordAudit 记录审计事件
+func (c *ExecutionContext) RecordAudit(ctx context.Context, event AuditEvent) {
+	if c == nil || c.AuditRecorder == nil {
+		return
+	}
+	c.AuditRecorder.RecordAudit(ctx, c, event)
+}
+
+// AddTokenUsage 累加 Token 使用量
+func (c *ExecutionContext) AddTokenUsage(usage TokenUsage) {
+	if c == nil {
+		return
+	}
+	normalized := NormalizeTokenUsage(usage)
+	c.TokenUsage.PromptTokens += normalized.PromptTokens
+	c.TokenUsage.CompletionTokens += normalized.CompletionTokens
+	c.TokenUsage.TotalTokens = c.TokenUsage.PromptTokens + c.TokenUsage.CompletionTokens
+}
+
+// GetVariableLogs 获取节点变量日志
+func (c *ExecutionContext) GetVariableLogs(nodeID string) []LogEntry {
+	if c == nil || nodeID == "" || c.VariableLogs == nil {
+		return nil
+	}
+	logs := c.VariableLogs[nodeID]
+	if len(logs) == 0 {
+		return nil
+	}
+	copied := make([]LogEntry, len(logs))
+	copy(copied, logs)
+	return copied
 }
 
 // Cancel 取消执行
@@ -176,9 +312,10 @@ type NodeResult struct {
 
 // LogEntry 日志条目
 type LogEntry struct {
-	Level     string    `json:"level"`
-	Message   string    `json:"message"`
-	Timestamp time.Time `json:"timestamp"`
+	Level     string                 `json:"level"`
+	Message   string                 `json:"message"`
+	Timestamp time.Time              `json:"timestamp"`
+	Data      map[string]interface{} `json:"data,omitempty"`
 }
 
 // ExecutionResult 执行结果
@@ -199,6 +336,28 @@ type TokenUsage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
+}
+
+// NormalizeTokenUsage 确保 total_tokens = prompt_tokens + completion_tokens
+func NormalizeTokenUsage(usage TokenUsage) TokenUsage {
+	promptTokens := clampTokenValue(usage.PromptTokens)
+	completionTokens := clampTokenValue(usage.CompletionTokens)
+	if promptTokens == 0 && completionTokens == 0 && usage.TotalTokens > 0 {
+		promptTokens = usage.TotalTokens
+	}
+	totalTokens := promptTokens + completionTokens
+	return TokenUsage{
+		PromptTokens:     promptTokens,
+		CompletionTokens: completionTokens,
+		TotalTokens:      totalTokens,
+	}
+}
+
+func clampTokenValue(value int) int {
+	if value < 0 {
+		return 0
+	}
+	return value
 }
 
 // NodeExecutor 节点执行器接口

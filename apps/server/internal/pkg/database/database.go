@@ -76,8 +76,44 @@ func Migrate(db *gorm.DB) error {
 		// 用户相关
 		&entity.User{},
 		&entity.APIKey{},
+		&entity.Secret{},
 		&entity.UserFollow{},
 		&entity.UserSession{},
+		&entity.Workspace{},
+		&entity.WorkspaceRole{},
+		&entity.WorkspaceMember{},
+		&entity.WorkspaceDatabase{},
+		&entity.WorkspaceDBRole{},
+		&entity.WorkspaceDBSchemaMigration{},
+		&entity.IdempotencyKey{},
+
+		// App 相关
+		&entity.App{},
+		&entity.AppVersion{},
+		&entity.AppAccessPolicy{},
+		&entity.AppDomain{},
+		&entity.AppSession{},
+		&entity.AppEvent{},
+
+		// Webhook 相关
+		&entity.WebhookEndpoint{},
+		&entity.WebhookDelivery{},
+
+		// 配置中心
+		&entity.ConfigItem{},
+
+		// 审计相关
+		&entity.AuditLog{},
+		&entity.SupportTicket{},
+		&entity.SupportChannel{},
+		&entity.SupportAssignmentRule{},
+		&entity.SupportTicketComment{},
+		&entity.SupportTeam{},
+		&entity.SupportTeamMember{},
+		&entity.SupportQueue{},
+		&entity.SupportQueueMember{},
+		&entity.SupportNotificationTemplate{},
+		&entity.WorkspaceExportJob{},
 
 		// 工作流相关
 		&entity.Workflow{},
@@ -88,8 +124,14 @@ func Migrate(db *gorm.DB) error {
 		&entity.Template{},
 
 		// 执行相关
+		&entity.RuntimeEvent{},
 		&entity.Execution{},
 		&entity.NodeLog{},
+		&entity.ModelUsageEvent{},
+		&entity.AnalyticsMetricDefinition{},
+		&entity.AnalyticsMetric{},
+		&entity.AnalyticsExportJob{},
+		&entity.AnalyticsSubscription{},
 
 		// 创意模板相关
 		&entity.CreativeTemplate{},
