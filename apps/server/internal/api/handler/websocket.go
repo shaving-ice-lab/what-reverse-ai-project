@@ -44,25 +44,13 @@ func (h *WebSocketHandler) HandleConnection(c echo.Context) error {
 	// 从查询参数获取 Token
 	tokenString := c.QueryParam("token")
 	if tokenString == "" {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"success": false,
-			"error": map[string]interface{}{
-				"code":    "UNAUTHORIZED",
-				"message": "Token is required",
-			},
-		})
+		return errorResponse(c, http.StatusUnauthorized, "UNAUTHORIZED", "Token is required")
 	}
 
 	// 验证 Token
 	userID, err := h.validateToken(tokenString)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"success": false,
-			"error": map[string]interface{}{
-				"code":    "INVALID_TOKEN",
-				"message": "Invalid or expired token",
-			},
-		})
+		return errorResponse(c, http.StatusUnauthorized, "INVALID_TOKEN", "Invalid or expired token")
 	}
 
 	// 升级 HTTP 连接为 WebSocket

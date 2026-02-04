@@ -9,6 +9,7 @@ import (
 
 	"github.com/agentflow/server/internal/api/middleware"
 	"github.com/agentflow/server/internal/domain/entity"
+	"github.com/agentflow/server/internal/pkg/security"
 	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -36,7 +37,7 @@ type ConversationChatRequest struct {
 	Message      string `json:"message" validate:"required"`
 	Model        string `json:"model"`
 	SystemPrompt string `json:"system_prompt"`
-	
+
 	// AI 参数设置（可覆盖对话默认设置）
 	Temperature      *float64 `json:"temperature"`       // 0.0-2.0
 	MaxTokens        *int     `json:"max_tokens"`        // 最大生成 token 数
@@ -177,6 +178,10 @@ func (h *ConversationChatHandler) Chat(c echo.Context) error {
 	if err != nil {
 		return errorResponse(c, http.StatusInternalServerError, "AI_CHAT_FAILED", "AI 对话失败")
 	}
+	review := security.ReviewAIOutput(aiResponse.Message)
+	if !review.Allowed {
+		return errorResponse(c, http.StatusUnprocessableEntity, "AI_OUTPUT_BLOCKED", "AI 输出包含不安全内容，已拦截")
+	}
 
 	// 保存 AI 回复
 	aiMessage, err := h.conversationService.AddMessage(ctx, conversationID, uid, service.AddMessageRequest{
@@ -274,6 +279,11 @@ func (h *ConversationChatHandler) StreamChat(c echo.Context) error {
 	aiResponse, err := h.aiService.Chat(ctx, uid, conversationID.String(), req.Message)
 	if err != nil {
 		sendSSEError(w, flusher, "AI 对话失败")
+		return nil
+	}
+	review := security.ReviewAIOutput(aiResponse.Message)
+	if !review.Allowed {
+		sendSSEError(w, flusher, "AI 输出包含不安全内容，已拦截")
 		return nil
 	}
 

@@ -13,7 +13,10 @@ import (
 	"github.com/agentflow/server/internal/config"
 	"github.com/agentflow/server/internal/pkg/database"
 	"github.com/agentflow/server/internal/pkg/logger"
+	"github.com/agentflow/server/internal/pkg/migration"
 	"github.com/agentflow/server/internal/pkg/redis"
+	"github.com/agentflow/server/internal/repository"
+	"github.com/agentflow/server/internal/service"
 )
 
 // @title AgentFlow API
@@ -67,6 +70,51 @@ func main() {
 	}
 	log.Info("Database migrated")
 
+	// 迁移回填与一致性校验（可选）
+	if cfg.Migration.WorkspaceBackfillEnabled || cfg.Migration.WorkspaceConsistencyCheck {
+		ctx := context.Background()
+		if cfg.Migration.WorkspaceBackfillEnabled {
+			result, err := migration.RunWorkspaceBackfill(ctx, db)
+			if err != nil {
+				log.Fatal("Workspace backfill failed", "error", err)
+			}
+			log.Info("Workspace backfill completed",
+				"created_workspaces", result.CreatedWorkspaces,
+				"updated_workflows", result.UpdatedWorkflows,
+				"updated_executions", result.UpdatedExecutions,
+				"updated_api_keys", result.UpdatedAPIKeys,
+				"updated_apps", result.UpdatedApps,
+				"updated_app_sessions", result.UpdatedAppSessions,
+			)
+		}
+		if cfg.Migration.WorkspaceConsistencyCheck {
+			report, err := migration.CheckWorkspaceConsistency(ctx, db)
+			if err != nil {
+				log.Warn("Workspace consistency check failed", "error", err)
+			} else {
+				log.Info("Workspace consistency check",
+					"users_missing_workspace", report.UsersMissingWorkspace,
+					"workflows_missing_workspace", report.WorkflowsMissingWorkspace,
+					"executions_missing_workspace", report.ExecutionsMissingWorkspace,
+					"api_keys_missing_workspace", report.APIKeysMissingWorkspace,
+					"apps_missing_workspace", report.AppsMissingWorkspace,
+					"app_sessions_missing_workspace", report.AppSessionsMissingWorkspace,
+				)
+			}
+		}
+	}
+
+	// 初始化数据保留清理服务
+	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
+	executionRepo := repository.NewExecutionRepository(db)
+	appSessionRepo := repository.NewAppSessionRepository(db)
+	workspaceRepo := repository.NewWorkspaceRepository(db)
+	auditLogRepo := repository.NewAuditLogRepository(db)
+	exportRepo := repository.NewWorkspaceExportRepository(db)
+	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, appSessionRepo, workspaceRepo, exportRepo, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
+	retentionCtx, retentionCancel := context.WithCancel(context.Background())
+	go retentionService.Run(retentionCtx)
+
 	// 初始化种子数据（预置模板）
 	if cfg.Server.Mode != "production" || os.Getenv("SEED_TEMPLATES") == "true" {
 		templateSeeder := database.NewWorkflowTemplateSeeder(db, log)
@@ -86,6 +134,21 @@ func main() {
 
 	// 创建 Echo 服务器
 	server := api.NewServer(cfg, db, rdb, log)
+	exportService := server.GetWorkspaceExportService()
+	exportCtx, exportCancel := context.WithCancel(context.Background())
+	if exportService != nil {
+		go exportService.RunWorker(exportCtx)
+	}
+	domainLifecycleService := server.GetDomainLifecycleService()
+	domainLifecycleCtx, domainLifecycleCancel := context.WithCancel(context.Background())
+	if domainLifecycleService != nil {
+		go domainLifecycleService.Run(domainLifecycleCtx)
+	}
+	connectorHealthService := server.GetConnectorHealthService()
+	connectorHealthCtx, connectorHealthCancel := context.WithCancel(context.Background())
+	if connectorHealthService != nil {
+		go connectorHealthService.Run(connectorHealthCtx)
+	}
 
 	// 启动服务器
 	go func() {
@@ -104,6 +167,10 @@ func main() {
 
 	log.Info("Shutting down server...")
 
+	exportCancel()
+	domainLifecycleCancel()
+	connectorHealthCancel()
+	retentionCancel()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

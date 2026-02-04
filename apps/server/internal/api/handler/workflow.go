@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/agentflow/server/internal/api/middleware"
 	"github.com/agentflow/server/internal/domain/entity"
@@ -15,12 +16,16 @@ import (
 type WorkflowHandler struct {
 	workflowService  service.WorkflowService
 	executionService service.ExecutionService
+	auditLogService  service.AuditLogService
+	workspaceService service.WorkspaceService
 }
 
-func NewWorkflowHandler(workflowService service.WorkflowService, executionService service.ExecutionService) *WorkflowHandler {
+func NewWorkflowHandler(workflowService service.WorkflowService, executionService service.ExecutionService, auditLogService service.AuditLogService, workspaceService service.WorkspaceService) *WorkflowHandler {
 	return &WorkflowHandler{
 		workflowService:  workflowService,
 		executionService: executionService,
+		auditLogService:  auditLogService,
+		workspaceService: workspaceService,
 	}
 }
 
@@ -199,6 +204,8 @@ func (h *WorkflowHandler) Update(c echo.Context) error {
 	})
 	if err != nil {
 		switch err {
+		case service.ErrExecutionOverloaded:
+			return errorResponse(c, http.StatusServiceUnavailable, "OVERLOADED", "系统繁忙，请稍后重试")
 		case service.ErrWorkflowNotFound:
 			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作流不存在")
 		case service.ErrUnauthorized:
@@ -265,7 +272,7 @@ func (h *WorkflowHandler) Execute(c echo.Context) error {
 	// 转换输入为 entity.JSON
 	inputs := entity.JSON(req.Inputs)
 
-	execution, err := h.executionService.Execute(c.Request().Context(), workflowID, uid, inputs, triggerType)
+	execution, err := h.executionService.Execute(c.Request().Context(), workflowID, uid, inputs, triggerType, nil)
 	if err != nil {
 		switch err {
 		case service.ErrWorkflowNotFound:
@@ -464,11 +471,17 @@ func (h *WorkflowHandler) Import(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
 
+	if err := validateJSONSchemaPayload(req, workflowImportSchema); err != nil {
+		h.recordImportFailure(c, uid, req, err)
+		return errorResponse(c, http.StatusBadRequest, "IMPORT_SCHEMA_INVALID", "导入数据格式不符合要求")
+	}
+
 	// 解析文件夹ID
 	var folderID *uuid.UUID
 	if req.FolderID != nil && *req.FolderID != "" {
 		parsed, err := uuid.Parse(*req.FolderID)
 		if err != nil {
+			h.recordImportFailure(c, uid, req, err)
 			return errorResponse(c, http.StatusBadRequest, "INVALID_FOLDER_ID", "文件夹 ID 无效")
 		}
 		folderID = &parsed
@@ -489,11 +502,56 @@ func (h *WorkflowHandler) Import(c echo.Context) error {
 
 	workflow, err := h.workflowService.Import(c.Request().Context(), uid, importData)
 	if err != nil {
+		h.recordImportFailure(c, uid, req, err)
 		return errorResponse(c, http.StatusInternalServerError, "IMPORT_FAILED", "导入失败")
 	}
+
+	metadata := entity.JSON{
+		"workflow_id":   workflow.ID.String(),
+		"workflow_name": workflow.Name,
+	}
+	if workflow.FolderID != nil {
+		metadata["folder_id"] = workflow.FolderID.String()
+	}
+	h.recordAudit(c, workflow.WorkspaceID, uid, "workflow.import", "workflow", &workflow.ID, metadata)
 
 	return successResponse(c, map[string]interface{}{
 		"workflow": workflow,
 		"message":  "工作流导入成功",
 	})
+}
+
+func (h *WorkflowHandler) recordAudit(ctx echo.Context, workspaceID uuid.UUID, actorID uuid.UUID, action string, targetType string, targetID *uuid.UUID, metadata entity.JSON) {
+	if h.auditLogService == nil {
+		return
+	}
+	_, _ = h.auditLogService.Record(ctx.Request().Context(), service.AuditLogRecordRequest{
+		WorkspaceID: workspaceID,
+		ActorUserID: &actorID,
+		Action:      action,
+		TargetType:  targetType,
+		TargetID:    targetID,
+		Metadata:    metadata,
+	})
+}
+
+func (h *WorkflowHandler) recordImportFailure(ctx echo.Context, actorID uuid.UUID, req ImportWorkflowRequest, err error) {
+	if h.auditLogService == nil || h.workspaceService == nil {
+		return
+	}
+	workspace, werr := h.workspaceService.EnsureDefaultWorkspaceByUserID(ctx.Request().Context(), actorID)
+	if werr != nil {
+		return
+	}
+	metadata := entity.JSON{
+		"status": "failed",
+		"error":  err.Error(),
+	}
+	if req.Workflow.Name != "" {
+		metadata["workflow_name"] = req.Workflow.Name
+	}
+	if req.FolderID != nil && strings.TrimSpace(*req.FolderID) != "" {
+		metadata["folder_id"] = strings.TrimSpace(*req.FolderID)
+	}
+	h.recordAudit(ctx, workspace.ID, actorID, "workflow.import", "workflow", nil, metadata)
 }

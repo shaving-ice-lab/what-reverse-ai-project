@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/agentflow/server/internal/api/middleware"
@@ -93,7 +94,13 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	user, tokenPair, err := h.authService.Login(c.Request().Context(), req.Email, req.Password)
 	if err != nil {
-		return errorResponse(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", "邮箱或密码错误")
+		if errors.Is(err, service.ErrInvalidCredentials) {
+			return errorResponse(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", "邮箱或密码错误")
+		}
+		if errors.Is(err, service.ErrUserSuspended) {
+			return errorResponse(c, http.StatusForbidden, "USER_SUSPENDED", "账号已被暂停")
+		}
+		return errorResponse(c, http.StatusInternalServerError, "INTERNAL_ERROR", "登录失败")
 	}
 
 	return successResponse(c, map[string]interface{}{
@@ -119,6 +126,9 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 
 	tokenPair, err := h.authService.Refresh(c.Request().Context(), req.RefreshToken)
 	if err != nil {
+		if errors.Is(err, service.ErrUserSuspended) {
+			return errorResponse(c, http.StatusForbidden, "USER_SUSPENDED", "账号已被暂停")
+		}
 		return errorResponse(c, http.StatusUnauthorized, "INVALID_TOKEN", "Token 无效或已过期")
 	}
 
@@ -136,7 +146,7 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 // @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c echo.Context) error {
 	userID := middleware.GetUserID(c)
-	
+
 	if err := h.authService.Logout(c.Request().Context(), userID); err != nil {
 		return errorResponse(c, http.StatusInternalServerError, "INTERNAL_ERROR", "登出失败")
 	}

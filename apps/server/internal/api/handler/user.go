@@ -100,9 +100,22 @@ func (h *UserHandler) ChangePassword(c echo.Context) error {
 
 // CreateAPIKeyRequest 创建 API 密钥请求
 type CreateAPIKeyRequest struct {
-	Provider string `json:"provider" validate:"required"`
-	Name     string `json:"name" validate:"required"`
-	Key      string `json:"key" validate:"required"`
+	Provider string   `json:"provider" validate:"required"`
+	Name     string   `json:"name" validate:"required"`
+	Key      string   `json:"key" validate:"required"`
+	Scopes   []string `json:"scopes"`
+}
+
+// RotateAPIKeyRequest 轮换 API 密钥请求
+type RotateAPIKeyRequest struct {
+	Name   *string  `json:"name"`
+	Key    string   `json:"key" validate:"required"`
+	Scopes []string `json:"scopes"`
+}
+
+// RevokeAPIKeyRequest 吊销 API 密钥请求
+type RevokeAPIKeyRequest struct {
+	Reason string `json:"reason"`
 }
 
 // TestAPIKeyRequest 测试 API 密钥请求
@@ -113,13 +126,17 @@ type TestAPIKeyRequest struct {
 
 // APIKeyResponse API 密钥响应
 type APIKeyResponse struct {
-	ID         uuid.UUID  `json:"id"`
-	Provider   string     `json:"provider"`
-	Name       string     `json:"name"`
-	KeyPreview *string    `json:"key_preview"`
-	IsActive   bool       `json:"is_active"`
-	LastUsedAt *string    `json:"last_used_at"`
-	CreatedAt  string     `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	Provider      string    `json:"provider"`
+	Name          string    `json:"name"`
+	KeyPreview    *string   `json:"key_preview"`
+	Scopes        []string  `json:"scopes"`
+	IsActive      bool      `json:"is_active"`
+	LastUsedAt    *string   `json:"last_used_at"`
+	LastRotatedAt *string   `json:"last_rotated_at"`
+	RevokedAt     *string   `json:"revoked_at"`
+	RevokedReason *string   `json:"revoked_reason"`
+	CreatedAt     string    `json:"created_at"`
 }
 
 // toAPIKeyResponse 转换为响应格式
@@ -129,12 +146,24 @@ func toAPIKeyResponse(apiKey entity.APIKey) APIKeyResponse {
 		Provider:   apiKey.Provider,
 		Name:       apiKey.Name,
 		KeyPreview: apiKey.KeyPreview,
+		Scopes:     []string(apiKey.Scopes),
 		IsActive:   apiKey.IsActive,
 		CreatedAt:  apiKey.CreatedAt.Format("2006-01-02T15:04:05Z"),
 	}
 	if apiKey.LastUsedAt != nil {
 		lastUsed := apiKey.LastUsedAt.Format("2006-01-02T15:04:05Z")
 		resp.LastUsedAt = &lastUsed
+	}
+	if apiKey.LastRotatedAt != nil {
+		lastRotated := apiKey.LastRotatedAt.Format("2006-01-02T15:04:05Z")
+		resp.LastRotatedAt = &lastRotated
+	}
+	if apiKey.RevokedAt != nil {
+		revokedAt := apiKey.RevokedAt.Format("2006-01-02T15:04:05Z")
+		resp.RevokedAt = &revokedAt
+	}
+	if apiKey.RevokedReason != nil {
+		resp.RevokedReason = apiKey.RevokedReason
 	}
 	return resp
 }
@@ -183,12 +212,86 @@ func (h *UserHandler) CreateAPIKey(c echo.Context) error {
 		Provider: req.Provider,
 		Name:     req.Name,
 		Key:      req.Key,
+		Scopes:   req.Scopes,
 	})
 	if err != nil {
 		if err == service.ErrInvalidAPIKey {
 			return errorResponse(c, http.StatusBadRequest, "INVALID_KEY", "密钥格式无效")
 		}
 		return errorResponse(c, http.StatusInternalServerError, "CREATE_FAILED", "创建密钥失败")
+	}
+
+	return successResponse(c, toAPIKeyResponse(*apiKey))
+}
+
+// RotateAPIKey 轮换 API 密钥
+func (h *UserHandler) RotateAPIKey(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+
+	keyID := c.Param("id")
+	kid, err := uuid.Parse(keyID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_KEY_ID", "密钥 ID 无效")
+	}
+
+	var req RotateAPIKeyRequest
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
+	}
+
+	apiKey, err := h.apiKeyService.Rotate(c.Request().Context(), uid, kid, service.RotateAPIKeyRequest{
+		Name:   req.Name,
+		Key:    req.Key,
+		Scopes: req.Scopes,
+	})
+	if err != nil {
+		if err == service.ErrAPIKeyNotFound {
+			return errorResponse(c, http.StatusNotFound, "KEY_NOT_FOUND", "密钥不存在")
+		}
+		if err == service.ErrInvalidAPIKey {
+			return errorResponse(c, http.StatusBadRequest, "INVALID_KEY", "密钥格式无效")
+		}
+		if err == service.ErrUnauthorized {
+			return errorResponse(c, http.StatusForbidden, "UNAUTHORIZED", "无权轮换此密钥")
+		}
+		return errorResponse(c, http.StatusInternalServerError, "ROTATE_FAILED", "轮换密钥失败")
+	}
+
+	return successResponse(c, toAPIKeyResponse(*apiKey))
+}
+
+// RevokeAPIKey 吊销 API 密钥
+func (h *UserHandler) RevokeAPIKey(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+
+	keyID := c.Param("id")
+	kid, err := uuid.Parse(keyID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_KEY_ID", "密钥 ID 无效")
+	}
+
+	var req RevokeAPIKeyRequest
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
+	}
+
+	apiKey, err := h.apiKeyService.Revoke(c.Request().Context(), uid, kid, req.Reason)
+	if err != nil {
+		if err == service.ErrAPIKeyNotFound {
+			return errorResponse(c, http.StatusNotFound, "KEY_NOT_FOUND", "密钥不存在")
+		}
+		if err == service.ErrUnauthorized {
+			return errorResponse(c, http.StatusForbidden, "UNAUTHORIZED", "无权吊销此密钥")
+		}
+		return errorResponse(c, http.StatusInternalServerError, "REVOKE_FAILED", "吊销密钥失败")
 	}
 
 	return successResponse(c, toAPIKeyResponse(*apiKey))
