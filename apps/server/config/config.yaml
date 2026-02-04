@@ -5,6 +5,13 @@ server:
   port: 8080
   mode: "development"  # development, production
 
+deployment:
+  region: "local"
+  primary_region: "local"
+  regions:
+    - "local"
+  region_base_urls: {}
+
 database:
   host: "localhost"
   port: 3306
@@ -14,6 +21,10 @@ database:
   charset: "utf8mb4"
   max_open_conns: 100
   max_idle_conns: 10
+  workspace_max_open_conns: 10
+  workspace_max_idle_conns: 5
+  workspace_conn_max_lifetime: "1h"
+  workspace_conn_max_idle_time: "30m"
 
 redis:
   host: "localhost"
@@ -21,10 +32,32 @@ redis:
   password: ""
   db: 0
 
+execution:
+  max_concurrent: 10
+  max_in_flight: 100
+  timeout: "5m"
+
+queue:
+  worker_concurrency: 10
+  queues:
+    execution: 6
+    db_provision: 3
+    domain_verify: 2
+    metrics_aggregation: 1
+    webhook: 3
+    scheduled: 1
+    workflow: 6
+
 jwt:
   secret: "your-secret-key-change-in-production"
   access_token_expire: "15m"
   refresh_token_expire: "168h"
+
+captcha:
+  provider: "" # turnstile
+  secret: ""
+  verify_url: "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+  timeout_seconds: 3
 
 ai:
   openai_api_key: ""
@@ -33,3 +66,135 @@ ai:
 
 encryption:
   key: "change-this-to-a-32-byte-secret!"  # 生产环境请修改此密钥
+
+features:
+  workspace_enabled: true
+  app_runtime_enabled: true
+  domain_enabled: true
+
+domain_routing:
+  provider: "" # webhook
+  webhook_url: ""
+  webhook_token: ""
+  timeout_seconds: 3
+
+certificate_issuer:
+  provider: "" # webhook
+  webhook_url: ""
+  webhook_token: ""
+  timeout_seconds: 5
+
+domain_lifecycle:
+  enabled: true
+  interval: "6h"
+  domain_expiry_warning_days: 30
+  ssl_expiry_warning_days: 14
+  ssl_auto_renew_days: 7
+  max_domains_per_tick: 200
+
+connector_health:
+  enabled: true
+  interval: "6h"
+  expiry_warning_days: 7
+
+migration:
+  workspace_backfill_enabled: false
+  workspace_consistency_check: false
+
+# 安全配置
+security:
+  # 数据分级启用
+  data_classification_enabled: true
+  # PII脱敏启用
+  pii_sanitization_enabled: true
+  # 审计日志启用
+  audit_logging_enabled: true
+  # 审计日志保留天数
+  audit_log_retention_days: 90
+  # 合规检查启用
+  compliance_check_enabled: true
+  # 密钥轮换提醒天数
+  key_rotation_warning_days: 7
+  # 供应链安全与依赖治理
+  supply_chain:
+    license:
+      enabled: true
+      default_action: "review"
+      allowed:
+        - "MIT"
+        - "Apache-2.0"
+        - "BSD-3-Clause"
+        - "BSD-2-Clause"
+        - "ISC"
+      review:
+        - "LGPL-2.1"
+        - "LGPL-3.0"
+        - "MPL-2.0"
+      denied:
+        - "GPL-3.0"
+        - "GPL-3.0-only"
+        - "AGPL-3.0"
+        - "AGPL-3.0-only"
+    sbom:
+      enabled: true
+      formats:
+        - "spdx-json"
+        - "cyclonedx-json"
+      retention_days: 180
+    signing:
+      required: true
+      verify_on_upload: true
+      allowed_algorithms:
+        - "cosign"
+      allowed_signers: []
+  # 管理员邮箱白名单（用于引导初始化管理员权限）
+  admin_emails: []
+  # 管理员角色映射（email -> role，例如 super_admin/ops/support/finance/reviewer/viewer）
+  admin_roles: {}
+
+# 数据保留策略
+retention:
+  enabled: true
+  cleanup_interval: "24h"
+  # 执行日志保留天数
+  execution_log_retention_days: 30
+  # 匿名会话保留天数
+  anonymous_session_retention_days: 7
+  # Workspace 软删除恢复窗口（天）
+  workspace_deletion_grace_days: 7
+  # Workspace 冷存储保留天数（天）
+  workspace_cold_storage_days: 30
+
+# 导出与归档配置
+archive:
+  enabled: true
+  base_path: "./data/exports"
+  # 导出包保留天数
+  export_retention_days: 7
+  # 导出任务轮询间隔
+  worker_interval: "30s"
+  # 每次轮询最多处理任务数
+  max_jobs_per_tick: 3
+  # 日志归档启用
+  log_archive_enabled: true
+  # 日志归档保留天数
+  log_archive_retention_days: 365
+  # 单次归档覆盖天数
+  log_archive_batch_days: 1
+  # 归档延迟天数（避免归档当天数据）
+  log_archive_delay_days: 1
+
+# 缓存与加速配置
+cache:
+  runtime:
+    # App/Version/Policy/Domain 读取缓存 TTL
+    entry_ttl: "30s"
+    # 空结果负缓存 TTL（防穿透）
+    negative_ttl: "10s"
+    # Schema 允许缓存的 TTL
+    schema_ttl: "60s"
+    # Schema 过期后的宽限期（stale-while-revalidate）
+    schema_stale_ttl: "30s"
+  execution:
+    # 终态执行结果缓存 TTL
+    result_ttl: "2m"

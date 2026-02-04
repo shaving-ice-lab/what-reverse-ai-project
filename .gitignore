@@ -36,6 +36,9 @@ pnpm-debug.log*
 # Testing
 coverage
 .nyc_output
+test-results/
+playwright-report/
+.last-run.json
 
 # Misc
 *.log
@@ -49,4 +52,4 @@ apps/server/bin/
 apps/server/tmp/
 
 # Resources (external references)
-rescources/
+resources/
