@@ -8,6 +8,10 @@ export * from "./types";
 // 工具函数
 export * from "./utils";
 
+// 节点清单与版本策略
+export * from "./catalog";
+export * from "./versioning";
+
 // 执行器
 export * from "./executors";
 

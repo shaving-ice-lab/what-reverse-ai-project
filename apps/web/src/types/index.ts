@@ -35,20 +35,27 @@ export interface ListParams {
 // ===== API 响应 =====
 
 export interface ApiResponse<T = unknown> {
-  success: boolean;
+  code: string;
+  message: string;
   data?: T;
   meta?: {
     total?: number;
     page?: number;
-    pageSize?: number;
+    page_size?: number;
   };
-  error?: ApiError;
+  trace_id?: string;
+  request_id?: string;
+  error_code?: string;
+  error_message?: string;
+  details?: unknown;
 }
 
 export interface ApiError {
   code: string;
   message: string;
   details?: unknown;
+  trace_id?: string;
+  request_id?: string;
 }
 
 // ===== WebSocket 消息 =====

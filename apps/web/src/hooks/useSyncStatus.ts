@@ -6,6 +6,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { getApiBaseUrl } from "@/lib/env";
+import { getStoredTokens } from "@/lib/api/shared";
 import type {
   SyncConfig,
   SyncResult,
@@ -161,23 +163,7 @@ function createLocalStorage() {
  * 通过现有的 workflowApi 等接口进行同步操作
  */
 function createCloudApi() {
-  // API 基础 URL
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
-
-  // 获取认证 Token (统一从 Zustand persist 存储读取)
-  const getAuthToken = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const authStorage = localStorage.getItem("auth-storage");
-      if (authStorage) {
-        const parsed = JSON.parse(authStorage);
-        return parsed?.state?.tokens?.accessToken || null;
-      }
-    } catch {
-      // ignore
-    }
-    return null;
-  };
+  const API_BASE_URL = getApiBaseUrl();
 
   return {
     async getChangesSince(_since: Date | null): Promise<ChangeRecord[]> {
@@ -187,7 +173,7 @@ function createCloudApi() {
       return [];
     },
     async pushChanges(changes: ChangeRecord[]) {
-      const token = getAuthToken();
+      const token = getStoredTokens()?.accessToken;
       if (!token) {
         return {
           successful: [],

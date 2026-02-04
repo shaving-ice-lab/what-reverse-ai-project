@@ -317,3 +317,200 @@ export const mergeExecutor: NodeExecutor<MergeConfig> = {
     return { valid: errors.length === 0, errors };
   },
 };
+
+// ==================== 数据库节点 (Mock) ====================
+
+type DatabaseOperation = "select" | "insert" | "update" | "delete" | "migrate";
+
+export interface DatabaseConfig {
+  operation?: DatabaseOperation;
+  table?: string;
+  where?: string;
+  values?: unknown;
+  limit?: number;
+  sql?: string;
+  mockRows?: unknown;
+  mockRowsAffected?: number;
+  mockInsertedId?: string | number;
+}
+
+function resolveDBOperation(nodeType: string, operation?: string): DatabaseOperation {
+  const op = (operation || nodeType.replace("db_", "")).toLowerCase();
+  if (op === "insert" || op === "update" || op === "delete" || op === "migrate") {
+    return op;
+  }
+  return "select";
+}
+
+function parseJSONValue(value: unknown): unknown {
+  if (typeof value === "string" && value.trim()) {
+    return safeJSONParse(value, value);
+  }
+  return value;
+}
+
+function normalizeRows(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === "object") return [value];
+  return [];
+}
+
+function estimateRowsAffected(values: unknown, fallback?: number): number {
+  if (typeof fallback === "number") return fallback;
+  if (Array.isArray(values)) return values.length;
+  if (values && typeof values === "object") return 1;
+  return 0;
+}
+
+export const databaseExecutor: NodeExecutor<DatabaseConfig> = {
+  type: "database",
+
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, inputs, nodeType } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+
+    try {
+      const operation = resolveDBOperation(nodeType, nodeConfig.operation);
+      const table = nodeConfig.table || "";
+      const where = nodeConfig.where || "";
+
+      if (operation === "select") {
+        const rowsSource =
+          nodeConfig.mockRows ??
+          inputs.rows ??
+          inputs.output ??
+          inputs.input;
+        const rows = normalizeRows(parseJSONValue(rowsSource));
+        const count = rows.length;
+        const first = rows[0] ?? null;
+
+        logs.push({
+          level: "info",
+          message: `DB select executed (mock)`,
+          timestamp: new Date().toISOString(),
+          data: { table, where, count },
+        });
+
+        return {
+          success: true,
+          outputs: {
+            rows,
+            count,
+            first,
+            output: rows,
+            result: rows,
+          },
+          logs,
+          duration: Date.now() - startTime,
+        };
+      }
+
+      if (operation === "insert") {
+        const values = parseJSONValue(nodeConfig.values ?? inputs.values ?? inputs.input);
+        const rowsAffected = estimateRowsAffected(values, nodeConfig.mockRowsAffected);
+        const insertedId =
+          nodeConfig.mockInsertedId ??
+          (values && typeof values === "object" && "id" in (values as Record<string, unknown>)
+            ? (values as Record<string, unknown>).id
+            : undefined);
+
+        logs.push({
+          level: "info",
+          message: `DB insert executed (mock)`,
+          timestamp: new Date().toISOString(),
+          data: { table, rowsAffected },
+        });
+
+        return {
+          success: true,
+          outputs: {
+            insertedId,
+            rowsAffected,
+            output: { insertedId, rowsAffected },
+            result: { insertedId, rowsAffected },
+          },
+          logs,
+          duration: Date.now() - startTime,
+        };
+      }
+
+      if (operation === "update") {
+        const values = parseJSONValue(nodeConfig.values ?? inputs.values ?? inputs.input);
+        const rowsAffected = estimateRowsAffected(values, nodeConfig.mockRowsAffected);
+
+        logs.push({
+          level: "info",
+          message: `DB update executed (mock)`,
+          timestamp: new Date().toISOString(),
+          data: { table, where, rowsAffected },
+        });
+
+        return {
+          success: true,
+          outputs: {
+            rowsAffected,
+            output: rowsAffected,
+            result: rowsAffected,
+          },
+          logs,
+          duration: Date.now() - startTime,
+        };
+      }
+
+      if (operation === "delete") {
+        const rowsAffected = estimateRowsAffected(undefined, nodeConfig.mockRowsAffected);
+
+        logs.push({
+          level: "info",
+          message: `DB delete executed (mock)`,
+          timestamp: new Date().toISOString(),
+          data: { table, where, rowsAffected },
+        });
+
+        return {
+          success: true,
+          outputs: {
+            rowsAffected,
+            output: rowsAffected,
+            result: rowsAffected,
+          },
+          logs,
+          duration: Date.now() - startTime,
+        };
+      }
+
+      const sql = nodeConfig.sql || "";
+      const appliedCount = sql ? 1 : 0;
+
+      logs.push({
+        level: "info",
+        message: `DB migrate executed (mock)`,
+        timestamp: new Date().toISOString(),
+        data: { appliedCount },
+      });
+
+      return {
+        success: true,
+        outputs: {
+          applied: appliedCount > 0,
+          appliedCount,
+          output: appliedCount > 0,
+          result: appliedCount,
+        },
+        logs,
+        duration: Date.now() - startTime,
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+
+      return {
+        success: false,
+        outputs: {},
+        error: createNodeError("DB_EXECUTION_FAILED", errorMessage, error, false),
+        logs,
+        duration: Date.now() - startTime,
+      };
+    }
+  },
+};

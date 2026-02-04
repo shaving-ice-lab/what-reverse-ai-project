@@ -6,6 +6,8 @@
  */
 
 import React, { createContext, useContext, useEffect, useCallback, useState, useRef } from "react";
+import { getWsBaseUrl } from "@/lib/env";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useExecutionStore } from "@/stores/useExecutionStore";
 import type { WSMessage, ConnectionState, ExecutionPayload, LogPayload, LatencyMetrics } from "@/hooks/useWebSocket";
@@ -184,8 +186,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   // 获取 WebSocket URL
   const getWsUrl = useCallback(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || 
-      (typeof window !== "undefined" 
+    const baseUrl = getWsBaseUrl() ||
+      (typeof window !== "undefined"
         ? `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`
         : "ws://localhost:8080/ws");
     const token = tokens?.accessToken;
@@ -204,7 +206,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 检查是否启用了本地模式（可能没有后端服务器）
-    const isLocalMode = process.env.NEXT_PUBLIC_ENABLE_LOCAL_MODE === "true";
+    const isLocalMode = isFeatureEnabled("local_mode");
     if (isLocalMode && process.env.NODE_ENV === "development") {
       console.info("[WebSocket] 本地模式已启用，WebSocket 连接是可选的");
     }

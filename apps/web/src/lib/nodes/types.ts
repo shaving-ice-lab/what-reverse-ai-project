@@ -60,6 +60,10 @@ export interface LLMConfig {
   timeout?: number;
   retryCount?: number;
   retryDelay?: number;
+  fallbackModels?: string[];
+  fallbackProviders?: string[];
+  fallbackText?: string;
+  apiKeys?: Record<string, string>;
 }
 
 // LLM 消息格式

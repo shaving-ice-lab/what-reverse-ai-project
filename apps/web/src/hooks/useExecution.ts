@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useCallback, useRef } from "react";
 import { api } from "@/lib/api";
+import { API_CACHE_CONFIG, queryKeys } from "@/lib/cache";
 import { WS_BASE_URL } from "@/lib/constants";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { Execution, NodeLog, ListParams, PagedResult, ExecutionEvent } from "@/types";
@@ -12,13 +13,13 @@ import type { Execution, NodeLog, ListParams, PagedResult, ExecutionEvent } from
 // ===== Query Keys =====
 
 export const executionKeys = {
-  all: ["executions"] as const,
-  lists: () => [...executionKeys.all, "list"] as const,
+  all: queryKeys.executions.all,
+  lists: queryKeys.executions.lists,
   list: (params: ListParams & { workflowId?: string }) =>
-    [...executionKeys.lists(), params] as const,
-  details: () => [...executionKeys.all, "detail"] as const,
-  detail: (id: string) => [...executionKeys.details(), id] as const,
-  logs: (id: string) => [...executionKeys.detail(id), "logs"] as const,
+    queryKeys.executions.list(params as Record<string, unknown>),
+  details: queryKeys.executions.details,
+  detail: queryKeys.executions.detail,
+  logs: queryKeys.executions.logs,
 };
 
 // ===== Hooks =====
@@ -39,6 +40,8 @@ export function useExecutions(params: ListParams & { workflowId?: string } = {})
           order: params.order,
         },
       }),
+    staleTime: API_CACHE_CONFIG.workflow.executions.staleTime,
+    gcTime: API_CACHE_CONFIG.workflow.executions.gcTime,
   });
 }
 
@@ -54,6 +57,8 @@ export function useExecution(id: string) {
         nodeLogs: NodeLog[];
       }>(`/executions/${id}`),
     enabled: !!id,
+    staleTime: API_CACHE_CONFIG.execution.status.staleTime,
+    gcTime: API_CACHE_CONFIG.execution.status.gcTime,
   });
 }
 

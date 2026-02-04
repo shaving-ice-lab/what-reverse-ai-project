@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { getWsBaseUrl } from "@/lib/env";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 // WebSocket 消息类型
 export type MessageType =
@@ -133,7 +134,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // 获取 WebSocket URL
   const getWsUrl = useCallback(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/ws';
+    const baseUrl = getWsBaseUrl();
     const token = tokens?.accessToken;
     return token ? `${baseUrl}?token=${token}` : baseUrl;
   }, [tokens?.accessToken]);

@@ -4,16 +4,17 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { API_CACHE_CONFIG, createOptimisticUpdate, queryKeys } from "@/lib/cache";
 import type { Workflow, WorkflowDefinition, ListParams, PagedResult } from "@/types";
 
 // ===== Query Keys =====
 
 export const workflowKeys = {
-  all: ["workflows"] as const,
-  lists: () => [...workflowKeys.all, "list"] as const,
-  list: (params: ListParams) => [...workflowKeys.lists(), params] as const,
-  details: () => [...workflowKeys.all, "detail"] as const,
-  detail: (id: string) => [...workflowKeys.details(), id] as const,
+  all: queryKeys.workflows.all,
+  lists: queryKeys.workflows.lists,
+  list: (params: ListParams) => queryKeys.workflows.list(params as Record<string, unknown>),
+  details: queryKeys.workflows.details,
+  detail: queryKeys.workflows.detail,
 };
 
 // ===== Hooks =====
@@ -34,6 +35,8 @@ export function useWorkflows(params: ListParams = {}) {
           order: params.order,
         },
       }),
+    staleTime: API_CACHE_CONFIG.workflow.list.staleTime,
+    gcTime: API_CACHE_CONFIG.workflow.list.gcTime,
   });
 }
 
@@ -45,6 +48,8 @@ export function useWorkflow(id: string) {
     queryKey: workflowKeys.detail(id),
     queryFn: () => api.get<Workflow>(`/workflows/${id}`),
     enabled: !!id,
+    staleTime: API_CACHE_CONFIG.workflow.detail.staleTime,
+    gcTime: API_CACHE_CONFIG.workflow.detail.gcTime,
   });
 }
 
@@ -87,7 +92,23 @@ export function useUpdateWorkflow() {
         triggerConfig: Record<string, unknown>;
       }>;
     }) => api.put<Workflow>(`/workflows/${id}`, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: workflowKeys.detail(id) });
+
+      const previous = queryClient.getQueryData<Workflow>(workflowKeys.detail(id));
+      if (!previous) return undefined;
+
+      return createOptimisticUpdate<Workflow>({
+        queryClient,
+        queryKey: workflowKeys.detail(id),
+        updater: (old) => ({ ...old, ...data }),
+      });
+    },
+    onError: (error, variables, context) => {
+      context?.onError(error as Error);
+    },
     onSuccess: (data) => {
+      queryClient.setQueryData(workflowKeys.detail(data.id), data);
       queryClient.invalidateQueries({ queryKey: workflowKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: workflowKeys.lists() });
     },

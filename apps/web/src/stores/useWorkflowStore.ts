@@ -98,6 +98,7 @@ interface WorkflowState {
   setWorkflow: (workflow: Workflow) => void;
   clearWorkflow: () => void;
   updateWorkflowMeta: (data: Partial<Workflow>) => void;
+  markSaved: () => void;
   
   // 节点操作
   setNodes: (nodes: WorkflowNode[]) => void;
@@ -187,6 +188,12 @@ export const useWorkflowStore = create<WorkflowState>()(
           Object.assign(state.workflow, data);
           state.isDirty = true;
         }
+      });
+    },
+
+    markSaved: () => {
+      set((state) => {
+        state.isDirty = false;
       });
     },
     

@@ -16,56 +16,7 @@ import type {
   OAuthProvider,
 } from "@/types/auth";
 
-// API 基础 URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
-
-// 获取存储的 token（统一从 Zustand persist 存储读取）
-function getStoredTokens(): { accessToken?: string; refreshToken?: string } | null {
-  if (typeof window === "undefined") return null;
-  
-  try {
-    const authStorage = localStorage.getItem("auth-storage");
-    if (authStorage) {
-      const parsed = JSON.parse(authStorage);
-      return parsed?.state?.tokens || null;
-    }
-  } catch {
-    // 解析失败，返回 null
-  }
-  return null;
-}
-
-// 通用请求函数
-async function request<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(options.headers as Record<string, string>),
-  };
-  
-  // 从统一的存储位置获取 token
-  const tokens = getStoredTokens();
-  if (tokens?.accessToken) {
-    headers["Authorization"] = `Bearer ${tokens.accessToken}`;
-  }
-  
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.error?.message || "请求失败");
-  }
-  
-  return data;
-}
+import { request, API_BASE_URL } from "./shared";
 
 // 后端响应格式（snake_case）
 interface BackendAuthResponse {

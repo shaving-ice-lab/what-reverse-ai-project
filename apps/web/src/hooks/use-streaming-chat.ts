@@ -4,9 +4,7 @@
  */
 
 import { useState, useRef, useCallback } from "react";
-import { getStoredTokens } from "@/lib/api/shared";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+import { API_BASE_URL, getStoredTokens } from "@/lib/api/shared";
 
 export interface StreamingChatOptions {
   model?: string;

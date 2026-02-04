@@ -16,3 +16,4 @@ export * from "./useSyncStatus";
 export * from "./useUpdater";
 export * from "./useSystem";
 export * from "./use-streaming-chat";
+export * from "./useNodeCatalog";

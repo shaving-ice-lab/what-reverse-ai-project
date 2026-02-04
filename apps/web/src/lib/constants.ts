@@ -2,9 +2,11 @@
  * 全局常量定义
  */
 
+import { getApiBaseUrl, getWsBaseUrl } from "@/lib/env";
+
 // ===== API 配置 =====
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
-export const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080/ws";
+export const API_BASE_URL = getApiBaseUrl();
+export const WS_BASE_URL = getWsBaseUrl();
 
 // ===== 节点类型 =====
 export const NODE_TYPES = {

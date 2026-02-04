@@ -12,7 +12,7 @@ export interface ChatMessage {
 }
 
 export interface ChatAction {
-  type: "generate" | "modify" | "explain" | "suggest";
+  type: "generate" | "modify" | "modify_app" | "explain" | "suggest";
   label: string;
   data?: Record<string, unknown>;
 }
@@ -20,6 +20,8 @@ export interface ChatAction {
 export interface ChatResponse {
   message: string;
   workflowJson?: string;
+  uiSchema?: Record<string, unknown>;
+  dbSchema?: Record<string, unknown>;
   suggestions?: string[];
   actions?: ChatAction[];
 }

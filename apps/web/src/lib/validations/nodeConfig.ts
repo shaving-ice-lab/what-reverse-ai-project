@@ -10,6 +10,8 @@ import { z } from "zod";
 // 非空字符串
 const nonEmptyString = z.string().min(1, "此字段不能为空");
 
+const outputSchemaSchema = z.union([z.record(z.any()), z.string()]);
+
 // URL 验证
 const urlSchema = z.string().refine(
   (val) => {
@@ -34,6 +36,9 @@ export const llmConfigSchema = z.object({
   userPrompt: z.string().optional(),
   temperature: z.number().min(0, "最小值为 0").max(2, "最大值为 2").default(0.7),
   maxTokens: z.number().int().min(1, "最小值为 1").max(128000, "最大值为 128000").default(2048),
+  max_tokens: z.number().int().min(1, "最小值为 1").max(128000, "最大值为 128000").optional(),
+  outputSchema: outputSchemaSchema.optional(),
+  output_schema: outputSchemaSchema.optional(),
   topP: z.number().min(0).max(1).default(1).optional(),
   frequencyPenalty: z.number().min(0).max(2).default(0).optional(),
   presencePenalty: z.number().min(0).max(2).default(0).optional(),
@@ -148,16 +153,131 @@ export type TemplateConfig = z.infer<typeof templateConfigSchema>;
 
 // ===== 变量节点配置 Schema =====
 
+const identifierSchema = z
+  .string()
+  .min(1, "字段名不能为空")
+  .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, "字段名只能包含字母、数字和下划线，且不能以数字开头");
+
+const optionalIdentifierSchema = z
+  .string()
+  .optional()
+  .refine((val) => {
+    if (val === undefined || val.trim() === "") return true;
+    return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(val);
+  }, { message: "字段名只能包含字母、数字和下划线，且不能以数字开头" });
+
 export const variableConfigSchema = z.object({
-  variableName: nonEmptyString.regex(
-    /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-    "变量名只能包含字母、数字和下划线，且不能以数字开头"
-  ),
+  variableName: identifierSchema,
   valueType: z.enum(["string", "number", "boolean", "object", "array"]).default("string"),
   value: z.any(),
 });
 
 export type VariableConfig = z.infer<typeof variableConfigSchema>;
+
+// ===== 输入输出节点配置 Schema =====
+
+const inputTypeSchema = z.enum([
+  "text",
+  "textarea",
+  "number",
+  "boolean",
+  "select",
+  "password",
+  "email",
+  "url",
+]);
+
+export const inputConfigSchema = z.object({
+  inputType: inputTypeSchema.default("text"),
+  name: optionalIdentifierSchema,
+  label: z.string().optional(),
+  placeholder: z.string().optional(),
+  defaultValue: z.any().optional(),
+  required: z.boolean().default(false),
+  options: z.array(z.object({
+    label: z.string(),
+    value: z.string(),
+  })).optional(),
+  validation: z.object({
+    min: z.number().optional(),
+    max: z.number().optional(),
+    pattern: z.string().optional(),
+  }).optional(),
+});
+
+export type InputConfig = z.infer<typeof inputConfigSchema>;
+
+const submitActionSchema = z.union([
+  z.string().min(1, "提交动作不能为空"),
+  z.object({
+    id: z.string().optional(),
+    type: z.enum(["submit", "reset", "custom"]).optional(),
+    label: z.string().optional(),
+  }),
+]);
+
+export const uiTriggerConfigSchema = z.object({
+  formId: z.string().min(1, "表单 ID 不能为空").optional(),
+  form_id: z.string().min(1, "表单 ID 不能为空").optional(),
+  submitAction: submitActionSchema.optional(),
+  submit_action: submitActionSchema.optional(),
+  validation: z.record(z.any()).optional(),
+});
+
+const outputTypeSchema = z.enum([
+  "text",
+  "json",
+  "table",
+  "image",
+  "markdown",
+  "html",
+  "file",
+]);
+
+export const outputConfigSchema = z.object({
+  outputType: outputTypeSchema.default("text"),
+  title: z.string().optional(),
+  showTimestamp: z.boolean().default(false),
+  maxLength: z.number().int().min(0).max(100000).optional(),
+  template: z.string().optional(),
+});
+
+export type OutputConfig = z.infer<typeof outputConfigSchema>;
+
+// ===== 数据库节点配置 Schema =====
+
+const dbOperationSchema = z.enum(["select", "insert", "update", "delete", "migrate"]);
+
+const dbBaseConfigSchema = z.object({
+  operation: dbOperationSchema.optional(),
+  table: z.string().optional(),
+  where: z.string().optional(),
+  values: z.any().optional(),
+  limit: z.number().int().min(1, "最小值为 1").max(100000, "最大值为 100000").optional(),
+  sql: z.string().optional(),
+});
+
+const dbSelectConfigSchema = dbBaseConfigSchema.extend({
+  table: nonEmptyString,
+});
+
+const dbInsertConfigSchema = dbBaseConfigSchema.extend({
+  table: nonEmptyString,
+  values: z.any(),
+});
+
+const dbUpdateConfigSchema = dbBaseConfigSchema.extend({
+  table: nonEmptyString,
+  values: z.any(),
+});
+
+const dbDeleteConfigSchema = dbBaseConfigSchema.extend({
+  table: nonEmptyString,
+});
+
+const dbMigrateConfigSchema = dbBaseConfigSchema.extend({
+  sql: nonEmptyString,
+});
 
 // ===== 节点基础信息 Schema =====
 
@@ -215,6 +335,14 @@ export const nodeConfigSchemas: Record<string, z.ZodSchema> = {
   code: codeConfigSchema,
   template: templateConfigSchema,
   variable: variableConfigSchema,
+  start: uiTriggerConfigSchema,
+  input: inputConfigSchema,
+  output: outputConfigSchema,
+  db_select: dbSelectConfigSchema,
+  db_insert: dbInsertConfigSchema,
+  db_update: dbUpdateConfigSchema,
+  db_delete: dbDeleteConfigSchema,
+  db_migrate: dbMigrateConfigSchema,
 };
 
 // 获取节点类型对应的 Schema

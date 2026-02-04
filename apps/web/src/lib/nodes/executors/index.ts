@@ -7,13 +7,15 @@ export * from "./http";
 export * from "./logic";
 export * from "./data";
 export * from "./text";
+export * from "./io";
 
 // 执行器注册表
 import { llmChatExecutor } from "./llm";
 import { httpExecutor } from "./http";
 import { conditionExecutor, loopExecutor } from "./logic";
-import { variableExecutor, transformExecutor, mergeExecutor } from "./data";
+import { variableExecutor, transformExecutor, mergeExecutor, databaseExecutor } from "./data";
 import { templateExecutor, regexExecutor, splitJoinExecutor } from "./text";
+import { inputExecutor, outputExecutor } from "./io";
 import type { NodeExecutor } from "../types";
 
 /**
@@ -41,6 +43,15 @@ export const nodeExecutors: Record<string, NodeExecutor> = {
   "data-transform": transformExecutor,
   merge: mergeExecutor,
   "data-merge": mergeExecutor,
+  db_select: databaseExecutor,
+  db_insert: databaseExecutor,
+  db_update: databaseExecutor,
+  db_delete: databaseExecutor,
+  db_migrate: databaseExecutor,
+  
+  // 输入输出节点
+  input: inputExecutor,
+  output: outputExecutor,
   
   // 文本节点
   template: templateExecutor,

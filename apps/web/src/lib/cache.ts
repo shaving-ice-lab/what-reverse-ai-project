@@ -84,7 +84,10 @@ export const queryKeys = {
   // 执行
   executions: {
     all: ["executions"] as const,
-    detail: (id: string) => [...queryKeys.executions.all, id] as const,
+    lists: () => [...queryKeys.executions.all, "list"] as const,
+    list: (params: Record<string, unknown>) => [...queryKeys.executions.lists(), params] as const,
+    details: () => [...queryKeys.executions.all, "detail"] as const,
+    detail: (id: string) => [...queryKeys.executions.details(), id] as const,
     logs: (id: string) => [...queryKeys.executions.all, "logs", id] as const,
   },
   

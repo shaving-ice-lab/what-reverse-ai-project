@@ -16,6 +16,7 @@ export type NodeCategory =
   | "text"
   | "code"
   | "flow"
+  | "io"
   | "custom";
 
 export type ExecutionStatus =
@@ -56,6 +57,9 @@ export interface LLMNodeConfig extends BaseNodeConfig {
   userPrompt: string;
   temperature: number;
   maxTokens: number;
+  max_tokens?: number;
+  outputSchema?: Record<string, unknown>;
+  output_schema?: Record<string, unknown>;
   topP: number;
   frequencyPenalty: number;
   presencePenalty: number;
@@ -140,6 +144,15 @@ export interface VariableNodeConfig extends BaseNodeConfig {
   valueType: DataType;
 }
 
+export interface DatabaseNodeConfig extends BaseNodeConfig {
+  operation?: "select" | "insert" | "update" | "delete" | "migrate";
+  table?: string;
+  where?: string;
+  values?: unknown;
+  limit?: number;
+  sql?: string;
+}
+
 // ===== 节点数据 =====
 
 export interface WorkflowNodeData {
@@ -153,6 +166,17 @@ export interface WorkflowNodeData {
 
 export interface WorkflowNode extends Node<WorkflowNodeData> {
   type: string;
+}
+
+// ===== 协议节点结构 =====
+
+export interface WorkflowNodeProtocol {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data?: WorkflowNodeData;
+  inputs?: PortDefinition[];
+  outputs?: PortDefinition[];
 }
 
 export interface WorkflowEdge extends Edge {

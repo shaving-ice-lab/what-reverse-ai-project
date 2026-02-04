@@ -5,6 +5,7 @@
  */
 
 import { api } from "./index";
+import { getApiBaseUrl } from "@/lib/env";
 import type {
   CreativeTemplate,
   CreativeTemplateCategory,
@@ -142,8 +143,8 @@ export async function cancelTask(taskId: string): Promise<void> {
  * 创建 SSE 连接获取实时更新
  */
 export function subscribeToTask(taskId: string): EventSource {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-  const url = `${baseUrl}/api/v1/creative/generate/${taskId}/stream`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}/creative/generate/${taskId}/stream`;
   return new EventSource(url, { withCredentials: true });
 }
 
@@ -214,8 +215,9 @@ export async function deleteDocument(id: string): Promise<void> {
  * 导出文档
  */
 export async function exportDocument(id: string, format: ExportFormat): Promise<Blob> {
+  const baseUrl = getApiBaseUrl();
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/creative/documents/${id}/export?format=${format}`,
+    `${baseUrl}/creative/documents/${id}/export?format=${format}`,
     {
       method: "GET",
       credentials: "include",

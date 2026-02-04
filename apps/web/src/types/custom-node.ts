@@ -36,6 +36,7 @@ export interface CustomNode {
   
   // 基础信息
   name: string;
+  displayName?: string;
   slug: string;
   description: string;
   longDescription: string | null;
@@ -47,6 +48,9 @@ export interface CustomNode {
   
   // 版本
   version: string;
+  latestVersion?: string;
+  minSdkVersion?: string;
+  maxSdkVersion?: string | null;
   
   // 状态
   status: CustomNodeStatus;
@@ -153,11 +157,13 @@ export interface CustomNodeListParams {
 // API 响应类型
 export interface CustomNodeListResponse {
   success: boolean;
-  data: CustomNode[];
+  data: {
+    nodes: CustomNode[];
+  };
   meta: {
     total: number;
     page: number;
-    pageSize: number;
+    page_size: number;
   };
 }
 

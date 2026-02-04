@@ -42,6 +42,23 @@ export interface UnreadCount {
 }
 
 // =====================
+// 通用 API 响应
+// =====================
+
+export interface ApiMeta {
+  total?: number;
+  page?: number;
+  page_size?: number;
+}
+
+export interface ApiResponse<T> {
+  code: string;
+  message: string;
+  data: T;
+  meta?: ApiMeta;
+}
+
+// =====================
 // 请求参数类型
 // =====================
 
@@ -64,30 +81,25 @@ export interface MarkMultipleAsReadRequest {
 
 // 通知列表响应
 export interface ListNotificationsResponse {
-  success: boolean;
-  data: NotificationItem[];
+  items: NotificationItem[];
   meta: {
     total: number;
     page: number;
     pageSize: number;
-    totalPages: number;
   };
 }
 
 // 通知详情响应
 export interface GetNotificationResponse {
-  success: boolean;
   data: NotificationItem;
 }
 
 // 未读数响应
 export interface GetUnreadCountResponse {
-  success: boolean;
   data: UnreadCount;
 }
 
 // 通用操作响应
 export interface NotificationActionResponse {
-  success: boolean;
-  message: string;
+  message?: string;
 }

@@ -3,6 +3,7 @@
  */
 
 import type {
+  ApiResponse,
   ListNotificationsParams,
   ListNotificationsResponse,
   GetNotificationResponse,
@@ -10,6 +11,8 @@ import type {
   NotificationActionResponse,
   MarkMultipleAsReadRequest,
   NotificationType,
+  NotificationItem,
+  UnreadCount,
 } from "@/types/notification";
 import { request } from "./shared";
 
@@ -22,6 +25,8 @@ export const notificationApi = {
    */
   async list(params?: ListNotificationsParams): Promise<ListNotificationsResponse> {
     const searchParams = new URLSearchParams();
+    const page = params?.page ?? 1;
+    const pageSize = params?.pageSize ?? 20;
     
     if (params) {
       if (params.type) searchParams.set("type", params.type);
@@ -31,23 +36,41 @@ export const notificationApi = {
     }
     
     const query = searchParams.toString();
-    return request<ListNotificationsResponse>(`/notifications${query ? `?${query}` : ""}`);
+    const response = await request<ApiResponse<NotificationItem[]>>(
+      `/notifications${query ? `?${query}` : ""}`
+    );
+    const meta = response.meta || {};
+    return {
+      items: response.data || [],
+      meta: {
+        total: meta.total ?? 0,
+        page: meta.page ?? page,
+        pageSize: meta.page_size ?? pageSize,
+      },
+    };
   },
 
   /**
    * 获取通知详情
    */
   async get(notificationId: string): Promise<GetNotificationResponse> {
-    return request<GetNotificationResponse>(`/notifications/${notificationId}`);
+    const response = await request<ApiResponse<NotificationItem>>(
+      `/notifications/${notificationId}`
+    );
+    return { data: response.data };
   },
 
   /**
    * 标记单个通知为已读
    */
   async markAsRead(notificationId: string): Promise<NotificationActionResponse> {
-    return request<NotificationActionResponse>(`/notifications/${notificationId}/read`, {
-      method: "POST",
-    });
+    const response = await request<ApiResponse<{ message?: string }>>(
+      `/notifications/${notificationId}/read`,
+      {
+        method: "POST",
+      }
+    );
+    return { message: response.data?.message };
   },
 
   /**
@@ -58,28 +81,40 @@ export const notificationApi = {
     if (type) searchParams.set("type", type);
     const query = searchParams.toString();
     
-    return request<NotificationActionResponse>(`/notifications/read-all${query ? `?${query}` : ""}`, {
-      method: "POST",
-    });
+    const response = await request<ApiResponse<{ message?: string }>>(
+      `/notifications/read-all${query ? `?${query}` : ""}`,
+      {
+        method: "POST",
+      }
+    );
+    return { message: response.data?.message };
   },
 
   /**
    * 批量标记通知为已读
    */
   async markMultipleAsRead(ids: string[]): Promise<NotificationActionResponse> {
-    return request<NotificationActionResponse>("/notifications/read-multiple", {
-      method: "POST",
-      body: JSON.stringify({ ids } as MarkMultipleAsReadRequest),
-    });
+    const response = await request<ApiResponse<{ message?: string }>>(
+      "/notifications/read-multiple",
+      {
+        method: "POST",
+        body: JSON.stringify({ ids } as MarkMultipleAsReadRequest),
+      }
+    );
+    return { message: response.data?.message };
   },
 
   /**
    * 删除通知
    */
   async delete(notificationId: string): Promise<NotificationActionResponse> {
-    return request<NotificationActionResponse>(`/notifications/${notificationId}`, {
-      method: "DELETE",
-    });
+    const response = await request<ApiResponse<{ message?: string }>>(
+      `/notifications/${notificationId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    return { message: response.data?.message };
   },
 
   /**
@@ -90,15 +125,20 @@ export const notificationApi = {
     if (type) searchParams.set("type", type);
     const query = searchParams.toString();
     
-    return request<NotificationActionResponse>(`/notifications/clear${query ? `?${query}` : ""}`, {
-      method: "DELETE",
-    });
+    const response = await request<ApiResponse<{ message?: string }>>(
+      `/notifications/clear${query ? `?${query}` : ""}`,
+      {
+        method: "DELETE",
+      }
+    );
+    return { message: response.data?.message };
   },
 
   /**
    * 获取未读通知数量
    */
   async getUnreadCount(): Promise<GetUnreadCountResponse> {
-    return request<GetUnreadCountResponse>("/notifications/unread-count");
+    const response = await request<ApiResponse<UnreadCount>>("/notifications/unread-count");
+    return { data: response.data };
   },
 };
