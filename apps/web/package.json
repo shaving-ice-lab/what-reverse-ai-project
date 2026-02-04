@@ -10,7 +10,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:perf": "vitest run --config vitest.perf.config.ts",
-    "test:perf:watch": "vitest --config vitest.perf.config.ts"
+    "test:perf:watch": "vitest --config vitest.perf.config.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -52,7 +54,9 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@eslint/eslintrc": "^3.2.0",
+    "@playwright/test": "^1.58.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.2.0",

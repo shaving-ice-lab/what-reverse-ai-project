@@ -160,7 +160,7 @@ export function mockApiResponse<T>(data: T, options: { delay?: number } = {}) {
         () =>
           resolve({
             ok: true,
-            json: () => Promise.resolve({ success: true, data }),
+            json: () => Promise.resolve({ code: "OK", message: "OK", data }),
           }),
         delay
       )
@@ -176,7 +176,7 @@ export function mockApiError(
     Promise.resolve({
       ok: false,
       status,
-      json: () => Promise.resolve({ success: false, error }),
+      json: () => Promise.resolve({ code: error.code, message: error.message }),
     })
   );
 }

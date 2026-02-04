@@ -1,0 +1,24 @@
+export const workspaceFixture = {
+  id: "ws_123",
+  owner_user_id: "user_1",
+  name: "测试工作空间",
+  slug: "demo",
+  icon: "🏢",
+  status: "active",
+  plan: "free",
+  region: "ap-east-1",
+  default_app_id: null,
+  settings_json: {},
+  created_at: "2026-02-01T10:00:00Z",
+  updated_at: "2026-02-02T10:00:00Z",
+} as const;
+
+export const workspaceAltFixture = {
+  ...workspaceFixture,
+  id: "ws_456",
+  name: "分析工作空间",
+  slug: "analytics",
+  plan: "pro",
+} as const;
+
+export const workspaceListFixture = [workspaceFixture, workspaceAltFixture] as const;
