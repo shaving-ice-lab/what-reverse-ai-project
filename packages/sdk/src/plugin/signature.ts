@@ -104,7 +104,7 @@ export class SignatureVerifier {
    * 验证插件签名
    */
   async verify(
-    manifest: PluginManifest,
+    _manifest: PluginManifest,
     packageData: ArrayBuffer,
     signature: PluginSignature
   ): Promise<SignatureVerificationResult> {
@@ -275,7 +275,7 @@ export class SignatureVerifier {
       case "RSA-SHA512":
         return { name: "RSASSA-PKCS1-v1_5" };
       case "ECDSA-SHA256":
-        return { name: "ECDSA", hash: "SHA-256" };
+        return { name: "ECDSA", hash: "SHA-256" } as AlgorithmIdentifier;
       default:
         throw new Error(`不支持的算法: ${algorithm}`);
     }
@@ -330,7 +330,7 @@ export class SignatureVerifier {
         try {
           const response = await fetch(crlUrl);
           if (response.ok) {
-            const crlData = await response.json();
+            const crlData = (await response.json()) as { revokedCerts?: string[] };
             if (crlData.revokedCerts?.includes(fingerprint)) {
               this.revokedCerts.add(fingerprint);
               return true;
@@ -572,7 +572,7 @@ export class SignatureGenerator {
       case "RSA-SHA512":
         return { name: "RSASSA-PKCS1-v1_5" };
       case "ECDSA-SHA256":
-        return { name: "ECDSA", hash: "SHA-256" };
+        return { name: "ECDSA", hash: "SHA-256" } as AlgorithmIdentifier;
       default:
         throw new Error(`不支持的算法: ${this.config.algorithm}`);
     }

@@ -146,9 +146,17 @@ async function loadNode(filePath: string, state: WatchState): Promise<boolean> {
     }
 
     // 获取节点定义
-    const node = nodeModule.default || nodeModule;
+    const node = (nodeModule.default || nodeModule) as {
+      id?: string;
+      name?: string;
+      version?: string;
+      category?: string;
+      execute?: unknown;
+      inputs?: Record<string, { type?: string; required?: boolean }>;
+      outputs?: Record<string, { type?: string }>;
+    };
 
-    if (!node || !node.id || !node.execute) {
+    if (!node || !node.id || typeof node.execute !== "function") {
       console.error("❌ 无效的节点定义");
       console.error("   确保导出了有效的 defineNode() 结果");
       state.lastError = new Error("Invalid node definition");
@@ -212,7 +220,7 @@ function setupFileWatcher(projectDir: string, entryFile: string, state: WatchSta
 
   let debounceTimer: NodeJS.Timeout | null = null;
 
-  fs.watch(watchDir, { recursive: true }, (eventType, filename) => {
+  fs.watch(watchDir, { recursive: true }, (_eventType, filename) => {
     if (!filename) return;
     if (!filename.endsWith(".ts") && !filename.endsWith(".js")) return;
     if (filename.includes("node_modules")) return;

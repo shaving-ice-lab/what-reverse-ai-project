@@ -7,6 +7,7 @@ import type {
   PluginCategory,
   PluginPermission,
 } from "./types";
+import { isValidSemver } from "./version";
 
 // ===== Manifest 验证 =====
 
@@ -90,10 +91,10 @@ export function validateManifest(manifest: unknown): ManifestValidationResult {
   }
 
   // version 格式验证
-  if (typeof m.version === "string" && !/^\d+\.\d+\.\d+/.test(m.version)) {
+  if (typeof m.version === "string" && !isValidSemver(m.version)) {
     errors.push({
       field: "version",
-      message: "Version must be in semver format (e.g., 1.0.0)",
+      message: "Version must be in semver format (e.g., 1.0.0 or 1.0.0-rc.1)",
       code: "INVALID_VERSION_FORMAT",
     });
   }

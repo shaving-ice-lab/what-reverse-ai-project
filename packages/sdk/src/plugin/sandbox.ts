@@ -134,7 +134,7 @@ export function createSandboxedAPI(
  */
 function createSandboxedCommands(
   commands: PluginAPI["commands"],
-  permissions: PermissionChecker,
+  _permissions: PermissionChecker,
   logger: PluginLogger
 ): PluginAPI["commands"] {
   return {

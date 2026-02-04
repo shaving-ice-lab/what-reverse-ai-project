@@ -83,6 +83,8 @@ export interface PluginNodeEntry {
 export type PluginPermission =
   | "network"           // 网络访问
   | "storage"           // 存储访问
+  | "storage:read"      // 存储只读
+  | "storage:write"     // 存储写入
   | "clipboard"         // 剪贴板
   | "notifications"     // 通知
   | "env"              // 环境变量

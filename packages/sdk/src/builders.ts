@@ -10,15 +10,16 @@ import type {
   ShowIfCondition,
   UIComponentType,
   SelectOption,
+  ExtractDataTypeValue,
 } from "./types";
 
 // ===== 输入字段构建器 =====
 
 /** 输入字段构建器 */
-class InputBuilder<T = unknown> {
-  private config: InputFieldConfig<T>;
+class InputBuilder<TType extends DataType, TValue = ExtractDataTypeValue<TType>> {
+  protected config: InputFieldConfig<TValue, TType>;
 
-  constructor(type: DataType, label: string) {
+  constructor(type: TType, label: string) {
     this.config = {
       type,
       label,
@@ -33,7 +34,7 @@ class InputBuilder<T = unknown> {
   }
 
   /** 设置默认值 */
-  default(value: T): this {
+  default(value: TValue): this {
     this.config.defaultValue = value;
     return this;
   }
@@ -132,13 +133,13 @@ class InputBuilder<T = unknown> {
   }
 
   /** 构建配置 */
-  build(): InputFieldConfig<T> {
+  build(): InputFieldConfig<TValue, TType> {
     return { ...this.config };
   }
 }
 
 /** 字符串输入构建器 */
-class StringInputBuilder extends InputBuilder<string> {
+class StringInputBuilder extends InputBuilder<"string"> {
   constructor(label: string) {
     super("string", label);
   }
@@ -152,7 +153,7 @@ class StringInputBuilder extends InputBuilder<string> {
   code(language?: string): this {
     this.ui("code");
     if (language) {
-      // 可以在扩展属性中保存语言
+      this.config.uiOptions = { ...(this.config.uiOptions ?? {}), language };
     }
     return this;
   }
@@ -175,13 +176,14 @@ class StringInputBuilder extends InputBuilder<string> {
 }
 
 /** 数字输入构建器 */
-class NumberInputBuilder extends InputBuilder<number> {
+class NumberInputBuilder extends InputBuilder<"number"> {
   constructor(label: string) {
     super("number", label);
   }
 
   /** 使用滑块 */
   slider(min: number, max: number, step = 1): this {
+    this.config.uiOptions = { ...(this.config.uiOptions ?? {}), step };
     return this.ui("slider").min(min).max(max);
   }
 
@@ -200,7 +202,7 @@ class NumberInputBuilder extends InputBuilder<number> {
 }
 
 /** 布尔输入构建器 */
-class BooleanInputBuilder extends InputBuilder<boolean> {
+class BooleanInputBuilder extends InputBuilder<"boolean"> {
   constructor(label: string) {
     super("boolean", label);
     this.default(false);
@@ -213,7 +215,7 @@ class BooleanInputBuilder extends InputBuilder<boolean> {
 }
 
 /** 对象输入构建器 */
-class ObjectInputBuilder extends InputBuilder<Record<string, unknown>> {
+class ObjectInputBuilder extends InputBuilder<"object"> {
   constructor(label: string) {
     super("object", label);
   }
@@ -225,7 +227,7 @@ class ObjectInputBuilder extends InputBuilder<Record<string, unknown>> {
 }
 
 /** 数组输入构建器 */
-class ArrayInputBuilder extends InputBuilder<unknown[]> {
+class ArrayInputBuilder extends InputBuilder<"array"> {
   constructor(label: string) {
     super("array", label);
     this.default([]);
@@ -233,12 +235,10 @@ class ArrayInputBuilder extends InputBuilder<unknown[]> {
 }
 
 /** 选择输入构建器 */
-class SelectInputBuilder extends InputBuilder<string | number> {
-  private options: SelectOption[] = [];
-
-  constructor(label: string, options: SelectOption[]) {
-    super("string", label);
-    this.options = options;
+class SelectInputBuilder<T extends string | number> extends InputBuilder<"any", T> {
+  constructor(label: string, options: SelectOption<T>[]) {
+    super("any", label);
+    this.config.options = options;
     this.ui("select");
   }
 
@@ -253,6 +253,8 @@ class SelectInputBuilder extends InputBuilder<string | number> {
 export const input = {
   /** 字符串输入 */
   string: (label: string) => new StringInputBuilder(label),
+  /** 多行文本输入 */
+  textarea: (label: string) => new StringInputBuilder(label).multiline(),
 
   /** 数字输入 */
   number: (label: string) => new NumberInputBuilder(label),
@@ -267,29 +269,30 @@ export const input = {
   array: (label: string) => new ArrayInputBuilder(label),
 
   /** 选择输入 */
-  select: (label: string, options: SelectOption[]) =>
+  select: <T extends string | number>(label: string, options: SelectOption<T>[]) =>
     new SelectInputBuilder(label, options),
 
   /** 文件输入 */
-  file: (label: string) => new InputBuilder<File>("file", label),
+  file: (label: string) => new InputBuilder("file", label),
 
   /** 图片输入 */
-  image: (label: string) => new InputBuilder<File>("image", label),
+  image: (label: string) => new InputBuilder("image", label),
 
   /** JSON 输入 */
-  json: (label: string) => new InputBuilder<unknown>("json", label).ui("json"),
+  json: <T = Record<string, unknown>>(label: string) =>
+    new InputBuilder<"json", T>("json", label).ui("json"),
 
   /** 任意类型输入 */
-  any: (label: string) => new InputBuilder<unknown>("any", label),
+  any: (label: string) => new InputBuilder("any", label),
 };
 
 // ===== 输出字段构建器 =====
 
 /** 输出字段构建器 */
-class OutputBuilder {
-  private config: OutputFieldConfig;
+class OutputBuilder<TType extends DataType> {
+  private config: OutputFieldConfig<TType>;
 
-  constructor(type: DataType, label: string) {
+  constructor(type: TType, label: string) {
     this.config = {
       type,
       label,
@@ -310,7 +313,7 @@ class OutputBuilder {
   }
 
   /** 构建配置 */
-  build(): OutputFieldConfig {
+  build(): OutputFieldConfig<TType> {
     return { ...this.config };
   }
 }

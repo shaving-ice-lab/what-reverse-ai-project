@@ -54,7 +54,7 @@ export {
   serializeManifest,
   hasPermission,
   getDangerousPermissions,
-  compareVersions,
+  compareVersions as compareManifestVersions,
   isVersionCompatible,
 } from "./manifest";
 
@@ -166,6 +166,10 @@ export type {
   CompatibilityResult,
   CompatibilityIssue,
 } from "./version";
+
+// 插件定义
+export { definePlugin } from "./definePlugin";
+export type { PluginDefinition } from "./definePlugin";
 
 // 签名验证
 export {

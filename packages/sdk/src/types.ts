@@ -51,15 +51,18 @@ export type IconName =
 // ===== 输入定义 =====
 
 /** 输入字段基础配置 */
-export interface InputFieldConfig<T = unknown> {
+export interface InputFieldConfig<
+  TValue = unknown,
+  TType extends DataType = DataType
+> {
   /** 字段类型 */
-  type: DataType;
+  type: TType;
   /** 显示名称 */
   label: string;
   /** 描述信息 */
   description?: string;
   /** 默认值 */
-  defaultValue?: T;
+  defaultValue?: TValue;
   /** 是否必填 */
   required?: boolean;
   /** 占位符文本 */
@@ -70,6 +73,10 @@ export interface InputFieldConfig<T = unknown> {
   showIf?: ShowIfCondition;
   /** UI 组件类型 */
   ui?: UIComponentType;
+  /** 选择项 (用于 select/multiselect) */
+  options?: SelectOption[];
+  /** UI 额外配置 */
+  uiOptions?: Record<string, unknown>;
 }
 
 /** 验证规则 */
@@ -108,9 +115,9 @@ export type UIComponentType =
   | "custom";
 
 /** 选项定义 (用于 select) */
-export interface SelectOption {
+export interface SelectOption<T extends string | number = string | number> {
   label: string;
-  value: string | number;
+  value: T;
   description?: string;
   disabled?: boolean;
 }
@@ -118,9 +125,9 @@ export interface SelectOption {
 // ===== 输出定义 =====
 
 /** 输出字段配置 */
-export interface OutputFieldConfig {
+export interface OutputFieldConfig<TType extends DataType = DataType> {
   /** 字段类型 */
-  type: DataType;
+  type: TType;
   /** 显示名称 */
   label: string;
   /** 描述信息 */
@@ -185,6 +192,11 @@ export interface ContextLLMClient {
    * @returns 生成的文本
    */
   chat(prompt: string, options?: ContextLLMOptions): Promise<string>;
+  /**
+   * 发送聊天消息（完整配置）
+   * @param request 请求配置
+   */
+  chat(request: ContextLLMChatRequest): Promise<ContextLLMChatResponse>;
 
   /**
    * 发送带系统提示的聊天消息
@@ -260,19 +272,56 @@ export interface ContextLLMOptions {
   model?: string;
   /** 温度 (0-2) */
   temperature?: number;
+  /** Top P 采样 */
+  topP?: number;
   /** 最大生成 token 数 */
   max_tokens?: number;
+  /** 最大生成 token 数（驼峰别名） */
+  maxTokens?: number;
   /** 停止序列 */
   stop?: string[];
   /** 超时时间 (毫秒) */
   timeout?: number;
 }
 
+/** LLM Chat 请求 */
+export interface ContextLLMChatRequest {
+  /** 模型名称 */
+  model?: string;
+  /** 消息列表 */
+  messages: ContextLLMMessage[];
+  /** 温度 (0-2) */
+  temperature?: number;
+  /** Top P 采样 */
+  topP?: number;
+  /** 最大生成 token 数 */
+  maxTokens?: number;
+  /** 停止序列 */
+  stop?: string[];
+  /** 流式输出 */
+  stream?: boolean;
+  /** 流式回调 */
+  onStream?: (chunk: string) => void;
+  /** 超时时间 (毫秒) */
+  timeout?: number;
+}
+
+/** LLM Chat 响应 */
+export interface ContextLLMChatResponse {
+  content: string;
+  model?: string;
+  usage?: ContextTokenUsage;
+  finishReason?: string;
+}
+
 /** Token 使用统计 */
 export interface ContextTokenUsage {
-  prompt_tokens: number;
-  completion_tokens: number;
-  total_tokens: number;
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+  promptTokens?: number;
+  completionTokens?: number;
+  totalTokens?: number;
 }
 
 /** 缓存接口 */
@@ -397,6 +446,8 @@ export interface NodeExecutionContext<
   log: LogFunction;
   /** 进度报告 (简化版) */
   reportProgress: (progress: number, message?: string) => void;
+  /** 流式输出 */
+  streamOutput: (field: string, chunk: unknown) => void;
   /** 获取环境变量 */
   getEnv: (key: string) => string | undefined;
   /** 获取密钥 (简化版) */
@@ -449,11 +500,13 @@ export interface HttpOptions {
 export interface HttpRequestOptions extends HttpOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   url: string;
+  body?: unknown;
   data?: unknown;
 }
 
 export interface HttpResponse<T = unknown> {
   data: T;
+  body?: T;
   status: number;
   headers: Record<string, string>;
 }
@@ -478,7 +531,9 @@ export type NodeExecuteFunction<
 
 /** 从输入配置提取值类型 */
 export type ExtractInputTypes<T extends Record<string, InputFieldConfig>> = {
-  [K in keyof T]: ExtractDataTypeValue<T[K]["type"]>;
+  [K in keyof T]: T[K] extends InputFieldConfig<infer TValue, any>
+    ? TValue
+    : ExtractDataTypeValue<T[K]["type"]>;
 };
 
 /** 从输出配置提取值类型 */

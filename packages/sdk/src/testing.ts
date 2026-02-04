@@ -15,6 +15,8 @@ import type {
   ValidationResult,
   ContextLLMClient,
   ContextLLMOptions,
+  ContextLLMChatRequest,
+  ContextLLMChatResponse,
   ContextLLMMessage,
   ContextTokenUsage,
   CacheInterface,
@@ -46,6 +48,7 @@ export interface LogEntry {
 export interface MockHttpRequest {
   method: string;
   url: string;
+  body?: unknown;
   data?: unknown;
   headers?: Record<string, string>;
 }
@@ -53,6 +56,7 @@ export interface MockHttpRequest {
 /** Mock HTTP 响应配置 */
 export interface MockHttpResponse<T = unknown> {
   data: T;
+  body?: T;
   status?: number;
   headers?: Record<string, string>;
 }
@@ -97,18 +101,23 @@ export function createMockHttpClient(): HttpClient & {
   const makeRequest = async <T>(
     method: string,
     url: string,
-    data?: unknown,
+    body?: unknown,
     headers?: Record<string, string>
   ): Promise<HttpResponse<T>> => {
-    requests.push({ method, url, data, headers });
+    requests.push({ method, url, body, data: body, headers });
 
     if (mockErrorConfig) {
       throw mockErrorConfig;
     }
 
     if (mockResponseConfig) {
+      const resolvedBody =
+        mockResponseConfig.body !== undefined
+          ? mockResponseConfig.body
+          : (mockResponseConfig.data as T);
       return {
         data: mockResponseConfig.data as T,
+        body: resolvedBody as T,
         status: mockResponseConfig.status ?? 200,
         headers: mockResponseConfig.headers ?? {},
       };
@@ -116,6 +125,7 @@ export function createMockHttpClient(): HttpClient & {
 
     return {
       data: {} as T,
+      body: {} as T,
       status: 200,
       headers: {},
     };
@@ -131,8 +141,8 @@ export function createMockHttpClient(): HttpClient & {
       makeRequest<T>("PUT", url, data, options?.headers),
     delete: <T>(url: string, options?: { headers?: Record<string, string> }) =>
       makeRequest<T>("DELETE", url, undefined, options?.headers),
-    request: <T>(options: { method: string; url: string; data?: unknown; headers?: Record<string, string> }) =>
-      makeRequest<T>(options.method, options.url, options.data, options.headers),
+    request: <T>(options: { method: string; url: string; data?: unknown; body?: unknown; headers?: Record<string, string> }) =>
+      makeRequest<T>(options.method, options.url, options.body ?? options.data, options.headers),
     mockResponse: <T>(response: MockHttpResponse<T>) => {
       mockResponseConfig = response as MockHttpResponse;
       mockErrorConfig = null;
@@ -188,7 +198,7 @@ export interface MockLLMConfig {
   /** 默认响应内容 */
   defaultResponse?: string;
   /** 响应生成函数 */
-  responseGenerator?: (prompt: string, options?: ContextLLMOptions) => string;
+  responseGenerator?: (prompt: string, options?: ContextLLMOptions | ContextLLMChatRequest) => string;
   /** 模拟延迟 (毫秒) */
   delay?: number;
   /** 模拟 Token 使用 */
@@ -206,7 +216,7 @@ export interface MockLLMRequest {
   systemPrompt?: string;
   messages?: ContextLLMMessage[];
   texts?: string[];
-  options?: ContextLLMOptions;
+  options?: ContextLLMOptions | ContextLLMChatRequest;
   timestamp: Date;
 }
 
@@ -238,23 +248,73 @@ export function createMockLLMClient(
 
   const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const getResponse = (prompt: string, options?: ContextLLMOptions): string => {
+  const getResponse = (
+    prompt: string,
+    options?: ContextLLMOptions | ContextLLMChatRequest
+  ): string => {
     if (currentResponseFn) {
       return currentResponseFn(prompt, options);
     }
     return currentResponse;
   };
 
+  const buildUsage = (): ContextTokenUsage => {
+    const promptTokens = tokenUsage.promptTokens ?? tokenUsage.prompt_tokens ?? 10;
+    const completionTokens = tokenUsage.completionTokens ?? tokenUsage.completion_tokens ?? 20;
+    const totalTokens =
+      tokenUsage.totalTokens ?? tokenUsage.total_tokens ?? promptTokens + completionTokens;
+
+    return {
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      total_tokens: totalTokens,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+    };
+  };
+
+  const chat = async (
+    promptOrRequest: string | ContextLLMChatRequest,
+    options?: ContextLLMOptions
+  ): Promise<string | ContextLLMChatResponse> => {
+    if (typeof promptOrRequest === "string") {
+      requests.push({ type: "chat", prompt: promptOrRequest, options, timestamp: new Date() });
+      if (currentError) throw currentError;
+      if (delay > 0) await sleep(delay);
+      lastUsage = buildUsage();
+      return getResponse(promptOrRequest, options);
+    }
+
+    const request = promptOrRequest;
+    const lastUserMessage = request.messages.filter((m) => m.role === "user").pop();
+    const prompt = lastUserMessage?.content || "";
+    requests.push({ type: "chat", messages: request.messages, options: request, timestamp: new Date() });
+    if (currentError) throw currentError;
+    if (delay > 0) await sleep(delay);
+
+    const responseText = getResponse(prompt, request);
+    if (request.stream && request.onStream) {
+      const words = responseText.split(" ");
+      for (let i = 0; i < words.length; i++) {
+        if (delay > 0) await sleep(delay / words.length);
+        request.onStream(words[i] + (i < words.length - 1 ? " " : ""));
+      }
+    }
+
+    lastUsage = buildUsage();
+    return {
+      content: responseText,
+      model: request.model,
+      usage: lastUsage,
+      finishReason: "stop",
+    };
+  };
+
   return {
     requests,
 
-    async chat(prompt: string, options?: ContextLLMOptions): Promise<string> {
-      requests.push({ type: "chat", prompt, options, timestamp: new Date() });
-      if (currentError) throw currentError;
-      if (delay > 0) await sleep(delay);
-      lastUsage = tokenUsage;
-      return getResponse(prompt, options);
-    },
+    chat: chat as ContextLLMClient["chat"],
 
     async chatWithSystem(
       systemPrompt: string,
@@ -270,7 +330,7 @@ export function createMockLLMClient(
       });
       if (currentError) throw currentError;
       if (delay > 0) await sleep(delay);
-      lastUsage = tokenUsage;
+      lastUsage = buildUsage();
       return getResponse(userPrompt, options);
     },
 
@@ -281,7 +341,7 @@ export function createMockLLMClient(
       requests.push({ type: "conversation", messages, options, timestamp: new Date() });
       if (currentError) throw currentError;
       if (delay > 0) await sleep(delay);
-      lastUsage = tokenUsage;
+      lastUsage = buildUsage();
       const lastUserMessage = messages.filter((m) => m.role === "user").pop();
       return getResponse(lastUserMessage?.content || "", options);
     },
@@ -302,7 +362,7 @@ export function createMockLLMClient(
         onChunk(words[i] + (i < words.length - 1 ? " " : ""));
       }
 
-      lastUsage = tokenUsage;
+      lastUsage = buildUsage();
       return response;
     },
 
@@ -326,7 +386,7 @@ export function createMockLLMClient(
       requests.push({ type: "jsonChat", prompt, options, timestamp: new Date() });
       if (currentError) throw currentError;
       if (delay > 0) await sleep(delay);
-      lastUsage = tokenUsage;
+      lastUsage = buildUsage();
       const response = getResponse(prompt, options);
       try {
         return JSON.parse(response) as T;
@@ -617,6 +677,7 @@ export function createTestContext<TInputs extends Record<string, InputFieldConfi
   secretsClient: ReturnType<typeof createMockSecrets>;
   progressClient: ReturnType<typeof createMockProgress>;
   progressReports: Array<{ progress: number; message?: string }>;
+  streamOutputs: Array<{ field: string; chunk: unknown }>;
 } {
   const logger = createMockLogger();
   const httpClient = createMockHttpClient();
@@ -626,6 +687,7 @@ export function createTestContext<TInputs extends Record<string, InputFieldConfi
   const secretsClient = createMockSecrets(config.secrets);
   const progressClient = createMockProgress();
   const progressReports: Array<{ progress: number; message?: string }> = [];
+  const streamOutputs: Array<{ field: string; chunk: unknown }> = [];
   const abortController = new AbortController();
 
   return {
@@ -637,6 +699,9 @@ export function createTestContext<TInputs extends Record<string, InputFieldConfi
     reportProgress: (progress: number, message?: string) => {
       progressReports.push({ progress, message });
       progressClient.report(progress, message);
+    },
+    streamOutput: (field: string, chunk: unknown) => {
+      streamOutputs.push({ field, chunk });
     },
     getEnv: (key: string) => config.env?.[key],
     getSecret: async (key: string) => config.secrets?.[key],
@@ -659,6 +724,7 @@ export function createTestContext<TInputs extends Record<string, InputFieldConfi
     secretsClient,
     progressClient,
     progressReports,
+    streamOutputs,
   };
 }
 

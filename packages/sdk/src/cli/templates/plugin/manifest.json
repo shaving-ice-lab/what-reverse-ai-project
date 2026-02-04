@@ -1,0 +1,26 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "AgentFlow 插件",
+  "author": "{{author}}",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "agentflow": {
+    "type": "plugin",
+    "minSdkVersion": "0.1.0",
+    "permissions": [
+      "http:request",
+      "storage:read",
+      "storage:write"
+    ],
+    "nodes": [
+      "plugin-node-1",
+      "plugin-node-2"
+    ]
+  },
+  "keywords": [
+    "agentflow",
+    "plugin"
+  ]
+}

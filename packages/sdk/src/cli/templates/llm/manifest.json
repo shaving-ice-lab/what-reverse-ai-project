@@ -1,0 +1,23 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "LLM 调用节点",
+  "author": "{{author}}",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "agentflow": {
+    "type": "node",
+    "category": "ai",
+    "icon": "brain",
+    "minSdkVersion": "0.1.0"
+  },
+  "keywords": [
+    "agentflow",
+    "node",
+    "llm",
+    "ai",
+    "gpt",
+    "claude"
+  ]
+}

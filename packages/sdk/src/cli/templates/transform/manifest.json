@@ -1,0 +1,22 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "数据转换节点",
+  "author": "{{author}}",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "agentflow": {
+    "type": "node",
+    "category": "data",
+    "icon": "shuffle",
+    "minSdkVersion": "0.1.0"
+  },
+  "keywords": [
+    "agentflow",
+    "node",
+    "transform",
+    "data",
+    "json"
+  ]
+}

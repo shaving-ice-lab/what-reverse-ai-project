@@ -274,7 +274,7 @@ export class MarketplaceClient {
           throw new Error(`Request failed: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json();
+        return (await response.json()) as T;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         
@@ -357,7 +357,12 @@ export class PublisherClient {
         body: formData,
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        error?: string;
+        warnings?: string[];
+        pluginId?: string;
+        version?: string;
+      };
 
       if (!response.ok) {
         return {
@@ -438,7 +443,7 @@ export class PublisherClient {
       });
 
       if (!response.ok) return [];
-      return await response.json();
+      return (await response.json()) as MarketplacePlugin[];
     } catch {
       return [];
     }
@@ -459,7 +464,7 @@ export class PublisherClient {
       );
 
       if (!response.ok) return {};
-      return await response.json();
+      return (await response.json()) as Record<string, number>;
     } catch {
       return {};
     }

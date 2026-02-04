@@ -15,12 +15,21 @@ export interface SemanticVersion {
   build?: string;
 }
 
+/** 语义化版本正则 */
+export const SEMVER_REGEX = /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
+
+/**
+ * 判断是否为有效语义化版本
+ */
+export function isValidSemver(version: string): boolean {
+  return SEMVER_REGEX.test(version);
+}
+
 /**
  * 解析语义化版本
  */
 export function parseVersion(version: string): SemanticVersion | null {
-  const regex = /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
-  const match = version.match(regex);
+  const match = version.match(SEMVER_REGEX);
 
   if (!match) return null;
 

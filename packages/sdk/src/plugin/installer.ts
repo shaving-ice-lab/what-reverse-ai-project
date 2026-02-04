@@ -424,8 +424,12 @@ export async function checkForUpdates(
     try {
       const response = await fetch(`${registryUrl}/plugins/${plugin.manifest.id}/latest`);
       if (response.ok) {
-        const latestInfo = await response.json();
-        if (compareVersions(latestInfo.version, plugin.manifest.version) > 0) {
+        const latestInfo = (await response.json()) as {
+          version?: string;
+          releaseNotes?: string;
+          downloadUrl?: string;
+        };
+        if (latestInfo.version && compareVersions(latestInfo.version, plugin.manifest.version) > 0) {
           updates.push({
             pluginId: plugin.manifest.id,
             currentVersion: plugin.manifest.version,

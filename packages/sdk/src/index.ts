@@ -32,6 +32,8 @@
 
 // 核心函数
 export { defineNode } from "./defineNode";
+export { definePlugin } from "./plugin/definePlugin";
+export type { PluginDefinition } from "./plugin/definePlugin";
 
 // 输入/输出构建器
 export { input, output } from "./builders";
@@ -90,7 +92,7 @@ export {
   createMockLogger,
   createMockHttpClient,
   createMockStorage,
-  createMockLLMClient,
+  createMockLLMClient as createMockContextLLMClient,
   createMockCache,
   createMockSecrets,
   createMockProgress,
@@ -143,6 +145,8 @@ export type {
   ContextLLMClient,
   ContextLLMMessage,
   ContextLLMOptions,
+  ContextLLMChatRequest,
+  ContextLLMChatResponse,
   ContextTokenUsage,
   CacheInterface,
   SecretsInterface,
@@ -153,7 +157,6 @@ export type {
   ExtractOutputTypes,
   // 验证
   ValidationResult,
-  ValidationError,
   // 序列化
   SerializedNodeDefinition,
   SerializedInputField,

@@ -9,6 +9,7 @@ import type {
   OutputFieldConfig,
   ValidationResult,
   ValidationError,
+  ValidationRule,
   SerializedNodeDefinition,
   SerializedInputField,
   SerializedOutputField,
@@ -258,7 +259,7 @@ function validateType(
  */
 function validateRule(
   fieldName: string,
-  rule: { type: string; value?: unknown; message: string; validator?: (v: unknown) => boolean },
+  rule: ValidationRule,
   value: unknown
 ): ValidationError | null {
   switch (rule.type) {

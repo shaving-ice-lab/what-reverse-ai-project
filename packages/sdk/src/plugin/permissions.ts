@@ -34,6 +34,22 @@ export const PERMISSION_METADATA: Record<PluginPermission, PermissionMeta> = {
     category: "storage",
     requiresApproval: false,
   },
+  "storage:read": {
+    id: "storage:read",
+    name: "存储读取",
+    description: "允许插件读取存储数据",
+    level: "safe",
+    category: "storage",
+    requiresApproval: false,
+  },
+  "storage:write": {
+    id: "storage:write",
+    name: "存储写入",
+    description: "允许插件写入存储数据",
+    level: "safe",
+    category: "storage",
+    requiresApproval: false,
+  },
   clipboard: {
     id: "clipboard",
     name: "剪贴板",
