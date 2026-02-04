@@ -128,7 +128,7 @@ export function UserProfileCard({
                 编辑资料
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings">
+                <Link href="/dashboard/settings">
                   <Settings className="w-4 h-4 mr-2" />
                   设置
                 </Link>

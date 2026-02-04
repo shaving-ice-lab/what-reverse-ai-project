@@ -18,10 +18,17 @@ import {
   Filter,
   Split,
   Search,
+  FormInput,
+  FileOutput,
   GripVertical,
   ChevronDown,
   ChevronRight,
   BookOpen,
+  Database,
+  Plus,
+  Pencil,
+  Trash2,
+  ArrowUpDown,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -57,6 +64,7 @@ const categories: { id: NodeCategory; label: string }[] = [
   { id: "logic", label: "逻辑节点" },
   { id: "data", label: "数据节点" },
   { id: "integration", label: "集成节点" },
+  { id: "io", label: "输入输出" },
   { id: "flow", label: "流程节点" },
   { id: "text", label: "文本节点" },
   { id: "code", label: "代码节点" },
@@ -130,6 +138,46 @@ const nodeDefinitions: NodeDefinition[] = [
     category: "data",
     colorType: "data",
   },
+  {
+    type: "db_select",
+    label: "DB 查询",
+    description: "读取数据行",
+    icon: <Database className="w-4 h-4" />,
+    category: "data",
+    colorType: "data",
+  },
+  {
+    type: "db_insert",
+    label: "DB 新增",
+    description: "插入数据行",
+    icon: <Plus className="w-4 h-4" />,
+    category: "data",
+    colorType: "data",
+  },
+  {
+    type: "db_update",
+    label: "DB 更新",
+    description: "更新数据行",
+    icon: <Pencil className="w-4 h-4" />,
+    category: "data",
+    colorType: "data",
+  },
+  {
+    type: "db_delete",
+    label: "DB 删除",
+    description: "删除数据行",
+    icon: <Trash2 className="w-4 h-4" />,
+    category: "data",
+    colorType: "data",
+  },
+  {
+    type: "db_migrate",
+    label: "DB 迁移",
+    description: "执行结构变更",
+    icon: <ArrowUpDown className="w-4 h-4" />,
+    category: "data",
+    colorType: "data",
+  },
   // 集成节点
   {
     type: "http",
@@ -146,6 +194,23 @@ const nodeDefinitions: NodeDefinition[] = [
     icon: <Webhook className="w-4 h-4" />,
     category: "integration",
     colorType: "integration",
+  },
+  // 输入输出节点
+  {
+    type: "input",
+    label: "表单输入",
+    description: "定义 App 表单输入字段",
+    icon: <FormInput className="w-4 h-4" />,
+    category: "io",
+    colorType: "io",
+  },
+  {
+    type: "output",
+    label: "结果输出",
+    description: "定义运行结果展示方式",
+    icon: <FileOutput className="w-4 h-4" />,
+    category: "io",
+    colorType: "io",
   },
   // 流程节点
   {
@@ -353,6 +418,7 @@ export function NodePanel() {
       data: [],
       text: [],
       code: [],
+      io: [],
       custom: [],
     };
 

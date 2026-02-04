@@ -15,7 +15,25 @@ const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+const TooltipTrigger = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+>(({ children, asChild, ...props }, ref) => {
+  if (asChild && React.isValidElement(children) && children.type === React.Fragment) {
+    return (
+      <TooltipPrimitive.Trigger ref={ref} asChild {...props}>
+        <span className="contents">{children.props.children}</span>
+      </TooltipPrimitive.Trigger>
+    )
+  }
+
+  return (
+    <TooltipPrimitive.Trigger ref={ref} asChild={asChild} {...props}>
+      {children}
+    </TooltipPrimitive.Trigger>
+  )
+})
+TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName
 
 // Tooltip 内容样式变体 - Supabase 风格
 const tooltipVariants = cva(

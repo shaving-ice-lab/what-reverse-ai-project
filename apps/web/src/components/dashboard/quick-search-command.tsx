@@ -52,10 +52,10 @@ const favoriteItems: SearchResult[] = [
 ];
 
 const quickActions: SearchResult[] = [
-  { id: "new", name: "创建新工作流", icon: "", type: "action", href: "/workflows/new" },
-  { id: "templates", name: "浏览模板", icon: "", type: "action", href: "/template-gallery" },
+  { id: "new", name: "创建新工作流", icon: "", type: "action", href: "/dashboard/workflows/new" },
+  { id: "templates", name: "浏览模板", icon: "", type: "action", href: "/dashboard/template-gallery" },
   { id: "docs", name: "查看文档", icon: "", type: "action", href: "/docs" },
-  { id: "settings", name: "设置", icon: "", type: "action", href: "/settings" },
+  { id: "settings", name: "设置", icon: "", type: "action", href: "/dashboard/settings" },
 ];
 
 const allWorkflows: SearchResult[] = [

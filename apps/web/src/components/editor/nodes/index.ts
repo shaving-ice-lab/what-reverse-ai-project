@@ -25,6 +25,7 @@ export * from "./parallel-node";
 export * from "./delay-node";
 export * from "./webhook-node";
 export * from "./document-assembler-node";
+export * from "./database-node";
 export { default as GroupNode } from "./group-node";
 
 // 节点类型注册映射
@@ -51,6 +52,7 @@ import { ParallelNode } from "./parallel-node";
 import { DelayNode } from "./delay-node";
 import { WebhookNode } from "./webhook-node";
 import { DocumentAssemblerNode } from "./document-assembler-node";
+import { DatabaseNode } from "./database-node";
 import GroupNode from "./group-node";
 
 export const nodeTypes = {
@@ -77,5 +79,10 @@ export const nodeTypes = {
   delay: DelayNode,
   webhook: WebhookNode,
   documentAssembler: DocumentAssemblerNode,
+  db_select: DatabaseNode,
+  db_insert: DatabaseNode,
+  db_update: DatabaseNode,
+  db_delete: DatabaseNode,
+  db_migrate: DatabaseNode,
   group: GroupNode,
 };

@@ -72,6 +72,7 @@ interface LazyWorkflowEditorProps {
     nodes?: unknown[];
     edges?: unknown[];
   };
+  showEmptyState?: boolean;
   // 新增状态属性
   saveStatus?: SaveStatus;
   lastSavedAt?: Date | null;

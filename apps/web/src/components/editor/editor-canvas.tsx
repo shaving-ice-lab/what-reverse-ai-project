@@ -31,6 +31,10 @@ import { Workflow, GitBranch, MousePointerClick, Sparkles, Play, Zap, Plus, Bot,
  * 编辑器画布 - 基于 React Flow - 专业简洁风格
  */
 
+interface EditorCanvasProps {
+  showEmptyState?: boolean;
+}
+
 // 数据类型兼容性矩阵
 const typeCompatibility: Record<string, string[]> = {
   string: ["string", "any"],
@@ -198,12 +202,106 @@ function createDefaultNodeData(type: string, label: string) {
         inputs: [{ id: "input", name: "输入", type: "any" }],
         outputs: [{ id: "output", name: "输出", type: "any" }],
       };
+    case "input":
+      return {
+        ...baseData,
+        label: label || "表单输入",
+        config: {
+          inputType: "text",
+          name: "input",
+          label: "用户输入",
+          placeholder: "",
+          required: true,
+        },
+        outputs: [{ id: "output", name: "输出", type: "any" }],
+      };
+    case "output":
+      return {
+        ...baseData,
+        label: label || "结果输出",
+        config: {
+          outputType: "text",
+          title: "输出结果",
+          showTimestamp: false,
+        },
+        inputs: [{ id: "input", name: "输入", type: "any", required: true }],
+      };
+    case "db_select":
+      return {
+        ...baseData,
+        label: label || "DB 查询",
+        config: {
+          operation: "select",
+          table: "table_name",
+          where: "",
+          limit: 100,
+        },
+        inputs: [{ id: "params", name: "参数", type: "object" }],
+        outputs: [
+          { id: "rows", name: "rows", type: "array" },
+          { id: "count", name: "count", type: "number" },
+        ],
+      };
+    case "db_insert":
+      return {
+        ...baseData,
+        label: label || "DB 新增",
+        config: {
+          operation: "insert",
+          table: "table_name",
+          values: { field: "value" },
+        },
+        inputs: [{ id: "values", name: "values", type: "object" }],
+        outputs: [
+          { id: "insertedId", name: "insertedId", type: "string" },
+          { id: "rowsAffected", name: "rowsAffected", type: "number" },
+        ],
+      };
+    case "db_update":
+      return {
+        ...baseData,
+        label: label || "DB 更新",
+        config: {
+          operation: "update",
+          table: "table_name",
+          where: "",
+          values: { field: "value" },
+        },
+        inputs: [{ id: "values", name: "values", type: "object" }],
+        outputs: [{ id: "rowsAffected", name: "rowsAffected", type: "number" }],
+      };
+    case "db_delete":
+      return {
+        ...baseData,
+        label: label || "DB 删除",
+        config: {
+          operation: "delete",
+          table: "table_name",
+          where: "",
+        },
+        inputs: [{ id: "params", name: "参数", type: "object" }],
+        outputs: [{ id: "rowsAffected", name: "rowsAffected", type: "number" }],
+      };
+    case "db_migrate":
+      return {
+        ...baseData,
+        label: label || "DB 迁移",
+        config: {
+          operation: "migrate",
+          sql: "CREATE TABLE example (id INT PRIMARY KEY);",
+        },
+        inputs: [{ id: "sql", name: "sql", type: "string" }],
+        outputs: [
+          { id: "applied", name: "applied", type: "boolean" },
+          { id: "appliedCount", name: "appliedCount", type: "number" },
+        ],
+      };
     default:
       return baseData;
   }
 }
 
-export function EditorCanvas() {
+export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -468,7 +566,7 @@ export function EditorCanvas() {
       }}
     >
       {/* 空状态引导 */}
-      {nodes.length === 0 && <EmptyStateGuide />}
+      {showEmptyState && nodes.length === 0 && <EmptyStateGuide />}
       
       <ReactFlow
         nodes={nodes}

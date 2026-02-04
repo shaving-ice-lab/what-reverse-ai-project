@@ -222,7 +222,7 @@ export function EditorToolbar({
     <header className={cn("h-12 flex items-center justify-between px-4 border-b", editorStyles.bg, editorStyles.border)}>
       {/* 左侧: 返回 + 标题 + 状态 */}
       <div className="flex items-center gap-3">
-        <Link href="/workflows">
+        <Link href="/dashboard/workflows">
           <button className={cn(
             "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
             editorStyles.textSecondary,
@@ -234,7 +234,7 @@ export function EditorToolbar({
         </Link>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 text-[11px] text-foreground-muted">
-            <Link href="/workflows" className="hover:text-foreground transition-colors">
+            <Link href="/dashboard/workflows" className="hover:text-foreground transition-colors">
               工作流
             </Link>
             <ChevronRight className="w-3 h-3" />

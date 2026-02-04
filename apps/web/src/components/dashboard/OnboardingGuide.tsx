@@ -77,7 +77,7 @@ const onboardingSteps: OnboardingStep[] = [
     position: "center",
     action: {
       label: "创建我的第一个工作流",
-      href: "/workflows/new",
+      href: "/dashboard/workflows/new",
     },
   },
 ];

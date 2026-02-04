@@ -7,6 +7,7 @@
 import { memo, useState } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { Webhook, Copy, Check, Shield, Globe2 } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import type { WorkflowNodeData } from "@/types/workflow";
 
@@ -36,7 +37,7 @@ export const WebhookNode = memo(function WebhookNode({
   const requireSignature = config.requireSignature !== false;
   const responseMode = config.responseMode || "immediate";
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.agentflow.ai";
+  const baseUrl = getApiBaseUrl();
   const webhookUrl = config.webhookUrl || `${baseUrl}/webhooks/${id}`;
 
   const handleCopyUrl = async () => {

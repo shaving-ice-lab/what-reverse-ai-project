@@ -4,7 +4,8 @@
 
 // 核心功能组件
 export { NotificationPanel, NotificationBell } from "./notification-panel";
-export { CommandPalette, useCommandPalette } from "./command-palette";
+export { CommandPalette } from "./command-palette";
+export { useCommandPalette } from "./use-command-palette";
 export { QuickTasksPanel } from "./quick-tasks-panel";
 export { FloatingAssistant } from "./floating-assistant";
 export { KeyboardShortcutsGuide, useKeyboardShortcuts } from "./keyboard-shortcuts-guide";

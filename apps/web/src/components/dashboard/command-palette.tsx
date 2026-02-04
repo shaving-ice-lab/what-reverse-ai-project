@@ -117,7 +117,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         shortcut: "⌘N",
 
-        href: "/",
+        href: "/dashboard/conversations",
 
       },
 
@@ -134,7 +134,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         shortcut: "⌘W",
 
-        href: "/workflows/new",
+        href: "/dashboard/workflows/new",
 
       },
 
@@ -149,7 +149,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Bot,
 
-        href: "/my-agents/new",
+        href: "/dashboard/my-agents/new",
 
       },
 
@@ -201,7 +201,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Zap,
 
-        href: "/workflows",
+        href: "/dashboard/workflows",
 
         keywords: ["workflow", "automation", "自动化"],
 
@@ -216,7 +216,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Palette,
 
-        href: "/creative",
+        href: "/dashboard/creative",
 
         keywords: ["creative", "design", "创意", "设计"],
 
@@ -231,7 +231,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: LayoutGrid,
 
-        href: "/template-gallery",
+        href: "/dashboard/template-gallery",
 
         keywords: ["template", "模板"],
 
@@ -246,7 +246,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Store,
 
-        href: "/store",
+        href: "/dashboard/store",
 
         keywords: ["store", "app", "应用", "商店"],
 
@@ -261,7 +261,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Users,
 
-        href: "/my-agents",
+        href: "/dashboard/my-agents",
 
         keywords: ["agent", "bot"],
 
@@ -276,7 +276,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Settings,
 
-        href: "/settings",
+        href: "/dashboard/settings",
 
         keywords: ["settings", "设置", "配置"],
 
@@ -317,7 +317,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Zap,
 
-        href: "/workflows/wf-1",
+        href: "/dashboard/workflows/wf-1",
 
       },
 
@@ -332,7 +332,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: Bot,
 
-        href: "/my-agents/agent-1",
+        href: "/dashboard/my-agents/agent-1",
 
       },
 
@@ -347,7 +347,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: MessageSquare,
 
-        href: "/",
+        href: "/dashboard/conversations",
 
       },
 
@@ -783,39 +783,5 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     </>
 
   );
-}
-
-// 快捷键钩子
-
-export function useCommandPalette() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-
-        setIsOpen((prev) => !prev);
-
-      }
-
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => window.removeEventListener("keydown", handleKeyDown);
-
-  }, []);
-
-  return {
-    isOpen,
-
-    open: () => setIsOpen(true),
-
-    close: () => setIsOpen(false),
-
-    toggle: () => setIsOpen((prev) => !prev),
-
-  };
 }
 

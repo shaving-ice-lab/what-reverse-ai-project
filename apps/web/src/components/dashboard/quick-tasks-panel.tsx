@@ -376,7 +376,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
         {filteredTasks.length > 3 && (
           <Link
 
-            href="/tasks"
+            href="/dashboard/tasks"
 
             className="flex items-center justify-center gap-1 p-2 text-xs text-primary hover:text-primary/80 transition-colors"
 

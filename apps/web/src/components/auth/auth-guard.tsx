@@ -5,7 +5,7 @@
  */
 
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,8 @@ export function AuthGuard({
 }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams?.get("redirect") || "";
   const { isAuthenticated, isLoading, isInitialized, initialize } = useAuthStore();
   
   useEffect(() => {
@@ -37,9 +39,22 @@ export function AuthGuard({
     if (requireAuth && !isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
     } else if (requireGuest && isAuthenticated) {
-      router.push(redirectTo || "/dashboard");
+      const target = redirectTo || redirectParam || "/dashboard";
+      if (target !== pathname) {
+        router.push(target);
+      }
     }
-  }, [isAuthenticated, isInitialized, isLoading, requireAuth, requireGuest, pathname, redirectTo, router]);
+  }, [
+    isAuthenticated,
+    isInitialized,
+    isLoading,
+    requireAuth,
+    requireGuest,
+    pathname,
+    redirectTo,
+    redirectParam,
+    router,
+  ]);
   
   if (!isInitialized || isLoading) {
     return (

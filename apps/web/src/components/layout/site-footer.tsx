@@ -16,7 +16,7 @@ const footerSections = [
       { label: "功能特性", href: "/features" },
       { label: "定价方案", href: "/pricing" },
       { label: "企业版", href: "/enterprise" },
-      { label: "集成", href: "/integrations" },
+      { label: "集成", href: "/dashboard/integrations" },
       { label: "更新日志", href: "/changelog" },
     ],
   },

@@ -11,6 +11,9 @@ import {
   Code2,
   FileText,
   Variable,
+  Database,
+  FormInput,
+  FileOutput,
   ChevronDown,
   ChevronRight,
   Sparkles,
@@ -49,6 +52,13 @@ const nodeIcons: Record<string, React.ReactNode> = {
   code: <Code2 className="h-4 w-4" />,
   template: <FileText className="h-4 w-4" />,
   variable: <Variable className="h-4 w-4" />,
+  db_select: <Database className="h-4 w-4" />,
+  db_insert: <Database className="h-4 w-4" />,
+  db_update: <Database className="h-4 w-4" />,
+  db_delete: <Database className="h-4 w-4" />,
+  db_migrate: <Database className="h-4 w-4" />,
+  input: <FormInput className="h-4 w-4" />,
+  output: <FileOutput className="h-4 w-4" />,
 };
 
 // 节点类型颜色配置
@@ -60,6 +70,13 @@ const nodeTypeColors: Record<string, { bg: string; icon: string; border: string 
   code: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
   template: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
   variable: { bg: "bg-brand-200/40", icon: "text-brand-500", border: "border-brand-400/30" },
+  db_select: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
+  db_insert: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
+  db_update: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
+  db_delete: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
+  db_migrate: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
+  input: { bg: "bg-brand-200/60", icon: "text-brand-500", border: "border-brand-400/40" },
+  output: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
   start: { bg: "bg-brand-200/60", icon: "text-brand-500", border: "border-brand-400/40" },
   end: { bg: "bg-destructive-200/80", icon: "text-destructive", border: "border-destructive/30" },
 };
@@ -126,8 +143,17 @@ function LLMNodeConfig({
     userPrompt?: string;
     temperature?: number;
     maxTokens?: number;
+    outputSchema?: string | Record<string, unknown>;
+    output_schema?: string | Record<string, unknown>;
     streaming?: boolean;
   };
+  const outputSchemaRaw = config.outputSchema ?? config.output_schema;
+  const outputSchemaText =
+    typeof outputSchemaRaw === "string"
+      ? outputSchemaRaw
+      : outputSchemaRaw
+        ? JSON.stringify(outputSchemaRaw, null, 2)
+        : "";
 
   const updateConfig = (key: string, value: unknown) => {
     onUpdate({
@@ -218,7 +244,7 @@ function LLMNodeConfig({
         
         <div className={cn(
           "overflow-hidden transition-all duration-200",
-          showAdvanced ? "max-h-[300px] opacity-100 mt-3" : "max-h-0 opacity-0"
+          showAdvanced ? "max-h-[420px] opacity-100 mt-3" : "max-h-0 opacity-0"
         )}>
           <div className="space-y-4 p-3 rounded-lg bg-surface-200/60 border border-border">
             <div className="space-y-2">
@@ -248,6 +274,17 @@ function LLMNodeConfig({
                 value={config.maxTokens ?? 2048}
                 onChange={(e) => updateConfig("maxTokens", parseInt(e.target.value))}
                 className={cn(inputStyles, "h-8 text-sm")}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs text-foreground-muted">输出 Schema (JSON)</label>
+              <Textarea
+                value={outputSchemaText}
+                onChange={(e) => updateConfig("outputSchema", e.target.value)}
+                placeholder='{"type":"object","properties":{}}'
+                rows={4}
+                className={cn(inputStyles, "resize-none text-xs")}
               />
             </div>
 
@@ -518,6 +555,247 @@ function VariableNodeConfig({
   );
 }
 
+// 输入节点配置
+function InputNodeConfig({
+  node,
+  onUpdate,
+}: {
+  node: WorkflowNode;
+  onUpdate: (data: Partial<WorkflowNode["data"]>) => void;
+}) {
+  const config = node.data.config as {
+    inputType?: string;
+    name?: string;
+    label?: string;
+    placeholder?: string;
+    defaultValue?: unknown;
+    required?: boolean;
+    options?: Array<{ label: string; value: string }>;
+    validation?: {
+      min?: number;
+      max?: number;
+      pattern?: string;
+    };
+  };
+
+  const updateConfig = (key: string, value: unknown) => {
+    onUpdate({
+      config: { ...config, [key]: value },
+    });
+  };
+
+  const updateValidation = (key: "min" | "max" | "pattern", value: unknown) => {
+    const next = { ...(config.validation || {}) } as Record<string, unknown>;
+    if (value === undefined || value === "") {
+      delete next[key];
+    } else {
+      next[key] = value;
+    }
+    updateConfig("validation", Object.keys(next).length ? next : undefined);
+  };
+
+  const inputType = config.inputType || "text";
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>字段名</Label>
+        <Input
+          value={config.name || ""}
+          onChange={(e) => updateConfig("name", e.target.value)}
+          placeholder="input"
+          className="font-mono"
+        />
+        <p className="text-xs text-foreground-muted">
+          用于输入映射，建议使用字母/数字/下划线
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label>显示名称</Label>
+        <Input
+          value={config.label || ""}
+          onChange={(e) => updateConfig("label", e.target.value)}
+          placeholder="用户输入"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>输入类型</Label>
+        <Select
+          value={inputType}
+          onValueChange={(value) => updateConfig("inputType", value)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="text">文本</SelectItem>
+            <SelectItem value="textarea">长文本</SelectItem>
+            <SelectItem value="number">数字</SelectItem>
+            <SelectItem value="boolean">开关</SelectItem>
+            <SelectItem value="select">选择</SelectItem>
+            <SelectItem value="password">密码</SelectItem>
+            <SelectItem value="email">邮箱</SelectItem>
+            <SelectItem value="url">链接</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>占位提示</Label>
+        <Input
+          value={config.placeholder || ""}
+          onChange={(e) => updateConfig("placeholder", e.target.value)}
+          placeholder="请输入..."
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>默认值</Label>
+        <Input
+          value={config.defaultValue === undefined ? "" : String(config.defaultValue)}
+          onChange={(e) => updateConfig("defaultValue", e.target.value)}
+          placeholder="可选"
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-foreground-muted">必填</label>
+        <Switch
+          checked={Boolean(config.required)}
+          onCheckedChange={(checked) => updateConfig("required", checked)}
+          className="data-[state=checked]:bg-brand-500"
+        />
+      </div>
+
+      {inputType === "select" && (
+        <div className="space-y-2">
+          <Label>选项 (JSON)</Label>
+          <Textarea
+            value={JSON.stringify(config.options || [], null, 2)}
+            onChange={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value) as Array<{ label: string; value: string }>;
+                updateConfig("options", parsed);
+              } catch {
+                // 忽略 JSON 解析错误
+              }
+            }}
+            rows={4}
+            className="font-mono text-sm"
+          />
+          <p className="text-xs text-foreground-muted">
+            格式：[{`{"label":"选项","value":"option"}`}] 
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label>校验规则</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Input
+            type="number"
+            value={config.validation?.min ?? ""}
+            onChange={(e) => updateValidation("min", e.target.value === "" ? undefined : Number(e.target.value))}
+            placeholder="最小值"
+            className={inputStyles}
+          />
+          <Input
+            type="number"
+            value={config.validation?.max ?? ""}
+            onChange={(e) => updateValidation("max", e.target.value === "" ? undefined : Number(e.target.value))}
+            placeholder="最大值"
+            className={inputStyles}
+          />
+        </div>
+        <Input
+          value={config.validation?.pattern || ""}
+          onChange={(e) => updateValidation("pattern", e.target.value)}
+          placeholder="正则表达式"
+          className={inputStyles}
+        />
+      </div>
+    </div>
+  );
+}
+
+// 输出节点配置
+function OutputNodeConfig({
+  node,
+  onUpdate,
+}: {
+  node: WorkflowNode;
+  onUpdate: (data: Partial<WorkflowNode["data"]>) => void;
+}) {
+  const config = node.data.config as {
+    outputType?: string;
+    title?: string;
+    showTimestamp?: boolean;
+    maxLength?: number;
+  };
+
+  const updateConfig = (key: string, value: unknown) => {
+    onUpdate({
+      config: { ...config, [key]: value },
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>展示类型</Label>
+        <Select
+          value={config.outputType || "text"}
+          onValueChange={(value) => updateConfig("outputType", value)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="text">文本</SelectItem>
+            <SelectItem value="json">JSON</SelectItem>
+            <SelectItem value="table">表格</SelectItem>
+            <SelectItem value="markdown">Markdown</SelectItem>
+            <SelectItem value="image">图片</SelectItem>
+            <SelectItem value="html">HTML</SelectItem>
+            <SelectItem value="file">文件</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>标题</Label>
+        <Input
+          value={config.title || ""}
+          onChange={(e) => updateConfig("title", e.target.value)}
+          placeholder="输出结果"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>最大长度</Label>
+        <Input
+          type="number"
+          min={0}
+          value={config.maxLength ?? ""}
+          onChange={(e) => updateConfig("maxLength", e.target.value === "" ? undefined : Number(e.target.value))}
+          placeholder="0 表示不限制"
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <label className="text-xs text-foreground-muted">显示时间戳</label>
+        <Switch
+          checked={Boolean(config.showTimestamp)}
+          onCheckedChange={(checked) => updateConfig("showTimestamp", checked)}
+          className="data-[state=checked]:bg-brand-500"
+        />
+      </div>
+    </div>
+  );
+}
+
 // 条件节点配置
 function ConditionNodeConfig({
   node,
@@ -683,6 +961,122 @@ function LoopNodeConfig({
   );
 }
 
+// 数据库节点配置
+function DatabaseNodeConfig({
+  node,
+  onUpdate,
+}: {
+  node: WorkflowNode;
+  onUpdate: (data: Partial<WorkflowNode["data"]>) => void;
+}) {
+  const config = node.data.config as {
+    operation?: string;
+    table?: string;
+    where?: string;
+    values?: unknown;
+    limit?: number;
+    sql?: string;
+  };
+
+  const operation = (config.operation || node.type.replace("db_", "") || "select").toLowerCase();
+
+  const updateConfig = (key: string, value: unknown) => {
+    onUpdate({
+      config: { ...config, operation, [key]: value },
+    });
+  };
+
+  const valuesText =
+    typeof config.values === "string"
+      ? config.values
+      : config.values !== undefined
+        ? JSON.stringify(config.values, null, 2)
+        : "";
+
+  const showTable = operation !== "migrate";
+  const showWhere = operation === "select" || operation === "update" || operation === "delete";
+  const showValues = operation === "insert" || operation === "update";
+  const showLimit = operation === "select";
+  const showSQL = operation === "migrate";
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1.5">
+        <label className={labelStyles}>操作类型</label>
+        <div className="text-xs text-foreground-muted">
+          {operation.toUpperCase()}
+        </div>
+      </div>
+
+      {showTable && (
+        <div className="space-y-1.5">
+          <label className={labelStyles}>数据表</label>
+          <Input
+            value={config.table || ""}
+            onChange={(e) => updateConfig("table", e.target.value)}
+            placeholder="table_name"
+            className={inputStyles}
+          />
+        </div>
+      )}
+
+      {showWhere && (
+        <div className="space-y-1.5">
+          <label className={labelStyles}>条件 (Where)</label>
+          <Textarea
+            value={config.where || ""}
+            onChange={(e) => updateConfig("where", e.target.value)}
+            placeholder="id = {{input.id}}"
+            rows={2}
+            className={cn(inputStyles, "resize-none font-mono text-xs")}
+          />
+        </div>
+      )}
+
+      {showLimit && (
+        <div className="space-y-1.5">
+          <label className={labelStyles}>Limit</label>
+          <Input
+            type="number"
+            min={1}
+            value={config.limit ?? 100}
+            onChange={(e) =>
+              updateConfig("limit", e.target.value ? parseInt(e.target.value, 10) : undefined)
+            }
+            className={inputStyles}
+          />
+        </div>
+      )}
+
+      {showValues && (
+        <div className="space-y-1.5">
+          <label className={labelStyles}>Values (JSON)</label>
+          <Textarea
+            value={valuesText}
+            onChange={(e) => updateConfig("values", e.target.value)}
+            placeholder='{"field":"value"}'
+            rows={4}
+            className={cn(inputStyles, "resize-none font-mono text-xs")}
+          />
+        </div>
+      )}
+
+      {showSQL && (
+        <div className="space-y-1.5">
+          <label className={labelStyles}>SQL</label>
+          <Textarea
+            value={config.sql || ""}
+            onChange={(e) => updateConfig("sql", e.target.value)}
+            placeholder="CREATE TABLE ..."
+            rows={4}
+            className={cn(inputStyles, "resize-none font-mono text-xs")}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // 通用基础配置
 function BasicConfig({
   node,
@@ -734,10 +1128,20 @@ function NodeConfigByType({
       return <TemplateNodeConfig node={node} onUpdate={onUpdate} />;
     case "variable":
       return <VariableNodeConfig node={node} onUpdate={onUpdate} />;
+    case "input":
+      return <InputNodeConfig node={node} onUpdate={onUpdate} />;
+    case "output":
+      return <OutputNodeConfig node={node} onUpdate={onUpdate} />;
     case "condition":
       return <ConditionNodeConfig node={node} onUpdate={onUpdate} />;
     case "loop":
       return <LoopNodeConfig node={node} onUpdate={onUpdate} />;
+    case "db_select":
+    case "db_insert":
+    case "db_update":
+    case "db_delete":
+    case "db_migrate":
+      return <DatabaseNodeConfig node={node} onUpdate={onUpdate} />;
     default:
       return (
         <div className="py-4 text-center text-foreground-muted text-sm">

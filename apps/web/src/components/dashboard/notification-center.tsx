@@ -398,7 +398,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
               )}
             </span>
             <a 
-              href="/settings/notifications" 
+              href="/dashboard/settings/notifications" 
               className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:text-foreground hover:bg-muted/50 transition-all duration-200 group"
             >
               <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-300" />

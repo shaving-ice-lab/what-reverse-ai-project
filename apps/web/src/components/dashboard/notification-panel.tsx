@@ -56,7 +56,7 @@ const mockNotifications: Notification[] = [
     description: "「客户反馈自动处理」已成功执行，处理了 24 条反馈",
     time: "2 分钟前",
     read: false,
-    actionUrl: "/workflows/wf-1",
+    actionUrl: "/dashboard/workflows/wf-1",
     actionLabel: "查看详情",
   },
   {
@@ -66,7 +66,7 @@ const mockNotifications: Notification[] = [
     description: "您的 API 调用量已达到本月限额的 80%",
     time: "1 小时前",
     read: false,
-    actionUrl: "/settings/api-keys",
+    actionUrl: "/dashboard/settings/api-keys",
     actionLabel: "管理配额",
   },
   {
@@ -354,7 +354,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
               清空全部
             </button>
             <a
-              href="/settings/notifications"
+              href="/dashboard/settings/notifications"
               className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
             >
               通知设置

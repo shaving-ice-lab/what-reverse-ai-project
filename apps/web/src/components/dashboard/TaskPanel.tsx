@@ -422,7 +422,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
             {tasks.length} 个任务
           </span>
           <button
-            onClick={() => router.push("/executions?status=failed")}
+            onClick={() => router.push("/dashboard/executions?status=failed")}
             className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-orange-500/10 transition-colors group"
           >
             查看所有执行记录

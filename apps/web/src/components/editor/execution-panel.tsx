@@ -8,7 +8,7 @@ import { workflowApi } from '@/lib/api';
 import { executionApi } from '@/lib/api/execution';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { VirtualScrollArea } from '@/components/ui/scroll-area';
 import {
   Play,
   Square,
@@ -209,9 +209,13 @@ export function ExecutionPanel({
     </button>
   );
 
-  const logCount = currentExecution?.logs.length || 0;
-  const outputCount = currentExecution?.logs.filter(l => l.level === 'info').length || 0;
+  const logs = currentExecution?.logs ?? [];
+  const logCount = logs.length;
+  const outputCount = logs.filter(l => l.level === 'info').length || 0;
   const variableCount = currentExecution?.nodes ? Object.keys(currentExecution.nodes).length : 0;
+  const panelHeight = 200;
+  const logRowHeight = 32;
+  const logViewportHeight = panelHeight;
 
   return (
     <div className={cn('bg-transparent h-full flex flex-col', className)}>
@@ -307,7 +311,7 @@ export function ExecutionPanel({
       </div>
 
       {/* 内容区域 */}
-      <div className="h-[200px] overflow-y-auto">
+      <div className="overflow-y-auto" style={{ height: panelHeight }}>
         {activeTab === 'output' && (
           <div className="p-4 font-mono text-xs text-foreground leading-normal">
             {currentExecution?.logs
@@ -337,46 +341,55 @@ export function ExecutionPanel({
         )}
 
         {activeTab === 'logs' && (
-          <ScrollArea className="h-full">
-            <div className="p-3 space-y-1 font-mono text-xs">
-              {currentExecution?.logs.map((log, idx) => (
-                <div
-                  key={log.id}
-                  className={cn(
-                    'flex items-start gap-2 py-1.5 px-2.5 rounded-md animate-fade-in transition-colors',
-                    log.level === 'error' && 'bg-destructive-200 hover:bg-destructive-200/70',
-                    log.level === 'warn' && 'bg-warning-200 hover:bg-warning-200/80',
-                    log.level === 'info' && 'hover:bg-surface-200/40',
-                    log.level === 'debug' && 'hover:bg-surface-200/30 opacity-60',
-                  )}
-                  style={{ animationDelay: `${idx * 20}ms` }}
-                >
-                  <span className="shrink-0 mt-0.5">{getLogIcon(log.level)}</span>
-                  <span className="text-foreground-muted shrink-0 tabular-nums">
-                    {formatTime(log.timestamp)}
-                  </span>
-                  <span className={cn(
-                    'flex-1 break-all leading-normal font-normal',
-                    log.level === 'error' && 'text-destructive',
-                    log.level === 'warn' && 'text-warning',
-                    log.level === 'info' && 'text-foreground',
-                    log.level === 'debug' && 'text-foreground-muted',
-                  )}>
-                    {log.message}
-                  </span>
-                </div>
-              ))}
-              {(!currentExecution || currentExecution.logs.length === 0) && (
-                <div className="flex flex-col items-center justify-center h-full py-8 text-center">
-                <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
-                  <Zap className="h-5 w-5 text-foreground-muted/50" />
-                  </div>
-                <p className="text-sm font-medium text-foreground-muted">暂无日志</p>
-                <p className="text-xs text-foreground-muted/70 mt-1">运行时日志将显示在这里</p>
-                </div>
-              )}
+          logs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full py-8 text-center">
+              <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
+                <Zap className="h-5 w-5 text-foreground-muted/50" />
+              </div>
+              <p className="text-sm font-medium text-foreground-muted">暂无日志</p>
+              <p className="text-xs text-foreground-muted/70 mt-1">运行时日志将显示在这里</p>
             </div>
-          </ScrollArea>
+          ) : (
+            <VirtualScrollArea
+              className="h-full font-mono text-xs"
+              itemCount={logs.length}
+              itemHeight={logRowHeight}
+              height={logViewportHeight}
+              overscan={6}
+              renderItem={(index) => {
+                const log = logs[index];
+                if (!log) return null;
+                return (
+                  <div
+                    className={cn(
+                      'flex items-center gap-2 px-2.5 rounded-md transition-colors h-8',
+                      log.level === 'error' && 'bg-destructive-200 hover:bg-destructive-200/70',
+                      log.level === 'warn' && 'bg-warning-200 hover:bg-warning-200/80',
+                      log.level === 'info' && 'hover:bg-surface-200/40',
+                      log.level === 'debug' && 'hover:bg-surface-200/30 opacity-60',
+                    )}
+                  >
+                    <span className="shrink-0">{getLogIcon(log.level)}</span>
+                    <span className="text-foreground-muted shrink-0 tabular-nums">
+                      {formatTime(log.timestamp)}
+                    </span>
+                    <span
+                      className={cn(
+                        'flex-1 truncate font-normal',
+                        log.level === 'error' && 'text-destructive',
+                        log.level === 'warn' && 'text-warning',
+                        log.level === 'info' && 'text-foreground',
+                        log.level === 'debug' && 'text-foreground-muted',
+                      )}
+                      title={log.message}
+                    >
+                      {log.message}
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          )
         )}
 
         {activeTab === 'variables' && (

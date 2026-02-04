@@ -17,8 +17,14 @@ import {
   Users,
   Inbox,
   AlertCircle,
+  AlertTriangle,
   RefreshCw,
   Plus,
+  ShieldAlert,
+  WifiOff,
+  Wrench,
+  KeyRound,
+  Timer,
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +33,89 @@ import { Button } from "./button";
 // ============================================
 // 主空状态组件
 // ============================================
+
+type EmptyStateTone = "neutral" | "info" | "warning" | "error" | "success";
+type EmptyStateSize = "sm" | "md" | "lg";
+
+const sizeStyles: Record<
+  EmptyStateSize,
+  { container: string; iconWrap: string; icon: string; title: string; description: string }
+> = {
+  sm: {
+    container: "py-8",
+    iconWrap: "w-10 h-10",
+    icon: "w-5 h-5",
+    title: "text-sm",
+    description: "text-[12px]",
+  },
+  md: {
+    container: "py-12",
+    iconWrap: "w-11 h-11",
+    icon: "w-5 h-5",
+    title: "text-base",
+    description: "text-[13px]",
+  },
+  lg: {
+    container: "py-16",
+    iconWrap: "w-12 h-12",
+    icon: "w-6 h-6",
+    title: "text-base",
+    description: "text-[13px]",
+  },
+};
+
+const toneStyles: Record<
+  EmptyStateTone,
+  {
+    iconBg: string;
+    iconColor: string;
+    badge: string;
+    border: string;
+    glow: string;
+    gradient: string;
+  }
+> = {
+  neutral: {
+    iconBg: "bg-surface-200",
+    iconColor: "text-foreground-muted",
+    badge: "text-foreground-light",
+    border: "border-border",
+    glow: "shadow-[0_0_18px_rgba(255,255,255,0.02)]",
+    gradient: "bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_55%)]",
+  },
+  info: {
+    iconBg: "bg-brand-200/70",
+    iconColor: "text-brand-500",
+    badge: "text-brand-500",
+    border: "border-brand-500/30",
+    glow: "shadow-[0_0_24px_rgba(62,207,142,0.14)]",
+    gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.18),transparent_55%)]",
+  },
+  warning: {
+    iconBg: "bg-warning-200/70",
+    iconColor: "text-warning",
+    badge: "text-warning",
+    border: "border-warning/40",
+    glow: "shadow-[0_0_24px_rgba(245,158,11,0.16)]",
+    gradient: "bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.2),transparent_55%)]",
+  },
+  error: {
+    iconBg: "bg-destructive-200/70",
+    iconColor: "text-destructive",
+    badge: "text-destructive",
+    border: "border-destructive/40",
+    glow: "shadow-[0_0_24px_rgba(239,68,68,0.16)]",
+    gradient: "bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.18),transparent_55%)]",
+  },
+  success: {
+    iconBg: "bg-brand-200/70",
+    iconColor: "text-brand-500",
+    badge: "text-brand-500",
+    border: "border-brand-500/40",
+    glow: "shadow-[0_0_24px_rgba(62,207,142,0.16)]",
+    gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.2),transparent_55%)]",
+  },
+};
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -43,6 +132,9 @@ interface EmptyStateProps {
     href?: string;
     onClick?: () => void;
   };
+  tone?: EmptyStateTone;
+  size?: EmptyStateSize;
+  badge?: string;
   className?: string;
   children?: ReactNode;
 }
@@ -53,23 +145,50 @@ export function EmptyState({
   description,
   action,
   secondaryAction,
+  tone = "neutral",
+  size = "lg",
+  badge,
   className,
   children,
 }: EmptyStateProps) {
   const ActionIcon = action?.icon || Plus;
+  const toneStyle = toneStyles[tone];
+  const sizeStyle = sizeStyles[size];
 
   return (
-    <div className={cn("flex flex-col items-center justify-center py-16 px-4", className)}>
-      <div className="w-12 h-12 rounded-lg bg-surface-200 flex items-center justify-center mb-4">
-        <Icon className="w-6 h-6 text-foreground-muted" />
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center px-4 text-center",
+        sizeStyle.container,
+        className
+      )}
+    >
+      {badge && (
+        <div
+          className={cn(
+            "text-[10px] tracking-[0.35em] uppercase mb-3",
+            toneStyle.badge
+          )}
+        >
+          {badge}
+        </div>
+      )}
+      <div
+        className={cn(
+          "rounded-lg flex items-center justify-center mb-4",
+          sizeStyle.iconWrap,
+          toneStyle.iconBg
+        )}
+      >
+        <Icon className={cn(sizeStyle.icon, toneStyle.iconColor)} />
       </div>
       
-      <h3 className="text-base font-medium text-foreground mb-2 text-center">
+      <h3 className={cn("font-medium text-foreground mb-2", sizeStyle.title)}>
         {title}
       </h3>
       
       {description && (
-        <p className="text-[13px] text-foreground-light text-center max-w-sm mb-6">
+        <p className={cn("text-foreground-light max-w-sm mb-6", sizeStyle.description)}>
           {description}
         </p>
       )}
@@ -109,6 +228,118 @@ export function EmptyState({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+type ExceptionVariant =
+  | "empty"
+  | "error"
+  | "permission"
+  | "offline"
+  | "maintenance"
+  | "not_found"
+  | "rate_limit";
+
+const exceptionPresets: Record<
+  ExceptionVariant,
+  { title: string; description: string; icon: LucideIcon; tone: EmptyStateTone; badge: string }
+> = {
+  empty: {
+    title: "暂无数据",
+    description: "当前没有可展示的内容",
+    icon: Inbox,
+    tone: "neutral",
+    badge: "EMPTY",
+  },
+  error: {
+    title: "加载失败",
+    description: "发生了一些错误，请稍后重试",
+    icon: AlertTriangle,
+    tone: "error",
+    badge: "ERROR",
+  },
+  permission: {
+    title: "权限不足",
+    description: "请检查权限或联系管理员获取访问",
+    icon: ShieldAlert,
+    tone: "warning",
+    badge: "ACCESS",
+  },
+  offline: {
+    title: "网络不可用",
+    description: "请检查网络连接后重试",
+    icon: WifiOff,
+    tone: "warning",
+    badge: "OFFLINE",
+  },
+  maintenance: {
+    title: "系统维护中",
+    description: "当前服务正在维护，请稍后再试",
+    icon: Wrench,
+    tone: "info",
+    badge: "MAINT",
+  },
+  not_found: {
+    title: "未找到内容",
+    description: "没有匹配的内容或已被移除",
+    icon: Search,
+    tone: "neutral",
+    badge: "MISSING",
+  },
+  rate_limit: {
+    title: "请求过于频繁",
+    description: "请稍后再试或降低请求频率",
+    icon: Timer,
+    tone: "warning",
+    badge: "LIMIT",
+  },
+};
+
+interface ExceptionStateProps extends Omit<EmptyStateProps, "icon" | "title" | "description" | "tone" | "badge"> {
+  variant?: ExceptionVariant;
+  title?: string;
+  description?: string;
+  icon?: LucideIcon;
+  tone?: EmptyStateTone;
+  badge?: string;
+}
+
+export function ExceptionState({
+  variant = "empty",
+  title,
+  description,
+  icon,
+  tone,
+  badge,
+  size = "md",
+  className,
+  ...rest
+}: ExceptionStateProps) {
+  const preset = exceptionPresets[variant];
+  const resolvedTone = tone || preset.tone;
+  const toneStyle = toneStyles[resolvedTone];
+
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl border bg-surface-100/70 p-6",
+        toneStyle.border,
+        toneStyle.glow,
+        className
+      )}
+    >
+      <div className={cn("absolute inset-0 pointer-events-none opacity-45", toneStyle.gradient)} />
+      <EmptyState
+        icon={icon || preset.icon}
+        title={title || preset.title}
+        description={description || preset.description}
+        tone={resolvedTone}
+        size={size}
+        badge={badge || preset.badge}
+        className="py-0"
+        {...rest}
+      />
     </div>
   );
 }
@@ -170,19 +401,27 @@ export function FolderEmptyState({ onUpload, className }: FolderEmptyStateProps)
 
 // 无工作流
 interface WorkflowEmptyStateProps {
+  onCreateClick?: () => void;
   className?: string;
 }
 
-export function WorkflowEmptyState({ className }: WorkflowEmptyStateProps) {
+export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptyStateProps) {
   return (
     <EmptyState
       icon={Zap}
       title="还没有工作流"
       description="创建您的第一个工作流，开始自动化之旅"
-      action={{
-        label: "创建工作流",
-        href: "/workflows/new",
-      }}
+      action={
+        onCreateClick
+          ? {
+              label: "创建工作流",
+              onClick: onCreateClick,
+            }
+          : {
+              label: "创建工作流",
+              href: "/dashboard/workflows/new",
+            }
+      }
       className={className}
     />
   );
@@ -201,7 +440,7 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
       description="与 AI 助手交流，获取帮助和灵感"
       action={{
         label: "新建对话",
-        href: "/",
+        href: "/dashboard/conversations",
         icon: MessageSquare,
       }}
       className={className}
@@ -222,7 +461,7 @@ export function AgentEmptyState({ className }: AgentEmptyStateProps) {
       description="创建您的第一个 AI Agent，让它帮您处理任务"
       action={{
         label: "创建 Agent",
-        href: "/my-agents/new",
+        href: "/dashboard/my-agents/new",
       }}
       className={className}
     />
@@ -273,12 +512,38 @@ export function ErrorEmptyState({
       icon={AlertCircle}
       title={title}
       description={description}
+      tone="error"
       action={
         onRetry
           ? {
               label: "重试",
               onClick: onRetry,
               icon: RefreshCw,
+            }
+          : undefined
+      }
+      className={className}
+    />
+  );
+}
+
+// 无 API Key
+interface ApiKeyEmptyStateProps {
+  onAddClick?: () => void;
+  className?: string;
+}
+
+export function ApiKeyEmptyState({ onAddClick, className }: ApiKeyEmptyStateProps) {
+  return (
+    <EmptyState
+      icon={KeyRound}
+      title="还没有 API 密钥"
+      description="添加密钥以便安全访问 API"
+      action={
+        onAddClick
+          ? {
+              label: "添加密钥",
+              onClick: onAddClick,
             }
           : undefined
       }
@@ -307,10 +572,15 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
             }
           : {
               label: "新建文档",
-              href: "/creative/generate",
+              href: "/dashboard/creative/generate",
             }
       }
       className={className}
     />
   );
 }
+
+export const SearchEmpty = SearchEmptyState;
+export const WorkflowEmpty = WorkflowEmptyState;
+export const ErrorEmpty = ErrorEmptyState;
+export const ApiKeyEmpty = ApiKeyEmptyState;

@@ -19,6 +19,7 @@ import {
   User,
   RefreshCw,
   Wand2,
+  Database,
   Copy,
   Check,
   ChevronDown,
@@ -50,6 +51,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   workflowJSON?: string;
+  uiSchema?: Record<string, unknown>;
+  dbSchema?: Record<string, unknown> | string;
   suggestions?: string[];
   actions?: ChatAction[];
   isLoading?: boolean;
@@ -57,7 +60,7 @@ export interface ChatMessage {
 }
 
 export interface ChatAction {
-  type: "generate" | "modify" | "explain" | "suggest";
+  type: "generate" | "modify" | "modify_app" | "explain" | "suggest";
   label: string;
   data?: Record<string, unknown>;
 }
@@ -102,21 +105,29 @@ interface MessageItemProps {
 }
 
 function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemProps) {
-  const [copied, setCopied] = useState(false);
+  const [copiedTarget, setCopiedTarget] = useState<"workflow" | "db" | null>(
+    null
+  );
   const [showJSON, setShowJSON] = useState(false);
+  const [showDBSchema, setShowDBSchema] = useState(false);
 
-  const handleCopy = async (text: string) => {
+  const handleCopy = async (text: string, target: "workflow" | "db") => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
+      setCopiedTarget(target);
       toast.success("已复制");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopiedTarget(null), 2000);
     } catch {
       toast.error("复制失败");
     }
   };
 
   const isUser = message.role === "user";
+  const dbSchemaText = message.dbSchema
+    ? typeof message.dbSchema === "string"
+      ? message.dbSchema
+      : JSON.stringify(message.dbSchema, null, 2)
+    : "";
 
   return (
     <div
@@ -211,9 +222,55 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
                 variant="outline"
                 size="sm"
                 className="border-border"
-                onClick={() => handleCopy(message.workflowJSON!)}
+                onClick={() => handleCopy(message.workflowJSON!, "workflow")}
               >
-                {copied ? (
+                {copiedTarget === "workflow" ? (
+                  <Check className="w-3.5 h-3.5 mr-1.5 text-brand-500" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 mr-1.5" />
+                )}
+                复制 JSON
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* 数据模型建议 */}
+        {message.dbSchema && (
+          <div className="mt-3 rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => setShowDBSchema(!showDBSchema)}
+              className="w-full flex items-center justify-between p-3 bg-surface-100 hover:bg-surface-200 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-brand-500" />
+                <span className="text-sm font-medium text-foreground">
+                  数据模型建议
+                </span>
+              </div>
+              {showDBSchema ? (
+                <ChevronUp className="w-4 h-4 text-foreground-muted" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-foreground-muted" />
+              )}
+            </button>
+
+            {showDBSchema && (
+              <div className="p-3 bg-surface-100">
+                <pre className="text-xs text-foreground-muted font-mono overflow-x-auto max-h-48">
+                  {dbSchemaText}
+                </pre>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 p-3 border-t border-border">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-border"
+                onClick={() => handleCopy(dbSchemaText, "db")}
+              >
+                {copiedTarget === "db" ? (
                   <Check className="w-3.5 h-3.5 mr-1.5 text-brand-500" />
                 ) : (
                   <Copy className="w-3.5 h-3.5 mr-1.5" />
@@ -356,6 +413,8 @@ export function AIAssistantPanel({
                 ...m,
                 content: aiResponse?.message || "我理解了你的需求，让我来处理...",
                 workflowJSON: aiResponse?.workflow_json,
+                uiSchema: aiResponse?.ui_schema,
+                dbSchema: aiResponse?.db_schema,
                 suggestions: aiResponse?.suggestions,
                 actions: aiResponse?.actions,
                 isLoading: false,
@@ -405,9 +464,13 @@ export function AIAssistantPanel({
 
   // 处理动作点击
   const handleActionClick = (action: ChatAction) => {
-    if (action.type === "suggest") {
+  if (action.type === "suggest") {
       setShowExamples(true);
-    } else if (action.type === "generate") {
+  } else if (
+    action.type === "generate" ||
+    action.type === "modify" ||
+    action.type === "modify_app"
+  ) {
       textareaRef.current?.focus();
     }
   };

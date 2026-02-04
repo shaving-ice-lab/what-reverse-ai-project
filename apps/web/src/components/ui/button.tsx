@@ -161,6 +161,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </svg>
     )
     
+    const content = loading ? (
+      <>
+        {LoadingSpinner}
+        <span>{loadingText || children}</span>
+      </>
+    ) : (
+      <>
+        {leftIcon && <span className="shrink-0">{leftIcon}</span>}
+        {children}
+        {rightIcon && <span className="shrink-0">{rightIcon}</span>}
+      </>
+    )
+
+    const slottedChildren =
+      asChild && React.isValidElement(children) && children.type === React.Fragment
+        ? <span className="contents">{children.props.children}</span>
+        : children
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -168,18 +186,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? (
-          <>
-            {LoadingSpinner}
-            <span>{loadingText || children}</span>
-          </>
-        ) : (
-          <>
-            {leftIcon && <span className="shrink-0">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="shrink-0">{rightIcon}</span>}
-          </>
-        )}
+        {asChild ? slottedChildren : content}
       </Comp>
     )
   }

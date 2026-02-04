@@ -14,6 +14,7 @@ export * from "./checkbox"
 export * from "./dialog"
 export * from "./divider"
 export * from "./dropdown-menu"
+export * from "./form-field"
 export * from "./input"
 export * from "./label"
 export * from "./scroll-area"
@@ -38,8 +39,7 @@ export * from "./offline-indicator"
 export * from "./sync-indicator"
 export * from "./confirm-dialog"
 
-// 装饰/动画组件 (glass-card 已弃用，建议使用 Card)
-export * from "./glass-card"
+// 装饰/动画组件
 export * from "./animated-background"
 
 // Manus 风格组件

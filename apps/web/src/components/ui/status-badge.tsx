@@ -21,6 +21,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  FileText,
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,8 +35,11 @@ type StatusType =
   | "error"
   | "warning"
   | "info"
+  | "draft"
   | "pending"
   | "processing"
+  | "published"
+  | "failed"
   | "paused"
   | "active"
   | "inactive";
@@ -88,6 +92,13 @@ const statusConfig: Record<
     bg: "bg-blue-500/10",
     dot: "bg-blue-500",
   },
+  draft: {
+    label: "草稿",
+    icon: FileText,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    dot: "bg-muted-foreground",
+  },
   pending: {
     label: "待处理",
     icon: Clock,
@@ -101,6 +112,20 @@ const statusConfig: Record<
     color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-500/10",
     dot: "bg-blue-500",
+  },
+  published: {
+    label: "已发布",
+    icon: CheckCircle2,
+    color: "text-emerald-600 dark:text-emerald-400",
+    bg: "bg-emerald-500/10",
+    dot: "bg-emerald-500",
+  },
+  failed: {
+    label: "失败",
+    icon: XCircle,
+    color: "text-red-600 dark:text-red-400",
+    bg: "bg-red-500/10",
+    dot: "bg-red-500",
   },
   paused: {
     label: "已暂停",

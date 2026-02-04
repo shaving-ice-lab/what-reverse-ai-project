@@ -56,6 +56,7 @@ interface WorkflowEditorProps {
     nodes?: unknown[];
     edges?: unknown[];
   };
+  showEmptyState?: boolean;
   // 状态属性
   saveStatus?: SaveStatus;
   lastSavedAt?: Date | null;
@@ -70,6 +71,7 @@ export function WorkflowEditor({
   workflowId, 
   workflowVersion,
   initialData,
+  showEmptyState = true,
   saveStatus = "saved",
   lastSavedAt,
   isOnline = true,
@@ -104,6 +106,7 @@ export function WorkflowEditor({
     setExecuting,
     isExecuting,
     isDirty,
+    markSaved,
   } = useWorkflowStore();
 
   // 初始化工作流数据
@@ -130,8 +133,9 @@ export function WorkflowEditor({
       if (initialData.edges) {
         setEdges(initialData.edges as Parameters<typeof setEdges>[0]);
       }
+      markSaved();
     }
-  }, [workflowId, initialData, setWorkflow, setNodes, setEdges]);
+  }, [workflowId, initialData, setWorkflow, setNodes, setEdges, markSaved]);
 
   // 保存工作流
   const handleSave = useCallback(async () => {
@@ -262,7 +266,7 @@ export function WorkflowEditor({
 
           {/* 画布区域 (全屏) */}
           <div className="flex-1 relative overflow-hidden">
-            <EditorCanvas />
+            <EditorCanvas showEmptyState={showEmptyState} />
             
             {/* 移动端浮动操作按钮 */}
             <div className="absolute bottom-4 left-4 flex flex-col gap-2 z-10">
@@ -362,7 +366,7 @@ export function WorkflowEditor({
           <div className="flex flex-col flex-1 overflow-hidden">
             {/* 画布区域 */}
             <div className="flex-1 relative overflow-hidden">
-              <EditorCanvas />
+            <EditorCanvas showEmptyState={showEmptyState} />
               
               {/* 面板折叠按钮 - 左侧 */}
               <button

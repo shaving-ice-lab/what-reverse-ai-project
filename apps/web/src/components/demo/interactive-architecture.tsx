@@ -22,8 +22,17 @@ import {
   CheckCircle,
 } from "lucide-react";
 
+export interface ArchitectureLayer {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  components: Array<{ name: string; desc: string }>;
+}
+
 // 架构层级
-const architectureLayers = [
+const defaultArchitectureLayers: ArchitectureLayer[] = [
   {
     id: "client",
     name: "客户端层",
@@ -98,17 +107,21 @@ export interface InteractiveArchitectureProps extends React.HTMLAttributes<HTMLD
   showConnections?: boolean;
   /** 布局方向 */
   layout?: "vertical" | "horizontal";
+  /** 自定义架构层级 */
+  layers?: ArchitectureLayer[];
 }
 
 export function InteractiveArchitecture({
   defaultExpanded,
   showConnections = true,
   layout = "vertical",
+  layers,
   className,
   ...props
 }: InteractiveArchitectureProps) {
   const [activeLayer, setActiveLayer] = useState<string | null>(defaultExpanded || null);
   const [hoveredComponent, setHoveredComponent] = useState<string | null>(null);
+  const resolvedLayers = layers ?? defaultArchitectureLayers;
 
   return (
     <div className={cn("relative", className)} {...props}>
@@ -117,7 +130,7 @@ export function InteractiveArchitecture({
         "space-y-3",
         layout === "horizontal" && "flex gap-4 space-y-0"
       )}>
-        {architectureLayers.map((layer, index) => {
+        {resolvedLayers.map((layer, index) => {
           const Icon = layer.icon;
           const isActive = activeLayer === layer.id;
 
@@ -194,7 +207,7 @@ export function InteractiveArchitecture({
               </div>
 
               {/* 连接线 */}
-              {showConnections && index < architectureLayers.length - 1 && layout === "vertical" && (
+              {showConnections && index < resolvedLayers.length - 1 && layout === "vertical" && (
                 <div className="flex justify-center py-1">
                   <div className="w-0.5 h-4 bg-gradient-to-b from-border to-transparent" />
                 </div>
@@ -206,7 +219,7 @@ export function InteractiveArchitecture({
 
       {/* 图例 */}
       <div className="mt-8 flex flex-wrap justify-center gap-4">
-        {architectureLayers.map((layer) => (
+        {resolvedLayers.map((layer) => (
           <div 
             key={layer.id}
             className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors"

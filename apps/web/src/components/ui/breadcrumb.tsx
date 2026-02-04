@@ -10,6 +10,7 @@
  */
 
 import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, ChevronDown, MoreHorizontal, Home, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -136,22 +137,21 @@ interface BreadcrumbLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorEleme
 
 const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
   ({ className, disabled, icon, isCurrent, asChild, children, ...props }, ref) => {
-    const Comp = asChild ? React.Fragment : "a"
-    const linkProps = asChild ? {} : props
+    const Comp = asChild ? Slot : "a"
 
     return (
       <Comp
-        ref={asChild ? undefined : ref}
+        ref={ref}
         className={cn(
           "flex items-center gap-1.5 transition-colors",
           isCurrent
             ? "text-foreground font-medium cursor-default"
             : "text-muted-foreground hover:text-foreground",
           disabled && "pointer-events-none opacity-50",
-          !asChild && className
+          className
         )}
         aria-disabled={disabled}
-        {...linkProps}
+        {...props}
       >
         {icon}
         {children}
