@@ -392,12 +392,17 @@ func (s *statsService) GetWorkflowAnalytics(ctx context.Context, userID uuid.UUI
 
 	// 统计节点类型分布 (从执行记录的元数据中获取)
 	nodeTypeMap := map[string]int64{
-		"llm":       0,
-		"http":      0,
-		"condition": 0,
-		"transform": 0,
-		"code":      0,
-		"other":     0,
+		"llm":        0,
+		"http":       0,
+		"condition":  0,
+		"transform":  0,
+		"code":       0,
+		"db_select":  0,
+		"db_insert":  0,
+		"db_update":  0,
+		"db_delete":  0,
+		"db_migrate": 0,
+		"other":      0,
 	}
 
 	for _, exec := range executions {
@@ -431,11 +436,14 @@ func (s *statsService) GetWorkflowAnalytics(ctx context.Context, userID uuid.UUI
 		{Label: "待执行", Value: statusMap["pending"], Color: "#F59E0B", Icon: "⏳"},
 	}
 
+	dbTotal := nodeTypeMap["db_select"] + nodeTypeMap["db_insert"] + nodeTypeMap["db_update"] + nodeTypeMap["db_delete"] + nodeTypeMap["db_migrate"]
+
 	nodeTypeDistribution := []DistributionItem{
 		{Label: "LLM 节点", Value: nodeTypeMap["llm"], Color: "#8B5CF6", Icon: "🤖"},
 		{Label: "HTTP 请求", Value: nodeTypeMap["http"], Color: "#3B82F6", Icon: "🌐"},
 		{Label: "条件分支", Value: nodeTypeMap["condition"], Color: "#10B981", Icon: "🔀"},
 		{Label: "数据转换", Value: nodeTypeMap["transform"], Color: "#F59E0B", Icon: "🔄"},
+		{Label: "数据库操作", Value: dbTotal, Color: "#0EA5E9", Icon: "🗄️"},
 		{Label: "代码执行", Value: nodeTypeMap["code"], Color: "#EC4899", Icon: "💻"},
 		{Label: "其他", Value: nodeTypeMap["other"], Color: "#6B7280", Icon: "📦"},
 	}

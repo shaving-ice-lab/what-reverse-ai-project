@@ -83,13 +83,15 @@ type UpdateTemplateRequest struct {
 type templateService struct {
 	templateRepo repository.TemplateRepository
 	workflowRepo repository.WorkflowRepository
+	workspaceService WorkspaceService
 }
 
 // NewTemplateService 创建模板服务实例
-func NewTemplateService(templateRepo repository.TemplateRepository, workflowRepo repository.WorkflowRepository) TemplateService {
+func NewTemplateService(templateRepo repository.TemplateRepository, workflowRepo repository.WorkflowRepository, workspaceService WorkspaceService) TemplateService {
 	return &templateService{
 		templateRepo: templateRepo,
 		workflowRepo: workflowRepo,
+		workspaceService: workspaceService,
 	}
 }
 
@@ -144,6 +146,11 @@ func (s *templateService) UseTemplate(ctx context.Context, templateID uuid.UUID,
 		return nil, ErrTemplateNotFound
 	}
 
+	workspace, err := s.workspaceService.EnsureDefaultWorkspaceByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
 	// 创建工作流名称
 	name := template.Name
 	if req.Name != nil && *req.Name != "" {
@@ -153,6 +160,7 @@ func (s *templateService) UseTemplate(ctx context.Context, templateID uuid.UUID,
 	// 创建工作流
 	workflow := &entity.Workflow{
 		UserID:      userID,
+		WorkspaceID: workspace.ID,
 		Name:        name,
 		Description: &template.Description,
 		Icon:        template.Icon,

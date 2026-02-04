@@ -75,17 +75,27 @@ type WorkflowImport struct {
 }
 
 type workflowService struct {
-	workflowRepo repository.WorkflowRepository
+	workflowRepo     repository.WorkflowRepository
+	workspaceService WorkspaceService
 }
 
 // NewWorkflowService 创建工作流服务实例
-func NewWorkflowService(workflowRepo repository.WorkflowRepository) WorkflowService {
-	return &workflowService{workflowRepo: workflowRepo}
+func NewWorkflowService(workflowRepo repository.WorkflowRepository, workspaceService WorkspaceService) WorkflowService {
+	return &workflowService{
+		workflowRepo:     workflowRepo,
+		workspaceService: workspaceService,
+	}
 }
 
 func (s *workflowService) Create(ctx context.Context, userID uuid.UUID, req CreateWorkflowRequest) (*entity.Workflow, error) {
+	workspace, err := s.workspaceService.EnsureDefaultWorkspaceByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
 	workflow := &entity.Workflow{
 		UserID:      userID,
+		WorkspaceID: workspace.ID,
 		Name:        req.Name,
 		Description: req.Description,
 		Definition:  req.Definition,
@@ -132,6 +142,14 @@ func (s *workflowService) Update(ctx context.Context, id uuid.UUID, userID uuid.
 	// 检查权限
 	if workflow.UserID != userID {
 		return nil, ErrUnauthorized
+	}
+
+	if workflow.WorkspaceID == uuid.Nil {
+		workspace, err := s.workspaceService.EnsureDefaultWorkspaceByUserID(ctx, workflow.UserID)
+		if err != nil {
+			return nil, err
+		}
+		workflow.WorkspaceID = workspace.ID
 	}
 
 	// 更新字段
@@ -185,9 +203,19 @@ func (s *workflowService) Duplicate(ctx context.Context, id uuid.UUID, userID uu
 		return nil, ErrWorkflowNotFound
 	}
 
+	workspaceID := original.WorkspaceID
+	if workspaceID == uuid.Nil {
+		workspace, err := s.workspaceService.EnsureDefaultWorkspaceByUserID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		workspaceID = workspace.ID
+	}
+
 	// 创建副本
 	copy := &entity.Workflow{
 		UserID:        userID,
+		WorkspaceID:   workspaceID,
 		Name:          original.Name + " (副本)",
 		Description:   original.Description,
 		Icon:          original.Icon,
@@ -273,8 +301,14 @@ func (s *workflowService) BatchExport(ctx context.Context, ids []uuid.UUID, user
 }
 
 func (s *workflowService) Import(ctx context.Context, userID uuid.UUID, data *WorkflowImport) (*entity.Workflow, error) {
+	workspace, err := s.workspaceService.EnsureDefaultWorkspaceByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
 	workflow := &entity.Workflow{
 		UserID:        userID,
+		WorkspaceID:   workspace.ID,
 		Name:          data.Workflow.Name,
 		Description:   data.Workflow.Description,
 		Icon:          data.Workflow.Icon,

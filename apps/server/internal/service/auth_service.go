@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/agentflow/server/internal/config"
@@ -22,6 +23,7 @@ var (
 	ErrInvalidToken       = errors.New("invalid token")
 	ErrTokenExpired       = errors.New("token expired")
 	ErrAlreadyVerified    = errors.New("email already verified")
+	ErrUserSuspended      = errors.New("user suspended")
 )
 
 // AuthService 认证服务接口
@@ -43,17 +45,28 @@ type TokenPair struct {
 }
 
 type authService struct {
-	userRepo repository.UserRepository
-	redis    *redis.Client
-	jwtCfg   *config.JWTConfig
+	userRepo         repository.UserRepository
+	workspaceService WorkspaceService
+	redis            *redis.Client
+	jwtCfg           *config.JWTConfig
+	adminEmailSet    map[string]struct{}
 }
 
 // NewAuthService 创建认证服务实例
-func NewAuthService(userRepo repository.UserRepository, redis *redis.Client, jwtCfg *config.JWTConfig) AuthService {
+func NewAuthService(userRepo repository.UserRepository, workspaceService WorkspaceService, redis *redis.Client, jwtCfg *config.JWTConfig, adminEmails []string) AuthService {
+	adminSet := map[string]struct{}{}
+	for _, email := range adminEmails {
+		normalized := strings.ToLower(strings.TrimSpace(email))
+		if normalized != "" {
+			adminSet[normalized] = struct{}{}
+		}
+	}
 	return &authService{
-		userRepo: userRepo,
-		redis:    redis,
-		jwtCfg:   jwtCfg,
+		userRepo:         userRepo,
+		workspaceService: workspaceService,
+		redis:            redis,
+		jwtCfg:           jwtCfg,
+		adminEmailSet:    adminSet,
 	}
 }
 
@@ -83,14 +96,25 @@ func (s *authService) Register(ctx context.Context, email, username, password st
 	}
 
 	// 创建用户
+	role := "user"
 	user := &entity.User{
 		Email:        email,
 		Username:     username,
 		PasswordHash: string(hashedPassword),
+		Role:         role,
+		Status:       "active",
 	}
 
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		return nil, nil, err
+	}
+
+	// 创建默认 Workspace
+	if s.workspaceService != nil {
+		if _, err := s.workspaceService.EnsureDefaultWorkspace(ctx, user); err != nil {
+			_ = s.userRepo.Delete(ctx, user.ID)
+			return nil, nil, err
+		}
 	}
 
 	// 生成 Token
@@ -109,9 +133,31 @@ func (s *authService) Login(ctx context.Context, email, password string) (*entit
 		return nil, nil, ErrInvalidCredentials
 	}
 
+	normalizedRole := strings.TrimSpace(user.Role)
+	normalizedStatus := strings.TrimSpace(user.Status)
+	if normalizedRole == "" || normalizedStatus == "" {
+		if normalizedRole == "" {
+			user.Role = "user"
+		}
+		if normalizedStatus == "" {
+			user.Status = "active"
+		}
+		_ = s.userRepo.Update(ctx, user)
+	}
 	// 验证密码
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, nil, ErrInvalidCredentials
+	}
+
+	if strings.EqualFold(strings.TrimSpace(user.Status), "suspended") {
+		return nil, nil, ErrUserSuspended
+	}
+
+	// 确保默认 Workspace 存在（兼容历史用户）
+	if s.workspaceService != nil {
+		if _, err := s.workspaceService.EnsureDefaultWorkspace(ctx, user); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	// 更新最后登录时间
@@ -146,6 +192,14 @@ func (s *authService) Refresh(ctx context.Context, refreshToken string) (*TokenP
 	userID, ok := claims["user_id"].(string)
 	if !ok {
 		return nil, ErrInvalidToken
+	}
+
+	if uid, err := uuid.Parse(userID); err == nil {
+		if user, err := s.userRepo.GetByID(ctx, uid); err == nil {
+			if strings.EqualFold(strings.TrimSpace(user.Status), "suspended") {
+				return nil, ErrUserSuspended
+			}
+		}
 	}
 
 	// 检查 Token 是否在黑名单中
@@ -331,4 +385,16 @@ func (s *authService) generateToken(userID string, expiration time.Duration) (st
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(s.jwtCfg.Secret))
+}
+
+func (s *authService) isAdminEmail(email string) bool {
+	if s == nil || len(s.adminEmailSet) == 0 {
+		return false
+	}
+	normalized := strings.ToLower(strings.TrimSpace(email))
+	if normalized == "" {
+		return false
+	}
+	_, ok := s.adminEmailSet[normalized]
+	return ok
 }
