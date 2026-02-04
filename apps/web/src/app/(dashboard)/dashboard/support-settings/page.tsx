@@ -1485,7 +1485,7 @@ export default function SupportSettingsPage() {
             </div>
           </div>
           <div className="text-xs text-foreground-muted">
-            可用变量：{{"{{reference}}"}}, {{"{{subject}}"}}, {{"{{status}}"}}, {{"{{note}}"}}, {{"{{comment}}"}}, {{"{{assignee}}"}}
+            可用变量：{"{{reference}}"}, {"{{subject}}"}, {"{{status}}"}, {"{{note}}"}, {"{{comment}}"}, {"{{assignee}}"}
           </div>
           <div className="grid lg:grid-cols-3 gap-4">
             {(

@@ -298,11 +298,11 @@ export default function AppsPage() {
 
   const primaryWorkspaceApp = workspaceAppsPreview[0];
   const workspaceAppsHref = activeWorkspaceId
-    ? `/workspaces/${activeWorkspaceId}/apps`
-    : "/workspaces";
+    ? `/dashboard/workspaces/${activeWorkspaceId}/apps`
+    : "/dashboard/workspaces";
   const monitoringHref =
     primaryWorkspaceApp && activeWorkspaceId
-      ? `/workspaces/${activeWorkspaceId}/apps/${primaryWorkspaceApp.id}/monitoring`
+      ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${primaryWorkspaceApp.id}/monitoring`
       : workspaceAppsHref;
 
   const workbenchRoutes = [
@@ -311,7 +311,7 @@ export default function AppsPage() {
       step: "01",
       title: "Workspace 切换",
       description: "选择工作空间并进入对应 App 列表",
-      href: "/workspaces",
+      href: "/dashboard/workspaces",
       icon: LayoutGrid,
     },
     {
@@ -399,7 +399,7 @@ export default function AppsPage() {
           </>
         )}
         <div className="flex items-center justify-between text-[11px] text-foreground-muted">
-          <Link href="/workspaces" className="hover:text-foreground">
+          <Link href="/dashboard/workspaces" className="hover:text-foreground">
             工作空间列表
           </Link>
           <Link href={workspaceAppsHref} className="text-brand-500 hover:text-brand-400">
@@ -466,8 +466,8 @@ export default function AppsPage() {
                 <Link
                   href={
                     activeWorkspaceId
-                      ? `/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
-                      : "/workspaces"
+                      ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
+                      : "/dashboard/workspaces"
                   }
                   className="text-[11px] text-brand-500 hover:text-brand-400"
                 >
@@ -501,7 +501,7 @@ export default function AppsPage() {
         description="统一查看与管理 App 运行时，进入编辑器即可更新对应的工作流与配置。"
         actions={
           <Button variant="secondary" size="sm" asChild>
-            <Link href="/workflows/new">
+            <Link href="/dashboard/workflows/new">
               <Layers className="h-4 w-4" />
               新建工作流
             </Link>
@@ -607,7 +607,7 @@ export default function AppsPage() {
                 )}
                 <div className="mt-3">
                   <Link
-                    href="/workspaces"
+                    href="/dashboard/workspaces"
                     className="inline-flex items-center gap-1 text-[11px] text-(--workbench-ink) hover:text-(--workbench-accent)"
                   >
                     查看工作空间列表
@@ -631,8 +631,8 @@ export default function AppsPage() {
                         <Link
                           href={
                             activeWorkspaceId
-                              ? `/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
-                              : "/workspaces"
+                              ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
+                              : "/dashboard/workspaces"
                           }
                           className="text-[11px] text-(--workbench-accent) hover:text-(--workbench-ink)"
                         >
@@ -1595,7 +1595,7 @@ export default function AppsPage() {
             icon={<Layers className="h-5 w-5" />}
             title="暂无 App"
             description="先从工作流或 AI 创建一个 App，即可在 Workbench 中统一管理。"
-            action={{ label: "去创建工作流", href: "/workflows/new" }}
+            action={{ label: "去创建工作流", href: "/dashboard/workflows/new" }}
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

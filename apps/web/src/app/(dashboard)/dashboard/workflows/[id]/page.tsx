@@ -291,7 +291,7 @@ export default function WorkflowDetailPage() {
 
               <Link
 
-                href="/workflows"
+                href="/dashboard/workflows"
 
                 className="flex items-center gap-2 text-[13px] text-foreground-light hover:text-foreground transition-colors"
 

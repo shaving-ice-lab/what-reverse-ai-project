@@ -128,7 +128,8 @@ export default function NotFound() {
 
           )}>
 
-            抱歉，您访问的页面不存在或已被移动          </p>
+            抱歉，您访问的页面不存在或已被移动。可返回首页、重试，或联系支持获取帮助。
+          </p>
 
           {/* 主要操作 - Manus 风格按钮 */}
 
@@ -166,6 +167,15 @@ export default function NotFound() {
               <ArrowLeft className="mr-2 w-4 h-4" />
 
               返回上一页            </Button>
+
+            <Button
+              variant="outline"
+              className="h-11 px-6 rounded-full border-border hover:border-foreground/20"
+              onClick={() => window.location.reload()}
+            >
+              <RefreshCw className="mr-2 w-4 h-4" />
+              重新加载
+            </Button>
 
           </div>
 

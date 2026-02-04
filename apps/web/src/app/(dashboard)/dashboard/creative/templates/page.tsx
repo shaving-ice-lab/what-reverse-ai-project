@@ -199,7 +199,7 @@ export default function CreativeTemplatesPage() {
                 使用预设模板快速生成高质量内容
               </p>
             </div>
-            <Link href="/creative/generate">
+            <Link href="/dashboard/creative/generate">
               <Button className="bg-brand-500 hover:bg-brand-600 text-background">
                 <Plus className="mr-2 w-4 h-4" />
                 自定义生成
@@ -286,7 +286,7 @@ export default function CreativeTemplatesPage() {
                 {featuredTemplates.map((template) => (
                   <Link
                     key={template.id}
-                    href={`/creative/generate?template=${template.id}`}
+                    href={`/dashboard/creative/generate?template=${template.id}`}
                     className={cn(
                       "group p-5 rounded-md",
                       "bg-surface-100 border border-brand-400/30",
@@ -345,7 +345,7 @@ export default function CreativeTemplatesPage() {
                   {filteredTemplates.map((template) => (
                     <Link
                       key={template.id}
-                      href={`/creative/generate?template=${template.id}`}
+                      href={`/dashboard/creative/generate?template=${template.id}`}
                       className={cn(
                         "group p-4 rounded-md",
                         "bg-surface-100 border border-border",
@@ -397,7 +397,7 @@ export default function CreativeTemplatesPage() {
                   {filteredTemplates.map((template) => (
                     <Link
                       key={template.id}
-                      href={`/creative/generate?template=${template.id}`}
+                      href={`/dashboard/creative/generate?template=${template.id}`}
                       className={cn(
                         "group flex items-center gap-4 p-4 rounded-md",
                         "bg-surface-100 border border-border",

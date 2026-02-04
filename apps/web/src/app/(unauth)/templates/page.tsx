@@ -357,7 +357,7 @@ export default function TemplatesPage() {
           <p className="text-muted-foreground mb-6">
             从零开始创建您的自定义工作流
           </p>
-          <Link href="/workflows/new">
+          <Link href="/dashboard/workflows/new">
             <Button size="lg" className="rounded-full">
               创建工作流
               <ArrowRight className="ml-2 h-4 w-4" />

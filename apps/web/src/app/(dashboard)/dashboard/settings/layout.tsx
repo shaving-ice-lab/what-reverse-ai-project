@@ -30,22 +30,22 @@ const settingsNavSections = [
     items: [
       {
         label: "通用设置",
-        href: "/settings",
+        href: "/dashboard/settings",
         icon: Settings,
       },
       {
         label: "个人资料",
-        href: "/settings/profile",
+        href: "/dashboard/settings/profile",
         icon: User,
       },
       {
         label: "安全设置",
-        href: "/settings/security",
+        href: "/dashboard/settings/security",
         icon: Shield,
       },
       {
         label: "通知设置",
-        href: "/settings/notifications",
+        href: "/dashboard/settings/notifications",
         icon: Bell,
       },
     ],
@@ -55,13 +55,13 @@ const settingsNavSections = [
     items: [
       {
         label: "API 密钥",
-        href: "/settings/api-keys",
+        href: "/dashboard/settings/api-keys",
         icon: Key,
         badge: "3",
       },
       {
         label: "本地 LLM",
-        href: "/settings/local-llm",
+        href: "/dashboard/settings/local-llm",
         icon: Cpu,
         badge: "Beta",
         badgeColor: "bg-brand-200 text-brand-500",
@@ -73,13 +73,13 @@ const settingsNavSections = [
     items: [
       {
         label: "订阅计划",
-        href: "/upgrade",
+        href: "/dashboard/upgrade",
         icon: CreditCard,
         external: true,
       },
       {
         label: "使用量",
-        href: "/analytics",
+        href: "/dashboard/analytics",
         icon: BarChart3,
         external: true,
       },
@@ -90,7 +90,7 @@ const settingsNavSections = [
 // 危险操作
 const dangerItem = {
   label: "删除账户",
-  href: "/settings/delete-account",
+  href: "/dashboard/settings/delete-account",
   icon: AlertTriangle,
 };
 
@@ -103,8 +103,8 @@ export default function SettingsLayout({
 
   // 精确匹配或路径以 href 开头
   const isActive = (href: string) => {
-    if (href === "/settings") {
-      return pathname === "/settings" || pathname === "/settings/preferences";
+    if (href === "/dashboard/settings") {
+      return pathname === "/dashboard/settings" || pathname === "/dashboard/settings/preferences";
     }
     return pathname.startsWith(href);
   };
@@ -197,7 +197,7 @@ export default function SettingsLayout({
               升级到专业版解锁更多功能
             </p>
             <Link 
-              href="/upgrade"
+              href="/dashboard/upgrade"
               className="block w-full text-center text-[11px] font-medium py-1.5 rounded-md bg-brand-500 text-background hover:bg-brand-600 transition-colors"
             >
               升级专业版

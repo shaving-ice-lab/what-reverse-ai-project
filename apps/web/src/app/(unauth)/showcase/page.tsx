@@ -243,7 +243,7 @@ export default function ShowcasePage() {
           <p className="text-muted-foreground mb-6">
             将您的创意分享给社区，帮助更多人提升效率
           </p>
-          <Link href="/workflows/new">
+          <Link href="/dashboard/workflows/new">
             <Button size="lg" className="rounded-full">
               提交作品
               <ArrowRight className="ml-2 h-4 w-4" />

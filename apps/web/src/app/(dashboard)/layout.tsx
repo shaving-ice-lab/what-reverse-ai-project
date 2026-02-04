@@ -6,9 +6,10 @@
  * 支持亮色/暗色主题切换
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import {
   Sparkles,
@@ -30,20 +31,23 @@ import {
   ChevronDown,
   Bot,
   HelpCircle,
+  LifeBuoy,
   Crown,
   Activity,
   PanelLeftClose,
   PanelLeft,
   BarChart3,
   PlugZap,
+  ListTodo,
+  Loader2,
 } from "lucide-react";
 import { RequireAuth } from "@/components/auth/auth-guard";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { NotificationPanel } from "@/components/dashboard/notification-panel";
-import { CommandPalette, useCommandPalette } from "@/components/dashboard/command-palette";
+import { useCommandPalette } from "@/components/dashboard/use-command-palette";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { workspaceApi, type Workspace, type WorkspaceQuota } from "@/lib/api/workspace";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,33 +65,70 @@ import {
 // 主导航菜单
 const mainNavItems = [
   { title: "项目概览", href: "/dashboard", icon: Activity },
-  { title: "对话", href: "/conversations", icon: MessageSquare },
-  { title: "工作流", href: "/workflows", icon: Zap },
-  { title: "创意工坊", href: "/creative", icon: Palette },
-  { title: "模板库", href: "/template-gallery", icon: LayoutGrid },
-  { title: "商店", href: "/store", icon: Store },
+  { title: "工作空间", href: "/dashboard/workspaces", icon: LayoutGrid },
+  { title: "规划", href: "/dashboard/plans", icon: ListTodo },
+  { title: "工单管理", href: "/dashboard/support-tickets", icon: LifeBuoy },
+  { title: "支持设置", href: "/dashboard/support-settings", icon: Settings },
+  { title: "对话", href: "/dashboard/conversations", icon: MessageSquare },
+  { title: "工作流（旧）", href: "/dashboard/workflows", icon: Zap },
+  { title: "Workbench", href: "/dashboard/apps", icon: LayoutGrid },
+  { title: "创意工坊", href: "/dashboard/creative", icon: Palette },
+  { title: "模板库", href: "/dashboard/template-gallery", icon: LayoutGrid },
+  { title: "商店", href: "/dashboard/store", icon: Store },
 ];
 
 // 个人菜单
 const personalNavItems = [
-  { title: "我的 Agent", href: "/my-agents", icon: Bot },
-  { title: "我的文件", href: "/files", icon: FolderOpen },
-  { title: "数据分析", href: "/analytics", icon: BarChart3 },
+  { title: "我的 Agent（旧）", href: "/dashboard/my-agents", icon: Bot },
+  { title: "我的文件", href: "/dashboard/files", icon: FolderOpen },
+  { title: "数据分析", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
 // 全宽页面（由页面自身控制布局和滚动）
 const fullBleedRoutes = [
   "/dashboard",
-  "/editor",
-  "/chat",
-  "/conversations",
-  "/creative",
-  "/review",
-  "/workflows",
-  "/my-agents",
-  "/files",
-  "/analytics",
+  "/dashboard/editor",
+  "/dashboard/apps/editor",
+  "/dashboard/chat",
+  "/dashboard/conversations",
+  "/dashboard/creative",
+  "/dashboard/store",
+  "/dashboard/review",
+  "/dashboard/workflows",
+  "/dashboard/my-agents",
+  "/dashboard/files",
+  "/dashboard/analytics",
+  "/dashboard/workspaces",
+  "/dashboard/plans",
+  "/dashboard/support-tickets",
+  "/dashboard/apps",
 ];
+
+const WORKSPACE_STORAGE_KEY = "last_workspace_id";
+const RECENT_WORKSPACE_STORAGE_KEY = "recent_workspace_ids";
+const RECENT_WORKSPACE_LIMIT = 4;
+
+const NotificationPanel = dynamic(
+  () => import("@/components/dashboard/notification-panel").then((mod) => ({ default: mod.NotificationPanel })),
+  { ssr: false }
+);
+
+const CommandPalette = dynamic(
+  () => import("@/components/dashboard/command-palette").then((mod) => ({ default: mod.CommandPalette })),
+  { ssr: false }
+);
+
+const workspacePlanConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+  free: { label: "FREE", color: "text-foreground-muted", bgColor: "bg-surface-200" },
+  pro: { label: "PRO", color: "text-brand-500", bgColor: "bg-brand-200" },
+  enterprise: { label: "ENTERPRISE", color: "text-warning", bgColor: "bg-warning-200" },
+};
+
+const workspaceStatusConfig: Record<string, { label: string; color: string }> = {
+  active: { label: "可用", color: "text-brand-500" },
+  suspended: { label: "已暂停", color: "text-warning" },
+  deleted: { label: "已删除", color: "text-destructive" },
+};
 
 // 模拟对话历史
 const recentConversations = [
@@ -113,11 +154,136 @@ export default function DashboardLayout({
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const commandPalette = useCommandPalette();
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [workspaceLoading, setWorkspaceLoading] = useState(true);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  const [workspaceQuota, setWorkspaceQuota] = useState<WorkspaceQuota | null>(null);
+  const [quotaLoading, setQuotaLoading] = useState(false);
+  const [recentWorkspaceIds, setRecentWorkspaceIds] = useState<string[]>([]);
+  const resolvedMainNavItems = useMemo(
+    () =>
+      user?.role === "admin"
+        ? [
+            ...mainNavItems,
+            {
+              title: "管理后台",
+              href: "/dashboard/admin",
+              icon: Shield,
+            },
+          ]
+        : mainNavItems,
+    [user?.role]
+  );
+
+  const workspaceIdFromPath = pathname.startsWith("/dashboard/workspaces/")
+    ? pathname.split("/")[3] || null
+    : null;
+
+  const updateRecentWorkspaces = useCallback((workspaceId: string) => {
+    if (!workspaceId || typeof window === "undefined") return;
+    setRecentWorkspaceIds((prev) => {
+      const next = [workspaceId, ...prev.filter((id) => id !== workspaceId)].slice(
+        0,
+        RECENT_WORKSPACE_LIMIT
+      );
+      localStorage.setItem(RECENT_WORKSPACE_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   // 等待客户端挂载以避免 hydration 问题
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem(RECENT_WORKSPACE_STORAGE_KEY);
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        setRecentWorkspaceIds(parsed.filter((id) => typeof id === "string"));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    const loadWorkspaces = async () => {
+      try {
+        setWorkspaceLoading(true);
+        const data = await workspaceApi.list();
+        if (!isActive) return;
+        setWorkspaces(data);
+      } catch (error) {
+        console.error("Failed to load workspaces:", error);
+      } finally {
+        if (isActive) {
+          setWorkspaceLoading(false);
+        }
+      }
+    };
+
+    loadWorkspaces();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!workspaceIdFromPath || typeof window === "undefined") return;
+    localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceIdFromPath);
+    updateRecentWorkspaces(workspaceIdFromPath);
+  }, [workspaceIdFromPath, updateRecentWorkspaces]);
+
+  useEffect(() => {
+    if (workspaces.length === 0) return;
+    const storedId =
+      typeof window !== "undefined" ? localStorage.getItem(WORKSPACE_STORAGE_KEY) : null;
+    const preferredId = workspaceIdFromPath || storedId;
+    const fallbackId = workspaces[0]?.id;
+    const resolvedId = workspaces.some((ws) => ws.id === preferredId)
+      ? preferredId
+      : fallbackId;
+    setActiveWorkspaceId(resolvedId ?? null);
+  }, [workspaces, workspaceIdFromPath]);
+
+  useEffect(() => {
+    if (!activeWorkspaceId) return;
+    updateRecentWorkspaces(activeWorkspaceId);
+  }, [activeWorkspaceId, updateRecentWorkspaces]);
+
+  useEffect(() => {
+    if (!activeWorkspaceId) {
+      setWorkspaceQuota(null);
+      return;
+    }
+    let isActive = true;
+    const loadQuota = async () => {
+      try {
+        setQuotaLoading(true);
+        const quota = await workspaceApi.getQuota(activeWorkspaceId);
+        if (isActive) {
+          setWorkspaceQuota(quota);
+        }
+      } catch (error) {
+        if (isActive) {
+          setWorkspaceQuota(null);
+        }
+      } finally {
+        if (isActive) {
+          setQuotaLoading(false);
+        }
+      }
+    };
+    loadQuota();
+    return () => {
+      isActive = false;
+    };
+  }, [activeWorkspaceId]);
 
   // 切换主题
   const toggleTheme = () => {
@@ -136,6 +302,78 @@ export default function DashboardLayout({
     return pathname === route || pathname.startsWith(`${route}/`);
   });
 
+  const activeWorkspace = workspaces.find((ws) => ws.id === activeWorkspaceId) || null;
+
+  const resolvePlanConfig = (plan?: string) => {
+    if (!plan) return workspacePlanConfig.free;
+    return workspacePlanConfig[plan] || workspacePlanConfig.free;
+  };
+
+  const handleWorkspaceSwitch = (workspaceId: string) => {
+    if (workspaceId === activeWorkspaceId) return;
+    if (typeof window !== "undefined" && activeWorkspaceId) {
+      const confirmed = window.confirm("切换工作空间将离开当前上下文，确定继续？");
+      if (!confirmed) return;
+    }
+    setActiveWorkspaceId(workspaceId);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId);
+    }
+    updateRecentWorkspaces(workspaceId);
+    router.push(`/dashboard/workspaces/${workspaceId}/apps`);
+  };
+
+  const activePlan = resolvePlanConfig(activeWorkspace?.plan);
+  const recentWorkspaces = useMemo(() => {
+    return recentWorkspaceIds
+      .map((id) => workspaces.find((workspace) => workspace.id === id))
+      .filter((workspace): workspace is Workspace => Boolean(workspace))
+      .filter((workspace) => workspace.id !== activeWorkspaceId);
+  }, [recentWorkspaceIds, workspaces, activeWorkspaceId]);
+
+  const quotaSummaryItems = useMemo(() => {
+    if (!workspaceQuota) return [];
+    const buildItem = (label: string, used: number, limit: number, unit = "") => {
+      if (limit <= 0) return { label, value: "不限" };
+      return { label, value: `${used}/${limit}${unit}` };
+    };
+    return [
+      buildItem("请求", workspaceQuota.requests.used, workspaceQuota.requests.limit, ""),
+      buildItem("Token", workspaceQuota.tokens.used, workspaceQuota.tokens.limit, ""),
+      buildItem("存储", workspaceQuota.storage.used, workspaceQuota.storage.limit, "GB"),
+      buildItem("应用", workspaceQuota.apps.used, workspaceQuota.apps.limit, ""),
+    ];
+  }, [workspaceQuota]);
+
+  const quotaUsagePercent = useMemo(() => {
+    if (!workspaceQuota) return null;
+    const ratios = [
+      workspaceQuota.requests,
+      workspaceQuota.tokens,
+      workspaceQuota.storage,
+      workspaceQuota.apps,
+    ]
+      .filter((item) => item.limit > 0)
+      .map((item) => item.used / item.limit);
+    if (ratios.length === 0) return null;
+    return Math.max(...ratios);
+  }, [workspaceQuota]);
+
+  const quotaUsageLabel =
+    quotaUsagePercent === null ? "—" : `${Math.round(quotaUsagePercent * 100)}%`;
+  const hasRestrictedWorkspaces = useMemo(
+    () => workspaces.some((workspace) => workspace.status !== "active"),
+    [workspaces]
+  );
+  const workspaceQuickLinks = activeWorkspace
+    ? [
+        { label: "创建 App", href: `/dashboard/workspaces/${activeWorkspace.id}/apps` },
+        { label: "成员管理", href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members` },
+        { label: "用量与账单", href: "/dashboard/billing" },
+        { label: "设置", href: `/dashboard/workspaces/${activeWorkspace.id}/settings` },
+      ]
+    : [];
+
   // 键盘快捷键
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -145,7 +383,7 @@ export default function DashboardLayout({
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "n") {
         e.preventDefault();
-        router.push("/conversations");
+        router.push("/dashboard/conversations");
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "b") {
         e.preventDefault();
@@ -219,47 +457,285 @@ export default function DashboardLayout({
 
             <span className="text-foreground-muted">/</span>
 
-            {/* 组织选择 */}
+            {/* 工作空间切换器 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 px-2 py-0.5 rounded-md hover:bg-surface-100 transition-colors text-foreground-light hover:text-foreground">
-                  <span className="text-[12px] font-medium">WhatTech</span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-surface-200 text-foreground-muted">
-                    FREE
+                  {workspaceLoading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-foreground-muted" />
+                  ) : (
+                    <LayoutGrid className="w-3.5 h-3.5 text-foreground-muted" />
+                  )}
+                  <span className="text-[12px] font-medium">
+                    {workspaceLoading
+                      ? "加载工作空间..."
+                      : activeWorkspace?.name || "选择工作空间"}
+                  </span>
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.5 text-[10px] font-medium rounded",
+                      activePlan.bgColor,
+                      activePlan.color
+                    )}
+                  >
+                    {workspaceLoading
+                      ? "..."
+                      : activeWorkspace
+                      ? activePlan.label
+                      : "未选择"}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52 bg-surface-100 border-border">
-                <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  切换组织
+              <DropdownMenuContent align="start" className="w-64 bg-surface-100 border-border">
+                <div className="px-3 py-2 text-[11px] text-foreground-muted">工作空间</div>
+                {activeWorkspace && (
+                  <div className="px-3 pb-2 space-y-2 text-[11px] text-foreground-light">
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground-muted">当前计划</span>
+                      <span
+                        className={cn(
+                          "px-1.5 py-0.5 text-[10px] font-semibold rounded",
+                          activePlan.bgColor,
+                          activePlan.color
+                        )}
+                      >
+                        {activePlan.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground-muted">配额概览</span>
+                      <span className="text-[10px] text-foreground-muted">
+                        {quotaLoading ? "同步中" : `使用 ${quotaUsageLabel}`}
+                      </span>
+                    </div>
+                    {quotaSummaryItems.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {quotaSummaryItems.map((item) => (
+                          <div
+                            key={item.label}
+                            className="rounded-md border border-border bg-surface-75 px-2 py-1 text-[10px] text-foreground-muted"
+                          >
+                            <span className="text-foreground-light">{item.label}</span>
+                            <span className="ml-1 text-foreground">{item.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-foreground-muted">
+                        暂无配额数据
+                      </div>
+                    )}
+                    <Link href="/dashboard/billing" className="text-brand-500 hover:underline">
+                      查看用量详情
+                    </Link>
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      {workspaceQuickLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="flex items-center justify-center rounded-md border border-border bg-surface-75 px-2 py-1 text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong hover:bg-surface-100 transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <DropdownMenuSeparator className="bg-border" />
+                {workspaceLoading ? (
+                  <DropdownMenuItem
+                    disabled
+                    className="text-[12px] text-foreground-muted flex items-center gap-2"
+                  >
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    加载中
+                  </DropdownMenuItem>
+                ) : workspaces.length === 0 ? (
+                  <DropdownMenuItem asChild className="text-[12px]">
+                    <Link href="/dashboard/workspaces" className="flex items-center gap-2">
+                      <Plus className="w-3.5 h-3.5" />
+                      创建工作空间
+                    </Link>
+                  </DropdownMenuItem>
+                ) : (
+                  workspaces.map((workspace) => {
+                    const plan = resolvePlanConfig(workspace.plan);
+                    const isActiveWorkspace = workspace.id === activeWorkspaceId;
+                    const status = workspaceStatusConfig[workspace.status] || {
+                      label: "受限",
+                      color: "text-foreground-muted",
+                    };
+                    const isDisabled = workspace.status !== "active";
+                    return (
+                      <DropdownMenuItem
+                        key={workspace.id}
+                        disabled={isDisabled}
+                        onClick={() => {
+                          if (isDisabled) return;
+                          handleWorkspaceSwitch(workspace.id);
+                        }}
+                        className={cn(
+                          "flex items-center justify-between gap-2 text-[12px]",
+                          isActiveWorkspace && "bg-surface-200/70 text-foreground",
+                          isDisabled && "opacity-60 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{workspace.name}</span>
+                          <span className="text-[10px] text-foreground-muted">
+                            /{workspace.slug}
+                          </span>
+                          {isDisabled && (
+                            <span className={cn("text-[10px]", status.color)}>
+                              {status.label}
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={cn(
+                            "px-1.5 py-0.5 text-[10px] font-semibold rounded",
+                            plan.bgColor,
+                            plan.color
+                          )}
+                        >
+                          {plan.label}
+                        </span>
+                      </DropdownMenuItem>
+                    );
+                  })
+                )}
+                {hasRestrictedWorkspaces && (
+                  <div className="px-3 pb-2 text-[10px] text-foreground-muted">
+                    部分工作空间已暂停或权限受限，需管理员恢复访问。
+                  </div>
+                )}
+                {recentWorkspaces.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator className="bg-border" />
+                    <div className="px-3 py-2 text-[11px] text-foreground-muted">
+                      最近访问
+                    </div>
+                    {recentWorkspaces.map((workspace) => {
+                      const plan = resolvePlanConfig(workspace.plan);
+                      const status = workspaceStatusConfig[workspace.status] || {
+                        label: "受限",
+                        color: "text-foreground-muted",
+                      };
+                      const isDisabled = workspace.status !== "active";
+                      return (
+                        <DropdownMenuItem
+                          key={`recent-${workspace.id}`}
+                          disabled={isDisabled}
+                          onClick={() => {
+                            if (isDisabled) return;
+                            handleWorkspaceSwitch(workspace.id);
+                          }}
+                          className={cn(
+                            "flex items-center justify-between gap-2 text-[12px]",
+                            isDisabled && "opacity-60 cursor-not-allowed"
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{workspace.name}</span>
+                            <span className="text-[10px] text-foreground-muted">
+                              /{workspace.slug}
+                            </span>
+                            {isDisabled && (
+                              <span className={cn("text-[10px]", status.color)}>
+                                {status.label}
+                              </span>
+                            )}
+                          </div>
+                          <span
+                            className={cn(
+                              "px-1.5 py-0.5 text-[10px] font-semibold rounded",
+                              plan.bgColor,
+                              plan.color
+                            )}
+                          >
+                            {plan.label}
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </>
+                )}
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem asChild className="text-[12px]">
+                  <Link href="/dashboard/workspaces" className="flex items-center gap-2">
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    工作空间列表
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  组织设置
-                </DropdownMenuItem>
+                {activeWorkspace && (
+                  <DropdownMenuItem asChild className="text-[12px]">
+                    <Link
+                      href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+                      className="flex items-center gap-2"
+                    >
+                      <Settings className="w-3.5 h-3.5" />
+                      工作空间设置
+                    </Link>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <span className="text-foreground-muted">/</span>
 
-            {/* 项目名称 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-2 py-0.5 rounded-md hover:bg-surface-100 transition-colors text-foreground-light hover:text-foreground">
-                  <Settings className="w-3.5 h-3.5" />
-                  <span className="text-[12px] font-medium">Dashboard</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52 bg-surface-100 border-border">
-                <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  项目设置
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  环境与部署
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Workspace 上下文条 */}
+            {workspaceLoading ? (
+              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-muted">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                载入中
+              </div>
+            ) : activeWorkspace ? (
+              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light">
+                <span className="text-foreground-muted">/{activeWorkspace.slug}</span>
+                <span
+                  className={cn(
+                    "px-1.5 py-0.5 text-[10px] font-semibold rounded",
+                    activePlan.bgColor,
+                    activePlan.color
+                  )}
+                >
+                  {activePlan.label}
+                </span>
+                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-surface-200 text-foreground-muted">
+                  配额 {quotaUsageLabel}
+                </span>
+                <span className="h-3 w-px bg-border" />
+                <Link
+                  href={`/dashboard/workspaces/${activeWorkspace.id}/apps`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  创建 App
+                </Link>
+                <Link
+                  href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  成员管理
+                </Link>
+                <Link href="/dashboard/billing" className="hover:text-foreground transition-colors">
+                  用量
+                </Link>
+                <Link
+                  href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  设置
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/dashboard/workspaces"
+                className="hidden md:inline-flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light hover:text-foreground transition-colors"
+              >
+                创建/选择工作空间
+              </Link>
+            )}
 
             <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-full bg-warning/15 text-warning">
               PRODUCTION
@@ -267,7 +743,7 @@ export default function DashboardLayout({
 
             {/* 右侧工具栏 */}
             <div className="ml-auto flex items-center gap-1.5">
-              <Link href="/integrations">
+              <Link href="/dashboard/integrations">
                 <Button
                   variant="outline"
                   size="sm"
@@ -351,19 +827,19 @@ export default function DashboardLayout({
                   </div>
                   <div className="py-1">
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
+                      <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
                         <User className="w-3.5 h-3.5" />
                         个人资料
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
+                      <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
                         <Settings className="w-3.5 h-3.5" />
                         设置
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/billing" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
+                      <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
                         <CreditCard className="w-3.5 h-3.5" />
                         订阅计划
                       </Link>
@@ -399,7 +875,7 @@ export default function DashboardLayout({
                 <div className={cn("shrink-0", sidebarCollapsed ? "px-1.5 pt-3 pb-2" : "px-2 pt-3 pb-2")}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link href="/conversations">
+                      <Link href="/dashboard/conversations">
                         <button
                           className={cn(
                             "w-full flex items-center gap-2 rounded-md text-[12px] font-medium transition-colors",
@@ -430,7 +906,7 @@ export default function DashboardLayout({
                 {/* 主导航 */}
                 <div className="py-1">
                   <nav className="space-y-0">
-                    {mainNavItems.map((item) => {
+                    {resolvedMainNavItems.map((item) => {
                       const active = isActive(item.href);
                       return sidebarCollapsed ? (
                         <Tooltip key={item.href}>
@@ -565,7 +1041,7 @@ export default function DashboardLayout({
                           <Crown className="w-3.5 h-3.5 text-brand-500" />
                           <span className="text-[11px] font-medium text-foreground-light">免费版</span>
                         </div>
-                        <Link href="/billing" className="text-[10px] text-brand-500 hover:underline">
+                        <Link href="/dashboard/billing" className="text-[10px] text-brand-500 hover:underline">
                           升级
                         </Link>
                       </div>
@@ -621,16 +1097,20 @@ export default function DashboardLayout({
         </div>
 
         {/* 通知面板 */}
-        <NotificationPanel
-          isOpen={showNotifications}
-          onClose={() => setShowNotifications(false)}
-        />
+        {showNotifications && (
+          <NotificationPanel
+            isOpen={showNotifications}
+            onClose={() => setShowNotifications(false)}
+          />
+        )}
 
         {/* 命令面板 */}
-        <CommandPalette
-          isOpen={commandPalette.isOpen}
-          onClose={commandPalette.close}
-        />
+        {commandPalette.isOpen && (
+          <CommandPalette
+            isOpen={commandPalette.isOpen}
+            onClose={commandPalette.close}
+          />
+        )}
       </div>
     </TooltipProvider>
   </RequireAuth>

@@ -232,7 +232,7 @@ export default function PayoutsPage() {
         </div>
         <PageHeader
           title="提现管理"
-          backHref="/creator/earnings"
+          backHref="/dashboard/creator/earnings"
           backLabel="返回"
           actions={(
             <Button

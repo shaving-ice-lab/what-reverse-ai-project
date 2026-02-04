@@ -148,7 +148,7 @@ export default function DashboardPage() {
           actions={
             <div className="flex items-center gap-2">
               <Button size="sm" asChild>
-                <Link href="/workflows/new">
+                <Link href="/dashboard/workflows/new">
                   <Plus className="w-3.5 h-3.5" />
                   新建工作流
                 </Link>
@@ -252,22 +252,22 @@ export default function DashboardPage() {
           >
             <div className="space-y-1">
               <ActionRow
-                href="/workflows/new"
+                href="/dashboard/workflows/new"
                 label="创建工作流"
                 description="构建自动化任务流程"
               />
               <ActionRow
-                href="/template-gallery"
+                href="/dashboard/template-gallery"
                 label="模板库"
                 description="从预设模板快速开始"
               />
               <ActionRow
-                href="/creative/generate"
+                href="/dashboard/creative/generate"
                 label="生成内容"
                 description="AI 辅助文案创作"
               />
               <ActionRow
-                href="/my-agents"
+                href="/dashboard/my-agents"
                 label="我的 Agent"
                 description="管理已发布的 Agent"
               />
@@ -293,12 +293,15 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyMessage text="暂无工作流" action={{ label: "创建工作流", href: "/workflows/new" }} />
+                <EmptyMessage
+                  text="暂无工作流"
+                  action={{ label: "创建工作流", href: "/dashboard/workflows/new" }}
+                />
               )}
               {dashboardData?.recent_workflows && dashboardData.recent_workflows.length > 0 && (
                 <div className="pt-3 border-t border-border mt-3">
                   <Link
-                    href="/workflows"
+                    href="/dashboard/workflows"
                     className="text-[12px] text-foreground-light hover:text-foreground transition-colors flex items-center gap-1"
                   >
                     查看全部工作流
@@ -328,7 +331,7 @@ export default function DashboardPage() {
               {dashboardData?.recent_executions && dashboardData.recent_executions.length > 0 && (
                 <div className="pt-3 border-t border-border mt-3">
                   <Link
-                    href="/executions"
+                    href="/dashboard/executions"
                     className="text-[12px] text-foreground-light hover:text-foreground transition-colors flex items-center gap-1"
                   >
                     查看全部执行记录
@@ -536,7 +539,7 @@ function WorkflowRow({ workflow }: { workflow: WorkflowSummary }) {
 
   return (
     <Link
-      href={`/workflows/${workflow.id}`}
+      href={`/dashboard/workflows/${workflow.id}`}
       className="flex items-center justify-between py-2 px-3 -mx-3 rounded-md hover:bg-surface-100/60 transition-colors group"
     >
       <div className="flex-1 min-w-0">

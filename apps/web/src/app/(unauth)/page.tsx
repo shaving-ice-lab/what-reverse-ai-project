@@ -915,7 +915,7 @@ const footerLinks = {
     { label: "功能", href: "/features" },
     { label: "定价", href: "/pricing" },
     { label: "模板", href: "/store" },
-    { label: "集成", href: "/integrations" },
+    { label: "集成", href: "/dashboard/integrations" },
     { label: "更新日志", href: "/whats-new" },
     { label: "路线图", href: "/roadmap" },
   ],
@@ -923,7 +923,7 @@ const footerLinks = {
     { label: "文档", href: "/docs" },
     { label: "API 参考", href: "/developers" },
     { label: "博客", href: "/blog" },
-    { label: "教程", href: "/learn" },
+    { label: "教程", href: "/learn/courses" },
     { label: "用例", href: "/use-cases" },
     { label: "社区", href: "/community" },
   ],
@@ -1375,7 +1375,7 @@ export default function HomePage() {
                 快速入门指南
               </Button>
             </Link>
-            <Link href="/learn">
+            <Link href="/learn/courses">
               <Button variant="outline" className="rounded-full">
                 <GraduationCap className="mr-2 h-4 w-4" />
                 视频教程
@@ -1800,7 +1800,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center">
-            <Link href="/integrations">
+            <Link href="/dashboard/integrations">
               <Button variant="outline" className="rounded-full group">
                 查看全部集成
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -3139,7 +3139,7 @@ await workflow.deploy();`}</code>
                 掌握 AgentFlow
               </h2>
             </div>
-            <Link href="/learn">
+            <Link href="/learn/courses">
               <Button variant="outline" className="rounded-full group shrink-0">
                 探索全部资源
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

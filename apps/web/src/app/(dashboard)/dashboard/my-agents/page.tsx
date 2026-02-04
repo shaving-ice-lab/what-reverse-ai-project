@@ -44,6 +44,7 @@ import {
   SidebarNavGroup,
   SidebarNavItem,
 } from "@/components/dashboard/page-layout";
+import { LegacyEntryBanner } from "@/components/dashboard/legacy-entry-banner";
 
 // ===== 类型定义 =====
 type AgentStatus = "active" | "paused" | "error" | "draft";
@@ -350,7 +351,7 @@ export default function MyAgentsPage() {
 
       {/* 快速操作 */}
       <SidebarNavGroup title="快速操作">
-        <Link href="/my-agents/new" className="block">
+        <Link href="/dashboard/my-agents/new" className="block">
           <Button
             variant="ghost"
             size="sm"
@@ -371,6 +372,7 @@ export default function MyAgentsPage() {
       sidebar={sidebar}
     >
       <PageContainer>
+        <LegacyEntryBanner type="agent" />
         {/* 页面头部 */}
         <PageHeader
           title="我的代理"
@@ -510,7 +512,7 @@ export default function MyAgentsPage() {
                       setStatusFilter("all");
                     },
                   }
-                : { label: "创建代理", href: "/my-agents/new" }
+                : { label: "创建代理", href: "/dashboard/my-agents/new" }
             }
           />
         )}
@@ -596,7 +598,7 @@ function AgentListView({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      href={`/my-agents/${agent.id}`}
+                      href={`/dashboard/my-agents/${agent.id}`}
                       className="text-[13px] font-medium text-foreground hover:text-foreground-light transition-colors"
                     >
                       {agent.name}
@@ -667,7 +669,7 @@ function AgentListView({
                 <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <AgentActionButton status={agent.status} />
                   <Button variant="ghost" size="icon-sm" asChild>
-                    <Link href={`/my-agents/${agent.id}/edit`}>
+                    <Link href={`/dashboard/my-agents/${agent.id}/edit`}>
                       <Settings className="h-3.5 w-3.5" />
                     </Link>
                   </Button>
@@ -715,7 +717,7 @@ function AgentGridView({ agents, activeMenu, setActiveMenu }: AgentGridViewProps
                 </div>
                 <div>
                   <Link
-                    href={`/my-agents/${agent.id}`}
+                    href={`/dashboard/my-agents/${agent.id}`}
                     className="text-[13px] font-medium text-foreground hover:text-foreground-light transition-colors"
                   >
                     {agent.name}
@@ -784,7 +786,7 @@ function AgentGridView({ agents, activeMenu, setActiveMenu }: AgentGridViewProps
               <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <AgentActionButton status={agent.status} />
                 <Button variant="ghost" size="icon-sm" asChild>
-                  <Link href={`/my-agents/${agent.id}/edit`}>
+                  <Link href={`/dashboard/my-agents/${agent.id}/edit`}>
                     <Settings className="h-3.5 w-3.5" />
                   </Link>
                 </Button>

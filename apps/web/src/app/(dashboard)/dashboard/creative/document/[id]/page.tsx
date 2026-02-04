@@ -159,7 +159,7 @@ export default function DocumentPage() {
           <FileText className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
           <h2 className="text-lg font-medium text-foreground mb-2">文档不存在</h2>
           <p className="text-foreground-muted mb-4">该文档可能已被删除</p>
-          <Link href="/creative">
+          <Link href="/dashboard/creative">
             <Button className="bg-brand-500 hover:bg-brand-600 text-foreground">
               返回创意助手
             </Button>
@@ -185,7 +185,7 @@ export default function DocumentPage() {
 
   const handleDelete = async () => {
     if (confirm("确定要删除这个文档吗？")) {
-      router.push("/creative");
+      router.push("/dashboard/creative");
     }
   };
 
@@ -196,7 +196,7 @@ export default function DocumentPage() {
         <div className="max-w-5xl mx-auto w-full px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href="/creative"
+              href="/dashboard/creative"
               className="p-2 rounded-md hover:bg-surface-75 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-foreground-muted" />

@@ -504,6 +504,8 @@ export default function ConversationsPage() {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<{ id: string; title: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
+
+  const shouldLogApiError = process.env.NEXT_PUBLIC_DEBUG_API === "true";
   
   // 计算总页数
   const totalPages = Math.ceil(total / pageSize);
@@ -535,9 +537,11 @@ export default function ConversationsPage() {
       const response = await conversationFolderApi.list();
       setFolders(response.folders || []);
     } catch (err) {
-      console.error("Failed to fetch folders:", err);
+      if (shouldLogApiError) {
+        console.error("Failed to fetch folders:", err);
+      }
     }
-  }, []);
+  }, [shouldLogApiError]);
 
   // 获取对话列表
   const fetchConversations = useCallback(async () => {
@@ -567,11 +571,13 @@ export default function ConversationsPage() {
       setTotal(response.total || 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "获取对话列表失败");
-      console.error("Failed to fetch conversations:", err);
+      if (shouldLogApiError) {
+        console.error("Failed to fetch conversations:", err);
+      }
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, selectedFolder, filter]);
+  }, [page, searchQuery, selectedFolder, filter, shouldLogApiError]);
 
   // 初始化
   useEffect(() => {

@@ -187,7 +187,7 @@ export default function NewWorkflowPage() {
     // 模拟创建
     await new Promise((resolve) => setTimeout(resolve, 1500));
     // 跳转到编辑器
-    router.push("/editor/new-workflow-id");
+    router.push("/dashboard/editor/new-workflow-id");
   };
 
   // 下一步
@@ -217,7 +217,7 @@ export default function NewWorkflowPage() {
             title="创建工作流"
             description="选择模板、配置触发器并发布自动化流程。"
             eyebrow="Workflows"
-            backHref="/workflows"
+            backHref="/dashboard/workflows"
             backLabel="返回工作流"
             badge={(
               <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-200/40 px-2.5 py-0.5 text-[11px] text-brand-500">
@@ -458,7 +458,7 @@ export default function NewWorkflowPage() {
                   上一步
                 </Button>
               ) : (
-                <Link href="/workflows">
+                <Link href="/dashboard/workflows">
                   <Button variant="outline" size="sm">
                     取消
                   </Button>

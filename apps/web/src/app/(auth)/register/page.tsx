@@ -33,7 +33,7 @@ function getPasswordStrength(password: string): number {
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/workflows";
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   
   const { register, isLoading, error, clearError } = useAuthStore();
   

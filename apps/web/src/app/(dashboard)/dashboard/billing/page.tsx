@@ -5,18 +5,31 @@
  * 管理订阅套餐、用量、付款方式与账单历史
  */
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Callout } from "@/components/ui/callout";
+import { CircularProgress, Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 import {
+  billingApi,
+  type BudgetSettings,
+  type BillingInvoiceDetail,
+  type BillingInvoiceSummary,
+  type AppUsageStat,
+} from "@/lib/api/billing";
+import { workspaceApi, type WorkspaceQuota } from "@/lib/api/workspace";
+import {
+  ArrowDown,
+  ArrowUp,
   ArrowUpRight,
   Bot,
+  Calendar,
   Check,
   ChevronRight,
   CreditCard,
@@ -25,7 +38,10 @@ import {
   Download,
   ExternalLink,
   Gift,
+  Globe,
   Infinity,
+  LayoutGrid,
+  Minus,
   Plus,
   Receipt,
   Star,
@@ -34,6 +50,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
+
+const WORKSPACE_STORAGE_KEY = "last_workspace_id";
 
 // 订阅套餐
 const plans = [
@@ -95,49 +113,14 @@ const plans = [
 ];
 
 // 当前使用情况
-const currentUsage = {
+const defaultUsage = {
   apiCalls: { used: 3247, limit: 5000 },
-  workflows: { used: 8, limit: -1 }, // -1 表示无限
-  agents: { used: 4, limit: 10 },
+  tokens: { used: 820000, limit: 1000000 },
   storage: { used: 2.4, limit: 10 }, // GB
+  bandwidth: { used: 15.6, limit: 50 }, // GB
+  apps: { used: 8, limit: 12 },
   teamMembers: { used: 2, limit: 3 },
 };
-
-// 账单历史
-const billingHistory = [
-  {
-    id: "1",
-    date: "2026-01-31",
-    description: "专业版订阅 - 1月",
-    amount: 99,
-    status: "paid",
-    invoice: "INV-2026-001",
-  },
-  {
-    id: "2",
-    date: "2025-12-31",
-    description: "专业版订阅 - 12月",
-    amount: 99,
-    status: "paid",
-    invoice: "INV-2025-012",
-  },
-  {
-    id: "3",
-    date: "2025-11-30",
-    description: "专业版订阅 - 11月",
-    amount: 99,
-    status: "paid",
-    invoice: "INV-2025-011",
-  },
-  {
-    id: "4",
-    date: "2025-10-31",
-    description: "额外 API 调用包",
-    amount: 29,
-    status: "paid",
-    invoice: "INV-2025-010B",
-  },
-];
 
 // 付款方式
 const paymentMethods = [
@@ -170,11 +153,31 @@ const billingAddress = {
 export default function BillingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [spendCapEnabled, setSpendCapEnabled] = useState(true);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  const [quota, setQuota] = useState<WorkspaceQuota | null>(null);
+  const [budget, setBudget] = useState<BudgetSettings | null>(null);
+  const [quotaLoading, setQuotaLoading] = useState(false);
+  const [invoices, setInvoices] = useState<BillingInvoiceSummary[]>([]);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [invoiceError, setInvoiceError] = useState<string | null>(null);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [selectedInvoiceDetail, setSelectedInvoiceDetail] =
+    useState<BillingInvoiceDetail | null>(null);
+  const [invoiceDetailLoading, setInvoiceDetailLoading] = useState(false);
+  const [invoiceDownloadId, setInvoiceDownloadId] = useState<string | null>(null);
+  const [appUsageStats, setAppUsageStats] = useState<AppUsageStat[]>([]);
+  const [appUsageLoading, setAppUsageLoading] = useState(false);
+  const [appUsageError, setAppUsageError] = useState<string | null>(null);
   const currentPlan = plans.find((plan) => plan.current);
+  const selectedInvoiceSummary =
+    (selectedInvoiceId && invoices.find((bill) => bill.id === selectedInvoiceId)) || invoices[0];
+  const selectedInvoice = selectedInvoiceDetail ?? selectedInvoiceSummary;
 
   const formatCurrency = (value: number) => `¥${value.toLocaleString("zh-CN")}`;
   const formatNumber = (value: number, digits = 0) =>
     value.toLocaleString("zh-CN", { maximumFractionDigits: digits });
+  const formatSignedCurrency = (value: number) =>
+    value < 0 ? `-${formatCurrency(Math.abs(value))}` : formatCurrency(value);
   const priceMultiplier = billingCycle === "yearly" ? 0.8 : 1;
   const billingLabel = billingCycle === "yearly" ? "年付" : "月付";
   const billingHint = billingCycle === "yearly" ? "已包含 20% 折扣" : "切换年付享 20% 折扣";
@@ -184,6 +187,272 @@ export default function BillingPage() {
   const discountAmount =
     billingCycle === "yearly" ? Math.round((currentPlan?.price ?? 0) * 0.2) : 0;
   const creditBalance = 0;
+  const spendLimitDisplay =
+    budget && budget.spend_limit > 0 ? formatCurrency(budget.spend_limit) : "未设置";
+  const invoiceSubtotal = selectedInvoiceSummary?.subtotal ?? (currentPlan?.price ?? 0);
+  const invoiceDiscount =
+    selectedInvoiceSummary?.discountAmount ?? (discountAmount > 0 ? discountAmount : 0);
+  const invoiceTax = selectedInvoiceSummary?.taxAmount ?? 0;
+  const invoiceTotal = selectedInvoiceSummary?.totalAmount ?? currentPlanPrice;
+
+  type InvoiceStatus = BillingInvoiceSummary["status"];
+  type InvoiceStatusVariant = "success" | "warning" | "error" | "secondary";
+
+  const resolveInvoiceStatusLabel = (status?: InvoiceStatus) => {
+    switch (status) {
+      case "paid":
+        return "已支付";
+      case "failed":
+        return "支付失败";
+      case "refunded":
+        return "已退款";
+      case "pending":
+      default:
+        return "待处理";
+    }
+  };
+
+  const resolveInvoiceStatusVariant = (status?: InvoiceStatus): InvoiceStatusVariant => {
+    switch (status) {
+      case "paid":
+        return "success";
+      case "failed":
+        return "error";
+      case "refunded":
+        return "secondary";
+      case "pending":
+      default:
+        return "warning";
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedId = localStorage.getItem(WORKSPACE_STORAGE_KEY);
+    if (storedId) {
+      setActiveWorkspaceId(storedId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!activeWorkspaceId) return;
+    let isActive = true;
+
+    const loadQuotaAndBudget = async () => {
+      try {
+        setQuotaLoading(true);
+        try {
+          const quotaData = await workspaceApi.getQuota(activeWorkspaceId);
+          if (isActive) setQuota(quotaData);
+        } catch {
+          // 配额接口可能未实现或无权限
+        }
+
+        try {
+          const settings = await billingApi.getBudgetSettings(activeWorkspaceId);
+          if (isActive) {
+            setBudget(settings);
+            setSpendCapEnabled(settings.spend_limit_enabled);
+          }
+        } catch {
+          // 预算接口可能未实现或无权限
+        }
+      } finally {
+        if (isActive) setQuotaLoading(false);
+      }
+    };
+
+    loadQuotaAndBudget();
+    return () => {
+      isActive = false;
+    };
+  }, [activeWorkspaceId]);
+
+  useEffect(() => {
+    if (!activeWorkspaceId) return;
+    let isActive = true;
+
+    const loadInvoices = async () => {
+      try {
+        setInvoiceLoading(true);
+        setInvoiceError(null);
+        const list = await billingApi.listInvoices(activeWorkspaceId, { limit: 6 });
+        if (!isActive) return;
+        setInvoices(list);
+        setSelectedInvoiceId((prev) => {
+          if (prev && list.some((invoice) => invoice.id === prev)) {
+            return prev;
+          }
+          return list[0]?.id || null;
+        });
+      } catch (error) {
+        if (!isActive) return;
+        setInvoiceError(error instanceof Error ? error.message : "获取账单失败");
+        setInvoices([]);
+        setSelectedInvoiceId(null);
+        setSelectedInvoiceDetail(null);
+      } finally {
+        if (isActive) setInvoiceLoading(false);
+      }
+    };
+
+    loadInvoices();
+    return () => {
+      isActive = false;
+    };
+  }, [activeWorkspaceId]);
+
+  useEffect(() => {
+    if (!activeWorkspaceId || !selectedInvoiceId) {
+      setSelectedInvoiceDetail(null);
+      setInvoiceDetailLoading(false);
+      return;
+    }
+    let isActive = true;
+
+    const loadInvoiceDetail = async () => {
+      try {
+        setInvoiceDetailLoading(true);
+        setSelectedInvoiceDetail(null);
+        const detail = await billingApi.getInvoiceDetail(activeWorkspaceId, selectedInvoiceId);
+        if (!isActive) return;
+        setSelectedInvoiceDetail(detail);
+      } catch {
+        if (!isActive) return;
+        setSelectedInvoiceDetail(null);
+      } finally {
+        if (isActive) setInvoiceDetailLoading(false);
+      }
+    };
+
+    loadInvoiceDetail();
+    return () => {
+      isActive = false;
+    };
+  }, [activeWorkspaceId, selectedInvoiceId]);
+
+  // 加载 App 用量统计
+  useEffect(() => {
+    if (!activeWorkspaceId) return;
+    let isActive = true;
+
+    const loadAppUsageStats = async () => {
+      try {
+        setAppUsageLoading(true);
+        setAppUsageError(null);
+        const stats = await billingApi.getAppUsageStats(activeWorkspaceId);
+        if (!isActive) return;
+        setAppUsageStats(stats);
+      } catch (error) {
+        if (!isActive) return;
+        setAppUsageError(error instanceof Error ? error.message : "获取 App 用量失败");
+        // 使用示例数据
+        setAppUsageStats([
+          {
+            id: "1",
+            app_id: "app-1",
+            app_name: "智能客服助手",
+            app_icon: "🤖",
+            workspace_id: activeWorkspaceId,
+            period_start: "2026-01-01",
+            period_end: "2026-01-31",
+            usage: { requests: 1523, tokens: 245000, storage: 0.8, bandwidth: 5.2 },
+            cost_amount: 45.8,
+            currency: "CNY",
+            trend_percent: 12.5,
+            trend_direction: "up",
+          },
+          {
+            id: "2",
+            app_id: "app-2",
+            app_name: "文档分析器",
+            app_icon: "📄",
+            workspace_id: activeWorkspaceId,
+            period_start: "2026-01-01",
+            period_end: "2026-01-31",
+            usage: { requests: 856, tokens: 320000, storage: 1.2, bandwidth: 6.8 },
+            cost_amount: 38.2,
+            currency: "CNY",
+            trend_percent: 8.3,
+            trend_direction: "down",
+          },
+          {
+            id: "3",
+            app_id: "app-3",
+            app_name: "数据提取工作流",
+            app_icon: "📊",
+            workspace_id: activeWorkspaceId,
+            period_start: "2026-01-01",
+            period_end: "2026-01-31",
+            usage: { requests: 432, tokens: 156000, storage: 0.3, bandwidth: 2.1 },
+            cost_amount: 22.5,
+            currency: "CNY",
+            trend_percent: 0,
+            trend_direction: "flat",
+          },
+          {
+            id: "4",
+            app_id: "app-4",
+            app_name: "营销文案生成",
+            app_icon: "✍️",
+            workspace_id: activeWorkspaceId,
+            period_start: "2026-01-01",
+            period_end: "2026-01-31",
+            usage: { requests: 287, tokens: 89000, storage: 0.1, bandwidth: 1.2 },
+            cost_amount: 15.3,
+            currency: "CNY",
+            trend_percent: 25.6,
+            trend_direction: "up",
+          },
+        ]);
+      } finally {
+        if (isActive) setAppUsageLoading(false);
+      }
+    };
+
+    loadAppUsageStats();
+    return () => {
+      isActive = false;
+    };
+  }, [activeWorkspaceId]);
+
+  const handleInvoiceDownload = async (invoiceId: string, invoiceNo?: string) => {
+    if (!activeWorkspaceId) return;
+    try {
+      setInvoiceDownloadId(invoiceId);
+      const blob = await billingApi.downloadInvoice(activeWorkspaceId, invoiceId, "pdf");
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${invoiceNo || `invoice-${invoiceId}`}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download invoice:", error);
+    } finally {
+      setInvoiceDownloadId(null);
+    }
+  };
+
+  const resolvedUsage = {
+    apiCalls: quota?.requests ?? defaultUsage.apiCalls,
+    tokens: quota?.tokens ?? defaultUsage.tokens,
+    storage: quota?.storage ?? defaultUsage.storage,
+    bandwidth: quota?.bandwidth ?? defaultUsage.bandwidth,
+    apps: quota?.apps ?? defaultUsage.apps,
+    teamMembers: defaultUsage.teamMembers,
+  };
+
+  const buildUsageHelper = (used: number, limit: number, unit?: string, digits = 0) => {
+    if (limit <= 0) return "不限";
+    const remaining = limit - used;
+    const formatted = formatNumber(Math.abs(remaining), digits);
+    const unitLabel = unit ? ` ${unit}` : "";
+    if (remaining < 0) return `已超额 ${formatted}${unitLabel}`;
+    return `剩余 ${formatted}${unitLabel}`;
+  };
 
   const usageItems = [
     {
@@ -191,58 +460,95 @@ export default function BillingPage() {
       label: "API 调用",
       caption: "月度请求配额",
       icon: Zap,
-      used: currentUsage.apiCalls.used,
-      limit: currentUsage.apiCalls.limit,
-      helper: `剩余 ${formatNumber(
-        Math.max(currentUsage.apiCalls.limit - currentUsage.apiCalls.used, 0)
-      )} 次`,
+      used: resolvedUsage.apiCalls.used,
+      limit: resolvedUsage.apiCalls.limit,
+      helper: buildUsageHelper(resolvedUsage.apiCalls.used, resolvedUsage.apiCalls.limit, "次"),
     },
     {
-      id: "workflows",
-      label: "工作流",
-      caption: "已启用",
-      icon: TrendingUp,
-      used: currentUsage.workflows.used,
-      limit: currentUsage.workflows.limit,
-      helper: "无限制",
-    },
-    {
-      id: "agents",
-      label: "AI Agent",
-      caption: "运行中",
+      id: "tokens",
+      label: "Token 用量",
+      caption: "模型消耗",
       icon: Bot,
-      used: currentUsage.agents.used,
-      limit: currentUsage.agents.limit,
-      helper: `还可创建 ${formatNumber(
-        Math.max(currentUsage.agents.limit - currentUsage.agents.used, 0)
-      )} 个`,
+      used: resolvedUsage.tokens.used,
+      limit: resolvedUsage.tokens.limit,
+      helper: buildUsageHelper(resolvedUsage.tokens.used, resolvedUsage.tokens.limit, "Token"),
     },
     {
       id: "storage",
       label: "存储空间",
       caption: "对象存储",
       icon: Database,
-      used: currentUsage.storage.used,
-      limit: currentUsage.storage.limit,
+      used: resolvedUsage.storage.used,
+      limit: resolvedUsage.storage.limit,
       unit: "GB",
       digits: 1,
-      helper: `剩余 ${formatNumber(
-        Math.max(currentUsage.storage.limit - currentUsage.storage.used, 0),
+      helper: buildUsageHelper(
+        resolvedUsage.storage.used,
+        resolvedUsage.storage.limit,
+        "GB",
         1
-      )} GB`,
+      ),
+    },
+    {
+      id: "bandwidth",
+      label: "带宽用量",
+      caption: "网络传输",
+      icon: Globe,
+      used: resolvedUsage.bandwidth.used,
+      limit: resolvedUsage.bandwidth.limit,
+      unit: "GB",
+      digits: 1,
+      helper: buildUsageHelper(
+        resolvedUsage.bandwidth.used,
+        resolvedUsage.bandwidth.limit,
+        "GB",
+        1
+      ),
+    },
+    {
+      id: "apps",
+      label: "应用数量",
+      caption: "可创建应用",
+      icon: LayoutGrid,
+      used: resolvedUsage.apps.used,
+      limit: resolvedUsage.apps.limit,
+      helper: buildUsageHelper(resolvedUsage.apps.used, resolvedUsage.apps.limit, "个"),
     },
     {
       id: "teamMembers",
       label: "团队成员",
       caption: "成员席位",
       icon: Users,
-      used: currentUsage.teamMembers.used,
-      limit: currentUsage.teamMembers.limit,
-      helper: `还可邀请 ${formatNumber(
-        Math.max(currentUsage.teamMembers.limit - currentUsage.teamMembers.used, 0)
-      )} 人`,
+      used: resolvedUsage.teamMembers.used,
+      limit: resolvedUsage.teamMembers.limit,
+      helper: buildUsageHelper(
+        resolvedUsage.teamMembers.used,
+        resolvedUsage.teamMembers.limit,
+        "人"
+      ),
     },
   ];
+
+  const usagePercentages = usageItems
+    .filter((item) => item.limit > 0)
+    .map((item) => ({
+      id: item.id,
+      label: item.label,
+      percent: item.used / Math.max(item.limit, 1),
+    }));
+  const usageAlertItems = usagePercentages.filter((item) => item.percent >= 0.8);
+  const overLimitItems = usageAlertItems.filter((item) => item.percent >= 1);
+  const nearLimitItems = usageAlertItems.filter((item) => item.percent >= 0.8 && item.percent < 1);
+  const maxUsagePercent = usagePercentages.length
+    ? Math.max(...usagePercentages.map((item) => item.percent))
+    : 0;
+  const averageUsagePercent = usagePercentages.length
+    ? usagePercentages.reduce((sum, item) => sum + item.percent, 0) / usagePercentages.length
+    : 0;
+  const quotaStatus =
+    maxUsagePercent >= 1 ? "已超额" : maxUsagePercent >= 0.8 ? "临近上限" : "健康";
+  const quotaStatusVariant = maxUsagePercent >= 1 ? "error" : maxUsagePercent >= 0.8 ? "warning" : "success";
+  const quotaSourceLabel = quota ? "实时数据" : "示例数据";
 
   return (
     <PageContainer>
@@ -290,6 +596,20 @@ export default function BillingPage() {
             </span>
           </div>
         </PageHeader>
+        <Callout variant="info" title="升级引导">
+          当前配额使用将随着业务增长快速上升，建议提前评估升级或申请额外额度。
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link href="/dashboard/upgrade">
+                升级套餐
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/dashboard/support-tickets?category=billing">申请额外配额</Link>
+            </Button>
+          </div>
+        </Callout>
         <div className="page-divider" />
         <section className="page-panel relative overflow-hidden">
           <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-brand-500/10 blur-3xl" />
@@ -348,23 +668,23 @@ export default function BillingPage() {
                 <div className="rounded-md border border-border bg-surface-75 p-4">
                   <p className="text-xs text-foreground-muted">团队席位</p>
                   <p className="text-sm font-medium text-foreground tabular-nums">
-                    {currentUsage.teamMembers.used} / {currentUsage.teamMembers.limit}
+                    {resolvedUsage.teamMembers.used} / {resolvedUsage.teamMembers.limit}
                   </p>
                   <p className="text-xs text-foreground-light">已分配</p>
                 </div>
                 <div className="rounded-md border border-border bg-surface-75 p-4">
                   <p className="text-xs text-foreground-muted">存储空间</p>
                   <p className="text-sm font-medium text-foreground tabular-nums">
-                    {formatNumber(currentUsage.storage.used, 1)} GB /{" "}
-                    {formatNumber(currentUsage.storage.limit, 1)} GB
+                    {formatNumber(resolvedUsage.storage.used, 1)} GB /{" "}
+                    {formatNumber(resolvedUsage.storage.limit, 1)} GB
                   </p>
                   <p className="text-xs text-foreground-light">本月使用</p>
                 </div>
                 <div className="rounded-md border border-border bg-surface-75 p-4">
                   <p className="text-xs text-foreground-muted">API 调用</p>
                   <p className="text-sm font-medium text-foreground tabular-nums">
-                    {formatNumber(currentUsage.apiCalls.used)} /{" "}
-                    {formatNumber(currentUsage.apiCalls.limit)}
+                    {formatNumber(resolvedUsage.apiCalls.used)} /{" "}
+                    {formatNumber(resolvedUsage.apiCalls.limit)}
                   </p>
                   <p className="text-xs text-foreground-light">本月用量</p>
                 </div>
@@ -390,26 +710,30 @@ export default function BillingPage() {
                 <p className="text-xs text-foreground-muted mb-3">账单摘要</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-light">套餐费用</span>
+                    <span className="text-foreground-light">小计</span>
                     <span className="text-foreground tabular-nums">
-                      {formatCurrency(currentPlan?.price || 0)}
+                      {formatCurrency(invoiceSubtotal)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-foreground-light">折扣</span>
                     <span className="text-foreground tabular-nums">
-                      -{formatCurrency(discountAmount)}
+                      {invoiceDiscount > 0
+                        ? `-${formatCurrency(invoiceDiscount)}`
+                        : formatCurrency(0)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-foreground-light">税费</span>
-                    <span className="text-foreground tabular-nums">¥0</span>
+                    <span className="text-foreground tabular-nums">
+                      {formatCurrency(invoiceTax)}
+                    </span>
                   </div>
                   <div className="h-px bg-border my-2" />
                   <div className="flex items-center justify-between font-medium">
                     <span className="text-foreground">预计总额</span>
                     <span className="text-foreground tabular-nums">
-                      {formatCurrency(currentPlanPrice)}
+                      {formatCurrency(invoiceTotal)}
                     </span>
                   </div>
                 </div>
@@ -422,6 +746,13 @@ export default function BillingPage() {
                     size="sm"
                     className="w-full justify-between"
                     rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
+                    onClick={() =>
+                      selectedInvoice &&
+                      handleInvoiceDownload(selectedInvoice.id, selectedInvoice.invoice)
+                    }
+                    disabled={!selectedInvoice}
+                    loading={invoiceDownloadId === selectedInvoice?.id}
+                    loadingText="下载中"
                   >
                     下载本期发票
                   </Button>
@@ -467,71 +798,288 @@ export default function BillingPage() {
         <section className="page-panel">
           <div className="page-panel-header flex items-center justify-between">
             <div>
-              <h3 className="page-panel-title">本月使用情况</h3>
-              <p className="page-panel-description">按套餐配额实时统计</p>
+              <h3 className="page-panel-title">配额使用仪表盘</h3>
+              <p className="page-panel-description">按工作空间配额实时统计</p>
             </div>
-            <Button variant="outline" size="sm">
-              购买额外配额
-            </Button>
+            <div className="flex items-center gap-2">
+              {quotaLoading && (
+                <Badge variant="secondary" size="xs">
+                  同步中
+                </Badge>
+              )}
+              <Button variant="outline" size="sm">
+                购买额外配额
+              </Button>
+            </div>
           </div>
-          <div className="p-6 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {usageItems.map((item) => {
-              const isUnlimited = item.limit < 0;
-              const progressValue = isUnlimited
-                ? 100
-                : (item.used / Math.max(item.limit, 1)) * 100;
-              const precision = item.digits ?? 0;
-              const usageText = isUnlimited ? (
-                <span className="inline-flex items-center gap-1">
-                  {formatNumber(item.used)}
-                  <span className="text-foreground-muted">/</span>
-                  <Infinity className="w-3 h-3" />
-                </span>
-              ) : item.unit ? (
-                `${formatNumber(item.used, precision)} ${item.unit} / ${formatNumber(
-                  item.limit,
-                  precision
-                )} ${item.unit}`
-              ) : (
-                `${formatNumber(item.used)} / ${formatNumber(item.limit)}`
-              );
-
-              return (
-                <div
-                  key={item.id}
-                  className="rounded-md border border-border bg-surface-75 p-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center">
-                        <item.icon className="w-4 h-4 text-foreground-light" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{item.label}</p>
-                        <p className="text-xs text-foreground-muted">{item.caption}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-foreground-light tabular-nums">
-                      {usageText}
-                    </span>
-                  </div>
-                  <Progress
-                    value={progressValue}
-                    size="sm"
-                    variant={isUnlimited ? "success" : "default"}
-                    className="mt-3"
-                  />
-                  <p
-                    className={cn(
-                      "text-xs mt-2",
-                      isUnlimited ? "text-brand-500" : "text-foreground-muted"
-                    )}
-                  >
-                    {item.helper}
-                  </p>
+          <div className="p-6 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-border bg-surface-75 p-4">
+              <div className="space-y-2">
+                <p className="text-xs text-foreground-muted">配额健康度</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={quotaStatusVariant} size="sm">
+                    {quotaStatus}
+                  </Badge>
+                  <span className="text-xs text-foreground-light">
+                    最高使用率 {Math.round(maxUsagePercent * 100)}%
+                  </span>
                 </div>
-              );
-            })}
+                <p className="text-xs text-foreground-muted">
+                  平均使用率 {Math.round(averageUsagePercent * 100)}% · {quotaSourceLabel}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <CircularProgress
+                  value={Math.round(maxUsagePercent * 100)}
+                  size={68}
+                  showValue
+                  variant={quotaStatusVariant}
+                  formatValue={(value) => `${Math.round(value)}%`}
+                />
+                <div className="text-xs text-foreground-muted space-y-1">
+                  <p>高峰配额优先展示</p>
+                  <p>建议留出 20% 安全边际</p>
+                </div>
+              </div>
+            </div>
+
+            {usageAlertItems.length > 0 && (
+              <Callout
+                variant={overLimitItems.length > 0 ? "error" : "warning"}
+                title={overLimitItems.length > 0 ? "已触发超额" : "配额即将用尽"}
+              >
+                <p>
+                  {overLimitItems.length > 0
+                    ? "部分资源已超出套餐配额，建议立即升级或申请额外配额，避免影响业务稳定性。"
+                    : "关键资源即将触达配额上限，请提前规划升级或补充额度。"}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {usageAlertItems.map((item) => (
+                    <Badge
+                      key={item.id}
+                      variant={item.percent >= 1 ? "error" : "warning"}
+                      size="sm"
+                    >
+                      {item.label} {Math.round(item.percent * 100)}%
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Button asChild size="sm">
+                    <Link href="/dashboard/upgrade">
+                      升级套餐
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/dashboard/support-tickets?category=billing">申请额外配额</Link>
+                  </Button>
+                </div>
+              </Callout>
+            )}
+
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {usageItems.map((item) => {
+                const isUnlimited = item.limit <= 0;
+                const progressValue = isUnlimited
+                  ? 100
+                  : (item.used / Math.max(item.limit, 1)) * 100;
+                const progressVariant = isUnlimited
+                  ? "success"
+                  : progressValue >= 100
+                  ? "error"
+                  : progressValue >= 80
+                  ? "warning"
+                  : "default";
+                const precision = item.digits ?? 0;
+                const usageText = isUnlimited ? (
+                  <span className="inline-flex items-center gap-1">
+                    {formatNumber(item.used)}
+                    <span className="text-foreground-muted">/</span>
+                    <Infinity className="w-3 h-3" />
+                  </span>
+                ) : item.unit ? (
+                  `${formatNumber(item.used, precision)} ${item.unit} / ${formatNumber(
+                    item.limit,
+                    precision
+                  )} ${item.unit}`
+                ) : (
+                  `${formatNumber(item.used)} / ${formatNumber(item.limit)}`
+                );
+
+                return (
+                  <div
+                    key={item.id}
+                    className="rounded-md border border-border bg-surface-75 p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center">
+                          <item.icon className="w-4 h-4 text-foreground-light" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{item.label}</p>
+                          <p className="text-xs text-foreground-muted">{item.caption}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs text-foreground-light tabular-nums">
+                        {usageText}
+                      </span>
+                    </div>
+                    <Progress
+                      value={progressValue}
+                      size="sm"
+                      variant={progressVariant}
+                      className="mt-3"
+                    />
+                    <p
+                      className={cn(
+                        "text-xs mt-2",
+                        isUnlimited
+                          ? "text-brand-500"
+                          : progressValue >= 80
+                          ? "text-warning"
+                          : "text-foreground-muted"
+                      )}
+                    >
+                      {item.helper}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="page-panel">
+          <div className="page-panel-header flex items-center justify-between">
+            <div>
+              <h3 className="page-panel-title">按 App 统计</h3>
+              <p className="page-panel-description">分应用查看用量与成本，便于对账与优化</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {appUsageLoading && (
+                <Badge variant="secondary" size="xs">
+                  同步中
+                </Badge>
+              )}
+              <Button variant="outline" size="sm" rightIcon={<Download className="w-3.5 h-3.5" />}>
+                导出报表
+              </Button>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="rounded-md border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-surface-200">
+                  <tr>
+                    <th className="text-table-header text-left px-4 py-2">应用</th>
+                    <th className="text-table-header text-right px-4 py-2">请求数</th>
+                    <th className="text-table-header text-right px-4 py-2">Token</th>
+                    <th className="text-table-header text-right px-4 py-2">存储</th>
+                    <th className="text-table-header text-right px-4 py-2">带宽</th>
+                    <th className="text-table-header text-right px-4 py-2">成本</th>
+                    <th className="text-table-header text-right px-4 py-2">趋势</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {appUsageStats.length === 0 ? (
+                    <tr className="bg-surface-75">
+                      <td colSpan={7} className="px-4 py-6 text-center text-foreground-muted">
+                        {appUsageError
+                          ? `加载失败：${appUsageError}`
+                          : appUsageLoading
+                          ? "正在加载 App 用量数据..."
+                          : "暂无 App 用量数据"}
+                      </td>
+                    </tr>
+                  ) : (
+                    appUsageStats.map((stat) => (
+                      <tr key={stat.id} className="bg-surface-75 hover:bg-surface-100 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center text-base">
+                              {stat.app_icon || "📱"}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{stat.app_name}</p>
+                              <p className="text-xs text-foreground-muted">{stat.period_start} ~ {stat.period_end}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right text-foreground tabular-nums">
+                          {formatNumber(stat.usage.requests || 0)}
+                        </td>
+                        <td className="px-4 py-3 text-right text-foreground tabular-nums">
+                          {formatNumber(stat.usage.tokens || 0)}
+                        </td>
+                        <td className="px-4 py-3 text-right text-foreground tabular-nums">
+                          {formatNumber(stat.usage.storage || 0, 1)} GB
+                        </td>
+                        <td className="px-4 py-3 text-right text-foreground tabular-nums">
+                          {formatNumber(stat.usage.bandwidth || 0, 1)} GB
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-foreground font-medium tabular-nums">
+                            {formatCurrency(stat.cost_amount)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="inline-flex items-center gap-1">
+                            {stat.trend_direction === "up" && (
+                              <>
+                                <ArrowUp className="w-3.5 h-3.5 text-error" />
+                                <span className="text-xs text-error tabular-nums">+{stat.trend_percent}%</span>
+                              </>
+                            )}
+                            {stat.trend_direction === "down" && (
+                              <>
+                                <ArrowDown className="w-3.5 h-3.5 text-success" />
+                                <span className="text-xs text-success tabular-nums">-{stat.trend_percent}%</span>
+                              </>
+                            )}
+                            {stat.trend_direction === "flat" && (
+                              <>
+                                <Minus className="w-3.5 h-3.5 text-foreground-muted" />
+                                <span className="text-xs text-foreground-muted">持平</span>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+                {appUsageStats.length > 0 && (
+                  <tfoot className="bg-surface-200/50">
+                    <tr>
+                      <td className="px-4 py-2 text-sm font-medium text-foreground">合计</td>
+                      <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
+                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.requests || 0), 0))}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
+                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.tokens || 0), 0))}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
+                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.storage || 0), 0), 1)} GB
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
+                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.bandwidth || 0), 0), 1)} GB
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
+                        {formatCurrency(appUsageStats.reduce((sum, s) => sum + s.cost_amount, 0))}
+                      </td>
+                      <td className="px-4 py-2 text-right text-xs text-foreground-muted">-</td>
+                    </tr>
+                  </tfoot>
+                )}
+              </table>
+            </div>
+            <p className="text-xs text-foreground-muted mt-3">
+              {appUsageStats.length === 0
+                ? "暂无应用数据"
+                : `显示 ${appUsageStats.length} 个应用的本月用量统计`}
+            </p>
           </div>
         </section>
 
@@ -575,7 +1123,7 @@ export default function BillingPage() {
                 <span>当前上限</span>
                 <div className="flex items-center gap-2">
                   <Input
-                    value={formatCurrency(0)}
+                    value={spendLimitDisplay}
                     readOnly
                     className="h-8 max-w-[120px] text-xs bg-surface-200"
                   />
@@ -599,26 +1147,31 @@ export default function BillingPage() {
                 <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
                   <span className="text-foreground-light">API 调用</span>
                   <span className="text-foreground tabular-nums">
-                    {formatNumber(currentUsage.apiCalls.limit)}
+                    {formatNumber(resolvedUsage.apiCalls.limit)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
+                  <span className="text-foreground-light">Token 用量</span>
+                  <span className="text-foreground tabular-nums">
+                    {formatNumber(resolvedUsage.tokens.limit)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
                   <span className="text-foreground-light">存储空间</span>
                   <span className="text-foreground tabular-nums">
-                    {formatNumber(currentUsage.storage.limit, 1)} GB
+                    {formatNumber(resolvedUsage.storage.limit, 1)} GB
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
+                  <span className="text-foreground-light">应用数量</span>
+                  <span className="text-foreground tabular-nums">
+                    {formatNumber(resolvedUsage.apps.limit)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
                   <span className="text-foreground-light">团队成员</span>
                   <span className="text-foreground tabular-nums">
-                    {formatNumber(currentUsage.teamMembers.limit)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
-                  <span className="text-foreground-light">工作流</span>
-                  <span className="text-foreground inline-flex items-center gap-1">
-                    <Infinity className="w-3 h-3" />
-                    不限
+                    {formatNumber(resolvedUsage.teamMembers.limit)}
                   </span>
                 </div>
               </div>
@@ -787,6 +1340,80 @@ export default function BillingPage() {
               </Button>
             </div>
             <div className="p-6">
+              {selectedInvoiceSummary && (
+                <div className="mb-5 rounded-md border border-border bg-surface-75 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <p className="text-xs text-foreground-muted">账单明细</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-medium text-foreground">
+                          {selectedInvoiceSummary.description}
+                        </p>
+                        <Badge
+                          variant={resolveInvoiceStatusVariant(selectedInvoiceSummary.status)}
+                          size="xs"
+                        >
+                          {resolveInvoiceStatusLabel(selectedInvoiceSummary.status)}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-foreground-muted">
+                        账期 {selectedInvoiceSummary.period} · 发票号 {selectedInvoiceSummary.invoice}
+                      </p>
+                      {selectedInvoiceSummary.paidAt && (
+                        <p className="text-xs text-foreground-muted">
+                          支付时间 {selectedInvoiceSummary.paidAt}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<Download className="w-3.5 h-3.5" />}
+                        onClick={() =>
+                          handleInvoiceDownload(
+                            selectedInvoiceSummary.id,
+                            selectedInvoiceSummary.invoice
+                          )
+                        }
+                        loading={invoiceDownloadId === selectedInvoiceSummary.id}
+                        loadingText="下载中"
+                      >
+                        下载发票
+                      </Button>
+                      <Button variant="ghost" size="sm" leftIcon={<Receipt className="w-3.5 h-3.5" />}>
+                        查看收据
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid gap-2 text-xs">
+                    {selectedInvoiceDetail?.lineItems?.length ? (
+                      selectedInvoiceDetail.lineItems.map((item, index) => (
+                        <div
+                          key={`${item.label}-${index}`}
+                          className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-3 py-2"
+                        >
+                          <div className="space-y-0.5">
+                            <p className="text-foreground">{item.label}</p>
+                            {item.quantity !== undefined && item.unitPrice !== undefined && (
+                              <p className="text-foreground-muted">
+                                {item.quantity} × {formatCurrency(item.unitPrice)}
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-foreground tabular-nums">
+                            {formatSignedCurrency(item.total)}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-md border border-dashed border-border bg-surface-200/60 px-3 py-3 text-foreground-muted">
+                        {invoiceDetailLoading ? "正在加载账单明细..." : "暂无账单明细"}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="rounded-md border border-border overflow-hidden">
                 <table className="w-full text-sm">
                   <thead className="bg-surface-200">
@@ -800,33 +1427,71 @@ export default function BillingPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {billingHistory.map((bill) => (
-                      <tr key={bill.id} className="bg-surface-75">
-                        <td className="px-4 py-3 text-foreground-light">{bill.date}</td>
-                        <td className="px-4 py-3">
-                          <div className="text-foreground font-medium">{bill.description}</div>
-                        </td>
-                        <td className="px-4 py-3 text-foreground-muted">{bill.invoice}</td>
-                        <td className="px-4 py-3 text-right text-foreground tabular-nums">
-                          {formatCurrency(bill.amount)}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Badge variant="secondary" size="sm">
-                            {bill.status === "paid" ? "已支付" : "待处理"}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Button variant="ghost" size="icon-sm">
-                            <Download className="w-4 h-4" />
-                          </Button>
+                    {invoices.length === 0 ? (
+                      <tr className="bg-surface-75">
+                        <td colSpan={6} className="px-4 py-6 text-center text-foreground-muted">
+                          {invoiceError
+                            ? `账单加载失败：${invoiceError}`
+                            : invoiceLoading
+                            ? "正在加载账单..."
+                            : "暂无账单记录"}
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      invoices.map((bill) => (
+                        <tr
+                          key={bill.id}
+                          className={cn(
+                            "bg-surface-75",
+                            bill.id === selectedInvoiceSummary?.id && "bg-surface-100"
+                          )}
+                        >
+                          <td className="px-4 py-3 text-foreground-light">{bill.date}</td>
+                          <td className="px-4 py-3">
+                            <div className="text-foreground font-medium">{bill.description}</div>
+                          </td>
+                          <td className="px-4 py-3 text-foreground-muted">{bill.invoice}</td>
+                          <td className="px-4 py-3 text-right text-foreground tabular-nums">
+                            {formatCurrency(bill.amount)}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Badge
+                              variant={resolveInvoiceStatusVariant(bill.status)}
+                              size="sm"
+                            >
+                              {resolveInvoiceStatusLabel(bill.status)}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="inline-flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedInvoiceId(bill.id)}
+                              >
+                                查看明细
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleInvoiceDownload(bill.id, bill.invoice)}
+                                loading={invoiceDownloadId === bill.id}
+                                loadingText=""
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
               <p className="text-xs text-foreground-muted mt-3">
-                显示 1 至 {billingHistory.length} 条，共 {billingHistory.length} 条记录
+                {invoices.length === 0
+                  ? "暂无账单记录"
+                  : `显示 1 至 ${invoices.length} 条，共 ${invoices.length} 条记录`}
               </p>
             </div>
           </section>

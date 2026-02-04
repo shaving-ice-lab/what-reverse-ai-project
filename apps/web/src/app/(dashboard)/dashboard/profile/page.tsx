@@ -237,7 +237,7 @@ export default function ProfilePage() {
 
                   {/* 操作按钮 */}
                   <div className="flex items-center gap-2">
-                    <Link href="/settings/profile">
+                    <Link href="/dashboard/settings/profile">
                       <Button size="sm" className="bg-brand-500 text-background hover:bg-brand-600">
                         <Edit3 className="w-4 h-4 mr-2" />
                         编辑资料

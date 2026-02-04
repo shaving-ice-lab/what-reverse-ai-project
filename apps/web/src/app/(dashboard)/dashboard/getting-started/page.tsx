@@ -41,7 +41,7 @@ const onboardingSteps = [
     title: "开始第一次对话",
     description: "与 AI 进行一次对话，体验智能助手的核心能力",
     icon: MessageSquare,
-    href: "/conversations",
+    href: "/dashboard/conversations",
     completed: true,
     points: 50,
   },
@@ -50,7 +50,7 @@ const onboardingSteps = [
     title: "创建工作流",
     description: "创建您的第一个自动化工作流，提升工作效率",
     icon: Zap,
-    href: "/workflows/new",
+    href: "/dashboard/workflows/new",
     completed: true,
     points: 100,
   },
@@ -59,7 +59,7 @@ const onboardingSteps = [
     title: "创建 AI Agent",
     description: "定制一个专属于您的 AI 助手",
     icon: Bot,
-    href: "/my-agents/new",
+    href: "/dashboard/my-agents/new",
     completed: false,
     points: 150,
   },
@@ -68,7 +68,7 @@ const onboardingSteps = [
     title: "上传文件到知识库",
     description: "上传文档，让 AI 基于您的数据进行回答",
     icon: Upload,
-    href: "/files",
+    href: "/dashboard/files",
     completed: false,
     points: 100,
   },
@@ -77,7 +77,7 @@ const onboardingSteps = [
     title: "添加 API 密钥",
     description: "配置您自己的 AI 模型 API 密钥",
     icon: Key,
-    href: "/settings/api-keys",
+    href: "/dashboard/settings/api-keys",
     completed: false,
     points: 75,
   },
@@ -86,7 +86,7 @@ const onboardingSteps = [
     title: "邀请团队成员",
     description: "邀请同事一起协作",
     icon: Users,
-    href: "/team",
+    href: "/dashboard/team",
     completed: false,
     points: 200,
   },
@@ -101,7 +101,7 @@ const features = [
     color: "text-brand-500",
     bgColor: "bg-brand-200/60",
     tag: "核心",
-    href: "/conversations",
+    href: "/dashboard/conversations",
   },
   {
     title: "工作流自动化",
@@ -110,7 +110,7 @@ const features = [
     color: "text-warning",
     bgColor: "bg-warning-200/60",
     tag: "自动化",
-    href: "/workflows",
+    href: "/dashboard/workflows",
   },
   {
     title: "AI Agent",
@@ -119,7 +119,7 @@ const features = [
     color: "text-brand-500",
     bgColor: "bg-brand-200/60",
     tag: "Agent",
-    href: "/my-agents",
+    href: "/dashboard/my-agents",
   },
   {
     title: "知识库",
@@ -128,7 +128,7 @@ const features = [
     color: "text-brand-500",
     bgColor: "bg-brand-200/60",
     tag: "资料库",
-    href: "/files",
+    href: "/dashboard/files",
   },
 ];
 
@@ -140,7 +140,7 @@ const learningResources = [
     icon: Play,
     duration: "5 分钟",
     type: "video",
-    href: "/learn",
+    href: "/dashboard/learn",
   },
   {
     title: "工作流创建指南",
@@ -148,7 +148,7 @@ const learningResources = [
     icon: BookOpen,
     duration: "10 分钟",
     type: "tutorial",
-    href: "/workflows",
+    href: "/dashboard/workflows",
   },
   {
     title: "API 集成文档",
@@ -156,7 +156,7 @@ const learningResources = [
     icon: FileText,
     duration: "15 分钟",
     type: "docs",
-    href: "/settings/api-keys",
+    href: "/dashboard/settings/api-keys",
   },
   {
     title: "最佳实践案例",
@@ -164,7 +164,7 @@ const learningResources = [
     icon: Lightbulb,
     duration: "阅读",
     type: "article",
-    href: "/template-gallery",
+    href: "/dashboard/template-gallery",
   },
 ];
 
@@ -259,28 +259,28 @@ export default function GettingStartedPage() {
       title: "学习中心",
       description: "快速上手与最佳实践",
       icon: BookOpen,
-      href: "/learn",
+      href: "/dashboard/learn",
     },
     {
       id: "api",
       title: "API 密钥",
       description: "配置模型与密钥",
       icon: Key,
-      href: "/settings/api-keys",
+      href: "/dashboard/settings/api-keys",
     },
     {
       id: "templates",
       title: "模板库",
       description: "从模板开始自动化",
       icon: FileText,
-      href: "/template-gallery",
+      href: "/dashboard/template-gallery",
     },
     {
       id: "team",
       title: "团队协作",
       description: "邀请成员一起使用",
       icon: Users,
-      href: "/team",
+      href: "/dashboard/team",
     },
   ];
 
@@ -304,7 +304,7 @@ export default function GettingStartedPage() {
             size="sm"
             className="border-border-muted text-foreground-light"
           >
-            <Link href="/learn">
+            <Link href="/dashboard/learn">
               <BookOpen className="w-4 h-4 mr-2" />
               查看文档
             </Link>
@@ -314,7 +314,7 @@ export default function GettingStartedPage() {
             size="sm"
             className="bg-brand-500 hover:bg-brand-600 text-background"
           >
-            <Link href="/conversations">
+            <Link href="/dashboard/conversations">
               <Play className="w-4 h-4 mr-2" />
               开始引导
             </Link>
@@ -525,7 +525,7 @@ export default function GettingStartedPage() {
                       size="sm"
                       className="border-border-muted text-foreground-light"
                     >
-                      <Link href="/learn">查看学习资源</Link>
+                      <Link href="/dashboard/learn">查看学习资源</Link>
                     </Button>
                   </div>
                 </div>
@@ -534,7 +534,7 @@ export default function GettingStartedPage() {
                   🎉 你已完成全部入门任务，建议浏览模板库或完善账号设置。
                   <div className="mt-3 flex items-center gap-2">
                     <Button asChild size="sm" variant="outline-primary">
-                      <Link href="/template-gallery">浏览模板</Link>
+                      <Link href="/dashboard/template-gallery">浏览模板</Link>
                     </Button>
                     <Button
                       asChild
@@ -542,7 +542,7 @@ export default function GettingStartedPage() {
                       variant="outline"
                       className="border-border-muted text-foreground-light"
                     >
-                      <Link href="/settings">账号设置</Link>
+                      <Link href="/dashboard/settings">账号设置</Link>
                     </Button>
                   </div>
                 </div>
@@ -780,7 +780,7 @@ export default function GettingStartedPage() {
                 size="sm"
                 className="bg-brand-500 hover:bg-brand-600 text-background"
               >
-                <Link href="/team">
+                <Link href="/dashboard/team">
                   立即邀请
                   <ExternalLink className="w-4 h-4 ml-1" />
                 </Link>
@@ -805,7 +805,7 @@ export default function GettingStartedPage() {
               size="sm"
               className="border-border-muted text-foreground-light"
             >
-              <Link href="/learn">
+              <Link href="/dashboard/learn">
                 <BookOpen className="w-4 h-4 mr-2" />
                 学习中心
               </Link>
@@ -816,7 +816,7 @@ export default function GettingStartedPage() {
               size="sm"
               className="border-border-muted text-foreground-light"
             >
-              <Link href="/feedback">
+              <Link href="/dashboard/feedback">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 提交反馈
               </Link>

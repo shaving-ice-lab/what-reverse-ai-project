@@ -12,6 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 import {
+  planApi,
+  type MetricsDictionary,
+  type TrackingEventPlan,
+  type IncidentDrillPlanSet,
+  type IncidentOwnerTable,
+  type PostmortemTemplate,
+  type ErrorBudgetPolicyTable,
+  type SyntheticMonitoringPlan,
+  type OnCallSLOTable,
+  type StabilityPlan,
+} from "@/lib/api/plan";
+import {
   Activity,
   CheckCircle2,
   XCircle,
@@ -33,6 +45,10 @@ import {
   MessageSquare,
   Cloud,
   Shield,
+  Gauge,
+  Radar,
+  PhoneCall,
+  ShieldCheck,
   ArrowUpRight,
   ArrowDownRight,
   Minus,
@@ -203,6 +219,20 @@ const uptimeHistory = Array.from({ length: 90 }, (_, i) => ({
 export default function StatusPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [incidentPlans, setIncidentPlans] = useState<IncidentDrillPlanSet | null>(null);
+  const [incidentOwners, setIncidentOwners] = useState<IncidentOwnerTable | null>(null);
+  const [postmortemTemplate, setPostmortemTemplate] = useState<PostmortemTemplate | null>(null);
+  const [errorBudgetPolicy, setErrorBudgetPolicy] = useState<ErrorBudgetPolicyTable | null>(null);
+  const [syntheticPlan, setSyntheticPlan] = useState<SyntheticMonitoringPlan | null>(null);
+  const [oncallSLO, setOncallSLO] = useState<OnCallSLOTable | null>(null);
+  const [stabilityPlan, setStabilityPlan] = useState<StabilityPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(true);
+  const [planError, setPlanError] = useState<string | null>(null);
+  const [metricsDictionary, setMetricsDictionary] = useState<MetricsDictionary | null>(null);
+  const [frontendTrackingPlan, setFrontendTrackingPlan] = useState<TrackingEventPlan | null>(null);
+  const [backendTrackingPlan, setBackendTrackingPlan] = useState<TrackingEventPlan | null>(null);
+  const [observabilityLoading, setObservabilityLoading] = useState(true);
+  const [observabilityError, setObservabilityError] = useState<string | null>(null);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -218,6 +248,74 @@ export default function StatusPage() {
       setLastUpdated(new Date());
     }, 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    const loadPlanData = async () => {
+      try {
+        setPlanLoading(true);
+        setPlanError(null);
+        const [drills, owners, template, errorBudget, synthetic, oncall, stability] = await Promise.all([
+          planApi.getIncidentDrillPlans(),
+          planApi.getIncidentOwnerTable(),
+          planApi.getPostmortemTemplate(),
+          planApi.getErrorBudgetPolicy(),
+          planApi.getSyntheticMonitoringPlan(),
+          planApi.getOnCallSLOTable(),
+          planApi.getStabilityPlan(),
+        ]);
+        if (!isActive) return;
+        setIncidentPlans(drills);
+        setIncidentOwners(owners);
+        setPostmortemTemplate(template);
+        setErrorBudgetPolicy(errorBudget);
+        setSyntheticPlan(synthetic);
+        setOncallSLO(oncall);
+        setStabilityPlan(stability);
+      } catch (error) {
+        if (!isActive) return;
+        console.error("Failed to load plan data:", error);
+        setPlanError("规划数据加载失败，请稍后重试。");
+      } finally {
+        if (isActive) setPlanLoading(false);
+      }
+    };
+
+    loadPlanData();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    const loadObservabilityPlans = async () => {
+      try {
+        setObservabilityLoading(true);
+        setObservabilityError(null);
+        const [dictionary, frontend, backend] = await Promise.all([
+          planApi.getMetricsDictionary(),
+          planApi.getFrontendTrackingPlan(),
+          planApi.getBackendTrackingPlan(),
+        ]);
+        if (!isActive) return;
+        setMetricsDictionary(dictionary);
+        setFrontendTrackingPlan(frontend);
+        setBackendTrackingPlan(backend);
+      } catch (error) {
+        if (!isActive) return;
+        console.error("Failed to load observability plan data:", error);
+        setObservabilityError("监控指标与埋点计划加载失败，请稍后重试。");
+      } finally {
+        if (isActive) setObservabilityLoading(false);
+      }
+    };
+
+    loadObservabilityPlans();
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   // 计算整体状态
@@ -550,6 +648,489 @@ export default function StatusPage() {
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* 故障演练与应急预案 */}
+          <section className="page-panel">
+            <div className="page-panel-header flex items-center justify-between gap-3">
+              <div>
+                <p className="page-panel-title">故障演练与应急预案</p>
+                <p className="page-panel-description">演练清单、责任表与复盘模板</p>
+              </div>
+              <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                Playbook
+              </Badge>
+            </div>
+            <div className="p-5 space-y-4">
+              {planLoading ? (
+                <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
+                  正在加载演练与预案数据...
+                </div>
+              ) : planError ? (
+                <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
+                  {planError}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <Calendar className="w-4 h-4 text-foreground-light" />
+                        {incidentPlans?.title || "关键故障演练计划"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {incidentPlans?.drills?.length ?? 0} 项
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {incidentPlans?.summary || "暂无演练计划。"}
+                    </p>
+                    <div className="space-y-3">
+                      {(incidentPlans?.drills || []).map((drill) => (
+                        <div
+                          key={drill.key}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-2"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[13px] text-foreground font-medium">{drill.title}</div>
+                            <Badge variant="secondary" size="sm" className="text-[10px]">
+                              {drill.severity}
+                            </Badge>
+                          </div>
+                          <div className="text-[11px] text-foreground-light">频次：{drill.frequency}</div>
+                          <div className="text-[11px] text-foreground-light">
+                            场景：{drill.scenarios.map((scenario) => scenario.title).join(" / ")}
+                          </div>
+                          <div className="text-[11px] text-foreground-light">
+                            负责人：{drill.owners.join(" / ")}
+                          </div>
+                          <ul className="list-disc pl-4 text-[11px] text-foreground-light">
+                            {drill.objectives.slice(0, 2).map((objective) => (
+                              <li key={objective}>{objective}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                      {(incidentPlans?.drills || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无演练条目。
+                        </div>
+                      )}
+                    </div>
+                    {(incidentPlans?.notes || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 text-[11px] text-foreground-light">
+                        {incidentPlans?.notes?.[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <Shield className="w-4 h-4 text-foreground-light" />
+                      {incidentOwners?.title || "应急响应与回滚责任表"}
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {incidentOwners?.summary || "暂无责任人配置。"}
+                    </p>
+                    <div className="space-y-3">
+                      {(incidentOwners?.roles || []).map((role) => (
+                        <div
+                          key={role.role}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-2"
+                        >
+                          <div className="text-[13px] text-foreground font-medium">{role.role}</div>
+                          <div className="text-[11px] text-foreground-light">
+                            主负责人：{role.primary} · 备份：{role.backup}
+                          </div>
+                          <ul className="list-disc pl-4 text-[11px] text-foreground-light">
+                            {role.responsibilities.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                      {(incidentOwners?.roles || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无角色配置。
+                        </div>
+                      )}
+                    </div>
+                    {(incidentOwners?.escalation || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 space-y-1">
+                        <div className="text-[11px] text-foreground-light">升级路径</div>
+                        {(incidentOwners?.escalation || []).map((item) => (
+                          <div key={item.level} className="text-[11px] text-foreground">
+                            {item.level} · {item.condition} · {item.action}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <MessageSquare className="w-4 h-4 text-foreground-light" />
+                      {postmortemTemplate?.title || "事故复盘模板"}
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {postmortemTemplate?.summary || "暂无复盘模板。"}
+                    </p>
+                    <div className="space-y-3">
+                      {(postmortemTemplate?.sections || []).map((section) => (
+                        <div
+                          key={section.key}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-2"
+                        >
+                          <div className="text-[13px] text-foreground font-medium">{section.title}</div>
+                          <ul className="list-disc pl-4 text-[11px] text-foreground-light">
+                            {section.questions.slice(0, 2).map((question) => (
+                              <li key={question}>{question}</li>
+                            ))}
+                          </ul>
+                          {section.questions.length > 2 && (
+                            <div className="text-[10px] text-foreground-light">
+                              还有 {section.questions.length - 2} 个问题未展示
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {(postmortemTemplate?.sections || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无模板条目。
+                        </div>
+                      )}
+                    </div>
+                    {(postmortemTemplate?.checklist || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 space-y-2">
+                        <div className="text-[11px] text-foreground-light">复盘清单</div>
+                        <ul className="list-disc pl-4 text-[11px] text-foreground-light">
+                          {postmortemTemplate?.checklist?.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* 监控指标字典与埋点计划 */}
+          <section className="page-panel">
+            <div className="page-panel-header flex items-center justify-between gap-3">
+              <div>
+                <p className="page-panel-title">监控指标字典与埋点计划</p>
+                <p className="page-panel-description">Prometheus 指标与前后端埋点事件定义</p>
+              </div>
+              <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                Observability
+              </Badge>
+            </div>
+            <div className="p-5 space-y-4">
+              {observabilityLoading ? (
+                <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
+                  正在加载监控指标与埋点计划...
+                </div>
+              ) : observabilityError ? (
+                <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
+                  {observabilityError}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr_1fr] gap-4">
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <TrendingUp className="w-4 h-4 text-foreground-light" />
+                        {metricsDictionary?.title || "指标字典"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {metricsDictionary?.metrics?.length ?? 0} 项
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {metricsDictionary?.summary || "暂无指标字典说明。"}
+                    </p>
+                    <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
+                      {(metricsDictionary?.metrics || []).map((metric) => (
+                        <div key={metric.name} className="px-3 py-2 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[12px] font-mono text-foreground">{metric.name}</div>
+                            <Badge variant="outline" size="sm" className="text-[10px] border-border text-foreground-light">
+                              {metric.type}
+                            </Badge>
+                          </div>
+                          <div className="text-[11px] text-foreground-light">{metric.description}</div>
+                          <div className="text-[10px] text-foreground-light">
+                            标签：{metric.labels?.length ? metric.labels.join(", ") : "-"}
+                            {metric.unit ? ` · 单位：${metric.unit}` : ""}
+                          </div>
+                          {metric.buckets && metric.buckets.length > 0 && (
+                            <div className="text-[10px] text-foreground-light">
+                              Buckets：{metric.buckets.join(", ")}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {(metricsDictionary?.metrics || []).length === 0 && (
+                        <div className="px-3 py-3 text-[11px] text-foreground-light">
+                          暂无指标条目。
+                        </div>
+                      )}
+                    </div>
+                    {(metricsDictionary?.notes || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 text-[11px] text-foreground-light">
+                        {metricsDictionary?.notes?.[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <Zap className="w-4 h-4 text-foreground-light" />
+                        {frontendTrackingPlan?.title || "前端埋点事件"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {frontendTrackingPlan?.events?.length ?? 0} 项
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {frontendTrackingPlan?.summary || "暂无前端埋点说明。"}
+                    </p>
+                    <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
+                      {(frontendTrackingPlan?.events || []).map((event) => (
+                        <div key={event.key} className="px-3 py-2 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[12px] text-foreground font-medium">{event.event}</div>
+                            <Badge variant="secondary" size="sm" className="text-[10px]">
+                              {event.category}
+                            </Badge>
+                          </div>
+                          <div className="text-[11px] text-foreground-light">{event.description}</div>
+                          <div className="text-[10px] text-foreground-light">触发：{event.trigger}</div>
+                          <div className="text-[10px] text-foreground-light">
+                            属性：{event.properties.join(", ")}
+                          </div>
+                        </div>
+                      ))}
+                      {(frontendTrackingPlan?.events || []).length === 0 && (
+                        <div className="px-3 py-3 text-[11px] text-foreground-light">
+                          暂无前端埋点事件。
+                        </div>
+                      )}
+                    </div>
+                    {(frontendTrackingPlan?.notes || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 text-[11px] text-foreground-light">
+                        {frontendTrackingPlan?.notes?.[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <Server className="w-4 h-4 text-foreground-light" />
+                        {backendTrackingPlan?.title || "后端埋点事件"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {backendTrackingPlan?.events?.length ?? 0} 项
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {backendTrackingPlan?.summary || "暂无后端埋点说明。"}
+                    </p>
+                    <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
+                      {(backendTrackingPlan?.events || []).map((event) => (
+                        <div key={event.key} className="px-3 py-2 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[12px] text-foreground font-medium">{event.event}</div>
+                            <Badge variant="secondary" size="sm" className="text-[10px]">
+                              {event.category}
+                            </Badge>
+                          </div>
+                          <div className="text-[11px] text-foreground-light">{event.description}</div>
+                          <div className="text-[10px] text-foreground-light">触发：{event.trigger}</div>
+                          <div className="text-[10px] text-foreground-light">
+                            属性：{event.properties.join(", ")}
+                          </div>
+                        </div>
+                      ))}
+                      {(backendTrackingPlan?.events || []).length === 0 && (
+                        <div className="px-3 py-3 text-[11px] text-foreground-light">
+                          暂无后端埋点事件。
+                        </div>
+                      )}
+                    </div>
+                    {(backendTrackingPlan?.notes || []).length > 0 && (
+                      <div className="rounded-md border border-border bg-background-200 p-3 text-[11px] text-foreground-light">
+                        {backendTrackingPlan?.notes?.[0]}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* 可用性与错误预算（SRE） */}
+          <section className="page-panel">
+            <div className="page-panel-header flex items-center justify-between gap-3">
+              <div>
+                <p className="page-panel-title">可用性与错误预算（SRE）</p>
+                <p className="page-panel-description">错误预算、合成监控、值班 SLO 与稳定性专项</p>
+              </div>
+              <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                SRE
+              </Badge>
+            </div>
+            <div className="p-5 space-y-4">
+              {planLoading ? (
+                <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
+                  正在加载 SRE 规划数据...
+                </div>
+              ) : planError ? (
+                <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
+                  {planError}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <Gauge className="w-4 h-4 text-foreground-light" />
+                        {errorBudgetPolicy?.title || "Error Budget 规则"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {errorBudgetPolicy?.rules?.length ?? 0} 项
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {errorBudgetPolicy?.summary || "暂无错误预算规则。"}
+                    </p>
+                    <div className="space-y-2">
+                      {(errorBudgetPolicy?.rules || []).slice(0, 3).map((rule) => (
+                        <div
+                          key={rule.key}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-1"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[12px] text-foreground font-medium">{rule.title}</span>
+                            <Badge variant="secondary" size="sm" className="text-[10px]">
+                              {rule.slo}
+                            </Badge>
+                          </div>
+                          <div className="text-[11px] text-foreground-light">
+                            预算 {rule.budget} · 窗口 {rule.window}
+                          </div>
+                        </div>
+                      ))}
+                      {(errorBudgetPolicy?.rules || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无规则条目。
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <Radar className="w-4 h-4 text-foreground-light" />
+                        {syntheticPlan?.title || "合成监控方案"}
+                      </div>
+                      <Badge variant="outline" size="sm" className="border-border text-foreground-light">
+                        {syntheticPlan?.probes?.length ?? 0} 探针
+                      </Badge>
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {syntheticPlan?.summary || "暂无合成监控配置。"}
+                    </p>
+                    <div className="space-y-2">
+                      {(syntheticPlan?.probes || []).slice(0, 3).map((probe) => (
+                        <div
+                          key={probe.key}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-1"
+                        >
+                          <div className="text-[12px] text-foreground font-medium">{probe.name}</div>
+                          <div className="text-[11px] text-foreground-light">
+                            {probe.method} {probe.target}
+                          </div>
+                          <div className="text-[11px] text-foreground-light">
+                            频次 {probe.frequency} · 区域 {probe.locations.join(" / ")}
+                          </div>
+                        </div>
+                      ))}
+                      {(syntheticPlan?.probes || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无探针条目。
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <PhoneCall className="w-4 h-4 text-foreground-light" />
+                      {oncallSLO?.title || "值班与响应 SLO"}
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {oncallSLO?.summary || "暂无值班 SLO 配置。"}
+                    </p>
+                    <div className="space-y-2">
+                      {(oncallSLO?.targets || []).map((target) => (
+                        <div
+                          key={target.severity}
+                          className="rounded-md border border-border bg-background-200 p-3"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[12px] text-foreground font-medium">{target.severity}</span>
+                            <span className="text-[10px] text-foreground-light">{target.coverage}</span>
+                          </div>
+                          <div className="text-[11px] text-foreground-light mt-1">
+                            确认 {target.ack_target} · 缓解 {target.mitigate_target}
+                          </div>
+                        </div>
+                      ))}
+                      {(oncallSLO?.targets || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无响应目标。
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <ShieldCheck className="w-4 h-4 text-foreground-light" />
+                      {stabilityPlan?.title || "稳定性专项"}
+                    </div>
+                    <p className="text-[12px] text-foreground-light">
+                      {stabilityPlan?.summary || "暂无稳定性专项计划。"}
+                    </p>
+                    <div className="space-y-2">
+                      {(stabilityPlan?.tracks || []).slice(0, 3).map((track) => (
+                        <div
+                          key={track.key}
+                          className="rounded-md border border-border bg-background-200 p-3 space-y-1"
+                        >
+                          <div className="text-[12px] text-foreground font-medium">{track.title}</div>
+                          <div className="text-[11px] text-foreground-light">频次：{track.cadence}</div>
+                          <div className="text-[11px] text-foreground-light">
+                            负责人：{track.owners.join(" / ")}
+                          </div>
+                        </div>
+                      ))}
+                      {(stabilityPlan?.tracks || []).length === 0 && (
+                        <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
+                          暂无专项条目。
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

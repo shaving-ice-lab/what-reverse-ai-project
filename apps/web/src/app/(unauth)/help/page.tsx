@@ -10,7 +10,7 @@ import {
   Search,
   HelpCircle,
   BookOpen,
-  MessageSquare,
+  LifeBuoy,
   Zap,
   Users,
   Settings,
@@ -19,7 +19,6 @@ import {
   ArrowRight,
   ExternalLink,
   Mail,
-  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,6 +71,46 @@ const categories = [
   },
 ];
 
+// 帮助中心目录
+const helpDirectory = [
+  {
+    title: "入门与概览",
+    description: "从 0 到 1 上手并掌握核心概念",
+    links: [
+      { title: "快速开始", href: "/docs/getting-started" },
+      { title: "功能概览", href: "/docs" },
+      { title: "FAQ 常见问题", href: "/faq" },
+    ],
+  },
+  {
+    title: "故障排查",
+    description: "自助排查运行与集成问题",
+    links: [
+      { title: "故障自助指南", href: "/help/troubleshooting" },
+      { title: "运行时入口说明", href: "/docs" },
+      { title: "访问策略与限流", href: "/docs" },
+    ],
+  },
+  {
+    title: "支持与协作",
+    description: "获取支持与团队协作方式",
+    links: [
+      { title: "提交工单", href: "/support" },
+      { title: "联系我们", href: "/contact" },
+      { title: "社区讨论", href: "/community" },
+    ],
+  },
+  {
+    title: "安全与合规",
+    description: "安全、隐私与运营保障",
+    links: [
+      { title: "安全中心", href: "/security" },
+      { title: "隐私政策", href: "/privacy" },
+      { title: "服务条款", href: "/terms" },
+    ],
+  },
+];
+
 // 热门文章
 const popularArticles = [
   { title: "如何创建第一个工作流", views: 12500, href: "/docs/guide/first-workflow" },
@@ -79,16 +118,17 @@ const popularArticles = [
   { title: "设置定时触发器", views: 7600, href: "/docs/guide/triggers" },
   { title: "邀请团队成员", views: 5400, href: "/docs/guide/team" },
   { title: "设置 Webhook 触发器", views: 4800, href: "/docs/integrations/webhook" },
+  { title: "故障自助排查指南", views: 4200, href: "/help/troubleshooting" },
 ];
 
 // 联系方式
 const contactMethods = [
   {
-    icon: MessageSquare,
-    title: "在线客服",
-    description: "实时在线支持",
-    action: "开始对话",
-    href: "#chat",
+    icon: LifeBuoy,
+    title: "提交工单",
+    description: "SLA 跟踪与处理进度可视化",
+    action: "提交工单",
+    href: "/support",
   },
   {
     icon: Mail,
@@ -115,7 +155,7 @@ export default function HelpPage() {
 
       {/* Hero */}
       <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
@@ -170,8 +210,38 @@ export default function HelpPage() {
         </div>
       </section>
 
-      {/* Popular Articles */}
+      {/* Directory */}
       <section className="py-12 px-6 bg-muted/20">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-xl font-semibold text-foreground mb-6">帮助中心目录</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {helpDirectory.map((section) => (
+              <div key={section.title} className="p-6 rounded-2xl bg-card border border-border">
+                <h3 className="font-semibold text-foreground mb-1">{section.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {section.description}
+                </p>
+                <ul className="space-y-2">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {link.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Articles */}
+      <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-xl font-semibold text-foreground mb-6">热门文章</h2>
           <div className="space-y-3">

@@ -365,17 +365,17 @@ export default function SearchPage() {
                 <span className="page-panel-title">快捷入口</span>
               </div>
               <div className="p-4 page-grid md:grid-cols-3">
-                <Link href="/workflows/new" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
+                <Link href="/dashboard/workflows/new" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
                   <Zap className="w-6 h-6 text-warning mb-3" />
                   <h4 className="text-sm font-medium text-foreground group-hover:text-brand-500 transition-colors">创建工作流</h4>
                   <p className="text-[13px] text-foreground-light mt-1">自动化您的任务</p>
                 </Link>
-                <Link href="/my-agents/new" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
+                <Link href="/dashboard/my-agents/new" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
                   <Bot className="w-6 h-6 text-foreground-light mb-3" />
                   <h4 className="text-sm font-medium text-foreground group-hover:text-brand-500 transition-colors">创建 Agent</h4>
                   <p className="text-[13px] text-foreground-light mt-1">定制您的 AI 助手</p>
                 </Link>
-                <Link href="/" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
+                <Link href="/dashboard/conversations" className="p-4 rounded-md bg-surface-100 border border-border-muted hover:border-border-strong transition-supabase group">
                   <MessageSquare className="w-6 h-6 text-brand-500 mb-3" />
                   <h4 className="text-sm font-medium text-foreground group-hover:text-brand-500 transition-colors">开始对话</h4>
                   <p className="text-[13px] text-foreground-light mt-1">与 AI 畅聊</p>

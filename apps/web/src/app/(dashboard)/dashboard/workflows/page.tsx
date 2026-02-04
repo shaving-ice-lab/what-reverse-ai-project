@@ -36,6 +36,7 @@ import {
   SidebarNavGroup,
   CategoryHeader,
 } from "@/components/dashboard/page-layout";
+import { LegacyEntryBanner } from "@/components/dashboard/legacy-entry-banner";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -415,6 +416,7 @@ export default function WorkflowsPage() {
       }
     >
       <div className="space-y-6 max-w-[960px]">
+        <LegacyEntryBanner type="workflow" />
         {/* 页面头部 */}
         <div className="flex items-start justify-between">
           <div>
@@ -427,8 +429,11 @@ export default function WorkflowsPage() {
             <Button variant="outline" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>
               导入
             </Button>
-            <Button size="sm" asChild leftIcon={<Plus className="h-3.5 w-3.5" />}>
-              <Link href="/workflows/new">创建工作流</Link>
+            <Button size="sm" asChild>
+              <Link href="/dashboard/workflows/new">
+                <Plus className="h-3.5 w-3.5" />
+                创建工作流
+              </Link>
             </Button>
           </div>
         </div>
@@ -481,7 +486,7 @@ export default function WorkflowsPage() {
                           <Star className="w-3.5 h-3.5 text-warning fill-current" />
                         )}
                         <Link
-                          href={`/workflows/${mostRecentWorkflow.id}`}
+                          href={`/dashboard/workflows/${mostRecentWorkflow.id}`}
                           className="text-[13px] font-medium text-foreground hover:text-brand-500 transition-colors truncate"
                         >
                           {mostRecentWorkflow.name}
@@ -634,7 +639,7 @@ export default function WorkflowsPage() {
                               <Star className="w-3.5 h-3.5 text-warning fill-current shrink-0" />
                             )}
                             <Link
-                              href={`/workflows/${workflow.id}`}
+                              href={`/dashboard/workflows/${workflow.id}`}
                               className="text-[13px] font-medium text-foreground hover:text-brand-500 transition-colors truncate"
                             >
                               {workflow.name}
@@ -747,7 +752,7 @@ export default function WorkflowsPage() {
                 return (
                   <Link
                     key={workflow.id}
-                    href={`/workflows/${workflow.id}`}
+                    href={`/dashboard/workflows/${workflow.id}`}
                     className="block p-4 rounded-lg border border-border bg-surface-75/60 hover:border-border-strong hover:bg-surface-100/80 transition-colors group"
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -814,7 +819,7 @@ export default function WorkflowsPage() {
                 </Button>
               ) : (
                 <Button size="sm" asChild>
-                  <Link href="/workflows/new">
+                  <Link href="/dashboard/workflows/new">
                     <Plus className="mr-1.5 w-3.5 h-3.5" />
                     创建工作流
                   </Link>

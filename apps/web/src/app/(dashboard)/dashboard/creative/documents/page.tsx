@@ -151,7 +151,7 @@ export default function CreativeDocumentsPage() {
                 管理您生成的所有创意内容
               </p>
             </div>
-            <Link href="/creative/generate">
+            <Link href="/dashboard/creative/generate">
               <Button className="bg-brand-500 hover:bg-brand-600 text-background">
                 <Plus className="mr-2 w-4 h-4" />
                 新建文档
@@ -438,7 +438,7 @@ export default function CreativeDocumentsPage() {
                   清除筛选
                 </Button>
               ) : (
-                <Link href="/creative/generate">
+                <Link href="/dashboard/creative/generate">
                   <Button className="bg-brand-500 hover:bg-brand-600 text-background">
                     <Plus className="mr-2 w-4 h-4" />
                     新建文档

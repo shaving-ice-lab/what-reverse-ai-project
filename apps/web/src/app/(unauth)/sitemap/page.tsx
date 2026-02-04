@@ -88,7 +88,7 @@ const sitemapSections = [
 
       { name: "企业?", href: "/enterprise" },
 
-      { name: "集成应用", href: "/integrations" },
+      { name: "集成应用", href: "/dashboard/integrations" },
 
       { name: "模板市场", href: "/store" },
 
@@ -132,7 +132,7 @@ const sitemapSections = [
 
       { name: "帮助中心", href: "/help" },
 
-      { name: "学习资源", href: "/learn" },
+      { name: "学习资源", href: "/learn/courses" },
 
       { name: "网络研讨会", href: "/webinars" },
 

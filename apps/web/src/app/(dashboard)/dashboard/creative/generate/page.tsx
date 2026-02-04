@@ -114,7 +114,7 @@ export default function GeneratePage() {
         <div className="max-w-[1400px] mx-auto w-full px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
-              href="/creative"
+              href="/dashboard/creative"
               className="p-2 rounded-md hover:bg-surface-75 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-foreground-muted" />

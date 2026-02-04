@@ -255,7 +255,7 @@ export default function SupportTicketDetailPage() {
             variant="outline"
             size="sm"
             className="h-8 border-border text-foreground-light hover:text-foreground"
-            onClick={() => router.push("/support-tickets")}
+            onClick={() => router.push("/dashboard/support-tickets")}
           >
             <ArrowLeft className="w-4 h-4 mr-1.5" />
             返回列表
@@ -530,7 +530,7 @@ export default function SupportTicketDetailPage() {
       )}
 
       <div className="mt-6">
-        <Link href="/support-tickets" className="text-xs text-foreground-muted hover:text-foreground">
+        <Link href="/dashboard/support-tickets" className="text-xs text-foreground-muted hover:text-foreground">
           返回工单列表
         </Link>
       </div>

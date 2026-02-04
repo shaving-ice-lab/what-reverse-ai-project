@@ -50,7 +50,7 @@ const featuredActions = [
     title: "新建对话",
     description: "立即开始一个新的对话",
     icon: MessageSquare,
-    href: "/conversations",
+    href: "/dashboard/conversations",
     badge: "快捷",
     badgeVariant: "secondary",
     iconBg: "bg-brand-200/60",
@@ -60,7 +60,7 @@ const featuredActions = [
     title: "创建工作流",
     description: "用模板快速搭建自动化",
     icon: Zap,
-    href: "/workflows/new",
+    href: "/dashboard/workflows/new",
     badge: "推荐",
     badgeVariant: "primary",
     iconBg: "bg-brand-200/60",
@@ -70,7 +70,7 @@ const featuredActions = [
     title: "生成内容",
     description: "文本、图像与代码生成",
     icon: Sparkles,
-    href: "/creative/generate",
+    href: "/dashboard/creative/generate",
     badge: "AI",
     badgeVariant: "primary",
     iconBg: "bg-surface-200",
@@ -80,7 +80,7 @@ const featuredActions = [
     title: "上传文件",
     description: "整理素材与知识库",
     icon: Upload,
-    href: "/files",
+    href: "/dashboard/files",
     badge: "常用",
     badgeVariant: "secondary",
     iconBg: "bg-surface-200",
@@ -136,7 +136,7 @@ const quickActionCategories = [
         title: "新建对话",
         description: "开始新的 AI 对话",
         icon: MessageSquare,
-        href: "/conversations",
+        href: "/dashboard/conversations",
         shortcut: "⌘ N",
         badge: "快捷",
         badgeVariant: "primary",
@@ -145,14 +145,14 @@ const quickActionCategories = [
         title: "新建工作流",
         description: "创建自动化工作流",
         icon: Zap,
-        href: "/workflows/new",
+        href: "/dashboard/workflows/new",
         shortcut: "⌘ W",
       },
       {
         title: "新建 Agent",
         description: "创建自定义 AI 助手",
         icon: Bot,
-        href: "/my-agents/new",
+        href: "/dashboard/my-agents/new",
         badge: "Beta",
         badgeVariant: "secondary",
       },
@@ -160,7 +160,7 @@ const quickActionCategories = [
         title: "新建文档",
         description: "创建创意文档",
         icon: FileText,
-        href: "/creative/documents",
+        href: "/dashboard/creative/documents",
       },
     ],
   },
@@ -176,7 +176,7 @@ const quickActionCategories = [
         title: "生成文本",
         description: "AI 文本生成",
         icon: FileText,
-        href: "/creative/generate?type=text",
+        href: "/dashboard/creative/generate?type=text",
         badge: "AI",
         badgeVariant: "primary",
       },
@@ -184,7 +184,7 @@ const quickActionCategories = [
         title: "生成图片",
         description: "AI 图像生成",
         icon: Palette,
-        href: "/creative/generate?type=image",
+        href: "/dashboard/creative/generate?type=image",
         badge: "AI",
         badgeVariant: "primary",
       },
@@ -192,7 +192,7 @@ const quickActionCategories = [
         title: "生成代码",
         description: "AI 代码生成",
         icon: Code,
-        href: "/creative/generate?type=code",
+        href: "/dashboard/creative/generate?type=code",
         badge: "AI",
         badgeVariant: "primary",
       },
@@ -210,13 +210,13 @@ const quickActionCategories = [
         title: "我的工作流",
         description: "管理所有工作流",
         icon: Zap,
-        href: "/workflows",
+        href: "/dashboard/workflows",
       },
       {
         title: "我的 Agent",
         description: "管理 AI 助手",
         icon: Bot,
-        href: "/my-agents",
+        href: "/dashboard/my-agents",
         badge: "常用",
         badgeVariant: "secondary",
       },
@@ -224,7 +224,7 @@ const quickActionCategories = [
         title: "文件库",
         description: "管理上传文件",
         icon: Upload,
-        href: "/files",
+        href: "/dashboard/files",
         badge: "资源",
         badgeVariant: "secondary",
       },
@@ -232,7 +232,7 @@ const quickActionCategories = [
         title: "收藏夹",
         description: "收藏的内容",
         icon: Star,
-        href: "/favorites",
+        href: "/dashboard/favorites",
       },
     ],
   },
@@ -248,14 +248,14 @@ const quickActionCategories = [
         title: "账户设置",
         description: "管理账户信息",
         icon: Settings,
-        href: "/settings",
+        href: "/dashboard/settings",
         shortcut: "⌘ ,",
       },
       {
         title: "API 密钥",
         description: "管理 API 配置",
         icon: Shield,
-        href: "/settings/api-keys",
+        href: "/dashboard/settings/api-keys",
         badge: "敏感",
         badgeVariant: "warning",
       },
@@ -263,13 +263,13 @@ const quickActionCategories = [
         title: "通知设置",
         description: "配置通知偏好",
         icon: Bell,
-        href: "/settings/notifications",
+        href: "/dashboard/settings/notifications",
       },
       {
         title: "团队管理",
         description: "管理团队成员",
         icon: Users,
-        href: "/team",
+        href: "/dashboard/team",
       },
     ],
   },
@@ -280,28 +280,28 @@ const recentActions = [
     title: "客户反馈处理工作流",
     type: "工作流",
     icon: Zap,
-    href: "/workflows/1",
+    href: "/dashboard/workflows/1",
     time: "10 分钟前",
   },
   {
     title: "写作助手 Agent",
     type: "Agent",
     icon: Bot,
-    href: "/my-agents/1",
+    href: "/dashboard/my-agents/1",
     time: "30 分钟前",
   },
   {
     title: "SEO 博客模板",
     type: "模板",
     icon: FileText,
-    href: "/creative/templates",
+    href: "/dashboard/creative/templates",
     time: "1 小时前",
   },
   {
     title: "产品需求讨论",
     type: "对话",
     icon: MessageSquare,
-    href: "/conversations/1",
+    href: "/dashboard/chat/1",
     time: "2 小时前",
   },
 ];
@@ -324,12 +324,12 @@ const helpLinks = [
   {
     title: "学习中心",
     description: "最佳实践与模板",
-    href: "/learn",
+    href: "/dashboard/learn",
   },
   {
     title: "反馈建议",
     description: "告诉我们你的想法",
-    href: "/feedback",
+    href: "/dashboard/feedback",
   },
 ];
 
@@ -447,7 +447,7 @@ export default function QuickActionsPage() {
                 rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
                 className="text-foreground-light hover:text-foreground"
               >
-                <Link href="/shortcuts">管理快捷方式</Link>
+                <Link href="/dashboard/shortcuts">管理快捷方式</Link>
               </Button>
             </div>
             <div className="p-4 page-grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3">
@@ -502,7 +502,7 @@ export default function QuickActionsPage() {
               rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
               className="text-foreground-light hover:text-foreground"
             >
-              <Link href="/analytics">查看报表</Link>
+              <Link href="/dashboard/analytics">查看报表</Link>
             </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 divide-y divide-border md:divide-y-0 md:divide-x">
@@ -655,7 +655,7 @@ export default function QuickActionsPage() {
               </div>
               <div className="px-4 pb-4">
                 <Link
-                  href="/activity"
+                  href="/dashboard/activity"
                   className="block text-[12px] text-brand-500 hover:underline text-center"
                 >
                   查看全部活动
@@ -690,7 +690,7 @@ export default function QuickActionsPage() {
               </div>
               <div className="px-4 pb-4">
                 <Link
-                  href="/shortcuts"
+                  href="/dashboard/shortcuts"
                   className="block text-[12px] text-brand-500 hover:underline text-center"
                 >
                   查看全部快捷键
@@ -732,3 +732,4 @@ export default function QuickActionsPage() {
       </div>
     </div>
   );
+}

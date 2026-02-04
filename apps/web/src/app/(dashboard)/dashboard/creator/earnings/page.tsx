@@ -230,10 +230,8 @@ export default function CreatorEarningsPage() {
               </Link>
             </div>
           </div>
-        </div>
-
-      {/* 内容区域 */}
-      <div>
+        {/* 内容区域 */}
+        <div>
         <div className="grid lg:grid-cols-3 gap-6">
           {/* 左侧：图表和交易记录 */}
           <div className="lg:col-span-2 space-y-6">
@@ -290,7 +288,7 @@ export default function CreatorEarningsPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="page-panel-title">交易记录</h2>
                 <Link
-                  href="/creator/transactions"
+                  href="/dashboard/creator/earnings"
                   className="text-[13px] text-brand-500 hover:underline flex items-center gap-1"
                 >
                   查看全部
@@ -379,28 +377,28 @@ export default function CreatorEarningsPage() {
               <h2 className="page-panel-title mb-4">快捷操作</h2>
               <div className="space-y-2">
                 <Link
-                  href="/store/publish"
+                  href="/dashboard/store"
                   className="flex items-center justify-between p-3 rounded-md hover:bg-surface-75 transition-colors"
                 >
                   <span className="text-[13px] text-foreground">发布新模板</span>
                   <ArrowRight className="w-4 h-4 text-foreground-muted" />
                 </Link>
                 <Link
-                  href="/creator/analytics"
+                  href="/dashboard/creator/analytics"
                   className="flex items-center justify-between p-3 rounded-md hover:bg-surface-75 transition-colors"
                 >
                   <span className="text-[13px] text-foreground">查看数据分析</span>
                   <ArrowRight className="w-4 h-4 text-foreground-muted" />
                 </Link>
                 <Link
-                  href="/creator/payouts"
+                  href="/dashboard/creator/payouts"
                   className="flex items-center justify-between p-3 rounded-md hover:bg-surface-75 transition-colors"
                 >
                   <span className="text-[13px] text-foreground">提现设置</span>
                   <ArrowRight className="w-4 h-4 text-foreground-muted" />
                 </Link>
                 <Link
-                  href="/referral"
+                  href="/dashboard/referral"
                   className="flex items-center justify-between p-3 rounded-md hover:bg-surface-75 transition-colors"
                 >
                   <span className="text-[13px] text-foreground">推荐计划</span>
@@ -428,7 +426,7 @@ export default function CreatorEarningsPage() {
                   参与推荐计划赚取奖励
                 </li>
               </ul>
-              <Link href="/learn/creator-guide" className="text-brand-500 text-xs hover:underline mt-3 inline-block">
+              <Link href="/dashboard/learn" className="text-brand-500 text-xs hover:underline mt-3 inline-block">
                 查看完整指南 →
               </Link>
             </div>

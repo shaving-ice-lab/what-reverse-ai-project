@@ -44,28 +44,28 @@ const creativeTypes = [
     title: "文字创作",
     description: "文章、文案、邮件、报告等",
     icon: FileText,
-    href: "/creative/generate?type=text",
+    href: "/dashboard/creative/generate?type=text",
   },
   {
     id: "image",
     title: "图像生成",
     description: "插画、海报、产品图等",
     icon: Image,
-    href: "/creative/generate?type=image",
+    href: "/dashboard/creative/generate?type=image",
   },
   {
     id: "code",
     title: "代码助手",
     description: "代码生成、调试、解释",
     icon: Code,
-    href: "/creative/generate?type=code",
+    href: "/dashboard/creative/generate?type=code",
   },
   {
     id: "chat",
     title: "智能对话",
     description: "问答、头脑风暴、创意",
     icon: MessageSquare,
-    href: "/creative/generate?type=chat",
+    href: "/dashboard/creative/generate?type=chat",
   },
 ];
 
@@ -135,30 +135,30 @@ function CreativeSidebar() {
     <>
       <SidebarNavGroup title="创作">
         <SidebarNavItem 
-          href="/creative" 
+          href="/dashboard/creative" 
           label="概览" 
           icon={<Layout className="w-4 h-4" />}
-          active={pathname === "/creative"} 
+          active={pathname === "/dashboard/creative"} 
         />
         <SidebarNavItem 
-          href="/creative/generate" 
+          href="/dashboard/creative/generate" 
           label="新建创作" 
           icon={<Plus className="w-4 h-4" />}
         />
         <SidebarNavItem 
-          href="/creative/documents" 
+          href="/dashboard/creative/documents" 
           label="我的文档" 
           icon={<FolderOpen className="w-4 h-4" />}
         />
         <SidebarNavItem 
-          href="/creative/templates" 
+          href="/dashboard/creative/templates" 
           label="模板库" 
           icon={<BookOpen className="w-4 h-4" />}
         />
       </SidebarNavGroup>
       <SidebarNavGroup title="数据">
         <SidebarNavItem 
-          href="/creative/analytics" 
+          href="/dashboard/creative/analytics" 
           label="数据分析" 
           icon={<BarChart3 className="w-4 h-4" />}
         />
@@ -182,7 +182,7 @@ export default function CreativePage() {
         description="AI 驱动的内容创作工具"
         actions={
           <div className="flex items-center gap-2">
-            <Link href="/creative/templates">
+            <Link href="/dashboard/creative/templates">
               <Button
                 variant="outline"
                 size="sm"
@@ -192,7 +192,7 @@ export default function CreativePage() {
                 模板库
               </Button>
             </Link>
-            <Link href="/creative/generate">
+            <Link href="/dashboard/creative/generate">
               <Button size="sm" className="h-8 bg-brand-500 hover:bg-brand-600 text-background">
                 <Plus className="w-4 h-4 mr-2" />
                 新建创作
@@ -281,7 +281,7 @@ export default function CreativePage() {
           description="高使用率的创作模板"
           footer={
             <Link
-              href="/creative/templates"
+              href="/dashboard/creative/templates"
               className="text-[12px] text-foreground-muted hover:text-foreground flex items-center gap-1 transition-colors"
             >
               查看全部模板
@@ -293,7 +293,7 @@ export default function CreativePage() {
             {quickTemplates.map((template) => (
               <Link
                 key={template.id}
-                href={`/creative/generate?template=${template.id}`}
+                href={`/dashboard/creative/generate?template=${template.id}`}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-md",
                   "bg-surface-75 border border-border",
@@ -329,7 +329,7 @@ export default function CreativePage() {
           description="继续编辑最近内容"
           footer={
             <Link
-              href="/creative/documents"
+              href="/dashboard/creative/documents"
               className="text-[12px] text-foreground-muted hover:text-foreground flex items-center gap-1 transition-colors"
             >
               查看全部文档
@@ -341,7 +341,7 @@ export default function CreativePage() {
             {recentDocuments.map((doc) => (
               <Link
                 key={doc.id}
-                href={`/creative/document/${doc.id}`}
+                href={`/dashboard/creative/document/${doc.id}`}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-md",
                   "bg-surface-75 border border-border",
@@ -394,7 +394,7 @@ export default function CreativePage() {
                 </p>
               </div>
             </div>
-            <Link href="/creative/generate?mode=brainstorm">
+            <Link href="/dashboard/creative/generate?mode=brainstorm">
               <Button
                 variant="outline"
                 size="sm"

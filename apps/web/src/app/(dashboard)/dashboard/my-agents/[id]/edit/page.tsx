@@ -113,7 +113,7 @@ export default function EditAgentPage() {
   // 删除 Agent
   const handleDelete = () => {
     if (confirm("确定要删除这个 Agent 吗？此操作不可撤销。")) {
-      router.push("/my-agents");
+      router.push("/dashboard/my-agents");
     }
   };
 
@@ -124,7 +124,7 @@ export default function EditAgentPage() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href={`/my-agents/${params.id}`}
+              href={`/dashboard/my-agents/${params.id}`}
               className="flex items-center gap-2 text-[13px] text-foreground-light hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />

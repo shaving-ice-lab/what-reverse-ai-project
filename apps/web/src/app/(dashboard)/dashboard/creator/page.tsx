@@ -686,7 +686,7 @@ export default function CreatorDashboardPage() {
 
             <CardFooter className="border-t border-border bg-surface-75/70">
 
-              <Link href="/my-agents" className="text-[13px] text-brand-500 hover:underline flex items-center">
+              <Link href="/dashboard/my-agents" className="text-[13px] text-brand-500 hover:underline flex items-center">
 
                 查看所有 Agent
 
@@ -766,7 +766,7 @@ export default function CreatorDashboardPage() {
 
             <CardFooter className="border-t border-border bg-surface-75/70">
 
-              <Link href="/creator/earnings" className="text-[13px] text-brand-500 hover:underline flex items-center">
+              <Link href="/dashboard/creator/earnings" className="text-[13px] text-brand-500 hover:underline flex items-center">
 
                 查看全部记录
 

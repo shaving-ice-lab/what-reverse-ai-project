@@ -5,7 +5,7 @@
  * 记录用户所有操作历史
  */
 
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DrawerDialog } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -105,10 +106,21 @@ const mockLogs = [
     resourceId: "wf-123",
     status: "success",
     message: "工作流执行成功，处理了 15 条反馈",
+    actor: {
+      id: "user-001",
+      name: "陈奕",
+      email: "chenyi@reverse.ai",
+      role: "管理员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-31T10:30:00Z",
     duration: 2500,
+    metadata: {
+      request_id: "req_94c3",
+      region: "ap-sg",
+      trigger: "manual",
+    },
   },
   {
     id: "2",
@@ -118,9 +130,20 @@ const mockLogs = [
     resourceId: "ag-456",
     status: "success",
     message: "创建新 Agent 成功",
+    actor: {
+      id: "user-002",
+      name: "宋雨",
+      email: "songyu@reverse.ai",
+      role: "成员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-31T10:15:00Z",
+    metadata: {
+      template: "assistant-v2",
+      visibility: "workspace",
+      source: "dashboard",
+    },
   },
   {
     id: "3",
@@ -130,9 +153,19 @@ const mockLogs = [
     resourceId: "key-789",
     status: "warning",
     message: "API 密钥即将过期，请及时更新",
+    actor: {
+      id: "system",
+      name: "安全审计",
+      email: "security@reverse.ai",
+      role: "系统",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-31T09:45:00Z",
+    metadata: {
+      expires_at: "2026-02-03T00:00:00Z",
+      policy: "rotate-7d",
+    },
   },
   {
     id: "4",
@@ -142,9 +175,19 @@ const mockLogs = [
     resourceId: "conv-012",
     status: "success",
     message: "删除对话成功",
+    actor: {
+      id: "user-001",
+      name: "陈奕",
+      email: "chenyi@reverse.ai",
+      role: "管理员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-31T09:30:00Z",
+    metadata: {
+      retention: "30d",
+      soft_delete: true,
+    },
   },
   {
     id: "5",
@@ -153,9 +196,20 @@ const mockLogs = [
     resourceName: "账户登录",
     status: "success",
     message: "用户登录成功",
+    actor: {
+      id: "user-003",
+      name: "李可",
+      email: "like@reverse.ai",
+      role: "成员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-31T09:00:00Z",
+    metadata: {
+      method: "password",
+      mfa: true,
+      session_id: "sess_7f2a",
+    },
   },
   {
     id: "6",
@@ -165,11 +219,22 @@ const mockLogs = [
     resourceId: "wf-345",
     status: "failed",
     message: "工作流执行失败：连接超时",
+    actor: {
+      id: "user-004",
+      name: "周宁",
+      email: "zhouning@reverse.ai",
+      role: "成员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-30T18:20:00Z",
     duration: 30000,
     error: "Connection timeout after 30s",
+    metadata: {
+      error_code: "EXEC_TIMEOUT",
+      retry: 2,
+      node: "http.request",
+    },
   },
   {
     id: "7",
@@ -178,9 +243,20 @@ const mockLogs = [
     resourceName: "通知设置",
     status: "success",
     message: "更新通知偏好设置",
+    actor: {
+      id: "user-005",
+      name: "孙洁",
+      email: "sunjie@reverse.ai",
+      role: "成员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-30T16:45:00Z",
+    metadata: {
+      channel: "email",
+      previous: "all",
+      current: "mentions",
+    },
   },
   {
     id: "8",
@@ -190,9 +266,19 @@ const mockLogs = [
     resourceId: "wf-678",
     status: "success",
     message: "工作流已分享给团队成员",
+    actor: {
+      id: "user-002",
+      name: "宋雨",
+      email: "songyu@reverse.ai",
+      role: "成员",
+    },
     ip: "192.168.1.100",
     userAgent: "Chrome/120.0 Windows",
     timestamp: "2026-01-30T14:30:00Z",
+    metadata: {
+      shared_with: "Growth 团队",
+      permission: "edit",
+    },
   },
 ];
 
@@ -245,6 +331,13 @@ function formatDuration(durationMs?: number) {
   return `${(durationMs / 1000).toFixed(1)}s`;
 }
 
+function formatMetadataValue(value: unknown) {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value);
+}
+
 function computeStats(logs: typeof mockLogs) {
   const total = logs.length;
   const success = logs.filter((log) => log.status === "success").length;
@@ -259,14 +352,45 @@ function computeStats(logs: typeof mockLogs) {
   return { total, success, failed, warning, avgDuration, successRate, durationCount };
 }
 
+function formatCsvValue(value: unknown) {
+  if (value === null || value === undefined) return "";
+  const stringValue = String(value);
+  if (/[",\n]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  return stringValue;
+}
+
+function buildCsv(headers: string[], rows: Array<Record<string, unknown>>) {
+  const lines = [
+    headers.join(","),
+    ...rows.map((row) => headers.map((header) => formatCsvValue(row[header])).join(",")),
+  ];
+  return lines.join("\n");
+}
+
+function downloadFile(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export default function LogsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAction, setSelectedAction] = useState<string>("all");
   const [selectedResource, setSelectedResource] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedActor, setSelectedActor] = useState<string>("all");
   const [timeRange, setTimeRange] = useState("24h");
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [expandedLog, setExpandedLog] = useState<string | null>(null);
+  const [selectedLog, setSelectedLog] = useState<(typeof mockLogs)[number] | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState(() => new Date());
   const [collectionQuery, setCollectionQuery] = useState("");
   const [queryDraft, setQueryDraft] = useState(
@@ -287,7 +411,72 @@ export default function LogsPage() {
     setSelectedAction("all");
     setSelectedResource("all");
     setSelectedStatus("all");
+    setSelectedActor("all");
     setTimeRange("24h");
+  };
+
+  const handleExport = (format: "csv" | "json") => {
+    if (filteredLogs.length === 0) return;
+    const exportRows = filteredLogs.map((log) => ({
+      id: log.id,
+      timestamp: log.timestamp,
+      action: log.action,
+      resource: log.resource,
+      resource_name: log.resourceName ?? "",
+      resource_id: log.resourceId ?? "",
+      status: log.status,
+      message: log.message,
+      actor_name: log.actor?.name ?? "",
+      actor_email: log.actor?.email ?? "",
+      actor_role: log.actor?.role ?? "",
+      ip: log.ip ?? "",
+      user_agent: log.userAgent ?? "",
+      duration_ms: log.duration ?? "",
+      error: log.error ?? "",
+      metadata: log.metadata ? JSON.stringify(log.metadata) : "",
+    }));
+    const exportedAt = new Date().toISOString();
+    const fileStamp = exportedAt.replace(/[:]/g, "-").slice(0, 19);
+    const baseName = `audit-logs-${fileStamp}`;
+
+    if (format === "json") {
+      const payload = {
+        exported_at: exportedAt,
+        filters: {
+          search: searchQuery.trim(),
+          action: selectedAction,
+          resource: selectedResource,
+          status: selectedStatus,
+          actor: selectedActor,
+          time_range: timeRange,
+        },
+        total: filteredLogs.length,
+        items: exportRows,
+      };
+      downloadFile(JSON.stringify(payload, null, 2), `${baseName}.json`, "application/json;charset=utf-8");
+      return;
+    }
+
+    const headers = [
+      "id",
+      "timestamp",
+      "action",
+      "resource",
+      "resource_name",
+      "resource_id",
+      "status",
+      "message",
+      "actor_name",
+      "actor_email",
+      "actor_role",
+      "ip",
+      "user_agent",
+      "duration_ms",
+      "error",
+      "metadata",
+    ];
+    const csv = buildCsv(headers, exportRows);
+    downloadFile(csv, `${baseName}.csv`, "text/csv;charset=utf-8");
   };
 
   // 筛选日志
@@ -301,15 +490,25 @@ export default function LogsPage() {
         query.length === 0 ||
         log.resourceName?.toLowerCase().includes(query) ||
         log.message.toLowerCase().includes(query) ||
-        log.resourceId?.toLowerCase().includes(query);
+        log.resourceId?.toLowerCase().includes(query) ||
+        log.actor?.name?.toLowerCase().includes(query) ||
+        log.actor?.email?.toLowerCase().includes(query);
       const matchesAction = selectedAction === "all" || log.action === selectedAction;
       const matchesResource = selectedResource === "all" || log.resource === selectedResource;
       const matchesStatus = selectedStatus === "all" || log.status === selectedStatus;
+      const matchesActor = selectedActor === "all" || log.actor?.id === selectedActor;
       const matchesTime =
         !timeLimit || now - new Date(log.timestamp).getTime() <= timeLimit;
-      return matchesSearch && matchesAction && matchesResource && matchesStatus && matchesTime;
+      return (
+        matchesSearch &&
+        matchesAction &&
+        matchesResource &&
+        matchesStatus &&
+        matchesActor &&
+        matchesTime
+      );
     });
-  }, [searchQuery, selectedAction, selectedResource, selectedStatus, timeRange]);
+  }, [searchQuery, selectedAction, selectedResource, selectedStatus, selectedActor, timeRange]);
 
   // 统计数据
   const stats = useMemo(() => computeStats(mockLogs), []);
@@ -317,6 +516,22 @@ export default function LogsPage() {
 
   const selectedTimeRangeLabel =
     timeRanges.find((range) => range.id === timeRange)?.label ?? "自定义范围";
+
+  const actorOptions = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; email?: string; role?: string }>();
+    mockLogs.forEach((log) => {
+      if (!log.actor?.id) return;
+      if (!map.has(log.actor.id)) {
+        map.set(log.actor.id, {
+          id: log.actor.id,
+          name: log.actor.name,
+          email: log.actor.email,
+          role: log.actor.role,
+        });
+      }
+    });
+    return Array.from(map.values());
+  }, []);
 
   const activeFilters = useMemo(() => {
     const items: { id: string; label: string }[] = [];
@@ -345,6 +560,13 @@ export default function LogsPage() {
         label: `状态: ${statusConfig[selectedStatus as keyof typeof statusConfig]?.label ?? selectedStatus}`,
       });
     }
+    if (selectedActor !== "all") {
+      const actor = actorOptions.find((item) => item.id === selectedActor);
+      items.push({
+        id: "actor",
+        label: `操作者: ${actor?.name ?? selectedActor}`,
+      });
+    }
     if (timeRange !== "24h") {
       items.push({
         id: "time",
@@ -352,7 +574,16 @@ export default function LogsPage() {
       });
     }
     return items;
-  }, [searchQuery, selectedAction, selectedResource, selectedStatus, timeRange, selectedTimeRangeLabel]);
+  }, [
+    searchQuery,
+    selectedAction,
+    selectedResource,
+    selectedStatus,
+    selectedActor,
+    timeRange,
+    selectedTimeRangeLabel,
+    actorOptions,
+  ]);
 
   const hasActiveFilters = activeFilters.length > 0;
   const failureRate = filteredStats.total
@@ -423,10 +654,24 @@ export default function LogsPage() {
     setSelectedAction(filter.action ?? "all");
     setSelectedStatus(filter.status ?? "all");
     setSelectedResource("all");
+    setSelectedActor("all");
     setSearchQuery("");
     setTimeRange("24h");
     setResultsTab("results");
   };
+
+  const selectedLogContext = selectedLog
+    ? {
+        action: actionTypes[selectedLog.action as keyof typeof actionTypes],
+        resource: resourceTypes[selectedLog.resource as keyof typeof resourceTypes],
+        status: statusConfig[selectedLog.status as keyof typeof statusConfig] ?? statusConfig.info,
+      }
+    : null;
+  const SelectedActionIcon = selectedLogContext?.action?.icon ?? Info;
+  const SelectedResourceIcon = selectedLogContext?.resource?.icon ?? FileText;
+  const SelectedStatusIcon = selectedLogContext?.status?.icon ?? Info;
+  const selectedMetadataEntries = selectedLog ? Object.entries(selectedLog.metadata ?? {}) : [];
+  const canExport = filteredLogs.length > 0;
 
   return (
     <PageContainer>
@@ -445,9 +690,28 @@ export default function LogsPage() {
               >
                 {isRefreshing ? "刷新中" : "刷新"}
               </Button>
-              <Button variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
-                导出日志
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    leftIcon={<Download className="w-4 h-4" />}
+                    disabled={!canExport}
+                  >
+                    导出日志
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-surface-100 border-border">
+                  <DropdownMenuItem disabled={!canExport} onClick={() => handleExport("csv")}>
+                    导出为 CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled={!canExport} onClick={() => handleExport("json")}>
+                    导出为 JSON
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
         >
@@ -500,6 +764,29 @@ export default function LogsPage() {
                 : "暂无耗时数据"
             }
           />
+        </div>
+
+        <div className="page-panel">
+          <div className="page-panel-header">
+            <p className="page-panel-title">事件类型</p>
+            <p className="page-panel-description">按操作与资源类型快速查看</p>
+          </div>
+          <div className="p-4 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {Object.entries(actionTypes).map(([key, config]) => (
+                <Badge key={key} variant="secondary" size="xs">
+                  {config.label}
+                </Badge>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {Object.entries(resourceTypes).map(([key, config]) => (
+                <Badge key={key} variant="outline" size="xs">
+                  {config.label}
+                </Badge>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="page-grid xl:grid-cols-[280px_minmax(0,1fr)]">
@@ -770,6 +1057,33 @@ export default function LogsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+
+                  <Select value={selectedActor} onValueChange={setSelectedActor}>
+                    <SelectTrigger className="h-8 w-[160px] bg-surface-100 border-border text-[12px] text-foreground-light">
+                      <SelectValue placeholder="操作者" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-surface-100 border-border">
+                      <SelectItem value="all">所有操作者</SelectItem>
+                      {actorOptions.map((actor) => (
+                        <SelectItem key={actor.id} value={actor.id}>
+                          {actor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={timeRange} onValueChange={setTimeRange}>
+                    <SelectTrigger className="h-8 w-[150px] bg-surface-100 border-border text-[12px] text-foreground-light">
+                      <SelectValue placeholder="时间范围" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-surface-100 border-border">
+                      {timeRanges.map((range) => (
+                        <SelectItem key={range.id} value={range.id}>
+                          {range.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 {hasActiveFilters && (
                   <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
@@ -818,11 +1132,11 @@ export default function LogsPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[50%]">事件</TableHead>
-                        <TableHead>状态</TableHead>
-                        <TableHead>耗时</TableHead>
-                        <TableHead>时间</TableHead>
-                        <TableHead className="w-[56px]" />
+                        <TableHead className="w-[160px]">时间</TableHead>
+                        <TableHead className="w-[180px]">操作者</TableHead>
+                        <TableHead>动作</TableHead>
+                        <TableHead>对象</TableHead>
+                        <TableHead className="w-[170px]">结果</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -833,71 +1147,84 @@ export default function LogsPage() {
                         const ActionIcon = actionConfig?.icon || Info;
                         const ResourceIcon = resourceConfig?.icon || FileText;
                         const StatusIcon = status?.icon || Info;
-                        const isExpanded = expandedLog === log.id;
-                        const statusDot =
-                          log.status === "success"
-                            ? "bg-brand-500"
-                            : log.status === "warning"
-                            ? "bg-warning"
-                            : log.status === "failed"
-                            ? "bg-destructive"
-                            : "bg-foreground-muted";
+                        const actorInitial = log.actor?.name?.slice(0, 1) ?? "U";
+                        const actorName = log.actor?.name ?? "未知用户";
+                        const actorMeta = log.actor?.email ?? log.actor?.id ?? "—";
 
                         return (
-                          <Fragment key={log.id}>
-                            <TableRow className={cn("group", isExpanded && "bg-surface-200/60")}>
-                              <TableCell className="w-[50%]">
-                                <div className="flex items-start gap-3">
-                                  <span className={cn("mt-2 h-2 w-2 rounded-full", statusDot)} />
-                                  <div
-                                    className={cn(
-                                      "mt-0.5 flex h-9 w-9 items-center justify-center rounded-md border border-border/60",
-                                      actionConfig?.bg ?? "bg-surface-200/70"
-                                    )}
-                                  >
-                                    <ActionIcon
-                                      className={cn("h-4 w-4", actionConfig?.color ?? "text-foreground-light")}
-                                    />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className="text-sm font-medium text-foreground">
-                                        {actionConfig?.label ?? log.action}
-                                      </span>
-                                      <Badge
-                                        variant="secondary"
-                                        size="xs"
-                                        icon={<ResourceIcon className="w-3 h-3" />}
-                                      >
-                                        {resourceConfig?.label ?? log.resource}
-                                      </Badge>
-                                      {log.resourceName && (
-                                        <span className="text-sm text-foreground truncate">
-                                          {log.resourceName}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <p className="text-[13px] text-foreground-light truncate">{log.message}</p>
-                                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
-                                      <span className="inline-flex items-center gap-1">
-                                        <User className="w-3 h-3" />
-                                        {log.ip}
-                                      </span>
-                                      <span className="inline-flex items-center gap-1">
-                                        <Monitor className="w-3 h-3" />
-                                        {log.userAgent}
-                                      </span>
-                                      {log.resourceId && (
-                                        <span className="inline-flex items-center gap-1 font-mono">
-                                          <FileText className="w-3 h-3" />
-                                          {log.resourceId}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
+                          <TableRow key={log.id} className="group">
+                            <TableCell className="w-[160px] text-xs text-foreground-light">
+                              <div className="flex flex-col">
+                                <span className="text-[13px] text-foreground">
+                                  {formatTimestamp(log.timestamp)}
+                                </span>
+                                <span className="text-[11px] text-foreground-muted">
+                                  {new Date(log.timestamp).toLocaleString("zh-CN", {
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="w-[180px]">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-200 text-[12px] font-semibold text-foreground">
+                                  {actorInitial}
                                 </div>
-                              </TableCell>
-                              <TableCell className="w-[120px]">
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-sm font-medium text-foreground">{actorName}</span>
+                                    {log.actor?.role && (
+                                      <Badge variant="outline" size="xs">
+                                        {log.actor.role}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-[11px] text-foreground-muted truncate">{actorMeta}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="min-w-[260px]">
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className={cn(
+                                    "mt-0.5 flex h-9 w-9 items-center justify-center rounded-md border border-border/60",
+                                    actionConfig?.bg ?? "bg-surface-200/70"
+                                  )}
+                                >
+                                  <ActionIcon
+                                    className={cn("h-4 w-4", actionConfig?.color ?? "text-foreground-light")}
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium text-foreground">
+                                    {actionConfig?.label ?? log.action}
+                                  </p>
+                                  <p className="text-[12px] text-foreground-light truncate">{log.message}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="min-w-[220px]">
+                              <div className="space-y-1">
+                                <Badge
+                                  variant="secondary"
+                                  size="xs"
+                                  icon={<ResourceIcon className="w-3 h-3" />}
+                                >
+                                  {resourceConfig?.label ?? log.resource}
+                                </Badge>
+                                <p className="text-[13px] text-foreground">{log.resourceName ?? "—"}</p>
+                                {log.resourceId && (
+                                  <p className="text-[11px] text-foreground-muted font-mono">
+                                    {log.resourceId}
+                                  </p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="w-[170px]">
+                              <div className="flex flex-col items-start gap-2">
                                 <Badge
                                   variant={status?.variant ?? "secondary"}
                                   size="sm"
@@ -905,88 +1232,22 @@ export default function LogsPage() {
                                 >
                                   {status?.label ?? "未知"}
                                 </Badge>
-                              </TableCell>
-                              <TableCell className="w-[120px] text-xs text-foreground-light">
-                                {formatDuration(log.duration)}
-                              </TableCell>
-                              <TableCell className="w-[180px] text-xs text-foreground-light">
-                                <div className="flex flex-col">
-                                  <span className="text-[13px] text-foreground">
-                                    {formatTimestamp(log.timestamp)}
-                                  </span>
+                                {log.duration !== undefined && (
                                   <span className="text-[11px] text-foreground-muted">
-                                    {new Date(log.timestamp).toLocaleString("zh-CN", {
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                    耗时 {formatDuration(log.duration)}
                                   </span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="w-[56px] text-right">
+                                )}
                                 <Button
                                   variant="ghost"
-                                  size="icon-sm"
-                                  aria-label={isExpanded ? "收起详情" : "展开详情"}
-                                  onClick={() => setExpandedLog(isExpanded ? null : log.id)}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => setSelectedLog(log)}
                                 >
-                                  <ChevronDown
-                                    className={cn(
-                                      "w-4 h-4 text-foreground-muted transition-transform",
-                                      isExpanded && "rotate-180"
-                                    )}
-                                  />
+                                  详情
                                 </Button>
-                              </TableCell>
-                            </TableRow>
-                            {isExpanded && (
-                              <TableRow className="bg-surface-75/60">
-                                <TableCell colSpan={5} className="p-0">
-                                  <div className="px-6 pb-4 pt-3 border-t border-border-muted">
-                                    <div className="page-grid md:grid-cols-3 text-sm">
-                                      <div>
-                                        <p className="text-[11px] text-foreground-muted mb-1">事件时间</p>
-                                        <p className="text-[13px] text-foreground">
-                                          {new Date(log.timestamp).toLocaleString("zh-CN")}
-                                        </p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[11px] text-foreground-muted mb-1">IP 地址</p>
-                                        <p className="text-[13px] text-foreground">{log.ip}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[11px] text-foreground-muted mb-1">设备信息</p>
-                                        <p className="text-[13px] text-foreground">{log.userAgent}</p>
-                                      </div>
-                                      {log.resourceId && (
-                                        <div>
-                                          <p className="text-[11px] text-foreground-muted mb-1">资源 ID</p>
-                                          <p className="text-[12px] text-foreground font-mono">{log.resourceId}</p>
-                                        </div>
-                                      )}
-                                      {log.duration !== undefined && (
-                                        <div>
-                                          <p className="text-[11px] text-foreground-muted mb-1">执行耗时</p>
-                                          <p className="text-[13px] text-foreground">
-                                            {formatDuration(log.duration)}
-                                          </p>
-                                        </div>
-                                      )}
-                                      {log.error && (
-                                        <div className="md:col-span-3">
-                                          <p className="text-[11px] text-foreground-muted mb-1">错误信息</p>
-                                          <p className="text-[12px] text-foreground-light font-mono bg-surface-200/70 border border-border rounded-md px-3 py-2">
-                                            {log.error}
-                                          </p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </Fragment>
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
                     </TableBody>
@@ -1008,6 +1269,158 @@ export default function LogsPage() {
           </div>
         </div>
       </div>
+      <DrawerDialog
+        open={!!selectedLog}
+        onOpenChange={(open) => {
+          if (!open) setSelectedLog(null);
+        }}
+        title="日志详情"
+        description={
+          selectedLog
+            ? `${selectedLogContext?.action?.label ?? selectedLog.action} · ${
+                selectedLogContext?.resource?.label ?? selectedLog.resource
+              }`
+            : undefined
+        }
+        side="right"
+        size="lg"
+      >
+        {selectedLog && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-md border border-border/60",
+                      selectedLogContext?.action?.bg ?? "bg-surface-200/70"
+                    )}
+                  >
+                    <SelectedActionIcon
+                      className={cn("h-4 w-4", selectedLogContext?.action?.color ?? "text-foreground-light")}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs text-foreground-muted">动作</p>
+                    <p className="text-base font-semibold text-foreground">
+                      {selectedLogContext?.action?.label ?? selectedLog.action}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-foreground-light">{selectedLog.message}</p>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {new Date(selectedLog.timestamp).toLocaleString("zh-CN")}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <User className="w-3.5 h-3.5" />
+                    {selectedLog.actor?.name ?? "未知用户"}
+                  </span>
+                  {selectedLog.duration !== undefined && (
+                    <span className="inline-flex items-center gap-1">
+                      <Play className="w-3.5 h-3.5" />
+                      {formatDuration(selectedLog.duration)}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Badge
+                variant={selectedLogContext?.status?.variant ?? "secondary"}
+                size="sm"
+                icon={<SelectedStatusIcon className="w-3 h-3" />}
+              >
+                {selectedLogContext?.status?.label ?? "未知"}
+              </Badge>
+            </div>
+
+            <div className="page-grid md:grid-cols-2">
+              <div className="rounded-lg border border-border p-4 space-y-2">
+                <p className="text-[11px] text-foreground-muted">操作者</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-200 text-[12px] font-semibold text-foreground">
+                    {selectedLog.actor?.name?.slice(0, 1) ?? "U"}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {selectedLog.actor?.name ?? "未知用户"}
+                    </p>
+                    <p className="text-[11px] text-foreground-muted">
+                      {selectedLog.actor?.email ?? selectedLog.actor?.id ?? "—"}
+                    </p>
+                  </div>
+                </div>
+                {selectedLog.actor?.role && (
+                  <Badge variant="outline" size="xs">
+                    {selectedLog.actor.role}
+                  </Badge>
+                )}
+              </div>
+
+              <div className="rounded-lg border border-border p-4 space-y-2">
+                <p className="text-[11px] text-foreground-muted">对象</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    size="xs"
+                    icon={<SelectedResourceIcon className="w-3 h-3" />}
+                  >
+                    {selectedLogContext?.resource?.label ?? selectedLog.resource}
+                  </Badge>
+                  <span className="text-sm text-foreground">{selectedLog.resourceName ?? "—"}</span>
+                </div>
+                {selectedLog.resourceId && (
+                  <p className="text-[11px] text-foreground-muted font-mono">
+                    {selectedLog.resourceId}
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-lg border border-border p-4 space-y-2">
+                <p className="text-[11px] text-foreground-muted">访问环境</p>
+                <div className="flex items-center gap-2 text-xs text-foreground-light">
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span>{selectedLog.userAgent}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-foreground-light">
+                  <User className="w-3.5 h-3.5" />
+                  <span>{selectedLog.ip}</span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-border p-4 space-y-2">
+                <p className="text-[11px] text-foreground-muted">执行信息</p>
+                <p className="text-xs text-foreground-light">
+                  耗时 {formatDuration(selectedLog.duration)}
+                </p>
+                {selectedLog.error && (
+                  <p className="text-[11px] text-foreground-light font-mono bg-surface-200/70 border border-border rounded-md px-2 py-1">
+                    {selectedLog.error}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border p-4">
+              <p className="text-[11px] text-foreground-muted mb-2">元数据</p>
+              {selectedMetadataEntries.length ? (
+                <div className="space-y-2">
+                  {selectedMetadataEntries.map(([key, value]) => (
+                    <div key={key} className="flex items-start justify-between gap-3">
+                      <span className="text-[11px] uppercase tracking-wide text-foreground-muted">
+                        {key.replace(/_/g, " ")}
+                      </span>
+                      <span className="text-[12px] text-foreground">{formatMetadataValue(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-foreground-muted">暂无元数据</p>
+              )}
+            </div>
+          </div>
+        )}
+      </DrawerDialog>
     </PageContainer>
   );
 }

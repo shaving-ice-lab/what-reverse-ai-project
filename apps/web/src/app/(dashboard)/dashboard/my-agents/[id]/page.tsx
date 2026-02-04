@@ -271,7 +271,7 @@ export default function AgentDetailPage() {
 
             <Link
 
-              href="/my-agents"
+              href="/dashboard/my-agents"
 
               className="flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors"
 
@@ -357,7 +357,7 @@ export default function AgentDetailPage() {
 
             </Button>
 
-            <Link href={`/my-agents/${agent.id}/edit`}>
+            <Link href={`/dashboard/my-agents/${agent.id}/edit`}>
 
               <Button variant="outline" size="sm">
 

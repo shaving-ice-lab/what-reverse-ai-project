@@ -91,7 +91,7 @@ export default function DeleteAccountPage() {
           eyebrow="Settings"
           title="删除账户"
           description="此操作不可逆，请谨慎操作"
-          backHref="/settings"
+          backHref="/dashboard/settings"
           backLabel="返回设置"
         />
 
@@ -154,7 +154,7 @@ export default function DeleteAccountPage() {
                   您可以在设置页面导出所有工作流和配置
                 </p>
               </div>
-              <Link href="/settings#data">
+              <Link href="/dashboard/settings#data">
                 <Button variant="outline" size="sm" className="border-border text-foreground-light">
                   导出数据
                 </Button>
@@ -163,7 +163,7 @@ export default function DeleteAccountPage() {
           </div>
 
           <div className="flex gap-4 pt-4">
-            <Link href="/settings" className="flex-1">
+            <Link href="/dashboard/settings" className="flex-1">
               <Button variant="outline" className="w-full border-border text-foreground-light">
                 取消
               </Button>

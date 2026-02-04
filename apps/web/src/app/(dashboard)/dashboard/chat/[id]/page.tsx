@@ -478,7 +478,7 @@ export default function ChatPage() {
     if (!conversation) return;
     try {
       await conversationApi.setArchived(conversation.id, true);
-      router.push("/conversations");
+      router.push("/dashboard/conversations");
     } catch (err) {
       console.error("Failed to archive:", err);
     }
@@ -490,7 +490,7 @@ export default function ChatPage() {
     if (!confirm("确定要删除这个对话吗？")) return;
     try {
       await conversationApi.delete(conversation.id);
-      router.push("/conversations");
+      router.push("/dashboard/conversations");
     } catch (err) {
       console.error("Failed to delete:", err);
     }
@@ -546,7 +546,7 @@ export default function ChatPage() {
       <header className="shrink-0 border-b border-border bg-surface-75/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4 px-6 py-3">
           <div className="flex items-start gap-3 min-w-0">
-            <Link href="/conversations">
+            <Link href="/dashboard/conversations">
               <Button
                 variant="ghost"
                 size="icon-xs"

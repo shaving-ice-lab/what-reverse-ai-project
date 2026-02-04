@@ -218,7 +218,7 @@ export default function NewAgentPage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     
     // 跳转到 Agent 列表
-    router.push("/my-agents");
+    router.push("/dashboard/my-agents");
   };
 
   // 验证当前步骤
@@ -244,7 +244,7 @@ export default function NewAgentPage() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href="/my-agents"
+              href="/dashboard/my-agents"
               className="flex items-center gap-2 text-[13px] text-foreground-light hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -258,7 +258,12 @@ export default function NewAgentPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/my-agents")} className="border-border text-foreground-light">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push("/dashboard/my-agents")}
+              className="border-border text-foreground-light"
+            >
               取消
             </Button>
             {currentStep === steps.length ? (

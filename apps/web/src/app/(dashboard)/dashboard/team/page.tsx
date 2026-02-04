@@ -7,12 +7,15 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
+import { PermissionGate } from "@/components/permissions/permission-gate";
+import { useAuthStore } from "@/stores/useAuthStore";
 import {
   Users,
 
@@ -287,6 +290,10 @@ const teamStats = {
 };
 
 export default function TeamPage() {
+  const { user } = useAuthStore();
+  const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
+  const permissions = buildWorkspacePermissions(workspaceRole);
+  const [members, setMembers] = useState(teamMembers);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedRole, setSelectedRole] = useState<string>("all");
@@ -298,10 +305,12 @@ export default function TeamPage() {
   const [inviteRole, setInviteRole] = useState("editor");
 
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
+  const [frozenMembers, setFrozenMembers] = useState<Set<string>>(new Set());
+  const [managementMessage, setManagementMessage] = useState<string | null>(null);
 
   // 筛选成员
 
-  const filteredMembers = teamMembers.filter((member) => {
+  const filteredMembers = members.filter((member) => {
     const matchesSearch =
 
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -314,6 +323,9 @@ export default function TeamPage() {
 
   });
 
+  const allSelected = filteredMembers.length > 0 && selectedMembers.size === filteredMembers.length;
+  const someSelected = selectedMembers.size > 0 && !allSelected;
+
   // 获取角色配置
 
   const getRoleConfig = (roleId: string) => {
@@ -323,19 +335,89 @@ export default function TeamPage() {
 
   // 切换选择
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (id: string, checked?: boolean | "indeterminate") => {
     const newSelected = new Set(selectedMembers);
 
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-
-    } else {
+    if (checked === true || (checked === undefined && !newSelected.has(id))) {
       newSelected.add(id);
-
+    } else {
+      newSelected.delete(id);
     }
 
     setSelectedMembers(newSelected);
+  };
 
+  const toggleSelectAll = (checked: boolean | "indeterminate") => {
+    if (checked === true) {
+      setSelectedMembers(new Set(filteredMembers.map((member) => member.id)));
+    } else {
+      setSelectedMembers(new Set());
+    }
+  };
+
+  const handleToggleFreeze = (memberId: string) => {
+    setFrozenMembers((prev) => {
+      const next = new Set(prev);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+        setManagementMessage("已解除冻结。");
+      } else {
+        next.add(memberId);
+        setManagementMessage("成员已冻结。");
+      }
+      return next;
+    });
+    setTimeout(() => setManagementMessage(null), 2000);
+  };
+
+  const handleBulkFreeze = () => {
+    if (selectedMembers.size === 0) return;
+    setFrozenMembers((prev) => {
+      const next = new Set(prev);
+      selectedMembers.forEach((id) => next.add(id));
+      return next;
+    });
+    setManagementMessage("已冻结所选成员。");
+    setSelectedMembers(new Set());
+    setTimeout(() => setManagementMessage(null), 2000);
+  };
+
+  const handleBulkRemove = () => {
+    if (selectedMembers.size === 0) return;
+    if (!confirm("确认移除所选成员？")) return;
+    setMembers((prev) => prev.filter((member) => !selectedMembers.has(member.id)));
+    setFrozenMembers((prev) => {
+      const next = new Set(prev);
+      selectedMembers.forEach((id) => next.delete(id));
+      return next;
+    });
+    setManagementMessage("已移除所选成员。");
+    setSelectedMembers(new Set());
+    setTimeout(() => setManagementMessage(null), 2000);
+  };
+
+  const handleRemoveMember = (memberId: string) => {
+    if (!confirm("确认移除此成员？")) return;
+    setMembers((prev) => prev.filter((member) => member.id !== memberId));
+    setFrozenMembers((prev) => {
+      const next = new Set(prev);
+      next.delete(memberId);
+      return next;
+    });
+    setSelectedMembers((prev) => {
+      const next = new Set(prev);
+      next.delete(memberId);
+      return next;
+    });
+    setManagementMessage("成员已移除。");
+    setTimeout(() => setManagementMessage(null), 2000);
+  };
+
+  const formatDate = (value?: string | null) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString("zh-CN");
   };
 
   return (
@@ -346,19 +428,23 @@ export default function TeamPage() {
           description="管理团队成员、角色和访问权限"
           actions={(
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" leftIcon={<Settings className="w-4 h-4" />}>
-                团队设置
-              </Button>
-              <Button size="sm" leftIcon={<UserPlus className="w-4 h-4" />} onClick={() => setShowInviteModal(true)}>
-                邀请成员
-              </Button>
+              <PermissionGate permissions={permissions} required={["workspace_admin", "billing_manage"]}>
+                <Button variant="outline" size="sm" leftIcon={<Settings className="w-4 h-4" />}>
+                  团队设置
+                </Button>
+              </PermissionGate>
+              <PermissionGate permissions={permissions} required={["members_manage"]}>
+                <Button size="sm" leftIcon={<UserPlus className="w-4 h-4" />} onClick={() => setShowInviteModal(true)}>
+                  邀请成员
+                </Button>
+              </PermissionGate>
             </div>
           )}
         >
           <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
             <span className="inline-flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5" />
-              成员 {teamStats.members}/{teamStats.maxMembers}
+              成员 {members.length}/{teamStats.maxMembers}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5" />
@@ -370,6 +456,70 @@ export default function TeamPage() {
             </span>
           </div>
         </PageHeader>
+
+        <div className="p-4 rounded-md bg-surface-100 border border-border">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-foreground-light" />
+              </div>
+              <div className="space-y-1 text-[12px] text-foreground-light">
+                <p>邀请成员：通过邮箱邀请加入 Workspace，支持重新发送与过期提醒。</p>
+                <p>角色配置：Owner/Admin/Editor/Viewer 对应不同权限范围。</p>
+                <p>权限说明：成员管理、账单与安全策略需管理员或所有者权限。</p>
+              </div>
+            </div>
+            <div className="min-w-[260px] space-y-2">
+              <div className="text-[11px] text-foreground-muted">邀请与管理</div>
+              <Select value={inviteRole} onValueChange={setInviteRole}>
+                <SelectTrigger className="h-9 bg-surface-75 border-border">
+                  <SelectValue placeholder="默认邀请角色" />
+                </SelectTrigger>
+                <SelectContent className="bg-surface-100 border-border">
+                  {roles.filter((role) => role.id !== "owner").map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-2">
+                <PermissionGate permissions={permissions} required={["members_manage"]}>
+                  <Button size="sm" onClick={() => setShowInviteModal(true)}>
+                    <UserPlus className="w-4 h-4 mr-1.5" />
+                    邀请成员
+                  </Button>
+                </PermissionGate>
+                <PermissionGate permissions={permissions} required={["members_manage"]}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBulkFreeze}
+                    disabled={selectedMembers.size === 0}
+                  >
+                    冻结
+                  </Button>
+                </PermissionGate>
+                <PermissionGate permissions={permissions} required={["members_manage"]}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBulkRemove}
+                    disabled={selectedMembers.size === 0}
+                  >
+                    移除
+                  </Button>
+                </PermissionGate>
+              </div>
+              <div className="text-[11px] text-foreground-muted">
+                已选择 {selectedMembers.size} 位成员
+              </div>
+              {managementMessage && (
+                <div className="text-[11px] text-brand-500">{managementMessage}</div>
+              )}
+            </div>
+          </div>
+        </div>
 
         <div className="page-divider" />
 
@@ -395,7 +545,7 @@ export default function TeamPage() {
 
             </div>
 
-            <p className="text-stat-number text-foreground">{teamStats.members}</p>
+            <p className="text-stat-number text-foreground">{members.length}</p>
 
             <p className="text-xs text-foreground-muted">团队成员</p>
 
@@ -612,39 +762,35 @@ export default function TeamPage() {
                 <tr className="border-b border-border bg-surface-75">
 
                   <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
-
-                    成员
-
+                    <Checkbox
+                      checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="选择所有成员"
+                    />
                   </th>
 
                   <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
+                    用户
+                  </th>
 
+                  <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
                     角色
-
                   </th>
 
                   <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
-
                     状态
-
                   </th>
 
                   <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
-
-                    活动
-
+                    加入时间
                   </th>
 
                   <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
-
-                    贡献
-
+                    最后活跃
                   </th>
 
                   <th className="text-right text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
-
                     操作
-
                   </th>
 
                 </tr>
@@ -655,197 +801,131 @@ export default function TeamPage() {
 
                 {filteredMembers.map((member) => {
                   const roleConfig = getRoleConfig(member.role);
-
                   const RoleIcon = roleConfig.icon;
+                  const isFrozen = frozenMembers.has(member.id);
+                  const statusLabel = isFrozen
+                    ? "已冻结"
+                    : member.status === "active"
+                    ? "活跃"
+                    : "待接受";
+                  const statusColor = isFrozen
+                    ? "text-warning"
+                    : member.status === "active"
+                    ? "text-brand-500"
+                    : "text-warning";
+                  const statusDot = isFrozen
+                    ? "bg-warning"
+                    : member.status === "active"
+                    ? "bg-brand-500"
+                    : "bg-warning";
 
                   return (
                     <tr key={member.id} className="border-b border-border hover:bg-surface-75 transition-colors">
+                      <td className="px-4 py-4">
+                        <Checkbox
+                          checked={selectedMembers.has(member.id)}
+                          onCheckedChange={(checked) => toggleSelect(member.id, checked)}
+                          aria-label={`选择成员 ${member.name}`}
+                        />
+                      </td>
 
                       <td className="px-4 py-4">
-
                         <div className="flex items-center gap-3">
-
                           <Avatar className="w-10 h-10">
-
                             <AvatarImage src={member.avatar || undefined} />
-
                             <AvatarFallback className="bg-brand-200 text-brand-500">
-
                               {member.name.slice(0, 2)}
-
                             </AvatarFallback>
-
                           </Avatar>
-
                           <div>
-
                             <p className="font-medium text-foreground">{member.name}</p>
-
                             <p className="text-sm text-foreground-light">{member.email}</p>
-
                           </div>
-
                         </div>
-
                       </td>
 
                       <td className="px-4 py-4">
-
                         <Badge variant="secondary" className={cn("gap-1", roleConfig.bgColor, roleConfig.color)}>
-
                           <RoleIcon className="w-3 h-3" />
-
                           {roleConfig.name}
-
                         </Badge>
-
                       </td>
 
                       <td className="px-4 py-4">
-
-                        {member.status === "active" ? (
-                          <span className="flex items-center gap-1.5 text-sm text-brand-500">
-
-                            <span className="w-2 h-2 rounded-full bg-brand-500" />
-
-                            活跃
-
-                          </span>
-
-                        ) : (
-                          <span className="flex items-center gap-1.5 text-sm text-warning">
-
-                            <span className="w-2 h-2 rounded-full bg-warning" />
-
-                            待接受
-
-                          </span>
-
-                        )}
-
+                        <span className={cn("flex items-center gap-1.5 text-sm", statusColor)}>
+                          <span className={cn("w-2 h-2 rounded-full", statusDot)} />
+                          {statusLabel}
+                        </span>
                       </td>
 
                       <td className="px-4 py-4">
-
-                        <div className="text-sm">
-
-                          {member.lastActive ? (
-                            <>
-
-                              <p className="text-foreground">{member.lastActive}</p>
-
-                              <p className="text-xs text-foreground-muted">
-
-                                加入于 {member.joinedAt}
-
-                              </p>
-
-                            </>
-
-                          ) : (
-                            <p className="text-foreground-muted">尚未加入</p>
-
-                          )}
-
-                        </div>
-
+                        <span className="text-sm text-foreground-light">
+                          {member.joinedAt ? formatDate(member.joinedAt) : "-"}
+                        </span>
                       </td>
 
                       <td className="px-4 py-4">
-
-                        <div className="flex items-center gap-4 text-xs text-foreground-muted">
-
-                          <span className="flex items-center gap-1">
-
-                            <Zap className="w-3 h-3" />
-
-                            {member.stats.workflows}
-
-                          </span>
-
-                          <span className="flex items-center gap-1">
-
-                            <Bot className="w-3 h-3" />
-
-                            {member.stats.agents}
-
-                          </span>
-
-                          <span className="flex items-center gap-1">
-
-                            <MessageSquare className="w-3 h-3" />
-
-                            {member.stats.conversations}
-
-                          </span>
-
-                        </div>
-
+                        <span className="text-sm text-foreground-light">
+                          {member.lastActive || (member.status === "pending" ? "未加入" : "—")}
+                        </span>
                       </td>
 
                       <td className="px-4 py-4 text-right">
-
                         <DropdownMenu>
-
                           <DropdownMenuTrigger asChild>
-
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground-muted hover:text-foreground hover:bg-surface-200">
-
                               <MoreHorizontal className="w-4 h-4" />
-
                             </Button>
-
                           </DropdownMenuTrigger>
-
                           <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
-
-                            <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-
-                              <UserCog className="w-4 h-4 mr-2" />
-
-                              更改角色
-
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-
-                              <Key className="w-4 h-4 mr-2" />
-
-                              管理权限
-
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-
-                              <Mail className="w-4 h-4 mr-2" />
-
-                              发送消息
-
-                            </DropdownMenuItem>
-
-                            <DropdownMenuSeparator className="bg-border" />
-
-                            {member.role !== "owner" && (
-                              <DropdownMenuItem className="text-destructive hover:bg-destructive-200">
-
-                                <Trash2 className="w-4 h-4 mr-2" />
-
-                                移除成员
-
+                            <PermissionGate permissions={permissions} required={["members_manage"]}>
+                              <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
+                                <UserCog className="w-4 h-4 mr-2" />
+                                更改角色
                               </DropdownMenuItem>
-
-                            )}
-
+                            </PermissionGate>
+                            <PermissionGate permissions={permissions} required={["members_manage"]}>
+                              <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
+                                <Key className="w-4 h-4 mr-2" />
+                                管理权限
+                              </DropdownMenuItem>
+                            </PermissionGate>
+                            <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
+                              <Mail className="w-4 h-4 mr-2" />
+                              发送消息
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border" />
+                            <PermissionGate permissions={permissions} required={["members_manage"]}>
+                              {member.role !== "owner" && (
+                                <DropdownMenuItem
+                                  className="text-foreground-light hover:text-foreground hover:bg-surface-200"
+                                  onClick={() => handleToggleFreeze(member.id)}
+                                >
+                                  {isFrozen ? (
+                                    <Eye className="w-4 h-4 mr-2" />
+                                  ) : (
+                                    <EyeOff className="w-4 h-4 mr-2" />
+                                  )}
+                                  {isFrozen ? "解除冻结" : "冻结成员"}
+                                </DropdownMenuItem>
+                              )}
+                            </PermissionGate>
+                            <PermissionGate permissions={permissions} required={["members_manage"]}>
+                              {member.role !== "owner" && (
+                                <DropdownMenuItem
+                                  className="text-destructive hover:bg-destructive-200"
+                                  onClick={() => handleRemoveMember(member.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  移除成员
+                                </DropdownMenuItem>
+                              )}
+                            </PermissionGate>
                           </DropdownMenuContent>
-
                         </DropdownMenu>
-
                       </td>
-
                     </tr>
-
                   );
-
                 })}
 
               </tbody>
@@ -899,7 +979,8 @@ export default function TeamPage() {
       {/* 邀请成员弹窗 */}
 
       {showInviteModal && (
-        <>
+        <PermissionGate permissions={permissions} required={["members_manage"]}>
+          <>
 
           <div
 
@@ -1006,11 +1087,11 @@ export default function TeamPage() {
 
           </div>
 
-        </>
+          </>
+        </PermissionGate>
 
       )}
 
-    </div>
   </PageContainer>
   );
 }

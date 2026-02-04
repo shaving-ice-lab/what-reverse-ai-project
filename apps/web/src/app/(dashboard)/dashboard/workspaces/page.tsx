@@ -420,7 +420,7 @@ export default function WorkspacesPage() {
                   新工作空间默认使用免费计划，最多支持 3 个应用并含基础调用配额。
                 </p>
                 <Link
-                  href="/billing"
+                  href="/dashboard/billing"
                   className="text-[11px] text-brand-500 hover:underline"
                 >
                   查看配额与升级
@@ -560,7 +560,7 @@ export default function WorkspacesPage() {
                 <div className="rounded-md border border-border bg-surface-75 p-3">
                   <p className="font-medium text-foreground mb-1">计划与配额</p>
                   <p>免费计划可创建 3 个应用，适合试用与小型团队。</p>
-                  <Link href="/billing" className="text-brand-500 hover:underline text-[11px]">
+                  <Link href="/dashboard/billing" className="text-brand-500 hover:underline text-[11px]">
                     查看配额详情
                   </Link>
                 </div>

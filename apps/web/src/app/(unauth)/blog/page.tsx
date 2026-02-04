@@ -2088,7 +2088,7 @@ export default function BlogPage() {
               </div>
               <p className="text-muted-foreground">系统学习，由浅入深掌握工作流自动化</p>
             </div>
-            <Link href="/learn">
+            <Link href="/learn/courses">
               <Button variant="outline" className="rounded-full">
                 查看全部课程
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -3461,7 +3461,7 @@ export default function BlogPage() {
                   <Link2 className="w-5 h-5 text-blue-500" />
                   <h3 className="text-xl font-bold text-foreground">热门集成</h3>
                 </div>
-                <Link href="/integrations">
+                <Link href="/dashboard/integrations">
                   <Button variant="outline" size="sm" className="rounded-full">
                     查看全部集成
                     <ChevronRight className="ml-1 w-4 h-4" />

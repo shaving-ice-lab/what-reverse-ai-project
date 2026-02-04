@@ -164,7 +164,7 @@ export default function AppEditorPage({
       <div className="border-b border-border bg-background px-6 py-4">
         <div className="flex items-center justify-between gap-6">
           <div className="flex items-start gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.push("/apps")}>
+            <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/apps")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
@@ -189,7 +189,7 @@ export default function AppEditorPage({
           </div>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" asChild>
-              <Link href="/apps">返回 Workbench</Link>
+              <Link href="/dashboard/apps">返回 Workbench</Link>
             </Button>
           </div>
         </div>

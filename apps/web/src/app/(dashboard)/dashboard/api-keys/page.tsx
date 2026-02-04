@@ -708,7 +708,6 @@ export default function ApiKeysPage() {
           </section>
 
         </div>
-      </div>
 
       {showCreateModal && (
         <>
@@ -919,7 +918,6 @@ export default function ApiKeysPage() {
           </div>
         </>
       )}
-    </div>
     </PageContainer>
   );
 }

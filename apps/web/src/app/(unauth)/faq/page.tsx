@@ -16,6 +16,7 @@ import {
   Settings,
   Users,
   MessageSquare,
+  AlertTriangle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const categories = [
   { id: "billing", name: "账单与订阅", icon: CreditCard },
   { id: "security", name: "安全与隐私", icon: Shield },
   { id: "technical", name: "技术问题", icon: Settings },
+  { id: "troubleshooting", name: "故障排查", icon: AlertTriangle },
 ];
 
 // FAQ 数据
@@ -83,6 +85,26 @@ const faqs = [
     question: "有 API 限制吗？",
     answer: "是的，不同版本有不同的 API 限制：免费版 100 次/分钟、专业版 500 次/分钟、团队版 2000 次/分钟、企业版自定义限制。如果您需要更高的限制，请联系我们的销售团队。",
   },
+  {
+    category: "troubleshooting",
+    question: "工作流执行失败如何快速定位？",
+    answer: "建议先查看执行记录中的失败节点与错误信息，确认输入参数是否缺失或格式不正确，再检查目标应用的访问策略与配额。必要时降低并发或开启重试以缩短恢复时间。",
+  },
+  {
+    category: "troubleshooting",
+    question: "Webhook 收不到事件回调怎么办？",
+    answer: "请确认 Webhook URL 可公网访问且未被防火墙拦截，核对签名密钥与事件类型是否匹配，再使用测试事件触发。也可在日志中查看回调失败原因。",
+  },
+  {
+    category: "troubleshooting",
+    question: "运行时提示限流或超时如何处理？",
+    answer: "优先检查访问频率是否超过当前计划配额，必要时调整 rate_limit 策略或升级套餐。同时可减少并发或启用重试来缓解高峰期超时。",
+  },
+  {
+    category: "troubleshooting",
+    question: "如何提交工单并跟踪响应 SLA？",
+    answer: "进入支持中心提交工单，系统会自动分级并给出响应 SLA。您可以在工单回执中查看预计响应时间与当前状态。",
+  },
 ];
 
 export default function FAQPage() {
@@ -105,7 +127,7 @@ export default function FAQPage() {
 
       {/* Hero */}
       <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">

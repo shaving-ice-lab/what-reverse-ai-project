@@ -6,12 +6,13 @@
  */
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
-import { Download, ExternalLink, Plus, Search, Settings, Star } from "lucide-react";
+import { Download, ExternalLink, Key, Plus, Search, Settings, Star } from "lucide-react";
 
 // 集合筛选（对齐 Supabase Integrations）
 const collections = [
@@ -655,6 +656,39 @@ export default function IntegrationsPage() {
                     })}
                   </div>
                 )}
+              </div>
+            </div>
+
+            <div className="page-panel">
+              <div className="page-panel-header">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
+                    <Key className="h-4 w-4 text-foreground-muted" />
+                  </div>
+                  <div>
+                    <h3 className="page-panel-title">API Key 与权限</h3>
+                    <p className="page-panel-description">
+                      创建密钥并管理权限，用于集成调用与 Webhook 签名。
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5 flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-border-muted text-foreground-light hover:text-foreground hover:bg-surface-200"
+                  asChild
+                >
+                  <Link href="/dashboard/settings/api-keys">前往 API Key</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-border-muted text-foreground-light hover:text-foreground hover:bg-surface-200"
+                >
+                  查看权限说明
+                </Button>
               </div>
             </div>
             <div className="page-panel">

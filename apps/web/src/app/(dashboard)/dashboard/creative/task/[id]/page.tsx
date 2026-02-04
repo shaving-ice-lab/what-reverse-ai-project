@@ -139,7 +139,7 @@ export default function TaskDetailPage() {
           <AlertCircle className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
           <h2 className="text-lg font-medium text-foreground mb-2">任务不存在</h2>
           <p className="text-foreground-muted mb-4">该任务可能已被删除</p>
-          <Link href="/creative">
+          <Link href="/dashboard/creative">
             <Button className="bg-brand-500 hover:bg-brand-600 text-background">
               返回创意助手
             </Button>
@@ -176,7 +176,7 @@ export default function TaskDetailPage() {
         <div className="max-w-5xl mx-auto w-full px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href="/creative"
+              href="/dashboard/creative"
               className="p-2 rounded-md hover:bg-surface-75 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-foreground-muted" />
@@ -318,7 +318,7 @@ export default function TaskDetailPage() {
               <h3 className="text-sm font-medium text-foreground mb-3">下一步</h3>
               <div className="grid sm:grid-cols-3 gap-3">
                 <Link
-                  href={`/creative/generate?template=${task.id}`}
+                  href={`/dashboard/creative/generate?template=${task.id}`}
                   className="flex items-center gap-3 p-3 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase group"
                 >
                   <RotateCcw className="w-5 h-5 text-foreground-muted group-hover:text-brand-500" />
@@ -326,7 +326,7 @@ export default function TaskDetailPage() {
                   <ChevronRight className="w-4 h-4 text-foreground-muted ml-auto" />
                 </Link>
                 <Link
-                  href="/creative/generate"
+                  href="/dashboard/creative/generate"
                   className="flex items-center gap-3 p-3 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase group"
                 >
                   <Zap className="w-5 h-5 text-foreground-muted group-hover:text-brand-500" />

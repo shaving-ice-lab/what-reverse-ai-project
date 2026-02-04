@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <main className="pt-20 pb-16 px-6">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold text-foreground mb-2">隐私政策</h1>
-          <p className="text-muted-foreground mb-8">最后更新：2026 年 1 月 1 日</p>
+          <p className="text-muted-foreground mb-8">最后更新：2026 年 2 月 2 日</p>
 
           <div className="prose prose-neutral dark:prose-invert max-w-none">
             <section className="mb-8">
@@ -58,7 +58,31 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">4. 数据安全</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">4. 公开访问与分享</h2>
+              <p className="text-muted-foreground mb-4">
+                当您选择公开访问或分享应用与内容时，相关信息可能向公众或特定受众可见。
+              </p>
+              <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+                <li>请避免在公开内容中包含敏感个人信息或机密数据</li>
+                <li>公开访问内容的可见范围由您配置，我们不会为此类内容提供默认隐私保护</li>
+                <li>您可以随时关闭公开访问或撤回分享以减少曝光</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">5. AI 生成内容与自动化处理</h2>
+              <p className="text-muted-foreground mb-4">
+                为提供 AI 功能，我们会处理您提交的提示词、输入与生成结果。
+              </p>
+              <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+                <li>可能会与受信任的模型服务商共享必要内容以完成生成与安全审查</li>
+                <li>我们遵循最小必要原则处理 AI 相关数据，并尽可能减少敏感信息暴露</li>
+                <li>如需对特定数据进行更严格的控制，请优先使用私有访问模式</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">6. 数据安全</h2>
               <p className="text-muted-foreground mb-4">
                 我们采取多层安全措施保护您的数据：
               </p>
@@ -71,7 +95,7 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">5. 数据保留</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">7. 数据保留</h2>
               <p className="text-muted-foreground">
                 我们会在提供服务所需的期间内保留您的信息。账户删除后，我们会在 30 天内删除您的个人数据，
                 但可能会保留匿名化的统计数据。
@@ -79,7 +103,7 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">6. 您的权利</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">8. 您的权利</h2>
               <p className="text-muted-foreground mb-4">您有权：</p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
                 <li>访问和获取您的数据副本</li>
@@ -91,7 +115,7 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">7. Cookie 政策</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">9. Cookie 政策</h2>
               <p className="text-muted-foreground">
                 我们使用 Cookie 和类似技术来改善用户体验、分析使用情况和个性化内容。
                 您可以通过浏览器设置管理 Cookie 偏好。
@@ -99,7 +123,7 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">8. 联系我们</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">10. 联系我们</h2>
               <p className="text-muted-foreground">
                 如有任何隐私相关问题，请联系我们：
               </p>

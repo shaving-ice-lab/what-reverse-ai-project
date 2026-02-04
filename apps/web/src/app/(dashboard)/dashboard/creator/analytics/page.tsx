@@ -283,7 +283,7 @@ export default function CreatorAnalyticsPage() {
         </div>
         <PageHeader
           title="数据分析"
-          backHref="/creator"
+          backHref="/dashboard/creator"
           backLabel="返回"
           actions={(
             <div className="flex items-center gap-2">
@@ -761,6 +761,8 @@ export default function CreatorAnalyticsPage() {
             ))}
 
           </div>
+
+        </div>
 
         </div>
 

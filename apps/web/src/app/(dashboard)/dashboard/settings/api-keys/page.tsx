@@ -239,6 +239,42 @@ export default function ApiKeysPage() {
         </div>
       </div>
 
+      <SettingsSection
+        title="创建与权限说明"
+        description="按用途创建密钥，并为集成设置最小权限范围"
+      >
+        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-4">
+          <div className="space-y-3 text-[12px] text-foreground-light">
+            <p>1) 创建密钥：为不同环境（开发/生产）单独创建密钥。</p>
+            <p>2) 权限最小化：仅授予需要的模型或工作流权限。</p>
+            <p>3) 使用说明：在 LLM/HTTP 节点中引用该密钥进行调用。</p>
+          </div>
+          <div className="rounded-md border border-border bg-surface-75 p-4">
+            <div className="text-[11px] text-foreground-muted uppercase tracking-wider">
+              推荐权限
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {["模型调用", "Workflow 执行", "Webhook 触发", "只读统计"].map((item) => (
+                <Badge key={item} variant="secondary" className="text-[10px]">
+                  {item}
+                </Badge>
+              ))}
+            </div>
+            <div className="mt-3">
+              <AddApiKeyDialog
+                trigger={
+                  <Button size="sm" className="w-full">
+                    <Plus className="h-4 w-4 mr-1.5" />
+                    创建新密钥
+                  </Button>
+                }
+                onSuccess={loadApiKeys}
+              />
+            </div>
+          </div>
+        </div>
+      </SettingsSection>
+
       {/* 使用统计卡片 */}
       <div className="page-grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-surface-100 border border-border rounded-md p-4">

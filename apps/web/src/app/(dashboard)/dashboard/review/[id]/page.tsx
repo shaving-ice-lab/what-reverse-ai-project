@@ -430,7 +430,7 @@ export default function ReviewDetailPage() {
         icon={<Shield className="w-4 h-4" />}
         title={review.title}
         description={review.description || "审核项目详情与操作"}
-        backHref="/review"
+        backHref="/dashboard/review"
         backLabel="返回列表"
         badge={headerBadges}
         actions={(

@@ -5,13 +5,16 @@
  * 查看和管理所有通知消息
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button, ButtonGroup } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { EmptyState, PageContainer, PageHeader } from "@/components/dashboard/page-layout";
+import { useToast } from "@/components/ui/toast";
+import { notificationApi } from "@/lib/api/notification";
+import type { NotificationItem as ApiNotificationItem, NotificationType } from "@/types/notification";
 import {
   Bell,
   BellOff,
@@ -21,21 +24,19 @@ import {
   MoreHorizontal,
   Filter,
   Settings,
-  Zap,
-  Bot,
   MessageSquare,
-  AlertTriangle,
   Info,
   CheckCircle2,
   Clock,
-  Users,
   CreditCard,
-  Shield,
   Star,
-  Gift,
   Search,
   ExternalLink,
   RefreshCw,
+  UserPlus,
+  AtSign,
+  CornerUpRight,
+  Heart,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -47,80 +48,66 @@ import {
 import Link from "next/link";
 
 // 通知类型配置 - Supabase 风格
-const notificationTypes = {
-  workflow: {
-    icon: Zap,
-    color: "text-warning",
-    bg: "bg-warning-200",
-    label: "工作流",
-    badge: "warning",
+const notificationTypes: Record<
+  NotificationType,
+  {
+    icon: typeof Bell;
+    color: string;
+    bg: string;
+    label: string;
+    badge: NonNullable<BadgeProps["variant"]>;
+  }
+> = {
+  system: {
+    icon: Info,
+    color: "text-brand-500",
+    bg: "bg-brand-200",
+    label: "系统",
+    badge: "primary",
   },
-  agent: {
-    icon: Bot,
+  follow: {
+    icon: UserPlus,
     color: "text-foreground-light",
     bg: "bg-surface-200",
-    label: "Agent",
+    label: "关注",
     badge: "secondary",
   },
-  message: {
+  comment: {
     icon: MessageSquare,
     color: "text-foreground-light",
     bg: "bg-surface-200",
-    label: "消息",
+    label: "评论",
     badge: "secondary",
   },
-  alert: {
-    icon: AlertTriangle,
-    color: "text-destructive",
-    bg: "bg-destructive-200",
-    label: "警告",
-    badge: "destructive",
-  },
-  info: {
-    icon: Info,
+  reply: {
+    icon: CornerUpRight,
     color: "text-foreground-light",
     bg: "bg-surface-200",
-    label: "信息",
-    badge: "outline",
-  },
-  success: {
-    icon: CheckCircle2,
-    color: "text-brand-500",
-    bg: "bg-brand-200",
-    label: "成功",
-    badge: "success",
-  },
-  team: {
-    icon: Users,
-    color: "text-foreground-light",
-    bg: "bg-surface-200",
-    label: "团队",
+    label: "回复",
     badge: "secondary",
   },
-  billing: {
+  like: {
+    icon: Heart,
+    color: "text-warning",
+    bg: "bg-warning-200",
+    label: "点赞",
+    badge: "warning",
+  },
+  mention: {
+    icon: AtSign,
+    color: "text-foreground-light",
+    bg: "bg-surface-200",
+    label: "@提及",
+    badge: "secondary",
+  },
+  income: {
     icon: CreditCard,
     color: "text-warning",
     bg: "bg-warning-200",
-    label: "账单",
+    label: "收入",
     badge: "warning",
   },
-  security: {
-    icon: Shield,
-    color: "text-destructive",
-    bg: "bg-destructive-200",
-    label: "安全",
-    badge: "error",
-  },
-  promotion: {
-    icon: Gift,
-    color: "text-brand-500",
-    bg: "bg-brand-200",
-    label: "推广",
-    badge: "primary",
-  },
-} as const;
-
-type NotificationType = keyof typeof notificationTypes;
+};
 type SelectedType = NotificationType | "all";
 
 const notificationTypeEntries = Object.entries(notificationTypes) as [
@@ -128,109 +115,32 @@ const notificationTypeEntries = Object.entries(notificationTypes) as [
   (typeof notificationTypes)[NotificationType],
 ][];
 
-// 模拟通知数据
-const mockNotifications = [
-  {
-    id: "n1",
-    type: "workflow" as const,
-    title: "工作流执行完成",
-    message: "「每日数据同步」工作流已成功执行，处理了 1,256 条数据",
-    read: false,
-    starred: false,
-    createdAt: "2026-01-31T14:30:00",
-    link: "/workflows/wf-123",
-  },
-  {
-    id: "n2",
-    type: "alert" as const,
-    title: "工作流执行失败",
-    message: "「用户通知」工作流执行失败：API 请求超时，请检查网络连接",
-    read: false,
-    starred: true,
-    createdAt: "2026-01-31T13:15:00",
-    link: "/workflows/wf-456/logs",
-  },
-  {
-    id: "n3",
-    type: "team" as const,
-    title: "新成员加入团队",
-    message: "李华 已接受邀请并加入您的团队",
-    read: false,
-    starred: false,
-    createdAt: "2026-01-31T10:00:00",
-    link: "/team",
-  },
-  {
-    id: "n4",
-    type: "agent" as const,
-    title: "Agent 对话量突破",
-    message: "您的「客服助手」Agent 本周对话量超过 500 次",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-30T18:45:00",
-    link: "/my-agents/agent-789",
-  },
-  {
-    id: "n5",
-    type: "billing" as const,
-    title: "账单提醒",
-    message: "您的专业版订阅将于 7 天后到期，请及时续费",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-30T09:00:00",
-    link: "/billing",
-  },
-  {
-    id: "n6",
-    type: "security" as const,
-    title: "新设备登录",
-    message: "检测到新设备登录您的账户：Windows 11 / Chrome 120",
-    read: true,
-    starred: true,
-    createdAt: "2026-01-29T22:30:00",
-    link: "/settings/security",
-  },
-  {
-    id: "n7",
-    type: "success" as const,
-    title: "数据导出完成",
-    message: "您请求的工作流执行日志已导出完成，可以下载了",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-29T16:00:00",
-    link: "/files",
-  },
-  {
-    id: "n8",
-    type: "promotion" as const,
-    title: "春节特惠活动",
-    message: "限时优惠：企业版年付享 7 折，活动截止至 2 月 15 日",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-28T10:00:00",
-    link: "/billing",
-  },
-  {
-    id: "n9",
-    type: "info" as const,
-    title: "系统维护通知",
-    message: "计划于 2026-02-05 02:00-04:00 进行系统维护，届时服务可能短暂中断",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-27T14:00:00",
-    link: "/whats-new",
-  },
-  {
-    id: "n10",
-    type: "workflow" as const,
-    title: "工作流执行完成",
-    message: "「周报生成」工作流已成功执行",
-    read: true,
-    starred: false,
-    createdAt: "2026-01-26T17:30:00",
-    link: "/workflows/wf-321",
-  },
-];
+interface NotificationRow {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  read: boolean;
+  starred: boolean;
+  createdAt: string;
+  link?: string;
+}
+
+const resolveNotificationLink = (notification: ApiNotificationItem): string | undefined => {
+  const link = notification.metadata?.link;
+  return typeof link === "string" ? link : undefined;
+};
+
+const toNotificationRow = (notification: ApiNotificationItem): NotificationRow => ({
+  id: notification.id,
+  type: notification.type,
+  title: notification.title,
+  message: notification.content ?? "",
+  read: notification.isRead,
+  starred: false,
+  createdAt: notification.createdAt,
+  link: resolveNotificationLink(notification),
+});
 
 // 格式化时间
 function formatTime(dateString: string) {
@@ -253,12 +163,105 @@ function formatTime(dateString: string) {
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const toast = useToast();
+  const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [selectedType, setSelectedType] = useState<SelectedType>("all");
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const pageSize = 20;
+
+  const loadNotifications = useCallback(
+    async ({
+      page: targetPage = 1,
+      append = false,
+      mode = "initial",
+    }: {
+      page?: number;
+      append?: boolean;
+      mode?: "initial" | "refresh" | "more";
+    } = {}) => {
+      if (mode === "more") {
+        setIsLoadingMore(true);
+      } else if (mode === "refresh") {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+      setErrorMessage(null);
+
+      try {
+        const result = await notificationApi.list({
+          page: targetPage,
+          pageSize,
+          type: selectedType === "all" ? undefined : selectedType,
+          isRead: showUnreadOnly ? false : undefined,
+        });
+        const mapped = result.items.map(toNotificationRow);
+
+        setNotifications((prev) => {
+          if (!append) {
+            return mapped;
+          }
+          const existing = new Set(prev.map((item) => item.id));
+          const merged = [...prev];
+          mapped.forEach((item) => {
+            if (!existing.has(item.id)) {
+              merged.push(item);
+            }
+          });
+          return merged;
+        });
+
+        if (!append) {
+          setSelectedItems(new Set());
+        }
+
+        const resolvedTotal = Math.max(result.meta.total, mapped.length);
+        const resolvedPage = result.meta.page || targetPage;
+        const resolvedPageSize = result.meta.pageSize || pageSize;
+        setTotal(resolvedTotal);
+        setPage(resolvedPage);
+        setHasMore(resolvedPage * resolvedPageSize < resolvedTotal);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "获取通知失败";
+        setErrorMessage(message);
+        toast.error("获取通知失败", message);
+        if (!append) {
+          setNotifications([]);
+          setTotal(0);
+          setHasMore(false);
+        }
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [pageSize, selectedType, showUnreadOnly, toast]
+  );
+
+  useEffect(() => {
+    loadNotifications({ page: 1, append: false, mode: "initial" });
+  }, [loadNotifications]);
+
+  const refreshNotifications = useCallback(() => {
+    loadNotifications({ page: 1, append: false, mode: "refresh" });
+  }, [loadNotifications]);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    loadNotifications({ page: page + 1, append: true, mode: "more" });
+  }, [hasMore, isLoadingMore, loadNotifications, page]);
 
   // 筛选通知
   const filteredNotifications = useMemo(() => {
@@ -284,8 +287,9 @@ export default function NotificationsPage() {
   }, [filteredNotifications, sortOrder]);
 
   // 统计数据
+  const resolvedTotal = Math.max(total, notifications.length);
   const stats = {
-    total: notifications.length,
+    total: resolvedTotal,
     unread: notifications.filter((n) => !n.read).length,
     starred: notifications.filter((n) => n.starred).length,
   };
@@ -300,15 +304,33 @@ export default function NotificationsPage() {
   }, [notifications]);
 
   // 标记已读
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+  const markAsRead = async (id: string) => {
+    const target = notifications.find((n) => n.id === id);
+    if (!target || target.read) return;
+
+    try {
+      await notificationApi.markAsRead(id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "标记已读失败";
+      toast.error("标记已读失败", message);
+    }
   };
 
   // 标记全部已读
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const markAllAsRead = async () => {
+    if (notifications.every((n) => n.read)) return;
+
+    try {
+      await notificationApi.markAllAsRead(selectedType === "all" ? undefined : selectedType);
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setSelectedItems(new Set());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "标记已读失败";
+      toast.error("标记已读失败", message);
+    }
   };
 
   // 切换收藏
@@ -319,8 +341,20 @@ export default function NotificationsPage() {
   };
 
   // 删除通知
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const deleteNotification = async (id: string) => {
+    try {
+      await notificationApi.delete(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      setSelectedItems((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      setTotal((prev) => Math.max(prev - 1, 0));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "删除通知失败";
+      toast.error("删除通知失败", message);
+    }
   };
 
   // 切换选择
@@ -335,17 +369,40 @@ export default function NotificationsPage() {
   };
 
   // 批量删除
-  const bulkDelete = () => {
-    setNotifications((prev) => prev.filter((n) => !selectedItems.has(n.id)));
+  const bulkDelete = async () => {
+    const ids = Array.from(selectedItems);
+    if (ids.length === 0) return;
+
+    const results = await Promise.allSettled(ids.map((id) => notificationApi.delete(id)));
+    const succeeded = ids.filter((_, index) => results[index].status === "fulfilled");
+    const failed = ids.filter((_, index) => results[index].status === "rejected");
+
+    if (succeeded.length > 0) {
+      setNotifications((prev) => prev.filter((n) => !succeeded.includes(n.id)));
+      setTotal((prev) => Math.max(prev - succeeded.length, 0));
+    }
     setSelectedItems(new Set());
+
+    if (failed.length > 0) {
+      toast.error("部分删除失败", `仍有 ${failed.length} 条未删除`);
+    }
   };
 
   // 批量标记已读
-  const bulkMarkAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((n) => (selectedItems.has(n.id) ? { ...n, read: true } : n))
-    );
-    setSelectedItems(new Set());
+  const bulkMarkAsRead = async () => {
+    const ids = Array.from(selectedItems);
+    if (ids.length === 0) return;
+
+    try {
+      await notificationApi.markMultipleAsRead(ids);
+      setNotifications((prev) =>
+        prev.map((n) => (ids.includes(n.id) ? { ...n, read: true } : n))
+      );
+      setSelectedItems(new Set());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "批量标记已读失败";
+      toast.error("批量标记已读失败", message);
+    }
   };
 
   const resetFilters = () => {
@@ -397,8 +454,17 @@ export default function NotificationsPage() {
   const hasActiveFilters = selectedType !== "all" || showUnreadOnly || trimmedQuery.length > 0;
   let emptyTitle = "暂无通知";
   let emptyDescription = "新的通知会显示在这里";
+  let emptyAction = hasActiveFilters ? { label: "重置筛选", onClick: resetFilters } : undefined;
 
-  if (trimmedQuery) {
+  if (isLoading) {
+    emptyTitle = "加载中";
+    emptyDescription = "正在获取通知";
+    emptyAction = undefined;
+  } else if (errorMessage) {
+    emptyTitle = "加载失败";
+    emptyDescription = errorMessage;
+    emptyAction = { label: "重试", onClick: refreshNotifications };
+  } else if (trimmedQuery) {
     emptyTitle = "没有匹配结果";
     emptyDescription = "请尝试更换关键词或清除筛选";
   } else if (showUnreadOnly) {
@@ -408,14 +474,17 @@ export default function NotificationsPage() {
     emptyTitle = "该类型暂无通知";
     emptyDescription = "尝试切换类型或重置筛选";
   }
-  const emptyAction = hasActiveFilters ? { label: "重置筛选", onClick: resetFilters } : undefined;
 
   return (
     <PageContainer>
       <div className="space-y-6">
         <PageHeader
           title="通知中心"
-          description={stats.unread > 0 ? `您有 ${stats.unread} 条未读通知` : "所有通知已读"}
+          description={isLoading
+            ? "正在获取通知..."
+            : stats.unread > 0
+              ? `您有 ${stats.unread} 条未读通知`
+              : "所有通知已读"}
           actions={(
             <div className="flex items-center gap-2">
               {stats.unread > 0 && (
@@ -428,7 +497,7 @@ export default function NotificationsPage() {
                   全部标记已读
                 </Button>
               )}
-              <Link href="/settings">
+              <Link href="/dashboard/settings/notifications">
                 <Button variant="outline" size="sm" leftIcon={<Settings className="w-4 h-4" />}>
                   通知设置
                 </Button>
@@ -664,8 +733,14 @@ export default function NotificationsPage() {
                         最早
                       </Button>
                     </ButtonGroup>
-                    <Button variant="ghost" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
-                      刷新
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={refreshNotifications}
+                      disabled={isRefreshing}
+                      leftIcon={<RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />}
+                    >
+                      {isRefreshing ? "刷新中" : "刷新"}
                     </Button>
                   </div>
                 </div>
@@ -859,10 +934,10 @@ export default function NotificationsPage() {
               </div>
             </div>
 
-            {filteredNotifications.length > 0 && (
+            {hasMore && (
               <div className="flex justify-center">
-                <Button variant="outline" size="sm">
-                  加载更多
+                <Button variant="outline" size="sm" onClick={loadMore} disabled={isLoadingMore}>
+                  {isLoadingMore ? "加载中..." : "加载更多"}
                 </Button>
               </div>
             )}

@@ -908,7 +908,6 @@ export default function FeedbackPage() {
           </div>
         </Tabs>
       </div>
-      </div>
     </div>
   );
 }

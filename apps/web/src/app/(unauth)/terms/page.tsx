@@ -14,7 +14,7 @@ export default function TermsPage() {
       <main className="pt-20 pb-16 px-6">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold text-foreground mb-2">服务条款</h1>
-          <p className="text-muted-foreground mb-8">最后更新：2026 年 1 月 1 日</p>
+          <p className="text-muted-foreground mb-8">最后更新：2026 年 2 月 2 日</p>
 
           <div className="prose prose-neutral dark:prose-invert max-w-none">
             <section className="mb-8">
@@ -57,7 +57,31 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">5. 付费服务</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">5. 公开访问内容责任声明</h2>
+              <p className="text-muted-foreground mb-4">
+                公开访问的应用与内容由发布者创建并负责，我们仅提供技术平台与展示通道。
+              </p>
+              <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+                <li>发布者需确保内容合法、合规，且不侵犯第三方权益</li>
+                <li>用户在使用公开访问内容前应自行判断风险与适用性</li>
+                <li>如发现侵权或违规内容，请联系 legal@agentflow.ai 以便及时处理</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">6. AI 生成内容免责声明</h2>
+              <p className="text-muted-foreground mb-4">
+                平台中的 AI 生成内容可能存在错误、偏差或不完整。
+              </p>
+              <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+                <li>AI 生成内容仅供参考，不构成专业意见或保证</li>
+                <li>在做出重要决策前，请进行人工核验与专业评估</li>
+                <li>不得将 AI 生成内容直接用于医疗、法律或金融等高风险场景</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">7. 付费服务</h2>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
                 <li>付费订阅按选定的计费周期收费</li>
                 <li>价格可能会变更，我们会提前 30 天通知</li>
@@ -67,14 +91,14 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">6. 服务变更</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">8. 服务变更</h2>
               <p className="text-muted-foreground">
                 我们可能会不时更新、修改或终止服务的某些功能。对于重大变更，我们会提前通知用户。
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">7. 免责声明</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">9. 免责声明</h2>
               <p className="text-muted-foreground">
                 服务按"现状"提供，不提供任何明示或暗示的保证。我们不保证服务不会中断或无错误。
                 在法律允许的最大范围内，我们不对任何间接、附带或后果性损害承担责任。
@@ -82,14 +106,14 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">8. 责任限制</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">10. 责任限制</h2>
               <p className="text-muted-foreground">
                 我们对您的最大责任不超过您在过去 12 个月内支付给我们的费用总额。
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">9. 条款修改</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">11. 条款修改</h2>
               <p className="text-muted-foreground">
                 我们保留修改这些条款的权利。重大修改将提前 30 天通知。
                 继续使用服务即表示您接受修改后的条款。
@@ -97,7 +121,7 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-foreground mb-4">10. 联系方式</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">12. 联系方式</h2>
               <p className="text-muted-foreground">
                 如有任何问题，请联系我们：
               </p>
