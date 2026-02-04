@@ -1,0 +1,72 @@
+# Gitleaks 配置文件
+# 用于排除已知的误报和允许的模式
+
+title = "Gitleaks Config"
+
+[allowlist]
+  description = "Allowlisted patterns"
+  
+  # 允许的路径
+  paths = [
+    '''\.lock$''',
+    '''go\.sum$''',
+    '''pnpm-lock\.yaml$''',
+    '''package-lock\.json$''',
+    '''\.min\.js$''',
+    '''\.min\.css$''',
+  ]
+  
+  # 允许的正则模式
+  regexes = [
+    # 示例密钥（文档和测试用）
+    '''change-this-to-a-32-byte-secret!''',
+    '''your-secret-key-change-in-production''',
+    # 占位符
+    '''sk-xxx''',
+    '''api_key_placeholder''',
+    # 测试用mock数据
+    '''test-api-key''',
+    '''mock-secret''',
+  ]
+
+# 自定义规则
+[[rules]]
+  id = "generic-api-key"
+  description = "Generic API Key"
+  regex = '''(?i)(api[_-]?key|apikey|api[_-]?secret)\s*[:=]\s*['"]?([a-zA-Z0-9_\-]{32,})['"]?'''
+  secretGroup = 2
+  keywords = ["api_key", "apikey", "api-key", "api_secret"]
+  
+  [rules.allowlist]
+    regexes = [
+      '''change-this''',
+      '''your-secret''',
+      '''placeholder''',
+      '''example''',
+    ]
+
+[[rules]]
+  id = "jwt-secret"
+  description = "JWT Secret"
+  regex = '''(?i)jwt[_-]?secret\s*[:=]\s*['"]?([a-zA-Z0-9_\-]{16,})['"]?'''
+  secretGroup = 1
+  keywords = ["jwt_secret", "jwt-secret"]
+  
+  [rules.allowlist]
+    regexes = [
+      '''change-in-production''',
+      '''your-secret''',
+    ]
+
+[[rules]]
+  id = "encryption-key"
+  description = "Encryption Key"
+  regex = '''(?i)encryption[_-]?key\s*[:=]\s*['"]?([a-zA-Z0-9_\-!@#$%^&*]{32,})['"]?'''
+  secretGroup = 1
+  keywords = ["encryption_key", "encryption-key"]
+  
+  [rules.allowlist]
+    regexes = [
+      '''32-byte-secret''',
+      '''change-this''',
+    ]

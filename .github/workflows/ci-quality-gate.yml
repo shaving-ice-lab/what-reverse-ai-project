@@ -1,0 +1,239 @@
+name: CI Quality Gate
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      perf_url:
+        description: "Performance test URL"
+        required: false
+        default: ""
+      perf_requests:
+        description: "Total requests"
+        required: false
+        default: "200"
+      perf_concurrency:
+        description: "Concurrent workers"
+        required: false
+        default: "10"
+      perf_timeout_ms:
+        description: "Timeout per request (ms)"
+        required: false
+        default: "10000"
+      perf_max_error_rate:
+        description: "Max error rate (0-1)"
+        required: false
+        default: "0.02"
+      perf_min_rps:
+        description: "Min requests per second"
+        required: false
+        default: "20"
+      perf_max_avg_ms:
+        description: "Max average latency (ms)"
+        required: false
+        default: "500"
+      perf_max_p95_ms:
+        description: "Max p95 latency (ms)"
+        required: false
+        default: "1200"
+      perf_max_p99_ms:
+        description: "Max p99 latency (ms)"
+        required: false
+        default: "2000"
+      require_staging_approval:
+        description: "Require staging approval gate"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+  pull-requests: read
+  security-events: write
+
+jobs:
+  lint-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Web lint
+        run: pnpm lint
+
+      - name: Web tests
+        run: pnpm test
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Go lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: apps/server
+
+      - name: Go tests
+        run: go test -v ./...
+        working-directory: apps/server
+
+  schema-check:
+    name: Schema Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install swag
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+        working-directory: apps/server
+
+      - name: Generate swagger schema
+        run: swag init -g cmd/server/main.go -o docs/swagger
+        working-directory: apps/server
+
+      - name: Verify schema is up to date
+        run: git diff --exit-code -- apps/server/docs/swagger
+
+  migration-check:
+    name: Migration Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate migration pairs
+        run: node scripts/ci/migration-check.mjs
+
+  feature-flag-check:
+    name: Feature Flag Release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate feature flag release label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const requiredLabel = "feature-flag/approved";
+            const featureTokens = [
+              "features:",
+              "FeatureFlagsConfig",
+              "workspace_enabled",
+              "app_runtime_enabled",
+              "domain_enabled",
+            ];
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info("No pull request context. Skipping feature flag validation.");
+              return;
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+
+            const isFeatureFile = (filename) =>
+              filename === "apps/server/internal/config/config.go" ||
+              filename.startsWith("apps/server/config/config.");
+
+            const touchedFeatureFiles = files.filter((file) => {
+              if (!isFeatureFile(file.filename)) return false;
+              const patch = file.patch || "";
+              return featureTokens.some((token) => patch.includes(token));
+            });
+
+            if (touchedFeatureFiles.length === 0) {
+              core.info("No feature flag changes detected.");
+              return;
+            }
+
+            const labels = pr.labels.map((label) => label.name);
+            if (!labels.includes(requiredLabel)) {
+              const fileList = touchedFeatureFiles.map((file) => file.filename).join(", ");
+              core.setFailed(
+                `Feature flag change detected in: ${fileList}. Add label "${requiredLabel}" to proceed.`
+              );
+              return;
+            }
+
+            core.info(`Feature flag label "${requiredLabel}" present.`);
+
+  security-scan:
+    name: Security Scan
+    uses: ./.github/workflows/security-scan.yml
+    permissions:
+      contents: read
+      security-events: write
+
+  performance-gate:
+    name: Performance Gate
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Skip when no perf URL
+        if: inputs.perf_url == ''
+        run: echo "No perf_url provided. Skipping performance gate."
+
+      - name: Run performance benchmark
+        if: inputs.perf_url != ''
+        run: |
+          node scripts/ops/runtime-load-test.mjs \
+            --url "${{ inputs.perf_url }}" \
+            --requests "${{ inputs.perf_requests }}" \
+            --concurrency "${{ inputs.perf_concurrency }}" \
+            --timeout-ms "${{ inputs.perf_timeout_ms }}" \
+            --max-error-rate "${{ inputs.perf_max_error_rate }}" \
+            --min-rps "${{ inputs.perf_min_rps }}" \
+            --max-avg-ms "${{ inputs.perf_max_avg_ms }}" \
+            --max-p95-ms "${{ inputs.perf_max_p95_ms }}" \
+            --max-p99-ms "${{ inputs.perf_max_p99_ms }}"
+
+  staging-approval:
+    name: Staging Approval
+    if: github.event_name == 'workflow_dispatch' && inputs.require_staging_approval == 'true'
+    runs-on: ubuntu-latest
+    needs: [lint-test, schema-check, migration-check, feature-flag-check, security-scan, performance-gate]
+    environment:
+      name: staging
+    steps:
+      - name: Await approval
+        run: echo "Staging approval granted."

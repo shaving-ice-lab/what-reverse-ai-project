@@ -1,0 +1,30 @@
+# Code ownership rules for AgentFlow.
+# Order matters. The last matching rule wins.
+# critical-owners: @shaving-ice-lab/security @shaving-ice-lab/db @shaving-ice-lab/devops
+# critical-approvals-base: 2
+# critical-owners-approvals: @shaving-ice-lab/security=3 @shaving-ice-lab/db=2 @shaving-ice-lab/devops=2
+# critical-files-approvals: 5=3 10=4
+# critical-groups-approvals: 2=3 3=4
+# critical-changes-approvals: 200=3 500=4
+# module-approvals: /apps/server/internal/pkg/security/=4 /apps/server/internal/pkg/database/migrations/=3 /apps/server/internal/pkg/migration/=3 /apps/server/internal/service/auth_service.go=3 /apps/server/config/=3
+
+* @shaving-ice-lab/maintainers
+
+# Product areas
+/apps/server/ @shaving-ice-lab/backend
+/apps/web/ @shaving-ice-lab/frontend
+/apps/desktop/ @shaving-ice-lab/desktop
+/packages/sdk/ @shaving-ice-lab/sdk
+
+# Critical modules (merge-gate applies)
+/apps/server/internal/pkg/security/ @shaving-ice-lab/security @shaving-ice-lab/backend
+/apps/server/internal/pkg/database/migrations/ @shaving-ice-lab/db @shaving-ice-lab/backend
+/apps/server/internal/pkg/migration/ @shaving-ice-lab/db @shaving-ice-lab/backend
+/apps/server/internal/service/auth_service.go @shaving-ice-lab/security @shaving-ice-lab/backend
+/apps/server/internal/api/handler/auth.go @shaving-ice-lab/security @shaving-ice-lab/backend
+/apps/server/internal/domain/entity/secret.go @shaving-ice-lab/security @shaving-ice-lab/backend
+/apps/server/config/ @shaving-ice-lab/devops @shaving-ice-lab/backend
+
+# CI/CD and docs
+/.github/workflows/ @shaving-ice-lab/devops
+/docs/ @shaving-ice-lab/maintainers
