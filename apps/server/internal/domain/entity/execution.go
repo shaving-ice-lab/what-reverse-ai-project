@@ -12,6 +12,7 @@ type Execution struct {
 	ID            uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	WorkflowID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"workflow_id"`
 	UserID        uuid.UUID      `gorm:"type:char(36);not null;index" json:"user_id"`
+	WorkspaceID   uuid.UUID      `gorm:"type:char(36);index" json:"workspace_id"`
 
 	// 执行状态
 	Status        string         `gorm:"size:20;not null;default:'pending'" json:"status"`
@@ -43,6 +44,7 @@ type Execution struct {
 	// 关联
 	Workflow      *Workflow      `gorm:"foreignKey:WorkflowID" json:"workflow,omitempty"`
 	User          *User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Workspace     *Workspace     `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 	NodeLogs      []NodeLog      `gorm:"foreignKey:ExecutionID" json:"node_logs,omitempty"`
 }
 

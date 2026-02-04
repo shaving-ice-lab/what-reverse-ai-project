@@ -9,19 +9,27 @@ import (
 
 // APIKey API 密钥实体
 type APIKey struct {
-	ID     uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID uuid.UUID `gorm:"type:char(36);not null;index" json:"user_id"`
+	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID      uuid.UUID `gorm:"type:char(36);not null;index" json:"user_id"`
+	WorkspaceID uuid.UUID `gorm:"type:char(36);index" json:"workspace_id"`
 
-	Provider     string  `gorm:"size:50;not null" json:"provider"`
-	Name         string  `gorm:"size:100;not null" json:"name"`
-	KeyEncrypted string  `gorm:"type:text;not null" json:"-"`
-	KeyPreview   *string `gorm:"size:20" json:"key_preview"`
+	Provider     string      `gorm:"size:50;not null" json:"provider"`
+	Name         string      `gorm:"size:100;not null" json:"name"`
+	KeyEncrypted string      `gorm:"type:text;not null" json:"-"`
+	KeyPreview   *string     `gorm:"size:20" json:"key_preview"`
+	Scopes       StringArray `gorm:"type:json" json:"scopes"`
 
-	IsActive   bool       `gorm:"default:true" json:"is_active"`
-	LastUsedAt *time.Time `json:"last_used_at"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	LastUsedAt    *time.Time `json:"last_used_at"`
+	LastRotatedAt *time.Time `json:"last_rotated_at"`
+	RevokedAt     *time.Time `json:"revoked_at"`
+	RevokedBy     *uuid.UUID `gorm:"type:char(36)" json:"revoked_by"`
+	RevokedReason *string    `gorm:"size:255" json:"revoked_reason"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+
+	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 }
 
 // TableName 表名

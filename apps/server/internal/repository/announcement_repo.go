@@ -16,6 +16,8 @@ type AnnouncementRepository interface {
 	Update(ctx context.Context, announcement *entity.Announcement) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	ListActive(ctx context.Context, params AnnouncementListParams) ([]entity.Announcement, int64, error)
+	ListAll(ctx context.Context, params AnnouncementAdminListParams) ([]entity.Announcement, int64, error)
+	GetReadCounts(ctx context.Context, announcementIDs []uuid.UUID) (map[uuid.UUID]int64, error)
 	MarkAsRead(ctx context.Context, announcementID, userID uuid.UUID) error
 	GetReadStatus(ctx context.Context, userID uuid.UUID) ([]uuid.UUID, error)
 }
@@ -27,8 +29,22 @@ type AnnouncementListParams struct {
 	PageSize int
 }
 
+// AnnouncementAdminListParams 公告列表参数（管理员）
+type AnnouncementAdminListParams struct {
+	Type            string
+	IncludeInactive bool
+	IsActive        *bool
+	Page            int
+	PageSize        int
+}
+
 type announcementRepository struct {
 	db *gorm.DB
+}
+
+type announcementReadCountRow struct {
+	AnnouncementID uuid.UUID `gorm:"column:announcement_id"`
+	ReadCount      int64     `gorm:"column:read_count"`
 }
 
 // NewAnnouncementRepository 创建公告仓储实例
@@ -96,6 +112,65 @@ func (r *announcementRepository) ListActive(ctx context.Context, params Announce
 	}
 
 	return announcements, total, nil
+}
+
+func (r *announcementRepository) ListAll(ctx context.Context, params AnnouncementAdminListParams) ([]entity.Announcement, int64, error) {
+	var announcements []entity.Announcement
+	var total int64
+
+	query := r.db.WithContext(ctx).Model(&entity.Announcement{})
+	if params.Type != "" {
+		query = query.Where("type = ?", params.Type)
+	}
+	if params.IsActive != nil {
+		query = query.Where("is_active = ?", *params.IsActive)
+	} else if !params.IncludeInactive {
+		query = query.Where("is_active = ?", true)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if params.Page <= 0 {
+		params.Page = 1
+	}
+	if params.PageSize <= 0 {
+		params.PageSize = 20
+	}
+
+	offset := (params.Page - 1) * params.PageSize
+	if err := query.Order("priority DESC, created_at DESC").
+		Offset(offset).
+		Limit(params.PageSize).
+		Find(&announcements).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return announcements, total, nil
+}
+
+func (r *announcementRepository) GetReadCounts(ctx context.Context, announcementIDs []uuid.UUID) (map[uuid.UUID]int64, error) {
+	counts := make(map[uuid.UUID]int64)
+	if len(announcementIDs) == 0 {
+		return counts, nil
+	}
+
+	var rows []announcementReadCountRow
+	if err := r.db.WithContext(ctx).
+		Model(&entity.AnnouncementRead{}).
+		Select("announcement_id, COUNT(DISTINCT user_id) as read_count").
+		Where("announcement_id IN ?", announcementIDs).
+		Group("announcement_id").
+		Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+
+	for _, row := range rows {
+		counts[row.AnnouncementID] = row.ReadCount
+	}
+
+	return counts, nil
 }
 
 func (r *announcementRepository) MarkAsRead(ctx context.Context, announcementID, userID uuid.UUID) error {

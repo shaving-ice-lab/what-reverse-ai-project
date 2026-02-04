@@ -14,6 +14,7 @@ type WorkflowRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.Workflow, error)
 	GetByIDs(ctx context.Context, ids []uuid.UUID) ([]entity.Workflow, error)
 	List(ctx context.Context, userID uuid.UUID, params ListParams) ([]entity.Workflow, int64, error)
+	ListByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]entity.Workflow, error)
 	Update(ctx context.Context, workflow *entity.Workflow) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	DeleteByIDs(ctx context.Context, ids []uuid.UUID, userID uuid.UUID) (int64, error)
@@ -95,6 +96,17 @@ func (r *workflowRepository) List(ctx context.Context, userID uuid.UUID, params 
 	}
 
 	return workflows, total, nil
+}
+
+func (r *workflowRepository) ListByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]entity.Workflow, error) {
+	var workflows []entity.Workflow
+	if err := r.db.WithContext(ctx).
+		Where("workspace_id = ?", workspaceID).
+		Order("created_at ASC").
+		Find(&workflows).Error; err != nil {
+		return nil, err
+	}
+	return workflows, nil
 }
 
 func (r *workflowRepository) Update(ctx context.Context, workflow *entity.Workflow) error {

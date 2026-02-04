@@ -30,6 +30,12 @@ type User struct {
 	// 配置
 	Settings JSON `gorm:"type:json" json:"settings"`
 
+	// 角色与状态
+	Role            string     `gorm:"size:20;default:'user';index" json:"role"`
+	Status          string     `gorm:"size:20;default:'active';index" json:"status"`
+	StatusReason    *string    `gorm:"size:255" json:"status_reason,omitempty"`
+	StatusUpdatedAt *time.Time `json:"status_updated_at,omitempty"`
+
 	// 统计
 	WorkflowCount  int `gorm:"default:0" json:"workflow_count"`
 	AgentCount     int `gorm:"default:0" json:"agent_count"`

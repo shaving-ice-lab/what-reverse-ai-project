@@ -25,12 +25,14 @@ const (
 type ReviewItemType string
 
 const (
-	ReviewItemTypeAgent      ReviewItemType = "agent"
-	ReviewItemTypeWorkflow   ReviewItemType = "workflow"
-	ReviewItemTypeTemplate   ReviewItemType = "template"
-	ReviewItemTypeUser       ReviewItemType = "user"
-	ReviewItemTypeContent    ReviewItemType = "content"
-	ReviewItemTypeCustomNode ReviewItemType = "custom_node" // 自定义节点
+	ReviewItemTypeAgent       ReviewItemType = "agent"
+	ReviewItemTypeWorkflow    ReviewItemType = "workflow"
+	ReviewItemTypeTemplate    ReviewItemType = "template"
+	ReviewItemTypeUser        ReviewItemType = "user"
+	ReviewItemTypeContent     ReviewItemType = "content"
+	ReviewItemTypeCustomNode  ReviewItemType = "custom_node"  // 自定义节点
+	ReviewItemTypeDBSchema    ReviewItemType = "db_schema"    // DB Schema 变更
+	ReviewItemTypeMajorChange ReviewItemType = "major_change" // 重大变更审批
 )
 
 // ReviewPriority 审核优先级

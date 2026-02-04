@@ -11,6 +11,7 @@ import (
 type Workflow struct {
 	ID            uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID        uuid.UUID      `gorm:"type:char(36);not null;index" json:"user_id"`
+	WorkspaceID   uuid.UUID      `gorm:"type:char(36);index" json:"workspace_id"`
 
 	// 基础信息
 	Name          string         `gorm:"size:200;not null" json:"name"`
@@ -48,6 +49,7 @@ type Workflow struct {
 
 	// 关联
 	User          *User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Workspace     *Workspace     `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 }
 
 // TableName 表名

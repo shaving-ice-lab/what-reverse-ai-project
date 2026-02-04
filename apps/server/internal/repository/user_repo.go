@@ -14,10 +14,21 @@ type UserRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetByUsername(ctx context.Context, username string) (*entity.User, error)
+	List(ctx context.Context, params UserListParams) ([]entity.User, int64, error)
+	Count(ctx context.Context) (int64, error)
 	Update(ctx context.Context, user *entity.User) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
 	ExistsByUsername(ctx context.Context, username string) (bool, error)
+}
+
+// UserListParams 用户列表参数
+type UserListParams struct {
+	Search   string
+	Status   string
+	Role     string
+	Page     int
+	PageSize int
 }
 
 type userRepository struct {
@@ -55,6 +66,50 @@ func (r *userRepository) GetByUsername(ctx context.Context, username string) (*e
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) List(ctx context.Context, params UserListParams) ([]entity.User, int64, error) {
+	var users []entity.User
+	var total int64
+
+	query := r.db.WithContext(ctx).Model(&entity.User{})
+	if params.Search != "" {
+		like := "%" + params.Search + "%"
+		query = query.Where("email LIKE ? OR username LIKE ? OR display_name LIKE ?", like, like, like)
+	}
+	if params.Status != "" {
+		query = query.Where("status = ?", params.Status)
+	}
+	if params.Role != "" {
+		query = query.Where("role = ?", params.Role)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	page := params.Page
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := params.PageSize
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	offset := (page - 1) * pageSize
+	if err := query.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
+}
+
+func (r *userRepository) Count(ctx context.Context) (int64, error) {
+	var total int64
+	if err := r.db.WithContext(ctx).Model(&entity.User{}).Count(&total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
 }
 
 func (r *userRepository) Update(ctx context.Context, user *entity.User) error {
