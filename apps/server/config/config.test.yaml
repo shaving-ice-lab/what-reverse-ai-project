@@ -1,0 +1,8 @@
+env: test
+server:
+  mode: "development"
+  port: 8081
+database:
+  name: "what-reverse_test"
+redis:
+  db: 1

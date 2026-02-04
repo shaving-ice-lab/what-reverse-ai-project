@@ -1,0 +1,140 @@
+# AgentFlow Server Configuration (Example)
+env: development
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  mode: "development"  # development | production
+  base_url: "http://localhost:8080"
+
+deployment:
+  region: "local"
+  primary_region: "local"
+  regions:
+    - "local"
+  region_base_urls: {}
+
+database:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: ""
+  name: "agentflow"
+  charset: "utf8mb4"
+  max_open_conns: 100
+  max_idle_conns: 10
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+
+execution:
+  max_concurrent: 10
+  max_in_flight: 100
+  timeout: "5m"
+
+queue:
+  worker_concurrency: 10
+  queues:
+    workflow: 6
+    webhook: 3
+    scheduled: 1
+
+jwt:
+  secret: "your-secret-key-change-in-production"
+  access_token_expire: "15m"
+  refresh_token_expire: "168h"
+
+captcha:
+  provider: "" # turnstile
+  secret: ""
+  verify_url: "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+  timeout_seconds: 3
+
+ai:
+  openai_api_key: ""
+  anthropic_api_key: ""
+  default_model: "gpt-4"
+
+encryption:
+  key: "change-this-to-a-32-byte-secret!"  # 生产环境请修改此密钥
+
+features:
+  workspace_enabled: true
+  app_runtime_enabled: true
+  domain_enabled: true
+
+domain_routing:
+  provider: "" # webhook
+  webhook_url: ""
+  webhook_token: ""
+  timeout_seconds: 3
+
+certificate_issuer:
+  provider: "" # webhook
+  webhook_url: ""
+  webhook_token: ""
+  timeout_seconds: 5
+
+connector_health:
+  enabled: true
+  interval: "6h"
+  expiry_warning_days: 7
+
+migration:
+  workspace_backfill_enabled: false
+  workspace_consistency_check: false
+
+# 安全配置
+security:
+  data_classification_enabled: true
+  pii_sanitization_enabled: true
+  audit_logging_enabled: true
+  audit_log_retention_days: 90
+  compliance_check_enabled: true
+  key_rotation_warning_days: 7
+  admin_emails: []
+  admin_roles: {}
+  supply_chain:
+    license:
+      enabled: true
+      default_action: "review"
+      allowed:
+        - "MIT"
+        - "Apache-2.0"
+        - "BSD-3-Clause"
+        - "BSD-2-Clause"
+        - "ISC"
+      review:
+        - "LGPL-2.1"
+        - "LGPL-3.0"
+        - "MPL-2.0"
+      denied:
+        - "GPL-3.0"
+        - "GPL-3.0-only"
+        - "AGPL-3.0"
+        - "AGPL-3.0-only"
+    sbom:
+      enabled: true
+      formats:
+        - "spdx-json"
+        - "cyclonedx-json"
+      retention_days: 180
+    signing:
+      required: true
+      verify_on_upload: true
+      allowed_algorithms:
+        - "cosign"
+      allowed_signers: []
+
+# 数据保留策略
+retention:
+  enabled: true
+  cleanup_interval: "24h"
+  execution_log_retention_days: 30
+  anonymous_session_retention_days: 7
+  workspace_deletion_grace_days: 7
+  workspace_cold_storage_days: 30
+
