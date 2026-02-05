@@ -818,22 +818,22 @@
 ## 38. 后端模块拆解与服务边界
 
 1. [x] Workspace Service（输出：模块职责；验收：用户/成员/权限）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（Workspace Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（Workspace Service）。  
    - 代码：`apps/server/internal/service/workspace_service.go`；接口：`apps/server/internal/api/handler/workspace.go`。  
 2. [x] App Service（输出：模块职责；验收：创建/发布/版本）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（App Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（App Service）。  
    - 代码：`apps/server/internal/service/app_service.go`；接口：`apps/server/internal/api/handler/app.go`。  
 3. [x] Runtime Service（输出：模块职责；验收：公开访问与执行）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（Runtime Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（Runtime Service）。  
    - 代码：`apps/server/internal/service/runtime_service.go`；接口：`apps/server/internal/api/handler/runtime.go`。  
 4. [x] DB Provisioner Service（输出：模块职责；验收：独立库创建）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（DB Provisioner Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（DB Provisioner Service）。  
    - 代码：`apps/server/internal/service/workspace_database_service.go`；接口：`apps/server/internal/api/handler/workspace_database.go`。  
 5. [x] Domain Service（输出：模块职责；验收：域名绑定/证书）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（Domain Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（Domain Service）。  
    - 代码：`apps/server/internal/service/app_domain_service.go`；接口：`apps/server/internal/api/handler/app_domain.go`。  
 6. [x] Billing Service（输出：模块职责；验收：计费/配额）。  
-   - 职责边界：`docs/BACKEND-SERVICE-BOUNDARIES.md`（Billing Service）。  
+   - 职责边界：`docs/architecture/BACKEND-SERVICE-BOUNDARIES.md`（Billing Service）。  
    - 代码：`apps/server/internal/service/billing_service.go`；接口：`apps/server/internal/api/handler/billing.go`。  
 
 7. [x] Plan Service（输出：模块职责；验收：规划模块/任务/版本/权限）。  
@@ -888,15 +888,15 @@
 ## 41. 测试用例模板与基准
 
 1. [x] Workspace 测试用例模板（输出：模板；验收：可复用）。  
-   - 见 `docs/TEST-CASE-TEMPLATES.md` 的 Workspace 模板
+   - 见 `docs/operations/TEST-CASE-TEMPLATES.md` 的 Workspace 模板
 2. [x] App 公开访问测试用例模板（输出：模板；验收：可复用）。  
-   - 见 `docs/TEST-CASE-TEMPLATES.md` 的 App 公开访问模板
+   - 见 `docs/operations/TEST-CASE-TEMPLATES.md` 的 App 公开访问模板
 3. [x] DB Provision 测试用例模板（输出：模板；验收：可复用）。  
-   - 见 `docs/TEST-CASE-TEMPLATES.md` 的 DB Provision 模板
+   - 见 `docs/operations/TEST-CASE-TEMPLATES.md` 的 DB Provision 模板
 4. [x] 域名绑定测试用例模板（输出：模板；验收：可复用）。  
-   - 见 `docs/TEST-CASE-TEMPLATES.md` 的 域名绑定模板
+   - 见 `docs/operations/TEST-CASE-TEMPLATES.md` 的 域名绑定模板
 5. [x] 安全测试基准（输出：基准；验收：可执行）。  
-   - 见 `docs/TEST-CASE-TEMPLATES.md` 的 安全测试基准
+   - 见 `docs/operations/TEST-CASE-TEMPLATES.md` 的 安全测试基准
 
 ---
 
@@ -927,7 +927,7 @@
    - API：`/api/v1/admin/ops/sops/anonymous_abuse`  
 4. [x] 用户数据恢复流程（输出：流程；验收：可执行）。  
    - API：`/api/v1/admin/ops/sops/user_data_recovery`  
-   - 文档：`docs/OPS-SUPPORT-SOPS.md`  
+   - 文档：`docs/operations/OPS-SUPPORT-SOPS.md`  
 
 curl 示例（需要管理员 JWT）：
 
@@ -980,7 +980,7 @@ curl -H "Authorization: Bearer <token>" https://<base_url>/api/v1/admin/ops/sops
 
 2. [x] SDK/CLI 规划（输出：规划；验收：可实施）。  
 
-   - 规划文档：`docs/SDK-CLI-PLAN.md`  
+   - 规划文档：`docs/development/SDK-CLI-PLAN.md`  
 
 3. [x] 示例应用与模板（输出：模板清单；验收：可复用）。  
 
@@ -1002,9 +1002,9 @@ curl -H "Authorization: Bearer <token>" https://<base_url>/api/v1/admin/ops/sops
 1. [x] 开发/测试/生产环境隔离（输出：规范；验收：可区分）。  
    - 规范：通过 `AGENTFLOW_ENV` 选择 `config.{env}.yaml` 覆盖基础配置，dev/test/prod 可区分。  
 2. [x] 配置管理与环境变量规范（输出：清单；验收：可维护）。  
-   - 已新增 `docs/CONFIGURATION.md` 与 `apps/server/config/config.example.yaml` 作为清单与模板。  
+   - 已新增 `docs/development/CONFIGURATION.md` 与 `apps/server/config/config.example.yaml` 作为清单与模板。  
 3. [x] 多地域部署策略（输出：方案；验收：可扩展）。  
-   - 已新增 `docs/DEPLOYMENT-MULTI-REGION.md` 并提供部署配置与发现接口 `/api/v1/system/deployment`。  
+   - 已新增 `docs/architecture/DEPLOYMENT-MULTI-REGION.md` 并提供部署配置与发现接口 `/api/v1/system/deployment`。  
 
 ---
 
@@ -1017,33 +1017,33 @@ curl -H "Authorization: Bearer <token>" https://<base_url>/api/v1/admin/ops/sops
 
 2. [x] 错误码体系（输出：错误码表；验收：可定位问题）。  
 
-   - 已新增 `docs/ERROR-CODES.md` 与 `/api/v1/system/error-codes`  
+   - 已新增 `docs/api/ERROR-CODES.md` 与 `/api/v1/system/error-codes`  
    - WORKSPACE_*, APP_*, RUNTIME_*, DOMAIN_*, DB_*  
 
 3. [x] Workspace 创建请求/响应字段（输出：字段定义；验收：可用）。  
 
    - request：name、slug、region  
    - response：id、owner_user_id、created_at  
-   - 已新增 `docs/API-FIELDS-WORKSPACE.md` 并支持 `region` 字段写入  
+   - 字段定义见 `docs/api/API-FIELDS.md` 的「Workspace API」章节（含 `region`）。  
 
 4. [x] App 创建/发布/版本请求字段（输出：字段定义；验收：可用）。  
 
    - create：name、slug、workflow_id、ui_schema  
    - publish：access_policy、rate_limit  
    - version：changelog、config_json  
-   - 已新增 `docs/API-FIELDS-APP.md`，发布接口支持 `access_policy`/`rate_limit`  
+   - 字段定义见 `docs/api/API-FIELDS.md` 的「App API」章节（含 `access_policy`/`rate_limit`）。  
 
 5. [x] Runtime 执行请求/响应字段（输出：字段定义；验收：可落地）。  
 
    - request：inputs、session_id、client_context  
    - response：status、outputs、execution_id、logs  
-   - 已新增 `docs/API-FIELDS-RUNTIME.md`  
+   - 字段定义见 `docs/api/API-FIELDS.md` 的「Runtime API」章节。  
 
 6. [x] Domain 绑定/验证请求字段（输出：字段定义；验收：可用）。  
 
    - bind：domain  
    - verify：token  
-   - 已新增 `docs/API-FIELDS-DOMAIN.md`  
+   - 字段定义见 `docs/api/API-FIELDS.md` 的「Domain API」章节。  
 
 ---
 
@@ -1072,7 +1072,7 @@ curl -H "Authorization: Bearer <token>" https://<base_url>/api/v1/admin/ops/sops
 6. [x] `app_sessions` 约束与索引（输出：SQL 草案；验收：可执行）。  
 
    - index(app_id, created_at)、index(session_type)  
-   - 已新增 `docs/SQL-SCHEMA-INDEX-CONSTRAINTS.md`  
+   - 已新增 `docs/operations/SQL-SCHEMA-INDEX-CONSTRAINTS.md`  
 
 ---
 
@@ -2205,9 +2205,9 @@ CREATE TABLE what_reverse_app_versions (
 
 ## 102. 变更记录与 ADR
 
-1. [x] 架构决策记录（ADR）模板（输出：模板；验收：可复用）。详见 `docs/ADR-TEMPLATE.md`。  
-1. [x] 版本变更记录规范（输出：规范；验收：一致）。详见 `docs/CHANGELOG-STANDARD.md`。  
-1. [x] 重大变更审批流程（输出：流程；验收：可执行）。详见 `docs/MAJOR-CHANGE-APPROVAL.md`。  
+1. [x] 架构决策记录（ADR）模板（输出：模板；验收：可复用）。详见 `docs/standards/ADR-TEMPLATE.md`。  
+1. [x] 版本变更记录规范（输出：规范；验收：一致）。详见 `docs/standards/CHANGELOG-STANDARD.md`。  
+1. [x] 重大变更审批流程（输出：流程；验收：可执行）。详见 `docs/standards/MAJOR-CHANGE-APPROVAL.md`。  
 
 ---
 
