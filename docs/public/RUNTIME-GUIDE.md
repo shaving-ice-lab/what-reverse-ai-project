@@ -43,7 +43,8 @@
 
 ```json
 {
-  "success": true,
+  "code": "OK",
+  "message": "OK",
   "data": {
     "execution_id": "uuid",
     "status": "running",
@@ -51,7 +52,9 @@
     "started_at": "2026-02-02T10:00:00Z",
     "session_id": "uuid",
     "message": "执行已开始"
-  }
+  },
+  "trace_id": "trace_xxx",
+  "request_id": "req_yyy"
 }
 ```
 

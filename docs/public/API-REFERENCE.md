@@ -8,14 +8,17 @@
 - **Runtime 公开入口**: `/runtime/:workspaceSlug/:appSlug`（不走 `/api/v1`）
 - **自定义域名入口**: 绑定域名后，使用根路径 `/` 与 `/schema`
 
-## 响应结构
+## 响应结构（统一包裹）
 
 ### 成功响应
 
 ```json
 {
-  "success": true,
-  "data": {}
+  "code": "OK",
+  "message": "OK",
+  "data": {},
+  "trace_id": "trace_xxx",
+  "request_id": "req_yyy"
 }
 ```
 
@@ -23,37 +26,38 @@
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "错误描述",
+  "code": "ERROR_CODE",
+  "message": "错误描述",
+  "data": {
     "details": {}
-  }
+  },
+  "trace_id": "trace_xxx",
+  "request_id": "req_yyy"
 }
 ```
 
-### 分页响应
+### 分页响应（列表接口）
 
 ```json
 {
-  "success": true,
+  "code": "OK",
+  "message": "OK",
   "data": [],
   "meta": {
     "total": 100,
     "page": 1,
     "page_size": 20
-  }
+  },
+  "trace_id": "trace_xxx",
+  "request_id": "req_yyy"
 }
 ```
 
 ## 文档与规范入口
 
 - Swagger: `apps/server/docs/swagger/swagger.json`
-- 现有 API 文档: `docs/api/creative-assistant-api.md`
-- 错误码表: `docs/ERROR-CODES.md`
-- App 字段定义: `docs/API-FIELDS-APP.md`
-- Runtime 字段定义: `docs/API-FIELDS-RUNTIME.md`
-- Domain 字段定义: `docs/API-FIELDS-DOMAIN.md`
+- 字段定义（Workspace/App/Domain/Runtime）: [`docs/api/API-FIELDS.md`](../api/API-FIELDS.md)
+- 错误码表: [`docs/api/ERROR-CODES.md`](../api/ERROR-CODES.md)
 
 ## 常用公开入口（示例）
 
