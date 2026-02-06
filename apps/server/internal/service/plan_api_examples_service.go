@@ -84,10 +84,10 @@ func defaultAPIExampleTable() APIExampleTable {
 				},
 			},
 			{
-				Key:    "app_publish",
-				Title:  "App 发布示例",
+				Key:    "workspace_publish",
+				Title:  "Workspace 发布示例",
 				Method: "POST",
-				Path:   "/api/v1/apps/{id}/publish",
+				Path:   "/api/v1/workspaces/{id}/publish",
 				Request: map[string]interface{}{
 					"version_id": "ver_123",
 					"access_policy": map[string]interface{}{
@@ -115,7 +115,7 @@ func defaultAPIExampleTable() APIExampleTable {
 				Key:    "runtime_execute",
 				Title:  "Runtime 执行示例",
 				Method: "POST",
-				Path:   "/runtime/{workspaceSlug}/{appSlug}",
+				Path:   "/runtime/{workspaceSlug}",
 				Request: map[string]interface{}{
 					"inputs": map[string]interface{}{
 						"prompt": "帮我生成日报",
@@ -138,7 +138,7 @@ func defaultAPIExampleTable() APIExampleTable {
 					},
 				},
 				Notes: []string{
-					"匿名访问会返回 session_id，并通过 X-App-Session-Id 复用。",
+					"匿名访问会返回 session_id，并通过 X-Workspace-Session-Id 复用。",
 				},
 			},
 		},

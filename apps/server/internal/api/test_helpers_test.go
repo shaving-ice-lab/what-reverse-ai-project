@@ -7,20 +7,18 @@ import (
 )
 
 type TestConfig struct {
-	ServerBaseURL  string
-	APIBaseURL     string
-	RuntimeBaseURL string
-	Token          string
-	WorkspaceID    string
-	WorkspaceSlug  string
-	AppID          string
-	AppSlug        string
-	AppVersionID   string
-	Domain         string
-	DomainID       string
-	MemberUserID   string
-	CaptchaToken   string
-	BackupID       string
+	ServerBaseURL      string
+	APIBaseURL         string
+	RuntimeBaseURL     string
+	Token              string
+	WorkspaceID        string
+	WorkspaceSlug      string
+	WorkspaceVersionID string
+	WorkspaceDomain    string
+	WorkspaceDomainID  string
+	MemberUserID       string
+	CaptchaToken       string
+	BackupID           string
 }
 
 func loadTestConfig() TestConfig {
@@ -29,20 +27,18 @@ func loadTestConfig() TestConfig {
 	runtimeBaseDefault := serverBase + "/runtime"
 
 	return TestConfig{
-		ServerBaseURL:  serverBase,
-		APIBaseURL:     getEnv("TEST_API_BASE_URL", apiBaseDefault),
-		RuntimeBaseURL: getEnv("TEST_RUNTIME_BASE_URL", runtimeBaseDefault),
-		Token:          os.Getenv("TEST_JWT_TOKEN"),
-		WorkspaceID:    os.Getenv("TEST_WORKSPACE_ID"),
-		WorkspaceSlug:  os.Getenv("TEST_WORKSPACE_SLUG"),
-		AppID:          os.Getenv("TEST_APP_ID"),
-		AppSlug:        os.Getenv("TEST_APP_SLUG"),
-		AppVersionID:   os.Getenv("TEST_APP_VERSION_ID"),
-		Domain:         os.Getenv("TEST_APP_DOMAIN"),
-		DomainID:       os.Getenv("TEST_APP_DOMAIN_ID"),
-		MemberUserID:   os.Getenv("TEST_MEMBER_USER_ID"),
-		CaptchaToken:   os.Getenv("TEST_CAPTCHA_TOKEN"),
-		BackupID:       os.Getenv("TEST_BACKUP_ID"),
+		ServerBaseURL:      serverBase,
+		APIBaseURL:         getEnv("TEST_API_BASE_URL", apiBaseDefault),
+		RuntimeBaseURL:     getEnv("TEST_RUNTIME_BASE_URL", runtimeBaseDefault),
+		Token:              os.Getenv("TEST_JWT_TOKEN"),
+		WorkspaceID:        os.Getenv("TEST_WORKSPACE_ID"),
+		WorkspaceSlug:      os.Getenv("TEST_WORKSPACE_SLUG"),
+		WorkspaceVersionID: os.Getenv("TEST_WORKSPACE_VERSION_ID"),
+		WorkspaceDomain:    os.Getenv("TEST_WORKSPACE_DOMAIN"),
+		WorkspaceDomainID:  os.Getenv("TEST_WORKSPACE_DOMAIN_ID"),
+		MemberUserID:       os.Getenv("TEST_MEMBER_USER_ID"),
+		CaptchaToken:       os.Getenv("TEST_CAPTCHA_TOKEN"),
+		BackupID:           os.Getenv("TEST_BACKUP_ID"),
 	}
 }
 

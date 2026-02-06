@@ -74,7 +74,6 @@ type DomainVerifyPayload struct {
 type MetricsAggregationPayload struct {
 	OwnerID     string  `json:"owner_id"`
 	WorkspaceID *string `json:"workspace_id,omitempty"`
-	AppID       *string `json:"app_id,omitempty"`
 }
 
 // EnqueueResult 统一任务入队结果

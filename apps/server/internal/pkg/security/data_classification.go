@@ -131,7 +131,7 @@ var DefaultAccessPolicies = map[DataClassificationLevel]AccessPolicy{
 	},
 	DataLevelInternal: {
 		MinRole:         "member",
-		RequiredPerms:   []string{"app_view_metrics"},
+		RequiredPerms:   []string{"workspace_view_metrics"},
 		AllowAnonymous:  false,
 		AuditRequired:   false,
 		EncryptRequired: false,

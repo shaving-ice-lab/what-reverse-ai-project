@@ -41,7 +41,7 @@ const workflowSystemPromptTemplate = `你是一个专业的工作流设计师。
 输出协议结构（JSON 对象）：
 {
   "schema_version": "%[1]s",
-  "app_metadata": {
+  "workspace_metadata": {
     "name": "应用名称",
     "description": "应用描述",
     "icon": "可选",

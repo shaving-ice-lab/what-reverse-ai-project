@@ -202,7 +202,7 @@ func defaultCapacityCostPlan(execution config.ExecutionConfig, queue config.Queu
 				},
 				Notes: []string{
 					"utilization_target 建议 0.6~0.75，避免过度逼近极限。",
-					"可按 workspace/app 维度拆分估算。",
+					"可按 workspace 维度拆分估算。",
 				},
 			},
 			{
@@ -293,7 +293,7 @@ func defaultCapacityCostPlan(execution config.ExecutionConfig, queue config.Queu
 				Key:   "rate_limit",
 				Title: "运行时限流与排队",
 				Triggers: []string{
-					"per_app/per_ip/per_session 超出 rate_limit_json",
+					"per_workspace/per_ip/per_session 超出 rate_limit_json",
 					"runtime_rate_limited 事件激增",
 				},
 				Actions: []string{
@@ -358,15 +358,15 @@ func defaultCapacityCostPlan(execution config.ExecutionConfig, queue config.Queu
 		},
 		NoisyNeighborIsolation: []NoisyNeighborIsolationRule{
 			{
-				Key:         "per_app_rate_limit",
-				Title:       "按 App/Session/IP 限流",
+				Key:         "per_workspace_rate_limit",
+				Title:       "按 Workspace/Session/IP 限流",
 				Description: "使用 rate_limit_json 控制单一租户或来源的负载。",
 				Signals: []string{
 					"runtime_rate_limited",
 					"agentflow_runtime_requests_total",
 				},
 				Actions: []string{
-					"设置 per_app/per_ip/per_session 限流窗口",
+					"设置 per_workspace/per_ip/per_session 限流窗口",
 					"封禁高频 session 并告警",
 				},
 			},

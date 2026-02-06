@@ -13,20 +13,12 @@ type RuntimeCacheSettings struct {
 }
 
 type runtimeCache struct {
-	workspaceBySlug        *ttlCache[*entity.Workspace]
-	workspaceByID          *ttlCache[*entity.Workspace]
-	appByWorkspaceSlug     *ttlCache[*entity.App]
-	appByID                *ttlCache[*entity.App]
-	policyByAppID          *ttlCache[*entity.AppAccessPolicy]
-	versionByID            *ttlCache[*entity.AppVersion]
-	domainByHost           *ttlCache[*entity.AppDomain]
-	workspaceBySlugMiss    *ttlCache[bool]
-	workspaceByIDMiss      *ttlCache[bool]
-	appByWorkspaceSlugMiss *ttlCache[bool]
-	appByIDMiss            *ttlCache[bool]
-	policyByAppIDMiss      *ttlCache[bool]
-	versionByIDMiss        *ttlCache[bool]
-	domainByHostMiss       *ttlCache[bool]
+	workspaceBySlug     *ttlCache[*entity.Workspace]
+	workspaceByID       *ttlCache[*entity.Workspace]
+	versionByID         *ttlCache[*entity.WorkspaceVersion]
+	workspaceBySlugMiss *ttlCache[bool]
+	workspaceByIDMiss   *ttlCache[bool]
+	versionByIDMiss     *ttlCache[bool]
 }
 
 func newRuntimeCache(settings RuntimeCacheSettings) *runtimeCache {
@@ -37,20 +29,12 @@ func newRuntimeCache(settings RuntimeCacheSettings) *runtimeCache {
 	if settings.EntryTTL > 0 {
 		cache.workspaceBySlug = newTTLCache[*entity.Workspace](settings.EntryTTL)
 		cache.workspaceByID = newTTLCache[*entity.Workspace](settings.EntryTTL)
-		cache.appByWorkspaceSlug = newTTLCache[*entity.App](settings.EntryTTL)
-		cache.appByID = newTTLCache[*entity.App](settings.EntryTTL)
-		cache.policyByAppID = newTTLCache[*entity.AppAccessPolicy](settings.EntryTTL)
-		cache.versionByID = newTTLCache[*entity.AppVersion](settings.EntryTTL)
-		cache.domainByHost = newTTLCache[*entity.AppDomain](settings.EntryTTL)
+		cache.versionByID = newTTLCache[*entity.WorkspaceVersion](settings.EntryTTL)
 	}
 	if settings.NegativeTTL > 0 {
 		cache.workspaceBySlugMiss = newTTLCache[bool](settings.NegativeTTL)
 		cache.workspaceByIDMiss = newTTLCache[bool](settings.NegativeTTL)
-		cache.appByWorkspaceSlugMiss = newTTLCache[bool](settings.NegativeTTL)
-		cache.appByIDMiss = newTTLCache[bool](settings.NegativeTTL)
-		cache.policyByAppIDMiss = newTTLCache[bool](settings.NegativeTTL)
 		cache.versionByIDMiss = newTTLCache[bool](settings.NegativeTTL)
-		cache.domainByHostMiss = newTTLCache[bool](settings.NegativeTTL)
 	}
 	return cache
 }

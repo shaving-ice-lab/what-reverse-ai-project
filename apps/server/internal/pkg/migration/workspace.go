@@ -8,22 +8,18 @@ import (
 
 // WorkspaceBackfillResult 回填结果
 type WorkspaceBackfillResult struct {
-	CreatedWorkspaces  int64 `json:"created_workspaces"`
-	UpdatedWorkflows   int64 `json:"updated_workflows"`
-	UpdatedExecutions  int64 `json:"updated_executions"`
-	UpdatedAPIKeys     int64 `json:"updated_api_keys"`
-	UpdatedApps        int64 `json:"updated_apps"`
-	UpdatedAppSessions int64 `json:"updated_app_sessions"`
+	CreatedWorkspaces int64 `json:"created_workspaces"`
+	UpdatedWorkflows  int64 `json:"updated_workflows"`
+	UpdatedExecutions int64 `json:"updated_executions"`
+	UpdatedAPIKeys    int64 `json:"updated_api_keys"`
 }
 
 // WorkspaceConsistencyReport 一致性校验结果
 type WorkspaceConsistencyReport struct {
-	UsersMissingWorkspace       int64 `json:"users_missing_workspace"`
-	WorkflowsMissingWorkspace   int64 `json:"workflows_missing_workspace"`
-	ExecutionsMissingWorkspace  int64 `json:"executions_missing_workspace"`
-	APIKeysMissingWorkspace     int64 `json:"api_keys_missing_workspace"`
-	AppsMissingWorkspace        int64 `json:"apps_missing_workspace"`
-	AppSessionsMissingWorkspace int64 `json:"app_sessions_missing_workspace"`
+	UsersMissingWorkspace      int64 `json:"users_missing_workspace"`
+	WorkflowsMissingWorkspace  int64 `json:"workflows_missing_workspace"`
+	ExecutionsMissingWorkspace int64 `json:"executions_missing_workspace"`
+	APIKeysMissingWorkspace    int64 `json:"api_keys_missing_workspace"`
 }
 
 // RunWorkspaceBackfill 回填默认 workspace 与 workspace_id
@@ -54,18 +50,6 @@ func RunWorkspaceBackfill(ctx context.Context, db *gorm.DB) (*WorkspaceBackfillR
 		}
 		result.UpdatedAPIKeys = updatedAPIKeys
 
-		updatedApps, err := execRows(tx, backfillAppWorkspaceSQL)
-		if err != nil {
-			return err
-		}
-		result.UpdatedApps = updatedApps
-
-		updatedSessions, err := execRows(tx, backfillAppSessionWorkspaceSQL)
-		if err != nil {
-			return err
-		}
-		result.UpdatedAppSessions = updatedSessions
-
 		return nil
 	})
 	if err != nil {
@@ -95,15 +79,6 @@ func CheckWorkspaceConsistency(ctx context.Context, db *gorm.DB) (*WorkspaceCons
 	if err != nil {
 		return nil, err
 	}
-	report.AppsMissingWorkspace, err = queryCount(ctx, db, missingWorkspaceByAppSQL)
-	if err != nil {
-		return nil, err
-	}
-	report.AppSessionsMissingWorkspace, err = queryCount(ctx, db, missingWorkspaceBySessionSQL)
-	if err != nil {
-		return nil, err
-	}
-
 	return report, nil
 }
 
@@ -155,20 +130,6 @@ SET ak.workspace_id = ws.id
 WHERE ak.workspace_id IS NULL OR ak.workspace_id = '';
 `
 
-const backfillAppWorkspaceSQL = `
-UPDATE what_reverse_apps app
-JOIN what_reverse_workspaces ws ON ws.owner_user_id = app.owner_user_id
-SET app.workspace_id = ws.id
-WHERE app.workspace_id IS NULL OR app.workspace_id = '';
-`
-
-const backfillAppSessionWorkspaceSQL = `
-UPDATE what_reverse_app_sessions s
-JOIN what_reverse_apps a ON a.id = s.app_id
-SET s.workspace_id = a.workspace_id
-WHERE s.workspace_id IS NULL OR s.workspace_id = '';
-`
-
 const missingWorkspaceByUserSQL = `
 SELECT COUNT(*)
 FROM what_reverse_users u
@@ -195,18 +156,4 @@ SELECT COUNT(*)
 FROM what_reverse_api_keys ak
 LEFT JOIN what_reverse_workspaces ws ON ws.id = ak.workspace_id
 WHERE ak.workspace_id IS NULL OR ak.workspace_id = '' OR ws.id IS NULL;
-`
-
-const missingWorkspaceByAppSQL = `
-SELECT COUNT(*)
-FROM what_reverse_apps app
-LEFT JOIN what_reverse_workspaces ws ON ws.id = app.workspace_id
-WHERE app.workspace_id IS NULL OR app.workspace_id = '' OR ws.id IS NULL;
-`
-
-const missingWorkspaceBySessionSQL = `
-SELECT COUNT(*)
-FROM what_reverse_app_sessions s
-LEFT JOIN what_reverse_workspaces ws ON ws.id = s.workspace_id
-WHERE s.workspace_id IS NULL OR s.workspace_id = '' OR ws.id IS NULL;
 `

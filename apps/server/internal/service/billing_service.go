@@ -18,7 +18,7 @@ type BillingService interface {
 	ListPlans(ctx context.Context) ([]entity.BillingPlan, error)
 	GetWorkspaceQuota(ctx context.Context, ownerID, workspaceID uuid.UUID) (*entity.WorkspaceQuota, *entity.BillingPlan, error)
 	ConsumeUsage(ctx context.Context, ownerID, workspaceID uuid.UUID, req ConsumeUsageRequest) (*ConsumeUsageResult, error)
-	GetAppUsageStats(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) ([]entity.AppUsageStat, error)
+	GetWorkspaceUsageStats(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) (*entity.WorkspaceUsageStats, error)
 	GetCostModel(ctx context.Context, ownerID, workspaceID uuid.UUID) (*CostModel, error)
 	GetCostSummary(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) (*CostSummary, error)
 	EstimateCost(ctx context.Context, ownerID, workspaceID uuid.UUID, usage map[string]float64) (*CostEstimate, error)
@@ -35,11 +35,9 @@ type billingService struct {
 	planRepo       repository.BillingPlanRepository
 	quotaRepo      repository.WorkspaceQuotaRepository
 	usageRepo      repository.BillingUsageEventRepository
-	appUsageRepo   repository.AppUsageStatRepository
 	invoicePayRepo repository.BillingInvoicePaymentRepository
 	workspaceRepo  repository.WorkspaceRepository
 	workspaceSvc   WorkspaceService
-	appRepo        repository.AppRepository
 }
 
 // BillingDimension 计量维度
@@ -53,7 +51,6 @@ type BillingDimension struct {
 
 // ConsumeUsageRequest 用量扣减请求
 type ConsumeUsageRequest struct {
-	AppID *uuid.UUID         `json:"app_id"`
 	Usage map[string]float64 `json:"usage"`
 }
 
@@ -73,21 +70,17 @@ func NewBillingService(
 	planRepo repository.BillingPlanRepository,
 	quotaRepo repository.WorkspaceQuotaRepository,
 	usageRepo repository.BillingUsageEventRepository,
-	appUsageRepo repository.AppUsageStatRepository,
 	invoicePayRepo repository.BillingInvoicePaymentRepository,
 	workspaceRepo repository.WorkspaceRepository,
 	workspaceSvc WorkspaceService,
-	appRepo repository.AppRepository,
 ) BillingService {
 	return &billingService{
 		planRepo:       planRepo,
 		quotaRepo:      quotaRepo,
 		usageRepo:      usageRepo,
-		appUsageRepo:   appUsageRepo,
 		invoicePayRepo: invoicePayRepo,
 		workspaceRepo:  workspaceRepo,
 		workspaceSvc:   workspaceSvc,
-		appRepo:        appRepo,
 	}
 }
 
@@ -131,11 +124,6 @@ func (s *billingService) ConsumeUsage(ctx context.Context, ownerID, workspaceID 
 	}
 	if err := s.validateUsage(req.Usage); err != nil {
 		return nil, err
-	}
-	if req.AppID != nil {
-		if err := s.validateApp(ctx, workspaceID, *req.AppID); err != nil {
-			return nil, err
-		}
 	}
 
 	plan, err := s.getPlanByCode(ctx, workspace.Plan)
@@ -184,19 +172,12 @@ func (s *billingService) ConsumeUsage(ctx context.Context, ownerID, workspaceID 
 
 	if err := s.usageRepo.Create(ctx, &entity.BillingUsageEvent{
 		WorkspaceID: workspace.ID,
-		AppID:       req.AppID,
 		Usage:       floatMapToJSON(normalized),
 		CostAmount:  cost,
 		Currency:    currency,
 		RecordedAt:  now,
 	}); err != nil {
 		return nil, err
-	}
-
-	if req.AppID != nil {
-		if err := s.updateAppUsage(ctx, workspace.ID, *req.AppID, quota.PeriodStart, quota.PeriodEnd, normalized, cost, currency); err != nil {
-			return nil, err
-		}
 	}
 
 	return &ConsumeUsageResult{
@@ -210,11 +191,20 @@ func (s *billingService) ConsumeUsage(ctx context.Context, ownerID, workspaceID 
 	}, nil
 }
 
-func (s *billingService) GetAppUsageStats(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) ([]entity.AppUsageStat, error) {
+func (s *billingService) GetWorkspaceUsageStats(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) (*entity.WorkspaceUsageStats, error) {
 	if _, err := s.workspaceSvc.GetByID(ctx, workspaceID, ownerID); err != nil {
 		return nil, err
 	}
-	return s.appUsageRepo.GetByWorkspaceAndPeriod(ctx, workspaceID, periodStart, periodEnd)
+	// 从 workspace repo 获取用量统计
+	stats, err := s.workspaceRepo.GetUsageStats(ctx, workspaceID, periodStart, periodEnd)
+	if err != nil {
+		return nil, err
+	}
+	if len(stats) == 0 {
+		return nil, nil
+	}
+	// 返回第一条统计记录（聚合）
+	return &stats[0], nil
 }
 
 func (s *billingService) ensureDefaultPlans(ctx context.Context) error {
@@ -311,43 +301,17 @@ func (s *billingService) validateUsage(usage map[string]float64) error {
 	return nil
 }
 
-func (s *billingService) validateApp(ctx context.Context, workspaceID, appID uuid.UUID) error {
-	app, err := s.appRepo.GetByID(ctx, appID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrBillingAppNotFound
-		}
-		return err
-	}
-	if app.WorkspaceID != workspaceID {
-		return ErrBillingAppMismatch
-	}
+// updateWorkspaceUsage 更新 workspace 用量统计
+// 由于 Workspace 现在就是 App，用量统计直接关联到 Workspace
+func (s *billingService) updateWorkspaceUsage(ctx context.Context, workspaceID uuid.UUID, periodStart, periodEnd time.Time, usage map[string]float64, cost float64, currency string) error {
+	// 简化版：用量现在直接记录到 workspace quota 中
+	// 完整实现需要在 workspace_repo 中添加用量统计方法
+	_ = periodStart
+	_ = periodEnd
+	_ = usage
+	_ = cost
+	_ = currency
 	return nil
-}
-
-func (s *billingService) updateAppUsage(ctx context.Context, workspaceID, appID uuid.UUID, periodStart, periodEnd time.Time, usage map[string]float64, cost float64, currency string) error {
-	stat, err := s.appUsageRepo.GetByWorkspaceAppPeriod(ctx, workspaceID, appID, periodStart, periodEnd)
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		return s.appUsageRepo.Create(ctx, &entity.AppUsageStat{
-			WorkspaceID: workspaceID,
-			AppID:       appID,
-			PeriodStart: periodStart,
-			PeriodEnd:   periodEnd,
-			Usage:       floatMapToJSON(usage),
-			CostAmount:  roundCurrency(cost),
-			Currency:    currency,
-		})
-	}
-
-	current := jsonToFloatMap(stat.Usage)
-	updated := mergeUsage(current, usage)
-	stat.Usage = floatMapToJSON(updated)
-	stat.CostAmount = roundCurrency(stat.CostAmount + cost)
-	stat.Currency = currency
-	return s.appUsageRepo.Update(ctx, stat)
 }
 
 func billingPeriod(now time.Time) (time.Time, time.Time) {
@@ -406,23 +370,6 @@ func roundCurrency(value float64) float64 {
 	return math.Round(value*100) / 100
 }
 
-func jsonToFloatMap(data entity.JSON) map[string]float64 {
-	result := map[string]float64{}
-	for key, value := range data {
-		switch v := value.(type) {
-		case float64:
-			result[key] = v
-		case int:
-			result[key] = float64(v)
-		case int64:
-			result[key] = float64(v)
-		case float32:
-			result[key] = float64(v)
-		}
-	}
-	return result
-}
-
 func floatMapToJSON(data map[string]float64) entity.JSON {
 	result := entity.JSON{}
 	for key, value := range data {
@@ -444,8 +391,6 @@ func planOveragePolicy(policy entity.JSON) string {
 var (
 	ErrBillingInvalidUsage     = errors.New("billing usage is invalid")
 	ErrBillingInvalidDimension = errors.New("billing dimension is invalid")
-	ErrBillingAppNotFound      = errors.New("billing app not found")
-	ErrBillingAppMismatch      = errors.New("billing app does not belong to workspace")
 	ErrBillingBudgetInvalid    = errors.New("billing budget settings invalid")
 	ErrBillingInvoiceNotFound  = errors.New("billing invoice not found")
 	ErrBillingInvoiceInvalid   = errors.New("billing invoice request invalid")

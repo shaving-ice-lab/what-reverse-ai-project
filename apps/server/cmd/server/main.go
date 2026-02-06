@@ -83,8 +83,6 @@ func main() {
 				"updated_workflows", result.UpdatedWorkflows,
 				"updated_executions", result.UpdatedExecutions,
 				"updated_api_keys", result.UpdatedAPIKeys,
-				"updated_apps", result.UpdatedApps,
-				"updated_app_sessions", result.UpdatedAppSessions,
 			)
 		}
 		if cfg.Migration.WorkspaceConsistencyCheck {
@@ -97,8 +95,6 @@ func main() {
 					"workflows_missing_workspace", report.WorkflowsMissingWorkspace,
 					"executions_missing_workspace", report.ExecutionsMissingWorkspace,
 					"api_keys_missing_workspace", report.APIKeysMissingWorkspace,
-					"apps_missing_workspace", report.AppsMissingWorkspace,
-					"app_sessions_missing_workspace", report.AppSessionsMissingWorkspace,
 				)
 			}
 		}
@@ -107,11 +103,10 @@ func main() {
 	// 初始化数据保留清理服务
 	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
 	executionRepo := repository.NewExecutionRepository(db)
-	appSessionRepo := repository.NewAppSessionRepository(db)
 	workspaceRepo := repository.NewWorkspaceRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
 	exportRepo := repository.NewWorkspaceExportRepository(db)
-	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, appSessionRepo, workspaceRepo, exportRepo, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
+	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, workspaceRepo, exportRepo, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
 	retentionCtx, retentionCancel := context.WithCancel(context.Background())
 	go retentionService.Run(retentionCtx)
 

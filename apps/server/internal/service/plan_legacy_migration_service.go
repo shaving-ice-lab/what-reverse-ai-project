@@ -106,25 +106,25 @@ func defaultLegacyMigrationPlan() LegacyMigrationPlan {
 			Title: "旧 workflow 与 agent 迁移映射表",
 			Mappings: []LegacyMigrationMappingItem{
 				{
-					Key:           "workflow_to_app",
+					Key:           "workflow_to_workspace",
 					LegacyType:    "workflow",
 					LegacyObject:  "what_reverse_workflows",
-					TargetObject:  "what_reverse_apps / what_reverse_app_versions / what_reverse_app_access_policies",
-					ExecutionPath: "POST /api/v1/apps/from-workflow",
+					TargetObject:  "what_reverse_workspaces / what_reverse_workspace_versions",
+					ExecutionPath: "POST /api/v1/workspaces",
 					FieldMappings: []LegacyMigrationFieldMapping{
-						{From: "workflow.id", To: "app_version.workflow_id", Rule: "建立溯源关联"},
-						{From: "workflow.name", To: "app.name", Rule: "空值时沿用 workflow 名称"},
-						{From: "workflow.description", To: "app.description", Rule: "空值可保留"},
-						{From: "workflow.icon", To: "app.icon", Rule: "空值默认 📦"},
-						{From: "workflow.definition", To: "app_version.ui_schema / config_json", Rule: "自动生成 UI Schema 与 output_schema"},
-						{From: "workflow.is_public", To: "app_access_policy.access_mode", Rule: "public -> public_anonymous; private -> private（需手动更新）"},
+						{From: "workflow.id", To: "workspace_version.workflow_id", Rule: "建立溯源关联"},
+						{From: "workflow.name", To: "workspace.name", Rule: "空值时沿用 workflow 名称"},
+						{From: "workflow.description", To: "workspace.description", Rule: "空值可保留"},
+						{From: "workflow.icon", To: "workspace.icon", Rule: "空值默认 📦"},
+						{From: "workflow.definition", To: "workspace_version.ui_schema / config_json", Rule: "自动生成 UI Schema 与 output_schema"},
+						{From: "workflow.is_public", To: "workspace.access_mode", Rule: "public -> public_anonymous; private -> private（需手动更新）"},
 					},
 					Preconditions: []string{
 						"workflow 与 workspace 匹配",
-						"操作者具备 apps:create 权限",
+						"操作者具备 workspaces:create 权限",
 					},
 					PostActions: []string{
-						"确认 app.current_version_id 已生成",
+						"确认 workspace.current_version_id 已生成",
 						"按需更新 access_policy 与 slug",
 					},
 					Notes: []string{
@@ -132,18 +132,18 @@ func defaultLegacyMigrationPlan() LegacyMigrationPlan {
 					},
 				},
 				{
-					Key:           "agent_to_app",
+					Key:           "agent_to_workspace",
 					LegacyType:    "agent",
 					LegacyObject:  "what_reverse_agents",
-					TargetObject:  "what_reverse_apps / what_reverse_app_versions / what_reverse_app_access_policies",
-					ExecutionPath: "GET /api/v1/agents/:slug -> POST /api/v1/apps/from-workflow",
+					TargetObject:  "what_reverse_workspaces / what_reverse_workspace_versions",
+					ExecutionPath: "GET /api/v1/agents/:slug -> POST /api/v1/workspaces",
 					FieldMappings: []LegacyMigrationFieldMapping{
-						{From: "agent.workflow_id", To: "app_version.workflow_id", Rule: "使用 agent 的 workflow 作为迁移入口"},
-						{From: "agent.name", To: "app.name", Rule: "建议保持一致"},
-						{From: "agent.description/long_description", To: "app.description", Rule: "可合并为 app 描述"},
-						{From: "agent.icon", To: "app.icon", Rule: "空值默认 📦"},
-						{From: "agent.pricing_type/price", To: "app.pricing_type/price", Rule: "需调用 /api/v1/apps/:id 更新"},
-						{From: "agent.status", To: "app.status", Rule: "已发布需调用 /api/v1/apps/:id/publish"},
+						{From: "agent.workflow_id", To: "workspace_version.workflow_id", Rule: "使用 agent 的 workflow 作为迁移入口"},
+						{From: "agent.name", To: "workspace.name", Rule: "建议保持一致"},
+						{From: "agent.description/long_description", To: "workspace.description", Rule: "可合并为 workspace 描述"},
+						{From: "agent.icon", To: "workspace.icon", Rule: "空值默认 📦"},
+						{From: "agent.pricing_type/price", To: "workspace.pricing_type/price", Rule: "需调用 /api/v1/workspaces/:id 更新"},
+						{From: "agent.status", To: "workspace.app_status", Rule: "已发布需调用 /api/v1/workspaces/:id/publish"},
 					},
 					Preconditions: []string{
 						"agent.workflow_id 存在且可访问",
@@ -151,7 +151,7 @@ func defaultLegacyMigrationPlan() LegacyMigrationPlan {
 					},
 					PostActions: []string{
 						"补充访问策略与商业化字段",
-						"如需市场展示，完成 app 发布",
+						"如需市场展示，完成 workspace 发布",
 					},
 					Notes: []string{
 						"agent.cover_image/screenshots 暂无直接字段，需手工补充展示素材。",
@@ -247,28 +247,28 @@ func defaultLegacyMigrationPlan() LegacyMigrationPlan {
 				{
 					Key:         "workflow_migration",
 					Title:       "Workflow 迁移到 App",
-					Description: "通过 workflow 创建 App 并生成首个版本。",
+					Description: "通过 workflow 创建 Workspace 并生成首个版本。",
 					Steps: []string{
-						"调用 POST /api/v1/apps/from-workflow 创建 App",
+						"调用 POST /api/v1/workspaces 创建 workspace（从 workflow）",
 						"检查自动生成的 UI Schema 与输出配置",
 						"按需更新访问策略与发布设置",
 					},
 					Actions: []string{
 						"必要时调整 app slug 与描述",
-						"执行 /api/v1/apps/:id/publish 完成发布",
+						"执行 /api/v1/workspaces/:id/publish 完成发布",
 					},
 				},
 				{
 					Key:         "agent_migration",
 					Title:       "Agent 迁移到 App",
-					Description: "使用 agent.workflow_id 创建 App，并补齐商业化信息。",
+					Description: "使用 agent.workflow_id 创建 Workspace，并补齐商业化信息。",
 					Steps: []string{
 						"GET /api/v1/agents/:slug 获取 workflow_id",
-						"POST /api/v1/apps/from-workflow 创建 App",
+						"POST /api/v1/workspaces 创建 Workspace",
 						"同步 pricing_type/price 等商业化字段",
 					},
 					Actions: []string{
-						"如需市场展示，完成 app 发布并检查 marketplace 列表",
+						"如需市场展示，完成 workspace 发布并检查 marketplace 列表",
 					},
 				},
 				{
@@ -288,15 +288,15 @@ func defaultLegacyMigrationPlan() LegacyMigrationPlan {
 			FAQs: []LegacyMigrationGuideFAQ{
 				{
 					Question: "旧 workflow/agent 是否会被删除？",
-					Answer:   "迁移默认只新增 App，不会自动删除旧数据；建议在确认稳定后再清理。",
+					Answer:   "迁移默认只新增 Workspace，不会自动删除旧数据；建议在确认稳定后再清理。",
 				},
 				{
 					Question: "公开访问如何对齐？",
-					Answer:   "通过 app_access_policy.access_mode 设置公开策略，并在发布前验证。",
+					Answer:   "通过 workspace.access_mode 设置公开策略，并在发布前验证。",
 				},
 				{
 					Question: "封面/截图怎么处理？",
-					Answer:   "App 当前无直接字段，建议在描述、品牌配置或外部页面补充。",
+					Answer:   "Workspace 当前无直接字段，建议在描述、品牌配置或外部页面补充。",
 				},
 			},
 			Notes: []string{

@@ -306,7 +306,7 @@ func (s *aiAssistantService) ParseIntent(ctx context.Context, message string) (*
 	} else {
 		result.Intent = "other"
 		result.NeedsClarification = true
-		result.ClarificationQuestion = "请问您想要做什么？是创建新工作流、修改现有工作流/应用，还是有其他问题？"
+		result.ClarificationQuestion = "请问您想要做什么？是创建新工作流、修改现有 Workspace，还是有其他问题？"
 	}
 
 	// 提取节点类型建议
@@ -548,10 +548,10 @@ func (s *aiAssistantService) Chat(ctx context.Context, userID uuid.UUID, session
 		})
 
 	case "modify_app":
-		response.Message = "请告诉我需要修改的 App（名称/ID），以及想调整的功能、界面或数据模型。"
+		response.Message = "请告诉我需要修改的 Workspace（名称/ID），以及想调整的功能、界面或数据模型。"
 		response.Actions = append(response.Actions, ChatAction{
 			Type:  "modify_app",
-			Label: "修改 App",
+			Label: "修改 Workspace",
 			Data: map[string]interface{}{
 				"intent": "modify_app",
 			},

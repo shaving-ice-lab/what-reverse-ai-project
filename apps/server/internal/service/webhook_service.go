@@ -524,7 +524,7 @@ func (s *webhookService) ListEventCatalog() []WebhookEventGroup {
 
 func (s *webhookService) ListIntegrationCatalog() []IntegrationCatalogItem {
 	recommended := []string{
-		string(entity.EventAppPublished),
+		string(entity.EventWorkspacePublished),
 		string(entity.EventExecutionCompleted),
 		string(entity.EventDomainVerified),
 	}
@@ -792,9 +792,6 @@ func buildRuntimeEventPayload(event *entity.RuntimeEvent) map[string]interface{}
 	data := map[string]interface{}{}
 	if event.WorkspaceID != nil {
 		data["workspace_id"] = event.WorkspaceID.String()
-	}
-	if event.AppID != nil {
-		data["app_id"] = event.AppID.String()
 	}
 	if event.ExecutionID != nil {
 		data["execution_id"] = event.ExecutionID.String()

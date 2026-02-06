@@ -268,7 +268,7 @@ func defaultSyntheticMonitoringPlan() SyntheticMonitoringPlan {
 				Key:       "runtime_entry",
 				Name:      "Runtime 入口请求",
 				Method:    "GET",
-				Target:    "/runtime/:workspaceSlug/:appSlug",
+				Target:    "/runtime/:workspaceSlug",
 				Frequency: "1m",
 				Timeout:   "3s",
 				Locations: []string{"ap-southeast", "us-east", "eu-west"},
@@ -286,7 +286,7 @@ func defaultSyntheticMonitoringPlan() SyntheticMonitoringPlan {
 				Key:       "runtime_schema",
 				Name:      "Runtime Schema 获取",
 				Method:    "GET",
-				Target:    "/runtime/:workspaceSlug/:appSlug/schema",
+				Target:    "/runtime/:workspaceSlug/schema",
 				Frequency: "5m",
 				Timeout:   "3s",
 				Locations: []string{"ap-southeast", "us-east", "eu-west"},
@@ -382,7 +382,7 @@ func defaultStabilityPlan() StabilityPlan {
 				Cadence: "每次发布",
 				Scope: []string{
 					"Runtime 执行",
-					"Workspace / App / Workflow 关键接口",
+					"Workspace / Workflow 关键接口",
 					"登录与权限校验",
 				},
 				Actions: []string{

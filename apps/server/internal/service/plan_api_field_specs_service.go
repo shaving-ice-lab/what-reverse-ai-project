@@ -102,14 +102,14 @@ func defaultAPIFieldSpecTable() APIFieldSpecTable {
 				},
 			},
 			{
-				Key:   "app",
-				Title: "App API",
+				Key:   "workspace",
+				Title: "Workspace API",
 				Operations: []APIOperationSpec{
 					{
 						Key:    "create",
-						Title:  "创建 App",
+						Title:  "创建 Workspace",
 						Method: "POST",
-						Path:   "/api/v1/apps",
+						Path:   "/api/v1/workspaces",
 						RequestFields: []APIFieldSpec{
 							{Name: "name", Required: true},
 							{Name: "slug"},
@@ -120,9 +120,9 @@ func defaultAPIFieldSpecTable() APIFieldSpecTable {
 					},
 					{
 						Key:    "publish",
-						Title:  "发布 App",
+						Title:  "发布 Workspace",
 						Method: "POST",
-						Path:   "/api/v1/apps/:id/publish",
+						Path:   "/api/v1/workspaces/:id/publish",
 						RequestFields: []APIFieldSpec{
 							{Name: "access_policy"},
 							{Name: "domain_bindings"},
@@ -130,9 +130,9 @@ func defaultAPIFieldSpecTable() APIFieldSpecTable {
 					},
 					{
 						Key:    "version",
-						Title:  "创建 App 版本",
+						Title:  "创建 Workspace 版本",
 						Method: "POST",
-						Path:   "/api/v1/apps/:id/versions",
+						Path:   "/api/v1/workspaces/:id/versions",
 						RequestFields: []APIFieldSpec{
 							{Name: "changelog"},
 							{Name: "config_json"},
@@ -148,7 +148,7 @@ func defaultAPIFieldSpecTable() APIFieldSpecTable {
 						Key:    "execute",
 						Title:  "运行时执行",
 						Method: "POST",
-						Path:   "/runtime/:workspaceSlug/:appSlug",
+						Path:   "/runtime/:workspaceSlug",
 						RequestFields: []APIFieldSpec{
 							{Name: "inputs", Required: true},
 							{Name: "session_id"},
@@ -171,7 +171,7 @@ func defaultAPIFieldSpecTable() APIFieldSpecTable {
 						Key:    "bind",
 						Title:  "绑定域名",
 						Method: "POST",
-						Path:   "/api/v1/apps/:id/domains",
+						Path:   "/api/v1/workspaces/:id/domains",
 						RequestFields: []APIFieldSpec{
 							{Name: "domain", Required: true},
 						},

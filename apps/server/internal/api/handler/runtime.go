@@ -22,7 +22,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// RuntimeHandler App Runtime 处理器
+// RuntimeHandler Workspace Runtime 处理器
 type RuntimeHandler struct {
 	runtimeService   service.RuntimeService
 	executionService service.ExecutionService
@@ -70,12 +70,32 @@ type RuntimeExecuteRequest struct {
 	CaptchaToken string                 `json:"captcha_token"`
 }
 
-// GetEntry 获取 App Runtime 入口信息
+type runtimeAccessPolicy struct {
+	AccessMode         string      `json:"access_mode"`
+	DataClassification string      `json:"data_classification,omitempty"`
+	RateLimitJSON      entity.JSON `json:"rate_limit_json,omitempty"`
+	AllowedOrigins     []string    `json:"allowed_origins,omitempty"`
+	RequireCaptcha     bool        `json:"require_captcha"`
+}
+
+func buildRuntimeAccessPolicy(workspace *entity.Workspace) *runtimeAccessPolicy {
+	if workspace == nil {
+		return nil
+	}
+	return &runtimeAccessPolicy{
+		AccessMode:         workspace.AccessMode,
+		DataClassification: workspace.DataClassification,
+		RateLimitJSON:      workspace.RateLimitJSON,
+		AllowedOrigins:     []string(workspace.AllowedOrigins),
+		RequireCaptcha:     workspace.RequireCaptcha,
+	}
+}
+
+// GetEntry 获取 Workspace Runtime 入口信息
 func (h *RuntimeHandler) GetEntry(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -84,14 +104,11 @@ func (h *RuntimeHandler) GetEntry(c echo.Context) error {
 
 	entry, err := h.resolveEntry(c, userID)
 	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "获取 App 入口失败")
+		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "获取 Workspace 入口失败")
 	}
 	if entry != nil {
 		if entry.Workspace != nil {
 			workspaceID = entry.Workspace.ID.String()
-		}
-		if entry.App != nil {
-			appID = entry.App.ID.String()
 		}
 	}
 
@@ -101,7 +118,7 @@ func (h *RuntimeHandler) GetEntry(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := entry.AccessPolicy != nil && entry.AccessPolicy.RequireCaptcha
+	requireCaptcha := entry.Workspace != nil && entry.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -109,30 +126,28 @@ func (h *RuntimeHandler) GetEntry(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, entry, session, "runtime_entry", userID)
 
 	return successResponse(c, map[string]interface{}{
 		"workspace":     entry.Workspace,
-		"app":           entry.App,
-		"access_policy": entry.AccessPolicy,
+		"access_policy": buildRuntimeAccessPolicy(entry.Workspace),
 		"session_id":    sessionIDOrEmpty(session),
 	})
 }
 
-// GetSchema 获取 App Runtime Schema
+// GetSchema 获取 Workspace Runtime Schema
 func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -150,9 +165,6 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 		if schema.Workspace != nil {
 			workspaceID = schema.Workspace.ID.String()
 		}
-		if schema.App != nil {
-			appID = schema.App.ID.String()
-		}
 	}
 
 	captchaToken := h.getCaptchaToken(c, "")
@@ -161,7 +173,7 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := schema.AccessPolicy != nil && schema.AccessPolicy.RequireCaptcha
+	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -169,12 +181,12 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_schema", userID)
@@ -206,10 +218,10 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 		}
 	}
 
-	cacheable := h.schemaCacheEnabled(schema.AccessPolicy, cacheRequest, skipSession)
+	cacheable := h.schemaCacheEnabled(schema.Workspace, cacheRequest, skipSession)
 	var etag string
 	if cacheable {
-		etag = buildSchemaETag(schemaPayload, schema.AccessPolicy, schema.App, schema.Version)
+		etag = buildSchemaETag(schemaPayload, schema.Workspace, schema.Version)
 	}
 	h.setSchemaCacheHeaders(c, cacheable, etag)
 	if cacheable && etagMatches(c.Request().Header.Get("If-None-Match"), etag) {
@@ -218,8 +230,7 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 
 	return successResponse(c, map[string]interface{}{
 		"workspace":     schema.Workspace,
-		"app":           schema.App,
-		"access_policy": schema.AccessPolicy,
+		"access_policy": buildRuntimeAccessPolicy(schema.Workspace),
 		"session_id":    sessionIDOrEmpty(session),
 		"schema":        schemaPayload,
 	})
@@ -229,8 +240,7 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 func (h *RuntimeHandler) GetDomainEntry(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -240,14 +250,11 @@ func (h *RuntimeHandler) GetDomainEntry(c echo.Context) error {
 	domain := h.getDomainHost(c)
 	entry, err := h.runtimeService.GetEntryByDomain(c.Request().Context(), domain, userID)
 	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "获取 App 入口失败")
+		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "获取 Workspace 入口失败")
 	}
 	if entry != nil {
 		if entry.Workspace != nil {
 			workspaceID = entry.Workspace.ID.String()
-		}
-		if entry.App != nil {
-			appID = entry.App.ID.String()
 		}
 	}
 
@@ -257,7 +264,7 @@ func (h *RuntimeHandler) GetDomainEntry(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := entry.AccessPolicy != nil && entry.AccessPolicy.RequireCaptcha
+	requireCaptcha := entry.Workspace != nil && entry.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -265,20 +272,19 @@ func (h *RuntimeHandler) GetDomainEntry(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, entry, session, "runtime_entry", userID)
 
 	return successResponse(c, map[string]interface{}{
 		"workspace":     entry.Workspace,
-		"app":           entry.App,
-		"access_policy": entry.AccessPolicy,
+		"access_policy": buildRuntimeAccessPolicy(entry.Workspace),
 		"session_id":    sessionIDOrEmpty(session),
 	})
 }
@@ -287,8 +293,7 @@ func (h *RuntimeHandler) GetDomainEntry(c echo.Context) error {
 func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -307,9 +312,6 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 		if schema.Workspace != nil {
 			workspaceID = schema.Workspace.ID.String()
 		}
-		if schema.App != nil {
-			appID = schema.App.ID.String()
-		}
 	}
 
 	captchaToken := h.getCaptchaToken(c, "")
@@ -318,7 +320,7 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := schema.AccessPolicy != nil && schema.AccessPolicy.RequireCaptcha
+	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -326,12 +328,12 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_schema", userID)
@@ -363,10 +365,10 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 		}
 	}
 
-	cacheable := h.schemaCacheEnabled(schema.AccessPolicy, cacheRequest, skipSession)
+	cacheable := h.schemaCacheEnabled(schema.Workspace, cacheRequest, skipSession)
 	var etag string
 	if cacheable {
-		etag = buildSchemaETag(schemaPayload, schema.AccessPolicy, schema.App, schema.Version)
+		etag = buildSchemaETag(schemaPayload, schema.Workspace, schema.Version)
 	}
 	h.setSchemaCacheHeaders(c, cacheable, etag)
 	if cacheable && etagMatches(c.Request().Header.Get("If-None-Match"), etag) {
@@ -375,19 +377,17 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 
 	return successResponse(c, map[string]interface{}{
 		"workspace":     schema.Workspace,
-		"app":           schema.App,
-		"access_policy": schema.AccessPolicy,
+		"access_policy": buildRuntimeAccessPolicy(schema.Workspace),
 		"session_id":    sessionIDOrEmpty(session),
 		"schema":        schemaPayload,
 	})
 }
 
-// ExecuteDomain 执行域名绑定的 App Runtime
+// ExecuteDomain 执行域名绑定的 Workspace Runtime
 func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -401,7 +401,7 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 
 	triggerType := strings.TrimSpace(req.TriggerType)
 	if triggerType == "" {
-		triggerType = "app_runtime"
+		triggerType = "workspace_runtime"
 	}
 
 	domain := h.getDomainHost(c)
@@ -412,9 +412,6 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 	if schema != nil {
 		if schema.Workspace != nil {
 			workspaceID = schema.Workspace.ID.String()
-		}
-		if schema.App != nil {
-			appID = schema.App.ID.String()
 		}
 	}
 
@@ -429,7 +426,7 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := schema.AccessPolicy != nil && schema.AccessPolicy.RequireCaptcha
+	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -437,18 +434,18 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_execute", userID)
 
 	if schema.Version.WorkflowID == nil {
-		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "App 未绑定工作流")
+		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "Workspace 未绑定工作流")
 	}
 
 	inputPayload := req.Inputs
@@ -464,8 +461,7 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 	}
 
 	if h.billingService != nil {
-		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.App.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
-			AppID: &schema.App.ID,
+		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.Workspace.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
 			Usage: map[string]float64{
 				"requests": 1,
 			},
@@ -474,10 +470,6 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 			switch err {
 			case service.ErrBillingInvalidUsage, service.ErrBillingInvalidDimension:
 				return errorResponse(c, http.StatusBadRequest, "INVALID_USAGE", "用量数据无效")
-			case service.ErrBillingAppNotFound:
-				return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-			case service.ErrBillingAppMismatch:
-				return errorResponse(c, http.StatusBadRequest, "APP_MISMATCH", "App 不属于此工作空间")
 			case service.ErrWorkspaceNotFound:
 				return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
 			case service.ErrWorkspaceUnauthorized:
@@ -496,7 +488,7 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 	execution, err := h.executionService.Execute(
 		c.Request().Context(),
 		*schema.Version.WorkflowID,
-		schema.App.OwnerUserID,
+		schema.Workspace.OwnerUserID,
 		inputs,
 		triggerType,
 		triggerData,
@@ -524,12 +516,11 @@ func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
 	})
 }
 
-// Execute 执行 App Runtime
+// Execute 执行 Workspace Runtime
 func (h *RuntimeHandler) Execute(c echo.Context) error {
 	startedAt := time.Now()
 	workspaceID := "unknown"
-	appID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID, &appID)
+	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
 
 	userID, err := h.getOptionalUserID(c)
 	if err != nil {
@@ -543,7 +534,7 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 
 	triggerType := strings.TrimSpace(req.TriggerType)
 	if triggerType == "" {
-		triggerType = "app_runtime"
+		triggerType = "workspace_runtime"
 	}
 
 	schema, err := h.resolveSchema(c, userID)
@@ -554,9 +545,6 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 		if schema.Workspace != nil {
 			workspaceID = schema.Workspace.ID.String()
 		}
-		if schema.App != nil {
-			appID = schema.App.ID.String()
-		}
 	}
 
 	captchaToken := h.getCaptchaToken(c, req.CaptchaToken)
@@ -565,7 +553,7 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
 	}
 
-	requireCaptcha := schema.AccessPolicy != nil && schema.AccessPolicy.RequireCaptcha
+	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
 	if accessResult != nil && accessResult.Decision.RequireCaptcha {
 		requireCaptcha = true
 	}
@@ -573,7 +561,7 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 		return h.handleCaptchaError(c, err)
 	}
 
-	var session *entity.AppSession
+	var session *entity.WorkspaceSession
 	if accessResult != nil {
 		session = accessResult.Session
 	}
@@ -584,13 +572,13 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 	}
 
 	if session != nil {
-		c.Response().Header().Set("X-App-Session-Id", session.ID.String())
+		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
 	}
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_execute", userID)
 
 	if schema.Version.WorkflowID == nil {
-		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "App 未绑定工作流")
+		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "Workspace 未绑定工作流")
 	}
 
 	inputPayload := req.Inputs
@@ -606,8 +594,7 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 	}
 
 	if h.billingService != nil {
-		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.App.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
-			AppID: &schema.App.ID,
+		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.Workspace.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
 			Usage: map[string]float64{
 				"requests": 1,
 			},
@@ -616,10 +603,6 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 			switch err {
 			case service.ErrBillingInvalidUsage, service.ErrBillingInvalidDimension:
 				return errorResponse(c, http.StatusBadRequest, "INVALID_USAGE", "用量数据无效")
-			case service.ErrBillingAppNotFound:
-				return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-			case service.ErrBillingAppMismatch:
-				return errorResponse(c, http.StatusBadRequest, "APP_MISMATCH", "App 不属于此工作空间")
 			case service.ErrWorkspaceNotFound:
 				return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
 			case service.ErrWorkspaceUnauthorized:
@@ -638,7 +621,7 @@ func (h *RuntimeHandler) Execute(c echo.Context) error {
 	execution, err := h.executionService.Execute(
 		c.Request().Context(),
 		*schema.Version.WorkflowID,
-		schema.App.OwnerUserID,
+		schema.Workspace.OwnerUserID,
 		inputs,
 		triggerType,
 		triggerData,
@@ -721,7 +704,13 @@ func (h *RuntimeHandler) getOptionalUserID(c echo.Context) (*uuid.UUID, error) {
 }
 
 func (h *RuntimeHandler) getOptionalSessionID(c echo.Context) *uuid.UUID {
-	sessionID := strings.TrimSpace(c.Request().Header.Get("X-App-Session-Id"))
+	sessionID := strings.TrimSpace(c.Request().Header.Get("X-Workspace-Session-Id"))
+	if sessionID == "" {
+		sessionID = strings.TrimSpace(c.Request().Header.Get("X-Workspace-Session"))
+	}
+	if sessionID == "" {
+		sessionID = strings.TrimSpace(c.Request().Header.Get("X-App-Session-Id"))
+	}
 	if sessionID == "" {
 		sessionID = strings.TrimSpace(c.Request().Header.Get("X-App-Session"))
 	}
@@ -747,7 +736,6 @@ func (h *RuntimeHandler) resolveEntry(c echo.Context, userID *uuid.UUID) (*servi
 	return h.runtimeService.GetEntry(
 		c.Request().Context(),
 		c.Param("workspaceSlug"),
-		c.Param("appSlug"),
 		userID,
 	)
 }
@@ -760,7 +748,6 @@ func (h *RuntimeHandler) resolveSchema(c echo.Context, userID *uuid.UUID) (*serv
 	return h.runtimeService.GetSchema(
 		c.Request().Context(),
 		c.Param("workspaceSlug"),
-		c.Param("appSlug"),
 		userID,
 	)
 }
@@ -899,19 +886,17 @@ func mapRuntimeError(err error) (int, string, string, bool) {
 	case errors.Is(err, service.ErrRuntimeInvalidDomain):
 		return http.StatusBadRequest, "INVALID_DOMAIN", "域名无效", true
 	case errors.Is(err, service.ErrRuntimeWorkspaceNotFound),
-		errors.Is(err, service.ErrRuntimeAppNotFound),
-		errors.Is(err, service.ErrRuntimePolicyNotFound),
 		errors.Is(err, service.ErrRuntimeNotPublished):
-		return http.StatusNotFound, "NOT_FOUND", "App 不存在或未发布", true
+		return http.StatusNotFound, "NOT_FOUND", "Workspace 不存在或未发布", true
 	case errors.Is(err, service.ErrRuntimeAuthRequired):
 		return http.StatusUnauthorized, "UNAUTHORIZED", "需要登录后访问", true
 	case errors.Is(err, service.ErrRuntimeAccessDenied):
-		return http.StatusForbidden, "FORBIDDEN", "无权限访问该 App", true
+		return http.StatusForbidden, "FORBIDDEN", "无权限访问该 Workspace", true
 	case errors.Is(err, service.ErrRuntimeInvalidSlug):
 		return http.StatusBadRequest, "INVALID_SLUG", "访问入口参数无效", true
 	case errors.Is(err, service.ErrRuntimeVersionRequired),
 		errors.Is(err, service.ErrRuntimeVersionNotFound):
-		return http.StatusBadRequest, "VERSION_REQUIRED", "App 版本未就绪", true
+		return http.StatusBadRequest, "VERSION_REQUIRED", "Workspace 版本未就绪", true
 	case errors.Is(err, service.ErrRuntimeRateLimited):
 		return http.StatusTooManyRequests, "RATE_LIMITED", "访问过于频繁", true
 	case errors.Is(err, service.ErrRuntimeOverloaded):
@@ -945,11 +930,11 @@ func (h *RuntimeHandler) trackAnonymousAccess(c echo.Context, entry *service.Run
 	return result, nil
 }
 
-func (h *RuntimeHandler) recordAnonymousAudit(c echo.Context, entry *service.RuntimeEntry, session *entity.AppSession, eventType string, userID *uuid.UUID) {
-	if h.auditLogService == nil || entry == nil || entry.AccessPolicy == nil || entry.Workspace == nil || entry.App == nil {
+func (h *RuntimeHandler) recordAnonymousAudit(c echo.Context, entry *service.RuntimeEntry, session *entity.WorkspaceSession, eventType string, userID *uuid.UUID) {
+	if h.auditLogService == nil || entry == nil || entry.Workspace == nil {
 		return
 	}
-	if strings.ToLower(strings.TrimSpace(entry.AccessPolicy.AccessMode)) != "public_anonymous" {
+	if strings.ToLower(strings.TrimSpace(entry.Workspace.AccessMode)) != "public_anonymous" {
 		return
 	}
 	if userID != nil {
@@ -957,31 +942,30 @@ func (h *RuntimeHandler) recordAnonymousAudit(c echo.Context, entry *service.Run
 	}
 	metadata := entity.JSON{
 		"event_type":  eventType,
-		"access_mode": entry.AccessPolicy.AccessMode,
+		"access_mode": entry.Workspace.AccessMode,
 	}
 	if session != nil {
 		metadata["session_id"] = session.ID.String()
 	}
 	metadata = buildAuditMetadata(c, metadata)
-	appID := entry.App.ID
 	_, _ = h.auditLogService.Record(c.Request().Context(), service.AuditLogRecordRequest{
 		WorkspaceID: entry.Workspace.ID,
 		ActorUserID: nil,
 		Action:      "anonymous_access",
-		TargetType:  "app",
-		TargetID:    &appID,
+		TargetType:  "workspace",
+		TargetID:    &entry.Workspace.ID,
 		Metadata:    metadata,
 	})
 }
 
 func (h *RuntimeHandler) ensureCaptcha(c echo.Context, entry *service.RuntimeEntry, token string, requireCaptcha bool) error {
-	if entry == nil || entry.AccessPolicy == nil {
+	if entry == nil || entry.Workspace == nil {
 		return nil
 	}
 	if !requireCaptcha {
 		return nil
 	}
-	if strings.ToLower(strings.TrimSpace(entry.AccessPolicy.AccessMode)) != "public_anonymous" {
+	if strings.ToLower(strings.TrimSpace(entry.Workspace.AccessMode)) != "public_anonymous" {
 		return nil
 	}
 	if strings.TrimSpace(token) == "" {
@@ -994,7 +978,10 @@ func (h *RuntimeHandler) ensureCaptcha(c echo.Context, entry *service.RuntimeEnt
 }
 
 func (h *RuntimeHandler) getCaptchaToken(c echo.Context, fallback string) string {
-	token := strings.TrimSpace(c.Request().Header.Get("X-App-Captcha-Token"))
+	token := strings.TrimSpace(c.Request().Header.Get("X-Workspace-Captcha-Token"))
+	if token == "" {
+		token = strings.TrimSpace(c.Request().Header.Get("X-App-Captcha-Token"))
+	}
 	if token == "" {
 		token = strings.TrimSpace(c.QueryParam("captcha_token"))
 	}
@@ -1030,11 +1017,11 @@ func (h *RuntimeHandler) shouldUseSchemaCache(c echo.Context) bool {
 	}
 }
 
-func (h *RuntimeHandler) schemaCacheEnabled(policy *entity.AppAccessPolicy, cacheRequest bool, skipSession bool) bool {
-	if !cacheRequest || !skipSession || policy == nil {
+func (h *RuntimeHandler) schemaCacheEnabled(workspace *entity.Workspace, cacheRequest bool, skipSession bool) bool {
+	if !cacheRequest || !skipSession || workspace == nil {
 		return false
 	}
-	mode := strings.ToLower(strings.TrimSpace(policy.AccessMode))
+	mode := strings.ToLower(strings.TrimSpace(workspace.AccessMode))
 	return mode == "public_anonymous"
 }
 
@@ -1058,19 +1045,15 @@ func (h *RuntimeHandler) setSchemaCacheHeaders(c echo.Context, cacheable bool, e
 	c.Response().Header().Set("Vary", "Accept-Encoding")
 }
 
-func buildSchemaETag(schemaPayload map[string]interface{}, policy *entity.AppAccessPolicy, app *entity.App, version *entity.AppVersion) string {
+func buildSchemaETag(schemaPayload map[string]interface{}, workspace *entity.Workspace, version *entity.WorkspaceVersion) string {
 	payload := map[string]interface{}{
 		"schema": schemaPayload,
 	}
-	if app != nil {
-		payload["app_id"] = app.ID
-		payload["app_updated_at"] = app.UpdatedAt
-	}
-	if policy != nil {
-		payload["policy_id"] = policy.ID
-		payload["policy_updated_at"] = policy.UpdatedAt
-		payload["access_mode"] = policy.AccessMode
-		payload["data_classification"] = policy.DataClassification
+	if workspace != nil {
+		payload["workspace_id"] = workspace.ID
+		payload["workspace_updated_at"] = workspace.UpdatedAt
+		payload["access_mode"] = workspace.AccessMode
+		payload["data_classification"] = workspace.DataClassification
 	}
 	if version != nil {
 		payload["version_id"] = version.ID
@@ -1096,14 +1079,14 @@ func etagMatches(headerValue string, etag string) bool {
 	return false
 }
 
-func sessionIDOrEmpty(session *entity.AppSession) string {
+func sessionIDOrEmpty(session *entity.WorkspaceSession) string {
 	if session == nil {
 		return ""
 	}
 	return session.ID.String()
 }
 
-func (h *RuntimeHandler) recordRuntimeMetrics(c echo.Context, startedAt time.Time, workspaceID, appID *string) {
+func (h *RuntimeHandler) recordRuntimeMetrics(c echo.Context, startedAt time.Time, workspaceID *string) {
 	if h.metrics == nil {
 		return
 	}
@@ -1112,8 +1095,7 @@ func (h *RuntimeHandler) recordRuntimeMetrics(c echo.Context, startedAt time.Tim
 		status = http.StatusOK
 	}
 	resolvedWorkspace := resolveRuntimeMetricLabel(workspaceID)
-	resolvedApp := resolveRuntimeMetricLabel(appID)
-	h.metrics.RecordRuntimeRequest(resolvedWorkspace, resolvedApp, runtimeStatusLabel(status), time.Since(startedAt).Seconds())
+	h.metrics.RecordRuntimeRequest(resolvedWorkspace, runtimeStatusLabel(status), time.Since(startedAt).Seconds())
 }
 
 func resolveRuntimeMetricLabel(value *string) string {
@@ -1142,21 +1124,20 @@ func runtimeStatusLabel(code int) string {
 	}
 }
 
-func buildRuntimeTriggerData(schema *service.RuntimeSchema, session *entity.AppSession) entity.JSON {
-	if schema == nil || schema.App == nil || schema.Workspace == nil || schema.Version == nil {
+func buildRuntimeTriggerData(schema *service.RuntimeSchema, session *entity.WorkspaceSession) entity.JSON {
+	if schema == nil || schema.Workspace == nil || schema.Version == nil {
 		return nil
 	}
 	data := entity.JSON{
-		"source":         "app_runtime",
-		"app_id":         schema.App.ID.String(),
-		"app_version_id": schema.Version.ID.String(),
-		"workspace_id":   schema.Workspace.ID.String(),
+		"source":               "workspace_runtime",
+		"workspace_id":         schema.Workspace.ID.String(),
+		"workspace_version_id": schema.Version.ID.String(),
 	}
 	if schema.Version.WorkflowID != nil {
 		data["workflow_id"] = schema.Version.WorkflowID.String()
 	}
-	if schema.AccessPolicy != nil && strings.TrimSpace(schema.AccessPolicy.AccessMode) != "" {
-		data["access_mode"] = schema.AccessPolicy.AccessMode
+	if strings.TrimSpace(schema.Workspace.AccessMode) != "" {
+		data["access_mode"] = schema.Workspace.AccessMode
 	}
 	if session != nil {
 		data["session_id"] = session.ID.String()

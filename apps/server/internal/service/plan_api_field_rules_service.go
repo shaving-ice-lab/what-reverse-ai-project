@@ -120,33 +120,33 @@ func defaultAPIFieldRulesSpec() APIFieldRulesSpec {
 		Validation: []ValidationRule{
 			{
 				Key:         "slug_format",
-				Field:       "workspace.slug / app.slug",
+				Field:       "workspace.slug",
 				Rule:        "^[a-z0-9]+(?:-[a-z0-9]+)*$",
 				Description: "仅允许小写字母、数字与连字符，首尾不为连字符",
 				Enforced:    true,
-				Source:      "apps/server/internal/service/workspace_service.go & app_service.go (generateSlug)",
+				Source:      "apps/server/internal/service/workspace_service.go (generateSlug)",
 				Notes: []string{
 					"空格替换为连字符，非法字符会被移除，连续连字符会被压缩。",
 				},
 			},
 			{
 				Key:         "domain_format",
-				Field:       "app_domains.domain",
+				Field:       "workspace_domains.domain",
 				Rule:        "^(?i)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$",
 				Description: "仅允许标准域名，禁止协议/路径/空格/通配符",
 				Enforced:    true,
-				Source:      "apps/server/internal/service/app_domain_service.go (normalizeDomain)",
+				Source:      "apps/server/internal/service/workspace_domain_service.go (normalizeDomain)",
 				Notes: []string{
 					"会自动转小写并去除末尾点号。",
 				},
 			},
 			{
 				Key:         "version_format",
-				Field:       "app_versions.version",
+				Field:       "workspace_versions.version",
 				Rule:        "v{n}",
 				Description: "版本号由服务端自动生成，按 v1/v2 递增",
 				Enforced:    true,
-				Source:      "apps/server/internal/service/app_service.go (CreateVersion)",
+				Source:      "apps/server/internal/service/workspace_service.go (CreateVersion)",
 			},
 		},
 		Security: []SecurityFilterRule{

@@ -44,7 +44,6 @@ type workspaceExportService struct {
 	repo             repository.WorkspaceExportRepository
 	workspaceRepo    repository.WorkspaceRepository
 	memberRepo       repository.WorkspaceMemberRepository
-	appRepo          repository.AppRepository
 	workflowRepo     repository.WorkflowRepository
 	executionRepo    repository.ExecutionRepository
 	auditLogRepo     repository.AuditLogRepository
@@ -58,7 +57,6 @@ func NewWorkspaceExportService(
 	repo repository.WorkspaceExportRepository,
 	workspaceRepo repository.WorkspaceRepository,
 	memberRepo repository.WorkspaceMemberRepository,
-	appRepo repository.AppRepository,
 	workflowRepo repository.WorkflowRepository,
 	executionRepo repository.ExecutionRepository,
 	auditLogRepo repository.AuditLogRepository,
@@ -70,7 +68,6 @@ func NewWorkspaceExportService(
 		repo:             repo,
 		workspaceRepo:    workspaceRepo,
 		memberRepo:       memberRepo,
-		appRepo:          appRepo,
 		workflowRepo:     workflowRepo,
 		executionRepo:    executionRepo,
 		auditLogRepo:     auditLogRepo,
@@ -272,10 +269,6 @@ func (s *workspaceExportService) buildExportDataSystem(ctx context.Context, work
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.appRepo.ListByWorkspaceID(ctx, workspaceID)
-	if err != nil {
-		return nil, err
-	}
 	workflows, err := s.workflowRepo.ListByWorkspaceID(ctx, workspaceID)
 	if err != nil {
 		return nil, err
@@ -286,7 +279,6 @@ func (s *workspaceExportService) buildExportDataSystem(ctx context.Context, work
 		ExportedAt: time.Now().Format(time.RFC3339),
 		Workspace:  workspace,
 		Members:    members,
-		Apps:       apps,
 		Workflows:  workflows,
 	}, nil
 }

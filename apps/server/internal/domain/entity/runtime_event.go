@@ -27,16 +27,13 @@ const (
 	EventNodeSkipped   RuntimeEventType = "node.skipped"
 
 	// ===== Workspace 事件 =====
-	EventWorkspaceCreated RuntimeEventType = "workspace.created"
-
-	// ===== App 运行时事件 =====
-	EventAppAccessed       RuntimeEventType = "app.accessed"
-	EventAppExecuted       RuntimeEventType = "app.executed"
-	EventAppRateLimited    RuntimeEventType = "app.rate_limited"
-	EventAppSessionCreated RuntimeEventType = "app.session.created"
-	EventAppSessionExpired RuntimeEventType = "app.session.expired"
-	EventAppCreated        RuntimeEventType = "app.created"
-	EventAppPublished      RuntimeEventType = "app.published"
+	EventWorkspaceCreated        RuntimeEventType = "workspace.created"
+	EventWorkspaceAccessed       RuntimeEventType = "workspace.accessed"
+	EventWorkspaceExecuted       RuntimeEventType = "workspace.executed"
+	EventWorkspaceRateLimited    RuntimeEventType = "workspace.rate_limited"
+	EventWorkspacePublished      RuntimeEventType = "workspace.published"
+	EventWorkspaceSessionCreated RuntimeEventType = "workspace.session.created"
+	EventWorkspaceSessionExpired RuntimeEventType = "workspace.session.expired"
 
 	// ===== 数据库操作事件 =====
 	EventDBProvisionStarted   RuntimeEventType = "db.provision.started"
@@ -121,7 +118,6 @@ type RuntimeEvent struct {
 
 	// 业务上下文
 	WorkspaceID *uuid.UUID `gorm:"type:char(36);index" json:"workspace_id,omitempty"`
-	AppID       *uuid.UUID `gorm:"type:char(36);index" json:"app_id,omitempty"`
 	ExecutionID *uuid.UUID `gorm:"type:char(36);index" json:"execution_id,omitempty"`
 	UserID      *uuid.UUID `gorm:"type:char(36);index" json:"user_id,omitempty"`
 	SessionID   *uuid.UUID `gorm:"type:char(36);index" json:"session_id,omitempty"`
@@ -207,12 +203,6 @@ func (b *RuntimeEventBuilder) WithTrace(traceID, spanID, parentSpanID string) *R
 // WithWorkspace 设置工作空间
 func (b *RuntimeEventBuilder) WithWorkspace(workspaceID uuid.UUID) *RuntimeEventBuilder {
 	b.event.WorkspaceID = &workspaceID
-	return b
-}
-
-// WithApp 设置应用
-func (b *RuntimeEventBuilder) WithApp(appID uuid.UUID) *RuntimeEventBuilder {
-	b.event.AppID = &appID
 	return b
 }
 
@@ -311,7 +301,6 @@ type RuntimeEventFilter struct {
 
 	// 上下文过滤
 	WorkspaceID *uuid.UUID
-	AppID       *uuid.UUID
 	ExecutionID *uuid.UUID
 	UserID      *uuid.UUID
 	SessionID   *uuid.UUID
@@ -374,15 +363,12 @@ func GetEventTypeMetadata() []EventTypeMeta {
 
 		// Workspace 事件
 		{EventWorkspaceCreated, "workspace", "Workspace 创建"},
-
-		// App 事件
-		{EventAppAccessed, "app", "App 被访问"},
-		{EventAppExecuted, "app", "App 执行"},
-		{EventAppRateLimited, "app", "App 触发速率限制"},
-		{EventAppSessionCreated, "app", "App 会话创建"},
-		{EventAppSessionExpired, "app", "App 会话过期"},
-		{EventAppCreated, "app", "App 创建"},
-		{EventAppPublished, "app", "App 发布"},
+		{EventWorkspaceAccessed, "workspace", "Workspace 被访问"},
+		{EventWorkspaceExecuted, "workspace", "Workspace 执行"},
+		{EventWorkspaceRateLimited, "workspace", "Workspace 触发速率限制"},
+		{EventWorkspaceSessionCreated, "workspace", "Workspace 会话创建"},
+		{EventWorkspaceSessionExpired, "workspace", "Workspace 会话过期"},
+		{EventWorkspacePublished, "workspace", "Workspace 发布"},
 
 		// 数据库事件
 		{EventDBProvisionStarted, "database", "数据库创建开始"},

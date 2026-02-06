@@ -74,7 +74,7 @@ func defaultRuntimeErrorMappingTable() RuntimeErrorMappingTable {
 			},
 			{
 				ErrorCode:   "FORBIDDEN",
-				UserMessage: "无权限访问该 App",
+				UserMessage: "无权限访问该工作空间",
 				HTTPStatus:  403,
 				Category:    "access",
 				Retryable:   false,
@@ -86,13 +86,13 @@ func defaultRuntimeErrorMappingTable() RuntimeErrorMappingTable {
 			},
 			{
 				ErrorCode:   "NOT_FOUND",
-				UserMessage: "App 不存在或未发布",
+				UserMessage: "工作空间不存在或未发布",
 				HTTPStatus:  404,
 				Category:    "resource",
 				Retryable:   false,
 				InternalErrors: []string{
 					"ErrRuntimeWorkspaceNotFound",
-					"ErrRuntimeAppNotFound",
+					"ErrRuntimeWorkspaceNotPublished",
 					"ErrRuntimePolicyNotFound",
 					"ErrRuntimeNotPublished",
 					"ErrWorkspaceNotFound",
@@ -132,7 +132,7 @@ func defaultRuntimeErrorMappingTable() RuntimeErrorMappingTable {
 			},
 			{
 				ErrorCode:      "VERSION_REQUIRED",
-				UserMessage:    "App 版本未就绪",
+				UserMessage:    "工作空间版本未就绪",
 				HTTPStatus:     400,
 				Category:       "validation",
 				Retryable:      false,
@@ -164,7 +164,7 @@ func defaultRuntimeErrorMappingTable() RuntimeErrorMappingTable {
 			},
 			{
 				ErrorCode:      "WORKFLOW_REQUIRED",
-				UserMessage:    "App 未绑定工作流",
+				UserMessage:    "工作空间未绑定工作流",
 				HTTPStatus:     400,
 				Category:       "validation",
 				Retryable:      false,
@@ -204,20 +204,12 @@ func defaultRuntimeErrorMappingTable() RuntimeErrorMappingTable {
 				InternalErrors: []string{"ErrBillingInvalidUsage", "ErrBillingInvalidDimension"},
 			},
 			{
-				ErrorCode:      "APP_NOT_FOUND",
-				UserMessage:    "App 不存在",
+				ErrorCode:      "WORKSPACE_NOT_FOUND",
+				UserMessage:    "工作空间不存在",
 				HTTPStatus:     404,
 				Category:       "billing",
 				Retryable:      false,
-				InternalErrors: []string{"ErrBillingAppNotFound"},
-			},
-			{
-				ErrorCode:      "APP_MISMATCH",
-				UserMessage:    "App 不属于此工作空间",
-				HTTPStatus:     400,
-				Category:       "billing",
-				Retryable:      false,
-				InternalErrors: []string{"ErrBillingAppMismatch"},
+				InternalErrors: []string{"ErrBillingWorkspaceNotFound"},
 			},
 			{
 				ErrorCode:      "QUOTA_EXCEEDED",

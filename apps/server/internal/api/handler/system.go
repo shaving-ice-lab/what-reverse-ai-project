@@ -66,14 +66,14 @@ func (h *SystemHandler) UpdateFeatures(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
 
-	if req.WorkspaceEnabled == nil && req.AppRuntimeEnabled == nil && req.DomainEnabled == nil {
+	if req.WorkspaceEnabled == nil && req.WorkspaceRuntimeEnabled == nil && req.DomainEnabled == nil {
 		return errorResponse(c, http.StatusBadRequest, "EMPTY_PATCH", "未提供可更新的功能开关")
 	}
 
 	updated := h.features.Update(service.FeatureFlagsPatch{
-		WorkspaceEnabled:  req.WorkspaceEnabled,
-		AppRuntimeEnabled: req.AppRuntimeEnabled,
-		DomainEnabled:     req.DomainEnabled,
+		WorkspaceEnabled:        req.WorkspaceEnabled,
+		WorkspaceRuntimeEnabled: req.WorkspaceRuntimeEnabled,
+		DomainEnabled:           req.DomainEnabled,
 	})
 
 	return successResponse(c, map[string]interface{}{
@@ -83,9 +83,9 @@ func (h *SystemHandler) UpdateFeatures(c echo.Context) error {
 
 // FeatureFlagsUpdateRequest 功能开关更新请求
 type FeatureFlagsUpdateRequest struct {
-	WorkspaceEnabled  *bool `json:"workspace_enabled"`
-	AppRuntimeEnabled *bool `json:"app_runtime_enabled"`
-	DomainEnabled     *bool `json:"domain_enabled"`
+	WorkspaceEnabled        *bool `json:"workspace_enabled"`
+	WorkspaceRuntimeEnabled *bool `json:"workspace_runtime_enabled"`
+	DomainEnabled           *bool `json:"domain_enabled"`
 }
 
 // GetDeployment 获取部署信息

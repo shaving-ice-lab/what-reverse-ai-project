@@ -48,7 +48,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleSuper: {
 		"users":         AdminPermissionReadWrite,
 		"workspaces":    AdminPermissionReadWrite,
-		"apps":          AdminPermissionReadWrite,
 		"workflows":     AdminPermissionReadWrite,
 		"executions":    AdminPermissionReadWrite,
 		"conversations": AdminPermissionReadWrite,
@@ -69,7 +68,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleOps: {
 		"users":         AdminPermissionRead,
 		"workspaces":    AdminPermissionReadWrite,
-		"apps":          AdminPermissionReadWrite,
 		"workflows":     AdminPermissionReadWrite,
 		"executions":    AdminPermissionReadWrite,
 		"conversations": AdminPermissionRead,
@@ -90,7 +88,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleSupport: {
 		"users":         AdminPermissionRead,
 		"workspaces":    AdminPermissionRead,
-		"apps":          AdminPermissionRead,
 		"workflows":     AdminPermissionNone,
 		"executions":    AdminPermissionNone,
 		"conversations": AdminPermissionReadWrite,
@@ -111,7 +108,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleFinance: {
 		"users":         AdminPermissionRead,
 		"workspaces":    AdminPermissionRead,
-		"apps":          AdminPermissionRead,
 		"workflows":     AdminPermissionNone,
 		"executions":    AdminPermissionNone,
 		"conversations": AdminPermissionNone,
@@ -132,7 +128,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleReviewer: {
 		"users":         AdminPermissionRead,
 		"workspaces":    AdminPermissionRead,
-		"apps":          AdminPermissionReadWrite,
 		"workflows":     AdminPermissionNone,
 		"executions":    AdminPermissionNone,
 		"conversations": AdminPermissionRead,
@@ -153,7 +148,6 @@ var adminRolePermissionMatrix = map[AdminRole]map[string]AdminPermissionLevel{
 	AdminRoleViewer: {
 		"users":         AdminPermissionRead,
 		"workspaces":    AdminPermissionRead,
-		"apps":          AdminPermissionRead,
 		"workflows":     AdminPermissionRead,
 		"executions":    AdminPermissionRead,
 		"conversations": AdminPermissionRead,
@@ -192,36 +186,10 @@ type AdminWorkspaceListParams struct {
 	PageSize       int
 }
 
-// AdminAppListParams App 查询参数
-type AdminAppListParams struct {
-	Search      string
-	Status      string
-	WorkspaceID *uuid.UUID
-	OwnerID     *uuid.UUID
-	Page        int
-	PageSize    int
-}
-
 // AdminWorkspaceDetail 管理员 Workspace 详情
 type AdminWorkspaceDetail struct {
 	Workspace *entity.Workspace
 	Members   []entity.WorkspaceMember
-	Apps      []entity.App
-}
-
-// AdminAppDetail 管理员 App 详情
-type AdminAppDetail struct {
-	App           *entity.App
-	Versions      []entity.AppVersion
-	VersionsTotal int64
-	Domains       []entity.AppDomain
-	AccessPolicy  *entity.AppAccessPolicy
-}
-
-// AdminAppDetailParams App 详情查询参数
-type AdminAppDetailParams struct {
-	VersionPage     int
-	VersionPageSize int
 }
 
 // AdminStatusUpdateInput 管理员状态变更入参
@@ -254,9 +222,7 @@ type AdminService interface {
 	ListWorkspaces(ctx context.Context, params AdminWorkspaceListParams) ([]entity.Workspace, int64, error)
 	GetWorkspaceDetail(ctx context.Context, workspaceID uuid.UUID, includeDeleted bool) (*AdminWorkspaceDetail, error)
 	UpdateWorkspaceStatus(ctx context.Context, adminID, workspaceID uuid.UUID, input AdminStatusUpdateInput) (*entity.Workspace, error)
-	ListApps(ctx context.Context, params AdminAppListParams) ([]entity.App, int64, error)
-	GetAppDetail(ctx context.Context, appID uuid.UUID, params AdminAppDetailParams) (*AdminAppDetail, error)
-	UpdateAppStatus(ctx context.Context, adminID, appID uuid.UUID, input AdminStatusUpdateInput) (*entity.App, error)
+	UpdateWorkspacePublishStatus(ctx context.Context, adminID, workspaceID uuid.UUID, input AdminStatusUpdateInput) (*entity.Workspace, error)
 	Capabilities() []AdminCapability
 	CapabilitiesForUser(user *entity.User) []AdminCapability
 }
@@ -265,10 +231,6 @@ type adminService struct {
 	userRepo            repository.UserRepository
 	workspaceRepo       repository.WorkspaceRepository
 	workspaceMemberRepo repository.WorkspaceMemberRepository
-	appRepo             repository.AppRepository
-	appDomainRepo       repository.AppDomainRepository
-	appAccessPolicyRepo repository.AppAccessPolicyRepository
-	appVersionRepo      repository.AppVersionRepository
 	sessionRepo         repository.SessionRepository
 	executionRepo       repository.ExecutionRepository
 	workspaceQuotaRepo  repository.WorkspaceQuotaRepository
@@ -283,11 +245,7 @@ type adminService struct {
 func NewAdminService(
 	userRepo repository.UserRepository,
 	workspaceRepo repository.WorkspaceRepository,
-	appRepo repository.AppRepository,
 	workspaceMemberRepo repository.WorkspaceMemberRepository,
-	appDomainRepo repository.AppDomainRepository,
-	appAccessPolicyRepo repository.AppAccessPolicyRepository,
-	appVersionRepo repository.AppVersionRepository,
 	sessionRepo repository.SessionRepository,
 	executionRepo repository.ExecutionRepository,
 	workspaceQuotaRepo repository.WorkspaceQuotaRepository,
@@ -300,10 +258,6 @@ func NewAdminService(
 		userRepo:            userRepo,
 		workspaceRepo:       workspaceRepo,
 		workspaceMemberRepo: workspaceMemberRepo,
-		appRepo:             appRepo,
-		appDomainRepo:       appDomainRepo,
-		appAccessPolicyRepo: appAccessPolicyRepo,
-		appVersionRepo:      appVersionRepo,
 		sessionRepo:         sessionRepo,
 		executionRepo:       executionRepo,
 		workspaceQuotaRepo:  workspaceQuotaRepo,
@@ -318,7 +272,6 @@ func NewAdminService(
 var (
 	ErrAdminUserNotFound      = errors.New("admin user not found")
 	ErrAdminWorkspaceNotFound = errors.New("admin workspace not found")
-	ErrAdminAppNotFound       = errors.New("admin app not found")
 	ErrAdminInvalidStatus     = errors.New("admin invalid status")
 	ErrAdminInvalidRole       = errors.New("admin invalid role")
 	ErrAdminInvalidAdminRole  = errors.New("admin invalid admin role")
@@ -334,13 +287,6 @@ type AdminUserAssetWorkspace struct {
 	CreatedAt string `json:"created_at"`
 }
 
-type AdminUserAssetApp struct {
-	ID            string `json:"id"`
-	Name          string `json:"name"`
-	WorkspaceName string `json:"workspace_name"`
-	Status        string `json:"status"`
-}
-
 type AdminUserAssetUsage struct {
 	TotalExecutions      int64 `json:"total_executions"`
 	TotalTokens          int64 `json:"total_tokens"`
@@ -350,7 +296,6 @@ type AdminUserAssetUsage struct {
 
 type AdminUserAssets struct {
 	Workspaces []AdminUserAssetWorkspace `json:"workspaces"`
-	Apps       []AdminUserAssetApp       `json:"apps"`
 	Usage      AdminUserAssetUsage       `json:"usage"`
 }
 
@@ -378,13 +323,6 @@ func (s *adminService) Capabilities() []AdminCapability {
 		{Key: "workspaces.manage", Title: "管理工作空间", Description: "高级工作空间管理"},
 		{Key: "workspaces.delete", Title: "删除工作空间", Description: "删除工作空间"},
 		{Key: "workspaces.export", Title: "导出工作空间", Description: "导出工作空间数据"},
-
-		// 应用管理
-		{Key: "apps.read", Title: "查看应用", Description: "查看应用列表与详情"},
-		{Key: "apps.write", Title: "编辑应用", Description: "修改应用状态"},
-		{Key: "apps.manage", Title: "管理应用", Description: "高级应用管理"},
-		{Key: "apps.delete", Title: "删除应用", Description: "删除应用"},
-		{Key: "apps.approve", Title: "审核应用", Description: "审核应用上架"},
 
 		// 工作流管理
 		{Key: "workflows.read", Title: "查看工作流", Description: "查看工作流列表与详情"},
@@ -842,24 +780,6 @@ func (s *adminService) GetUserAssets(ctx context.Context, userID uuid.UUID) (*Ad
 		})
 	}
 
-	apps, err := s.appRepo.ListByOwnerID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	appAssets := make([]AdminUserAssetApp, 0, len(apps))
-	for _, app := range apps {
-		workspaceName := ""
-		if app.Workspace != nil {
-			workspaceName = app.Workspace.Name
-		}
-		appAssets = append(appAssets, AdminUserAssetApp{
-			ID:            app.ID.String(),
-			Name:          app.Name,
-			WorkspaceName: workspaceName,
-			Status:        app.Status,
-		})
-	}
-
 	usage := AdminUserAssetUsage{}
 	if s.executionRepo != nil {
 		stats, err := s.executionRepo.GetUsageByUser(ctx, userID, s.now().AddDate(0, 0, -30))
@@ -878,7 +798,6 @@ func (s *adminService) GetUserAssets(ctx context.Context, userID uuid.UUID) (*Ad
 
 	return &AdminUserAssets{
 		Workspaces: workspaceAssets,
-		Apps:       appAssets,
 		Usage:      usage,
 	}, nil
 }
@@ -998,15 +917,9 @@ func (s *adminService) GetWorkspaceDetail(ctx context.Context, workspaceID uuid.
 		return nil, err
 	}
 
-	apps, err := s.appRepo.ListByWorkspaceID(ctx, workspaceID)
-	if err != nil {
-		return nil, err
-	}
-
 	return &AdminWorkspaceDetail{
 		Workspace: workspace,
 		Members:   members,
-		Apps:      apps,
 	}, nil
 }
 
@@ -1048,114 +961,39 @@ func (s *adminService) UpdateWorkspaceStatus(ctx context.Context, adminID, works
 	return workspace, nil
 }
 
-func (s *adminService) ListApps(ctx context.Context, params AdminAppListParams) ([]entity.App, int64, error) {
-	search := strings.TrimSpace(params.Search)
-	status := normalizeAdminValue(params.Status)
-	return s.appRepo.ListAll(ctx, repository.AdminAppListParams{
-		Search:      search,
-		Status:      status,
-		WorkspaceID: params.WorkspaceID,
-		OwnerID:     params.OwnerID,
-		Page:        params.Page,
-		PageSize:    params.PageSize,
-	})
-}
-
-func (s *adminService) GetAppDetail(ctx context.Context, appID uuid.UUID, params AdminAppDetailParams) (*AdminAppDetail, error) {
-	app, err := s.appRepo.GetByID(ctx, appID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrAdminAppNotFound
-		}
-		return nil, err
-	}
-
-	if app != nil {
-		if owner, err := s.userRepo.GetByID(ctx, app.OwnerUserID); err == nil {
-			app.Owner = owner
-		}
-	}
-
-	domains, err := s.appDomainRepo.ListByAppID(ctx, appID)
-	if err != nil {
-		return nil, err
-	}
-
-	var accessPolicy *entity.AppAccessPolicy
-	if s.appAccessPolicyRepo != nil {
-		policy, err := s.appAccessPolicyRepo.GetByAppID(ctx, appID)
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, err
-			}
-		} else {
-			accessPolicy = policy
-		}
-	}
-
-	page := params.VersionPage
-	if page <= 0 {
-		page = 1
-	}
-	pageSize := params.VersionPageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	versions, total, err := s.appVersionRepo.ListByAppID(ctx, appID, repository.AppVersionListParams{
-		Page:     page,
-		PageSize: pageSize,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &AdminAppDetail{
-		App:           app,
-		Versions:      versions,
-		VersionsTotal: total,
-		Domains:       domains,
-		AccessPolicy:  accessPolicy,
-	}, nil
-}
-
-func (s *adminService) UpdateAppStatus(ctx context.Context, adminID, appID uuid.UUID, input AdminStatusUpdateInput) (*entity.App, error) {
+func (s *adminService) UpdateWorkspacePublishStatus(ctx context.Context, adminID, workspaceID uuid.UUID, input AdminStatusUpdateInput) (*entity.Workspace, error) {
 	status := normalizeAdminValue(input.Status)
-	if !isAllowedAppStatus(status) {
+	if !isAllowedWorkspacePublishStatus(status) {
 		return nil, ErrAdminInvalidStatus
 	}
 
-	app, err := s.appRepo.GetByID(ctx, appID)
+	workspace, err := s.workspaceRepo.GetByIDUnscoped(ctx, workspaceID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrAdminAppNotFound
+			return nil, ErrAdminWorkspaceNotFound
 		}
 		return nil, err
 	}
 
 	now := s.now()
-	previous := app.Status
+	previous := workspace.AppStatus
 	reason := strings.TrimSpace(input.Reason)
-	app.Status = status
-	app.StatusUpdatedAt = &now
-	if reason != "" {
-		app.StatusReason = &reason
-	} else {
-		app.StatusReason = nil
+	workspace.AppStatus = status
+	if status == "published" && workspace.PublishedAt == nil {
+		workspace.PublishedAt = &now
 	}
 
-	if err := s.appRepo.Update(ctx, app); err != nil {
+	if err := s.workspaceRepo.Update(ctx, workspace); err != nil {
 		return nil, err
 	}
 
-	s.recordAdminAudit(ctx, app.WorkspaceID, adminID, "admin.app_status_update", "app", app.ID, map[string]interface{}{
-		"app_id":      app.ID,
+	s.recordAdminAudit(ctx, workspace.ID, adminID, "admin.workspace_publish_status_update", "workspace", workspace.ID, map[string]interface{}{
 		"from_status": previous,
 		"to_status":   status,
 		"reason":      reason,
 	})
 
-	return app, nil
+	return workspace, nil
 }
 
 func (s *adminService) recordUserAdminActivity(ctx context.Context, targetUserID, actorID uuid.UUID, action string, metadata map[string]interface{}) {
@@ -1224,9 +1062,9 @@ func isAllowedWorkspaceStatus(status string) bool {
 	}
 }
 
-func isAllowedAppStatus(status string) bool {
+func isAllowedWorkspacePublishStatus(status string) bool {
 	switch status {
-	case AppStatusDraft, AppStatusPublished, AppStatusDeprecated, AppStatusArchived, "suspended":
+	case "draft", "published", "deprecated", "archived", "suspended":
 		return true
 	default:
 		return false

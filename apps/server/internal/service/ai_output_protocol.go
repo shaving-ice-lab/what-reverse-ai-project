@@ -13,8 +13,8 @@ const (
 	AIOutputSchemaVersion = "1.0"
 )
 
-// AppMetadata 应用元信息
-type AppMetadata struct {
+// WorkspaceMetadata 工作空间元信息
+type WorkspaceMetadata struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description,omitempty"`
 	Icon        string   `json:"icon,omitempty"`
@@ -35,7 +35,7 @@ type AccessPolicy struct {
 // AIOutputProtocol AI 输出协议
 type AIOutputProtocol struct {
 	SchemaVersion      string                 `json:"schema_version"`
-	AppMetadata        AppMetadata            `json:"app_metadata"`
+	WorkspaceMetadata  WorkspaceMetadata      `json:"workspace_metadata"`
 	WorkflowDefinition map[string]interface{} `json:"workflow_definition"`
 	UISchema           map[string]interface{} `json:"ui_schema"`
 	DBSchema           map[string]interface{} `json:"db_schema"`
@@ -45,13 +45,13 @@ type AIOutputProtocol struct {
 const aiOutputProtocolSchema = `{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["schema_version", "app_metadata", "workflow_definition", "ui_schema", "db_schema", "access_policy"],
+  "required": ["schema_version", "workspace_metadata", "workflow_definition", "ui_schema", "db_schema", "access_policy"],
   "properties": {
     "schema_version": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
     },
-    "app_metadata": {
+    "workspace_metadata": {
       "type": "object",
       "required": ["name"],
       "properties": {
@@ -102,7 +102,7 @@ func BuildAIOutputProtocol(
 ) AIOutputProtocol {
 	return AIOutputProtocol{
 		SchemaVersion:      AIOutputSchemaVersion,
-		AppMetadata:        buildAppMetadata(description, workflowDefinition),
+		WorkspaceMetadata:  buildWorkspaceMetadata(description, workflowDefinition),
 		WorkflowDefinition: workflowDefinition,
 		UISchema:           ensureMap(uiSchema),
 		DBSchema:           ensureMap(dbSchema),
@@ -265,8 +265,8 @@ func buildProtocolFromMap(payload map[string]interface{}, description string) AI
 
 	protocol := BuildAIOutputProtocol(description, workflowDefinition, uiSchema, dbSchema)
 
-	if rawMeta, ok := payload["app_metadata"].(map[string]interface{}); ok {
-		protocol.AppMetadata = mergeAppMetadata(protocol.AppMetadata, rawMeta)
+	if rawMeta, ok := payload["workspace_metadata"].(map[string]interface{}); ok {
+		protocol.WorkspaceMetadata = mergeWorkspaceMetadata(protocol.WorkspaceMetadata, rawMeta)
 	}
 
 	if rawPolicy, ok := payload["access_policy"].(map[string]interface{}); ok {
@@ -287,7 +287,7 @@ func hasWorkflowShape(payload map[string]interface{}) bool {
 	return hasNodes && hasEdges && hasName
 }
 
-func mergeAppMetadata(current AppMetadata, raw map[string]interface{}) AppMetadata {
+func mergeWorkspaceMetadata(current WorkspaceMetadata, raw map[string]interface{}) WorkspaceMetadata {
 	if name, ok := raw["name"].(string); ok && strings.TrimSpace(name) != "" {
 		current.Name = name
 	}
@@ -345,9 +345,9 @@ func coerceStringSliceValue(value interface{}) []string {
 	}
 }
 
-func buildAppMetadata(description string, workflowDefinition map[string]interface{}) AppMetadata {
-	name := deriveAppName(description, workflowDefinition)
-	metadata := AppMetadata{
+func buildWorkspaceMetadata(description string, workflowDefinition map[string]interface{}) WorkspaceMetadata {
+	name := deriveWorkspaceName(description, workflowDefinition)
+	metadata := WorkspaceMetadata{
 		Name: name,
 	}
 
@@ -358,7 +358,7 @@ func buildAppMetadata(description string, workflowDefinition map[string]interfac
 	return metadata
 }
 
-func deriveAppName(description string, workflowDefinition map[string]interface{}) string {
+func deriveWorkspaceName(description string, workflowDefinition map[string]interface{}) string {
 	if workflowDefinition != nil {
 		if name, ok := workflowDefinition["name"].(string); ok && strings.TrimSpace(name) != "" {
 			return truncateRunes(name, 24)

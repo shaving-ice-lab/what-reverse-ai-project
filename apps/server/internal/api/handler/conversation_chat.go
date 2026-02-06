@@ -135,6 +135,15 @@ func (h *ConversationChatHandler) Chat(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "对话 ID 无效")
 	}
 
+	var workspaceID *uuid.UUID
+	if workspaceIDStr := c.QueryParam("workspace_id"); workspaceIDStr != "" {
+		parsed, err := uuid.Parse(workspaceIDStr)
+		if err != nil {
+			return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+		}
+		workspaceID = &parsed
+	}
+
 	var req ConversationChatRequest
 	if err := c.Bind(&req); err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
@@ -157,6 +166,10 @@ func (h *ConversationChatHandler) Chat(c echo.Context) error {
 		default:
 			return errorResponse(c, http.StatusInternalServerError, "GET_FAILED", "获取对话失败")
 		}
+	}
+
+	if workspaceID != nil && conversation.WorkspaceID != *workspaceID {
+		return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "对话不存在")
 	}
 
 	// 保存用户消息
@@ -358,7 +371,7 @@ func readSSEResponse(resp *http.Response) (<-chan string, <-chan error) {
 						contentChan <- content
 					}
 					if errMsg, ok := chunk["error"]; ok {
-						errChan <- fmt.Errorf(errMsg)
+						errChan <- fmt.Errorf("%s", errMsg)
 						return
 					}
 				}

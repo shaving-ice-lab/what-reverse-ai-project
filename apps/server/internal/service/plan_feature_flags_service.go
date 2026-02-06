@@ -94,7 +94,7 @@ func defaultFeatureFlagPolicy() FeatureFlagPolicy {
 						Enforced:    true,
 						ConfigKeys: []string{
 							"features.workspace_enabled",
-							"features.app_runtime_enabled",
+							"features.workspace_runtime_enabled",
 							"features.domain_enabled",
 						},
 						Source: "apps/server/internal/config/config.go",

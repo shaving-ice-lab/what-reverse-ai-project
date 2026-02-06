@@ -17,7 +17,6 @@ const (
 	RequestIDHeader      = "X-Request-Id"
 	IdempotencyKeyHeader = "Idempotency-Key"
 	WorkspaceIDHeader    = "X-Workspace-Id"
-	AppIDHeader          = "X-App-Id"
 	ExecutionIDHeader    = "X-Execution-Id"
 	SessionIDHeader      = "X-Session-Id"
 )
@@ -127,9 +126,6 @@ func extractOrCreateTraceContext(c echo.Context) *observability.TraceContext {
 	if workspaceID := req.Header.Get(WorkspaceIDHeader); workspaceID != "" {
 		tc.WorkspaceID = workspaceID
 	}
-	if appID := req.Header.Get(AppIDHeader); appID != "" {
-		tc.AppID = appID
-	}
 	if executionID := req.Header.Get(ExecutionIDHeader); executionID != "" {
 		tc.ExecutionID = executionID
 	}
@@ -203,17 +199,6 @@ func SetWorkspaceID(c echo.Context, workspaceID string) {
 		tc.WorkspaceID = workspaceID
 		c.Set(TraceContextKey, tc)
 		// 同步更新 request context
-		req := c.Request()
-		ctx := observability.ContextWithTraceContext(req.Context(), tc)
-		c.SetRequest(req.WithContext(ctx))
-	}
-}
-
-// SetAppID 设置应用 ID 到追踪上下文
-func SetAppID(c echo.Context, appID string) {
-	if tc := GetTraceContext(c); tc != nil {
-		tc.AppID = appID
-		c.Set(TraceContextKey, tc)
 		req := c.Request()
 		ctx := observability.ContextWithTraceContext(req.Context(), tc)
 		c.SetRequest(req.WithContext(ctx))

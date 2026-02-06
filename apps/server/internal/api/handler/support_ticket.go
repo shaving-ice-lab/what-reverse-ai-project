@@ -15,10 +15,10 @@ import (
 
 // SupportTicketHandler 客户支持工单处理器
 type SupportTicketHandler struct {
-	supportTicketService service.SupportTicketService
+	supportTicketService   service.SupportTicketService
 	supportSettingsService service.SupportSettingsService
-	captchaVerifier      service.CaptchaVerifier
-	rateLimiter          *supportTicketRateLimiter
+	captchaVerifier        service.CaptchaVerifier
+	rateLimiter            *supportTicketRateLimiter
 }
 
 // NewSupportTicketHandler 创建客户支持工单处理器
@@ -28,16 +28,15 @@ func NewSupportTicketHandler(
 	captchaVerifier service.CaptchaVerifier,
 ) *SupportTicketHandler {
 	return &SupportTicketHandler{
-		supportTicketService:  supportTicketService,
+		supportTicketService:   supportTicketService,
 		supportSettingsService: supportSettingsService,
-		captchaVerifier:       captchaVerifier,
-		rateLimiter:           newSupportTicketRateLimiter(5, 10*time.Minute),
+		captchaVerifier:        captchaVerifier,
+		rateLimiter:            newSupportTicketRateLimiter(5, 10*time.Minute),
 	}
 }
 
 type createSupportTicketRequest struct {
 	WorkspaceID    string                 `json:"workspace_id"`
-	AppID          string                 `json:"app_id"`
 	RequesterName  string                 `json:"requester_name"`
 	RequesterEmail string                 `json:"requester_email"`
 	Subject        string                 `json:"subject"`
@@ -95,13 +94,6 @@ func (h *SupportTicketHandler) CreateTicket(c echo.Context) error {
 			return errorResponse(c, http.StatusBadRequest, "SUPPORT_TICKET_INVALID_WORKSPACE", "workspace_id 格式错误")
 		}
 		input.WorkspaceID = &workspaceID
-	}
-	if req.AppID != "" {
-		appID, err := uuid.Parse(req.AppID)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "SUPPORT_TICKET_INVALID_APP", "app_id 格式错误")
-		}
-		input.AppID = &appID
 	}
 	if uid := middleware.GetUserID(c); uid != "" {
 		if userID, err := uuid.Parse(uid); err == nil {
@@ -188,14 +180,6 @@ func (h *SupportTicketHandler) ListTickets(c echo.Context) error {
 		}
 		workspaceID = &id
 	}
-	var appID *uuid.UUID
-	if raw := strings.TrimSpace(c.QueryParam("app_id")); raw != "" {
-		id, err := uuid.Parse(raw)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "SUPPORT_TICKET_INVALID_APP", "app_id 格式错误")
-		}
-		appID = &id
-	}
 
 	tickets, total, err := h.supportTicketService.ListTickets(c.Request().Context(), service.SupportTicketListParams{
 		Status:      status,
@@ -203,7 +187,6 @@ func (h *SupportTicketHandler) ListTickets(c echo.Context) error {
 		Category:    category,
 		Search:      search,
 		WorkspaceID: workspaceID,
-		AppID:       appID,
 		Page:        page,
 		PageSize:    pageSize,
 	})

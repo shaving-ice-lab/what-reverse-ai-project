@@ -137,7 +137,7 @@ func defaultAccessibilityPlan() AccessibilityPlan {
 					Scope: "dashboard",
 					Targets: []string{
 						"apps/web/src/app/(dashboard)/dashboard/page.tsx",
-						"apps/web/src/app/(dashboard)/apps/page.tsx",
+						"apps/web/src/app/(dashboard)/dashboard/workspaces/page.tsx",
 						"apps/web/src/app/(dashboard)/workflows/page.tsx",
 						"apps/web/src/app/(dashboard)/notifications/page.tsx",
 					},
@@ -153,11 +153,11 @@ func defaultAccessibilityPlan() AccessibilityPlan {
 					},
 				},
 				{
-					Key:   "app_builder",
-					Title: "App 编辑器",
+					Key:   "workspace_builder",
+					Title: "Workspace 编辑器",
 					Scope: "editor",
 					Targets: []string{
-						"apps/web/src/app/(dashboard)/workspaces/[workspaceId]/apps/[appId]/builder/page.tsx",
+						"apps/web/src/app/(dashboard)/dashboard/app/[appId]/builder/page.tsx",
 						"apps/web/src/components/editor",
 					},
 					Items: []string{

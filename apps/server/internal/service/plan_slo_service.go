@@ -68,9 +68,9 @@ func defaultSLOTable() SLOTable {
 				Objective:   "P95 < 2s",
 				Window:      "5m",
 				Target:      "2s",
-				Query:       "histogram_quantile(0.95, sum(rate(agentflow_http_request_duration_seconds_bucket{method=\"POST\", path=\"/runtime/:workspaceSlug/:appSlug\"}[5m])) by (le))",
+				Query:       "histogram_quantile(0.95, sum(rate(agentflow_http_request_duration_seconds_bucket{method=\"POST\", path=\"/runtime/:workspaceSlug\"}[5m])) by (le))",
 				Notes: []string{
-					"若使用根域名入口，可将 path 替换为 \"/\" 或 \"/:workspaceSlug/:appSlug\"。",
+					"若使用根域名入口，可将 path 替换为 \"/\" 或 \"/:workspaceSlug\"。",
 				},
 			},
 			{
@@ -115,11 +115,11 @@ func defaultSLOTable() SLOTable {
 				Objective:   "success_rate >= 99%",
 				Window:      "30m",
 				Target:      ">= 0.99",
-				Query:       "sum(rate(agentflow_http_requests_total{method=\"POST\", path=\"/api/v1/apps/:id/domains/:domainId/verify\", status=\"2xx\"}[30m])) / sum(rate(agentflow_http_requests_total{method=\"POST\", path=\"/api/v1/apps/:id/domains/:domainId/verify\"}[30m]))",
+				Query:       "sum(rate(agentflow_http_requests_total{method=\"POST\", path=\"/api/v1/workspaces/:id/domains/:domainId/verify\", status=\"2xx\"}[30m])) / sum(rate(agentflow_http_requests_total{method=\"POST\", path=\"/api/v1/workspaces/:id/domains/:domainId/verify\"}[30m]))",
 			},
 		},
 		Notes: []string{
-			"PromQL 查询默认聚合全局，可按 workspace_id、app_id 或 status 维度扩展。",
+			"PromQL 查询默认聚合全局，可按 workspace_id 或 status 维度扩展。",
 			"如需区分 4xx/5xx，可补充 status 标签筛选。",
 		},
 	}

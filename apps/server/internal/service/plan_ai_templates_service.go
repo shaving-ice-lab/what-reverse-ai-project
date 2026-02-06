@@ -58,7 +58,7 @@ func (s *planAITemplateService) GetLibrary(ctx context.Context) (*AITemplateLibr
 func defaultAITemplateLibrary() AITemplateLibrary {
 	appOutputFormat := fmt.Sprintf(`{
   "schema_version": "%s",
-  "app_metadata": { "name": "应用名称", "description": "应用描述" },
+  "workspace_metadata": { "name": "应用名称", "description": "应用描述" },
   "workflow_definition": { "name": "工作流名称", "nodes": [], "edges": [] },
   "ui_schema": { "schema_version": "%s", "blocks": [] },
   "db_schema": { "tables": [] },
@@ -68,7 +68,7 @@ func defaultAITemplateLibrary() AITemplateLibrary {
 	patchFormat := fmt.Sprintf(`{
   "schema_version": "%s",
   "ops": [
-    { "op": "set", "path": "/app_metadata/name", "value": "新名称" }
+    { "op": "set", "path": "/workspace_metadata/name", "value": "新名称" }
   ]
 }`, AIPatchSchemaVersion)
 
@@ -92,11 +92,11 @@ func defaultAITemplateLibrary() AITemplateLibrary {
 		Title: "AI 生成模板库（按意图）",
 		Templates: []AITemplate{
 			{
-				Key:         "generate_app",
-				Title:       "生成 App",
-				Intent:      "从需求生成 app_metadata/workflow/ui/db",
+				Key:         "generate_workspace",
+				Title:       "生成 Workspace",
+				Intent:      "从需求生成 workspace_metadata/workflow/ui/db",
 				Description: "输出符合 AI 输出协议的 JSON。",
-				SystemPrompt: fmt.Sprintf("你是应用生成助手。必须输出符合 AI 输出协议的 JSON。schema_version=%s，ui_schema.schema_version=%s。只输出 JSON。",
+				SystemPrompt: fmt.Sprintf("你是 Workspace 生成助手。必须输出符合 AI 输出协议的 JSON。schema_version=%s，ui_schema.schema_version=%s。只输出 JSON。",
 					AIOutputSchemaVersion,
 					uischema.CurrentSchemaVersion,
 				),
@@ -117,10 +117,10 @@ func defaultAITemplateLibrary() AITemplateLibrary {
 			},
 			{
 				Key:         "modify_app",
-				Title:       "修改 App",
+				Title:       "修改 Workspace",
 				Intent:      "输出 diff/patch 模板",
 				Description: "基于现有 AI 输出协议生成补丁。",
-				SystemPrompt: fmt.Sprintf("你是应用修改助手。输出 AI 补丁协议 JSON。schema_version=%s。只输出 JSON。",
+				SystemPrompt: fmt.Sprintf("你是 Workspace 修改助手。输出 AI 补丁协议 JSON。schema_version=%s。只输出 JSON。",
 					AIPatchSchemaVersion,
 				),
 				UserPrompt: `现有协议:

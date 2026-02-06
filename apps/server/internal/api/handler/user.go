@@ -324,6 +324,61 @@ func (h *UserHandler) DeleteAPIKey(c echo.Context) error {
 	return successResponse(c, map[string]string{"message": "密钥已删除"})
 }
 
+// TestSavedAPIKey 测试已保存的 API 密钥（服务端解密后校验）
+func (h *UserHandler) TestSavedAPIKey(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+
+	keyID := c.Param("id")
+	kid, err := uuid.Parse(keyID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_KEY_ID", "密钥 ID 无效")
+	}
+
+	keys, err := h.apiKeyService.List(c.Request().Context(), uid)
+	if err != nil {
+		return errorResponse(c, http.StatusInternalServerError, "LIST_FAILED", "获取密钥列表失败")
+	}
+
+	var provider string
+	found := false
+	for _, key := range keys {
+		if key.ID == kid {
+			provider = key.Provider
+			found = true
+			break
+		}
+	}
+	if !found {
+		return errorResponse(c, http.StatusNotFound, "KEY_NOT_FOUND", "密钥不存在")
+	}
+
+	decrypted, err := h.apiKeyService.GetDecrypted(c.Request().Context(), uid, provider)
+	if err != nil {
+		if err == service.ErrAPIKeyNotFound {
+			return errorResponse(c, http.StatusNotFound, "KEY_NOT_FOUND", "密钥不存在")
+		}
+		if err == service.ErrUnauthorized {
+			return errorResponse(c, http.StatusForbidden, "UNAUTHORIZED", "无权测试此密钥")
+		}
+		return errorResponse(c, http.StatusInternalServerError, "DECRYPT_FAILED", "读取密钥失败")
+	}
+
+	valid, err := h.apiKeyService.TestKey(c.Request().Context(), provider, decrypted)
+	if err != nil {
+		return errorResponse(c, http.StatusInternalServerError, "TEST_FAILED", "测试密钥失败")
+	}
+
+	return successResponse(c, map[string]interface{}{
+		"valid":    valid,
+		"provider": provider,
+		"message":  map[bool]string{true: "密钥格式有效", false: "密钥格式无效"}[valid],
+	})
+}
+
 // TestAPIKey 测试 API 密钥
 func (h *UserHandler) TestAPIKey(c echo.Context) error {
 	var req TestAPIKeyRequest

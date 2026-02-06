@@ -111,14 +111,14 @@ func defaultOpsSOPs() []OpsSOP {
 				"用户报告自定义域名无法访问",
 			},
 			Preconditions: []string{
-				"确认 app_id 与 domain_id 归属",
+				"确认 workspace_id 与 domain_id 归属",
 				"已获取域名验证 token 或 CNAME 目标",
 			},
 			Steps: []OpsSOPStep{
 				{
 					Title: "确认域名记录状态",
 					Actions: []string{
-						"调用 GET /api/v1/apps/:id/domains 获取 status/ssl_status/last_verification_error/next_retry_at",
+						"调用 GET /api/v1/workspaces/:id/domains 获取 status/ssl_status/last_verification_error/next_retry_at",
 						"若 status=failed，记录 support_url 与错误详情",
 					},
 					Expected: "已定位域名状态与失败原因",
@@ -127,14 +127,14 @@ func defaultOpsSOPs() []OpsSOP {
 					Title: "校验 DNS 记录并触发验证",
 					Actions: []string{
 						"核对 TXT `_agentflow.<domain>` 或 CNAME 指向 base host",
-						"等待 TTL 后调用 POST /api/v1/apps/:id/domains/:domainId/verify",
+						"等待 TTL 后调用 POST /api/v1/workspaces/:id/domains/:domainId/verify",
 					},
 					Expected: "域名状态变为 verified 或给出可执行错误",
 				},
 				{
 					Title: "处理证书签发",
 					Actions: []string{
-						"当 ssl_status 非 issued 时调用 POST /api/v1/apps/:id/domains/:domainId/cert/issue",
+						"当 ssl_status 非 issued 时调用 POST /api/v1/workspaces/:id/domains/:domainId/cert/issue",
 						"若签发失败，返回 DNS 校验并重试",
 					},
 					Expected: "ssl_status 变为 issued",
@@ -142,8 +142,8 @@ func defaultOpsSOPs() []OpsSOP {
 				{
 					Title: "生效或回滚路由",
 					Actions: []string{
-						"调用 POST /api/v1/apps/:id/domains/:domainId/activate 使域名生效",
-						"失败时调用 POST /api/v1/apps/:id/domains/:domainId/rollback",
+						"调用 POST /api/v1/workspaces/:id/domains/:domainId/activate 使域名生效",
+						"失败时调用 POST /api/v1/workspaces/:id/domains/:domainId/rollback",
 					},
 					Expected: "域名状态为 active 或已回滚",
 				},
@@ -151,11 +151,11 @@ func defaultOpsSOPs() []OpsSOP {
 			Escalation:   "verification_attempts >= 3 或 support_url 已生成时，转人工排查权威 DNS 与路由服务日志。",
 			RollbackPlan: "执行 /rollback 或删除域名记录后恢复默认访问。",
 			References: []OpsSOPReference{
-				{Label: "列出域名", Target: "GET /api/v1/apps/:id/domains"},
-				{Label: "验证域名", Target: "POST /api/v1/apps/:id/domains/:domainId/verify"},
-				{Label: "签发证书", Target: "POST /api/v1/apps/:id/domains/:domainId/cert/issue"},
-				{Label: "域名生效", Target: "POST /api/v1/apps/:id/domains/:domainId/activate"},
-				{Label: "域名回滚", Target: "POST /api/v1/apps/:id/domains/:domainId/rollback"},
+				{Label: "列出域名", Target: "GET /api/v1/workspaces/:id/domains"},
+				{Label: "验证域名", Target: "POST /api/v1/workspaces/:id/domains/:domainId/verify"},
+				{Label: "签发证书", Target: "POST /api/v1/workspaces/:id/domains/:domainId/cert/issue"},
+				{Label: "域名生效", Target: "POST /api/v1/workspaces/:id/domains/:domainId/activate"},
+				{Label: "域名回滚", Target: "POST /api/v1/workspaces/:id/domains/:domainId/rollback"},
 			},
 		},
 		{
@@ -219,21 +219,21 @@ func defaultOpsSOPs() []OpsSOP {
 				"匿名访问异常增长或用户投诉",
 			},
 			Preconditions: []string{
-				"应用 access_mode 为 public_anonymous",
+				"Workspace access_mode 为 public_anonymous",
 				"已收集滥用 IP/UA/路径信息",
 			},
 			Steps: []OpsSOPStep{
 				{
 					Title: "确认访问策略",
 					Actions: []string{
-						"调用 GET /api/v1/apps/:id/access-policy 确认 access_mode 与 rate_limit_json",
+						"调用 GET /api/v1/workspaces/:id/access-policy 确认 access_mode 与 rate_limit_json",
 					},
 					Expected: "确认可对匿名访问策略进行调整",
 				},
 				{
 					Title: "设置黑名单或灰名单",
 					Actions: []string{
-						"通过 PATCH /api/v1/apps/:id/access-policy 更新 rate_limit_json.blacklist/graylist",
+						"通过 PATCH /api/v1/workspaces/:id/access-policy 更新 rate_limit_json.blacklist/graylist",
 						"可填入原始 IP 或 sha256 哈希值（支持前缀 sha256:/hash:）",
 					},
 					Expected: "高风险访问被阻断或触发验证码",
@@ -241,7 +241,7 @@ func defaultOpsSOPs() []OpsSOP {
 				{
 					Title: "收紧限流策略",
 					Actions: []string{
-						"设置 rate_limit_json.per_ip / per_session / per_app 的 max_requests 与 window_seconds",
+						"设置 rate_limit_json.per_ip / per_session / per_workspace 的 max_requests 与 window_seconds",
 						"必要时提高 require_captcha 或设置 graylist_policy",
 					},
 					Expected: "请求被限流且风险事件下降",
@@ -250,8 +250,8 @@ func defaultOpsSOPs() []OpsSOP {
 			Escalation:   "持续异常时，结合日志分析并升级安全团队处理。",
 			RollbackPlan: "移除 blacklist/graylist 并恢复默认限流配置。",
 			References: []OpsSOPReference{
-				{Label: "查看访问策略", Target: "GET /api/v1/apps/:id/access-policy"},
-				{Label: "更新访问策略", Target: "PATCH /api/v1/apps/:id/access-policy"},
+				{Label: "查看访问策略", Target: "GET /api/v1/workspaces/:id/access-policy"},
+				{Label: "更新访问策略", Target: "PATCH /api/v1/workspaces/:id/access-policy"},
 				{Label: "运行时事件", Target: "runtime_rate_limited / runtime_risk_detected"},
 			},
 		},

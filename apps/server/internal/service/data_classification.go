@@ -55,15 +55,15 @@ func validateAccessPolicyClassification(accessMode, classification string) error
 		return nil
 	case DataClassificationInternal, DataClassificationConfidential:
 		if normalizedMode == "public_anonymous" {
-			return ErrAppInvalidAccessPolicy
+			return ErrWorkspaceInvalidAccessPolicy
 		}
 		return nil
 	case DataClassificationRestricted:
 		if normalizedMode != "private" {
-			return ErrAppInvalidAccessPolicy
+			return ErrWorkspaceInvalidAccessPolicy
 		}
 		return nil
 	default:
-		return ErrAppInvalidDataClassification
+		return ErrWorkspaceInvalidDataClassification
 	}
 }

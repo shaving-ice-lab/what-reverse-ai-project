@@ -53,7 +53,6 @@ func main() {
 	// 初始化仓储
 	executionRepo := repository.NewExecutionRepository(db)
 	workflowRepo := repository.NewWorkflowRepository(db)
-	appRepo := repository.NewAppRepository(db)
 	workspaceDatabaseRepo := repository.NewWorkspaceDatabaseRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	workspaceRepo := repository.NewWorkspaceRepository(db)
@@ -62,14 +61,11 @@ func main() {
 	workspaceMemberRepo := repository.NewWorkspaceMemberRepository(db)
 	modelUsageRepo := repository.NewModelUsageRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
-	appVersionRepo := repository.NewAppVersionRepository(db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
 	workspaceQuotaRepo := repository.NewWorkspaceQuotaRepository(db)
 	billingPlanRepo := repository.NewBillingPlanRepository(db)
 	billingUsageRepo := repository.NewBillingUsageEventRepository(db)
-	appUsageRepo := repository.NewAppUsageStatRepository(db)
 	invoicePaymentRepo := repository.NewBillingInvoicePaymentRepository(db)
-	appDomainRepo := repository.NewAppDomainRepository(db)
 	reviewQueueRepo := repository.NewReviewQueueRepository(db)
 	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(db)
 	idempotencyRepo := repository.NewIdempotencyKeyRepository(db)
@@ -81,7 +77,6 @@ func main() {
 		workspaceRoleRepo,
 		workspaceMemberRepo,
 		eventRecorder,
-		appRepo,
 		workflowRepo,
 		cfg.Retention,
 	)
@@ -93,11 +88,9 @@ func main() {
 		billingPlanRepo,
 		workspaceQuotaRepo,
 		billingUsageRepo,
-		appUsageRepo,
 		invoicePaymentRepo,
 		workspaceRepo,
 		workspaceService,
-		appRepo,
 	)
 	workspaceDatabaseService, err := service.NewWorkspaceDatabaseService(
 		workspaceDatabaseRepo,
@@ -126,16 +119,15 @@ func main() {
 	}
 	domainRoutingExecutor := service.NewDomainRoutingExecutor(&cfg.DomainRouting, log)
 	certificateIssuer := service.NewCertificateIssuerExecutor(&cfg.CertificateIssuer, log)
-	appDomainService := service.NewAppDomainService(
-		appRepo,
-		appDomainRepo,
+	workspaceDomainService := service.NewWorkspaceDomainService(
+		workspaceRepo,
 		eventRecorder,
 		cfg.Server.BaseURL,
 		cfg.Deployment.RegionBaseURLs,
 		domainRoutingExecutor,
 		certificateIssuer,
 	)
-	metricsService := service.NewMetricsService(appRepo, appVersionRepo, executionRepo, runtimeEventRepo, workspaceService, workspaceQuotaRepo, cacheRedis)
+	metricsService := service.NewMetricsService(workspaceRepo, executionRepo, runtimeEventRepo, workspaceService, workspaceQuotaRepo, cacheRedis)
 
 	// Workspace DB runtime (db provider + authorizer)
 	workspaceDBRuntime, runtimeErr := service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, cfg.Database, cfg.Encryption.Key)
@@ -171,8 +163,8 @@ func main() {
 		dbProvisioner = dbProvisionerAdapter{svc: workspaceDatabaseService}
 	}
 	var domainVerifier queue.DomainVerifier
-	if appDomainService != nil {
-		domainVerifier = domainVerifierAdapter{svc: appDomainService}
+	if workspaceDomainService != nil {
+		domainVerifier = domainVerifierAdapter{svc: workspaceDomainService}
 	}
 	var metricsAggregator queue.MetricsAggregator
 	if metricsService != nil {
@@ -221,14 +213,14 @@ func (a dbProvisionerAdapter) Provision(ctx context.Context, workspaceID, ownerI
 }
 
 type domainVerifierAdapter struct {
-	svc service.AppDomainService
+	svc service.WorkspaceDomainService
 }
 
 func (a domainVerifierAdapter) VerifyByID(ctx context.Context, ownerID, domainID uuid.UUID) error {
 	if a.svc == nil {
 		return queue.ErrTaskNoop
 	}
-	_, err := a.svc.VerifyByID(ctx, ownerID, domainID)
+	_, err := a.svc.VerifyDomainByID(ctx, ownerID, domainID)
 	if err == nil {
 		return nil
 	}
@@ -248,13 +240,5 @@ func (a metricsAggregatorAdapter) AggregateWorkspaceUsage(ctx context.Context, o
 		return queue.ErrTaskNoop
 	}
 	_, err := a.svc.GetWorkspaceUsage(ctx, ownerID, workspaceID)
-	return err
-}
-
-func (a metricsAggregatorAdapter) AggregateAppMetrics(ctx context.Context, ownerID, appID uuid.UUID) error {
-	if a.svc == nil {
-		return queue.ErrTaskNoop
-	}
-	_, err := a.svc.GetAppMetrics(ctx, ownerID, appID)
 	return err
 }

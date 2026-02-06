@@ -58,7 +58,6 @@ type DomainVerifier interface {
 // MetricsAggregator 指标聚合执行器
 type MetricsAggregator interface {
 	AggregateWorkspaceUsage(ctx context.Context, ownerID, workspaceID uuid.UUID) error
-	AggregateAppMetrics(ctx context.Context, ownerID, appID uuid.UUID) error
 }
 
 // NewWorker 创建 Worker
@@ -481,15 +480,6 @@ func (w *Worker) handleMetricsAggregation(ctx context.Context, task *asynq.Task)
 			return fmt.Errorf("invalid workspace ID: %w", err)
 		}
 		if err := w.metricsAggregator.AggregateWorkspaceUsage(ctx, ownerID, workspaceID); err != nil {
-			return err
-		}
-	}
-	if payload.AppID != nil {
-		appID, err := uuid.Parse(*payload.AppID)
-		if err != nil {
-			return fmt.Errorf("invalid app ID: %w", err)
-		}
-		if err := w.metricsAggregator.AggregateAppMetrics(ctx, ownerID, appID); err != nil {
 			return err
 		}
 	}

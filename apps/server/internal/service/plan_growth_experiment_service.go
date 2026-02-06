@@ -171,7 +171,7 @@ func defaultGrowthExperimentPlan() GrowthExperimentPlan {
 					Owner:       "runtime",
 					Description: "在执行链路中记录实验影响的性能与失败指标。",
 					Requirements: []string{
-						"关联 execution_id 与 app_id",
+						"关联 execution_id 与 workspace_id",
 						"采集延迟与失败率指标",
 					},
 				},
@@ -193,7 +193,6 @@ func defaultGrowthExperimentPlan() GrowthExperimentPlan {
 				OptionalFields: []string{
 					"user_id",
 					"session_id",
-					"app_id",
 					"request_id",
 					"value",
 					"metadata",

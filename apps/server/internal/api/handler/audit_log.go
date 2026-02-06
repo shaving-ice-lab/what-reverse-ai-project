@@ -35,8 +35,9 @@ type ClientAuditLogRequest struct {
 }
 
 var allowedClientAuditActions = map[string]string{
-	"workflow.import":   "workflow",
-	"app.schema.import": "app_version",
+	"workflow.import":         "workflow",
+	"app.schema.import":       "workspace_version",
+	"workspace.schema.import": "workspace_version",
 }
 
 // List 获取工作空间审计日志
@@ -188,7 +189,7 @@ func sanitizeClientAuditMetadata(metadata map[string]interface{}) entity.JSON {
 		"file_name":        200,
 		"workflow_name":    200,
 		"workflow_id":      36,
-		"app_id":           36,
+		"workspace_id":     36,
 		"source":           50,
 		"validation_stage": 50,
 	}

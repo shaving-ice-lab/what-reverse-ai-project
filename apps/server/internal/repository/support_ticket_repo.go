@@ -28,7 +28,6 @@ type SupportTicketListParams struct {
 	Category    string
 	Search      string
 	WorkspaceID *uuid.UUID
-	AppID       *uuid.UUID
 	Page        int
 	PageSize    int
 }
@@ -76,9 +75,6 @@ func (r *supportTicketRepository) List(ctx context.Context, params SupportTicket
 	}
 	if params.WorkspaceID != nil && *params.WorkspaceID != uuid.Nil {
 		query = query.Where("workspace_id = ?", *params.WorkspaceID)
-	}
-	if params.AppID != nil && *params.AppID != uuid.Nil {
-		query = query.Where("app_id = ?", *params.AppID)
 	}
 	if params.Search != "" {
 		like := "%" + params.Search + "%"

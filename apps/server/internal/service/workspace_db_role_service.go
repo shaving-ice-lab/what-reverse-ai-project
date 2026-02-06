@@ -45,14 +45,12 @@ var (
 
 // CreateWorkspaceDBRoleRequest 创建数据库角色请求
 type CreateWorkspaceDBRoleRequest struct {
-	AppID     *uuid.UUID
 	RoleType  string
 	ExpiresAt *time.Time
 }
 
 // WorkspaceDBRoleListParams 角色列表参数
 type WorkspaceDBRoleListParams struct {
-	AppID    *uuid.UUID
 	Status   *string
 	RoleType *string
 }
@@ -68,7 +66,6 @@ type WorkspaceDBRoleService interface {
 type workspaceDBRoleService struct {
 	repo             repository.WorkspaceDBRoleRepository
 	databaseRepo     repository.WorkspaceDatabaseRepository
-	appRepo          repository.AppRepository
 	workspaceService WorkspaceService
 	auditLogService  AuditLogService
 	encryptor        *crypto.Encryptor
@@ -79,7 +76,6 @@ type workspaceDBRoleService struct {
 func NewWorkspaceDBRoleService(
 	repo repository.WorkspaceDBRoleRepository,
 	databaseRepo repository.WorkspaceDatabaseRepository,
-	appRepo repository.AppRepository,
 	workspaceService WorkspaceService,
 	auditLogService AuditLogService,
 	dbConfig config.DatabaseConfig,
@@ -92,7 +88,6 @@ func NewWorkspaceDBRoleService(
 	return &workspaceDBRoleService{
 		repo:             repo,
 		databaseRepo:     databaseRepo,
-		appRepo:          appRepo,
 		workspaceService: workspaceService,
 		auditLogService:  auditLogService,
 		encryptor:        encryptor,
@@ -111,14 +106,8 @@ func (s *workspaceDBRoleService) Create(ctx context.Context, workspaceID, actorI
 	if req.ExpiresAt != nil && req.ExpiresAt.Before(time.Now()) {
 		return nil, "", ErrWorkspaceDBRoleInvalid
 	}
-	if req.AppID == nil || *req.AppID == uuid.Nil {
-		return nil, "", ErrWorkspaceDBRoleInvalid
-	}
-	if err := s.ensureAppInWorkspace(ctx, workspaceID, *req.AppID); err != nil {
-		return nil, "", err
-	}
 
-	existing, err := s.repo.GetActiveByWorkspaceAppRole(ctx, workspaceID, req.AppID, roleType)
+	existing, err := s.repo.GetActiveByWorkspaceRole(ctx, workspaceID, roleType)
 	if err == nil && existing != nil {
 		return nil, "", ErrWorkspaceDBRoleExists
 	}
@@ -131,7 +120,7 @@ func (s *workspaceDBRoleService) Create(ctx context.Context, workspaceID, actorI
 		return nil, "", err
 	}
 
-	dbUser := s.dbUserForRole(workspaceID, req.AppID, roleType)
+	dbUser := s.dbUserForRole(workspaceID, roleType)
 	password, err := generateWorkspaceDBRolePassword()
 	if err != nil {
 		return nil, "", ErrWorkspaceDBRoleProvisionFail
@@ -150,7 +139,6 @@ func (s *workspaceDBRoleService) Create(ctx context.Context, workspaceID, actorI
 
 	role := &entity.WorkspaceDBRole{
 		WorkspaceID: workspaceID,
-		AppID:       req.AppID,
 		RoleType:    roleType,
 		DBUser:      dbUser,
 		SecretRef:   &secretRef,
@@ -165,7 +153,6 @@ func (s *workspaceDBRoleService) Create(ctx context.Context, workspaceID, actorI
 	s.recordAudit(ctx, workspaceID, actorID, "workspace.db.role.create", role, entity.JSON{
 		"role_type": roleType,
 		"db_user":   dbUser,
-		"app_id":    req.AppID.String(),
 	})
 
 	return role, password, nil
@@ -177,7 +164,6 @@ func (s *workspaceDBRoleService) List(ctx context.Context, workspaceID, actorID 
 	}
 	filter := repository.WorkspaceDBRoleListParams{
 		WorkspaceID: workspaceID,
-		AppID:       params.AppID,
 		Status:      params.Status,
 		RoleType:    params.RoleType,
 	}
@@ -303,20 +289,6 @@ func (s *workspaceDBRoleService) ensureWorkspaceAccess(ctx context.Context, work
 	return nil
 }
 
-func (s *workspaceDBRoleService) ensureAppInWorkspace(ctx context.Context, workspaceID, appID uuid.UUID) error {
-	app, err := s.appRepo.GetByID(ctx, appID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrAppNotFound
-		}
-		return err
-	}
-	if app.WorkspaceID != workspaceID {
-		return ErrWorkspaceUnauthorized
-	}
-	return nil
-}
-
 func (s *workspaceDBRoleService) getWorkspaceDatabase(ctx context.Context, workspaceID uuid.UUID) (*entity.WorkspaceDatabase, error) {
 	database, err := s.databaseRepo.GetByWorkspaceID(ctx, workspaceID)
 	if err != nil {
@@ -434,9 +406,6 @@ func (s *workspaceDBRoleService) recordAudit(ctx context.Context, workspaceID, a
 	if role.ID != uuid.Nil {
 		metadata["role_id"] = role.ID.String()
 	}
-	if role.AppID != nil && *role.AppID != uuid.Nil {
-		metadata["app_id"] = role.AppID.String()
-	}
 	if role.ExpiresAt != nil {
 		metadata["expires_at"] = role.ExpiresAt.Format(time.RFC3339)
 	}
@@ -494,18 +463,10 @@ func (s *workspaceDBRoleService) adminDSN() string {
 	)
 }
 
-func (s *workspaceDBRoleService) dbUserForRole(workspaceID uuid.UUID, appID *uuid.UUID, roleType string) string {
+func (s *workspaceDBRoleService) dbUserForRole(workspaceID uuid.UUID, roleType string) string {
 	ws := strings.ReplaceAll(strings.ToLower(workspaceID.String()), "-", "")
 	if len(ws) > 8 {
 		ws = ws[:8]
-	}
-	appSegment := "workspace"
-	if appID != nil && *appID != uuid.Nil {
-		appValue := strings.ReplaceAll(strings.ToLower(appID.String()), "-", "")
-		if len(appValue) > 8 {
-			appValue = appValue[:8]
-		}
-		appSegment = appValue
 	}
 	roleSegment := roleType
 	if roleType == workspaceDBRoleTypeRead {
@@ -515,7 +476,7 @@ func (s *workspaceDBRoleService) dbUserForRole(workspaceID uuid.UUID, appID *uui
 	} else if roleType == workspaceDBRoleTypeAdmin {
 		roleSegment = "a"
 	}
-	user := fmt.Sprintf("%s%s_%s_%s", workspaceDBRoleUserPrefix, ws, appSegment, roleSegment)
+	user := fmt.Sprintf("%s%s_%s", workspaceDBRoleUserPrefix, ws, roleSegment)
 	if len(user) > workspaceDBRoleUserMaxLength {
 		user = user[:workspaceDBRoleUserMaxLength]
 	}

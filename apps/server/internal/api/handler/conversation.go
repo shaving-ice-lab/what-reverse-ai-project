@@ -13,14 +13,22 @@ import (
 
 type ConversationHandler struct {
 	conversationService service.ConversationService
+	workspaceService    service.WorkspaceService
 }
 
-func NewConversationHandler(conversationService service.ConversationService) *ConversationHandler {
-	return &ConversationHandler{conversationService: conversationService}
+func NewConversationHandler(
+	conversationService service.ConversationService,
+	workspaceService service.WorkspaceService,
+) *ConversationHandler {
+	return &ConversationHandler{
+		conversationService: conversationService,
+		workspaceService:    workspaceService,
+	}
 }
 
 // 请求结构体
 type CreateConversationRequest struct {
+	WorkspaceID  string   `json:"workspace_id" validate:"required"`
 	Title        string   `json:"title" validate:"required,max=500"`
 	Model        string   `json:"model"`
 	SystemPrompt *string  `json:"system_prompt"`
@@ -80,6 +88,27 @@ func (h *ConversationHandler) List(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
 	}
 
+	var workspaceID *uuid.UUID
+	if workspaceIDStr := c.QueryParam("workspace_id"); workspaceIDStr != "" {
+		parsed, err := uuid.Parse(workspaceIDStr)
+		if err != nil {
+			return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+		}
+		workspaceID = &parsed
+		if _, err := h.workspaceService.GetByID(c.Request().Context(), parsed, uid); err != nil {
+			switch err {
+			case service.ErrWorkspaceNotFound:
+				return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+			case service.ErrWorkspaceUnauthorized:
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
+			default:
+				return errorResponse(c, http.StatusInternalServerError, "WORKSPACE_GET_FAILED", "获取工作空间失败")
+			}
+		}
+	}
+
+	ctx := c.Request().Context()
+
 	// 解析查询参数
 	var folderID *uuid.UUID
 	if folderIDStr := c.QueryParam("folder_id"); folderIDStr != "" {
@@ -114,17 +143,18 @@ func (h *ConversationHandler) List(c echo.Context) error {
 	}
 
 	req := service.ListConversationsRequest{
-		FolderID: folderID,
-		Starred:  starred,
-		Pinned:   pinned,
-		Archived: archived,
-		Search:   c.QueryParam("search"),
-		Page:     page,
-		PageSize: pageSize,
-		OrderBy:  c.QueryParam("order_by"),
+		WorkspaceID: workspaceID,
+		FolderID:    folderID,
+		Starred:     starred,
+		Pinned:      pinned,
+		Archived:    archived,
+		Search:      c.QueryParam("search"),
+		Page:        page,
+		PageSize:    pageSize,
+		OrderBy:     c.QueryParam("order_by"),
 	}
 
-	result, err := h.conversationService.List(c.Request().Context(), uid, req)
+	result, err := h.conversationService.List(ctx, uid, req)
 	if err != nil {
 		return errorResponse(c, http.StatusInternalServerError, "LIST_FAILED", "获取对话列表失败")
 	}
@@ -149,6 +179,26 @@ func (h *ConversationHandler) Create(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "TITLE_REQUIRED", "对话标题不能为空")
 	}
 
+	if req.WorkspaceID == "" {
+		return errorResponse(c, http.StatusBadRequest, "WORKSPACE_ID_REQUIRED", "Workspace ID 不能为空")
+	}
+	workspaceID, err := uuid.Parse(req.WorkspaceID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+
+	ctx := c.Request().Context()
+	if _, err := h.workspaceService.GetByID(ctx, workspaceID, uid); err != nil {
+		switch err {
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
+		default:
+			return errorResponse(c, http.StatusInternalServerError, "WORKSPACE_GET_FAILED", "获取工作空间失败")
+		}
+	}
+
 	// 解析文件夹ID
 	var folderID *uuid.UUID
 	if req.FolderID != nil && *req.FolderID != "" {
@@ -159,7 +209,8 @@ func (h *ConversationHandler) Create(c echo.Context) error {
 		folderID = &parsed
 	}
 
-	conversation, err := h.conversationService.Create(c.Request().Context(), uid, service.CreateConversationRequest{
+	conversation, err := h.conversationService.Create(ctx, uid, service.CreateConversationRequest{
+		WorkspaceID:  workspaceID,
 		Title:        req.Title,
 		Model:        req.Model,
 		SystemPrompt: req.SystemPrompt,
@@ -195,13 +246,34 @@ func (h *ConversationHandler) Get(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "对话 ID 无效")
 	}
 
+	workspaceIDStr := c.QueryParam("workspace_id")
+	if workspaceIDStr == "" {
+		return errorResponse(c, http.StatusBadRequest, "WORKSPACE_ID_REQUIRED", "Workspace ID 不能为空")
+	}
+	workspaceID, err := uuid.Parse(workspaceIDStr)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+
+	ctx := c.Request().Context()
+	if _, err := h.workspaceService.GetByID(ctx, workspaceID, uid); err != nil {
+		switch err {
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
+		default:
+			return errorResponse(c, http.StatusInternalServerError, "WORKSPACE_GET_FAILED", "获取工作空间失败")
+		}
+	}
+
 	// 检查是否需要加载消息
 	messageLimit := 50 // 默认加载最近50条消息
 	if limitStr := c.QueryParam("message_limit"); limitStr != "" {
 		fmt.Sscanf(limitStr, "%d", &messageLimit)
 	}
 
-	conversation, err := h.conversationService.GetWithMessages(c.Request().Context(), id, uid, messageLimit)
+	conversation, err := h.conversationService.GetWithMessages(ctx, id, uid, messageLimit)
 	if err != nil {
 		switch err {
 		case service.ErrConversationNotFound:
@@ -211,6 +283,10 @@ func (h *ConversationHandler) Get(c echo.Context) error {
 		default:
 			return errorResponse(c, http.StatusInternalServerError, "GET_FAILED", "获取对话失败")
 		}
+	}
+
+	if conversation.WorkspaceID != workspaceID {
+		return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "对话不存在")
 	}
 
 	return successResponse(c, map[string]interface{}{
@@ -988,6 +1064,7 @@ func (h *ConversationHandler) Export(c echo.Context) error {
 
 // ImportConversationRequest 导入对话请求
 type ImportConversationRequest struct {
+	WorkspaceID  string                 `json:"workspace_id" validate:"required"`
 	Title        string                 `json:"title" validate:"required"`
 	Model        string                 `json:"model"`
 	SystemPrompt string                 `json:"system_prompt"`
@@ -1021,11 +1098,30 @@ func (h *ConversationHandler) Import(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "TITLE_REQUIRED", "对话标题不能为空")
 	}
 
+	if req.WorkspaceID == "" {
+		return errorResponse(c, http.StatusBadRequest, "WORKSPACE_ID_REQUIRED", "Workspace ID 不能为空")
+	}
+	workspaceID, err := uuid.Parse(req.WorkspaceID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+
 	if len(req.Messages) == 0 {
 		return errorResponse(c, http.StatusBadRequest, "MESSAGES_REQUIRED", "对话消息不能为空")
 	}
 
 	ctx := c.Request().Context()
+
+	if _, err := h.workspaceService.GetByID(ctx, workspaceID, uid); err != nil {
+		switch err {
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
+		default:
+			return errorResponse(c, http.StatusInternalServerError, "WORKSPACE_GET_FAILED", "获取工作空间失败")
+		}
+	}
 
 	// 解析文件夹 ID
 	var folderID *uuid.UUID
@@ -1043,9 +1139,10 @@ func (h *ConversationHandler) Import(c echo.Context) error {
 	}
 
 	createReq := service.CreateConversationRequest{
-		Title:    req.Title,
-		Model:    model,
-		FolderID: folderID,
+		WorkspaceID: workspaceID,
+		Title:       req.Title,
+		Model:       model,
+		FolderID:    folderID,
 	}
 	if req.SystemPrompt != "" {
 		createReq.SystemPrompt = &req.SystemPrompt

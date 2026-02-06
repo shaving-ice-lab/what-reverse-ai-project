@@ -129,9 +129,9 @@ func defaultRuntimeSecurityPolicy() RuntimeSecurityPolicy {
 						Description: "通过 rate_limit_json.blacklist/denylist/blocked_ips/blocked_ip_hashes 与 graylist 配置访问控制。",
 						Enforced:    true,
 						ConfigKeys: []string{
-							"app_access_policy.rate_limit_json.blacklist",
-							"app_access_policy.rate_limit_json.graylist",
-							"app_access_policy.rate_limit_json.graylist_policy",
+							"workspace.rate_limit_json.blacklist",
+							"workspace.rate_limit_json.graylist",
+							"workspace.rate_limit_json.graylist_policy",
 						},
 						Source: "apps/server/internal/service/runtime_service.go",
 						Notes: []string{
@@ -164,12 +164,12 @@ func defaultRuntimeSecurityPolicy() RuntimeSecurityPolicy {
 					{
 						Key:         "rate_limit_rules",
 						Title:       "固定窗口限流",
-						Description: "支持 per_ip / per_session / per_app 限流，超限返回 RATE_LIMITED。",
+						Description: "支持 per_ip / per_session / per_workspace 限流，超限返回 RATE_LIMITED。",
 						Enforced:    true,
 						ConfigKeys: []string{
-							"app_access_policy.rate_limit_json.per_ip",
-							"app_access_policy.rate_limit_json.per_session",
-							"app_access_policy.rate_limit_json.per_app",
+							"workspace.rate_limit_json.per_ip",
+							"workspace.rate_limit_json.per_session",
+							"workspace.rate_limit_json.per_workspace",
 						},
 						Source: "apps/server/internal/service/runtime_service.go",
 					},
@@ -178,7 +178,7 @@ func defaultRuntimeSecurityPolicy() RuntimeSecurityPolicy {
 						Title:       "灰名单降级策略",
 						Description: "灰名单可收紧 max_requests 或要求验证码。",
 						Enforced:    true,
-						ConfigKeys:  []string{"app_access_policy.rate_limit_json.graylist_policy"},
+						ConfigKeys:  []string{"workspace.rate_limit_json.graylist_policy"},
 						Source:      "apps/server/internal/service/runtime_service.go",
 					},
 					{
@@ -187,9 +187,9 @@ func defaultRuntimeSecurityPolicy() RuntimeSecurityPolicy {
 						Description: "高频/失败率/突刺检测触发 risk_signals，并要求验证码。",
 						Enforced:    true,
 						ConfigKeys: []string{
-							"app_access_policy.rate_limit_json.anomaly.high_freq",
-							"app_access_policy.rate_limit_json.anomaly.failure_rate",
-							"app_access_policy.rate_limit_json.anomaly.spike",
+							"workspace.rate_limit_json.anomaly.high_freq",
+							"workspace.rate_limit_json.anomaly.failure_rate",
+							"workspace.rate_limit_json.anomaly.spike",
 						},
 						Source: "apps/server/internal/service/runtime_service.go",
 					},

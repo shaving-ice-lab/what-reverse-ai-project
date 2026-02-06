@@ -102,7 +102,7 @@ type AnalyticsIngestionSpec struct {
 }
 
 func (s *analyticsService) GetIngestionSpec(ctx context.Context, userID, workspaceID uuid.UUID) (*AnalyticsIngestionSpec, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionLogsView); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionLogsView); err != nil {
 		return nil, err
 	}
 
@@ -114,11 +114,11 @@ func (s *analyticsService) GetIngestionSpec(ctx context.Context, userID, workspa
 	return &AnalyticsIngestionSpec{
 		EventSchema: map[string]interface{}{
 			"required_fields": []string{"name"},
-			"optional_fields": []string{"message", "severity", "app_id", "user_id", "session_id", "timestamp", "properties"},
+			"optional_fields": []string{"message", "severity", "user_id", "session_id", "timestamp", "properties"},
 		},
 		MetricSchema: map[string]interface{}{
 			"required_fields": []string{"name", "value"},
-			"optional_fields": []string{"unit", "app_id", "recorded_at", "labels", "metadata"},
+			"optional_fields": []string{"unit", "recorded_at", "labels", "metadata"},
 		},
 		MetricDefinitions: definitions,
 		EventTypeCatalog:  entity.GetEventTypeMetadata(),
@@ -138,7 +138,6 @@ type AnalyticsEventPayload struct {
 	Name       string                 `json:"name"`
 	Message    string                 `json:"message"`
 	Severity   string                 `json:"severity"`
-	AppID      *string                `json:"app_id,omitempty"`
 	UserID     *string                `json:"user_id,omitempty"`
 	SessionID  *string                `json:"session_id,omitempty"`
 	Timestamp  *time.Time             `json:"timestamp,omitempty"`
@@ -176,13 +175,6 @@ func (s *analyticsService) IngestEvents(ctx context.Context, userID, workspaceID
 			WithMessage(resolveEventMessage(payload.Message, name)).
 			WithSeverity(severity)
 
-		if payload.AppID != nil && strings.TrimSpace(*payload.AppID) != "" {
-			appID, err := uuid.Parse(strings.TrimSpace(*payload.AppID))
-			if err != nil {
-				return 0, ErrAnalyticsInvalidInput
-			}
-			builder.WithApp(appID)
-		}
 		if payload.UserID != nil && strings.TrimSpace(*payload.UserID) != "" {
 			uid, err := uuid.Parse(strings.TrimSpace(*payload.UserID))
 			if err != nil {
@@ -231,14 +223,13 @@ type AnalyticsMetricPayload struct {
 	Name       string                 `json:"name"`
 	Value      float64                `json:"value"`
 	Unit       string                 `json:"unit"`
-	AppID      *string                `json:"app_id,omitempty"`
 	RecordedAt *time.Time             `json:"recorded_at,omitempty"`
 	Labels     map[string]interface{} `json:"labels,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 func (s *analyticsService) IngestMetrics(ctx context.Context, userID, workspaceID uuid.UUID, req AnalyticsMetricIngestRequest) (int, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionBillingManage, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionBillingManage, PermissionWorkspaceAdmin); err != nil {
 		return 0, err
 	}
 	if len(req.Metrics) == 0 {
@@ -254,15 +245,6 @@ func (s *analyticsService) IngestMetrics(ctx context.Context, userID, workspaceI
 		}
 		if math.IsNaN(payload.Value) || math.IsInf(payload.Value, 0) {
 			return 0, ErrAnalyticsInvalidInput
-		}
-
-		var appID *uuid.UUID
-		if payload.AppID != nil && strings.TrimSpace(*payload.AppID) != "" {
-			parsed, err := uuid.Parse(strings.TrimSpace(*payload.AppID))
-			if err != nil {
-				return 0, ErrAnalyticsInvalidInput
-			}
-			appID = &parsed
 		}
 
 		var definitionID *uuid.UUID
@@ -291,7 +273,6 @@ func (s *analyticsService) IngestMetrics(ctx context.Context, userID, workspaceI
 
 		records = append(records, &entity.AnalyticsMetric{
 			WorkspaceID:  workspaceID,
-			AppID:        appID,
 			DefinitionID: definitionID,
 			Name:         name,
 			Unit:         unit,
@@ -323,14 +304,14 @@ type AnalyticsMetricDefinitionInput struct {
 }
 
 func (s *analyticsService) ListMetricDefinitions(ctx context.Context, userID, workspaceID uuid.UUID, includeInactive bool) ([]entity.AnalyticsMetricDefinition, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionLogsView); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionLogsView); err != nil {
 		return nil, err
 	}
 	return s.metricDefRepo.ListByWorkspace(ctx, workspaceID, includeInactive)
 }
 
 func (s *analyticsService) UpsertMetricDefinition(ctx context.Context, userID, workspaceID uuid.UUID, req AnalyticsMetricDefinitionInput) (*entity.AnalyticsMetricDefinition, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceAdmin, PermissionAppEdit); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceAdmin, PermissionWorkspaceEdit); err != nil {
 		return nil, err
 	}
 	name := strings.TrimSpace(req.Name)
@@ -419,17 +400,15 @@ type AnalyticsMetricListParams struct {
 	PageSize  int
 	OrderDesc bool
 	Names     []string
-	AppID     *uuid.UUID
 }
 
 func (s *analyticsService) ListMetrics(ctx context.Context, userID, workspaceID uuid.UUID, params AnalyticsMetricListParams) ([]entity.AnalyticsMetric, int64, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionBillingManage, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionBillingManage, PermissionWorkspaceAdmin); err != nil {
 		return nil, 0, err
 	}
 
 	return s.metricRepo.List(ctx, repository.AnalyticsMetricFilter{
 		WorkspaceID: workspaceID,
-		AppID:       params.AppID,
 		Names:       params.Names,
 		StartTime:   params.StartTime,
 		EndTime:     params.EndTime,
@@ -465,7 +444,7 @@ func (s *analyticsService) RequestExport(ctx context.Context, userID, workspaceI
 	if err != nil {
 		return nil, ErrAnalyticsInvalidInput
 	}
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(exportType), PermissionLogsView, PermissionAppViewMetrics, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(exportType), PermissionLogsView, PermissionWorkspaceViewMetrics, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 	format := normalizeExportFormat(req.Format)
@@ -500,7 +479,7 @@ func (s *analyticsService) RequestExport(ctx context.Context, userID, workspaceI
 }
 
 func (s *analyticsService) GetExport(ctx context.Context, userID, workspaceID, exportID uuid.UUID) (*entity.AnalyticsExportJob, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionLogsView, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionLogsView, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 	job, err := s.exportRepo.GetByIDAndWorkspace(ctx, exportID, workspaceID)
@@ -569,7 +548,7 @@ func (s *analyticsService) CreateSubscription(ctx context.Context, userID, works
 	if err != nil {
 		return nil, ErrAnalyticsInvalidInput
 	}
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(exportType), PermissionLogsView, PermissionAppViewMetrics, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(exportType), PermissionLogsView, PermissionWorkspaceViewMetrics, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 
@@ -609,7 +588,7 @@ func (s *analyticsService) CreateSubscription(ctx context.Context, userID, works
 }
 
 func (s *analyticsService) ListSubscriptions(ctx context.Context, userID, workspaceID uuid.UUID) ([]entity.AnalyticsSubscription, error) {
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionAppViewMetrics, PermissionLogsView, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, security.DataLevelInternal, PermissionWorkspaceViewMetrics, PermissionLogsView, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 	return s.subscriptionRepo.ListByWorkspace(ctx, workspaceID)
@@ -623,7 +602,7 @@ func (s *analyticsService) UpdateSubscription(ctx context.Context, userID, works
 	if subscription == nil {
 		return nil, ErrAnalyticsSubscriptionNotFound
 	}
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionAppViewMetrics, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionWorkspaceViewMetrics, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 
@@ -677,7 +656,7 @@ func (s *analyticsService) DeleteSubscription(ctx context.Context, userID, works
 	if subscription == nil {
 		return ErrAnalyticsSubscriptionNotFound
 	}
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionAppViewMetrics, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionWorkspaceViewMetrics, PermissionWorkspaceAdmin); err != nil {
 		return err
 	}
 	return s.subscriptionRepo.Delete(ctx, subscriptionID, workspaceID)
@@ -691,7 +670,7 @@ func (s *analyticsService) TriggerSubscription(ctx context.Context, userID, work
 	if subscription == nil {
 		return nil, ErrAnalyticsSubscriptionNotFound
 	}
-	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionAppViewMetrics, PermissionWorkspaceAdmin); err != nil {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, exportClassification(subscription.ExportType), PermissionLogsView, PermissionWorkspaceViewMetrics, PermissionWorkspaceAdmin); err != nil {
 		return nil, err
 	}
 
@@ -1139,7 +1118,6 @@ func writeEventsToFile(file *os.File, events []entity.RuntimeEvent, format strin
 				"severity":     event.Severity,
 				"message":      event.Message,
 				"workspace_id": event.WorkspaceID,
-				"app_id":       event.AppID,
 				"user_id":      event.UserID,
 				"session_id":   event.SessionID,
 				"created_at":   event.CreatedAt,
@@ -1154,7 +1132,7 @@ func writeEventsToFile(file *os.File, events []entity.RuntimeEvent, format strin
 		return err
 	case "csv":
 		writer := csv.NewWriter(file)
-		if err := writer.Write([]string{"event_id", "event_type", "severity", "message", "created_at", "workspace_id", "app_id", "user_id", "session_id", "event_name", "source", "metadata_json"}); err != nil {
+		if err := writer.Write([]string{"event_id", "event_type", "severity", "message", "created_at", "workspace_id", "user_id", "session_id", "event_name", "source", "metadata_json"}); err != nil {
 			return err
 		}
 		for _, event := range events {
@@ -1167,7 +1145,6 @@ func writeEventsToFile(file *os.File, events []entity.RuntimeEvent, format strin
 				event.Message,
 				event.CreatedAt.Format(time.RFC3339),
 				uuidPtrToString(event.WorkspaceID),
-				uuidPtrToString(event.AppID),
 				uuidPtrToString(event.UserID),
 				uuidPtrToString(event.SessionID),
 				eventName,
@@ -1196,7 +1173,6 @@ func writeMetricsToFile(file *os.File, metrics []entity.AnalyticsMetric, format 
 				"value":         metric.Value,
 				"unit":          metric.Unit,
 				"workspace_id":  metric.WorkspaceID,
-				"app_id":        metric.AppID,
 				"definition_id": metric.DefinitionID,
 				"recorded_at":   metric.RecordedAt,
 				"labels":        metric.Labels,
@@ -1211,7 +1187,7 @@ func writeMetricsToFile(file *os.File, metrics []entity.AnalyticsMetric, format 
 		return err
 	case "csv":
 		writer := csv.NewWriter(file)
-		if err := writer.Write([]string{"metric_id", "name", "value", "unit", "recorded_at", "workspace_id", "app_id", "definition_id", "labels_json", "metadata_json"}); err != nil {
+		if err := writer.Write([]string{"metric_id", "name", "value", "unit", "recorded_at", "workspace_id", "definition_id", "labels_json", "metadata_json"}); err != nil {
 			return err
 		}
 		for _, metric := range metrics {
@@ -1222,7 +1198,6 @@ func writeMetricsToFile(file *os.File, metrics []entity.AnalyticsMetric, format 
 				metric.Unit,
 				metric.RecordedAt.Format(time.RFC3339),
 				metric.WorkspaceID.String(),
-				uuidPtrToString(metric.AppID),
 				uuidPtrToString(metric.DefinitionID),
 				marshalJSON(metric.Labels),
 				marshalJSON(metric.Metadata),

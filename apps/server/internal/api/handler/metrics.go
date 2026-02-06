@@ -20,30 +20,30 @@ func NewMetricsHandler(metricsService service.MetricsService) *MetricsHandler {
 	return &MetricsHandler{metricsService: metricsService}
 }
 
-// GetAppMetrics 获取 App 指标
-func (h *MetricsHandler) GetAppMetrics(c echo.Context) error {
+// GetWorkspaceMetrics 获取 Workspace 指标
+func (h *MetricsHandler) GetWorkspaceMetrics(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 	uid, err := uuid.Parse(userID)
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
 	}
 
-	appID, err := uuid.Parse(c.Param("id"))
+	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "APP_INVALID_ID", "App ID 无效")
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
 	}
 
-	metrics, err := h.metricsService.GetAppMetrics(c.Request().Context(), uid, appID)
+	metrics, err := h.metricsService.GetWorkspaceMetrics(c.Request().Context(), uid, workspaceID)
 	if err != nil {
 		switch err {
-		case service.ErrAppNotFound:
-			return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-		case service.ErrAppUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该 App")
-		case service.ErrAppVersionNotFound:
-			return errorResponse(c, http.StatusNotFound, "VERSION_NOT_FOUND", "App 版本不存在")
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
+		case service.ErrWorkspaceVersionNotFound:
+			return errorResponse(c, http.StatusNotFound, "VERSION_NOT_FOUND", "Workspace 版本不存在")
 		default:
-			return errorResponse(c, http.StatusInternalServerError, "METRICS_FAILED", "获取 App 指标失败")
+			return errorResponse(c, http.StatusInternalServerError, "METRICS_FAILED", "获取 Workspace 指标失败")
 		}
 	}
 
@@ -52,17 +52,17 @@ func (h *MetricsHandler) GetAppMetrics(c echo.Context) error {
 	})
 }
 
-// GetAppAccessStats 获取 App 访问统计概览
-func (h *MetricsHandler) GetAppAccessStats(c echo.Context) error {
+// GetWorkspaceAccessStats 获取 Workspace 访问统计概览
+func (h *MetricsHandler) GetWorkspaceAccessStats(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 	uid, err := uuid.Parse(userID)
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
 	}
 
-	appID, err := uuid.Parse(c.Param("id"))
+	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "APP_INVALID_ID", "App ID 无效")
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
 	}
 
 	windowDays := 0
@@ -74,15 +74,15 @@ func (h *MetricsHandler) GetAppAccessStats(c echo.Context) error {
 		windowDays = parsed
 	}
 
-	stats, err := h.metricsService.GetAppAccessStats(c.Request().Context(), uid, appID, windowDays)
+	stats, err := h.metricsService.GetWorkspaceAccessStats(c.Request().Context(), uid, workspaceID, windowDays)
 	if err != nil {
 		switch err {
-		case service.ErrAppNotFound:
-			return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-		case service.ErrAppUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该 App")
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问该工作空间")
 		default:
-			return errorResponse(c, http.StatusInternalServerError, "STATS_FAILED", "获取 App 访问统计失败")
+			return errorResponse(c, http.StatusInternalServerError, "STATS_FAILED", "获取 Workspace 访问统计失败")
 		}
 	}
 

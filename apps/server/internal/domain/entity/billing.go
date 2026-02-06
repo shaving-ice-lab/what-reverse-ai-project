@@ -75,17 +75,15 @@ func (q *WorkspaceQuota) BeforeCreate(tx *gorm.DB) error {
 
 // BillingUsageEvent 用量事件
 type BillingUsageEvent struct {
-	ID          uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
-	WorkspaceID uuid.UUID  `gorm:"type:char(36);not null;index" json:"workspace_id"`
-	AppID       *uuid.UUID `gorm:"type:char(36);index" json:"app_id"`
-	Usage       JSON       `gorm:"type:json" json:"usage"`
-	CostAmount  float64    `gorm:"type:decimal(12,2);default:0" json:"cost_amount"`
-	Currency    string     `gorm:"size:10;default:'CNY'" json:"currency"`
-	RecordedAt  time.Time  `json:"recorded_at"`
-	CreatedAt   time.Time  `json:"created_at"`
+	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	WorkspaceID uuid.UUID `gorm:"type:char(36);not null;index" json:"workspace_id"`
+	Usage       JSON      `gorm:"type:json" json:"usage"`
+	CostAmount  float64   `gorm:"type:decimal(12,2);default:0" json:"cost_amount"`
+	Currency    string    `gorm:"size:10;default:'CNY'" json:"currency"`
+	RecordedAt  time.Time `json:"recorded_at"`
+	CreatedAt   time.Time `json:"created_at"`
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
-	App       *App       `gorm:"foreignKey:AppID" json:"app,omitempty"`
 }
 
 // TableName 表名
@@ -100,39 +98,6 @@ func (e *BillingUsageEvent) BeforeCreate(tx *gorm.DB) error {
 	}
 	if e.RecordedAt.IsZero() {
 		e.RecordedAt = time.Now()
-	}
-	return nil
-}
-
-// AppUsageStat App 级用量统计
-type AppUsageStat struct {
-	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	WorkspaceID uuid.UUID `gorm:"type:char(36);not null;index" json:"workspace_id"`
-	AppID       uuid.UUID `gorm:"type:char(36);not null;index" json:"app_id"`
-
-	PeriodStart time.Time `gorm:"type:date;not null" json:"period_start"`
-	PeriodEnd   time.Time `gorm:"type:date;not null" json:"period_end"`
-
-	Usage      JSON    `gorm:"type:json" json:"usage"`
-	CostAmount float64 `gorm:"type:decimal(12,2);default:0" json:"cost_amount"`
-	Currency   string  `gorm:"size:10;default:'CNY'" json:"currency"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-
-	App       *App       `gorm:"foreignKey:AppID" json:"app,omitempty"`
-	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
-}
-
-// TableName 表名
-func (AppUsageStat) TableName() string {
-	return "what_reverse_app_usage_stats"
-}
-
-// BeforeCreate 创建前钩子
-func (s *AppUsageStat) BeforeCreate(tx *gorm.DB) error {
-	if s.ID == uuid.Nil {
-		s.ID = uuid.New()
 	}
 	return nil
 }

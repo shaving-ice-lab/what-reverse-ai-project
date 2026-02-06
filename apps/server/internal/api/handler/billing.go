@@ -28,7 +28,6 @@ func NewBillingHandler(billingService service.BillingService) *BillingHandler {
 }
 
 type ConsumeUsageRequest struct {
-	AppID *string            `json:"app_id"`
 	Usage map[string]float64 `json:"usage"`
 }
 
@@ -116,7 +115,6 @@ func (h *BillingHandler) GetWorkspaceQuota(c echo.Context) error {
 		"tokens":     formattedQuota["tokens"],
 		"storage":    formattedQuota["storage"],
 		"bandwidth":  formattedQuota["bandwidth"],
-		"apps":       formattedQuota["apps"],
 		"dimensions": h.billingService.ListDimensions(c.Request().Context()),
 	})
 }
@@ -129,7 +127,6 @@ func formatQuotaForFrontendEntity(quota *entity.WorkspaceQuota, plan *entity.Bil
 			"tokens":    {Used: 0, Limit: 0},
 			"storage":   {Used: 0, Limit: 0},
 			"bandwidth": {Used: 0, Limit: 0},
-			"apps":      {Used: 0, Limit: 0},
 		}
 	}
 
@@ -178,10 +175,6 @@ func formatQuotaForFrontendEntity(quota *entity.WorkspaceQuota, plan *entity.Bil
 		"bandwidth": {
 			Used:  getUsage("bandwidth"),
 			Limit: getLimit("bandwidth"),
-		},
-		"apps": {
-			Used:  getUsage("apps"),
-			Limit: getLimit("apps"),
 		},
 	}
 }
@@ -233,17 +226,7 @@ func (h *BillingHandler) ConsumeUsage(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
 
-	var appID *uuid.UUID
-	if req.AppID != nil && *req.AppID != "" {
-		parsed, err := uuid.Parse(*req.AppID)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "APP_INVALID_ID", "App ID 无效")
-		}
-		appID = &parsed
-	}
-
 	result, err := h.billingService.ConsumeUsage(c.Request().Context(), uid, workspaceID, service.ConsumeUsageRequest{
-		AppID: appID,
 		Usage: req.Usage,
 	})
 	if err != nil {
@@ -254,10 +237,6 @@ func (h *BillingHandler) ConsumeUsage(c echo.Context) error {
 			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
 		case service.ErrBillingInvalidUsage, service.ErrBillingInvalidDimension:
 			return errorResponse(c, http.StatusBadRequest, "INVALID_USAGE", "用量数据无效")
-		case service.ErrBillingAppNotFound:
-			return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-		case service.ErrBillingAppMismatch:
-			return errorResponse(c, http.StatusBadRequest, "APP_MISMATCH", "App 不属于此工作空间")
 		default:
 			return errorResponse(c, http.StatusInternalServerError, "CONSUME_FAILED", "扣减失败")
 		}
@@ -277,8 +256,8 @@ func (h *BillingHandler) ConsumeUsage(c echo.Context) error {
 	})
 }
 
-// GetAppUsageStats 获取 App 用量统计
-func (h *BillingHandler) GetAppUsageStats(c echo.Context) error {
+// GetWorkspaceUsageStats 获取 Workspace 用量统计
+func (h *BillingHandler) GetWorkspaceUsageStats(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 	uid, err := uuid.Parse(userID)
 	if err != nil {
@@ -329,7 +308,7 @@ func (h *BillingHandler) GetAppUsageStats(c echo.Context) error {
 		}
 	}
 
-	stats, err := h.billingService.GetAppUsageStats(c.Request().Context(), uid, workspaceID, periodStart, periodEnd)
+	stats, err := h.billingService.GetWorkspaceUsageStats(c.Request().Context(), uid, workspaceID, periodStart, periodEnd)
 	if err != nil {
 		switch err {
 		case service.ErrWorkspaceNotFound:
@@ -337,76 +316,15 @@ func (h *BillingHandler) GetAppUsageStats(c echo.Context) error {
 		case service.ErrWorkspaceUnauthorized:
 			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
 		default:
-			return errorResponse(c, http.StatusInternalServerError, "GET_FAILED", "获取 App 用量失败")
+			return errorResponse(c, http.StatusInternalServerError, "GET_FAILED", "获取 Workspace 用量失败")
 		}
 	}
-
-	// 格式化返回数据，包含 App 信息
-	formattedStats := formatAppUsageStats(stats)
 
 	return successResponse(c, map[string]interface{}{
 		"period_start": periodStart.Format("2006-01-02"),
 		"period_end":   periodEnd.Format("2006-01-02"),
-		"stats":        formattedStats,
+		"stats":        stats,
 	})
-}
-
-// AppUsageStatResponse 格式化的 App 用量统计响应
-type AppUsageStatResponse struct {
-	ID          string                 `json:"id"`
-	AppID       string                 `json:"app_id"`
-	WorkspaceID string                 `json:"workspace_id"`
-	PeriodStart string                 `json:"period_start"`
-	PeriodEnd   string                 `json:"period_end"`
-	Usage       map[string]interface{} `json:"usage"`
-	CostAmount  float64                `json:"cost_amount"`
-	Currency    string                 `json:"currency"`
-	App         *AppBasicInfo          `json:"app,omitempty"`
-}
-
-// AppBasicInfo App 基础信息
-type AppBasicInfo struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Icon string `json:"icon,omitempty"`
-}
-
-// formatAppUsageStats 格式化 App 用量统计数据
-func formatAppUsageStats(stats []entity.AppUsageStat) []AppUsageStatResponse {
-	result := make([]AppUsageStatResponse, 0, len(stats))
-	for _, stat := range stats {
-		item := AppUsageStatResponse{
-			ID:          stat.ID.String(),
-			AppID:       stat.AppID.String(),
-			WorkspaceID: stat.WorkspaceID.String(),
-			PeriodStart: stat.PeriodStart.Format("2006-01-02"),
-			PeriodEnd:   stat.PeriodEnd.Format("2006-01-02"),
-			Usage:       parseEntityJSONToInterface(stat.Usage),
-			CostAmount:  stat.CostAmount,
-			Currency:    stat.Currency,
-		}
-		if stat.App != nil {
-			item.App = &AppBasicInfo{
-				ID:   stat.App.ID.String(),
-				Name: stat.App.Name,
-				Icon: stat.App.Icon,
-			}
-		}
-		result = append(result, item)
-	}
-	return result
-}
-
-// parseEntityJSONToInterface 解析 entity.JSON 到 map[string]interface{}
-func parseEntityJSONToInterface(data entity.JSON) map[string]interface{} {
-	result := make(map[string]interface{})
-	if data == nil {
-		return result
-	}
-	for key, val := range data {
-		result[key] = val
-	}
-	return result
 }
 
 // GetCostModel 获取成本模型

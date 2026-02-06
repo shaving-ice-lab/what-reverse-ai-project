@@ -144,7 +144,7 @@ func defaultChaosScenarioCatalog() ChaosScenarioCatalog {
 				Title:       "Runtime 延迟抖动",
 				Category:    "latency",
 				Scope:       "runtime execute",
-				Description: "在指定 workspace/app 上注入固定延迟，验证超时与降级策略。",
+				Description: "在指定 workspace 上注入固定延迟，验证超时与降级策略。",
 				Impact:      "公开请求 P95 上升，可能触发超时与重试。",
 				Signals: []string{
 					"agentflow_http_request_duration_seconds",
@@ -171,7 +171,7 @@ func defaultChaosScenarioCatalog() ChaosScenarioCatalog {
 				},
 				SafetyGuards: []string{
 					"最大延迟 500ms，持续时间 <= 10 分钟",
-					"只对指定 workspace/app 生效",
+					"只对指定 workspace 生效",
 				},
 				Owners:     []string{"ops", "runtime"},
 				References: []string{"/api/v1/config/items"},
@@ -369,7 +369,7 @@ func defaultChaosDrillEvaluationTemplate() ChaosDrillEvaluationTemplate {
 				Title: "演练概览",
 				Questions: []string{
 					"演练场景与假设是什么？",
-					"演练范围与影响的 workspace/app？",
+					"演练范围与影响的 workspace？",
 					"成功标准是否达成？",
 				},
 			},

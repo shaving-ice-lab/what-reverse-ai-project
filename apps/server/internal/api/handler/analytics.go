@@ -201,15 +201,6 @@ func (h *AnalyticsHandler) ListMetrics(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_END", "end 参数无效")
 	}
 	orderDesc := strings.ToLower(strings.TrimSpace(c.QueryParam("order"))) == "desc"
-
-	var appID *uuid.UUID
-	if raw := strings.TrimSpace(c.QueryParam("app_id")); raw != "" {
-		parsed, err := uuid.Parse(raw)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_APP_ID", "App ID 无效")
-		}
-		appID = &parsed
-	}
 	names := splitCommaList(c.QueryParam("names"))
 
 	metrics, total, err := h.analyticsService.ListMetrics(c.Request().Context(), uid, workspaceID, service.AnalyticsMetricListParams{
@@ -219,7 +210,6 @@ func (h *AnalyticsHandler) ListMetrics(c echo.Context) error {
 		PageSize:  pageSize,
 		OrderDesc: orderDesc,
 		Names:     names,
-		AppID:     appID,
 	})
 	if err != nil {
 		switch err {

@@ -171,53 +171,6 @@ func (r *billingUsageEventRepository) SumCostByWorkspace(ctx context.Context, wo
 	return total, nil
 }
 
-// AppUsageStatRepository App 用量统计仓储接口
-type AppUsageStatRepository interface {
-	GetByWorkspaceAndPeriod(ctx context.Context, workspaceID uuid.UUID, periodStart, periodEnd time.Time) ([]entity.AppUsageStat, error)
-	GetByWorkspaceAppPeriod(ctx context.Context, workspaceID, appID uuid.UUID, periodStart, periodEnd time.Time) (*entity.AppUsageStat, error)
-	Create(ctx context.Context, stat *entity.AppUsageStat) error
-	Update(ctx context.Context, stat *entity.AppUsageStat) error
-}
-
-type appUsageStatRepository struct {
-	db *gorm.DB
-}
-
-// NewAppUsageStatRepository 创建 App 用量统计仓储实例
-func NewAppUsageStatRepository(db *gorm.DB) AppUsageStatRepository {
-	return &appUsageStatRepository{db: db}
-}
-
-func (r *appUsageStatRepository) GetByWorkspaceAndPeriod(ctx context.Context, workspaceID uuid.UUID, periodStart, periodEnd time.Time) ([]entity.AppUsageStat, error) {
-	var stats []entity.AppUsageStat
-	if err := r.db.WithContext(ctx).
-		Preload("App").
-		Where("workspace_id = ? AND period_start = ? AND period_end = ?", workspaceID, periodStart, periodEnd).
-		Order("cost_amount desc").
-		Find(&stats).Error; err != nil {
-		return nil, err
-	}
-	return stats, nil
-}
-
-func (r *appUsageStatRepository) GetByWorkspaceAppPeriod(ctx context.Context, workspaceID, appID uuid.UUID, periodStart, periodEnd time.Time) (*entity.AppUsageStat, error) {
-	var stat entity.AppUsageStat
-	if err := r.db.WithContext(ctx).
-		Where("workspace_id = ? AND app_id = ? AND period_start = ? AND period_end = ?", workspaceID, appID, periodStart, periodEnd).
-		First(&stat).Error; err != nil {
-		return nil, err
-	}
-	return &stat, nil
-}
-
-func (r *appUsageStatRepository) Create(ctx context.Context, stat *entity.AppUsageStat) error {
-	return r.db.WithContext(ctx).Create(stat).Error
-}
-
-func (r *appUsageStatRepository) Update(ctx context.Context, stat *entity.AppUsageStat) error {
-	return r.db.WithContext(ctx).Save(stat).Error
-}
-
 // BillingInvoicePaymentRepository 账单支付状态仓储接口
 type BillingInvoicePaymentRepository interface {
 	GetByInvoiceID(ctx context.Context, invoiceID uuid.UUID) (*entity.BillingInvoicePayment, error)

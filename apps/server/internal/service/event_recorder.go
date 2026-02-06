@@ -24,9 +24,9 @@ type EventRecorderService interface {
 	// 便捷记录方法
 	RecordExecutionEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID, workflowID, workspaceID uuid.UUID, message string, metadata entity.JSON) error
 	RecordNodeEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID uuid.UUID, nodeID, nodeType string, durationMs int64, err error) error
-	RecordAppEvent(ctx context.Context, eventType entity.RuntimeEventType, appID, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error
+	RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error
 	RecordDBEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, durationMs int64, err error) error
-	RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, appID uuid.UUID, domain string, durationMs int64, err error) error
+	RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, domain string, durationMs int64, err error) error
 	RecordLLMEvent(ctx context.Context, eventType entity.RuntimeEventType, provider, model string, durationMs, promptTokens, completionTokens int64, err error) error
 	RecordSecurityEvent(ctx context.Context, eventType entity.RuntimeEventType, remoteIP, userAgent, reason string) error
 	RecordSystemEvent(ctx context.Context, eventType entity.RuntimeEventType, message string, err error) error
@@ -321,9 +321,8 @@ func (s *eventRecorderService) RecordNodeEvent(ctx context.Context, eventType en
 	return s.Record(ctx, builder.Build())
 }
 
-func (s *eventRecorderService) RecordAppEvent(ctx context.Context, eventType entity.RuntimeEventType, appID, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error {
+func (s *eventRecorderService) RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error {
 	builder := entity.NewRuntimeEvent(eventType).
-		WithApp(appID).
 		WithWorkspace(workspaceID).
 		WithMessage(message)
 
@@ -351,9 +350,9 @@ func (s *eventRecorderService) RecordDBEvent(ctx context.Context, eventType enti
 	return s.Record(ctx, builder.Build())
 }
 
-func (s *eventRecorderService) RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, appID uuid.UUID, domain string, durationMs int64, err error) error {
+func (s *eventRecorderService) RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, domain string, durationMs int64, err error) error {
 	builder := entity.NewRuntimeEvent(eventType).
-		WithApp(appID).
+		WithWorkspace(workspaceID).
 		WithDuration(durationMs).
 		WithMetadata("domain", domain)
 
@@ -452,11 +451,6 @@ func enrichEventWithTraceContext(event *entity.RuntimeEvent, tc *observability.T
 	if tc.WorkspaceID != "" && event.WorkspaceID == nil {
 		if id, err := uuid.Parse(tc.WorkspaceID); err == nil {
 			event.WorkspaceID = &id
-		}
-	}
-	if tc.AppID != "" && event.AppID == nil {
-		if id, err := uuid.Parse(tc.AppID); err == nil {
-			event.AppID = &id
 		}
 	}
 	if tc.ExecutionID != "" && event.ExecutionID == nil {

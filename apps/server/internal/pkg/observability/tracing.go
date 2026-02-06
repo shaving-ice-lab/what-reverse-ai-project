@@ -192,7 +192,6 @@ func SpanFromContext(ctx context.Context) trace.Span {
 // 标准 Span 属性键
 const (
 	AttrWorkspaceID  = "workspace.id"
-	AttrAppID        = "app.id"
 	AttrExecutionID  = "execution.id"
 	AttrUserID       = "user.id"
 	AttrNodeID       = "node.id"
@@ -211,9 +210,6 @@ func SetSpanAttributes(span trace.Span, tc *TraceContext) {
 	attrs := make([]attribute.KeyValue, 0, 8)
 	if tc.WorkspaceID != "" {
 		attrs = append(attrs, attribute.String(AttrWorkspaceID, tc.WorkspaceID))
-	}
-	if tc.AppID != "" {
-		attrs = append(attrs, attribute.String(AttrAppID, tc.AppID))
 	}
 	if tc.ExecutionID != "" {
 		attrs = append(attrs, attribute.String(AttrExecutionID, tc.ExecutionID))

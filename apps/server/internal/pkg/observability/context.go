@@ -19,8 +19,6 @@ const (
 	ParentSpanIDKey ContextKey = "parent_span_id"
 	// WorkspaceIDKey 工作空间 ID 键
 	WorkspaceIDKey ContextKey = "workspace_id"
-	// AppIDKey 应用 ID 键
-	AppIDKey ContextKey = "app_id"
 	// ExecutionIDKey 执行 ID 键
 	ExecutionIDKey ContextKey = "execution_id"
 	// UserIDKey 用户 ID 键
@@ -41,8 +39,6 @@ type TraceContext struct {
 	ParentSpanID string `json:"parent_span_id,omitempty"`
 	// WorkspaceID 工作空间 ID
 	WorkspaceID string `json:"workspace_id,omitempty"`
-	// AppID 应用 ID
-	AppID string `json:"app_id,omitempty"`
 	// ExecutionID 工作流执行 ID
 	ExecutionID string `json:"execution_id,omitempty"`
 	// UserID 用户 ID
@@ -68,7 +64,6 @@ func (tc *TraceContext) NewChildSpan() *TraceContext {
 		SpanID:       generateSpanID(),
 		ParentSpanID: tc.SpanID,
 		WorkspaceID:  tc.WorkspaceID,
-		AppID:        tc.AppID,
 		ExecutionID:  tc.ExecutionID,
 		UserID:       tc.UserID,
 		RequestID:    tc.RequestID,
@@ -79,12 +74,6 @@ func (tc *TraceContext) NewChildSpan() *TraceContext {
 // WithWorkspace 设置工作空间 ID
 func (tc *TraceContext) WithWorkspace(workspaceID string) *TraceContext {
 	tc.WorkspaceID = workspaceID
-	return tc
-}
-
-// WithApp 设置应用 ID
-func (tc *TraceContext) WithApp(appID string) *TraceContext {
-	tc.AppID = appID
 	return tc
 }
 
@@ -127,9 +116,6 @@ func (tc *TraceContext) ToMap() map[string]interface{} {
 	if tc.WorkspaceID != "" {
 		m[string(WorkspaceIDKey)] = tc.WorkspaceID
 	}
-	if tc.AppID != "" {
-		m[string(AppIDKey)] = tc.AppID
-	}
 	if tc.ExecutionID != "" {
 		m[string(ExecutionIDKey)] = tc.ExecutionID
 	}
@@ -160,9 +146,6 @@ func (tc *TraceContext) ToKeyValues() []interface{} {
 	if tc.WorkspaceID != "" {
 		kv = append(kv, string(WorkspaceIDKey), tc.WorkspaceID)
 	}
-	if tc.AppID != "" {
-		kv = append(kv, string(AppIDKey), tc.AppID)
-	}
 	if tc.ExecutionID != "" {
 		kv = append(kv, string(ExecutionIDKey), tc.ExecutionID)
 	}
@@ -187,7 +170,6 @@ func ContextWithTraceContext(ctx context.Context, tc *TraceContext) context.Cont
 	ctx = context.WithValue(ctx, SpanIDKey, tc.SpanID)
 	ctx = context.WithValue(ctx, ParentSpanIDKey, tc.ParentSpanID)
 	ctx = context.WithValue(ctx, WorkspaceIDKey, tc.WorkspaceID)
-	ctx = context.WithValue(ctx, AppIDKey, tc.AppID)
 	ctx = context.WithValue(ctx, ExecutionIDKey, tc.ExecutionID)
 	ctx = context.WithValue(ctx, UserIDKey, tc.UserID)
 	ctx = context.WithValue(ctx, RequestIDKey, tc.RequestID)
@@ -221,11 +203,6 @@ func TraceContextFromContext(ctx context.Context) *TraceContext {
 	if v := ctx.Value(WorkspaceIDKey); v != nil {
 		if s, ok := v.(string); ok {
 			tc.WorkspaceID = s
-		}
-	}
-	if v := ctx.Value(AppIDKey); v != nil {
-		if s, ok := v.(string); ok {
-			tc.AppID = s
 		}
 	}
 	if v := ctx.Value(ExecutionIDKey); v != nil {
@@ -289,7 +266,6 @@ type LogFields struct {
 
 	// 业务上下文字段
 	WorkspaceID string `json:"workspace_id,omitempty"`
-	AppID       string `json:"app_id,omitempty"`
 	ExecutionID string `json:"execution_id,omitempty"`
 	UserID      string `json:"user_id,omitempty"`
 	RequestID   string `json:"request_id,omitempty"`

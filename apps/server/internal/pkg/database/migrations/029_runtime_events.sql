@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS runtime_events (
     
     -- 业务上下文
     workspace_id UUID,
-    app_id UUID,
     execution_id UUID,
     user_id UUID,
     session_id UUID,
@@ -55,7 +54,6 @@ CREATE TABLE IF NOT EXISTS runtime_events (
 CREATE INDEX IF NOT EXISTS idx_runtime_events_type ON runtime_events(type);
 CREATE INDEX IF NOT EXISTS idx_runtime_events_trace_id ON runtime_events(trace_id);
 CREATE INDEX IF NOT EXISTS idx_runtime_events_workspace_id ON runtime_events(workspace_id);
-CREATE INDEX IF NOT EXISTS idx_runtime_events_app_id ON runtime_events(app_id);
 CREATE INDEX IF NOT EXISTS idx_runtime_events_execution_id ON runtime_events(execution_id);
 CREATE INDEX IF NOT EXISTS idx_runtime_events_user_id ON runtime_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_runtime_events_session_id ON runtime_events(session_id);

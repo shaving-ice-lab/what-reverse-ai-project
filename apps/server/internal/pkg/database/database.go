@@ -80,20 +80,18 @@ func Migrate(db *gorm.DB) error {
 		&entity.UserFollow{},
 		&entity.UserSession{},
 		&entity.Workspace{},
+		&entity.WorkspaceVersion{},
+		&entity.WorkspaceDomain{},
+		&entity.WorkspaceSession{},
+		&entity.WorkspaceEvent{},
+		&entity.WorkspaceRating{},
+		&entity.WorkspaceSlugAlias{},
 		&entity.WorkspaceRole{},
 		&entity.WorkspaceMember{},
 		&entity.WorkspaceDatabase{},
 		&entity.WorkspaceDBRole{},
 		&entity.WorkspaceDBSchemaMigration{},
 		&entity.IdempotencyKey{},
-
-		// App 相关
-		&entity.App{},
-		&entity.AppVersion{},
-		&entity.AppAccessPolicy{},
-		&entity.AppDomain{},
-		&entity.AppSession{},
-		&entity.AppEvent{},
 
 		// Webhook 相关
 		&entity.WebhookEndpoint{},

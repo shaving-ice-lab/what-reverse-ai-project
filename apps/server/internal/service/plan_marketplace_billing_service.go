@@ -171,7 +171,7 @@ func defaultMarketplaceBillingPlan() MarketplaceBillingPlan {
 			ReferenceAPIs: []string{
 				"POST /api/v1/agents (pricing_type/price)",
 				"PUT /api/v1/agents/:id (pricing_type/price)",
-				"GET /api/v1/marketplace/apps",
+				"GET /api/v1/marketplace/workspaces",
 			},
 			Notes: []string{
 				"pricing_type/price 字段用于 Marketplace 展示与结算口径。",

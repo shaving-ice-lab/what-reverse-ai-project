@@ -100,7 +100,7 @@ func defaultRunbookPlan() RunbookPlan {
 					{
 						Phase: "定位与隔离",
 						Actions: []string{
-							"定位最近变更的 workflow/app 版本（GET /api/v1/apps/:id）",
+							"定位最近变更的 workflow/workspace 版本（GET /api/v1/workspaces/:id）",
 							"检查队列积压与执行超时（GET /api/v1/dashboard/running-queue）",
 							"对异常执行进行取消或暂停（POST /api/v1/executions/:id/cancel）",
 						},
@@ -112,9 +112,9 @@ func defaultRunbookPlan() RunbookPlan {
 						Phase: "缓解与回滚",
 						Actions: []string{
 							"启用降级或限流策略，减少高风险流量",
-							"回滚高风险发布版本（POST /api/v1/apps/:id/rollback）",
-							"如涉及 DB Schema 变更，生成 Schema 回退版本（POST /api/v1/apps/:id/db-schema/rollback）",
-							"发布 Schema 回退版本（POST /api/v1/apps/:id/publish）",
+							"回滚高风险发布版本（POST /api/v1/workspaces/:id/rollback）",
+							"如涉及 DB Schema 变更，生成 Schema 回退版本（POST /api/v1/workspaces/:id/db-schema/rollback）",
+							"发布 Schema 回退版本（POST /api/v1/workspaces/:id/publish）",
 							"必要时临时关闭非关键入口",
 						},
 						Expected: []string{
@@ -147,9 +147,9 @@ func defaultRunbookPlan() RunbookPlan {
 					"/api/v1/dashboard/errors",
 					"/api/v1/executions",
 					"/api/v1/executions/:id/cancel",
-					"/api/v1/apps/:id/rollback",
-					"/api/v1/apps/:id/db-schema/rollback",
-					"/api/v1/apps/:id/publish",
+					"/api/v1/workspaces/:id/rollback",
+					"/api/v1/workspaces/:id/db-schema/rollback",
+					"/api/v1/workspaces/:id/publish",
 				},
 			},
 			{
@@ -223,15 +223,15 @@ func defaultRunbookPlan() RunbookPlan {
 					"域名状态持续为 pending/blocked",
 				},
 				Preconditions: []string{
-					"确认 app_id 与 domain_id",
+					"确认 workspace_id 与 domain_id",
 					"确认 DNS 记录已更新",
 				},
 				Steps: []RunbookStep{
 					{
 						Phase: "验证与记录核查",
 						Actions: []string{
-							"获取域名详情与验证信息（GET /api/v1/apps/:id/domains）",
-							"使用验证接口重新验证（POST /api/v1/apps/:id/domains/:domainId/verify）",
+							"获取域名详情与验证信息（GET /api/v1/workspaces/:id/domains）",
+							"使用验证接口重新验证（POST /api/v1/workspaces/:id/domains/:domainId/verify）",
 							"确认 DNS 记录和 CNAME 指向正确",
 						},
 						Expected: []string{
@@ -241,12 +241,12 @@ func defaultRunbookPlan() RunbookPlan {
 					{
 						Phase: "证书签发与激活",
 						Actions: []string{
-							"重新签发证书（POST /api/v1/apps/:id/domains/:domainId/cert/issue）",
-							"证书续期（POST /api/v1/apps/:id/domains/:domainId/cert/renew）",
-							"激活证书（POST /api/v1/apps/:id/domains/:domainId/activate）",
+							"重新签发证书（POST /api/v1/workspaces/:id/domains/:domainId/cert/issue）",
+							"证书续期（POST /api/v1/workspaces/:id/domains/:domainId/cert/renew）",
+							"激活证书（POST /api/v1/workspaces/:id/domains/:domainId/activate）",
 						},
 						Rollback: []string{
-							"证书不可用时执行回滚（POST /api/v1/apps/:id/domains/:domainId/rollback）",
+							"证书不可用时执行回滚（POST /api/v1/workspaces/:id/domains/:domainId/rollback）",
 						},
 					},
 					{
@@ -266,12 +266,12 @@ func defaultRunbookPlan() RunbookPlan {
 					"证书持续签发失败升级至平台基础设施团队",
 				},
 				References: []string{
-					"/api/v1/apps/:id/domains",
-					"/api/v1/apps/:id/domains/:domainId/verify",
-					"/api/v1/apps/:id/domains/:domainId/cert/issue",
-					"/api/v1/apps/:id/domains/:domainId/cert/renew",
-					"/api/v1/apps/:id/domains/:domainId/activate",
-					"/api/v1/apps/:id/domains/:domainId/rollback",
+					"/api/v1/workspaces/:id/domains",
+					"/api/v1/workspaces/:id/domains/:domainId/verify",
+					"/api/v1/workspaces/:id/domains/:domainId/cert/issue",
+					"/api/v1/workspaces/:id/domains/:domainId/cert/renew",
+					"/api/v1/workspaces/:id/domains/:domainId/activate",
+					"/api/v1/workspaces/:id/domains/:domainId/rollback",
 				},
 			},
 		},

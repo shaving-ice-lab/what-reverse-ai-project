@@ -36,7 +36,6 @@ type SupportSLA struct {
 // CreateSupportTicketInput 创建工单入参
 type CreateSupportTicketInput struct {
 	WorkspaceID     *uuid.UUID
-	AppID           *uuid.UUID
 	RequesterUserID *uuid.UUID
 	RequesterName   string
 	RequesterEmail  string
@@ -55,7 +54,6 @@ type SupportTicketListParams struct {
 	Category    string
 	Search      string
 	WorkspaceID *uuid.UUID
-	AppID       *uuid.UUID
 	Page        int
 	PageSize    int
 }
@@ -77,14 +75,14 @@ type SupportTicketService interface {
 }
 
 type supportTicketService struct {
-	repo repository.SupportTicketRepository
-	ruleRepo repository.SupportAssignmentRuleRepository
-	channelRepo repository.SupportChannelRepository
-	routingService SupportRoutingService
+	repo                repository.SupportTicketRepository
+	ruleRepo            repository.SupportAssignmentRuleRepository
+	channelRepo         repository.SupportChannelRepository
+	routingService      SupportRoutingService
 	notificationService NotificationService
 	templateService     SupportNotificationTemplateService
-	sla  SupportSLA
-	now  func() time.Time
+	sla                 SupportSLA
+	now                 func() time.Time
 }
 
 // ErrSupportTicketInvalid 工单参数错误
@@ -142,7 +140,6 @@ func (s *supportTicketService) CreateTicket(ctx context.Context, input CreateSup
 		ID:              ticketID,
 		Reference:       generateSupportTicketReference(now, ticketID),
 		WorkspaceID:     input.WorkspaceID,
-		AppID:           input.AppID,
 		RequesterUserID: input.RequesterUserID,
 		RequesterName:   strings.TrimSpace(input.RequesterName),
 		RequesterEmail:  requesterEmail,
@@ -232,7 +229,6 @@ func (s *supportTicketService) ListTickets(ctx context.Context, params SupportTi
 		Category:    category,
 		Search:      search,
 		WorkspaceID: params.WorkspaceID,
-		AppID:       params.AppID,
 		Page:        params.Page,
 		PageSize:    params.PageSize,
 	}
@@ -737,7 +733,7 @@ func defaultSupportSLA() SupportSLA {
 		},
 		Notes: []string{
 			"响应 SLA 以首次响应为准，处理进度将按优先级更新。",
-			"若提供 workspace/app 信息与日志截图，可显著缩短排查时间。",
+			"若提供 workspace 信息与日志截图，可显著缩短排查时间。",
 		},
 	}
 }

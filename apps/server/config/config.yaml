@@ -69,7 +69,7 @@ encryption:
 
 features:
   workspace_enabled: true
-  app_runtime_enabled: true
+  workspace_runtime_enabled: true
   domain_enabled: true
 
 domain_routing:

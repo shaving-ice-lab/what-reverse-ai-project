@@ -9,39 +9,40 @@ import (
 
 // Conversation 对话实体
 type Conversation struct {
-	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"user_id"`
+	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID      uuid.UUID `gorm:"type:char(36);not null;index" json:"user_id"`
+	WorkspaceID uuid.UUID `gorm:"type:char(36);not null;index" json:"workspace_id"`
 
 	// 基础信息
-	Title     string         `gorm:"size:500;not null" json:"title"`
-	Preview   string         `gorm:"size:500" json:"preview"` // 最后一条消息预览
+	Title   string `gorm:"size:500;not null" json:"title"`
+	Preview string `gorm:"size:500" json:"preview"` // 最后一条消息预览
 
 	// AI 模型配置
-	Model        string         `gorm:"size:50;default:'gpt-4'" json:"model"`
-	SystemPrompt *string        `gorm:"type:text" json:"system_prompt"`
-	
+	Model        string  `gorm:"size:50;default:'gpt-4'" json:"model"`
+	SystemPrompt *string `gorm:"type:text" json:"system_prompt"`
+
 	// AI 参数设置
-	Temperature  *float64       `gorm:"type:decimal(3,2)" json:"temperature"`  // 0.0-2.0，默认 1.0
-	MaxTokens    *int           `json:"max_tokens"`                            // 最大生成 token 数
-	TopP         *float64       `gorm:"type:decimal(3,2)" json:"top_p"`        // 0.0-1.0
-	TopK         *int           `json:"top_k"`                                 // Top-K 采样
-	FrequencyPenalty *float64   `gorm:"type:decimal(3,2)" json:"frequency_penalty"` // -2.0-2.0
-	PresencePenalty  *float64   `gorm:"type:decimal(3,2)" json:"presence_penalty"`  // -2.0-2.0
+	Temperature      *float64 `gorm:"type:decimal(3,2)" json:"temperature"`       // 0.0-2.0，默认 1.0
+	MaxTokens        *int     `json:"max_tokens"`                                 // 最大生成 token 数
+	TopP             *float64 `gorm:"type:decimal(3,2)" json:"top_p"`             // 0.0-1.0
+	TopK             *int     `json:"top_k"`                                      // Top-K 采样
+	FrequencyPenalty *float64 `gorm:"type:decimal(3,2)" json:"frequency_penalty"` // -2.0-2.0
+	PresencePenalty  *float64 `gorm:"type:decimal(3,2)" json:"presence_penalty"`  // -2.0-2.0
 
 	// 状态标记
-	Starred   bool           `gorm:"default:false;index" json:"starred"`
-	Pinned    bool           `gorm:"default:false;index" json:"pinned"`
-	Archived  bool           `gorm:"default:false;index" json:"archived"`
+	Starred  bool `gorm:"default:false;index" json:"starred"`
+	Pinned   bool `gorm:"default:false;index" json:"pinned"`
+	Archived bool `gorm:"default:false;index" json:"archived"`
 
 	// 统计信息
-	MessageCount int         `gorm:"default:0" json:"message_count"`
-	TokenUsage   int         `gorm:"default:0" json:"token_usage"`
+	MessageCount int `gorm:"default:0" json:"message_count"`
+	TokenUsage   int `gorm:"default:0" json:"token_usage"`
 
 	// 文件夹
-	FolderID  *uuid.UUID     `gorm:"type:char(36);index" json:"folder_id"`
+	FolderID *uuid.UUID `gorm:"type:char(36);index" json:"folder_id"`
 
 	// 元数据 (JSON)
-	Metadata  JSON           `gorm:"type:json" json:"metadata"`
+	Metadata JSON `gorm:"type:json" json:"metadata"`
 
 	// 时间戳
 	CreatedAt time.Time      `json:"created_at"`
@@ -50,6 +51,7 @@ type Conversation struct {
 
 	// 关联
 	User      *User               `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Workspace *Workspace          `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 	Folder    *ConversationFolder `gorm:"foreignKey:FolderID" json:"folder,omitempty"`
 	Messages  []Message           `gorm:"foreignKey:ConversationID" json:"messages,omitempty"`
 	Tags      []ConversationTag   `gorm:"foreignKey:ConversationID" json:"tags,omitempty"`
@@ -86,10 +88,10 @@ type ConversationFolder struct {
 	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// 关联
-	User          *User                 `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	Parent        *ConversationFolder   `gorm:"foreignKey:ParentID" json:"parent,omitempty"`
-	Children      []ConversationFolder  `gorm:"foreignKey:ParentID" json:"children,omitempty"`
-	Conversations []Conversation        `gorm:"foreignKey:FolderID" json:"conversations,omitempty"`
+	User          *User                `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Parent        *ConversationFolder  `gorm:"foreignKey:ParentID" json:"parent,omitempty"`
+	Children      []ConversationFolder `gorm:"foreignKey:ParentID" json:"children,omitempty"`
+	Conversations []Conversation       `gorm:"foreignKey:FolderID" json:"conversations,omitempty"`
 }
 
 // TableName 表名

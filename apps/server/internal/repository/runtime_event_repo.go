@@ -244,9 +244,6 @@ func applyEventFilter(query *gorm.DB, filter entity.RuntimeEventFilter) *gorm.DB
 	if filter.WorkspaceID != nil {
 		query = query.Where("workspace_id = ?", filter.WorkspaceID)
 	}
-	if filter.AppID != nil {
-		query = query.Where("app_id = ?", filter.AppID)
-	}
 	if filter.ExecutionID != nil {
 		query = query.Where("execution_id = ?", filter.ExecutionID)
 	}

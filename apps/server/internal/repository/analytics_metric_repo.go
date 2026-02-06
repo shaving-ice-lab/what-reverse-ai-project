@@ -12,7 +12,6 @@ import (
 // AnalyticsMetricFilter 指标查询过滤器
 type AnalyticsMetricFilter struct {
 	WorkspaceID uuid.UUID
-	AppID       *uuid.UUID
 	Names       []string
 	StartTime   *time.Time
 	EndTime     *time.Time
@@ -82,9 +81,6 @@ func (r *analyticsMetricRepository) List(ctx context.Context, filter AnalyticsMe
 func applyMetricFilter(query *gorm.DB, filter AnalyticsMetricFilter) *gorm.DB {
 	if filter.WorkspaceID != uuid.Nil {
 		query = query.Where("workspace_id = ?", filter.WorkspaceID)
-	}
-	if filter.AppID != nil {
-		query = query.Where("app_id = ?", filter.AppID)
 	}
 	if len(filter.Names) > 0 {
 		query = query.Where("name IN ?", filter.Names)

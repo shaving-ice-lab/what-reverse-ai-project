@@ -123,7 +123,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Name:      "total",
 				Help:      "Total number of workflow executions",
 			},
-			[]string{"workspace_id", "app_id", "status", "trigger_type"},
+			[]string{"workspace_id", "status", "trigger_type"},
 		),
 		ExecutionDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
@@ -133,7 +133,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Help:      "Workflow execution duration in seconds",
 				Buckets:   []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300},
 			},
-			[]string{"workspace_id", "app_id", "status"},
+			[]string{"workspace_id", "status"},
 		),
 		ExecutionSuccessRate: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -142,7 +142,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Name:      "success_rate",
 				Help:      "Workflow execution success rate (0-1)",
 			},
-			[]string{"workspace_id", "app_id"},
+			[]string{"workspace_id"},
 		),
 		ExecutionsInProgress: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -301,7 +301,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Name:      "requests_total",
 				Help:      "Total number of runtime (public app) requests",
 			},
-			[]string{"workspace_id", "app_id", "status"},
+			[]string{"workspace_id", "status"},
 		),
 		RuntimeRequestDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
@@ -311,7 +311,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Help:      "Runtime request duration in seconds",
 				Buckets:   []float64{.1, .5, 1, 2.5, 5, 10, 30, 60},
 			},
-			[]string{"workspace_id", "app_id"},
+			[]string{"workspace_id"},
 		),
 		SessionsActive: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -320,7 +320,7 @@ func NewMetricsCollector() *MetricsCollector {
 				Name:      "sessions_active",
 				Help:      "Number of active runtime sessions",
 			},
-			[]string{"workspace_id", "app_id"},
+			[]string{"workspace_id"},
 		),
 
 		// ===== WebSocket 指标 =====
@@ -382,9 +382,9 @@ func (m *MetricsCollector) RecordHTTPRequest(method, path string, statusCode int
 }
 
 // RecordExecution 记录工作流执行指标
-func (m *MetricsCollector) RecordExecution(workspaceID, appID, status, triggerType string, durationSeconds float64) {
-	m.ExecutionTotal.WithLabelValues(workspaceID, appID, status, triggerType).Inc()
-	m.ExecutionDuration.WithLabelValues(workspaceID, appID, status).Observe(durationSeconds)
+func (m *MetricsCollector) RecordExecution(workspaceID, status, triggerType string, durationSeconds float64) {
+	m.ExecutionTotal.WithLabelValues(workspaceID, status, triggerType).Inc()
+	m.ExecutionDuration.WithLabelValues(workspaceID, status).Observe(durationSeconds)
 }
 
 // RecordNodeExecution 记录节点执行指标
@@ -409,9 +409,9 @@ func (m *MetricsCollector) RecordLLMRequest(provider, model, status string, dura
 }
 
 // RecordRuntimeRequest 记录运行时请求指标
-func (m *MetricsCollector) RecordRuntimeRequest(workspaceID, appID, status string, durationSeconds float64) {
-	m.RuntimeRequestsTotal.WithLabelValues(workspaceID, appID, status).Inc()
-	m.RuntimeRequestDuration.WithLabelValues(workspaceID, appID).Observe(durationSeconds)
+func (m *MetricsCollector) RecordRuntimeRequest(workspaceID, status string, durationSeconds float64) {
+	m.RuntimeRequestsTotal.WithLabelValues(workspaceID, status).Inc()
+	m.RuntimeRequestDuration.WithLabelValues(workspaceID).Observe(durationSeconds)
 }
 
 // statusCodeToLabel 将状态码转换为标签
@@ -449,9 +449,9 @@ func GetMetricsDictionary() []MetricsDimension {
 		{Name: "agentflow_http_requests_in_flight", Description: "正在处理的 HTTP 请求数", Type: "gauge", Labels: []string{}},
 
 		// Execution
-		{Name: "agentflow_execution_total", Description: "工作流执行总数", Type: "counter", Labels: []string{"workspace_id", "app_id", "status", "trigger_type"}},
-		{Name: "agentflow_execution_duration_seconds", Description: "工作流执行耗时", Type: "histogram", Labels: []string{"workspace_id", "app_id", "status"}, Unit: "seconds", Buckets: []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300}},
-		{Name: "agentflow_execution_success_rate", Description: "工作流执行成功率", Type: "gauge", Labels: []string{"workspace_id", "app_id"}},
+		{Name: "agentflow_execution_total", Description: "工作流执行总数", Type: "counter", Labels: []string{"workspace_id", "status", "trigger_type"}},
+		{Name: "agentflow_execution_duration_seconds", Description: "工作流执行耗时", Type: "histogram", Labels: []string{"workspace_id", "status"}, Unit: "seconds", Buckets: []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300}},
+		{Name: "agentflow_execution_success_rate", Description: "工作流执行成功率", Type: "gauge", Labels: []string{"workspace_id"}},
 		{Name: "agentflow_execution_in_progress", Description: "正在执行的工作流数", Type: "gauge", Labels: []string{"workspace_id"}},
 
 		// Node
@@ -469,9 +469,9 @@ func GetMetricsDictionary() []MetricsDimension {
 		{Name: "agentflow_llm_tokens_used_total", Description: "LLM Token 使用量", Type: "counter", Labels: []string{"provider", "model", "token_type"}},
 
 		// Runtime
-		{Name: "agentflow_runtime_requests_total", Description: "运行时请求总数", Type: "counter", Labels: []string{"workspace_id", "app_id", "status"}},
-		{Name: "agentflow_runtime_request_duration_seconds", Description: "运行时请求耗时", Type: "histogram", Labels: []string{"workspace_id", "app_id"}, Unit: "seconds"},
-		{Name: "agentflow_runtime_sessions_active", Description: "活跃会话数", Type: "gauge", Labels: []string{"workspace_id", "app_id"}},
+		{Name: "agentflow_runtime_requests_total", Description: "运行时请求总数", Type: "counter", Labels: []string{"workspace_id", "status"}},
+		{Name: "agentflow_runtime_request_duration_seconds", Description: "运行时请求耗时", Type: "histogram", Labels: []string{"workspace_id"}, Unit: "seconds"},
+		{Name: "agentflow_runtime_sessions_active", Description: "活跃会话数", Type: "gauge", Labels: []string{"workspace_id"}},
 
 		// Domain
 		{Name: "agentflow_domain_verify_total", Description: "域名验证总数", Type: "counter", Labels: []string{"status"}},

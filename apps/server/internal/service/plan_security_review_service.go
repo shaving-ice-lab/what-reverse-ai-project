@@ -185,10 +185,9 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 	return SecurityThreatModel{
 		Key:     "security_threat_model",
 		Title:   "安全威胁模型（STRIDE）",
-		Summary: "覆盖 Workspace/App/Runtime/Domain/Webhook/DB 等核心入口的威胁清单。",
+		Summary: "覆盖 Workspace/Runtime/Domain/Webhook/DB 等核心入口的威胁清单。",
 		Scope: []string{
 			"workspace",
-			"app",
 			"runtime",
 			"domain",
 			"webhook",
@@ -204,8 +203,8 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Description:    "workspace 信息、成员、权限与配置。",
 			},
 			{
-				Key:            "app_configs",
-				Name:           "App 配置与访问策略",
+				Key:            "workspace_configs",
+				Name:           "Workspace 配置与访问策略",
 				Classification: "P1",
 				Owner:          "backend",
 				Description:    "workflow 配置、access policy 与版本信息。",
@@ -244,7 +243,7 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Key:  "public_runtime",
 				Name: "Runtime 公网入口",
 				EntryPoints: []string{
-					"POST /runtime/{workspaceSlug}/{appSlug}",
+					"POST /runtime/{workspaceSlug}",
 					"POST /api/v1/runtime/execute",
 				},
 				Controls: []string{
@@ -258,7 +257,6 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Name: "管理 API",
 				EntryPoints: []string{
 					"/api/v1/workspaces",
-					"/api/v1/apps",
 					"/api/v1/secrets",
 				},
 				Controls: []string{
@@ -351,7 +349,7 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Title:       "运行时请求身份伪造",
 				STRIDE:      "spoofing",
 				Description: "攻击者利用泄露的 API key 或 session_id 访问 runtime。",
-				Assets:      []string{"runtime_executions", "app_configs"},
+				Assets:      []string{"runtime_executions", "workspace_configs"},
 				EntryPoints: []string{"public_runtime"},
 				Controls: []string{
 					"JWT/API key",
@@ -391,8 +389,8 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Key:         "config_tampering",
 				Title:       "配置越权修改",
 				STRIDE:      "tampering",
-				Description: "低权限成员修改 App/Workspace 关键配置。",
-				Assets:      []string{"workspace_data", "app_configs"},
+				Description: "低权限成员修改 Workspace 关键配置。",
+				Assets:      []string{"workspace_data", "workspace_configs"},
 				EntryPoints: []string{"management_api"},
 				Controls: []string{
 					"workspace permissions",
@@ -468,7 +466,7 @@ func defaultSecurityThreatModel() SecurityThreatModel {
 				Title:       "权限提升",
 				STRIDE:      "elevation_of_privilege",
 				Description: "角色/权限配置不当导致越权访问。",
-				Assets:      []string{"workspace_data", "app_configs"},
+				Assets:      []string{"workspace_data", "workspace_configs"},
 				EntryPoints: []string{"management_api"},
 				Controls: []string{
 					"workspace role checks",

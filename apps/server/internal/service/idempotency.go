@@ -24,7 +24,6 @@ var (
 
 type idempotencyScope struct {
 	WorkspaceID *uuid.UUID
-	AppID       *uuid.UUID
 }
 
 type idempotencyStartResult struct {
@@ -57,9 +56,6 @@ func beginIdempotency(ctx context.Context, repo repository.IdempotencyKeyReposit
 			if scope.WorkspaceID != nil {
 				record.WorkspaceID = scope.WorkspaceID
 			}
-			if scope.AppID != nil {
-				record.AppID = scope.AppID
-			}
 			if err := repo.Update(ctx, record); err != nil {
 				return nil, err
 			}
@@ -76,7 +72,6 @@ func beginIdempotency(ctx context.Context, repo repository.IdempotencyKeyReposit
 		IdempotencyKey: trimmed,
 		Action:         action,
 		WorkspaceID:    scope.WorkspaceID,
-		AppID:          scope.AppID,
 		RequestHash:    requestHash,
 		Status:         idempotencyStatusProcessing,
 	}

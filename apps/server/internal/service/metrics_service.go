@@ -15,15 +15,15 @@ import (
 )
 
 // MetricsService 可观测性指标服务接口
+// Workspace 现在就是 App，所有指标都基于 Workspace
 type MetricsService interface {
-	GetAppMetrics(ctx context.Context, userID, appID uuid.UUID) (*AppMetrics, error)
-	GetAppAccessStats(ctx context.Context, userID, appID uuid.UUID, windowDays int) (*AppAccessStats, error)
+	GetWorkspaceMetrics(ctx context.Context, userID, workspaceID uuid.UUID) (*WorkspaceMetrics, error)
+	GetWorkspaceAccessStats(ctx context.Context, userID, workspaceID uuid.UUID, windowDays int) (*WorkspaceAccessStats, error)
 	GetWorkspaceUsage(ctx context.Context, userID, workspaceID uuid.UUID) (*WorkspaceUsage, error)
 }
 
 type metricsService struct {
-	appRepo            repository.AppRepository
-	appVersionRepo     repository.AppVersionRepository
+	workspaceRepo      repository.WorkspaceRepository
 	executionRepo      repository.ExecutionRepository
 	runtimeEventRepo   repository.RuntimeEventRepository
 	workspaceService   WorkspaceService
@@ -34,8 +34,7 @@ type metricsService struct {
 
 // NewMetricsService 创建指标服务实例
 func NewMetricsService(
-	appRepo repository.AppRepository,
-	appVersionRepo repository.AppVersionRepository,
+	workspaceRepo repository.WorkspaceRepository,
 	executionRepo repository.ExecutionRepository,
 	runtimeEventRepo repository.RuntimeEventRepository,
 	workspaceService WorkspaceService,
@@ -43,8 +42,7 @@ func NewMetricsService(
 	cache *redis.Client,
 ) MetricsService {
 	return &metricsService{
-		appRepo:            appRepo,
-		appVersionRepo:     appVersionRepo,
+		workspaceRepo:      workspaceRepo,
 		executionRepo:      executionRepo,
 		runtimeEventRepo:   runtimeEventRepo,
 		workspaceService:   workspaceService,
@@ -54,9 +52,9 @@ func NewMetricsService(
 	}
 }
 
-// AppMetrics App 维度指标
-type AppMetrics struct {
-	AppID          uuid.UUID  `json:"app_id"`
+// WorkspaceMetrics Workspace 维度指标（原 AppMetrics）
+type WorkspaceMetrics struct {
+	WorkspaceID    uuid.UUID  `json:"workspace_id"`
 	WorkflowID     *uuid.UUID `json:"workflow_id,omitempty"`
 	Requests       int64      `json:"requests"`
 	SuccessfulRuns int64      `json:"successful_runs"`
@@ -67,9 +65,9 @@ type AppMetrics struct {
 	LastRunAt      *time.Time `json:"last_run_at,omitempty"`
 }
 
-// AppAccessStats App 访问统计概览
-type AppAccessStats struct {
-	AppID       uuid.UUID  `json:"app_id"`
+// WorkspaceAccessStats Workspace 访问统计概览（原 AppAccessStats）
+type WorkspaceAccessStats struct {
+	WorkspaceID uuid.UUID  `json:"workspace_id"`
 	WindowDays  int        `json:"window_days"`
 	StartAt     *time.Time `json:"start_at,omitempty"`
 	EndAt       *time.Time `json:"end_at,omitempty"`
@@ -88,35 +86,35 @@ type WorkspaceUsage struct {
 	Bandwidth   float64   `json:"bandwidth"`
 }
 
-func (s *metricsService) GetAppMetrics(ctx context.Context, userID, appID uuid.UUID) (*AppMetrics, error) {
-	app, err := s.appRepo.GetByID(ctx, appID)
+func (s *metricsService) GetWorkspaceMetrics(ctx context.Context, userID, workspaceID uuid.UUID) (*WorkspaceMetrics, error) {
+	workspace, err := s.workspaceRepo.GetByID(ctx, workspaceID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrAppNotFound
+			return nil, ErrWorkspaceNotFound
 		}
 		return nil, err
 	}
 
-	if err := s.ensureAppMetricsAccess(ctx, userID, app); err != nil {
+	if err := s.ensureWorkspaceMetricsAccess(ctx, userID, workspace); err != nil {
 		return nil, err
 	}
 
-	if cached := s.getCachedAppMetrics(ctx, app.ID); cached != nil {
+	if cached := s.getCachedWorkspaceMetrics(ctx, workspace.ID); cached != nil {
 		return cached, nil
 	}
 
-	metrics := &AppMetrics{
-		AppID: app.ID,
+	metrics := &WorkspaceMetrics{
+		WorkspaceID: workspace.ID,
 	}
 
-	if app.CurrentVersionID == nil {
+	if workspace.CurrentVersionID == nil {
 		return metrics, nil
 	}
 
-	version, err := s.appVersionRepo.GetByID(ctx, *app.CurrentVersionID)
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *workspace.CurrentVersionID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrAppVersionNotFound
+			return nil, ErrWorkspaceVersionNotFound
 		}
 		return nil, err
 	}
@@ -144,19 +142,19 @@ func (s *metricsService) GetAppMetrics(ctx context.Context, userID, appID uuid.U
 	metrics.TokensUsed = agg.TokensUsed
 	metrics.LastRunAt = agg.LastRunAt
 
-	s.setCachedAppMetrics(ctx, app.ID, metrics)
+	s.setCachedWorkspaceMetrics(ctx, workspace.ID, metrics)
 	return metrics, nil
 }
 
-func (s *metricsService) GetAppAccessStats(ctx context.Context, userID, appID uuid.UUID, windowDays int) (*AppAccessStats, error) {
-	app, err := s.appRepo.GetByID(ctx, appID)
+func (s *metricsService) GetWorkspaceAccessStats(ctx context.Context, userID, workspaceID uuid.UUID, windowDays int) (*WorkspaceAccessStats, error) {
+	workspace, err := s.workspaceRepo.GetByID(ctx, workspaceID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrAppNotFound
+			return nil, ErrWorkspaceNotFound
 		}
 		return nil, err
 	}
-	if err := s.ensureAppMetricsAccess(ctx, userID, app); err != nil {
+	if err := s.ensureWorkspaceMetricsAccess(ctx, userID, workspace); err != nil {
 		return nil, err
 	}
 
@@ -167,13 +165,13 @@ func (s *metricsService) GetAppAccessStats(ctx context.Context, userID, appID uu
 	start := now.AddDate(0, 0, -windowDays)
 
 	filter := entity.RuntimeEventFilter{
-		AppID:     &app.ID,
-		StartTime: &start,
-		EndTime:   &now,
+		WorkspaceID: &workspace.ID,
+		StartTime:   &start,
+		EndTime:     &now,
 		Types: []entity.RuntimeEventType{
-			entity.EventAppAccessed,
-			entity.EventAppExecuted,
-			entity.EventAppRateLimited,
+			entity.EventWorkspaceAccessed,
+			entity.EventWorkspaceExecuted,
+			entity.EventWorkspaceRateLimited,
 		},
 	}
 	stats, err := s.runtimeEventRepo.GetStats(ctx, filter)
@@ -181,18 +179,18 @@ func (s *metricsService) GetAppAccessStats(ctx context.Context, userID, appID uu
 		return nil, err
 	}
 
-	result := &AppAccessStats{
-		AppID:      app.ID,
-		WindowDays: windowDays,
-		StartAt:    &start,
-		EndAt:      &now,
+	result := &WorkspaceAccessStats{
+		WorkspaceID: workspace.ID,
+		WindowDays:  windowDays,
+		StartAt:     &start,
+		EndAt:       &now,
 	}
 	if stats != nil {
 		result.Total = stats.TotalCount
 		if stats.CountByType != nil {
-			result.Accessed = stats.CountByType[entity.EventAppAccessed]
-			result.Executed = stats.CountByType[entity.EventAppExecuted]
-			result.RateLimited = stats.CountByType[entity.EventAppRateLimited]
+			result.Accessed = stats.CountByType[entity.EventWorkspaceAccessed]
+			result.Executed = stats.CountByType[entity.EventWorkspaceExecuted]
+			result.RateLimited = stats.CountByType[entity.EventWorkspaceRateLimited]
 		}
 	}
 	return result, nil
@@ -203,7 +201,7 @@ func (s *metricsService) GetWorkspaceUsage(ctx context.Context, userID, workspac
 	if err != nil {
 		return nil, err
 	}
-	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionAppViewMetrics, PermissionLogsView) {
+	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionWorkspaceViewMetrics, PermissionLogsView) {
 		return nil, ErrWorkspaceUnauthorized
 	}
 
@@ -245,22 +243,16 @@ func (s *metricsService) GetWorkspaceUsage(ctx context.Context, userID, workspac
 	return result, nil
 }
 
-func (s *metricsService) ensureAppMetricsAccess(ctx context.Context, userID uuid.UUID, app *entity.App) error {
-	if app == nil {
-		return ErrAppNotFound
+func (s *metricsService) ensureWorkspaceMetricsAccess(ctx context.Context, userID uuid.UUID, workspace *entity.Workspace) error {
+	if workspace == nil {
+		return ErrWorkspaceNotFound
 	}
-	access, err := s.workspaceService.GetWorkspaceAccess(ctx, app.WorkspaceID, userID)
+	access, err := s.workspaceService.GetWorkspaceAccess(ctx, workspace.ID, userID)
 	if err != nil {
-		if errors.Is(err, ErrWorkspaceNotFound) {
-			return ErrAppNotFound
-		}
-		if errors.Is(err, ErrWorkspaceUnauthorized) {
-			return ErrAppUnauthorized
-		}
 		return err
 	}
-	if !hasAnyPermission(access.Permissions, PermissionAppViewMetrics, PermissionAppEdit, PermissionAppPublish, PermissionAppsCreate) {
-		return ErrAppUnauthorized
+	if !hasAnyPermission(access.Permissions, PermissionWorkspaceViewMetrics, PermissionWorkspaceEdit, PermissionWorkspacePublish, PermissionWorkspaceCreate) {
+		return ErrWorkspaceUnauthorized
 	}
 	return nil
 }
@@ -349,22 +341,22 @@ func parseTokenValue(value interface{}) int64 {
 	return 0
 }
 
-func (s *metricsService) getCachedAppMetrics(ctx context.Context, appID uuid.UUID) *AppMetrics {
+func (s *metricsService) getCachedWorkspaceMetrics(ctx context.Context, workspaceID uuid.UUID) *WorkspaceMetrics {
 	if s.cache == nil {
 		return nil
 	}
-	raw, err := s.cache.Get(ctx, appMetricsCacheKey(appID))
+	raw, err := s.cache.Get(ctx, workspaceMetricsCacheKey(workspaceID))
 	if err != nil || raw == "" {
 		return nil
 	}
-	var metrics AppMetrics
+	var metrics WorkspaceMetrics
 	if err := json.Unmarshal([]byte(raw), &metrics); err != nil {
 		return nil
 	}
 	return &metrics
 }
 
-func (s *metricsService) setCachedAppMetrics(ctx context.Context, appID uuid.UUID, metrics *AppMetrics) {
+func (s *metricsService) setCachedWorkspaceMetrics(ctx context.Context, workspaceID uuid.UUID, metrics *WorkspaceMetrics) {
 	if s.cache == nil || metrics == nil {
 		return
 	}
@@ -372,7 +364,7 @@ func (s *metricsService) setCachedAppMetrics(ctx context.Context, appID uuid.UUI
 	if err != nil {
 		return
 	}
-	_ = s.cache.Set(ctx, appMetricsCacheKey(appID), payload, s.cacheTTL)
+	_ = s.cache.Set(ctx, workspaceMetricsCacheKey(workspaceID), payload, s.cacheTTL)
 }
 
 func (s *metricsService) getCachedWorkspaceUsage(ctx context.Context, workspaceID uuid.UUID) *WorkspaceUsage {
@@ -401,10 +393,15 @@ func (s *metricsService) setCachedWorkspaceUsage(ctx context.Context, workspaceI
 	_ = s.cache.Set(ctx, workspaceUsageCacheKey(workspaceID), payload, s.cacheTTL)
 }
 
-func appMetricsCacheKey(appID uuid.UUID) string {
-	return "metrics:app:" + appID.String()
+func workspaceMetricsCacheKey(workspaceID uuid.UUID) string {
+	return "metrics:workspace:" + workspaceID.String()
 }
 
 func workspaceUsageCacheKey(workspaceID uuid.UUID) string {
 	return "metrics:workspace:" + workspaceID.String() + ":usage"
 }
+
+// 错误定义
+var (
+	ErrWorkspaceVersionNotFound = errors.New("workspace version not found")
+)

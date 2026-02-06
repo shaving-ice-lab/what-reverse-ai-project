@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -14,20 +15,23 @@ import (
 )
 
 type WorkspaceHandler struct {
-	workspaceService service.WorkspaceService
-	auditLogService  service.AuditLogService
-	exportService    service.WorkspaceExportService
+	workspaceService       service.WorkspaceService
+	workspaceDomainService service.WorkspaceDomainService
+	auditLogService        service.AuditLogService
+	exportService          service.WorkspaceExportService
 }
 
 func NewWorkspaceHandler(
 	workspaceService service.WorkspaceService,
+	workspaceDomainService service.WorkspaceDomainService,
 	auditLogService service.AuditLogService,
 	exportService service.WorkspaceExportService,
 ) *WorkspaceHandler {
 	return &WorkspaceHandler{
-		workspaceService: workspaceService,
-		auditLogService:  auditLogService,
-		exportService:    exportService,
+		workspaceService:       workspaceService,
+		workspaceDomainService: workspaceDomainService,
+		auditLogService:        auditLogService,
+		exportService:          exportService,
 	}
 }
 
@@ -630,6 +634,46 @@ func (h *WorkspaceHandler) UpdateMemberRole(c echo.Context) error {
 	})
 }
 
+// VerifyDomainByID 验证工作空间域名
+func (h *WorkspaceHandler) VerifyDomainByID(c echo.Context) error {
+	if h.workspaceDomainService == nil {
+		return errorResponse(c, http.StatusServiceUnavailable, "DOMAIN_SERVICE_UNAVAILABLE", "域名服务不可用")
+	}
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	domainID, err := uuid.Parse(c.Param("domainId"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "域名 ID 无效")
+	}
+
+	result, err := h.workspaceDomainService.VerifyDomainByID(c.Request().Context(), uid, domainID)
+	if err != nil {
+		var verifyErr *service.DomainVerifyError
+		if errors.As(err, &verifyErr) {
+			return errorResponse(c, http.StatusBadRequest, "VERIFICATION_FAILED", "域名验证失败")
+		}
+		switch err {
+		case service.ErrWorkspaceDomainNotFound:
+			return errorResponse(c, http.StatusNotFound, "DOMAIN_NOT_FOUND", "域名不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限操作该域名")
+		case service.ErrWorkspaceDomainVerificationFailed:
+			return errorResponse(c, http.StatusBadRequest, "VERIFICATION_FAILED", "域名验证失败")
+		default:
+			return errorResponse(c, http.StatusInternalServerError, "VERIFY_FAILED", "域名验证失败")
+		}
+	}
+
+	return successResponse(c, map[string]interface{}{
+		"domain":       result.Domain,
+		"verification": result.Verification,
+		"verified":     result.Verified,
+	})
+}
+
 func (h *WorkspaceHandler) recordAudit(ctx echo.Context, workspaceID uuid.UUID, actorID uuid.UUID, action string, targetType string, targetID *uuid.UUID, metadata entity.JSON) {
 	if h.auditLogService == nil {
 		return
@@ -675,4 +719,291 @@ func (h *WorkspaceHandler) buildExportJobResponse(job *entity.WorkspaceExportJob
 	}
 
 	return resp
+}
+
+// ===== Workspace 应用功能 Handler =====
+
+// PublishWorkspace 发布 Workspace
+func (h *WorkspaceHandler) PublishWorkspace(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	ws, err := h.workspaceService.Publish(c.Request().Context(), id, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"workspace": ws}})
+}
+
+// RollbackWorkspace 回滚到指定版本
+func (h *WorkspaceHandler) RollbackWorkspace(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	var req struct {
+		VersionID string `json:"version_id"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": "invalid request"})
+	}
+	versionID, err := uuid.Parse(req.VersionID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid version id"})
+	}
+	ws, err := h.workspaceService.Rollback(c.Request().Context(), id, uid, versionID)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"workspace": ws}})
+}
+
+// DeprecateWorkspace 下线 Workspace
+func (h *WorkspaceHandler) DeprecateWorkspace(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	ws, err := h.workspaceService.Deprecate(c.Request().Context(), id, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"workspace": ws}})
+}
+
+// ArchiveWorkspace 归档 Workspace
+func (h *WorkspaceHandler) ArchiveWorkspace(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	ws, err := h.workspaceService.Archive(c.Request().Context(), id, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"workspace": ws}})
+}
+
+// CreateWorkspaceVersion 创建版本
+func (h *WorkspaceHandler) CreateWorkspaceVersion(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	var req service.WorkspaceCreateVersionRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": "invalid request"})
+	}
+	version, err := h.workspaceService.CreateVersion(c.Request().Context(), id, uid, req)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusCreated, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"version": version}})
+}
+
+// GetWorkspaceVersions 获取版本列表
+func (h *WorkspaceHandler) GetWorkspaceVersions(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	page := intParam(c, "page", 1)
+	pageSize := intParam(c, "page_size", 20)
+	versions, total, err := h.workspaceService.ListVersions(c.Request().Context(), id, uid, page, pageSize)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"code": "OK", "message": "OK",
+		"data": map[string]interface{}{"items": versions, "total": total, "page": page, "page_size": pageSize},
+	})
+}
+
+// CompareWorkspaceVersions 版本对比
+func (h *WorkspaceHandler) CompareWorkspaceVersions(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	fromID, err := uuid.Parse(c.QueryParam("from"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid from version id"})
+	}
+	toID, err := uuid.Parse(c.QueryParam("to"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid to version id"})
+	}
+	diff, err := h.workspaceService.CompareVersions(c.Request().Context(), id, fromID, toID)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": diff})
+}
+
+// GetWorkspaceAccessPolicy 获取访问策略
+func (h *WorkspaceHandler) GetWorkspaceAccessPolicy(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	policy, err := h.workspaceService.GetAccessPolicy(c.Request().Context(), id, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"policy": policy}})
+}
+
+// UpdateWorkspaceAccessPolicy 更新访问策略
+func (h *WorkspaceHandler) UpdateWorkspaceAccessPolicy(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	var req service.UpdateAccessPolicyRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": "invalid request"})
+	}
+	policy, err := h.workspaceService.UpdateAccessPolicy(c.Request().Context(), id, uid, req)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"policy": policy}})
+}
+
+// ===== Marketplace Handlers =====
+
+// ListPublicWorkspaces 应用市场公开列表
+func (h *WorkspaceHandler) ListPublicWorkspaces(c echo.Context) error {
+	page := intParam(c, "page", 1)
+	pageSize := intParam(c, "page_size", 20)
+	workspaces, total, err := h.workspaceService.ListPublic(c.Request().Context(), page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"code": "INTERNAL_ERROR", "message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"code": "OK", "message": "OK",
+		"data": map[string]interface{}{"items": workspaces, "total": total, "page": page, "page_size": pageSize},
+	})
+}
+
+// GetPublicWorkspace 应用市场单个详情
+func (h *WorkspaceHandler) GetPublicWorkspace(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	ws, err := h.workspaceService.GetPublic(c.Request().Context(), id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{"code": "NOT_FOUND", "message": "workspace not found"})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"workspace": ws}})
+}
+
+// ListPublicRatings 公开评分列表
+func (h *WorkspaceHandler) ListPublicRatings(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	page := intParam(c, "page", 1)
+	pageSize := intParam(c, "page_size", 20)
+	ratings, total, err := h.workspaceService.ListRatings(c.Request().Context(), id, page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"code": "INTERNAL_ERROR", "message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"code": "OK", "message": "OK",
+		"data": map[string]interface{}{"items": ratings, "total": total, "page": page, "page_size": pageSize},
+	})
+}
+
+// SubmitRating 提交评分
+func (h *WorkspaceHandler) SubmitRating(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	var req struct {
+		Score   int    `json:"score"`
+		Comment string `json:"comment"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": "invalid request"})
+	}
+	rating, err := h.workspaceService.SubmitRating(c.Request().Context(), id, uid, req.Score, req.Comment)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": err.Error()})
+	}
+	return c.JSON(http.StatusCreated, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"rating": rating}})
+}
+
+// ===== 工具函数 =====
+
+func (h *WorkspaceHandler) handleWorkspaceError(c echo.Context, err error) error {
+	switch {
+	case errors.Is(err, service.ErrWorkspaceNotFound):
+		return c.JSON(http.StatusNotFound, map[string]interface{}{"code": "NOT_FOUND", "message": "workspace not found"})
+	case errors.Is(err, service.ErrWorkspaceUnauthorized):
+		return c.JSON(http.StatusForbidden, map[string]interface{}{"code": "FORBIDDEN", "message": "unauthorized"})
+	default:
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"code": "INTERNAL_ERROR", "message": err.Error()})
+	}
+}
+
+func intParam(c echo.Context, name string, defaultVal int) int {
+	val := c.QueryParam(name)
+	if val == "" {
+		return defaultVal
+	}
+	var n int
+	if _, err := fmt.Sscanf(val, "%d", &n); err != nil || n < 1 {
+		return defaultVal
+	}
+	return n
 }

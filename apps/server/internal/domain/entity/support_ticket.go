@@ -12,7 +12,6 @@ type SupportTicket struct {
 	ID               uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
 	Reference        string     `gorm:"size:40;uniqueIndex" json:"reference"`
 	WorkspaceID      *uuid.UUID `gorm:"type:char(36);index" json:"workspace_id,omitempty"`
-	AppID            *uuid.UUID `gorm:"type:char(36);index" json:"app_id,omitempty"`
 	RequesterUserID  *uuid.UUID `gorm:"type:char(36);index" json:"requester_user_id,omitempty"`
 	RequesterName    string     `gorm:"size:120" json:"requester_name,omitempty"`
 	RequesterEmail   string     `gorm:"size:255;not null;index" json:"requester_email"`

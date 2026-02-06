@@ -84,7 +84,7 @@ func defaultRetentionPolicy(retention config.RetentionConfig, security config.Se
 		{
 			Key:           "anonymous_sessions",
 			Title:         "匿名会话保留",
-			Target:        "what_reverse_app_sessions",
+			Target:        "what_reverse_workspace_sessions",
 			Action:        "delete",
 			RetentionDays: retention.AnonymousSessionRetentionDays,
 			Enabled:       retention.Enabled && retention.AnonymousSessionRetentionDays > 0,

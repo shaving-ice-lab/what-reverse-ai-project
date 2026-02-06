@@ -429,8 +429,6 @@ func (h *AdminHandler) GetWorkspace(c echo.Context) error {
 		"workspace":     detail.Workspace,
 		"members":       detail.Members,
 		"members_total": len(detail.Members),
-		"apps":          detail.Apps,
-		"apps_total":    len(detail.Apps),
 	})
 }
 
@@ -473,100 +471,14 @@ func (h *AdminHandler) UpdateWorkspaceStatus(c echo.Context) error {
 	})
 }
 
-// ListApps 查询 App 列表
-func (h *AdminHandler) ListApps(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "apps.read"); err != nil {
+// UpdateWorkspacePublishStatus 更新 Workspace 发布状态
+func (h *AdminHandler) UpdateWorkspacePublishStatus(c echo.Context) error {
+	if err := requireAdminCapability(c, h.adminService, "workspaces.write"); err != nil {
 		return err
 	}
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	pageSize, _ := strconv.Atoi(c.QueryParam("page_size"))
-	if page <= 0 {
-		page = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	var workspaceID *uuid.UUID
-	if workspaceParam := strings.TrimSpace(c.QueryParam("workspace_id")); workspaceParam != "" {
-		parsed, err := uuid.Parse(workspaceParam)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_WORKSPACE_ID", "Workspace ID 无效")
-		}
-		workspaceID = &parsed
-	}
-
-	var ownerID *uuid.UUID
-	if ownerParam := strings.TrimSpace(c.QueryParam("owner_id")); ownerParam != "" {
-		parsed, err := uuid.Parse(ownerParam)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_OWNER_ID", "Owner ID 无效")
-		}
-		ownerID = &parsed
-	}
-
-	apps, total, err := h.adminService.ListApps(c.Request().Context(), service.AdminAppListParams{
-		Search:      c.QueryParam("search"),
-		Status:      c.QueryParam("status"),
-		WorkspaceID: workspaceID,
-		OwnerID:     ownerID,
-		Page:        page,
-		PageSize:    pageSize,
-	})
+	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return errorResponse(c, http.StatusInternalServerError, "ADMIN_LIST_APPS_FAILED", "获取 App 列表失败")
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"items":     apps,
-		"total":     total,
-		"page":      page,
-		"page_size": pageSize,
-	})
-}
-
-// GetApp 获取 App 详情
-func (h *AdminHandler) GetApp(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "apps.read"); err != nil {
-		return err
-	}
-	appID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "App ID 无效")
-	}
-
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	pageSize, _ := strconv.Atoi(c.QueryParam("page_size"))
-	detail, err := h.adminService.GetAppDetail(c.Request().Context(), appID, service.AdminAppDetailParams{
-		VersionPage:     page,
-		VersionPageSize: pageSize,
-	})
-	if err != nil {
-		switch err {
-		case service.ErrAdminAppNotFound:
-			return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "GET_FAILED", "获取 App 详情失败")
-		}
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"app":            detail.App,
-		"versions":       detail.Versions,
-		"versions_total": detail.VersionsTotal,
-		"domains":        detail.Domains,
-		"access_policy":  detail.AccessPolicy,
-	})
-}
-
-// UpdateAppStatus 更新 App 状态
-func (h *AdminHandler) UpdateAppStatus(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "apps.write"); err != nil {
-		return err
-	}
-	appID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "App ID 无效")
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Workspace ID 无效")
 	}
 	adminID, err := parseAdminID(c)
 	if err != nil {
@@ -578,23 +490,23 @@ func (h *AdminHandler) UpdateAppStatus(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
 
-	app, err := h.adminService.UpdateAppStatus(c.Request().Context(), adminID, appID, service.AdminStatusUpdateInput{
+	workspace, err := h.adminService.UpdateWorkspacePublishStatus(c.Request().Context(), adminID, workspaceID, service.AdminStatusUpdateInput{
 		Status: req.Status,
 		Reason: req.Reason,
 	})
 	if err != nil {
 		switch err {
-		case service.ErrAdminAppNotFound:
-			return errorResponse(c, http.StatusNotFound, "APP_NOT_FOUND", "App 不存在")
+		case service.ErrAdminWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "WORKSPACE_NOT_FOUND", "Workspace 不存在")
 		case service.ErrAdminInvalidStatus:
-			return errorResponse(c, http.StatusBadRequest, "INVALID_STATUS", "App 状态非法")
+			return errorResponse(c, http.StatusBadRequest, "INVALID_STATUS", "Workspace 发布状态非法")
 		default:
-			return errorResponse(c, http.StatusInternalServerError, "UPDATE_FAILED", "更新 App 状态失败")
+			return errorResponse(c, http.StatusInternalServerError, "UPDATE_FAILED", "更新 Workspace 发布状态失败")
 		}
 	}
 
 	return successResponse(c, map[string]interface{}{
-		"app": app,
+		"workspace": workspace,
 	})
 }
 
@@ -822,22 +734,12 @@ func (h *AdminHandler) ListSupportTickets(c echo.Context) error {
 		workspaceID = &parsed
 	}
 
-	var appID *uuid.UUID
-	if appParam := strings.TrimSpace(c.QueryParam("app_id")); appParam != "" {
-		parsed, err := uuid.Parse(appParam)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_APP_ID", "App ID 无效")
-		}
-		appID = &parsed
-	}
-
 	tickets, total, err := h.supportTicketService.ListTickets(c.Request().Context(), service.SupportTicketListParams{
 		Status:      c.QueryParam("status"),
 		Priority:    c.QueryParam("priority"),
 		Category:    c.QueryParam("category"),
 		Search:      c.QueryParam("search"),
 		WorkspaceID: workspaceID,
-		AppID:       appID,
 		Page:        page,
 		PageSize:    pageSize,
 	})

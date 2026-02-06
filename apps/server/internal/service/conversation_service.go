@@ -10,9 +10,10 @@ import (
 )
 
 var (
-	ErrConversationNotFound     = errors.New("conversation not found")
-	ErrConversationUnauthorized = errors.New("unauthorized to access this conversation")
-	ErrMessageNotFound          = errors.New("message not found")
+	ErrConversationNotFound          = errors.New("conversation not found")
+	ErrConversationUnauthorized      = errors.New("unauthorized to access this conversation")
+	ErrMessageNotFound               = errors.New("message not found")
+	ErrConversationWorkspaceRequired = errors.New("workspace id required")
 )
 
 // ConversationService 对话服务接口
@@ -72,6 +73,7 @@ type ConversationDailyStat struct {
 
 // CreateConversationRequest 创建对话请求
 type CreateConversationRequest struct {
+	WorkspaceID  uuid.UUID  `json:"workspace_id"`
 	Title        string     `json:"title" validate:"required,max=500"`
 	Model        string     `json:"model"`
 	SystemPrompt *string    `json:"system_prompt"`
@@ -103,14 +105,15 @@ type UpdateConversationRequest struct {
 
 // ListConversationsRequest 列表查询请求
 type ListConversationsRequest struct {
-	FolderID *uuid.UUID `json:"folder_id" query:"folder_id"`
-	Starred  *bool      `json:"starred" query:"starred"`
-	Pinned   *bool      `json:"pinned" query:"pinned"`
-	Archived *bool      `json:"archived" query:"archived"`
-	Search   string     `json:"search" query:"search"`
-	Page     int        `json:"page" query:"page"`
-	PageSize int        `json:"page_size" query:"page_size"`
-	OrderBy  string     `json:"order_by" query:"order_by"`
+	WorkspaceID *uuid.UUID `json:"workspace_id" query:"workspace_id"`
+	FolderID    *uuid.UUID `json:"folder_id" query:"folder_id"`
+	Starred     *bool      `json:"starred" query:"starred"`
+	Pinned      *bool      `json:"pinned" query:"pinned"`
+	Archived    *bool      `json:"archived" query:"archived"`
+	Search      string     `json:"search" query:"search"`
+	Page        int        `json:"page" query:"page"`
+	PageSize    int        `json:"page_size" query:"page_size"`
+	OrderBy     string     `json:"order_by" query:"order_by"`
 }
 
 // ConversationListResponse 对话列表响应
@@ -124,6 +127,7 @@ type ConversationListResponse struct {
 // ConversationResponse 对话响应
 type ConversationResponse struct {
 	ID           uuid.UUID  `json:"id"`
+	WorkspaceID  uuid.UUID  `json:"workspace_id"`
 	Title        string     `json:"title"`
 	Preview      string     `json:"preview"`
 	Model        string     `json:"model"`
@@ -200,6 +204,10 @@ func NewConversationService(
 }
 
 func (s *conversationService) Create(ctx context.Context, userID uuid.UUID, req CreateConversationRequest) (*entity.Conversation, error) {
+	if req.WorkspaceID == uuid.Nil {
+		return nil, ErrConversationWorkspaceRequired
+	}
+
 	// 如果指定了文件夹，验证文件夹存在且属于当前用户
 	if req.FolderID != nil {
 		folder, err := s.conversationFolderRepo.GetByID(ctx, *req.FolderID)
@@ -213,6 +221,7 @@ func (s *conversationService) Create(ctx context.Context, userID uuid.UUID, req 
 
 	conversation := &entity.Conversation{
 		UserID:           userID,
+		WorkspaceID:      req.WorkspaceID,
 		Title:            req.Title,
 		Model:            req.Model,
 		SystemPrompt:     req.SystemPrompt,
@@ -270,6 +279,10 @@ func (s *conversationService) GetWithMessages(ctx context.Context, id uuid.UUID,
 }
 
 func (s *conversationService) List(ctx context.Context, userID uuid.UUID, req ListConversationsRequest) (*ConversationListResponse, error) {
+	if req.WorkspaceID == nil {
+		return nil, ErrConversationWorkspaceRequired
+	}
+
 	// 默认分页
 	if req.Page <= 0 {
 		req.Page = 1
@@ -288,15 +301,16 @@ func (s *conversationService) List(ctx context.Context, userID uuid.UUID, req Li
 	}
 
 	opts := repository.ConversationListOptions{
-		UserID:   userID,
-		FolderID: req.FolderID,
-		Starred:  req.Starred,
-		Pinned:   req.Pinned,
-		Archived: req.Archived,
-		Search:   req.Search,
-		Page:     req.Page,
-		PageSize: req.PageSize,
-		OrderBy:  req.OrderBy,
+		UserID:      userID,
+		WorkspaceID: req.WorkspaceID,
+		FolderID:    req.FolderID,
+		Starred:     req.Starred,
+		Pinned:      req.Pinned,
+		Archived:    req.Archived,
+		Search:      req.Search,
+		Page:        req.Page,
+		PageSize:    req.PageSize,
+		OrderBy:     req.OrderBy,
 	}
 
 	conversations, total, err := s.conversationRepo.List(ctx, opts)
@@ -314,6 +328,7 @@ func (s *conversationService) List(ctx context.Context, userID uuid.UUID, req Li
 
 		responses[i] = ConversationResponse{
 			ID:           conv.ID,
+			WorkspaceID:  conv.WorkspaceID,
 			Title:        conv.Title,
 			Preview:      conv.Preview,
 			Model:        conv.Model,
@@ -432,6 +447,7 @@ func (s *conversationService) Duplicate(ctx context.Context, id uuid.UUID, userI
 	// 创建副本
 	duplicate := &entity.Conversation{
 		UserID:       userID,
+		WorkspaceID:  original.WorkspaceID,
 		Title:        original.Title + " (副本)",
 		Model:        original.Model,
 		SystemPrompt: original.SystemPrompt,

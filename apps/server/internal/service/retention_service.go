@@ -46,7 +46,6 @@ type retentionService struct {
 	archiveCfg            config.ArchiveConfig
 	runtimeEventRepo      repository.RuntimeEventRepository
 	executionRepo         repository.ExecutionRepository
-	appSessionRepo        repository.AppSessionRepository
 	workspaceRepo         repository.WorkspaceRepository
 	exportRepo            repository.WorkspaceExportRepository
 	auditLogRepo          repository.AuditLogRepository
@@ -61,7 +60,6 @@ func NewRetentionService(
 	archiveCfg config.ArchiveConfig,
 	runtimeEventRepo repository.RuntimeEventRepository,
 	executionRepo repository.ExecutionRepository,
-	appSessionRepo repository.AppSessionRepository,
 	workspaceRepo repository.WorkspaceRepository,
 	exportRepo repository.WorkspaceExportRepository,
 	auditLogRepo repository.AuditLogRepository,
@@ -77,7 +75,6 @@ func NewRetentionService(
 		archiveCfg:            archiveCfg,
 		runtimeEventRepo:      runtimeEventRepo,
 		executionRepo:         executionRepo,
-		appSessionRepo:        appSessionRepo,
 		workspaceRepo:         workspaceRepo,
 		exportRepo:            exportRepo,
 		auditLogRepo:          auditLogRepo,
@@ -164,7 +161,7 @@ func (s *retentionService) RunOnce(ctx context.Context) (*RetentionReport, error
 		cutoff := now.AddDate(0, 0, -s.cfg.AnonymousSessionRetentionDays)
 		report.AnonymousSessionCutoff = &cutoff
 
-		if s.appSessionRepo != nil {
+		if s.workspaceRepo != nil {
 			deleted, err := s.deleteAnonymousSessions(ctx, cutoff)
 			if err != nil && firstErr == nil {
 				firstErr = err
@@ -241,7 +238,7 @@ func (s *retentionService) deleteAuditLogs(ctx context.Context, cutoff time.Time
 func (s *retentionService) deleteAnonymousSessions(ctx context.Context, cutoff time.Time) (int64, error) {
 	ctx, cancel := s.withTimeout(ctx)
 	defer cancel()
-	return s.appSessionRepo.DeleteAnonymousBefore(ctx, cutoff)
+	return s.workspaceRepo.DeleteAnonymousSessionsBefore(ctx, cutoff)
 }
 
 func (s *retentionService) moveWorkspacesToColdStorage(ctx context.Context, cutoff time.Time) (int64, error) {

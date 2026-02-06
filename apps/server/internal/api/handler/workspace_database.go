@@ -102,7 +102,6 @@ func (h *WorkspaceDatabaseHandler) Provision(c echo.Context) error {
 
 // CreateWorkspaceDBRoleRequest 创建数据库角色请求
 type CreateWorkspaceDBRoleRequest struct {
-	AppID     string     `json:"app_id"`
 	RoleType  string     `json:"role_type"`
 	ExpiresAt *time.Time `json:"expires_at"`
 }
@@ -129,16 +128,8 @@ func (h *WorkspaceDatabaseHandler) CreateRole(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
-	if strings.TrimSpace(req.AppID) == "" {
-		return errorResponse(c, http.StatusBadRequest, "APP_ID_REQUIRED", "应用 ID 不能为空")
-	}
-	appID, err := uuid.Parse(req.AppID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_APP_ID", "应用 ID 无效")
-	}
 
 	role, password, err := h.workspaceDBRoleService.Create(c.Request().Context(), workspaceID, uid, service.CreateWorkspaceDBRoleRequest{
-		AppID:     &appID,
 		RoleType:  req.RoleType,
 		ExpiresAt: req.ExpiresAt,
 	})
@@ -180,14 +171,6 @@ func (h *WorkspaceDatabaseHandler) ListRoles(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
 	}
 
-	var appID *uuid.UUID
-	if raw := strings.TrimSpace(c.QueryParam("app_id")); raw != "" {
-		parsed, err := uuid.Parse(raw)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_APP_ID", "应用 ID 无效")
-		}
-		appID = &parsed
-	}
 	var roleType *string
 	if raw := strings.TrimSpace(c.QueryParam("role_type")); raw != "" {
 		normalized := strings.ToLower(raw)
@@ -199,7 +182,6 @@ func (h *WorkspaceDatabaseHandler) ListRoles(c echo.Context) error {
 	}
 
 	roles, err := h.workspaceDBRoleService.List(c.Request().Context(), workspaceID, uid, service.WorkspaceDBRoleListParams{
-		AppID:    appID,
 		RoleType: roleType,
 		Status:   status,
 	})

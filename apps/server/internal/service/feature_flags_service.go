@@ -8,9 +8,9 @@ import (
 
 // FeatureFlagsPatch 功能开关更新请求
 type FeatureFlagsPatch struct {
-	WorkspaceEnabled  *bool
-	AppRuntimeEnabled *bool
-	DomainEnabled     *bool
+	WorkspaceEnabled        *bool
+	WorkspaceRuntimeEnabled *bool
+	DomainEnabled           *bool
 }
 
 // FeatureFlagsService 功能开关服务
@@ -18,7 +18,7 @@ type FeatureFlagsService interface {
 	Get() config.FeatureFlagsConfig
 	Update(patch FeatureFlagsPatch) config.FeatureFlagsConfig
 	IsWorkspaceEnabled() bool
-	IsAppRuntimeEnabled() bool
+	IsWorkspaceRuntimeEnabled() bool
 	IsDomainEnabled() bool
 }
 
@@ -45,8 +45,8 @@ func (s *featureFlagsService) Update(patch FeatureFlagsPatch) config.FeatureFlag
 	if patch.WorkspaceEnabled != nil {
 		s.flags.WorkspaceEnabled = *patch.WorkspaceEnabled
 	}
-	if patch.AppRuntimeEnabled != nil {
-		s.flags.AppRuntimeEnabled = *patch.AppRuntimeEnabled
+	if patch.WorkspaceRuntimeEnabled != nil {
+		s.flags.WorkspaceRuntimeEnabled = *patch.WorkspaceRuntimeEnabled
 	}
 	if patch.DomainEnabled != nil {
 		s.flags.DomainEnabled = *patch.DomainEnabled
@@ -60,10 +60,10 @@ func (s *featureFlagsService) IsWorkspaceEnabled() bool {
 	return s.flags.WorkspaceEnabled
 }
 
-func (s *featureFlagsService) IsAppRuntimeEnabled() bool {
+func (s *featureFlagsService) IsWorkspaceRuntimeEnabled() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.flags.AppRuntimeEnabled
+	return s.flags.WorkspaceRuntimeEnabled
 }
 
 func (s *featureFlagsService) IsDomainEnabled() bool {

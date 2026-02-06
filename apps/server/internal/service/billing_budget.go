@@ -129,7 +129,7 @@ func (s *billingService) authorizeBillingView(ctx context.Context, workspaceID, 
 	if err != nil {
 		return nil, err
 	}
-	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionAppViewMetrics, PermissionLogsView) {
+	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionWorkspaceViewMetrics, PermissionLogsView) {
 		return nil, ErrWorkspaceUnauthorized
 	}
 	return access.Workspace, nil

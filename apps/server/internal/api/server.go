@@ -130,16 +130,7 @@ func (s *Server) setupRoutes() {
 	workflowRepo := repository.NewWorkflowRepository(s.db)
 	executionRepo := repository.NewExecutionRepository(s.db)
 	agentRepo := repository.NewAgentRepository(s.db)
-	appRepo := repository.NewAppRepository(s.db)
-	appSlugAliasRepo := repository.NewAppSlugAliasRepository(s.db)
 	workspaceExportRepo := repository.NewWorkspaceExportRepository(s.db)
-	appVersionRepo := repository.NewAppVersionRepository(s.db)
-	appPolicyRepo := repository.NewAppAccessPolicyRepository(s.db)
-	appMarketplaceRepo := repository.NewAppMarketplaceRepository(s.db)
-	appRatingRepo := repository.NewAppRatingRepository(s.db)
-	appDomainRepo := repository.NewAppDomainRepository(s.db)
-	appSessionRepo := repository.NewAppSessionRepository(s.db)
-	appEventRepo := repository.NewAppEventRepository(s.db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(s.db)
 	auditLogRepo := repository.NewAuditLogRepository(s.db)
 	supportTicketRepo := repository.NewSupportTicketRepository(s.db)
@@ -177,7 +168,6 @@ func (s *Server) setupRoutes() {
 	billingPlanRepo := repository.NewBillingPlanRepository(s.db)
 	workspaceQuotaRepo := repository.NewWorkspaceQuotaRepository(s.db)
 	billingUsageRepo := repository.NewBillingUsageEventRepository(s.db)
-	appUsageRepo := repository.NewAppUsageStatRepository(s.db)
 	invoicePaymentRepo := repository.NewBillingInvoicePaymentRepository(s.db)
 	modelUsageRepo := repository.NewModelUsageRepository(s.db)
 	analyticsMetricDefRepo := repository.NewAnalyticsMetricDefinitionRepository(s.db)
@@ -207,7 +197,6 @@ func (s *Server) setupRoutes() {
 		workspaceRoleRepo,
 		workspaceMemberRepo,
 		eventRecorder,
-		appRepo,
 		workflowRepo,
 		s.config.Retention,
 	)
@@ -215,7 +204,6 @@ func (s *Server) setupRoutes() {
 		workspaceExportRepo,
 		workspaceRepo,
 		workspaceMemberRepo,
-		appRepo,
 		workflowRepo,
 		executionRepo,
 		auditLogRepo,
@@ -234,11 +222,9 @@ func (s *Server) setupRoutes() {
 		billingPlanRepo,
 		workspaceQuotaRepo,
 		billingUsageRepo,
-		appUsageRepo,
 		invoicePaymentRepo,
 		workspaceRepo,
 		workspaceService,
-		appRepo,
 	)
 	apiKeyService, err := service.NewAPIKeyService(apiKeyRepo, workspaceService, s.config.Encryption.Key)
 	if err != nil {
@@ -291,7 +277,6 @@ func (s *Server) setupRoutes() {
 	workspaceDBRoleService, err := service.NewWorkspaceDBRoleService(
 		workspaceDBRoleRepo,
 		workspaceDatabaseRepo,
-		appRepo,
 		workspaceService,
 		auditLogService,
 		s.config.Database,
@@ -302,7 +287,6 @@ func (s *Server) setupRoutes() {
 		workspaceDBRoleService, _ = service.NewWorkspaceDBRoleService(
 			workspaceDBRoleRepo,
 			workspaceDatabaseRepo,
-			appRepo,
 			workspaceService,
 			auditLogService,
 			s.config.Database,
@@ -350,7 +334,7 @@ func (s *Server) setupRoutes() {
 
 	// 初始化统计服务
 	statsService := service.NewStatsService(executionRepo, workflowRepo)
-	metricsService := service.NewMetricsService(appRepo, appVersionRepo, executionRepo, runtimeEventRepo, workspaceService, workspaceQuotaRepo, s.redis)
+	metricsService := service.NewMetricsService(workspaceRepo, executionRepo, runtimeEventRepo, workspaceService, workspaceQuotaRepo, s.redis)
 	analyticsService := service.NewAnalyticsService(analyticsMetricRepo, analyticsMetricDefRepo, analyticsExportRepo, analyticsSubscriptionRepo, workspaceService, eventRecorder, s.config.Archive, s.config.Security)
 
 	// 初始化 Dashboard 服务
@@ -386,31 +370,10 @@ func (s *Server) setupRoutes() {
 
 	// AI 助手服务
 	aiAssistantService := service.NewAIAssistantService()
-	appService := service.NewAppService(
-		appRepo,
-		appSlugAliasRepo,
-		appVersionRepo,
-		appPolicyRepo,
-		idempotencyRepo,
-		workflowRepo,
-		executionRepo,
-		workspaceService,
-		aiAssistantService,
-		reviewQueueRepo,
-		eventRecorder,
-	)
-	appMarketplaceService := service.NewAppMarketplaceService(appMarketplaceRepo, appRatingRepo)
 	runtimeService := service.NewRuntimeService(
 		workspaceRepo,
 		workspaceSlugAliasRepo,
 		workspaceMemberRepo,
-		appRepo,
-		appSlugAliasRepo,
-		appVersionRepo,
-		appPolicyRepo,
-		appDomainRepo,
-		appSessionRepo,
-		appEventRepo,
 		eventRecorder,
 		s.config.Security.PIISanitizationEnabled,
 		service.RuntimeCacheSettings{
@@ -421,9 +384,8 @@ func (s *Server) setupRoutes() {
 	captchaVerifier := service.NewCaptchaVerifier(&s.config.Captcha)
 	domainRoutingExecutor := service.NewDomainRoutingExecutor(&s.config.DomainRouting, s.log)
 	certificateIssuer := service.NewCertificateIssuerExecutor(&s.config.CertificateIssuer, s.log)
-	appDomainService := service.NewAppDomainService(
-		appRepo,
-		appDomainRepo,
+	workspaceDomainService := service.NewWorkspaceDomainService(
+		workspaceRepo,
 		eventRecorder,
 		s.config.Server.BaseURL,
 		s.config.Deployment.RegionBaseURLs,
@@ -432,10 +394,9 @@ func (s *Server) setupRoutes() {
 	)
 	domainLifecycleService := service.NewDomainLifecycleService(
 		s.config.DomainLifecycle,
-		appDomainRepo,
-		appRepo,
+		workspaceRepo,
 		notificationService,
-		appDomainService,
+		workspaceDomainService,
 		eventRecorder,
 		s.log,
 		s.config.Server.BaseURL,
@@ -470,11 +431,7 @@ func (s *Server) setupRoutes() {
 	adminService := service.NewAdminService(
 		userRepo,
 		workspaceRepo,
-		appRepo,
 		workspaceMemberRepo,
-		appDomainRepo,
-		appPolicyRepo,
-		appVersionRepo,
 		sessionRepo,
 		executionRepo,
 		workspaceQuotaRepo,
@@ -530,7 +487,7 @@ func (s *Server) setupRoutes() {
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService, apiKeyService)
-	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, auditLogService, workspaceExportService)
+	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, workspaceDomainService, auditLogService, workspaceExportService)
 	logArchiveHandler := handler.NewLogArchiveHandler(logArchiveService)
 	workspaceDatabaseHandler := handler.NewWorkspaceDatabaseHandler(workspaceDatabaseService, workspaceDBRoleService, auditLogService, s.taskQueue)
 	auditLogHandler := handler.NewAuditLogHandler(auditLogService, workspaceService)
@@ -545,9 +502,6 @@ func (s *Server) setupRoutes() {
 	templateHandler := handler.NewTemplateHandler(templateService)
 	executionHandler := handler.NewExecutionHandler(executionService)
 	agentHandler := handler.NewAgentHandler(agentService)
-	appHandler := handler.NewAppHandler(appService, auditLogService)
-	appMarketplaceHandler := handler.NewAppMarketplaceHandler(appMarketplaceService)
-	appDomainHandler := handler.NewAppDomainHandler(appDomainService, appService, auditLogService, s.taskQueue)
 	opsSupportHandler := handler.NewOpsSupportHandler(opsSupportService)
 	supportTicketHandler := handler.NewSupportTicketHandler(supportTicketService, supportSettingsService, captchaVerifier)
 	adminHandler := handler.NewAdminHandler(
@@ -640,7 +594,7 @@ func (s *Server) setupRoutes() {
 	earningHandler := handler.NewEarningHandler(earningService, adminService)
 
 	// 对话相关处理器
-	conversationHandler := handler.NewConversationHandler(conversationService)
+	conversationHandler := handler.NewConversationHandler(conversationService, workspaceService)
 	conversationFolderHandler := handler.NewConversationFolderHandler(conversationFolderService)
 	conversationTemplateHandler := handler.NewConversationTemplateHandler(conversationTemplateService)
 
@@ -660,17 +614,17 @@ func (s *Server) setupRoutes() {
 	wsHandler := handler.NewWebSocketHandler(s.wsHub, &s.config.JWT)
 	s.echo.GET("/ws", wsHandler.HandleConnection)
 
-	// Runtime 公开访问入口
-	runtime := s.echo.Group("/runtime", middleware.RequireFeature(featureFlagsService.IsAppRuntimeEnabled, "APP_RUNTIME_DISABLED", "App Runtime 暂未开放"))
+	// Runtime 公开访问入口（现在直接用 workspaceSlug）
+	runtime := s.echo.Group("/runtime", middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 	{
-		runtime.POST("/:workspaceSlug/:appSlug", runtimeHandler.Execute)
-		runtime.GET("/:workspaceSlug/:appSlug", runtimeHandler.GetEntry)
-		runtime.GET("/:workspaceSlug/:appSlug/schema", runtimeHandler.GetSchema)
+		runtime.POST("/:workspaceSlug", runtimeHandler.Execute)
+		runtime.GET("/:workspaceSlug", runtimeHandler.GetEntry)
+		runtime.GET("/:workspaceSlug/schema", runtimeHandler.GetSchema)
 	}
-	s.echo.GET("/", runtimeHandler.GetDomainEntry, middleware.RequireFeature(featureFlagsService.IsAppRuntimeEnabled, "APP_RUNTIME_DISABLED", "App Runtime 暂未开放"))
-	s.echo.GET("/schema", runtimeHandler.GetDomainSchema, middleware.RequireFeature(featureFlagsService.IsAppRuntimeEnabled, "APP_RUNTIME_DISABLED", "App Runtime 暂未开放"))
-	s.echo.POST("/", runtimeHandler.ExecuteDomain, middleware.RequireFeature(featureFlagsService.IsAppRuntimeEnabled, "APP_RUNTIME_DISABLED", "App Runtime 暂未开放"))
-	s.echo.GET("/:workspaceSlug/:appSlug", runtimeHandler.GetEntry, middleware.RequireFeature(featureFlagsService.IsAppRuntimeEnabled, "APP_RUNTIME_DISABLED", "App Runtime 暂未开放"))
+	s.echo.GET("/", runtimeHandler.GetDomainEntry, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
+	s.echo.GET("/schema", runtimeHandler.GetDomainSchema, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
+	s.echo.POST("/", runtimeHandler.ExecuteDomain, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
+	s.echo.GET("/:workspaceSlug", runtimeHandler.GetEntry, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 
 	// API v1
 	v1 := s.echo.Group("/api/v1")
@@ -697,12 +651,12 @@ func (s *Server) setupRoutes() {
 		publicTemplates.GET("/:id", templateHandler.Get)
 	}
 
-	// 应用市场路由 (无需认证)
+	// 应用市场路由 (无需认证) - Workspace 现在就是 App
 	marketplace := v1.Group("/marketplace")
 	{
-		marketplace.GET("/apps", appMarketplaceHandler.ListApps)
-		marketplace.GET("/apps/:id", appMarketplaceHandler.GetApp)
-		marketplace.GET("/apps/:id/ratings", appMarketplaceHandler.ListRatings)
+		marketplace.GET("/workspaces", workspaceHandler.ListPublicWorkspaces)
+		marketplace.GET("/workspaces/:id", workspaceHandler.GetPublicWorkspace)
+		marketplace.GET("/workspaces/:id/ratings", workspaceHandler.ListPublicRatings)
 	}
 
 	// 公开系统路由 (无需认证)
@@ -805,6 +759,7 @@ func (s *Server) setupRoutes() {
 			users.DELETE("/me/api-keys/:id", userHandler.DeleteAPIKey)
 			users.POST("/me/api-keys/:id/rotate", userHandler.RotateAPIKey)
 			users.POST("/me/api-keys/:id/revoke", userHandler.RevokeAPIKey)
+			users.POST("/me/api-keys/:id/test", userHandler.TestSavedAPIKey)
 			users.POST("/me/api-keys/test", userHandler.TestAPIKey)
 			// 活动历史
 			users.GET("/me/activities", activityHandler.List)
@@ -886,6 +841,17 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/members", workspaceHandler.ListMembers)
 			workspaces.POST("/:id/members", workspaceHandler.AddMember)
 			workspaces.PATCH("/:id/members/:memberId", workspaceHandler.UpdateMemberRole)
+
+			// App 功能路由（Workspace = App）
+			workspaces.POST("/:id/publish", workspaceHandler.PublishWorkspace)
+			workspaces.POST("/:id/rollback", workspaceHandler.RollbackWorkspace)
+			workspaces.POST("/:id/deprecate", workspaceHandler.DeprecateWorkspace)
+			workspaces.POST("/:id/archive", workspaceHandler.ArchiveWorkspace)
+			workspaces.GET("/:id/versions", workspaceHandler.GetWorkspaceVersions)
+			workspaces.POST("/:id/versions", workspaceHandler.CreateWorkspaceVersion)
+			workspaces.GET("/:id/versions/compare", workspaceHandler.CompareWorkspaceVersions)
+			workspaces.GET("/:id/access-policy", workspaceHandler.GetWorkspaceAccessPolicy)
+			workspaces.PATCH("/:id/access-policy", workspaceHandler.UpdateWorkspaceAccessPolicy)
 		}
 
 		// 安全与合规
@@ -1028,7 +994,7 @@ func (s *Server) setupRoutes() {
 			billing.GET("/workspaces/:id/invoices/:invoiceId/download", billingHandler.DownloadInvoice)
 			billing.POST("/workspaces/:id/invoices/:invoiceId/payment", billingHandler.SyncInvoicePayment)
 			billing.POST("/workspaces/:id/consume", billingHandler.ConsumeUsage)
-			billing.GET("/workspaces/:id/apps/usage", billingHandler.GetAppUsageStats)
+			billing.GET("/workspaces/:id/usage", billingHandler.GetWorkspaceUsageStats)
 		}
 
 		// 工作流
@@ -1108,63 +1074,10 @@ func (s *Server) setupRoutes() {
 			agents.POST("/:id/submit", agentHandler.SubmitForReview)
 		}
 
-		// App
-		apps := protected.Group("/apps")
-		{
-			apps.GET("", appHandler.List)
-			apps.POST("", appHandler.Create)
-			apps.POST("/from-workflow", appHandler.CreateFromWorkflow)
-			apps.POST("/from-ai", appHandler.CreateFromAI)
-			apps.GET("/:id/versions", appHandler.ListVersions)
-			apps.GET("/:id/versions/compare", appHandler.CompareVersions)
-			apps.POST("/:id/versions", appHandler.CreateVersion)
-			apps.POST("/:id/db-schema/review", appHandler.SubmitDBSchemaReview)
-			apps.GET("/:id/db-schema/review", appHandler.GetDBSchemaReview)
-			apps.GET("/:id/db-schema/review/history", appHandler.GetDBSchemaReviewHistory)
-			apps.POST("/:id/db-schema/rollback", appHandler.RollbackDBSchema)
-			apps.POST("/:id/db-schema/review/approve", appHandler.ApproveDBSchemaReview)
-			apps.POST("/:id/db-schema/review/reject", appHandler.RejectDBSchemaReview)
-			apps.POST("/:id/major-change/review", appHandler.SubmitMajorChangeReview)
-			apps.GET("/:id/major-change/review", appHandler.GetMajorChangeReview)
-			apps.GET("/:id/major-change/review/history", appHandler.GetMajorChangeReviewHistory)
-			apps.POST("/:id/major-change/review/approve", appHandler.ApproveMajorChangeReview)
-			apps.POST("/:id/major-change/review/reject", appHandler.RejectMajorChangeReview)
-			apps.POST("/:id/publish", appHandler.Publish)
-			apps.POST("/:id/rollback", appHandler.Rollback)
-			apps.POST("/:id/deprecate", appHandler.Deprecate)
-			apps.POST("/:id/archive", appHandler.Archive)
-			apps.PATCH("/:id", appHandler.Update)
-			apps.GET("/:id", appHandler.Get)
-			apps.GET("/:id/export", appHandler.ExportConfig)
-			apps.GET("/:id/access-stats", metricsHandler.GetAppAccessStats)
-			apps.GET("/:id/metrics", metricsHandler.GetAppMetrics)
-			apps.GET("/:id/executions", appHandler.ListExecutions)
-			apps.GET("/:id/access-policy", appHandler.GetAccessPolicy)
-			apps.PATCH("/:id/access-policy", appHandler.UpdateAccessPolicy)
-			apps.PATCH("/:id/public-branding", appHandler.UpdatePublicBranding)
-			apps.PATCH("/:id/public-seo", appHandler.UpdatePublicSEO)
-			apps.PATCH("/:id/public-inputs", appHandler.UpdatePublicInputs)
-			apps.PATCH("/:id/ui-schema", appHandler.UpdateUISchema)
-			domains := apps.Group("/:id/domains", middleware.RequireFeature(featureFlagsService.IsDomainEnabled, "DOMAIN_DISABLED", "域名功能未开放"))
-			{
-				domains.GET("", appDomainHandler.List)
-				domains.POST("", appDomainHandler.Create)
-				domains.POST("/:domainId/verify", appDomainHandler.Verify)
-				domains.POST("/:domainId/cert/issue", appDomainHandler.IssueCertificate)
-				domains.POST("/:domainId/cert/renew", appDomainHandler.RenewCertificate)
-				domains.POST("/:domainId/activate", appDomainHandler.Activate)
-				domains.POST("/:domainId/rollback", appDomainHandler.Rollback)
-				domains.PATCH("/:domainId/expiry", appDomainHandler.UpdateExpiry)
-				domains.POST("/:domainId/block", appDomainHandler.Block)
-				domains.POST("/:domainId/unblock", appDomainHandler.Unblock)
-				domains.DELETE("/:domainId", appDomainHandler.Delete)
-			}
-		}
-
-		// Domain (by domain id)
+		// 域名路由（现在直接挂在 workspace 下，通过 workspaceDomainHandler 处理）
 		domainRoutes := protected.Group("/domains", middleware.RequireFeature(featureFlagsService.IsDomainEnabled, "DOMAIN_DISABLED", "域名功能未开放"))
 		{
-			domainRoutes.POST("/:domainId/verify", appDomainHandler.VerifyByID)
+			domainRoutes.POST("/:domainId/verify", workspaceHandler.VerifyDomainByID)
 		}
 
 		// 统计
@@ -1241,10 +1154,10 @@ func (s *Server) setupRoutes() {
 			reviews.POST("/:id/helpful", reviewHandler.MarkHelpful)
 		}
 
-		// 应用市场评分
+		// 应用市场评分（现在直接对 workspace 评分）
 		protectedMarketplace := protected.Group("/marketplace")
 		{
-			protectedMarketplace.POST("/apps/:id/ratings", appMarketplaceHandler.SubmitRating)
+			protectedMarketplace.POST("/workspaces/:id/ratings", workspaceHandler.SubmitRating)
 		}
 
 		// Agent 评价列表（无需认证也可访问）
@@ -1393,9 +1306,7 @@ func (s *Server) setupRoutes() {
 		admin.GET("/workspaces", adminHandler.ListWorkspaces)
 		admin.GET("/workspaces/:id", adminHandler.GetWorkspace)
 		admin.PATCH("/workspaces/:id/status", adminHandler.UpdateWorkspaceStatus)
-		admin.GET("/apps", adminHandler.ListApps)
-		admin.GET("/apps/:id", adminHandler.GetApp)
-		admin.PATCH("/apps/:id/status", adminHandler.UpdateAppStatus)
+		admin.PATCH("/workspaces/:id/publish-status", adminHandler.UpdateWorkspacePublishStatus)
 		admin.GET("/announcements", adminHandler.ListAnnouncements)
 		admin.POST("/announcements", adminHandler.CreateAnnouncement)
 		admin.PATCH("/announcements/:id", adminHandler.UpdateAnnouncement)

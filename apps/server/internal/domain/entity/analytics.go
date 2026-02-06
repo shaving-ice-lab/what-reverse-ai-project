@@ -49,7 +49,6 @@ func (d *AnalyticsMetricDefinition) BeforeCreate(tx *gorm.DB) error {
 type AnalyticsMetric struct {
 	ID           uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
 	WorkspaceID  uuid.UUID  `gorm:"type:char(36);not null;index" json:"workspace_id"`
-	AppID        *uuid.UUID `gorm:"type:char(36);index" json:"app_id,omitempty"`
 	DefinitionID *uuid.UUID `gorm:"type:char(36);index" json:"definition_id,omitempty"`
 
 	Name  string  `gorm:"size:120;not null;index" json:"name"`
@@ -64,7 +63,6 @@ type AnalyticsMetric struct {
 	CreatedAt time.Time `json:"created_at"`
 
 	Workspace  *Workspace                 `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
-	App        *App                       `gorm:"foreignKey:AppID" json:"app,omitempty"`
 	Definition *AnalyticsMetricDefinition `gorm:"foreignKey:DefinitionID" json:"definition,omitempty"`
 }
 

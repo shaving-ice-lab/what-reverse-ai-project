@@ -8,56 +8,56 @@ import (
 )
 
 const (
-	PermissionMembersManage     = "members_manage"
-	PermissionBillingManage     = "billing_manage"
-	PermissionAppPublish        = "app_publish"
-	PermissionAppEdit           = "app_edit"
-	PermissionAppViewMetrics    = "app_view_metrics"
-	PermissionLogsView          = "logs_view"
-	PermissionWorkspaceAdmin    = "workspace_admin"
-	PermissionAppsCreate        = "apps_create"
-	PermissionWorkspaceDBAccess = "workspace_db_access"
-	PermissionPlanView          = "plan_view"
-	PermissionPlanManage        = "plan_manage"
-	PermissionConnectorsManage  = "connectors_manage"
+	PermissionMembersManage        = "members_manage"
+	PermissionBillingManage        = "billing_manage"
+	PermissionWorkspacePublish     = "workspace_publish"
+	PermissionWorkspaceEdit        = "workspace_edit"
+	PermissionWorkspaceViewMetrics = "workspace_view_metrics"
+	PermissionLogsView             = "logs_view"
+	PermissionWorkspaceAdmin       = "workspace_admin"
+	PermissionWorkspaceCreate      = "workspace_create"
+	PermissionWorkspaceDBAccess    = "workspace_db_access"
+	PermissionPlanView             = "plan_view"
+	PermissionPlanManage           = "plan_manage"
+	PermissionConnectorsManage     = "connectors_manage"
 )
 
 var defaultWorkspaceRolePermissions = map[string]entity.JSON{
 	"owner": {
-		PermissionMembersManage:     true,
-		PermissionBillingManage:     true,
-		PermissionAppPublish:        true,
-		PermissionAppEdit:           true,
-		PermissionAppViewMetrics:    true,
-		PermissionLogsView:          true,
-		PermissionWorkspaceAdmin:    true,
-		PermissionAppsCreate:        true,
-		PermissionWorkspaceDBAccess: true,
-		PermissionPlanView:          true,
-		PermissionPlanManage:        true,
-		PermissionConnectorsManage:  true,
+		PermissionMembersManage:        true,
+		PermissionBillingManage:        true,
+		PermissionWorkspacePublish:     true,
+		PermissionWorkspaceEdit:        true,
+		PermissionWorkspaceViewMetrics: true,
+		PermissionLogsView:             true,
+		PermissionWorkspaceAdmin:       true,
+		PermissionWorkspaceCreate:      true,
+		PermissionWorkspaceDBAccess:    true,
+		PermissionPlanView:             true,
+		PermissionPlanManage:           true,
+		PermissionConnectorsManage:     true,
 	},
 	"admin": {
-		PermissionMembersManage:     true,
-		PermissionAppPublish:        true,
-		PermissionAppEdit:           true,
-		PermissionAppViewMetrics:    true,
-		PermissionLogsView:          true,
-		PermissionAppsCreate:        true,
-		PermissionWorkspaceDBAccess: true,
-		PermissionPlanView:          true,
-		PermissionPlanManage:        true,
-		PermissionConnectorsManage:  true,
+		PermissionMembersManage:        true,
+		PermissionWorkspacePublish:     true,
+		PermissionWorkspaceEdit:        true,
+		PermissionWorkspaceViewMetrics: true,
+		PermissionLogsView:             true,
+		PermissionWorkspaceCreate:      true,
+		PermissionWorkspaceDBAccess:    true,
+		PermissionPlanView:             true,
+		PermissionPlanManage:           true,
+		PermissionConnectorsManage:     true,
 	},
 	"member": {
-		PermissionAppEdit:           true,
-		PermissionAppViewMetrics:    true,
-		PermissionLogsView:          true,
-		PermissionAppsCreate:        true,
-		PermissionWorkspaceDBAccess: false,
-		PermissionPlanView:          true,
-		PermissionPlanManage:        false,
-		PermissionConnectorsManage:  false,
+		PermissionWorkspaceEdit:        true,
+		PermissionWorkspaceViewMetrics: true,
+		PermissionLogsView:             true,
+		PermissionWorkspaceCreate:      true,
+		PermissionWorkspaceDBAccess:    false,
+		PermissionPlanView:             true,
+		PermissionPlanManage:           false,
+		PermissionConnectorsManage:     false,
 	},
 }
 

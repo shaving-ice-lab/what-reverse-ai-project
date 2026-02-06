@@ -131,7 +131,7 @@ func (s *planDependencyMilestoneService) GetPlan(ctx context.Context) (*Dependen
 			{
 				Key:         "app_ready",
 				Title:       "App 生命周期闭环",
-				Description: "完成 App 模型、版本管理与发布流程",
+				Description: "完成 Workspace 模型、版本管理与发布流程",
 				Sequence:    2,
 				DependsOn:   []string{"workspace_ready"},
 				Status:      "planned",

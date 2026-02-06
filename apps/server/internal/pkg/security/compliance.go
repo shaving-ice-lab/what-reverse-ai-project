@@ -159,25 +159,11 @@ var AuditActionRegistry = map[string]AuditAction{
 		Severity:    "high",
 		Required:    true,
 	},
-	"app_created": {
-		Name:        "app_created",
+	"workspace_published": {
+		Name:        "workspace_published",
 		Category:    AuditCategoryOperation,
-		Description: "创建应用",
+		Description: "发布工作空间",
 		Severity:    "medium",
-		Required:    true,
-	},
-	"app_published": {
-		Name:        "app_published",
-		Category:    AuditCategoryOperation,
-		Description: "发布应用",
-		Severity:    "medium",
-		Required:    true,
-	},
-	"app_deleted": {
-		Name:        "app_deleted",
-		Category:    AuditCategoryOperation,
-		Description: "删除应用",
-		Severity:    "high",
 		Required:    true,
 	},
 	"workflow_executed": {

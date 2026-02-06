@@ -15,11 +15,7 @@ var ErrorCodeTable = []ErrorCodeDefinition{
 	{Code: "WORKSPACE_INVALID_ID", HTTPStatus: 400, Module: "workspace", Description: "工作空间 ID 无效"},
 	{Code: "WORKSPACE_NOT_FOUND", HTTPStatus: 404, Module: "workspace", Description: "工作空间不存在"},
 
-	{Code: "APP_INVALID_ID", HTTPStatus: 400, Module: "app", Description: "App ID 无效"},
-	{Code: "APP_NOT_FOUND", HTTPStatus: 404, Module: "app", Description: "App 不存在"},
-	{Code: "APP_MISMATCH", HTTPStatus: 400, Module: "app", Description: "App 不属于此工作空间"},
-
-	{Code: "APP_RUNTIME_DISABLED", HTTPStatus: 503, Module: "runtime", Description: "App Runtime 暂未开放"},
+	{Code: "WORKSPACE_RUNTIME_DISABLED", HTTPStatus: 503, Module: "runtime", Description: "工作空间 Runtime 暂未开放"},
 	{Code: "RUNTIME_FAILED", HTTPStatus: 500, Module: "runtime", Description: "运行时执行失败"},
 
 	{Code: "DOMAIN_DISABLED", HTTPStatus: 503, Module: "domain", Description: "域名功能未开放"},

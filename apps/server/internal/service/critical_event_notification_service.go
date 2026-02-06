@@ -206,9 +206,6 @@ func buildCriticalEventMessage(event *entity.RuntimeEvent, description string) (
 	if event.WorkspaceID != nil {
 		lines = append(lines, fmt.Sprintf("Workspace: %s", event.WorkspaceID.String()))
 	}
-	if event.AppID != nil {
-		lines = append(lines, fmt.Sprintf("App: %s", event.AppID.String()))
-	}
 	if event.ExecutionID != nil {
 		lines = append(lines, fmt.Sprintf("Execution: %s", event.ExecutionID.String()))
 	}
@@ -335,9 +332,6 @@ func buildSMSBody(title string, event *entity.RuntimeEvent) string {
 	}
 	if event.ExecutionID != nil {
 		return fmt.Sprintf("%s (execution: %s)", title, event.ExecutionID.String())
-	}
-	if event.AppID != nil {
-		return fmt.Sprintf("%s (app: %s)", title, event.AppID.String())
 	}
 	return title
 }

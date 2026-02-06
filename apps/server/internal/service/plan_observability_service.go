@@ -99,7 +99,7 @@ func defaultMetricsDictionary() MetricsDictionary {
 		Summary: "Prometheus metrics covering HTTP, execution, runtime, database, domain, LLM, websocket, system, and ops.",
 		Metrics: observability.GetMetricsDictionary(),
 		Notes: []string{
-			"Use labels to slice by workspace_id, app_id, status, or provider/model.",
+			"Use labels to slice by workspace_id, status, or provider/model.",
 			"Histogram buckets are tuned for core request, execution, and runtime paths.",
 		},
 	}
@@ -109,7 +109,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 	return TrackingEventPlan{
 		Key:     "frontend_tracking_events",
 		Title:   "Frontend tracking event table",
-		Summary: "Client-side analytics events for core workspace, app, workflow, runtime, and billing flows.",
+		Summary: "Client-side analytics events for core workspace, workflow, runtime, and billing flows.",
 		Events: []TrackingEventDefinition{
 			{
 				Key:         "workspace.created",
@@ -130,21 +130,12 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Source:      "frontend",
 			},
 			{
-				Key:         "app.created",
-				Event:       "app.created",
-				Category:    "app",
-				Description: "App created",
-				Trigger:     "App creation succeeds",
-				Properties:  []string{"app_id", "workspace_id", "user_id", "source"},
-				Source:      "frontend",
-			},
-			{
-				Key:         "app.published",
-				Event:       "app.published",
-				Category:    "app",
-				Description: "App published",
+				Key:         "workspace.published",
+				Event:       "workspace.published",
+				Category:    "workspace",
+				Description: "Workspace published",
 				Trigger:     "Publish action completes successfully",
-				Properties:  []string{"app_id", "workspace_id", "version_id", "access_mode", "domain_bound"},
+				Properties:  []string{"workspace_id", "version_id", "access_mode", "domain_bound"},
 				Source:      "frontend",
 			},
 			{
@@ -153,7 +144,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Category:    "workflow",
 				Description: "Workflow editor opened",
 				Trigger:     "User enters workflow editor",
-				Properties:  []string{"workflow_id", "app_id", "workspace_id", "user_id", "source"},
+				Properties:  []string{"workflow_id", "workspace_id", "user_id", "source"},
 				Source:      "frontend",
 			},
 			{
@@ -180,7 +171,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Category:    "runtime",
 				Description: "Runtime entry viewed",
 				Trigger:     "User opens the public runtime entry",
-				Properties:  []string{"workspace_id", "app_id", "session_id", "client", "referrer"},
+				Properties:  []string{"workspace_id", "session_id", "client", "referrer"},
 				Source:      "frontend",
 			},
 			{
@@ -189,7 +180,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Category:    "runtime",
 				Description: "Runtime schema viewed",
 				Trigger:     "User requests the runtime schema",
-				Properties:  []string{"workspace_id", "app_id", "session_id"},
+				Properties:  []string{"workspace_id", "session_id"},
 				Source:      "frontend",
 			},
 			{
@@ -198,7 +189,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Category:    "runtime",
 				Description: "Runtime execution submitted",
 				Trigger:     "User submits runtime execution",
-				Properties:  []string{"workspace_id", "app_id", "session_id", "trigger_type", "input_size"},
+				Properties:  []string{"workspace_id", "session_id", "trigger_type", "input_size"},
 				Source:      "frontend",
 			},
 			{
@@ -207,7 +198,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 				Category:    "execution",
 				Description: "Execution cancel requested",
 				Trigger:     "User cancels an in-flight execution",
-				Properties:  []string{"execution_id", "app_id", "workspace_id", "user_id"},
+				Properties:  []string{"execution_id", "workspace_id", "user_id"},
 				Source:      "frontend",
 			},
 			{
@@ -230,7 +221,7 @@ func defaultFrontendTrackingPlan() TrackingEventPlan {
 			},
 		},
 		Notes: []string{
-			"Include user_id, workspace_id, and app_id when available for segmentation.",
+			"Include user_id and workspace_id when available for segmentation.",
 			"Event names are stable identifiers for dashboarding.",
 		},
 	}
@@ -266,8 +257,7 @@ func backendTriggerForCategory(category string) string {
 	triggers := map[string]string{
 		"execution": "Execution lifecycle state change",
 		"node":      "Node execution state change",
-		"workspace": "Workspace lifecycle event",
-		"app":       "App runtime or access event",
+		"workspace": "Workspace lifecycle or runtime event",
 		"database":  "Database provision or migration event",
 		"domain":    "Domain verification or certificate event",
 		"llm":       "LLM request lifecycle event",
@@ -289,7 +279,6 @@ func backendPropertiesForCategory(category string) []string {
 		"trace_id",
 		"request_id",
 		"workspace_id",
-		"app_id",
 		"execution_id",
 		"user_id",
 		"session_id",

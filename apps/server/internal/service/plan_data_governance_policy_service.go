@@ -225,7 +225,7 @@ func defaultDataMinimizationPolicy(retention config.RetentionConfig, securityCfg
 			Title:       "导出范围受控",
 			Purpose:     "用户数据可移植性",
 			Scope:       "workspace_export",
-			Description: "导出包仅包含 workspace/members/apps/workflows，不包含运行日志与审计日志。",
+			Description: "导出包仅包含 workspace/members/workflows，不包含运行日志与审计日志。",
 			Enforced:    true,
 			Source:      "apps/server/internal/service/workspace_service.go & workspace_export_service.go",
 			Notes: []string{

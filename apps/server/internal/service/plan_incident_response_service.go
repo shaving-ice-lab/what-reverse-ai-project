@@ -416,7 +416,7 @@ func defaultIncidentDrillPlanSet() IncidentDrillPlanSet {
 					{
 						Title: "确认超时与队列压力",
 						Actions: []string{
-							"调用 GET /api/v1/apps/:id/metrics 查看失败率",
+							"调用 GET /api/v1/workspaces/:id/metrics 查看失败率",
 							"查看执行队列中超时任务数量",
 						},
 						Expected: "确认超时影响范围与队列压力",
@@ -466,7 +466,7 @@ func defaultIncidentDrillPlanSet() IncidentDrillPlanSet {
 					{
 						Title: "确认域名状态",
 						Actions: []string{
-							"调用 GET /api/v1/apps/:id/domains 获取状态",
+							"调用 GET /api/v1/workspaces/:id/domains 获取状态",
 							"检查 last_verification_error 与 retry 次数",
 						},
 						Expected: "定位失败原因",

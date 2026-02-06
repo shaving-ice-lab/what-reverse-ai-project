@@ -10,15 +10,16 @@ import (
 
 // ConversationListOptions 对话列表查询选项
 type ConversationListOptions struct {
-	UserID   uuid.UUID
-	FolderID *uuid.UUID
-	Starred  *bool
-	Pinned   *bool
-	Archived *bool
-	Search   string
-	Page     int
-	PageSize int
-	OrderBy  string
+	UserID      uuid.UUID
+	WorkspaceID *uuid.UUID
+	FolderID    *uuid.UUID
+	Starred     *bool
+	Pinned      *bool
+	Archived    *bool
+	Search      string
+	Page        int
+	PageSize    int
+	OrderBy     string
 }
 
 // ConversationRepository 对话仓储接口
@@ -29,22 +30,22 @@ type ConversationRepository interface {
 	List(ctx context.Context, opts ConversationListOptions) ([]entity.Conversation, int64, error)
 	Update(ctx context.Context, conversation *entity.Conversation) error
 	Delete(ctx context.Context, id uuid.UUID) error
-	
+
 	// 状态操作
 	SetStarred(ctx context.Context, id uuid.UUID, starred bool) error
 	SetPinned(ctx context.Context, id uuid.UUID, pinned bool) error
 	SetArchived(ctx context.Context, id uuid.UUID, archived bool) error
-	
+
 	// 批量操作
 	BatchSetStarred(ctx context.Context, ids []uuid.UUID, starred bool) error
 	BatchSetArchived(ctx context.Context, ids []uuid.UUID, archived bool) error
 	BatchDelete(ctx context.Context, ids []uuid.UUID) error
 	BatchMove(ctx context.Context, ids []uuid.UUID, folderID *uuid.UUID) error
-	
+
 	// 统计
 	CountByUser(ctx context.Context, userID uuid.UUID) (int64, error)
 	CountByFolder(ctx context.Context, folderID uuid.UUID) (int64, error)
-	
+
 	// 更新消息计数和预览
 	UpdateMessageStats(ctx context.Context, id uuid.UUID, messageCount int, preview string) error
 	IncrementTokenUsage(ctx context.Context, id uuid.UUID, tokens int) error
@@ -98,6 +99,11 @@ func (r *conversationRepository) List(ctx context.Context, opts ConversationList
 
 	query := r.db.WithContext(ctx).Model(&entity.Conversation{}).
 		Where("user_id = ?", opts.UserID)
+
+	// Workspace 筛选
+	if opts.WorkspaceID != nil {
+		query = query.Where("workspace_id = ?", opts.WorkspaceID)
+	}
 
 	// 文件夹筛选
 	if opts.FolderID != nil {
@@ -299,7 +305,7 @@ func (r *conversationFolderRepository) Delete(ctx context.Context, id uuid.UUID)
 	r.db.WithContext(ctx).Model(&entity.Conversation{}).
 		Where("folder_id = ?", id).
 		Update("folder_id", nil)
-	
+
 	return r.db.WithContext(ctx).Delete(&entity.ConversationFolder{}, "id = ?", id).Error
 }
 

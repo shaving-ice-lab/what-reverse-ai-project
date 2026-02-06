@@ -169,7 +169,7 @@ func defaultResponsiveExperiencePlan() ResponsiveExperiencePlan {
 					"表单与设置页保持 1 列为主，md 起允许二列并排。",
 				},
 				Targets: []string{
-					"apps/web/src/app/(dashboard)/apps",
+					"apps/web/src/app/(dashboard)/dashboard/workspaces",
 					"apps/web/src/app/(unauth)/store",
 				},
 			},
@@ -263,8 +263,8 @@ func defaultResponsiveExperiencePlan() ResponsiveExperiencePlan {
 			},
 		},
 		EditorStrategy: ResponsiveEditorStrategy{
-			Key:     "app_editor_responsive",
-			Title:   "App 编辑器多端适配策略",
+			Key:     "workspace_editor_responsive",
+			Title:   "Workspace 编辑器多端适配策略",
 			Summary: "保证编辑器在大屏/小屏下可操作、信息不丢失。",
 			Layouts: []ResponsiveEditorLayout{
 				{
@@ -281,7 +281,7 @@ func defaultResponsiveExperiencePlan() ResponsiveExperiencePlan {
 						"拖拽与缩放在画布区域完成",
 					},
 					Targets: []string{
-						"apps/web/src/app/(dashboard)/workspaces/[workspaceId]/apps/[appId]/builder/page.tsx",
+						"apps/web/src/app/(dashboard)/dashboard/app/[appId]/builder/page.tsx",
 						"apps/web/src/components/editor",
 					},
 					Acceptance: []string{
@@ -303,7 +303,7 @@ func defaultResponsiveExperiencePlan() ResponsiveExperiencePlan {
 						"减少同时显示的表单字段数量",
 					},
 					Targets: []string{
-						"apps/web/src/app/(dashboard)/workspaces/[workspaceId]/apps/[appId]/builder/page.tsx",
+						"apps/web/src/app/(dashboard)/dashboard/app/[appId]/builder/page.tsx",
 						"apps/web/src/components/editor",
 					},
 					Acceptance: []string{

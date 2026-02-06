@@ -108,7 +108,7 @@ func (s *modelUsageService) GetWorkspaceUsage(ctx context.Context, userID, works
 	if err != nil {
 		return nil, err
 	}
-	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionAppViewMetrics, PermissionLogsView) {
+	if !hasAnyPermission(access.Permissions, PermissionBillingManage, PermissionWorkspaceViewMetrics, PermissionLogsView) {
 		return nil, ErrWorkspaceUnauthorized
 	}
 

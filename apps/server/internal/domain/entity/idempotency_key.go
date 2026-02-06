@@ -14,7 +14,6 @@ type IdempotencyKey struct {
 	IdempotencyKey string     `gorm:"column:idempotency_key;size:100;not null;uniqueIndex:uniq_idempotency_key" json:"idempotency_key"`
 	Action         string     `gorm:"size:50;not null;uniqueIndex:uniq_idempotency_key" json:"action"`
 	WorkspaceID    *uuid.UUID `gorm:"type:char(36);index" json:"workspace_id,omitempty"`
-	AppID          *uuid.UUID `gorm:"type:char(36);index" json:"app_id,omitempty"`
 	ResourceID     *uuid.UUID `gorm:"type:char(36);index" json:"resource_id,omitempty"`
 	ResourceType   string     `gorm:"size:50" json:"resource_type,omitempty"`
 	RequestHash    string     `gorm:"size:64" json:"request_hash,omitempty"`

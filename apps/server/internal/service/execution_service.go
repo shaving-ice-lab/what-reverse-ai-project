@@ -288,7 +288,6 @@ func (s *executionService) executeWorkflow(ctx context.Context, execution *entit
 		defer s.loadShedder.Release()
 	}
 	workspaceID := workflow.WorkspaceID.String()
-	appID := "" // TODO: 从 workflow 关联获取 app_id
 	triggerType := execution.TriggerType
 	if triggerType == "" {
 		triggerType = "manual"
@@ -305,14 +304,14 @@ func (s *executionService) executeWorkflow(ctx context.Context, execution *entit
 	defJSON, err := json.Marshal(workflow.Definition)
 	if err != nil {
 		s.updateExecutionFailed(ctx, execution, err)
-		s.recordExecutionMetrics(workspaceID, appID, "failed", triggerType, execution)
+		s.recordExecutionMetrics(workspaceID, "failed", triggerType, execution)
 		return
 	}
 
 	def, err := executor.ParseWorkflowDefinition(defJSON)
 	if err != nil {
 		s.updateExecutionFailed(ctx, execution, err)
-		s.recordExecutionMetrics(workspaceID, appID, "failed", triggerType, execution)
+		s.recordExecutionMetrics(workspaceID, "failed", triggerType, execution)
 		return
 	}
 
@@ -449,7 +448,7 @@ func (s *executionService) executeWorkflow(ctx context.Context, execution *entit
 	_ = s.executionRepo.Update(ctx, execution)
 
 	// 记录执行指标
-	s.recordExecutionMetrics(workspaceID, appID, status, triggerType, execution)
+	s.recordExecutionMetrics(workspaceID, status, triggerType, execution)
 
 	// 记录 Token 用量
 	s.consumeTokenUsage(ctx, execution, normalizedTokenUsage)
@@ -482,7 +481,7 @@ func (s *executionService) enqueueMetricsAggregation(ctx context.Context, execut
 }
 
 // recordExecutionMetrics 记录执行指标
-func (s *executionService) recordExecutionMetrics(workspaceID, appID, status, triggerType string, execution *entity.Execution) {
+func (s *executionService) recordExecutionMetrics(workspaceID, status, triggerType string, execution *entity.Execution) {
 	if s.metrics == nil {
 		return
 	}
@@ -492,7 +491,7 @@ func (s *executionService) recordExecutionMetrics(workspaceID, appID, status, tr
 		durationSeconds = float64(*execution.DurationMs) / 1000.0
 	}
 
-	s.metrics.RecordExecution(workspaceID, appID, status, triggerType, durationSeconds)
+	s.metrics.RecordExecution(workspaceID, status, triggerType, durationSeconds)
 }
 
 func (s *executionService) consumeTokenUsage(ctx context.Context, execution *entity.Execution, usage executor.TokenUsage) {
@@ -661,7 +660,7 @@ func buildExecutionAuditTriggerData(triggerData entity.JSON) map[string]interfac
 	if triggerData == nil {
 		return nil
 	}
-	allowed := []string{"source", "app_id", "app_version_id", "session_id", "access_mode"}
+	allowed := []string{"source", "workspace_id", "workspace_version_id", "session_id", "access_mode"}
 	result := make(map[string]interface{})
 	for _, key := range allowed {
 		if value, ok := triggerData[key]; ok {

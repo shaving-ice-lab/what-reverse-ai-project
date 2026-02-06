@@ -103,9 +103,9 @@ type CaptchaConfig struct {
 
 // FeatureFlagsConfig 功能开关配置
 type FeatureFlagsConfig struct {
-	WorkspaceEnabled  bool `mapstructure:"workspace_enabled"`
-	AppRuntimeEnabled bool `mapstructure:"app_runtime_enabled"`
-	DomainEnabled     bool `mapstructure:"domain_enabled"`
+	WorkspaceEnabled        bool `mapstructure:"workspace_enabled"`
+	WorkspaceRuntimeEnabled bool `mapstructure:"workspace_runtime_enabled"`
+	DomainEnabled           bool `mapstructure:"domain_enabled"`
 }
 
 // DomainRoutingConfig 域名路由切流配置
@@ -358,7 +358,7 @@ func setDefaults() {
 
 	// Feature Flags
 	viper.SetDefault("features.workspace_enabled", true)
-	viper.SetDefault("features.app_runtime_enabled", true)
+	viper.SetDefault("features.workspace_runtime_enabled", true)
 	viper.SetDefault("features.domain_enabled", true)
 
 	// Domain Routing

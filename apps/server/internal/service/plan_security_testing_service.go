@@ -184,7 +184,7 @@ func defaultSecurityPenTestPlan() SecurityPenTestPlan {
 		Scope: []string{
 			"公开访问入口（App 公开页面 / Runtime）",
 			"控制台登录、工作空间管理与权限配置",
-			"Workspace/App/API 关键管理接口",
+			"Workspace/API 关键管理接口",
 			"Webhook/回调与第三方集成入口",
 			"导出、密钥、配置中心等高风险功能",
 		},
