@@ -453,6 +453,8 @@ export default function WorkflowDetailPage() {
 
         </div>
 
+      </div>
+
       </header>
 
       {/* Tabs */}
@@ -632,8 +634,6 @@ export default function WorkflowDetailPage() {
 
               </div>
               </div>
-            </div>
-
             </div>
 
             {/* Recent Executions */}

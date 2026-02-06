@@ -50,6 +50,7 @@ export interface AIParameters {
 export interface Conversation extends AIParameters {
   id: string;
   userId: string;
+  workspaceId?: string;
   title: string;
   preview: string;
   model: string;
@@ -85,6 +86,7 @@ export interface ConversationFolder {
 // ===== 请求类型 =====
 
 export interface CreateConversationRequest extends AIParameters {
+  workspaceId: string;
   title: string;
   model?: string;
   systemPrompt?: string;
@@ -100,6 +102,7 @@ export interface UpdateConversationRequest extends AIParameters {
 }
 
 export interface ListConversationsParams {
+  workspaceId?: string;
   folderId?: string;
   starred?: boolean;
   pinned?: boolean;

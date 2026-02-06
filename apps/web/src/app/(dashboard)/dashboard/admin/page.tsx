@@ -6,7 +6,6 @@ import {
   Shield,
   Users,
   Building2,
-  LayoutGrid,
   LifeBuoy,
   Ban,
   CheckCircle2,
@@ -24,7 +23,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 import {
   adminApi,
-  type AdminApp,
   type AdminCapability,
   type AdminUser,
   type AdminWorkspace,
@@ -34,7 +32,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 
 type ActionTarget =
   | {
-      type: "user" | "workspace" | "app";
+      type: "user" | "workspace";
       id: string;
       title: string;
       description: string;
@@ -128,11 +126,6 @@ export default function AdminConsolePage() {
   const [workspaceStatus, setWorkspaceStatus] = useState("");
   const [workspaceLoading, setWorkspaceLoading] = useState(false);
 
-  const [apps, setApps] = useState<AdminApp[]>([]);
-  const [appSearch, setAppSearch] = useState("");
-  const [appStatus, setAppStatus] = useState("");
-  const [appLoading, setAppLoading] = useState(false);
-
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [ticketSearch, setTicketSearch] = useState("");
   const [ticketStatus, setTicketStatus] = useState("");
@@ -198,24 +191,6 @@ export default function AdminConsolePage() {
     }
   };
 
-  const loadApps = async () => {
-    setAppLoading(true);
-    try {
-      const data = await adminApi.listApps({
-        search: appSearch || undefined,
-        status: appStatus || undefined,
-        page: 1,
-        page_size: 20,
-      });
-      setApps(data.items ?? []);
-    } catch (error) {
-      console.error("Failed to load apps", error);
-      setApps([]);
-    } finally {
-      setAppLoading(false);
-    }
-  };
-
   const loadTickets = async () => {
     setTicketLoading(true);
     try {
@@ -241,8 +216,6 @@ export default function AdminConsolePage() {
         return loadUsers();
       case "workspaces":
         return loadWorkspaces();
-      case "apps":
-        return loadApps();
       case "tickets":
         return loadTickets();
       default:
@@ -259,11 +232,6 @@ export default function AdminConsolePage() {
     if (!isAdmin) return;
     if (activeTab === "workspaces") loadWorkspaces();
   }, [activeTab, isAdmin, workspaceSearch, workspaceStatus]);
-
-  useEffect(() => {
-    if (!isAdmin) return;
-    if (activeTab === "apps") loadApps();
-  }, [activeTab, isAdmin, appSearch, appStatus]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -287,12 +255,6 @@ export default function AdminConsolePage() {
       }
       if (actionTarget.type === "workspace") {
         await adminApi.updateWorkspaceStatus(actionTarget.id, {
-          status: actionTarget.nextStatus,
-          reason: actionReason || undefined,
-        });
-      }
-      if (actionTarget.type === "app") {
-        await adminApi.updateAppStatus(actionTarget.id, {
           status: actionTarget.nextStatus,
           reason: actionReason || undefined,
         });
@@ -386,9 +348,6 @@ export default function AdminConsolePage() {
               </TabsTrigger>
               <TabsTrigger value="workspaces" icon={<Building2 className="h-4 w-4" />}>
                 Workspace
-              </TabsTrigger>
-              <TabsTrigger value="apps" icon={<LayoutGrid className="h-4 w-4" />}>
-                应用
               </TabsTrigger>
               <TabsTrigger value="tickets" icon={<LifeBuoy className="h-4 w-4" />}>
                 支持工单
@@ -596,93 +555,6 @@ export default function AdminConsolePage() {
                   ))}
                   {workspaces.length === 0 && !workspaceLoading && (
                     <p className="text-sm text-foreground-muted">暂无匹配 Workspace。</p>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="apps" animated>
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Input
-                    value={appSearch}
-                    onChange={(event) => setAppSearch(event.target.value)}
-                    placeholder="搜索应用名称/Slug"
-                    className="max-w-xs"
-                  />
-                  <select
-                    value={appStatus}
-                    onChange={(event) => setAppStatus(event.target.value)}
-                    className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
-                  >
-                    <option value="">全部状态</option>
-                    <option value="draft">草稿</option>
-                    <option value="published">已发布</option>
-                    <option value="deprecated">已弃用</option>
-                    <option value="archived">已归档</option>
-                    <option value="suspended">暂停</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  {apps.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface-100/80 px-4 py-3"
-                    >
-                      <div className="min-w-[240px]">
-                        <p className="text-sm font-semibold text-foreground">
-                          {item.icon} {item.name}
-                        </p>
-                        <p className="text-xs text-foreground-muted">{item.slug}</p>
-                        {item.workspace && (
-                          <p className="mt-1 text-xs text-foreground-muted">
-                            Workspace：{item.workspace.name}
-                          </p>
-                        )}
-                        {item.status_reason && (
-                          <p className="mt-1 text-xs text-warning">原因：{item.status_reason}</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">{statusBadge(item.status)}</div>
-                      <div className="flex flex-wrap gap-2">
-                        {item.status !== "suspended" ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              openActionDialog({
-                                type: "app",
-                                id: item.id,
-                                title: "暂停应用",
-                                description: "暂停后应用将无法被调用",
-                                nextStatus: "suspended",
-                              })
-                            }
-                          >
-                            暂停
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() =>
-                              openActionDialog({
-                                type: "app",
-                                id: item.id,
-                                title: "恢复应用",
-                                description: "恢复后应用可继续访问",
-                                nextStatus: "published",
-                              })
-                            }
-                          >
-                            恢复
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {apps.length === 0 && !appLoading && (
-                    <p className="text-sm text-foreground-muted">暂无匹配应用。</p>
                   )}
                 </div>
               </div>

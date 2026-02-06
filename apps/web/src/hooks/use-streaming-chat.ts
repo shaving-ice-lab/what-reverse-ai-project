@@ -9,6 +9,7 @@ import { API_BASE_URL, getStoredTokens } from "@/lib/api/shared";
 export interface StreamingChatOptions {
   model?: string;
   systemPrompt?: string;
+  workspaceId?: string;
   onToken?: (token: string) => void;
   onComplete?: (fullContent: string) => void;
   onError?: (error: Error) => void;
@@ -41,8 +42,9 @@ export function useStreamingChat() {
       try {
         const tokens = getStoredTokens();
 
+        const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : "";
         const response = await fetch(
-          `${API_BASE_URL}/conversations/${conversationId}/chat/stream`,
+          `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`,
           {
             method: "POST",
             headers: {
@@ -156,13 +158,15 @@ export async function* streamChatGenerator(
   options?: {
     model?: string;
     systemPrompt?: string;
+    workspaceId?: string;
     signal?: AbortSignal;
   }
 ): AsyncGenerator<string, string, unknown> {
   const tokens = getStoredTokens();
 
+  const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : "";
   const response = await fetch(
-    `${API_BASE_URL}/conversations/${conversationId}/chat/stream`,
+    `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`,
     {
       method: "POST",
       headers: {

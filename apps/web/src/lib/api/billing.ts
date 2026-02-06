@@ -90,13 +90,12 @@ export interface BillingInvoiceDetail extends BillingInvoiceSummary {
   }>;
 }
 
-// App 用量统计项
-export interface AppUsageStat {
+// 工作空间用量统计项
+export interface WorkspaceUsageStat {
   id: string;
-  app_id: string;
-  app_name: string;
-  app_icon?: string;
   workspace_id: string;
+  workspace_name: string;
+  workspace_icon?: string;
   period_start: string;
   period_end: string;
   usage: {
@@ -224,12 +223,12 @@ export const billingApi = {
   },
 
   /**
-   * 获取 App 用量统计
+   * 获取 Workspace 用量统计
    */
-  async getAppUsageStats(
+  async getWorkspaceUsageStats(
     workspaceId: string,
     params?: { period_start?: string; period_end?: string }
-  ): Promise<AppUsageStat[]> {
+  ): Promise<WorkspaceUsageStat[]> {
     const search = new URLSearchParams();
     if (params?.period_start) search.set("period_start", params.period_start);
     if (params?.period_end) search.set("period_end", params.period_end);
@@ -240,21 +239,20 @@ export const billingApi = {
         period_end: string;
         stats: Array<{
           id: string;
-          app_id: string;
           workspace_id: string;
           period_start: string;
           period_end: string;
           usage: Record<string, number>;
           cost_amount: number;
           currency: string;
-          app?: {
+          workspace?: {
             id: string;
             name: string;
             icon?: string;
           };
         }>;
       }>
-    >(`/billing/workspaces/${workspaceId}/apps/usage${query ? `?${query}` : ""}`);
+    >(`/billing/workspaces/${workspaceId}/usage${query ? `?${query}` : ""}`);
     const stats = response.data?.stats || [];
     // 计算趋势（简化：这里假设后端已返回或前端模拟）
     return stats.map((stat, index, arr) => {
@@ -268,10 +266,9 @@ export const billingApi = {
       }
       return {
         id: stat.id,
-        app_id: stat.app_id,
-        app_name: stat.app?.name || "未知应用",
-        app_icon: stat.app?.icon,
         workspace_id: stat.workspace_id,
+        workspace_name: stat.workspace?.name || "未知工作空间",
+        workspace_icon: stat.workspace?.icon,
         period_start: stat.period_start,
         period_end: stat.period_end,
         usage: {

@@ -85,12 +85,10 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
     setError(null);
     
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const isValid = apiKey.length > 20;
-      
+      const result = await apiKeysApi.testValue(provider, apiKey.trim());
       setTestResult({
-        valid: isValid,
-        message: isValid ? "密钥有效" : "密钥无效，请检查",
+        valid: result.valid,
+        message: result.message || (result.valid ? "密钥格式有效" : "密钥格式无效"),
       });
     } catch (err) {
       setTestResult({

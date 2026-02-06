@@ -19,7 +19,7 @@ const workspace = {
   status: "active",
   plan: "free",
   region: "ap-east-1",
-  default_app_id: null,
+  app_status: "draft",
   settings_json: {},
   created_at: "2026-02-01T10:00:00Z",
   updated_at: "2026-02-02T10:00:00Z",
@@ -93,18 +93,7 @@ async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
       return route.fulfill(respondOk(workspace));
     }
 
-    if (path === "/api/v1/apps" && method === "GET") {
-      return route.fulfill(
-        respondOk({
-          items: appStore,
-          total: appStore.length,
-          page: 1,
-          page_size: 20,
-        })
-      );
-    }
-
-    if (path === "/api/v1/apps" && method === "POST") {
+    if (path === "/api/v1/workspaces" && method === "POST") {
       const payload = request.postData() ? JSON.parse(request.postData() as string) : {};
       const created = {
         ...draftApp,
@@ -112,22 +101,21 @@ async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
         name: payload.name || draftApp.name,
         slug: payload.slug || draftApp.slug,
         description: payload.description || draftApp.description,
-        workspace_id: payload.workspace_id || draftApp.workspace_id,
       };
       appStore.splice(0, appStore.length, created);
       return route.fulfill(respondOk(created));
     }
 
-    if (path === `/api/v1/apps/${draftApp.id}` && method === "GET") {
+    if (path === `/api/v1/workspaces/${draftApp.id}` && method === "GET") {
       return route.fulfill(respondOk(appStore[0] || draftApp));
     }
 
-    if (path === "/api/v1/apps/app_456" && method === "GET") {
+    if (path === "/api/v1/workspaces/app_456" && method === "GET") {
       return route.fulfill(respondOk(appStore[0]));
     }
 
-    if (path === `/api/v1/apps/${draftApp.id}/publish` && method === "POST") {
-      const updated = { ...(appStore[0] || draftApp), status: "published", published_at: "2026-02-03T10:00:00Z" };
+    if (path === `/api/v1/workspaces/${draftApp.id}/publish` && method === "POST") {
+      const updated = { ...(appStore[0] || draftApp), app_status: "published", published_at: "2026-02-03T10:00:00Z" };
       appStore.splice(0, appStore.length, updated);
       return route.fulfill(respondOk(updated));
     }
@@ -156,12 +144,12 @@ test("create app flow navigates to builder", async ({ page }) => {
   await seedAuth(page);
   await mockApiRoutes(page, appStore);
 
-  await page.goto(`/workspaces/${workspace.id}/apps`);
+  await page.goto("/dashboard/apps");
   await page.getByRole("button", { name: "创建应用" }).click();
   await page.getByPlaceholder("例如：日报助手").fill("日报助手");
   await page.getByRole("button", { name: "创建" }).click();
 
-  await expect(page).toHaveURL(new RegExp(`/workspaces/${workspace.id}/apps/app_456/builder`));
+  await expect(page).toHaveURL(new RegExp(`/dashboard/app/app_456/builder`));
 });
 
 test("publish app flow updates status", async ({ page }) => {
@@ -169,7 +157,7 @@ test("publish app flow updates status", async ({ page }) => {
   await seedAuth(page);
   await mockApiRoutes(page, appStore);
 
-  await page.goto(`/workspaces/${workspace.id}/apps`);
+  await page.goto("/dashboard/apps");
   await page.getByRole("button", { name: "发布" }).click();
 
   await expect(page.getByText("已发布")).toBeVisible();

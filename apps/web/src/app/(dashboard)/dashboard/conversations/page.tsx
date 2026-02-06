@@ -75,7 +75,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { conversationApi, conversationFolderApi } from "@/lib/api";
+import { appApi, conversationApi, conversationFolderApi } from "@/lib/api";
 import {
   ConversationFolderManageDialog,
   MoveToFolderDialog,
@@ -99,6 +99,26 @@ const sortOptions = [
 
 // 视图类型 - 移除 timeline
 type ViewType = "list" | "grid";
+
+const LAST_WORKSPACE_STORAGE_KEY = "last_workspace_id";
+
+const readStoredWorkspaceId = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(LAST_WORKSPACE_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredWorkspaceId = (workspaceId: string) => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LAST_WORKSPACE_STORAGE_KEY, workspaceId);
+  } catch {
+    // ignore storage errors
+  }
+};
 
 // 骨架屏组件
 function ConversationSkeleton({ view }: { view: ViewType }) {
@@ -469,7 +489,11 @@ function FilterNavItem({ label, count, active, onClick }: FilterNavItemProps) {
   );
 }
 
-export default function ConversationsPage() {
+type ConversationsPageProps = {
+  workspaceId?: string;
+};
+
+export function ConversationsPageContent({ workspaceId }: ConversationsPageProps) {
   const router = useRouter();
   
   // 状态
@@ -549,7 +573,15 @@ export default function ConversationsPage() {
     setError(null);
     
     try {
+      if (!workspaceId) {
+        setConversations([]);
+        setTotal(0);
+        setError("请先选择工作空间");
+        setLoading(false);
+        return;
+      }
       const params: ListConversationsParams = {
+        workspaceId,
         page,
         pageSize: 20,
         search: searchQuery || undefined,
@@ -577,7 +609,7 @@ export default function ConversationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, selectedFolder, filter, shouldLogApiError]);
+  }, [workspaceId, page, searchQuery, selectedFolder, filter, shouldLogApiError]);
 
   // 初始化
   useEffect(() => {
@@ -837,11 +869,17 @@ export default function ConversationsPage() {
   // 创建新对话
   const handleCreateConversation = async () => {
     try {
+      if (!workspaceId) {
+        toast.error("请先选择工作空间");
+        router.push("/dashboard/apps");
+        return;
+      }
       const newConversation = await conversationApi.create({
+        workspaceId,
         title: "新对话",
         model: "gpt-4",
       });
-      router.push(`/chat/${newConversation.id}`);
+      router.push(`/dashboard/app/${workspaceId}/conversations/${newConversation.id}`);
     } catch (err) {
       console.error("Failed to create conversation:", err);
       toast.error("创建对话失败");
@@ -983,7 +1021,10 @@ export default function ConversationsPage() {
               variant="outline"
               size="sm"
               className="h-8 border-border text-foreground-light hover:text-foreground"
-              onClick={() => setImportDialogOpen(true)}
+              onClick={() =>
+                workspaceId ? setImportDialogOpen(true) : toast.error("请先选择工作空间")
+              }
+              disabled={!workspaceId}
             >
               <Upload className="w-3.5 h-3.5 mr-1.5" />
               导入
@@ -1247,7 +1288,11 @@ export default function ConversationsPage() {
                   onExport={handleExport}
                   onArchive={handleArchive}
                   onDelete={handleDelete}
-                  onClick={(id) => router.push(`/chat/${id}`)}
+                  onClick={(id) =>
+                    workspaceId
+                      ? router.push(`/dashboard/app/${workspaceId}/conversations/${id}`)
+                      : toast.error("请先选择工作空间")
+                  }
                 />
               ))}
             </div>
@@ -1272,7 +1317,11 @@ export default function ConversationsPage() {
                   onExport={handleExport}
                   onArchive={handleArchive}
                   onDelete={handleDelete}
-                  onClick={(id) => router.push(`/chat/${id}`)}
+                  onClick={(id) =>
+                    workspaceId
+                      ? router.push(`/dashboard/app/${workspaceId}/conversations/${id}`)
+                      : toast.error("请先选择工作空间")
+                  }
                 />
               ))}
             </div>
@@ -1411,6 +1460,7 @@ export default function ConversationsPage() {
 
       {/* 导入对话框 */}
       <ImportDialog
+        workspaceId={workspaceId ?? ""}
         open={importDialogOpen}
         onOpenChange={setImportDialogOpen}
         folders={folders}
@@ -1420,5 +1470,59 @@ export default function ConversationsPage() {
         }}
       />
     </PageWithSidebar>
+  );
+}
+
+export default function ConversationsPage() {
+  const router = useRouter();
+  const [redirectError, setRedirectError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const redirectToAppConversations = async () => {
+      const storedWorkspaceId = readStoredWorkspaceId();
+      if (storedWorkspaceId) {
+        router.replace(`/dashboard/app/${storedWorkspaceId}/conversations`);
+        return;
+      }
+
+      try {
+        const { items } = await appApi.list({ pageSize: 1 });
+        const firstAppId = items?.[0]?.id;
+        if (firstAppId) {
+          writeStoredWorkspaceId(firstAppId);
+          router.replace(`/dashboard/app/${firstAppId}/conversations`);
+          return;
+        }
+        router.replace("/dashboard/apps");
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Failed to resolve app for conversations:", error);
+        setRedirectError("无法加载应用列表，请稍后重试");
+      }
+    };
+
+    redirectToAppConversations();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  if (redirectError) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-foreground-muted">{redirectError}</p>
+        <Button variant="outline" onClick={() => router.replace("/dashboard/apps")}>
+          返回应用列表
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center text-sm text-foreground-muted">
+      正在跳转到应用对话...
+    </div>
   );
 }

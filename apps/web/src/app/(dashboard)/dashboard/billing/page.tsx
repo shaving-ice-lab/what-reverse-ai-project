@@ -21,7 +21,7 @@ import {
   type BudgetSettings,
   type BillingInvoiceDetail,
   type BillingInvoiceSummary,
-  type AppUsageStat,
+  type WorkspaceUsageStat,
 } from "@/lib/api/billing";
 import { workspaceApi, type WorkspaceQuota } from "@/lib/api/workspace";
 import {
@@ -165,9 +165,9 @@ export default function BillingPage() {
     useState<BillingInvoiceDetail | null>(null);
   const [invoiceDetailLoading, setInvoiceDetailLoading] = useState(false);
   const [invoiceDownloadId, setInvoiceDownloadId] = useState<string | null>(null);
-  const [appUsageStats, setAppUsageStats] = useState<AppUsageStat[]>([]);
-  const [appUsageLoading, setAppUsageLoading] = useState(false);
-  const [appUsageError, setAppUsageError] = useState<string | null>(null);
+  const [workspaceUsageStats, setWorkspaceUsageStats] = useState<WorkspaceUsageStat[]>([]);
+  const [workspaceUsageLoading, setWorkspaceUsageLoading] = useState(false);
+  const [workspaceUsageError, setWorkspaceUsageError] = useState<string | null>(null);
   const currentPlan = plans.find((plan) => plan.current);
   const selectedInvoiceSummary =
     (selectedInvoiceId && invoices.find((bill) => bill.id === selectedInvoiceId)) || invoices[0];
@@ -331,29 +331,28 @@ export default function BillingPage() {
     };
   }, [activeWorkspaceId, selectedInvoiceId]);
 
-  // 加载 App 用量统计
+  // 加载工作空间用量统计
   useEffect(() => {
     if (!activeWorkspaceId) return;
     let isActive = true;
 
-    const loadAppUsageStats = async () => {
+    const loadWorkspaceUsageStats = async () => {
       try {
-        setAppUsageLoading(true);
-        setAppUsageError(null);
-        const stats = await billingApi.getAppUsageStats(activeWorkspaceId);
+        setWorkspaceUsageLoading(true);
+        setWorkspaceUsageError(null);
+        const stats = await billingApi.getWorkspaceUsageStats(activeWorkspaceId);
         if (!isActive) return;
-        setAppUsageStats(stats);
+        setWorkspaceUsageStats(stats);
       } catch (error) {
         if (!isActive) return;
-        setAppUsageError(error instanceof Error ? error.message : "获取 App 用量失败");
+        setWorkspaceUsageError(error instanceof Error ? error.message : "获取工作空间用量失败");
         // 使用示例数据
-        setAppUsageStats([
+        setWorkspaceUsageStats([
           {
             id: "1",
-            app_id: "app-1",
-            app_name: "智能客服助手",
-            app_icon: "🤖",
             workspace_id: activeWorkspaceId,
+            workspace_name: "智能客服助手",
+            workspace_icon: "🤖",
             period_start: "2026-01-01",
             period_end: "2026-01-31",
             usage: { requests: 1523, tokens: 245000, storage: 0.8, bandwidth: 5.2 },
@@ -364,10 +363,9 @@ export default function BillingPage() {
           },
           {
             id: "2",
-            app_id: "app-2",
-            app_name: "文档分析器",
-            app_icon: "📄",
             workspace_id: activeWorkspaceId,
+            workspace_name: "文档分析器",
+            workspace_icon: "📄",
             period_start: "2026-01-01",
             period_end: "2026-01-31",
             usage: { requests: 856, tokens: 320000, storage: 1.2, bandwidth: 6.8 },
@@ -378,10 +376,9 @@ export default function BillingPage() {
           },
           {
             id: "3",
-            app_id: "app-3",
-            app_name: "数据提取工作流",
-            app_icon: "📊",
             workspace_id: activeWorkspaceId,
+            workspace_name: "数据提取工作流",
+            workspace_icon: "📊",
             period_start: "2026-01-01",
             period_end: "2026-01-31",
             usage: { requests: 432, tokens: 156000, storage: 0.3, bandwidth: 2.1 },
@@ -392,10 +389,9 @@ export default function BillingPage() {
           },
           {
             id: "4",
-            app_id: "app-4",
-            app_name: "营销文案生成",
-            app_icon: "✍️",
             workspace_id: activeWorkspaceId,
+            workspace_name: "营销文案生成",
+            workspace_icon: "✍️",
             period_start: "2026-01-01",
             period_end: "2026-01-31",
             usage: { requests: 287, tokens: 89000, storage: 0.1, bandwidth: 1.2 },
@@ -406,11 +402,11 @@ export default function BillingPage() {
           },
         ]);
       } finally {
-        if (isActive) setAppUsageLoading(false);
+        if (isActive) setWorkspaceUsageLoading(false);
       }
     };
 
-    loadAppUsageStats();
+    loadWorkspaceUsageStats();
     return () => {
       isActive = false;
     };
@@ -958,7 +954,7 @@ export default function BillingPage() {
               <p className="page-panel-description">分应用查看用量与成本，便于对账与优化</p>
             </div>
             <div className="flex items-center gap-2">
-              {appUsageLoading && (
+              {workspaceUsageLoading && (
                 <Badge variant="secondary" size="xs">
                   同步中
                 </Badge>
@@ -983,26 +979,26 @@ export default function BillingPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {appUsageStats.length === 0 ? (
+                  {workspaceUsageStats.length === 0 ? (
                     <tr className="bg-surface-75">
                       <td colSpan={7} className="px-4 py-6 text-center text-foreground-muted">
-                        {appUsageError
-                          ? `加载失败：${appUsageError}`
-                          : appUsageLoading
-                          ? "正在加载 App 用量数据..."
-                          : "暂无 App 用量数据"}
+                        {workspaceUsageError
+                          ? `加载失败：${workspaceUsageError}`
+                          : workspaceUsageLoading
+                          ? "正在加载工作空间用量数据..."
+                          : "暂无工作空间用量数据"}
                       </td>
                     </tr>
                   ) : (
-                    appUsageStats.map((stat) => (
+                    workspaceUsageStats.map((stat) => (
                       <tr key={stat.id} className="bg-surface-75 hover:bg-surface-100 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center text-base">
-                              {stat.app_icon || "📱"}
+                              {stat.workspace_icon || "📱"}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-foreground">{stat.app_name}</p>
+                              <p className="text-sm font-medium text-foreground">{stat.workspace_name}</p>
                               <p className="text-xs text-foreground-muted">{stat.period_start} ~ {stat.period_end}</p>
                             </div>
                           </div>
@@ -1050,24 +1046,24 @@ export default function BillingPage() {
                     ))
                   )}
                 </tbody>
-                {appUsageStats.length > 0 && (
+                {workspaceUsageStats.length > 0 && (
                   <tfoot className="bg-surface-200/50">
                     <tr>
                       <td className="px-4 py-2 text-sm font-medium text-foreground">合计</td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
-                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.requests || 0), 0))}
+                        {formatNumber(workspaceUsageStats.reduce((sum, s) => sum + (s.usage.requests || 0), 0))}
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
-                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.tokens || 0), 0))}
+                        {formatNumber(workspaceUsageStats.reduce((sum, s) => sum + (s.usage.tokens || 0), 0))}
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
-                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.storage || 0), 0), 1)} GB
+                        {formatNumber(workspaceUsageStats.reduce((sum, s) => sum + (s.usage.storage || 0), 0), 1)} GB
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
-                        {formatNumber(appUsageStats.reduce((sum, s) => sum + (s.usage.bandwidth || 0), 0), 1)} GB
+                        {formatNumber(workspaceUsageStats.reduce((sum, s) => sum + (s.usage.bandwidth || 0), 0), 1)} GB
                       </td>
                       <td className="px-4 py-2 text-right text-sm font-medium text-foreground tabular-nums">
-                        {formatCurrency(appUsageStats.reduce((sum, s) => sum + s.cost_amount, 0))}
+                        {formatCurrency(workspaceUsageStats.reduce((sum, s) => sum + s.cost_amount, 0))}
                       </td>
                       <td className="px-4 py-2 text-right text-xs text-foreground-muted">-</td>
                     </tr>
@@ -1076,9 +1072,9 @@ export default function BillingPage() {
               </table>
             </div>
             <p className="text-xs text-foreground-muted mt-3">
-              {appUsageStats.length === 0
+              {workspaceUsageStats.length === 0
                 ? "暂无应用数据"
-                : `显示 ${appUsageStats.length} 个应用的本月用量统计`}
+                : `显示 ${workspaceUsageStats.length} 个应用的本月用量统计`}
             </p>
           </div>
         </section>

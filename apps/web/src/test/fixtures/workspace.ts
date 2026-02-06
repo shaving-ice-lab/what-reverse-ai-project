@@ -7,8 +7,15 @@ export const workspaceFixture = {
   status: "active",
   plan: "free",
   region: "ap-east-1",
-  default_app_id: null,
   settings_json: {},
+  // App 合并字段
+  description: "",
+  app_status: "draft",
+  current_version_id: null,
+  pricing_type: "free",
+  price: null,
+  published_at: null,
+  access_mode: "private",
   created_at: "2026-02-01T10:00:00Z",
   updated_at: "2026-02-02T10:00:00Z",
 } as const;

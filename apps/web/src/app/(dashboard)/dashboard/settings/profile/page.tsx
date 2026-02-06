@@ -830,7 +830,8 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </div>
-  </PageContainer>
+        </div>
+      </div>
+    </PageContainer>
   );
 }

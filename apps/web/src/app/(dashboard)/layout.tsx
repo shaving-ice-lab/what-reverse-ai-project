@@ -47,6 +47,7 @@ import { useCommandPalette } from "@/components/dashboard/use-command-palette";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { appApi } from "@/lib/api/workspace";
 import { workspaceApi, type Workspace, type WorkspaceQuota } from "@/lib/api/workspace";
 import {
   DropdownMenu,
@@ -107,6 +108,7 @@ const fullBleedRoutes = [
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
 const RECENT_WORKSPACE_STORAGE_KEY = "recent_workspace_ids";
 const RECENT_WORKSPACE_LIMIT = 4;
+const SETUP_STORAGE_KEY = "agentflow-setup-completed";
 
 const NotificationPanel = dynamic(
   () => import("@/components/dashboard/notification-panel").then((mod) => ({ default: mod.NotificationPanel })),
@@ -160,6 +162,8 @@ export default function DashboardLayout({
   const [workspaceQuota, setWorkspaceQuota] = useState<WorkspaceQuota | null>(null);
   const [quotaLoading, setQuotaLoading] = useState(false);
   const [recentWorkspaceIds, setRecentWorkspaceIds] = useState<string[]>([]);
+  const [needsSetup, setNeedsSetup] = useState(false);
+  const [setupChecked, setSetupChecked] = useState(false);
   const resolvedMainNavItems = useMemo(
     () =>
       user?.role === "admin"
@@ -252,6 +256,59 @@ export default function DashboardLayout({
   }, [workspaces, workspaceIdFromPath]);
 
   useEffect(() => {
+    if (!mounted || workspaceLoading) return;
+    if (typeof window === "undefined") return;
+    if (setupChecked) return;
+
+    const completed = localStorage.getItem(SETUP_STORAGE_KEY) === "true";
+    if (completed) {
+      setSetupChecked(true);
+      setNeedsSetup(false);
+      return;
+    }
+
+    const activeWorkspace =
+      workspaces.find((ws) => ws.id === activeWorkspaceId) ?? workspaces[0] ?? null;
+    if (!activeWorkspace) {
+      setSetupChecked(true);
+      setNeedsSetup(true);
+      return;
+    }
+
+    const isDefaultName = activeWorkspace.name?.trim() === "Default Workspace";
+    const checkApps = async () => {
+      try {
+        const apps = await appApi.list({
+          workspace_id: activeWorkspace.id,
+          page: 1,
+          pageSize: 1,
+        });
+        const hasApps = (apps.items?.length ?? 0) > 0;
+        setNeedsSetup(isDefaultName || !hasApps);
+      } catch (error) {
+        console.error("Failed to check onboarding status:", error);
+        setNeedsSetup(true);
+      } finally {
+        setSetupChecked(true);
+      }
+    };
+
+    checkApps();
+  }, [
+    activeWorkspaceId,
+    mounted,
+    setupChecked,
+    workspaceLoading,
+    workspaces,
+  ]);
+
+  useEffect(() => {
+    if (!needsSetup) return;
+    if (pathname?.startsWith("/dashboard/setup")) return;
+    router.replace("/dashboard/setup");
+  }, [needsSetup, pathname, router]);
+
+  useEffect(() => {
     if (!activeWorkspaceId) return;
     updateRecentWorkspaces(activeWorkspaceId);
   }, [activeWorkspaceId, updateRecentWorkspaces]);
@@ -320,7 +377,7 @@ export default function DashboardLayout({
       localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId);
     }
     updateRecentWorkspaces(workspaceId);
-    router.push(`/dashboard/workspaces/${workspaceId}/apps`);
+    router.push("/dashboard/apps");
   };
 
   const activePlan = resolvePlanConfig(activeWorkspace?.plan);
@@ -367,7 +424,7 @@ export default function DashboardLayout({
   );
   const workspaceQuickLinks = activeWorkspace
     ? [
-        { label: "创建 App", href: `/dashboard/workspaces/${activeWorkspace.id}/apps` },
+        { label: "创建 App", href: "/dashboard/apps" },
         { label: "成员管理", href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members` },
         { label: "用量与账单", href: "/dashboard/billing" },
         { label: "设置", href: `/dashboard/workspaces/${activeWorkspace.id}/settings` },
@@ -706,10 +763,7 @@ export default function DashboardLayout({
                   配额 {quotaUsageLabel}
                 </span>
                 <span className="h-3 w-px bg-border" />
-                <Link
-                  href={`/dashboard/workspaces/${activeWorkspace.id}/apps`}
-                  className="hover:text-foreground transition-colors"
-                >
+                <Link href="/dashboard/apps" className="hover:text-foreground transition-colors">
                   创建 App
                 </Link>
                 <Link

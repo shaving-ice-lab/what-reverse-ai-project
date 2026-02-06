@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Workbench - App 列表
+ * Workbench - 应用列表
  */
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
@@ -81,7 +81,7 @@ const releaseImpactTone = {
 
 const appsSidebarLinks = [
   { id: "workbench-map", label: "Workbench Map", icon: LayoutGrid },
-  { id: "sample-apps", label: "示例 App", icon: Sparkles },
+  { id: "sample-apps", label: "示例应用", icon: Sparkles },
   { id: "demo-kit", label: "Demo Kit", icon: Database },
   { id: "demo-script", label: "Demo Script", icon: FileCode },
   { id: "release", label: "Release 策略", icon: Server },
@@ -90,7 +90,7 @@ const appsSidebarLinks = [
   { id: "container", label: "容器规范", icon: Cpu },
   { id: "environment", label: "环境命名", icon: Globe },
   { id: "deploy", label: "部署流水线", icon: Layers },
-  { id: "apps-list", label: "App 列表", icon: LayoutGrid },
+  { id: "apps-list", label: "应用列表", icon: LayoutGrid },
 ];
 
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
@@ -216,10 +216,10 @@ export default function AppsPage() {
       try {
         const response = await appApi.list({ page: 1, pageSize: 50 });
         if (!mounted) return;
-        setApps(response.data || []);
+        setApps(response.items || []);
       } catch (err) {
         if (!mounted) return;
-        setError(err instanceof Error ? err.message : "加载 App 失败");
+        setError(err instanceof Error ? err.message : "加载应用失败");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -297,30 +297,27 @@ export default function AppsPage() {
   );
 
   const primaryWorkspaceApp = workspaceAppsPreview[0];
-  const workspaceAppsHref = activeWorkspaceId
-    ? `/dashboard/workspaces/${activeWorkspaceId}/apps`
-    : "/dashboard/workspaces";
-  const monitoringHref =
-    primaryWorkspaceApp && activeWorkspaceId
-      ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${primaryWorkspaceApp.id}/monitoring`
-      : workspaceAppsHref;
+  const workspaceAppsHref = "/dashboard/apps";
+  const monitoringHref = primaryWorkspaceApp
+    ? `/dashboard/app/${primaryWorkspaceApp.id}/monitoring`
+    : workspaceAppsHref;
 
   const workbenchRoutes = [
     {
       id: "workspace",
       step: "01",
       title: "Workspace 切换",
-      description: "选择工作空间并进入对应 App 列表",
+      description: "选择工作空间并进入对应应用列表",
       href: "/dashboard/workspaces",
       icon: LayoutGrid,
     },
     {
       id: "apps",
       step: "02",
-      title: "App 列表",
+      title: "应用列表",
       description: activeWorkspace
-        ? `${activeWorkspace.name} · ${workspaceApps.length} 个 App`
-        : "进入工作空间 App 列表",
+        ? `${activeWorkspace.name} · ${workspaceApps.length} 个应用`
+        : "进入工作空间应用列表",
       href: workspaceAppsHref,
       icon: Layers,
     },
@@ -393,7 +390,7 @@ export default function AppsPage() {
               </div>
             )}
             <div className="flex items-center justify-between text-[11px] text-foreground-muted">
-              <span>当前 App</span>
+              <span>当前应用</span>
               <span>{workspaceApps.length}</span>
             </div>
           </>
@@ -410,14 +407,14 @@ export default function AppsPage() {
 
       <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-2">
         <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
-          App 搜索
+          应用搜索
         </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground-muted" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索 App 名称、Slug"
+            placeholder="搜索应用名称、Slug"
             className="pl-8 h-8 bg-surface-75 border-border"
           />
         </div>
@@ -456,7 +453,7 @@ export default function AppsPage() {
 
       <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-3">
         <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
-          App 快览
+          应用快览
         </div>
         {workspaceAppsPreview.length > 0 ? (
           <div className="space-y-2">
@@ -464,11 +461,7 @@ export default function AppsPage() {
               <div key={app.id} className="flex items-center justify-between text-[12px]">
                 <span className="truncate text-foreground">{app.name}</span>
                 <Link
-                  href={
-                    activeWorkspaceId
-                      ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
-                      : "/dashboard/workspaces"
-                  }
+                  href={`/dashboard/app/${app.id}/monitoring`}
                   className="text-[11px] text-brand-500 hover:text-brand-400"
                 >
                   监控
@@ -478,7 +471,7 @@ export default function AppsPage() {
           </div>
         ) : (
           <div className="text-[11px] text-foreground-muted">
-            {activeWorkspaceId ? "暂无 App" : "选择工作空间后查看"}
+            {activeWorkspaceId ? "暂无应用" : "选择工作空间后查看"}
           </div>
         )}
         <div className="flex items-center justify-between text-[11px] text-foreground-muted">
@@ -498,7 +491,7 @@ export default function AppsPage() {
         title="Workbench"
         eyebrow="Apps"
         icon={<LayoutGrid className="h-4 w-4" />}
-        description="统一查看与管理 App 运行时，进入编辑器即可更新对应的工作流与配置。"
+        description="统一查看与管理应用运行时，进入编辑器即可更新对应的工作流与配置。"
         actions={
           <Button variant="secondary" size="sm" asChild>
             <Link href="/dashboard/workflows/new">
@@ -522,7 +515,7 @@ export default function AppsPage() {
                 工作台信息架构
               </h2>
               <p className="mt-2 text-sm text-(--workbench-muted)">
-                围绕 Workspace 上下文串联 App 列表与运行监控，确保主要路径一屏可达。
+                围绕 Workspace 上下文串联应用列表与运行监控，确保主要路径一屏可达。
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 {workbenchRoutes.map((route) => {
@@ -555,13 +548,13 @@ export default function AppsPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-(--workbench-muted)">
                 <span className="rounded-full border border-(--workbench-border) px-2 py-1">
-                  /workspaces
+                  /dashboard/workspaces
                 </span>
                 <span className="rounded-full border border-(--workbench-border) px-2 py-1">
-                  /workspaces/&#123;workspaceId&#125;/apps
+                  /dashboard/apps
                 </span>
                 <span className="rounded-full border border-(--workbench-border) px-2 py-1">
-                  /workspaces/&#123;workspaceId&#125;/apps/&#123;appId&#125;/monitoring
+                  /dashboard/app/&#123;appId&#125;/monitoring
                 </span>
               </div>
             </div>
@@ -591,12 +584,12 @@ export default function AppsPage() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-(--workbench-muted)">
-                      <span>App 总数 {workspaceApps.length}</span>
+                      <span>应用总数 {workspaceApps.length}</span>
                       <Link
                         href={workspaceAppsHref}
                         className="text-(--workbench-accent) hover:text-(--workbench-ink)"
                       >
-                        进入 App 列表
+                        进入应用列表
                       </Link>
                     </div>
                   </div>
@@ -618,7 +611,7 @@ export default function AppsPage() {
 
               <div className="rounded-xl border border-(--workbench-border) bg-(--workbench-panel) p-4">
                 <div className="text-[10px] uppercase tracking-[0.35em] text-(--workbench-muted)">
-                  App 预览
+                  应用预览
                 </div>
                 {workspaceAppsPreview.length > 0 ? (
                   <div className="mt-3 space-y-2">
@@ -629,11 +622,7 @@ export default function AppsPage() {
                           <span className="font-medium">{app.name}</span>
                         </div>
                         <Link
-                          href={
-                            activeWorkspaceId
-                              ? `/dashboard/workspaces/${activeWorkspaceId}/apps/${app.id}/monitoring`
-                              : "/dashboard/workspaces"
-                          }
+                          href={`/dashboard/app/${app.id}/monitoring`}
                           className="text-[11px] text-(--workbench-accent) hover:text-(--workbench-ink)"
                         >
                           监控
@@ -643,7 +632,7 @@ export default function AppsPage() {
                   </div>
                 ) : (
                   <div className="mt-3 text-xs text-(--workbench-muted)">
-                    {activeWorkspaceId ? "暂无 App，可先创建工作流。" : "选择工作空间后查看 App。"}
+                    {activeWorkspaceId ? "暂无应用，可先创建工作流。" : "选择工作空间后查看应用。"}
                   </div>
                 )}
                 <div className="mt-3 flex items-center justify-between text-[11px] text-(--workbench-muted)">
@@ -664,8 +653,8 @@ export default function AppsPage() {
       <section id="sample-apps" className="mt-6 rounded-md border border-border bg-surface-100 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-wider text-foreground-muted">示例 App</div>
-            <h2 className="text-sm font-medium text-foreground">内置示例 App 清单</h2>
+            <div className="text-xs uppercase tracking-wider text-foreground-muted">示例应用</div>
+            <h2 className="text-sm font-medium text-foreground">内置示例应用清单</h2>
             <p className="text-xs text-foreground-light">
               覆盖 {sampleCategoryCount} 类典型场景，可直接用于演示或二次改造
             </p>
@@ -1568,9 +1557,9 @@ export default function AppsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
             <div className="text-xs uppercase tracking-wider text-foreground-muted">Apps</div>
-            <h2 className="text-sm font-medium text-foreground">App 列表</h2>
+            <h2 className="text-sm font-medium text-foreground">应用列表</h2>
             <p className="text-xs text-foreground-light">
-              {query ? `当前搜索：${query}` : "按 Workspace 统一管理 App 资产"}
+              {query ? `当前搜索：${query}` : "按 Workspace 统一管理应用资产"}
             </p>
           </div>
           <Badge variant="secondary" size="xs" className="bg-surface-200 text-foreground-light">
@@ -1582,7 +1571,7 @@ export default function AppsPage() {
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-foreground-muted">
             <Loader2 className="h-4 w-4 animate-spin" />
-            正在加载 App 列表...
+            正在加载应用列表...
           </div>
         ) : error ? (
           <EmptyState
@@ -1593,8 +1582,8 @@ export default function AppsPage() {
         ) : filteredApps.length === 0 ? (
           <EmptyState
             icon={<Layers className="h-5 w-5" />}
-            title="暂无 App"
-            description="先从工作流或 AI 创建一个 App，即可在 Workbench 中统一管理。"
+            title="暂无应用"
+            description="先从工作流或 AI 创建一个应用，即可在 Workbench 中统一管理。"
             action={{ label: "去创建工作流", href: "/dashboard/workflows/new" }}
           />
         ) : (
@@ -1643,7 +1632,7 @@ export default function AppsPage() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between text-xs text-foreground-muted">
-                    <span>版本: {app.currentVersionId ? "已绑定" : "未绑定"}</span>
+                    <span>版本: {app.current_version_id ? "已绑定" : "未绑定"}</span>
                     <Link
                       href={`/apps/editor/${app.id}`}
                       className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-400"

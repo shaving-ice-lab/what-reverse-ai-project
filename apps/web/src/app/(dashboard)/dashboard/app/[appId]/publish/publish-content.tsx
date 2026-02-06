@@ -44,7 +44,7 @@ import {
   SidebarNavItem,
   ToggleRow,
 } from "@/components/dashboard/page-layout";
-import { appApi, type App, type AppAccessPolicy, type AppDomain } from "@/lib/api/app";
+import { appApi, type App, type AppAccessPolicy, type AppDomain } from "@/lib/api/workspace";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from "@/lib/permissions";
@@ -90,14 +90,14 @@ const domainStatusConfig: Record<
 };
 
 // 侧边导航
-function AppNav({ workspaceId, appId, activeTab }: { workspaceId: string; appId: string; activeTab: string }) {
+function AppNav({ appId, activeTab }: { appId: string; activeTab: string }) {
   const navItems = [
-    { id: "overview", label: "概览", href: `/workspaces/${workspaceId}/apps/${appId}` },
-    { id: "builder", label: "构建", href: `/workspaces/${workspaceId}/apps/${appId}/builder` },
-    { id: "publish", label: "发布设置", href: `/workspaces/${workspaceId}/apps/${appId}/publish` },
-    { id: "versions", label: "版本历史", href: `/workspaces/${workspaceId}/apps/${appId}/versions` },
-    { id: "monitoring", label: "监控", href: `/workspaces/${workspaceId}/apps/${appId}/monitoring` },
-    { id: "domains", label: "域名", href: `/workspaces/${workspaceId}/apps/${appId}/domains` },
+    { id: "overview", label: "概览", href: `/dashboard/app/${appId}` },
+    { id: "builder", label: "构建", href: `/dashboard/app/${appId}/builder` },
+    { id: "publish", label: "发布设置", href: `/dashboard/app/${appId}/publish` },
+    { id: "versions", label: "版本历史", href: `/dashboard/app/${appId}/versions` },
+    { id: "monitoring", label: "监控", href: `/dashboard/app/${appId}/monitoring` },
+    { id: "domains", label: "域名", href: `/dashboard/app/${appId}/domains` },
   ];
 
   return (
@@ -114,15 +114,17 @@ function AppNav({ workspaceId, appId, activeTab }: { workspaceId: string; appId:
   );
 }
 
-export default function PublishSettingsPage() {
-  const params = useParams();
-  const workspaceId = params.workspaceId as string;
-  const appId = params.appId as string;
+type PublishSettingsPageProps = {
+  workspaceId: string;
+  appId: string;
+};
+
+export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettingsPageProps) {
   const { user } = useAuthStore();
   const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
   const permissions = buildWorkspacePermissions(workspaceRole);
-  const canPublish = Boolean(permissions?.app_publish);
-  const canEdit = Boolean(permissions?.app_edit);
+  const canPublish = Boolean(permissions?.workspace_publish);
+  const canEdit = Boolean(permissions?.workspace_edit);
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [app, setApp] = useState<App | null>(null);
@@ -146,6 +148,8 @@ export default function PublishSettingsPage() {
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDesc, setSeoDesc] = useState("");
   const [seoSaved, setSeoSaved] = useState(false);
+  const [isSavingSEO, setIsSavingSEO] = useState(false);
+  const [seoSaveError, setSeoSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -220,6 +224,16 @@ export default function PublishSettingsPage() {
     setAllowedOriginsText(sourcePolicy.allowed_origins?.join(", ") || "");
     setRequireCaptcha(Boolean(sourcePolicy.require_captcha));
   }, [accessPolicy, app?.access_policy]);
+
+  // 从当前版本 config_json.public_seo 回填 SEO
+  useEffect(() => {
+    const raw = (app?.current_version?.config_json as any)?.public_seo;
+    if (!raw || typeof raw !== "object") return;
+    const title = typeof raw.title === "string" ? raw.title : "";
+    const desc = typeof raw.description === "string" ? raw.description : "";
+    setSeoTitle(title);
+    setSeoDesc(desc);
+  }, [app?.current_version?.id]);
 
   const runtimeEntryUrl =
     workspace?.slug && app?.slug ? `/runtime/${workspace.slug}/${app.slug}` : null;
@@ -324,6 +338,25 @@ export default function PublishSettingsPage() {
     }
   };
 
+  const handleSaveSEO = async () => {
+    try {
+      setIsSavingSEO(true);
+      setSeoSaveError(null);
+      setSeoSaved(false);
+      await appApi.updatePublicSEO(appId, {
+        title: seoTitle.trim(),
+        description: seoDesc.trim(),
+      });
+      setSeoSaved(true);
+      setTimeout(() => setSeoSaved(false), 2000);
+    } catch (error) {
+      console.error("Failed to update public SEO:", error);
+      setSeoSaveError("SEO 保存失败，请稍后重试。");
+    } finally {
+      setIsSavingSEO(false);
+    }
+  };
+
   const handlePublish = async () => {
     if (!app) return;
     if (!confirm("确认发布该应用吗？")) return;
@@ -385,14 +418,14 @@ export default function PublishSettingsPage() {
     <PageWithSidebar
       sidebarWidth="narrow"
       sidebarTitle={app?.name || "应用"}
-      sidebar={<AppNav workspaceId={workspaceId} appId={appId} activeTab="publish" />}
+      sidebar={<AppNav appId={appId} activeTab="publish" />}
     >
       <PageContainer>
         <PageHeader
           title="发布设置"
           eyebrow={app?.name}
           description="配置访问策略、匿名访问与限流规则，确保发布安全可控。"
-          backHref={`/workspaces/${workspaceId}/apps/${appId}`}
+          backHref={`/dashboard/app/${appId}`}
           backLabel="返回应用概览"
           icon={<SlidersHorizontal className="w-4 h-4" />}
           actions={
@@ -402,11 +435,11 @@ export default function PublishSettingsPage() {
                 刷新
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/workspaces/${workspaceId}/apps/${appId}/builder`}>
+                <Link href={`/dashboard/app/${appId}/builder`}>
                   进入构建
                 </Link>
               </Button>
-              <PermissionGate permissions={permissions} required={["app_publish"]}>
+              <PermissionGate permissions={permissions} required={["workspace_publish"]}>
                 <Button size="sm" onClick={handlePublish} disabled={isPublishing}>
                   {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                   发布应用
@@ -430,7 +463,7 @@ export default function PublishSettingsPage() {
               <div className="text-[11px] text-foreground-muted">
                 {!canPublish ? "当前角色无发布权限，仅可查看设置。" : "保存后会立即生效。"}
               </div>
-              <PermissionGate permissions={permissions} required={["app_publish"]}>
+              <PermissionGate permissions={permissions} required={["workspace_publish"]}>
                 <Button onClick={handleSave} disabled={isSaving}>
                   {isSaving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                   保存设置
@@ -598,16 +631,17 @@ export default function PublishSettingsPage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => {
-                  setSeoSaved(true);
-                  setTimeout(() => setSeoSaved(false), 2000);
-                }}
-                disabled={!canPublish}
+                onClick={handleSaveSEO}
+                disabled={!canPublish || isSavingSEO}
               >
+                {isSavingSEO && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                 保存 SEO
               </Button>
               {seoSaved && (
                 <span className="text-[11px] text-brand-500">已保存 SEO 配置</span>
+              )}
+              {seoSaveError && (
+                <span className="text-[11px] text-destructive">{seoSaveError}</span>
               )}
             </div>
           </SettingsSection>
@@ -631,7 +665,7 @@ export default function PublishSettingsPage() {
                 </div>
                 <div className="mt-3">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/domains`}>
+                    <Link href={`/dashboard/app/${appId}/domains`}>
                       去绑定域名
                     </Link>
                   </Button>
@@ -671,7 +705,7 @@ export default function PublishSettingsPage() {
                 </div>
                 <div className="mt-3">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/domains`}>
+                    <Link href={`/dashboard/app/${appId}/domains`}>
                       管理域名
                     </Link>
                   </Button>
@@ -738,14 +772,14 @@ export default function PublishSettingsPage() {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <PermissionGate permissions={permissions} required={["app_publish"]}>
+              <PermissionGate permissions={permissions} required={["workspace_publish"]}>
                 <Button onClick={handlePublish} disabled={isPublishing}>
                   {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                   {app?.status === "published" ? "重新发布" : "发布应用"}
                 </Button>
               </PermissionGate>
               <Button variant="outline" asChild>
-                <Link href={`/workspaces/${workspaceId}/apps/${appId}/domains`}>
+                <Link href={`/dashboard/app/${appId}/domains`}>
                   管理域名
                 </Link>
               </Button>
@@ -758,19 +792,19 @@ export default function PublishSettingsPage() {
             compact
           >
             <div className="flex flex-wrap items-center gap-2">
-              <PermissionGate permissions={permissions} required={["app_publish"]}>
+              <PermissionGate permissions={permissions} required={["workspace_publish"]}>
                 <Button onClick={handlePublish} disabled={isPublishing}>
                   {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                   {app?.status === "published" ? "重新发布" : "发布"}
                 </Button>
               </PermissionGate>
-              <PermissionGate permissions={permissions} required={["app_edit"]}>
+              <PermissionGate permissions={permissions} required={["workspace_edit"]}>
                 <Button variant="outline" onClick={handleSaveDraft} disabled={!canEdit}>
                   保存草稿
                 </Button>
               </PermissionGate>
               <Button variant="ghost" asChild>
-                <Link href={`/workspaces/${workspaceId}/apps/${appId}`}>取消</Link>
+                <Link href={`/dashboard/app/${appId}`}>取消</Link>
               </Button>
             </div>
             <div className="mt-2 text-[11px] text-foreground-muted">
@@ -781,4 +815,18 @@ export default function PublishSettingsPage() {
       </PageContainer>
     </PageWithSidebar>
   );
+}
+
+export default function PublishSettingsPage() {
+  const params = useParams();
+  const workspaceId = Array.isArray(params?.workspaceId)
+    ? params.workspaceId[0]
+    : (params?.workspaceId as string | undefined);
+  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
+
+  if (!workspaceId || !appId) {
+    return null;
+  }
+
+  return <PublishSettingsPageContent workspaceId={workspaceId} appId={appId} />;
 }

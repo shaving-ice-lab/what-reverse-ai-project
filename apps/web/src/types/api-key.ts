@@ -2,16 +2,17 @@
  * API 密钥类型定义
  */
 
-// API 密钥提供商
-export type ApiKeyProvider = 
+// API 密钥提供商（对齐后端允许列表）
+export type ApiKeyProvider =
   | "openai"
   | "anthropic"
   | "google"
   | "azure"
-  | "cohere"
-  | "huggingface"
-  | "ollama"
-  | "custom";
+  | "deepseek"
+  | "moonshot"
+  | "zhipu"
+  | "baichuan"
+  | "ollama";
 
 // API 密钥状态
 export type ApiKeyStatus = "active" | "expired" | "revoked";
@@ -40,34 +41,14 @@ export interface CreateApiKeyRequest {
   name: string;
   provider: ApiKeyProvider;
   key: string;
-  expiresAt?: string;
+  scopes?: string[];
 }
 
-// 创建 API 密钥响应
-export interface CreateApiKeyResponse {
-  success: boolean;
-  apiKey: ApiKey;
-}
-
-// API 密钥列表响应
-export interface ListApiKeysResponse {
-  success: boolean;
-  data: ApiKey[];
-}
-
-// 更新 API 密钥请求
-export interface UpdateApiKeyRequest {
-  name?: string;
-  status?: ApiKeyStatus;
-}
-
-// 测试 API 密钥响应
-export interface TestApiKeyResponse {
-  success: boolean;
+// 测试 API 密钥结果（对齐后端 /users/me/api-keys/test & /users/me/api-keys/:id/test）
+export interface ApiKeyTestResult {
   valid: boolean;
-  message?: string;
-  balance?: number;
-  models?: string[];
+  provider: ApiKeyProvider;
+  message: string;
 }
 
 // 提供商配置
@@ -91,8 +72,9 @@ export const PROVIDER_CONFIGS: Record<ApiKeyProvider, ProviderConfig> = {
     description: "GPT-4, GPT-3.5, DALL-E, Whisper",
     icon: "🤖",
     color: "#10a37f",
-    keyPattern: /^sk-[a-zA-Z0-9]{48}$/,
-    keyPlaceholder: "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    // OpenAI 新旧 key 前缀差异较大，这里保持更宽松校验
+    keyPattern: /^(sk-|sk-proj)[a-zA-Z0-9-_]{10,}$/,
+    keyPlaceholder: "sk-... 或 sk-proj-...",
     models: ["gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
   },
   anthropic: {
@@ -101,8 +83,9 @@ export const PROVIDER_CONFIGS: Record<ApiKeyProvider, ProviderConfig> = {
     description: "Claude 3.5, Claude 3, Claude 2",
     icon: "🧠",
     color: "#d4a373",
-    keyPattern: /^sk-ant-[a-zA-Z0-9-]+$/,
-    keyPlaceholder: "sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    // 后端目前仅做格式粗校验，这里也保持宽松
+    keyPattern: /^sk-[a-zA-Z0-9-_]{10,}$/,
+    keyPlaceholder: "sk-...",
     models: ["claude-3-5-sonnet", "claude-3-opus", "claude-3-sonnet", "claude-3-haiku"],
   },
   google: {
@@ -123,23 +106,37 @@ export const PROVIDER_CONFIGS: Record<ApiKeyProvider, ProviderConfig> = {
     keyPlaceholder: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     baseUrl: "https://YOUR_RESOURCE.openai.azure.com",
   },
-  cohere: {
-    id: "cohere",
-    name: "Cohere",
-    description: "Command, Embed, Rerank",
-    icon: "🌐",
-    color: "#39594d",
-    keyPlaceholder: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    models: ["command", "command-light", "command-nightly"],
+  deepseek: {
+    id: "deepseek",
+    name: "DeepSeek",
+    description: "DeepSeek 系列模型",
+    icon: "🧩",
+    color: "#4f46e5",
+    keyPlaceholder: "输入 DeepSeek API Key",
   },
-  huggingface: {
-    id: "huggingface",
-    name: "Hugging Face",
-    description: "开源模型推理 API",
-    icon: "🤗",
-    color: "#ff9d00",
-    keyPattern: /^hf_[a-zA-Z0-9]+$/,
-    keyPlaceholder: "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  moonshot: {
+    id: "moonshot",
+    name: "Moonshot",
+    description: "Kimi / Moonshot 模型",
+    icon: "🌙",
+    color: "#0ea5e9",
+    keyPlaceholder: "输入 Moonshot API Key",
+  },
+  zhipu: {
+    id: "zhipu",
+    name: "智谱 AI",
+    description: "GLM 系列模型",
+    icon: "🧠",
+    color: "#22c55e",
+    keyPlaceholder: "输入 ZhiPu API Key",
+  },
+  baichuan: {
+    id: "baichuan",
+    name: "百川智能",
+    description: "Baichuan 系列模型",
+    icon: "🌊",
+    color: "#f97316",
+    keyPlaceholder: "输入 Baichuan API Key",
   },
   ollama: {
     id: "ollama",
@@ -147,15 +144,8 @@ export const PROVIDER_CONFIGS: Record<ApiKeyProvider, ProviderConfig> = {
     description: "本地运行的开源模型",
     icon: "🦙",
     color: "#000000",
-    keyPlaceholder: "无需密钥（本地部署）",
+    // 后端目前仍要求非空 key，这里将其作为本地 endpoint / token 的载体
+    keyPlaceholder: "http://localhost:11434",
     baseUrl: "http://localhost:11434",
-  },
-  custom: {
-    id: "custom",
-    name: "自定义",
-    description: "自定义 API 端点",
-    icon: "⚙️",
-    color: "#6b7280",
-    keyPlaceholder: "输入 API 密钥",
   },
 };

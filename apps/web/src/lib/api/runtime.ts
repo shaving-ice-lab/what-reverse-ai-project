@@ -12,12 +12,6 @@ export interface RuntimeWorkspace {
   name?: string;
   slug?: string;
   icon?: string | null;
-}
-
-export interface RuntimeApp {
-  id?: string;
-  name?: string;
-  slug?: string;
   description?: string | null;
   status?: string;
 }
@@ -36,10 +30,12 @@ export interface RuntimeAccessPolicy {
 
 export interface RuntimeEntryData {
   workspace?: RuntimeWorkspace | null;
-  app?: RuntimeApp | null;
   access_policy?: RuntimeAccessPolicy | null;
   session_id?: string;
 }
+
+/** @deprecated Workspace 现在就是 App，使用 RuntimeWorkspace */
+export type RuntimeApp = RuntimeWorkspace;
 
 export interface RuntimeSchemaPayload {
   ui_schema?: Record<string, unknown> | null;
@@ -120,28 +116,27 @@ async function runtimeRequest<T>(
 }
 
 export const runtimeApi = {
-  getEntry(workspaceSlug: string, appSlug: string, sessionId?: string) {
+  getEntry(workspaceSlug: string, sessionId?: string) {
     return runtimeRequest<RuntimeEntryData>(
-      `/runtime/${encodeURIComponent(workspaceSlug)}/${encodeURIComponent(appSlug)}`,
+      `/runtime/${encodeURIComponent(workspaceSlug)}`,
       { method: "GET" },
       sessionId
     );
   },
-  getSchema(workspaceSlug: string, appSlug: string, sessionId?: string) {
+  getSchema(workspaceSlug: string, sessionId?: string) {
     return runtimeRequest<RuntimeSchemaData>(
-      `/runtime/${encodeURIComponent(workspaceSlug)}/${encodeURIComponent(appSlug)}/schema`,
+      `/runtime/${encodeURIComponent(workspaceSlug)}/schema`,
       { method: "GET" },
       sessionId
     );
   },
   execute(
     workspaceSlug: string,
-    appSlug: string,
     inputs: Record<string, string>,
     sessionId?: string
   ) {
     return runtimeRequest<RuntimeExecuteResponse>(
-      `/runtime/${encodeURIComponent(workspaceSlug)}/${encodeURIComponent(appSlug)}`,
+      `/runtime/${encodeURIComponent(workspaceSlug)}`,
       {
         method: "POST",
         body: JSON.stringify({

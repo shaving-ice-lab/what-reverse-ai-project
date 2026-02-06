@@ -66,9 +66,8 @@ export default function AppEditorPage({
     const load = async () => {
       setState((s) => ({ ...s, isLoading: true, error: null }));
       try {
-        const appResp = await appApi.get(id);
-        const app = appResp.data;
-        const workflowId = app.currentVersion?.workflowId || null;
+        const app = await appApi.get(id);
+        const workflowId = app.current_version?.workflow_id || null;
 
         if (!workflowId) {
           if (!mounted) return;
@@ -78,7 +77,7 @@ export default function AppEditorPage({
             workflowId: null,
             workflowData: null,
             isLoading: false,
-            error: "当前 App 未绑定可编辑的工作流版本",
+            error: "当前应用未绑定可编辑的工作流版本",
           }));
           return;
         }

@@ -63,6 +63,7 @@ export const conversationApi = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          workspace_id: data.workspaceId,
           title: data.title,
           model: data.model,
           system_prompt: data.systemPrompt,
@@ -78,10 +79,20 @@ export const conversationApi = {
   /**
    * 获取对话详情
    */
-  async get(id: string, messageLimit?: number): Promise<Conversation> {
-    const params = messageLimit ? `?message_limit=${messageLimit}` : "";
+  async get(
+    id: string,
+    options?: { messageLimit?: number; workspaceId?: string }
+  ): Promise<Conversation> {
+    const searchParams = new URLSearchParams();
+    if (options?.messageLimit) {
+      searchParams.set("message_limit", String(options.messageLimit));
+    }
+    if (options?.workspaceId) {
+      searchParams.set("workspace_id", options.workspaceId);
+    }
+    const params = searchParams.toString();
     const response = await request<{ conversation: Conversation }>(
-      `${API_BASE_URL}/conversations/${id}${params}`
+      `${API_BASE_URL}/conversations/${id}${params ? `?${params}` : ""}`
     );
     
     return response.conversation;
@@ -347,17 +358,18 @@ export const conversationApi = {
   async chat(
     conversationId: string,
     message: string,
-    options?: { model?: string; systemPrompt?: string }
+    options?: { model?: string; systemPrompt?: string; workspaceId?: string }
   ): Promise<{
     userMessage: Message;
     aiMessage: Message;
     suggestions?: string[];
   }> {
+    const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : "";
     const response = await request<{
       user_message: { id: string; content: string; created_at: string };
       ai_message: { message_id: string; content: string; model: string };
       suggestions?: string[];
-    }>(`${API_BASE_URL}/conversations/${conversationId}/chat`, {
+    }>(`${API_BASE_URL}/conversations/${conversationId}/chat${query}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -485,6 +497,7 @@ export const conversationApi = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        workspace_id: data.workspaceId,
         title: data.title,
         model: data.model,
         system_prompt: data.systemPrompt,
@@ -509,6 +522,7 @@ export const conversationApi = {
 
 // 导入对话请求类型
 export interface ImportConversationRequest {
+  workspaceId: string;
   title: string;
   model?: string;
   systemPrompt?: string;

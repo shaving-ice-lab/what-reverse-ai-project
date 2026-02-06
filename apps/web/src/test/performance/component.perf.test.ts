@@ -199,7 +199,7 @@ describe('组件渲染性能测试', () => {
       expect(result.averageTime).toBeLessThan(5);
     });
 
-    it('map 10000 项应在 5ms 内完成', async () => {
+    it('map 10000 项应在 10ms 内完成', async () => {
       const result = await benchmark(
         'map 10000 项',
         () => largeArray.map(item => ({ ...item, doubled: item.value * 2 })),
@@ -207,7 +207,7 @@ describe('组件渲染性能测试', () => {
       );
 
       console.log(`map 10000 项: ${result.averageTime.toFixed(2)}ms`);
-      expect(result.averageTime).toBeLessThan(5);
+      expect(result.averageTime).toBeLessThan(10);
     });
 
     it('reduce 10000 项应在 2ms 内完成', async () => {

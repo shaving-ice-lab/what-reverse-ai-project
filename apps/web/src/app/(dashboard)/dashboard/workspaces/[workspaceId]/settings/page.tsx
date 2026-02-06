@@ -419,7 +419,7 @@ export default function WorkspaceSettingsPage() {
   const [webhookName, setWebhookName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
-  const [webhookEvents, setWebhookEvents] = useState<string[]>(["workflow.completed"]);
+  const [webhookEvents, setWebhookEvents] = useState<string[]>(["execution.completed"]);
   const [isCreatingWebhook, setIsCreatingWebhook] = useState(false);
 
   // 从 URL 获取当前 tab
@@ -663,7 +663,7 @@ export default function WorkspaceSettingsPage() {
       setWebhookName("");
       setWebhookUrl("");
       setWebhookSecret("");
-      setWebhookEvents(["workflow.completed"]);
+      setWebhookEvents(["execution.completed"]);
       loadIntegrations();
     } catch (error) {
       console.error("Failed to create webhook:", error);
@@ -1785,7 +1785,7 @@ export default function WorkspaceSettingsPage() {
         <PageHeader
           title={workspace.name}
           eyebrow="工作空间设置"
-          backHref={`/workspaces/${workspaceId}/apps`}
+          backHref="/dashboard/apps"
           backLabel="返回应用列表"
         />
 
@@ -2520,11 +2520,11 @@ export default function WorkspaceSettingsPage() {
               <FormRow label="订阅事件">
                 <div className="flex flex-wrap gap-2">
                   {[
-                    "workflow.completed",
-                    "workflow.failed",
-                    "workflow.started",
-                    "execution.success",
-                    "execution.error",
+                    "execution.completed",
+                    "execution.failed",
+                    "execution.started",
+                    "app.published",
+                    "domain.verified",
                   ].map((event) => (
                     <Badge
                       key={event}

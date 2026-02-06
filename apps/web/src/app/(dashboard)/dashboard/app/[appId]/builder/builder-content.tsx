@@ -82,7 +82,7 @@ import {
   type AppVersion,
   type AppVersionDiff,
   type AppAccessPolicy,
-} from "@/lib/api/app";
+} from "@/lib/api/workspace";
 import { workflowApi } from "@/lib/api";
 import { request } from "@/lib/api/shared";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
@@ -145,11 +145,13 @@ const chatQuickActions = [
   },
 ];
 
-export default function BuilderPage() {
-  const params = useParams();
+type BuilderPageProps = {
+  workspaceId: string;
+  appId: string;
+};
+
+export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   const router = useRouter();
-  const workspaceId = params.workspaceId as string;
-  const appId = params.appId as string;
   const { user } = useAuthStore();
   const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
   const permissions = buildWorkspacePermissions(workspaceRole);
@@ -228,7 +230,7 @@ export default function BuilderPage() {
     chatMessages.length === 0 &&
     !hasChanges &&
     !hasWorkflowContent &&
-    !app?.currentVersion?.workflowId;
+    !app?.current_version?.workflow_id;
   const runtimeEntryUrl =
     workspace?.slug && app?.slug ? `/runtime/${workspace.slug}/${app.slug}` : null;
   const accessModeMap = {
@@ -282,16 +284,16 @@ export default function BuilderPage() {
     {
       key: "workflow",
       title: "工作流已关联版本",
-      passed: Boolean(app?.currentVersionId || app?.currentVersion?.workflowId),
+      passed: Boolean(app?.current_version_id || app?.current_version?.workflow_id),
       required: true,
-      detail: app?.currentVersionId || app?.currentVersion?.workflowId ? "" : "需要绑定工作流版本后才能发布。",
+      detail: app?.current_version_id || app?.current_version?.workflow_id ? "" : "需要绑定工作流版本后才能发布。",
     },
     {
       key: "ui_schema",
       title: "UI Schema 已配置",
-      passed: Boolean(app?.currentVersion?.uiSchema),
+      passed: Boolean(app?.current_version?.ui_schema),
       required: false,
-      detail: app?.currentVersion?.uiSchema
+      detail: app?.current_version?.ui_schema
         ? ""
         : "未配置 UI Schema，将使用默认输入表单。",
     },
@@ -435,7 +437,7 @@ export default function BuilderPage() {
 
   useEffect(() => {
     if (!app) return;
-    const workflowId = app.currentVersion?.workflowId || null;
+    const workflowId = app.current_version?.workflow_id || null;
     let cancelled = false;
 
     if (!workflowId) {
@@ -482,19 +484,19 @@ export default function BuilderPage() {
     return () => {
       cancelled = true;
     };
-  }, [app?.currentVersion?.workflowId, app?.name, clearWorkflow]);
+  }, [app?.current_version?.workflow_id, app?.name, clearWorkflow]);
 
   useEffect(() => {
     const fields = extractUISchemaFields(
-      app?.currentVersion?.uiSchema as Record<string, unknown> | null
+      app?.current_version?.ui_schema as Record<string, unknown> | null
     );
     setUiSchemaFields(fields);
     setUiSchemaDirty(false);
-  }, [app?.currentVersion?.uiSchema]);
+  }, [app?.current_version?.ui_schema]);
 
   useEffect(() => {
     const defaults =
-      (app?.currentVersion?.configJson?.public_input_defaults as Record<string, unknown>) || {};
+      (app?.current_version?.config_json?.public_input_defaults as Record<string, unknown>) || {};
     setPreviewInputs((prev) => {
       const next: Record<string, string> = {};
       uiSchemaFields.forEach((field, index) => {
@@ -514,12 +516,12 @@ export default function BuilderPage() {
       });
       return next;
     });
-  }, [uiSchemaFields, app?.currentVersion?.configJson]);
+  }, [uiSchemaFields, app?.current_version?.config_json]);
 
   useEffect(() => {
     if (!appId) return;
     try {
-      const dismissed = localStorage.getItem(`app-guide-dismissed:${appId}`) === "true";
+      const dismissed = localStorage.getItem(`workspace-guide-dismissed:${appId}`) === "true";
       setShowGuide(!dismissed);
     } catch (error) {
       console.warn("Failed to load guide state:", error);
@@ -615,8 +617,8 @@ export default function BuilderPage() {
       const workflowFallbackName = app?.name || workflowSnapshot?.name || "未命名工作流";
       const nextSnapshot = extractWorkflowSnapshot(workflowDefinition, workflowFallbackName);
 
-      const hasWorkflow = Boolean(app?.currentVersion?.workflowId);
-      let workflowId = app?.currentVersion?.workflowId || null;
+      const hasWorkflow = Boolean(app?.current_version?.workflow_id);
+      let workflowId = app?.current_version?.workflow_id || null;
       if (hasWorkflow && workflowId) {
         await request<APIResponse<Record<string, unknown>>>(`/workflows/${workflowId}`, {
           method: "PATCH",
@@ -647,16 +649,16 @@ export default function BuilderPage() {
       const dbSchema = payload.db_schema;
       let updatedVersion: AppVersion | null = null;
 
-      if (hasWorkflow && app?.currentVersionId) {
+      if (hasWorkflow && app?.current_version_id) {
         if (uiSchema) {
-          const uiResponse = await request<APIResponse<unknown>>(`/apps/${appId}/ui-schema`, {
+          const uiResponse = await request<APIResponse<unknown>>(`/workspaces/${appId}/ui-schema`, {
             method: "PATCH",
             body: JSON.stringify({ ui_schema: uiSchema }),
           });
           updatedVersion = normalizeVersionPayload(uiResponse.data);
         }
       } else if (workflowId) {
-        const versionResponse = await request<APIResponse<unknown>>(`/apps/${appId}/versions`, {
+        const versionResponse = await request<APIResponse<unknown>>(`/workspaces/${appId}/versions`, {
           method: "POST",
           body: JSON.stringify({
             workflow_id: workflowId,
@@ -673,13 +675,13 @@ export default function BuilderPage() {
           prev
             ? {
                 ...prev,
-                currentVersionId: updatedVersion.id,
-                currentVersion: updatedVersion,
+                current_version_id: updatedVersion.id,
+                current_version: updatedVersion,
               }
             : prev
         );
         setUiSchemaFields(
-          extractUISchemaFields(updatedVersion.uiSchema as Record<string, unknown> | null)
+          extractUISchemaFields(updatedVersion.ui_schema as Record<string, unknown> | null)
         );
       } else if (uiSchema) {
         setUiSchemaFields(extractUISchemaFields(uiSchema));
@@ -728,7 +730,7 @@ export default function BuilderPage() {
 
       const definition = buildWorkflowDefinitionPayload();
       const workflowName = definition.name;
-      let workflowId = app?.currentVersion?.workflowId || workflowSnapshot?.id || null;
+      let workflowId = app?.current_version?.workflow_id || workflowSnapshot?.id || null;
 
       if (workflowId) {
         await request<APIResponse<Record<string, unknown>>>(`/workflows/${workflowId}`, {
@@ -753,13 +755,13 @@ export default function BuilderPage() {
       }
 
       let updatedVersion: AppVersion | null = null;
-      if (!app?.currentVersionId || !app?.currentVersion?.workflowId) {
-        const versionResponse = await request<APIResponse<unknown>>(`/apps/${appId}/versions`, {
+      if (!app?.current_version_id || !app?.current_version?.workflow_id) {
+        const versionResponse = await request<APIResponse<unknown>>(`/workspaces/${appId}/versions`, {
           method: "POST",
           body: JSON.stringify({
             workflow_id: workflowId,
-            ui_schema: app?.currentVersion?.uiSchema || {},
-            db_schema: app?.currentVersion?.dbSchema || {},
+            ui_schema: app?.current_version?.ui_schema || {},
+            db_schema: app?.current_version?.db_schema || {},
             changelog: "工作流更新",
           }),
         });
@@ -771,8 +773,8 @@ export default function BuilderPage() {
           prev
             ? {
                 ...prev,
-                currentVersionId: updatedVersion.id,
-                currentVersion: updatedVersion,
+                current_version_id: updatedVersion.id,
+                current_version: updatedVersion,
               }
             : prev
         );
@@ -827,7 +829,7 @@ export default function BuilderPage() {
     setShowGuide(false);
     if (!appId) return;
     try {
-      localStorage.setItem(`app-guide-dismissed:${appId}`, "true");
+      localStorage.setItem(`workspace-guide-dismissed:${appId}`, "true");
     } catch (error) {
       console.warn("Failed to save guide state:", error);
     }
@@ -960,7 +962,7 @@ export default function BuilderPage() {
 
   const handleResetUISchema = () => {
     const fields = extractUISchemaFields(
-      app?.currentVersion?.uiSchema as Record<string, unknown> | null
+      app?.current_version?.ui_schema as Record<string, unknown> | null
     );
     setUiSchemaFields(fields);
     setUiSchemaDirty(false);
@@ -979,8 +981,8 @@ export default function BuilderPage() {
         prev
           ? {
               ...prev,
-              currentVersionId: updatedVersion.id,
-              currentVersion: updatedVersion,
+              current_version_id: updatedVersion.id,
+              current_version: updatedVersion,
             }
           : prev
       );
@@ -1039,7 +1041,7 @@ export default function BuilderPage() {
           action={{ label: "重新加载", onClick: loadData, icon: RefreshCw }}
           secondaryAction={{
             label: "返回应用列表",
-            onClick: () => router.push(`/workspaces/${workspaceId}/apps`),
+            onClick: () => router.push("/dashboard/apps"),
           }}
         />
       </div>
@@ -1049,10 +1051,9 @@ export default function BuilderPage() {
   return (
     <AppAccessGate
       app={app}
-      workspaceId={workspaceId}
       permissions={permissions}
-      required={["app_edit"]}
-      backHref={`/workspaces/${workspaceId}/apps`}
+      required={["workspace_edit"]}
+      backHref="/dashboard/apps"
     >
       <TooltipProvider delayDuration={100}>
         <div className="h-full flex flex-col bg-background-studio">
@@ -1060,7 +1061,7 @@ export default function BuilderPage() {
         <header className="h-12 shrink-0 border-b border-border bg-surface-75 flex items-center px-4 gap-4">
           {/* 返回 */}
           <Link
-            href={`/workspaces/${workspaceId}/apps`}
+            href="/dashboard/apps"
             className="flex items-center gap-1 text-[12px] text-foreground-light hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -1154,7 +1155,7 @@ export default function BuilderPage() {
 
             <PermissionAction
               permissions={permissions}
-              required={["app_publish"]}
+              required={["workspace_publish"]}
               label="发布"
               icon={Rocket}
               size="sm"
@@ -1171,7 +1172,7 @@ export default function BuilderPage() {
               <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
                 <DropdownMenuItem asChild>
                   <Link
-                    href={`/workspaces/${workspaceId}/apps/${appId}/monitoring`}
+                    href={`/dashboard/app/${appId}/monitoring`}
                     className="flex items-center gap-2 text-[12px]"
                   >
                     <Eye className="w-4 h-4" />
@@ -1180,7 +1181,7 @@ export default function BuilderPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href={`/workspaces/${workspaceId}/apps/${appId}/domains`}
+                    href={`/dashboard/app/${appId}/domains`}
                     className="flex items-center gap-2 text-[12px]"
                   >
                     <Settings className="w-4 h-4" />
@@ -1262,7 +1263,7 @@ export default function BuilderPage() {
                 <p className="mt-2 text-[11px] text-foreground-muted">{publicGuardrailsDetail}</p>
               )}
               <Link
-                href={`/workspaces/${workspaceId}/apps/${appId}/domains`}
+                href={`/dashboard/app/${appId}/domains`}
                 className="mt-2 inline-flex items-center gap-1 text-[11px] text-brand-500 hover:text-brand-400"
               >
                 前往访问策略与域名设置
@@ -1492,7 +1493,7 @@ export default function BuilderPage() {
             ) : (
               <div className="flex-1 min-h-0">
                 <LazyWorkflowEditor
-                  workflowId={workflowSnapshot?.id || app?.currentVersion?.workflowId}
+                  workflowId={workflowSnapshot?.id || app?.current_version?.workflow_id}
                   workflowVersion={workflowSnapshot?.version}
                   initialData={workflowInitialData}
                   showEmptyState
@@ -1863,7 +1864,7 @@ export default function BuilderPage() {
                             保存 UI Schema 后将生成最新的工作流输入映射。
                           </div>
                           {(() => {
-                            const mapping = app?.currentVersion?.configJson?.input_mapping as
+                            const mapping = app?.current_version?.config_json?.input_mapping as
                               | Record<string, unknown>
                               | undefined;
                             const missingWorkflow = (mapping?.missing_in_workflow as string[]) || [];
@@ -1964,6 +1965,20 @@ export default function BuilderPage() {
       </TooltipProvider>
     </AppAccessGate>
   );
+}
+
+export default function BuilderPage() {
+  const params = useParams();
+  const workspaceId = Array.isArray(params?.workspaceId)
+    ? params.workspaceId[0]
+    : (params?.workspaceId as string | undefined);
+  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
+
+  if (!workspaceId || !appId) {
+    return null;
+  }
+
+  return <BuilderPageContent workspaceId={workspaceId} appId={appId} />;
 }
 
 // Plus 图标（lucide-react 中已有，这里是为了避免重复导入）

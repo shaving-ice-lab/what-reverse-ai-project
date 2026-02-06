@@ -58,7 +58,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { appApi, type App, type AppDomain, type DomainVerificationInfo } from "@/lib/api/app";
+import { appApi, type App, type AppDomain, type DomainVerificationInfo } from "@/lib/api/workspace";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from "@/lib/permissions";
@@ -86,14 +86,14 @@ const sslStatusConfig: Record<string, { label: string; color: string }> = {
 };
 
 // 侧边导航
-function AppNav({ workspaceId, appId, activeTab }: { workspaceId: string; appId: string; activeTab: string }) {
+function AppNav({ appId, activeTab }: { appId: string; activeTab: string }) {
   const navItems = [
-    { id: "overview", label: "概览", href: `/workspaces/${workspaceId}/apps/${appId}` },
-    { id: "builder", label: "构建", href: `/workspaces/${workspaceId}/apps/${appId}/builder` },
-    { id: "publish", label: "发布设置", href: `/workspaces/${workspaceId}/apps/${appId}/publish` },
-    { id: "versions", label: "版本历史", href: `/workspaces/${workspaceId}/apps/${appId}/versions` },
-    { id: "monitoring", label: "监控", href: `/workspaces/${workspaceId}/apps/${appId}/monitoring` },
-    { id: "domains", label: "域名", href: `/workspaces/${workspaceId}/apps/${appId}/domains` },
+    { id: "overview", label: "概览", href: `/dashboard/app/${appId}` },
+    { id: "builder", label: "构建", href: `/dashboard/app/${appId}/builder` },
+    { id: "publish", label: "发布设置", href: `/dashboard/app/${appId}/publish` },
+    { id: "versions", label: "版本历史", href: `/dashboard/app/${appId}/versions` },
+    { id: "monitoring", label: "监控", href: `/dashboard/app/${appId}/monitoring` },
+    { id: "domains", label: "域名", href: `/dashboard/app/${appId}/domains` },
   ];
 
   return (
@@ -112,9 +112,25 @@ function AppNav({ workspaceId, appId, activeTab }: { workspaceId: string; appId:
 
 export default function DomainsPage() {
   const params = useParams();
+  const workspaceId = Array.isArray(params?.workspaceId)
+    ? params.workspaceId[0]
+    : (params?.workspaceId as string | undefined);
+  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
+
+  if (!workspaceId || !appId) {
+    return null;
+  }
+
+  return <DomainsPageContent workspaceId={workspaceId} appId={appId} />;
+}
+
+type DomainsPageProps = {
+  workspaceId: string;
+  appId: string;
+};
+
+export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
   const router = useRouter();
-  const workspaceId = params.workspaceId as string;
-  const appId = params.appId as string;
   const { user } = useAuthStore();
   const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
   const permissions = buildWorkspacePermissions(workspaceRole);
@@ -321,27 +337,26 @@ export default function DomainsPage() {
   return (
     <AppAccessGate
       app={app}
-      workspaceId={workspaceId}
       permissions={permissions}
-      required={["app_publish"]}
-      backHref={`/workspaces/${workspaceId}/apps`}
+      required={["workspace_publish"]}
+      backHref="/dashboard/apps"
     >
       <PageWithSidebar
         sidebarWidth="narrow"
         sidebarTitle={app?.name || "应用"}
-        sidebar={<AppNav workspaceId={workspaceId} appId={appId} activeTab="domains" />}
+        sidebar={<AppNav appId={appId} activeTab="domains" />}
       >
         <PageContainer>
         {/* 页面头部 */}
         <PageHeader
           title="域名管理"
           eyebrow={app?.name}
-          backHref={`/workspaces/${workspaceId}/apps`}
+          backHref="/dashboard/apps"
           backLabel="返回应用列表"
           actions={
             <PermissionAction
               permissions={permissions}
-              required={["app_publish"]}
+              required={["workspace_publish"]}
               label="绑定域名"
               icon={Plus}
               size="sm"
@@ -648,7 +663,7 @@ export default function DomainsPage() {
                               查看证书
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
-                            <PermissionGate permissions={permissions} required={["app_publish"]}>
+                            <PermissionGate permissions={permissions} required={["workspace_publish"]}>
                               <DropdownMenuItem
                                 onClick={() => handleDelete(domain.id)}
                                 className="text-destructive"

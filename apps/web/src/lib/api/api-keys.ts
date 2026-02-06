@@ -2,78 +2,185 @@
  * API 密钥服务
  */
 
-import type {
-  ApiKey,
-  CreateApiKeyRequest,
-  CreateApiKeyResponse,
-  ListApiKeysResponse,
-  UpdateApiKeyRequest,
-  TestApiKeyResponse,
-} from "@/types/api-key";
+import type { ApiKey, ApiKeyProvider, ApiKeyTestResult, CreateApiKeyRequest } from "@/types/api-key";
 import { request } from "./shared";
 
 /**
- * API 密钥服务
+ * API 密钥服务（对齐后端 /api/v1/users/me/api-keys）
  */
+interface ApiResponse<T> {
+  code: string;
+  message: string;
+  data: T;
+  meta?: Record<string, unknown>;
+}
+
+type BackendApiKey = {
+  id: string;
+  provider: string;
+  name: string;
+  key_preview?: string | null;
+  scopes?: string[] | null;
+  is_active?: boolean;
+  last_used_at?: string | null;
+  last_rotated_at?: string | null;
+  revoked_at?: string | null;
+  revoked_reason?: string | null;
+  created_at?: string;
+};
+
+type BackendTestResult = {
+  valid: boolean;
+  provider: string;
+  message: string;
+};
+
+const API_KEYS_BASE = "/users/me/api-keys";
+
+function splitKeyPreview(preview?: string | null) {
+  const value = (preview ?? "").trim();
+  if (!value) return { keyPrefix: "***", keySuffix: "" };
+
+  // 兼容可能的 "sk-abc...wxyz" 形式
+  if (value.includes("...")) {
+    const [prefix, suffix] = value.split("...");
+    return {
+      keyPrefix: prefix || "***",
+      keySuffix: suffix || "",
+    };
+  }
+
+  // 当前后端默认是 "***" + last4
+  if (value.startsWith("***")) {
+    return {
+      keyPrefix: "***",
+      keySuffix: value.slice(3),
+    };
+  }
+
+  if (value.length <= 4) return { keyPrefix: "***", keySuffix: value };
+
+  return {
+    keyPrefix: value.slice(0, 3),
+    keySuffix: value.slice(-4),
+  };
+}
+
+function toUiApiKey(item: BackendApiKey): ApiKey {
+  const { keyPrefix, keySuffix } = splitKeyPreview(item.key_preview);
+  const createdAt = item.created_at || new Date().toISOString();
+  const updatedAt = item.last_rotated_at || createdAt;
+  const status = item.is_active ? "active" : "revoked";
+  return {
+    id: item.id,
+    name: item.name,
+    provider: item.provider as ApiKeyProvider,
+    keyPrefix,
+    keySuffix,
+    status,
+    lastUsedAt: item.last_used_at || undefined,
+    createdAt,
+    updatedAt,
+  };
+}
+
+function toUiTestResult(result: BackendTestResult): ApiKeyTestResult {
+  return {
+    valid: Boolean(result?.valid),
+    provider: result?.provider as ApiKeyProvider,
+    message: result?.message || (result?.valid ? "密钥格式有效" : "密钥格式无效"),
+  };
+}
+
 export const apiKeysApi = {
   /**
    * 获取密钥列表
    */
-  async list(): Promise<ListApiKeysResponse> {
-    return request<ListApiKeysResponse>("/api-keys");
-  },
-
-  /**
-   * 获取单个密钥
-   */
-  async get(id: string): Promise<{ apiKey: ApiKey }> {
-    return request<{ apiKey: ApiKey }>(`/api-keys/${id}`);
+  async list(): Promise<ApiKey[]> {
+    const response = await request<ApiResponse<BackendApiKey[]>>(API_KEYS_BASE);
+    const items = Array.isArray(response.data) ? response.data : [];
+    return items.map(toUiApiKey);
   },
 
   /**
    * 创建密钥
    */
-  async create(data: CreateApiKeyRequest): Promise<CreateApiKeyResponse> {
-    return request<CreateApiKeyResponse>("/api-keys", {
+  async create(data: CreateApiKeyRequest): Promise<ApiKey> {
+    const response = await request<ApiResponse<BackendApiKey>>(API_KEYS_BASE, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        provider: data.provider,
+        name: data.name,
+        key: data.key,
+        scopes: data.scopes || [],
+      }),
     });
+    return toUiApiKey(response.data);
   },
 
   /**
-   * 更新密钥
+   * 轮换密钥
    */
-  async update(id: string, data: UpdateApiKeyRequest): Promise<{ apiKey: ApiKey }> {
-    return request<{ apiKey: ApiKey }>(`/api-keys/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
+  async rotate(
+    id: string,
+    data: { key: string; name?: string; scopes?: string[] }
+  ): Promise<ApiKey> {
+    const response = await request<ApiResponse<BackendApiKey>>(
+      `${API_KEYS_BASE}/${id}/rotate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          name: data.name,
+          key: data.key,
+          scopes: data.scopes || [],
+        }),
+      }
+    );
+    return toUiApiKey(response.data);
+  },
+
+  /**
+   * 撤销密钥
+   */
+  async revoke(id: string, reason = ""): Promise<ApiKey> {
+    const response = await request<ApiResponse<BackendApiKey>>(
+      `${API_KEYS_BASE}/${id}/revoke`,
+      {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }
+    );
+    return toUiApiKey(response.data);
   },
 
   /**
    * 删除密钥
    */
-  async delete(id: string): Promise<{ success: boolean }> {
-    return request<{ success: boolean }>(`/api-keys/${id}`, {
+  async delete(id: string): Promise<void> {
+    await request<ApiResponse<{ message: string }>>(`${API_KEYS_BASE}/${id}`, {
       method: "DELETE",
     });
   },
 
   /**
-   * 测试密钥
+   * 测试已保存密钥（服务端解密后校验）
    */
-  async test(id: string): Promise<TestApiKeyResponse> {
-    return request<TestApiKeyResponse>(`/api-keys/${id}/test`, {
-      method: "POST",
-    });
+  async test(id: string): Promise<ApiKeyTestResult> {
+    const response = await request<ApiResponse<BackendTestResult>>(
+      `${API_KEYS_BASE}/${id}/test`,
+      { method: "POST" }
+    );
+    return toUiTestResult(response.data);
   },
 
   /**
-   * 刷新密钥统计
+   * 测试密钥值（保存前校验）
    */
-  async refreshStats(id: string): Promise<{ apiKey: ApiKey }> {
-    return request<{ apiKey: ApiKey }>(`/api-keys/${id}/refresh-stats`, {
+  async testValue(provider: ApiKeyProvider, key: string): Promise<ApiKeyTestResult> {
+    const response = await request<ApiResponse<BackendTestResult>>(`${API_KEYS_BASE}/test`, {
       method: "POST",
+      body: JSON.stringify({ provider, key }),
     });
+    return toUiTestResult(response.data);
   },
 };

@@ -87,6 +87,8 @@ const workspaceSidebarLinks = [
   { id: "list", label: "空间列表", icon: FolderOpen },
 ];
 
+const WORKSPACE_STORAGE_KEY = "last_workspace_id";
+
 export default function WorkspacesPage() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -105,6 +107,12 @@ export default function WorkspacesPage() {
     plan: "free",
   });
   const [isCreating, setIsCreating] = useState(false);
+
+  const rememberWorkspace = (workspaceId: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId);
+    }
+  };
 
   // 加载工作空间列表
   useEffect(() => {
@@ -155,7 +163,8 @@ export default function WorkspacesPage() {
         region: regionOptions[0]?.value || "",
         plan: "free",
       });
-      router.push(`/workspaces/${workspace.id}/apps`);
+      rememberWorkspace(workspace.id);
+      router.push("/dashboard/apps");
     } catch (error) {
       console.error("Failed to create workspace:", error);
     } finally {
@@ -334,7 +343,8 @@ export default function WorkspacesPage() {
             return (
               <Link
                 key={workspace.id}
-                href={`/workspaces/${workspace.id}/apps`}
+                href="/dashboard/apps"
+                onClick={() => rememberWorkspace(workspace.id)}
                 className="flex items-center justify-between px-2 py-1.5 rounded-md text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-100/60 transition-colors"
               >
                 <span className="truncate">{workspace.name}</span>
@@ -624,7 +634,8 @@ export default function WorkspacesPage() {
               return (
                 <Link
                   key={workspace.id}
-                  href={`/workspaces/${workspace.id}/apps`}
+                  href="/dashboard/apps"
+                  onClick={() => rememberWorkspace(workspace.id)}
                   className="group"
                 >
                   <div className="p-4 rounded-md bg-surface-100 border border-border hover:border-brand-500/50 transition-all">

@@ -38,7 +38,7 @@ import {
   type App,
   type AppVersion,
   type AppVersionDiff,
-} from "@/lib/api/app";
+} from "@/lib/api/workspace";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
 import { cn } from "@/lib/utils";
 
@@ -67,21 +67,19 @@ const sortOptions = [
 ];
 
 function AppNav({
-  workspaceId,
   appId,
   activeTab,
 }: {
-  workspaceId: string;
   appId: string;
   activeTab: string;
 }) {
   const navItems = [
-    { id: "overview", label: "概览", href: `/workspaces/${workspaceId}/apps/${appId}` },
-    { id: "builder", label: "构建", href: `/workspaces/${workspaceId}/apps/${appId}/builder` },
-    { id: "publish", label: "发布设置", href: `/workspaces/${workspaceId}/apps/${appId}/publish` },
-    { id: "versions", label: "版本历史", href: `/workspaces/${workspaceId}/apps/${appId}/versions` },
-    { id: "monitoring", label: "监控", href: `/workspaces/${workspaceId}/apps/${appId}/monitoring` },
-    { id: "domains", label: "域名", href: `/workspaces/${workspaceId}/apps/${appId}/domains` },
+    { id: "overview", label: "概览", href: `/dashboard/app/${appId}` },
+    { id: "builder", label: "构建", href: `/dashboard/app/${appId}/builder` },
+    { id: "publish", label: "发布设置", href: `/dashboard/app/${appId}/publish` },
+    { id: "versions", label: "版本历史", href: `/dashboard/app/${appId}/versions` },
+    { id: "monitoring", label: "监控", href: `/dashboard/app/${appId}/monitoring` },
+    { id: "domains", label: "域名", href: `/dashboard/app/${appId}/domains` },
   ];
 
   return (
@@ -98,10 +96,12 @@ function AppNav({
   );
 }
 
-export default function VersionsPage() {
-  const params = useParams();
-  const workspaceId = params.workspaceId as string;
-  const appId = params.appId as string;
+type VersionsPageProps = {
+  workspaceId: string;
+  appId: string;
+};
+
+export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [app, setApp] = useState<App | null>(null);
@@ -299,14 +299,14 @@ export default function VersionsPage() {
     <PageWithSidebar
       sidebarWidth="narrow"
       sidebarTitle={app?.name || "应用"}
-      sidebar={<AppNav workspaceId={workspaceId} appId={appId} activeTab="versions" />}
+      sidebar={<AppNav appId={appId} activeTab="versions" />}
     >
       <PageContainer>
         <PageHeader
           title="版本历史"
           eyebrow={app?.name}
           description="查看版本变更、对比差异并执行回滚"
-          backHref={`/workspaces/${workspaceId}/apps/${appId}`}
+          backHref={`/dashboard/app/${appId}`}
           backLabel="返回应用概览"
           actions={
             <Button variant="outline" size="sm" onClick={loadData}>
@@ -607,4 +607,18 @@ export default function VersionsPage() {
       </PageContainer>
     </PageWithSidebar>
   );
+}
+
+export default function VersionsPage() {
+  const params = useParams();
+  const workspaceId = Array.isArray(params?.workspaceId)
+    ? params.workspaceId[0]
+    : (params?.workspaceId as string | undefined);
+  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
+
+  if (!workspaceId || !appId) {
+    return null;
+  }
+
+  return <VersionsPageContent workspaceId={workspaceId} appId={appId} />;
 }

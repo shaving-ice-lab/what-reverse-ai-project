@@ -26,7 +26,7 @@ export * from "./dashboard";
 export { configApi } from "./config";
 export type { ConfigItem, ConfigItemListParams, UpsertConfigItemRequest } from "./config";
 export { billingApi } from "./billing";
-export type { BudgetSettings, BudgetSettingsUpdate, AppUsageStat } from "./billing";
+export type { BudgetSettings, BudgetSettingsUpdate, WorkspaceUsageStat } from "./billing";
 export { conversationApi, conversationFolderApi } from "./conversation";
 export { conversationTemplateApi } from "./conversation-template";
 export type {
@@ -51,13 +51,15 @@ export type {
   FixSuggestion,
 } from "./ai";
 
-// Workspace API
-export { workspaceApi } from "./workspace";
+// Workspace API（Workspace 现在就是 App）
+export { workspaceApi, appApi } from "./workspace";
 export type {
+  // Workspace 核心类型
   Workspace,
   WorkspaceMember,
   WorkspaceRole,
   WorkspaceQuota,
+  // 日志归档
   LogArchiveJob,
   LogArchiveStatus,
   LogArchiveType,
@@ -65,28 +67,24 @@ export type {
   LogArchiveListParams,
   LogArchiveReplayParams,
   LogArchiveReplayResult,
+  // 请求类型
   CreateWorkspaceRequest,
   UpdateWorkspaceRequest,
   InviteMemberRequest,
   UpdateMemberRoleRequest,
-} from "./workspace";
-
-// App API
-export { appApi } from "./app";
-export type {
+  // App 相关类型（现在是 Workspace 的一部分）
   App,
   AppVersion,
-  AppAccessPolicy,
   AppDomain,
-  AppExecution,
+  AppAccessPolicy,
+  WorkspaceVersion,
+  WorkspaceDomain,
+  WorkspaceAccessPolicy,
+  WorkspaceDomainBindingResult,
+  WorkspaceExecution,
+  WorkspaceMetrics,
+  DomainVerificationInfo,
+  AppVersionDiff,
   AppMetrics,
-  CreateAppRequest,
-  CreateAppFromWorkflowRequest,
-  CreateAppFromAIRequest,
-  UpdateAppRequest,
-  CreateVersionRequest,
-  UpdateAccessPolicyRequest,
-  BindDomainRequest,
-  ListAppsParams,
-  ListExecutionsParams,
-} from "./app";
+  AppExecution,
+} from "./workspace";

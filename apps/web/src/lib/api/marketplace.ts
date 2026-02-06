@@ -54,7 +54,7 @@ export interface MarketplaceRatingUser {
 
 export interface MarketplaceRating {
   id: string;
-  app_id: string;
+  workspace_id: string;
   user_id: string;
   rating: number;
   comment?: string | null;
@@ -88,26 +88,26 @@ export const marketplaceApi = {
     if (params.page) searchParams.set("page", String(params.page));
     if (params.page_size) searchParams.set("page_size", String(params.page_size));
     const query = searchParams.toString();
-    return request<MarketplaceAppListResponse>(`/marketplace/apps${query ? `?${query}` : ""}`);
+    return request<MarketplaceAppListResponse>(`/marketplace/workspaces${query ? `?${query}` : ""}`);
   },
 
   async getApp(id: string): Promise<{ data: { app: MarketplaceApp } }> {
-    return request<{ data: { app: MarketplaceApp } }>(`/marketplace/apps/${id}`);
+    return request<{ data: { app: MarketplaceApp } }>(`/marketplace/workspaces/${id}`);
   },
 
-  async listRatings(appId: string, params?: { page?: number; page_size?: number; sort?: string }): Promise<MarketplaceRatingListResponse> {
+  async listRatings(workspaceId: string, params?: { page?: number; page_size?: number; sort?: string }): Promise<MarketplaceRatingListResponse> {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.page_size) searchParams.set("page_size", String(params.page_size));
     if (params?.sort) searchParams.set("sort", params.sort);
     const query = searchParams.toString();
     return request<MarketplaceRatingListResponse>(
-      `/marketplace/apps/${appId}/ratings${query ? `?${query}` : ""}`
+      `/marketplace/workspaces/${workspaceId}/ratings${query ? `?${query}` : ""}`
     );
   },
 
-  async submitRating(appId: string, payload: { rating: number; comment?: string | null }): Promise<SubmitMarketplaceRatingResponse> {
-    return request<SubmitMarketplaceRatingResponse>(`/marketplace/apps/${appId}/ratings`, {
+  async submitRating(workspaceId: string, payload: { rating: number; comment?: string | null }): Promise<SubmitMarketplaceRatingResponse> {
+    return request<SubmitMarketplaceRatingResponse>(`/marketplace/workspaces/${workspaceId}/ratings`, {
       method: "POST",
       body: JSON.stringify(payload),
     });

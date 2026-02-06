@@ -5,12 +5,12 @@ export type WorkspaceRole = "owner" | "admin" | "member";
 export type WorkspacePermission =
   | "members_manage"
   | "billing_manage"
-  | "app_publish"
-  | "app_edit"
-  | "app_view_metrics"
+  | "workspace_publish"
+  | "workspace_edit"
+  | "workspace_view_metrics"
   | "logs_view"
   | "workspace_admin"
-  | "apps_create"
+  | "workspace_create"
   | "plan_view"
   | "plan_manage";
 
@@ -20,36 +20,36 @@ export const workspaceRolePermissions: Record<WorkspaceRole, WorkspacePermission
   owner: {
     members_manage: true,
     billing_manage: true,
-    app_publish: true,
-    app_edit: true,
-    app_view_metrics: true,
+    workspace_publish: true,
+    workspace_edit: true,
+    workspace_view_metrics: true,
     logs_view: true,
     workspace_admin: true,
-    apps_create: true,
+    workspace_create: true,
     plan_view: true,
     plan_manage: true,
   },
   admin: {
     members_manage: true,
     billing_manage: false,
-    app_publish: true,
-    app_edit: true,
-    app_view_metrics: true,
+    workspace_publish: true,
+    workspace_edit: true,
+    workspace_view_metrics: true,
     logs_view: true,
     workspace_admin: false,
-    apps_create: true,
+    workspace_create: true,
     plan_view: true,
     plan_manage: true,
   },
   member: {
     members_manage: false,
     billing_manage: false,
-    app_publish: false,
-    app_edit: true,
-    app_view_metrics: true,
+    workspace_publish: false,
+    workspace_edit: true,
+    workspace_view_metrics: true,
     logs_view: true,
     workspace_admin: false,
-    apps_create: true,
+    workspace_create: true,
     plan_view: true,
     plan_manage: false,
   },

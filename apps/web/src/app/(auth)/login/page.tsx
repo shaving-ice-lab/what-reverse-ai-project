@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/templates";
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   
   const { login, isLoading, error, clearError } = useAuthStore();
   

@@ -32,7 +32,7 @@ describe("EmptyState", () => {
       />
     );
 
-    const button = screen.getByRole("button", { name: "添加" });
+    const button = screen.getByRole("button", { name: /添加/ });
     expect(button).toBeInTheDocument();
 
     fireEvent.click(button);
@@ -50,35 +50,41 @@ describe("EmptyState", () => {
       />
     );
 
-    expect(screen.getByRole("button", { name: "主要" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /主要/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "次要" })).toBeInTheDocument();
   });
 
   it("应该应用不同的尺寸", () => {
-    const { rerender, container } = render(
+    const { rerender } = render(
       <EmptyState title="测试" size="sm" />
     );
-    expect(container.firstChild).toHaveClass("py-8");
+    // EmptyState 外层 div 含有 size 对应的 padding class
+    expect(screen.getByText("测试").closest("div[class*='py-']")).toBeTruthy();
+
+    // sm -> py-8, md -> py-12, lg -> py-16
+    const getContainer = () => screen.getByText("测试").parentElement!;
+
+    expect(getContainer()).toHaveClass("py-8");
 
     rerender(<EmptyState title="测试" size="md" />);
-    expect(container.firstChild).toHaveClass("py-12");
+    expect(getContainer()).toHaveClass("py-12");
 
     rerender(<EmptyState title="测试" size="lg" />);
-    expect(container.firstChild).toHaveClass("py-16");
+    expect(getContainer()).toHaveClass("py-16");
   });
 });
 
 describe("SearchEmpty", () => {
   it("应该显示搜索词", () => {
     render(<SearchEmpty query="测试关键词" />);
-    expect(screen.getByText(/没有找到.*测试关键词.*的结果/)).toBeInTheDocument();
+    expect(screen.getByText(/没有找到.*测试关键词/)).toBeInTheDocument();
   });
 
   it("应该显示清除按钮", () => {
     const handleClear = vi.fn();
     render(<SearchEmpty query="测试" onClear={handleClear} />);
 
-    const button = screen.getByRole("button", { name: "清除搜索" });
+    const button = screen.getByRole("button", { name: /清除搜索/ });
     fireEvent.click(button);
     expect(handleClear).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +100,7 @@ describe("WorkflowEmpty", () => {
     const handleCreate = vi.fn();
     render(<WorkflowEmpty onCreateClick={handleCreate} />);
 
-    const button = screen.getByRole("button", { name: "创建工作流" });
+    const button = screen.getByRole("button", { name: /创建工作流/ });
     fireEvent.click(button);
     expect(handleCreate).toHaveBeenCalledTimes(1);
   });
@@ -110,7 +116,7 @@ describe("ApiKeyEmpty", () => {
     const handleAdd = vi.fn();
     render(<ApiKeyEmpty onAddClick={handleAdd} />);
 
-    const button = screen.getByRole("button", { name: "添加密钥" });
+    const button = screen.getByRole("button", { name: /添加密钥/ });
     fireEvent.click(button);
     expect(handleAdd).toHaveBeenCalledTimes(1);
   });
@@ -132,7 +138,7 @@ describe("ErrorEmpty", () => {
     const handleRetry = vi.fn();
     render(<ErrorEmpty onRetry={handleRetry} />);
 
-    const button = screen.getByRole("button", { name: "重试" });
+    const button = screen.getByRole("button", { name: /重试/ });
     fireEvent.click(button);
     expect(handleRetry).toHaveBeenCalledTimes(1);
   });

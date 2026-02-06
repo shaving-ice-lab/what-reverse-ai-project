@@ -1,94 +1,32 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { ExceptionState } from "@/components/ui/empty-state";
-import {
-  hasAnyWorkspacePermission,
-  type WorkspacePermission,
-  type WorkspacePermissionMap,
-} from "@/lib/permissions";
-import type { App } from "@/lib/api/app";
+/**
+ * AppAccessGate 兼容组件
+ * Workspace = App 架构合并后，App 级别的权限检查由 Workspace 层承担
+ */
 
-const resolveAppWorkspaceId = (app?: App | null) => {
-  if (!app) return null;
-  return (
-    (app as { workspace_id?: string }).workspace_id ||
-    (app as { workspaceId?: string }).workspaceId ||
-    (app as { workspace?: { id?: string } }).workspace?.id ||
-    null
-  );
-};
+import type { ReactNode } from "react";
 
 interface AppAccessGateProps {
-  app: App | null;
-  workspaceId: string;
-  permissions?: Partial<WorkspacePermissionMap>;
-  required?: WorkspacePermission[];
-  requireAll?: boolean;
-  backHref?: string;
-  backLabel?: string;
+  appId?: string;
+  workspaceId?: string;
+  requiredPermission?: string;
   children: ReactNode;
+  fallback?: ReactNode;
+  /** @deprecated 兼容旧调用方式 - 权限已由 WorkspaceGuard 统一处理 */
+  app?: unknown;
+  /** @deprecated 兼容旧调用方式 */
+  permissions?: unknown;
+  /** @deprecated 使用 requiredPermission 代替 */
+  required?: string[];
+  /** @deprecated 兼容旧调用方式 */
+  backHref?: string;
 }
 
-export function AppAccessGate({
-  app,
-  workspaceId,
-  permissions,
-  required,
-  requireAll = false,
-  backHref,
-  backLabel = "返回应用列表",
-  children,
-}: AppAccessGateProps) {
-  const hasPermission = required
-    ? requireAll
-      ? required.every((permission) => Boolean(permissions?.[permission]))
-      : hasAnyWorkspacePermission(permissions, ...required)
-    : true;
-
-  if (!hasPermission) {
-    return (
-      <div className="h-full flex items-center justify-center px-6">
-        <div className="w-full max-w-xl">
-          <ExceptionState
-            variant="permission"
-            title="权限不足"
-            description="当前账号没有访问该页面的权限，请联系管理员授权。"
-            action={{
-              label: backLabel,
-              href: backHref || `/workspaces/${workspaceId}/apps`,
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  const appWorkspaceId = resolveAppWorkspaceId(app);
-  if (app && appWorkspaceId && appWorkspaceId !== workspaceId) {
-    const redirectHref = app?.id
-      ? `/workspaces/${appWorkspaceId}/apps/${app.id}`
-      : `/workspaces/${appWorkspaceId}/apps`;
-    return (
-      <div className="h-full flex items-center justify-center px-6">
-        <div className="w-full max-w-xl">
-          <ExceptionState
-            variant="permission"
-            title="应用不属于当前 Workspace"
-            description="该应用属于其他 Workspace，请切换到正确的工作空间查看。"
-            action={{
-              label: "前往所属 Workspace",
-              href: redirectHref,
-            }}
-            secondaryAction={{
-              label: backLabel,
-              href: backHref || `/workspaces/${workspaceId}/apps`,
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
+/**
+ * AppAccessGate 在新架构下直接放行子组件。
+ * 权限检查已在 WorkspaceGuard（layout 层）统一处理。
+ */
+export function AppAccessGate({ children }: AppAccessGateProps) {
   return <>{children}</>;
 }

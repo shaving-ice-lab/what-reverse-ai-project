@@ -47,6 +47,19 @@ const LEGACY_DASHBOARD_PREFIXES = [
   "/workspaces",
 ] as const;
 
+function resolveLegacyDashboardPath(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments[0] !== "dashboard") return null;
+  if (segments[1] !== "workspaces") return null;
+  if (segments[3] !== "apps") return null;
+  const appId = segments[4];
+  if (!appId) return null;
+  const rest = segments.slice(5);
+  return rest.length
+    ? `/dashboard/app/${appId}/${rest.join("/")}`
+    : `/dashboard/app/${appId}`;
+}
+
 function matchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
@@ -56,6 +69,12 @@ export function middleware(request: NextRequest) {
 
   // Already on the new namespace
   if (pathname.startsWith(DASHBOARD_PREFIX)) {
+    const legacyRedirect = resolveLegacyDashboardPath(pathname);
+    if (legacyRedirect && legacyRedirect !== pathname) {
+      const url = request.nextUrl.clone();
+      url.pathname = legacyRedirect;
+      return NextResponse.redirect(url);
+    }
     return NextResponse.next();
   }
 

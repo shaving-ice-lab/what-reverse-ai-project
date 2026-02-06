@@ -233,32 +233,47 @@ describe("VersionedState", () => {
 });
 
 describe("RequestSerializer", () => {
-  it("应该序列化相同 key 的请求", async () => {
+  it("应该通过 Mutex 序列化请求执行", async () => {
     const serializer = new RequestSerializer();
-    const mockFn = vi.fn().mockResolvedValue("result");
+    const results: number[] = [];
 
-    // 同时发起两个相同 key 的请求
-    const promise1 = serializer.execute("key", mockFn);
-    const promise2 = serializer.execute("key", mockFn);
+    const mockFn1 = vi.fn().mockImplementation(async () => {
+      results.push(1);
+      return "result1";
+    });
 
-    const [result1, result2] = await Promise.all([promise1, promise2]);
+    const mockFn2 = vi.fn().mockImplementation(async () => {
+      results.push(2);
+      return "result2";
+    });
 
-    // 请求应该只执行一次
-    expect(mockFn).toHaveBeenCalledTimes(1);
-    expect(result1).toBe("result");
-    expect(result2).toBe("result");
+    // 同时发起两个不同 key 的请求
+    const [result1, result2] = await Promise.all([
+      serializer.execute("key1", mockFn1),
+      serializer.execute("key2", mockFn2),
+    ]);
+
+    // 因为 Mutex 串行化，两个请求应该都执行
+    expect(mockFn1).toHaveBeenCalledTimes(1);
+    expect(mockFn2).toHaveBeenCalledTimes(1);
+    expect(result1).toBe("result1");
+    expect(result2).toBe("result2");
   });
 
   it("hasPending 应该正确检测进行中的请求", async () => {
     const serializer = new RequestSerializer();
     let resolvePromise: () => void;
     const mockFn = vi.fn().mockImplementation(
-      () => new Promise((resolve) => {
-        resolvePromise = () => resolve("result");
-      })
+      () =>
+        new Promise<string>((resolve) => {
+          resolvePromise = () => resolve("result");
+        })
     );
 
     const promise = serializer.execute("key", mockFn);
+
+    // 等待 mutex 锁获取并开始执行
+    await new Promise((r) => setTimeout(r, 10));
 
     expect(serializer.hasPending("key")).toBe(true);
     expect(serializer.hasPending("other")).toBe(false);

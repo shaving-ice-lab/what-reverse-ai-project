@@ -30,9 +30,9 @@ const MAX_HISTORY_ITEMS = 20;
 const MAX_IMPORT_MB = 5;
 const MAX_IMPORT_BYTES = MAX_IMPORT_MB * 1024 * 1024;
 const AUDIT_ACTIONS = [
-  "app.export",
+  "workspace.export",
   "workflow.import",
-  "app.schema.import",
+  "workspace.schema.import",
   "workspace.db.backup",
   "workspace.db.restore",
 ];
@@ -47,7 +47,7 @@ type ApiListResponse<T> = ApiResponse<T> & {
   meta?: { total?: number; page?: number; page_size?: number };
 };
 
-type AppOption = {
+type WorkspaceOption = {
   id: string;
   name: string;
   slug?: string;
@@ -90,14 +90,14 @@ type HistoryEntry = {
   id: string;
   workspaceId: string;
   action:
-    | "app_export"
+    | "workspace_export"
     | "workflow_import"
     | "schema_import"
     | "db_backup"
     | "db_restore"
-    | "app.export"
+    | "workspace.export"
     | "workflow.import"
-    | "app.schema.import"
+    | "workspace.schema.import"
     | "workspace.db.backup"
     | "workspace.db.restore";
   status: "success" | "failed";
@@ -106,15 +106,15 @@ type HistoryEntry = {
   timestamp: string;
 };
 
-const extractAppList = (payload: unknown): AppOption[] => {
+const extractWorkspaceList = (payload: unknown): WorkspaceOption[] => {
   if (!payload || typeof payload !== "object") return [];
   const data = (payload as { data?: unknown }).data ?? payload;
-  if (Array.isArray(data)) return data as AppOption[];
+  if (Array.isArray(data)) return data as WorkspaceOption[];
   if (data && typeof data === "object" && Array.isArray((data as { items?: unknown }).items)) {
-    return (data as { items: AppOption[] }).items;
+    return (data as { items: WorkspaceOption[] }).items;
   }
   if (Array.isArray((payload as { items?: unknown }).items)) {
-    return (payload as { items: AppOption[] }).items;
+    return (payload as { items: WorkspaceOption[] }).items;
   }
   return [];
 };
@@ -279,9 +279,9 @@ const validateSchemaPayload = (payload: Record<string, unknown>) => {
 };
 
 const auditActionLabels: Record<string, string> = {
-  "app.export": "App 配置导出",
+  "workspace.export": "工作空间配置导出",
   "workflow.import": "工作流导入",
-  "app.schema.import": "Schema 导入",
+  "workspace.schema.import": "Schema 导入",
   "workspace.db.backup": "数据库备份",
   "workspace.db.restore": "数据库恢复",
 };
@@ -295,7 +295,7 @@ const buildAuditDetail = (action: string, metadata?: Record<string, unknown>) =>
   const backupId = readStringValue(metadata.backup_id);
   const workflowName = readStringValue(metadata.workflow_name);
   const filename = readStringValue(metadata.filename);
-  const appName = readStringValue(metadata.app_name);
+  const appName = readStringValue(metadata.workspace_name) || readStringValue(metadata.app_name);
   const version = readStringValue(metadata.version);
   const versionId = readStringValue(metadata.version_id);
   const tables = readNumberValue(metadata.tables);
@@ -308,13 +308,13 @@ const buildAuditDetail = (action: string, metadata?: Record<string, unknown>) =>
   }
 
   switch (action) {
-    case "app.export":
+    case "workspace.export":
       if (appName && filename) return `${appName} · ${filename}`;
       if (appName) return appName;
       return filename || "";
     case "workflow.import":
       return workflowName || readStringValue(metadata.workflow_id);
-    case "app.schema.import":
+    case "workspace.schema.import":
       if (version) return `版本 ${version}`;
       if (versionId) return `版本 ${versionId.slice(0, 8)}`;
       return "";
@@ -407,11 +407,11 @@ export default function ExportPage() {
   const schemaFileRef = useRef<HTMLInputElement | null>(null);
 
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
-  const [apps, setApps] = useState<AppOption[]>([]);
-  const [appsLoading, setAppsLoading] = useState(false);
+  const [workspaces, setWorkspaces] = useState<WorkspaceOption[]>([]);
+  const [workspacesLoading, setWorkspacesLoading] = useState(false);
 
-  const [selectedAppId, setSelectedAppId] = useState("");
-  const [schemaAppId, setSchemaAppId] = useState("");
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState("");
+  const [schemaWorkspaceId, setSchemaWorkspaceId] = useState("");
 
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -450,37 +450,37 @@ export default function ExportPage() {
     if (!activeWorkspaceId) return;
     let isActive = true;
 
-    const loadApps = async () => {
+    const loadWorkspaces = async () => {
       try {
-        setAppsLoading(true);
+        setWorkspacesLoading(true);
         const response = await request<ApiResponse<unknown>>(
-          `/apps?workspace_id=${activeWorkspaceId}`
+          `/workspaces?workspace_id=${activeWorkspaceId}`
         );
-        const resolved = extractAppList(response.data);
+        const resolved = extractWorkspaceList(response.data);
         if (isActive) {
-          setApps(resolved);
-          if (!selectedAppId && resolved.length > 0) {
-            setSelectedAppId(resolved[0].id);
+          setWorkspaces(resolved);
+          if (!selectedWorkspaceId && resolved.length > 0) {
+            setSelectedWorkspaceId(resolved[0].id);
           }
-          if (!schemaAppId && resolved.length > 0) {
-            setSchemaAppId(resolved[0].id);
+          if (!schemaWorkspaceId && resolved.length > 0) {
+            setSchemaWorkspaceId(resolved[0].id);
           }
         }
       } catch (error) {
-        console.error("Failed to load apps:", error);
-        if (isActive) setApps([]);
+        console.error("Failed to load workspaces:", error);
+        if (isActive) setWorkspaces([]);
       } finally {
-        if (isActive) setAppsLoading(false);
+        if (isActive) setWorkspacesLoading(false);
       }
     };
 
-    loadApps();
+    loadWorkspaces();
     return () => {
       isActive = false;
     };
-  }, [activeWorkspaceId, selectedAppId, schemaAppId]);
+  }, [activeWorkspaceId, selectedWorkspaceId, schemaWorkspaceId]);
 
-  const appOptions = useMemo(() => apps, [apps]);
+  const workspaceOptions = useMemo(() => workspaces, [workspaces]);
 
   const fetchAuditHistory = useCallback(async (workspaceId: string) => {
     setHistoryLoading(true);
@@ -502,7 +502,7 @@ export default function ExportPage() {
   }, []);
 
   const recordClientAudit = useCallback(
-    async (action: "workflow.import" | "app.schema.import", metadata: Record<string, unknown>) => {
+    async (action: "workflow.import" | "workspace.schema.import", metadata: Record<string, unknown>) => {
       if (!activeWorkspaceId) return;
       try {
         await request<ApiResponse<{ recorded: boolean }>>(
@@ -553,31 +553,31 @@ export default function ExportPage() {
     });
   };
 
-  const handleExportAppConfig = async () => {
-    if (!selectedAppId) return;
+  const handleExportWorkspaceConfig = async () => {
+    if (!selectedWorkspaceId) return;
     setExporting(true);
     setExportError(null);
     setExportResult(null);
     try {
-      const appName =
-        appOptions.find((app) => app.id === selectedAppId)?.name ??
-        `App ${selectedAppId.slice(0, 8)}`;
+      const workspaceName =
+        workspaceOptions.find((app) => app.id === selectedWorkspaceId)?.name ??
+        `Workspace ${selectedWorkspaceId.slice(0, 8)}`;
       const response = await request<ApiResponse<ExportConfigResponse>>(
-        `/apps/${selectedAppId}/export`
+        `/workspaces/${selectedWorkspaceId}/export`
       );
       const exportPayload = response.data?.export ?? response.data;
       const filename =
-        response.data?.filename || `app-${selectedAppId.slice(0, 8)}-config.json`;
+        response.data?.filename || `app-${selectedWorkspaceId.slice(0, 8)}-config.json`;
       downloadJson(exportPayload, filename);
       setExportResult({
         filename,
         exportedAt: response.data?.export?.exported_at,
       });
       addHistoryEntry({
-        action: "app_export",
+        action: "workspace_export",
         status: "success",
-        label: "App 配置导出",
-        detail: `${appName} · ${filename}`,
+        label: "工作空间配置导出",
+        detail: `${workspaceName} · ${filename}`,
       });
       if (activeWorkspaceId) {
         await fetchAuditHistory(activeWorkspaceId);
@@ -586,9 +586,9 @@ export default function ExportPage() {
       const message = error instanceof Error ? error.message : "导出失败";
       setExportError(message);
       addHistoryEntry({
-        action: "app_export",
+        action: "workspace_export",
         status: "failed",
-        label: "App 配置导出",
+        label: "工作空间配置导出",
         detail: message,
       });
     } finally {
@@ -672,13 +672,13 @@ export default function ExportPage() {
 
   const handleImportSchema = async () => {
     const file = schemaFileRef.current?.files?.[0];
-    if (!schemaAppId) {
-      setSchemaImportError("请选择目标 App");
-      await recordClientAudit("app.schema.import", {
+    if (!schemaWorkspaceId) {
+      setSchemaImportError("请选择目标工作空间");
+      await recordClientAudit("workspace.schema.import", {
         status: "failed",
-        error: "未选择目标 App",
+        error: "未选择目标工作空间",
         validation_stage: "context",
-        app_id: schemaAppId,
+        workspace_id: schemaWorkspaceId,
         source: "schema_import",
       });
       return;
@@ -686,12 +686,12 @@ export default function ExportPage() {
     const fileError = file ? validateJsonFile(file, "Schema") : "请选择 Schema JSON 文件";
     if (fileError) {
       setSchemaImportError(fileError);
-      await recordClientAudit("app.schema.import", {
+      await recordClientAudit("workspace.schema.import", {
         status: "failed",
         error: fileError,
         file_name: file?.name,
         validation_stage: "file",
-        app_id: schemaAppId,
+        workspace_id: schemaWorkspaceId,
         source: "schema_import",
       });
       if (file) {
@@ -724,7 +724,7 @@ export default function ExportPage() {
       if (schema.workflow_id) requestBody.workflow_id = schema.workflow_id;
 
       const response = await request<ApiResponse<SchemaImportResponse>>(
-        `/apps/${schemaAppId}/versions`,
+        `/workspaces/${schemaWorkspaceId}/versions`,
         {
           method: "POST",
           body: JSON.stringify(requestBody),
@@ -733,26 +733,26 @@ export default function ExportPage() {
       setSchemaImportResult({
         versionId: response.data?.version?.id,
       });
-      const appName =
-        appOptions.find((app) => app.id === schemaAppId)?.name ??
-        `App ${schemaAppId.slice(0, 8)}`;
+      const workspaceName =
+        workspaceOptions.find((app) => app.id === schemaWorkspaceId)?.name ??
+        `Workspace ${schemaWorkspaceId.slice(0, 8)}`;
       addHistoryEntry({
         action: "schema_import",
         status: "success",
         label: "Schema 导入",
-        detail: `${appName} · ${file.name}`,
+        detail: `${workspaceName} · ${file.name}`,
       });
       if (activeWorkspaceId) {
         await fetchAuditHistory(activeWorkspaceId);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "导入失败";
-      await recordClientAudit("app.schema.import", {
+      await recordClientAudit("workspace.schema.import", {
         status: "failed",
         error: message,
         file_name: file?.name,
         validation_stage: "content",
-        app_id: schemaAppId,
+        workspace_id: schemaWorkspaceId,
         source: "schema_import",
       });
       setSchemaImportError(message);
@@ -862,7 +862,7 @@ export default function ExportPage() {
   const summaryItems = useMemo(
     () => [
       {
-        label: "App 配置导出",
+        label: "工作空间配置导出",
         status: exportError ? "失败" : exportResult ? "已完成" : "未执行",
         detail: exportResult?.filename,
       },
@@ -906,7 +906,7 @@ export default function ExportPage() {
       <p className="page-caption">Data</p>
       <PageHeader
         title="数据导入/导出与备份"
-        description="导出 App 配置、导入工作流与 Schema，并管理工作空间备份"
+        description="导出工作空间配置、导入工作流与 Schema，并管理工作空间备份"
         actions={(
           <Badge variant="secondary" className="bg-surface-200 text-foreground-muted">
             {activeWorkspaceId ? "已绑定工作空间" : "未选择工作空间"}
@@ -919,18 +919,18 @@ export default function ExportPage() {
           <div className="page-section space-y-6">
             <div className="page-panel">
               <div className="page-panel-header">
-                <h2 className="page-panel-title">App 配置导出</h2>
-                <p className="page-panel-description mt-1">导出 App 当前版本的 UI/DB Schema 与配置</p>
+                <h2 className="page-panel-title">工作空间配置导出</h2>
+                <p className="page-panel-description mt-1">导出工作空间当前版本的 UI/DB Schema 与配置</p>
               </div>
               <div className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[12px] text-foreground-light">选择 App</label>
-                  <Select value={selectedAppId} onValueChange={setSelectedAppId}>
+                  <label className="text-[12px] text-foreground-light">选择工作空间</label>
+                  <Select value={selectedWorkspaceId} onValueChange={setSelectedWorkspaceId}>
                     <SelectTrigger className="bg-surface-100 border-border">
-                      <SelectValue placeholder={appsLoading ? "加载中..." : "请选择 App"} />
+                      <SelectValue placeholder={workspacesLoading ? "加载中..." : "请选择工作空间"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {appOptions.map((app) => (
+                      {workspaceOptions.map((app) => (
                         <SelectItem key={app.id} value={app.id}>
                           <span className="flex items-center gap-2">
                             <span>{app.icon || "📦"}</span>
@@ -945,8 +945,8 @@ export default function ExportPage() {
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    onClick={handleExportAppConfig}
-                    disabled={!selectedAppId || exporting}
+                    onClick={handleExportWorkspaceConfig}
+                    disabled={!selectedWorkspaceId || exporting}
                     className="bg-brand-500 hover:bg-brand-600 text-background"
                   >
                     {exporting ? (
@@ -1051,12 +1051,12 @@ export default function ExportPage() {
                       </Badge>
                     )}
                   </div>
-                  <Select value={schemaAppId} onValueChange={setSchemaAppId}>
+                  <Select value={schemaWorkspaceId} onValueChange={setSchemaWorkspaceId}>
                     <SelectTrigger className="bg-surface-100 border-border">
-                      <SelectValue placeholder={appsLoading ? "加载中..." : "选择目标 App"} />
+                      <SelectValue placeholder={workspacesLoading ? "加载中..." : "选择目标工作空间"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {appOptions.map((app) => (
+                      {workspaceOptions.map((app) => (
                         <SelectItem key={app.id} value={app.id}>
                           <span className="flex items-center gap-2">
                             <span>{app.icon || "📦"}</span>
@@ -1075,7 +1075,7 @@ export default function ExportPage() {
                   <Button
                     size="sm"
                     onClick={handleImportSchema}
-                    disabled={schemaImporting || !schemaAppId}
+                    disabled={schemaImporting || !schemaWorkspaceId}
                     className="w-full"
                   >
                     {schemaImporting ? (

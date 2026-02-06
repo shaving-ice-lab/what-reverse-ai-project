@@ -69,7 +69,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { appApi, type App } from "@/lib/api/app";
+import { appApi, type App } from "@/lib/api/workspace";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
@@ -137,9 +137,9 @@ export default function AppsPage() {
   const { user } = useAuthStore();
   const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
   const permissions = buildWorkspacePermissions(workspaceRole);
-  const canCreate = hasAnyWorkspacePermission(permissions, "apps_create", "app_edit");
-  const canPublish = hasAnyWorkspacePermission(permissions, "app_publish");
-  const canEdit = hasAnyWorkspacePermission(permissions, "app_edit");
+  const canCreate = hasAnyWorkspacePermission(permissions, "workspace_create", "workspace_edit");
+  const canPublish = hasAnyWorkspacePermission(permissions, "workspace_publish");
+  const canEdit = hasAnyWorkspacePermission(permissions, "workspace_edit");
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [apps, setApps] = useState<App[]>([]);
@@ -215,7 +215,7 @@ export default function AppsPage() {
       });
       setShowCreateDialog(false);
       setCreateForm({ name: "", slug: "", description: "" });
-      router.push(`/workspaces/${workspaceId}/apps/${app.id}/builder`);
+      router.push(`/dashboard/app/${app.id}/builder`);
     } catch (error) {
       console.error("Failed to create app:", error);
     } finally {
@@ -330,7 +330,7 @@ export default function AppsPage() {
     if (origin && workspace?.slug) {
       return `${origin}/runtime/${workspace.slug}/${app.slug}`;
     }
-    return `/workspaces/${workspaceId}/apps/${app.id}`;
+    return `/dashboard/app/${app.id}`;
   };
 
   const handleCopyLink = async (app: App) => {
@@ -469,7 +469,7 @@ export default function AppsPage() {
               </Button>
               <PermissionAction
                 permissions={permissions}
-                required={["apps_create", "app_edit"]}
+                required={["workspace_create", "workspace_edit"]}
                 label="创建应用"
                 icon={Plus}
                 size="sm"
@@ -594,7 +594,7 @@ export default function AppsPage() {
               ) : (
                 <PermissionAction
                   permissions={permissions}
-                  required={["app_publish"]}
+                  required={["workspace_publish"]}
                   label="批量发布"
                   icon={Rocket}
                   size="sm"
@@ -614,7 +614,7 @@ export default function AppsPage() {
               ) : (
                 <PermissionAction
                   permissions={permissions}
-                  required={["app_edit"]}
+                  required={["workspace_edit"]}
                   label="批量归档"
                   icon={Archive}
                   size="sm"
@@ -691,7 +691,7 @@ export default function AppsPage() {
                         className="mt-2"
                       />
                       <Link
-                        href={`/workspaces/${workspaceId}/apps/${app.id}`}
+                        href={`/dashboard/app/${app.id}`}
                         className="group flex items-center gap-3"
                       >
                         <div className="w-10 h-10 rounded-md bg-surface-200 border border-border flex items-center justify-center text-foreground-light group-hover:border-brand-500/50 transition-colors">
@@ -769,7 +769,7 @@ export default function AppsPage() {
                     {app.status === "draft" && (
                       <PermissionAction
                         permissions={permissions}
-                        required={["app_publish"]}
+                        required={["workspace_publish"]}
                         label="发布"
                         icon={Rocket}
                         variant="outline"
@@ -786,7 +786,7 @@ export default function AppsPage() {
                         asChild
                         className="h-8"
                       >
-                        <Link href={`/workspaces/${workspaceId}/apps/${app.id}/monitoring`}>
+                        <Link href={`/dashboard/app/${app.id}/monitoring`}>
                           <BarChart3 className="w-3.5 h-3.5 mr-1" />
                           监控
                         </Link>
@@ -803,7 +803,7 @@ export default function AppsPage() {
                       <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/workspaces/${workspaceId}/apps/${app.id}`}
+                            href={`/dashboard/app/${app.id}`}
                             className="flex items-center gap-2 text-[12px]"
                           >
                             <Eye className="w-4 h-4" />
@@ -812,7 +812,7 @@ export default function AppsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/workspaces/${workspaceId}/apps/${app.id}/builder`}
+                            href={`/dashboard/app/${app.id}/builder`}
                             className="flex items-center gap-2 text-[12px]"
                           >
                             <Edit3 className="w-4 h-4" />
@@ -828,7 +828,7 @@ export default function AppsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/workspaces/${workspaceId}/apps/${app.id}/monitoring`}
+                            href={`/dashboard/app/${app.id}/monitoring`}
                             className="flex items-center gap-2 text-[12px]"
                           >
                             <BarChart3 className="w-4 h-4" />
@@ -837,7 +837,7 @@ export default function AppsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/workspaces/${workspaceId}/apps/${app.id}/domains`}
+                            href={`/dashboard/app/${app.id}/domains`}
                             className="flex items-center gap-2 text-[12px]"
                           >
                             <Globe className="w-4 h-4" />

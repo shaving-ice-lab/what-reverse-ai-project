@@ -43,7 +43,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { conversationApi } from "@/lib/api";
+import { appApi, conversationApi } from "@/lib/api";
 import { useStreamingChat } from "@/hooks";
 import type { Conversation, Message as ConversationMessage, AIParameters } from "@/types/conversation";
 import { AI_MODELS, formatRelativeTime, getModelDisplayName } from "@/types/conversation";
@@ -78,10 +78,38 @@ const SUGGESTIONS = [
   { label: "提供建议", prompt: "给我一些提高工作效率的建议" },
 ];
 
-export default function ChatPage() {
-  const params = useParams();
+const LAST_WORKSPACE_STORAGE_KEY = "last_workspace_id";
+
+const readStoredWorkspaceId = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(LAST_WORKSPACE_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredWorkspaceId = (workspaceId: string) => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LAST_WORKSPACE_STORAGE_KEY, workspaceId);
+  } catch {
+    // ignore storage errors
+  }
+};
+
+const resolveConversationWorkspaceId = (conversation: Conversation) =>
+  (conversation as { workspaceId?: string }).workspaceId ||
+  (conversation as { workspace_id?: string }).workspace_id ||
+  null;
+
+type ChatPageProps = {
+  conversationId: string;
+  workspaceId?: string;
+};
+
+export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) {
   const router = useRouter();
-  const conversationId = params.id as string;
 
   // 状态
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -112,6 +140,7 @@ export default function ChatPage() {
   
   // 流式聊天 hook
   const { streamChat, cancelStream, isStreaming } = useStreamingChat();
+  const conversationsHref = workspaceId ? `/dashboard/app/${workspaceId}/conversations` : "/dashboard/apps";
 
   // 加载对话详情
   const fetchConversation = useCallback(async () => {
@@ -120,11 +149,20 @@ export default function ChatPage() {
       return;
     }
 
+    if (!workspaceId) {
+      setError("请先选择工作空间");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const conv = await conversationApi.get(conversationId, 100);
+      const conv = await conversationApi.get(conversationId, {
+        messageLimit: 100,
+        workspaceId,
+      });
       setConversation(conv);
       setSelectedModel(conv.model || "gpt-4");
       setEditTitle(conv.title);
@@ -152,7 +190,7 @@ export default function ChatPage() {
     } finally {
       setLoading(false);
     }
-  }, [conversationId]);
+  }, [conversationId, workspaceId]);
 
   useEffect(() => {
     fetchConversation();
@@ -167,14 +205,24 @@ export default function ChatPage() {
     // 如果是新对话，先创建对话
     if (conversationId === "new") {
       try {
+        if (!workspaceId) {
+          setError("请先选择工作空间");
+          router.push("/dashboard/apps");
+          return;
+        }
         const newConv = await conversationApi.create({
+          workspaceId,
           title: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
           model: selectedModel,
         });
         currentConversationId = newConv.id;
         setConversation(newConv);
         // 更新 URL（不刷新页面）
-        window.history.replaceState(null, "", `/chat/${newConv.id}`);
+        window.history.replaceState(
+          null,
+          "",
+          `/dashboard/app/${workspaceId}/conversations/${newConv.id}`
+        );
       } catch (err) {
         console.error("Failed to create conversation:", err);
         setError("创建对话失败");
@@ -215,6 +263,7 @@ export default function ChatPage() {
       if (useStreaming) {
         // 使用流式响应
         const fullContent = await streamChat(currentConversationId, content, {
+          workspaceId,
           model: selectedModel,
           onToken: (token) => {
             // 实时更新 AI 消息内容
@@ -250,6 +299,7 @@ export default function ChatPage() {
       } else {
         // 使用非流式响应
         const response = await conversationApi.chat(currentConversationId, content, {
+          workspaceId,
           model: selectedModel,
         });
 
@@ -478,7 +528,7 @@ export default function ChatPage() {
     if (!conversation) return;
     try {
       await conversationApi.setArchived(conversation.id, true);
-      router.push("/dashboard/conversations");
+      router.push(conversationsHref);
     } catch (err) {
       console.error("Failed to archive:", err);
     }
@@ -490,7 +540,7 @@ export default function ChatPage() {
     if (!confirm("确定要删除这个对话吗？")) return;
     try {
       await conversationApi.delete(conversation.id);
-      router.push("/dashboard/conversations");
+      router.push(conversationsHref);
     } catch (err) {
       console.error("Failed to delete:", err);
     }
@@ -546,7 +596,7 @@ export default function ChatPage() {
       <header className="shrink-0 border-b border-border bg-surface-75/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4 px-6 py-3">
           <div className="flex items-start gap-3 min-w-0">
-            <Link href="/dashboard/conversations">
+            <Link href={conversationsHref}>
               <Button
                 variant="ghost"
                 size="icon-xs"
@@ -827,6 +877,84 @@ export default function ChatPage() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function ChatPage() {
+  const params = useParams();
+  const router = useRouter();
+  const conversationId = params.id as string | undefined;
+  const [redirectError, setRedirectError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const redirectToWorkspaceConversation = async () => {
+      if (!conversationId) return;
+      const storedId = readStoredWorkspaceId();
+
+      if (conversationId === "new") {
+        if (storedId) {
+          router.replace(`/dashboard/app/${storedId}/conversations/new`);
+          return;
+        }
+        try {
+          const { items } = await appApi.list({ pageSize: 1 });
+          const firstId = items?.[0]?.id;
+          if (firstId) {
+            writeStoredWorkspaceId(firstId);
+            router.replace(`/dashboard/app/${firstId}/conversations/new`);
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to resolve workspace for new conversation:", error);
+        }
+        router.replace("/dashboard/apps");
+        return;
+      }
+
+      try {
+        const conv = await conversationApi.get(conversationId, { messageLimit: 1 });
+        if (cancelled) return;
+        const wsId = resolveConversationWorkspaceId(conv);
+        if (wsId) {
+          writeStoredWorkspaceId(wsId);
+          router.replace(`/dashboard/app/${wsId}/conversations/${conversationId}`);
+          return;
+        }
+        setRedirectError("该对话未绑定工作空间，无法跳转");
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Failed to resolve app for conversation:", error);
+        setRedirectError("加载对话失败，请稍后重试");
+      }
+    };
+
+    redirectToWorkspaceConversation();
+    return () => {
+      cancelled = true;
+    };
+  }, [conversationId, router]);
+
+  if (!conversationId) {
+    return null;
+  }
+
+  if (redirectError) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-foreground-muted">{redirectError}</p>
+        <Button variant="outline" onClick={() => router.replace("/dashboard/apps")}>
+          返回应用列表
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center text-sm text-foreground-muted">
+      正在跳转到应用对话...
     </div>
   );
 }

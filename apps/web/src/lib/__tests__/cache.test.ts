@@ -65,6 +65,7 @@ describe("queryKeys", () => {
       expect(queryKeys.executions.all).toEqual(["executions"]);
       expect(queryKeys.executions.detail("exec-123")).toEqual([
         "executions",
+        "detail",
         "exec-123",
       ]);
       expect(queryKeys.executions.logs("exec-123")).toEqual([

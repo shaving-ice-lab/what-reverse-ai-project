@@ -1107,7 +1107,7 @@ export const demoFlowScript: DemoFlowScript = {
       goal: "展示端到端输出效果",
       actions: ["触发执行", "展示输出结果", "说明业务价值"],
       deliverable: "演示结果样例",
-      links: [{ label: "运行监控", href: "/dashboard/workspaces/demo/apps/demo/monitoring" }],
+      links: [{ label: "运行监控", href: "/dashboard/app/demo/monitoring" }],
     },
     {
       id: "step-4",
@@ -1117,7 +1117,7 @@ export const demoFlowScript: DemoFlowScript = {
       goal: "说明可控质量与评审机制",
       actions: ["展示回归用例", "讲解抽样策略", "说明风险控制"],
       deliverable: "质量保障说明",
-      links: [{ label: "质量监控", href: "/dashboard/workspaces/demo/apps/demo/monitoring" }],
+      links: [{ label: "质量监控", href: "/dashboard/app/demo/monitoring" }],
     },
     {
       id: "step-5",

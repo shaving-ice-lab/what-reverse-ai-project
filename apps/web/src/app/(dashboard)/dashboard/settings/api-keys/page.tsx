@@ -99,8 +99,8 @@ export default function ApiKeysPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apiKeysApi.list();
-      setApiKeys(response.apiKeys || []);
+      const keys = await apiKeysApi.list();
+      setApiKeys(keys);
     } catch (err) {
       console.error("Failed to load API keys:", err);
       setError(err instanceof Error ? err.message : "加载失败");
@@ -128,9 +128,7 @@ export default function ApiKeysPage() {
         ...prev,
         [apiKey.id]: {
           success: result.valid,
-          message: result.valid 
-            ? `密钥验证成功 (响应时间: ${result.responseTime}ms)` 
-            : result.error || "密钥验证失败",
+          message: result.message || (result.valid ? "密钥格式有效" : "密钥格式无效"),
         },
       }));
     } catch (err) {
@@ -143,16 +141,6 @@ export default function ApiKeysPage() {
       }));
     } finally {
       setTestingId(null);
-    }
-  };
-
-  // 刷新统计
-  const handleRefreshStats = async (id: string) => {
-    try {
-      const { apiKey } = await apiKeysApi.refreshStats(id);
-      setApiKeys(prev => prev.map(k => k.id === id ? apiKey : k));
-    } catch (err) {
-      console.error("刷新统计失败:", err);
     }
   };
 

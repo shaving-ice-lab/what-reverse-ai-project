@@ -1,23 +1,23 @@
+/**
+ * Workspace = App 测试 fixture
+ * 架构合并后 App 即 Workspace，此处保留兼容别名
+ */
+import { workspaceFixture, workspaceAltFixture } from "./workspace";
+
+// 兼容旧测试 —— appDraftFixture 就是一个 draft 状态的 workspace
 export const appDraftFixture = {
-  id: "app_123",
-  workspace_id: "ws_123",
-  owner_user_id: "user_1",
-  name: "日报助手",
-  slug: "daily-report",
-  icon: "📄",
+  ...workspaceFixture,
+  id: "ws_123",
   description: "生成日报",
-  status: "draft",
+  app_status: "draft",
   current_version_id: "ver_1",
   pricing_type: "free",
   price: null,
-  created_at: "2026-02-01T10:00:00Z",
-  updated_at: "2026-02-02T10:00:00Z",
   published_at: null,
-  deleted_at: null,
 } as const;
 
 export const appPublishedFixture = {
   ...appDraftFixture,
-  status: "published",
+  app_status: "published",
   published_at: "2026-02-03T10:00:00Z",
 } as const;

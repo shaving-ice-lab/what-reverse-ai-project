@@ -40,40 +40,8 @@ export type AdminWorkspace = {
   status_updated_at?: string;
   plan: string;
   region?: string;
-  default_app_id?: string;
   created_at: string;
   updated_at: string;
-  owner?: {
-    id: string;
-    email: string;
-    username: string;
-    display_name?: string;
-    avatar_url?: string;
-  };
-};
-
-export type AdminApp = {
-  id: string;
-  workspace_id: string;
-  owner_user_id: string;
-  name: string;
-  slug: string;
-  icon?: string;
-  description?: string;
-  status: string;
-  status_reason?: string;
-  status_updated_at?: string;
-  current_version_id?: string;
-  pricing_type: string;
-  price?: number;
-  created_at: string;
-  updated_at: string;
-  published_at?: string;
-  workspace?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
   owner?: {
     id: string;
     email: string;
@@ -118,18 +86,11 @@ export const adminApi = {
       payload
     );
   },
-  listApps(params?: {
-    search?: string;
-    status?: string;
-    workspace_id?: string;
-    owner_id?: string;
-    page?: number;
-    page_size?: number;
-  }) {
-    return api.get<AdminListResponse<AdminApp>>("/admin/apps", { params });
-  },
-  updateAppStatus(id: string, payload: { status: string; reason?: string }) {
-    return api.patch<{ app: AdminApp }>(`/admin/apps/${id}/status`, payload);
+  updateWorkspaceAppStatus(id: string, payload: { status: string; reason?: string }) {
+    return api.patch<{ workspace: AdminWorkspace }>(
+      `/admin/workspaces/${id}/app-status`,
+      payload
+    );
   },
   listSupportTickets(params?: {
     search?: string;
@@ -137,7 +98,6 @@ export const adminApi = {
     priority?: string;
     category?: string;
     workspace_id?: string;
-    app_id?: string;
     page?: number;
     page_size?: number;
   }) {

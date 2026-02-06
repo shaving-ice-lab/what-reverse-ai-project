@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 
 interface ImportDialogProps {
+  workspaceId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folders: ConversationFolder[];
@@ -38,6 +39,7 @@ interface ImportDialogProps {
 }
 
 export function ImportDialog({
+  workspaceId,
   open,
   onOpenChange,
   folders,
@@ -80,6 +82,7 @@ export function ImportDialog({
 
         // 转换为导入格式
         const importData: ImportConversationRequest = {
+          workspaceId,
           title: data.title || selectedFile.name.replace(/\.\w+$/, ""),
           model: data.model,
           systemPrompt: data.system_prompt,
@@ -118,6 +121,7 @@ export function ImportDialog({
     try {
       const importResult = await conversationApi.importConversation({
         ...parsedData,
+        workspaceId,
         title: title || parsedData.title,
         folderId: folderId || undefined,
       });

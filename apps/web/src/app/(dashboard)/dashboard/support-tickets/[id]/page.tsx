@@ -512,7 +512,7 @@ export default function SupportTicketDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-foreground-muted" />
-                  App：{ticket.app_id || "未绑定"}
+                  Workspace：{ticket.workspace_id || "未绑定"}
                 </div>
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-foreground-muted" />

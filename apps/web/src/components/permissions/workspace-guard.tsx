@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Suspense, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
@@ -63,6 +63,26 @@ function resolveErrorState(error: unknown): WorkspaceGuardError {
 }
 
 export function WorkspaceGuard({
+  workspaceId,
+  children,
+}: {
+  workspaceId: string;
+  children: ReactNode;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full flex items-center justify-center px-6">
+          <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
+        </div>
+      }
+    >
+      <WorkspaceGuardInner workspaceId={workspaceId}>{children}</WorkspaceGuardInner>
+    </Suspense>
+  );
+}
+
+function WorkspaceGuardInner({
   workspaceId,
   children,
 }: {

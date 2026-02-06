@@ -44,7 +44,7 @@ import {
   type AppAccessPolicy,
   type AppMetrics,
   type AppDomain,
-} from "@/lib/api/app";
+} from "@/lib/api/workspace";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
 import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from "@/lib/permissions";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -71,21 +71,19 @@ const accessModeConfig: Record<
 
 // 侧边导航
 function AppNav({
-  workspaceId,
   appId,
   activeTab,
 }: {
-  workspaceId: string;
   appId: string;
   activeTab: string;
 }) {
   const navItems = [
-    { id: "overview", label: "概览", href: `/workspaces/${workspaceId}/apps/${appId}` },
-    { id: "builder", label: "构建", href: `/workspaces/${workspaceId}/apps/${appId}/builder` },
-    { id: "publish", label: "发布设置", href: `/workspaces/${workspaceId}/apps/${appId}/publish` },
-    { id: "versions", label: "版本历史", href: `/workspaces/${workspaceId}/apps/${appId}/versions` },
-    { id: "monitoring", label: "监控", href: `/workspaces/${workspaceId}/apps/${appId}/monitoring` },
-    { id: "domains", label: "域名", href: `/workspaces/${workspaceId}/apps/${appId}/domains` },
+    { id: "overview", label: "概览", href: `/dashboard/app/${appId}` },
+    { id: "builder", label: "构建", href: `/dashboard/app/${appId}/builder` },
+    { id: "publish", label: "发布设置", href: `/dashboard/app/${appId}/publish` },
+    { id: "versions", label: "版本历史", href: `/dashboard/app/${appId}/versions` },
+    { id: "monitoring", label: "监控", href: `/dashboard/app/${appId}/monitoring` },
+    { id: "domains", label: "域名", href: `/dashboard/app/${appId}/domains` },
   ];
 
   return (
@@ -102,10 +100,12 @@ function AppNav({
   );
 }
 
-export default function AppOverviewPage() {
-  const params = useParams();
-  const workspaceId = params.workspaceId as string;
-  const appId = params.appId as string;
+type AppOverviewPageProps = {
+  workspaceId: string;
+  appId: string;
+};
+
+export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPageProps) {
   const { user } = useAuthStore();
   const workspaceRole = resolveWorkspaceRoleFromUser(user?.role);
   const permissions = buildWorkspacePermissions(workspaceRole);
@@ -228,22 +228,21 @@ export default function AppOverviewPage() {
   return (
     <AppAccessGate
       app={app}
-      workspaceId={workspaceId}
       permissions={permissions}
-      required={["app_edit"]}
-      backHref={`/workspaces/${workspaceId}/apps`}
+      required={["workspace_edit"]}
+      backHref="/dashboard/apps"
     >
       <PageWithSidebar
         sidebarWidth="narrow"
         sidebarTitle={app?.name || "应用"}
-        sidebar={<AppNav workspaceId={workspaceId} appId={appId} activeTab="overview" />}
+        sidebar={<AppNav appId={appId} activeTab="overview" />}
       >
         <PageContainer>
         <PageHeader
           title="应用概览"
           eyebrow={workspace?.name}
           description={app?.description || "查看应用基础信息、状态摘要与运行指标。"}
-          backHref={`/workspaces/${workspaceId}/apps`}
+          backHref="/dashboard/apps"
           backLabel="返回应用列表"
           badge={
             app ? (
@@ -268,7 +267,7 @@ export default function AppOverviewPage() {
                 刷新
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/workspaces/${workspaceId}/apps/${appId}/builder`}>
+                <Link href={`/dashboard/app/${appId}/builder`}>
                   <Rocket className="w-4 h-4 mr-1.5" />
                   进入构建
                 </Link>
@@ -371,31 +370,31 @@ export default function AppOverviewPage() {
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/builder`}>
+                    <Link href={`/dashboard/app/${appId}/builder`}>
                       <Edit3 className="w-3.5 h-3.5 mr-1.5" />
                       编辑应用
                     </Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/monitoring`}>
+                    <Link href={`/dashboard/app/${appId}/monitoring`}>
                       <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
                       查看运行监控
                     </Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/publish`}>
+                    <Link href={`/dashboard/app/${appId}/publish`}>
                       <Rocket className="w-3.5 h-3.5 mr-1.5" />
                       发布
                     </Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/domains`}>
+                    <Link href={`/dashboard/app/${appId}/domains`}>
                       <Globe className="w-3.5 h-3.5 mr-1.5" />
                       绑定域名
                     </Link>
                   </Button>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${workspaceId}/apps/${appId}/versions`}>
+                    <Link href={`/dashboard/app/${appId}/versions`}>
                       <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
                       版本历史
                     </Link>
@@ -444,13 +443,13 @@ export default function AppOverviewPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/workspaces/${workspaceId}/apps/${appId}/publish`}>
+              <Link href={`/dashboard/app/${appId}/publish`}>
                 <Rocket className="w-3.5 h-3.5 mr-1.5" />
                 访问策略设置
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/workspaces/${workspaceId}/apps/${appId}/domains`}>
+              <Link href={`/dashboard/app/${appId}/domains`}>
                 <Globe className="w-3.5 h-3.5 mr-1.5" />
                 管理域名
               </Link>
@@ -479,13 +478,13 @@ export default function AppOverviewPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/workspaces/${workspaceId}/apps/${appId}/versions`}>
+              <Link href={`/dashboard/app/${appId}/versions`}>
                 <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
                 查看版本历史
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/workspaces/${workspaceId}/apps/${appId}/builder`}>
+              <Link href={`/dashboard/app/${appId}/builder`}>
                 <Rocket className="w-3.5 h-3.5 mr-1.5" />
                 继续构建
               </Link>
@@ -537,6 +536,20 @@ export default function AppOverviewPage() {
       </PageWithSidebar>
     </AppAccessGate>
   );
+}
+
+export default function AppOverviewPage() {
+  const params = useParams();
+  const workspaceId = Array.isArray(params?.workspaceId)
+    ? params.workspaceId[0]
+    : (params?.workspaceId as string | undefined);
+  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
+
+  if (!workspaceId || !appId) {
+    return null;
+  }
+
+  return <AppOverviewPageContent workspaceId={workspaceId} appId={appId} />;
 }
 
 function SummaryCard({

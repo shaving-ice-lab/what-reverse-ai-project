@@ -14,30 +14,30 @@ describe("Button", () => {
 
   it("应该正确应用 variant", () => {
     const { rerender } = render(<Button variant="default">默认</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-primary");
+    expect(screen.getByRole("button")).toHaveClass("bg-brand-500");
 
     rerender(<Button variant="destructive">删除</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-destructive");
+    expect(screen.getByRole("button")).toHaveClass("text-destructive-400");
 
     rerender(<Button variant="outline">轮廓</Button>);
     expect(screen.getByRole("button")).toHaveClass("border");
 
     rerender(<Button variant="ghost">幽灵</Button>);
-    expect(screen.getByRole("button")).toHaveClass("hover:bg-accent");
+    expect(screen.getByRole("button")).toHaveClass("bg-transparent");
   });
 
   it("应该正确应用 size", () => {
     const { rerender } = render(<Button size="default">默认</Button>);
-    expect(screen.getByRole("button")).toHaveClass("h-10");
+    expect(screen.getByRole("button")).toHaveClass("h-8");
 
     rerender(<Button size="sm">小</Button>);
-    expect(screen.getByRole("button")).toHaveClass("h-9");
+    expect(screen.getByRole("button")).toHaveClass("h-7");
 
     rerender(<Button size="lg">大</Button>);
-    expect(screen.getByRole("button")).toHaveClass("h-11");
+    expect(screen.getByRole("button")).toHaveClass("h-9");
 
     rerender(<Button size="icon">图标</Button>);
-    expect(screen.getByRole("button")).toHaveClass("h-10", "w-10");
+    expect(screen.getByRole("button")).toHaveClass("h-8", "w-8");
   });
 
   it("应该在点击时触发 onClick", () => {
