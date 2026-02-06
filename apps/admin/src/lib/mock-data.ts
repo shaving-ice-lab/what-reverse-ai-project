@@ -668,7 +668,7 @@ export const systemHealth = [
 
 export const featureFlags = {
   workspaceEnabled: true,
-  appRuntimeEnabled: true,
+  workspaceRuntimeEnabled: true,
   domainEnabled: true,
 };
 
@@ -1118,7 +1118,7 @@ export const workspaceActivityLogs = [
 export const appVersions = [
   {
     id: "appver-3001",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     version: "v1.8.2",
     status: "stable",
     runtime: "node18",
@@ -1128,7 +1128,7 @@ export const appVersions = [
   },
   {
     id: "appver-3002",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     version: "v1.9.0-rc",
     status: "candidate",
     runtime: "node18",
@@ -1138,7 +1138,7 @@ export const appVersions = [
   },
   {
     id: "appver-3003",
-    app_id: appRows[3].id,
+    workspace_id: appRows[3].id,
     version: "v2.3.1",
     status: "stable",
     runtime: "node18",
@@ -1148,7 +1148,7 @@ export const appVersions = [
   },
   {
     id: "appver-3004",
-    app_id: appRows[7].id,
+    workspace_id: appRows[7].id,
     version: "v1.4.0",
     status: "stable",
     runtime: "node18",
@@ -1158,10 +1158,10 @@ export const appVersions = [
   },
 ];
 
-export const appDomains = [
+export const workspaceDomains = [
   {
     id: "appdom-7001",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     domain: "support.agentflow.ai",
     type: "custom",
     status: "verified",
@@ -1170,7 +1170,7 @@ export const appDomains = [
   },
   {
     id: "appdom-7002",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     domain: "support-copilot.agentflow.ai",
     type: "system",
     status: "active",
@@ -1179,7 +1179,7 @@ export const appDomains = [
   },
   {
     id: "appdom-7003",
-    app_id: appRows[3].id,
+    workspace_id: appRows[3].id,
     domain: "trust-score.enterprise.ai",
     type: "custom",
     status: "pending",
@@ -1188,10 +1188,10 @@ export const appDomains = [
   },
 ];
 
-export const appAccessPolicies = [
+export const workspaceAccessPolicies = [
   {
     id: "policy-9001",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     title: "公开访问",
     description: "允许未登录访问基础接口。",
     enabled: true,
@@ -1199,7 +1199,7 @@ export const appAccessPolicies = [
   },
   {
     id: "policy-9002",
-    app_id: appRows[0].id,
+    workspace_id: appRows[0].id,
     title: "Webhook 白名单",
     description: "仅允许特定来源调用 webhook。",
     enabled: true,
@@ -1207,7 +1207,7 @@ export const appAccessPolicies = [
   },
   {
     id: "policy-9003",
-    app_id: appRows[3].id,
+    workspace_id: appRows[3].id,
     title: "企业 SSO",
     description: "仅企业账号可访问。",
     enabled: false,
@@ -1215,7 +1215,7 @@ export const appAccessPolicies = [
   },
   {
     id: "policy-9004",
-    app_id: appRows[7].id,
+    workspace_id: appRows[7].id,
     title: "模型调用限流",
     description: "单用户每分钟 120 次调用。",
     enabled: true,
@@ -2142,7 +2142,7 @@ export const earningRows = [
     id: "earn-001-a1b2c3d4",
     user_id: "c6c8b0d1-275d-43dd-a8aa-8e86bfe36a18",
     workspace_id: "5d58fa6b-0e17-4a2f-a9d3-f6f7a3a9a7b2",
-    app_id: "9e6f4d4a-3c4b-4b2c-9a81-9c2b2a1c0b8d",
+    workspace_id: "9e6f4d4a-3c4b-4b2c-9a81-9c2b2a1c0b8d",
     source: "app_sales",
     amount: 245.50,
     currency: "USD",
@@ -2155,7 +2155,7 @@ export const earningRows = [
     id: "earn-002-e5f6g7h8",
     user_id: "0e6d8d91-6f6b-4c1a-9fb9-9d7c999a18a1",
     workspace_id: "3d1f5f0e-b4d2-4f36-8b0a-0d1c1e9181c8",
-    app_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
+    workspace_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
     source: "app_sales",
     amount: 1280.00,
     currency: "USD",
@@ -2168,7 +2168,7 @@ export const earningRows = [
     id: "earn-003-i9j0k1l2",
     user_id: "c6c8b0d1-275d-43dd-a8aa-8e86bfe36a18",
     workspace_id: null,
-    app_id: null,
+    workspace_id: null,
     source: "referral",
     amount: 50.00,
     currency: "USD",
@@ -2181,7 +2181,7 @@ export const earningRows = [
     id: "earn-004-m3n4o5p6",
     user_id: "0e6d8d91-6f6b-4c1a-9fb9-9d7c999a18a1",
     workspace_id: "3d1f5f0e-b4d2-4f36-8b0a-0d1c1e9181c8",
-    app_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
+    workspace_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
     source: "app_sales",
     amount: 420.00,
     currency: "USD",
@@ -2579,12 +2579,10 @@ export const workspaceBehaviorRows = [
   },
 ];
 
-export const appUsageRows = [
+export const workspaceUsageRows = [
   {
-    app_id: "9e6f4d4a-3c4b-4b2c-9a81-9c2b2a1c0b8d",
-    app_name: "Customer Support Bot",
-    workspace_id: "1ab7d8a7-2c6f-4a08-9f2a-0bdaaa1d8d12",
-    workspace_name: "Acme Corp",
+    workspace_id: "9e6f4d4a-3c4b-4b2c-9a81-9c2b2a1c0b8d",
+    workspace_name: "Customer Support Bot",
     period: "2026-02",
     total_runs: 4520,
     successful_runs: 4380,
@@ -2598,10 +2596,8 @@ export const appUsageRows = [
     updated_at: "2026-02-03T08:00:00Z",
   },
   {
-    app_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
-    app_name: "Data Analyzer Pro",
-    workspace_id: "3d1f5f0e-b4d2-4f36-8b0a-0d1c1e9181c8",
-    workspace_name: "DataFlow Labs",
+    workspace_id: "cf20e0a1-2b9b-4d8e-8f9e-8d7c6b5a4a30",
+    workspace_name: "Data Analyzer Pro",
     period: "2026-02",
     total_runs: 12800,
     successful_runs: 12450,
@@ -2615,10 +2611,8 @@ export const appUsageRows = [
     updated_at: "2026-02-03T08:00:00Z",
   },
   {
-    app_id: "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6",
-    app_name: "Content Generator",
-    workspace_id: "5d58fa6b-0e17-4a2f-a9d3-f6f7a3a9a7b2",
-    workspace_name: "TechStart",
+    workspace_id: "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6",
+    workspace_name: "Content Generator",
     period: "2026-02",
     total_runs: 1890,
     successful_runs: 1820,
@@ -2632,10 +2626,8 @@ export const appUsageRows = [
     updated_at: "2026-02-03T08:00:00Z",
   },
   {
-    app_id: "d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
-    app_name: "Email Assistant",
-    workspace_id: "1ab7d8a7-2c6f-4a08-9f2a-0bdaaa1d8d12",
-    workspace_name: "Acme Corp",
+    workspace_id: "d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
+    workspace_name: "Email Assistant",
     period: "2026-02",
     total_runs: 8920,
     successful_runs: 8750,
@@ -2649,10 +2641,8 @@ export const appUsageRows = [
     updated_at: "2026-02-03T08:00:00Z",
   },
   {
-    app_id: "e5f6a7b8-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
-    app_name: "Report Builder",
-    workspace_id: "3d1f5f0e-b4d2-4f36-8b0a-0d1c1e9181c8",
-    workspace_name: "DataFlow Labs",
+    workspace_id: "e5f6a7b8-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
+    workspace_name: "Report Builder",
     period: "2026-02",
     total_runs: 3450,
     successful_runs: 3380,
@@ -2973,7 +2963,7 @@ export const systemLogRows = [
     service: "app-runtime",
     message: "App instance scaled up: 2 -> 4 replicas",
     trace_id: "trace-stu901",
-    metadata: { app_id: appRows[0].id, reason: "high_load", cpu_usage: 82 },
+    metadata: { workspace_id: appRows[0].id, reason: "high_load", cpu_usage: 82 },
   },
   {
     id: "log-006",
@@ -3375,3 +3365,11 @@ export const quotaRuleRows = [
     updated_at: "2026-01-15T00:00:00Z",
   },
 ];
+
+// 兼容别名（Workspace = App）
+/** @deprecated 使用 workspaceDomains */
+export const appDomains = workspaceDomains;
+/** @deprecated 使用 workspaceAccessPolicies */
+export const appAccessPolicies = workspaceAccessPolicies;
+/** @deprecated 使用 workspaceUsageRows */
+export const appUsageRows = workspaceUsageRows;

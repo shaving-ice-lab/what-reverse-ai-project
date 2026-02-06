@@ -15,7 +15,7 @@
 ## API 示例
 
 ### 提交审核
-`POST /api/v1/apps/:id/major-change/review`
+`POST /api/v1/workspaces/:id/major-change/review`
 ```json
 {
   "version_id": "uuid",
@@ -24,13 +24,13 @@
 ```
 
 ### 获取审核状态
-`GET /api/v1/apps/:id/major-change/review?version_id=uuid`
+`GET /api/v1/workspaces/:id/major-change/review?version_id=uuid`
 
 ### 获取审核历史
-`GET /api/v1/apps/:id/major-change/review/history?version_id=uuid`
+`GET /api/v1/workspaces/:id/major-change/review/history?version_id=uuid`
 
 ### 审核通过
-`POST /api/v1/apps/:id/major-change/review/approve`
+`POST /api/v1/workspaces/:id/major-change/review/approve`
 ```json
 {
   "version_id": "uuid",
@@ -39,7 +39,7 @@
 ```
 
 ### 审核拒绝
-`POST /api/v1/apps/:id/major-change/review/reject`
+`POST /api/v1/workspaces/:id/major-change/review/reject`
 ```json
 {
   "version_id": "uuid",

@@ -72,9 +72,9 @@
 
 ## App API
 
-### 创建 App（基础）
+### 创建 Workspace（基础）
 
-- **Method**: `POST /api/v1/apps`
+- **Method**: `POST /api/v1/workspaces`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段
@@ -89,9 +89,9 @@
 
 `data.app` 中包含 App 基础信息（`id`、`workspace_id`、`created_at` 等）。
 
-### 创建 App（基于 Workflow）
+### 创建 Workspace（基于 Workflow）
 
-- **Method**: `POST /api/v1/apps/from-workflow`
+- **Method**: `POST /api/v1/workspaces/from-workflow`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段
@@ -108,9 +108,9 @@
 
 `data.app` 中包含 App 基础信息，若提供 `workflow_id` 则会创建首个版本。
 
-### 发布 App
+### 发布 Workspace
 
-- **Method**: `POST /api/v1/apps/:id/publish`
+- **Method**: `POST /api/v1/workspaces/:id/publish`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段
@@ -131,9 +131,9 @@
 | `allowed_origins` | string[] | 允许的来源 |
 | `require_captcha` | bool | 是否需要验证码 |
 
-### 创建 App 版本
+### 创建 Workspace 版本
 
-- **Method**: `POST /api/v1/apps/:id/versions`
+- **Method**: `POST /api/v1/workspaces/:id/versions`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段
@@ -155,7 +155,7 @@
 
 ### 绑定域名
 
-- **Method**: `POST /api/v1/apps/:id/domains`
+- **Method**: `POST /api/v1/workspaces/:id/domains`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段
@@ -179,7 +179,7 @@
 
 ### 验证域名（App 维度）
 
-- **Method**: `POST /api/v1/apps/:id/domains/:domainId/verify`
+- **Method**: `POST /api/v1/workspaces/:id/domains/:domainId/verify`
 - **Auth**: 必须登录（Bearer Token）
 
 #### 请求字段

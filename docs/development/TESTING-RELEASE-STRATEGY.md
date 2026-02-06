@@ -121,7 +121,7 @@
 
 ```bash
 # API 调用
-POST /api/v1/apps/:id/rollback
+POST /api/v1/workspaces/:id/rollback
 {
   "target_version_id": "ver_xxx",
   "reason": "功能回退"

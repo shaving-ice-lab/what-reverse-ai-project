@@ -21,7 +21,7 @@ import type { FeatureFlags } from "@/types/system";
 
 const DEFAULT_FLAGS: FeatureFlags = {
   workspaceEnabled: true,
-  appRuntimeEnabled: true,
+  workspaceRuntimeEnabled: true,
   domainEnabled: true,
 };
 
@@ -59,14 +59,14 @@ export default function SystemFeaturesPage() {
   const buildPatch = () => {
     const patch: {
       workspace_enabled?: boolean;
-      app_runtime_enabled?: boolean;
+      workspace_runtime_enabled?: boolean;
       domain_enabled?: boolean;
     } = {};
     if (draft.workspaceEnabled !== source.workspaceEnabled) {
       patch.workspace_enabled = draft.workspaceEnabled;
     }
-    if (draft.appRuntimeEnabled !== source.appRuntimeEnabled) {
-      patch.app_runtime_enabled = draft.appRuntimeEnabled;
+    if (draft.workspaceRuntimeEnabled !== source.workspaceRuntimeEnabled) {
+      patch.workspace_runtime_enabled = draft.workspaceRuntimeEnabled;
     }
     if (draft.domainEnabled !== source.domainEnabled) {
       patch.domain_enabled = draft.domainEnabled;
@@ -159,10 +159,10 @@ export default function SystemFeaturesPage() {
             <ToggleRow
               label="App Runtime"
               description="应用运行时与在线执行入口"
-              checked={draft.appRuntimeEnabled}
+              checked={draft.workspaceRuntimeEnabled}
               onCheckedChange={(checked) => {
                 setDirty(true);
-                setDraft((prev) => ({ ...prev, appRuntimeEnabled: checked }));
+                setDraft((prev) => ({ ...prev, workspaceRuntimeEnabled: checked }));
               }}
             />
             <ToggleRow

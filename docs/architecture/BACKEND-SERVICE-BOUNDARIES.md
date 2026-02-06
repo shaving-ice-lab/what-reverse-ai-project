@@ -58,18 +58,18 @@
 
 接口入口（API v1）：
 
-- `POST /api/v1/apps`
-- `POST /api/v1/apps/from-workflow`
-- `POST /api/v1/apps/from-ai`
-- `GET /api/v1/apps`
-- `GET /api/v1/apps/:id`
-- `POST /api/v1/apps/:id/versions`
-- `POST /api/v1/apps/:id/publish`
-- `POST /api/v1/apps/:id/rollback`
-- `POST /api/v1/apps/:id/deprecate`
-- `POST /api/v1/apps/:id/archive`
-- `GET /api/v1/apps/:id/access-policy`
-- `PATCH /api/v1/apps/:id/access-policy`
+- `POST /api/v1/workspaces`
+- `POST /api/v1/workspaces/from-workflow`
+- `POST /api/v1/workspaces/from-ai`
+- `GET /api/v1/workspaces`
+- `GET /api/v1/workspaces/:id`
+- `POST /api/v1/workspaces/:id/versions`
+- `POST /api/v1/workspaces/:id/publish`
+- `POST /api/v1/workspaces/:id/rollback`
+- `POST /api/v1/workspaces/:id/deprecate`
+- `POST /api/v1/workspaces/:id/archive`
+- `GET /api/v1/workspaces/:id/access-policy`
+- `PATCH /api/v1/workspaces/:id/access-policy`
 
 ## 3. Runtime Service
 
@@ -147,14 +147,14 @@
 
 接口入口（API v1）：
 
-- `GET /api/v1/apps/:id/domains`
-- `POST /api/v1/apps/:id/domains`
-- `POST /api/v1/apps/:id/domains/:domainId/verify`
-- `POST /api/v1/apps/:id/domains/:domainId/cert/issue`
-- `POST /api/v1/apps/:id/domains/:domainId/cert/renew`
-- `POST /api/v1/apps/:id/domains/:domainId/activate`
-- `POST /api/v1/apps/:id/domains/:domainId/rollback`
-- `DELETE /api/v1/apps/:id/domains/:domainId`
+- `GET /api/v1/workspaces/:id/domains`
+- `POST /api/v1/workspaces/:id/domains`
+- `POST /api/v1/workspaces/:id/domains/:domainId/verify`
+- `POST /api/v1/workspaces/:id/domains/:domainId/cert/issue`
+- `POST /api/v1/workspaces/:id/domains/:domainId/cert/renew`
+- `POST /api/v1/workspaces/:id/domains/:domainId/activate`
+- `POST /api/v1/workspaces/:id/domains/:domainId/rollback`
+- `DELETE /api/v1/workspaces/:id/domains/:domainId`
 - `POST /api/v1/domains/:domainId/verify`
 
 ## 6. Billing Service

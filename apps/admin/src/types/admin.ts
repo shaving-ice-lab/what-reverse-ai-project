@@ -29,27 +29,8 @@ export interface Workspace {
   owner?: User | null;
 }
  
-export interface App {
-  id: string;
-  workspace_id: string;
-  owner_user_id: string;
-  name: string;
-  slug: string;
-  icon: string;
-  description?: string | null;
-  status: string;
-  status_reason?: string | null;
-  status_updated_at?: string | null;
-  current_version_id?: string | null;
-  pricing_type: string;
-  price?: number | null;
-  created_at: string;
-  updated_at: string;
-  published_at?: string | null;
-  workspace?: Workspace | null;
-  owner?: User | null;
-  current_version?: AppVersion | null;
-}
+/** @deprecated Workspace = App，使用 Workspace 类型代替 */
+export type App = Workspace;
 
 export interface WorkspaceRole {
   id: string;
@@ -75,9 +56,9 @@ export interface WorkspaceMember {
   role?: WorkspaceRole | null;
 }
 
-export interface AppVersion {
+export interface WorkspaceVersion {
   id: string;
-  app_id: string;
+  workspace_id: string;
   version: string;
   changelog?: string | null;
   workflow_id?: string | null;
@@ -85,10 +66,12 @@ export interface AppVersion {
   created_at: string;
   creator?: User | null;
 }
+/** @deprecated 使用 WorkspaceVersion 代替 */
+export type AppVersion = WorkspaceVersion;
 
-export interface AppAccessPolicy {
+export interface WorkspaceAccessPolicy {
   id: string;
-  app_id: string;
+  workspace_id: string;
   access_mode: string;
   data_classification: string;
   rate_limit_json?: Record<string, unknown> | null;
@@ -99,10 +82,12 @@ export interface AppAccessPolicy {
   created_at: string;
   updater?: User | null;
 }
+/** @deprecated 使用 WorkspaceAccessPolicy 代替 */
+export type AppAccessPolicy = WorkspaceAccessPolicy;
 
-export interface AppDomain {
+export interface WorkspaceDomain {
   id: string;
-  app_id: string;
+  workspace_id: string;
   domain: string;
   status: string;
   ssl_status?: string;
@@ -112,6 +97,8 @@ export interface AppDomain {
   created_at: string;
   updated_at: string;
 }
+/** @deprecated 使用 WorkspaceDomain 代替 */
+export type AppDomain = WorkspaceDomain;
  
 export type SupportTicketPriority = "low" | "medium" | "high" | "urgent";
 export type SupportTicketStatus =
@@ -125,7 +112,6 @@ export interface SupportTicket {
   id: string;
   reference: string;
   workspace_id?: string | null;
-  app_id?: string | null;
   requester_user_id?: string | null;
   requester_name?: string | null;
   requester_email: string;
@@ -451,7 +437,6 @@ export interface Earning {
   id: string;
   user_id: string;
   workspace_id?: string | null;
-  app_id?: string | null;
   source: string;
   amount: number;
   currency: string;
@@ -522,7 +507,7 @@ export interface Secret {
   name: string;
   key_prefix: string;
   description?: string | null;
-  scope: "system" | "workspace" | "app";
+  scope: "system" | "workspace";
   scope_id?: string | null;
   status: "active" | "rotated" | "disabled";
   expires_at?: string | null;
@@ -567,10 +552,8 @@ export interface WorkspaceBehaviorMetric {
   updated_at: string;
 }
 
-export interface AppUsageMetric {
-  app_id: string;
-  app_name?: string;
-  workspace_id?: string;
+export interface WorkspaceUsageMetric {
+  workspace_id: string;
   workspace_name?: string;
   period: string;
   total_runs: number;
@@ -584,6 +567,8 @@ export interface AppUsageMetric {
   peak_concurrent_users: number;
   updated_at: string;
 }
+/** @deprecated 使用 WorkspaceUsageMetric 代替 */
+export type AppUsageMetric = WorkspaceUsageMetric;
 
 // Export job types
 export type ExportJobStatus = "pending" | "running" | "completed" | "failed" | "cancelled";

@@ -1,16 +1,32 @@
-# 工作流应用平台落地开发计划（Workspace + App + 独立数据库 + 公开访问/域名）
+# 工作流应用平台落地开发计划（Workspace = App + 独立数据库 + 公开访问/域名）
 
-版本：v0.1  
-日期：2026-02-01  
+版本：v0.2  
+日期：2026-02-06  
 状态：Draft  
 说明：本计划为单文档分段式 Todo List，可持续追加与追踪。  
+
+---
+
+> **重大架构变更（v0.2，2026-02-06）：Workspace = App 合并**
+>
+> 原有的 **Workspace -> App（一对多）** 架构已重构为 **Workspace = App（一对一）** 架构：
+>
+> - 一个 Workspace 就是一个 SaaS 应用，不再有独立的 App 层级
+> - 原 App 的所有功能（版本管理、域名、访问策略、发布等）已整合到 Workspace
+> - 原 `what_reverse_apps` 及关联表已删除，字段合并到 `what_reverse_workspaces`
+> - 原 App API 路由已合并到 `/api/v1/workspaces/:id/*`
+> - 前端路由从 `/workspaces/[workspaceId]/apps/[appId]/*` 简化为 `/app/[appId]/*`
+> - 详见重构计划：`.cursor/plans/合并workspace和app架构_fa8d23d6.plan.md`
+>
+> 本文档中部分章节仍保留 "App" 术语用于描述应用能力，但实际代码中 App 概念已合并到 Workspace。
+> 后续章节中 "App" 均指 Workspace 的应用功能部分。
 
 ---
 
 ## 0. 文档使用方式
 
 1. [x] 统一此文档为唯一计划入口，后续所有任务仅在此追加（输出：团队共识说明；验收：团队确认）。  
-   - 确认：本文档为 Workspace + App 平台开发的唯一计划入口，所有任务在此追踪。  
+   - 确认：本文档为 Workspace 应用平台开发的唯一计划入口，所有任务在此追踪。  
 2. [x] 规定更新节奏（如每周一次），并在文首追加变更记录（输出：变更记录区；验收：至少一次更新）。  
    - 更新节奏：每周一更新进度，重大变更及时同步。  
 

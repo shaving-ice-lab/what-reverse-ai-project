@@ -52,7 +52,7 @@ export default function SystemHealthPage() {
     ? featureFlagsMock
     : featuresQuery.data || {
         workspaceEnabled: true,
-        appRuntimeEnabled: true,
+        workspaceRuntimeEnabled: true,
         domainEnabled: true,
       };
 
@@ -147,11 +147,11 @@ export default function SystemHealthPage() {
             </Badge>
           </FormRow>
           <FormRow
-            label="App Runtime"
+            label="Workspace Runtime"
             description="应用运行时与在线执行入口"
           >
-            <Badge variant={featureFlags.appRuntimeEnabled ? "success" : "secondary"} size="sm">
-              {featureFlags.appRuntimeEnabled ? "启用" : "关闭"}
+            <Badge variant={featureFlags.workspaceRuntimeEnabled ? "success" : "secondary"} size="sm">
+              {featureFlags.workspaceRuntimeEnabled ? "启用" : "关闭"}
             </Badge>
           </FormRow>
           <FormRow

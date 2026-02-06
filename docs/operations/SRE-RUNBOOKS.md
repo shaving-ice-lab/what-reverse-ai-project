@@ -189,13 +189,13 @@ ORDER BY created_at DESC;
 
 ```bash
 # 手动验证域名
-POST /api/v1/apps/<app_id>/domains/<domain_id>/verify
+POST /api/v1/workspaces/<workspace_id>/domains/<domain_id>/verify
 
 # 手动签发证书
-POST /api/v1/apps/<app_id>/domains/<domain_id>/cert/issue
+POST /api/v1/workspaces/<workspace_id>/domains/<domain_id>/cert/issue
 
 # 手动续期证书
-POST /api/v1/apps/<app_id>/domains/<domain_id>/cert/renew
+POST /api/v1/workspaces/<workspace_id>/domains/<domain_id>/cert/renew
 
 # 强制刷新缓存
 POST /api/v1/admin/cache/invalidate

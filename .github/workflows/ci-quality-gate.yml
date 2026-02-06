@@ -147,7 +147,7 @@ jobs:
               "features:",
               "FeatureFlagsConfig",
               "workspace_enabled",
-              "app_runtime_enabled",
+              "workspace_runtime_enabled",
               "domain_enabled",
             ];
             const pr = context.payload.pull_request;

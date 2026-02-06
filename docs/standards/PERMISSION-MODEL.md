@@ -47,10 +47,10 @@ Platform Level (系统级)
 | workspace_admin | ✓ | - | - | - |
 | members_manage | ✓ | ✓ | - | - |
 | billing_manage | ✓ | ✓ | - | - |
-| apps_create | ✓ | ✓ | ✓ | - |
-| app_edit | ✓ | ✓ | ✓ | - |
-| app_publish | ✓ | ✓ | - | - |
-| app_view_metrics | ✓ | ✓ | ✓ | ✓ |
+| workspace_create | ✓ | ✓ | ✓ | - |
+| workspace_edit | ✓ | ✓ | ✓ | - |
+| workspace_publish | ✓ | ✓ | - | - |
+| workspace_view_metrics | ✓ | ✓ | ✓ | ✓ |
 | logs_view | ✓ | ✓ | ✓ | ✓ |
 | plan_view | ✓ | ✓ | ✓ | ✓ |
 | plan_manage | ✓ | ✓ | - | - |
@@ -69,20 +69,17 @@ Platform Level (系统级)
 | `GET /workspaces/:id/members` | members_manage |
 | `POST /workspaces/:id/members` | members_manage |
 | `PATCH /workspaces/:id/members/:mid` | members_manage |
-| `GET /apps` | app_view_metrics |
-| `POST /apps` | apps_create |
-| `GET /apps/:id` | app_view_metrics |
-| `PATCH /apps/:id` | app_edit |
-| `POST /apps/:id/publish` | app_publish |
-| `POST /apps/:id/rollback` | app_publish |
-| `GET /apps/:id/access-policy` | app_edit |
-| `PATCH /apps/:id/access-policy` | app_publish |
+| `POST /workspaces/:id/publish` | workspace_publish |
+| `POST /workspaces/:id/rollback` | workspace_publish |
+| `GET /workspaces/:id/versions` | workspace_view_metrics |
+| `GET /workspaces/:id/access-policy` | workspace_edit |
+| `PATCH /workspaces/:id/access-policy` | workspace_publish |
 
 ### 前端权限控制
 
 ```typescript
 // PermissionGate 组件示例
-<PermissionGate permission="app_publish">
+<PermissionGate permission="workspace_publish">
   <PublishButton />
 </PermissionGate>
 

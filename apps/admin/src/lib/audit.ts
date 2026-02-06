@@ -22,11 +22,10 @@ export type AuditAction =
   | "admin.workspace.delete"
   | "admin.workspace.member_remove"
   | "admin.workspace.plan_change"
-  // 应用管理
-  | "admin.app.view"
-  | "admin.app.status_update"
-  | "admin.app.delete"
-  | "admin.app.version_rollback"
+  // Workspace 发布管理
+  | "admin.workspace.view"
+  | "admin.workspace.publish_status_update"
+  | "admin.workspace.version_rollback"
   // 计费与收益
   | "admin.billing.refund_process"
   | "admin.billing.invoice_void"
@@ -61,7 +60,6 @@ export type AuditAction =
 export type AuditTargetType =
   | "user"
   | "workspace"
-  | "app"
   | "config"
   | "secret"
   | "ticket"
@@ -130,10 +128,9 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   "admin.workspace.delete": "删除工作空间",
   "admin.workspace.member_remove": "移除工作空间成员",
   "admin.workspace.plan_change": "变更工作空间计划",
-  "admin.app.view": "查看应用",
-  "admin.app.status_update": "更新应用状态",
-  "admin.app.delete": "删除应用",
-  "admin.app.version_rollback": "回滚应用版本",
+  "admin.workspace.view": "查看工作空间",
+  "admin.workspace.publish_status_update": "更新发布状态",
+  "admin.workspace.version_rollback": "回滚版本",
   "admin.billing.refund_process": "处理退款",
   "admin.billing.invoice_void": "作废发票",
   "admin.earnings.withdrawal_process": "处理提现",
@@ -194,10 +191,9 @@ export const ACTION_RISK_LEVELS: Record<AuditAction, RiskLevel> = {
   "admin.workspace.delete": "critical",
   "admin.workspace.member_remove": "medium",
   "admin.workspace.plan_change": "high",
-  "admin.app.view": "low",
-  "admin.app.status_update": "high",
-  "admin.app.delete": "critical",
-  "admin.app.version_rollback": "high",
+  "admin.workspace.view": "low",
+  "admin.workspace.publish_status_update": "high",
+  "admin.workspace.version_rollback": "high",
   "admin.billing.refund_process": "critical",
   "admin.billing.invoice_void": "critical",
   "admin.earnings.withdrawal_process": "critical",
@@ -229,7 +225,7 @@ export const REQUIRES_APPROVAL: AuditAction[] = [
   "admin.user.delete",
   "admin.user.batch_update",
   "admin.workspace.delete",
-  "admin.app.delete",
+  "admin.workspace.delete",
   "admin.billing.refund_process",
   "admin.billing.invoice_void",
   "admin.earnings.withdrawal_process",

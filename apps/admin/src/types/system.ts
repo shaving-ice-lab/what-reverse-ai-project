@@ -11,7 +11,7 @@ export interface SystemHealth {
 
 export interface FeatureFlags {
   workspaceEnabled: boolean;
-  appRuntimeEnabled: boolean;
+  workspaceRuntimeEnabled: boolean;
   domainEnabled: boolean;
 }
 

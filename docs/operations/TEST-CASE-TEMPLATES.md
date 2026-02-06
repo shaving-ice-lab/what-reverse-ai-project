@@ -17,7 +17,7 @@
 | `{{server_base_url}}` | 服务基础地址 | `http://localhost:8080` |
 | `{{workspace_id}}` | Workspace ID | `b0b1...` |
 | `{{workspace_slug}}` | Workspace Slug | `demo-workspace` |
-| `{{app_id}}` | App ID | `a1a2...` |
+| `{{workspace_id}}` | App ID | `a1a2...` |
 | `{{app_slug}}` | App Slug | `demo-app` |
 | `{{app_version_id}}` | App Version ID | `v-id...` |
 | `{{domain}}` | 绑定域名 | `app.example.com` |
@@ -159,11 +159,11 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/members" \
 
 ### 2.3 关键接口
 
-- `POST /api/v1/apps`
-- `POST /api/v1/apps/:id/versions`
-- `POST /api/v1/apps/:id/publish`
-- `GET /api/v1/apps/:id/access-policy`
-- `PATCH /api/v1/apps/:id/access-policy`
+- `POST /api/v1/workspaces`
+- `POST /api/v1/workspaces/:id/versions`
+- `POST /api/v1/workspaces/:id/publish`
+- `GET /api/v1/workspaces/:id/access-policy`
+- `PATCH /api/v1/workspaces/:id/access-policy`
 - `GET /runtime/:workspaceSlug/:appSlug`
 - `GET /runtime/:workspaceSlug/:appSlug/schema`
 - `POST /runtime/:workspaceSlug/:appSlug`
@@ -177,10 +177,10 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/members" \
 
 | 编号 | 操作 | 请求/路径 | 预期 |
 | --- | --- | --- | --- |
-| AP-01 | 创建 App | `POST /api/v1/apps` | 返回 `app.id` |
-| AP-02 | 创建版本 | `POST /api/v1/apps/{{app_id}}/versions` | 返回 `version.id` |
-| AP-03 | 发布 App | `POST /api/v1/apps/{{app_id}}/publish` | `status=published` |
-| AP-04 | 设置访问策略 | `PATCH /api/v1/apps/{{app_id}}/access-policy` | `access_mode=public_anonymous` |
+| AP-01 | 创建 Workspace | `POST /api/v1/workspaces` | 返回 `workspace.id` |
+| AP-02 | 创建版本 | `POST /api/v1/workspaces/{{workspace_id}}/versions` | 返回 `version.id` |
+| AP-03 | 发布 Workspace | `POST /api/v1/workspaces/{{workspace_id}}/publish` | `status=published` |
+| AP-04 | 设置访问策略 | `PATCH /api/v1/workspaces/{{workspace_id}}/access-policy` | `access_mode=public_anonymous` |
 | AP-05 | 获取 Runtime 入口 | `GET /runtime/{{workspace_slug}}/{{app_slug}}` | 返回 app/workspace/access_policy |
 | AP-06 | 获取 Runtime Schema | `GET /runtime/{{workspace_slug}}/{{app_slug}}/schema` | 返回 UI/DB/Config Schema |
 | AP-07 | 执行 Runtime | `POST /runtime/{{workspace_slug}}/{{app_slug}}` | 返回执行结果 |
@@ -194,15 +194,15 @@ curl -X POST "{{api_base_url}}/apps" \
   -H "Content-Type: application/json" \
   -d '{"workspace_id":"{{workspace_id}}","name":"Demo App","slug":"demo-app","icon":"app"}'
 
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/versions" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/versions" \
   -H "Authorization: Bearer {{jwt_token}}" \
   -H "Content-Type: application/json" \
   -d '{"ui_schema":{},"db_schema":{},"config_json":{}}'
 
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/publish" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/publish" \
   -H "Authorization: Bearer {{jwt_token}}"
 
-curl -X PATCH "{{api_base_url}}/apps/{{app_id}}/access-policy" \
+curl -X PATCH "{{api_base_url}}/apps/{{workspace_id}}/access-policy" \
   -H "Authorization: Bearer {{jwt_token}}" \
   -H "Content-Type: application/json" \
   -d '{"access_mode":"public_anonymous","require_captcha":false}'
@@ -319,13 +319,13 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/database/restore" \
 
 ### 4.3 关键接口
 
-- `GET /api/v1/apps/:id/domains`
-- `POST /api/v1/apps/:id/domains`
-- `POST /api/v1/apps/:id/domains/:domainId/verify`
-- `POST /api/v1/apps/:id/domains/:domainId/cert/issue`
-- `POST /api/v1/apps/:id/domains/:domainId/activate`
-- `POST /api/v1/apps/:id/domains/:domainId/rollback`
-- `DELETE /api/v1/apps/:id/domains/:domainId`
+- `GET /api/v1/workspaces/:id/domains`
+- `POST /api/v1/workspaces/:id/domains`
+- `POST /api/v1/workspaces/:id/domains/:domainId/verify`
+- `POST /api/v1/workspaces/:id/domains/:domainId/cert/issue`
+- `POST /api/v1/workspaces/:id/domains/:domainId/activate`
+- `POST /api/v1/workspaces/:id/domains/:domainId/rollback`
+- `DELETE /api/v1/workspaces/:id/domains/:domainId`
 - `GET /`（Host=`{{domain}}`）
 - `GET /schema`（Host=`{{domain}}`）
 
@@ -333,28 +333,28 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/database/restore" \
 
 | 编号 | 操作 | 请求/路径 | 预期 |
 | --- | --- | --- | --- |
-| DM-01 | 创建域名 | `POST /api/v1/apps/{{app_id}}/domains` | 返回 `domain.id` 与验证信息 |
-| DM-02 | 验证域名 | `POST /api/v1/apps/{{app_id}}/domains/{{domain_id}}/verify` | `verified=true` |
-| DM-03 | 签发证书 | `POST /api/v1/apps/{{app_id}}/domains/{{domain_id}}/cert/issue` | `ssl_status` 更新 |
-| DM-04 | 路由生效 | `POST /api/v1/apps/{{app_id}}/domains/{{domain_id}}/activate` | 状态为 active |
+| DM-01 | 创建域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains` | 返回 `domain.id` 与验证信息 |
+| DM-02 | 验证域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/verify` | `verified=true` |
+| DM-03 | 签发证书 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/cert/issue` | `ssl_status` 更新 |
+| DM-04 | 路由生效 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/activate` | 状态为 active |
 | DM-05 | 域名访问 | `GET /` + Host=`{{domain}}` | 返回 Runtime 入口 |
-| DM-06 | 回滚 | `POST /api/v1/apps/{{app_id}}/domains/{{domain_id}}/rollback` | 状态回退 |
+| DM-06 | 回滚 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/rollback` | 状态回退 |
 
 ### 4.5 curl 请求示例
 
 ```bash
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/domains" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/domains" \
   -H "Authorization: Bearer {{jwt_token}}" \
   -H "Content-Type: application/json" \
   -d '{"domain":"{{domain}}"}'
 
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/domains/{{domain_id}}/verify" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/domains/{{domain_id}}/verify" \
   -H "Authorization: Bearer {{jwt_token}}"
 
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/domains/{{domain_id}}/cert/issue" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/domains/{{domain_id}}/cert/issue" \
   -H "Authorization: Bearer {{jwt_token}}"
 
-curl -X POST "{{api_base_url}}/apps/{{app_id}}/domains/{{domain_id}}/activate" \
+curl -X POST "{{api_base_url}}/apps/{{workspace_id}}/domains/{{domain_id}}/activate" \
   -H "Authorization: Bearer {{jwt_token}}"
 
 curl "{{server_base_url}}/" \
@@ -372,7 +372,7 @@ curl "{{server_base_url}}/" \
 
 ### 4.8 清理/回滚
 
-- 删除测试域名：`DELETE /api/v1/apps/{{app_id}}/domains/{{domain_id}}`
+- 删除测试域名：`DELETE /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}`
 
 ### 4.9 验收标准
 

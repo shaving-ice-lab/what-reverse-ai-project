@@ -36,16 +36,16 @@ Severity：P1
 
 ### 前置条件（domain_binding_failure）
 
-- 已确认 app_id 与 domain_id 归属
+- 已确认 workspace_id 与 domain_id 归属
 - 已获取验证 token 或 CNAME 目标
 
 ### 步骤（domain_binding_failure）
 
-1. 调用 `GET /api/v1/apps/:id/domains`，获取 `status/ssl_status/last_verification_error/next_retry_at`
+1. 调用 `GET /api/v1/workspaces/:id/domains`，获取 `status/ssl_status/last_verification_error/next_retry_at`
 2. 校验 DNS 记录（TXT `_agentflow.<domain>` 或 CNAME 指向 base host）
-3. 触发验证 `POST /api/v1/apps/:id/domains/:domainId/verify`
-4. 证书签发 `POST /api/v1/apps/:id/domains/:domainId/cert/issue`
-5. 域名生效 `POST /api/v1/apps/:id/domains/:domainId/activate`
+3. 触发验证 `POST /api/v1/workspaces/:id/domains/:domainId/verify`
+4. 证书签发 `POST /api/v1/workspaces/:id/domains/:domainId/cert/issue`
+5. 域名生效 `POST /api/v1/workspaces/:id/domains/:domainId/activate`
 
 ### 升级条件（domain_binding_failure）
 
@@ -53,8 +53,8 @@ Severity：P1
 
 ### 回滚方案（domain_binding_failure）
 
-- 执行 `POST /api/v1/apps/:id/domains/:domainId/rollback`
-- 必要时删除域名 `DELETE /api/v1/apps/:id/domains/:domainId`
+- 执行 `POST /api/v1/workspaces/:id/domains/:domainId/rollback`
+- 必要时删除域名 `DELETE /api/v1/workspaces/:id/domains/:domainId`
 
 ---
 
@@ -108,9 +108,9 @@ Severity：P1
 
 ### 步骤（anonymous_abuse）
 
-1. 调用 `GET /api/v1/apps/:id/access-policy` 确认策略与 `rate_limit_json`
-2. 通过 `PATCH /api/v1/apps/:id/access-policy` 设置 `rate_limit_json.blacklist/graylist`
-3. 调整 `per_ip / per_session / per_app` 的 `max_requests` 与 `window_seconds`
+1. 调用 `GET /api/v1/workspaces/:id/access-policy` 确认策略与 `rate_limit_json`
+2. 通过 `PATCH /api/v1/workspaces/:id/access-policy` 设置 `rate_limit_json.blacklist/graylist`
+3. 调整 `per_ip / per_session / per_workspace` 的 `max_requests` 与 `window_seconds`
 4. 必要时启用 `require_captcha` 或设置 `graylist_policy`
 
 ### 补充说明（anonymous_abuse）

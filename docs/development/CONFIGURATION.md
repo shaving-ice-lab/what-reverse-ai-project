@@ -37,7 +37,7 @@
 - `captcha`: `provider` / `secret` / `verify_url` / `timeout_seconds`
 - `ai`: `openai_api_key` / `anthropic_api_key` / `default_model`
 - `encryption`: `key`
-- `features`: `workspace_enabled` / `app_runtime_enabled` / `domain_enabled`
+- `features`: `workspace_enabled` / `workspace_runtime_enabled` / `domain_enabled`
 - `domain_routing`: `provider` / `webhook_url` / `webhook_token` / `timeout_seconds`
 - `certificate_issuer`: `provider` / `webhook_url` / `webhook_token` / `timeout_seconds`
 - `migration`: `workspace_backfill_enabled` / `workspace_consistency_check`

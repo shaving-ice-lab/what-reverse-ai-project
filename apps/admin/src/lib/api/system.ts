@@ -16,16 +16,16 @@ import type {
 
 type FeatureFlagsRaw = {
   workspace_enabled?: boolean;
-  app_runtime_enabled?: boolean;
+  workspace_runtime_enabled?: boolean;
   domain_enabled?: boolean;
   WorkspaceEnabled?: boolean;
-  AppRuntimeEnabled?: boolean;
+  WorkspaceRuntimeEnabled?: boolean;
   DomainEnabled?: boolean;
 };
 
 const normalizeFeatureFlags = (raw?: FeatureFlagsRaw | null): FeatureFlags => ({
   workspaceEnabled: Boolean(raw?.workspace_enabled ?? raw?.WorkspaceEnabled),
-  appRuntimeEnabled: Boolean(raw?.app_runtime_enabled ?? raw?.AppRuntimeEnabled),
+  workspaceRuntimeEnabled: Boolean(raw?.workspace_runtime_enabled ?? raw?.WorkspaceRuntimeEnabled),
   domainEnabled: Boolean(raw?.domain_enabled ?? raw?.DomainEnabled),
 });
 
@@ -62,7 +62,7 @@ export const systemApi = {
 
   async updateFeatures(input: {
     workspace_enabled?: boolean;
-    app_runtime_enabled?: boolean;
+    workspace_runtime_enabled?: boolean;
     domain_enabled?: boolean;
   }): Promise<FeatureFlags> {
     const data = await api.patch<{ features?: FeatureFlagsRaw }>("/admin/system/features", input);

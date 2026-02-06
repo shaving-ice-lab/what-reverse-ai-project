@@ -47,7 +47,7 @@ import { formatDate, formatRelativeTime } from "@/lib/utils";
 const mockAuditLogs = [
   { id: "log-1", action: "user.login", target_type: "user", target_id: "user-123", actor_email: "admin@agentflow.ai", ip_address: "192.168.1.100", created_at: "2026-02-03T08:15:00Z" },
   { id: "log-2", action: "workspace.update", target_type: "workspace", target_id: "ws-456", actor_email: "ray@agentflow.ai", ip_address: "192.168.1.101", created_at: "2026-02-03T08:10:00Z" },
-  { id: "log-3", action: "app.deploy", target_type: "app", target_id: "app-789", actor_email: "dev@agentflow.ai", ip_address: "192.168.1.102", created_at: "2026-02-03T08:05:00Z" },
+  { id: "log-3", action: "workspace.publish", target_type: "workspace", target_id: "ws-789", actor_email: "dev@agentflow.ai", ip_address: "192.168.1.102", created_at: "2026-02-03T08:05:00Z" },
   { id: "log-4", action: "config.change", target_type: "config", target_id: "cfg-001", actor_email: "admin@agentflow.ai", ip_address: "192.168.1.100", created_at: "2026-02-03T08:00:00Z" },
   { id: "log-5", action: "user.role_change", target_type: "user", target_id: "user-456", actor_email: "admin@agentflow.ai", ip_address: "192.168.1.100", created_at: "2026-02-03T07:55:00Z" },
 ];
