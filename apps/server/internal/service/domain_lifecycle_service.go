@@ -41,10 +41,9 @@ type DomainLifecycleService interface {
 
 type domainLifecycleService struct {
 	cfg                 config.DomainLifecycleConfig
-	domainRepo          repository.AppDomainRepository
-	appRepo             repository.AppRepository
+	workspaceRepo       repository.WorkspaceRepository
 	notificationService NotificationService
-	appDomainService    AppDomainService
+	workspaceDomainSvc  WorkspaceDomainService
 	eventRecorder       EventRecorderService
 	log                 logger.Logger
 	baseURL             string
@@ -54,20 +53,18 @@ type domainLifecycleService struct {
 // NewDomainLifecycleService 创建域名生命周期服务
 func NewDomainLifecycleService(
 	cfg config.DomainLifecycleConfig,
-	domainRepo repository.AppDomainRepository,
-	appRepo repository.AppRepository,
+	workspaceRepo repository.WorkspaceRepository,
 	notificationService NotificationService,
-	appDomainService AppDomainService,
+	workspaceDomainSvc WorkspaceDomainService,
 	eventRecorder EventRecorderService,
 	log logger.Logger,
 	baseURL string,
 ) DomainLifecycleService {
 	return &domainLifecycleService{
 		cfg:                 cfg,
-		domainRepo:          domainRepo,
-		appRepo:             appRepo,
+		workspaceRepo:       workspaceRepo,
 		notificationService: notificationService,
-		appDomainService:    appDomainService,
+		workspaceDomainSvc:  workspaceDomainSvc,
 		eventRecorder:       eventRecorder,
 		log:                 log,
 		baseURL:             baseURL,
@@ -140,11 +137,11 @@ func (s *domainLifecycleService) RunOnce(ctx context.Context) (*DomainLifecycleR
 }
 
 func (s *domainLifecycleService) handleDomainExpiryReminders(ctx context.Context, now time.Time) (int, error) {
-	if s.domainRepo == nil || s.appRepo == nil || s.notificationService == nil {
+	if s.workspaceRepo == nil || s.notificationService == nil {
 		return 0, nil
 	}
 	warnBefore := now.AddDate(0, 0, s.resolveDomainExpiryWarningDays())
-	domains, err := s.domainRepo.ListExpiryReminders(ctx, warnBefore, s.resolveBatchLimit())
+	domains, err := s.workspaceRepo.ListExpiryReminders(ctx, warnBefore, s.resolveBatchLimit())
 	if err != nil {
 		return 0, err
 	}
@@ -158,13 +155,13 @@ func (s *domainLifecycleService) handleDomainExpiryReminders(ctx context.Context
 		if domain.DomainExpiresAt == nil {
 			continue
 		}
-		app, err := s.appRepo.GetByID(ctx, domain.AppID)
-		if err != nil || app == nil {
+		workspace, err := s.workspaceRepo.GetByID(ctx, domain.WorkspaceID)
+		if err != nil || workspace == nil {
 			continue
 		}
 
 		title, content := buildDomainExpiryMessage(domain.Domain, *domain.DomainExpiresAt, now)
-		if err := s.notificationService.SendSystemNotification(ctx, app.OwnerUserID, title, content); err != nil {
+		if err := s.notificationService.SendSystemNotification(ctx, workspace.OwnerUserID, title, content); err != nil {
 			if s.log != nil {
 				s.log.Warn("Domain expiry notification failed", "domain", domain.Domain, "error", err)
 			}
@@ -172,7 +169,7 @@ func (s *domainLifecycleService) handleDomainExpiryReminders(ctx context.Context
 		}
 
 		domain.DomainExpiryNotifiedAt = &now
-		if err := s.domainRepo.Update(ctx, &domain); err != nil && s.log != nil {
+		if err := s.workspaceRepo.UpdateDomain(ctx, &domain); err != nil && s.log != nil {
 			s.log.Warn("Domain expiry notify update failed", "domain", domain.Domain, "error", err)
 		}
 		notified++
@@ -182,11 +179,11 @@ func (s *domainLifecycleService) handleDomainExpiryReminders(ctx context.Context
 }
 
 func (s *domainLifecycleService) handleSSLExpiryReminders(ctx context.Context, now time.Time) (int, error) {
-	if s.domainRepo == nil || s.appRepo == nil || s.notificationService == nil {
+	if s.workspaceRepo == nil || s.notificationService == nil {
 		return 0, nil
 	}
 	warnBefore := now.AddDate(0, 0, s.resolveSSLExpiryWarningDays())
-	domains, err := s.domainRepo.ListSSLExpiryReminders(ctx, warnBefore, s.resolveBatchLimit())
+	domains, err := s.workspaceRepo.ListSSLExpiryReminders(ctx, warnBefore, s.resolveBatchLimit())
 	if err != nil {
 		return 0, err
 	}
@@ -200,14 +197,14 @@ func (s *domainLifecycleService) handleSSLExpiryReminders(ctx context.Context, n
 		if domain.SSLExpiresAt == nil || domain.SSLExpiresAt.Before(now) {
 			continue
 		}
-		app, err := s.appRepo.GetByID(ctx, domain.AppID)
-		if err != nil || app == nil {
+		workspace, err := s.workspaceRepo.GetByID(ctx, domain.WorkspaceID)
+		if err != nil || workspace == nil {
 			continue
 		}
 
 		title := fmt.Sprintf("证书即将到期：%s", domain.Domain)
 		content := fmt.Sprintf("SSL 证书将于 %s 到期，请及时续期以保持访问。", domain.SSLExpiresAt.Format("2006-01-02"))
-		if err := s.notificationService.SendSystemNotification(ctx, app.OwnerUserID, title, content); err != nil {
+		if err := s.notificationService.SendSystemNotification(ctx, workspace.OwnerUserID, title, content); err != nil {
 			if s.log != nil {
 				s.log.Warn("SSL expiry notification failed", "domain", domain.Domain, "error", err)
 			}
@@ -215,11 +212,11 @@ func (s *domainLifecycleService) handleSSLExpiryReminders(ctx context.Context, n
 		}
 
 		if s.eventRecorder != nil {
-			_ = s.eventRecorder.RecordDomainEvent(ctx, entity.EventCertExpiringSoon, domain.AppID, domain.Domain, 0, nil)
+			_ = s.eventRecorder.RecordDomainEvent(ctx, entity.EventCertExpiringSoon, domain.WorkspaceID, domain.Domain, 0, nil)
 		}
 
 		domain.SSLExpiryNotifiedAt = &now
-		if err := s.domainRepo.Update(ctx, &domain); err != nil && s.log != nil {
+		if err := s.workspaceRepo.UpdateDomain(ctx, &domain); err != nil && s.log != nil {
 			s.log.Warn("SSL expiry notify update failed", "domain", domain.Domain, "error", err)
 		}
 		notified++
@@ -229,10 +226,10 @@ func (s *domainLifecycleService) handleSSLExpiryReminders(ctx context.Context, n
 }
 
 func (s *domainLifecycleService) handleSSLExpired(ctx context.Context, now time.Time) (int, error) {
-	if s.domainRepo == nil || s.appRepo == nil {
+	if s.workspaceRepo == nil {
 		return 0, nil
 	}
-	domains, err := s.domainRepo.ListSSLExpired(ctx, now, s.resolveBatchLimit())
+	domains, err := s.workspaceRepo.ListSSLExpired(ctx, now, s.resolveBatchLimit())
 	if err != nil {
 		return 0, err
 	}
@@ -246,14 +243,14 @@ func (s *domainLifecycleService) handleSSLExpired(ctx context.Context, now time.
 		if domain.SSLExpiresAt == nil {
 			continue
 		}
-		app, err := s.appRepo.GetByID(ctx, domain.AppID)
-		if err != nil || app == nil {
+		workspace, err := s.workspaceRepo.GetByID(ctx, domain.WorkspaceID)
+		if err != nil || workspace == nil {
 			continue
 		}
 
 		domain.SSLStatus = SSLStatusExpired
 		domain.SSLExpiryNotifiedAt = &now
-		if err := s.domainRepo.Update(ctx, &domain); err != nil {
+		if err := s.workspaceRepo.UpdateDomain(ctx, &domain); err != nil {
 			if s.log != nil {
 				s.log.Warn("SSL expired update failed", "domain", domain.Domain, "error", err)
 			}
@@ -263,7 +260,7 @@ func (s *domainLifecycleService) handleSSLExpired(ctx context.Context, now time.
 		if s.notificationService != nil {
 			title := fmt.Sprintf("证书已过期：%s", domain.Domain)
 			content := fmt.Sprintf("SSL 证书已于 %s 过期，请尽快续期恢复访问。", domain.SSLExpiresAt.Format("2006-01-02"))
-			if err := s.notificationService.SendSystemNotification(ctx, app.OwnerUserID, title, content); err != nil && s.log != nil {
+			if err := s.notificationService.SendSystemNotification(ctx, workspace.OwnerUserID, title, content); err != nil && s.log != nil {
 				s.log.Warn("SSL expired notification failed", "domain", domain.Domain, "error", err)
 			}
 		}
@@ -274,11 +271,11 @@ func (s *domainLifecycleService) handleSSLExpired(ctx context.Context, now time.
 }
 
 func (s *domainLifecycleService) handleSSLAutoRenew(ctx context.Context, now time.Time) (int, int, error) {
-	if s.domainRepo == nil || s.appRepo == nil || s.appDomainService == nil {
+	if s.workspaceRepo == nil || s.workspaceDomainSvc == nil {
 		return 0, 0, nil
 	}
 	renewBefore := now.AddDate(0, 0, s.resolveSSLAutoRenewDays())
-	domains, err := s.domainRepo.ListSSLAutoRenewCandidates(ctx, now, renewBefore, s.resolveBatchLimit())
+	domains, err := s.workspaceRepo.ListSSLAutoRenewCandidates(ctx, now, renewBefore, s.resolveBatchLimit())
 	if err != nil {
 		return 0, 0, err
 	}
@@ -296,17 +293,17 @@ func (s *domainLifecycleService) handleSSLAutoRenew(ctx context.Context, now tim
 			continue
 		}
 
-		app, err := s.appRepo.GetByID(ctx, domain.AppID)
-		if err != nil || app == nil {
+		workspace, err := s.workspaceRepo.GetByID(ctx, domain.WorkspaceID)
+		if err != nil || workspace == nil {
 			continue
 		}
 
-		if _, err := s.appDomainService.RenewCertificate(ctx, app.OwnerUserID, domain.AppID, domain.ID); err != nil {
-			if errors.Is(err, ErrAppDomainSSLNotDue) || errors.Is(err, ErrAppDomainSSLRetryLater) {
+		if _, err := s.workspaceDomainSvc.RenewCertificate(ctx, workspace.OwnerUserID, domain.WorkspaceID, domain.ID); err != nil {
+			if errors.Is(err, ErrWorkspaceDomainSSLNotDue) || errors.Is(err, ErrWorkspaceDomainSSLRetryLater) {
 				continue
 			}
 			failed++
-			s.notifyAutoRenewFailed(ctx, app.OwnerUserID, domain.Domain, err)
+			s.notifyAutoRenewFailed(ctx, workspace.OwnerUserID, domain.Domain, err)
 			continue
 		}
 		renewed++
@@ -315,8 +312,8 @@ func (s *domainLifecycleService) handleSSLAutoRenew(ctx context.Context, now tim
 	return renewed, failed, nil
 }
 
-func (s *domainLifecycleService) markSSLValidationFailed(ctx context.Context, domain *entity.AppDomain, err error) error {
-	if domain == nil || s.domainRepo == nil {
+func (s *domainLifecycleService) markSSLValidationFailed(ctx context.Context, domain *entity.WorkspaceDomain, err error) error {
+	if domain == nil || s.workspaceRepo == nil {
 		return nil
 	}
 	errMessage := strings.TrimSpace(err.Error())
@@ -329,7 +326,7 @@ func (s *domainLifecycleService) markSSLValidationFailed(ctx context.Context, do
 	domain.SSLIssueAttempts = attempts
 	nextRetry := s.nextSSLRetryAt(attempts, time.Now())
 	domain.SSLNextRetryAt = &nextRetry
-	return s.domainRepo.Update(ctx, domain)
+	return s.workspaceRepo.UpdateDomain(ctx, domain)
 }
 
 func (s *domainLifecycleService) notifyAutoRenewFailed(ctx context.Context, userID uuid.UUID, domain string, err error) {
@@ -341,9 +338,9 @@ func (s *domainLifecycleService) notifyAutoRenewFailed(ctx context.Context, user
 	_ = s.notificationService.SendSystemNotification(ctx, userID, title, message)
 }
 
-func (s *domainLifecycleService) validateDomainDNS(domain entity.AppDomain) error {
+func (s *domainLifecycleService) validateDomainDNS(domain entity.WorkspaceDomain) error {
 	if strings.TrimSpace(domain.Domain) == "" {
-		return ErrAppDomainInvalid
+		return ErrWorkspaceDomainInvalid
 	}
 	token := safeToken(domain.VerificationToken)
 	txtName := fmt.Sprintf("%s.%s", s.txtPrefix, domain.Domain)
@@ -366,7 +363,7 @@ func (s *domainLifecycleService) validateDomainDNS(domain entity.AppDomain) erro
 		}
 	}
 
-	return ErrAppDomainVerificationFailed
+	return ErrWorkspaceDomainVerificationFailed
 }
 
 func (s *domainLifecycleService) cnameTarget() string {

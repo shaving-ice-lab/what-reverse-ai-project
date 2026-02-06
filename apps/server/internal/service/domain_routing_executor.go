@@ -24,8 +24,6 @@ type DomainRoutingRequest struct {
 	Action         string    `json:"action"`
 	Domain         string    `json:"domain"`
 	PreviousDomain string    `json:"previous_domain,omitempty"`
-	AppID          string    `json:"app_id"`
-	AppSlug        string    `json:"app_slug"`
 	WorkspaceID    string    `json:"workspace_id"`
 	WorkspaceSlug  string    `json:"workspace_slug"`
 	TargetBaseURL  string    `json:"target_base_url"`

@@ -23,8 +23,6 @@ const (
 type CertificateIssueRequest struct {
 	Action        string                 `json:"action"`
 	Domain        string                 `json:"domain"`
-	AppID         string                 `json:"app_id"`
-	AppSlug       string                 `json:"app_slug"`
 	WorkspaceID   string                 `json:"workspace_id"`
 	WorkspaceSlug string                 `json:"workspace_slug,omitempty"`
 	Verification  DomainVerificationInfo `json:"verification"`

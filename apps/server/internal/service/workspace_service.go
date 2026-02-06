@@ -31,6 +31,24 @@ type WorkspaceService interface {
 	AddMember(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, userID uuid.UUID, roleID *uuid.UUID) (*entity.WorkspaceMember, error)
 	UpdateMemberRole(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID, roleID uuid.UUID) (*entity.WorkspaceMember, error)
 	GetWorkspaceAccess(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) (*WorkspaceAccess, error)
+
+	// App 功能（Workspace = App）
+	Publish(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error)
+	Rollback(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, versionID uuid.UUID) (*entity.Workspace, error)
+	Deprecate(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error)
+	Archive(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error)
+	CreateVersion(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req WorkspaceCreateVersionRequest) (*entity.WorkspaceVersion, error)
+	ListVersions(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, page, pageSize int) ([]entity.WorkspaceVersion, int64, error)
+	CompareVersions(ctx context.Context, id uuid.UUID, fromID uuid.UUID, toID uuid.UUID) (map[string]interface{}, error)
+	GetAccessPolicy(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*AccessPolicyResponse, error)
+	UpdateAccessPolicy(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req UpdateAccessPolicyRequest) (*AccessPolicyResponse, error)
+	UpdateUISchema(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, uiSchema map[string]interface{}) (*entity.WorkspaceVersion, error)
+
+	// Marketplace
+	ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error)
+	GetPublic(ctx context.Context, id uuid.UUID) (*entity.Workspace, error)
+	ListRatings(ctx context.Context, workspaceID uuid.UUID, page, pageSize int) ([]entity.WorkspaceRating, int64, error)
+	SubmitRating(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID, score int, comment string) (*entity.WorkspaceRating, error)
 }
 
 type workspaceService struct {
@@ -40,7 +58,6 @@ type workspaceService struct {
 	roleRepo      repository.WorkspaceRoleRepository
 	memberRepo    repository.WorkspaceMemberRepository
 	eventRecorder EventRecorderService
-	appRepo       repository.AppRepository
 	workflowRepo  repository.WorkflowRepository
 	retentionCfg  config.RetentionConfig
 }
@@ -53,7 +70,6 @@ func NewWorkspaceService(
 	roleRepo repository.WorkspaceRoleRepository,
 	memberRepo repository.WorkspaceMemberRepository,
 	eventRecorder EventRecorderService,
-	appRepo repository.AppRepository,
 	workflowRepo repository.WorkflowRepository,
 	retentionCfg config.RetentionConfig,
 ) WorkspaceService {
@@ -64,7 +80,6 @@ func NewWorkspaceService(
 		roleRepo:      roleRepo,
 		memberRepo:    memberRepo,
 		eventRecorder: eventRecorder,
-		appRepo:       appRepo,
 		workflowRepo:  workflowRepo,
 		retentionCfg:  retentionCfg,
 	}
@@ -296,7 +311,6 @@ type WorkspaceDataExport struct {
 	ExportedAt string                   `json:"exported_at"`
 	Workspace  *entity.Workspace        `json:"workspace"`
 	Members    []entity.WorkspaceMember `json:"members"`
-	Apps       []entity.App             `json:"apps"`
 	Workflows  []entity.Workflow        `json:"workflows"`
 }
 
@@ -366,7 +380,7 @@ func (s *workspaceService) Update(ctx context.Context, id uuid.UUID, ownerID uui
 }
 
 func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDataExport, error) {
-	if s.appRepo == nil || s.workflowRepo == nil {
+	if s.workflowRepo == nil {
 		return nil, ErrWorkspaceExportUnavailable
 	}
 	access, err := s.authorizeWorkspace(ctx, id, ownerID, PermissionWorkspaceAdmin)
@@ -375,10 +389,6 @@ func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID
 	}
 
 	members, err := s.memberRepo.ListByWorkspaceID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	apps, err := s.appRepo.ListByWorkspaceID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -392,7 +402,6 @@ func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID
 		ExportedAt: time.Now().Format(time.RFC3339),
 		Workspace:  access.Workspace,
 		Members:    members,
-		Apps:       apps,
 		Workflows:  workflows,
 	}, nil
 }
@@ -776,20 +785,293 @@ func (s *workspaceService) purgeDeadline(deletedAt time.Time) *time.Time {
 	return &deadline
 }
 
+// ===== Workspace 版本管理请求/响应类型 =====
+
+type WorkspaceCreateVersionRequest struct {
+	Version    string                 `json:"version"`
+	Changelog  *string                `json:"changelog"`
+	WorkflowID *uuid.UUID             `json:"workflow_id"`
+	UISchema   map[string]interface{} `json:"ui_schema"`
+	DBSchema   map[string]interface{} `json:"db_schema"`
+	ConfigJSON map[string]interface{} `json:"config_json"`
+}
+
+type AccessPolicyResponse struct {
+	AccessMode         string                 `json:"access_mode"`
+	DataClassification string                 `json:"data_classification"`
+	RateLimitJSON      map[string]interface{} `json:"rate_limit_json"`
+	AllowedOrigins     []string               `json:"allowed_origins"`
+	RequireCaptcha     bool                   `json:"require_captcha"`
+}
+
+type UpdateAccessPolicyRequest struct {
+	AccessMode         *string                `json:"access_mode"`
+	DataClassification *string                `json:"data_classification"`
+	RateLimitJSON      map[string]interface{} `json:"rate_limit_json"`
+	AllowedOrigins     []string               `json:"allowed_origins"`
+	RequireCaptcha     *bool                  `json:"require_captcha"`
+}
+
+// ===== App 功能实现 =====
+
+func (s *workspaceService) Publish(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if ws.AppStatus == "published" {
+		return ws, nil
+	}
+	now := time.Now()
+	ws.AppStatus = "published"
+	ws.PublishedAt = &now
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to publish workspace: %w", err)
+	}
+	return ws, nil
+}
+
+func (s *workspaceService) Rollback(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, versionID uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, versionID)
+	if err != nil {
+		return nil, fmt.Errorf("version not found: %w", err)
+	}
+	if version.WorkspaceID != ws.ID {
+		return nil, errors.New("version does not belong to this workspace")
+	}
+	ws.CurrentVersionID = &version.ID
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to rollback workspace: %w", err)
+	}
+	return ws, nil
+}
+
+func (s *workspaceService) Deprecate(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	ws.AppStatus = "deprecated"
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to deprecate workspace: %w", err)
+	}
+	return ws, nil
+}
+
+func (s *workspaceService) Archive(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	ws.AppStatus = "archived"
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to archive workspace: %w", err)
+	}
+	return ws, nil
+}
+
+func (s *workspaceService) CreateVersion(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req WorkspaceCreateVersionRequest) (*entity.WorkspaceVersion, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	version := &entity.WorkspaceVersion{
+		ID:          uuid.New(),
+		WorkspaceID: ws.ID,
+		Version:     req.Version,
+		Changelog:   req.Changelog,
+		WorkflowID:  req.WorkflowID,
+		CreatedBy:   &ownerID,
+		CreatedAt:   time.Now(),
+	}
+	if err := s.workspaceRepo.CreateVersion(ctx, version); err != nil {
+		return nil, fmt.Errorf("failed to create version: %w", err)
+	}
+	// 设置为当前版本
+	ws.CurrentVersionID = &version.ID
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to update current version: %w", err)
+	}
+	return version, nil
+}
+
+func (s *workspaceService) ListVersions(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, page, pageSize int) ([]entity.WorkspaceVersion, int64, error) {
+	_, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, 0, err
+	}
+	return s.workspaceRepo.ListVersions(ctx, id, repository.WorkspaceVersionListParams{
+		Page:     page,
+		PageSize: pageSize,
+	})
+}
+
+func (s *workspaceService) CompareVersions(ctx context.Context, id uuid.UUID, fromID uuid.UUID, toID uuid.UUID) (map[string]interface{}, error) {
+	fromVer, err := s.workspaceRepo.GetVersionByID(ctx, fromID)
+	if err != nil {
+		return nil, fmt.Errorf("from version not found: %w", err)
+	}
+	toVer, err := s.workspaceRepo.GetVersionByID(ctx, toID)
+	if err != nil {
+		return nil, fmt.Errorf("to version not found: %w", err)
+	}
+	if fromVer.WorkspaceID != id || toVer.WorkspaceID != id {
+		return nil, errors.New("version does not belong to this workspace")
+	}
+	diff := map[string]interface{}{
+		"from_version": fromVer.Version,
+		"to_version":   toVer.Version,
+		"from_id":      fromVer.ID.String(),
+		"to_id":        toVer.ID.String(),
+		"changes": map[string]interface{}{
+			"version":   fromVer.Version != toVer.Version,
+			"changelog": fromVer.Changelog != toVer.Changelog,
+		},
+	}
+	return diff, nil
+}
+
+func (s *workspaceService) GetAccessPolicy(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*AccessPolicyResponse, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	return &AccessPolicyResponse{
+		AccessMode:         ws.AccessMode,
+		DataClassification: ws.DataClassification,
+		RequireCaptcha:     ws.RequireCaptcha,
+	}, nil
+}
+
+func (s *workspaceService) UpdateAccessPolicy(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req UpdateAccessPolicyRequest) (*AccessPolicyResponse, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if req.AccessMode != nil {
+		ws.AccessMode = *req.AccessMode
+	}
+	if req.DataClassification != nil {
+		ws.DataClassification = *req.DataClassification
+	}
+	if req.RequireCaptcha != nil {
+		ws.RequireCaptcha = *req.RequireCaptcha
+	}
+	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+		return nil, fmt.Errorf("failed to update access policy: %w", err)
+	}
+	return &AccessPolicyResponse{
+		AccessMode:         ws.AccessMode,
+		DataClassification: ws.DataClassification,
+		RequireCaptcha:     ws.RequireCaptcha,
+	}, nil
+}
+
+func (s *workspaceService) UpdateUISchema(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, uiSchema map[string]interface{}) (*entity.WorkspaceVersion, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if ws.CurrentVersionID == nil {
+		return nil, errors.New("no current version to update")
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("current version not found: %w", err)
+	}
+	// 注意：版本的 UISchema 更新需要在 repository 层支持
+	_ = uiSchema
+	return version, nil
+}
+
+func (s *workspaceService) ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error) {
+	return s.workspaceRepo.ListPublic(ctx, page, pageSize)
+}
+
+func (s *workspaceService) GetPublic(ctx context.Context, id uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.workspaceRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if ws.AppStatus != "published" || ws.AccessMode == "private" {
+		return nil, ErrWorkspaceNotFound
+	}
+	return ws, nil
+}
+
+func (s *workspaceService) ListRatings(ctx context.Context, workspaceID uuid.UUID, page, pageSize int) ([]entity.WorkspaceRating, int64, error) {
+	return s.workspaceRepo.ListRatings(ctx, workspaceID, repository.RatingListParams{
+		Page:     page,
+		PageSize: pageSize,
+	})
+}
+
+func (s *workspaceService) SubmitRating(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID, score int, comment string) (*entity.WorkspaceRating, error) {
+	if score < 1 || score > 5 {
+		return nil, errors.New("score must be between 1 and 5")
+	}
+	rating := &entity.WorkspaceRating{
+		ID:          uuid.New(),
+		WorkspaceID: workspaceID,
+		UserID:      userID,
+		Rating:      score,
+		Review:      &comment,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	if err := s.workspaceRepo.CreateOrUpdateRating(ctx, rating); err != nil {
+		return nil, fmt.Errorf("failed to submit rating: %w", err)
+	}
+	return rating, nil
+}
+
+// getAuthorizedWorkspace 获取并验证权限
+func (s *workspaceService) getAuthorizedWorkspace(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error) {
+	ws, err := s.workspaceRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, ErrWorkspaceNotFound
+	}
+	if ws.OwnerUserID != ownerID {
+		// 检查是否为成员
+		members, mErr := s.memberRepo.ListByWorkspaceID(ctx, id)
+		if mErr != nil {
+			return nil, ErrWorkspaceUnauthorized
+		}
+		found := false
+		for _, m := range members {
+			if m.UserID == ownerID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, ErrWorkspaceUnauthorized
+		}
+	}
+	return ws, nil
+}
+
 var (
-	ErrWorkspaceNotFound          = errors.New("workspace not found")
-	ErrWorkspaceUnauthorized      = errors.New("unauthorized to access this workspace")
-	ErrWorkspaceSlugExists        = errors.New("workspace slug already exists")
-	ErrWorkspaceInvalidName       = errors.New("workspace name is invalid")
-	ErrWorkspaceInvalidSlug       = errors.New("workspace slug is invalid")
-	ErrWorkspaceInvalidIcon       = errors.New("workspace icon is invalid")
-	ErrWorkspaceInvalidPlan       = errors.New("workspace plan is invalid")
-	ErrWorkspaceRoleNotFound      = errors.New("workspace role not found")
-	ErrWorkspaceMemberNotFound    = errors.New("workspace member not found")
-	ErrWorkspaceMemberExists      = errors.New("workspace member already exists")
-	ErrWorkspaceUserNotFound      = errors.New("workspace user not found")
-	ErrWorkspaceOwnerRoleLocked   = errors.New("workspace owner role locked")
-	ErrWorkspaceExportUnavailable = errors.New("workspace export unavailable")
-	ErrWorkspaceNotDeleted        = errors.New("workspace is not deleted")
-	ErrWorkspaceRestoreExpired    = errors.New("workspace restore window expired")
+	ErrWorkspaceNotFound                  = errors.New("workspace not found")
+	ErrWorkspaceUnauthorized              = errors.New("unauthorized to access this workspace")
+	ErrWorkspaceSlugExists                = errors.New("workspace slug already exists")
+	ErrWorkspaceInvalidName               = errors.New("workspace name is invalid")
+	ErrWorkspaceInvalidSlug               = errors.New("workspace slug is invalid")
+	ErrWorkspaceInvalidIcon               = errors.New("workspace icon is invalid")
+	ErrWorkspaceInvalidPlan               = errors.New("workspace plan is invalid")
+	ErrWorkspaceRoleNotFound              = errors.New("workspace role not found")
+	ErrWorkspaceMemberNotFound            = errors.New("workspace member not found")
+	ErrWorkspaceMemberExists              = errors.New("workspace member already exists")
+	ErrWorkspaceUserNotFound              = errors.New("workspace user not found")
+	ErrWorkspaceOwnerRoleLocked           = errors.New("workspace owner role locked")
+	ErrWorkspaceExportUnavailable         = errors.New("workspace export unavailable")
+	ErrWorkspaceNotDeleted                = errors.New("workspace is not deleted")
+	ErrWorkspaceRestoreExpired            = errors.New("workspace restore window expired")
+	ErrWorkspaceNotPublished              = errors.New("workspace is not published")
+	ErrWorkspaceInvalidAccessPolicy       = errors.New("workspace access policy is invalid for the given data classification")
+	ErrWorkspaceInvalidDataClassification = errors.New("workspace data classification is invalid")
 )
