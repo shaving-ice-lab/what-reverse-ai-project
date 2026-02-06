@@ -1,21 +1,18 @@
 "use client";
 
 /**
- * 案例研究页面 - Manus 风格
+ * 案例研究页面 - LobeHub 风格设计
  */
 
 import Link from "next/link";
 import {
-  Building,
-  TrendingUp,
-  Clock,
-  Users,
   ArrowRight,
   Quote,
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 案例数据
@@ -86,29 +83,24 @@ const caseStudies = [
   },
 ];
 
-// 行业列表
-const industries = ["全部", "电商", "金融", "制造", "科技", "医疗", "教育"];
-
 export default function CaseStudiesPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
             <Sparkles className="h-4 w-4" />
             真实客户案例
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             客户案例
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
             了解各行业领先企业如何使用 AgentFlow 实现业务自动化，提升效率
           </p>
         </div>
@@ -117,7 +109,7 @@ export default function CaseStudiesPage() {
       {/* Featured Cases */}
       <section className="py-12 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-8">精选案例</h2>
+          <h2 className="lobe-section-header mb-8">精选案例</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {caseStudies
               .filter((c) => c.featured)
@@ -126,53 +118,53 @@ export default function CaseStudiesPage() {
                   key={study.id}
                   className={cn(
                     "p-6 rounded-2xl",
-                    "bg-card border border-border",
-                    "hover:border-primary/30 hover:shadow-lg",
+                    "bg-surface-100/30 border border-border/30",
+                    "hover:border-[#4e8fff]/30 hover:shadow-lg",
                     "transition-all duration-300"
                   )}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl">
+                    <div className="w-12 h-12 rounded-xl bg-surface-100/50 flex items-center justify-center text-2xl">
                       {study.logo}
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">
                         {study.company}
                       </h3>
-                      <span className="text-xs text-primary">{study.industry}</span>
+                      <span className="text-[11px] text-[#4e8fff]">{study.industry}</span>
                     </div>
                   </div>
 
-                  <h4 className="text-lg font-medium text-foreground mb-2">
+                  <h4 className="text-[15px] font-medium text-foreground mb-2">
                     {study.title}
                   </h4>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-[13px] text-foreground-light mb-4">
                     {study.description}
                   </p>
 
                   <div className="grid grid-cols-3 gap-4 mb-4">
                     {study.results.map((result) => (
                       <div key={result.metric}>
-                        <div className="text-xl font-bold text-primary">
+                        <div className="text-xl font-bold text-[#4e8fff]">
                           {result.value}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-[11px] text-foreground-lighter">
                           {result.metric}
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="p-4 rounded-xl bg-muted/50 mb-4">
-                    <Quote className="w-4 h-4 text-primary mb-2" />
-                    <p className="text-sm text-muted-foreground italic mb-2">
-                      "{study.quote}"
+                  <div className="p-4 rounded-xl bg-surface-100/50 mb-4">
+                    <Quote className="w-4 h-4 text-[#4e8fff] mb-2" />
+                    <p className="text-[13px] text-foreground-light italic mb-2">
+                      &ldquo;{study.quote}&rdquo;
                     </p>
-                    <p className="text-xs text-foreground">— {study.author}</p>
+                    <p className="text-[11px] text-foreground">— {study.author}</p>
                   </div>
 
                   <Link href={`/case-studies/${study.id}`}>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full rounded-full border-border/50 text-foreground-light">
                       查看详情
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -184,9 +176,9 @@ export default function CaseStudiesPage() {
       </section>
 
       {/* All Cases */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-12 px-6 bg-gradient-section">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-8">所有案例</h2>
+          <h2 className="lobe-section-header mb-8">所有案例</h2>
           <div className="space-y-4">
             {caseStudies.map((study) => (
               <Link
@@ -194,26 +186,26 @@ export default function CaseStudiesPage() {
                 href={`/case-studies/${study.id}`}
                 className={cn(
                   "block p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:border-[#4e8fff]/30",
                   "transition-all duration-300 group"
                 )}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-surface-100/50 flex items-center justify-center text-2xl shrink-0">
                       {study.logo}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-foreground group-hover:text-[#4e8fff] transition-colors">
                           {study.company}
                         </h3>
-                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                        <span className="px-2 py-0.5 rounded-full bg-[#4e8fff]/10 text-[#4e8fff] text-[11px]">
                           {study.industry}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-[13px] text-foreground-light">
                         {study.title}
                       </p>
                     </div>
@@ -221,15 +213,15 @@ export default function CaseStudiesPage() {
                   <div className="flex items-center gap-4">
                     {study.results.slice(0, 2).map((result) => (
                       <div key={result.metric} className="text-center">
-                        <div className="text-lg font-bold text-primary">
+                        <div className="text-lg font-bold text-[#4e8fff]">
                           {result.value}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-[11px] text-foreground-lighter">
                           {result.metric}
                         </div>
                       </div>
                     ))}
-                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ArrowRight className="w-5 h-5 text-foreground-lighter group-hover:text-[#4e8fff] transition-colors" />
                   </div>
                 </div>
               </Link>
@@ -241,21 +233,21 @@ export default function CaseStudiesPage() {
       {/* CTA */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">
             想成为下一个成功案例？
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-[13px] text-foreground-light mb-6">
             联系我们，了解 AgentFlow 如何帮助您的业务实现自动化
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/demo">
-              <Button size="lg" className="rounded-full">
+              <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
                 预约演示
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
                 联系销售
               </Button>
             </Link>
@@ -263,12 +255,7 @@ export default function CaseStudiesPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

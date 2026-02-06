@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 帮助中心页面 - Manus 风格
+ * 帮助中心页面 - LobeHub 风格
  */
 
 import { useState } from "react";
@@ -19,10 +19,12 @@ import {
   ArrowRight,
   ExternalLink,
   Mail,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 帮助分类
@@ -154,56 +156,65 @@ export default function HelpPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+      <section className="relative pt-32 sm:pt-40 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+          <div className="lobe-badge mb-8">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span>帮助中心</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             帮助中心
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
             搜索常见问题解答，或浏览下方分类
           </p>
 
           {/* Search */}
           <div className="max-w-xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
             <Input
               placeholder="搜索帮助文章..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-full"
+              className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
             />
           </div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="py-12 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-6">帮助分类</h2>
+      <section className="py-24 sm:py-32">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="lobe-section-header">
+            <h2>帮助分类</h2>
+            <p>按主题快速找到您需要的帮助</p>
+          </div>
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category) => (
               <Link
                 key={category.title}
                 href={category.href}
                 className={cn(
-                  "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
-                  "transition-all duration-300 group"
+                  "p-6 rounded-2xl group",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <category.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300">
+                  <category.icon className="w-6 h-6 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                <h3 className="text-[15px] font-semibold text-foreground mb-1 group-hover:text-brand-500 transition-colors">
                   {category.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-[13px] text-foreground-lighter mb-2 leading-relaxed">
                   {category.description}
                 </p>
-                <span className="text-xs text-primary">{category.articles} 篇文章</span>
+                <span className="text-[12px] text-brand-500">{category.articles} 篇文章</span>
               </Link>
             ))}
           </div>
@@ -211,14 +222,24 @@ export default function HelpPage() {
       </section>
 
       {/* Directory */}
-      <section className="py-12 px-6 bg-muted/20">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-6">帮助中心目录</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+      <section className="py-24 sm:py-32 bg-gradient-section">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="lobe-section-header">
+            <h2>帮助中心目录</h2>
+            <p>按主题浏览完整的帮助资料</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
             {helpDirectory.map((section) => (
-              <div key={section.title} className="p-6 rounded-2xl bg-card border border-border">
-                <h3 className="font-semibold text-foreground mb-1">{section.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+              <div
+                key={section.title}
+                className={cn(
+                  "p-6 rounded-2xl",
+                  "bg-surface-100/30 border border-border/30"
+                )}
+              >
+                <h3 className="text-[15px] font-semibold text-foreground mb-1">{section.title}</h3>
+                <p className="text-[12px] text-foreground-lighter mb-4">
                   {section.description}
                 </p>
                 <ul className="space-y-2">
@@ -226,7 +247,7 @@ export default function HelpPage() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                        className="flex items-center gap-2 text-[13px] text-foreground-lighter hover:text-foreground transition-colors"
                       >
                         <ExternalLink className="w-4 h-4" />
                         {link.title}
@@ -241,30 +262,34 @@ export default function HelpPage() {
       </section>
 
       {/* Popular Articles */}
-      <section className="py-12 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-6">热门文章</h2>
-          <div className="space-y-3">
+      <section className="py-24 sm:py-32">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="lobe-section-header">
+            <h2>热门文章</h2>
+            <p>最受欢迎的帮助文章</p>
+          </div>
+
+          <div className="space-y-2">
             {popularArticles.map((article) => (
               <Link
                 key={article.title}
                 href={article.href}
                 className={cn(
-                  "block p-4 rounded-xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30",
-                  "transition-all duration-300 group"
+                  "block p-5 rounded-xl group",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300"
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground group-hover:text-primary transition-colors">
+                  <span className="text-[14px] text-foreground group-hover:text-brand-500 transition-colors">
                     {article.title}
                   </span>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-[11px] text-foreground-lighter">
                       {article.views.toLocaleString()} 次查看
                     </span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ArrowRight className="w-4 h-4 text-foreground-lighter group-hover:text-foreground-light transition-colors" />
                   </div>
                 </div>
               </Link>
@@ -274,9 +299,13 @@ export default function HelpPage() {
       </section>
 
       {/* Quick Links */}
-      <section className="py-12 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-foreground mb-6">快速链接</h2>
+      <section className="py-24 sm:py-32 bg-gradient-section">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="lobe-section-header">
+            <h2>快速链接</h2>
+            <p>常用资源入口</p>
+          </div>
+
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { title: "API 文档", href: "/docs/api", icon: "📚" },
@@ -288,14 +317,14 @@ export default function HelpPage() {
                 key={link.title}
                 href={link.href}
                 className={cn(
-                  "p-4 rounded-xl text-center",
-                  "bg-card border border-border",
-                  "hover:border-primary/30",
-                  "transition-all duration-300 group"
+                  "p-5 rounded-2xl text-center group",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300"
                 )}
               >
-                <span className="text-2xl mb-2 block">{link.icon}</span>
-                <span className="text-foreground group-hover:text-primary transition-colors">
+                <span className="text-2xl mb-3 block">{link.icon}</span>
+                <span className="text-[14px] text-foreground group-hover:text-brand-500 transition-colors">
                   {link.title}
                 </span>
               </Link>
@@ -305,12 +334,12 @@ export default function HelpPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-12 px-6 bg-muted/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+      <section className="py-24 sm:py-32">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
             没有找到答案？
           </h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-foreground-light mb-10">
             联系我们的支持团队获取帮助
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -319,22 +348,22 @@ export default function HelpPage() {
                 key={method.title}
                 href={method.href}
                 className={cn(
-                  "p-6 rounded-2xl text-center",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "p-6 rounded-2xl text-center group",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
                   "transition-all duration-300"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <method.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
+                  <method.icon className="w-6 h-6 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">
+                <h3 className="text-[15px] font-semibold text-foreground mb-1">
                   {method.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-[12px] text-foreground-lighter mb-3">
                   {method.description}
                 </p>
-                <span className="text-sm text-primary font-medium">
+                <span className="text-[13px] text-brand-500 font-medium">
                   {method.action} →
                 </span>
               </a>
@@ -343,12 +372,7 @@ export default function HelpPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

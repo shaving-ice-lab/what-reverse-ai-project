@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 企业版页面 - Manus 风格
+ * 企业版页面 - LobeHub 风格设计
  */
 
 import { useState } from "react";
@@ -17,13 +17,12 @@ import {
   Globe,
   CheckCircle,
   ArrowRight,
-  Mail,
-  Phone,
   Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 企业特性
@@ -123,34 +122,32 @@ export default function EnterprisePage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
             <Building className="h-4 w-4" />
             企业级解决方案
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             为企业打造的
             <br />
-            <span className="text-primary">自动化平台</span>
+            <span className="text-[#4e8fff]">自动化平台</span>
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-10">
             获得企业级安全、私有化部署、专属支持和无限扩展能力
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="#contact">
-              <Button size="lg" className="rounded-full">
+              <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
                 联系销售
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/demo">
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
                 预约演示
               </Button>
             </Link>
@@ -161,34 +158,32 @@ export default function EnterprisePage() {
       {/* Features */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-12">
-            企业级功能
-          </h2>
+          <h2 className="lobe-section-header text-center mb-12">企业级功能</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => (
               <div
                 key={feature.title}
                 className={cn(
                   "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:border-[#4e8fff]/30 hover:shadow-lg",
                   "transition-all duration-300"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-[#4e8fff]/10 flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-[#4e8fff]" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
+                <h3 className="text-[15px] font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-[13px] text-foreground-light mb-4">
                   {feature.description}
                 </p>
                 <ul className="space-y-2">
                   {feature.highlights.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      <span className="text-muted-foreground">{item}</span>
+                    <li key={item} className="flex items-center gap-2 text-[12px]">
+                      <CheckCircle className="w-4 h-4 text-[#4e8fff]" />
+                      <span className="text-foreground-lighter">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -199,25 +194,23 @@ export default function EnterprisePage() {
       </section>
 
       {/* Comparison */}
-      <section className="py-16 px-6 bg-muted/20">
+      <section className="py-16 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-12">
-            企业版 vs 标准版
-          </h2>
-          <div className="rounded-2xl border border-border overflow-hidden bg-card">
-            <div className="grid grid-cols-3 gap-4 p-4 border-b border-border bg-muted/50">
-              <div className="font-medium text-foreground">功能</div>
-              <div className="font-medium text-foreground text-center">标准版</div>
-              <div className="font-medium text-primary text-center">企业版</div>
+          <h2 className="lobe-section-header text-center mb-12">企业版 vs 标准版</h2>
+          <div className="rounded-2xl border border-border/30 overflow-hidden bg-surface-100/30">
+            <div className="grid grid-cols-3 gap-4 p-4 border-b border-border/30 bg-surface-100/50">
+              <div className="font-medium text-foreground text-[13px]">功能</div>
+              <div className="font-medium text-foreground text-center text-[13px]">标准版</div>
+              <div className="font-medium text-[#4e8fff] text-center text-[13px]">企业版</div>
             </div>
             {comparison.map((row) => (
               <div
                 key={row.feature}
-                className="grid grid-cols-3 gap-4 p-4 border-b border-border last:border-0"
+                className="grid grid-cols-3 gap-4 p-4 border-b border-border/30 last:border-0"
               >
-                <div className="text-foreground">{row.feature}</div>
-                <div className="text-muted-foreground text-center">{row.standard}</div>
-                <div className="text-primary font-medium text-center">{row.enterprise}</div>
+                <div className="text-foreground text-[13px]">{row.feature}</div>
+                <div className="text-foreground-lighter text-center text-[13px]">{row.standard}</div>
+                <div className="text-[#4e8fff] font-medium text-center text-[13px]">{row.enterprise}</div>
               </div>
             ))}
           </div>
@@ -227,26 +220,24 @@ export default function EnterprisePage() {
       {/* Case Studies */}
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-12">
-            客户案例
-          </h2>
+          <h2 className="lobe-section-header text-center mb-12">客户案例</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {caseStudies.map((study) => (
               <div
                 key={study.company}
-                className="p-6 rounded-2xl bg-card border border-border"
+                className="p-6 rounded-2xl bg-surface-100/30 border border-border/30"
               >
-                <div className="text-sm text-primary font-medium mb-2">
+                <div className="text-[12px] text-[#4e8fff] font-medium mb-2">
                   {study.industry}
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">
                   {study.company}
                 </h3>
-                <div className="text-2xl font-bold text-primary mb-4">
+                <div className="text-2xl font-bold text-[#4e8fff] mb-4">
                   {study.result}
                 </div>
-                <p className="text-sm text-muted-foreground italic">
-                  "{study.quote}"
+                <p className="text-[13px] text-foreground-light italic">
+                  &ldquo;{study.quote}&rdquo;
                 </p>
               </div>
             ))}
@@ -255,22 +246,20 @@ export default function EnterprisePage() {
       </section>
 
       {/* Contact Form */}
-      <section id="contact" className="py-16 px-6 bg-muted/20">
+      <section id="contact" className="py-16 px-6 bg-gradient-section">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-4">
-            联系企业销售团队
-          </h2>
-          <p className="text-muted-foreground text-center mb-8">
+          <h2 className="lobe-section-header text-center mb-4">联系企业销售团队</h2>
+          <p className="text-[13px] text-foreground-light text-center mb-8">
             填写表单，我们会在 1 个工作日内与您联系
           </p>
 
           {isSubmitted ? (
-            <div className="p-8 rounded-2xl bg-primary/5 border border-primary/20 text-center">
-              <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
+            <div className="p-8 rounded-2xl bg-[#4e8fff]/5 border border-[#4e8fff]/20 text-center">
+              <CheckCircle className="w-12 h-12 text-[#4e8fff] mx-auto mb-4" />
+              <h3 className="text-[15px] font-semibold text-foreground mb-2">
                 提交成功！
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-[13px] text-foreground-light">
                 我们的销售团队会尽快与您联系
               </p>
             </div>
@@ -278,7 +267,7 @@ export default function EnterprisePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[12px] font-medium text-foreground mb-2">
                     姓名 *
                   </label>
                   <Input
@@ -286,10 +275,11 @@ export default function EnterprisePage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="您的姓名"
+                    className="bg-surface-100/30 border-border/30 rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[12px] font-medium text-foreground mb-2">
                     工作邮箱 *
                   </label>
                   <Input
@@ -298,12 +288,13 @@ export default function EnterprisePage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="work@company.com"
+                    className="bg-surface-100/30 border-border/30 rounded-xl"
                   />
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[12px] font-medium text-foreground mb-2">
                     公司名称 *
                   </label>
                   <Input
@@ -311,21 +302,23 @@ export default function EnterprisePage() {
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     placeholder="您的公司"
+                    className="bg-surface-100/30 border-border/30 rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[12px] font-medium text-foreground mb-2">
                     联系电话
                   </label>
                   <Input
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="138-xxxx-xxxx"
+                    className="bg-surface-100/30 border-border/30 rounded-xl"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-[12px] font-medium text-foreground mb-2">
                   需求描述
                 </label>
                 <textarea
@@ -333,13 +326,13 @@ export default function EnterprisePage() {
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="请简单描述您的需求"
                   rows={4}
-                  className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-100/30 border border-border/30 text-foreground text-[13px] resize-none placeholder:text-foreground-lighter focus:outline-none focus:ring-2 focus:ring-[#4e8fff]/20 focus:border-[#4e8fff]/50"
                 />
               </div>
               <Button
                 type="submit"
                 size="lg"
-                className="w-full"
+                className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -356,12 +349,7 @@ export default function EnterprisePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,14 +1,13 @@
 "use client";
 
 /**
- * 应用市场页面 - Manus 风格
- * - 公开路由：/store
- * - 已登录用户：自动进入 /dashboard/store（统一 Dashboard 布局）
+ * 应用市场页面 - LobeHub 风格设计
  */
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { MarketplaceStoreContent } from "@/components/store/marketplace-store-content";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -35,13 +34,7 @@ export default function StorePage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <MarketplaceStoreContent variant="public" />
-
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

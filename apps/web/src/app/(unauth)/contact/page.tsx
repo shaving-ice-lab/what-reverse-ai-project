@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 联系我们页面 - Manus 风格
+ * 联系我们页面 - LobeHub 风格
  */
 
 import { useState } from "react";
@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 联系方式
@@ -97,21 +98,26 @@ export default function ContactPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+      <section className="relative pt-32 sm:pt-40 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
         
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+        <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
+          <div className="lobe-badge mb-8">
+            <Mail className="h-3.5 w-3.5" />
+            <span>Contact Us</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             联系我们
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
             有任何问题或建议？我们的团队随时为您提供帮助。
           </p>
         </div>
       </section>
 
       {/* Contact Methods */}
-      <section className="py-12 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-3 gap-4">
             {contactMethods.map((method) => (
@@ -120,21 +126,21 @@ export default function ContactPage() {
                 href={method.href}
                 className={cn(
                   "p-6 rounded-2xl text-center",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
-                  "transition-all duration-300"
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300 group"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <method.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <method.icon className="w-6 h-6 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">
+                <h3 className="text-[14px] font-semibold text-foreground mb-1">
                   {method.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-[12px] text-foreground-lighter mb-3">
                   {method.description}
                 </p>
-                <span className="text-sm text-primary font-medium">
+                <span className="text-[13px] text-brand-500 font-medium">
                   {method.action} →
                 </span>
               </a>
@@ -144,7 +150,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form */}
-      <section className="py-12 px-6">
+      <section className="py-20 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Form */}
@@ -154,16 +160,17 @@ export default function ContactPage() {
               </h2>
 
               {isSubmitted ? (
-                <div className="p-8 rounded-2xl bg-primary/5 border border-primary/20 text-center">
-                  <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+                <div className="p-8 rounded-2xl bg-brand-500/5 border border-brand-500/20 text-center">
+                  <CheckCircle className="w-12 h-12 text-brand-500 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">
                     消息已发送！
                   </h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-foreground-lighter mb-4 text-[13px]">
                     我们会在 1-2 个工作日内回复您
                   </p>
                   <Button
                     variant="outline"
+                    className="rounded-full border-border/50 hover:bg-surface-200/50"
                     onClick={() => {
                       setIsSubmitted(false);
                       setFormData({
@@ -182,7 +189,7 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-[13px] font-medium text-foreground mb-2">
                         姓名 *
                       </label>
                       <Input
@@ -190,10 +197,11 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="您的姓名"
+                        className="bg-surface-200/50 border-border/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-[13px] font-medium text-foreground mb-2">
                         邮箱 *
                       </label>
                       <Input
@@ -202,29 +210,31 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="your@email.com"
+                        className="bg-surface-200/50 border-border/30"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       公司名称
                     </label>
                     <Input
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="您的公司（选填）"
+                      className="bg-surface-200/50 border-border/30"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       咨询类型
                     </label>
                     <select
                       value={formData.type}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                      className="w-full h-10 px-3 rounded-lg bg-background border border-border text-foreground"
+                      className="w-full h-10 px-3 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px]"
                     >
                       {inquiryTypes.map((type) => (
                         <option key={type.id} value={type.id}>
@@ -235,7 +245,7 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       消息内容 *
                     </label>
                     <textarea
@@ -244,13 +254,13 @@ export default function ContactPage() {
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       placeholder="请详细描述您的问题或需求..."
                       rows={5}
-                      className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground resize-none"
+                      className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full rounded-full bg-foreground hover:bg-foreground/90 text-background"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -280,20 +290,22 @@ export default function ContactPage() {
                   {offices.map((office) => (
                     <div
                       key={office.city}
-                      className="p-4 rounded-xl bg-card border border-border"
+                      className="p-4 rounded-xl bg-surface-100/30 border border-border/30"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="w-4 h-4 text-primary" />
-                        <span className="font-medium text-foreground">
+                        <div className="w-7 h-7 rounded-lg bg-surface-200/80 flex items-center justify-center">
+                          <MapPin className="w-3.5 h-3.5 text-foreground-light" />
+                        </div>
+                        <span className="font-semibold text-foreground text-[14px]">
                           {office.city}
                         </span>
                         {office.type === "总部" && (
-                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                          <span className="px-2 py-0.5 rounded-full bg-surface-200/80 text-foreground-lighter text-[10px] font-medium">
                             HQ
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground pl-6">
+                      <p className="text-[12px] text-foreground-lighter pl-9">
                         {office.address}
                       </p>
                     </div>
@@ -306,24 +318,24 @@ export default function ContactPage() {
                 <h3 className="text-lg font-semibold text-foreground mb-4">
                   工作时间
                 </h3>
-                <div className="p-4 rounded-xl bg-card border border-border">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-primary" />
+                <div className="p-4 rounded-xl bg-surface-100/30 border border-border/30">
+                  <div className="flex items-center gap-2 text-[13px]">
+                    <Clock className="w-4 h-4 text-foreground-light" />
                     <span className="text-foreground">周一至周五</span>
-                    <span className="text-muted-foreground">9:00 - 18:00</span>
+                    <span className="text-foreground-lighter">9:00 - 18:00</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 pl-6">
+                  <p className="text-[11px] text-foreground-muted mt-2 pl-6">
                     节假日可能调整，紧急问题请发邮件
                   </p>
                 </div>
               </div>
 
               {/* Response Time */}
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                <h4 className="font-medium text-foreground mb-2">
+              <div className="p-4 rounded-xl bg-surface-100/30 border border-border/30">
+                <h4 className="font-medium text-foreground mb-2 text-[14px]">
                   响应时间
                 </h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
+                <ul className="text-[13px] text-foreground-lighter space-y-1">
                   <li>• 一般咨询：1-2 个工作日</li>
                   <li>• 技术支持：24 小时内</li>
                   <li>• 紧急问题：4 小时内</li>
@@ -334,12 +346,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

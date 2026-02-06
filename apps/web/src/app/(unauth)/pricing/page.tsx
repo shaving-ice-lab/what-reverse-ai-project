@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 定价页面 - Manus 风格
+ * 定价页面 - LobeHub 风格
  */
 
 import { useState } from "react";
@@ -11,14 +11,11 @@ import {
   X,
   Sparkles,
   ArrowRight,
-  Zap,
-  Shield,
-  Users,
-  Building,
-  HelpCircle,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 定价方案
@@ -119,38 +116,39 @@ const faqs = [
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
-            <Sparkles className="h-4 w-4" />
-            简单透明的定价
+      <section className="relative pt-32 sm:pt-40 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+          <div className="lobe-badge mb-8">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>简单透明的定价</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             选择适合您的方案
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
             从免费版开始，随时升级。所有付费版本都提供 14 天免费试用。
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-4 p-1.5 rounded-full bg-muted">
+          <div className="inline-flex items-center gap-1 p-1 rounded-full bg-surface-100/50 border border-border/30">
             <button
               onClick={() => setBillingCycle("monthly")}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                "px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200",
                 billingCycle === "monthly"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-foreground text-background"
+                  : "text-foreground-lighter hover:text-foreground-light"
               )}
             >
               月付
@@ -158,56 +156,51 @@ export default function PricingPage() {
             <button
               onClick={() => setBillingCycle("yearly")}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                "px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-200",
                 billingCycle === "yearly"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-foreground text-background"
+                  : "text-foreground-lighter hover:text-foreground-light"
               )}
             >
               年付
-              <span className="ml-1.5 text-xs text-primary">省 20%</span>
+              <span className="ml-1.5 text-[11px] text-brand-500">省 20%</span>
             </button>
           </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="py-12 sm:py-16">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {plans.map((plan) => (
               <div
                 key={plan.name}
                 className={cn(
-                  "relative p-6 rounded-2xl",
-                  "bg-card border",
+                  "relative p-6 rounded-2xl transition-all duration-300",
                   plan.popular
-                    ? "border-primary shadow-lg shadow-primary/10"
-                    : "border-border"
+                    ? "bg-surface-100/60 border-2 border-foreground/20 shadow-lg shadow-white/5"
+                    : "bg-surface-100/30 border border-border/30 hover:border-border/60"
                 )}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-medium">
                     最受欢迎
                   </div>
                 )}
 
-                <h3 className="text-lg font-semibold text-foreground mb-1">
-                  {plan.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {plan.description}
-                </p>
+                <h3 className="text-[16px] font-semibold text-foreground mb-1">{plan.name}</h3>
+                <p className="text-[12px] text-foreground-lighter mb-5">{plan.description}</p>
 
                 <div className="mb-6">
                   {plan.price.monthly !== null ? (
                     <>
-                      <span className="text-3xl font-bold text-foreground">
+                      <span className="text-3xl font-bold text-foreground tracking-tight">
                         ¥{billingCycle === "yearly" ? plan.price.yearly : plan.price.monthly}
                       </span>
-                      <span className="text-muted-foreground">/月</span>
+                      <span className="text-foreground-lighter text-[13px]">/月</span>
                       {billingCycle === "yearly" && plan.price.yearly > 0 && (
-                        <div className="text-xs text-primary mt-1">
+                        <div className="text-[11px] text-brand-500 mt-1">
                           年付节省 ¥{(plan.price.monthly - plan.price.yearly) * 12}
                         </div>
                       )}
@@ -217,28 +210,28 @@ export default function PricingPage() {
                   )}
                 </div>
 
-                <Link href={plan.href}>
+                <Link href={plan.href} className="block mb-6">
                   <Button
                     className={cn(
-                      "w-full mb-6",
+                      "w-full rounded-full h-10 text-[13px] font-medium transition-all duration-200",
                       plan.popular
-                        ? "bg-primary hover:bg-primary/90"
-                        : "bg-muted hover:bg-muted/80 text-foreground"
+                        ? "bg-foreground text-background hover:bg-foreground/90"
+                        : "bg-surface-200/50 text-foreground border border-border/30 hover:bg-surface-300/50"
                     )}
                   >
                     {plan.cta}
                   </Button>
                 </Link>
 
-                <ul className="space-y-3">
+                <ul className="space-y-2.5">
                   {plan.features.map((feature) => (
-                    <li key={feature.name} className="flex items-center gap-2 text-sm">
+                    <li key={feature.name} className="flex items-center gap-2.5 text-[13px]">
                       {feature.included ? (
-                        <Check className="w-4 h-4 text-primary shrink-0" />
+                        <Check className="w-3.5 h-3.5 text-foreground-light shrink-0" />
                       ) : (
-                        <X className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+                        <X className="w-3.5 h-3.5 text-foreground-muted shrink-0" />
                       )}
-                      <span className={feature.included ? "text-foreground" : "text-muted-foreground"}>
+                      <span className={feature.included ? "text-foreground-light" : "text-foreground-muted"}>
                         {feature.name}
                       </span>
                     </li>
@@ -251,24 +244,39 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-6 bg-muted/20">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-10">
-            常见问题
-          </h2>
-          <div className="space-y-4">
-            {faqs.map((faq) => (
+      <section className="py-24 sm:py-32">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">常见问题</h2>
+          </div>
+          <div className="space-y-2">
+            {faqs.map((faq, idx) => (
               <div
-                key={faq.question}
-                className="p-5 rounded-xl bg-card border border-border"
+                key={idx}
+                className={cn(
+                  "rounded-xl border transition-all duration-200",
+                  openFAQ === idx
+                    ? "border-border/60 bg-surface-100/30"
+                    : "border-transparent hover:bg-surface-100/20"
+                )}
               >
-                <h3 className="font-medium text-foreground mb-2 flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-primary" />
-                  {faq.question}
-                </h3>
-                <p className="text-sm text-muted-foreground pl-6">
-                  {faq.answer}
-                </p>
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === idx ? null : idx)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left"
+                >
+                  <span className="text-[15px] font-medium text-foreground pr-4">{faq.question}</span>
+                  <div className={cn(
+                    "shrink-0 w-6 h-6 rounded-full bg-surface-200/80 flex items-center justify-center transition-transform duration-200",
+                    openFAQ === idx && "rotate-45"
+                  )}>
+                    <Plus className="w-3.5 h-3.5 text-foreground-light" />
+                  </div>
+                </button>
+                {openFAQ === idx && (
+                  <div className="px-6 pb-5">
+                    <p className="text-[14px] text-foreground-lighter leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -276,16 +284,17 @@ export default function PricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
             还有其他问题？
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-foreground-light mb-8">
             联系我们的销售团队，获取定制方案和企业级解决方案
           </p>
           <Link href="/contact">
-            <Button size="lg" variant="outline" className="rounded-full">
+            <Button className="h-12 px-8 rounded-full text-[15px] border-border/50 bg-surface-200/50 text-foreground hover:bg-surface-300/50">
               联系销售
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -293,12 +302,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

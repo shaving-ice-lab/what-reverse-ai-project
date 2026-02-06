@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 社区页面 - Manus 风格
+ * 社区页面 - LobeHub 风格
  */
 
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 社区统计
@@ -114,30 +115,30 @@ export default function CommunityPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+      <section className="relative pt-32 sm:pt-40 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
         
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
-            <Users className="h-4 w-4" />
-            加入全球社区
+        <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
+          <div className="lobe-badge mb-8">
+            <Users className="h-3.5 w-3.5" />
+            <span>加入全球社区</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             AgentFlow 社区
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
             与全球 50,000+ 开发者和自动化爱好者一起学习、分享和成长
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="rounded-full">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">
               加入 Discord
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Link href="https://github.com/agentflow" target="_blank">
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50 h-12 px-8">
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
               </Button>
@@ -147,19 +148,19 @@ export default function CommunityPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="text-center p-6 rounded-2xl bg-card border border-border"
+                className="text-center p-6 rounded-2xl bg-surface-100/30 border border-border/30"
               >
-                <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
+                <stat.icon className="w-8 h-8 text-foreground-light mx-auto mb-3" />
                 <div className="text-2xl font-bold text-foreground mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-[13px] text-foreground-lighter">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -167,11 +168,12 @@ export default function CommunityPage() {
       </section>
 
       {/* Platforms */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-20 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            加入社区平台
-          </h2>
+          <div className="lobe-section-header">
+            <h2>加入社区平台</h2>
+            <p>Join our community platforms</p>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {platforms.map((platform) => (
               <a
@@ -181,21 +183,21 @@ export default function CommunityPage() {
                 rel="noopener noreferrer"
                 className={cn(
                   "p-6 rounded-2xl text-center",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
                   "transition-all duration-300 group"
                 )}
               >
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <platform.icon className="w-7 h-7 text-primary" />
+                <div className="w-14 h-14 rounded-2xl bg-surface-200/80 border border-border/30 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <platform.icon className="w-7 h-7 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">
+                <h3 className="text-[14px] font-semibold text-foreground mb-2">
                   {platform.name}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-[12px] text-foreground-lighter mb-4">
                   {platform.description}
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm text-primary font-medium">
+                <span className="inline-flex items-center gap-1 text-[13px] text-brand-500 font-medium">
                   {platform.cta}
                   <ExternalLink className="w-3.5 h-3.5" />
                 </span>
@@ -206,37 +208,38 @@ export default function CommunityPage() {
       </section>
 
       {/* Events */}
-      <section className="py-12 px-6">
+      <section className="py-24 sm:py-32 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            社区活动
-          </h2>
+          <div className="lobe-section-header">
+            <h2>社区活动</h2>
+            <p>Community events</p>
+          </div>
           <div className="space-y-4">
             {events.map((event) => (
               <div
                 key={event.title}
-                className="p-6 rounded-2xl bg-card border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-6 rounded-2xl bg-surface-100/30 border border-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-100/60 hover:border-border/60 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Calendar className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center shrink-0">
+                    <Calendar className="w-6 h-6 text-foreground-light" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">
+                    <h3 className="text-[14px] font-semibold text-foreground mb-1">
                       {event.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-1">
+                    <p className="text-[12px] text-foreground-lighter mb-1">
                       {event.description}
                     </p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 text-[11px] text-foreground-muted">
                       <span>{event.date}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-muted">
+                      <span className="px-2 py-0.5 rounded-full bg-surface-200/50 text-foreground-lighter">
                         {event.type}
                       </span>
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="shrink-0">
+                <Button variant="outline" size="sm" className="shrink-0 rounded-full border-border/50 hover:bg-surface-200/50">
                   了解更多
                 </Button>
               </div>
@@ -246,25 +249,31 @@ export default function CommunityPage() {
       </section>
 
       {/* Contributors */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-20 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            优秀贡献者
-          </h2>
+          <div className="lobe-section-header">
+            <h2>优秀贡献者</h2>
+            <p>Top contributors</p>
+          </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {contributors.map((contributor) => (
               <div
                 key={contributor.name}
-                className="p-5 rounded-2xl bg-card border border-border text-center"
+                className={cn(
+                  "p-5 rounded-2xl text-center",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300"
+                )}
               >
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 text-xl font-bold text-primary">
+                <div className="w-14 h-14 rounded-full bg-surface-200/50 border border-border/30 flex items-center justify-center mx-auto mb-3 text-xl font-bold text-foreground-light">
                   {contributor.avatar}
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">
+                <h3 className="text-[14px] font-semibold text-foreground mb-1">
                   {contributor.name}
                 </h3>
-                <div className="text-xs text-primary mb-2">{contributor.badge}</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-[11px] text-brand-500 mb-2">{contributor.badge}</div>
+                <div className="text-[12px] text-foreground-lighter">
                   {contributor.contributions} 贡献
                 </div>
               </div>
@@ -274,11 +283,12 @@ export default function CommunityPage() {
       </section>
 
       {/* Resources */}
-      <section className="py-12 px-6">
+      <section className="py-24 sm:py-32 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            社区资源
-          </h2>
+          <div className="lobe-section-header">
+            <h2>社区资源</h2>
+            <p>Community resources</p>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {resources.map((resource) => (
               <Link
@@ -286,18 +296,18 @@ export default function CommunityPage() {
                 href={resource.href}
                 className={cn(
                   "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
                   "transition-all duration-300 group"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <resource.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <resource.icon className="w-6 h-6 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-[14px] font-semibold text-foreground mb-2 group-hover:text-foreground transition-colors">
                   {resource.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[12px] text-foreground-lighter">
                   {resource.description}
                 </p>
               </Link>
@@ -307,27 +317,23 @@ export default function CommunityPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6 bg-muted/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+        <div className="max-w-2xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
             开始您的社区之旅
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-foreground-light mb-10">
             加入我们，与全球开发者一起构建未来
           </p>
-          <Button size="lg" className="rounded-full">
+          <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">
             加入社区
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 产品路线图页面
+ * 产品路线图页面 - LobeHub 风格设计
  */
 
 import Link from "next/link";
@@ -11,10 +11,10 @@ import {
   Clock,
   Lightbulb,
   ArrowRight,
-  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 路线图数据
@@ -58,10 +58,10 @@ const roadmapItems = [
 ];
 
 const statusConfig = {
-  completed: { label: "已完成", color: "text-green-500", bg: "bg-green-500/10" },
-  "in-progress": { label: "进行中", color: "text-primary", bg: "bg-primary/10" },
-  planned: { label: "计划中", color: "text-blue-500", bg: "bg-blue-500/10" },
-  exploring: { label: "探索中", color: "text-purple-500", bg: "bg-purple-500/10" },
+  completed: { label: "已完成", color: "text-emerald-400", bg: "bg-emerald-400/10" },
+  "in-progress": { label: "进行中", color: "text-[#4e8fff]", bg: "bg-[#4e8fff]/10" },
+  planned: { label: "计划中", color: "text-blue-400", bg: "bg-blue-400/10" },
+  exploring: { label: "探索中", color: "text-purple-400", bg: "bg-purple-400/10" },
 };
 
 export default function RoadmapPage() {
@@ -70,20 +70,18 @@ export default function RoadmapPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
             <Rocket className="h-4 w-4" />
             产品规划
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             产品路线图
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
             了解我们正在构建的功能，以及未来的计划。您的反馈将帮助我们确定优先级。
           </p>
         </div>
@@ -99,39 +97,36 @@ export default function RoadmapPage() {
                 <div key={quarter.quarter} className="relative">
                   {/* Quarter Header */}
                   <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-xl font-bold text-foreground">
+                    <h2 className="text-[15px] font-bold text-foreground">
                       {quarter.quarter}
                     </h2>
-                    <span className={cn("px-3 py-1 rounded-full text-xs font-medium", config.bg, config.color)}>
+                    <span className={cn("px-3 py-1 rounded-full text-[11px] font-medium", config.bg, config.color)}>
                       {config.label}
                     </span>
                   </div>
 
                   {/* Items */}
-                  <div className="space-y-3 pl-4 border-l-2 border-border">
+                  <div className="space-y-3 pl-4 border-l-2 border-border/30">
                     {quarter.items.map((item) => (
                       <div
                         key={item.title}
                         className={cn(
-                          "p-4 rounded-xl ml-4",
-                          "bg-card border border-border",
-                          item.done && "border-green-500/30"
+                          "p-4 rounded-2xl ml-4",
+                          "bg-surface-100/30 border border-border/30",
+                          item.done && "border-emerald-400/30"
                         )}
                       >
                         <div className="flex items-start gap-3">
                           {item.done ? (
-                            <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" />
                           ) : (
-                            <Clock className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
+                            <Clock className="w-5 h-5 text-foreground-lighter mt-0.5 shrink-0" />
                           )}
                           <div>
-                            <h3 className={cn(
-                              "font-medium mb-1",
-                              item.done ? "text-foreground" : "text-foreground"
-                            )}>
+                            <h3 className="font-medium text-foreground mb-1 text-[13px]">
                               {item.title}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-[12px] text-foreground-light">
                               {item.description}
                             </p>
                           </div>
@@ -147,17 +142,15 @@ export default function RoadmapPage() {
       </section>
 
       {/* Feedback */}
-      <section className="py-16 px-6 bg-muted/20">
+      <section className="py-16 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto text-center">
-          <Lightbulb className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            有功能建议？
-          </h2>
-          <p className="text-muted-foreground mb-6">
+          <Lightbulb className="w-12 h-12 text-[#4e8fff] mx-auto mb-4" />
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">有功能建议？</h2>
+          <p className="text-[13px] text-foreground-light mb-6">
             我们非常重视您的反馈，帮助我们构建更好的产品
           </p>
           <Link href="/contact?type=feature-request">
-            <Button size="lg" className="rounded-full">
+            <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
               提交建议
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -165,12 +158,7 @@ export default function RoadmapPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

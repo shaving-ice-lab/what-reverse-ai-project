@@ -307,23 +307,21 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
       setExecuteError(null);
       setInputs({});
       try {
-        const entryData = await runtimeApi.getEntry(workspaceSlug, appSlug, sessionId || undefined);
+        const entryData = await runtimeApi.getEntry(workspaceSlug, sessionId || undefined);
         if (cancelled) return;
         const resolvedWorkspaceSlug = entryData.workspace?.slug;
-        const resolvedAppSlug = entryData.app?.slug;
         if (
           resolvedWorkspaceSlug &&
-          resolvedAppSlug &&
-          (resolvedWorkspaceSlug !== workspaceSlug || resolvedAppSlug !== appSlug)
+          resolvedWorkspaceSlug !== workspaceSlug
         ) {
           const suffix = isEmbed ? "/embed" : "";
-          router.replace(`/runtime/${resolvedWorkspaceSlug}/${resolvedAppSlug}${suffix}`);
+          router.replace(`/runtime/${resolvedWorkspaceSlug}${suffix}`);
           return;
         }
         setEntry(entryData);
         const nextSession = entryData.session_id || sessionId || "";
         setSessionId(nextSession);
-        const schemaData = await runtimeApi.getSchema(workspaceSlug, appSlug, nextSession || undefined);
+        const schemaData = await runtimeApi.getSchema(workspaceSlug, nextSession || undefined);
         if (cancelled) return;
         setSchema(schemaData);
         if (schemaData.session_id && schemaData.session_id !== nextSession) {
@@ -344,7 +342,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
     return () => {
       cancelled = true;
     };
-  }, [workspaceSlug, appSlug, isEmbed, router]);
+  }, [workspaceSlug, isEmbed, router]);
 
   const fields = useMemo(
     () => extractUISchemaFields(schema?.schema?.ui_schema as Record<string, unknown> | null),
@@ -438,8 +436,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
   const accessMeta = accessModeMap[accessMode as keyof typeof accessModeMap] || accessModeMap.private;
 
   const resolvedWorkspaceSlug = entry?.workspace?.slug || workspaceSlug;
-  const resolvedAppSlug = entry?.app?.slug || appSlug;
-  const runtimePath = `/runtime/${resolvedWorkspaceSlug}/${resolvedAppSlug}`;
+  const runtimePath = `/runtime/${resolvedWorkspaceSlug}`;
   const shareLink = origin ? `${origin}${runtimePath}` : "";
   const embedLink = shareLink ? `${shareLink}/embed` : "";
   const embedCode = embedLink
@@ -541,7 +538,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
     setExecuteResult(null);
     setIsExecuting(true);
     try {
-      const result = await runtimeApi.execute(workspaceSlug, appSlug, inputs, sessionId || undefined);
+      const result = await runtimeApi.execute(workspaceSlug, inputs, sessionId || undefined);
       setExecuteResult(result);
       if (result.session_id) {
         setSessionId(result.session_id);
@@ -596,7 +593,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
       {!isEmbed && <SiteHeader />}
 
       <TermsPrompt
-        storageKey={`public-terms:${resolvedWorkspaceSlug}:${resolvedAppSlug}`}
+        storageKey={`public-terms:${resolvedWorkspaceSlug}:${appSlug}`}
         onStatusChange={setTermsAccepted}
       />
 
@@ -611,18 +608,18 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
                 <accessMeta.icon className="h-3.5 w-3.5" />
                 {accessMeta.label}
               </Badge>
-              {entry?.app?.status && (
+              {entry?.workspace?.status && (
                 <Badge variant="outline" className="uppercase tracking-[0.2em] text-xs">
-                  {entry.app.status}
+                  {entry.workspace.status}
                 </Badge>
               )}
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
-                {entry?.app?.name || "公开应用"}
+                {entry?.workspace?.name || "公开应用"}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                {entry?.app?.description || "此应用已对外公开，欢迎体验。"}
+                {entry?.workspace?.description || "此应用已对外公开，欢迎体验。"}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">

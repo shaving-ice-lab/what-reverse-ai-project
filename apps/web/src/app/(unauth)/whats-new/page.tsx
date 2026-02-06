@@ -1,20 +1,18 @@
 "use client";
 
 /**
- * 更新日志页面
+ * 更新日志页面 - LobeHub 风格设计
  */
 
 import Link from "next/link";
 import {
   Sparkles,
-  Zap,
-  Bug,
   ArrowRight,
   Calendar,
-  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 更新日志
@@ -71,9 +69,9 @@ const releases = [
 ];
 
 const typeConfig = {
-  feature: { label: "新功能", color: "text-green-500", bg: "bg-green-500/10" },
-  improvement: { label: "优化", color: "text-blue-500", bg: "bg-blue-500/10" },
-  fix: { label: "修复", color: "text-orange-500", bg: "bg-orange-500/10" },
+  feature: { label: "新功能", color: "text-emerald-400", bg: "bg-emerald-400/10" },
+  improvement: { label: "优化", color: "text-[#4e8fff]", bg: "bg-[#4e8fff]/10" },
+  fix: { label: "修复", color: "text-orange-400", bg: "bg-orange-400/10" },
 };
 
 export default function WhatsNewPage() {
@@ -82,20 +80,18 @@ export default function WhatsNewPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
             <Sparkles className="h-4 w-4" />
             产品更新
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             更新日志
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
             了解 AgentFlow 的最新功能、改进和修复
           </p>
         </div>
@@ -108,24 +104,24 @@ export default function WhatsNewPage() {
             {releases.map((release) => (
               <div
                 key={release.version}
-                className="p-6 rounded-2xl bg-card border border-border"
+                className="p-6 rounded-2xl bg-surface-100/30 border border-border/30"
               >
                 {/* Header */}
                 <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-mono font-medium">
+                  <span className="px-3 py-1 rounded-full bg-[#4e8fff]/10 text-[#4e8fff] text-[12px] font-medium">
                     v{release.version}
                   </span>
-                  <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1 text-[12px] text-foreground-lighter">
                     <Calendar className="w-4 h-4" />
                     {release.date}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h2 className="text-xl font-bold text-foreground mb-2">
+                <h2 className="text-[15px] font-bold text-foreground mb-2">
                   {release.title}
                 </h2>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-[13px] text-foreground-light mb-4">
                   {release.description}
                 </p>
 
@@ -135,10 +131,10 @@ export default function WhatsNewPage() {
                     const config = typeConfig[change.type as keyof typeof typeConfig];
                     return (
                       <div key={index} className="flex items-center gap-3">
-                        <span className={cn("px-2 py-0.5 rounded text-xs font-medium", config.bg, config.color)}>
+                        <span className={cn("px-2 py-0.5 rounded text-[11px] font-medium", config.bg, config.color)}>
                           {config.label}
                         </span>
-                        <span className="text-sm text-foreground">{change.text}</span>
+                        <span className="text-[13px] text-foreground">{change.text}</span>
                       </div>
                     );
                   })}
@@ -150,16 +146,12 @@ export default function WhatsNewPage() {
       </section>
 
       {/* Subscribe */}
-      <section className="py-16 px-6 bg-muted/20">
+      <section className="py-16 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            订阅更新通知
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            第一时间获取产品更新信息
-          </p>
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">订阅更新通知</h2>
+          <p className="text-[13px] text-foreground-light mb-6">第一时间获取产品更新信息</p>
           <Link href="/newsletter">
-            <Button size="lg" className="rounded-full">
+            <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
               订阅通讯
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -167,12 +159,7 @@ export default function WhatsNewPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 展示页面 - 社区精选工作流
+ * 展示页面 - LobeHub 风格设计
  */
 
 import { useState } from "react";
@@ -10,16 +10,13 @@ import {
   Search,
   Star,
   Eye,
-  Copy,
   ArrowRight,
   Sparkles,
-  Filter,
-  TrendingUp,
-  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 展示作品
@@ -113,31 +110,29 @@ export default function ShowcasePage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
             <Sparkles className="h-4 w-4" />
             社区精选
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             工作流展示
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-8">
             探索社区成员创建的优秀工作流，获取灵感和最佳实践
           </p>
 
           {/* Search */}
           <div className="max-w-xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
             <Input
               placeholder="搜索工作流..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-full"
+              className="pl-12 h-12 rounded-full bg-surface-100/30 border-border/30"
             />
           </div>
         </div>
@@ -152,10 +147,10 @@ export default function ShowcasePage() {
                 key={category}
                 onClick={() => setActiveCategory(category)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                  "px-4 py-2 rounded-full text-[12px] font-medium transition-all",
                   activeCategory === category
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-foreground text-background"
+                    : "bg-surface-100/30 text-foreground-lighter hover:text-foreground"
                 )}
               >
                 {category}
@@ -174,35 +169,35 @@ export default function ShowcasePage() {
                 key={item.id}
                 className={cn(
                   "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:border-[#4e8fff]/30 hover:shadow-lg",
                   "transition-all duration-300 group"
                 )}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-xl bg-surface-100/50 flex items-center justify-center text-2xl">
                     {item.icon}
                   </div>
                   {item.featured && (
-                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <span className="px-2 py-0.5 rounded-full bg-[#4e8fff]/10 text-[#4e8fff] text-[11px] font-medium">
                       精选
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                <h3 className="font-semibold text-foreground mb-2 group-hover:text-[#4e8fff] transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                <p className="text-[13px] text-foreground-light mb-4 line-clamp-2">
                   {item.description}
                 </p>
 
-                <div className="text-xs text-muted-foreground mb-4">
+                <div className="text-[11px] text-foreground-lighter mb-4">
                   by {item.author}
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                  <div className="flex items-center gap-4 text-[11px] text-foreground-lighter">
                     <span className="flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5" />
                       {(item.views / 1000).toFixed(1)}k
@@ -212,7 +207,7 @@ export default function ShowcasePage() {
                       {item.stars}
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full bg-muted text-xs">
+                  <span className="px-2 py-0.5 rounded-full bg-surface-100/50 text-[11px] text-foreground-lighter">
                     {item.category}
                   </span>
                 </div>
@@ -222,29 +217,21 @@ export default function ShowcasePage() {
 
           {filteredItems.length === 0 && (
             <div className="text-center py-16">
-              <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                没有找到匹配的工作流
-              </h3>
-              <p className="text-muted-foreground">
-                尝试调整筛选条件或搜索关键词
-              </p>
+              <Sparkles className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
+              <h3 className="text-[15px] font-medium text-foreground mb-2">没有找到匹配的工作流</h3>
+              <p className="text-[13px] text-foreground-light">尝试调整筛选条件或搜索关键词</p>
             </div>
           )}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6 bg-muted/20">
+      <section className="py-16 px-6 bg-gradient-section">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            分享您的工作流
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            将您的创意分享给社区，帮助更多人提升效率
-          </p>
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">分享您的工作流</h2>
+          <p className="text-[13px] text-foreground-light mb-6">将您的创意分享给社区，帮助更多人提升效率</p>
           <Link href="/dashboard/workflows/new">
-            <Button size="lg" className="rounded-full">
+            <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
               提交作品
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -252,12 +239,7 @@ export default function ShowcasePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

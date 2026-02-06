@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 常见问题页面 - Manus 风格
+ * 常见问题页面 - LobeHub 风格
  */
 
 import { useState } from "react";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import {
   HelpCircle,
   Search,
-  ChevronDown,
+  Plus,
   Zap,
   CreditCard,
   Shield,
@@ -17,10 +17,13 @@ import {
   Users,
   MessageSquare,
   AlertTriangle,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // FAQ 分类
@@ -126,25 +129,30 @@ export default function FAQPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+      <section className="relative pt-32 sm:pt-40 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+          <div className="lobe-badge mb-8">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span>常见问题</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             常见问题
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
             快速找到您需要的答案
           </p>
 
           {/* Search */}
           <div className="max-w-xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
             <Input
               placeholder="搜索问题..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-full"
+              className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
             />
           </div>
         </div>
@@ -159,10 +167,10 @@ export default function FAQPage() {
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200",
                   activeCategory === category.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-foreground text-background"
+                    : "bg-surface-100/50 border border-border/30 text-foreground-lighter hover:text-foreground hover:border-border/60"
                 )}
               >
                 <category.icon className="w-4 h-4" />
@@ -174,49 +182,49 @@ export default function FAQPage() {
       </section>
 
       {/* FAQ List */}
-      <section className="py-12 px-6">
+      <section className="py-16 sm:py-24 px-6">
         <div className="max-w-3xl mx-auto">
           {filteredFaqs.length === 0 ? (
-            <div className="text-center py-12">
-              <HelpCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">
+            <div className="text-center py-16">
+              <HelpCircle className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
+              <h3 className="text-[15px] font-medium text-foreground mb-2">
                 没有找到相关问题
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-[13px] text-foreground-lighter">
                 尝试使用其他关键词搜索
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {filteredFaqs.map((faq, index) => (
                 <div
                   key={index}
                   className={cn(
-                    "rounded-xl border transition-all",
+                    "rounded-xl border transition-all duration-200",
                     expandedIndex === index
-                      ? "bg-card border-primary/30"
-                      : "bg-card border-border hover:border-primary/20"
+                      ? "border-border/60 bg-surface-100/30"
+                      : "border-transparent hover:bg-surface-100/20"
                   )}
                 >
                   <button
                     onClick={() =>
                       setExpandedIndex(expandedIndex === index ? null : index)
                     }
-                    className="w-full p-5 text-left flex items-center justify-between gap-4"
+                    className="w-full flex items-center justify-between px-6 py-5 text-left"
                   >
-                    <span className="font-medium text-foreground">
+                    <span className="text-[15px] font-medium text-foreground pr-4">
                       {faq.question}
                     </span>
-                    <ChevronDown
-                      className={cn(
-                        "w-5 h-5 text-muted-foreground shrink-0 transition-transform",
-                        expandedIndex === index && "rotate-180"
-                      )}
-                    />
+                    <div className={cn(
+                      "shrink-0 w-6 h-6 rounded-full bg-surface-200/80 flex items-center justify-center transition-transform duration-200",
+                      expandedIndex === index && "rotate-45"
+                    )}>
+                      <Plus className="w-3.5 h-3.5 text-foreground-light" />
+                    </div>
                   </button>
                   {expandedIndex === index && (
-                    <div className="px-5 pb-5">
-                      <p className="text-muted-foreground text-sm leading-relaxed">
+                    <div className="px-6 pb-5">
+                      <p className="text-[14px] text-foreground-lighter leading-relaxed">
                         {faq.answer}
                       </p>
                     </div>
@@ -228,24 +236,25 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* Help */}
-      <section className="py-16 px-6 bg-muted/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+      {/* Help CTA */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
             还有其他问题？
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-foreground-light mb-8">
             联系我们的支持团队获取帮助
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/contact">
-              <Button className="rounded-full">
+              <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 联系支持
               </Button>
             </Link>
             <Link href="/docs">
-              <Button variant="outline" className="rounded-full">
+              <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
                 查看文档
               </Button>
             </Link>
@@ -253,12 +262,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

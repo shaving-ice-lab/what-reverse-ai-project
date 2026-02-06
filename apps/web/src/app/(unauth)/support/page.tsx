@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 客户支持中心页面 - Manus 风格
+ * 客户支持中心页面 - LobeHub 风格
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 import { ApiError, supportApi, type SupportSLA, type SupportTicket } from "@/lib/api";
 
@@ -141,7 +142,6 @@ export default function SupportPage() {
     category: "general",
     priority: "normal",
     workspaceId: "",
-    appId: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -237,7 +237,6 @@ export default function SupportPage() {
       category: "general",
       priority: "normal",
       workspaceId: "",
-      appId: "",
     });
     setCaptchaToken("");
     setCaptchaRequired(false);
@@ -263,7 +262,6 @@ export default function SupportPage() {
         priority: formData.priority,
         channel: "web",
         workspace_id: formData.workspaceId || undefined,
-        app_id: formData.appId || undefined,
         metadata: { locale },
         captcha_token: captchaToken || undefined,
       };
@@ -294,24 +292,24 @@ export default function SupportPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs mb-4">
-            <LifeBuoy className="w-4 h-4" />
-            客户成功与支持中心
+      <section className="relative pt-32 sm:pt-40 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+        <div className="max-w-5xl mx-auto text-center relative z-10 px-6">
+          <div className="lobe-badge mb-8">
+            <LifeBuoy className="h-3.5 w-3.5" />
+            <span>客户成功与支持中心</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-5">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             让问题更快闭环
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
             从自助排查到工单跟进，我们为每一位用户提供清晰、可追踪的支持路径。
           </p>
         </div>
       </section>
 
       {/* Quick Links */}
-      <section className="py-10 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {supportQuickLinks.map((link) => (
@@ -320,18 +318,18 @@ export default function SupportPage() {
                 href={link.href}
                 className={cn(
                   "p-5 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
                   "transition-all duration-300 group"
                 )}
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <link.icon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <link.icon className="w-5 h-5 text-foreground-light" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                <h3 className="text-[14px] font-semibold text-foreground mb-1 group-hover:text-foreground transition-colors">
                   {link.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">{link.description}</p>
+                <p className="text-[12px] text-foreground-lighter leading-relaxed">{link.description}</p>
               </Link>
             ))}
           </div>
@@ -339,10 +337,10 @@ export default function SupportPage() {
       </section>
 
       {/* Channels */}
-      <section className="py-10 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-2 mb-6">
-            <LifeBuoy className="w-5 h-5 text-primary" />
+            <LifeBuoy className="w-5 h-5 text-foreground-light" />
             <h2 className="text-xl font-semibold text-foreground">支持渠道</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -353,18 +351,18 @@ export default function SupportPage() {
                   key={channel.key}
                   className={cn(
                     "p-5 rounded-2xl",
-                    "bg-card border border-border",
-                    "hover:border-primary/30 hover:shadow-lg",
+                    "bg-surface-100/30 border border-border/30",
+                    "hover:bg-surface-100/60 hover:border-border/60",
                     "transition-all duration-300"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-foreground-light" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">{channel.name}</h3>
-                  <p className="text-sm text-muted-foreground">{channel.description}</p>
+                  <h3 className="text-[14px] font-semibold text-foreground mb-1">{channel.name}</h3>
+                  <p className="text-[12px] text-foreground-lighter">{channel.description}</p>
                   {channel.contact && (
-                    <p className="text-xs text-muted-foreground mt-2">{channel.contact}</p>
+                    <p className="text-[11px] text-foreground-muted mt-2">{channel.contact}</p>
                   )}
                 </div>
               );
@@ -374,55 +372,55 @@ export default function SupportPage() {
       </section>
 
       {/* Ticket & SLA */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-20 px-6 bg-gradient-section">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8">
-          <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="bg-surface-100/30 border border-border/30 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-semibold text-foreground">提交工单</h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-[13px] text-foreground-lighter mt-1">
                   填写关键信息，系统将自动分级并计算响应 SLA。
                 </p>
               </div>
-              <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-                <BadgeCheck className="w-4 h-4 text-primary" />
+              <div className="hidden sm:flex items-center gap-2 text-[12px] text-foreground-lighter">
+                <BadgeCheck className="w-4 h-4 text-brand-500" />
                 已支持 SLA 跟踪
               </div>
             </div>
 
             {ticket ? (
-              <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
+              <div className="rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <CheckCircle2 className="w-6 h-6 text-primary" />
+                  <CheckCircle2 className="w-6 h-6 text-brand-500" />
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">工单已提交</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-[13px] text-foreground-lighter">
                       参考编号：<span className="text-foreground font-medium">{ticket.reference}</span>
                     </p>
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                  <div className="rounded-xl border border-border bg-card p-4">
-                    <div className="text-xs text-muted-foreground mb-1">预计响应截止</div>
-                    <div className="text-foreground font-medium">
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  <div className="rounded-xl border border-border/30 bg-surface-100/30 p-4">
+                    <div className="text-[11px] text-foreground-muted mb-1">预计响应截止</div>
+                    <div className="text-foreground font-medium text-[13px]">
                       {formatDateTime(ticket.sla_response_due_at)}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-border bg-card p-4">
-                    <div className="text-xs text-muted-foreground mb-1">当前状态</div>
-                    <div className="text-foreground font-medium">{ticket.status}</div>
+                  <div className="rounded-xl border border-border/30 bg-surface-100/30 p-4">
+                    <div className="text-[11px] text-foreground-muted mb-1">当前状态</div>
+                    <div className="text-foreground font-medium text-[13px]">{ticket.status}</div>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-3 mt-6">
                   <Button
                     variant="outline"
                     onClick={() => setTicket(null)}
-                    className="rounded-full"
+                    className="rounded-full border-border/50 hover:bg-surface-200/50"
                   >
                     提交新工单
                   </Button>
                   <Link href="/help">
-                    <Button className="rounded-full">继续自助排查</Button>
+                    <Button className="rounded-full bg-foreground hover:bg-foreground/90 text-background">继续自助排查</Button>
                   </Link>
                 </div>
               </div>
@@ -430,17 +428,18 @@ export default function SupportPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       联系人姓名
                     </label>
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="您的姓名（选填）"
+                      className="bg-surface-200/50 border-border/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       联系邮箱 *
                     </label>
                     <Input
@@ -449,19 +448,20 @@ export default function SupportPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="name@company.com"
+                      className="bg-surface-200/50 border-border/30"
                     />
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       问题分类
                     </label>
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full h-10 px-3 rounded-lg bg-background border border-border text-foreground"
+                      className="w-full h-10 px-3 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px]"
                     >
                       {supportCategories.map((item) => (
                         <option key={item.id} value={item.id}>
@@ -471,13 +471,13 @@ export default function SupportPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       优先级
                     </label>
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                      className="w-full h-10 px-3 rounded-lg bg-background border border-border text-foreground"
+                      className="w-full h-10 px-3 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px]"
                     >
                       {supportPriorities.map((item) => (
                         <option key={item.id} value={item.id}>
@@ -490,29 +490,31 @@ export default function SupportPage() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       Workspace ID（可选）
                     </label>
                     <Input
                       value={formData.workspaceId}
                       onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
                       placeholder="用于快速定位环境"
+                      className="bg-surface-200/50 border-border/30"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      App ID（可选）
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
+                      Workspace ID（可选）
                     </label>
                     <Input
-                      value={formData.appId}
-                      onChange={(e) => setFormData({ ...formData, appId: e.target.value })}
-                      placeholder="如涉及具体应用"
+                      value={formData.workspaceId}
+                      onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
+                      placeholder="如涉及具体工作空间"
+                      className="bg-surface-200/50 border-border/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[13px] font-medium text-foreground mb-2">
                     问题标题 *
                   </label>
                   <Input
@@ -520,11 +522,12 @@ export default function SupportPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder="请简要描述遇到的问题"
+                    className="bg-surface-200/50 border-border/30"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-[13px] font-medium text-foreground mb-2">
                     详细描述 *
                   </label>
                   <textarea
@@ -533,38 +536,39 @@ export default function SupportPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={6}
                     placeholder="包括复现步骤、错误提示、期望结果等"
-                    className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground resize-none"
+                    className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
                   />
                 </div>
 
                 {captchaRequired && (
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-[13px] font-medium text-foreground mb-2">
                       验证码 Token
                     </label>
                     <Input
                       value={captchaToken}
                       onChange={(e) => setCaptchaToken(e.target.value)}
                       placeholder="如启用验证码，请粘贴 token"
+                      className="bg-surface-200/50 border-border/30"
                     />
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-[11px] text-foreground-muted mt-2">
                       若提示频繁请求，请完成验证码并重新提交。
                     </p>
                   </div>
                 )}
 
                 {submitError && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
                     {submitError}
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="text-[11px] text-foreground-muted flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     我们会对敏感信息进行脱敏处理
                   </div>
-                  <Button type="submit" disabled={isSubmitting} className="rounded-full">
+                  <Button type="submit" disabled={isSubmitting} className="rounded-full bg-foreground hover:bg-foreground/90 text-background">
                     {isSubmitting ? (
                       <>
                         <Clock className="w-4 h-4 mr-2 animate-spin" />
@@ -583,31 +587,31 @@ export default function SupportPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-2xl border border-border/30 bg-surface-100/30 p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Inbox className="w-5 h-5 text-primary" />
+                <Inbox className="w-5 h-5 text-foreground-light" />
                 <h3 className="text-lg font-semibold text-foreground">响应 SLA</h3>
               </div>
               <div className="space-y-4">
                 {activeSLA.targets.map((target) => (
-                  <div key={target.priority} className="rounded-xl border border-border bg-background p-4">
-                    <div className="flex items-center justify-between text-sm">
+                  <div key={target.priority} className="rounded-xl border border-border/30 bg-surface-200/30 p-4">
+                    <div className="flex items-center justify-between text-[13px]">
                       <span className="font-medium text-foreground">
                         {supportPriorities.find((item) => item.id === target.priority)?.label || target.priority}
                       </span>
-                      <span className="text-muted-foreground">{target.first_response_target}</span>
+                      <span className="text-foreground-lighter">{target.first_response_target}</span>
                     </div>
-                    <div className="text-xs text-muted-foreground mt-2">
+                    <div className="text-[11px] text-foreground-muted mt-2">
                       更新频率：{target.update_cadence}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className="text-[11px] text-foreground-muted mt-1">
                       目标：{target.resolution_target}
                     </div>
-                    <div className="flex flex-wrap gap-2 mt-3 text-xs">
+                    <div className="flex flex-wrap gap-2 mt-3 text-[11px]">
                       {target.applies_to.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                          className="px-2 py-1 rounded-full bg-surface-200/50 text-foreground-lighter"
                         >
                           {tag}
                         </span>
@@ -617,10 +621,10 @@ export default function SupportPage() {
                 ))}
               </div>
               {activeSLA.notes?.length ? (
-                <div className="mt-4 space-y-2 text-xs text-muted-foreground">
+                <div className="mt-4 space-y-2 text-[11px] text-foreground-muted">
                   {activeSLA.notes.map((note) => (
                     <div key={note} className="flex items-start gap-2">
-                      <AlertTriangle className="w-4 h-4 text-primary mt-0.5" />
+                      <AlertTriangle className="w-4 h-4 text-foreground-lighter mt-0.5" />
                       <span>{note}</span>
                     </div>
                   ))}
@@ -628,12 +632,12 @@ export default function SupportPage() {
               ) : null}
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-2xl border border-border/30 bg-surface-100/30 p-6">
               <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <CheckCircle2 className="w-5 h-5 text-foreground-light" />
                 <h3 className="text-lg font-semibold text-foreground">处理流程</h3>
               </div>
-              <ul className="space-y-3 text-sm text-muted-foreground">
+              <ul className="space-y-3 text-[13px] text-foreground-lighter">
                 <li>1. 自动分级并创建工单编号</li>
                 <li>2. 支持团队首次响应并同步 SLA 时间</li>
                 <li>3. 按优先级更新处理进展</li>
@@ -644,12 +648,7 @@ export default function SupportPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

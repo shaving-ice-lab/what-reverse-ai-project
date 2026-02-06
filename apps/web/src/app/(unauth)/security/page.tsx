@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 安全页面 - Manus 风格
+ * 安全页面 - LobeHub 风格
  */
 
 import Link from "next/link";
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 安全特性
@@ -86,34 +87,34 @@ export default function SecurityPage() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+      <section className="relative pt-32 sm:pt-40 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
         
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
-            <Shield className="h-4 w-4" />
-            企业级安全
+        <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
+          <div className="lobe-badge mb-8">
+            <Shield className="h-3.5 w-3.5" />
+            <span>企业级安全</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             您的数据安全
             <br />
-            <span className="text-primary">是我们的首要任务</span>
+            <span className="gradient-text-brand">是我们的首要任务</span>
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
             我们采用行业领先的安全措施和合规标准，确保您的数据受到最高级别的保护
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/docs/security">
-              <Button size="lg" className="rounded-full">
+              <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">
                 查看安全文档
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/contact?type=security">
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50 h-12 px-8">
                 联系安全团队
               </Button>
             </Link>
@@ -122,20 +123,26 @@ export default function SecurityPage() {
       </section>
 
       {/* Certifications */}
-      <section className="py-12 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            合规认证
-          </h2>
+          <div className="lobe-section-header">
+            <h2>合规认证</h2>
+            <p>Compliance certifications</p>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {certifications.map((cert) => (
               <div
                 key={cert.name}
-                className="p-6 rounded-2xl bg-card border border-border text-center"
+                className={cn(
+                  "p-6 rounded-2xl text-center",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
+                  "transition-all duration-300"
+                )}
               >
                 <span className="text-3xl mb-3 block">{cert.icon}</span>
-                <h3 className="font-semibold text-foreground mb-1">{cert.name}</h3>
-                <p className="text-sm text-muted-foreground">{cert.description}</p>
+                <h3 className="text-[14px] font-semibold text-foreground mb-1">{cert.name}</h3>
+                <p className="text-[12px] text-foreground-lighter">{cert.description}</p>
               </div>
             ))}
           </div>
@@ -143,36 +150,37 @@ export default function SecurityPage() {
       </section>
 
       {/* Features */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-20 px-6 bg-gradient-section">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            安全特性
-          </h2>
+          <div className="lobe-section-header">
+            <h2>安全特性</h2>
+            <p>Security features</p>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {securityFeatures.map((feature) => (
               <div
                 key={feature.title}
                 className={cn(
                   "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:bg-surface-100/60 hover:border-border/60",
                   "transition-all duration-300"
                 )}
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-surface-200/80 border border-border/30 flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-foreground-light" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
+                <h3 className="text-[15px] font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-[12px] text-foreground-lighter mb-4 leading-relaxed">
                   {feature.description}
                 </p>
                 <ul className="space-y-2">
                   {feature.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary" />
-                      <span className="text-muted-foreground">{item}</span>
+                    <li key={item} className="flex items-center gap-2 text-[13px]">
+                      <CheckCircle className="w-4 h-4 text-foreground-light" />
+                      <span className="text-foreground-lighter">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -183,19 +191,20 @@ export default function SecurityPage() {
       </section>
 
       {/* Practices */}
-      <section className="py-12 px-6">
+      <section className="py-24 sm:py-32 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            安全实践
-          </h2>
+          <div className="lobe-section-header">
+            <h2>安全实践</h2>
+            <p>Security practices</p>
+          </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {practices.map((practice) => (
               <div
                 key={practice}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border"
+                className="flex items-center gap-3 p-4 rounded-xl bg-surface-100/30 border border-border/30 hover:bg-surface-100/60 hover:border-border/60 transition-all duration-300"
               >
-                <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-foreground">{practice}</span>
+                <CheckCircle className="w-5 h-5 text-foreground-light shrink-0" />
+                <span className="text-[14px] text-foreground">{practice}</span>
               </div>
             ))}
           </div>
@@ -203,16 +212,20 @@ export default function SecurityPage() {
       </section>
 
       {/* Report */}
-      <section className="py-16 px-6 bg-muted/20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+        <div className="max-w-2xl mx-auto px-6 text-center relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-foreground flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-5 h-5 text-background" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
             发现安全问题？
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-foreground-light mb-10">
             我们重视安全研究人员的贡献，欢迎负责任地报告安全漏洞
           </p>
           <Link href="mailto:security@agentflow.ai">
-            <Button size="lg" variant="outline" className="rounded-full">
+            <Button size="lg" variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50 h-12 px-8">
               报告安全问题
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -220,12 +233,7 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

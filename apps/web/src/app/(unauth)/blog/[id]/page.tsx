@@ -1,8 +1,7 @@
 "use client";
 
 /**
- * 博客详情页面 - 单篇文章展示
- * Manus 风格：简约、中性色
+ * 博客详情页面 - LobeHub 风格暗色设计
  */
 
 import { useState, useEffect } from "react";
@@ -110,7 +109,8 @@ AI Agent 2.0 现在支持市面上所有主流的大语言模型：
 - 社区论坛：[community.agentflow.ai](https://community.agentflow.ai)
 - Twitter：[@agentflow](https://twitter.com/agentflow)
 - 邮箱：feedback@agentflow.ai
-    `", category: "product",
+`,
+    category: "product",
     author: "产品团队",
     authorRole: "AgentFlow 产品部",
     date: "2026-01-25",
@@ -197,7 +197,8 @@ AI Agent 2.0 现在支持市面上所有主流的大语言模型：
 好的工作流设计需要不断实践和优化。希望这些最佳实践能帮助您构建更好的自动化流程。
 
 如果您有任何问题或想分享您的经验，欢迎在社区论坛与我们交流！
-    `", category: "tips",
+`,
+    category: "tips",
     author: "技术团队",
     authorRole: "AgentFlow 技术部",
     date: "2026-01-20",
@@ -244,11 +245,11 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen bg-background">
         <SiteHeader />
-        <div className="pt-32 pb-16 px-6 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">文章不存在</h1>
-          <p className="text-muted-foreground mb-8">抱歉，您访问的文章不存在或已被删除</p>
+        <div className="pt-32 sm:pt-40 pb-16 px-6 text-center">
+          <h1 className="text-[20px] font-semibold text-foreground mb-4">文章不存在</h1>
+          <p className="text-[13px] text-foreground-light mb-8">抱歉，您访问的文章不存在或已被删除</p>
           <Link href="/blog">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
               返回博客列表
             </Button>
           </Link>
@@ -278,12 +279,12 @@ export default function BlogPostPage() {
       <SiteHeader />
 
       {/* Article Header */}
-      <article className="pt-20 sm:pt-28 pb-16 px-6">
+      <article className="pt-32 sm:pt-40 pb-16 px-6">
         <div className="max-w-3xl mx-auto">
           {/* Back link */}
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 group"
+            className="inline-flex items-center gap-2 text-[13px] text-foreground-light hover:text-foreground mb-8 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             返回博客
@@ -291,34 +292,34 @@ export default function BlogPostPage() {
 
           {/* Category & Meta */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <span className="lobe-badge">
               {post.category === "product" ? "产品更新" : 
                post.category === "tips" ? "使用技巧" : 
                post.category === "tech" ? "技术分享" : post.category}
             </span>
-            <span className="flex items-center gap-1 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1 text-[12px] text-foreground-lighter">
               <Clock className="w-4 h-4" />
               {post.readTime}
             </span>
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-6 leading-tight">
+          <h1 className="text-[26px] sm:text-[32px] font-semibold text-foreground mb-6 leading-tight">
             {post.title}
           </h1>
 
           {/* Author & Date */}
-          <div className="flex items-center justify-between flex-wrap gap-4 pb-8 border-b border-border">
+          <div className="flex items-center justify-between flex-wrap gap-4 pb-8 border-b border-border/30">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-6 h-6 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-brand/10 flex items-center justify-center">
+                <User className="w-6 h-6 text-brand" />
               </div>
               <div>
-                <div className="font-medium text-foreground">{post.author}</div>
-                <div className="text-sm text-muted-foreground">{post.authorRole}</div>
+                <div className="text-[14px] font-medium text-foreground">{post.author}</div>
+                <div className="text-[12px] text-foreground-lighter">{post.authorRole}</div>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-[13px] text-foreground-lighter">
               <Calendar className="w-4 h-4" />
               {post.date}
             </div>
@@ -330,45 +331,45 @@ export default function BlogPostPage() {
               {post.content.split('\n').map((paragraph, index) => {
                 if (paragraph.startsWith('## ')) {
                   return (
-                    <h2 key={index} className="text-2xl font-bold text-foreground mt-10 mb-4">
+                    <h2 key={index} className="text-[20px] font-semibold text-foreground mt-10 mb-4">
                       {paragraph.replace('## ', '')}
                     </h2>
                   );
                 }
                 if (paragraph.startsWith('### ')) {
                   return (
-                    <h3 key={index} className="text-xl font-semibold text-foreground mt-8 mb-3">
+                    <h3 key={index} className="text-[17px] font-semibold text-foreground mt-8 mb-3">
                       {paragraph.replace('### ', '')}
                     </h3>
                   );
                 }
                 if (paragraph.startsWith('- ')) {
                   return (
-                    <li key={index} className="text-muted-foreground ml-4">
+                    <li key={index} className="text-[13px] text-foreground-light ml-4">
                       {paragraph.replace('- ', '')}
                     </li>
                   );
                 }
                 if (paragraph.startsWith('1. ') || paragraph.startsWith('2. ') || paragraph.startsWith('3. ') || paragraph.startsWith('4. ')) {
                   return (
-                    <li key={index} className="text-muted-foreground ml-4 list-decimal">
+                    <li key={index} className="text-[13px] text-foreground-light ml-4 list-decimal">
                       {paragraph.replace(/^\d+\.\s/, '')}
                     </li>
                   );
                 }
                 if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
                   return (
-                    <p key={index} className="text-foreground font-semibold my-4">
+                    <p key={index} className="text-foreground font-semibold my-4 text-[14px]">
                       {paragraph.replace(/\*\*/g, '')}
                     </p>
                   );
                 }
                 if (paragraph.startsWith('---')) {
-                  return <hr key={index} className="my-8 border-border" />;
+                  return <hr key={index} className="my-8 border-border/30" />;
                 }
                 if (paragraph.trim() === '') return null;
                 return (
-                  <p key={index} className="text-muted-foreground leading-relaxed my-4">
+                  <p key={index} className="text-[13px] text-foreground-light leading-relaxed my-4">
                     {paragraph}
                   </p>
                 );
@@ -377,13 +378,13 @@ export default function BlogPostPage() {
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap items-center gap-2 py-6 border-t border-border">
-            <Tag className="w-4 h-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-2 py-6 border-t border-border/30">
+            <Tag className="w-4 h-4 text-foreground-lighter" />
             {post.tags.map((tag) => (
               <Link
                 key={tag}
                 href={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="px-3 py-1 rounded-full bg-muted text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="px-3 py-1 rounded-full bg-surface-100/30 text-[12px] text-foreground-light hover:text-foreground transition-colors"
               >
                 {tag}
               </Link>
@@ -391,33 +392,33 @@ export default function BlogPostPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between py-6 border-t border-border">
+          <div className="flex items-center justify-between py-6 border-t border-border/30">
             <div className="flex items-center gap-4">
               <button
                 onClick={handleLike}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-full transition-all",
                   liked
-                    ? "bg-red-500/10 text-red-500"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-red-500/10 text-red-400"
+                    : "bg-surface-100/30 text-foreground-light hover:text-foreground"
                 )}
               >
                 <Heart className={cn("w-5 h-5", liked && "fill-current")} />
-                <span>{likeCount}</span>
+                <span className="text-[13px]">{likeCount}</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-100/30 text-foreground-light hover:text-foreground transition-colors">
                 <MessageSquare className="w-5 h-5" />
-                <span>评论</span>
+                <span className="text-[13px]">评论</span>
               </button>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground mr-2">分享</span>
+              <span className="text-[12px] text-foreground-lighter mr-2">分享</span>
               <a
                 href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                className="w-10 h-10 rounded-full bg-surface-100/30 flex items-center justify-center text-foreground-lighter hover:text-foreground transition-colors"
               >
                 <Twitter className="w-4 h-4" />
               </a>
@@ -425,15 +426,15 @@ export default function BlogPostPage() {
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                className="w-10 h-10 rounded-full bg-surface-100/30 flex items-center justify-center text-foreground-lighter hover:text-foreground transition-colors"
               >
                 <Linkedin className="w-4 h-4" />
               </a>
               <button
                 onClick={copyLink}
-                className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                className="w-10 h-10 rounded-full bg-surface-100/30 flex items-center justify-center text-foreground-lighter hover:text-foreground transition-colors"
               >
-                {copied ? <Check className="w-4 h-4 text-primary" /> : <Link2 className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-brand" /> : <Link2 className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -441,10 +442,10 @@ export default function BlogPostPage() {
       </article>
 
       {/* Related Posts */}
-      <section className="py-16 px-6 bg-muted/20">
+      <section className="py-16 px-6 bg-gradient-section">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-foreground mb-8 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-primary" />
+          <h2 className="text-[17px] font-semibold text-foreground mb-8 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-brand" />
             相关文章
           </h2>
 
@@ -454,22 +455,22 @@ export default function BlogPostPage() {
                 key={relatedPost.id}
                 href={`/blog/${relatedPost.id}`}
                 className={cn(
-                  "flex items-center justify-between p-5 rounded-xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-md",
+                  "flex items-center justify-between p-5 rounded-2xl",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:border-brand/30",
                   "transition-all group"
                 )}
               >
                 <div className="flex-1">
-                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors mb-2">
+                  <h3 className="text-[14px] font-medium text-foreground group-hover:text-brand transition-colors mb-2">
                     {relatedPost.title}
                   </h3>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-4 text-[12px] text-foreground-lighter">
                     <span>{relatedPost.date}</span>
                     <span>{relatedPost.readTime}</span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <ChevronRight className="w-5 h-5 text-foreground-lighter group-hover:text-brand transition-colors" />
               </Link>
             ))}
           </div>
@@ -479,19 +480,19 @@ export default function BlogPostPage() {
       {/* Newsletter CTA */}
       <section className="py-16 px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-xl font-bold text-foreground mb-4">
+          <h2 className="text-[17px] font-semibold text-foreground mb-4">
             订阅我们的 Newsletter
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-[13px] text-foreground-light mb-6">
             每周精选最新文章和产品更新，直接发送到您的邮箱
           </p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
               placeholder="your@email.com"
-              className="flex-1 h-11 px-4 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
+              className="flex-1 h-11 px-4 rounded-full bg-surface-100/30 border border-border/30 text-foreground placeholder:text-foreground-lighter focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/50"
             />
-            <Button className="h-11 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
+            <Button className="h-11 px-6 rounded-full bg-foreground text-background font-medium hover:bg-foreground/90">
               订阅
             </Button>
           </div>

@@ -1,104 +1,94 @@
 @import "tailwindcss";
 
 /* ============================================
-   Supabase Dashboard Design System
-   完全复刻 Supabase 风格的颜色系统
+   LobeHub-Inspired Design System
+   现代、简约、深色主题
    ============================================ */
 
 @theme {
-  /* ===== 背景色 (Background) - 精确匹配 Supabase 截图 ===== */
-  --color-background: #111111;
-  --color-background-200: #181818;
-  --color-background-studio: #0f0f0f;
-  --color-background-alternative: #0b0b0b;
-  --color-background-overlay: rgba(0, 0, 0, 0.7);
+  /* ===== 背景色 (Background) - LobeHub 深色风格 ===== */
+  /* LobeHub 使用带微妙蓝紫色调的深色背景，不是纯黑 */
+  --color-background: #01010a;
+  --color-background-200: #08080f;
+  --color-background-studio: #040408;
+  --color-background-alternative: #01010a;
+  --color-background-overlay: rgba(1, 1, 10, 0.85);
 
-  /* ===== Surface 层级 - Supabase 卡片/表面 ===== */
-  --color-surface-75: #1a1a1a;
-  --color-surface-100: #1f1f1f;
-  --color-surface-200: #242424;
-  --color-surface-300: #2b2b2b;
-  --color-surface-400: #333333;
+  /* ===== Surface 层级 - LobeHub 卡片/表面 ===== */
+  --color-surface-75: #0c0c14;
+  --color-surface-100: #101018;
+  --color-surface-200: #16161f;
+  --color-surface-300: #1e1e28;
+  --color-surface-400: #262630;
 
-  /* ===== 文字色 (Foreground) - Supabase 文字 ===== */
-  --color-foreground: #ededed;
-  --color-foreground-light: #b0b0b0;
-  --color-foreground-lighter: #7a7a7a;
-  --color-foreground-muted: #5a5a5a;
+  /* ===== 文字色 (Foreground) - LobeHub 文字 ===== */
+  --color-foreground: #ffffffee;
+  --color-foreground-light: #a8a8b8;
+  --color-foreground-lighter: #6b6b7b;
+  --color-foreground-muted: #44445a;
 
-  /* ===== 边框色 (Border) - Supabase 边框 ===== */
-  --color-border: #2a2a2a;
-  --color-border-muted: #242424;
-  --color-border-strong: #3a3a3a;
-  --color-border-stronger: #4a4a4a;
+  /* ===== 边框色 (Border) - LobeHub 边框 ===== */
+  --color-border: #1a1a28;
+  --color-border-muted: #131320;
+  --color-border-strong: #26263a;
+  --color-border-stronger: #333348;
 
-  /* ===== 品牌绿色 (Brand) - Supabase 品牌色 ===== */
-  --color-brand-200: #1a3a2a;
-  --color-brand-300: #1f4a35;
-  --color-brand-400: #2a6348;
-  --color-brand-500: #3ECF8E;
-  --color-brand-600: #5fd9a3;
-  --color-brand: #3ECF8E;
+  /* ===== 品牌色 (Brand) - LobeHub 风格 ===== */
+  --color-brand-200: #0a1628;
+  --color-brand-300: #0f2440;
+  --color-brand-400: #1a3a6a;
+  --color-brand-500: #4e8fff;
+  --color-brand-600: #6ba3ff;
+  --color-brand: #4e8fff;
 
   /* ===== 主色 (Primary) ===== */
-  --color-primary: #3ECF8E;
-  --color-primary-foreground: #171717;
+  --color-primary: #ffffffee;
+  --color-primary-foreground: #01010a;
 
   /* ===== 次要色 (Secondary) ===== */
-  --color-secondary: #262626;
-  --color-secondary-foreground: #ededed;
+  --color-secondary: #101018;
+  --color-secondary-foreground: #ffffffee;
 
   /* ===== 静音色 (Muted) ===== */
-  --color-muted: #262626;
-  --color-muted-foreground: #a3a3a3;
+  --color-muted: #101018;
+  --color-muted-foreground: #8888a0;
 
   /* ===== 强调色 (Accent) ===== */
-  --color-accent: #262626;
-  --color-accent-foreground: #ededed;
+  --color-accent: #101018;
+  --color-accent-foreground: #ffffffee;
 
   /* ===== 卡片 (Card) ===== */
-  --color-card: #1f1f1f;
-  --color-card-foreground: #ededed;
+  --color-card: #08080f;
+  --color-card-foreground: #ffffffee;
 
   /* ===== 弹窗 (Popover) ===== */
-  --color-popover: #1f1f1f;
-  --color-popover-foreground: #ededed;
+  --color-popover: #0c0c14;
+  --color-popover-foreground: #ffffffee;
 
   /* ===== 破坏性 (Destructive) ===== */
   --color-destructive: #ef4444;
   --color-destructive-200: #3b1818;
   --color-destructive-400: #dc2626;
-  --color-destructive-foreground: #ededed;
+  --color-destructive-foreground: #ffffff;
 
   /* ===== 警告 (Warning) ===== */
   --color-warning: #f59e0b;
   --color-warning-200: #3b2e0a;
   --color-warning-400: #d97706;
 
-  /* ===== 成功 (Success) - 使用 Brand 色 ===== */
-  --color-success: #3ECF8E;
-  --color-success-200: #1a3a2a;
+  /* ===== 成功 (Success) ===== */
+  --color-success: #22c55e;
+  --color-success-200: #0a3a1a;
 
   /* ===== 输入框 (Input) ===== */
-  --color-input: #262626;
-  --color-ring: #3ECF8E;
+  --color-input: #16161f;
+  --color-ring: #4e8fff;
 
   /* ===== 圆角 (Radius) ===== */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-
-  /* ===== Terminal Overlay ===== */
-  --terminal-scanline-color: rgba(62, 207, 142, 0.12);
-  --terminal-scanline-opacity: 0.18;
-  --terminal-grid-color: rgba(62, 207, 142, 0.08);
-  --terminal-grid-opacity: 0.14;
-  --terminal-noise-color: rgba(255, 255, 255, 0.04);
-  --terminal-scanline-thickness: 1px;
-  --terminal-scanline-step: 4px;
-  --terminal-grid-size: 12px;
-  --terminal-noise-size: 6px;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 }
 
 @layer base {
@@ -109,62 +99,32 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: var(--font-mono);
-    letter-spacing: 0.02em;
-    font-variant-ligatures: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: -0.01em;
   }
 
-  body::before,
-  body::after {
+  /* ===== LobeHub 全局背景层 - 模拟深邃太空感 ===== */
+  body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 10;
-  }
-
-  body::before {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      var(--terminal-scanline-color) 0px,
-      var(--terminal-scanline-color) var(--terminal-scanline-thickness),
-      transparent var(--terminal-scanline-thickness),
-      transparent var(--terminal-scanline-step)
-    );
-    opacity: var(--terminal-scanline-opacity);
-    mix-blend-mode: soft-light;
-  }
-
-  body::after {
-    background-image:
-      linear-gradient(90deg, var(--terminal-grid-color) 1px, transparent 1px),
-      linear-gradient(0deg, var(--terminal-grid-color) 1px, transparent 1px),
-      radial-gradient(circle at 1px 1px, var(--terminal-noise-color) 1px, transparent 1px);
-    background-size:
-      var(--terminal-grid-size) var(--terminal-grid-size),
-      var(--terminal-grid-size) var(--terminal-grid-size),
-      var(--terminal-noise-size) var(--terminal-noise-size);
-    opacity: var(--terminal-grid-opacity);
-    mix-blend-mode: soft-light;
-  }
-
-  .font-mono,
-  code,
-  pre,
-  kbd,
-  samp {
-    font-family: var(--font-mono);
+    z-index: -1;
+    background: 
+      radial-gradient(ellipse 120% 60% at 50% 0%, rgba(40, 50, 120, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 50% at 80% 20%, rgba(100, 50, 150, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 50% at 20% 80%, rgba(30, 60, 120, 0.03) 0%, transparent 50%);
   }
 
   ::selection {
-    background: rgba(62, 207, 142, 0.22);
-    color: #ededed;
+    background: rgba(78, 143, 255, 0.25);
+    color: #ffffff;
   }
   
-  /* ===== 滚动条样式 - Supabase 风格 ===== */
+  /* ===== 滚动条样式 - LobeHub 风格 ===== */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
@@ -172,16 +132,16 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    background: #2e2e2e;
-    border-radius: 4px;
+    background: #1e1e30;
+    border-radius: 3px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: #404040;
+    background: #2e2e45;
   }
   
   .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
   
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -189,19 +149,19 @@
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
   }
 
   /* ===== 动画 - 淡入向上 ===== */
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
@@ -209,7 +169,7 @@
     }
   }
   .animate-fadeInUp {
-    animation: fadeInUp 300ms ease-out;
+    animation: fadeInUp 600ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ===== 动画 - 淡入 ===== */
@@ -222,10 +182,10 @@
     }
   }
   .animate-fade-in {
-    animation: fadeIn 200ms ease-out;
+    animation: fadeIn 400ms ease-out;
   }
   .animate-fadeIn {
-    animation: fadeIn 300ms ease-out;
+    animation: fadeIn 500ms ease-out;
   }
 
   /* ===== 动画 - 滚动 ===== */
@@ -238,7 +198,7 @@
     }
   }
   .animate-scroll {
-    animation: scroll 30s linear infinite;
+    animation: scroll 40s linear infinite;
   }
   .animate-scroll:hover {
     animation-play-state: paused;
@@ -263,11 +223,11 @@
       opacity: 1;
     }
     50% {
-      opacity: 0.8;
+      opacity: 0.7;
     }
   }
   .animate-pulse-soft {
-    animation: pulse-soft 2s ease-in-out infinite;
+    animation: pulse-soft 3s ease-in-out infinite;
   }
 
   /* ===== 滚动行为 ===== */
@@ -279,22 +239,22 @@
   @keyframes cardLift {
     from {
       transform: translateY(0);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     }
     to {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
   }
   .animate-card-lift {
-    animation: cardLift 200ms ease-out forwards;
+    animation: cardLift 300ms ease-out forwards;
   }
 
   /* ===== 动画 - 交错淡入 ===== */
   @keyframes staggerFadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
@@ -302,16 +262,16 @@
     }
   }
   .animate-stagger-in {
-    animation: staggerFadeIn 300ms ease-out forwards;
+    animation: staggerFadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .animate-stagger-in:nth-child(1) { animation-delay: 0ms; }
-  .animate-stagger-in:nth-child(2) { animation-delay: 50ms; }
-  .animate-stagger-in:nth-child(3) { animation-delay: 100ms; }
-  .animate-stagger-in:nth-child(4) { animation-delay: 150ms; }
-  .animate-stagger-in:nth-child(5) { animation-delay: 200ms; }
-  .animate-stagger-in:nth-child(6) { animation-delay: 250ms; }
-  .animate-stagger-in:nth-child(7) { animation-delay: 300ms; }
-  .animate-stagger-in:nth-child(8) { animation-delay: 350ms; }
+  .animate-stagger-in:nth-child(2) { animation-delay: 80ms; }
+  .animate-stagger-in:nth-child(3) { animation-delay: 160ms; }
+  .animate-stagger-in:nth-child(4) { animation-delay: 240ms; }
+  .animate-stagger-in:nth-child(5) { animation-delay: 320ms; }
+  .animate-stagger-in:nth-child(6) { animation-delay: 400ms; }
+  .animate-stagger-in:nth-child(7) { animation-delay: 480ms; }
+  .animate-stagger-in:nth-child(8) { animation-delay: 560ms; }
 
   /* ===== 动画 - 闪光 (加载) ===== */
   @keyframes shimmer {
@@ -326,11 +286,11 @@
     background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.03) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+    animation: shimmer 2s infinite;
   }
 
   /* ===== 动画 - 缩放进入 ===== */
@@ -345,14 +305,14 @@
     }
   }
   .animate-scale-in {
-    animation: scaleIn 200ms ease-out;
+    animation: scaleIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ===== 动画 - 从右滑入 ===== */
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(20px);
+      transform: translateX(30px);
     }
     to {
       opacity: 1;
@@ -360,14 +320,14 @@
     }
   }
   .animate-slide-in-right {
-    animation: slideInRight 300ms ease-out;
+    animation: slideInRight 500ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ===== 动画 - 从左滑入 ===== */
   @keyframes slideInLeft {
     from {
       opacity: 0;
-      transform: translateX(-20px);
+      transform: translateX(-30px);
     }
     to {
       opacity: 1;
@@ -375,10 +335,10 @@
     }
   }
   .animate-slide-in-left {
-    animation: slideInLeft 300ms ease-out;
+    animation: slideInLeft 500ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* ===== 动画 - 渐变文字 (品牌绿色) ===== */
+  /* ===== 渐变文字 - LobeHub 风格 ===== */
   @keyframes gradientFlow {
     0%, 100% {
       background-position: 0% 50%;
@@ -389,95 +349,170 @@
   }
   .animate-gradient-text {
     background: linear-gradient(
-      90deg,
-      #3ECF8E,
-      #5fd9a3,
-      #3ECF8E
+      135deg,
+      #ffffff 0%,
+      #a1a1a1 50%,
+      #ffffff 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: gradientFlow 3s ease infinite;
+    animation: gradientFlow 4s ease infinite;
   }
 
-  /* ===== 发光效果 (品牌绿色) ===== */
+  /* ===== LobeHub 蓝色渐变文字 ===== */
+  .gradient-text-blue {
+    background: linear-gradient(135deg, #4e8fff, #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ===== LobeHub 品牌渐变文字 ===== */
+  .gradient-text-brand {
+    background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ===== 发光效果 - LobeHub 风格 ===== */
   .glow-brand {
-    box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+    box-shadow: 0 0 40px rgba(78, 143, 255, 0.15);
   }
   .glow-brand-hover:hover {
-    box-shadow: 0 0 30px rgba(62, 207, 142, 0.4);
+    box-shadow: 0 0 60px rgba(78, 143, 255, 0.25);
   }
   .glow-primary {
-    box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
   }
   .glow-primary-hover:hover {
-    box-shadow: 0 0 30px rgba(62, 207, 142, 0.4);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
   }
 
-  /* ===== Supabase 标准过渡 ===== */
+  /* ===== LobeHub 标准过渡 ===== */
   .transition-supabase {
-    transition: all 150ms ease;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* ===== 聚焦环 (品牌绿色) ===== */
+  /* ===== 聚焦环 ===== */
   .focus-ring-brand:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #171717, 0 0 0 4px #3ECF8E;
+    box-shadow: 0 0 0 2px #01010a, 0 0 0 4px #4e8fff;
   }
 
+  /* ===== LobeHub 玻璃拟态效果 ===== */
+  .glass {
+    background: rgba(4, 4, 14, 0.75);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .glass-card {
+    background: rgba(12, 12, 24, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  /* ===== LobeHub 渐变背景 - 多层深度感 ===== */
+  .bg-gradient-radial {
+    background: 
+      radial-gradient(ellipse 100% 80% at 50% 0%, rgba(60, 80, 180, 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 70% 10%, rgba(130, 60, 200, 0.05) 0%, transparent 45%);
+  }
+
+  .bg-gradient-hero {
+    background: 
+      radial-gradient(ellipse 140% 70% at 50% -30%, rgba(55, 80, 200, 0.18) 0%, rgba(130, 60, 200, 0.06) 35%, transparent 65%),
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(100, 40, 180, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(40, 70, 200, 0.04) 0%, transparent 50%);
+  }
+
+  .bg-gradient-section {
+    background: 
+      linear-gradient(180deg, rgba(20, 25, 50, 0.15) 0%, rgba(10, 10, 20, 0.05) 40%, transparent 100%);
+  }
+
+  /* ===== LobeHub 区域间渐变分隔 ===== */
+  .bg-gradient-section-alt {
+    background: 
+      linear-gradient(180deg, transparent 0%, rgba(15, 15, 30, 0.2) 30%, rgba(15, 15, 30, 0.2) 70%, transparent 100%);
+  }
+
+  /* ===== LobeHub CTA 区域渐变 ===== */
+  .bg-gradient-cta {
+    background: 
+      radial-gradient(ellipse 120% 80% at 50% 50%, rgba(55, 80, 200, 0.12) 0%, rgba(130, 60, 200, 0.04) 40%, transparent 65%),
+      radial-gradient(ellipse 80% 60% at 30% 60%, rgba(40, 60, 150, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(80, 40, 180, 0.04) 0%, transparent 50%);
+  }
+
+  /* ===== LobeHub 边框渐变效果 ===== */
+  .border-gradient {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    z-index: -1;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    padding: 1px;
+  }
 }
 
 /* ===== 亮色主题 (可选) ===== */
 @layer base {
   .light {
-    --color-background: #ffffff;
-    --color-background-200: #fafafa;
-    --color-background-studio: #f5f5f5;
-    --color-background-alternative: #f0f0f0;
+    --color-background: #fafbff;
+    --color-background-200: #f5f6fa;
+    --color-background-studio: #f0f1f8;
+    --color-background-alternative: #fafbff;
     
-    --color-surface-75: #fafafa;
-    --color-surface-100: #f5f5f5;
-    --color-surface-200: #eeeeee;
-    --color-surface-300: #e0e0e0;
-    --color-surface-400: #d0d0d0;
+    --color-surface-75: #f5f6fa;
+    --color-surface-100: #eff0f6;
+    --color-surface-200: #e8e9f0;
+    --color-surface-300: #dddee8;
+    --color-surface-400: #d0d1dd;
     
-    --color-foreground: #1a1a1a;
-    --color-foreground-light: #525252;
-    --color-foreground-lighter: #737373;
-    --color-foreground-muted: #a3a3a3;
+    --color-foreground: #0a0a14;
+    --color-foreground-light: #4a4a5e;
+    --color-foreground-lighter: #6b6b80;
+    --color-foreground-muted: #9b9bb0;
     
-    --color-border: #e5e5e5;
-    --color-border-muted: #eeeeee;
-    --color-border-strong: #d4d4d4;
-    --color-border-stronger: #a3a3a3;
+    --color-border: #e0e1ec;
+    --color-border-muted: #eaebf2;
+    --color-border-strong: #d0d1dd;
+    --color-border-stronger: #a0a0b8;
     
     --color-card: #ffffff;
-    --color-card-foreground: #1a1a1a;
+    --color-card-foreground: #0a0a14;
     
     --color-popover: #ffffff;
-    --color-popover-foreground: #1a1a1a;
+    --color-popover-foreground: #0a0a14;
     
-    --color-muted: #f5f5f5;
-    --color-muted-foreground: #737373;
+    --color-muted: #eff0f6;
+    --color-muted-foreground: #6b6b80;
     
-    --color-secondary: #f5f5f5;
-    --color-secondary-foreground: #1a1a1a;
+    --color-secondary: #eff0f6;
+    --color-secondary-foreground: #0a0a14;
     
-    --color-accent: #f5f5f5;
-    --color-accent-foreground: #1a1a1a;
+    --color-accent: #eff0f6;
+    --color-accent-foreground: #0a0a14;
     
-    --color-input: #eeeeee;
+    --color-input: #e8e9f0;
     
-    --color-brand-500: #2ea67a;
-    --color-primary: #2ea67a;
+    --color-primary: #0a0a14;
     --color-primary-foreground: #ffffff;
-
-    --terminal-scanline-color: rgba(16, 32, 24, 0.08);
-    --terminal-scanline-opacity: 0.1;
-    --terminal-grid-color: rgba(16, 32, 24, 0.06);
-    --terminal-grid-opacity: 0.1;
-    --terminal-noise-color: rgba(0, 0, 0, 0.04);
   }
   
   /* 亮色模式滚动条 */
@@ -498,53 +533,35 @@
   }
 }
 
-@layer base {
-  body.terminal-soft {
-    --terminal-scanline-opacity: 0.08;
-    --terminal-grid-opacity: 0.06;
-    --terminal-scanline-step: 6px;
-    --terminal-grid-size: 18px;
-    --terminal-noise-size: 10px;
-  }
-
-  body.terminal-strong {
-    --terminal-scanline-opacity: 0.3;
-    --terminal-grid-opacity: 0.22;
-    --terminal-scanline-step: 3px;
-    --terminal-grid-size: 10px;
-    --terminal-noise-size: 5px;
-  }
-}
-
 @layer utilities {
-  /* ===== Supabase 排版系统 ===== */
+  /* ===== LobeHub 排版系统 ===== */
 
-  /* 页面标题 - 24px, semibold */
+  /* 页面标题 - 大号 */
   .text-page-title {
     font-size: 1.5rem;
     line-height: 2rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: -0.02em;
   }
 
-  /* 章节标题 - 20px, semibold */
+  /* 章节标题 */
   .text-section-title {
     font-size: 1.25rem;
     line-height: 1.75rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: -0.02em;
   }
 
-  /* 卡片标题 - 16px, semibold */
+  /* 卡片标题 */
   .text-card-title {
     font-size: 1rem;
     line-height: 1.5rem;
     font-weight: 600;
   }
 
-  /* 分类标签 - 11px, uppercase, tracking-wider */
+  /* 分类标签 */
   .text-category {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     line-height: 1rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -552,7 +569,7 @@
     color: var(--color-foreground-light);
   }
 
-  /* 表格头 - 12px, semibold */
+  /* 表格头 */
   .text-table-header {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -562,39 +579,39 @@
     color: var(--color-foreground-light);
   }
 
-  /* 描述文本 - 14px, regular, gray */
+  /* 描述文本 */
   .text-description {
     font-size: 0.875rem;
-    line-height: 1.25rem;
+    line-height: 1.5rem;
     color: var(--color-foreground-light);
   }
 
-  /* 小文本 - 12px */
+  /* 小文本 */
   .text-small {
     font-size: 0.75rem;
     line-height: 1rem;
   }
 
-  /* 极小文本 - 11px */
+  /* 极小文本 */
   .text-xs-custom {
     font-size: 0.6875rem;
     line-height: 0.875rem;
   }
 
-  /* 统计数字 - 24px, semibold */
+  /* 统计数字 */
   .text-stat-number {
     font-size: 1.5rem;
     line-height: 2rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
   }
 
-  /* 大统计数字 - 32px, bold */
+  /* 大统计数字 */
   .text-stat-large {
-    font-size: 2rem;
-    line-height: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: 2.5rem;
+    line-height: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
   }
 }
 
@@ -633,21 +650,21 @@
     padding: 0 !important;
   }
 
-  /* ===== Supabase Panel Patterns ===== */
+  /* ===== LobeHub Panel 样式 ===== */
   .page-panel {
-    @apply bg-surface-100 border border-border rounded-lg;
+    @apply bg-surface-100 border border-border rounded-xl;
   }
 
   .page-panel-header {
-    @apply px-4 py-3 border-b border-border bg-surface-75/70;
+    @apply px-5 py-4 border-b border-border;
   }
 
   .page-panel-title {
-    @apply text-[13px] font-medium text-foreground;
+    @apply text-sm font-medium text-foreground;
   }
 
   .page-panel-description {
-    @apply text-[12px] text-foreground-light;
+    @apply text-xs text-foreground-light;
   }
 
   .page-section {
@@ -659,11 +676,11 @@
   }
 
   .page-subtle {
-    @apply text-[12px] text-foreground-light;
+    @apply text-xs text-foreground-light;
   }
 
   .page-caption {
-    @apply text-[10px] font-medium uppercase tracking-wide text-foreground-muted;
+    @apply text-xs font-medium uppercase tracking-wider text-foreground-muted;
   }
 
   /* ===== Page Header ===== */
@@ -672,38 +689,11 @@
   }
 
   .page-title {
-    @apply text-[1.25rem] leading-7 font-semibold tracking-[-0.015em] text-foreground;
+    @apply text-xl font-semibold tracking-tight text-foreground;
   }
 
   .page-description {
-    @apply mt-1.5 text-[13px] leading-5 text-foreground-light;
-  }
-
-  .page-title,
-  .text-page-title,
-  .text-section-title,
-  .page-panel-title,
-  .dashboard-page h1:not([class*="text-"]),
-  .dashboard-page h2:not([class*="text-"]),
-  .dashboard-page h3:not([class*="text-"]) {
-    position: relative;
-    padding-left: 0.9rem;
-    letter-spacing: 0.05em;
-  }
-
-  .page-title::before,
-  .text-page-title::before,
-  .text-section-title::before,
-  .page-panel-title::before,
-  .dashboard-page h1:not([class*="text-"])::before,
-  .dashboard-page h2:not([class*="text-"])::before,
-  .dashboard-page h3:not([class*="text-"])::before {
-    content: ">";
-    position: absolute;
-    left: 0;
-    top: 0.1em;
-    color: var(--color-brand-500);
-    opacity: 0.9;
+    @apply mt-1.5 text-sm leading-relaxed text-foreground-light;
   }
 
   .page-toolbar {
@@ -714,31 +704,30 @@
     @apply h-px bg-border;
   }
 
-  /* ===== Dashboard Typography Defaults ===== */
+  /* ===== Dashboard Typography ===== */
   .dashboard-page h1:not([class*="text-"]) {
-    @apply text-[1.25rem] leading-7 font-semibold tracking-[-0.015em] text-foreground;
+    @apply text-xl font-semibold tracking-tight text-foreground;
   }
 
   .dashboard-page h2:not([class*="text-"]) {
-    @apply text-[1.125rem] leading-6 font-semibold tracking-[-0.01em] text-foreground;
+    @apply text-lg font-semibold tracking-tight text-foreground;
   }
 
   .dashboard-page h3:not([class*="text-"]) {
-    @apply text-[0.9375rem] leading-6 font-semibold text-foreground;
+    @apply text-base font-semibold text-foreground;
   }
 
   .dashboard-page p:not([class*="text-"]) {
-    @apply text-[13px] leading-5 text-foreground-light;
+    @apply text-sm leading-relaxed text-foreground-light;
   }
 
-  /* 常见标题尺寸覆盖（避免页面内手写尺寸过大） */
   .dashboard-page h1.text-2xl,
   .dashboard-page h1.text-3xl,
   .dashboard-page h1.text-4xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
 
   .dashboard-page h2.text-xl,
@@ -759,7 +748,79 @@
 
   .dashboard-page p.text-sm,
   .dashboard-page span.text-sm {
-    font-size: 0.75rem;
-    line-height: 1.125rem;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  /* ===== LobeHub 公共页面通用组件 ===== */
+  
+  /* Hero 区域 */
+  .lobe-hero {
+    @apply relative overflow-hidden py-24 sm:py-32 lg:py-40;
+  }
+
+  .lobe-hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -20%, rgba(78, 143, 255, 0.1) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* 章节 */
+  .lobe-section {
+    @apply py-20 sm:py-28 lg:py-32;
+  }
+
+  /* 容器 */
+  .lobe-container {
+    @apply max-w-6xl mx-auto px-6;
+  }
+
+  /* 卡片 */
+  .lobe-card {
+    @apply bg-surface-100/50 border border-border rounded-2xl p-6 transition-all duration-300;
+  }
+
+  .lobe-card:hover {
+    @apply border-border-strong bg-surface-200/50;
+    transform: translateY(-2px);
+  }
+
+  /* 徽章/标签 */
+  .lobe-badge {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium;
+    @apply bg-surface-200/80 text-foreground-light border border-border;
+  }
+
+  /* CTA 按钮 */
+  .lobe-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium;
+    @apply bg-foreground text-background;
+    @apply hover:opacity-90 transition-all duration-200;
+    @apply shadow-lg shadow-white/5;
+  }
+
+  .lobe-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium;
+    @apply bg-surface-200 text-foreground border border-border;
+    @apply hover:bg-surface-300 hover:border-border-strong transition-all duration-200;
+  }
+
+  /* 信任标志滚动 */
+  .lobe-trust-scroll {
+    @apply flex items-center gap-12 overflow-hidden;
+  }
+
+  /* 章节标题区 */
+  .lobe-section-header {
+    @apply text-center max-w-3xl mx-auto mb-16;
+  }
+
+  .lobe-section-header h2 {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4;
+  }
+
+  .lobe-section-header p {
+    @apply text-lg text-foreground-light leading-relaxed;
   }
 }

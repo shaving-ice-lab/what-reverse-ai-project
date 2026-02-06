@@ -2,11 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@/test/utils";
 import { PublicRuntimeView } from "../public-runtime-view";
 
-const mockGetEntry = vi.fn();
-const mockGetSchema = vi.fn();
+const { mockGetEntry, mockGetSchema, mockRouter } = vi.hoisted(() => ({
+  mockGetEntry: vi.fn(),
+  mockGetSchema: vi.fn(),
+  mockRouter: { replace: vi.fn() },
+}));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: vi.fn() }),
+  useRouter: () => mockRouter,
 }));
 
 vi.mock("@/components/layout/site-header", () => ({
@@ -15,6 +18,10 @@ vi.mock("@/components/layout/site-header", () => ({
 
 vi.mock("@/components/ui/terms-prompt", () => ({
   TermsPrompt: () => <div data-testid="terms-prompt" />,
+}));
+
+vi.mock("@/components/creative/markdown-preview", () => ({
+  MarkdownPreview: ({ content }: { content: string }) => <div data-testid="markdown-preview">{content}</div>,
 }));
 
 vi.mock("@/lib/api/runtime", () => ({
@@ -27,9 +34,10 @@ vi.mock("@/lib/api/runtime", () => ({
 
 describe("PublicRuntimeView", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+
     mockGetEntry.mockResolvedValue({
-      workspace: { id: "ws_123", name: "Demo Workspace", slug: "demo" },
-      app: { id: "app_123", name: "日报助手", slug: "daily-report" },
+      workspace: { id: "ws_123", name: "日报助手", slug: "demo" },
       access_policy: { access_mode: "public_anonymous" },
       session_id: "sess_1",
     });

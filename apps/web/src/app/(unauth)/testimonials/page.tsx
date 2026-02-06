@@ -1,20 +1,17 @@
 "use client";
 
 /**
- * 客户评价页面 - Manus 风格
+ * 客户评价页面 - LobeHub 风格设计
  */
 
 import Link from "next/link";
 import {
   Star,
-  Quote,
   ArrowRight,
-  Building,
-  Users,
-  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 // 客户评价
@@ -83,29 +80,24 @@ const stats = [
   { value: "4.9", label: "平均评分" },
 ];
 
-// 行业
-const industries = ["全部", "电商", "金融", "制造", "科技", "医疗", "SaaS"];
-
 export default function TestimonialsPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative pt-20 pb-16 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8">
-            <Star className="h-4 w-4 fill-primary" />
+      <section className="pt-32 sm:pt-40 pb-16 px-6 bg-gradient-hero">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="lobe-badge mb-8">
+            <Star className="h-4 w-4 fill-current" />
             客户好评如潮
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+          <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
             他们都在用 AgentFlow
           </h1>
 
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
             来自各行业领先企业的真实评价
           </p>
         </div>
@@ -118,12 +110,10 @@ export default function TestimonialsPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="text-center p-6 rounded-2xl bg-card border border-border"
+                className="text-center p-6 rounded-2xl bg-surface-100/30 border border-border/30"
               >
-                <div className="text-3xl font-bold text-primary mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-3xl font-bold text-[#4e8fff] mb-1">{stat.value}</div>
+                <div className="text-[12px] text-foreground-lighter">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -131,7 +121,7 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-12 px-6 bg-muted/20">
+      <section className="py-12 px-6 bg-gradient-section">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((item, index) => (
@@ -139,8 +129,8 @@ export default function TestimonialsPage() {
                 key={index}
                 className={cn(
                   "p-6 rounded-2xl",
-                  "bg-card border border-border",
-                  "hover:border-primary/30 hover:shadow-lg",
+                  "bg-surface-100/30 border border-border/30",
+                  "hover:border-[#4e8fff]/30 hover:shadow-lg",
                   "transition-all duration-300"
                 )}
               >
@@ -155,28 +145,26 @@ export default function TestimonialsPage() {
                 </div>
 
                 {/* Quote */}
-                <p className="text-foreground mb-6 leading-relaxed">
-                  "{item.quote}"
+                <p className="text-[13px] text-foreground mb-6 leading-relaxed">
+                  &ldquo;{item.quote}&rdquo;
                 </p>
 
                 {/* Author */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                  <div className="w-10 h-10 rounded-full bg-[#4e8fff]/10 flex items-center justify-center text-[#4e8fff] font-medium">
                     {item.avatar}
                   </div>
                   <div>
-                    <div className="font-medium text-foreground">
-                      {item.author}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="font-medium text-foreground text-[13px]">{item.author}</div>
+                    <div className="text-[11px] text-foreground-lighter">
                       {item.role} · {item.company}
                     </div>
                   </div>
                 </div>
 
                 {/* Industry Tag */}
-                <div className="mt-4 pt-4 border-t border-border">
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                <div className="mt-4 pt-4 border-t border-border/30">
+                  <span className="px-2 py-0.5 rounded-full bg-[#4e8fff]/10 text-[#4e8fff] text-[11px]">
                     {item.industry}
                   </span>
                 </div>
@@ -189,21 +177,19 @@ export default function TestimonialsPage() {
       {/* CTA */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            加入他们的行列
-          </h2>
-          <p className="text-muted-foreground mb-6">
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">加入他们的行列</h2>
+          <p className="text-[13px] text-foreground-light mb-6">
             开始使用 AgentFlow，体验 AI 自动化的强大力量
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/register">
-              <Button size="lg" className="rounded-full">
+              <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
                 免费开始使用
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/case-studies">
-              <Button size="lg" variant="outline" className="rounded-full">
+              <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
                 查看案例详情
               </Button>
             </Link>
@@ -211,12 +197,7 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 AgentFlow. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
