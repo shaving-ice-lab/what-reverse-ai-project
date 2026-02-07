@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
-// 检测是否为 Tauri 桌面应用构建
+// Detect if building for Tauri desktop app
 const isTauriBuild = process.env.TAURI_ENV_PLATFORM !== undefined;
 
-// Tauri 模块在 Web 模式下的 noop 存根映射（使用相对路径）
+// Tauri module noop stub mappings for Web mode (using relative paths)
 const tauriNoopAliases = !isTauriBuild
   ? {
       '@tauri-apps/api/core': './src/lib/tauri/noop-core.ts',
@@ -19,39 +19,39 @@ const tauriNoopAliases = !isTauriBuild
   : {};
 
 const nextConfig: NextConfig = {
-  // 构建时忽略 ESLint 错误（用于测试，生产环境应该修复所有错误）
+  // Ignore ESLint errors during build (for testing, production should fix all errors)
   eslint: {
     ignoreDuringBuilds: true,
   },
   
-  // 构建时忽略 TypeScript 错误
+  // Ignore TypeScript errors during build
   typescript: {
     ignoreBuildErrors: true,
   },
   
-  // Tauri 桌面应用需要静态导出
+  // Tauri desktop app requires static export
   ...(isTauriBuild && {
     output: 'export',
-    // 静态导出时禁用图片优化
+    // Disable image optimization for static export
     images: {
       unoptimized: true,
     },
-    // 静态导出不支持 trailing slash
+    // Static export does not support trailing slash
     trailingSlash: false,
   }),
   
-  // Turbopack 配置 - Web 模式下将 Tauri 模块映射为 noop 存根
+  // Turbopack config - map Tauri modules to noop stubs in Web mode
   turbopack: {
     resolveAlias: tauriNoopAliases,
   },
   
-  // 启用实验性功能
+  // Enable experimental features
   experimental: {
-    // React 编译器优化 (可选)
+    // React compiler optimization (optional)
     // reactCompiler: true,
   },
   
-  // 图片域名白名单 (Web 模式)
+  // Image domain whitelist (Web mode)
   ...(!isTauriBuild && {
     images: {
       remotePatterns: [
@@ -71,15 +71,15 @@ const nextConfig: NextConfig = {
     },
   }),
   
-  // 重定向规则 (仅 Web 模式)
+  // Redirect rules (Web mode only)
   async redirects() {
-    // 静态导出不支持重定向
+    // Static export does not support redirects
     if (isTauriBuild) return [];
     
     return [];
   },
   
-  // 环境变量
+  // Environment variables
   env: {
     NEXT_PUBLIC_IS_TAURI: isTauriBuild ? 'true' : 'false',
   },
