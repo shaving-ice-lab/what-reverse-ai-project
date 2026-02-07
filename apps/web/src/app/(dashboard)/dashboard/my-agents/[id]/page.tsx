@@ -1,1089 +1,1089 @@
 "use client";
 
 /**
- * Agent 详情页面
+ * Agent DetailsPage
  *
- * Supabase 风格：简约、专业、数据丰富
+ * Supabase Style: Minimal, Professional, DataRich
  */
 
 import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
-  Bot,
+ Bot,
 
-  ArrowLeft,
+ ArrowLeft,
 
-  Settings,
+ Settings,
 
-  Play,
+ Play,
 
-  Pause,
+ Pause,
 
-  Trash2,
+ Trash2,
 
-  Copy,
+ Copy,
 
-  Check,
+ Check,
 
-  MessageSquare,
+ MessageSquare,
 
-  Activity,
+ Activity,
 
-  Clock,
+ Clock,
 
-  Zap,
+ Zap,
 
-  Code,
+ Code,
 
-  BarChart3,
+ BarChart3,
 
-  Calendar,
+ Calendar,
 
-  TrendingUp,
+ TrendingUp,
 
-  AlertCircle,
+ AlertCircle,
 
-  ExternalLink,
+ ExternalLink,
 
-  Edit,
+ Edit,
 
-  Share2,
+ Share2,
 
-  MoreVertical,
+ MoreVertical,
 
-  RefreshCw,
+ RefreshCw,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// 模拟 Agent 数据
+// Mock Agent Data
 
 const mockAgent = {
-  id: "1",
+ id: "1",
 
-  name: "客服助手",
+ name: "SupportAssistant",
 
-  description: "智能客服机器人，能够处理常见问题并提供24/7支持",
+ description: "SmartSupportBot, canProcessFAQandProvide24/7Support",
 
-  status: "active" as const,
+ status: "active" as const,
 
-  model: "GPT-4",
+ model: "GPT-4",
 
-  createdAt: "2026-01-15",
+ createdAt: "2026-01-15",
 
-  lastActive: "2 分钟前",
+ lastActive: "2 minbefore",
 
-  avatar: null,
+ avatar: null,
 
-  capabilities: ["对话", "问答", "知识库"],
+ capabilities: ["Conversation", "Q&A", "Knowledge Base"],
 
-  stats: {
-    totalConversations: 1234,
+ stats: {
+ totalConversations: 1234,
 
-    totalMessages: 5678,
+ totalMessages: 5678,
 
-    avgResponseTime: "1.2s",
+ avgResponseTime: "1.2s",
 
-    satisfactionRate: 94.5,
+ satisfactionRate: 94.5,
 
-    tokensUsed: 125000,
+ tokensUsed: 125000,
 
-    activeUsers: 89,
+ activeUsers: 89,
 
-  },
+ },
 
-  config: {
-    temperature: 0.7,
+ config: {
+ temperature: 0.7,
 
-    maxTokens: 2048,
+ maxTokens: 2048,
 
-    systemPrompt: "你是一个专业的客服助手，帮助用户解决问题...",
+ systemPrompt: "youis1Professional'sSupportAssistant, HelpUserResolveIssue...",
 
-    welcomeMessage: "您好！我是智能客服助手，有什么可以帮助您的？",
+ welcomeMessage: "you!IisSmartSupportAssistant, hasWhatcanwithHelpyou's?",
 
-  },
+ },
 };
 
-// 模拟对话历史
+// MockConversationHistory
 
 const mockConversations = [
 
-  {
-    id: "c1",
+ {
+ id: "c1",
 
-    user: "用户 A",
+ user: "User A",
 
-    preview: "请问如何修改密码？",
+ preview: "PleaseifwhatEditPassword?",
 
-    time: "10 分钟前",
+ time: "10 minbefore",
 
-    messages: 5,
+ messages: 5,
 
-    status: "completed",
+ status: "completed",
 
-  },
+ },
 
-  {
-    id: "c2",
+ {
+ id: "c2",
 
-    user: "用户 B",
+ user: "User B",
 
-    preview: "产品什么时候发货？",
+ preview: "ProductWhattime?",
 
-    time: "30 分钟前",
+ time: "30 minbefore",
 
-    messages: 8,
+ messages: 8,
 
-    status: "completed",
+ status: "completed",
 
-  },
+ },
 
-  {
-    id: "c3",
+ {
+ id: "c3",
 
-    user: "用户 C",
+ user: "User C",
 
-    preview: "我想申请退款",
+ preview: "IwantPleaseRefund",
 
-    time: "1 小时前",
+ time: "1 hbefore",
 
-    messages: 12,
+ messages: 12,
 
-    status: "escalated",
+ status: "escalated",
 
-  },
+ },
 
-  {
-    id: "c4",
+ {
+ id: "c4",
 
-    user: "用户 D",
+ user: "User D",
 
-    preview: "会员权益有哪些？",
+ preview: "willRightshasWhich?",
 
-    time: "2 小时前",
+ time: "2 hbefore",
 
-    messages: 4,
+ messages: 4,
 
-    status: "completed",
+ status: "completed",
 
-  },
+ },
 
 ];
 
-// 模拟性能数据
+// MockcanData
 
 const performanceData = [
 
-  { date: "01-24", conversations: 45, satisfaction: 92 },
+ { date: "01-24", conversations: 45, satisfaction: 92 },
 
-  { date: "01-25", conversations: 52, satisfaction: 95 },
+ { date: "01-25", conversations: 52, satisfaction: 95 },
 
-  { date: "01-26", conversations: 48, satisfaction: 91 },
+ { date: "01-26", conversations: 48, satisfaction: 91 },
 
-  { date: "01-27", conversations: 61, satisfaction: 96 },
+ { date: "01-27", conversations: 61, satisfaction: 96 },
 
-  { date: "01-28", conversations: 55, satisfaction: 94 },
+ { date: "01-28", conversations: 55, satisfaction: 94 },
 
-  { date: "01-29", conversations: 67, satisfaction: 93 },
+ { date: "01-29", conversations: 67, satisfaction: 93 },
 
-  { date: "01-30", conversations: 72, satisfaction: 95 },
+ { date: "01-30", conversations: 72, satisfaction: 95 },
 
 ];
 
 export default function AgentDetailPage() {
-  const params = useParams();
+ const params = useParams();
 
-  const router = useRouter();
+ const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"overview" | "conversations" | "settings">("overview");
+ const [activeTab, setActiveTab] = useState<"overview" | "conversations" | "settings">("overview");
 
-  const [isRunning, setIsRunning] = useState(true);
+ const [isRunning, setIsRunning] = useState(true);
 
-  const [copied, setCopied] = useState(false);
+ const [copied, setCopied] = useState(false);
 
-  const [testInput, setTestInput] = useState("");
+ const [testInput, setTestInput] = useState("");
 
-  const [testMessages, setTestMessages] = useState<{ role: string; content: string }[]>([
+ const [testMessages, setTestMessages] = useState<{ role: string; content: string }[]>([
 
-    { role: "assistant", content: mockAgent.config.welcomeMessage },
+ { role: "assistant", content: mockAgent.config.welcomeMessage },
 
-  ]);
+ ]);
 
-  const [isTesting, setIsTesting] = useState(false);
+ const [isTesting, setIsTesting] = useState(false);
 
-  const agent = mockAgent;
+ const agent = mockAgent;
 
-  // 复制 Agent ID
+ // Copy Agent ID
 
-  const copyId = () => {
-    navigator.clipboard.writeText(agent.id);
+ const copyId = () => {
+ navigator.clipboard.writeText(agent.id);
 
-    setCopied(true);
+ setCopied(true);
 
-    setTimeout(() => setCopied(false), 2000);
+ setTimeout(() => setCopied(false), 2000);
 
-  };
+ };
 
-  // 切换运行状态
+ // SwitchRunStatus
 
-  const toggleRunning = () => {
-    setIsRunning(!isRunning);
+ const toggleRunning = () => {
+ setIsRunning(!isRunning);
 
-  };
+ };
 
-  // 发送测试消息
+ // SendTestMessage
 
-  const sendTestMessage = async () => {
-    if (!testInput.trim()) return;
+ const sendTestMessage = async () => {
+ if (!testInput.trim()) return;
 
-    const userMessage = { role: "user", content: testInput };
+ const userMessage = { role: "user", content: testInput };
 
-    setTestMessages((prev) => [...prev, userMessage]);
+ setTestMessages((prev) => [...prev, userMessage]);
 
-    setTestInput("");
+ setTestInput("");
 
-    setIsTesting(true);
+ setIsTesting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+ await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const aiMessage = {
-      role: "assistant",
+ const aiMessage = {
+ role: "assistant",
 
-      content: `感谢您的问题！关于"${testInput}"，我来为您解答...这是一个测试回复。`,
+ content: `Thank youyou'sIssue!About"${testInput}", IcomeasyouResolve...thisis1TestReply.`,
 
-    };
+ };
 
-    setTestMessages((prev) => [...prev, aiMessage]);
+ setTestMessages((prev) => [...prev, aiMessage]);
 
-    setIsTesting(false);
+ setIsTesting(false);
 
-  };
+ };
 
-  return (
-    <div className="min-h-full bg-background-studio">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background-studio/95 backdrop-blur border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+ return (
+ <div className="min-h-full bg-background-studio">
+ {/* Header */}
+ <header className="sticky top-0 z-40 bg-background-studio/95 backdrop-blur border-b border-border">
+ <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+ <div className="flex items-center gap-4">
 
-            <Link
+ <Link
 
-              href="/dashboard/my-agents"
+ href="/dashboard/my-agents"
 
-              className="flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors"
+ className="flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors"
 
-            >
+ >
 
-              <ArrowLeft className="w-4 h-4" />
+ <ArrowLeft className="w-4 h-4" />
 
-              返回
+ Back
 
-            </Link>
+ </Link>
 
-            <div className="h-6 w-px bg-border" />
+ <div className="h-6 w-px bg-border" />
 
-            <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
 
-              <div className="w-10 h-10 rounded-md bg-brand-200 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-md bg-brand-200 flex items-center justify-center">
 
-                <Bot className="w-5 h-5 text-brand-500" />
+ <Bot className="w-5 h-5 text-brand-500" />
 
-              </div>
+ </div>
 
-              <div>
-                <p className="page-caption">Agents</p>
-                <h1 className="text-page-title text-foreground">{agent.name}</h1>
-                <div className="flex items-center gap-2 text-xs text-foreground-muted">
+ <div>
+ <p className="page-caption">Agents</p>
+ <h1 className="text-page-title text-foreground">{agent.name}</h1>
+ <div className="flex items-center gap-2 text-xs text-foreground-muted">
 
-                  <span>ID: {agent.id}</span>
+ <span>ID: {agent.id}</span>
 
-                  <button onClick={copyId} className="hover:text-foreground">
+ <button onClick={copyId} className="hover:text-foreground">
 
-                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+ {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
 
-                  </button>
+ </button>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-          <div className="flex items-center gap-2">
+ <div className="flex items-center gap-2">
 
-            <Button
+ <Button
 
-              variant="outline"
+ variant="outline"
 
-              size="sm"
+ size="sm"
 
-              onClick={toggleRunning}
+ onClick={toggleRunning}
 
-              className={cn(
-                isRunning
+ className={cn(
+ isRunning
 
-                  ? "text-brand-500 border-brand-400"
+ ? "text-brand-500 border-brand-400"
 
-                  : "text-foreground-muted"
+ : "text-foreground-muted"
 
-              )}
+ )}
 
-            >
+ >
 
-              {isRunning ? (
-                <>
+ {isRunning ? (
+ <>
 
-                  <Pause className="w-4 h-4 mr-2" />
+ <Pause className="w-4 h-4 mr-2" />
 
-                  暂停
+ Pause
 
-                </>
+ </>
 
-              ) : (
-                <>
+ ) : (
+ <>
 
-                  <Play className="w-4 h-4 mr-2" />
+ <Play className="w-4 h-4 mr-2" />
 
-                  启动
+ Launch
 
-                </>
+ </>
 
-              )}
+ )}
 
-            </Button>
+ </Button>
 
-            <Link href={`/dashboard/my-agents/${agent.id}/edit`}>
+ <Link href={`/dashboard/my-agents/${agent.id}/edit`}>
 
-              <Button variant="outline" size="sm">
+ <Button variant="outline" size="sm">
 
-                <Edit className="w-4 h-4 mr-2" />
+ <Edit className="w-4 h-4 mr-2" />
 
-                编辑
+ Edit
 
-              </Button>
+ </Button>
 
-            </Link>
+ </Link>
 
-            <Button variant="outline" size="sm">
+ <Button variant="outline" size="sm">
 
-              <Share2 className="w-4 h-4" />
+ <Share2 className="w-4 h-4" />
 
-            </Button>
+ </Button>
 
-            <Button variant="outline" size="sm" className="text-foreground-muted hover:text-foreground">
+ <Button variant="outline" size="sm" className="text-foreground-muted hover:text-foreground">
 
-              <Trash2 className="w-4 h-4" />
+ <Trash2 className="w-4 h-4" />
 
-            </Button>
+ </Button>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-      </header>
+ </header>
 
-      {/* Tabs */}
+ {/* Tabs */}
 
-      <div className="border-b border-border bg-surface-75">
+ <div className="border-b border-border bg-surface-75">
 
-        <div className="max-w-6xl mx-auto px-6">
+ <div className="max-w-6xl mx-auto px-6">
 
-          <div className="flex gap-6">
+ <div className="flex gap-6">
 
-            {[
+ {[
 
-              { id: "overview" as const, label: "概览", icon: BarChart3 },
+ { id: "overview" as const, label: "Overview", icon: BarChart3 },
 
-              { id: "conversations" as const, label: "对话记录", icon: MessageSquare },
+ { id: "conversations" as const, label: "ConversationRecord", icon: MessageSquare },
 
-              { id: "settings" as const, label: "设置", icon: Settings },
+ { id: "settings" as const, label: "Settings", icon: Settings },
 
-            ].map((tab) => (
-              <button
+ ].map((tab) => (
+ <button
 
-                key={tab.id}
+ key={tab.id}
 
-                onClick={() => setActiveTab(tab.id)}
+ onClick={() => setActiveTab(tab.id)}
 
-                className={cn(
-                  "flex items-center gap-2 px-1 py-4 border-b-2 text-sm font-medium transition-colors",
+ className={cn(
+ "flex items-center gap-2 px-1 py-4 border-b-2 text-sm font-medium transition-colors",
 
-                  activeTab === tab.id
+ activeTab === tab.id
 
-                    ? "border-brand-400 text-brand-500"
+ ? "border-brand-400 text-brand-500"
 
-                    : "border-transparent text-foreground-muted hover:text-foreground"
+ : "border-transparent text-foreground-muted hover:text-foreground"
 
-                )}
+ )}
 
-              >
+ >
 
-                <tab.icon className="w-4 h-4" />
+ <tab.icon className="w-4 h-4" />
 
-                {tab.label}
+ {tab.label}
 
-              </button>
+ </button>
 
-            ))}
+ ))}
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-      {/* Content */}
+ {/* Content */}
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+ <div className="max-w-6xl mx-auto px-6 py-8">
 
-        {/* Overview Tab */}
+ {/* Overview Tab */}
 
-        {activeTab === "overview" && (
-          <div className="space-y-8">
+ {activeTab === "overview" && (
+ <div className="space-y-8">
 
-            {/* Status Banner */}
+ {/* Status Banner */}
 
-            <div className={cn(
-              "p-4 rounded-md flex items-center justify-between",
+ <div className={cn(
+ "p-4 rounded-md flex items-center justify-between",
 
-              isRunning
+ isRunning
 
-                ? "bg-brand-200 border border-brand-400"
+ ? "bg-brand-200 border border-brand-400"
 
-                : "bg-surface-100 border border-border"
+ : "bg-surface-100 border border-border"
 
-            )}>
+ )}>
 
-              <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
 
-                <div className={cn(
-                  "w-3 h-3 rounded-full",
+ <div className={cn(
+ "w-3 h-3 rounded-full",
 
-                  isRunning ? "bg-brand-500 animate-pulse" : "bg-foreground-muted"
+ isRunning ? "bg-brand-500 animate-pulse" : "bg-foreground-muted"
 
-                )} />
+ )} />
 
-                <span className="font-medium text-foreground">
+ <span className="font-medium text-foreground">
 
-                  {isRunning ? "运行中" : "已暂停"}
+ {isRunning ? "Run": "Paused"}
 
-                </span>
+ </span>
 
-                <span className="text-sm text-foreground-muted">
+ <span className="text-sm text-foreground-muted">
 
-                   最后活跃: {agent.lastActive}
+ mostafterActive: {agent.lastActive}
 
-                </span>
+ </span>
 
-              </div>
+ </div>
 
-              <div className="flex items-center gap-4 text-sm">
+ <div className="flex items-center gap-4 text-sm">
 
-                <span className="text-foreground-muted">
+ <span className="text-foreground-muted">
 
-                  模型: <span className="text-foreground">{agent.model}</span>
+ Model: <span className="text-foreground">{agent.model}</span>
 
-                </span>
+ </span>
 
-                <span className="text-foreground-muted">
+ <span className="text-foreground-muted">
 
-                  创建于: <span className="text-foreground">{agent.createdAt}</span>
+ Createat: <span className="text-foreground">{agent.createdAt}</span>
 
-                </span>
+ </span>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            {/* Stats Grid */}
+ {/* Stats Grid */}
 
-            <div className="page-grid sm:grid-cols-2 lg:grid-cols-4">
+ <div className="page-grid sm:grid-cols-2 lg:grid-cols-4">
 
-              {[
+ {[
 
-                {
-                  label: "总对话数",
+ {
+ label: "totalConversationcount",
 
-                  value: agent.stats.totalConversations.toLocaleString(),
+ value: agent.stats.totalConversations.toLocaleString(),
 
-                  icon: MessageSquare,
+ icon: MessageSquare,
 
-                  change: "+12%",
+ change: "+12%",
 
-                },
+ },
 
-                {
-                  label: "总消息数",
+ {
+ label: "totalMessagecount",
 
-                  value: agent.stats.totalMessages.toLocaleString(),
+ value: agent.stats.totalMessages.toLocaleString(),
 
-                  icon: Activity,
+ icon: Activity,
 
-                  change: "+8%",
+ change: "+8%",
 
-                },
+ },
 
-                {
-                  label: "平均响应时间",
+ {
+ label: "AverageResponse Time",
 
-                  value: agent.stats.avgResponseTime,
+ value: agent.stats.avgResponseTime,
 
-                  icon: Clock,
+ icon: Clock,
 
-                  change: "-5%",
+ change: "-5%",
 
-                },
+ },
 
-                {
-                  label: "满意度",
+ {
+ label: "Satisfaction",
 
-                  value: `${agent.stats.satisfactionRate}%`,
+ value: `${agent.stats.satisfactionRate}%`,
 
-                  icon: TrendingUp,
+ icon: TrendingUp,
 
-                  change: "+2%",
+ change: "+2%",
 
-                },
+ },
 
-              ].map((stat) => (
-                <div
+ ].map((stat) => (
+ <div
 
-                  key={stat.label}
+ key={stat.label}
 
-                  className="p-5 rounded-md bg-surface-100 border border-border"
+ className="p-5 rounded-md bg-surface-100 border border-border"
 
-                >
+ >
 
-                  <div className="flex items-center justify-between mb-3">
+ <div className="flex items-center justify-between mb-3">
 
-                    <stat.icon className="w-5 h-5 text-brand-500" />
+ <stat.icon className="w-5 h-5 text-brand-500" />
 
-                    <span className={cn(
-                      "text-xs font-medium px-1.5 py-0.5 rounded",
+ <span className={cn(
+ "text-xs font-medium px-1.5 py-0.5 rounded",
 
-                      stat.change.startsWith("+")
+ stat.change.startsWith("+")
 
-                        ? "bg-brand-200 text-brand-500"
+ ? "bg-brand-200 text-brand-500"
 
-                        : "bg-brand-200 text-brand-500"
+ : "bg-brand-200 text-brand-500"
 
-                    )}>
+ )}>
 
-                      {stat.change}
+ {stat.change}
 
-                    </span>
+ </span>
 
-                  </div>
+ </div>
 
-                  <div className="text-2xl font-bold text-foreground mb-1">
+ <div className="text-2xl font-bold text-foreground mb-1">
 
-                    {stat.value}
+ {stat.value}
 
-                  </div>
+ </div>
 
-                  <div className="text-sm text-foreground-muted">
+ <div className="text-sm text-foreground-muted">
 
-                    {stat.label}
+ {stat.label}
 
-                  </div>
+ </div>
 
-                </div>
+ </div>
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-            {/* Charts & Test */}
+ {/* Charts & Test */}
 
-            <div className="page-grid lg:grid-cols-2">
+ <div className="page-grid lg:grid-cols-2">
 
-              {/* Performance Chart Placeholder */}
+ {/* Performance Chart Placeholder */}
 
-              <div className="p-6 rounded-md bg-surface-100 border border-border">
+ <div className="p-6 rounded-md bg-surface-100 border border-border">
 
-                <h3 className="font-semibold text-foreground mb-4">性能趋势</h3>
+ <h3 className="font-semibold text-foreground mb-4">canTrend</h3>
 
-                <div className="space-y-4">
+ <div className="space-y-4">
 
-                  {performanceData.map((data) => (
-                    <div key={data.date} className="flex items-center gap-4">
+ {performanceData.map((data) => (
+ <div key={data.date} className="flex items-center gap-4">
 
-                      <span className="text-sm text-foreground-muted w-12">
+ <span className="text-sm text-foreground-muted w-12">
 
-                        {data.date}
+ {data.date}
 
-                      </span>
+ </span>
 
-                      <div className="flex-1 h-6 bg-surface-100 rounded-full overflow-hidden">
+ <div className="flex-1 h-6 bg-surface-100 rounded-full overflow-hidden">
 
-                        <div
+ <div
 
-                          className="h-full bg-brand-500 rounded-full"
+ className="h-full bg-brand-500 rounded-full"
 
-                          style={{ width: `${(data.conversations / 80) * 100}%` }}
+ style={{ width: `${(data.conversations / 80) * 100}%` }}
 
-                        />
+ />
 
-                      </div>
+ </div>
 
-                      <span className="text-sm text-foreground w-16 text-right">
+ <span className="text-sm text-foreground w-16 text-right">
 
-                        {data.conversations} 次
+ {data.conversations} times
 
-                      </span>
+ </span>
 
-                    </div>
+ </div>
 
-                  ))}
+ ))}
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              {/* Quick Test */}
+ {/* Quick Test */}
 
-              <div className="flex flex-col rounded-md bg-surface-100 border border-border overflow-hidden">
+ <div className="flex flex-col rounded-md bg-surface-100 border border-border overflow-hidden">
 
-                <div className="p-4 border-b border-border bg-surface-75">
+ <div className="p-4 border-b border-border bg-surface-75">
 
-                  <h3 className="font-semibold text-foreground">快速测试</h3>
+ <h3 className="font-semibold text-foreground">QuickTest</h3>
 
-                </div>
+ </div>
 
-                <div className="flex-1 p-4 space-y-3 max-h-[300px] overflow-y-auto">
+ <div className="flex-1 p-4 space-y-3 max-h-[300px] overflow-y-auto">
 
-                  {testMessages.map((msg, index) => (
-                    <div
+ {testMessages.map((msg, index) => (
+ <div
 
-                      key={index}
+ key={index}
 
-                      className={cn(
-                        "flex gap-3",
+ className={cn(
+ "flex gap-3",
 
-                        msg.role === "user" && "justify-end"
+ msg.role === "user" && "justify-end"
 
-                      )}
+ )}
 
-                    >
+ >
 
-                      {msg.role === "assistant" && (
-                        <div className="w-7 h-7 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
+ {msg.role === "assistant" && (
+ <div className="w-7 h-7 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
 
-                          <Bot className="w-4 h-4 text-brand-500" />
+ <Bot className="w-4 h-4 text-brand-500" />
 
-                        </div>
+ </div>
 
-                      )}
+ )}
 
-                      <div
+ <div
 
-                        className={cn(
-                          "px-3 py-2 rounded-md text-sm max-w-[80%]",
+ className={cn(
+ "px-3 py-2 rounded-md text-sm max-w-[80%]",
 
-                          msg.role === "user"
+ msg.role === "user"
 
-                            ? "bg-brand-500 text-background"
+ ? "bg-brand-500 text-background"
 
-                            : "bg-surface-100 text-foreground"
+ : "bg-surface-100 text-foreground"
 
-                        )}
+ )}
 
-                      >
+ >
 
-                        {msg.content}
+ {msg.content}
 
-                      </div>
+ </div>
 
-                    </div>
+ </div>
 
-                  ))}
+ ))}
 
-                  {isTesting && (
-                    <div className="flex gap-3">
+ {isTesting && (
+ <div className="flex gap-3">
 
-                      <div className="w-7 h-7 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
+ <div className="w-7 h-7 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
 
-                        <Bot className="w-4 h-4 text-brand-500" />
+ <Bot className="w-4 h-4 text-brand-500" />
 
-                      </div>
+ </div>
 
-                      <div className="px-3 py-2 rounded-md bg-surface-100 text-sm text-foreground-muted">
+ <div className="px-3 py-2 rounded-md bg-surface-100 text-sm text-foreground-muted">
 
-                        正在思考...
+ currentlyatThink...
 
-                      </div>
+ </div>
 
-                    </div>
+ </div>
 
-                  )}
+ )}
 
-                </div>
+ </div>
 
-                <div className="p-4 border-t border-border">
+ <div className="p-4 border-t border-border">
 
-                  <div className="flex gap-2">
+ <div className="flex gap-2">
 
-                    <Input
+ <Input
 
-                      value={testInput}
+ value={testInput}
 
-                      onChange={(e) => setTestInput(e.target.value)}
+ onChange={(e) => setTestInput(e.target.value)}
 
-                      placeholder="输入测试消息..."
+ placeholder="InputTestMessage..."
 
-                      className="h-9"
+ className="h-9"
 
-                      onKeyDown={(e) => e.key === "Enter" && sendTestMessage()}
+ onKeyDown={(e) => e.key === "Enter" && sendTestMessage()}
 
-                    />
+ />
 
-                    <Button
+ <Button
 
-                      size="sm"
+ size="sm"
 
-                      onClick={sendTestMessage}
+ onClick={sendTestMessage}
 
-                      disabled={!testInput.trim() || isTesting}
+ disabled={!testInput.trim() || isTesting}
 
-                      className="bg-brand-500 hover:bg-brand-600"
+ className="bg-brand-500 hover:bg-brand-600"
 
-                    >
+ >
 
-                      <Play className="w-4 h-4" />
+ <Play className="w-4 h-4" />
 
-                    </Button>
+ </Button>
 
-                  </div>
+ </div>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            {/* Recent Conversations */}
+ {/* Recent Conversations */}
 
-            <div>
+ <div>
 
-              <div className="flex items-center justify-between mb-4">
+ <div className="flex items-center justify-between mb-4">
 
-                <h3 className="font-semibold text-foreground">最近对话</h3>
+ <h3 className="font-semibold text-foreground">RecentConversation</h3>
 
-                <Button variant="ghost" size="sm" onClick={() => setActiveTab("conversations")}>
+ <Button variant="ghost" size="sm" onClick={() => setActiveTab("conversations")}>
 
-                  查看全部
+ View all
 
-                  <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+ <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
 
-                </Button>
+ </Button>
 
-              </div>
+ </div>
 
-              <div className="space-y-3">
+ <div className="space-y-3">
 
-                {mockConversations.slice(0, 4).map((conv) => (
-                  <div
+ {mockConversations.slice(0, 4).map((conv) => (
+ <div
 
-                    key={conv.id}
+ key={conv.id}
 
-                    className="p-4 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase cursor-pointer"
+ className="p-4 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase cursor-pointer"
 
-                  >
+ >
 
-                    <div className="flex items-center justify-between mb-2">
+ <div className="flex items-center justify-between mb-2">
 
-                      <span className="font-medium text-foreground">{conv.user}</span>
+ <span className="font-medium text-foreground">{conv.user}</span>
 
-                      <span className="text-xs text-foreground-muted">{conv.time}</span>
+ <span className="text-xs text-foreground-muted">{conv.time}</span>
 
-                    </div>
+ </div>
 
-                    <p className="text-sm text-foreground-muted line-clamp-1 mb-2">
+ <p className="text-sm text-foreground-muted line-clamp-1 mb-2">
 
-                      {conv.preview}
+ {conv.preview}
 
-                    </p>
+ </p>
 
-                    <div className="flex items-center gap-3 text-xs text-foreground-muted">
+ <div className="flex items-center gap-3 text-xs text-foreground-muted">
 
-                      <span>{conv.messages} 条消息</span>
+ <span>{conv.messages} Message</span>
 
-                      <span className={cn(
-                        "px-1.5 py-0.5 rounded",
+ <span className={cn(
+ "px-1.5 py-0.5 rounded",
 
-                        conv.status === "completed"
+ conv.status === "completed"
 
-                          ? "bg-brand-200 text-brand-500"
+ ? "bg-brand-200 text-brand-500"
 
-                          : "bg-warning-200 text-warning"
+ : "bg-warning-200 text-warning"
 
-                      )}>
+ )}>
 
-                        {conv.status === "completed" ? "已完成" : "已转人工"}
+ {conv.status === "completed" ? "Completed": "alreadyperson"}
 
-                      </span>
+ </span>
 
-                    </div>
+ </div>
 
-                  </div>
+ </div>
 
-                ))}
+ ))}
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        )}
+ )}
 
-        {/* Conversations Tab */}
+ {/* Conversations Tab */}
 
-        {activeTab === "conversations" && (
-          <div className="space-y-6">
+ {activeTab === "conversations" && (
+ <div className="space-y-6">
 
-            <div className="flex items-center justify-between">
+ <div className="flex items-center justify-between">
 
-              <h2 className="text-lg font-semibold text-foreground">对话记录</h2>
+ <h2 className="text-lg font-semibold text-foreground">ConversationRecord</h2>
 
-              <div className="flex items-center gap-2">
+ <div className="flex items-center gap-2">
 
-                <Input
+ <Input
 
-                  placeholder="搜索对话..."
+ placeholder="SearchConversation..."
 
-                  className="w-64 h-9"
+ className="w-64 h-9"
 
-                />
+ />
 
-                <Button variant="outline" size="sm">
+ <Button variant="outline" size="sm">
 
-                  <RefreshCw className="w-4 h-4" />
+ <RefreshCw className="w-4 h-4" />
 
-                </Button>
+ </Button>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            <div className="space-y-3">
+ <div className="space-y-3">
 
-              {mockConversations.map((conv) => (
-                <div
+ {mockConversations.map((conv) => (
+ <div
 
-                  key={conv.id}
+ key={conv.id}
 
-                  className="p-5 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase cursor-pointer"
+ className="p-5 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase cursor-pointer"
 
-                >
+ >
 
-                  <div className="flex items-center justify-between mb-3">
+ <div className="flex items-center justify-between mb-3">
 
-                    <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
 
-                      <div className="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center">
 
-                        <MessageSquare className="w-5 h-5 text-foreground-muted" />
+ <MessageSquare className="w-5 h-5 text-foreground-muted" />
 
-                      </div>
+ </div>
 
-                      <div>
+ <div>
 
-                        <span className="font-medium text-foreground">{conv.user}</span>
+ <span className="font-medium text-foreground">{conv.user}</span>
 
-                        <p className="text-sm text-foreground-muted">{conv.preview}</p>
+ <p className="text-sm text-foreground-muted">{conv.preview}</p>
 
-                      </div>
+ </div>
 
-                    </div>
+ </div>
 
-                    <div className="text-right">
+ <div className="text-right">
 
-                      <span className="text-xs text-foreground-muted">{conv.time}</span>
+ <span className="text-xs text-foreground-muted">{conv.time}</span>
 
-                      <div className={cn(
-                        "text-xs px-2 py-0.5 rounded mt-1",
+ <div className={cn(
+ "text-xs px-2 py-0.5 rounded mt-1",
 
-                        conv.status === "completed"
+ conv.status === "completed"
 
-                          ? "bg-brand-200 text-brand-500"
+ ? "bg-brand-200 text-brand-500"
 
-                          : "bg-warning-200 text-warning"
+ : "bg-warning-200 text-warning"
 
-                      )}>
+ )}>
 
-                        {conv.status === "completed" ? "已完成" : "已转人工"}
+ {conv.status === "completed" ? "Completed": "alreadyperson"}
 
-                      </div>
+ </div>
 
-                    </div>
+ </div>
 
-                  </div>
+ </div>
 
-                  <div className="flex items-center gap-4 text-sm text-foreground-muted">
+ <div className="flex items-center gap-4 text-sm text-foreground-muted">
 
-                    <span>{conv.messages} 条消息</span>
+ <span>{conv.messages} Message</span>
 
-                    <Button variant="ghost" size="sm" className="ml-auto">
+ <Button variant="ghost" size="sm" className="ml-auto">
 
-                      查看详情
+ ViewDetails
 
-                      <ExternalLink className="w-3 h-3 ml-1" />
+ <ExternalLink className="w-3 h-3 ml-1" />
 
-                    </Button>
+ </Button>
 
-                  </div>
+ </div>
 
-                </div>
+ </div>
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        )}
+ )}
 
-        {/* Settings Tab */}
+ {/* Settings Tab */}
 
-        {activeTab === "settings" && (
-          <div className="space-y-8">
+ {activeTab === "settings" && (
+ <div className="space-y-8">
 
-            <div className="p-6 rounded-md bg-surface-100 border border-border">
+ <div className="p-6 rounded-md bg-surface-100 border border-border">
 
-              <h3 className="font-semibold text-foreground mb-4">基本信息</h3>
+ <h3 className="font-semibold text-foreground mb-4">Basic Info</h3>
 
-              <div className="space-y-4">
+ <div className="space-y-4">
 
-                <div>
+ <div>
 
-                  <label className="block text-sm font-medium text-foreground mb-2">
+ <label className="block text-sm font-medium text-foreground mb-2">
 
-                    Agent 名称
+ Agent Name
 
-                  </label>
+ </label>
 
-                  <Input value={agent.name} className="h-11" />
+ <Input value={agent.name} className="h-11" />
 
-                </div>
+ </div>
 
-                <div>
+ <div>
 
-                  <label className="block text-sm font-medium text-foreground mb-2">
+ <label className="block text-sm font-medium text-foreground mb-2">
 
-                    描述
+ Description
 
-                  </label>
+ </label>
 
-                  <textarea
+ <textarea
 
-                    value={agent.description}
+ value={agent.description}
 
-                    rows={3}
+ rows={3}
 
-                    className="w-full px-4 py-3 rounded-md bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+ className="w-full px-4 py-3 rounded-md bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
 
-                  />
+ />
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            <div className="p-6 rounded-md bg-surface-100 border border-border">
+ <div className="p-6 rounded-md bg-surface-100 border border-border">
 
-              <h3 className="font-semibold text-foreground mb-4">模型配置</h3>
+ <h3 className="font-semibold text-foreground mb-4">ModelConfig</h3>
 
-              <div className="page-grid sm:grid-cols-2">
+ <div className="page-grid sm:grid-cols-2">
 
-                <div>
+ <div>
 
-                  <label className="block text-sm font-medium text-foreground mb-2">
+ <label className="block text-sm font-medium text-foreground mb-2">
 
-                    AI 模型
+ AI Model
 
-                  </label>
+ </label>
 
-                  <select className="w-full h-11 px-4 rounded-md bg-background border border-border text-foreground">
+ <select className="w-full h-11 px-4 rounded-md bg-background border border-border text-foreground">
 
-                    <option value="gpt-4">GPT-4</option>
+ <option value="gpt-4">GPT-4</option>
 
-                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+ <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
 
-                    <option value="claude-3">Claude 3</option>
+ <option value="claude-3">Claude 3</option>
 
-                  </select>
+ </select>
 
-                </div>
+ </div>
 
-                <div>
+ <div>
 
-                  <label className="block text-sm font-medium text-foreground mb-2">
+ <label className="block text-sm font-medium text-foreground mb-2">
 
-                    温度 ({agent.config.temperature})
+ Temperature ({agent.config.temperature})
 
-                  </label>
+ </label>
 
-                  <input
+ <input
 
-                    type="range"
+ type="range"
 
-                    min="0"
+ min="0"
 
-                    max="2"
+ max="2"
 
-                    step="0.1"
+ step="0.1"
 
-                    defaultValue={agent.config.temperature}
+ defaultValue={agent.config.temperature}
 
-                    className="w-full"
+ className="w-full"
 
-                  />
+ />
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            <div className="p-6 rounded-md bg-surface-100 border border-border">
+ <div className="p-6 rounded-md bg-surface-100 border border-border">
 
-              <h3 className="font-semibold text-foreground mb-4">系统提示词</h3>
+ <h3 className="font-semibold text-foreground mb-4">System Prompt</h3>
 
-              <textarea
+ <textarea
 
-                value={agent.config.systemPrompt}
+ value={agent.config.systemPrompt}
 
-                rows={6}
+ rows={6}
 
-                className="w-full px-4 py-3 rounded-md bg-background border border-border text-foreground font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+ className="w-full px-4 py-3 rounded-md bg-background border border-border text-foreground font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
 
-              />
+ />
 
-            </div>
+ </div>
 
-            <div className="flex justify-end gap-4">
+ <div className="flex justify-end gap-4">
 
-              <Button variant="outline">取消</Button>
+ <Button variant="outline">Cancel</Button>
 
-              <Button className="bg-brand-500 hover:bg-brand-600">保存更改</Button>
+ <Button className="bg-brand-500 hover:bg-brand-600">SaveChange</Button>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        )}
+ )}
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 

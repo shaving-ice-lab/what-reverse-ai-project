@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 应用市场页面 - LobeHub 风格设计
+ * AppMarketplacePage - LobeHub StyleDesign
  */
 
 import { useEffect } from "react";
@@ -12,29 +12,29 @@ import { MarketplaceStoreContent } from "@/components/store/marketplace-store-co
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function StorePage() {
-  const router = useRouter();
-  const { isAuthenticated, isLoading, isInitialized, initialize } = useAuthStore();
+ const router = useRouter();
+ const { isAuthenticated, isLoading, isInitialized, initialize } = useAuthStore();
 
-  useEffect(() => {
-    initialize();
-  }, [initialize]);
+ useEffect(() => {
+ initialize();
+ }, [initialize]);
 
-  useEffect(() => {
-    if (!isInitialized || isLoading) return;
-    if (isAuthenticated) {
-      router.replace("/dashboard/store");
-    }
-  }, [isAuthenticated, isInitialized, isLoading, router]);
+ useEffect(() => {
+ if (!isInitialized || isLoading) return;
+ if (isAuthenticated) {
+ router.replace("/dashboard/store");
+ }
+ }, [isAuthenticated, isInitialized, isLoading, router]);
 
-  if (isInitialized && !isLoading && isAuthenticated) {
-    return null;
-  }
+ if (isInitialized && !isLoading && isAuthenticated) {
+ return null;
+ }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-      <MarketplaceStoreContent variant="public" />
-      <SiteFooter />
-    </div>
-  );
+ return (
+ <div className="min-h-screen bg-background">
+ <SiteHeader />
+ <MarketplaceStoreContent variant="public" />
+ <SiteFooter />
+ </div>
+ );
 }

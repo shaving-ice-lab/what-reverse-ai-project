@@ -1,774 +1,774 @@
 "use client";
 
 /**
- * 创作者数据分析页面
+ * CreativeuserDataAnalyticsPage
  *
- * Supabase 风格：简约、专业、数据可视化
+ * Supabase Style: Minimal, Professional, Datacanvisual
  */
 
 import { useState } from "react";
 import {
-  BarChart3,
-  TrendingUp,
+ BarChart3,
+ TrendingUp,
 
-  TrendingDown,
+ TrendingDown,
 
-  Users,
+ Users,
 
-  Eye,
+ Eye,
 
-  Star,
+ Star,
 
-  Download,
+ Download,
 
-  Calendar,
+ Calendar,
 
-  Filter,
+ Filter,
 
-  RefreshCw,
+ RefreshCw,
 
-  ChevronDown,
+ ChevronDown,
 
-  ArrowUpRight,
+ ArrowUpRight,
 
-  Zap,
+ Zap,
 
-  Clock,
+ Clock,
 
-  Target,
+ Target,
 
-  Award,
+ Award,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// 时间范围选项
+// TimeRangeOption
 
 const timeRanges = [
 
-  { id: "7d", label: "最近 7 天" },
+ { id: "7d", label: "Recent 7 days" },
 
-  { id: "30d", label: "最近 30 天" },
+ { id: "30d", label: "Recent 30 days" },
 
-  { id: "90d", label: "最近 90 天" },
+ { id: "90d", label: "Recent 90 days" },
 
-  { id: "1y", label: "最近 1 年" },
+ { id: "1y", label: "Recent 1 years" },
 
 ];
 
-// 概览统计
+// OverviewStatistics
 
 const overviewStats = [
 
-  {
-    label: "总浏览量",
+ {
+ label: "totalBrowse",
 
-    value: "125,678",
+ value: "125,678",
 
-    change: "+12.5%",
+ change: "+12.5%",
 
-    trend: "up",
+ trend: "up",
 
-    icon: Eye,
+ icon: Eye,
 
-    description: "较上期增加 14,230 次",
+ description: "onIncrease 14,230 times",
 
-  },
+ },
 
-  {
-    label: "独立访客",
+ {
+ label: "Unique Visitors",
 
-    value: "45,892",
+ value: "45,892",
 
-    change: "+8.3%",
+ change: "+8.3%",
 
-    trend: "up",
+ trend: "up",
 
-    icon: Users,
+ icon: Users,
 
-    description: "较上期增加 3,521 人",
+ description: "onIncrease 3,521 person",
 
-  },
+ },
 
-  {
-    label: "平均评分",
+ {
+ label: "AverageRating",
 
-    value: "4.8",
+ value: "4.8",
 
-    change: "+0.2",
+ change: "+0.2",
 
-    trend: "up",
+ trend: "up",
 
-    icon: Star,
+ icon: Star,
 
-    description: "共 2,345 条评价",
+ description: " 2,345 Reviews",
 
-  },
+ },
 
-  {
-    label: "使用次数",
+ {
+ label: "Usagetimescount",
 
-    value: "89,234",
+ value: "89,234",
 
-    change: "+15.7%",
+ change: "+15.7%",
 
-    trend: "up",
+ trend: "up",
 
-    icon: Zap,
+ icon: Zap,
 
-    description: "较上期增加 12,156 次",
+ description: "onIncrease 12,156 times",
 
-  },
+ },
 
 ];
 
-// 热门作品
+// PopularWork
 
 const topWorks = [
 
-  {
-    id: "1",
+ {
+ id: "1",
 
-    title: "智能客服助手模板",
+ title: "SmartSupportAssistantTemplate",
 
-    type: "模板",
+ type: "Template",
 
-    views: 12580,
+ views: 12580,
 
-    uses: 3456,
+ uses: 3456,
 
-    rating: 4.9,
+ rating: 4.9,
 
-    trend: "+23%",
+ trend: "+23%",
 
-  },
+ },
 
-  {
-    id: "2",
+ {
+ id: "2",
 
-    title: "数据同步工作流",
+ title: "DataSyncWorkflow",
 
-    type: "工作流",
+ type: "Workflow",
 
-    views: 8920,
+ views: 8920,
 
-    uses: 2134,
+ uses: 2134,
 
-    rating: 4.8,
+ rating: 4.8,
 
-    trend: "+18%",
+ trend: "+18%",
 
-  },
+ },
 
-  {
-    id: "3",
+ {
+ id: "3",
 
-    title: "邮件自动回复 Agent",
+ title: "EmailAutoReply Agent",
 
-    type: "Agent",
+ type: "Agent",
 
-    views: 7650,
+ views: 7650,
 
-    uses: 1890,
+ uses: 1890,
 
-    rating: 4.7,
+ rating: 4.7,
 
-    trend: "+15%",
+ trend: "+15%",
 
-  },
+ },
 
-  {
-    id: "4",
+ {
+ id: "4",
 
-    title: "报表生成模板",
+ title: "ReportGenerateTemplate",
 
-    type: "模板",
+ type: "Template",
 
-    views: 6234,
+ views: 6234,
 
-    uses: 1567,
+ uses: 1567,
 
-    rating: 4.6,
+ rating: 4.6,
 
-    trend: "+12%",
+ trend: "+12%",
 
-  },
+ },
 
-  {
-    id: "5",
+ {
+ id: "5",
 
-    title: "社交媒体管理工作流",
+ title: "Social MediaManageWorkflow",
 
-    type: "工作流",
+ type: "Workflow",
 
-    views: 5890,
+ views: 5890,
 
-    uses: 1234,
+ uses: 1234,
 
-    rating: 4.5,
+ rating: 4.5,
 
-    trend: "+10%",
+ trend: "+10%",
 
-  },
+ },
 
 ];
 
-// 用户来源
+// UserSource
 
 const trafficSources = [
 
-  { source: "搜索", percentage: 35, color: "bg-brand-500" },
+ { source: "Search", percentage: 35, color: "bg-brand-500" },
 
-  { source: "推荐", percentage: 28, color: "bg-brand-400" },
+ { source: "Recommended", percentage: 28, color: "bg-brand-400" },
 
-  { source: "分类浏览", percentage: 22, color: "bg-surface-300" },
+ { source: "CategoryBrowse", percentage: 22, color: "bg-surface-300" },
 
-  { source: "直接访问", percentage: 10, color: "bg-brand-400" },
+ { source: "DirectAccess", percentage: 10, color: "bg-brand-400" },
 
-  { source: "其他", percentage: 5, color: "bg-surface-200" },
+ { source: "otherhe", percentage: 5, color: "bg-surface-200" },
 
 ];
 
-// 每日数据
+// eachdayData
 
 const dailyData = [
 
-  { date: "01-24", views: 4520, uses: 1230, revenue: 245 },
+ { date: "01-24", views: 4520, uses: 1230, revenue: 245 },
 
-  { date: "01-25", views: 5120, uses: 1450, revenue: 312 },
+ { date: "01-25", views: 5120, uses: 1450, revenue: 312 },
 
-  { date: "01-26", views: 4890, uses: 1320, revenue: 278 },
+ { date: "01-26", views: 4890, uses: 1320, revenue: 278 },
 
-  { date: "01-27", views: 6230, uses: 1780, revenue: 456 },
+ { date: "01-27", views: 6230, uses: 1780, revenue: 456 },
 
-  { date: "01-28", views: 5670, uses: 1560, revenue: 389 },
+ { date: "01-28", views: 5670, uses: 1560, revenue: 389 },
 
-  { date: "01-29", views: 7120, uses: 1920, revenue: 523 },
+ { date: "01-29", views: 7120, uses: 1920, revenue: 523 },
 
-  { date: "01-30", views: 7890, uses: 2150, revenue: 612 },
+ { date: "01-30", views: 7890, uses: 2150, revenue: 612 },
 
 ];
 
-// 目标达成
+// Target
 
 const goals = [
 
-  { label: "月浏览量目标", current: 125678, target: 150000, unit: "次" },
+ { label: "monthsBrowseTarget", current: 125678, target: 150000, unit: "times" },
 
-  { label: "新增用户目标", current: 3521, target: 5000, unit: "人" },
+ { label: "AddUserTarget", current: 3521, target: 5000, unit: "person" },
 
-  { label: "收入目标", current: 2815, target: 4000, unit: "元" },
+ { label: "EarningsTarget", current: 2815, target: 4000, unit: "" },
 
 ];
 
 export default function CreatorAnalyticsPage() {
-  const [selectedRange, setSelectedRange] = useState("30d");
+ const [selectedRange, setSelectedRange] = useState("30d");
 
-  const [activeMetric, setActiveMetric] = useState<"views" | "uses" | "revenue">("views");
+ const [activeMetric, setActiveMetric] = useState<"views" | "uses" | "revenue">("views");
 
-  // 获取图表最大值
+ // FetchChartMaximumvalue
 
-  const maxValue = Math.max(...dailyData.map((d) => d[activeMetric]));
+ const maxValue = Math.max(...dailyData.map((d) => d[activeMetric]));
 
-  return (
-    <PageContainer>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-brand-200/60 flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-brand-500" />
-          </div>
-          <div className="page-caption">Creator</div>
-        </div>
-        <PageHeader
-          title="数据分析"
-          backHref="/dashboard/creator"
-          backLabel="返回"
-          actions={(
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 p-1 rounded-md bg-surface-200">
-                {timeRanges.map((range) => (
-                  <button
-                    key={range.id}
-                    onClick={() => setSelectedRange(range.id)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-md text-[13px] font-medium transition-all",
-                      selectedRange === range.id
-                        ? "bg-surface-100 text-foreground shadow-sm"
-                        : "text-foreground-muted hover:text-foreground"
-                    )}
-                  >
-                    {range.label}
-                  </button>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="border-border text-foreground-light">
-                <Download className="w-4 h-4 mr-2" />
-                导出报告
-              </Button>
-            </div>
-          )}
-        />
+ return (
+ <PageContainer>
+ <div className="max-w-6xl mx-auto space-y-6">
+ <div className="flex items-center gap-3">
+ <div className="w-9 h-9 rounded-md bg-brand-200/60 flex items-center justify-center">
+ <BarChart3 className="w-4 h-4 text-brand-500" />
+ </div>
+ <div className="page-caption">Creator</div>
+ </div>
+ <PageHeader
+ title="DataAnalytics"
+ backHref="/dashboard/creator"
+ backLabel="Back"
+ actions={(
+ <div className="flex items-center gap-2">
+ <div className="flex items-center gap-1 p-1 rounded-md bg-surface-200">
+ {timeRanges.map((range) => (
+ <button
+ key={range.id}
+ onClick={() => setSelectedRange(range.id)}
+ className={cn(
+ "px-3 py-1.5 rounded-md text-[13px] font-medium transition-all",
+ selectedRange === range.id
+ ? "bg-surface-100 text-foreground shadow-sm"
+ : "text-foreground-muted hover:text-foreground"
+ )}
+ >
+ {range.label}
+ </button>
+ ))}
+ </div>
+ <Button variant="outline" size="sm" className="border-border text-foreground-light">
+ <Download className="w-4 h-4 mr-2" />
+ ExportReport
+ </Button>
+ </div>
+ )}
+ />
 
-        {/* Content */}
+ {/* Content */}
 
-        <div className="space-y-6">
+ <div className="space-y-6">
 
-        {/* Overview Stats */}
+ {/* Overview Stats */}
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+ <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-          {overviewStats.map((stat) => (
-            <div
+ {overviewStats.map((stat) => (
+ <div
 
-              key={stat.label}
+ key={stat.label}
 
-              className="page-panel p-6"
+ className="page-panel p-6"
 
-            >
+ >
 
-              <div className="flex items-center justify-between mb-3">
+ <div className="flex items-center justify-between mb-3">
 
-                <stat.icon className="w-4 h-4 text-brand-500" />
+ <stat.icon className="w-4 h-4 text-brand-500" />
 
-                <span className={cn(
-                  "flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-md",
+ <span className={cn(
+ "flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-md",
 
-                  stat.trend === "up"
+ stat.trend === "up"
 
-                    ? "bg-brand-200 text-brand-500"
+ ? "bg-brand-200 text-brand-500"
 
-                    : "bg-destructive-200 text-destructive"
+ : "bg-destructive-200 text-destructive"
 
-                )}>
+ )}>
 
-                  {stat.trend === "up" ? (
-                    <TrendingUp className="w-3 h-3" />
+ {stat.trend === "up" ? (
+ <TrendingUp className="w-3 h-3" />
 
-                  ) : (
-                    <TrendingDown className="w-3 h-3" />
+ ) : (
+ <TrendingDown className="w-3 h-3" />
 
-                  )}
+ )}
 
-                  {stat.change}
+ {stat.change}
 
-                </span>
+ </span>
 
-              </div>
+ </div>
 
-              <div className="text-xl font-semibold text-foreground mb-1">
+ <div className="text-xl font-semibold text-foreground mb-1">
 
-                {stat.value}
+ {stat.value}
 
-              </div>
+ </div>
 
-              <div className="text-[13px] text-foreground-light">
+ <div className="text-[13px] text-foreground-light">
 
-                {stat.label}
+ {stat.label}
 
-              </div>
+ </div>
 
-              <div className="text-xs text-foreground-muted mt-2">
+ <div className="text-xs text-foreground-muted mt-2">
 
-                {stat.description}
+ {stat.description}
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-          ))}
+ ))}
 
-        </div>
+ </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+ <div className="grid lg:grid-cols-3 gap-6 mb-8">
 
-          {/* Chart */}
+ {/* Chart */}
 
-          <div className="lg:col-span-2 page-panel p-6">
+ <div className="lg:col-span-2 page-panel p-6">
 
-            <div className="flex items-center justify-between mb-6">
+ <div className="flex items-center justify-between mb-6">
 
-              <h3 className="page-panel-title">趋势分析</h3>
+ <h3 className="page-panel-title">TrendAnalytics</h3>
 
-              <div className="flex items-center gap-1 p-1 rounded-md bg-surface-200">
+ <div className="flex items-center gap-1 p-1 rounded-md bg-surface-200">
 
-                {[
+ {[
 
-                  { id: "views" as const, label: "浏览量" },
+ { id: "views" as const, label: "Browse" },
 
-                  { id: "uses" as const, label: "使用次数" },
+ { id: "uses" as const, label: "Usagetimescount" },
 
-                  { id: "revenue" as const, label: "收入" },
+ { id: "revenue" as const, label: "Earnings" },
 
-                ].map((metric) => (
-                  <button
+ ].map((metric) => (
+ <button
 
-                    key={metric.id}
+ key={metric.id}
 
-                    onClick={() => setActiveMetric(metric.id)}
+ onClick={() => setActiveMetric(metric.id)}
 
-                    className={cn(
-                      "px-3 py-1 rounded-md text-xs font-medium transition-all",
+ className={cn(
+ "px-3 py-1 rounded-md text-xs font-medium transition-all",
 
-                      activeMetric === metric.id
+ activeMetric === metric.id
 
-                        ? "bg-surface-100 text-foreground shadow-sm"
+ ? "bg-surface-100 text-foreground shadow-sm"
 
-                        : "text-foreground-muted hover:text-foreground"
+ : "text-foreground-muted hover:text-foreground"
 
-                    )}
+ )}
 
-                  >
+ >
 
-                    {metric.label}
+ {metric.label}
 
-                  </button>
+ </button>
 
-                ))}
+ ))}
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-            {/* Simple Bar Chart */}
+ {/* Simple Bar Chart */}
 
-            <div className="space-y-3">
+ <div className="space-y-3">
 
-              {dailyData.map((data) => (
-                <div key={data.date} className="flex items-center gap-4">
+ {dailyData.map((data) => (
+ <div key={data.date} className="flex items-center gap-4">
 
-                  <span className="text-xs text-foreground-muted w-12">
+ <span className="text-xs text-foreground-muted w-12">
 
-                    {data.date}
+ {data.date}
 
-                  </span>
+ </span>
 
-                  <div className="flex-1 h-6 bg-surface-200 rounded-full overflow-hidden">
+ <div className="flex-1 h-6 bg-surface-200 rounded-full overflow-hidden">
 
-                    <div
+ <div
 
-                      className="h-full bg-brand-500 rounded-full transition-all"
+ className="h-full bg-brand-500 rounded-full transition-all"
 
-                      style={{ width: `${(data[activeMetric] / maxValue) * 100}%` }}
+ style={{ width: `${(data[activeMetric] / maxValue) * 100}%` }}
 
-                    />
+ />
 
-                  </div>
+ </div>
 
-                  <span className="text-[13px] font-medium text-foreground w-16 text-right">
+ <span className="text-[13px] font-medium text-foreground w-16 text-right">
 
-                    {activeMetric === "revenue" ? `${data[activeMetric]}` : data[activeMetric].toLocaleString()}
+ {activeMetric === "revenue" ? `${data[activeMetric]}` : data[activeMetric].toLocaleString()}
 
-                  </span>
+ </span>
 
-                </div>
+ </div>
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-          {/* Traffic Sources */}
+ {/* Traffic Sources */}
 
-          <div className="page-panel p-6">
+ <div className="page-panel p-6">
 
-            <h3 className="page-panel-title mb-6">流量来源</h3>
+ <h3 className="page-panel-title mb-6">Source</h3>
 
-            <div className="space-y-4">
+ <div className="space-y-4">
 
-              {trafficSources.map((source) => (
-                <div key={source.source}>
+ {trafficSources.map((source) => (
+ <div key={source.source}>
 
-                  <div className="flex items-center justify-between mb-2">
+ <div className="flex items-center justify-between mb-2">
 
-                    <span className="text-[13px] text-foreground">{source.source}</span>
+ <span className="text-[13px] text-foreground">{source.source}</span>
 
-                    <span className="text-[13px] font-medium text-foreground">
+ <span className="text-[13px] font-medium text-foreground">
 
-                      {source.percentage}%
+ {source.percentage}%
 
-                    </span>
+ </span>
 
-                  </div>
+ </div>
 
-                  <div className="h-1.5 bg-surface-200 rounded-full overflow-hidden">
+ <div className="h-1.5 bg-surface-200 rounded-full overflow-hidden">
 
-                    <div
+ <div
 
-                      className={cn("h-full rounded-full", source.color)}
+ className={cn("h-full rounded-full", source.color)}
 
-                      style={{ width: `${source.percentage}%` }}
+ style={{ width: `${source.percentage}%` }}
 
-                    />
+ />
 
-                  </div>
+ </div>
 
-                </div>
+ </div>
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+ <div className="grid lg:grid-cols-2 gap-6">
 
-          {/* Top Works */}
+ {/* Top Works */}
 
-          <div className="page-panel p-6">
+ <div className="page-panel p-6">
 
-            <div className="flex items-center justify-between mb-6">
+ <div className="flex items-center justify-between mb-6">
 
-              <h3 className="page-panel-title">热门作品</h3>
+ <h3 className="page-panel-title">PopularWork</h3>
 
-              <Button variant="ghost" size="sm" className="text-foreground-light">
+ <Button variant="ghost" size="sm" className="text-foreground-light">
 
-                查看全部
+ View all
 
-                <ArrowUpRight className="w-4 h-4 ml-1" />
+ <ArrowUpRight className="w-4 h-4 ml-1" />
 
-              </Button>
+ </Button>
 
-            </div>
+ </div>
 
-            <div className="space-y-4">
+ <div className="space-y-4">
 
-              {topWorks.map((work, index) => (
-                <div
+ {topWorks.map((work, index) => (
+ <div
 
-                  key={work.id}
+ key={work.id}
 
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-surface-75 transition-colors"
+ className="flex items-center gap-4 p-3 rounded-md hover:bg-surface-75 transition-colors"
 
-                >
+ >
 
-                  <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center text-[13px] font-bold text-foreground-muted">
+ <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center text-[13px] font-bold text-foreground-muted">
 
-                    {index + 1}
+ {index + 1}
 
-                  </div>
+ </div>
 
-                  <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-0">
 
-                    <div className="text-[13px] font-medium text-foreground truncate">
+ <div className="text-[13px] font-medium text-foreground truncate">
 
-                      {work.title}
+ {work.title}
 
-                    </div>
+ </div>
 
-                    <div className="text-xs text-foreground-muted">
+ <div className="text-xs text-foreground-muted">
 
-                      {work.type}
+ {work.type}
 
-                    </div>
+ </div>
 
-                  </div>
+ </div>
 
-                  <div className="text-right">
+ <div className="text-right">
 
-                    <div className="text-[13px] font-medium text-foreground">
+ <div className="text-[13px] font-medium text-foreground">
 
-                      {work.views.toLocaleString()} 浏览
+ {work.views.toLocaleString()} Browse
 
-                    </div>
+ </div>
 
-                    <div className="text-xs text-brand-500">{work.trend}</div>
+ <div className="text-xs text-brand-500">{work.trend}</div>
 
-                  </div>
+ </div>
 
-                </div>
+ </div>
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-          {/* Goals Progress */}
+ {/* Goals Progress */}
 
-          <div className="page-panel p-6">
+ <div className="page-panel p-6">
 
-            <div className="flex items-center justify-between mb-6">
+ <div className="flex items-center justify-between mb-6">
 
-              <h3 className="page-panel-title">目标达成</h3>
+ <h3 className="page-panel-title">Target</h3>
 
-              <span className="text-xs text-foreground-muted">本月</span>
+ <span className="text-xs text-foreground-muted">currentmonths</span>
 
-            </div>
+ </div>
 
-            <div className="space-y-6">
+ <div className="space-y-6">
 
-              {goals.map((goal) => {
-                const percentage = Math.min((goal.current / goal.target) * 100, 100);
+ {goals.map((goal) => {
+ const percentage = Math.min((goal.current / goal.target) * 100, 100);
 
-                return (
-                  <div key={goal.label}>
+ return (
+ <div key={goal.label}>
 
-                    <div className="flex items-center justify-between mb-2">
+ <div className="flex items-center justify-between mb-2">
 
-                      <span className="text-[13px] text-foreground">{goal.label}</span>
+ <span className="text-[13px] text-foreground">{goal.label}</span>
 
-                      <span className="text-xs text-foreground-muted">
+ <span className="text-xs text-foreground-muted">
 
-                        {goal.current.toLocaleString()} / {goal.target.toLocaleString()} {goal.unit}
+ {goal.current.toLocaleString()} / {goal.target.toLocaleString()} {goal.unit}
 
-                      </span>
+ </span>
 
-                    </div>
+ </div>
 
-                    <div className="h-2 bg-surface-200 rounded-full overflow-hidden">
+ <div className="h-2 bg-surface-200 rounded-full overflow-hidden">
 
-                      <div
+ <div
 
-                        className={cn(
-                          "h-full rounded-full transition-all",
+ className={cn(
+ "h-full rounded-full transition-all",
 
-                          percentage >= 100 ? "bg-brand-500" : percentage >= 70 ? "bg-brand-500" : "bg-brand-400"
+ percentage >= 100 ? "bg-brand-500" : percentage >= 70 ? "bg-brand-500" : "bg-brand-400"
 
-                        )}
+ )}
 
-                        style={{ width: `${percentage}%` }}
+ style={{ width: `${percentage}%` }}
 
-                      />
+ />
 
-                    </div>
+ </div>
 
-                    <div className="text-xs text-foreground-muted mt-1">
+ <div className="text-xs text-foreground-muted mt-1">
 
-                      完成 {percentage.toFixed(1)}%
+ Done {percentage.toFixed(1)}%
 
-                    </div>
+ </div>
 
-                  </div>
+ </div>
 
-                );
+ );
 
-              })}
+ })}
 
-            </div>
+ </div>
 
-            {/* Tips */}
+ {/* Tips */}
 
-            <div className="mt-6 p-4 rounded-md bg-brand-200/60 border border-brand-500/30">
+ <div className="mt-6 p-4 rounded-md bg-brand-200/60 border border-brand-500/30">
 
-              <div className="flex items-start gap-3">
+ <div className="flex items-start gap-3">
 
-                <Target className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+ <Target className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
 
-                <div>
+ <div>
 
-                  <h4 className="text-[13px] font-medium text-foreground mb-1">优化建议</h4>
+ <h4 className="text-[13px] font-medium text-foreground mb-1">optimalSuggestion</h4>
 
-                  <p className="text-xs text-foreground-light">
+ <p className="text-xs text-foreground-light">
 
-                    您的模板在周末使用量明显增加，建议在周五发布新作品以获得更好的曝光。
+ you'sTemplateatweeksUsageIncrease, Suggestionatweeks5PublishnewWorkwithObtainmore'sExposure.
 
-                  </p>
+ </p>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-        {/* Insights */}
+ {/* Insights */}
 
-        <div className="mt-8 page-panel p-6">
+ <div className="mt-8 page-panel p-6">
 
-          <h3 className="page-panel-title mb-6">数据洞察</h3>
+ <h3 className="page-panel-title mb-6">DataInsights</h3>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-            {[
+ {[
 
-              {
-                icon: Clock,
+ {
+ icon: Clock,
 
-                title: "最佳发布时间",
+ title: "mostPublishTime",
 
-                value: "周三 10:00",
+ value: "weeks3 10:00",
 
-                description: "该时段发布作品平均浏览量最高",
+ description: "timePublishWorkAverageBrowsemost",
 
-              },
+ },
 
-              {
-                icon: Users,
+ {
+ icon: Users,
 
-                title: "用户留存率",
+ title: "UserRetention Rate",
 
-                value: "68.5%",
+ value: "68.5%",
 
-                description: "使用过您作品的用户再次使用的比例",
+ description: "UsagepastyouWork'sUseragaintimesUsage'scompareexample",
 
-              },
+ },
 
-              {
-                icon: Star,
+ {
+ icon: Star,
 
-                title: "评价响应率",
+ title: "ReviewsResponserate",
 
-                value: "92%",
+ value: "92%",
 
-                description: "您回复用户评价的比例",
+ description: "youReplyUserReviews'scompareexample",
 
-              },
+ },
 
-              {
-                icon: Award,
+ {
+ icon: Award,
 
-                title: "创作者排名",
+ title: "CreativeuserRanking",
 
-                value: "Top 5%",
+ value: "Top 5%",
 
-                description: "您在所有创作者中的排名",
+ description: "youatAllCreativeuser'sRanking",
 
-              },
+ },
 
-            ].map((insight) => (
-              <div key={insight.title} className="p-4 rounded-md bg-surface-75">
+ ].map((insight) => (
+ <div key={insight.title} className="p-4 rounded-md bg-surface-75">
 
-                <insight.icon className="w-4 h-4 text-brand-500 mb-3" />
+ <insight.icon className="w-4 h-4 text-brand-500 mb-3" />
 
-                <div className="text-base font-semibold text-foreground mb-1">
+ <div className="text-base font-semibold text-foreground mb-1">
 
-                  {insight.value}
+ {insight.value}
 
-                </div>
+ </div>
 
-                <div className="text-[13px] font-medium text-foreground mb-1">
+ <div className="text-[13px] font-medium text-foreground mb-1">
 
-                  {insight.title}
+ {insight.title}
 
-                </div>
+ </div>
 
-                <div className="text-xs text-foreground-muted">
+ <div className="text-xs text-foreground-muted">
 
-                  {insight.description}
+ {insight.description}
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            ))}
+ ))}
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-        </div>
+ </div>
 
-      </div>
-    </PageContainer>
+ </div>
+ </PageContainer>
 
-  );
+ );
 }
 

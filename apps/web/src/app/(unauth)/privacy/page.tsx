@@ -1,143 +1,143 @@
 "use client";
 
 /**
- * 隐私政策页面 - LobeHub 风格设计
+ * Privacy PolicyPage - LobeHub StyleDesign
  */
 
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 
 export default function PrivacyPage() {
-  return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+ return (
+ <div className="min-h-screen bg-background">
+ <SiteHeader />
 
-      <main className="pt-32 sm:pt-40 pb-16 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-[15px] sm:text-3xl font-bold text-foreground mb-2">隐私政策</h1>
-          <p className="text-[13px] text-foreground-lighter mb-8">最后更新：2026 年 2 月 2 日</p>
+ <main className="pt-32 sm:pt-40 pb-16 px-6">
+ <div className="max-w-3xl mx-auto">
+ <h1 className="text-[15px] sm:text-3xl font-bold text-foreground mb-2">Privacy Policy</h1>
+ <p className="text-[13px] text-foreground-lighter mb-8">Last Updated: 2026 years 2 months 2 day</p>
 
-          <div className="space-y-8">
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">1. 信息收集</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                我们收集您在使用服务时提供的信息，包括：
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>账户信息：姓名、邮箱、密码</li>
-                <li>使用数据：工作流配置、执行记录</li>
-                <li>设备信息：浏览器类型、IP 地址、设备标识</li>
-                <li>第三方集成数据：您授权连接的服务数据</li>
-              </ul>
-            </section>
+ <div className="space-y-8">
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">1. InfoCollect</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ WeCollectyouatUsageServicetimeProvide'sInfo, Include: 
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>AccountInfo: Name, Email, Password</li>
+ <li>UsageData: WorkflowConfig, ExecuteRecord</li>
+ <li>DeviceInfo: BrowseType, IP Address, DeviceIdentifier</li>
+ <li>Third-partyIntegrationData: youAuthorizeConnect'sServiceData</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">2. 信息使用</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                我们使用收集的信息用于：
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>提供和维护服务</li>
-                <li>改进用户体验</li>
-                <li>发送服务通知和更新</li>
-                <li>分析使用趋势和优化性能</li>
-                <li>防止欺诈和滥用</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">2. InfoUsage</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ WeUsageCollect'sInfoUsed for: 
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>ProvideandMaintainService</li>
+ <li>ImproveUserExperience</li>
+ <li>SendServiceNotificationsandUpdate</li>
+ <li>AnalyticsUsageTrendandoptimalcan</li>
+ <li>PreventFraudanduse</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">3. 信息共享</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                我们不会出售您的个人信息。我们可能在以下情况下共享信息：
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>经您同意</li>
-                <li>与服务提供商合作（如云服务、支付处理）</li>
-                <li>法律要求或保护权利</li>
-                <li>业务转让或合并</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">3. InfoShare</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ Wenotwillyou'sPersonal Info.WecancanatwithdownSituationdownShareInfo: 
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>youAgree</li>
+ <li>andServiceProviderCooperation(ifService, PaymentProcess)</li>
+ <li>LegalneedorProtectRight</li>
+ <li>Businessletorand</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">4. 公开访问与分享</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                当您选择公开访问或分享应用与内容时，相关信息可能向公众或特定受众可见。
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>请避免在公开内容中包含敏感个人信息或机密数据</li>
-                <li>公开访问内容的可见范围由您配置，我们不会为此类内容提供默认隐私保护</li>
-                <li>您可以随时关闭公开访问或撤回分享以减少曝光</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">4. PublicAccessandShare</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ youSelectPublicAccessorShareAppandContenttime, RelatedInfocancanorSpecificAudiencecan.
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>PleaseAvoidatPublicContentContainsSensitivePersonal InfoorData</li>
+ <li>PublicAccessContent'scanRangeyouConfig, WenotwillasthisContentProvideDefaultPrivacyProtect</li>
+ <li>youcanwithAnytimeClosePublicAccessorSharewithfewExposure</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">5. AI 生成内容与自动化处理</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                为提供 AI 功能，我们会处理您提交的提示词、输入与生成结果。
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>可能会与受信任的模型服务商共享必要内容以完成生成与安全审查</li>
-                <li>我们遵循最小必要原则处理 AI 相关数据，并尽可能减少敏感信息暴露</li>
-                <li>如需对特定数据进行更严格的控制，请优先使用私有访问模式</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">5. AI GenerateContentandAutomationProcess</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ asProvide AI Features, WewillProcessyouSubmit'sPrompt, InputandGenerateResult.
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>cancanwilland'sModelServiceShareneedContentwithDoneGenerateandSecurityReview</li>
+ <li>WeFollowMinimumneedthenProcess AI RelatedData, andcancanfewSensitiveInfo</li>
+ <li>ifneedforSpecificDataProceedmoreStrict'sControl, PleasePriorityUsagePrivateAccess</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">6. 数据安全</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
-                我们采取多层安全措施保护您的数据：
-              </p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>传输加密：所有数据传输使用 TLS 加密</li>
-                <li>存储加密：敏感数据使用 AES-256 加密存储</li>
-                <li>访问控制：严格的内部访问权限管理</li>
-                <li>定期审计：安全审计和渗透测试</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">6. DataSecurity</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">
+ WemultipleSecurityMeasureProtectyou'sData: 
+ </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>TransferEncrypt: AllDataTransferUsage TLS Encrypt</li>
+ <li>StorageEncrypt: SensitiveDataUsage AES-256 EncryptStorage</li>
+ <li>AccessControl: Strict'sInternalAccessPermissionManage</li>
+ <li>PeriodicAudit: SecurityAuditandPenetrationTest</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">7. 数据保留</h2>
-              <p className="text-[13px] text-foreground-light leading-relaxed">
-                我们会在提供服务所需的期间内保留您的信息。账户删除后，我们会在 30 天内删除您的个人数据，
-                但可能会保留匿名化的统计数据。
-              </p>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">7. DataRetain</h2>
+ <p className="text-[13px] text-foreground-light leading-relaxed">
+ WewillatProvideServiceneed'sbetweeninRetainyou'sInfo.AccountDeleteafter, Wewillat 30 daysinDeleteyou'spersonData, 
+ butcancanwillRetainAnonymous'sStatisticsData.
+ </p>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">8. 您的权利</h2>
-              <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">您有权：</p>
-              <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
-                <li>访问和获取您的数据副本</li>
-                <li>更正不准确的信息</li>
-                <li>请求删除您的账户和数据</li>
-                <li>反对某些数据处理活动</li>
-                <li>数据可携带性</li>
-              </ul>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">8. you'sRight</h2>
+ <p className="text-[13px] text-foreground-light mb-4 leading-relaxed">youhas: </p>
+ <ul className="list-disc pl-6 text-[13px] text-foreground-light space-y-2 leading-relaxed">
+ <li>AccessandFetchyou'sDatacurrent</li>
+ <li>morecurrentlynotAccurate'sInfo</li>
+ <li>RequestDeleteyou'sAccountandData</li>
+ <li>forDataProcessActivity</li>
+ <li>Datacan</li>
+ </ul>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">9. Cookie 政策</h2>
-              <p className="text-[13px] text-foreground-light leading-relaxed">
-                我们使用 Cookie 和类似技术来改善用户体验、分析使用情况和个性化内容。
-                您可以通过浏览器设置管理 Cookie 偏好。
-              </p>
-            </section>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">9. Cookie Policy</h2>
+ <p className="text-[13px] text-foreground-light leading-relaxed">
+ WeUsage Cookie andTechnologycomeUserExperience, AnalyticsUsageSituationandPersonalizationContent.
+ youcanwithViaBrowseSettingsManage Cookie Preference.
+ </p>
+ </section>
 
-            <section>
-              <h2 className="text-[15px] font-semibold text-foreground mb-4">10. 联系我们</h2>
-              <p className="text-[13px] text-foreground-light leading-relaxed">
-                如有任何隐私相关问题，请联系我们：
-              </p>
-              <ul className="list-none text-[13px] text-foreground-light mt-2 space-y-1">
-                <li>邮箱：privacy@agentflow.ai</li>
-                <li>地址：北京市海淀区中关村科技园</li>
-              </ul>
-            </section>
-          </div>
-        </div>
-      </main>
+ <section>
+ <h2 className="text-[15px] font-semibold text-foreground mb-4">10. Contact Us</h2>
+ <p className="text-[13px] text-foreground-light leading-relaxed">
+ ifhaswhatPrivacyRelatedIssue, PleaseContact Us: 
+ </p>
+ <ul className="list-none text-[13px] text-foreground-light mt-2 space-y-1">
+ <li>Email: privacy@agentflow.ai</li>
+ <li>Address: Beijing</li>
+ </ul>
+ </section>
+ </div>
+ </div>
+ </main>
 
-      <SiteFooter />
-    </div>
-  );
+ <SiteFooter />
+ </div>
+ );
 }

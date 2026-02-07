@@ -1,24 +1,24 @@
 "use client";
 
 /**
- * 常见问题页面 - LobeHub 风格
+ * FAQPage - LobeHub Style
  */
 
 import { useState } from "react";
 import Link from "next/link";
 import {
-  HelpCircle,
-  Search,
-  Plus,
-  Zap,
-  CreditCard,
-  Shield,
-  Settings,
-  Users,
-  MessageSquare,
-  AlertTriangle,
-  ArrowRight,
-  Sparkles,
+ HelpCircle,
+ Search,
+ Plus,
+ Zap,
+ CreditCard,
+ Shield,
+ Settings,
+ Users,
+ MessageSquare,
+ AlertTriangle,
+ ArrowRight,
+ Sparkles,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,243 +26,243 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// FAQ 分类
+// FAQ Category
 const categories = [
-  { id: "all", name: "全部", icon: HelpCircle },
-  { id: "getting-started", name: "入门使用", icon: Zap },
-  { id: "billing", name: "账单与订阅", icon: CreditCard },
-  { id: "security", name: "安全与隐私", icon: Shield },
-  { id: "technical", name: "技术问题", icon: Settings },
-  { id: "troubleshooting", name: "故障排查", icon: AlertTriangle },
+ { id: "all", name: "allsection", icon: HelpCircle },
+ { id: "getting-started", name: "Getting StartedUsage", icon: Zap },
+ { id: "billing", name: "BillingandSubscription", icon: CreditCard },
+ { id: "security", name: "SecurityandPrivacy", icon: Shield },
+ { id: "technical", name: "TechnologyIssue", icon: Settings },
+ { id: "troubleshooting", name: "Fault", icon: AlertTriangle },
 ];
 
-// FAQ 数据
+// FAQ Data
 const faqs = [
-  {
-    category: "getting-started",
-    question: "什么是 AgentFlow？",
-    answer: "AgentFlow 是一个 AI 驱动的工作流自动化平台，帮助用户通过可视化编辑器和智能 AI Agent 快速构建、部署和管理自动化工作流。无需编程知识，即可实现复杂的业务自动化。",
-  },
-  {
-    category: "getting-started",
-    question: "如何开始使用 AgentFlow？",
-    answer: "开始使用非常简单：1. 注册免费账户；2. 在模板市场选择一个模板，或从零开始创建工作流；3. 使用可视化编辑器配置工作流节点；4. 设置触发条件并激活工作流。我们还提供详细的文档和视频教程帮助您快速上手。",
-  },
-  {
-    category: "getting-started",
-    question: "需要编程知识吗？",
-    answer: "不需要。AgentFlow 提供可视化的拖拽式编辑器，无需编写任何代码即可创建复杂的工作流。当然，如果您有编程背景，可以使用我们的 API 和 SDK 进行更高级的定制。",
-  },
-  {
-    category: "billing",
-    question: "可以免费试用吗？",
-    answer: "是的！专业版和团队版都提供 14 天免费试用，无需绑定信用卡。试用期间您可以体验所有付费功能。试用期结束后，您可以选择订阅付费版本或降级到免费版。",
-  },
-  {
-    category: "billing",
-    question: "支持哪些支付方式？",
-    answer: "我们支持多种支付方式：信用卡（Visa、MasterCard、American Express）、支付宝、微信支付、企业对公转账（企业客户）。所有支付均通过安全的第三方支付平台处理。",
-  },
-  {
-    category: "billing",
-    question: "如何取消订阅？",
-    answer: "您可以随时取消订阅，无需支付任何取消费用。取消后，您的付费功能将在当前计费周期结束后停止，账户会自动降级到免费版本。您的数据将被保留，如需删除请联系我们。",
-  },
-  {
-    category: "security",
-    question: "数据安全如何保障？",
-    answer: "数据安全是我们的首要任务。我们采取多层安全措施：所有数据传输使用 TLS 加密、敏感数据使用 AES-256 加密存储、SOC 2 Type II 认证、GDPR 合规、定期安全审计和渗透测试、严格的内部访问控制。",
-  },
-  {
-    category: "security",
-    question: "数据存储在哪里？",
-    answer: "我们的数据中心位于中国境内，使用阿里云和腾讯云的基础设施。对于有特殊合规要求的企业客户，我们提供私有化部署选项，数据可以存储在您自己的服务器上。",
-  },
-  {
-    category: "technical",
-    question: "支持哪些集成？",
-    answer: "我们支持 100+ 主流服务的集成，包括：通讯（Slack、飞书、钉钉、微信）、项目管理（Notion、Asana、Jira、Linear）、开发工具（GitHub、GitLab、Vercel）、数据库（MySQL、PostgreSQL、MongoDB）、AI 服务（OpenAI、Anthropic、通义千问）。还支持自定义 Webhook 和 API 集成。",
-  },
-  {
-    category: "technical",
-    question: "有 API 限制吗？",
-    answer: "是的，不同版本有不同的 API 限制：免费版 100 次/分钟、专业版 500 次/分钟、团队版 2000 次/分钟、企业版自定义限制。如果您需要更高的限制，请联系我们的销售团队。",
-  },
-  {
-    category: "troubleshooting",
-    question: "工作流执行失败如何快速定位？",
-    answer: "建议先查看执行记录中的失败节点与错误信息，确认输入参数是否缺失或格式不正确，再检查目标应用的访问策略与配额。必要时降低并发或开启重试以缩短恢复时间。",
-  },
-  {
-    category: "troubleshooting",
-    question: "Webhook 收不到事件回调怎么办？",
-    answer: "请确认 Webhook URL 可公网访问且未被防火墙拦截，核对签名密钥与事件类型是否匹配，再使用测试事件触发。也可在日志中查看回调失败原因。",
-  },
-  {
-    category: "troubleshooting",
-    question: "运行时提示限流或超时如何处理？",
-    answer: "优先检查访问频率是否超过当前计划配额，必要时调整 rate_limit 策略或升级套餐。同时可减少并发或启用重试来缓解高峰期超时。",
-  },
-  {
-    category: "troubleshooting",
-    question: "如何提交工单并跟踪响应 SLA？",
-    answer: "进入支持中心提交工单，系统会自动分级并给出响应 SLA。您可以在工单回执中查看预计响应时间与当前状态。",
-  },
+ {
+ category: "getting-started",
+ question: "Whatis AgentFlow?",
+ answer: "AgentFlow is1 AI Driven'sWorkflowAutomationPlatform, HelpUserViacanvisualEditandSmart AI Agent QuickBuild, DeployandManageAutomationWorkflow.NoneneedProgramming, nowcanImplementComplex'sBusinessAutomation.",
+ },
+ {
+ category: "getting-started",
+ question: "ifwhatStartUsage AgentFlow?",
+ answer: "StartUsageVerySimple: 1. Sign UpFreeAccount; 2. atTemplateMarketplaceSelect1Template, orfromStartCreateWorkflow; 3. UsagecanvisualEditConfigWorkflowNode; 4. SettingsTriggerConditionandActivateWorkflow.WestillProvideDetailed'sDocumentandVideoTutorialHelpyouQuickon.",
+ },
+ {
+ category: "getting-started",
+ question: "needneedProgramming??",
+ answer: "notneedneed.AgentFlow Providecanvisual'sDrag & DropEdit, NoneneedWritewhatCodenowcanCreateComplex'sWorkflow., ifresultyouhasProgrammingBackground, canwithUsageWe's API and SDK ProceedmoreAdvanced'sCustomize.",
+ },
+ {
+ category: "billing",
+ question: "canwithFreeuse??",
+ answer: "is's!ProfessionalversionandTeamversionallProvide 14 daysFreeuse, NoneneedBinduse.usebetweenyoucanwithExperienceAllPaidFeatures.useEndafter, youcanwithSelectSubscriptionPaidVersionorDowngradetoFreeversion.",
+ },
+ {
+ category: "billing",
+ question: "SupportWhichPaymentmethod?",
+ answer: "WeSupportmultipletypePaymentmethod: use(Visa, MasterCard, American Express), Payment, WeChatPayment, Enterprisefor(EnterpriseCustomer).AllPaymentViaSecurity'sThird-partyPaymentPlatformProcess.",
+ },
+ {
+ category: "billing",
+ question: "ifwhatUnsubscribe?",
+ answer: "youcanwithAnytimeUnsubscribe, NoneneedPaymentwhatCancelCost.Cancelafter, you'sPaidFeatureswillatCurrentBillingweeksEndafterStop, AccountwillAutoDowngradetoFreeVersion.you'sDatawillbyRetain, ifneedDeletePleaseContact Us.",
+ },
+ {
+ category: "security",
+ question: "DataSecurityifwhatAssurance?",
+ answer: "DataSecurityisWe'sneedTask.WemultipleSecurityMeasure: AllDataTransferUsage TLS Encrypt, SensitiveDataUsage AES-256 EncryptStorage, SOC 2 Type II Authentication, GDPR Compliance, PeriodicSecurityAuditandPenetrationTest, Strict'sInternalAccessControl.",
+ },
+ {
+ category: "security",
+ question: "DataStorageatin?",
+ answer: "We'sDatacenteratin, UsageinandTencent Cloud'sBasicInfrastructure.forathasSpecialComplianceneed'sEnterpriseCustomer, WeProvidePrivateDeployOption, DatacanwithStorageatyouSelf'sServiceon.",
+ },
+ {
+ category: "technical",
+ question: "SupportWhichIntegration?",
+ answer: "WeSupport 100+ mainService'sIntegration, Include: Newsletter(Slack, Feishu, DingTalk, WeChat), itemManage(Notion, Asana, Jira, Linear), DevelopmentTool(GitHub, GitLab, Vercel), Database(MySQL, PostgreSQL, MongoDB), AI Service(OpenAI, Anthropic, Tongyi1000).stillSupportCustom Webhook and API Integration.",
+ },
+ {
+ category: "technical",
+ question: "has API Limit??",
+ answer: "is's, notVersionhasnot's API Limit: Freeversion 100 times/min, Professionalversion 500 times/min, Teamversion 2000 times/min, EnterpriseCustomLimit.ifresultyouneedneedmore'sLimit, PleaseContact Us'sSalesTeam.",
+ },
+ {
+ category: "troubleshooting",
+ question: "WorkflowExecuteFailedifwhatQuick?",
+ answer: "SuggestionfirstViewExecuteRecord'sFailedNodeandErrorInfo, ConfirmInputParameterisnoMissingorInvalid format, againCheckTargetApp'sAccessPolicyandQuota.needtimeReduceConcurrencyorEnableRetrywithShortenRestoreTime.",
+ },
+ {
+ category: "troubleshooting",
+ question: "Webhook nottoEventCallback?",
+ answer: "Please confirm Webhook URL canAccessandnot yetbyFirewallIntercept, forBioKeyandEventTypeisnoMatch, againUsageTestEventTrigger.alsocanatLogsViewCallbackFailedReason.",
+ },
+ {
+ category: "troubleshooting",
+ question: "RuntimeTipRate LimitingorTimeoutifwhatProcess?",
+ answer: "PriorityCheckAccessrateisnoExceedCurrentPlanQuota, needtimeAdjust rate_limit PolicyorUpgradePlan.timecanfewConcurrencyorEnableRetrycomeTimeout.",
+ },
+ {
+ category: "troubleshooting",
+ question: "ifwhatSubmitTicketandTrackResponse SLA?",
+ answer: "EnterSupportcenterSubmitTicket, SystemwillAutoTierandtoResponse SLA.youcanwithatTicketViewEstimatedResponse TimeandCurrentStatus.",
+ },
 ];
 
 export default function FAQPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+ const [searchQuery, setSearchQuery] = useState("");
+ const [activeCategory, setActiveCategory] = useState("all");
+ const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  const filteredFaqs = faqs.filter((faq) => {
-    const matchesSearch =
-      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      activeCategory === "all" || faq.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+ const filteredFaqs = faqs.filter((faq) => {
+ const matchesSearch =
+ faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+ faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+ const matchesCategory =
+ activeCategory === "all" || faq.category === activeCategory;
+ return matchesSearch && matchesCategory;
+ });
 
-  return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
+ return (
+ <div className="min-h-screen bg-background">
+ <SiteHeader />
 
-      {/* Hero */}
-      <section className="relative pt-32 sm:pt-40 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+ {/* Hero */}
+ <section className="relative pt-32 sm:pt-40 pb-16 overflow-hidden">
+ <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
 
-        <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-          <div className="lobe-badge mb-8">
-            <HelpCircle className="h-3.5 w-3.5" />
-            <span>常见问题</span>
-          </div>
+ <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+ <div className="lobe-badge mb-8">
+ <HelpCircle className="h-3.5 w-3.5" />
+ <span>FAQ</span>
+ </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
-            常见问题
-          </h1>
-          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
-            快速找到您需要的答案
-          </p>
+ <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+ FAQ
+ </h1>
+ <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
+ Quicktoyouneedneed'sAnswer
+ </p>
 
-          {/* Search */}
-          <div className="max-w-xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
-            <Input
-              placeholder="搜索问题..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
-            />
-          </div>
-        </div>
-      </section>
+ {/* Search */}
+ <div className="max-w-xl mx-auto relative">
+ <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
+ <Input
+ placeholder="SearchIssue..."
+ value={searchQuery}
+ onChange={(e) => setSearchQuery(e.target.value)}
+ className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
+ />
+ </div>
+ </div>
+ </section>
 
-      {/* Categories */}
-      <section className="py-8 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-2">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200",
-                  activeCategory === category.id
-                    ? "bg-foreground text-background"
-                    : "bg-surface-100/50 border border-border/30 text-foreground-lighter hover:text-foreground hover:border-border/60"
-                )}
-              >
-                <category.icon className="w-4 h-4" />
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+ {/* Categories */}
+ <section className="py-8 px-6">
+ <div className="max-w-3xl mx-auto">
+ <div className="flex flex-wrap justify-center gap-2">
+ {categories.map((category) => (
+ <button
+ key={category.id}
+ onClick={() => setActiveCategory(category.id)}
+ className={cn(
+ "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200",
+ activeCategory === category.id
+ ? "bg-foreground text-background"
+ : "bg-surface-100/50 border border-border/30 text-foreground-lighter hover:text-foreground hover:border-border/60"
+ )}
+ >
+ <category.icon className="w-4 h-4" />
+ {category.name}
+ </button>
+ ))}
+ </div>
+ </div>
+ </section>
 
-      {/* FAQ List */}
-      <section className="py-16 sm:py-24 px-6">
-        <div className="max-w-3xl mx-auto">
-          {filteredFaqs.length === 0 ? (
-            <div className="text-center py-16">
-              <HelpCircle className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
-              <h3 className="text-[15px] font-medium text-foreground mb-2">
-                没有找到相关问题
-              </h3>
-              <p className="text-[13px] text-foreground-lighter">
-                尝试使用其他关键词搜索
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {filteredFaqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "rounded-xl border transition-all duration-200",
-                    expandedIndex === index
-                      ? "border-border/60 bg-surface-100/30"
-                      : "border-transparent hover:bg-surface-100/20"
-                  )}
-                >
-                  <button
-                    onClick={() =>
-                      setExpandedIndex(expandedIndex === index ? null : index)
-                    }
-                    className="w-full flex items-center justify-between px-6 py-5 text-left"
-                  >
-                    <span className="text-[15px] font-medium text-foreground pr-4">
-                      {faq.question}
-                    </span>
-                    <div className={cn(
-                      "shrink-0 w-6 h-6 rounded-full bg-surface-200/80 flex items-center justify-center transition-transform duration-200",
-                      expandedIndex === index && "rotate-45"
-                    )}>
-                      <Plus className="w-3.5 h-3.5 text-foreground-light" />
-                    </div>
-                  </button>
-                  {expandedIndex === index && (
-                    <div className="px-6 pb-5">
-                      <p className="text-[14px] text-foreground-lighter leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+ {/* FAQ List */}
+ <section className="py-16 sm:py-24 px-6">
+ <div className="max-w-3xl mx-auto">
+ {filteredFaqs.length === 0 ? (
+ <div className="text-center py-16">
+ <HelpCircle className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
+ <h3 className="text-[15px] font-medium text-foreground mb-2">
+ NotoRelatedIssue
+ </h3>
+ <p className="text-[13px] text-foreground-lighter">
+ TryUsageotherheKeywordsSearch
+ </p>
+ </div>
+ ) : (
+ <div className="space-y-2">
+ {filteredFaqs.map((faq, index) => (
+ <div
+ key={index}
+ className={cn(
+ "rounded-xl border transition-all duration-200",
+ expandedIndex === index
+ ? "border-border/60 bg-surface-100/30"
+ : "border-transparent hover:bg-surface-100/20"
+ )}
+ >
+ <button
+ onClick={() =>
+ setExpandedIndex(expandedIndex === index ? null : index)
+ }
+ className="w-full flex items-center justify-between px-6 py-5 text-left"
+ >
+ <span className="text-[15px] font-medium text-foreground pr-4">
+ {faq.question}
+ </span>
+ <div className={cn(
+ "shrink-0 w-6 h-6 rounded-full bg-surface-200/80 flex items-center justify-center transition-transform duration-200",
+ expandedIndex === index && "rotate-45"
+ )}>
+ <Plus className="w-3.5 h-3.5 text-foreground-light" />
+ </div>
+ </button>
+ {expandedIndex === index && (
+ <div className="px-6 pb-5">
+ <p className="text-[14px] text-foreground-lighter leading-relaxed">
+ {faq.answer}
+ </p>
+ </div>
+ )}
+ </div>
+ ))}
+ </div>
+ )}
+ </div>
+ </section>
 
-      {/* Help CTA */}
-      <section className="relative py-24 sm:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
-            还有其他问题？
-          </h2>
-          <p className="text-foreground-light mb-8">
-            联系我们的支持团队获取帮助
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/contact">
-              <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                联系支持
-              </Button>
-            </Link>
-            <Link href="/docs">
-              <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
-                查看文档
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+ {/* Help CTA */}
+ <section className="relative py-24 sm:py-32 overflow-hidden">
+ <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
+ <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+ <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
+ stillhasotherheIssue?
+ </h2>
+ <p className="text-foreground-light mb-8">
+ Contact Us'sSupportTeamFetchHelp
+ </p>
+ <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+ <Link href="/contact">
+ <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
+ <MessageSquare className="w-4 h-4 mr-2" />
+ ContactSupport
+ </Button>
+ </Link>
+ <Link href="/docs">
+ <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
+ ViewDocument
+ </Button>
+ </Link>
+ </div>
+ </div>
+ </section>
 
-      <SiteFooter />
-    </div>
-  );
+ <SiteFooter />
+ </div>
+ );
 }

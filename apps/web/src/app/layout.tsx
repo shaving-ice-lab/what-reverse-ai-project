@@ -3,41 +3,41 @@ import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// 正文字体：Space Grotesk - 更具个性的现代字体
+// Bodychar: Space Grotesk - more'sModernchar
 const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
+ subsets: ["latin"],
+ variable: "--font-sans",
+ display: "swap",
+ weight: ["400", "500", "600", "700"],
 });
 
-// 代码字体：IBM Plex Mono - 清晰的工程感等宽字体
+// Codechar: IBM Plex Mono - Clear'setcchar
 const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-  weight: ["400", "500", "600"],
+ subsets: ["latin"],
+ variable: "--font-mono",
+ display: "swap",
+ weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "AgentFlow - AI 工作流平台",
-  description: "本地优先、代码级自定义、社区驱动的 AI Agent 工作流平台",
-  keywords: ["AI", "Agent", "Workflow", "自动化", "工作流"],
-  authors: [{ name: "AgentFlow Team" }],
+ title: "AgentFlow - AI WorkflowPlatform",
+ description: "LocalPriority, CodeCustom, CommunityDriven's AI Agent WorkflowPlatform",
+ keywords: ["AI", "Agent", "Workflow", "Automation", "Workflow"],
+ authors: [{ name: "AgentFlow Team" }],
 };
 
 export default function RootLayout({
-  children,
+ children,
 }: Readonly<{
-  children: React.ReactNode;
+ children: React.ReactNode;
 }>) {
-  return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body 
-        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-mono antialiased terminal-strong`}
-      >
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+ return (
+ <html lang="zh-CN" suppressHydrationWarning>
+ <body 
+ className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-mono antialiased terminal-strong`}
+ >
+ <Providers>{children}</Providers>
+ </body>
+ </html>
+ );
 }
