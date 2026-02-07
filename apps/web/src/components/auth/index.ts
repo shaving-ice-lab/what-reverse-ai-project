@@ -1,5 +1,5 @@
 /**
- * 认证组件导出
+ * AuthenticationComponentExport
  */
 
 export * from "./auth-guard";

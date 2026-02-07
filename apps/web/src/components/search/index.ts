@@ -1,5 +1,5 @@
 /**
- * 搜索组件导出
+ * SearchComponentExport
  */
 
 export {

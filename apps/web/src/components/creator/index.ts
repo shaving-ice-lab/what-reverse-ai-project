@@ -1,5 +1,5 @@
 /**
- * 创作者中心组件
+ * CreativeusercenterComponent
  */
 
 export { EarningsChart } from "./earnings-chart";

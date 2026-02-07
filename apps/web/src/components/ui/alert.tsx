@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Alert 提示组件 - 极简风格
+ * Alert TipComponent - Minimalist Style
  */
 
 import * as React from "react";

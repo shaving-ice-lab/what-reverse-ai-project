@@ -33,7 +33,7 @@ export function PermissionAction({
   icon: Icon,
   onClick,
   href,
-  tooltip = "权限不足",
+ tooltip = "Insufficient permissions",
   variant,
   size,
   className,

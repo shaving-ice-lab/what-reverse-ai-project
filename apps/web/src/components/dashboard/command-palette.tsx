@@ -1,787 +1,787 @@
 "use client";
 
 /**
- * 全局命令面板 - Manus 风格
+ * allCommandPanel - Manus Style
 
- * 支持快捷搜索、命令执行、导航跳转
+ * SupportShortcutSearch, CommandExecute, NavigationNavigate
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  Search,
+ Search,
 
-  X,
+ X,
 
-  Zap,
+ Zap,
 
-  MessageSquare,
+ MessageSquare,
 
-  Settings,
+ Settings,
 
-  FileText,
+ FileText,
 
-  Users,
+ Users,
 
-  Store,
+ Store,
 
-  Palette,
+ Palette,
 
-  LayoutGrid,
+ LayoutGrid,
 
-  HelpCircle,
+ HelpCircle,
 
-  Plus,
+ Plus,
 
-  ArrowRight,
+ ArrowRight,
 
-  Command,
+ Command,
 
-  Clock,
+ Clock,
 
-  Star,
+ Star,
 
-  Folder,
+ Folder,
 
-  Bot,
+ Bot,
 
-  Code,
+ Code,
 
-  Image as ImageIcon,
+ Image as ImageIcon,
 
-  Terminal,
+ Terminal,
 
-  Mail,
+ Mail,
 
-  Github,
+ Github,
 
-  Database,
+ Database,
 
-  Globe,
+ Globe,
 
-  ChevronRight,
+ ChevronRight,
 
-  Sparkles,
+ Sparkles,
 
-  History,
+ History,
 
-  Bookmark,
+ Bookmark,
 
-  Hash,
+ Hash,
 } from "lucide-react";
 
-// 命令类型
+// CommandType
 
 type CommandType = "navigation" | "action" | "recent" | "workflow" | "agent";
 
 interface CommandItem {
-  id: string;
+ id: string;
 
-  type: CommandType;
+ type: CommandType;
 
-  title: string;
+ title: string;
 
-  description?: string;
+ description?: string;
 
-  icon: React.ElementType;
+ icon: React.ElementType;
 
-  shortcut?: string;
+ shortcut?: string;
 
-  href?: string;
+ href?: string;
 
-  action?: () => void;
+ action?: () => void;
 
-  keywords?: string[];
+ keywords?: string[];
 }
 
-// 命令分组
+// CommandGroup
 
 const commandGroups: { title: string; items: CommandItem[] }[] = [
 
-  {
-    title: "快捷操作",
+ {
+ title: "Quick Actions",
 
-    items: [
+ items: [
 
-      {
-        id: "new-conversation",
+ {
+ id: "new-conversation",
 
-        type: "action",
+ type: "action",
 
-        title: "新建对话",
+ title: "CreateConversation",
 
-        description: "开始一个新的 AI 对话",
+ description: "Start1new's AI Conversation",
 
-        icon: MessageSquare,
+ icon: MessageSquare,
 
-        shortcut: "⌘N",
+ shortcut: "⌘N",
 
-        href: "/dashboard/conversations",
+ href: "/dashboard/conversations",
 
-      },
+ },
 
-      {
-        id: "new-workflow",
+ {
+ id: "new-workflow",
 
-        type: "action",
+ type: "action",
 
-        title: "创建工作流",
+ title: "CreateWorkflow",
 
-        description: "创建新的自动化工作流",
+ description: "Createnew'sAutomationWorkflow",
 
-        icon: Zap,
+ icon: Zap,
 
-        shortcut: "⌘W",
+ shortcut: "⌘W",
 
-        href: "/dashboard/workflows/new",
+ href: "/dashboard/workflows/new",
 
-      },
+ },
 
-      {
-        id: "new-agent",
+ {
+ id: "new-agent",
 
-        type: "action",
+ type: "action",
 
-        title: "创建 Agent",
+ title: "Create Agent",
 
-        description: "创建自定义 AI Agent",
+ description: "CreateCustom AI Agent",
 
-        icon: Bot,
+ icon: Bot,
 
-        href: "/dashboard/my-agents/new",
+ href: "/dashboard/my-agents/new",
 
-      },
+ },
 
-      {
-        id: "generate-code",
+ {
+ id: "generate-code",
 
-        type: "action",
+ type: "action",
 
-        title: "生成代码",
+ title: "GenerateCode",
 
-        description: "使用 AI 生成代码",
+ description: "Usage AI GenerateCode",
 
-        icon: Code,
+ icon: Code,
 
-        shortcut: "⌘K",
+ shortcut: "⌘K",
 
-      },
+ },
 
-      {
-        id: "generate-image",
+ {
+ id: "generate-image",
 
-        type: "action",
+ type: "action",
 
-        title: "生成图像",
+ title: "GenerateImage",
 
-        description: "使用 AI 生成图像",
+ description: "Usage AI GenerateImage",
 
-        icon: ImageIcon,
+ icon: ImageIcon,
 
-        shortcut: "⌘I",
+ shortcut: "⌘I",
 
-      },
+ },
 
-    ],
+ ],
 
-  },
+ },
 
-  {
-    title: "导航",
+ {
+ title: "Navigation",
 
-    items: [
+ items: [
 
-      {
-        id: "nav-workflows",
+ {
+ id: "nav-workflows",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "工作流列表",
+ title: "WorkflowList",
 
-        icon: Zap,
+ icon: Zap,
 
-        href: "/dashboard/workflows",
+ href: "/dashboard/workflows",
 
-        keywords: ["workflow", "automation", "自动化"],
+ keywords: ["workflow", "automation", "Automation"],
 
-      },
+ },
 
-      {
-        id: "nav-creative",
+ {
+ id: "nav-creative",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "创意工坊",
+ title: "CreativeWorkshop",
 
-        icon: Palette,
+ icon: Palette,
 
-        href: "/dashboard/creative",
+ href: "/dashboard/creative",
 
-        keywords: ["creative", "design", "创意", "设计"],
+ keywords: ["creative", "design", "Creative", "Design"],
 
-      },
+ },
 
-      {
-        id: "nav-templates",
+ {
+ id: "nav-templates",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "模板库",
+ title: "Template Gallery",
 
-        icon: LayoutGrid,
+ icon: LayoutGrid,
 
-        href: "/dashboard/template-gallery",
+ href: "/dashboard/template-gallery",
 
-        keywords: ["template", "模板"],
+ keywords: ["template", "Template"],
 
-      },
+ },
 
-      {
-        id: "nav-store",
+ {
+ id: "nav-store",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "应用商店",
+ title: "App Store",
 
-        icon: Store,
+ icon: Store,
 
-        href: "/dashboard/store",
+ href: "/dashboard/store",
 
-        keywords: ["store", "app", "应用", "商店"],
+ keywords: ["store", "app", "App", "Store"],
 
-      },
+ },
 
-      {
-        id: "nav-agents",
+ {
+ id: "nav-agents",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "我的 Agent",
+ title: "I's Agent",
 
-        icon: Users,
+ icon: Users,
 
-        href: "/dashboard/my-agents",
+ href: "/dashboard/my-agents",
 
-        keywords: ["agent", "bot"],
+ keywords: ["agent", "bot"],
 
-      },
+ },
 
-      {
-        id: "nav-settings",
+ {
+ id: "nav-settings",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "设置",
+ title: "Settings",
 
-        icon: Settings,
+ icon: Settings,
 
-        href: "/dashboard/settings",
+ href: "/dashboard/settings",
 
-        keywords: ["settings", "设置", "配置"],
+ keywords: ["settings", "Settings", "Config"],
 
-      },
+ },
 
-      {
-        id: "nav-docs",
+ {
+ id: "nav-docs",
 
-        type: "navigation",
+ type: "navigation",
 
-        title: "文档",
+ title: "Document",
 
-        icon: FileText,
+ icon: FileText,
 
-        href: "/docs",
+ href: "/docs",
 
-        keywords: ["docs", "documentation", "文档", "帮助"],
+ keywords: ["docs", "documentation", "Document", "Help"],
 
-      },
+ },
 
-    ],
+ ],
 
-  },
+ },
 
-  {
-    title: "最近使用",
+ {
+ title: "RecentUsage",
 
-    items: [
+ items: [
 
-      {
-        id: "recent-1",
+ {
+ id: "recent-1",
 
-        type: "recent",
+ type: "recent",
 
-        title: "客户反馈自动处理",
+ title: "CustomerFeedbackAutoProcess",
 
-        description: "工作流  编辑于 2 小时前",
+ description: "Workflow Editat 2 hbefore",
 
-        icon: Zap,
+ icon: Zap,
 
-        href: "/dashboard/workflows/wf-1",
+ href: "/dashboard/workflows/wf-1",
 
-      },
+ },
 
-      {
-        id: "recent-2",
+ {
+ id: "recent-2",
 
-        type: "recent",
+ type: "recent",
 
-        title: "邮件助手 Agent",
+ title: "EmailAssistant Agent",
 
-        description: "Agent  编辑于 昨天",
+ description: "Agent Editat Yesterday",
 
-        icon: Bot,
+ icon: Bot,
 
-        href: "/dashboard/my-agents/agent-1",
+ href: "/dashboard/my-agents/agent-1",
 
-      },
+ },
 
-      {
-        id: "recent-3",
+ {
+ id: "recent-3",
 
-        type: "recent",
+ type: "recent",
 
-        title: "数据分析报告",
+ title: "DataAnalyticsReport",
 
-        description: "对话  3 天前",
+ description: "Conversation 3 daysbefore",
 
-        icon: MessageSquare,
+ icon: MessageSquare,
 
-        href: "/dashboard/conversations",
+ href: "/dashboard/conversations",
 
-      },
+ },
 
-    ],
+ ],
 
-  },
+ },
 
 ];
 
 interface CommandPaletteProps {
-  isOpen: boolean;
+ isOpen: boolean;
 
-  onClose: () => void;
+ onClose: () => void;
 }
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
-  const router = useRouter();
+ const router = useRouter();
 
-  const [query, setQuery] = useState("");
+ const [query, setQuery] = useState("");
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+ const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+ const inputRef = useRef<HTMLInputElement>(null);
 
-  const listRef = useRef<HTMLDivElement>(null);
+ const listRef = useRef<HTMLDivElement>(null);
 
-  // 过滤命令
+ // FilterCommand
 
-  const filteredGroups = commandGroups
+ const filteredGroups = commandGroups
 
-    .map((group) => ({
-      ...group,
+ .map((group) => ({
+ ...group,
 
-      items: group.items.filter((item) => {
-        const searchLower = query.toLowerCase();
+ items: group.items.filter((item) => {
+ const searchLower = query.toLowerCase();
 
-        return (
-          item.title.toLowerCase().includes(searchLower) ||
+ return (
+ item.title.toLowerCase().includes(searchLower) ||
 
-          item.description?.toLowerCase().includes(searchLower) ||
+ item.description?.toLowerCase().includes(searchLower) ||
 
-          item.keywords?.some((k) => k.toLowerCase().includes(searchLower))
+ item.keywords?.some((k) => k.toLowerCase().includes(searchLower))
 
-        );
+ );
 
-      }),
+ }),
 
-    }))
+ }))
 
-    .filter((group) => group.items.length > 0);
+ .filter((group) => group.items.length > 0);
 
-  // 扁平化的命令列表
+ // Flat'sCommandList
 
-  const flatItems = filteredGroups.flatMap((group) => group.items);
+ const flatItems = filteredGroups.flatMap((group) => group.items);
 
-  // 执行命令
+ // ExecuteCommand
 
-  const executeCommand = useCallback(
-    (item: CommandItem) => {
-      if (item.action) {
-        item.action();
+ const executeCommand = useCallback(
+ (item: CommandItem) => {
+ if (item.action) {
+ item.action();
 
-      } else if (item.href) {
-        router.push(item.href);
+ } else if (item.href) {
+ router.push(item.href);
 
-      }
+ }
 
-      onClose();
+ onClose();
 
-    },
+ },
 
-    [router, onClose]
+ [router, onClose]
 
-  );
+ );
 
-  // 键盘导航
+ // keyNavigation
 
-  useEffect(() => {
-    if (!isOpen) return;
+ useEffect(() => {
+ if (!isOpen) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case "ArrowDown":
+ const handleKeyDown = (e: KeyboardEvent) => {
+ switch (e.key) {
+ case "ArrowDown":
 
-          e.preventDefault();
+ e.preventDefault();
 
-          setSelectedIndex((prev) =>
+ setSelectedIndex((prev) =>
 
-            prev < flatItems.length - 1 ? prev + 1 : 0
+ prev < flatItems.length - 1 ? prev + 1 : 0
 
-          );
+ );
 
-          break;
+ break;
 
-        case "ArrowUp":
+ case "ArrowUp":
 
-          e.preventDefault();
+ e.preventDefault();
 
-          setSelectedIndex((prev) =>
+ setSelectedIndex((prev) =>
 
-            prev > 0 ? prev - 1 : flatItems.length - 1
+ prev > 0 ? prev - 1 : flatItems.length - 1
 
-          );
+ );
 
-          break;
+ break;
 
-        case "Enter":
+ case "Enter":
 
-          e.preventDefault();
+ e.preventDefault();
 
-          if (flatItems[selectedIndex]) {
-            executeCommand(flatItems[selectedIndex]);
+ if (flatItems[selectedIndex]) {
+ executeCommand(flatItems[selectedIndex]);
 
-          }
+ }
 
-          break;
+ break;
 
-        case "Escape":
+ case "Escape":
 
-          e.preventDefault();
+ e.preventDefault();
 
-          onClose();
+ onClose();
 
-          break;
+ break;
 
-      }
+ }
 
-    };
+ };
 
-    window.addEventListener("keydown", handleKeyDown);
+ window.addEventListener("keydown", handleKeyDown);
 
-    return () => window.removeEventListener("keydown", handleKeyDown);
+ return () => window.removeEventListener("keydown", handleKeyDown);
 
-  }, [isOpen, selectedIndex, flatItems, executeCommand, onClose]);
+ }, [isOpen, selectedIndex, flatItems, executeCommand, onClose]);
 
-  // 重置选中状态
+ // ResetselectStatus
 
-  useEffect(() => {
-    setSelectedIndex(0);
+ useEffect(() => {
+ setSelectedIndex(0);
 
-  }, [query]);
+ }, [query]);
 
-  // 自动聚焦
+ // AutoFocus
 
-  useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
+ useEffect(() => {
+ if (isOpen) {
+ inputRef.current?.focus();
 
-      setQuery("");
+ setQuery("");
 
-      setSelectedIndex(0);
+ setSelectedIndex(0);
 
-    }
+ }
 
-  }, [isOpen]);
+ }, [isOpen]);
 
-  // 滚动到选中项
+ // Scrolltoselect
 
-  useEffect(() => {
-    if (listRef.current && flatItems[selectedIndex]) {
-      const item = listRef.current.querySelector(
-        `[data-index="${selectedIndex}"]`
+ useEffect(() => {
+ if (listRef.current && flatItems[selectedIndex]) {
+ const item = listRef.current.querySelector(
+ `[data-index="${selectedIndex}"]`
 
-      );
+ );
 
-      item?.scrollIntoView({ block: "nearest" });
+ item?.scrollIntoView({ block: "nearest" });
 
-    }
+ }
 
-  }, [selectedIndex, flatItems]);
+ }, [selectedIndex, flatItems]);
 
-  if (!isOpen) return null;
+ if (!isOpen) return null;
 
-  // 计算扁平索引
+ // CalculateFlatIndex
 
-  let flatIndex = -1;
+ let flatIndex = -1;
 
-  return (
-    <>
+ return (
+ <>
 
-      {/* 背景遮罩 */}
+ {/* BackgroundMask */}
 
-      <div
+ <div
 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+ className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
 
-        onClick={onClose}
+ onClick={onClose}
 
-      />
+ />
 
-      {/* 命令面板 */}
+ {/* CommandPanel */}
 
-      <div className="fixed left-1/2 top-[20%] -translate-x-1/2 w-full max-w-[600px] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
+ <div className="fixed left-1/2 top-[20%] -translate-x-1/2 w-full max-w-[600px] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
 
-        {/* 搜索输入框 */}
+ {/* SearchInput */}
 
-        <div className="flex items-center gap-3 p-4 border-b border-border">
+ <div className="flex items-center gap-3 p-4 border-b border-border">
 
-          <Search className="w-5 h-5 text-foreground-light" />
+ <Search className="w-5 h-5 text-foreground-light" />
 
-          <input
+ <input
 
-            ref={inputRef}
+ ref={inputRef}
 
-            type="text"
+ type="text"
 
-            value={query}
+ value={query}
 
-            onChange={(e) => setQuery(e.target.value)}
+ onChange={(e) => setQuery(e.target.value)}
 
-            placeholder="搜索命令、页面或功能..."
+ placeholder="SearchCommand, PageorFeatures..."
 
-            className="flex-1 bg-transparent text-foreground text-sm placeholder:text-foreground-light focus:outline-none"
+ className="flex-1 bg-transparent text-foreground text-sm placeholder:text-foreground-light focus:outline-none"
 
-          />
+ />
 
-          {query && (
-            <button
+ {query && (
+ <button
 
-              onClick={() => setQuery("")}
+ onClick={() => setQuery("")}
 
-              className="p-1 rounded-lg hover:bg-surface-200 text-foreground-light hover:text-foreground/70 transition-colors"
+ className="p-1 rounded-lg hover:bg-surface-200 text-foreground-light hover:text-foreground/70 transition-colors"
 
-            >
+ >
 
-              <X className="w-4 h-4" />
+ <X className="w-4 h-4" />
 
-            </button>
+ </button>
 
-          )}
+ )}
 
-          <kbd className="px-2 py-1 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
+ <kbd className="px-2 py-1 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
 
-            ESC
+ ESC
 
-          </kbd>
+ </kbd>
 
-        </div>
+ </div>
 
-        {/* 命令列表 */}
+ {/* CommandList */}
 
-        <div
+ <div
 
-          ref={listRef}
+ ref={listRef}
 
-          className="max-h-[400px] overflow-y-auto py-2"
+ className="max-h-[400px] overflow-y-auto py-2"
 
-        >
+ >
 
-          {filteredGroups.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+ {filteredGroups.length === 0 ? (
+ <div className="flex flex-col items-center justify-center py-12 text-center">
 
-              <Search className="w-10 h-10 text-foreground-light/30 mb-3" />
+ <Search className="w-10 h-10 text-foreground-light/30 mb-3" />
 
-              <p className="text-sm text-foreground-light">未找到相关命令</p>
+ <p className="text-sm text-foreground-light">not yettoRelatedCommand</p>
 
-              <p className="text-xs text-foreground-light/70 mt-1">尝试其他关键词</p>
+ <p className="text-xs text-foreground-light/70 mt-1">TryotherheKeywords</p>
 
-            </div>
+ </div>
 
-          ) : (
-            filteredGroups.map((group) => (
-              <div key={group.title} className="mb-2">
+ ) : (
+ filteredGroups.map((group) => (
+ <div key={group.title} className="mb-2">
 
-                <div className="px-4 py-2 text-[11px] font-medium text-foreground-light uppercase tracking-wider">
+ <div className="px-4 py-2 text-[11px] font-medium text-foreground-light uppercase tracking-wider">
 
-                  {group.title}
+ {group.title}
 
-                </div>
+ </div>
 
-                {group.items.map((item) => {
-                  flatIndex++;
+ {group.items.map((item) => {
+ flatIndex++;
 
-                  const currentIndex = flatIndex;
+ const currentIndex = flatIndex;
 
-                  const isSelected = selectedIndex === currentIndex;
+ const isSelected = selectedIndex === currentIndex;
 
-                  return (
-                    <button
+ return (
+ <button
 
-                      key={item.id}
+ key={item.id}
 
-                      data-index={currentIndex}
+ data-index={currentIndex}
 
-                      onClick={() => executeCommand(item)}
+ onClick={() => executeCommand(item)}
 
-                      onMouseEnter={() => setSelectedIndex(currentIndex)}
+ onMouseEnter={() => setSelectedIndex(currentIndex)}
 
-                      className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 transition-all",
+ className={cn(
+ "w-full flex items-center gap-3 px-4 py-3 transition-all",
 
-                        isSelected
+ isSelected
 
-                          ? "bg-surface-200"
+ ? "bg-surface-200"
 
-                          : "hover:bg-muted/50"
+ : "hover:bg-muted/50"
 
-                      )}
+ )}
 
-                    >
+ >
 
-                      {/* 图标 */}
+ {/* Icon */}
 
-                      <div
+ <div
 
-                        className={cn(
-                          "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors",
+ className={cn(
+ "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors",
 
-                          isSelected
+ isSelected
 
-                            ? "bg-primary/20 text-primary"
+ ? "bg-primary/20 text-primary"
 
-                            : "bg-surface-200 text-foreground-light"
+ : "bg-surface-200 text-foreground-light"
 
-                        )}
+ )}
 
-                      >
+ >
 
-                        <item.icon className="w-4 h-4" />
+ <item.icon className="w-4 h-4" />
 
-                      </div>
+ </div>
 
-                      {/* 内容 */}
+ {/* Content */}
 
-                      <div className="flex-1 min-w-0 text-left">
+ <div className="flex-1 min-w-0 text-left">
 
-                        <p
+ <p
 
-                          className={cn(
-                            "text-sm font-medium truncate",
+ className={cn(
+ "text-sm font-medium truncate",
 
-                            isSelected ? "text-foreground" : "text-foreground/80"
+ isSelected ? "text-foreground" : "text-foreground/80"
 
-                          )}
+ )}
 
-                        >
+ >
 
-                          {item.title}
+ {item.title}
 
-                        </p>
+ </p>
 
-                        {item.description && (
-                          <p className="text-xs text-foreground-light truncate mt-0.5">
+ {item.description && (
+ <p className="text-xs text-foreground-light truncate mt-0.5">
 
-                            {item.description}
+ {item.description}
 
-                          </p>
+ </p>
 
-                        )}
+ )}
 
-                      </div>
+ </div>
 
-                      {/* 快捷键 */}
+ {/* Shortcutkey */}
 
-                      {item.shortcut && (
-                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
+ {item.shortcut && (
+ <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
 
-                          {item.shortcut}
+ {item.shortcut}
 
-                        </kbd>
+ </kbd>
 
-                      )}
+ )}
 
-                      {/* 箭头 */}
+ {/* head */}
 
-                      <ChevronRight
+ <ChevronRight
 
-                        className={cn(
-                          "w-4 h-4 shrink-0 transition-all",
+ className={cn(
+ "w-4 h-4 shrink-0 transition-all",
 
-                          isSelected
+ isSelected
 
-                            ? "text-foreground/70 translate-x-0.5"
+ ? "text-foreground/70 translate-x-0.5"
 
-                            : "text-foreground-light/50"
+ : "text-foreground-light/50"
 
-                        )}
+ )}
 
-                      />
+ />
 
-                    </button>
+ </button>
 
-                  );
+ );
 
-                })}
+ })}
 
-              </div>
+ </div>
 
-            ))
+ ))
 
-          )}
+ )}
 
-        </div>
+ </div>
 
-        {/* 底部提示 */}
+ {/* FooterTip */}
 
-        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
+ <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
 
-          <div className="flex items-center gap-4 text-[11px] text-foreground-light">
+ <div className="flex items-center gap-4 text-[11px] text-foreground-light">
 
-            <span className="flex items-center gap-1">
+ <span className="flex items-center gap-1">
 
-              <kbd className="px-1 py-0.5 rounded bg-surface-200">↑</kbd>
+ <kbd className="px-1 py-0.5 rounded bg-surface-200">↑</kbd>
 
-              <kbd className="px-1 py-0.5 rounded bg-surface-200">↓</kbd>
+ <kbd className="px-1 py-0.5 rounded bg-surface-200">↓</kbd>
 
-              导航
+ Navigation
 
-            </span>
+ </span>
 
-            <span className="flex items-center gap-1">
+ <span className="flex items-center gap-1">
 
-              <kbd className="px-1.5 py-0.5 rounded bg-surface-200">↵</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-surface-200">↵</kbd>
 
-              执行
+ Execute
 
-            </span>
+ </span>
 
-          </div>
+ </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-foreground-light">
+ <div className="flex items-center gap-2 text-[11px] text-foreground-light">
 
-            <Sparkles className="w-3 h-3 text-primary" />
+ <Sparkles className="w-3 h-3 text-primary" />
 
-            <span>AgentFlow</span>
+ <span>AgentFlow</span>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    </>
+ </>
 
-  );
+ );
 }
 

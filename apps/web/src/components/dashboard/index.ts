@@ -1,8 +1,8 @@
 /**
- * Dashboard 组件导出
+ * Dashboard ComponentExport
  */
 
-// 核心功能组件
+// CoreFeaturesComponent
 export { NotificationPanel, NotificationBell } from "./notification-panel";
 export { CommandPalette } from "./command-palette";
 export { useCommandPalette } from "./use-command-palette";
@@ -10,24 +10,24 @@ export { QuickTasksPanel } from "./quick-tasks-panel";
 export { FloatingAssistant } from "./floating-assistant";
 export { KeyboardShortcutsGuide, useKeyboardShortcuts } from "./keyboard-shortcuts-guide";
 export {
-  StatCard,
-  MiniStatCard,
-  ProgressStatCard,
-  CompareStatCard,
-  StatGrid,
-  LiveStatCard,
+ StatCard,
+ MiniStatCard,
+ ProgressStatCard,
+ CompareStatCard,
+ StatGrid,
+ LiveStatCard,
 } from "./stat-cards";
 
-// 聊天增强组件
+// ChatEnhancedComponent
 export {
-  AIMessageBubble,
-  UserMessageBubble,
-  TypingIndicator,
-  SuggestedReplies,
-  ContextIndicator,
+ AIMessageBubble,
+ UserMessageBubble,
+ TypingIndicator,
+ SuggestedReplies,
+ ContextIndicator,
 } from "./chat-enhancements";
 
-// 可选导出 - 如果存在的话
+// OptionalExport - ifresultat's
 export { OnboardingGuide, OnboardingTrigger } from "./onboarding-guide";
 export { QuickSearchCommand } from "./quick-search-command";
 export { WorkflowAnalyticsPie } from "./workflow-analytics-pie";

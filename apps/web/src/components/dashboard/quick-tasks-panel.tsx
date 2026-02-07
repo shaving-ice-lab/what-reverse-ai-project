@@ -1,70 +1,70 @@
 "use client";
 
 /**
- * 快速任务面板 - Manus 风格
+ * QuickTaskPanel - Manus Style
 
- * 显示待办任务、进行中任务和快速操作
+ * DisplayTodoTask, In ProgressTaskandQuickAction
  */
 
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  CheckCircle2,
+ CheckCircle2,
 
-  Circle,
+ Circle,
 
-  Clock,
+ Clock,
 
-  Zap,
+ Zap,
 
-  MessageSquare,
+ MessageSquare,
 
-  Bot,
+ Bot,
 
-  Calendar,
+ Calendar,
 
-  ChevronRight,
+ ChevronRight,
 
-  Plus,
+ Plus,
 
-  Play,
+ Play,
 
-  Pause,
+ Pause,
 
-  MoreHorizontal,
+ MoreHorizontal,
 
-  Trash2,
+ Trash2,
 
-  Edit3,
+ Edit3,
 
-  Star,
+ Star,
 
-  AlertCircle,
+ AlertCircle,
 
-  ArrowRight,
+ ArrowRight,
 
-  Sparkles,
+ Sparkles,
 
-  Target,
+ Target,
 
-  Flag,
+ Flag,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
+ DropdownMenu,
 
-  DropdownMenuContent,
+ DropdownMenuContent,
 
-  DropdownMenuItem,
+ DropdownMenuItem,
 
-  DropdownMenuTrigger,
+ DropdownMenuTrigger,
 
-  DropdownMenuSeparator,
+ DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-// 任务优先级
+// TaskPriority
 
 type Priority = "high" | "medium" | "low";
 
@@ -73,730 +73,730 @@ type TaskStatus = "todo" | "in_progress" | "completed";
 type TaskType = "workflow" | "conversation" | "agent" | "general";
 
 interface Task {
-  id: string;
+ id: string;
 
-  title: string;
+ title: string;
 
-  description?: string;
+ description?: string;
 
-  type: TaskType;
+ type: TaskType;
 
-  status: TaskStatus;
+ status: TaskStatus;
 
-  priority: Priority;
+ priority: Priority;
 
-  dueDate?: string;
+ dueDate?: string;
 
-  progress?: number;
+ progress?: number;
 
-  starred?: boolean;
+ starred?: boolean;
 }
 
-// 模拟任务数据
+// MockTaskData
 
 const mockTasks: Task[] = [
 
-  {
-    id: "1",
+ {
+ id: "1",
 
-    title: "完成客户反馈工作流配置",
+ title: "DoneCustomerFeedbackWorkflowConfig",
 
-    description: "配置 AI 节点和邮件通知",
+ description: "Config AI NodeandEmail Notifications",
 
-    type: "workflow",
+ type: "workflow",
 
-    status: "in_progress",
+ status: "in_progress",
 
-    priority: "high",
+ priority: "high",
 
-    progress: 65,
+ progress: 65,
 
-    starred: true,
+ starred: true,
 
-  },
+ },
 
-  {
-    id: "2",
+ {
+ id: "2",
 
-    title: "测试邮件助手 Agent",
+ title: "TestEmailAssistant Agent",
 
-    description: "验证自动回复功能",
+ description: "VerifyAutoReplyFeatures",
 
-    type: "agent",
+ type: "agent",
 
-    status: "todo",
+ status: "todo",
 
-    priority: "high",
+ priority: "high",
 
-    dueDate: "今天",
+ dueDate: "Today",
 
-  },
+ },
 
-  {
-    id: "3",
+ {
+ id: "3",
 
-    title: "分析上周销售数据",
+ title: "AnalyticsonweeksSalesData",
 
-    type: "conversation",
+ type: "conversation",
 
-    status: "todo",
+ status: "todo",
 
-    priority: "medium",
+ priority: "medium",
 
-    dueDate: "明天",
+ dueDate: "Tomorrow",
 
-  },
+ },
 
-  {
-    id: "4",
+ {
+ id: "4",
 
-    title: "更新 API 文档",
+ title: "Update API Document",
 
-    type: "general",
+ type: "general",
 
-    status: "todo",
+ status: "todo",
 
-    priority: "low",
+ priority: "low",
 
-    dueDate: "本周",
+ dueDate: "currentweeks",
 
-  },
+ },
 
-  {
-    id: "5",
+ {
+ id: "5",
 
-    title: "GitHub Issue 分类流程",
+ title: "GitHub Issue CategoryFlow",
 
-    type: "workflow",
+ type: "workflow",
 
-    status: "completed",
+ status: "completed",
 
-    priority: "medium",
+ priority: "medium",
 
-    starred: true,
+ starred: true,
 
-  },
+ },
 
 ];
 
-// 获取任务类型信息
+// FetchTaskTypeInfo
 
 const getTaskTypeInfo = (type: TaskType) => {
-  switch (type) {
-    case "workflow":
+ switch (type) {
+ case "workflow":
 
-      return { icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10", label: "工作流" };
+ return { icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10", label: "Workflow" };
 
-    case "conversation":
+ case "conversation":
 
-      return { icon: MessageSquare, color: "text-blue-400", bg: "bg-blue-500/10", label: "对话" };
+ return { icon: MessageSquare, color: "text-blue-400", bg: "bg-blue-500/10", label: "Conversation" };
 
-    case "agent":
+ case "agent":
 
-      return { icon: Bot, color: "text-purple-400", bg: "bg-purple-500/10", label: "Agent" };
+ return { icon: Bot, color: "text-purple-400", bg: "bg-purple-500/10", label: "Agent" };
 
-    default:
+ default:
 
-      return { icon: Target, color: "text-muted-foreground", bg: "bg-muted/50", label: "任务" };
+ return { icon: Target, color: "text-muted-foreground", bg: "bg-muted/50", label: "Task" };
 
-  }
+ }
 };
 
-// 获取优先级信息
+// FetchPriorityInfo
 
 const getPriorityInfo = (priority: Priority) => {
-  switch (priority) {
-    case "high":
+ switch (priority) {
+ case "high":
 
-      return { color: "text-red-400", bg: "bg-red-500/10", label: "高" };
+ return { color: "text-red-400", bg: "bg-red-500/10", label: "" };
 
-    case "medium":
+ case "medium":
 
-      return { color: "text-amber-400", bg: "bg-amber-500/10", label: "中" };
+ return { color: "text-amber-400", bg: "bg-amber-500/10", label: "" };
 
-    case "low":
+ case "low":
 
-      return { color: "text-green-400", bg: "bg-green-500/10", label: "低" };
+ return { color: "text-green-400", bg: "bg-green-500/10", label: "" };
 
-  }
+ }
 };
 
 interface QuickTasksPanelProps {
-  className?: string;
+ className?: string;
 
-  compact?: boolean;
+ compact?: boolean;
 }
 
 export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelProps) {
-  const [tasks, setTasks] = useState(mockTasks);
+ const [tasks, setTasks] = useState(mockTasks);
 
-  const [filter, setFilter] = useState<"all" | "todo" | "in_progress">("all");
+ const [filter, setFilter] = useState<"all" | "todo" | "in_progress">("all");
 
-  // 筛选任务
+ // FilterTask
 
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === "all") return task.status !== "completed";
+ const filteredTasks = tasks.filter((task) => {
+ if (filter === "all") return task.status !== "completed";
 
-    return task.status === filter;
+ return task.status === filter;
 
-  });
+ });
 
-  // 更新任务状态
+ // UpdateTaskStatus
 
-  const toggleTaskStatus = (id: string) => {
-    setTasks((prev) =>
+ const toggleTaskStatus = (id: string) => {
+ setTasks((prev) =>
 
-      prev.map((task) => {
-        if (task.id === id) {
-          if (task.status === "todo") return { ...task, status: "in_progress" as TaskStatus };
+ prev.map((task) => {
+ if (task.id === id) {
+ if (task.status === "todo") return { ...task, status: "in_progress" as TaskStatus };
 
-          if (task.status === "in_progress") return { ...task, status: "completed" as TaskStatus };
+ if (task.status === "in_progress") return { ...task, status: "completed" as TaskStatus };
 
-          return { ...task, status: "todo" as TaskStatus };
+ return { ...task, status: "todo" as TaskStatus };
 
-        }
+ }
 
-        return task;
+ return task;
 
-      })
+ })
 
-    );
+ );
 
-  };
+ };
 
-  // 删除任务
+ // DeleteTask
 
-  const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+ const deleteTask = (id: string) => {
+ setTasks((prev) => prev.filter((task) => task.id !== id));
 
-  };
+ };
 
-  // 切换收藏
+ // SwitchFavorite
 
-  const toggleStar = (id: string) => {
-    setTasks((prev) =>
+ const toggleStar = (id: string) => {
+ setTasks((prev) =>
 
-      prev.map((task) =>
+ prev.map((task) =>
 
-        task.id === id ? { ...task, starred: !task.starred } : task
+ task.id === id ? { ...task, starred: !task.starred } : task
 
-      )
+ )
 
-    );
+ );
 
-  };
+ };
 
-  // 统计数据
+ // StatisticsData
 
-  const stats = {
-    todo: tasks.filter((t) => t.status === "todo").length,
+ const stats = {
+ todo: tasks.filter((t) => t.status === "todo").length,
 
-    inProgress: tasks.filter((t) => t.status === "in_progress").length,
+ inProgress: tasks.filter((t) => t.status === "in_progress").length,
 
-    completed: tasks.filter((t) => t.status === "completed").length,
+ completed: tasks.filter((t) => t.status === "completed").length,
 
-  };
+ };
 
-  if (compact) {
-    // 紧凑模式 - 用于侧边栏或小卡片
+ if (compact) {
+ // Compact - Used forSidebarorsmallCard
 
-    return (
-      <div className={cn("rounded-xl bg-card border border-border overflow-hidden", className)}>
+ return (
+ <div className={cn("rounded-xl bg-card border border-border overflow-hidden", className)}>
 
-        <div className="flex items-center justify-between p-3 border-b border-border">
+ <div className="flex items-center justify-between p-3 border-b border-border">
 
-          <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+ <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
 
-            <Target className="w-4 h-4 text-primary" />
+ <Target className="w-4 h-4 text-primary" />
 
-            待办任务
+ TodoTask
 
-          </h3>
+ </h3>
 
-          <span className="text-xs text-muted-foreground">{stats.todo + stats.inProgress} 项</span>
+ <span className="text-xs text-muted-foreground">{stats.todo + stats.inProgress} </span>
 
-        </div>
+ </div>
 
-        <div className="divide-y divide-border">
+ <div className="divide-y divide-border">
 
-          {filteredTasks.slice(0, 3).map((task) => {
-            const typeInfo = getTaskTypeInfo(task.type);
+ {filteredTasks.slice(0, 3).map((task) => {
+ const typeInfo = getTaskTypeInfo(task.type);
 
-            return (
-              <div
+ return (
+ <div
 
-                key={task.id}
+ key={task.id}
 
-                className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-all cursor-pointer group"
+ className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-all cursor-pointer group"
 
-                onClick={() => toggleTaskStatus(task.id)}
+ onClick={() => toggleTaskStatus(task.id)}
 
-              >
+ >
 
-                <button className="shrink-0">
+ <button className="shrink-0">
 
-                  {task.status === "completed" ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+ {task.status === "completed" ? (
+ <CheckCircle2 className="w-4 h-4 text-emerald-400" />
 
-                  ) : task.status === "in_progress" ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+ ) : task.status === "in_progress" ? (
+ <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
 
-                  ) : (
-                    <Circle className="w-4 h-4 text-muted-foreground group-hover:text-foreground/70" />
+ ) : (
+ <Circle className="w-4 h-4 text-muted-foreground group-hover:text-foreground/70" />
 
-                  )}
+ )}
 
-                </button>
+ </button>
 
-                <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-0">
 
-                  <p className={cn(
-                    "text-sm truncate",
+ <p className={cn(
+ "text-sm truncate",
 
-                    task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground/80"
+ task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground/80"
 
-                  )}>
+ )}>
 
-                    {task.title}
+ {task.title}
 
-                  </p>
+ </p>
 
-                </div>
+ </div>
 
-                <typeInfo.icon className={cn("w-3.5 h-3.5 shrink-0", typeInfo.color)} />
+ <typeInfo.icon className={cn("w-3.5 h-3.5 shrink-0", typeInfo.color)} />
 
-              </div>
+ </div>
 
-            );
+ );
 
-          })}
+ })}
 
-        </div>
+ </div>
 
-        {filteredTasks.length > 3 && (
-          <Link
+ {filteredTasks.length > 3 && (
+ <Link
 
-            href="/dashboard/tasks"
+ href="/dashboard/tasks"
 
-            className="flex items-center justify-center gap-1 p-2 text-xs text-primary hover:text-primary/80 transition-colors"
+ className="flex items-center justify-center gap-1 p-2 text-xs text-primary hover:text-primary/80 transition-colors"
 
-          >
+ >
 
-            查看全部
+ View all
 
-            <ChevronRight className="w-3 h-3" />
+ <ChevronRight className="w-3 h-3" />
 
-          </Link>
+ </Link>
 
-        )}
+ )}
 
-      </div>
+ </div>
 
-    );
+ );
 
-  }
+ }
 
-  // 完整模式
+ // Complete
 
-  return (
-    <div className={cn("rounded-2xl bg-card border border-border overflow-hidden", className)}>
+ return (
+ <div className={cn("rounded-2xl bg-card border border-border overflow-hidden", className)}>
 
-      {/* 头部 */}
+ {/* Header */}
 
-      <div className="flex items-center justify-between p-4 border-b border-border">
+ <div className="flex items-center justify-between p-4 border-b border-border">
 
-        <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
 
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
 
-            <Target className="w-5 h-5 text-primary" />
+ <Target className="w-5 h-5 text-primary" />
 
-          </div>
+ </div>
 
-          <div>
+ <div>
 
-            <h3 className="text-lg font-semibold text-foreground">任务中心</h3>
+ <h3 className="text-lg font-semibold text-foreground">Taskcenter</h3>
 
-            <p className="text-xs text-muted-foreground">
+ <p className="text-xs text-muted-foreground">
 
-              {stats.todo} 待办  {stats.inProgress} 进行中  {stats.completed} 已完成
+ {stats.todo} Todo {stats.inProgress} In Progress {stats.completed} Completed
 
-            </p>
+ </p>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-        <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-0 gap-1.5">
+ <Button size="sm" className="bg-primary/10 hover:bg-primary/20 text-primary border-0 gap-1.5">
 
-          <Plus className="w-4 h-4" />
+ <Plus className="w-4 h-4" />
 
-          新任务
+ newTask
 
-        </Button>
+ </Button>
 
-      </div>
+ </div>
 
-      {/* 筛选器 */}
+ {/* Filter */}
 
-      <div className="flex items-center gap-2 p-3 border-b border-border">
+ <div className="flex items-center gap-2 p-3 border-b border-border">
 
-        <button
+ <button
 
-          onClick={() => setFilter("all")}
+ onClick={() => setFilter("all")}
 
-          className={cn(
-            "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
+ className={cn(
+ "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
 
-            filter === "all"
+ filter === "all"
 
-              ? "bg-muted text-foreground"
+ ? "bg-muted text-foreground"
 
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+ : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
 
-          )}
+ )}
 
-        >
+ >
 
-          全部
+ allsection
 
-        </button>
+ </button>
 
-        <button
+ <button
 
-          onClick={() => setFilter("todo")}
+ onClick={() => setFilter("todo")}
 
-          className={cn(
-            "px-3 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5",
+ className={cn(
+ "px-3 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5",
 
-            filter === "todo"
+ filter === "todo"
 
-              ? "bg-muted text-foreground"
+ ? "bg-muted text-foreground"
 
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+ : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
 
-          )}
+ )}
 
-        >
+ >
 
-          待办
+ Todo
 
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted">{stats.todo}</span>
+ <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted">{stats.todo}</span>
 
-        </button>
+ </button>
 
-        <button
+ <button
 
-          onClick={() => setFilter("in_progress")}
+ onClick={() => setFilter("in_progress")}
 
-          className={cn(
-            "px-3 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5",
+ className={cn(
+ "px-3 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5",
 
-            filter === "in_progress"
+ filter === "in_progress"
 
-              ? "bg-muted text-foreground"
+ ? "bg-muted text-foreground"
 
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+ : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
 
-          )}
+ )}
 
-        >
+ >
 
-          进行中
+ In Progress
 
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary">{stats.inProgress}</span>
+ <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary">{stats.inProgress}</span>
 
-        </button>
+ </button>
 
-      </div>
+ </div>
 
-      {/* 任务列表 */}
+ {/* TaskList */}
 
-      <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
+ <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
 
-        {filteredTasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
+ {filteredTasks.length === 0 ? (
+ <div className="flex flex-col items-center justify-center py-12 text-center">
 
-            <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+ <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
 
-              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+ <CheckCircle2 className="w-6 h-6 text-emerald-400" />
 
-            </div>
+ </div>
 
-            <p className="text-sm text-muted-foreground">太棒了！没有待处理的任务</p>
+ <p className="text-sm text-muted-foreground">Great!NoPending'sTask</p>
 
-            <p className="text-xs text-muted-foreground/70 mt-1">点击上方按钮添加新任务</p>
+ <p className="text-xs text-muted-foreground/70 mt-1">ClickonmethodButtonAddnewTask</p>
 
-          </div>
+ </div>
 
-        ) : (
-          filteredTasks.map((task) => {
-            const typeInfo = getTaskTypeInfo(task.type);
+ ) : (
+ filteredTasks.map((task) => {
+ const typeInfo = getTaskTypeInfo(task.type);
 
-            const priorityInfo = getPriorityInfo(task.priority);
+ const priorityInfo = getPriorityInfo(task.priority);
 
-            return (
-              <div
+ return (
+ <div
 
-                key={task.id}
+ key={task.id}
 
-                className="p-4 hover:bg-muted/50 transition-all group"
+ className="p-4 hover:bg-muted/50 transition-all group"
 
-              >
+ >
 
-                <div className="flex items-start gap-3">
+ <div className="flex items-start gap-3">
 
-                  {/* 状态按钮 */}
+ {/* StatusButton */}
 
-                  <button
+ <button
 
-                    onClick={() => toggleTaskStatus(task.id)}
+ onClick={() => toggleTaskStatus(task.id)}
 
-                    className="mt-0.5 shrink-0"
+ className="mt-0.5 shrink-0"
 
-                  >
+ >
 
-                    {task.status === "completed" ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+ {task.status === "completed" ? (
+ <CheckCircle2 className="w-5 h-5 text-emerald-400" />
 
-                    ) : task.status === "in_progress" ? (
-                      <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+ ) : task.status === "in_progress" ? (
+ <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
 
-                    ) : (
-                      <Circle className="w-5 h-5 text-muted-foreground group-hover:text-foreground/70 transition-colors" />
+ ) : (
+ <Circle className="w-5 h-5 text-muted-foreground group-hover:text-foreground/70 transition-colors" />
 
-                    )}
+ )}
 
-                  </button>
+ </button>
 
-                  {/* 内容 */}
+ {/* Content */}
 
-                  <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-0">
 
-                    <div className="flex items-center gap-2 mb-1">
+ <div className="flex items-center gap-2 mb-1">
 
-                      <p className={cn(
-                        "text-sm font-medium",
+ <p className={cn(
+ "text-sm font-medium",
 
-                        task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground"
+ task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground"
 
-                      )}>
+ )}>
 
-                        {task.title}
+ {task.title}
 
-                      </p>
+ </p>
 
-                      {task.starred && (
-                        <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+ {task.starred && (
+ <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
 
-                      )}
+ )}
 
-                    </div>
+ </div>
 
-                    {task.description && (
-                      <p className="text-xs text-muted-foreground mb-2">{task.description}</p>
+ {task.description && (
+ <p className="text-xs text-muted-foreground mb-2">{task.description}</p>
 
-                    )}
+ )}
 
-                    {/* 标签和信息 */}
+ {/* TagsandInfo */}
 
-                    <div className="flex items-center gap-2 flex-wrap">
+ <div className="flex items-center gap-2 flex-wrap">
 
-                      {/* 类型标签 */}
+ {/* TypeTags */}
 
-                      <span className={cn(
-                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+ <span className={cn(
+ "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
 
-                        typeInfo.bg, typeInfo.color
+ typeInfo.bg, typeInfo.color
 
-                      )}>
+ )}>
 
-                        <typeInfo.icon className="w-3 h-3" />
+ <typeInfo.icon className="w-3 h-3" />
 
-                        {typeInfo.label}
+ {typeInfo.label}
 
-                      </span>
+ </span>
 
-                      {/* 优先级 */}
+ {/* Priority */}
 
-                      {task.priority === "high" && (
-                        <span className={cn(
-                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+ {task.priority === "high" && (
+ <span className={cn(
+ "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
 
-                          priorityInfo.bg, priorityInfo.color
+ priorityInfo.bg, priorityInfo.color
 
-                        )}>
+ )}>
 
-                          <Flag className="w-3 h-3" />
+ <Flag className="w-3 h-3" />
 
-                          高优先级
+ Priority
 
-                        </span>
+ </span>
 
-                      )}
+ )}
 
-                      {/* 截止日期 */}
+ {/* DeadlineDate */}
 
-                      {task.dueDate && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+ {task.dueDate && (
+ <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
 
-                          <Calendar className="w-3 h-3" />
+ <Calendar className="w-3 h-3" />
 
-                          {task.dueDate}
+ {task.dueDate}
 
-                        </span>
+ </span>
 
-                      )}
+ )}
 
-                      {/* 进度条 */}
+ {/* Progress Bar */}
 
-                      {task.progress !== undefined && task.status === "in_progress" && (
-                        <div className="flex items-center gap-2">
+ {task.progress !== undefined && task.status === "in_progress" && (
+ <div className="flex items-center gap-2">
 
-                          <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+ <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
 
-                            <div
+ <div
 
-                              className="h-full bg-primary rounded-full transition-all"
+ className="h-full bg-primary rounded-full transition-all"
 
-                              style={{ width: `${task.progress}%` }}
+ style={{ width: `${task.progress}%` }}
 
-                            />
+ />
 
-                          </div>
+ </div>
 
-                          <span className="text-[10px] text-muted-foreground">{task.progress}%</span>
+ <span className="text-[10px] text-muted-foreground">{task.progress}%</span>
 
-                        </div>
+ </div>
 
-                      )}
+ )}
 
-                    </div>
+ </div>
 
-                  </div>
+ </div>
 
-                  {/* 操作菜单 */}
+ {/* ActionMenu */}
 
-                  <DropdownMenu>
+ <DropdownMenu>
 
-                    <DropdownMenuTrigger asChild>
+ <DropdownMenuTrigger asChild>
 
-                      <button className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 opacity-0 group-hover:opacity-100 transition-all">
+ <button className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 opacity-0 group-hover:opacity-100 transition-all">
 
-                        <MoreHorizontal className="w-4 h-4" />
+ <MoreHorizontal className="w-4 h-4" />
 
-                      </button>
+ </button>
 
-                    </DropdownMenuTrigger>
+ </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="w-40 bg-card border-border">
+ <DropdownMenuContent align="end" className="w-40 bg-card border-border">
 
-                      <DropdownMenuItem className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2">
+ <DropdownMenuItem className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2">
 
-                        <Edit3 className="w-4 h-4" />
+ <Edit3 className="w-4 h-4" />
 
-                        编辑
+ Edit
 
-                      </DropdownMenuItem>
+ </DropdownMenuItem>
 
-                      <DropdownMenuItem
+ <DropdownMenuItem
 
-                        className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2"
+ className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2"
 
-                        onClick={() => toggleStar(task.id)}
+ onClick={() => toggleStar(task.id)}
 
-                      >
+ >
 
-                        <Star className="w-4 h-4" />
+ <Star className="w-4 h-4" />
 
-                        {task.starred ? "取消收藏" : "收藏"}
+ {task.starred ? "Unfavorite": "Favorite"}
 
-                      </DropdownMenuItem>
+ </DropdownMenuItem>
 
-                      {task.status !== "completed" && (
-                        <DropdownMenuItem
+ {task.status !== "completed" && (
+ <DropdownMenuItem
 
-                          className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2"
+ className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2"
 
-                          onClick={() => {
-                            setTasks((prev) =>
+ onClick={() => {
+ setTasks((prev) =>
 
-                              prev.map((t) =>
+ prev.map((t) =>
 
-                                t.id === task.id ? { ...t, status: "completed" as TaskStatus } : t
+ t.id === task.id ? { ...t, status: "completed" as TaskStatus } : t
 
-                              )
+ )
 
-                            );
+ );
 
-                          }}
+ }}
 
-                        >
+ >
 
-                          <CheckCircle2 className="w-4 h-4" />
+ <CheckCircle2 className="w-4 h-4" />
 
-                          标记完成
+ MarkDone
 
-                        </DropdownMenuItem>
+ </DropdownMenuItem>
 
-                      )}
+ )}
 
-                      <DropdownMenuSeparator className="bg-border" />
+ <DropdownMenuSeparator className="bg-border" />
 
-                      <DropdownMenuItem
+ <DropdownMenuItem
 
-                        className="text-red-400 focus:bg-red-500/10 focus:text-red-400 gap-2"
+ className="text-red-400 focus:bg-red-500/10 focus:text-red-400 gap-2"
 
-                        onClick={() => deleteTask(task.id)}
+ onClick={() => deleteTask(task.id)}
 
-                      >
+ >
 
-                        <Trash2 className="w-4 h-4" />
+ <Trash2 className="w-4 h-4" />
 
-                        删除
+ Delete
 
-                      </DropdownMenuItem>
+ </DropdownMenuItem>
 
-                    </DropdownMenuContent>
+ </DropdownMenuContent>
 
-                  </DropdownMenu>
+ </DropdownMenu>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-            );
+ );
 
-          })
+ })
 
-        )}
+ )}
 
-      </div>
+ </div>
 
-      {/* 底部快捷入口 */}
+ {/* FooterShortcutEntry */}
 
-      <div className="flex items-center justify-between p-3 border-t border-border bg-muted/30">
+ <div className="flex items-center justify-between p-3 border-t border-border bg-muted/30">
 
-        <div className="flex items-center gap-2">
+ <div className="flex items-center gap-2">
 
-          <Sparkles className="w-4 h-4 text-primary" />
+ <Sparkles className="w-4 h-4 text-primary" />
 
-          <span className="text-xs text-muted-foreground">AI 可以帮你规划和跟踪任务</span>
+ <span className="text-xs text-muted-foreground">AI canwithyouPlanningandTrackTask</span>
 
-        </div>
+ </div>
 
-        <button className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+ <button className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
 
-          了解更多
+ moremultiple
 
-          <ArrowRight className="w-3 h-3" />
+ <ArrowRight className="w-3 h-3" />
 
-        </button>
+ </button>
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 

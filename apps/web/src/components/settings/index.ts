@@ -1,5 +1,5 @@
 /**
- * 设置组件导出
+ * SettingsComponentExport
  */
 
 export * from "./add-api-key-dialog";

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Slider 滑块组件 - 极简风格
+ * Slider SliderComponent - Minimalist Style
  */
 
 import * as React from "react";

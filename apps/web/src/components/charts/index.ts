@@ -1,5 +1,5 @@
 /**
- * 图表组件导出
+ * ChartComponentExport
  */
 
 export {

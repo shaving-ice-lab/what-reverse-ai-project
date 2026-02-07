@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Sheet 抽屉组件 - 极简风格
+ * Sheet DrawerComponent - Minimalist Style
  */
 
 import * as React from "react"

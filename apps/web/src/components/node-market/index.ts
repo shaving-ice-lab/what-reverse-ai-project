@@ -1,5 +1,5 @@
 /**
- * 节点市场组件导出
+ * NodeMarketplaceComponentExport
  */
 
 export { NodeCard } from './node-card';

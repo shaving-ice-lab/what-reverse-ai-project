@@ -1,5 +1,5 @@
 /**
- * 工作流组件导出
+ * WorkflowComponentExport
  */
 
 export * from "./workflow-card";

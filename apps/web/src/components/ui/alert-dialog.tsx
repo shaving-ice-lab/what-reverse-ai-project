@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AlertDialog 确认对话框组件 - 极简风格
+ * AlertDialog ConfirmDialogComponent - Minimalist Style
  */
 
 import * as React from "react";

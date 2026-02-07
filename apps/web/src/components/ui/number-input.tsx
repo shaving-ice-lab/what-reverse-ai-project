@@ -1,19 +1,19 @@
 "use client"
 
 /**
- * NumberInput 数字输入组件
+ * NumberInput countcharInputComponent
 
  * 
 
- * 支持：
+ * Support: 
 
- * - 步进器按钮
+ * - StepperButton
 
- * - 最小/最大值限制
+ * - Minimum/MaximumvalueLimit
 
- * - 格式化显示
+ * - FormatDisplay
 
- * - 精度控制
+ * - PrecisionControl
  */
 
 import * as React from "react"
@@ -21,643 +21,643 @@ import { Minus, Plus, ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange" | "size"> {
-  /** 当前值 */
+ /** Currentvalue */
 
-  value?: number
+ value?: number
 
-  /** 默认值 */
+ /** Defaultvalue */
 
-  defaultValue?: number
+ defaultValue?: number
 
-  /** 值变化回调 */
+ /** valueCallback */
 
-  onChange?: (value: number | undefined) => void
+ onChange?: (value: number | undefined) => void
 
-  /** 最小值 */
+ /** Minimumvalue */
 
-  min?: number
+ min?: number
 
-  /** 最大值 */
+ /** Maximumvalue */
 
-  max?: number
+ max?: number
 
-  /** 步进值 */
+ /** Steppervalue */
 
-  step?: number
+ step?: number
 
-  /** 小数精度 */
+ /** smallcountPrecision */
 
-  precision?: number
+ precision?: number
 
-  /** 尺寸 */
+ /** Dimension */
 
-  size?: "sm" | "default" | "lg"
+ size?: "sm" | "default" | "lg"
 
-  /** 是否显示步进器 */
+ /** isnoDisplayStepper */
 
-  showStepper?: boolean
+ showStepper?: boolean
 
-  /** 步进器位置 */
+ /** Stepper */
 
-  stepperPosition?: "right" | "sides"
+ stepperPosition?: "right" | "sides"
 
-  /** 前缀 */
+ /** before */
 
-  prefix?: React.ReactNode
+ prefix?: React.ReactNode
 
-  /** 后缀 */
+ /** after */
 
-  suffix?: React.ReactNode
+ suffix?: React.ReactNode
 
-  /** 格式化显示 */
+ /** FormatDisplay */
 
-  formatter?: (value: number | undefined) => string
+ formatter?: (value: number | undefined) => string
 
-  /** 解析输入 */
+ /** ParseInput */
 
-  parser?: (value: string) => number | undefined
+ parser?: (value: string) => number | undefined
 
-  /** 是否允许空值 */
+ /** isnoAllowEmptyvalue */
 
-  allowEmpty?: boolean
+ allowEmpty?: boolean
 
-  /** 错误状态 */
+ /** ErrorStatus */
 
-  error?: boolean
+ error?: boolean
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
-  ({
-    className", value: controlledValue,
+ ({
+ className", value: controlledValue,
 
-    defaultValue,
+ defaultValue,
 
-    onChange,
+ onChange,
 
-    min,
+ min,
 
-    max,
+ max,
 
-    step = 1,
+ step = 1,
 
-    precision,
+ precision,
 
-    size = "default",
+ size = "default",
 
-    showStepper = true,
+ showStepper = true,
 
-    stepperPosition = "right",
+ stepperPosition = "right",
 
-    prefix,
+ prefix,
 
-    suffix,
+ suffix,
 
-    formatter,
+ formatter,
 
-    parser,
+ parser,
 
-    allowEmpty = true,
+ allowEmpty = true,
 
-    error = false,
+ error = false,
 
-    disabled,
+ disabled,
 
-    ...props
+ ...props
 
-  }, ref) => {
-    const [internalValue, setInternalValue] = React.useState<number | undefined>(defaultValue)
+ }, ref) => {
+ const [internalValue, setInternalValue] = React.useState<number | undefined>(defaultValue)
 
-    const [inputValue, setInputValue] = React.useState<string>("")
+ const [inputValue, setInputValue] = React.useState<string>("")
 
-    const [isFocused, setIsFocused] = React.useState(false)
+ const [isFocused, setIsFocused] = React.useState(false)
 
-    const inputRef = React.useRef<HTMLInputElement>(null)
+ const inputRef = React.useRef<HTMLInputElement>(null)
 
-    // 合并 ref
+ // and ref
 
-    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
+ React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
-    const value = controlledValue !== undefined ? controlledValue : internalValue
+ const value = controlledValue !== undefined ? controlledValue : internalValue
 
-    // 格式化数值
+ // Formatcountvalue
 
-    const formatValue = React.useCallback((val: number | undefined): string => {
-      if (val === undefined) return ""
+ const formatValue = React.useCallback((val: number | undefined): string => {
+ if (val === undefined) return ""
 
-      if (formatter) return formatter(val)
+ if (formatter) return formatter(val)
 
-      if (precision !== undefined) return val.toFixed(precision)
+ if (precision !== undefined) return val.toFixed(precision)
 
-      return String(val)
+ return String(val)
 
-    }, [formatter, precision])
+ }, [formatter, precision])
 
-    // 解析输入
+ // ParseInput
 
-    const parseValue = React.useCallback((str: string): number | undefined => {
-      if (!str || str === "-") return undefined
+ const parseValue = React.useCallback((str: string): number | undefined => {
+ if (!str || str === "-") return undefined
 
-      if (parser) return parser(str)
+ if (parser) return parser(str)
 
-      const num = parseFloat(str)
+ const num = parseFloat(str)
 
-      return isNaN(num) ? undefined : num
+ return isNaN(num) ? undefined : num
 
-    }, [parser])
+ }, [parser])
 
-    // 限制范围
+ // LimitRange
 
-    const clampValue = React.useCallback((val: number | undefined): number | undefined => {
-      if (val === undefined) return undefined
+ const clampValue = React.useCallback((val: number | undefined): number | undefined => {
+ if (val === undefined) return undefined
 
-      let clamped = val
+ let clamped = val
 
-      if (min !== undefined) clamped = Math.max(min, clamped)
+ if (min !== undefined) clamped = Math.max(min, clamped)
 
-      if (max !== undefined) clamped = Math.min(max, clamped)
+ if (max !== undefined) clamped = Math.min(max, clamped)
 
-      if (precision !== undefined) {
-        clamped = parseFloat(clamped.toFixed(precision))
+ if (precision !== undefined) {
+ clamped = parseFloat(clamped.toFixed(precision))
 
-      }
+ }
 
-      return clamped
+ return clamped
 
-    }, [min, max, precision])
+ }, [min, max, precision])
 
-    // 更新显示值
+ // UpdateDisplayvalue
 
-    React.useEffect(() => {
-      if (!isFocused) {
-        setInputValue(formatValue(value))
+ React.useEffect(() => {
+ if (!isFocused) {
+ setInputValue(formatValue(value))
 
-      }
+ }
 
-    }, [value, isFocused, formatValue])
+ }, [value, isFocused, formatValue])
 
-    // 更新值
+ // Updatevalue
 
-    const updateValue = (newValue: number | undefined) => {
-      const clamped = clampValue(newValue)
+ const updateValue = (newValue: number | undefined) => {
+ const clamped = clampValue(newValue)
 
-      if (controlledValue === undefined) {
-        setInternalValue(clamped)
+ if (controlledValue === undefined) {
+ setInternalValue(clamped)
 
-      }
+ }
 
-      onChange?.(clamped)
+ onChange?.(clamped)
 
-    }
+ }
 
-    // 增加
+ // Increase
 
-    const increment = () => {
-      const current = value ?? (min ?? 0)
+ const increment = () => {
+ const current = value ?? (min ?? 0)
 
-      updateValue(current + step)
+ updateValue(current + step)
 
-    }
+ }
 
-    // 减少
+ // few
 
-    const decrement = () => {
-      const current = value ?? (max ?? 0)
+ const decrement = () => {
+ const current = value ?? (max ?? 0)
 
-      updateValue(current - step)
+ updateValue(current - step)
 
-    }
+ }
 
-    // 处理输入
+ // ProcessInput
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const str = e.target.value
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+ const str = e.target.value
 
-      setInputValue(str)
+ setInputValue(str)
 
-      if (str === "" && allowEmpty) {
-        updateValue(undefined)
+ if (str === "" && allowEmpty) {
+ updateValue(undefined)
 
-        return
+ return
 
-      }
+ }
 
-      const parsed = parseValue(str)
+ const parsed = parseValue(str)
 
-      if (parsed !== undefined) {
-        updateValue(parsed)
+ if (parsed !== undefined) {
+ updateValue(parsed)
 
-      }
+ }
 
-    }
+ }
 
-    // 处理失焦
+ // Process
 
-    const handleBlur = () => {
-      setIsFocused(false)
+ const handleBlur = () => {
+ setIsFocused(false)
 
-      setInputValue(formatValue(value))
+ setInputValue(formatValue(value))
 
-    }
+ }
 
-    // 处理键盘
+ // Processkey
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "ArrowUp") {
-        e.preventDefault()
+ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+ if (e.key === "ArrowUp") {
+ e.preventDefault()
 
-        increment()
+ increment()
 
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault()
+ } else if (e.key === "ArrowDown") {
+ e.preventDefault()
 
-        decrement()
+ decrement()
 
-      }
+ }
 
-    }
+ }
 
-    // 尺寸样式
+ // Dimensionstyle
 
-    const sizeStyles = {
-      sm: "h-8 text-sm",
+ const sizeStyles = {
+ sm: "h-8 text-sm",
 
-      default: "h-10",
+ default: "h-10",
 
-      lg: "h-12 text-lg",
+ lg: "h-12 text-lg",
 
-    }
+ }
 
-    const buttonSizeStyles = {
-      sm: "w-6 h-6",
+ const buttonSizeStyles = {
+ sm: "w-6 h-6",
 
-      default: "w-8 h-8",
+ default: "w-8 h-8",
 
-      lg: "w-10 h-10",
+ lg: "w-10 h-10",
 
-    }
+ }
 
-    const canIncrement = max === undefined || (value ?? 0) < max
+ const canIncrement = max === undefined || (value ?? 0) < max
 
-    const canDecrement = min === undefined || (value ?? 0) > min
+ const canDecrement = min === undefined || (value ?? 0) > min
 
-    return (
-      <div
+ return (
+ <div
 
-        className={cn(
-          "relative flex items-center",
+ className={cn(
+ "relative flex items-center",
 
-          "bg-background border rounded-lg",
+ "bg-background border rounded-lg",
 
-          "transition-all duration-200",
+ "transition-all duration-200",
 
-          error 
+ error 
 
-            ? "border-destructive focus-within:ring-2 focus-within:ring-destructive/20" 
+ ? "border-destructive focus-within:ring-2 focus-within:ring-destructive/20" 
 
-            : "border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-brand-500/20",
+ : "border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-brand-500/20",
 
-          disabled && "opacity-50 cursor-not-allowed",
+ disabled && "opacity-50 cursor-not-allowed",
 
-          sizeStyles[size],
+ sizeStyles[size],
 
-          className
+ className
 
-        )}
+ )}
 
-      >
+ >
 
-        {/* 左侧步进器 */}
+ {/* Left sideStepper */}
 
-        {showStepper && stepperPosition === "sides" && (
-          <button
+ {showStepper && stepperPosition === "sides" && (
+ <button
 
-            type="button"
+ type="button"
 
-            onClick={decrement}
+ onClick={decrement}
 
-            disabled={disabled || !canDecrement}
+ disabled={disabled || !canDecrement}
 
-            className={cn(
-              "flex items-center justify-center shrink-0",
+ className={cn(
+ "flex items-center justify-center shrink-0",
 
-              "text-foreground-light hover:text-foreground",
+ "text-foreground-light hover:text-foreground",
 
-              "disabled:opacity-30 disabled:cursor-not-allowed",
+ "disabled:opacity-30 disabled:cursor-not-allowed",
 
-              "transition-colors",
+ "transition-colors",
 
-              buttonSizeStyles[size]
+ buttonSizeStyles[size]
 
-            )}
+ )}
 
-            tabIndex={-1}
+ tabIndex={-1}
 
-          >
+ >
 
-            <Minus className="w-4 h-4" />
+ <Minus className="w-4 h-4" />
 
-          </button>
+ </button>
 
-        )}
+ )}
 
-        {/* 前缀 */}
+ {/* before */}
 
-        {prefix && (
-          <span className="pl-3 text-foreground-light shrink-0">{prefix}</span>
+ {prefix && (
+ <span className="pl-3 text-foreground-light shrink-0">{prefix}</span>
 
-        )}
+ )}
 
-        {/* 输入框 */}
+ {/* Input */}
 
-        <input
+ <input
 
-          ref={inputRef}
+ ref={inputRef}
 
-          type="text"
+ type="text"
 
-          inputMode="decimal"
+ inputMode="decimal"
 
-          value={inputValue}
+ value={inputValue}
 
-          onChange={handleChange}
+ onChange={handleChange}
 
-          onFocus={() => setIsFocused(true)}
+ onFocus={() => setIsFocused(true)}
 
-          onBlur={handleBlur}
+ onBlur={handleBlur}
 
-          onKeyDown={handleKeyDown}
+ onKeyDown={handleKeyDown}
 
-          disabled={disabled}
+ disabled={disabled}
 
-          className={cn(
-            "flex-1 w-full min-w-0 bg-transparent",
+ className={cn(
+ "flex-1 w-full min-w-0 bg-transparent",
 
-            "text-center tabular-nums",
+ "text-center tabular-nums",
 
-            "focus:outline-none",
+ "focus:outline-none",
 
-            "disabled:cursor-not-allowed",
+ "disabled:cursor-not-allowed",
 
-            !prefix && "pl-3",
+ !prefix && "pl-3",
 
-            !suffix && !showStepper && "pr-3",
+ !suffix && !showStepper && "pr-3",
 
-          )}
+ )}
 
-          {...props}
+ {...props}
 
-        />
+ />
 
-        {/* 后缀 */}
+ {/* after */}
 
-        {suffix && (
-          <span className="pr-3 text-foreground-light shrink-0">{suffix}</span>
+ {suffix && (
+ <span className="pr-3 text-foreground-light shrink-0">{suffix}</span>
 
-        )}
+ )}
 
-        {/* 右侧步进器 */}
+ {/* Right sideStepper */}
 
-        {showStepper && stepperPosition === "right" && (
-          <div className="flex flex-col border-l border-border shrink-0">
+ {showStepper && stepperPosition === "right" && (
+ <div className="flex flex-col border-l border-border shrink-0">
 
-            <button
+ <button
 
-              type="button"
+ type="button"
 
-              onClick={increment}
+ onClick={increment}
 
-              disabled={disabled || !canIncrement}
+ disabled={disabled || !canIncrement}
 
-              className={cn(
-                "flex items-center justify-center px-2 flex-1",
+ className={cn(
+ "flex items-center justify-center px-2 flex-1",
 
-                "text-foreground-light hover:text-foreground hover:bg-surface-200",
+ "text-foreground-light hover:text-foreground hover:bg-surface-200",
 
-                "disabled:opacity-30 disabled:cursor-not-allowed",
+ "disabled:opacity-30 disabled:cursor-not-allowed",
 
-                "transition-colors border-b border-border",
+ "transition-colors border-b border-border",
 
-              )}
+ )}
 
-              tabIndex={-1}
+ tabIndex={-1}
 
-            >
+ >
 
-              <ChevronUp className="w-3 h-3" />
+ <ChevronUp className="w-3 h-3" />
 
-            </button>
+ </button>
 
-            <button
+ <button
 
-              type="button"
+ type="button"
 
-              onClick={decrement}
+ onClick={decrement}
 
-              disabled={disabled || !canDecrement}
+ disabled={disabled || !canDecrement}
 
-              className={cn(
-                "flex items-center justify-center px-2 flex-1",
+ className={cn(
+ "flex items-center justify-center px-2 flex-1",
 
-                "text-foreground-light hover:text-foreground hover:bg-surface-200",
+ "text-foreground-light hover:text-foreground hover:bg-surface-200",
 
-                "disabled:opacity-30 disabled:cursor-not-allowed",
+ "disabled:opacity-30 disabled:cursor-not-allowed",
 
-                "transition-colors",
+ "transition-colors",
 
-              )}
+ )}
 
-              tabIndex={-1}
+ tabIndex={-1}
 
-            >
+ >
 
-              <ChevronDown className="w-3 h-3" />
+ <ChevronDown className="w-3 h-3" />
 
-            </button>
+ </button>
 
-          </div>
+ </div>
 
-        )}
+ )}
 
-        {/* 侧边步进器 - 右侧 */}
+ {/* EdgeStepper - Right side */}
 
-        {showStepper && stepperPosition === "sides" && (
-          <button
+ {showStepper && stepperPosition === "sides" && (
+ <button
 
-            type="button"
+ type="button"
 
-            onClick={increment}
+ onClick={increment}
 
-            disabled={disabled || !canIncrement}
+ disabled={disabled || !canIncrement}
 
-            className={cn(
-              "flex items-center justify-center shrink-0",
+ className={cn(
+ "flex items-center justify-center shrink-0",
 
-              "text-foreground-light hover:text-foreground",
+ "text-foreground-light hover:text-foreground",
 
-              "disabled:opacity-30 disabled:cursor-not-allowed",
+ "disabled:opacity-30 disabled:cursor-not-allowed",
 
-              "transition-colors",
+ "transition-colors",
 
-              buttonSizeStyles[size]
+ buttonSizeStyles[size]
 
-            )}
+ )}
 
-            tabIndex={-1}
+ tabIndex={-1}
 
-          >
+ >
 
-            <Plus className="w-4 h-4" />
+ <Plus className="w-4 h-4" />
 
-          </button>
+ </button>
 
-        )}
+ )}
 
-      </div>
+ </div>
 
-    )
+ )
 
-  }
+ }
 )
 
 NumberInput.displayName = "NumberInput"
 
 /**
- * CurrencyInput - 货币输入
+ * CurrencyInput - CurrencyInput
  */
 
 interface CurrencyInputProps extends Omit<NumberInputProps, "prefix" | "formatter" | "parser" | "precision"> {
-  /** 货币符号 */
+ /** CurrencySymbol */
 
-  currency?: string
+ currency?: string
 
-  /** 货币位置 */
+ /** Currency */
 
-  currencyPosition?: "prefix" | "suffix"
+ currencyPosition?: "prefix" | "suffix"
 
-  /** 小数位数 */
+ /** smallcountcount */
 
-  decimals?: number
+ decimals?: number
 }
 
 function CurrencyInput({
-  currency = "",
+ currency = "",
 
-  currencyPosition = "prefix",
+ currencyPosition = "prefix",
 
-  decimals = 2,
+ decimals = 2,
 
-  ...props
+ ...props
 }: CurrencyInputProps) {
-  return (
-    <NumberInput
+ return (
+ <NumberInput
 
-      precision={decimals}
+ precision={decimals}
 
-      prefix={currencyPosition === "prefix" ? currency : undefined}
+ prefix={currencyPosition === "prefix" ? currency : undefined}
 
-      suffix={currencyPosition === "suffix" ? currency : undefined}
+ suffix={currencyPosition === "suffix" ? currency : undefined}
 
-      formatter={(val) => val !== undefined ? val.toFixed(decimals) : ""}
+ formatter={(val) => val !== undefined ? val.toFixed(decimals) : ""}
 
-      {...props}
+ {...props}
 
-    />
+ />
 
-  )
+ )
 }
 
 /**
- * PercentInput - 百分比输入
+ * PercentInput - PercentageInput
  */
 
 interface PercentInputProps extends Omit<NumberInputProps, "suffix" | "formatter" | "parser" | "min" | "max"> {
-  /** 小数位数 */
+ /** smallcountcount */
 
-  decimals?: number
+ decimals?: number
 }
 
 function PercentInput({
-  decimals = 0,
+ decimals = 0,
 
-  ...props
+ ...props
 }: PercentInputProps) {
-  return (
-    <NumberInput
+ return (
+ <NumberInput
 
-      min={0}
+ min={0}
 
-      max={100}
+ max={100}
 
-      precision={decimals}
+ precision={decimals}
 
-      suffix="%"
+ suffix="%"
 
-      {...props}
+ {...props}
 
-    />
+ />
 
-  )
+ )
 }
 
 /**
- * QuantityInput - 数量输入（整数）
+ * QuantityInput - CountInput(count)
  */
 
 interface QuantityInputProps extends Omit<NumberInputProps, "precision" | "step"> {
-  /** 是否紧凑模式 */
+ /** isnoCompact */
 
-  compact?: boolean
+ compact?: boolean
 }
 
 function QuantityInput({
-  compact = false,
+ compact = false,
 
-  min = 0,
+ min = 0,
 
-  showStepper = true,
+ showStepper = true,
 
-  stepperPosition = "sides",
+ stepperPosition = "sides",
 
-  ...props
+ ...props
 }: QuantityInputProps) {
-  return (
-    <NumberInput
+ return (
+ <NumberInput
 
-      precision={0}
+ precision={0}
 
-      step={1}
+ step={1}
 
-      min={min}
+ min={min}
 
-      showStepper={showStepper}
+ showStepper={showStepper}
 
-      stepperPosition={stepperPosition}
+ stepperPosition={stepperPosition}
 
-      className={compact ? "w-32" : undefined}
+ className={compact ? "w-32" : undefined}
 
-      {...props}
+ {...props}
 
-    />
+ />
 
-  )
+ )
 }
 
 export {
-  NumberInput,
+ NumberInput,
 
-  CurrencyInput,
+ CurrencyInput,
 
-  PercentInput,
+ PercentInput,
 
-  QuantityInput,
+ QuantityInput,
 }
 
 export type {
-  NumberInputProps,
+ NumberInputProps,
 
-  CurrencyInputProps,
+ CurrencyInputProps,
 
-  PercentInputProps,
+ PercentInputProps,
 
-  QuantityInputProps,
+ QuantityInputProps,
 }

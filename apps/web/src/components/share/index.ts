@@ -1,5 +1,5 @@
 /**
- * 分享组件
+ * ShareComponent
  */
 
 export { ShareDialog, ShareButton } from "./share-dialog";

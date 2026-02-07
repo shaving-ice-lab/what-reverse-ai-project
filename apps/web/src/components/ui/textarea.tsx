@@ -1,5 +1,5 @@
 /**
- * Textarea 文本域组件 - 极简风格
+ * Textarea Text AreaComponent - Minimalist Style
  */
 
 import * as React from "react"

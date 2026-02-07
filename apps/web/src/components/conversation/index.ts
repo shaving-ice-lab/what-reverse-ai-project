@@ -1,5 +1,5 @@
 /**
- * 对话相关组件导出
+ * ConversationRelatedComponentExport
  */
 
 export { ConversationFolderManageDialog } from "./folder-manage-dialog";

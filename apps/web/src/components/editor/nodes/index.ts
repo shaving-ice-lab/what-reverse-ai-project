@@ -1,5 +1,5 @@
 /**
- * 自定义节点类型导出
+ * CustomNodeTypeExport
  */
 
 export * from "./base-node";
@@ -28,7 +28,7 @@ export * from "./document-assembler-node";
 export * from "./database-node";
 export { default as GroupNode } from "./group-node";
 
-// 节点类型注册映射
+// NodeTypeSign UpMapping
 import { BaseNode } from "./base-node";
 import { StartNode } from "./start-node";
 import { EndNode } from "./end-node";
@@ -56,33 +56,33 @@ import { DatabaseNode } from "./database-node";
 import GroupNode from "./group-node";
 
 export const nodeTypes = {
-  base: BaseNode,
-  start: StartNode,
-  end: EndNode,
-  llm: LLMNode,
-  http: HTTPNode,
-  condition: ConditionNode,
-  loop: LoopNode,
-  code: CodeNode,
-  template: TemplateNode,
-  variable: VariableNode,
-  input: InputNode,
-  output: OutputNode,
-  expression: ExpressionNode,
-  trycatch: TryCatchNode,
-  transform: TransformNode,
-  regex: RegexNode,
-  textsplit: TextSplitNode,
-  merge: MergeNode,
-  filter: FilterNode,
-  parallel: ParallelNode,
-  delay: DelayNode,
-  webhook: WebhookNode,
-  documentAssembler: DocumentAssemblerNode,
-  db_select: DatabaseNode,
-  db_insert: DatabaseNode,
-  db_update: DatabaseNode,
-  db_delete: DatabaseNode,
-  db_migrate: DatabaseNode,
-  group: GroupNode,
+ base: BaseNode,
+ start: StartNode,
+ end: EndNode,
+ llm: LLMNode,
+ http: HTTPNode,
+ condition: ConditionNode,
+ loop: LoopNode,
+ code: CodeNode,
+ template: TemplateNode,
+ variable: VariableNode,
+ input: InputNode,
+ output: OutputNode,
+ expression: ExpressionNode,
+ trycatch: TryCatchNode,
+ transform: TransformNode,
+ regex: RegexNode,
+ textsplit: TextSplitNode,
+ merge: MergeNode,
+ filter: FilterNode,
+ parallel: ParallelNode,
+ delay: DelayNode,
+ webhook: WebhookNode,
+ documentAssembler: DocumentAssemblerNode,
+ db_select: DatabaseNode,
+ db_insert: DatabaseNode,
+ db_update: DatabaseNode,
+ db_delete: DatabaseNode,
+ db_migrate: DatabaseNode,
+ group: GroupNode,
 };

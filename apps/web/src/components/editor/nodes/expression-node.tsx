@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 表达式计算节点 - 极简风格
+ * ExpressionCalculateNode - Minimalist Style
  */
 
 import { memo } from "react";
@@ -30,7 +30,7 @@ export const ExpressionNode = memo(function ExpressionNode({
     ? config.expression.length > 40
       ? config.expression.slice(0, 40) + "..."
       : config.expression
-    : "// 输入表达式...";
+: "// InputExpression...";
 
   return (
     <div
@@ -41,7 +41,7 @@ export const ExpressionNode = memo(function ExpressionNode({
           : "border-border hover:border-brand-500/40"
       )}
     >
-      {/* 输入端口 */}
+ {/* InputPort */}
       <Handle
         id="input"
         type="target"
@@ -50,18 +50,18 @@ export const ExpressionNode = memo(function ExpressionNode({
         className="w-3! h-3! border-2! border-background! rounded-full! top-[38px]! -left-1.5! bg-foreground-muted!"
       />
 
-      {/* 头部 */}
+ {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-border/70 px-3 py-2.5 bg-brand-200/30">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-500 text-background">
           <Calculator className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm truncate">{data.label || "表达式"}</h3>
-          <p className="text-xs text-foreground-muted">计算表达式</p>
+ <h3 className="font-medium text-sm truncate">{data.label || "Expression"}</h3>
+ <p className="text-xs text-foreground-muted">CalculateExpression</p>
         </div>
       </div>
 
-      {/* 表达式预览 */}
+ {/* ExpressionPreview */}
       <div className="px-3 py-2.5">
         <div className="text-xs font-mono text-foreground-muted p-2 rounded-md bg-surface-200 overflow-hidden">
           <code className="line-clamp-2">{expressionPreview}</code>
@@ -69,7 +69,7 @@ export const ExpressionNode = memo(function ExpressionNode({
         {config.outputName && (
           <div className="mt-2 flex items-center gap-1.5 text-xs">
             <Variable className="h-3.5 w-3.5 text-foreground-muted" />
-            <span className="text-foreground-muted">输出:</span>
+ <span className="text-foreground-muted">Output:</span>
             <span className="font-mono px-1.5 py-0.5 rounded bg-brand-200/60 text-brand-500">
               {config.outputName}
             </span>
@@ -77,19 +77,19 @@ export const ExpressionNode = memo(function ExpressionNode({
         )}
       </div>
 
-      {/* 底部 */}
+ {/* Footer */}
       <div className="flex justify-between px-3 py-2 border-t border-border text-xs text-foreground-muted bg-surface-200">
         <span className="flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted" />
-          输入
+ Input
         </span>
         <span className="flex items-center gap-1">
-          输出
+ Output
           <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
         </span>
       </div>
 
-      {/* 输出端口 */}
+ {/* OutputPort */}
       <Handle
         id="output"
         type="source"

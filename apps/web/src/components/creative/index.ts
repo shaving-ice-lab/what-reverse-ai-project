@@ -1,5 +1,5 @@
 /**
- * 创意组件导出
+ * CreativeComponentExport
  */
 
 export { AIWritingPanel, WritingSuggestionCard } from "./ai-writing-panel";

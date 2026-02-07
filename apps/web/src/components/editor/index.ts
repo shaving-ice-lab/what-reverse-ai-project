@@ -1,5 +1,5 @@
 /**
- * 工作流编辑器组件导出
+ * WorkflowEditComponentExport
  */
 
 export * from "./workflow-editor";

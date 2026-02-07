@@ -1,5 +1,5 @@
 /**
- * shadcn/ui 组件导出入口
+ * shadcn/ui ComponentExportEntry
  */
 
 export * from "./accordion"
@@ -29,7 +29,7 @@ export * from "./textarea"
 export * from "./timeline"
 export * from "./tooltip"
 
-// 自定义 UX 组件
+// Custom UX Component
 export * from "./loading"
 export * from "./empty-state"
 export * from "./toast"
@@ -39,18 +39,18 @@ export * from "./offline-indicator"
 export * from "./sync-indicator"
 export * from "./confirm-dialog"
 
-// 装饰/动画组件
+// Decoration/AnimationComponent
 export * from "./animated-background"
 
-// Manus 风格组件
+// Manus StyleComponent
 export * from "./feature-card"
 
-// 动画和展示组件
+// AnimationandShowcaseComponent
 export * from "./count-up"
 export * from "./code-block"
 export * from "./logo-carousel"
 
-// 微交互组件
+// InteractiveComponent
 export * from "./magnetic-button"
 export * from "./gradient-border"
 export * from "./shiny-text"
@@ -61,32 +61,30 @@ export * from "./loading-screen"
 export * from "./page-transition"
 export * from "./floating-input"
 
-// 实用组件
+// useComponent
 export * from "./kbd"
 export * from "./callout"
 export * from "./number-input"
 export * from "./copy-button"
-export * from "./empty-state"
-export * from "./breadcrumb"
 export * from "./rating"
 export * from "./color-picker"
 export * from "./stepper"
 
-// 数据展示组件
+// DataShowcaseComponent
 export * from "./tag"
 export * from "./file-upload"
 export * from "./pagination"
 export * from "./data-table"
 export * from "./notification-center"
 
-// 通知和横幅组件
+// NotificationsandBannerComponent
 export * from "./banner"
 
-// 定价和骨架组件
+// PricingandSkeletonComponent
 export * from "./pricing-cards"
 export * from "./skeleton-loaders"
 export * from "./tag-input"
 
-// 状态和向导组件
+// StatusandWizardComponent
 export * from "./status-badge"
 export * from "./wizard"

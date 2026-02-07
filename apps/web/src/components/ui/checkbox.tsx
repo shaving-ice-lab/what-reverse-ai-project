@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Checkbox 复选框组件 - 极简风格
+ * Checkbox CheckboxComponent - Minimalist Style
  */
 
 import * as React from "react"

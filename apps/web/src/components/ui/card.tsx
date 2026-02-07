@@ -5,553 +5,553 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Card 卡片组件 - Supabase 风格：深色主题、surface 层级
+ * Card CardComponent - Supabase Style: DarkTheme, surface Hierarchy
  */
 const cardVariants = cva(
-  "rounded-lg text-foreground transition-colors duration-150 ease-in-out",
-  {
-    variants: {
-      variant: {
-        // 默认卡片 - Supabase surface-100
-        default: [
-          "bg-surface-100 border border-border",
-        ].join(" "),
-        // 提升卡片 - 带阴影
-        elevated: [
-          "bg-surface-100 border border-border",
-          "shadow-md shadow-black/25",
-        ].join(" "),
-        // 轮廓卡片 - 透明背景
-        outline: [
-          "bg-transparent border border-border",
-        ].join(" "),
-        // 幽灵卡片 - 无边框
-        ghost: [
-          "bg-transparent border-0",
-        ].join(" "),
-        // 静音卡片 - Supabase surface-75
-        muted: [
-          "bg-surface-75 border border-border-muted",
-        ].join(" "),
-        // 玻璃卡片 - 毛玻璃效果
-        glass: [
-          "bg-surface-100/70 backdrop-blur-xl border border-border/50",
-        ].join(" "),
-        // 玻璃卡片 - 更透明
-        "glass-subtle": [
-          "bg-surface-100/40 backdrop-blur-lg border border-border/30",
-        ].join(" "),
-        // 渐变边框卡片 - 品牌绿色
-        gradient: [
-          "bg-surface-100 border-0 relative",
-          "before:absolute before:inset-0 before:rounded-lg before:p-[1px]",
-          "before:bg-gradient-to-br before:from-brand-500 before:via-brand-500/50 before:to-transparent",
-          "before:-z-10",
-        ].join(" "),
-        // 强调卡片 - 左边框品牌绿
-        accent: [
-          "bg-surface-100 border-l-4 border-l-brand-500 border border-border rounded-l-none",
-        ].join(" "),
-        // 面板卡片 - Supabase 风格面板
-        panel: [
-          "bg-surface-75 border border-border",
-        ].join(" "),
-        // 统计卡片 - Supabase 仪表盘统计卡
-        stats: [
-          "bg-surface-100 border border-border",
-        ].join(" "),
-        // 品牌高亮卡片 - 绿色背景
-        brand: [
-          "bg-brand-200 border border-brand-400/30",
-        ].join(" "),
-        // 警告卡片
-        warning: [
-          "bg-warning-200 border border-warning/30",
-        ].join(" "),
-        // 错误卡片
-        destructive: [
-          "bg-destructive-200 border border-destructive/30",
-        ].join(" "),
-      },
-      hover: {
-        none: "",
-        border: "hover:border-border-strong",
-        shadow: "hover:shadow-lg hover:shadow-black/30",
-        lift: "hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5",
-        muted: "hover:bg-surface-200",
-        // 交互卡片: Supabase 绿色边框
-        glow: "hover:border-brand-500 hover:shadow-brand-500/10",
-        "glow-border": "hover:border-brand-500/50 hover:shadow-sm",
-        // 缩放
-        scale: "hover:scale-[1.02]",
-        // 组合效果
-        interactive: "hover:border-border-strong hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5",
-      },
-      padding: {
-        none: "",
-        xs: "p-3",
-        sm: "p-4",
-        // 默认 padding: 24px
-        default: "p-6",
-        lg: "p-8",
-        xl: "p-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      hover: "none",
-      padding: "none",
-    },
-  }
+ "rounded-lg text-foreground transition-colors duration-150 ease-in-out",
+ {
+ variants: {
+ variant: {
+ // DefaultCard - Supabase surface-100
+ default: [
+ "bg-surface-100 border border-border",
+ ].join(""),
+ // ImproveCard - Shadow
+ elevated: [
+ "bg-surface-100 border border-border",
+ "shadow-md shadow-black/25",
+ ].join(""),
+ // OutlineCard - TransparentBackground
+ outline: [
+ "bg-transparent border border-border",
+ ].join(""),
+ // GhostCard - NoneEdge
+ ghost: [
+ "bg-transparent border-0",
+ ].join(""),
+ // MuteCard - Supabase surface-75
+ muted: [
+ "bg-surface-75 border border-border-muted",
+ ].join(""),
+ // GlassCard - GlassEffect
+ glass: [
+ "bg-surface-100/70 backdrop-blur-xl border border-border/50",
+ ].join(""),
+ // GlassCard - moreTransparent
+ "glass-subtle": [
+ "bg-surface-100/40 backdrop-blur-lg border border-border/30",
+ ].join(""),
+ // GradientEdgeCard - BrandGreen
+ gradient: [
+ "bg-surface-100 border-0 relative",
+ "before:absolute before:inset-0 before:rounded-lg before:p-[1px]",
+ "before:bg-gradient-to-br before:from-brand-500 before:via-brand-500/50 before:to-transparent",
+ "before:-z-10",
+ ].join(""),
+ // EmphasizeCard - leftEdgeBrand
+ accent: [
+ "bg-surface-100 border-l-4 border-l-brand-500 border border-border rounded-l-none",
+ ].join(""),
+ // PanelCard - Supabase StylePanel
+ panel: [
+ "bg-surface-75 border border-border",
+ ].join(""),
+ // StatisticsCard - Supabase DashboardStatistics
+ stats: [
+ "bg-surface-100 border border-border",
+ ].join(""),
+ // BrandHighlightCard - GreenBackground
+ brand: [
+ "bg-brand-200 border border-brand-400/30",
+ ].join(""),
+ // WarningCard
+ warning: [
+ "bg-warning-200 border border-warning/30",
+ ].join(""),
+ // ErrorCard
+ destructive: [
+ "bg-destructive-200 border border-destructive/30",
+ ].join(""),
+ },
+ hover: {
+ none: "",
+ border: "hover:border-border-strong",
+ shadow: "hover:shadow-lg hover:shadow-black/30",
+ lift: "hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5",
+ muted: "hover:bg-surface-200",
+ // InteractiveCard: Supabase GreenEdge
+ glow: "hover:border-brand-500 hover:shadow-brand-500/10",
+ "glow-border": "hover:border-brand-500/50 hover:shadow-sm",
+ // Zoom
+ scale: "hover:scale-[1.02]",
+ // groupEffect
+ interactive: "hover:border-border-strong hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5",
+ },
+ padding: {
+ none: "",
+ xs: "p-3",
+ sm: "p-4",
+ // Default padding: 24px
+ default: "p-6",
+ lg: "p-8",
+ xl: "p-10",
+ },
+ },
+ defaultVariants: {
+ variant: "default",
+ hover: "none",
+ padding: "none",
+ },
+ }
 )
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {
-  /** 是否可交互 */
-  interactive?: boolean
-  /** 入场动画 */
-  animation?: "none" | "fade" | "slide-up" | "scale"
-  /** 动画延迟 (ms) */
-  animationDelay?: number
+ extends React.HTMLAttributes<HTMLDivElement>,
+ VariantProps<typeof cardVariants> {
+ /** isnocanInteractive */
+ interactive?: boolean
+ /** enterAnimation */
+ animation?: "none" | "fade" | "slide-up" | "scale"
+ /** AnimationLatency (ms) */
+ animationDelay?: number
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ 
-    className, 
-    variant, 
-    hover, 
-    padding, 
-    interactive = false,
-    animation = "none",
-    animationDelay,
-    style,
-    ...props 
-  }, ref) => {
-    const animationClass = {
-      none: "",
-      fade: "animate-fade-in",
-      "slide-up": "animate-slide-up",
-      scale: "animate-scale-in",
-    }
+ ({ 
+ className, 
+ variant, 
+ hover, 
+ padding, 
+ interactive = false,
+ animation = "none",
+ animationDelay,
+ style,
+ ...props 
+ }, ref) => {
+ const animationClass = {
+ none: "",
+ fade: "animate-fade-in",
+ "slide-up": "animate-slide-up",
+ scale: "animate-scale-in",
+ }
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          cardVariants({ variant, hover, padding }),
-          interactive && "cursor-pointer",
-          animation !== "none" && animationClass[animation],
-          className
-        )}
-        style={{
-          ...style,
-          animationDelay: animationDelay ? `${animationDelay}ms` : undefined,
-        }}
-        {...props}
-      />
-    )
-  }
+ return (
+ <div
+ ref={ref}
+ className={cn(
+ cardVariants({ variant, hover, padding }),
+ interactive && "cursor-pointer",
+ animation !== "none" && animationClass[animation],
+ className
+ )}
+ style={{
+ ...style,
+ animationDelay: animationDelay ? `${animationDelay}ms` : undefined,
+ }}
+ {...props}
+ />
+ )
+ }
 )
 Card.displayName = "Card"
 
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 是否显示底部边框 */
-  bordered?: boolean
-  /** 右侧操作区 */
-  action?: React.ReactNode
+ /** isnoDisplayFooterEdge */
+ bordered?: boolean
+ /** Right sideAction */
+ action?: React.ReactNode
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, bordered, action, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "flex flex-col space-y-1 px-5 py-4",
-        bordered && "border-b border-border",
-        action && "flex-row items-start justify-between gap-4",
-        className
-      )}
-      {...props}
-    >
-      <div className="flex-1 min-w-0 space-y-1">
-        {children}
-      </div>
-      {action && (
-        <div className="shrink-0">{action}</div>
-      )}
-    </div>
-  )
+ ({ className, bordered, action, children, ...props }, ref) => (
+ <div
+ ref={ref}
+ className={cn(
+ "flex flex-col space-y-1 px-5 py-4",
+ bordered && "border-b border-border",
+ action && "flex-row items-start justify-between gap-4",
+ className
+ )}
+ {...props}
+ >
+ <div className="flex-1 min-w-0 space-y-1">
+ {children}
+ </div>
+ {action && (
+ <div className="shrink-0">{action}</div>
+ )}
+ </div>
+ )
 )
 CardHeader.displayName = "CardHeader"
 
 interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 标题大小 */
-  size?: "default" | "sm" | "lg"
+ /** TitleSize */
+ size?: "default" | "sm" | "lg"
 }
 
 const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
-  ({ className, size = "default", ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "font-medium leading-tight tracking-tight text-foreground",
-        size === "sm" && "text-[13px]",
-        size === "default" && "text-[13px]",
-        size === "lg" && "text-base",
-        className
-      )}
-      {...props}
-    />
-  )
+ ({ className, size = "default", ...props }, ref) => (
+ <div
+ ref={ref}
+ className={cn(
+ "font-medium leading-tight tracking-tight text-foreground",
+ size === "sm" && "text-[13px]",
+ size === "default" && "text-[13px]",
+ size === "lg" && "text-base",
+ className
+ )}
+ {...props}
+ />
+ )
 )
 CardTitle.displayName = "CardTitle"
 
 const CardDescription = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+ HTMLDivElement,
+ React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-[12px] text-foreground-light", className)}
-    {...props}
-  />
+ <div
+ ref={ref}
+ className={cn("text-[12px] text-foreground-light", className)}
+ {...props}
+ />
 ))
 CardDescription.displayName = "CardDescription"
 
 interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 内边距大小 */
-  padding?: "default" | "sm" | "lg" | "none"
+ /** inEdgeSize */
+ padding?: "default" | "sm" | "lg" | "none"
 }
 
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, padding = "default", ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        padding === "default" && "p-5",
-        padding === "sm" && "p-4",
-        padding === "lg" && "p-6",
-        padding === "none" && "p-0",
-        className
-      )}
-      {...props}
-    />
-  )
+ ({ className, padding = "default", ...props }, ref) => (
+ <div
+ ref={ref}
+ className={cn(
+ padding === "default" && "p-5",
+ padding === "sm" && "p-4",
+ padding === "lg" && "p-6",
+ padding === "none" && "p-0",
+ className
+ )}
+ {...props}
+ />
+ )
 )
 CardContent.displayName = "CardContent"
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 是否显示顶部边框 */
-  bordered?: boolean
-  /** 对齐方式 */
-  align?: "start" | "center" | "end" | "between"
+ /** isnoDisplayTopEdge */
+ bordered?: boolean
+ /** formethod */
+ align?: "start" | "center" | "end" | "between"
 }
 
 const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, bordered, align = "start", ...props }, ref) => {
-    const alignClass = {
-      start: "justify-start",
-      center: "justify-center",
-      end: "justify-end",
-      between: "justify-between",
-    }
+ ({ className, bordered, align = "start", ...props }, ref) => {
+ const alignClass = {
+ start: "justify-start",
+ center: "justify-center",
+ end: "justify-end",
+ between: "justify-between",
+ }
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "flex items-center gap-3 px-6 py-4",
-          bordered && "border-t border-border bg-surface-75",
-          alignClass[align],
-          className
-        )}
-        {...props}
-      />
-    )
-  }
+ return (
+ <div
+ ref={ref}
+ className={cn(
+ "flex items-center gap-3 px-6 py-4",
+ bordered && "border-t border-border bg-surface-75",
+ alignClass[align],
+ className
+ )}
+ {...props}
+ />
+ )
+ }
 )
 CardFooter.displayName = "CardFooter"
 
 /**
- * SpotlightCard - 带有鼠标跟随光效的卡片
+ * SpotlightCard - hasMouseFollowLight Effect'sCard
  */
 interface SpotlightCardProps extends CardProps {
-  /** 光效颜色 */
-  spotlightColor?: string
-  /** 光效大小 */
-  spotlightSize?: number
+ /** Light EffectColor */
+ spotlightColor?: string
+ /** Light EffectSize */
+ spotlightSize?: number
 }
 
 const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
-  ({ 
-    className, 
-    spotlightColor = "rgba(62, 207, 142, 0.15)",
-    spotlightSize = 300,
-    children,
-    ...props 
-  }, ref) => {
-    const cardRef = React.useRef<HTMLDivElement>(null)
-    const [position, setPosition] = React.useState({ x: 0, y: 0 })
-    const [isHovered, setIsHovered] = React.useState(false)
+ ({ 
+ className, 
+ spotlightColor = "rgba(62, 207, 142, 0.15)",
+ spotlightSize = 300,
+ children,
+ ...props 
+ }, ref) => {
+ const cardRef = React.useRef<HTMLDivElement>(null)
+ const [position, setPosition] = React.useState({ x: 0, y: 0 })
+ const [isHovered, setIsHovered] = React.useState(false)
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return
-      const rect = cardRef.current.getBoundingClientRect()
-      setPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      })
-    }
+ const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+ if (!cardRef.current) return
+ const rect = cardRef.current.getBoundingClientRect()
+ setPosition({
+ x: e.clientX - rect.left,
+ y: e.clientY - rect.top,
+ })
+ }
 
-    return (
-      <Card
-        ref={(node) => {
-          (cardRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-          if (typeof ref === "function") ref(node)
-          else if (ref) ref.current = node
-        }}
-        className={cn("relative overflow-hidden", className)}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        {...props}
-      >
-        {/* 光效层 */}
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-          style={{
-            opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(${spotlightSize}px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent)`,
-          }}
-        />
-        {children}
-      </Card>
-    )
-  }
+ return (
+ <Card
+ ref={(node) => {
+ (cardRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+ if (typeof ref === "function") ref(node)
+ else if (ref) ref.current = node
+ }}
+ className={cn("relative overflow-hidden", className)}
+ onMouseMove={handleMouseMove}
+ onMouseEnter={() => setIsHovered(true)}
+ onMouseLeave={() => setIsHovered(false)}
+ {...props}
+ >
+ {/* Light Effect */}
+ <div
+ className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+ style={{
+ opacity: isHovered ? 1 : 0,
+ background: `radial-gradient(${spotlightSize}px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent)`,
+ }}
+ />
+ {children}
+ </Card>
+ )
+ }
 )
 SpotlightCard.displayName = "SpotlightCard"
 
 /**
- * GlowCard - 发光边框卡片
+ * GlowCard - GlowEdgeCard
  */
 interface GlowCardProps extends CardProps {
-  /** 发光颜色 */
-  glowColor?: string
-  /** 是否一直发光 */
-  alwaysGlow?: boolean
+ /** GlowColor */
+ glowColor?: string
+ /** isno1Glow */
+ alwaysGlow?: boolean
 }
 
 const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
-  ({ 
-    className, 
-    glowColor = "#3ECF8E",
-    alwaysGlow = false,
-    children,
-    ...props 
-  }, ref) => {
-    return (
-      <div className="relative group">
-        {/* 发光背景 */}
-        <div
-          className={cn(
-            "absolute -inset-0.5 rounded-lg blur-sm transition-opacity duration-300",
-            alwaysGlow ? "opacity-30" : "opacity-0 group-hover:opacity-30"
-          )}
-          style={{ backgroundColor: glowColor }}
-        />
-        <Card
-          ref={ref}
-          className={cn("relative", className)}
-          {...props}
-        >
-          {children}
-        </Card>
-      </div>
-    )
-  }
+ ({ 
+ className, 
+ glowColor = "#3ECF8E",
+ alwaysGlow = false,
+ children,
+ ...props 
+ }, ref) => {
+ return (
+ <div className="relative group">
+ {/* GlowBackground */}
+ <div
+ className={cn(
+ "absolute -inset-0.5 rounded-lg blur-sm transition-opacity duration-300",
+ alwaysGlow ? "opacity-30" : "opacity-0 group-hover:opacity-30"
+ )}
+ style={{ backgroundColor: glowColor }}
+ />
+ <Card
+ ref={ref}
+ className={cn("relative", className)}
+ {...props}
+ >
+ {children}
+ </Card>
+ </div>
+ )
+ }
 )
 GlowCard.displayName = "GlowCard"
 
 /**
- * FlipCard - 翻转卡片
+ * FlipCard - FlipCard
  */
 interface FlipCardProps {
-  front: React.ReactNode
-  back: React.ReactNode
-  className?: string
-  flipOnHover?: boolean
-  flipped?: boolean
-  onFlip?: (flipped: boolean) => void
+ front: React.ReactNode
+ back: React.ReactNode
+ className?: string
+ flipOnHover?: boolean
+ flipped?: boolean
+ onFlip?: (flipped: boolean) => void
 }
 
 function FlipCard({ 
-  front, 
-  back, 
-  className,
-  flipOnHover = true,
-  flipped: controlledFlipped,
-  onFlip,
+ front, 
+ back, 
+ className,
+ flipOnHover = true,
+ flipped: controlledFlipped,
+ onFlip,
 }: FlipCardProps) {
-  const [internalFlipped, setInternalFlipped] = React.useState(false)
-  const isFlipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped
+ const [internalFlipped, setInternalFlipped] = React.useState(false)
+ const isFlipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped
 
-  const handleClick = () => {
-    if (!flipOnHover) {
-      const newFlipped = !isFlipped
-      setInternalFlipped(newFlipped)
-      onFlip?.(newFlipped)
-    }
-  }
+ const handleClick = () => {
+ if (!flipOnHover) {
+ const newFlipped = !isFlipped
+ setInternalFlipped(newFlipped)
+ onFlip?.(newFlipped)
+ }
+ }
 
-  return (
-    <div 
-      className={cn(
-        "relative perspective-1000",
-        flipOnHover && "group",
-        className
-      )}
-      onClick={handleClick}
-      style={{ perspective: "1000px" }}
-    >
-      <div 
-        className={cn(
-          "relative w-full h-full transition-transform duration-500 preserve-3d",
-          flipOnHover && "group-hover:rotate-y-180",
-          !flipOnHover && isFlipped && "rotate-y-180"
-        )}
-        style={{ 
-          transformStyle: "preserve-3d",
-          transform: !flipOnHover && isFlipped ? "rotateY(180deg)" : flipOnHover ? undefined : "rotateY(0deg)",
-        }}
-      >
-        {/* 正面 */}
-        <div 
-          className="absolute inset-0 backface-hidden"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          {front}
-        </div>
-        {/* 背面 */}
-        <div 
-          className="absolute inset-0 backface-hidden rotate-y-180"
-          style={{ 
-            backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
-          }}
-        >
-          {back}
-        </div>
-      </div>
-    </div>
-  )
+ return (
+ <div 
+ className={cn(
+ "relative perspective-1000",
+ flipOnHover && "group",
+ className
+ )}
+ onClick={handleClick}
+ style={{ perspective: "1000px" }}
+ >
+ <div 
+ className={cn(
+ "relative w-full h-full transition-transform duration-500 preserve-3d",
+ flipOnHover && "group-hover:rotate-y-180",
+ !flipOnHover && isFlipped && "rotate-y-180"
+ )}
+ style={{ 
+ transformStyle: "preserve-3d",
+ transform: !flipOnHover && isFlipped ? "rotateY(180deg)" : flipOnHover ? undefined : "rotateY(0deg)",
+ }}
+ >
+ {/* currentlyface */}
+ <div 
+ className="absolute inset-0 backface-hidden"
+ style={{ backfaceVisibility: "hidden" }}
+ >
+ {front}
+ </div>
+ {/* face */}
+ <div 
+ className="absolute inset-0 backface-hidden rotate-y-180"
+ style={{ 
+ backfaceVisibility: "hidden",
+ transform: "rotateY(180deg)",
+ }}
+ >
+ {back}
+ </div>
+ </div>
+ </div>
+ )
 }
 
 /**
- * ExpandableCard - 可展开卡片
+ * ExpandableCard - canExpandCard
  */
 interface ExpandableCardProps extends CardProps {
-  /** 折叠时的内容 */
-  collapsedContent: React.ReactNode
-  /** 展开时的额外内容 */
-  expandedContent: React.ReactNode
-  /** 是否展开 */
-  expanded?: boolean
-  /** 默认展开 */
-  defaultExpanded?: boolean
-  /** 展开状态改变回调 */
-  onExpandedChange?: (expanded: boolean) => void
+ /** Collapsetime'sContent */
+ collapsedContent: React.ReactNode
+ /** Expandtime'soutsideContent */
+ expandedContent: React.ReactNode
+ /** isnoExpand */
+ expanded?: boolean
+ /** DefaultExpand */
+ defaultExpanded?: boolean
+ /** ExpandStatusChangeCallback */
+ onExpandedChange?: (expanded: boolean) => void
 }
 
 function ExpandableCard({ 
-  collapsedContent,
-  expandedContent,
-  expanded: controlledExpanded,
-  defaultExpanded = false,
-  onExpandedChange,
-  className,
-  ...props
+ collapsedContent,
+ expandedContent,
+ expanded: controlledExpanded,
+ defaultExpanded = false,
+ onExpandedChange,
+ className,
+ ...props
 }: ExpandableCardProps) {
-  const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded)
-  const isExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded
+ const [internalExpanded, setInternalExpanded] = React.useState(defaultExpanded)
+ const isExpanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded
 
-  const toggle = () => {
-    const newExpanded = !isExpanded
-    setInternalExpanded(newExpanded)
-    onExpandedChange?.(newExpanded)
-  }
+ const toggle = () => {
+ const newExpanded = !isExpanded
+ setInternalExpanded(newExpanded)
+ onExpandedChange?.(newExpanded)
+ }
 
-  return (
-    <Card className={cn("overflow-hidden", className)} {...props}>
-      <div onClick={toggle} className="cursor-pointer">
-        {collapsedContent}
-      </div>
-      <div
-        className={cn(
-          "grid transition-all duration-300 ease-in-out",
-          isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        )}
-      >
-        <div className="overflow-hidden">
-          {expandedContent}
-        </div>
-      </div>
-    </Card>
-  )
+ return (
+ <Card className={cn("overflow-hidden", className)} {...props}>
+ <div onClick={toggle} className="cursor-pointer">
+ {collapsedContent}
+ </div>
+ <div
+ className={cn(
+ "grid transition-all duration-300 ease-in-out",
+ isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+ )}
+ >
+ <div className="overflow-hidden">
+ {expandedContent}
+ </div>
+ </div>
+ </Card>
+ )
 }
 
 /**
- * CardStack - 卡片堆叠效果
+ * CardStack - CardStackEffect
  */
 interface CardStackProps {
-  children: React.ReactNode[]
-  className?: string
-  offset?: number
+ children: React.ReactNode[]
+ className?: string
+ offset?: number
 }
 
 function CardStack({ children, className, offset = 8 }: CardStackProps) {
-  return (
-    <div className={cn("relative", className)}>
-      {React.Children.map(children, (child, index) => (
-        <div
-          key={index}
-          className="absolute inset-0 transition-all duration-300"
-          style={{
-            transform: `translateY(${index * offset}px) scale(${1 - index * 0.03})`,
-            zIndex: children.length - index,
-            opacity: 1 - index * 0.15,
-          }}
-        >
-          {child}
-        </div>
-      ))}
-    </div>
-  )
+ return (
+ <div className={cn("relative", className)}>
+ {React.Children.map(children, (child, index) => (
+ <div
+ key={index}
+ className="absolute inset-0 transition-all duration-300"
+ style={{
+ transform: `translateY(${index * offset}px) scale(${1 - index * 0.03})`,
+ zIndex: children.length - index,
+ opacity: 1 - index * 0.15,
+ }}
+ >
+ {child}
+ </div>
+ ))}
+ </div>
+ )
 }
 
 export { 
-  Card, 
-  CardHeader, 
-  CardFooter, 
-  CardTitle, 
-  CardDescription, 
-  CardContent,
-  SpotlightCard,
-  GlowCard,
-  FlipCard,
-  ExpandableCard,
-  CardStack,
-  cardVariants,
+ Card, 
+ CardHeader, 
+ CardFooter, 
+ CardTitle, 
+ CardDescription, 
+ CardContent,
+ SpotlightCard,
+ GlowCard,
+ FlipCard,
+ ExpandableCard,
+ CardStack,
+ cardVariants,
 }
 export type { 
-  CardProps, 
-  CardHeaderProps, 
-  CardTitleProps, 
-  CardContentProps, 
-  CardFooterProps,
-  SpotlightCardProps,
-  GlowCardProps,
-  FlipCardProps,
-  ExpandableCardProps,
-  CardStackProps,
+ CardProps, 
+ CardHeaderProps, 
+ CardTitleProps, 
+ CardContentProps, 
+ CardFooterProps,
+ SpotlightCardProps,
+ GlowCardProps,
+ FlipCardProps,
+ ExpandableCardProps,
+ CardStackProps,
 }

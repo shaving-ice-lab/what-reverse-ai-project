@@ -1,5 +1,5 @@
 /**
- * 聊天组件导出
+ * ChatComponentExport
  */
 
 export {

@@ -1,984 +1,984 @@
 "use client";
 
 /**
- * AI 聊天增强组件 - Manus 风格
+ * AI ChatEnhancedComponent - Manus Style
 
- * 包含：消息气泡、代码高亮、Markdown 渲染、快捷操作等
+ * Contains: MessageBubble, CodeHighlight, Markdown Render, Quick Actionsetc
  */
 
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Copy,
+ Copy,
 
-  Check,
+ Check,
 
-  ThumbsUp,
+ ThumbsUp,
 
-  ThumbsDown,
+ ThumbsDown,
 
-  RotateCcw,
+ RotateCcw,
 
-  Share2,
+ Share2,
 
-  Bookmark,
+ Bookmark,
 
-  Code,
+ Code,
 
-  FileText,
+ FileText,
 
-  Download,
+ Download,
 
-  ExternalLink,
+ ExternalLink,
 
-  Play,
+ Play,
 
-  Sparkles,
+ Sparkles,
 
-  ChevronDown,
+ ChevronDown,
 
-  ChevronRight,
+ ChevronRight,
 
-  Zap,
+ Zap,
 
-  MessageSquare,
+ MessageSquare,
 
-  Image as ImageIcon,
+ Image as ImageIcon,
 
-  Link as LinkIcon,
+ Link as LinkIcon,
 
-  Terminal,
+ Terminal,
 
-  Eye,
+ Eye,
 
-  EyeOff,
+ EyeOff,
 
-  Volume2,
+ Volume2,
 
-  VolumeX,
+ VolumeX,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Tooltip,
+ Tooltip,
 
-  TooltipContent,
+ TooltipContent,
 
-  TooltipProvider,
+ TooltipProvider,
 
-  TooltipTrigger,
+ TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// 消息类型
+// MessageType
 
 interface Message {
-  id: string;
+ id: string;
 
-  role: "user" | "assistant" | "system";
+ role: "user" | "assistant" | "system";
 
-  content: string;
+ content: string;
 
-  timestamp: Date;
+ timestamp: Date;
 
-  model?: string;
+ model?: string;
 
-  tokens?: number;
+ tokens?: number;
 
-  isStreaming?: boolean;
+ isStreaming?: boolean;
 
-  attachments?: Attachment[];
+ attachments?: Attachment[];
 
-  codeBlocks?: CodeBlock[];
+ codeBlocks?: CodeBlock[];
 }
 
 interface Attachment {
-  type: "image" | "file" | "link";
+ type: "image" | "file" | "link";
 
-  url: string;
+ url: string;
 
-  name: string;
+ name: string;
 
-  size?: number;
+ size?: number;
 }
 
 interface CodeBlock {
-  language: string;
+ language: string;
 
-  code: string;
+ code: string;
 
-  filename?: string;
+ filename?: string;
 }
 
-// AI 消息气泡组件
+// AI MessageBubbleComponent
 
 interface AIMessageBubbleProps {
-  message: Message;
+ message: Message;
 
-  avatar?: string;
+ avatar?: string;
 
-  onCopy?: () => void;
+ onCopy?: () => void;
 
-  onRegenerate?: () => void;
+ onRegenerate?: () => void;
 
-  onFeedback?: (type: "positive" | "negative") => void;
+ onFeedback?: (type: "positive" | "negative") => void;
 
-  className?: string;
+ className?: string;
 }
 
 export function AIMessageBubble({
-  message,
+ message,
 
-  avatar,
+ avatar,
 
-  onCopy,
+ onCopy,
 
-  onRegenerate,
+ onRegenerate,
 
-  onFeedback,
+ onFeedback,
 
-  className,
+ className,
 }: AIMessageBubbleProps) {
-  const [copied, setCopied] = useState(false);
+ const [copied, setCopied] = useState(false);
 
-  const [showRaw, setShowRaw] = useState(false);
+ const [showRaw, setShowRaw] = useState(false);
 
-  const [isSpeaking, setIsSpeaking] = useState(false);
+ const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(message.content);
+ const handleCopy = () => {
+ navigator.clipboard.writeText(message.content);
 
-    setCopied(true);
+ setCopied(true);
 
-    setTimeout(() => setCopied(false), 2000);
+ setTimeout(() => setCopied(false), 2000);
 
-    onCopy?.();
+ onCopy?.();
 
-  };
+ };
 
-  const toggleSpeech = () => {
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
+ const toggleSpeech = () => {
+ if (isSpeaking) {
+ window.speechSynthesis.cancel();
 
-      setIsSpeaking(false);
+ setIsSpeaking(false);
 
-    } else {
-      const utterance = new SpeechSynthesisUtterance(message.content);
+ } else {
+ const utterance = new SpeechSynthesisUtterance(message.content);
 
-      utterance.onend = () => setIsSpeaking(false);
+ utterance.onend = () => setIsSpeaking(false);
 
-      window.speechSynthesis.speak(utterance);
+ window.speechSynthesis.speak(utterance);
 
-      setIsSpeaking(true);
+ setIsSpeaking(true);
 
-    }
+ }
 
-  };
+ };
 
-  return (
-    <div className={cn("group animate-fadeInUp", className)}>
+ return (
+ <div className={cn("group animate-fadeInUp", className)}>
 
-      <div className="flex gap-4">
+ <div className="flex gap-4">
 
-        {/* AI 头像 */}
+ {/* AI Avatar */}
 
-        <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
+ <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
 
-          {avatar ? (
-            <AvatarImage src={avatar} />
+ {avatar ? (
+ <AvatarImage src={avatar} />
 
-          ) : (
-            <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80">
+ ) : (
+ <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80">
 
-              <Sparkles className="w-4 h-4 text-white" />
+ <Sparkles className="w-4 h-4 text-white" />
 
-            </AvatarFallback>
+ </AvatarFallback>
 
-          )}
+ )}
 
-        </Avatar>
+ </Avatar>
 
-        {/* 消息内容 */}
+ {/* MessageContent */}
 
-        <div className="flex-1 max-w-[85%]">
+ <div className="flex-1 max-w-[85%]">
 
-          {/* 消息头部 */}
+ {/* MessageHeader */}
 
-          <div className="flex items-center gap-2 mb-2">
+ <div className="flex items-center gap-2 mb-2">
 
-            <span className="text-xs text-muted-foreground font-medium">AgentFlow AI</span>
+ <span className="text-xs text-muted-foreground font-medium">AgentFlow AI</span>
 
-            {message.model && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+ {message.model && (
+ <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
 
-                {message.model}
+ {message.model}
 
-              </span>
+ </span>
 
-            )}
+ )}
 
-            {message.isStreaming && (
-              <span className="flex items-center gap-1 text-[10px] text-primary">
+ {message.isStreaming && (
+ <span className="flex items-center gap-1 text-[10px] text-primary">
 
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+ <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
 
-                生成中
+ Generating
 
-              </span>
+ </span>
 
-            )}
+ )}
 
-          </div>
+ </div>
 
-          {/* 消息正文 */}
+ {/* MessageBody */}
 
-          <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-muted/50 border border-border text-sm leading-relaxed text-foreground/80">
+ <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-muted/50 border border-border text-sm leading-relaxed text-foreground/80">
 
-            {showRaw ? (
-              <pre className="whitespace-pre-wrap font-mono text-xs">{message.content}</pre>
+ {showRaw ? (
+ <pre className="whitespace-pre-wrap font-mono text-xs">{message.content}</pre>
 
-            ) : (
-              <div className="prose prose-invert prose-sm max-w-none">
+ ) : (
+ <div className="prose prose-invert prose-sm max-w-none">
 
-                {/* 渲染 Markdown 内容 */}
+ {/* Render Markdown Content */}
 
-                <RenderMarkdown content={message.content} />
+ <RenderMarkdown content={message.content} />
 
-              </div>
+ </div>
 
-            )}
+ )}
 
-          </div>
+ </div>
 
-          {/* 代码块展示 */}
+ {/* CodeblockShowcase */}
 
-          {message.codeBlocks && message.codeBlocks.length > 0 && (
-            <div className="mt-3 space-y-3">
+ {message.codeBlocks && message.codeBlocks.length > 0 && (
+ <div className="mt-3 space-y-3">
 
-              {message.codeBlocks.map((block, index) => (
-                <CodeBlockDisplay key={index} {...block} />
+ {message.codeBlocks.map((block, index) => (
+ <CodeBlockDisplay key={index} {...block} />
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          )}
+ )}
 
-          {/* 附件展示 */}
+ {/* AttachmentShowcase */}
 
-          {message.attachments && message.attachments.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+ {message.attachments && message.attachments.length > 0 && (
+ <div className="mt-3 flex flex-wrap gap-2">
 
-              {message.attachments.map((attachment, index) => (
-                <AttachmentPreview key={index} attachment={attachment} />
+ {message.attachments.map((attachment, index) => (
+ <AttachmentPreview key={index} attachment={attachment} />
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          )}
+ )}
 
-          {/* 消息操作 */}
+ {/* MessageAction */}
 
-          <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+ <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
 
-            <TooltipProvider delayDuration={0}>
+ <TooltipProvider delayDuration={0}>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={handleCopy}
+ onClick={handleCopy}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    {copied ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
+ {copied ? (
+ <Check className="w-4 h-4 text-emerald-400" />
 
-                    ) : (
-                      <Copy className="w-4 h-4" />
+ ) : (
+ <Copy className="w-4 h-4" />
 
-                    )}
+ )}
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  {copied ? "已复制" : "复制"}
+ {copied ? "alreadyCopy": "Copy"}
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={() => onFeedback?.("positive")}
+ onClick={() => onFeedback?.("positive")}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    <ThumbsUp className="w-4 h-4" />
+ <ThumbsUp className="w-4 h-4" />
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  有帮助
+ hasHelp
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={() => onFeedback?.("negative")}
+ onClick={() => onFeedback?.("negative")}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    <ThumbsDown className="w-4 h-4" />
+ <ThumbsDown className="w-4 h-4" />
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  没有帮助
+ NoHelp
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={onRegenerate}
+ onClick={onRegenerate}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    <RotateCcw className="w-4 h-4" />
+ <RotateCcw className="w-4 h-4" />
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  重新生成
+ re-newGenerate
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={toggleSpeech}
+ onClick={toggleSpeech}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    {isSpeaking ? (
-                      <VolumeX className="w-4 h-4" />
+ {isSpeaking ? (
+ <VolumeX className="w-4 h-4" />
 
-                    ) : (
-                      <Volume2 className="w-4 h-4" />
+ ) : (
+ <Volume2 className="w-4 h-4" />
 
-                    )}
+ )}
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  {isSpeaking ? "停止朗读" : "朗读"}
+ {isSpeaking ? "Stopread": "read"}
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button
+ <button
 
-                    onClick={() => setShowRaw(!showRaw)}
+ onClick={() => setShowRaw(!showRaw)}
 
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-                  >
+ >
 
-                    {showRaw ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+ {showRaw ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  {showRaw ? "格式化显示" : "查看原文"}
+ {showRaw ? "FormatDisplay": "View"}
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              <Tooltip>
+ <Tooltip>
 
-                <TooltipTrigger asChild>
+ <TooltipTrigger asChild>
 
-                  <button className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors">
+ <button className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors">
 
-                    <Share2 className="w-4 h-4" />
+ <Share2 className="w-4 h-4" />
 
-                  </button>
+ </button>
 
-                </TooltipTrigger>
+ </TooltipTrigger>
 
-                <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
+ <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
-                  分享
+ Share
 
-                </TooltipContent>
+ </TooltipContent>
 
-              </Tooltip>
+ </Tooltip>
 
-              {message.tokens && (
-                <span className="ml-2 text-[10px] text-muted-foreground/70">
+ {message.tokens && (
+ <span className="ml-2 text-[10px] text-muted-foreground/70">
 
-                  {message.tokens} tokens
+ {message.tokens} tokens
 
-                </span>
+ </span>
 
-              )}
+ )}
 
-            </TooltipProvider>
+ </TooltipProvider>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// 用户消息气泡组件
+// UserMessageBubbleComponent
 
 interface UserMessageBubbleProps {
-  message: Message;
+ message: Message;
 
-  avatar?: string;
+ avatar?: string;
 
-  username?: string;
+ username?: string;
 
-  className?: string;
+ className?: string;
 }
 
 export function UserMessageBubble({
-  message,
+ message,
 
-  avatar,
+ avatar,
 
-  username,
+ username,
 
-  className,
+ className,
 }: UserMessageBubbleProps) {
-  return (
-    <div className={cn("flex justify-end animate-fadeInUp", className)}>
+ return (
+ <div className={cn("flex justify-end animate-fadeInUp", className)}>
 
-      <div className="flex gap-4 flex-row-reverse max-w-[85%]">
+ <div className="flex gap-4 flex-row-reverse max-w-[85%]">
 
-        {/* 用户头像 */}
+ {/* UserAvatar */}
 
-        <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
+ <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
 
-          <AvatarImage src={avatar} />
+ <AvatarImage src={avatar} />
 
-          <AvatarFallback className="bg-muted text-foreground text-sm">
+ <AvatarFallback className="bg-muted text-foreground text-sm">
 
-            {username?.charAt(0) || "U"}
+ {username?.charAt(0) || "U"}
 
-          </AvatarFallback>
+ </AvatarFallback>
 
-        </Avatar>
+ </Avatar>
 
-        {/* 消息内容 */}
+ {/* MessageContent */}
 
-        <div className="text-right">
+ <div className="text-right">
 
-          <div className="inline-block px-4 py-3 rounded-2xl rounded-tr-sm bg-primary text-white text-sm leading-relaxed">
+ <div className="inline-block px-4 py-3 rounded-2xl rounded-tr-sm bg-primary text-white text-sm leading-relaxed">
 
-            <div className="whitespace-pre-wrap">{message.content}</div>
+ <div className="whitespace-pre-wrap">{message.content}</div>
 
-          </div>
+ </div>
 
-          {/* 附件展示 */}
+ {/* AttachmentShowcase */}
 
-          {message.attachments && message.attachments.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-2 justify-end">
+ {message.attachments && message.attachments.length > 0 && (
+ <div className="mt-2 flex flex-wrap gap-2 justify-end">
 
-              {message.attachments.map((attachment, index) => (
-                <AttachmentPreview key={index} attachment={attachment} />
+ {message.attachments.map((attachment, index) => (
+ <AttachmentPreview key={index} attachment={attachment} />
 
-              ))}
+ ))}
 
-            </div>
+ </div>
 
-          )}
+ )}
 
-          {/* 时间戳 */}
+ {/* Time */}
 
-          <p className="text-[10px] text-muted-foreground/70 mt-1">
+ <p className="text-[10px] text-muted-foreground/70 mt-1">
 
-            {message.timestamp.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
+ {message.timestamp.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
 
-          </p>
+ </p>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// 代码块显示组件
+// CodeblockDisplayComponent
 
 interface CodeBlockDisplayProps {
-  language: string;
+ language: string;
 
-  code: string;
+ code: string;
 
-  filename?: string;
+ filename?: string;
 }
 
 function CodeBlockDisplay({ language, code, filename }: CodeBlockDisplayProps) {
-  const [copied, setCopied] = useState(false);
+ const [copied, setCopied] = useState(false);
 
-  const [collapsed, setCollapsed] = useState(false);
+ const [collapsed, setCollapsed] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
+ const handleCopy = () => {
+ navigator.clipboard.writeText(code);
 
-    setCopied(true);
+ setCopied(true);
 
-    setTimeout(() => setCopied(false), 2000);
+ setTimeout(() => setCopied(false), 2000);
 
-  };
+ };
 
-  const lines = code.split("\n").length;
+ const lines = code.split("\n").length;
 
-  return (
-    <div className="rounded-xl overflow-hidden border border-border bg-card">
+ return (
+ <div className="rounded-xl overflow-hidden border border-border bg-card">
 
-      {/* 代码块头部 */}
+ {/* CodeblockHeader */}
 
-      <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border-b border-border">
+ <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border-b border-border">
 
-        <div className="flex items-center gap-2">
+ <div className="flex items-center gap-2">
 
-          <Terminal className="w-4 h-4 text-muted-foreground" />
+ <Terminal className="w-4 h-4 text-muted-foreground" />
 
-          <span className="text-xs text-muted-foreground font-mono">
+ <span className="text-xs text-muted-foreground font-mono">
 
-            {filename || language}
+ {filename || language}
 
-          </span>
+ </span>
 
-          <span className="text-[10px] text-muted-foreground/70">{lines} 行</span>
+ <span className="text-[10px] text-muted-foreground/70">{lines} row</span>
 
-        </div>
+ </div>
 
-        <div className="flex items-center gap-1">
+ <div className="flex items-center gap-1">
 
-          <button
+ <button
 
-            onClick={() => setCollapsed(!collapsed)}
+ onClick={() => setCollapsed(!collapsed)}
 
-            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-          >
+ >
 
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+ {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
 
-          </button>
+ </button>
 
-          <button
+ <button
 
-            onClick={handleCopy}
+ onClick={handleCopy}
 
-            className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
+ className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
 
-          >
+ >
 
-            {copied ? (
-              <Check className="w-4 h-4 text-emerald-400" />
+ {copied ? (
+ <Check className="w-4 h-4 text-emerald-400" />
 
-            ) : (
-              <Copy className="w-4 h-4" />
+ ) : (
+ <Copy className="w-4 h-4" />
 
-            )}
+ )}
 
-          </button>
+ </button>
 
-          <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors">
+ <button className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors">
 
-            <Play className="w-4 h-4" />
+ <Play className="w-4 h-4" />
 
-          </button>
+ </button>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-      {/* 代码内容 */}
+ {/* CodeContent */}
 
-      {!collapsed && (
-        <div className="p-4 overflow-x-auto">
+ {!collapsed && (
+ <div className="p-4 overflow-x-auto">
 
-          <pre className="text-xs font-mono text-foreground/70 leading-relaxed">
+ <pre className="text-xs font-mono text-foreground/70 leading-relaxed">
 
-            <code>{code}</code>
+ <code>{code}</code>
 
-          </pre>
+ </pre>
 
-        </div>
+ </div>
 
-      )}
+ )}
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// 附件预览组件
+// AttachmentPreviewComponent
 
 interface AttachmentPreviewProps {
-  attachment: Attachment;
+ attachment: Attachment;
 }
 
 function AttachmentPreview({ attachment }: AttachmentPreviewProps) {
-  const getIcon = () => {
-    switch (attachment.type) {
-      case "image":
+ const getIcon = () => {
+ switch (attachment.type) {
+ case "image":
 
-        return ImageIcon;
+ return ImageIcon;
 
-      case "link":
+ case "link":
 
-        return LinkIcon;
+ return LinkIcon;
 
-      default:
+ default:
 
-        return FileText;
+ return FileText;
 
-    }
+ }
 
-  };
+ };
 
-  const Icon = getIcon();
+ const Icon = getIcon();
 
-  if (attachment.type === "image") {
-    return (
-      <div className="relative group rounded-lg overflow-hidden border border-border max-w-[200px]">
+ if (attachment.type === "image") {
+ return (
+ <div className="relative group rounded-lg overflow-hidden border border-border max-w-[200px]">
 
-        <img src={attachment.url} alt={attachment.name} className="w-full h-auto" />
+ <img src={attachment.url} alt={attachment.name} className="w-full h-auto" />
 
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+ <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
 
-          <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
+ <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
 
-            <ExternalLink className="w-4 h-4 text-white" />
+ <ExternalLink className="w-4 h-4 text-white" />
 
-          </button>
+ </button>
 
-          <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
+ <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
 
-            <Download className="w-4 h-4 text-white" />
+ <Download className="w-4 h-4 text-white" />
 
-          </button>
+ </button>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    );
+ );
 
-  }
+ }
 
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border hover:bg-muted transition-colors cursor-pointer">
+ return (
+ <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border hover:bg-muted transition-colors cursor-pointer">
 
-      <Icon className="w-4 h-4 text-muted-foreground" />
+ <Icon className="w-4 h-4 text-muted-foreground" />
 
-      <span className="text-xs text-foreground/70 truncate max-w-[120px]">{attachment.name}</span>
+ <span className="text-xs text-foreground/70 truncate max-w-[120px]">{attachment.name}</span>
 
-      {attachment.size && (
-        <span className="text-[10px] text-muted-foreground/70">
+ {attachment.size && (
+ <span className="text-[10px] text-muted-foreground/70">
 
-          {(attachment.size / 1024).toFixed(1)} KB
+ {(attachment.size / 1024).toFixed(1)} KB
 
-        </span>
+ </span>
 
-      )}
+ )}
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// Markdown 渲染组件（简化版）
+// Markdown RenderComponent(version)
 
 function RenderMarkdown({ content }: { content: string }) {
-  // 简单的 Markdown 渲染逻辑
+ // Simple's Markdown RenderLogic
 
-  // 在生产环境中应该使用 react-markdown 等库
+ // atProductionEnvironmentShouldUsage react-markdown etc
 
-  const parts = content.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\))/g);
+ const parts = content.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\))/g);
 
-  return (
-    <>
+ return (
+ <>
 
-      {parts.map((part, index) => {
-        if (part.startsWith("**") && part.endsWith("**")) {
-          return <strong key={index}>{part.slice(2, -2)}</strong>;
+ {parts.map((part, index) => {
+ if (part.startsWith("**") && part.endsWith("**")) {
+ return <strong key={index}>{part.slice(2, -2)}</strong>;
 
-        }
+ }
 
-        if (part.startsWith("*") && part.endsWith("*")) {
-          return <em key={index}>{part.slice(1, -1)}</em>;
+ if (part.startsWith("*") && part.endsWith("*")) {
+ return <em key={index}>{part.slice(1, -1)}</em>;
 
-        }
+ }
 
-        if (part.startsWith("`") && part.endsWith("`")) {
-          return (
-            <code
+ if (part.startsWith("`") && part.endsWith("`")) {
+ return (
+ <code
 
-              key={index}
+ key={index}
 
-              className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono text-primary"
+ className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono text-primary"
 
-            >
+ >
 
-              {part.slice(1, -1)}
+ {part.slice(1, -1)}
 
-            </code>
+ </code>
 
-          );
+ );
 
-        }
+ }
 
-        // 链接匹配
+ // LinkMatch
 
-        const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
+ const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
 
-        if (linkMatch) {
-          return (
-            <a
+ if (linkMatch) {
+ return (
+ <a
 
-              key={index}
+ key={index}
 
-              href={linkMatch[2]}
+ href={linkMatch[2]}
 
-              className="text-primary hover:underline"
+ className="text-primary hover:underline"
 
-              target="_blank"
+ target="_blank"
 
-              rel="noopener noreferrer"
+ rel="noopener noreferrer"
 
-            >
+ >
 
-              {linkMatch[1]}
+ {linkMatch[1]}
 
-            </a>
+ </a>
 
-          );
+ );
 
-        }
+ }
 
-        return <span key={index}>{part}</span>;
+ return <span key={index}>{part}</span>;
 
-      })}
+ })}
 
-    </>
+ </>
 
-  );
+ );
 }
 
-// 正在输入指示器
+// currentlyatInputIndicator
 
 interface TypingIndicatorProps {
-  modelName?: string;
+ modelName?: string;
 }
 
 export function TypingIndicator({ modelName = "AI" }: TypingIndicatorProps) {
-  return (
-    <div className="flex gap-4 animate-fadeInUp">
+ return (
+ <div className="flex gap-4 animate-fadeInUp">
 
-      <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
+ <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
 
-        <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80">
+ <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80">
 
-          <Sparkles className="w-4 h-4 text-white" />
+ <Sparkles className="w-4 h-4 text-white" />
 
-        </AvatarFallback>
+ </AvatarFallback>
 
-      </Avatar>
+ </Avatar>
 
-      <div>
+ <div>
 
-        <div className="flex items-center gap-2 mb-2">
+ <div className="flex items-center gap-2 mb-2">
 
-          <span className="text-xs text-muted-foreground">AgentFlow AI</span>
+ <span className="text-xs text-muted-foreground">AgentFlow AI</span>
 
-          {modelName && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+ {modelName && (
+ <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
 
-              {modelName}
+ {modelName}
 
-            </span>
+ </span>
 
-          )}
+ )}
 
-        </div>
+ </div>
 
-        <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-muted/50 border border-border rounded-tl-sm">
+ <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-muted/50 border border-border rounded-tl-sm">
 
-          <div className="flex gap-1">
+ <div className="flex gap-1">
 
-            <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+ <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
 
-            <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+ <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
 
-            <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+ <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
 
-          </div>
+ </div>
 
-          <span className="text-xs text-muted-foreground">正在思考...</span>
+ <span className="text-xs text-muted-foreground">currentlyatThink...</span>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// 快捷回复建议组件
+// ShortcutReplySuggestionComponent
 
 interface SuggestedRepliesProps {
-  suggestions: string[];
+ suggestions: string[];
 
-  onSelect: (suggestion: string) => void;
+ onSelect: (suggestion: string) => void;
 }
 
 export function SuggestedReplies({ suggestions, onSelect }: SuggestedRepliesProps) {
-  return (
-    <div className="flex flex-wrap gap-2 py-3">
+ return (
+ <div className="flex flex-wrap gap-2 py-3">
 
-      {suggestions.map((suggestion, index) => (
-        <button
+ {suggestions.map((suggestion, index) => (
+ <button
 
-          key={index}
+ key={index}
 
-          onClick={() => onSelect(suggestion)}
+ onClick={() => onSelect(suggestion)}
 
-          className="px-3 py-1.5 rounded-full bg-muted/50 border border-border text-xs text-foreground/70 hover:bg-muted hover:border-border/80 hover:text-foreground transition-all"
+ className="px-3 py-1.5 rounded-full bg-muted/50 border border-border text-xs text-foreground/70 hover:bg-muted hover:border-border/80 hover:text-foreground transition-all"
 
-        >
+ >
 
-          {suggestion}
+ {suggestion}
 
-        </button>
+ </button>
 
-      ))}
+ ))}
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
-// 对话上下文提示组件
+// ConversationContextTipComponent
 
 interface ContextIndicatorProps {
-  contextItems: { type: string; name: string }[];
+ contextItems: { type: string; name: string }[];
 
-  onRemove: (index: number) => void;
+ onRemove: (index: number) => void;
 }
 
 export function ContextIndicator({ contextItems, onRemove }: ContextIndicatorProps) {
-  if (contextItems.length === 0) return null;
+ if (contextItems.length === 0) return null;
 
-  return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-b border-border">
+ return (
+ <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-b border-border">
 
-      <span className="text-xs text-muted-foreground">上下文:</span>
+ <span className="text-xs text-muted-foreground">Context:</span>
 
-      {contextItems.map((item, index) => (
-        <span
+ {contextItems.map((item, index) => (
+ <span
 
-          key={index}
+ key={index}
 
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-xs text-primary"
+ className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-xs text-primary"
 
-        >
+ >
 
-          {item.type === "file" ? <FileText className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
+ {item.type === "file" ? <FileText className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
 
-          {item.name}
+ {item.name}
 
-          <button
+ <button
 
-            onClick={() => onRemove(index)}
+ onClick={() => onRemove(index)}
 
-            className="ml-0.5 hover:text-red-400 transition-colors"
+ className="ml-0.5 hover:text-red-400 transition-colors"
 
-          >
+ >
 
-            
+ 
 
-          </button>
+ </button>
 
-        </span>
+ </span>
 
-      ))}
+ ))}
 
-    </div>
+ </div>
 
-  );
+ );
 }
 

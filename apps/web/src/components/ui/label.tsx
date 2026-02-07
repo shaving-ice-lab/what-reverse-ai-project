@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Label 标签组件 - 极简风格
+ * Label TagsComponent - Minimalist Style
  */
 
 import * as React from "react"
@@ -20,7 +20,7 @@ const labelVariants = cva(
       variant: {
         default: "",
         required: "after:content-['*'] after:ml-0.5 after:text-destructive",
-        optional: "after:content-['(可选)'] after:ml-1 after:text-[11px] after:text-foreground-muted after:font-normal",
+ optional: "after:content-['(Optional)'] after:ml-1 after:text-[11px] after:text-foreground-muted after:font-normal",
       },
     },
     defaultVariants: {

@@ -1,473 +1,473 @@
 "use client";
 
 /**
- * ROICalculator - 投资回报率计算器组件
+ * ROICalculator - InvestmentrateCalculateComponent
 
  * 
 
- * 帮助用户估算使用 AgentFlow 后的成本节省
+ * HelpUserEstimateUsage AgentFlow after'sCostSave
  */
 
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Calculator,
+ Calculator,
 
-  Users,
+ Users,
 
-  Clock,
+ Clock,
 
-  DollarSign,
+ DollarSign,
 
-  TrendingUp,
+ TrendingUp,
 
-  Sparkles,
+ Sparkles,
 
-  Info,
+ Info,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 interface CalculatorInputs {
-  employees: number;
+ employees: number;
 
-  hoursPerWeek: number;
+ hoursPerWeek: number;
 
-  hourlyRate: number;
+ hourlyRate: number;
 
-  automationRate: number;
+ automationRate: number;
 }
 
 export function ROICalculator() {
-  const [inputs, setInputs] = useState<CalculatorInputs>({
-    employees: 10,
+ const [inputs, setInputs] = useState<CalculatorInputs>({
+ employees: 10,
 
-    hoursPerWeek: 5,
+ hoursPerWeek: 5,
 
-    hourlyRate: 50,
+ hourlyRate: 50,
 
-    automationRate: 70,
+ automationRate: 70,
 
-  });
+ });
 
-  const [showResults, setShowResults] = useState(false);
+ const [showResults, setShowResults] = useState(false);
 
-  const results = useMemo(() => {
-    const weeklyHours = inputs.employees * inputs.hoursPerWeek;
+ const results = useMemo(() => {
+ const weeklyHours = inputs.employees * inputs.hoursPerWeek;
 
-    const weeklyLaborcost = weeklyHours * inputs.hourlyRate;
+ const weeklyLaborcost = weeklyHours * inputs.hourlyRate;
 
-    const yearlyLaborCost = weeklyLaborcost * 52;
+ const yearlyLaborCost = weeklyLaborcost * 52;
 
-    const automatedHours = weeklyHours * (inputs.automationRate / 100);
+ const automatedHours = weeklyHours * (inputs.automationRate / 100);
 
-    const savedCostPerYear = yearlyLaborCost * (inputs.automationRate / 100);
+ const savedCostPerYear = yearlyLaborCost * (inputs.automationRate / 100);
 
-    // Estimated AgentFlow cost (Pro plan)
+ // Estimated AgentFlow cost (Pro plan)
 
-    const agentflowCost = inputs.employees * 49 * 12; // $49/user/month
+ const agentflowCost = inputs.employees * 49 * 12; // $49/user/month
 
-    const netSavings = savedCostPerYear - agentflowCost;
+ const netSavings = savedCostPerYear - agentflowCost;
 
-    const roi = ((netSavings / agentflowCost) * 100);
+ const roi = ((netSavings / agentflowCost) * 100);
 
-    return {
-      weeklyHours,
+ return {
+ weeklyHours,
 
-      automatedHours,
+ automatedHours,
 
-      yearlyLaborCost,
+ yearlyLaborCost,
 
-      savedCostPerYear,
+ savedCostPerYear,
 
-      agentflowCost,
+ agentflowCost,
 
-      netSavings,
+ netSavings,
 
-      roi,
+ roi,
 
-      hoursFreedPerYear: automatedHours * 52,
+ hoursFreedPerYear: automatedHours * 52,
 
-    };
+ };
 
-  }, [inputs]);
+ }, [inputs]);
 
-  const handleInputChange = (key: keyof CalculatorInputs, value: number) => {
-    setInputs(prev => ({ ...prev, [key]: value }));
+ const handleInputChange = (key: keyofCalculatorInputs, value: number) => {
+ setInputs(prev => ({ ...prev, [key]: value }));
 
-  };
+ };
 
-  return (
-    <div className="w-full max-w-4xl mx-auto">
+ return (
+ <div className="w-full max-w-4xl mx-auto">
 
-      <div className={cn(
-        "rounded-2xl overflow-hidden",
+ <div className={cn(
+ "rounded-2xl overflow-hidden",
 
-        "bg-card border border-border",
+ "bg-card border border-border",
 
-        "shadow-lg"
+ "shadow-lg"
 
-      )}>
+ )}>
 
-        {/* Header */}
+ {/* Header */}
 
-        <div className="p-6 border-b border-border bg-muted/30">
+ <div className="p-6 border-b border-border bg-muted/30">
 
-          <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3">
 
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
 
-              <Calculator className="w-5 h-5 text-primary" />
+ <Calculator className="w-5 h-5 text-primary" />
 
-            </div>
+ </div>
 
-            <div>
+ <div>
 
-              <h3 className="font-semibold text-foreground">ROI 计算器</h3>
+ <h3 className="font-semibold text-foreground">ROI Calculate</h3>
 
-              <p className="text-sm text-muted-foreground">估算使用 AgentFlow 后的投资回报</p>
+ <p className="text-sm text-muted-foreground">EstimateUsage AgentFlow after'sInvestment</p>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-        <div className="p-6">
+ <div className="p-6">
 
-          <div className="grid md:grid-cols-2 gap-8">
+ <div className="grid md:grid-cols-2 gap-8">
 
-            {/* Inputs */}
+ {/* Inputs */}
 
-            <div className="space-y-6">
+ <div className="space-y-6">
 
-              <h4 className="font-medium text-foreground flex items-center gap-2">
+ <h4 className="font-medium text-foreground flex items-center gap-2">
 
-                <Info className="w-4 h-4 text-muted-foreground" />
+ <Info className="w-4 h-4 text-muted-foreground" />
 
-                输入您的数据
+ Inputyou'sData
 
-              </h4>
+ </h4>
 
-              {/* Employees */}
+ {/* Employees */}
 
-              <div className="space-y-2">
+ <div className="space-y-2">
 
-                <label className="flex items-center justify-between text-sm">
+ <label className="flex items-center justify-between text-sm">
 
-                  <span className="flex items-center gap-2 text-muted-foreground">
+ <span className="flex items-center gap-2 text-muted-foreground">
 
-                    <Users className="w-4 h-4" />
+ <Users className="w-4 h-4" />
 
-                    团队人数
+ Teampersoncount
 
-                  </span>
+ </span>
 
-                  <span className="font-semibold text-foreground">{inputs.employees} 人</span>
+ <span className="font-semibold text-foreground">{inputs.employees} person</span>
 
-                </label>
+ </label>
 
-                <input
+ <input
 
-                  type="range"
+ type="range"
 
-                  min="1"
+ min="1"
 
-                  max="100"
+ max="100"
 
-                  value={inputs.employees}
+ value={inputs.employees}
 
-                  onChange={(e) => handleInputChange('employees', Number(e.target.value))}
+ onChange={(e) => handleInputChange('employees', Number(e.target.value))}
 
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+ className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
 
-                />
+ />
 
-                <div className="flex justify-between text-xs text-muted-foreground">
+ <div className="flex justify-between text-xs text-muted-foreground">
 
-                  <span>1</span>
+ <span>1</span>
 
-                  <span>100</span>
+ <span>100</span>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              {/* Hours per week */}
+ {/* Hours per week */}
 
-              <div className="space-y-2">
+ <div className="space-y-2">
 
-                <label className="flex items-center justify-between text-sm">
+ <label className="flex items-center justify-between text-sm">
 
-                  <span className="flex items-center gap-2 text-muted-foreground">
+ <span className="flex items-center gap-2 text-muted-foreground">
 
-                    <Clock className="w-4 h-4" />
+ <Clock className="w-4 h-4" />
 
-                    每人每周重复性工作时间
+ eachpersoneachweeksre-WorkTime
 
-                  </span>
+ </span>
 
-                  <span className="font-semibold text-foreground">{inputs.hoursPerWeek} 小时</span>
+ <span className="font-semibold text-foreground">{inputs.hoursPerWeek} h</span>
 
-                </label>
+ </label>
 
-                <input
+ <input
 
-                  type="range"
+ type="range"
 
-                  min="1"
+ min="1"
 
-                  max="40"
+ max="40"
 
-                  value={inputs.hoursPerWeek}
+ value={inputs.hoursPerWeek}
 
-                  onChange={(e) => handleInputChange('hoursPerWeek', Number(e.target.value))}
+ onChange={(e) => handleInputChange('hoursPerWeek', Number(e.target.value))}
 
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+ className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
 
-                />
+ />
 
-                <div className="flex justify-between text-xs text-muted-foreground">
+ <div className="flex justify-between text-xs text-muted-foreground">
 
-                  <span>1 小时</span>
+ <span>1 h</span>
 
-                  <span>40 小时</span>
+ <span>40 h</span>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              {/* Hourly rate */}
+ {/* Hourly rate */}
 
-              <div className="space-y-2">
+ <div className="space-y-2">
 
-                <label className="flex items-center justify-between text-sm">
+ <label className="flex items-center justify-between text-sm">
 
-                  <span className="flex items-center gap-2 text-muted-foreground">
+ <span className="flex items-center gap-2 text-muted-foreground">
 
-                    <DollarSign className="w-4 h-4" />
+ <DollarSign className="w-4 h-4" />
 
-                    平均时薪成本
+ AveragetimeCost
 
-                  </span>
+ </span>
 
-                  <span className="font-semibold text-foreground">{inputs.hourlyRate}/小时</span>
+ <span className="font-semibold text-foreground">{inputs.hourlyRate}/h</span>
 
-                </label>
+ </label>
 
-                <input
+ <input
 
-                  type="range"
+ type="range"
 
-                  min="20"
+ min="20"
 
-                  max="200"
+ max="200"
 
-                  step="10"
+ step="10"
 
-                  value={inputs.hourlyRate}
+ value={inputs.hourlyRate}
 
-                  onChange={(e) => handleInputChange('hourlyRate', Number(e.target.value))}
+ onChange={(e) => handleInputChange('hourlyRate', Number(e.target.value))}
 
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+ className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
 
-                />
+ />
 
-                <div className="flex justify-between text-xs text-muted-foreground">
+ <div className="flex justify-between text-xs text-muted-foreground">
 
-                  <span>¥20</span>
+ <span>¥20</span>
 
-                  <span>¥200</span>
+ <span>¥200</span>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              {/* Automation rate */}
+ {/* Automation rate */}
 
-              <div className="space-y-2">
+ <div className="space-y-2">
 
-                <label className="flex items-center justify-between text-sm">
+ <label className="flex items-center justify-between text-sm">
 
-                  <span className="flex items-center gap-2 text-muted-foreground">
+ <span className="flex items-center gap-2 text-muted-foreground">
 
-                    <Sparkles className="w-4 h-4" />
+ <Sparkles className="w-4 h-4" />
 
-                    预计可自动化比例
+ EstimatedcanAutomationcompareexample
 
-                  </span>
+ </span>
 
-                  <span className="font-semibold text-foreground">{inputs.automationRate}%</span>
+ <span className="font-semibold text-foreground">{inputs.automationRate}%</span>
 
-                </label>
+ </label>
 
-                <input
+ <input
 
-                  type="range"
+ type="range"
 
-                  min="30"
+ min="30"
 
-                  max="90"
+ max="90"
 
-                  step="5"
+ step="5"
 
-                  value={inputs.automationRate}
+ value={inputs.automationRate}
 
-                  onChange={(e) => handleInputChange('automationRate', Number(e.target.value))}
+ onChange={(e) => handleInputChange('automationRate', Number(e.target.value))}
 
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+ className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
 
-                />
+ />
 
-                <div className="flex justify-between text-xs text-muted-foreground">
+ <div className="flex justify-between text-xs text-muted-foreground">
 
-                  <span>保守 30%</span>
+ <span> 30%</span>
 
-                  <span>激进 90%</span>
+ <span> 90%</span>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              <Button 
+ <Button 
 
-                onClick={() => setShowResults(true)}
+ onClick={() => setShowResults(true)}
 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+ className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
 
-              >
+ >
 
-                <Calculator className="w-4 h-4 mr-2" />
+ <Calculator className="w-4 h-4 mr-2" />
 
-                计算 ROI
+ Calculate ROI
 
-              </Button>
+ </Button>
 
-            </div>
+ </div>
 
-            {/* Results */}
+ {/* Results */}
 
-            <div className={cn(
-              "space-y-4 transition-all duration-500",
+ <div className={cn(
+ "space-y-4 transition-all duration-500",
 
-              showResults ? "opacity-100" : "opacity-50"
+ showResults ? "opacity-100" : "opacity-50"
 
-            )}>
+ )}>
 
-              <h4 className="font-medium text-foreground flex items-center gap-2">
+ <h4 className="font-medium text-foreground flex items-center gap-2">
 
-                <TrendingUp className="w-4 h-4 text-primary" />
+ <TrendingUp className="w-4 h-4 text-primary" />
 
-                预估收益
+ EstimateRevenue
 
-              </h4>
+ </h4>
 
-              {/* Main ROI Card */}
+ {/* Main ROI Card */}
 
-              <div className={cn(
-                "p-6 rounded-xl text-center",
+ <div className={cn(
+ "p-6 rounded-xl text-center",
 
-                "bg-gradient-to-br from-primary/20 to-primary/5",
+ "bg-gradient-to-br from-primary/20 to-primary/5",
 
-                "border border-primary/30"
+ "border border-primary/30"
 
-              )}>
+ )}>
 
-                <p className="text-sm text-muted-foreground mb-2">年度投资回报率</p>
+ <p className="text-sm text-muted-foreground mb-2">yearsInvestmentrate</p>
 
-                <p className="text-5xl font-bold text-primary">
+ <p className="text-5xl font-bold text-primary">
 
-                  {results.roi > 0 ? `${results.roi.toFixed(0)}%` : '—'}
+ {results.roi > 0 ? `${results.roi.toFixed(0)}%` : '—'}
 
-                </p>
+ </p>
 
-                <p className="text-xs text-muted-foreground mt-2">
+ <p className="text-xs text-muted-foreground mt-2">
 
-                  净节省 {results.netSavings.toLocaleString()} / 年
+ Save {results.netSavings.toLocaleString()} / years
 
-                </p>
+ </p>
 
-              </div>
+ </div>
 
-              {/* Breakdown */}
+ {/* Breakdown */}
 
-              <div className="grid grid-cols-2 gap-3">
+ <div className="grid grid-cols-2 gap-3">
 
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+ <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
-                  <p className="text-xs text-muted-foreground mb-1">每年节省工时</p>
+ <p className="text-xs text-muted-foreground mb-1">eachyearsSavetime</p>
 
-                  <p className="text-xl font-bold text-foreground">
+ <p className="text-xl font-bold text-foreground">
 
-                    {results.hoursFreedPerYear.toLocaleString()}
+ {results.hoursFreedPerYear.toLocaleString()}
 
-                  </p>
+ </p>
 
-                  <p className="text-xs text-muted-foreground">小时</p>
+ <p className="text-xs text-muted-foreground">h</p>
 
-                </div>
+ </div>
 
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+ <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
-                  <p className="text-xs text-muted-foreground mb-1">节省人工成本</p>
+ <p className="text-xs text-muted-foreground mb-1">SavepersonCost</p>
 
-                  <p className="text-xl font-bold text-foreground">
+ <p className="text-xl font-bold text-foreground">
 
-                    {(results.savedCostPerYear / 10000).toFixed(1)}
+ {(results.savedCostPerYear / 10000).toFixed(1)}
 
-                  </p>
+ </p>
 
-                  <p className="text-xs text-muted-foreground">万元/年</p>
+ <p className="text-xs text-muted-foreground">10000/years</p>
 
-                </div>
+ </div>
 
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+ <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
-                  <p className="text-xs text-muted-foreground mb-1">AgentFlow 年费</p>
+ <p className="text-xs text-muted-foreground mb-1">AgentFlow years</p>
 
-                  <p className="text-xl font-bold text-foreground">
+ <p className="text-xl font-bold text-foreground">
 
-                    {(results.agentflowCost / 10000).toFixed(1)}
+ {(results.agentflowCost / 10000).toFixed(1)}
 
-                  </p>
+ </p>
 
-                  <p className="text-xs text-muted-foreground">万元/年</p>
+ <p className="text-xs text-muted-foreground">10000/years</p>
 
-                </div>
+ </div>
 
-                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+ <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
 
-                  <p className="text-xs text-muted-foreground mb-1">净收益</p>
+ <p className="text-xs text-muted-foreground mb-1">Revenue</p>
 
-                  <p className="text-xl font-bold text-primary">
+ <p className="text-xl font-bold text-primary">
 
-                    {(results.netSavings / 10000).toFixed(1)}
+ {(results.netSavings / 10000).toFixed(1)}
 
-                  </p>
+ </p>
 
-                  <p className="text-xs text-muted-foreground">万元/年</p>
+ <p className="text-xs text-muted-foreground">10000/years</p>
 
-                </div>
+ </div>
 
-              </div>
+ </div>
 
-              <p className="text-xs text-muted-foreground text-center pt-2">
+ <p className="text-xs text-muted-foreground text-center pt-2">
 
-                * 以上数据仅供参考，实际收益取决于具体使用场景
+ * withonDataonlyReference, ActualRevenueatSpecificUsageScenario
 
-              </p>
+ </p>
 
-            </div>
+ </div>
 
-          </div>
+ </div>
 
-        </div>
+ </div>
 
-      </div>
+ </div>
 
-    </div>
+ </div>
 
-  );
+ );
 }
 
 export default ROICalculator;

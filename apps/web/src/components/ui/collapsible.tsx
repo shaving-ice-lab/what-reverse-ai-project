@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Collapsible 折叠组件 - 极简风格
+ * Collapsible CollapseComponent - Minimalist Style
  */
 
 import * as React from "react"

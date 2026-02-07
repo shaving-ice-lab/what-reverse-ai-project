@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * HTTP 请求节点 - 极简风格
+ * HTTP RequestNode - Minimalist Style
  */
 
 import { memo } from "react";
@@ -45,7 +45,7 @@ export const HTTPNode = memo(function HTTPNode({
           : "border-border hover:border-brand-500/40"
       )}
     >
-      {/* 输入端口 */}
+ {/* InputPort */}
       <Handle
         id="input"
         type="target"
@@ -54,21 +54,21 @@ export const HTTPNode = memo(function HTTPNode({
         className="w-3! h-3! border-2! border-background! rounded-full! top-[38px]! -left-1.5! bg-foreground-muted!"
       />
 
-      {/* 头部 */}
+ {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-border/70 px-3 py-2.5 bg-brand-200/30">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-500 text-background">
           <Globe className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm truncate">{data.label || "HTTP 请求"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "HTTP Request"}</h3>
           <p className="text-xs text-foreground-muted flex items-center gap-1">
             <ExternalLink className="h-3 w-3" />
-            API 调用
+ API Call
           </p>
         </div>
       </div>
 
-      {/* 内容 */}
+ {/* Content */}
       <div className="px-3 py-2.5">
         <div className="flex items-center gap-1.5 text-xs">
           <span className={cn("px-1.5 py-0.5 rounded font-mono font-medium", methodStyle)}>
@@ -80,19 +80,19 @@ export const HTTPNode = memo(function HTTPNode({
         </div>
       </div>
 
-      {/* 底部 */}
+ {/* Footer */}
       <div className="flex justify-between px-3 py-2 border-t border-border text-xs text-foreground-muted bg-surface-200">
         <span className="flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted" />
-          输入
+ Input
         </span>
         <span className="flex items-center gap-1">
-          响应
+ Response
           <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
         </span>
       </div>
 
-      {/* 输出端口 */}
+ {/* OutputPort */}
       <Handle
         id="output"
         type="source"

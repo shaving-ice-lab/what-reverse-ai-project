@@ -1,5 +1,5 @@
 /**
- * 布局组件导出
+ * LayoutComponentExport
  */
 
 export { SiteHeader } from "./site-header";

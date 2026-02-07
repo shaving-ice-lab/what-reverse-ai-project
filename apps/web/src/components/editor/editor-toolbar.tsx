@@ -3,43 +3,43 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import {
-  Undo2,
-  Redo2,
-  Save,
-  Play,
-  Square,
-  ZoomIn,
-  ZoomOut,
-  Maximize,
-  LayoutGrid,
-  ArrowRight,
-  ArrowDown,
-  Settings,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Upload,
-  Copy,
-  Trash2,
-  Keyboard,
-  Users,
-  Loader2,
+ Undo2,
+ Redo2,
+ Save,
+ Play,
+ Square,
+ ZoomIn,
+ ZoomOut,
+ Maximize,
+ LayoutGrid,
+ ArrowRight,
+ ArrowDown,
+ Settings,
+ MoreHorizontal,
+ ChevronLeft,
+ ChevronRight,
+ Download,
+ Upload,
+ Copy,
+ Trash2,
+ Keyboard,
+ Users,
+ Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+ Tooltip,
+ TooltipContent,
+ TooltipProvider,
+ TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+ DropdownMenu,
+ DropdownMenuContent,
+ DropdownMenuItem,
+ DropdownMenuSeparator,
+ DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useReactFlow } from "@xyflow/react";
 import { useWorkflowStore } from "@/stores/useWorkflowStore";
@@ -48,442 +48,442 @@ import { KeyboardShortcutsDialog, useKeyboardShortcutsDialog } from "./keyboard-
 import { cn } from "@/lib/utils";
 
 /**
- * 编辑器顶部工具栏 - Manus 风格
+ * EditTopToolbar - Manus Style
  * 
- * 编辑器工具栏始终使用深色主题以保持一致的视觉体验
+ * EditToolbarAlwaysUsageDarkThemewithMaintain1'svisualExperience
  */
 
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
 interface EditorToolbarProps {
-  workflowName?: string;
-  workflowVersion?: number;
-  onSave?: () => void;
-  onRun?: () => void;
-  onStop?: () => void;
-  // 状态属性
-  saveStatus?: SaveStatus;
-  lastSavedAt?: Date | null;
-  isOnline?: boolean;
-  collaborators?: Array<{ id: string; name: string; avatar?: string }>;
-  executionStatus?: "idle" | "running" | "completed" | "failed";
+ workflowName?: string;
+ workflowVersion?: number;
+ onSave?: () => void;
+ onRun?: () => void;
+ onStop?: () => void;
+ // Status
+ saveStatus?: SaveStatus;
+ lastSavedAt?: Date | null;
+ isOnline?: boolean;
+ collaborators?: Array<{ id: string; name: string; avatar?: string }>;
+ executionStatus?: "idle" | "running" | "completed" | "failed";
 }
 
-// 编辑器专用深色样式
+// EdituseDarkstyle
 const editorStyles = {
-  bg: "bg-surface-100/95 backdrop-blur-sm",
-  border: "border-border/70",
-  buttonHover: "hover:bg-surface-200/70",
-  textPrimary: "text-foreground",
-  textSecondary: "text-foreground-light",
-  textMuted: "text-foreground-muted",
-  divider: "bg-border/70",
+ bg: "bg-surface-100/95 backdrop-blur-sm",
+ border: "border-border/70",
+ buttonHover: "hover:bg-surface-200/70",
+ textPrimary: "text-foreground",
+ textSecondary: "text-foreground-light",
+ textMuted: "text-foreground-muted",
+ divider: "bg-border/70",
 };
 
 export function EditorToolbar({
-  workflowName = "未命名工作流",
-  workflowVersion,
-  onSave,
-  onRun,
-  onStop,
-  saveStatus = "saved",
-  lastSavedAt,
-  isOnline = true,
-  collaborators = [],
-  executionStatus = "idle",
+ workflowName = "not yetNamingWorkflow",
+ workflowVersion,
+ onSave,
+ onRun,
+ onStop,
+ saveStatus = "saved",
+ lastSavedAt,
+ isOnline = true,
+ collaborators = [],
+ executionStatus = "idle",
 }: EditorToolbarProps) {
-  const { zoomIn, zoomOut, fitView } = useReactFlow();
-  const { applyHorizontalLayout, applyVerticalLayout } = useAutoLayout();
-  const shortcutsDialog = useKeyboardShortcutsDialog();
-  const {
-    isDirty,
-    isExecuting,
-    canUndo,
-    canRedo,
-    undo,
-    redo,
-    nodes,
-    edges,
-    selectedNodeIds,
-    removeNodes,
-  } = useWorkflowStore();
+ const { zoomIn, zoomOut, fitView } = useReactFlow();
+ const { applyHorizontalLayout, applyVerticalLayout } = useAutoLayout();
+ const shortcutsDialog = useKeyboardShortcutsDialog();
+ const {
+ isDirty,
+ isExecuting,
+ canUndo,
+ canRedo,
+ undo,
+ redo,
+ nodes,
+ edges,
+ selectedNodeIds,
+ removeNodes,
+ } = useWorkflowStore();
 
-  const saveStatusConfig = {
-    saved: { label: "已保存", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
-    saving: { label: "保存中", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
-    unsaved: { label: "未保存", dot: "var(--color-warning)", textClass: "text-warning" },
-    error: { label: "保存失败", dot: "var(--color-destructive)", textClass: "text-destructive" },
-  } as const;
-  const saveMeta = saveStatusConfig[saveStatus];
+ const saveStatusConfig = {
+ saved: { label: "Saved", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
+ saving: { label: "Saving", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
+ unsaved: { label: "Unsaved", dot: "var(--color-warning)", textClass: "text-warning" },
+ error: { label: "SaveFailed", dot: "var(--color-destructive)", textClass: "text-destructive" },
+ } as const;
+ const saveMeta = saveStatusConfig[saveStatus];
 
-  // 删除选中节点
-  const handleDelete = useCallback(() => {
-    if (selectedNodeIds.length > 0) {
-      removeNodes(selectedNodeIds);
-    }
-  }, [selectedNodeIds, removeNodes]);
+ // DeleteselectNode
+ const handleDelete = useCallback(() => {
+ if (selectedNodeIds.length > 0) {
+ removeNodes(selectedNodeIds);
+ }
+ }, [selectedNodeIds, removeNodes]);
 
-  // 导出工作流
-  const handleExport = useCallback(() => {
-    const data = {
-      version: "1.0",
-      nodes,
-      edges,
-      exportedAt: new Date().toISOString(),
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${workflowName.replace(/\s+/g, "_")}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [nodes, edges, workflowName]);
+ // ExportWorkflow
+ const handleExport = useCallback(() => {
+ const data = {
+ version: "1.0",
+ nodes,
+ edges,
+ exportedAt: new Date().toISOString(),
+ };
+ const blob = new Blob([JSON.stringify(data, null, 2)], {
+ type: "application/json",
+ });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
+ a.href = url;
+ a.download = `${workflowName.replace(/\s+/g, "_")}.json`;
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+ URL.revokeObjectURL(url);
+ }, [nodes, edges, workflowName]);
 
-  // 优化的工具按钮
-  const ToolButton = ({
-    icon: Icon,
-    label,
-    onClick,
-    disabled,
-    shortcut,
-    variant = "default",
-  }: {
-    icon: React.ElementType;
-    label: string;
-    onClick?: () => void;
-    disabled?: boolean;
-    shortcut?: string;
-    variant?: "default" | "primary" | "danger";
-  }) => (
-    <TooltipProvider>
-      <Tooltip delayDuration={200}>
-        <TooltipTrigger asChild>
-          <button
-            onClick={onClick}
-            disabled={disabled}
-            className={cn(
-              "h-8 w-8 flex items-center justify-center rounded-md",
-              "transition-all duration-150",
-              "disabled:opacity-30 disabled:pointer-events-none",
-              // 默认样式
-              variant === "default" && [
-                "text-foreground-muted",
-                "hover:text-foreground hover:bg-surface-200",
-                "active:scale-95"
-              ],
-              // 主要样式
-              variant === "primary" && [
-                "text-brand-500",
-                "hover:text-brand-500 hover:bg-brand-200/40",
-                "active:scale-95"
-              ],
-              // 危险样式
-              variant === "danger" && [
-                "text-destructive-400",
-                "hover:text-destructive hover:bg-destructive-200/60",
-                "active:scale-95"
-              ]
-            )}
-          >
-            <Icon className="h-4 w-4" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent 
-          side="bottom" 
-          className={cn(
-            "bg-surface-100/95 border-border/70",
-            "shadow-lg shadow-black/20",
-            "px-3 py-2"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-foreground">{label}</span>
-            {shortcut && (
-              <kbd className={cn(
-                "px-2 py-0.5 rounded-md",
-                "bg-surface-200/80 border border-border/70",
-                "text-foreground-muted text-[11px] font-mono"
-              )}>
-                {shortcut}
-              </kbd>
-            )}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
+ // optimal'sToolButton
+ const ToolButton = ({
+ icon: Icon,
+ label,
+ onClick,
+ disabled,
+ shortcut,
+ variant = "default",
+ }: {
+ icon: React.ElementType;
+ label: string;
+ onClick?: () => void;
+ disabled?: boolean;
+ shortcut?: string;
+ variant?: "default" | "primary" | "danger";
+ }) => (
+ <TooltipProvider>
+ <Tooltip delayDuration={200}>
+ <TooltipTrigger asChild>
+ <button
+ onClick={onClick}
+ disabled={disabled}
+ className={cn(
+ "h-8 w-8 flex items-center justify-center rounded-md",
+ "transition-all duration-150",
+ "disabled:opacity-30 disabled:pointer-events-none",
+ // Defaultstyle
+ variant === "default" && [
+ "text-foreground-muted",
+ "hover:text-foreground hover:bg-surface-200",
+ "active:scale-95"
+ ],
+ // mainneedstyle
+ variant === "primary" && [
+ "text-brand-500",
+ "hover:text-brand-500 hover:bg-brand-200/40",
+ "active:scale-95"
+ ],
+ // Dangerstyle
+ variant === "danger" && [
+ "text-destructive-400",
+ "hover:text-destructive hover:bg-destructive-200/60",
+ "active:scale-95"
+ ]
+ )}
+ >
+ <Icon className="h-4 w-4" />
+ </button>
+ </TooltipTrigger>
+ <TooltipContent 
+ side="bottom" 
+ className={cn(
+ "bg-surface-100/95 border-border/70",
+ "shadow-lg shadow-black/20",
+ "px-3 py-2"
+ )}
+ >
+ <div className="flex items-center gap-3">
+ <span className="text-sm text-foreground">{label}</span>
+ {shortcut && (
+ <kbd className={cn(
+ "px-2 py-0.5 rounded-md",
+ "bg-surface-200/80 border border-border/70",
+ "text-foreground-muted text-[11px] font-mono"
+ )}>
+ {shortcut}
+ </kbd>
+ )}
+ </div>
+ </TooltipContent>
+ </Tooltip>
+ </TooltipProvider>
+ );
 
-  return (
-    <header className={cn("h-12 flex items-center justify-between px-4 border-b", editorStyles.bg, editorStyles.border)}>
-      {/* 左侧: 返回 + 标题 + 状态 */}
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard/workflows">
-          <button className={cn(
-            "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
-            editorStyles.textSecondary,
-            `hover:${editorStyles.textPrimary}`,
-            editorStyles.buttonHover
-          )}>
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-        </Link>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 text-[11px] text-foreground-muted">
-            <Link href="/dashboard/workflows" className="hover:text-foreground transition-colors">
-              工作流
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-foreground">{workflowName}</span>
-          </div>
-          {workflowVersion !== undefined && (
-            <Badge
-              variant="secondary"
-              size="xs"
-              className="border-border/70 bg-surface-200/70 text-foreground-muted"
-            >
-              v{workflowVersion}
-            </Badge>
-          )}
-        </div>
+ return (
+ <header className={cn("h-12 flex items-center justify-between px-4 border-b", editorStyles.bg, editorStyles.border)}>
+ {/* Left side: Back + Title + Status */}
+ <div className="flex items-center gap-3">
+ <Link href="/dashboard/workflows">
+ <button className={cn(
+ "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
+ editorStyles.textSecondary,
+ `hover:${editorStyles.textPrimary}`,
+ editorStyles.buttonHover
+ )}>
+ <ChevronLeft className="w-4 h-4" />
+ </button>
+ </Link>
+ <div className="flex items-center gap-2">
+ <div className="flex items-center gap-1 text-[11px] text-foreground-muted">
+ <Link href="/dashboard/workflows" className="hover:text-foreground transition-colors">
+ Workflow
+ </Link>
+ <ChevronRight className="w-3 h-3" />
+ <span className="text-foreground">{workflowName}</span>
+ </div>
+ {workflowVersion !== undefined && (
+ <Badge
+ variant="secondary"
+ size="xs"
+ className="border-border/70 bg-surface-200/70 text-foreground-muted"
+ >
+ v{workflowVersion}
+ </Badge>
+ )}
+ </div>
 
-        <div className="hidden lg:flex items-center gap-2">
-          <div
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-surface-200/70 px-2 py-1 text-[11px]",
-              saveMeta.textClass
-            )}
-          >
-            {saveStatus === "saving" ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : (
-              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: saveMeta.dot }} />
-            )}
-            <span>{saveMeta.label}</span>
-            {lastSavedAt && saveStatus === "saved" && (
-              <span className="hidden xl:inline text-foreground-muted">
-                {lastSavedAt.toLocaleTimeString()}
-              </span>
-            )}
-          </div>
+ <div className="hidden lg:flex items-center gap-2">
+ <div
+ className={cn(
+ "inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-surface-200/70 px-2 py-1 text-[11px]",
+ saveMeta.textClass
+ )}
+ >
+ {saveStatus === "saving" ? (
+ <Loader2 className="h-3 w-3 animate-spin" />
+ ) : (
+ <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: saveMeta.dot }} />
+ )}
+ <span>{saveMeta.label}</span>
+ {lastSavedAt && saveStatus === "saved" && (
+ <span className="hidden xl:inline text-foreground-muted">
+ {lastSavedAt.toLocaleTimeString()}
+ </span>
+ )}
+ </div>
 
-          <div className="inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-surface-200/70 px-2 py-1 text-[11px] text-foreground-muted">
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: isOnline ? "var(--color-brand-500)" : "var(--color-foreground-muted)" }}
-            />
-            {isOnline ? "已连接" : "离线"}
-          </div>
+ <div className="inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-surface-200/70 px-2 py-1 text-[11px] text-foreground-muted">
+ <span
+ className="h-1.5 w-1.5 rounded-full"
+ style={{ backgroundColor: isOnline ? "var(--color-brand-500)" : "var(--color-foreground-muted)" }}
+ />
+ {isOnline ? "Connected": "Offline"}
+ </div>
 
-          {collaborators.length > 0 && (
-            <Badge
-              variant="secondary"
-              size="xs"
-              className="border-border/70 bg-surface-200/70 text-foreground-muted"
-            >
-              <Users className="h-3 w-3" />
-              {collaborators.length} 人在线
-            </Badge>
-          )}
+ {collaborators.length > 0 && (
+ <Badge
+ variant="secondary"
+ size="xs"
+ className="border-border/70 bg-surface-200/70 text-foreground-muted"
+ >
+ <Users className="h-3 w-3" />
+ {collaborators.length} personOnline
+ </Badge>
+ )}
 
-          {isDirty && (
-            <Badge
-              variant="secondary"
-              size="xs"
-              className="border-warning/30 bg-warning-200/60 text-warning"
-            >
-              未保存
-            </Badge>
-          )}
+ {isDirty && (
+ <Badge
+ variant="secondary"
+ size="xs"
+ className="border-warning/30 bg-warning-200/60 text-warning"
+ >
+ Unsaved
+ </Badge>
+ )}
 
-          {(isExecuting || executionStatus === "running") && (
-            <Badge
-              size="xs"
-              className="border border-brand-400/30 bg-brand-200/70 text-brand-500"
-            >
-              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-              运行中
-            </Badge>
-          )}
-        </div>
-      </div>
+ {(isExecuting || executionStatus === "running") && (
+ <Badge
+ size="xs"
+ className="border border-brand-400/30 bg-brand-200/70 text-brand-500"
+ >
+ <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+ Run
+ </Badge>
+ )}
+ </div>
+ </div>
 
-      {/* 中间：工具按钮 */}
-      <div className="flex items-center gap-0.5">
-        {/* 撤销/重做 */}
-        <ToolButton
-          icon={Undo2}
-          label="撤销"
-          shortcut="⌘Z"
-          onClick={undo}
-          disabled={!canUndo()}
-        />
-        <ToolButton
-          icon={Redo2}
-          label="重做"
-          shortcut="⌘⇧Z"
-          onClick={redo}
-          disabled={!canRedo()}
-        />
+ {/* between: ToolButton */}
+ <div className="flex items-center gap-0.5">
+ {/* Undo/Redo */}
+ <ToolButton
+ icon={Undo2}
+ label="Undo"
+ shortcut="⌘Z"
+ onClick={undo}
+ disabled={!canUndo()}
+ />
+ <ToolButton
+ icon={Redo2}
+ label="Redo"
+ shortcut="⌘⇧Z"
+ onClick={redo}
+ disabled={!canRedo()}
+ />
 
-        <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
+ <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
 
-        {/* 缩放控制 */}
-        <ToolButton
-          icon={ZoomOut}
-          label="缩小"
-          shortcut="⌘-"
-          onClick={() => zoomOut()}
-        />
-        <ToolButton
-          icon={ZoomIn}
-          label="放大"
-          shortcut="⌘+"
-          onClick={() => zoomIn()}
-        />
-        <ToolButton
-          icon={Maximize}
-          label="适应画布"
-          shortcut="⌘0"
-          onClick={() => fitView({ padding: 0.1, duration: 300 })}
-        />
+ {/* ZoomControl */}
+ <ToolButton
+ icon={ZoomOut}
+ label="small"
+ shortcut="⌘-"
+ onClick={() => zoomOut()}
+ />
+ <ToolButton
+ icon={ZoomIn}
+ label="large"
+ shortcut="⌘+"
+ onClick={() => zoomIn()}
+ />
+ <ToolButton
+ icon={Maximize}
+ label="shouldCanvas"
+ shortcut="⌘0"
+ onClick={() => fitView({ padding: 0.1, duration: 300 })}
+ />
 
-        <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
+ <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
 
-        {/* 布局 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className={cn(
-              "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
-              editorStyles.textSecondary,
-              `hover:${editorStyles.textPrimary}`,
-              editorStyles.buttonHover
-            )}>
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
-            <DropdownMenuItem onClick={applyHorizontalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <ArrowRight className="h-4 w-4 mr-2" />
-              水平布局 (左→右)
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={applyVerticalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <ArrowDown className="h-4 w-4 mr-2" />
-              垂直布局 (上→下)
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+ {/* Layout */}
+ <DropdownMenu>
+ <DropdownMenuTrigger asChild>
+ <button className={cn(
+ "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
+ editorStyles.textSecondary,
+ `hover:${editorStyles.textPrimary}`,
+ editorStyles.buttonHover
+ )}>
+ <LayoutGrid className="h-4 w-4" />
+ </button>
+ </DropdownMenuTrigger>
+ <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
+ <DropdownMenuItem onClick={applyHorizontalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <ArrowRight className="h-4 w-4 mr-2" />
+ HorizontalLayout (left→right)
+ </DropdownMenuItem>
+ <DropdownMenuItem onClick={applyVerticalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <ArrowDown className="h-4 w-4 mr-2" />
+ VerticalLayout (on→down)
+ </DropdownMenuItem>
+ </DropdownMenuContent>
+ </DropdownMenu>
 
-        {/* 删除 */}
-        <ToolButton
-          icon={Trash2}
-          label="删除选中"
-          shortcut="Del"
-          onClick={handleDelete}
-          disabled={selectedNodeIds.length === 0}
-          variant="danger"
-        />
+ {/* Delete */}
+ <ToolButton
+ icon={Trash2}
+ label="Deleteselect"
+ shortcut="Del"
+ onClick={handleDelete}
+ disabled={selectedNodeIds.length === 0}
+ variant="danger"
+ />
 
-        <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
+ <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
 
-        {/* 更多操作 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className={cn(
-              "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
-              editorStyles.textSecondary,
-              `hover:${editorStyles.textPrimary}`,
-              editorStyles.buttonHover
-            )}>
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
-            <DropdownMenuItem onClick={handleExport} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Download className="h-4 w-4 mr-2" />
-              导出工作流
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Upload className="h-4 w-4 mr-2" />
-              导入工作流
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border/70" />
-            <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Copy className="h-4 w-4 mr-2" />
-              复制工作流
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border/70" />
-            <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Settings className="h-4 w-4 mr-2" />
-              工作流设置
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border/70" />
-            <DropdownMenuItem onClick={shortcutsDialog.open} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Keyboard className="h-4 w-4 mr-2" />
-              快捷键帮助
-              <span className="ml-auto text-xs text-foreground-muted">?</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+ {/* moremultipleAction */}
+ <DropdownMenu>
+ <DropdownMenuTrigger asChild>
+ <button className={cn(
+ "h-8 w-8 flex items-center justify-center rounded-md transition-colors",
+ editorStyles.textSecondary,
+ `hover:${editorStyles.textPrimary}`,
+ editorStyles.buttonHover
+ )}>
+ <MoreHorizontal className="h-4 w-4" />
+ </button>
+ </DropdownMenuTrigger>
+ <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
+ <DropdownMenuItem onClick={handleExport} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <Download className="h-4 w-4 mr-2" />
+ ExportWorkflow
+ </DropdownMenuItem>
+ <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <Upload className="h-4 w-4 mr-2" />
+ ImportWorkflow
+ </DropdownMenuItem>
+ <DropdownMenuSeparator className="bg-border/70" />
+ <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <Copy className="h-4 w-4 mr-2" />
+ CopyWorkflow
+ </DropdownMenuItem>
+ <DropdownMenuSeparator className="bg-border/70" />
+ <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <Settings className="h-4 w-4 mr-2" />
+ WorkflowSettings
+ </DropdownMenuItem>
+ <DropdownMenuSeparator className="bg-border/70" />
+ <DropdownMenuItem onClick={shortcutsDialog.open} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
+ <Keyboard className="h-4 w-4 mr-2" />
+ ShortcutkeyHelp
+ <span className="ml-auto text-xs text-foreground-muted">?</span>
+ </DropdownMenuItem>
+ </DropdownMenuContent>
+ </DropdownMenu>
+ </div>
 
-      {/* 右侧: 操作按钮 */}
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn("h-8", editorStyles.textSecondary, `hover:${editorStyles.textPrimary}`, editorStyles.buttonHover)}
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          设置
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onSave}
-          disabled={saveStatus === "saving" || saveStatus === "saved"}
-          className="h-8 disabled:opacity-40"
-        >
-          {saveStatus === "saving" ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Save className="w-4 h-4 mr-2" />
-          )}
-          {saveStatus === "saving" ? "保存中" : "保存"}
-        </Button>
-        {(isExecuting || executionStatus === "running") ? (
-          <Button
-            variant="destructive-fill"
-            size="sm"
-            onClick={onStop}
-            className="h-8"
-          >
-            <Square className="w-4 h-4 mr-2" />
-            停止
-          </Button>
-        ) : (
-          <Button
-            variant={executionStatus === "failed" ? "destructive-fill" : "default"}
-            size="sm"
-            onClick={onRun}
-            disabled={nodes.length === 0}
-            className="h-8 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            运行
-          </Button>
-        )}
-      </div>
+ {/* Right side: ActionButton */}
+ <div className="flex items-center gap-2">
+ <Button
+ variant="ghost"
+ size="sm"
+ className={cn("h-8", editorStyles.textSecondary, `hover:${editorStyles.textPrimary}`, editorStyles.buttonHover)}
+ >
+ <Settings className="w-4 h-4 mr-2" />
+ Settings
+ </Button>
+ <Button
+ variant="outline"
+ size="sm"
+ onClick={onSave}
+ disabled={saveStatus === "saving" || saveStatus === "saved"}
+ className="h-8 disabled:opacity-40"
+ >
+ {saveStatus === "saving" ? (
+ <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+ ) : (
+ <Save className="w-4 h-4 mr-2" />
+ )}
+ {saveStatus === "saving" ? "Saving": "Save"}
+ </Button>
+ {(isExecuting || executionStatus === "running") ? (
+ <Button
+ variant="destructive-fill"
+ size="sm"
+ onClick={onStop}
+ className="h-8"
+ >
+ <Square className="w-4 h-4 mr-2" />
+ Stop
+ </Button>
+ ) : (
+ <Button
+ variant={executionStatus === "failed" ? "destructive-fill" : "default"}
+ size="sm"
+ onClick={onRun}
+ disabled={nodes.length === 0}
+ className="h-8 disabled:opacity-40 disabled:cursor-not-allowed"
+ >
+ <Play className="w-4 h-4 mr-2" />
+ Run
+ </Button>
+ )}
+ </div>
 
-      {/* 快捷键帮助对话框 */}
-      <KeyboardShortcutsDialog
-        open={shortcutsDialog.isOpen}
-        onOpenChange={shortcutsDialog.setIsOpen}
-      />
-    </header>
-  );
+ {/* ShortcutkeyHelpDialog */}
+ <KeyboardShortcutsDialog
+ open={shortcutsDialog.isOpen}
+ onOpenChange={shortcutsDialog.setIsOpen}
+ />
+ </header>
+ );
 }

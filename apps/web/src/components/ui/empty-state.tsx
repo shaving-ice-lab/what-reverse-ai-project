@@ -1,583 +1,583 @@
 "use client";
 
 /**
- * 空状态组件
- * 用于展示列表为空、搜索无结果等场景
+ * Empty StateComponent
+ * Used forShowcaseListasEmpty, SearchNo resultsetcScenario
  */
 
 import { ReactNode } from "react";
 import Link from "next/link";
 import {
-  FolderOpen,
-  Search,
-  FileText,
-  MessageSquare,
-  Zap,
-  Bot,
-  Users,
-  Inbox,
-  AlertCircle,
-  AlertTriangle,
-  RefreshCw,
-  Plus,
-  ShieldAlert,
-  WifiOff,
-  Wrench,
-  KeyRound,
-  Timer,
-  LucideIcon,
+ FolderOpen,
+ Search,
+ FileText,
+ MessageSquare,
+ Zap,
+ Bot,
+ Users,
+ Inbox,
+ AlertCircle,
+ AlertTriangle,
+ RefreshCw,
+ Plus,
+ ShieldAlert,
+ WifiOff,
+ Wrench,
+ KeyRound,
+ Timer,
+ LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 // ============================================
-// 主空状态组件
+// mainEmpty StateComponent
 // ============================================
 
 type EmptyStateTone = "neutral" | "info" | "warning" | "error" | "success";
 type EmptyStateSize = "sm" | "md" | "lg";
 
 const sizeStyles: Record<
-  EmptyStateSize,
-  { container: string; iconWrap: string; icon: string; title: string; description: string }
+ EmptyStateSize,
+ { container: string; iconWrap: string; icon: string; title: string; description: string }
 > = {
-  sm: {
-    container: "py-8",
-    iconWrap: "w-10 h-10",
-    icon: "w-5 h-5",
-    title: "text-sm",
-    description: "text-[12px]",
-  },
-  md: {
-    container: "py-12",
-    iconWrap: "w-11 h-11",
-    icon: "w-5 h-5",
-    title: "text-base",
-    description: "text-[13px]",
-  },
-  lg: {
-    container: "py-16",
-    iconWrap: "w-12 h-12",
-    icon: "w-6 h-6",
-    title: "text-base",
-    description: "text-[13px]",
-  },
+ sm: {
+ container: "py-8",
+ iconWrap: "w-10 h-10",
+ icon: "w-5 h-5",
+ title: "text-sm",
+ description: "text-[12px]",
+ },
+ md: {
+ container: "py-12",
+ iconWrap: "w-11 h-11",
+ icon: "w-5 h-5",
+ title: "text-base",
+ description: "text-[13px]",
+ },
+ lg: {
+ container: "py-16",
+ iconWrap: "w-12 h-12",
+ icon: "w-6 h-6",
+ title: "text-base",
+ description: "text-[13px]",
+ },
 };
 
 const toneStyles: Record<
-  EmptyStateTone,
-  {
-    iconBg: string;
-    iconColor: string;
-    badge: string;
-    border: string;
-    glow: string;
-    gradient: string;
-  }
+ EmptyStateTone,
+ {
+ iconBg: string;
+ iconColor: string;
+ badge: string;
+ border: string;
+ glow: string;
+ gradient: string;
+ }
 > = {
-  neutral: {
-    iconBg: "bg-surface-200",
-    iconColor: "text-foreground-muted",
-    badge: "text-foreground-light",
-    border: "border-border",
-    glow: "shadow-[0_0_18px_rgba(255,255,255,0.02)]",
-    gradient: "bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_55%)]",
-  },
-  info: {
-    iconBg: "bg-brand-200/70",
-    iconColor: "text-brand-500",
-    badge: "text-brand-500",
-    border: "border-brand-500/30",
-    glow: "shadow-[0_0_24px_rgba(62,207,142,0.14)]",
-    gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.18),transparent_55%)]",
-  },
-  warning: {
-    iconBg: "bg-warning-200/70",
-    iconColor: "text-warning",
-    badge: "text-warning",
-    border: "border-warning/40",
-    glow: "shadow-[0_0_24px_rgba(245,158,11,0.16)]",
-    gradient: "bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.2),transparent_55%)]",
-  },
-  error: {
-    iconBg: "bg-destructive-200/70",
-    iconColor: "text-destructive",
-    badge: "text-destructive",
-    border: "border-destructive/40",
-    glow: "shadow-[0_0_24px_rgba(239,68,68,0.16)]",
-    gradient: "bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.18),transparent_55%)]",
-  },
-  success: {
-    iconBg: "bg-brand-200/70",
-    iconColor: "text-brand-500",
-    badge: "text-brand-500",
-    border: "border-brand-500/40",
-    glow: "shadow-[0_0_24px_rgba(62,207,142,0.16)]",
-    gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.2),transparent_55%)]",
-  },
+ neutral: {
+ iconBg: "bg-surface-200",
+ iconColor: "text-foreground-muted",
+ badge: "text-foreground-light",
+ border: "border-border",
+ glow: "shadow-[0_0_18px_rgba(255,255,255,0.02)]",
+ gradient: "bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_55%)]",
+ },
+ info: {
+ iconBg: "bg-brand-200/70",
+ iconColor: "text-brand-500",
+ badge: "text-brand-500",
+ border: "border-brand-500/30",
+ glow: "shadow-[0_0_24px_rgba(62,207,142,0.14)]",
+ gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.18),transparent_55%)]",
+ },
+ warning: {
+ iconBg: "bg-warning-200/70",
+ iconColor: "text-warning",
+ badge: "text-warning",
+ border: "border-warning/40",
+ glow: "shadow-[0_0_24px_rgba(245,158,11,0.16)]",
+ gradient: "bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.2),transparent_55%)]",
+ },
+ error: {
+ iconBg: "bg-destructive-200/70",
+ iconColor: "text-destructive",
+ badge: "text-destructive",
+ border: "border-destructive/40",
+ glow: "shadow-[0_0_24px_rgba(239,68,68,0.16)]",
+ gradient: "bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.18),transparent_55%)]",
+ },
+ success: {
+ iconBg: "bg-brand-200/70",
+ iconColor: "text-brand-500",
+ badge: "text-brand-500",
+ border: "border-brand-500/40",
+ glow: "shadow-[0_0_24px_rgba(62,207,142,0.16)]",
+ gradient: "bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.2),transparent_55%)]",
+ },
 };
 
 interface EmptyStateProps {
-  icon?: LucideIcon;
-  title: string;
-  description?: string;
-  action?: {
-    label: string;
-    href?: string;
-    onClick?: () => void;
-    icon?: LucideIcon;
-  };
-  secondaryAction?: {
-    label: string;
-    href?: string;
-    onClick?: () => void;
-  };
-  tone?: EmptyStateTone;
-  size?: EmptyStateSize;
-  badge?: string;
-  className?: string;
-  children?: ReactNode;
+ icon?: LucideIcon;
+ title: string;
+ description?: string;
+ action?: {
+ label: string;
+ href?: string;
+ onClick?: () => void;
+ icon?: LucideIcon;
+ };
+ secondaryAction?: {
+ label: string;
+ href?: string;
+ onClick?: () => void;
+ };
+ tone?: EmptyStateTone;
+ size?: EmptyStateSize;
+ badge?: string;
+ className?: string;
+ children?: ReactNode;
 }
 
 export function EmptyState({
-  icon: Icon = Inbox,
-  title,
-  description,
-  action,
-  secondaryAction,
-  tone = "neutral",
-  size = "lg",
-  badge,
-  className,
-  children,
+ icon: Icon = Inbox,
+ title,
+ description,
+ action,
+ secondaryAction,
+ tone = "neutral",
+ size = "lg",
+ badge,
+ className,
+ children,
 }: EmptyStateProps) {
-  const ActionIcon = action?.icon || Plus;
-  const toneStyle = toneStyles[tone];
-  const sizeStyle = sizeStyles[size];
+ const ActionIcon = action?.icon || Plus;
+ const toneStyle = toneStyles[tone];
+ const sizeStyle = sizeStyles[size];
 
-  return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center px-4 text-center",
-        sizeStyle.container,
-        className
-      )}
-    >
-      {badge && (
-        <div
-          className={cn(
-            "text-[10px] tracking-[0.35em] uppercase mb-3",
-            toneStyle.badge
-          )}
-        >
-          {badge}
-        </div>
-      )}
-      <div
-        className={cn(
-          "rounded-lg flex items-center justify-center mb-4",
-          sizeStyle.iconWrap,
-          toneStyle.iconBg
-        )}
-      >
-        <Icon className={cn(sizeStyle.icon, toneStyle.iconColor)} />
-      </div>
-      
-      <h3 className={cn("font-medium text-foreground mb-2", sizeStyle.title)}>
-        {title}
-      </h3>
-      
-      {description && (
-        <p className={cn("text-foreground-light max-w-sm mb-6", sizeStyle.description)}>
-          {description}
-        </p>
-      )}
-      
-      {children}
-      
-      {(action || secondaryAction) && (
-        <div className="flex items-center gap-3 mt-2">
-          {secondaryAction && (
-            secondaryAction.href ? (
-              <Link href={secondaryAction.href}>
-                <Button variant="outline" size="sm">
-                  {secondaryAction.label}
-                </Button>
-              </Link>
-            ) : (
-              <Button variant="outline" size="sm" onClick={secondaryAction.onClick}>
-                {secondaryAction.label}
-              </Button>
-            )
-          )}
-          
-          {action && (
-            action.href ? (
-              <Link href={action.href}>
-                <Button size="sm">
-                  <ActionIcon className="w-4 h-4 mr-2" />
-                  {action.label}
-                </Button>
-              </Link>
-            ) : (
-              <Button size="sm" onClick={action.onClick}>
-                <ActionIcon className="w-4 h-4 mr-2" />
-                {action.label}
-              </Button>
-            )
-          )}
-        </div>
-      )}
-    </div>
-  );
+ return (
+ <div
+ className={cn(
+ "flex flex-col items-center justify-center px-4 text-center",
+ sizeStyle.container,
+ className
+ )}
+ >
+ {badge && (
+ <div
+ className={cn(
+ "text-[10px] tracking-[0.35em] uppercase mb-3",
+ toneStyle.badge
+ )}
+ >
+ {badge}
+ </div>
+ )}
+ <div
+ className={cn(
+ "rounded-lg flex items-center justify-center mb-4",
+ sizeStyle.iconWrap,
+ toneStyle.iconBg
+ )}
+ >
+ <Icon className={cn(sizeStyle.icon, toneStyle.iconColor)} />
+ </div>
+ 
+ <h3 className={cn("font-medium text-foreground mb-2", sizeStyle.title)}>
+ {title}
+ </h3>
+ 
+ {description && (
+ <p className={cn("text-foreground-light max-w-sm mb-6", sizeStyle.description)}>
+ {description}
+ </p>
+ )}
+ 
+ {children}
+ 
+ {(action || secondaryAction) && (
+ <div className="flex items-center gap-3 mt-2">
+ {secondaryAction && (
+ secondaryAction.href ? (
+ <Link href={secondaryAction.href}>
+ <Button variant="outline" size="sm">
+ {secondaryAction.label}
+ </Button>
+ </Link>
+ ) : (
+ <Button variant="outline" size="sm" onClick={secondaryAction.onClick}>
+ {secondaryAction.label}
+ </Button>
+ )
+ )}
+ 
+ {action && (
+ action.href ? (
+ <Link href={action.href}>
+ <Button size="sm">
+ <ActionIcon className="w-4 h-4 mr-2" />
+ {action.label}
+ </Button>
+ </Link>
+ ) : (
+ <Button size="sm" onClick={action.onClick}>
+ <ActionIcon className="w-4 h-4 mr-2" />
+ {action.label}
+ </Button>
+ )
+ )}
+ </div>
+ )}
+ </div>
+ );
 }
 
 type ExceptionVariant =
-  | "empty"
-  | "error"
-  | "permission"
-  | "offline"
-  | "maintenance"
-  | "not_found"
-  | "rate_limit";
+ | "empty"
+ | "error"
+ | "permission"
+ | "offline"
+ | "maintenance"
+ | "not_found"
+ | "rate_limit";
 
 const exceptionPresets: Record<
-  ExceptionVariant,
-  { title: string; description: string; icon: LucideIcon; tone: EmptyStateTone; badge: string }
+ ExceptionVariant,
+ { title: string; description: string; icon: LucideIcon; tone: EmptyStateTone; badge: string }
 > = {
-  empty: {
-    title: "暂无数据",
-    description: "当前没有可展示的内容",
-    icon: Inbox,
-    tone: "neutral",
-    badge: "EMPTY",
-  },
-  error: {
-    title: "加载失败",
-    description: "发生了一些错误，请稍后重试",
-    icon: AlertTriangle,
-    tone: "error",
-    badge: "ERROR",
-  },
-  permission: {
-    title: "权限不足",
-    description: "请检查权限或联系管理员获取访问",
-    icon: ShieldAlert,
-    tone: "warning",
-    badge: "ACCESS",
-  },
-  offline: {
-    title: "网络不可用",
-    description: "请检查网络连接后重试",
-    icon: WifiOff,
-    tone: "warning",
-    badge: "OFFLINE",
-  },
-  maintenance: {
-    title: "系统维护中",
-    description: "当前服务正在维护，请稍后再试",
-    icon: Wrench,
-    tone: "info",
-    badge: "MAINT",
-  },
-  not_found: {
-    title: "未找到内容",
-    description: "没有匹配的内容或已被移除",
-    icon: Search,
-    tone: "neutral",
-    badge: "MISSING",
-  },
-  rate_limit: {
-    title: "请求过于频繁",
-    description: "请稍后再试或降低请求频率",
-    icon: Timer,
-    tone: "warning",
-    badge: "LIMIT",
-  },
+ empty: {
+ title: "No data available",
+ description: "CurrentNocanShowcase'sContent",
+ icon: Inbox,
+ tone: "neutral",
+ badge: "EMPTY",
+ },
+ error: {
+ title: "LoadFailed",
+ description: "Occur1Error, Please try again laterRetry",
+ icon: AlertTriangle,
+ tone: "error",
+ badge: "ERROR",
+ },
+ permission: {
+ title: "Insufficient permissions",
+ description: "PleaseCheckPermissionorContactAdminFetchAccess",
+ icon: ShieldAlert,
+ tone: "warning",
+ badge: "ACCESS",
+ },
+ offline: {
+ title: "NetworkUnavailable",
+ description: "PleaseCheckNetworkConnectafterRetry",
+ icon: WifiOff,
+ tone: "warning",
+ badge: "OFFLINE",
+ },
+ maintenance: {
+ title: "SystemMaintain",
+ description: "CurrentServicecurrentlyatMaintain, Please try again later",
+ icon: Wrench,
+ tone: "info",
+ badge: "MAINT",
+ },
+ not_found: {
+ title: "not yettoContent",
+ description: "NoMatch'sContentoralreadybyRemove",
+ icon: Search,
+ tone: "neutral",
+ badge: "MISSING",
+ },
+ rate_limit: {
+ title: "RequestpastatFrequent",
+ description: "Please try again laterorReduceRequestrate",
+ icon: Timer,
+ tone: "warning",
+ badge: "LIMIT",
+ },
 };
 
 interface ExceptionStateProps extends Omit<EmptyStateProps, "icon" | "title" | "description" | "tone" | "badge"> {
-  variant?: ExceptionVariant;
-  title?: string;
-  description?: string;
-  icon?: LucideIcon;
-  tone?: EmptyStateTone;
-  badge?: string;
+ variant?: ExceptionVariant;
+ title?: string;
+ description?: string;
+ icon?: LucideIcon;
+ tone?: EmptyStateTone;
+ badge?: string;
 }
 
 export function ExceptionState({
-  variant = "empty",
-  title,
-  description,
-  icon,
-  tone,
-  badge,
-  size = "md",
-  className,
-  ...rest
+ variant = "empty",
+ title,
+ description,
+ icon,
+ tone,
+ badge,
+ size = "md",
+ className,
+ ...rest
 }: ExceptionStateProps) {
-  const preset = exceptionPresets[variant];
-  const resolvedTone = tone || preset.tone;
-  const toneStyle = toneStyles[resolvedTone];
+ const preset = exceptionPresets[variant];
+ const resolvedTone = tone || preset.tone;
+ const toneStyle = toneStyles[resolvedTone];
 
-  return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-2xl border bg-surface-100/70 p-6",
-        toneStyle.border,
-        toneStyle.glow,
-        className
-      )}
-    >
-      <div className={cn("absolute inset-0 pointer-events-none opacity-45", toneStyle.gradient)} />
-      <EmptyState
-        icon={icon || preset.icon}
-        title={title || preset.title}
-        description={description || preset.description}
-        tone={resolvedTone}
-        size={size}
-        badge={badge || preset.badge}
-        className="py-0"
-        {...rest}
-      />
-    </div>
-  );
+ return (
+ <div
+ className={cn(
+ "relative overflow-hidden rounded-2xl border bg-surface-100/70 p-6",
+ toneStyle.border,
+ toneStyle.glow,
+ className
+ )}
+ >
+ <div className={cn("absolute inset-0 pointer-events-none opacity-45", toneStyle.gradient)} />
+ <EmptyState
+ icon={icon || preset.icon}
+ title={title || preset.title}
+ description={description || preset.description}
+ tone={resolvedTone}
+ size={size}
+ badge={badge || preset.badge}
+ className="py-0"
+ {...rest}
+ />
+ </div>
+ );
 }
 
 // ============================================
-// 预设空状态变体
+// PresetEmpty StateVariant
 // ============================================
 
-// 搜索无结果
+// SearchNo results
 interface SearchEmptyStateProps {
-  query?: string;
-  onClear?: () => void;
-  className?: string;
+ query?: string;
+ onClear?: () => void;
+ className?: string;
 }
 
 export function SearchEmptyState({ query, onClear, className }: SearchEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={Search}
-      title={query ? `没有找到 "${query}" 的相关结果` : "没有找到结果"}
-      description="尝试使用其他关键词或调整筛选条件"
-      secondaryAction={
-        onClear
-          ? {
-              label: "清除搜索",
-              onClick: onClear,
-            }
-          : undefined
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={Search}
+ title={query ? `Noto "${query}" 'sRelatedResult`: "NotoResult"}
+ description="TryUsageotherheKeywordsorAdjustFilterCondition"
+ secondaryAction={
+ onClear
+ ? {
+ label: "ClearSearch",
+ onClick: onClear,
+ }
+ : undefined
+ }
+ className={className}
+ />
+ );
 }
 
-// 空文件夹
+// EmptyFolder
 interface FolderEmptyStateProps {
-  onUpload?: () => void;
-  className?: string;
+ onUpload?: () => void;
+ className?: string;
 }
 
 export function FolderEmptyState({ onUpload, className }: FolderEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={FolderOpen}
-      title="文件夹为空"
-      description="上传文件或创建新文件夹开始整理您的内容"
-      action={
-        onUpload
-          ? {
-              label: "上传文件",
-              onClick: onUpload,
-            }
-          : undefined
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={FolderOpen}
+ title="FolderasEmpty"
+ description="UploadFileorCreatenewFolderStartOrganizeyou'sContent"
+ action={
+ onUpload
+ ? {
+ label: "UploadFile",
+ onClick: onUpload,
+ }
+ : undefined
+ }
+ className={className}
+ />
+ );
 }
 
-// 无工作流
+// NoneWorkflow
 interface WorkflowEmptyStateProps {
-  onCreateClick?: () => void;
-  className?: string;
+ onCreateClick?: () => void;
+ className?: string;
 }
 
 export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={Zap}
-      title="还没有工作流"
-      description="创建您的第一个工作流，开始自动化之旅"
-      action={
-        onCreateClick
-          ? {
-              label: "创建工作流",
-              onClick: onCreateClick,
-            }
-          : {
-              label: "创建工作流",
-              href: "/dashboard/workflows/new",
-            }
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={Zap}
+ title="Not yetWorkflow"
+ description="Createyou's#1Workflow, StartAutomationJourney"
+ action={
+ onCreateClick
+ ? {
+ label: "CreateWorkflow",
+ onClick: onCreateClick,
+ }
+ : {
+ label: "CreateWorkflow",
+ href: "/dashboard/workflows/new",
+ }
+ }
+ className={className}
+ />
+ );
 }
 
-// 无对话
+// NoneConversation
 interface ConversationEmptyStateProps {
-  className?: string;
+ className?: string;
 }
 
 export function ConversationEmptyState({ className }: ConversationEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={MessageSquare}
-      title="开始新对话"
-      description="与 AI 助手交流，获取帮助和灵感"
-      action={{
-        label: "新建对话",
-        href: "/dashboard/conversations",
-        icon: MessageSquare,
-      }}
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={MessageSquare}
+ title="StartnewConversation"
+ description="and AI AssistantExchange, FetchHelpandInspiration"
+ action={{
+ label: "CreateConversation",
+ href: "/dashboard/conversations",
+ icon: MessageSquare,
+ }}
+ className={className}
+ />
+ );
 }
 
-// 无 Agent
+// None Agent
 interface AgentEmptyStateProps {
-  className?: string;
+ className?: string;
 }
 
 export function AgentEmptyState({ className }: AgentEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={Bot}
-      title="还没有 Agent"
-      description="创建您的第一个 AI Agent，让它帮您处理任务"
-      action={{
-        label: "创建 Agent",
-        href: "/dashboard/my-agents/new",
-      }}
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={Bot}
+ title="Not yet Agent"
+ description="Createyou's#1 AI Agent, letityouProcessTask"
+ action={{
+ label: "Create Agent",
+ href: "/dashboard/my-agents/new",
+ }}
+ className={className}
+ />
+ );
 }
 
-// 无团队成员
+// NoneTeamMember
 interface TeamEmptyStateProps {
-  onInvite?: () => void;
-  className?: string;
+ onInvite?: () => void;
+ className?: string;
 }
 
 export function TeamEmptyState({ onInvite, className }: TeamEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={Users}
-      title="邀请团队成员"
-      description="与团队一起协作，提高工作效率"
-      action={
-        onInvite
-          ? {
-              label: "邀请成员",
-              onClick: onInvite,
-            }
-          : undefined
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={Users}
+ title="InviteTeamMember"
+ description="andTeam1Collaboration, ImproveWorkrate"
+ action={
+ onInvite
+ ? {
+ label: "InviteMember",
+ onClick: onInvite,
+ }
+ : undefined
+ }
+ className={className}
+ />
+ );
 }
 
-// 加载错误
+// LoadError
 interface ErrorEmptyStateProps {
-  title?: string;
-  description?: string;
-  onRetry?: () => void;
-  className?: string;
+ title?: string;
+ description?: string;
+ onRetry?: () => void;
+ className?: string;
 }
 
 export function ErrorEmptyState({
-  title = "加载失败",
-  description = "发生了一些错误，请重试",
-  onRetry,
-  className,
+ title = "LoadFailed",
+ description = "Occur1Error, PleaseRetry",
+ onRetry,
+ className,
 }: ErrorEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={AlertCircle}
-      title={title}
-      description={description}
-      tone="error"
-      action={
-        onRetry
-          ? {
-              label: "重试",
-              onClick: onRetry,
-              icon: RefreshCw,
-            }
-          : undefined
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={AlertCircle}
+ title={title}
+ description={description}
+ tone="error"
+ action={
+ onRetry
+ ? {
+ label: "Retry",
+ onClick: onRetry,
+ icon: RefreshCw,
+ }
+ : undefined
+ }
+ className={className}
+ />
+ );
 }
 
-// 无 API Key
+// None API Key
 interface ApiKeyEmptyStateProps {
-  onAddClick?: () => void;
-  className?: string;
+ onAddClick?: () => void;
+ className?: string;
 }
 
 export function ApiKeyEmptyState({ onAddClick, className }: ApiKeyEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={KeyRound}
-      title="还没有 API 密钥"
-      description="添加密钥以便安全访问 API"
-      action={
-        onAddClick
-          ? {
-              label: "添加密钥",
-              onClick: onAddClick,
-            }
-          : undefined
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={KeyRound}
+ title="Not yet API Key"
+ description="AddKeywithSecurityAccess API"
+ action={
+ onAddClick
+ ? {
+ label: "AddKey",
+ onClick: onAddClick,
+ }
+ : undefined
+ }
+ className={className}
+ />
+ );
 }
 
-// 无文档
+// NoneDocument
 interface DocumentEmptyStateProps {
-  onCreate?: () => void;
-  className?: string;
+ onCreate?: () => void;
+ className?: string;
 }
 
 export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={FileText}
-      title="还没有文档"
-      description="创建您的第一个文档，开始内容创作"
-      action={
-        onCreate
-          ? {
-              label: "新建文档",
-              onClick: onCreate,
-            }
-          : {
-              label: "新建文档",
-              href: "/dashboard/creative/generate",
-            }
-      }
-      className={className}
-    />
-  );
+ return (
+ <EmptyState
+ icon={FileText}
+ title="Not yetDocument"
+ description="Createyou's#1Document, StartContentCreative"
+ action={
+ onCreate
+ ? {
+ label: "CreateDocument",
+ onClick: onCreate,
+ }
+ : {
+ label: "CreateDocument",
+ href: "/dashboard/creative/generate",
+ }
+ }
+ className={className}
+ />
+ );
 }
 
 export const SearchEmpty = SearchEmptyState;
