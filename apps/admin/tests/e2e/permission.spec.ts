@@ -1,11 +1,11 @@
 /**
- * 权限回归测试
- * 验证越权访问被正确拦截
+ * Permission regression tests
+ * Verify unauthorized access is properly blocked
  */
 
 import { test, expect, type Page } from "@playwright/test";
 
-// 不同权限级别的用户
+// Users with different permission levels
 interface TestUser {
   id: string;
   email: string;
@@ -75,9 +75,9 @@ const respondForbidden = () => ({
   contentType: "application/json",
   body: JSON.stringify({
     code: "FORBIDDEN",
-    message: "无权限访问",
+    message: "Access denied",
     error_code: "FORBIDDEN",
-    error_message: "无权限访问",
+    error_message: "Access denied",
   }),
 });
 
@@ -115,17 +115,17 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
     const path = url.pathname;
     const method = request.method();
 
-    // 获取当前用户
+    // Get current user
     if (path === "/api/v1/users/me") {
       return route.fulfill(respondOk(user));
     }
 
-    // 获取管理员能力点
+    // Get admin capabilities
     if (path === "/api/v1/admin/capabilities") {
       return route.fulfill(respondOk({ capabilities: user.capabilities }));
     }
 
-    // 用户管理 API - 检查权限
+    // User management API - check permissions
     if (path.startsWith("/api/v1/admin/users")) {
       if (method === "GET" && !user.capabilities.includes("users.read")) {
         return route.fulfill(respondForbidden());
@@ -136,7 +136,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({ items: [], total: 0, page: 1, page_size: 20 }));
     }
 
-    // Workspace 管理 API - 检查权限
+    // Workspace management API - check permissions
     if (path.startsWith("/api/v1/admin/workspaces")) {
       if (method === "GET" && !user.capabilities.includes("workspaces.read")) {
         return route.fulfill(respondForbidden());
@@ -147,7 +147,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({ items: [], total: 0, page: 1, page_size: 20 }));
     }
 
-    // 应用管理 API - 检查权限
+    // App management API - check permissions
     if (path.startsWith("/api/v1/admin/apps")) {
       if (method === "GET" && !user.capabilities.includes("apps.read")) {
         return route.fulfill(respondForbidden());
@@ -158,7 +158,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({ items: [], total: 0, page: 1, page_size: 20 }));
     }
 
-    // 工单管理 API - 检查权限
+    // Ticket management API - check permissions
     if (path.startsWith("/api/v1/admin/support")) {
       if (method === "GET" && !user.capabilities.includes("support.read")) {
         return route.fulfill(respondForbidden());
@@ -169,7 +169,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({ items: [], total: 0, page: 1, page_size: 20 }));
     }
 
-    // 计费管理 API - 检查权限
+    // Billing management API - check permissions
     if (path.startsWith("/api/v1/admin/billing") || path.startsWith("/api/v1/admin/earnings")) {
       if (method === "GET" && !user.capabilities.includes("billing.read")) {
         return route.fulfill(respondForbidden());
@@ -180,7 +180,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({ items: [], total: 0, page: 1, page_size: 20 }));
     }
 
-    // 系统管理 API - 检查权限
+    // System management API - check permissions
     if (path.startsWith("/api/v1/system") || path.startsWith("/api/v1/admin/config")) {
       if (method === "GET" && !user.capabilities.includes("system.read")) {
         return route.fulfill(respondForbidden());
@@ -191,7 +191,7 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
       return route.fulfill(respondOk({}));
     }
 
-    // 审计日志 - 检查权限
+    // Audit logs - check permissions
     if (path.startsWith("/api/v1/admin/audit-logs")) {
       if (!user.capabilities.includes("audit.read")) {
         return route.fulfill(respondForbidden());
@@ -203,119 +203,119 @@ function setupApiRoutes(page: Page, user: (typeof users)[keyof typeof users]) {
   });
 }
 
-test.describe("权限回归测试 - SuperAdmin", () => {
+test.describe("Permission Regression Tests - SuperAdmin", () => {
   test.beforeEach(async ({ page }) => {
     await setupUserSession(page, users.superAdmin);
     await setupApiRoutes(page, users.superAdmin);
   });
 
-  test("SuperAdmin 应该能访问所有管理页面", async ({ page }) => {
-    // 用户管理
+  test("SuperAdmin should be able to access all admin pages", async ({ page }) => {
+    // User management
     await page.goto("/users");
     await expect(page).not.toHaveURL(/\/403/);
 
-    // Workspace 管理
+    // Workspace management
     await page.goto("/workspaces");
     await expect(page).not.toHaveURL(/\/403/);
 
-    // 应用管理
+    // App management
     await page.goto("/apps");
     await expect(page).not.toHaveURL(/\/403/);
 
-    // 工单管理
+    // Ticket management
     await page.goto("/support/tickets");
     await expect(page).not.toHaveURL(/\/403/);
 
-    // 系统管理
+    // System management
     await page.goto("/system/health");
     await expect(page).not.toHaveURL(/\/403/);
   });
 });
 
-test.describe("权限回归测试 - SupportOnly", () => {
+test.describe("Permission Regression Tests - SupportOnly", () => {
   test.beforeEach(async ({ page }) => {
     await setupUserSession(page, users.supportOnly);
     await setupApiRoutes(page, users.supportOnly);
   });
 
-  test("Support 用户应该能访问工单管理", async ({ page }) => {
+  test("Support user should be able to access ticket management", async ({ page }) => {
     await page.goto("/support/tickets");
     await expect(page).not.toHaveURL(/\/403/);
   });
 
-  test("Support 用户访问用户管理应该被拒绝", async ({ page }) => {
+  test("Support user should be denied access to user management", async ({ page }) => {
     await page.goto("/users");
-    // 应该显示无权限提示或跳转到 403 页面
-    await expect(page.getByText(/无权限|没有权限|403/)).toBeVisible();
+    // Should display permission denied message or redirect to 403 page
+    await expect(page.getByText(/access denied|no permission|403/i)).toBeVisible();
   });
 
-  test("Support 用户访问系统管理应该被拒绝", async ({ page }) => {
+  test("Support user should be denied access to system management", async ({ page }) => {
     await page.goto("/system/health");
-    await expect(page.getByText(/无权限|没有权限|403/)).toBeVisible();
+    await expect(page.getByText(/access denied|no permission|403/i)).toBeVisible();
   });
 });
 
-test.describe("权限回归测试 - ReadOnly", () => {
+test.describe("Permission Regression Tests - ReadOnly", () => {
   test.beforeEach(async ({ page }) => {
     await setupUserSession(page, users.readOnly);
     await setupApiRoutes(page, users.readOnly);
   });
 
-  test("ReadOnly 用户应该能查看用户列表", async ({ page }) => {
+  test("ReadOnly user should be able to view user list", async ({ page }) => {
     await page.goto("/users");
     await expect(page).not.toHaveURL(/\/403/);
   });
 
-  test("ReadOnly 用户不应该看到操作按钮", async ({ page }) => {
+  test("ReadOnly user should not see action buttons", async ({ page }) => {
     await page.goto("/users");
-    // 操作按钮应该被隐藏或禁用
-    const freezeButton = page.getByRole("button", { name: /冻结/i });
+    // Action buttons should be hidden or disabled
+    const freezeButton = page.getByRole("button", { name: /suspend/i });
     const count = await freezeButton.count();
     if (count > 0) {
       await expect(freezeButton).toBeDisabled();
     }
   });
 
-  test("ReadOnly 用户不能执行写操作", async ({ page }) => {
+  test("ReadOnly user cannot perform write operations", async ({ page }) => {
     await page.goto("/users/user_1");
 
-    // 尝试点击冻结按钮（如果存在）
-    const freezeButton = page.getByRole("button", { name: /冻结/i });
+    // Try clicking suspend button (if it exists)
+    const freezeButton = page.getByRole("button", { name: /suspend/i });
     if (await freezeButton.isVisible()) {
       await freezeButton.click();
-      // 应该显示无权限提示
-      await expect(page.getByText(/无权限|没有权限/)).toBeVisible();
+      // Should display permission denied message
+      await expect(page.getByText(/access denied|no permission/i)).toBeVisible();
     }
   });
 });
 
-test.describe("权限回归测试 - NoPermission", () => {
+test.describe("Permission Regression Tests - NoPermission", () => {
   test.beforeEach(async ({ page }) => {
     await setupUserSession(page, users.noPermission);
     await setupApiRoutes(page, users.noPermission);
   });
 
-  test("无权限用户访问任何管理页面都应该被拒绝", async ({ page }) => {
+  test("user with no permissions should be denied access to all admin pages", async ({ page }) => {
     await page.goto("/users");
-    await expect(page.getByText(/无权限|没有权限|403/)).toBeVisible();
+    await expect(page.getByText(/access denied|no permission|403/i)).toBeVisible();
 
     await page.goto("/workspaces");
-    await expect(page.getByText(/无权限|没有权限|403/)).toBeVisible();
+    await expect(page.getByText(/access denied|no permission|403/i)).toBeVisible();
 
     await page.goto("/apps");
-    await expect(page.getByText(/无权限|没有权限|403/)).toBeVisible();
+    await expect(page.getByText(/access denied|no permission|403/i)).toBeVisible();
   });
 
-  test("无权限用户应该只能看到仪表盘概览", async ({ page }) => {
+  test("user with no permissions should only see dashboard overview", async ({ page }) => {
     await page.goto("/");
-    // 仪表盘应该显示但数据为空或显示无权限
+    // Dashboard should display but with empty data or permission denied
     await expect(page).toHaveURL(/\/$/);
   });
 });
 
-test.describe("权限回归测试 - 未登录用户", () => {
-  test("未登录用户访问管理页面应该跳转到登录", async ({ page }) => {
-    // 清除所有存储
+test.describe("Permission Regression Tests - Unauthenticated User", () => {
+  test("unauthenticated user should be redirected to login when accessing admin pages", async ({ page }) => {
+    // Clear all storage
     await page.context().clearCookies();
 
     await page.goto("/users");
@@ -328,14 +328,14 @@ test.describe("权限回归测试 - 未登录用户", () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
-  test("未登录用户访问 API 应该返回 401", async ({ page }) => {
+  test("unauthenticated user accessing API should return 401", async ({ page }) => {
     await page.route("**/api/v1/admin/users", async (route) => {
       return route.fulfill({
         status: 401,
         contentType: "application/json",
         body: JSON.stringify({
           code: "UNAUTHORIZED",
-          message: "请先登录",
+          message: "Please sign in first",
         }),
       });
     });
@@ -345,14 +345,14 @@ test.describe("权限回归测试 - 未登录用户", () => {
   });
 });
 
-test.describe("权限回归测试 - 跨模块越权", () => {
+test.describe("Permission Regression Tests - Cross-Module Privilege Escalation", () => {
   test.beforeEach(async ({ page }) => {
     await setupUserSession(page, users.supportOnly);
     await setupApiRoutes(page, users.supportOnly);
   });
 
-  test("Support 用户尝试更新用户状态应该被拒绝", async ({ page }) => {
-    // 直接调用 API
+  test("Support user attempting to update user status should be rejected", async ({ page }) => {
+    // Direct API call
     const response = await page.request.patch(
       "http://localhost:3002/api/v1/admin/users/user_1/status",
       {
@@ -367,7 +367,7 @@ test.describe("权限回归测试 - 跨模块越权", () => {
     expect(response.status()).toBe(403);
   });
 
-  test("Support 用户尝试访问计费 API 应该被拒绝", async ({ page }) => {
+  test("Support user attempting to access billing API should be rejected", async ({ page }) => {
     const response = await page.request.get(
       "http://localhost:3002/api/v1/admin/billing/invoices",
       {

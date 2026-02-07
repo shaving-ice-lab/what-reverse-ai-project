@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Admin 端认证状态管理
- * - 复用后端 /auth/login /auth/refresh /auth/logout
- * - 复用 localStorage key: auth-storage（与 apps/web 对齐）
+ * Admin Authentication State Management
+ * - Reuses backend /auth/login /auth/refresh /auth/logout
+ * - Reuses localStorage key: auth-storage (aligned with apps/web)
  */
 
 import { create } from "zustand";
@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : "登录失败",
+            error: error instanceof Error ? error.message : "Login failed",
           });
           throw error;
         }
@@ -153,4 +153,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-

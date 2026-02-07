@@ -1,6 +1,6 @@
 /**
- * 安全测试
- * 验证越权访问、敏感数据泄露等安全风险
+ * Security tests
+ * Verify unauthorized access, sensitive data leaks, and other security risks
  */
 
 import { test, expect, type Page } from "@playwright/test";
@@ -17,7 +17,7 @@ const respondError = (code: string, message: string, status: number) => ({
   body: JSON.stringify({ code, message, error_code: code, error_message: message }),
 });
 
-// XSS 测试向量
+// XSS test vectors
 const XSS_PAYLOADS = [
   '<script>alert("xss")</script>',
   'javascript:alert("xss")',
@@ -29,7 +29,7 @@ const XSS_PAYLOADS = [
   '${alert(1)}',
 ];
 
-// SQL 注入测试向量
+// SQL injection test vectors
 const SQL_INJECTION_PAYLOADS = [
   "'; DROP TABLE users; --",
   "1' OR '1'='1",
@@ -39,7 +39,7 @@ const SQL_INJECTION_PAYLOADS = [
   "1' AND '1'='1",
 ];
 
-// 敏感信息模式
+// Sensitive information patterns
 const SENSITIVE_PATTERNS = [
   /password/i,
   /secret/i,
@@ -99,7 +99,7 @@ async function mockApiRoutes(page: Page) {
       );
     }
 
-    // 模拟安全响应
+    // Mock secure responses
     if (path.includes("/admin/users") || path.includes("/admin/workspaces")) {
       return route.fulfill(
         respondOk({ items: [], total: 0, page: 1, page_size: 20 })
@@ -110,37 +110,37 @@ async function mockApiRoutes(page: Page) {
   });
 }
 
-test.describe("安全测试 - XSS 防护", () => {
+test.describe("Security Tests - XSS Protection", () => {
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedSession(page);
     await mockApiRoutes(page);
   });
 
-  test("搜索框应该对 XSS 攻击进行过滤或转义", async ({ page }) => {
+  test("search box should filter or escape XSS attacks", async ({ page }) => {
     await page.goto("/users");
 
     for (const payload of XSS_PAYLOADS) {
-      // 在搜索框中输入 XSS payload
-      const searchInput = page.getByPlaceholder(/搜索/i);
+      // Enter XSS payload in search box
+      const searchInput = page.getByPlaceholder(/search/i);
       if (await searchInput.isVisible()) {
         await searchInput.fill(payload);
         await searchInput.press("Enter");
 
-        // 等待页面更新
+        // Wait for page update
         await page.waitForTimeout(100);
 
-        // 验证 XSS 没有被执行（页面不应该有弹窗）
+        // Verify XSS was not executed (page should have no alerts)
         const alertDialog = page.locator('text="xss"');
         const count = await alertDialog.count();
         expect(count).toBe(0);
 
-        // 清空搜索框
+        // Clear search box
         await searchInput.clear();
       }
     }
   });
 
-  test("用户输入应该被正确转义显示", async ({ page }) => {
+  test("user input should be properly escaped when displayed", async ({ page }) => {
     await page.route("**/api/v1/admin/users", async (route) => {
       return route.fulfill(
         respondOk({
@@ -167,49 +167,49 @@ test.describe("安全测试 - XSS 防护", () => {
     await page.goto("/users");
     await page.waitForLoadState("networkidle");
 
-    // 恶意脚本不应该被执行
+    // Malicious scripts should not be executed
     const scripts = await page.evaluate(() => {
       return document.querySelectorAll('script:not([src])').length;
     });
     
-    // 页面不应该包含可执行的恶意脚本
-    // 用户名应该以文本形式显示而不是被解析
+    // Page should not contain executable malicious scripts
+    // Username should be displayed as text, not parsed as HTML
   });
 
-  test("表单提交应该对输入进行清理", async ({ page }) => {
+  test("form submission should sanitize input", async ({ page }) => {
     await page.goto("/users");
 
-    // 点击添加用户（如果存在）
-    const addButton = page.getByRole("button", { name: /新增|添加/i });
+    // Click add user (if it exists)
+    const addButton = page.getByRole("button", { name: /new|add/i });
     if (await addButton.isVisible()) {
       await addButton.click();
 
-      // 尝试在输入框中输入 XSS payload
-      const nameInput = page.getByPlaceholder(/名称|用户名/i);
+      // Try entering XSS payload in input field
+      const nameInput = page.getByPlaceholder(/name|username/i);
       if (await nameInput.isVisible()) {
         await nameInput.fill('<script>alert("xss")</script>');
       }
 
-      // 提交表单
-      const submitButton = page.getByRole("button", { name: /保存|提交|确认/i });
+      // Submit form
+      const submitButton = page.getByRole("button", { name: /save|submit|confirm/i });
       if (await submitButton.isVisible()) {
         await submitButton.click();
 
-        // 验证没有 XSS 执行
+        // Verify no XSS execution
         await page.waitForTimeout(500);
-        // 如果有弹窗，测试失败
+        // If there are alerts, the test fails
       }
     }
   });
 });
 
-test.describe("安全测试 - SQL 注入防护", () => {
+test.describe("Security Tests - SQL Injection Protection", () => {
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedSession(page);
     await mockApiRoutes(page);
   });
 
-  test("搜索参数应该正确处理 SQL 注入尝试", async ({ page }) => {
+  test("search parameters should properly handle SQL injection attempts", async ({ page }) => {
     let lastRequestUrl: string | null = null;
 
     await page.route("**/api/v1/admin/users**", async (route) => {
@@ -221,21 +221,21 @@ test.describe("安全测试 - SQL 注入防护", () => {
 
     await page.goto("/users");
 
-    const searchInput = page.getByPlaceholder(/搜索/i);
+    const searchInput = page.getByPlaceholder(/search/i);
     if (await searchInput.isVisible()) {
       for (const payload of SQL_INJECTION_PAYLOADS) {
         await searchInput.fill(payload);
         await searchInput.press("Enter");
 
-        // 等待请求
+        // Wait for request
         await page.waitForTimeout(200);
 
-        // 验证 SQL 注入 payload 被正确编码
+        // Verify SQL injection payload is properly encoded
         if (lastRequestUrl) {
           const url = new URL(lastRequestUrl);
           const searchParam = url.searchParams.get("search");
           
-          // payload 应该被 URL 编码，而不是直接拼接
+            // Payload should be URL-encoded, not directly concatenated
           if (searchParam) {
             expect(searchParam).not.toContain("DROP TABLE");
             expect(searchParam).not.toContain("DELETE FROM");
@@ -249,12 +249,12 @@ test.describe("安全测试 - SQL 注入防护", () => {
   });
 });
 
-test.describe("安全测试 - 敏感数据保护", () => {
+test.describe("Security Tests - Sensitive Data Protection", () => {
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedSession(page);
   });
 
-  test("API 响应不应该泄露敏感信息", async ({ page }) => {
+  test("API responses should not leak sensitive information", async ({ page }) => {
     const responses: string[] = [];
 
     await page.route("**/api/v1/**", async (route) => {
@@ -263,7 +263,7 @@ test.describe("安全测试 - 敏感数据保护", () => {
           id: "user_1",
           email: "user@example.com",
           username: "user1",
-          // 不应该返回这些字段
+          // These fields should not be returned
           // password: "hashed_password",
           // api_key: "secret_key",
         },
@@ -275,20 +275,20 @@ test.describe("安全测试 - 敏感数据保护", () => {
     await page.goto("/users");
     await page.waitForLoadState("networkidle");
 
-    // 验证响应中不包含敏感信息
+    // Verify responses do not contain sensitive information
     for (const responseBody of responses) {
       for (const pattern of SENSITIVE_PATTERNS) {
         const match = pattern.exec(responseBody);
         if (match) {
-          // 如果匹配到的是结构字段名（如 "access_token": "..."），而不是实际值，需要进一步检查
-          // 这里我们主要检查不应该出现在 UI 可见响应中的敏感数据
+          // If matched is a structural field name (e.g. "access_token": "...") rather than actual values, further checks are needed
+          // Here we primarily check for sensitive data that should not appear in UI-visible responses
           console.warn(`Potential sensitive data in response: ${match[0]}`);
         }
       }
     }
   });
 
-  test("控制台不应该输出敏感信息", async ({ page }) => {
+  test("console should not output sensitive information", async ({ page }) => {
     const consoleLogs: string[] = [];
 
     page.on("console", (msg) => {
@@ -299,7 +299,7 @@ test.describe("安全测试 - 敏感数据保护", () => {
     await page.goto("/users");
     await page.waitForLoadState("networkidle");
 
-    // 检查控制台输出
+    // Check console output
     for (const log of consoleLogs) {
       for (const pattern of SENSITIVE_PATTERNS) {
         expect(log).not.toMatch(pattern);
@@ -307,7 +307,7 @@ test.describe("安全测试 - 敏感数据保护", () => {
     }
   });
 
-  test("敏感字段应该被脱敏显示", async ({ page }) => {
+  test("sensitive fields should be masked when displayed", async ({ page }) => {
     await page.route("**/api/v1/admin/secrets", async (route) => {
       return route.fulfill(
         respondOk({
@@ -315,7 +315,7 @@ test.describe("安全测试 - 敏感数据保护", () => {
             {
               id: "secret_1",
               name: "OpenAI API Key",
-              key_prefix: "sk-...", // 应该只显示前缀
+              key_prefix: "sk-...", // Should only show prefix
               description: "Production API key",
               status: "active",
             },
@@ -327,16 +327,16 @@ test.describe("安全测试 - 敏感数据保护", () => {
       );
     });
 
-    // 完整的 API key 不应该出现在页面上
+    // Full API key should not appear on the page
     const fullApiKey = "sk-1234567890abcdefghijklmnop";
     const pageContent = await page.content();
     expect(pageContent).not.toContain(fullApiKey);
   });
 
-  test("导出功能不应该包含敏感字段", async ({ page }) => {
-    // 模拟导出请求
+  test("export function should not include sensitive fields", async ({ page }) => {
+    // Mock export request
     await page.route("**/api/v1/admin/users/export", async (route) => {
-      // 导出数据不应该包含密码等敏感字段
+      // Export data should not contain sensitive fields like passwords
       const exportData = [
         {
           id: "user_1",
@@ -344,7 +344,7 @@ test.describe("安全测试 - 敏感数据保护", () => {
           username: "user1",
           role: "user",
           status: "active",
-          // 不包含 password, api_keys 等
+          // Does not include password, api_keys, etc.
         },
       ];
       return route.fulfill({
@@ -356,29 +356,29 @@ test.describe("安全测试 - 敏感数据保护", () => {
   });
 });
 
-test.describe("安全测试 - CSRF 防护", () => {
-  test("敏感操作应该需要确认", async ({ page }) => {
+test.describe("Security Tests - CSRF Protection", () => {
+  test("sensitive operations should require confirmation", async ({ page }) => {
     await setupAuthenticatedSession(page);
     await mockApiRoutes(page);
 
     await page.goto("/users/user_1");
 
-    // 点击危险操作按钮
-    const deleteButton = page.getByRole("button", { name: /删除|冻结/i });
+    // Click dangerous action button
+    const deleteButton = page.getByRole("button", { name: /delete|suspend/i });
     if (await deleteButton.isVisible()) {
       await deleteButton.click();
 
-      // 应该显示确认对话框
+      // Should display confirmation dialog
       const confirmDialog = page.locator('[role="alertdialog"], [role="dialog"]');
       await expect(confirmDialog).toBeVisible();
 
-      // 应该需要输入原因
-      const reasonInput = page.getByPlaceholder(/原因/i);
+      // Should require entering a reason
+      const reasonInput = page.getByPlaceholder(/reason/i);
       await expect(reasonInput).toBeVisible();
     }
   });
 
-  test("状态变更请求应该包含正确的方法", async ({ page }) => {
+  test("state change requests should use the correct HTTP method", async ({ page }) => {
     await setupAuthenticatedSession(page);
 
     let requestMethod: string | null = null;
@@ -393,8 +393,8 @@ test.describe("安全测试 - CSRF 防护", () => {
     await mockApiRoutes(page);
     await page.goto("/users/user_1");
 
-    // 执行状态变更操作
-    const statusButton = page.getByRole("button", { name: /冻结/i });
+    // Execute status change operation
+    const statusButton = page.getByRole("button", { name: /suspend/i });
     if (await statusButton.isVisible()) {
       await statusButton.click();
 

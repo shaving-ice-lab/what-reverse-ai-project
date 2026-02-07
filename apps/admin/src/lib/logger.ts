@@ -1,6 +1,6 @@
 /**
- * Admin 日志与追踪工具
- * 提供 trace_id/request_id 透传支持
+ * Admin Logging and Tracing Utility
+ * Provides trace_id/request_id propagation support
  */
 
 // ===== Types =====
@@ -42,28 +42,28 @@ const generateUuid = () => {
 };
 
 /**
- * 生成新的 trace_id
+ * Generate a new trace_id
  */
 export function generateTraceId(): string {
   return `trace-${generateUuid()}`;
 }
 
 /**
- * 生成新的 request_id
+ * Generate a new request_id
  */
 export function generateRequestId(): string {
   return `req-${generateUuid()}`;
 }
 
 /**
- * 设置全局 trace_id
+ * Set the global trace_id
  */
 export function setTraceId(traceId: string): void {
   globalTraceId = traceId;
 }
 
 /**
- * 获取当前 trace_id
+ * Get the current trace_id
  */
 export function getTraceId(): string {
   if (!globalTraceId) {
@@ -73,14 +73,14 @@ export function getTraceId(): string {
 }
 
 /**
- * 设置全局 request_id
+ * Set the global request_id
  */
 export function setRequestId(requestId: string): void {
   globalRequestId = requestId;
 }
 
 /**
- * 获取当前 request_id
+ * Get the current request_id
  */
 export function getRequestId(): string {
   if (!globalRequestId) {
@@ -90,7 +90,7 @@ export function getRequestId(): string {
 }
 
 /**
- * 清除追踪上下文
+ * Clear trace context
  */
 export function clearTraceContext(): void {
   globalTraceId = null;
@@ -98,7 +98,7 @@ export function clearTraceContext(): void {
 }
 
 /**
- * 创建新的请求上下文
+ * Create a new request context
  */
 export function createRequestContext(): { traceId: string; requestId: string } {
   const traceId = getTraceId();
@@ -114,7 +114,7 @@ interface LoggerConfig {
   enableConsole: boolean;
   enableRemote: boolean;
   remoteEndpoint?: string;
-  sampleRate: number; // 0-1, 用于采样
+  sampleRate: number; // 0-1, used for sampling
   maxBufferSize: number;
 }
 
@@ -218,7 +218,7 @@ async function flushLogs(): Promise<void> {
       body: JSON.stringify({ logs: logsToSend }),
     });
   } catch (err) {
-    // 发送失败时，将日志放回缓冲区（如果空间足够）
+    // On failure, put logs back into the buffer (if space allows)
     if (logBuffer.length + logsToSend.length <= config.maxBufferSize) {
       logBuffer.unshift(...logsToSend);
     }
@@ -270,7 +270,7 @@ export const logger = {
   },
 
   /**
-   * 带计时的日志方法
+   * Timed logging method
    */
   time<T>(
     label: string,
@@ -293,21 +293,21 @@ export const logger = {
   },
 
   /**
-   * 配置日志器
+   * Configure the logger
    */
   configure(newConfig: Partial<LoggerConfig>): void {
     config = { ...config, ...newConfig };
   },
 
   /**
-   * 立即刷新日志缓冲区
+   * Immediately flush the log buffer
    */
   flush(): Promise<void> {
     return flushLogs();
   },
 
   /**
-   * 创建带模块名称的子日志器
+   * Create a child logger with a module name
    */
   child(module: string): ModuleLogger {
     return new ModuleLogger(module);
@@ -409,19 +409,19 @@ export function logAudit(entry: AuditLogEntry): void {
 // ===== Browser Lifecycle =====
 
 if (typeof window !== 'undefined') {
-  // 页面卸载前刷新日志
+  // Flush logs before page unload
   window.addEventListener('beforeunload', () => {
     flushLogs();
   });
 
-  // 页面可见性变化时刷新日志
+  // Flush logs on visibility change
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       flushLogs();
     }
   });
 
-  // 每次导航时创建新的 trace_id
+  // Create a new trace_id on each navigation
   if ('navigation' in performance) {
     const navEntry = performance.getEntriesByType('navigation')[0];
     if (navEntry) {

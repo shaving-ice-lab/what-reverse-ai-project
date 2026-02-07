@@ -1,6 +1,6 @@
 /**
- * 安全测试清单
- * 系统化验证安全要求
+ * Security test checklist
+ * Systematic verification of security requirements
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -10,7 +10,7 @@ import {
   checkForSensitiveData,
 } from "@/test/utils";
 
-// 安全测试清单状态
+// Security test checklist status
 interface SecurityCheckItem {
   id: string;
   category: string;
@@ -21,203 +21,203 @@ interface SecurityCheckItem {
 }
 
 const SECURITY_CHECKLIST: SecurityCheckItem[] = [
-  // 认证与授权
+  // Authentication & Authorization
   {
     id: "SEC-001",
-    category: "认证",
-    description: "登录必须使用 HTTPS",
+    category: "Authentication",
+    description: "Login must use HTTPS",
     severity: "critical",
     status: "pass",
   },
   {
     id: "SEC-002",
-    category: "认证",
-    description: "密码必须加密传输",
+    category: "Authentication",
+    description: "Passwords must be encrypted in transit",
     severity: "critical",
     status: "pass",
   },
   {
     id: "SEC-003",
-    category: "认证",
-    description: "会话 Token 使用 httpOnly cookie 或安全存储",
+    category: "Authentication",
+    description: "Session tokens use httpOnly cookies or secure storage",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-004",
-    category: "认证",
-    description: "Token 过期后自动刷新或重新登录",
+    category: "Authentication",
+    description: "Tokens auto-refresh or require re-login after expiry",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-005",
-    category: "授权",
-    description: "API 端点检查用户权限",
+    category: "Authorization",
+    description: "API endpoints check user permissions",
     severity: "critical",
     status: "pass",
   },
   {
     id: "SEC-006",
-    category: "授权",
-    description: "前端根据权限显示/隐藏功能",
+    category: "Authorization",
+    description: "Frontend shows/hides features based on permissions",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-007",
-    category: "授权",
-    description: "敏感操作需要二次确认",
+    category: "Authorization",
+    description: "Sensitive operations require secondary confirmation",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-008",
-    category: "授权",
-    description: "管理员操作记录审计日志",
+    category: "Authorization",
+    description: "Admin operations are recorded in audit logs",
     severity: "high",
     status: "pass",
   },
 
-  // XSS 防护
+  // XSS Protection
   {
     id: "SEC-101",
-    category: "XSS 防护",
-    description: "用户输入在显示前进行转义",
+    category: "XSS Protection",
+    description: "User input is escaped before display",
     severity: "critical",
     status: "pass",
   },
   {
     id: "SEC-102",
-    category: "XSS 防护",
-    description: "使用 CSP 策略限制脚本执行",
+    category: "XSS Protection",
+    description: "CSP policy restricts script execution",
     severity: "high",
     status: "pending",
   },
   {
     id: "SEC-103",
-    category: "XSS 防护",
-    description: "React dangerouslySetInnerHTML 审查",
+    category: "XSS Protection",
+    description: "React dangerouslySetInnerHTML audit",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-104",
-    category: "XSS 防护",
-    description: "第三方内容沙箱隔离",
+    category: "XSS Protection",
+    description: "Third-party content sandboxed",
     severity: "medium",
     status: "not_applicable",
   },
 
-  // CSRF 防护
+  // CSRF Protection
   {
     id: "SEC-201",
-    category: "CSRF 防护",
-    description: "状态变更使用 POST/PATCH/DELETE 方法",
+    category: "CSRF Protection",
+    description: "State changes use POST/PATCH/DELETE methods",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-202",
-    category: "CSRF 防护",
-    description: "API 请求携带认证 Token",
+    category: "CSRF Protection",
+    description: "API requests carry authentication token",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-203",
-    category: "CSRF 防护",
-    description: "敏感操作要求确认",
+    category: "CSRF Protection",
+    description: "Sensitive operations require confirmation",
     severity: "medium",
     status: "pass",
   },
 
-  // 数据保护
+  // Data Protection
   {
     id: "SEC-301",
-    category: "数据保护",
-    description: "敏感字段脱敏显示（邮箱/密钥）",
+    category: "Data Protection",
+    description: "Sensitive fields are masked (email/keys)",
     severity: "high",
     status: "pass",
   },
   {
     id: "SEC-302",
-    category: "数据保护",
-    description: "API 响应不泄露敏感信息",
+    category: "Data Protection",
+    description: "API responses do not leak sensitive information",
     severity: "critical",
     status: "pass",
   },
   {
     id: "SEC-303",
-    category: "数据保护",
-    description: "控制台不输出敏感信息",
+    category: "Data Protection",
+    description: "Console does not output sensitive information",
     severity: "medium",
     status: "pass",
   },
   {
     id: "SEC-304",
-    category: "数据保护",
-    description: "导出数据不包含敏感字段",
+    category: "Data Protection",
+    description: "Exported data does not contain sensitive fields",
     severity: "high",
     status: "pass",
   },
 
-  // 输入验证
+  // Input Validation
   {
     id: "SEC-401",
-    category: "输入验证",
-    description: "所有输入进行长度限制",
+    category: "Input Validation",
+    description: "All inputs have length limits",
     severity: "medium",
     status: "pass",
   },
   {
     id: "SEC-402",
-    category: "输入验证",
-    description: "特殊字符正确处理",
+    category: "Input Validation",
+    description: "Special characters handled correctly",
     severity: "medium",
     status: "pass",
   },
   {
     id: "SEC-403",
-    category: "输入验证",
-    description: "文件上传类型和大小限制",
+    category: "Input Validation",
+    description: "File upload type and size restrictions",
     severity: "high",
     status: "not_applicable",
   },
   {
     id: "SEC-404",
-    category: "输入验证",
-    description: "SQL 注入防护",
+    category: "Input Validation",
+    description: "SQL injection protection",
     severity: "critical",
     status: "pass",
   },
 
-  // 错误处理
+  // Error Handling
   {
     id: "SEC-501",
-    category: "错误处理",
-    description: "错误信息不泄露系统细节",
+    category: "Error Handling",
+    description: "Error messages do not leak system details",
     severity: "medium",
     status: "pass",
   },
   {
     id: "SEC-502",
-    category: "错误处理",
-    description: "统一错误响应格式",
+    category: "Error Handling",
+    description: "Unified error response format",
     severity: "low",
     status: "pass",
   },
 ];
 
-describe("安全测试清单", () => {
-  describe("清单状态检查", () => {
-    it("应该没有失败的关键安全项", () => {
+describe("Security Test Checklist", () => {
+  describe("Checklist Status Check", () => {
+    it("should have no failed critical security items", () => {
       const criticalFails = SECURITY_CHECKLIST.filter(
         (item) => item.severity === "critical" && item.status === "fail"
       );
 
       if (criticalFails.length > 0) {
-        console.error("关键安全问题:");
+        console.error("Critical security issues:");
         criticalFails.forEach((item) => {
           console.error(`  - ${item.id}: ${item.description}`);
         });
@@ -226,13 +226,13 @@ describe("安全测试清单", () => {
       expect(criticalFails).toHaveLength(0);
     });
 
-    it("应该没有失败的高危安全项", () => {
+    it("should have no failed high-severity security items", () => {
       const highFails = SECURITY_CHECKLIST.filter(
         (item) => item.severity === "high" && item.status === "fail"
       );
 
       if (highFails.length > 0) {
-        console.warn("高危安全问题:");
+        console.warn("High-severity security issues:");
         highFails.forEach((item) => {
           console.warn(`  - ${item.id}: ${item.description}`);
         });
@@ -241,7 +241,7 @@ describe("安全测试清单", () => {
       expect(highFails).toHaveLength(0);
     });
 
-    it("输出安全清单状态报告", () => {
+    it("outputs security checklist status report", () => {
       const report = {
         total: SECURITY_CHECKLIST.length,
         passed: SECURITY_CHECKLIST.filter((i) => i.status === "pass").length,
@@ -263,30 +263,30 @@ describe("安全测试清单", () => {
         }
       });
 
-      console.log("\n========== 安全清单报告 ==========");
-      console.log(`总计: ${report.total} 项`);
-      console.log(`通过: ${report.passed} 项`);
-      console.log(`失败: ${report.failed} 项`);
-      console.log(`待定: ${report.pending} 项`);
-      console.log(`不适用: ${report.notApplicable} 项`);
-      console.log("\n按分类:");
+      console.log("\n========== Security Checklist Report ==========");
+      console.log(`Total: ${report.total} items`);
+      console.log(`Passed: ${report.passed} items`);
+      console.log(`Failed: ${report.failed} items`);
+      console.log(`Pending: ${report.pending} items`);
+      console.log(`Not applicable: ${report.notApplicable} items`);
+      console.log("\nBy category:");
       Object.entries(report.byCategory).forEach(([category, stats]) => {
-        console.log(`  ${category}: ${stats.passed}/${stats.total} 通过`);
+        console.log(`  ${category}: ${stats.passed}/${stats.total} passed`);
       });
       console.log("===================================\n");
 
-      // 确保通过率超过 80%
+      // Ensure pass rate exceeds 80%
       const passRate = report.passed / (report.total - report.notApplicable);
       expect(passRate).toBeGreaterThan(0.8);
     });
   });
 
-  describe("XSS 向量测试", () => {
-    it("应该检测所有 XSS 测试向量", () => {
+  describe("XSS Vector Tests", () => {
+    it("should detect all XSS test vectors", () => {
       expect(XSS_TEST_VECTORS.length).toBeGreaterThan(0);
 
       XSS_TEST_VECTORS.forEach((vector) => {
-        // 验证向量包含潜在危险内容
+        // Verify vector contains potentially dangerous content
         const hasDangerousContent =
           vector.includes("<script") ||
           vector.includes("javascript:") ||
@@ -298,7 +298,7 @@ describe("安全测试清单", () => {
       });
     });
 
-    it("HTML 转义应该正确工作", () => {
+    it("HTML escaping should work correctly", () => {
       const escapeHtml = (str: string) => {
         return str
           .replace(/&/g, "&amp;")
@@ -310,7 +310,7 @@ describe("安全测试清单", () => {
 
       XSS_TEST_VECTORS.forEach((vector) => {
         const escaped = escapeHtml(vector);
-        // 转义后不应该包含原始的 HTML 标签
+        // Escaped output should not contain raw HTML tags
         expect(escaped).not.toContain("<script");
         expect(escaped).not.toContain("<img");
         expect(escaped).not.toContain("<svg");
@@ -318,12 +318,12 @@ describe("安全测试清单", () => {
     });
   });
 
-  describe("SQL 注入向量测试", () => {
-    it("应该检测所有 SQL 注入测试向量", () => {
+  describe("SQL Injection Vector Tests", () => {
+    it("should detect all SQL injection test vectors", () => {
       expect(SQL_INJECTION_VECTORS.length).toBeGreaterThan(0);
 
       SQL_INJECTION_VECTORS.forEach((vector) => {
-        // 验证向量包含 SQL 关键字
+        // Verify vector contains SQL keywords
         const hasSqlKeyword =
           vector.toUpperCase().includes("DROP") ||
           vector.toUpperCase().includes("DELETE") ||
@@ -334,25 +334,25 @@ describe("安全测试清单", () => {
       });
     });
 
-    it("参数化查询应该安全处理 SQL 注入", () => {
-      // 模拟参数化查询
+    it("parameterized queries should safely handle SQL injection", () => {
+      // Simulate parameterized query
       const safeQuery = (search: string) => {
-        // 参数化查询会将参数作为值而非 SQL 代码处理
+        // Parameterized queries treat parameters as values, not SQL code
         return { query: "SELECT * FROM users WHERE name = $1", params: [search] };
       };
 
       SQL_INJECTION_VECTORS.forEach((vector) => {
         const result = safeQuery(vector);
-        // 参数应该作为独立值传递
+        // Parameters should be passed as separate values
         expect(result.params[0]).toBe(vector);
-        // 查询本身不应该包含用户输入
+        // The query itself should not contain user input
         expect(result.query).not.toContain(vector);
       });
     });
   });
 
-  describe("敏感数据检测", () => {
-    it("应该检测响应中的敏感数据", () => {
+  describe("Sensitive Data Detection", () => {
+    it("should detect sensitive data in responses", () => {
       const safeResponse = {
         user: {
           id: "user_1",
@@ -365,7 +365,7 @@ describe("安全测试清单", () => {
       expect(issues).toHaveLength(0);
     });
 
-    it("应该标记包含敏感字段的响应", () => {
+    it("should flag responses containing sensitive fields", () => {
       const unsafeResponse = {
         user: {
           id: "user_1",
@@ -378,7 +378,7 @@ describe("安全测试清单", () => {
       expect(issues.length).toBeGreaterThan(0);
     });
 
-    it("应该检测 API 密钥泄露", () => {
+    it("should detect API key leaks", () => {
       const responseWithApiKey = {
         config: {
           api_key: "sk-1234567890abcdef",
@@ -389,7 +389,7 @@ describe("安全测试清单", () => {
       expect(issues.length).toBeGreaterThan(0);
     });
 
-    it("应该检测 Token 泄露", () => {
+    it("should detect token leaks", () => {
       const responseWithToken = {
         debug: {
           access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -401,30 +401,30 @@ describe("安全测试清单", () => {
     });
   });
 
-  describe("密码策略验证", () => {
+  describe("Password Policy Validation", () => {
     const validatePassword = (password: string) => {
       const errors: string[] = [];
 
       if (password.length < 8) {
-        errors.push("密码长度至少 8 位");
+        errors.push("Password must be at least 8 characters");
       }
       if (!/[A-Z]/.test(password)) {
-        errors.push("密码需要包含大写字母");
+        errors.push("Password must contain an uppercase letter");
       }
       if (!/[a-z]/.test(password)) {
-        errors.push("密码需要包含小写字母");
+        errors.push("Password must contain a lowercase letter");
       }
       if (!/[0-9]/.test(password)) {
-        errors.push("密码需要包含数字");
+        errors.push("Password must contain a digit");
       }
       if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-        errors.push("密码需要包含特殊字符");
+        errors.push("Password must contain a special character");
       }
 
       return { valid: errors.length === 0, errors };
     };
 
-    it("应该拒绝弱密码", () => {
+    it("should reject weak passwords", () => {
       const weakPasswords = ["123456", "password", "qwerty", "abc123"];
 
       weakPasswords.forEach((pwd) => {
@@ -433,7 +433,7 @@ describe("安全测试清单", () => {
       });
     });
 
-    it("应该接受强密码", () => {
+    it("should accept strong passwords", () => {
       const strongPasswords = ["P@ssw0rd!", "Str0ng#Pass", "C0mplex$Pwd"];
 
       strongPasswords.forEach((pwd) => {
@@ -444,8 +444,8 @@ describe("安全测试清单", () => {
   });
 });
 
-describe("安全配置检查", () => {
-  it("应该使用安全的 HTTP 头", () => {
+describe("Security Configuration Check", () => {
+  it("should use secure HTTP headers", () => {
     const expectedHeaders = [
       "X-Content-Type-Options: nosniff",
       "X-Frame-Options: DENY",
@@ -454,7 +454,7 @@ describe("安全配置检查", () => {
       "Content-Security-Policy",
     ];
 
-    // 这里模拟检查，实际应该从服务器响应中获取
+    // Simulated check here; actual checks should come from server responses
     const mockHeaders = {
       "x-content-type-options": "nosniff",
       "x-frame-options": "DENY",
@@ -466,8 +466,8 @@ describe("安全配置检查", () => {
     expect(mockHeaders["x-frame-options"]).toBe("DENY");
   });
 
-  it("应该禁用不安全的 JavaScript 特性", () => {
-    // 检查代码中不应该使用的危险函数
+  it("should disable unsafe JavaScript features", () => {
+    // Check for dangerous functions that should not be used in code
     const dangerousFunctions = [
       "eval(",
       "new Function(",
@@ -477,10 +477,10 @@ describe("安全配置检查", () => {
       "innerHTML =",
     ];
 
-    // 在实际测试中，应该扫描代码库
-    // 这里只是示例
+    // In actual tests, the codebase should be scanned
+    // This is just an example
     dangerousFunctions.forEach((fn) => {
-      // 验证检测函数名正确
+      // Verify function name detection is correct
       expect(fn.length).toBeGreaterThan(0);
     });
   });

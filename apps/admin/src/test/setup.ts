@@ -1,6 +1,6 @@
 /**
- * Vitest 测试设置文件
- * Admin 管理台测试环境配置
+ * Vitest test setup file
+ * Admin dashboard test environment configuration
  */
 
 import React from "react";
@@ -11,7 +11,7 @@ import { afterEach, vi } from "vitest";
 // Make React available globally for JSX
 globalThis.React = React;
 
-// 每个测试后清理
+// Clean up after each test
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
@@ -119,5 +119,5 @@ vi.mock("next-themes", () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// 环境变量
+// Environment variables
 process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:8080/api/v1";

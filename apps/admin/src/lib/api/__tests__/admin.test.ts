@@ -1,6 +1,6 @@
 /**
- * Admin API 单元测试
- * 覆盖用户、Workspace、应用、工单等核心管理 API
+ * Admin API unit tests
+ * Covering users, workspaces, apps, tickets and other core management APIs
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -36,7 +36,7 @@ describe("Admin API", () => {
   });
 
   describe("capabilities", () => {
-    it("应该获取管理员能力点列表", async () => {
+    it("should fetch admin capabilities list", async () => {
       const mockCapabilities = { capabilities: ["users.read", "users.manage"] };
       mockApi.get.mockResolvedValue(mockCapabilities);
 
@@ -48,7 +48,7 @@ describe("Admin API", () => {
   });
 
   describe("users", () => {
-    it("应该获取用户列表", async () => {
+    it("should fetch user list", async () => {
       const mockUsers = {
         items: [{ id: "1", email: "test@example.com" }],
         total: 1,
@@ -65,7 +65,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockUsers);
     });
 
-    it("应该支持搜索和状态筛选", async () => {
+    it("should support search and status filtering", async () => {
       mockApi.get.mockResolvedValue({ items: [], total: 0, page: 1, page_size: 20 });
 
       await adminApi.users.list({ search: "test", status: "active", role: "admin" });
@@ -75,7 +75,7 @@ describe("Admin API", () => {
       });
     });
 
-    it("应该获取用户详情", async () => {
+    it("should fetch user details", async () => {
       const mockUser = { user: { id: "1", email: "test@example.com" } };
       mockApi.get.mockResolvedValue(mockUser);
 
@@ -85,23 +85,23 @@ describe("Admin API", () => {
       expect(result).toEqual(mockUser);
     });
 
-    it("应该更新用户状态", async () => {
+    it("should update user status", async () => {
       const mockResult = { user: { id: "1", status: "suspended" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
       const result = await adminApi.users.updateStatus("1", {
         status: "suspended",
-        reason: "违规操作",
+        reason: "Policy violation",
       });
 
       expect(mockApi.patch).toHaveBeenCalledWith("/admin/users/1/status", {
         status: "suspended",
-        reason: "违规操作",
+        reason: "Policy violation",
       });
       expect(result).toEqual(mockResult);
     });
 
-    it("应该更新用户角色", async () => {
+    it("should update user role", async () => {
       const mockResult = { user: { id: "1", role: "admin" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
@@ -115,7 +115,7 @@ describe("Admin API", () => {
   });
 
   describe("workspaces", () => {
-    it("应该获取 Workspace 列表", async () => {
+    it("should fetch workspace list", async () => {
       const mockWorkspaces = {
         items: [{ id: "1", name: "Test WS" }],
         total: 1,
@@ -132,7 +132,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockWorkspaces);
     });
 
-    it("应该获取 Workspace 详情", async () => {
+    it("should fetch workspace details", async () => {
       const mockWorkspace = {
         workspace: { id: "1", name: "Test WS" },
         members: [],
@@ -146,25 +146,25 @@ describe("Admin API", () => {
       expect(result).toEqual(mockWorkspace);
     });
 
-    it("应该更新 Workspace 状态", async () => {
+    it("should update workspace status", async () => {
       const mockResult = { workspace: { id: "1", status: "suspended" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
       const result = await adminApi.workspaces.updateStatus("1", {
         status: "suspended",
-        reason: "违规内容",
+        reason: "Violating content",
       });
 
       expect(mockApi.patch).toHaveBeenCalledWith("/admin/workspaces/1/status", {
         status: "suspended",
-        reason: "违规内容",
+        reason: "Violating content",
       });
       expect(result).toEqual(mockResult);
     });
   });
 
   describe("apps", () => {
-    it("应该获取应用列表", async () => {
+    it("should fetch app list", async () => {
       const mockApps = {
         items: [{ id: "1", name: "Test App" }],
         total: 1,
@@ -179,7 +179,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockApps);
     });
 
-    it("应该获取应用详情", async () => {
+    it("should fetch app details", async () => {
       const mockApp = {
         app: { id: "1", name: "Test App" },
         versions: [],
@@ -193,25 +193,25 @@ describe("Admin API", () => {
       expect(result).toEqual(mockApp);
     });
 
-    it("应该更新应用状态", async () => {
+    it("should update app status", async () => {
       const mockResult = { app: { id: "1", status: "deprecated" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
       const result = await adminApi.apps.updateStatus("1", {
         status: "deprecated",
-        reason: "版本过旧",
+        reason: "Outdated version",
       });
 
       expect(mockApi.patch).toHaveBeenCalledWith("/admin/apps/1/status", {
         status: "deprecated",
-        reason: "版本过旧",
+        reason: "Outdated version",
       });
       expect(result).toEqual(mockResult);
     });
   });
 
   describe("support.tickets", () => {
-    it("应该获取工单列表", async () => {
+    it("should fetch ticket list", async () => {
       const mockTickets = {
         items: [{ id: "1", subject: "Test Ticket" }],
         total: 1,
@@ -228,7 +228,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockTickets);
     });
 
-    it("应该获取工单详情", async () => {
+    it("should fetch ticket details", async () => {
       const mockTicket = { ticket: { id: "1", subject: "Test Ticket" } };
       mockApi.get.mockResolvedValue(mockTicket);
 
@@ -238,23 +238,23 @@ describe("Admin API", () => {
       expect(result).toEqual(mockTicket);
     });
 
-    it("应该更新工单状态", async () => {
+    it("should update ticket status", async () => {
       const mockResult = { ticket: { id: "1", status: "resolved" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
       const result = await adminApi.support.tickets.updateStatus("1", {
         status: "resolved",
-        note: "问题已解决",
+        note: "Issue resolved",
       });
 
       expect(mockApi.patch).toHaveBeenCalledWith("/admin/support/tickets/1/status", {
         status: "resolved",
-        note: "问题已解决",
+        note: "Issue resolved",
       });
       expect(result).toEqual(mockResult);
     });
 
-    it("应该获取工单评论", async () => {
+    it("should fetch ticket comments", async () => {
       const mockComments = { comments: [{ id: "1", body: "Test comment" }] };
       mockApi.get.mockResolvedValue(mockComments);
 
@@ -264,7 +264,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockComments);
     });
 
-    it("应该创建工单评论", async () => {
+    it("should create ticket comment", async () => {
       const mockComment = { comment: { id: "1", body: "New comment" } };
       mockApi.post.mockResolvedValue(mockComment);
 
@@ -286,7 +286,7 @@ describe("Admin API", () => {
   });
 
   describe("workflows", () => {
-    it("应该获取工作流列表", async () => {
+    it("should fetch workflow list", async () => {
       const mockWorkflows = {
         items: [{ id: "1", name: "Test Workflow" }],
         total: 1,
@@ -301,7 +301,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockWorkflows);
     });
 
-    it("应该获取工作流详情", async () => {
+    it("should fetch workflow details", async () => {
       const mockWorkflow = {
         workflow: { id: "1", name: "Test Workflow" },
         versions: [],
@@ -317,7 +317,7 @@ describe("Admin API", () => {
   });
 
   describe("executions", () => {
-    it("应该获取执行列表", async () => {
+    it("should fetch execution list", async () => {
       const mockExecutions = {
         items: [{ id: "1", status: "success" }],
         total: 1,
@@ -332,19 +332,19 @@ describe("Admin API", () => {
       expect(result).toEqual(mockExecutions);
     });
 
-    it("应该取消执行", async () => {
+    it("should cancel execution", async () => {
       const mockResult = { execution: { id: "1", status: "cancelled" } };
       mockApi.post.mockResolvedValue(mockResult);
 
-      const result = await adminApi.executions.cancel("1", { reason: "测试取消" });
+      const result = await adminApi.executions.cancel("1", { reason: "Test cancellation" });
 
       expect(mockApi.post).toHaveBeenCalledWith("/admin/executions/1/cancel", {
-        reason: "测试取消",
+        reason: "Test cancellation",
       });
       expect(result).toEqual(mockResult);
     });
 
-    it("应该重试执行", async () => {
+    it("should retry execution", async () => {
       const mockResult = { execution: { id: "1", status: "pending" } };
       mockApi.post.mockResolvedValue(mockResult);
 
@@ -356,7 +356,7 @@ describe("Admin API", () => {
   });
 
   describe("announcements", () => {
-    it("应该创建公告", async () => {
+    it("should create announcement", async () => {
       const mockResult = { announcement: { id: "1", title: "New Announcement" } };
       mockApi.post.mockResolvedValue(mockResult);
 
@@ -374,7 +374,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockResult);
     });
 
-    it("应该更新公告", async () => {
+    it("should update announcement", async () => {
       const mockResult = { announcement: { id: "1", is_active: false } };
       mockApi.patch.mockResolvedValue(mockResult);
 
@@ -388,44 +388,44 @@ describe("Admin API", () => {
   });
 
   describe("billing", () => {
-    it("应该处理提现请求", async () => {
-      const mockResult = { message: "处理成功" };
+    it("should process withdrawal request", async () => {
+      const mockResult = { message: "Processed successfully" };
       mockApi.post.mockResolvedValue(mockResult);
 
       const result = await adminApi.billing.withdrawals.process("1", {
         action: "approve",
-        reason: "审核通过",
+        reason: "Review approved",
       });
 
       expect(mockApi.post).toHaveBeenCalledWith(
         "/admin/earnings/withdrawals/1/process",
         {
           approved: true,
-          reason: "审核通过",
+          reason: "Review approved",
         }
       );
       expect(result).toEqual(mockResult);
     });
 
-    it("应该拒绝退款请求", async () => {
+    it("should reject refund request", async () => {
       const mockResult = { refund: { id: "1", status: "rejected" } };
       mockApi.post.mockResolvedValue(mockResult);
 
       const result = await adminApi.billing.refunds.process("1", {
         action: "reject",
-        reason: "不符合退款条件",
+        reason: "Does not meet refund criteria",
       });
 
       expect(mockApi.post).toHaveBeenCalledWith("/admin/billing/refunds/1/process", {
         action: "reject",
-        reason: "不符合退款条件",
+        reason: "Does not meet refund criteria",
       });
       expect(result).toEqual(mockResult);
     });
   });
 
   describe("templates", () => {
-    it("应该更新模板状态", async () => {
+    it("should update template status", async () => {
       const mockResult = { template: { id: "1", status: "featured" } };
       mockApi.patch.mockResolvedValue(mockResult);
 
@@ -440,7 +440,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockResult);
     });
 
-    it("应该设置模板精选状态", async () => {
+    it("should set template featured status", async () => {
       const mockResult = { template: { id: "1", is_featured: true } };
       mockApi.patch.mockResolvedValue(mockResult);
 
@@ -454,7 +454,7 @@ describe("Admin API", () => {
   });
 
   describe("tags", () => {
-    it("应该创建标签", async () => {
+    it("should create tag", async () => {
       const mockResult = { tag: { id: "1", name: "New Tag" } };
       mockApi.post.mockResolvedValue(mockResult);
 
@@ -472,7 +472,7 @@ describe("Admin API", () => {
       expect(result).toEqual(mockResult);
     });
 
-    it("应该删除标签", async () => {
+    it("should delete tag", async () => {
       mockApi.delete.mockResolvedValue({});
 
       await adminApi.tags.delete("1");
@@ -482,26 +482,26 @@ describe("Admin API", () => {
   });
 
   describe("security", () => {
-    it("应该轮换密钥", async () => {
+    it("should rotate secret", async () => {
       const mockResult = { secret: { id: "1", status: "active" } };
       mockApi.post.mockResolvedValue(mockResult);
 
-      const result = await adminApi.security.secrets.rotate("1", { reason: "定期轮换" });
+      const result = await adminApi.security.secrets.rotate("1", { reason: "Scheduled rotation" });
 
       expect(mockApi.post).toHaveBeenCalledWith("/admin/secrets/1/rotate", {
-        reason: "定期轮换",
+        reason: "Scheduled rotation",
       });
       expect(result).toEqual(mockResult);
     });
 
-    it("应该禁用密钥", async () => {
+    it("should disable secret", async () => {
       const mockResult = { secret: { id: "1", status: "disabled" } };
       mockApi.post.mockResolvedValue(mockResult);
 
-      const result = await adminApi.security.secrets.disable("1", { reason: "安全风险" });
+      const result = await adminApi.security.secrets.disable("1", { reason: "Security risk" });
 
       expect(mockApi.post).toHaveBeenCalledWith("/admin/secrets/1/disable", {
-        reason: "安全风险",
+        reason: "Security risk",
       });
       expect(result).toEqual(mockResult);
     });

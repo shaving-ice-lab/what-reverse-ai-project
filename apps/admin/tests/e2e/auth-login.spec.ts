@@ -1,6 +1,6 @@
 /**
- * Admin 登录流程 E2E 测试
- * 关键管理流程：登录认证
+ * Admin login flow E2E tests
+ * Critical management flow: login authentication
  */
 
 import { test, expect, type Page } from "@playwright/test";
@@ -36,7 +36,7 @@ async function mockApiRoutes(page: Page) {
     const path = url.pathname;
     const method = request.method();
 
-    // 登录
+    // Login
     if (path === "/api/v1/auth/login" && method === "POST") {
       const body = request.postDataJSON();
       
@@ -50,15 +50,15 @@ async function mockApiRoutes(page: Page) {
         );
       }
       
-      return route.fulfill(respondError("INVALID_CREDENTIALS", "邮箱或密码错误", 401));
+      return route.fulfill(respondError("INVALID_CREDENTIALS", "Invalid email or password", 401));
     }
 
-    // 获取当前用户
+    // Get current user
     if (path === "/api/v1/users/me") {
       return route.fulfill(respondOk(adminUser));
     }
 
-    // 获取管理员能力点
+    // Get admin capabilities
     if (path === "/api/v1/admin/capabilities") {
       return route.fulfill(
         respondOk({
@@ -76,7 +76,7 @@ async function mockApiRoutes(page: Page) {
       );
     }
 
-    // Token 刷新
+    // Token refresh
     if (path === "/api/v1/auth/refresh" && method === "POST") {
       return route.fulfill(
         respondOk({
@@ -86,87 +86,87 @@ async function mockApiRoutes(page: Page) {
       );
     }
 
-    // 默认响应
+    // Default response
     return route.fulfill(respondOk({}));
   });
 }
 
-test.describe("Admin 登录流程", () => {
+test.describe("Admin Login Flow", () => {
   test.beforeEach(async ({ page }) => {
     await mockApiRoutes(page);
   });
 
-  test("应该成功登录并跳转到仪表盘", async ({ page }) => {
+  test("should successfully log in and redirect to dashboard", async ({ page }) => {
     await page.goto("/login");
 
-    // 输入邮箱
-    await page.getByPlaceholder("请输入邮箱").fill("admin@agentflow.ai");
-    await page.getByRole("button", { name: "继续" }).click();
+    // Enter email
+    await page.getByPlaceholder("Enter your email").fill("admin@agentflow.ai");
+    await page.getByRole("button", { name: "Continue" }).click();
 
-    // 输入密码
-    await page.getByPlaceholder("输入密码").fill("admin123");
-    await page.getByRole("button", { name: "登录" }).click();
+    // Enter password
+    await page.getByPlaceholder("Enter password").fill("admin123");
+    await page.getByRole("button", { name: "Sign in" }).click();
 
-    // 等待跳转到仪表盘
+    // Wait for redirect to dashboard
     await expect(page).toHaveURL(/\/$/);
   });
 
-  test("登录失败时应该显示错误信息", async ({ page }) => {
+  test("should display error message on login failure", async ({ page }) => {
     await page.goto("/login");
 
-    // 输入邮箱
-    await page.getByPlaceholder("请输入邮箱").fill("admin@agentflow.ai");
-    await page.getByRole("button", { name: "继续" }).click();
+    // Enter email
+    await page.getByPlaceholder("Enter your email").fill("admin@agentflow.ai");
+    await page.getByRole("button", { name: "Continue" }).click();
 
-    // 输入错误密码
-    await page.getByPlaceholder("输入密码").fill("wrongpassword");
-    await page.getByRole("button", { name: "登录" }).click();
+    // Enter wrong password
+    await page.getByPlaceholder("Enter password").fill("wrongpassword");
+    await page.getByRole("button", { name: "Sign in" }).click();
 
-    // 应该显示错误信息
-    await expect(page.getByText("邮箱或密码错误")).toBeVisible();
+    // Should display error message
+    await expect(page.getByText("Invalid email or password")).toBeVisible();
   });
 
-  test("未登录时访问仪表盘应该跳转到登录页", async ({ page }) => {
-    // 清除登录状态
+  test("should redirect to login page when accessing dashboard without login", async ({ page }) => {
+    // Clear login state
     await page.context().clearCookies();
 
     await page.goto("/");
 
-    // 应该被重定向到登录页
+    // Should be redirected to login page
     await expect(page).toHaveURL(/\/login/);
   });
 
-  test("登录后应该能获取管理员能力点", async ({ page }) => {
+  test("should fetch admin capabilities after login", async ({ page }) => {
     await page.goto("/login");
 
-    // 完成登录
-    await page.getByPlaceholder("请输入邮箱").fill("admin@agentflow.ai");
-    await page.getByRole("button", { name: "继续" }).click();
-    await page.getByPlaceholder("输入密码").fill("admin123");
-    await page.getByRole("button", { name: "登录" }).click();
+    // Complete login
+    await page.getByPlaceholder("Enter your email").fill("admin@agentflow.ai");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByPlaceholder("Enter password").fill("admin123");
+    await page.getByRole("button", { name: "Sign in" }).click();
 
-    // 等待仪表盘加载
+    // Wait for dashboard to load
     await expect(page).toHaveURL(/\/$/);
 
-    // 导航应该可见
+    // Navigation should be visible
     await expect(page.getByRole("navigation")).toBeVisible();
   });
 
-  test("登录页应该支持回车提交", async ({ page }) => {
+  test("login page should support Enter key submission", async ({ page }) => {
     await page.goto("/login");
 
-    // 输入邮箱并按回车
-    await page.getByPlaceholder("请输入邮箱").fill("admin@agentflow.ai");
-    await page.getByPlaceholder("请输入邮箱").press("Enter");
+    // Enter email and press Enter
+    await page.getByPlaceholder("Enter your email").fill("admin@agentflow.ai");
+    await page.getByPlaceholder("Enter your email").press("Enter");
 
-    // 应该进入密码输入阶段
-    await expect(page.getByPlaceholder("输入密码")).toBeVisible();
+    // Should enter password input stage
+    await expect(page.getByPlaceholder("Enter password")).toBeVisible();
 
-    // 输入密码并按回车
-    await page.getByPlaceholder("输入密码").fill("admin123");
-    await page.getByPlaceholder("输入密码").press("Enter");
+    // Enter password and press Enter
+    await page.getByPlaceholder("Enter password").fill("admin123");
+    await page.getByPlaceholder("Enter password").press("Enter");
 
-    // 等待跳转
+    // Wait for redirect
     await expect(page).toHaveURL(/\/$/);
   });
 });

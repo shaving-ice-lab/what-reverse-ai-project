@@ -29,7 +29,7 @@ export interface Workspace {
   owner?: User | null;
 }
  
-/** @deprecated Workspace = App，使用 Workspace 类型代替 */
+/** @deprecated Workspace = App, use Workspace type instead */
 export type App = Workspace;
 
 export interface WorkspaceRole {
@@ -66,7 +66,7 @@ export interface WorkspaceVersion {
   created_at: string;
   creator?: User | null;
 }
-/** @deprecated 使用 WorkspaceVersion 代替 */
+/** @deprecated Use WorkspaceVersion instead */
 export type AppVersion = WorkspaceVersion;
 
 export interface WorkspaceAccessPolicy {
@@ -82,7 +82,7 @@ export interface WorkspaceAccessPolicy {
   created_at: string;
   updater?: User | null;
 }
-/** @deprecated 使用 WorkspaceAccessPolicy 代替 */
+/** @deprecated Use WorkspaceAccessPolicy instead */
 export type AppAccessPolicy = WorkspaceAccessPolicy;
 
 export interface WorkspaceDomain {
@@ -97,7 +97,7 @@ export interface WorkspaceDomain {
   created_at: string;
   updated_at: string;
 }
-/** @deprecated 使用 WorkspaceDomain 代替 */
+/** @deprecated Use WorkspaceDomain instead */
 export type AppDomain = WorkspaceDomain;
  
 export type SupportTicketPriority = "low" | "medium" | "high" | "urgent";
@@ -567,7 +567,7 @@ export interface WorkspaceUsageMetric {
   peak_concurrent_users: number;
   updated_at: string;
 }
-/** @deprecated 使用 WorkspaceUsageMetric 代替 */
+/** @deprecated Use WorkspaceUsageMetric instead */
 export type AppUsageMetric = WorkspaceUsageMetric;
 
 // Export job types

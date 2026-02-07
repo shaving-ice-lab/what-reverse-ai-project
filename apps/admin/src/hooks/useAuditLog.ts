@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 审计日志 Hook
- * 提供便捷的操作审计记录能力
+ * Audit Log Hook
+ * Provides convenient audit logging capabilities
  */
 
 import { useCallback, useRef } from "react";
@@ -20,11 +20,11 @@ import {
 
 interface UseAuditLogOptions {
   /**
-   * 是否在高风险操作时显示确认
+   * Whether to show confirmation for high-risk operations
    */
   confirmHighRisk?: boolean;
   /**
-   * 自定义确认消息
+   * Custom confirmation message
    */
   confirmMessage?: string;
 }
@@ -44,7 +44,7 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
   const pendingLogs = useRef<AuditLogEntry[]>([]);
 
   /**
-   * 记录单条审计日志
+   * Record a single audit log entry
    */
   const log = useCallback(
     async (params: AuditLogParams): Promise<string | null> => {
@@ -65,7 +65,7 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
         return result.id;
       } catch (error) {
         console.error("[AuditLog] Failed to log:", error);
-        // 失败时添加到待发送队列
+        // Add to pending queue on failure
         pendingLogs.current.push({
           action: params.action,
           target_type: params.target_type,
@@ -80,7 +80,7 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
   );
 
   /**
-   * 批量记录审计日志
+   * Batch record audit log entries
    */
   const logBatch = useCallback(
     async (entries: AuditLogParams[]): Promise<string[]> => {
@@ -101,7 +101,7 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
         return result.ids;
       } catch (error) {
         console.error("[AuditLog] Failed to log batch:", error);
-        // 失败时添加到待发送队列
+        // Add to pending queue on failure
         pendingLogs.current.push(
           ...entries.map((e) => ({
             action: e.action,
@@ -118,8 +118,8 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
   );
 
   /**
-   * 执行带审计的操作
-   * 自动在操作前后记录审计日志
+   * Execute an operation with audit logging
+   * Automatically records audit logs before and after the operation
    */
   const withAudit = useCallback(
     async <T>(
@@ -154,7 +154,7 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
   );
 
   /**
-   * 重试发送待处理的审计日志
+   * Retry sending pending audit logs
    */
   const flushPendingLogs = useCallback(async (): Promise<number> => {
     if (pendingLogs.current.length === 0) return 0;
@@ -166,35 +166,35 @@ export function useAuditLog(options: UseAuditLogOptions = {}) {
       await auditApi.logBatch(logs);
       return logs.length;
     } catch {
-      // 失败时放回队列
+      // Put back into queue on failure
       pendingLogs.current = [...logs, ...pendingLogs.current];
       return 0;
     }
   }, []);
 
   /**
-   * 检查操作是否需要审批
+   * Check if an action requires approval
    */
   const checkRequiresApproval = useCallback((action: AuditAction): boolean => {
     return requiresApproval(action);
   }, []);
 
   /**
-   * 检查操作是否为高风险
+   * Check if an action is high risk
    */
   const checkIsHighRisk = useCallback((action: AuditAction): boolean => {
     return isHighRiskAction(action);
   }, []);
 
   /**
-   * 获取操作的风险级别
+   * Get the risk level of an action
    */
   const getRiskLevel = useCallback((action: AuditAction) => {
     return getActionRiskLevel(action);
   }, []);
 
   /**
-   * 获取操作的中文标签
+   * Get the label for an action
    */
   const getActionLabel = useCallback((action: AuditAction): string => {
     return AUDIT_ACTION_LABELS[action] || action;

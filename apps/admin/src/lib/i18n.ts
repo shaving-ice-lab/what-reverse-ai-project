@@ -8,8 +8,8 @@
 
 export type DateFormatStyle = "full" | "long" | "medium" | "short" | "relative";
 
-const DEFAULT_LOCALE = "zh-CN";
-const DEFAULT_TIMEZONE = "Asia/Shanghai";
+const DEFAULT_LOCALE = "en-US";
+const DEFAULT_TIMEZONE = "America/New_York";
 
 /**
  * Get the user's timezone from browser or fallback to default
@@ -51,7 +51,7 @@ export function formatDate(
   const d = date instanceof Date ? date : new Date(date);
 
   if (isNaN(d.getTime())) {
-    return "无效日期";
+    return "Invalid Date";
   }
 
   // Relative time for recent dates
@@ -95,7 +95,7 @@ export function formatDate(
 }
 
 /**
- * Format relative time (e.g., "3 分钟前", "2 小时后")
+ * Format relative time (e.g., "3 minutes ago", "in 2 hours")
  */
 export function formatRelativeTime(date: Date | string | number, locale = getUserLocale()): string {
   const d = date instanceof Date ? date : new Date(date);
@@ -175,7 +175,7 @@ export function formatNumber(
   const {
     locale = getUserLocale(),
     style = "decimal",
-    currency = "CNY",
+    currency = "USD",
     minimumFractionDigits,
     maximumFractionDigits,
   } = options || {};
@@ -198,7 +198,7 @@ export function formatNumber(
  */
 export function formatCurrency(
   value: number,
-  currency = "CNY",
+  currency = "USD",
   locale = getUserLocale()
 ): string {
   return formatNumber(value, {
@@ -282,18 +282,7 @@ function formatDurationUnit(
   locale: string,
   style: "narrow" | "short" | "long"
 ): string {
-  // Use a simple approach for Chinese
-  if (locale.startsWith("zh")) {
-    const unitMap: Record<string, string> = {
-      day: "天",
-      hour: "小时",
-      minute: "分钟",
-      second: "秒",
-    };
-    return `${value}${unitMap[unit] || unit}`;
-  }
-
-  // Use Intl for other locales
+  // Use Intl for all locales
   const formatter = new Intl.NumberFormat(locale, {
     style: "unit",
     unit,
@@ -307,40 +296,40 @@ function formatDurationUnit(
 // ============================================
 
 const translations: Record<string, Record<string, string>> = {
-  "zh-CN": {
-    "common.loading": "加载中...",
-    "common.error": "发生错误",
-    "common.retry": "重试",
-    "common.cancel": "取消",
-    "common.confirm": "确认",
-    "common.save": "保存",
-    "common.delete": "删除",
-    "common.edit": "编辑",
-    "common.create": "创建",
-    "common.search": "搜索",
-    "common.filter": "筛选",
-    "common.export": "导出",
-    "common.import": "导入",
-    "common.all": "全部",
-    "common.none": "无",
-    "common.yes": "是",
-    "common.no": "否",
-    "status.active": "活跃",
-    "status.inactive": "非活跃",
-    "status.suspended": "已暂停",
-    "status.pending": "待处理",
-    "status.completed": "已完成",
-    "status.failed": "失败",
-    "user.role.admin": "管理员",
-    "user.role.user": "普通用户",
-    "user.status.active": "活跃",
-    "user.status.suspended": "已暂停",
-    "ticket.priority.low": "低",
-    "ticket.priority.medium": "中",
-    "ticket.priority.high": "高",
-    "ticket.priority.urgent": "紧急",
-  },
   en: {
+    "common.loading": "Loading...",
+    "common.error": "An error occurred",
+    "common.retry": "Retry",
+    "common.cancel": "Cancel",
+    "common.confirm": "Confirm",
+    "common.save": "Save",
+    "common.delete": "Delete",
+    "common.edit": "Edit",
+    "common.create": "Create",
+    "common.search": "Search",
+    "common.filter": "Filter",
+    "common.export": "Export",
+    "common.import": "Import",
+    "common.all": "All",
+    "common.none": "None",
+    "common.yes": "Yes",
+    "common.no": "No",
+    "status.active": "Active",
+    "status.inactive": "Inactive",
+    "status.suspended": "Suspended",
+    "status.pending": "Pending",
+    "status.completed": "Completed",
+    "status.failed": "Failed",
+    "user.role.admin": "Admin",
+    "user.role.user": "User",
+    "user.status.active": "Active",
+    "user.status.suspended": "Suspended",
+    "ticket.priority.low": "Low",
+    "ticket.priority.medium": "Medium",
+    "ticket.priority.high": "High",
+    "ticket.priority.urgent": "Urgent",
+  },
+  "zh-CN": {
     "common.loading": "Loading...",
     "common.error": "An error occurred",
     "common.retry": "Retry",
@@ -381,7 +370,7 @@ const translations: Record<string, Record<string, string>> = {
 export function t(key: string, locale = getUserLocale()): string {
   const lang = locale.split("-")[0];
   const fullLocale = translations[locale] ? locale : lang;
-  return translations[fullLocale]?.[key] || translations["zh-CN"]?.[key] || key;
+  return translations[fullLocale]?.[key] || translations["en"]?.[key] || key;
 }
 
 /**
@@ -389,8 +378,8 @@ export function t(key: string, locale = getUserLocale()): string {
  */
 export function getSupportedLocales(): { code: string; name: string }[] {
   return [
-    { code: "zh-CN", name: "简体中文" },
     { code: "en", name: "English" },
+    { code: "zh-CN", name: "Simplified Chinese" },
   ];
 }
 
@@ -399,13 +388,13 @@ export function getSupportedLocales(): { code: string; name: string }[] {
  */
 export function getCommonTimezones(): { value: string; label: string }[] {
   return [
-    { value: "Asia/Shanghai", label: "中国标准时间 (UTC+8)" },
-    { value: "Asia/Tokyo", label: "日本标准时间 (UTC+9)" },
-    { value: "Asia/Singapore", label: "新加坡时间 (UTC+8)" },
-    { value: "America/New_York", label: "美国东部时间 (UTC-5/-4)" },
-    { value: "America/Los_Angeles", label: "美国太平洋时间 (UTC-8/-7)" },
-    { value: "Europe/London", label: "英国时间 (UTC+0/+1)" },
-    { value: "Europe/Paris", label: "中欧时间 (UTC+1/+2)" },
-    { value: "UTC", label: "协调世界时 (UTC)" },
+    { value: "Asia/Shanghai", label: "China Standard Time (UTC+8)" },
+    { value: "Asia/Tokyo", label: "Japan Standard Time (UTC+9)" },
+    { value: "Asia/Singapore", label: "Singapore Time (UTC+8)" },
+    { value: "America/New_York", label: "US Eastern Time (UTC-5/-4)" },
+    { value: "America/Los_Angeles", label: "US Pacific Time (UTC-8/-7)" },
+    { value: "Europe/London", label: "UK Time (UTC+0/+1)" },
+    { value: "Europe/Paris", label: "Central European Time (UTC+1/+2)" },
+    { value: "UTC", label: "Coordinated Universal Time (UTC)" },
   ];
 }

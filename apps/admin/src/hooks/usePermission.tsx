@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 权限检查 Hook
- * 提供便捷的权限验证能力
+ * Permission Check Hook
+ * Provides convenient permission verification capabilities
  */
 
 import { useCallback, useMemo } from "react";
@@ -22,9 +22,9 @@ import {
 export function usePermission() {
   const { capabilities, hasCapability } = useAdminCapabilities();
 
-  // 从用户角色或能力点推断管理员角色
+  // Infer admin role from user roles or capabilities
   const adminRole = useMemo<AdminRole>(() => {
-    // 检查是否有超级管理员能力
+    // Check for super admin capability
     if (hasCapability("admin.super")) return "super_admin";
     if (hasCapability("admin.ops")) return "ops";
     if (hasCapability("admin.support")) return "support";
@@ -32,25 +32,25 @@ export function usePermission() {
     if (hasCapability("admin.reviewer")) return "reviewer";
     if (hasCapability("admin.viewer")) return "viewer";
 
-    // 默认为只读
+    // Default to read-only
     return "viewer";
   }, [hasCapability]);
 
   /**
-   * 检查是否有指定权限点
+   * Check if the user has the specified permission point
    */
   const hasPermission = useCallback(
     (permissionKey: string): boolean => {
-      // 首先检查能力点
+      // First check capabilities
       if (hasCapability(permissionKey)) return true;
-      // 然后检查角色权限
+      // Then check role permissions
       return hasPermissionPoint(adminRole, permissionKey);
     },
     [adminRole, hasCapability]
   );
 
   /**
-   * 检查是否有模块权限
+   * Check if the user has module permission
    */
   const hasModule = useCallback(
     (module: string, level: PermissionLevel = "read"): boolean => {
@@ -60,7 +60,7 @@ export function usePermission() {
   );
 
   /**
-   * 检查是否可以访问页面
+   * Check if the user can access a page
    */
   const canAccess = useCallback(
     (path: string): boolean => {
@@ -70,7 +70,7 @@ export function usePermission() {
   );
 
   /**
-   * 检查是否有多个权限中的任一个
+   * Check if the user has any of the specified permissions
    */
   const hasAnyPermission = useCallback(
     (permissionKeys: string[]): boolean => {
@@ -80,7 +80,7 @@ export function usePermission() {
   );
 
   /**
-   * 检查是否有所有指定权限
+   * Check if the user has all of the specified permissions
    */
   const hasAllPermissions = useCallback(
     (permissionKeys: string[]): boolean => {
@@ -90,28 +90,28 @@ export function usePermission() {
   );
 
   /**
-   * 获取当前角色的所有权限点
+   * Get all permission points for the current role
    */
   const rolePermissions = useMemo<PermissionPoint[]>(() => {
     return getRolePermissions(adminRole);
   }, [adminRole]);
 
   /**
-   * 获取角色的中文名称
+   * Get the role label
    */
   const roleLabel = useMemo<string>(() => {
     return ADMIN_ROLE_LABELS[adminRole];
   }, [adminRole]);
 
   /**
-   * 检查是否为超级管理员
+   * Check if the user is a super admin
    */
   const isSuperAdmin = useMemo<boolean>(() => {
     return adminRole === "super_admin";
   }, [adminRole]);
 
   /**
-   * 检查是否有写权限
+   * Check if the user has write permission
    */
   const canWrite = useCallback(
     (module: string): boolean => {
@@ -121,7 +121,7 @@ export function usePermission() {
   );
 
   /**
-   * 获取用户可访问的模块列表
+   * Get the list of modules accessible to the user
    */
   const accessibleModules = useMemo<string[]>(() => {
     const modules = new Set<string>();
@@ -150,7 +150,7 @@ export function usePermission() {
 }
 
 /**
- * 权限检查组件 Props
+ * Permission Check Component Props
  */
 export interface RequirePermissionProps {
   permission?: string;
@@ -161,8 +161,8 @@ export interface RequirePermissionProps {
 }
 
 /**
- * 权限控制组件
- * 根据权限决定是否渲染子组件
+ * Permission Control Component
+ * Renders children based on permission checks
  */
 export function RequirePermission({
   permission,

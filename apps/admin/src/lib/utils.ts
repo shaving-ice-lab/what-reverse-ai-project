@@ -2,19 +2,19 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 /**
- * 合并 Tailwind CSS 类名
- * 使用 clsx 处理条件类名，使用 tailwind-merge 处理冲突
+ * Merge Tailwind CSS class names
+ * Uses clsx for conditional class names and tailwind-merge for conflict resolution
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 /**
- * 格式化日期
+ * Format date
  */
 export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("zh-CN", {
+  return d.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -23,7 +23,7 @@ export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOpt
 }
 
 /**
- * 格式化相对时间
+ * Format relative time
  */
 export function formatRelativeTime(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
@@ -35,23 +35,23 @@ export function formatRelativeTime(date: Date | string): string {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   
-  if (seconds < 60) return "刚刚";
-  if (minutes < 60) return `${minutes} 分钟前`;
-  if (hours < 24) return `${hours} 小时前`;
-  if (days < 7) return `${days} 天前`;
+  if (seconds < 60) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hr ago`;
+  if (days < 7) return `${days} days ago`;
   
   return formatDate(d);
 }
 
 /**
- * 延迟执行
+ * Delay execution
  */
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
- * 生成唯一 ID
+ * Generate unique ID
  */
 export function generateId(prefix = ""): string {
   const timestamp = Date.now().toString(36);
@@ -60,14 +60,14 @@ export function generateId(prefix = ""): string {
 }
 
 /**
- * 深拷贝对象
+ * Deep clone object
  */
 export function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
 /**
- * 截断文本
+ * Truncate text
  */
 export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
@@ -75,7 +75,7 @@ export function truncate(str: string, length: number): string {
 }
 
 /**
- * 字节格式化
+ * Format bytes
  */
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return "0 Bytes";

@@ -1,6 +1,6 @@
 /**
- * API Client 单元测试
- * 覆盖核心请求、错误处理、重试逻辑
+ * API Client unit tests
+ * Covering core requests, error handling, retry logic
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -23,8 +23,8 @@ describe("API Client", () => {
     vi.restoreAllMocks();
   });
 
-  describe("基础请求", () => {
-    it("应该正确发送 GET 请求", async () => {
+  describe("Basic Requests", () => {
+    it("should correctly send GET request", async () => {
       const mockResponse = { code: "OK", message: "OK", data: { id: "1" } };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -38,7 +38,7 @@ describe("API Client", () => {
       expect(result).toEqual({ id: "1" });
     });
 
-    it("应该正确发送 POST 请求并传递 body", async () => {
+    it("should correctly send POST request with body", async () => {
       const mockResponse = { code: "OK", message: "OK", data: { created: true } };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -55,7 +55,7 @@ describe("API Client", () => {
       expect(result).toEqual({ created: true });
     });
 
-    it("应该正确发送 PATCH 请求", async () => {
+    it("should correctly send PATCH request", async () => {
       const mockResponse = { code: "OK", message: "OK", data: { updated: true } };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -70,7 +70,7 @@ describe("API Client", () => {
       expect(result).toEqual({ updated: true });
     });
 
-    it("应该正确发送 DELETE 请求", async () => {
+    it("should correctly send DELETE request", async () => {
       const mockResponse = { code: "OK", message: "OK", data: {} };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -84,8 +84,8 @@ describe("API Client", () => {
     });
   });
 
-  describe("查询参数处理", () => {
-    it("应该正确附加查询参数", async () => {
+  describe("Query Parameter Handling", () => {
+    it("should correctly append query parameters", async () => {
       const mockResponse = { code: "OK", message: "OK", data: [] };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -101,7 +101,7 @@ describe("API Client", () => {
       expect(url).toContain("search=test");
     });
 
-    it("应该忽略 undefined 参数值", async () => {
+    it("should ignore undefined parameter values", async () => {
       const mockResponse = { code: "OK", message: "OK", data: [] };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -117,8 +117,8 @@ describe("API Client", () => {
     });
   });
 
-  describe("认证处理", () => {
-    it("应该在请求中添加 Authorization header", async () => {
+  describe("Authentication Handling", () => {
+    it("should add Authorization header to requests", async () => {
       setTokens("test-access-token", "test-refresh-token");
 
       const mockResponse = { code: "OK", message: "OK", data: {} };
@@ -134,7 +134,7 @@ describe("API Client", () => {
       expect(headers.get("Authorization")).toBe("Bearer test-access-token");
     });
 
-    it("无 token 时不应该添加 Authorization header", async () => {
+    it("should not add Authorization header when no token exists", async () => {
       clearTokens();
 
       const mockResponse = { code: "OK", message: "OK", data: {} };
@@ -150,29 +150,29 @@ describe("API Client", () => {
       expect(headers.has("Authorization")).toBe(false);
     });
 
-    it("getAccessToken 应该返回缓存的 token", () => {
+    it("getAccessToken should return cached token", () => {
       setTokens("cached-token", "refresh-token");
       expect(getAccessToken()).toBe("cached-token");
     });
 
-    it("clearTokens 应该清除所有 token", () => {
+    it("clearTokens should clear all tokens", () => {
       setTokens("token", "refresh");
       clearTokens();
       expect(getAccessToken()).toBeNull();
     });
   });
 
-  describe("错误处理", () => {
-    it("应该在 HTTP 错误时抛出 ApiError", async () => {
+  describe("Error Handling", () => {
+    it("should throw ApiError on HTTP errors", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 400,
         json: () =>
           Promise.resolve({
             code: "VALIDATION_ERROR",
-            message: "验证失败",
+            message: "Validation failed",
             error_code: "VALIDATION_ERROR",
-            error_message: "验证失败",
+            error_message: "Validation failed",
           }),
       });
 
@@ -183,14 +183,14 @@ describe("API Client", () => {
       });
     });
 
-    it("应该在 403 时抛出权限错误", async () => {
+    it("should throw permission error on 403", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 403,
         json: () =>
           Promise.resolve({
             code: "FORBIDDEN",
-            message: "无权限访问",
+            message: "Access denied",
           }),
       });
 
@@ -200,14 +200,14 @@ describe("API Client", () => {
       });
     });
 
-    it("应该在 404 时抛出 NOT_FOUND 错误", async () => {
+    it("should throw NOT_FOUND error on 404", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 404,
         json: () =>
           Promise.resolve({
             code: "NOT_FOUND",
-            message: "资源不存在",
+            message: "Resource not found",
           }),
       });
 
@@ -217,7 +217,7 @@ describe("API Client", () => {
       });
     });
 
-    it("应该在网络错误时抛出 NETWORK_ERROR", async () => {
+    it("should throw NETWORK_ERROR on network errors", async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
       await expect(api.get("/test")).rejects.toMatchObject({
@@ -225,7 +225,7 @@ describe("API Client", () => {
       });
     });
 
-    it("应该在超时时抛出 TIMEOUT 错误", async () => {
+    it("should throw TIMEOUT error on timeout", async () => {
       const abortError = new Error("Aborted");
       abortError.name = "AbortError";
       global.fetch = vi.fn().mockRejectedValue(abortError);
@@ -237,8 +237,8 @@ describe("API Client", () => {
     });
   });
 
-  describe("Token 刷新", () => {
-    it("应该在 401 时尝试刷新 token", async () => {
+  describe("Token Refresh", () => {
+    it("should attempt token refresh on 401", async () => {
       setTokens("expired-token", "valid-refresh-token");
 
       let callCount = 0;
@@ -267,7 +267,7 @@ describe("API Client", () => {
             json: () =>
               Promise.resolve({
                 code: "TOKEN_EXPIRED",
-                message: "Token 已过期",
+                message: "Token expired",
               }),
           };
         }
@@ -281,10 +281,10 @@ describe("API Client", () => {
 
       await api.get("/test");
 
-      expect(global.fetch).toHaveBeenCalledTimes(3); // 原始请求 + 刷新 + 重试
+      expect(global.fetch).toHaveBeenCalledTimes(3); // Original request + refresh + retry
     });
 
-    it("刷新失败时应该抛出 TOKEN_EXPIRED 错误", async () => {
+    it("should throw TOKEN_EXPIRED error when refresh fails", async () => {
       setTokens("expired-token", "invalid-refresh-token");
 
       global.fetch = vi.fn().mockImplementation(async (url: string) => {
@@ -295,7 +295,7 @@ describe("API Client", () => {
             json: () =>
               Promise.resolve({
                 code: "INVALID_REFRESH_TOKEN",
-                message: "刷新 Token 无效",
+                message: "Invalid refresh token",
               }),
           };
         }
@@ -306,7 +306,7 @@ describe("API Client", () => {
           json: () =>
             Promise.resolve({
               code: "TOKEN_EXPIRED",
-              message: "Token 已过期",
+              message: "Token expired",
             }),
         };
       });
@@ -318,8 +318,8 @@ describe("API Client", () => {
     });
   });
 
-  describe("重试逻辑", () => {
-    it("GET 请求在 5xx 错误时应该重试", async () => {
+  describe("Retry Logic", () => {
+    it("GET requests should retry on 5xx errors", async () => {
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
@@ -330,7 +330,7 @@ describe("API Client", () => {
             json: () =>
               Promise.resolve({
                 code: "INTERNAL_ERROR",
-                message: "服务器错误",
+                message: "Server error",
               }),
           };
         }
@@ -346,14 +346,14 @@ describe("API Client", () => {
       expect(callCount).toBe(2);
     });
 
-    it("POST 请求默认不应该重试", async () => {
+    it("POST requests should not retry by default", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
         json: () =>
           Promise.resolve({
             code: "INTERNAL_ERROR",
-            message: "服务器错误",
+            message: "Server error",
           }),
       });
 
@@ -361,14 +361,14 @@ describe("API Client", () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("不应该重试 401/403/404 错误", async () => {
+    it("should not retry 401/403/404 errors", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 403,
         json: () =>
           Promise.resolve({
             code: "FORBIDDEN",
-            message: "无权限",
+            message: "No permission",
           }),
       });
 
@@ -377,8 +377,8 @@ describe("API Client", () => {
     });
   });
 
-  describe("响应解析", () => {
-    it("应该正确解包 data 字段", async () => {
+  describe("Response Parsing", () => {
+    it("should correctly unwrap the data field", async () => {
       const mockResponse = {
         code: "OK",
         message: "OK",
@@ -395,7 +395,7 @@ describe("API Client", () => {
       expect(result).toEqual({ users: [{ id: "1" }], total: 1 });
     });
 
-    it("requestRaw 应该返回完整响应", async () => {
+    it("requestRaw should return the full response", async () => {
       const mockResponse = {
         code: "OK",
         message: "OK",

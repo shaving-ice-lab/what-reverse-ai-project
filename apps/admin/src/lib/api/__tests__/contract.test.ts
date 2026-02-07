@@ -1,12 +1,12 @@
 /**
- * API 契约测试
- * 验证管理端响应结构稳定
+ * API contract tests
+ * Verify admin response structure stability
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { z } from "zod";
 
-// API 响应基础结构
+// API response base structure
 const ApiResponseSchema = z.object({
   code: z.string(),
   message: z.string(),
@@ -22,7 +22,7 @@ const ApiResponseSchema = z.object({
   request_id: z.string().optional(),
 });
 
-// 分页列表响应结构
+// Paginated list response structure
 const PaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
   z.object({
     items: z.array(itemSchema),
@@ -31,7 +31,7 @@ const PaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
     page_size: z.number(),
   });
 
-// ===== 实体 Schema 定义 =====
+// ===== Entity Schema Definitions =====
 
 const UserSchema = z.object({
   id: z.string(),
@@ -141,11 +141,11 @@ const CapabilitiesSchema = z.object({
   capabilities: z.array(z.string()),
 });
 
-// ===== 契约测试 =====
+// ===== Contract Tests =====
 
-describe("API 契约测试", () => {
-  describe("基础响应结构", () => {
-    it("成功响应应该符合基础结构", () => {
+describe("API Contract Tests", () => {
+  describe("Base Response Structure", () => {
+    it("success response should match base structure", () => {
       const response = {
         code: "OK",
         message: "OK",
@@ -157,10 +157,10 @@ describe("API 契约测试", () => {
       expect(result.success).toBe(true);
     });
 
-    it("错误响应应该符合基础结构", () => {
+    it("error response should match base structure", () => {
       const response = {
         code: "VALIDATION_ERROR",
-        message: "验证失败",
+        message: "Validation failed",
         trace_id: "trace-456",
       };
 
@@ -169,8 +169,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("用户 API 契约", () => {
-    it("用户列表响应应该符合契约", () => {
+  describe("User API Contract", () => {
+    it("user list response should match contract", () => {
       const response = {
         items: [
           {
@@ -195,13 +195,13 @@ describe("API 契约测试", () => {
       const result = schema.safeParse(response);
       
       if (!result.success) {
-        console.error("契约验证失败:", result.error.issues);
+        console.error("Contract validation failed:", result.error.issues);
       }
       
       expect(result.success).toBe(true);
     });
 
-    it("用户详情响应应该符合契约", () => {
+    it("user details response should match contract", () => {
       const response = {
         user: {
           id: "user_1",
@@ -222,7 +222,7 @@ describe("API 契约测试", () => {
       expect(result.success).toBe(true);
     });
 
-    it("用户状态更新响应应该符合契约", () => {
+    it("user status update response should match contract", () => {
       const response = {
         user: {
           id: "user_1",
@@ -242,8 +242,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("Workspace API 契约", () => {
-    it("Workspace 列表响应应该符合契约", () => {
+  describe("Workspace API Contract", () => {
+    it("workspace list response should match contract", () => {
       const response = {
         items: [
           {
@@ -270,8 +270,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("应用 API 契约", () => {
-    it("应用列表响应应该符合契约", () => {
+  describe("App API Contract", () => {
+    it("app list response should match contract", () => {
       const response = {
         items: [
           {
@@ -300,8 +300,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("工单 API 契约", () => {
-    it("工单列表响应应该符合契约", () => {
+  describe("Ticket API Contract", () => {
+    it("ticket list response should match contract", () => {
       const response = {
         items: [
           {
@@ -330,8 +330,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("工作流 API 契约", () => {
-    it("工作流列表响应应该符合契约", () => {
+  describe("Workflow API Contract", () => {
+    it("workflow list response should match contract", () => {
       const response = {
         items: [
           {
@@ -361,8 +361,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("执行记录 API 契约", () => {
-    it("执行记录列表响应应该符合契约", () => {
+  describe("Execution API Contract", () => {
+    it("execution list response should match contract", () => {
       const response = {
         items: [
           {
@@ -391,8 +391,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("公告 API 契约", () => {
-    it("公告列表响应应该符合契约", () => {
+  describe("Announcement API Contract", () => {
+    it("announcement list response should match contract", () => {
       const response = {
         items: [
           {
@@ -421,8 +421,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("能力点 API 契约", () => {
-    it("能力点列表响应应该符合契约", () => {
+  describe("Capabilities API Contract", () => {
+    it("capabilities list response should match contract", () => {
       const response = {
         capabilities: [
           "users.read",
@@ -437,11 +437,11 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("字段必填性验证", () => {
-    it("缺少必填字段应该验证失败", () => {
+  describe("Required Field Validation", () => {
+    it("missing required fields should fail validation", () => {
       const invalidUser = {
         id: "user_1",
-        // 缺少 email
+        // Missing email
         username: "user1",
         role: "user",
         status: "active",
@@ -454,12 +454,12 @@ describe("API 契约测试", () => {
       expect(result.success).toBe(false);
     });
 
-    it("无效枚举值应该验证失败", () => {
+    it("invalid enum values should fail validation", () => {
       const invalidUser = {
         id: "user_1",
         email: "user@example.com",
         username: "user1",
-        role: "invalid_role", // 无效角色
+        role: "invalid_role", // Invalid role
         status: "active",
         email_verified: true,
         created_at: "2026-01-01T00:00:00Z",
@@ -470,7 +470,7 @@ describe("API 契约测试", () => {
       expect(result.success).toBe(false);
     });
 
-    it("无效日期格式应该验证失败", () => {
+    it("invalid date format should fail validation", () => {
       const invalidUser = {
         id: "user_1",
         email: "user@example.com",
@@ -478,7 +478,7 @@ describe("API 契约测试", () => {
         role: "user",
         status: "active",
         email_verified: true,
-        created_at: "invalid-date", // 无效日期
+        created_at: "invalid-date", // Invalid date
         updated_at: "2026-02-01T00:00:00Z",
       };
 
@@ -487,8 +487,8 @@ describe("API 契约测试", () => {
     });
   });
 
-  describe("分页参数验证", () => {
-    it("分页响应应该包含正确的元数据", () => {
+  describe("Pagination Parameter Validation", () => {
+    it("paginated response should contain correct metadata", () => {
       const response = {
         items: [],
         total: 0,
@@ -501,10 +501,10 @@ describe("API 契约测试", () => {
       expect(result.success).toBe(true);
     });
 
-    it("缺少分页元数据应该验证失败", () => {
+    it("missing pagination metadata should fail validation", () => {
       const response = {
         items: [],
-        // 缺少 total, page, page_size
+        // Missing total, page, page_size
       };
 
       const schema = PaginatedResponseSchema(z.unknown());

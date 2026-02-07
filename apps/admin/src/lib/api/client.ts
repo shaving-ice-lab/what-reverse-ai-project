@@ -152,7 +152,7 @@ function extractErrorInfo(payload: Partial<ApiResponse<unknown>> | undefined) {
     (fallback.error_message as string) ||
     payload?.message ||
     (error?.message as string) ||
-    "请求失败";
+    "Request failed";
   const code =
     (fallback.error_code as string) ||
     payload?.code ||
@@ -226,12 +226,12 @@ function normalizeError(error: unknown): ApiError {
 
   if (error instanceof Error) {
     if (error.name === "AbortError") {
-      return new ApiError("请求超时", "TIMEOUT", 408);
+      return new ApiError("Request timed out", "TIMEOUT", 408);
     }
     return new ApiError(error.message, "NETWORK_ERROR", 0);
   }
 
-  return new ApiError("未知错误", "UNKNOWN_ERROR", 0);
+  return new ApiError("Unknown error", "UNKNOWN_ERROR", 0);
 }
 
 function shouldRetry(error: ApiError, method: string): boolean {
@@ -279,7 +279,7 @@ async function performRequest<T>(
   fetchConfig: RequestInit,
   timeout: number
 ): Promise<T> {
-  // 创建请求追踪上下文
+  // Create request tracing context
   const { traceId, requestId } = createRequestContext();
 
   const buildHeaders = () => {
@@ -291,7 +291,7 @@ async function performRequest<T>(
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
-    // 添加追踪头
+    // Add tracing headers
     const traceHeaders = getTraceHeaders();
     Object.entries(traceHeaders).forEach(([key, value]) => {
       headers.set(key, value);
@@ -313,7 +313,7 @@ async function performRequest<T>(
 
   const response = await executeFetch(url, { ...fetchConfig, headers }, timeout);
 
-  // 从响应中更新追踪 ID（如果服务端返回了）
+  // Update trace IDs from response (if returned by server)
   const serverTraceId = response.headers.get('X-Trace-ID');
   const serverRequestId = response.headers.get('X-Request-ID');
   if (serverTraceId) setTraceId(serverTraceId);
@@ -323,7 +323,7 @@ async function performRequest<T>(
     const refreshed = await refreshAccessToken();
     if (!refreshed) {
       clearTokens();
-      throw new ApiError("登录已过期，请重新登录", "TOKEN_EXPIRED", 401);
+      throw new ApiError("Session expired, please log in again", "TOKEN_EXPIRED", 401);
     }
 
     const retryHeaders = buildHeaders();
@@ -420,7 +420,7 @@ export async function requestRaw<T>(
     }
   }
 
-  throw new ApiError("请求失败", "REQUEST_FAILED", 0);
+  throw new ApiError("Request failed", "REQUEST_FAILED", 0);
 }
 
 export async function request<T>(

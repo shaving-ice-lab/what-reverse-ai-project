@@ -1,6 +1,6 @@
 /**
- * 测试工具函数
- * Admin 管理台测试辅助方法
+ * Test utility functions
+ * Admin dashboard test helper methods
  */
 
 import { render, type RenderOptions } from "@testing-library/react";
@@ -9,7 +9,7 @@ import { ThemeProvider } from "next-themes";
 import type { ReactElement, ReactNode } from "react";
 import { vi } from "vitest";
 
-// 创建测试用 QueryClient
+// Create test QueryClient
 export function createTestQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -25,7 +25,7 @@ export function createTestQueryClient() {
   });
 }
 
-// 包含所有 Provider 的包装器
+// Wrapper containing all Providers
 interface AllProvidersProps {
   children: ReactNode;
 }
@@ -42,7 +42,7 @@ function AllProviders({ children }: AllProvidersProps) {
   );
 }
 
-// 自定义 render 函数
+// Custom render function
 function customRender(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">
@@ -50,13 +50,13 @@ function customRender(
   return render(ui, { wrapper: AllProviders, ...options });
 }
 
-// 重新导出所有 testing-library 函数
+// Re-export all testing-library functions
 export * from "@testing-library/react";
 export { customRender as render };
 
-// ===== Mock 工厂函数 =====
+// ===== Mock factory functions =====
 
-// 创建 Mock 用户
+// Create mock user
 export function createMockUser(overrides = {}) {
   return {
     id: "user-test-1234",
@@ -74,7 +74,7 @@ export function createMockUser(overrides = {}) {
   };
 }
 
-// 创建 Mock Workspace
+// Create mock workspace
 export function createMockWorkspace(overrides = {}) {
   return {
     id: "ws-test-1234",
@@ -91,7 +91,7 @@ export function createMockWorkspace(overrides = {}) {
   };
 }
 
-// 创建 Mock App
+// Create mock app
 export function createMockApp(overrides = {}) {
   return {
     id: "app-test-1234",
@@ -110,7 +110,7 @@ export function createMockApp(overrides = {}) {
   };
 }
 
-// 创建 Mock 工单
+// Create mock ticket
 export function createMockTicket(overrides = {}) {
   return {
     id: "ticket-test-1234",
@@ -129,7 +129,7 @@ export function createMockTicket(overrides = {}) {
   };
 }
 
-// 创建 Mock 执行记录
+// Create mock execution
 export function createMockExecution(overrides = {}) {
   return {
     id: "exec-test-1234",
@@ -148,7 +148,7 @@ export function createMockExecution(overrides = {}) {
   };
 }
 
-// 创建 Mock 工作流
+// Create mock workflow
 export function createMockWorkflow(overrides = {}) {
   return {
     id: "wf-test-1234",
@@ -168,7 +168,7 @@ export function createMockWorkflow(overrides = {}) {
   };
 }
 
-// 创建 Mock 公告
+// Create mock announcement
 export function createMockAnnouncement(overrides = {}) {
   return {
     id: "ann-test-1234",
@@ -187,7 +187,7 @@ export function createMockAnnouncement(overrides = {}) {
   };
 }
 
-// 创建 Mock Admin 能力点
+// Create mock admin capabilities
 export function createMockCapabilities() {
   return {
     capabilities: [
@@ -232,7 +232,7 @@ export function createMockCapabilities() {
   };
 }
 
-// 创建分页响应
+// Create paginated response
 export function createPaginatedResponse<T>(
   items: T[],
   options: { page?: number; page_size?: number; total?: number } = {}
@@ -246,14 +246,14 @@ export function createPaginatedResponse<T>(
   };
 }
 
-// ===== 异步测试工具 =====
+// ===== Async test utilities =====
 
-// 等待一段时间
+// Wait for a period of time
 export function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// 等待直到条件为真
+// Wait until condition is true
 export async function waitUntil(
   condition: () => boolean,
   timeout = 5000,
@@ -268,7 +268,7 @@ export async function waitUntil(
   }
 }
 
-// ===== Mock API 响应 =====
+// ===== Mock API responses =====
 
 export function createApiResponse<T>(data: T) {
   return {
@@ -315,7 +315,7 @@ export function mockApiError(
   );
 }
 
-// Mock 成功的 fetch 响应
+// Mock successful fetch response
 export function mockFetchSuccess<T>(data: T) {
   return vi.fn().mockResolvedValue({
     ok: true,
@@ -324,7 +324,7 @@ export function mockFetchSuccess<T>(data: T) {
   });
 }
 
-// Mock 失败的 fetch 响应
+// Mock failed fetch response
 export function mockFetchError(code: string, message: string, status = 400) {
   return vi.fn().mockResolvedValue({
     ok: false,
@@ -339,7 +339,7 @@ export function mockFetchError(code: string, message: string, status = 400) {
   });
 }
 
-// ===== 权限测试工具 =====
+// ===== Permission test utilities =====
 
 export function createMockAuthState(overrides = {}) {
   return {
@@ -354,7 +354,7 @@ export function createMockAuthState(overrides = {}) {
   };
 }
 
-// 模拟无权限状态
+// Mock unauthorized state
 export function createMockUnauthorizedState() {
   return {
     user: null,
@@ -364,7 +364,7 @@ export function createMockUnauthorizedState() {
   };
 }
 
-// ===== 性能测试工具 =====
+// ===== Performance test utilities =====
 
 export function measureExecutionTime(fn: () => void | Promise<void>) {
   return async () => {
@@ -382,9 +382,9 @@ export function generateLargeDataset<T>(
   return Array.from({ length: count }, (_, i) => factory(i));
 }
 
-// ===== 安全测试工具 =====
+// ===== Security test utilities =====
 
-// XSS 测试向量
+// XSS test vectors
 export const XSS_TEST_VECTORS = [
   '<script>alert("xss")</script>',
   'javascript:alert("xss")',
@@ -393,7 +393,7 @@ export const XSS_TEST_VECTORS = [
   "' onclick='alert(\"xss\")'",
 ];
 
-// SQL 注入测试向量
+// SQL injection test vectors
 export const SQL_INJECTION_VECTORS = [
   "'; DROP TABLE users; --",
   "1' OR '1'='1",
@@ -402,7 +402,7 @@ export const SQL_INJECTION_VECTORS = [
   "' UNION SELECT * FROM users --",
 ];
 
-// 检查响应是否包含敏感信息
+// Check if response contains sensitive information
 export function checkForSensitiveData(response: unknown): string[] {
   const sensitivePatterns = [
     /password/i,

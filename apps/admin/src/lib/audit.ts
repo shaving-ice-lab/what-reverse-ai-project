@@ -1,14 +1,14 @@
 /**
- * 审计日志工具库
- * 提供操作审计的记录、追踪和上报能力
+ * Audit Log Utility Library
+ * Provides operation audit recording, tracking, and reporting capabilities
  */
 
 import { api } from "@/lib/api";
 
-// ===== 审计事件类型定义 =====
+// ===== Audit Event Type Definitions =====
 
 export type AuditAction =
-  // 用户管理
+  // User Management
   | "admin.user.view"
   | "admin.user.status_update"
   | "admin.user.role_update"
@@ -16,44 +16,44 @@ export type AuditAction =
   | "admin.user.password_reset"
   | "admin.user.delete"
   | "admin.user.batch_update"
-  // Workspace 管理
+  // Workspace Management
   | "admin.workspace.view"
   | "admin.workspace.status_update"
   | "admin.workspace.delete"
   | "admin.workspace.member_remove"
   | "admin.workspace.plan_change"
-  // Workspace 发布管理
+  // Workspace Publishing Management
   | "admin.workspace.view"
   | "admin.workspace.publish_status_update"
   | "admin.workspace.version_rollback"
-  // 计费与收益
+  // Billing & Earnings
   | "admin.billing.refund_process"
   | "admin.billing.invoice_void"
   | "admin.earnings.withdrawal_process"
-  // 配置与安全
+  // Configuration & Security
   | "admin.config.update"
   | "admin.secret.rotate"
   | "admin.secret.disable"
   | "admin.secret.view"
-  // 工单与支持
+  // Tickets & Support
   | "admin.support.ticket_status_update"
   | "admin.support.ticket_assign"
   | "admin.support.ticket_escalate"
-  // 系统运维
+  // System Operations
   | "admin.system.feature_toggle"
   | "admin.system.queue_retry"
   | "admin.system.queue_delete"
-  // 认证与权限
+  // Authentication & Permissions
   | "admin.auth.login"
   | "admin.auth.logout"
   | "admin.auth.session_terminate"
   | "admin.permission.role_assign"
   | "admin.permission.capability_update"
-  // 审批流
+  // Approval Flow
   | "admin.approval.create"
   | "admin.approval.approve"
   | "admin.approval.reject"
-  // 导出操作
+  // Export Operations
   | "admin.export.create"
   | "admin.export.download";
 
@@ -90,11 +90,11 @@ export interface AuditContext {
   user_agent?: string;
 }
 
-// ===== 审计上报 API =====
+// ===== Audit Reporting API =====
 
 export const auditApi = {
   /**
-   * 记录审计日志
+   * Record an audit log entry
    */
   async log(entry: AuditLogEntry, context?: AuditContext): Promise<{ id: string }> {
     return api.post<{ id: string }>("/admin/audit-logs", {
@@ -104,7 +104,7 @@ export const auditApi = {
   },
 
   /**
-   * 批量记录审计日志
+   * Batch record audit log entries
    */
   async logBatch(entries: AuditLogEntry[], context?: AuditContext): Promise<{ ids: string[] }> {
     return api.post<{ ids: string[] }>("/admin/audit-logs/batch", {
@@ -113,68 +113,68 @@ export const auditApi = {
   },
 };
 
-// ===== 审计事件描述映射 =====
+// ===== Audit Event Description Mapping =====
 
 export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
-  "admin.user.view": "查看用户",
-  "admin.user.status_update": "更新用户状态",
-  "admin.user.role_update": "更新用户角色",
-  "admin.user.force_logout": "强制用户登出",
-  "admin.user.password_reset": "重置用户密码",
-  "admin.user.delete": "删除用户",
-  "admin.user.batch_update": "批量更新用户",
-  "admin.workspace.view": "查看工作空间",
-  "admin.workspace.status_update": "更新工作空间状态",
-  "admin.workspace.delete": "删除工作空间",
-  "admin.workspace.member_remove": "移除工作空间成员",
-  "admin.workspace.plan_change": "变更工作空间计划",
-  "admin.workspace.view": "查看工作空间",
-  "admin.workspace.publish_status_update": "更新发布状态",
-  "admin.workspace.version_rollback": "回滚版本",
-  "admin.billing.refund_process": "处理退款",
-  "admin.billing.invoice_void": "作废发票",
-  "admin.earnings.withdrawal_process": "处理提现",
-  "admin.config.update": "更新配置",
-  "admin.secret.rotate": "轮换密钥",
-  "admin.secret.disable": "禁用密钥",
-  "admin.secret.view": "查看密钥",
-  "admin.support.ticket_status_update": "更新工单状态",
-  "admin.support.ticket_assign": "分配工单",
-  "admin.support.ticket_escalate": "升级工单",
-  "admin.system.feature_toggle": "切换功能开关",
-  "admin.system.queue_retry": "重试队列任务",
-  "admin.system.queue_delete": "删除队列任务",
-  "admin.auth.login": "管理员登录",
-  "admin.auth.logout": "管理员登出",
-  "admin.auth.session_terminate": "终止会话",
-  "admin.permission.role_assign": "分配角色",
-  "admin.permission.capability_update": "更新能力点",
-  "admin.approval.create": "创建审批",
-  "admin.approval.approve": "审批通过",
-  "admin.approval.reject": "审批拒绝",
-  "admin.export.create": "创建导出",
-  "admin.export.download": "下载导出",
+  "admin.user.view": "View User",
+  "admin.user.status_update": "Update User Status",
+  "admin.user.role_update": "Update User Role",
+  "admin.user.force_logout": "Force User Logout",
+  "admin.user.password_reset": "Reset User Password",
+  "admin.user.delete": "Delete User",
+  "admin.user.batch_update": "Batch Update Users",
+  "admin.workspace.view": "View Workspace",
+  "admin.workspace.status_update": "Update Workspace Status",
+  "admin.workspace.delete": "Delete Workspace",
+  "admin.workspace.member_remove": "Remove Workspace Member",
+  "admin.workspace.plan_change": "Change Workspace Plan",
+  "admin.workspace.view": "View Workspace",
+  "admin.workspace.publish_status_update": "Update Publish Status",
+  "admin.workspace.version_rollback": "Rollback Version",
+  "admin.billing.refund_process": "Process Refund",
+  "admin.billing.invoice_void": "Void Invoice",
+  "admin.earnings.withdrawal_process": "Process Withdrawal",
+  "admin.config.update": "Update Configuration",
+  "admin.secret.rotate": "Rotate Secret",
+  "admin.secret.disable": "Disable Secret",
+  "admin.secret.view": "View Secret",
+  "admin.support.ticket_status_update": "Update Ticket Status",
+  "admin.support.ticket_assign": "Assign Ticket",
+  "admin.support.ticket_escalate": "Escalate Ticket",
+  "admin.system.feature_toggle": "Toggle Feature Flag",
+  "admin.system.queue_retry": "Retry Queue Task",
+  "admin.system.queue_delete": "Delete Queue Task",
+  "admin.auth.login": "Admin Login",
+  "admin.auth.logout": "Admin Logout",
+  "admin.auth.session_terminate": "Terminate Session",
+  "admin.permission.role_assign": "Assign Role",
+  "admin.permission.capability_update": "Update Capability",
+  "admin.approval.create": "Create Approval",
+  "admin.approval.approve": "Approval Approved",
+  "admin.approval.reject": "Approval Rejected",
+  "admin.export.create": "Create Export",
+  "admin.export.download": "Download Export",
 };
 
 export const AUDIT_TARGET_LABELS: Record<AuditTargetType, string> = {
-  user: "用户",
-  workspace: "工作空间",
-  app: "应用",
-  config: "配置",
-  secret: "密钥",
-  ticket: "工单",
-  refund: "退款",
-  withdrawal: "提现",
-  invoice: "发票",
-  session: "会话",
-  feature: "功能",
-  queue: "队列",
-  approval: "审批",
-  export: "导出",
-  system: "系统",
+  user: "User",
+  workspace: "Workspace",
+  app: "App",
+  config: "Configuration",
+  secret: "Secret",
+  ticket: "Ticket",
+  refund: "Refund",
+  withdrawal: "Withdrawal",
+  invoice: "Invoice",
+  session: "Session",
+  feature: "Feature",
+  queue: "Queue",
+  approval: "Approval",
+  export: "Export",
+  system: "System",
 };
 
-// ===== 风险级别定义 =====
+// ===== Risk Level Definitions =====
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 
@@ -219,7 +219,7 @@ export const ACTION_RISK_LEVELS: Record<AuditAction, RiskLevel> = {
   "admin.export.download": "low",
 };
 
-// ===== 需要审批的高风险操作 =====
+// ===== High-Risk Operations Requiring Approval =====
 
 export const REQUIRES_APPROVAL: AuditAction[] = [
   "admin.user.delete",
@@ -234,21 +234,21 @@ export const REQUIRES_APPROVAL: AuditAction[] = [
 ];
 
 /**
- * 判断操作是否需要审批
+ * Determine if an action requires approval
  */
 export function requiresApproval(action: AuditAction): boolean {
   return REQUIRES_APPROVAL.includes(action);
 }
 
 /**
- * 获取操作的风险级别
+ * Get the risk level of an action
  */
 export function getActionRiskLevel(action: AuditAction): RiskLevel {
   return ACTION_RISK_LEVELS[action] || "low";
 }
 
 /**
- * 判断操作是否为高风险
+ * Determine if an action is high risk
  */
 export function isHighRiskAction(action: AuditAction): boolean {
   const level = getActionRiskLevel(action);

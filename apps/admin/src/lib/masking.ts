@@ -1,9 +1,9 @@
 /**
- * 敏感字段脱敏工具库
- * 提供邮箱、密钥、支付信息等敏感数据的脱敏处理
+ * Sensitive Field Masking Utility Library
+ * Provides masking for sensitive data such as emails, secrets, payment info, etc.
  */
 
-// ===== 脱敏策略类型 =====
+// ===== Masking Strategy Types =====
 
 export type MaskingStrategy =
   | "email"
@@ -25,11 +25,11 @@ export interface MaskingOptions {
   preserveFormat?: boolean;
 }
 
-// ===== 脱敏函数 =====
+// ===== Masking Functions =====
 
 /**
- * 邮箱脱敏
- * 示例: john.doe@example.com -> j***e@example.com
+ * Email masking
+ * Example: john.doe@example.com -> j***e@example.com
  */
 export function maskEmail(email: string): string {
   if (!email || typeof email !== "string") return "";
@@ -44,8 +44,8 @@ export function maskEmail(email: string): string {
 }
 
 /**
- * 手机号脱敏
- * 示例: 13812345678 -> 138****5678
+ * Phone number masking
+ * Example: 13812345678 -> 138****5678
  */
 export function maskPhone(phone: string): string {
   if (!phone || typeof phone !== "string") return "";
@@ -58,8 +58,8 @@ export function maskPhone(phone: string): string {
 }
 
 /**
- * 身份证号脱敏
- * 示例: 110101199001011234 -> 110101********1234
+ * ID card number masking
+ * Example: 110101199001011234 -> 110101********1234
  */
 export function maskIdCard(idCard: string): string {
   if (!idCard || typeof idCard !== "string") return "";
@@ -73,8 +73,8 @@ export function maskIdCard(idCard: string): string {
 }
 
 /**
- * 银行卡号脱敏
- * 示例: 6222021234567890123 -> 6222 **** **** 0123
+ * Bank card number masking
+ * Example: 6222021234567890123 -> 6222 **** **** 0123
  */
 export function maskBankCard(cardNumber: string, preserveFormat = true): string {
   if (!cardNumber || typeof cardNumber !== "string") return "";
@@ -92,14 +92,14 @@ export function maskBankCard(cardNumber: string, preserveFormat = true): string 
 }
 
 /**
- * API 密钥脱敏
- * 示例: sk_live_1234567890abcdef -> sk_live_****cdef
+ * API key masking
+ * Example: sk_live_1234567890abcdef -> sk_live_****cdef
  */
 export function maskApiKey(apiKey: string): string {
   if (!apiKey || typeof apiKey !== "string") return "";
   if (apiKey.length <= 8) return "****";
 
-  // 查找前缀（如 sk_live_, pk_test_ 等）
+  // Find prefix (e.g., sk_live_, pk_test_, etc.)
   const prefixMatch = apiKey.match(/^([a-z_]+_)/i);
   const prefix = prefixMatch ? prefixMatch[1] : "";
   const keyPart = prefix ? apiKey.slice(prefix.length) : apiKey;
@@ -113,8 +113,8 @@ export function maskApiKey(apiKey: string): string {
 }
 
 /**
- * 通用密钥/Secret 脱敏
- * 示例: abcdef123456789xyz -> ****
+ * Generic secret masking
+ * Example: abcdef123456789xyz -> ****
  */
 export function maskSecret(secret: string, showSuffix = 0): string {
   if (!secret || typeof secret !== "string") return "";
@@ -123,8 +123,8 @@ export function maskSecret(secret: string, showSuffix = 0): string {
 }
 
 /**
- * IP 地址脱敏
- * 示例: 192.168.1.100 -> 192.168.*.100
+ * IP address masking
+ * Example: 192.168.1.100 -> 192.168.*.100
  */
 export function maskIpAddress(ip: string): string {
   if (!ip || typeof ip !== "string") return "";
@@ -135,7 +135,7 @@ export function maskIpAddress(ip: string): string {
     return `${parts[0]}.${parts[1]}.*.${parts[3]}`;
   }
 
-  // IPv6 简单处理
+  // IPv6 simple handling
   if (ip.includes(":")) {
     const parts = ip.split(":");
     if (parts.length >= 4) {
@@ -147,22 +147,22 @@ export function maskIpAddress(ip: string): string {
 }
 
 /**
- * 姓名脱敏
- * 示例: 张三 -> 张* | John Doe -> J*** D**
+ * Name masking
+ * Example: John Doe -> J*** D**
  */
 export function maskName(name: string): string {
   if (!name || typeof name !== "string") return "";
   const trimmed = name.trim();
   if (trimmed.length === 0) return "";
 
-  // 中文名
+  // Chinese name
   if (/[\u4e00-\u9fa5]/.test(trimmed)) {
     if (trimmed.length === 1) return trimmed;
     if (trimmed.length === 2) return `${trimmed[0]}*`;
     return `${trimmed[0]}${"*".repeat(trimmed.length - 2)}${trimmed[trimmed.length - 1]}`;
   }
 
-  // 英文名
+  // English name
   const parts = trimmed.split(/\s+/);
   return parts
     .map((part) => {
@@ -173,8 +173,8 @@ export function maskName(name: string): string {
 }
 
 /**
- * 部分脱敏
- * 保留前 N 位和后 M 位
+ * Partial masking
+ * Preserve first N and last M characters
  */
 export function maskPartial(
   value: string,
@@ -194,7 +194,7 @@ export function maskPartial(
 }
 
 /**
- * 完全脱敏
+ * Full masking
  */
 export function maskFull(value: string, maskChar = "*", length?: number): string {
   if (!value || typeof value !== "string") return "";
@@ -202,10 +202,10 @@ export function maskFull(value: string, maskChar = "*", length?: number): string
   return maskChar.repeat(Math.min(maskLength, 8));
 }
 
-// ===== 统一脱敏入口 =====
+// ===== Unified Masking Entry Point =====
 
 /**
- * 根据策略脱敏数据
+ * Mask data based on strategy
  */
 export function maskValue(value: string, options: MaskingOptions): string {
   if (!value) return "";
@@ -236,7 +236,7 @@ export function maskValue(value: string, options: MaskingOptions): string {
   }
 }
 
-// ===== 字段脱敏配置 =====
+// ===== Field Masking Configuration =====
 
 export interface FieldMaskingConfig {
   field: string;
@@ -245,7 +245,7 @@ export interface FieldMaskingConfig {
 }
 
 /**
- * 默认字段脱敏配置
+ * Default field masking configuration
  */
 export const DEFAULT_FIELD_MASKING: FieldMaskingConfig[] = [
   { field: "email", strategy: "email" },
@@ -267,7 +267,7 @@ export const DEFAULT_FIELD_MASKING: FieldMaskingConfig[] = [
 ];
 
 /**
- * 根据字段名获取脱敏配置
+ * Get masking configuration by field name
  */
 export function getFieldMaskingConfig(fieldName: string): FieldMaskingConfig | undefined {
   const lowerField = fieldName.toLowerCase();
@@ -277,7 +277,7 @@ export function getFieldMaskingConfig(fieldName: string): FieldMaskingConfig | u
 }
 
 /**
- * 自动脱敏对象中的敏感字段
+ * Automatically mask sensitive fields in an object
  */
 export function maskSensitiveFields<T extends Record<string, unknown>>(
   obj: T,
@@ -306,7 +306,7 @@ export function maskSensitiveFields<T extends Record<string, unknown>>(
   return result;
 }
 
-// ===== 显示控制 =====
+// ===== Display Control =====
 
 export interface MaskedValue {
   masked: string;
@@ -315,7 +315,7 @@ export interface MaskedValue {
 }
 
 /**
- * 创建可切换显示的脱敏值
+ * Create a toggleable masked value
  */
 export function createMaskedValue(
   value: string,
@@ -329,25 +329,25 @@ export function createMaskedValue(
 }
 
 /**
- * 检查用户是否有权查看敏感数据
+ * Check if the user has permission to view sensitive data
  */
 export function canViewSensitiveData(
   userRole: string,
   fieldType: MaskingStrategy
 ): boolean {
-  // 超级管理员可以查看所有敏感数据
+  // Super admin can view all sensitive data
   if (userRole === "super_admin") return true;
 
-  // 财务角色可以查看支付相关数据
+  // Finance role can view payment-related data
   if (userRole === "finance") {
     return ["bank_card", "partial"].includes(fieldType);
   }
 
-  // 运维角色可以查看密钥和 IP
+  // Ops role can view secrets and IPs
   if (userRole === "ops") {
     return ["api_key", "secret", "ip_address"].includes(fieldType);
   }
 
-  // 其他角色默认不能查看敏感数据
+  // Other roles cannot view sensitive data by default
   return false;
 }
