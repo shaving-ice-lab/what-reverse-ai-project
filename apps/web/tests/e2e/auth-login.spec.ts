@@ -56,11 +56,11 @@ test("login redirects to requested page", async ({ page }) => {
   await mockApiRoutes(page);
 
   await page.goto("/login?redirect=/workspaces");
-  await page.getByPlaceholder("请输入您的电子邮件地址").fill("test@example.com");
-  await page.getByRole("button", { name: "继续" }).click();
-  await page.getByPlaceholder("输入密码").fill("password123");
-  await page.getByRole("button", { name: "登录" }).click();
+  await page.getByPlaceholder("Please enteryouelectricchildemailAddress").fill("test@example.com");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByPlaceholder("InputPassword").fill("password123");
+  await page.getByRole("button", { name: "Sign In" }).click();
 
   await expect(page).toHaveURL(/\/workspaces$/);
-  await expect(page.getByRole("button", { name: "创建工作空间" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "CreateWorkspace" })).toBeVisible();
 });

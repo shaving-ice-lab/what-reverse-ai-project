@@ -1,456 +1,456 @@
 /**
- * 执行引擎性能测试
- * @description 测试工作流执行引擎的性能
+ * ExecuteEnginecanTest
+ * @description TestWorkflowExecuteEngine'scan
  */
 
 import { describe, it, expect } from 'vitest';
 import { benchmark, createPerformanceSuite, formatPerformanceReport } from './utils';
 
 /**
- * 模拟节点执行
+ * MockNodeExecute
  */
 async function simulateNodeExecution(
-  type: string,
-  delayMs: number = 0
+ type: string,
+ delayMs: number = 0
 ): Promise<{ output: unknown; duration: number }> {
-  const start = performance.now();
-  
-  // 模拟不同类型节点的处理时间
-  if (delayMs > 0) {
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-  }
+ const start = performance.now();
+ 
+ // MocknotTypeNode'sProcessTime
+ if (delayMs > 0) {
+ await new Promise(resolve => setTimeout(resolve, delayMs));
+ }
 
-  // 模拟计算
-  let result: unknown;
-  switch (type) {
-    case 'transform':
-      result = Array.from({ length: 1000 }, (_, i) => i * 2);
-      break;
-    case 'filter':
-      result = Array.from({ length: 1000 }, (_, i) => i).filter(x => x % 2 === 0);
-      break;
-    case 'aggregate':
-      result = Array.from({ length: 1000 }, (_, i) => i).reduce((a, b) => a + b, 0);
-      break;
-    default:
-      result = { type, timestamp: Date.now() };
-  }
+ // MockCalculate
+ let result: unknown;
+ switch (type) {
+ case 'transform':
+ result = Array.from({ length: 1000 }, (_, i) => i * 2);
+ break;
+ case 'filter':
+ result = Array.from({ length: 1000 }, (_, i) => i).filter(x => x % 2 === 0);
+ break;
+ case 'aggregate':
+ result = Array.from({ length: 1000 }, (_, i) => i).reduce((a, b) => a + b, 0);
+ break;
+ default:
+ result = { type, timestamp: Date.now() };
+ }
 
-  return {
-    output: result,
-    duration: performance.now() - start,
-  };
+ return {
+ output: result,
+ duration: performance.now() - start,
+ };
 }
 
 /**
- * DAG 拓扑排序
+ * DAG TopologySort
  */
 function topologicalSort(
-  nodes: { id: string }[],
-  edges: { source: string; target: string }[]
+ nodes: { id: string }[],
+ edges: { source: string; target: string }[]
 ): string[] {
-  const inDegree = new Map<string, number>();
-  const adjacency = new Map<string, string[]>();
+ const inDegree = new Map<string, number>();
+ const adjacency = new Map<string, string[]>();
 
-  // 初始化
-  for (const node of nodes) {
-    inDegree.set(node.id, 0);
-    adjacency.set(node.id, []);
-  }
+ // Initial
+ for (const node of nodes) {
+ inDegree.set(node.id, 0);
+ adjacency.set(node.id, []);
+ }
 
-  // 构建图
-  for (const edge of edges) {
-    adjacency.get(edge.source)?.push(edge.target);
-    inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
-  }
+ // Build
+ for (const edge of edges) {
+ adjacency.get(edge.source)?.push(edge.target);
+ inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
+ }
 
-  // Kahn 算法
-  const queue: string[] = [];
-  const result: string[] = [];
+ // Kahn Algorithm
+ const queue: string[] = [];
+ const result: string[] = [];
 
-  for (const [nodeId, degree] of inDegree) {
-    if (degree === 0) queue.push(nodeId);
-  }
+ for (const [nodeId, degree] of inDegree) {
+ if (degree === 0) queue.push(nodeId);
+ }
 
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    result.push(current);
+ while (queue.length > 0) {
+ const current = queue.shift()!;
+ result.push(current);
 
-    for (const neighbor of adjacency.get(current) || []) {
-      const newDegree = (inDegree.get(neighbor) || 0) - 1;
-      inDegree.set(neighbor, newDegree);
-      if (newDegree === 0) queue.push(neighbor);
-    }
-  }
+ for (const neighbor of adjacency.get(current) || []) {
+ const newDegree = (inDegree.get(neighbor) || 0) - 1;
+ inDegree.set(neighbor, newDegree);
+ if (newDegree === 0) queue.push(neighbor);
+ }
+ }
 
-  return result;
+ return result;
 }
 
 /**
- * 模拟 DAG 执行引擎
+ * Mock DAG ExecuteEngine
  */
 async function executeDAG(
-  nodes: { id: string; type: string }[],
-  edges: { source: string; target: string }[],
-  options: { parallel?: boolean } = {}
+ nodes: { id: string; type: string }[],
+ edges: { source: string; target: string }[],
+ options: { parallel?: boolean } = {}
 ): Promise<{
-  results: Map<string, unknown>;
-  totalDuration: number;
-  executionOrder: string[];
+ results: Map<string, unknown>;
+ totalDuration: number;
+ executionOrder: string[];
 }> {
-  const start = performance.now();
-  const results = new Map<string, unknown>();
-  const executionOrder = topologicalSort(nodes, edges);
+ const start = performance.now();
+ const results = new Map<string, unknown>();
+ const executionOrder = topologicalSort(nodes, edges);
 
-  if (options.parallel) {
-    // 并行执行（按层级）
-    const levels = new Map<string, number>();
-    const inDegree = new Map<string, number>();
+ if (options.parallel) {
+ // androwExecute(byHierarchy)
+ const levels = new Map<string, number>();
+ const inDegree = new Map<string, number>();
 
-    for (const node of nodes) {
-      inDegree.set(node.id, 0);
-    }
+ for (const node of nodes) {
+ inDegree.set(node.id, 0);
+ }
 
-    for (const edge of edges) {
-      inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
-    }
+ for (const edge of edges) {
+ inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
+ }
 
-    // 计算层级
-    for (const nodeId of executionOrder) {
-      const node = nodes.find(n => n.id === nodeId)!;
-      const parentEdges = edges.filter(e => e.target === nodeId);
-      const maxParentLevel = parentEdges.length > 0
-        ? Math.max(...parentEdges.map(e => levels.get(e.source) || 0))
-        : -1;
-      levels.set(nodeId, maxParentLevel + 1);
-    }
+ // CalculateHierarchy
+ for (const nodeId of executionOrder) {
+ const node = nodes.find(n => n.id === nodeId)!;
+ const parentEdges = edges.filter(e => e.target === nodeId);
+ const maxParentLevel = parentEdges.length > 0
+ ? Math.max(...parentEdges.map(e => levels.get(e.source) || 0))
+ : -1;
+ levels.set(nodeId, maxParentLevel + 1);
+ }
 
-    // 按层级分组
-    const levelGroups = new Map<number, string[]>();
-    for (const [nodeId, level] of levels) {
-      if (!levelGroups.has(level)) levelGroups.set(level, []);
-      levelGroups.get(level)!.push(nodeId);
-    }
+ // byHierarchyGroup
+ const levelGroups = new Map<number, string[]>();
+ for (const [nodeId, level] of levels) {
+ if (!levelGroups.has(level)) levelGroups.set(level, []);
+ levelGroups.get(level)!.push(nodeId);
+ }
 
-    // 按层级并行执行
-    for (const level of [...levelGroups.keys()].sort((a, b) => a - b)) {
-      const levelNodes = levelGroups.get(level)!;
-      const promises = levelNodes.map(async nodeId => {
-        const node = nodes.find(n => n.id === nodeId)!;
-        const { output } = await simulateNodeExecution(node.type);
-        results.set(nodeId, output);
-      });
-      await Promise.all(promises);
-    }
-  } else {
-    // 顺序执行
-    for (const nodeId of executionOrder) {
-      const node = nodes.find(n => n.id === nodeId)!;
-      const { output } = await simulateNodeExecution(node.type);
-      results.set(nodeId, output);
-    }
-  }
+ // byHierarchyandrowExecute
+ for (const level of [...levelGroups.keys()].sort((a, b) => a - b)) {
+ const levelNodes = levelGroups.get(level)!;
+ const promises = levelNodes.map(async nodeId => {
+ const node = nodes.find(n => n.id === nodeId)!;
+ const { output } = await simulateNodeExecution(node.type);
+ results.set(nodeId, output);
+ });
+ await Promise.all(promises);
+ }
+ } else {
+ // OrderExecute
+ for (const nodeId of executionOrder) {
+ const node = nodes.find(n => n.id === nodeId)!;
+ const { output } = await simulateNodeExecution(node.type);
+ results.set(nodeId, output);
+ }
+ }
 
-  return {
-    results,
-    totalDuration: performance.now() - start,
-    executionOrder,
-  };
+ return {
+ results,
+ totalDuration: performance.now() - start,
+ executionOrder,
+ };
 }
 
 /**
- * 生成线性工作流
+ * GeneratelineWorkflow
  */
 function generateLinearWorkflow(size: number) {
-  const nodes = Array.from({ length: size }, (_, i) => ({
-    id: `node-${i}`,
-    type: ['transform', 'filter', 'aggregate'][i % 3],
-  }));
+ const nodes = Array.from({ length: size }, (_, i) => ({
+ id: `node-${i}`,
+ type: ['transform', 'filter', 'aggregate'][i % 3],
+ }));
 
-  const edges = Array.from({ length: size - 1 }, (_, i) => ({
-    source: `node-${i}`,
-    target: `node-${i + 1}`,
-  }));
+ const edges = Array.from({ length: size - 1 }, (_, i) => ({
+ source: `node-${i}`,
+ target: `node-${i + 1}`,
+ }));
 
-  return { nodes, edges };
+ return { nodes, edges };
 }
 
 /**
- * 生成分支工作流
+ * GenerateBranchWorkflow
  */
 function generateBranchWorkflow(branches: number, depth: number) {
-  const nodes: { id: string; type: string }[] = [
-    { id: 'start', type: 'start' },
-  ];
-  const edges: { source: string; target: string }[] = [];
+ const nodes: { id: string; type: string }[] = [
+ { id: 'start', type: 'start' },
+ ];
+ const edges: { source: string; target: string }[] = [];
 
-  for (let b = 0; b < branches; b++) {
-    for (let d = 0; d < depth; d++) {
-      const nodeId = `branch-${b}-node-${d}`;
-      nodes.push({ id: nodeId, type: 'transform' });
+ for (let b = 0; b < branches; b++) {
+ for (let d = 0; d < depth; d++) {
+ const nodeId = `branch-${b}-node-${d}`;
+ nodes.push({ id: nodeId, type: 'transform' });
 
-      if (d === 0) {
-        edges.push({ source: 'start', target: nodeId });
-      } else {
-        edges.push({ source: `branch-${b}-node-${d - 1}`, target: nodeId });
-      }
-    }
-  }
+ if (d === 0) {
+ edges.push({ source: 'start', target: nodeId });
+ } else {
+ edges.push({ source: `branch-${b}-node-${d - 1}`, target: nodeId });
+ }
+ }
+ }
 
-  // 合并节点
-  nodes.push({ id: 'end', type: 'end' });
-  for (let b = 0; b < branches; b++) {
-    edges.push({ source: `branch-${b}-node-${depth - 1}`, target: 'end' });
-  }
+ // andNode
+ nodes.push({ id: 'end', type: 'end' });
+ for (let b = 0; b < branches; b++) {
+ edges.push({ source: `branch-${b}-node-${depth - 1}`, target: 'end' });
+ }
 
-  return { nodes, edges };
+ return { nodes, edges };
 }
 
-describe('执行引擎性能测试', () => {
-  describe('拓扑排序性能', () => {
-    it('排序 100 节点线性图应在 2ms 内完成', async () => {
-      const { nodes, edges } = generateLinearWorkflow(100);
+describe('ExecuteEnginecanTest', () => {
+ describe('TopologySortcan', () => {
+ it('Sort 100 Nodelineshouldat 2ms inDone', async () => {
+ const { nodes, edges } = generateLinearWorkflow(100);
 
-      const result = await benchmark(
-        '拓扑排序 100 节点',
-        () => topologicalSort(nodes, edges),
-        { iterations: 100 }
-      );
+ const result = await benchmark(
+ 'TopologySort 100 Node',
+ () => topologicalSort(nodes, edges),
+ { iterations: 100 }
+ );
 
-      console.log(`拓扑排序 100 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(2);
-    });
+ console.log(`TopologySort 100 Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(2);
+ });
 
-    it('排序 500 节点线性图应在 10ms 内完成', async () => {
-      const { nodes, edges } = generateLinearWorkflow(500);
+ it('Sort 500 Nodelineshouldat 10ms inDone', async () => {
+ const { nodes, edges } = generateLinearWorkflow(500);
 
-      const result = await benchmark(
-        '拓扑排序 500 节点',
-        () => topologicalSort(nodes, edges),
-        { iterations: 50 }
-      );
+ const result = await benchmark(
+ 'TopologySort 500 Node',
+ () => topologicalSort(nodes, edges),
+ { iterations: 50 }
+ );
 
-      console.log(`拓扑排序 500 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(10);
-    });
+ console.log(`TopologySort 500 Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(10);
+ });
 
-    it('排序 1000 节点线性图应在 20ms 内完成', async () => {
-      const { nodes, edges } = generateLinearWorkflow(1000);
+ it('Sort 1000 Nodelineshouldat 20ms inDone', async () => {
+ const { nodes, edges } = generateLinearWorkflow(1000);
 
-      const result = await benchmark(
-        '拓扑排序 1000 节点',
-        () => topologicalSort(nodes, edges),
-        { iterations: 20 }
-      );
+ const result = await benchmark(
+ 'TopologySort 1000 Node',
+ () => topologicalSort(nodes, edges),
+ { iterations: 20 }
+ );
 
-      console.log(`拓扑排序 1000 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(20);
-    });
+ console.log(`TopologySort 1000 Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(20);
+ });
 
-    it('排序复杂分支图应在 5ms 内完成', async () => {
-      const { nodes, edges } = generateBranchWorkflow(10, 10);
+ it('SortComplexBranchshouldat 5ms inDone', async () => {
+ const { nodes, edges } = generateBranchWorkflow(10, 10);
 
-      const result = await benchmark(
-        '拓扑排序分支图',
-        () => topologicalSort(nodes, edges),
-        { iterations: 100 }
-      );
+ const result = await benchmark(
+ 'TopologySortBranch',
+ () => topologicalSort(nodes, edges),
+ { iterations: 100 }
+ );
 
-      console.log(`拓扑排序分支图 (${nodes.length} 节点): ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(5);
-    });
-  });
+ console.log(`TopologySortBranch (${nodes.length} Node): ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(5);
+ });
+ });
 
-  describe('节点执行性能', () => {
-    it('单节点执行应在 2ms 内完成', async () => {
-      const result = await benchmark(
-        '单节点执行',
-        () => simulateNodeExecution('transform'),
-        { iterations: 100 }
-      );
+ describe('NodeExecutecan', () => {
+ it('NodeExecuteshouldat 2ms inDone', async () => {
+ const result = await benchmark(
+ 'NodeExecute',
+ () => simulateNodeExecution('transform'),
+ { iterations: 100 }
+ );
 
-      console.log(`单节点执行: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(2);
-    });
+ console.log(`NodeExecute: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(2);
+ });
 
-    it('Transform 节点应在 2ms 内完成', async () => {
-      const result = await benchmark(
-        'Transform 节点',
-        () => simulateNodeExecution('transform'),
-        { iterations: 100 }
-      );
+ it('Transform Nodeshouldat 2ms inDone', async () => {
+ const result = await benchmark(
+ 'Transform Node',
+ () => simulateNodeExecution('transform'),
+ { iterations: 100 }
+ );
 
-      console.log(`Transform 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(2);
-    });
+ console.log(`Transform Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(2);
+ });
 
-    it('Filter 节点应在 2ms 内完成', async () => {
-      const result = await benchmark(
-        'Filter 节点',
-        () => simulateNodeExecution('filter'),
-        { iterations: 100 }
-      );
+ it('Filter Nodeshouldat 2ms inDone', async () => {
+ const result = await benchmark(
+ 'Filter Node',
+ () => simulateNodeExecution('filter'),
+ { iterations: 100 }
+ );
 
-      console.log(`Filter 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(2);
-    });
+ console.log(`Filter Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(2);
+ });
 
-    it('Aggregate 节点应在 2ms 内完成', async () => {
-      const result = await benchmark(
-        'Aggregate 节点',
-        () => simulateNodeExecution('aggregate'),
-        { iterations: 100 }
-      );
+ it('Aggregate Nodeshouldat 2ms inDone', async () => {
+ const result = await benchmark(
+ 'Aggregate Node',
+ () => simulateNodeExecution('aggregate'),
+ { iterations: 100 }
+ );
 
-      console.log(`Aggregate 节点: ${result.averageTime.toFixed(3)}ms`);
-      expect(result.averageTime).toBeLessThan(2);
-    });
-  });
+ console.log(`Aggregate Node: ${result.averageTime.toFixed(3)}ms`);
+ expect(result.averageTime).toBeLessThan(2);
+ });
+ });
 
-  describe('DAG 执行性能', () => {
-    it('执行 10 节点线性工作流应在 10ms 内完成', async () => {
-      const { nodes, edges } = generateLinearWorkflow(10);
+ describe('DAG Executecan', () => {
+ it('Execute 10 NodelineWorkflowshouldat 10ms inDone', async () => {
+ const { nodes, edges } = generateLinearWorkflow(10);
 
-      const result = await benchmark(
-        '执行 10 节点线性工作流',
-        () => executeDAG(nodes, edges),
-        { iterations: 50 }
-      );
+ const result = await benchmark(
+ 'Execute 10 NodelineWorkflow',
+ () => executeDAG(nodes, edges),
+ { iterations: 50 }
+ );
 
-      console.log(`执行 10 节点: ${result.averageTime.toFixed(2)}ms`);
-      expect(result.averageTime).toBeLessThan(10);
-    });
+ console.log(`Execute 10 Node: ${result.averageTime.toFixed(2)}ms`);
+ expect(result.averageTime).toBeLessThan(10);
+ });
 
-    it('执行 50 节点线性工作流应在 50ms 内完成', async () => {
-      const { nodes, edges } = generateLinearWorkflow(50);
+ it('Execute 50 NodelineWorkflowshouldat 50ms inDone', async () => {
+ const { nodes, edges } = generateLinearWorkflow(50);
 
-      const result = await benchmark(
-        '执行 50 节点线性工作流',
-        () => executeDAG(nodes, edges),
-        { iterations: 20 }
-      );
+ const result = await benchmark(
+ 'Execute 50 NodelineWorkflow',
+ () => executeDAG(nodes, edges),
+ { iterations: 20 }
+ );
 
-      console.log(`执行 50 节点: ${result.averageTime.toFixed(2)}ms`);
-      expect(result.averageTime).toBeLessThan(50);
-    });
+ console.log(`Execute 50 Node: ${result.averageTime.toFixed(2)}ms`);
+ expect(result.averageTime).toBeLessThan(50);
+ });
 
-    it('并行执行分支工作流应比顺序执行更快', async () => {
-      const { nodes, edges } = generateBranchWorkflow(5, 5);
+ it('androwExecuteBranchWorkflowshouldcompareOrderExecutemore', async () => {
+ const { nodes, edges } = generateBranchWorkflow(5, 5);
 
-      const sequentialResult = await benchmark(
-        '顺序执行分支工作流',
-        () => executeDAG(nodes, edges, { parallel: false }),
-        { iterations: 10 }
-      );
+ const sequentialResult = await benchmark(
+ 'OrderExecuteBranchWorkflow',
+ () => executeDAG(nodes, edges, { parallel: false }),
+ { iterations: 10 }
+ );
 
-      const parallelResult = await benchmark(
-        '并行执行分支工作流',
-        () => executeDAG(nodes, edges, { parallel: true }),
-        { iterations: 10 }
-      );
+ const parallelResult = await benchmark(
+ 'androwExecuteBranchWorkflow',
+ () => executeDAG(nodes, edges, { parallel: true }),
+ { iterations: 10 }
+ );
 
-      console.log(`顺序执行: ${sequentialResult.averageTime.toFixed(2)}ms`);
-      console.log(`并行执行: ${parallelResult.averageTime.toFixed(2)}ms`);
-      
-      // 并行应该至少不比顺序慢太多（考虑开销）
-      expect(parallelResult.averageTime).toBeLessThan(sequentialResult.averageTime * 1.5);
-    });
-  });
+ console.log(`OrderExecute: ${sequentialResult.averageTime.toFixed(2)}ms`);
+ console.log(`androwExecute: ${parallelResult.averageTime.toFixed(2)}ms`);
+ 
+ // androwShouldfewnotcompareOrdermultiple(Consider)
+ expect(parallelResult.averageTime).toBeLessThan(sequentialResult.averageTime * 1.5);
+ });
+ });
 
-  describe('并发执行性能', () => {
-    it('同时处理 10 个请求应在 100ms 内完成', async () => {
-      const processRequest = async () => {
-        const results = await Promise.all(
-          Array.from({ length: 10 }, () => simulateNodeExecution('transform'))
-        );
-        return results;
-      };
+ describe('ConcurrencyExecutecan', () => {
+ it('timeProcess 10 Requestshouldat 100ms inDone', async () => {
+ const processRequest = async () => {
+ const results = await Promise.all(
+ Array.from({ length: 10 }, () => simulateNodeExecution('transform'))
+ );
+ return results;
+ };
 
-      const result = await benchmark(
-        '并发 10 请求',
-        processRequest,
-        { iterations: 20 }
-      );
+ const result = await benchmark(
+ 'Concurrency 10 Request',
+ processRequest,
+ { iterations: 20 }
+ );
 
-      console.log(`并发 10 请求: ${result.averageTime.toFixed(2)}ms`);
-      expect(result.averageTime).toBeLessThan(100);
-    });
+ console.log(`Concurrency 10 Request: ${result.averageTime.toFixed(2)}ms`);
+ expect(result.averageTime).toBeLessThan(100);
+ });
 
-    it('同时处理 50 个请求应在 200ms 内完成', async () => {
-      const processRequest = async () => {
-        const results = await Promise.all(
-          Array.from({ length: 50 }, () => simulateNodeExecution('transform'))
-        );
-        return results;
-      };
+ it('timeProcess 50 Requestshouldat 200ms inDone', async () => {
+ const processRequest = async () => {
+ const results = await Promise.all(
+ Array.from({ length: 50 }, () => simulateNodeExecution('transform'))
+ );
+ return results;
+ };
 
-      const result = await benchmark(
-        '并发 50 请求',
-        processRequest,
-        { iterations: 10 }
-      );
+ const result = await benchmark(
+ 'Concurrency 50 Request',
+ processRequest,
+ { iterations: 10 }
+ );
 
-      console.log(`并发 50 请求: ${result.averageTime.toFixed(2)}ms`);
-      expect(result.averageTime).toBeLessThan(200);
-    });
-  });
+ console.log(`Concurrency 50 Request: ${result.averageTime.toFixed(2)}ms`);
+ expect(result.averageTime).toBeLessThan(200);
+ });
+ });
 
-  describe('性能阈值验证', () => {
-    it('所有基准测试应满足性能阈值', async () => {
-      const suite = createPerformanceSuite('执行引擎性能套件');
+ describe('canvalueVerify', () => {
+ it('AllTestshouldSatisfycanvalue', async () => {
+ const suite = createPerformanceSuite('ExecuteEnginecanSuite');
 
-      await suite.add('拓扑排序', () => {
-        const { nodes, edges } = generateLinearWorkflow(100);
-        return topologicalSort(nodes, edges);
-      });
+ await suite.add('TopologySort', () => {
+ const { nodes, edges } = generateLinearWorkflow(100);
+ return topologicalSort(nodes, edges);
+ });
 
-      await suite.add('节点执行', () => simulateNodeExecution('transform'));
+ await suite.add('NodeExecute', () => simulateNodeExecution('transform'));
 
-      await suite.add('DAG 执行', () => {
-        const { nodes, edges } = generateLinearWorkflow(10);
-        return executeDAG(nodes, edges);
-      });
+ await suite.add('DAG Execute', () => {
+ const { nodes, edges } = generateLinearWorkflow(10);
+ return executeDAG(nodes, edges);
+ });
 
-      const validation = suite.validateAll({
-        maxAverageTime: 50,
-        maxP99: 100,
-        minOpsPerSecond: 10,
-      });
+ const validation = suite.validateAll({
+ maxAverageTime: 50,
+ maxP99: 100,
+ minOpsPerSecond: 10,
+ });
 
-      suite.printReport();
+ suite.printReport();
 
-      expect(validation.allPassed).toBe(true);
-      if (!validation.allPassed) {
-        console.log('失败的测试:', validation.validations.filter(v => !v.passed));
-      }
-    });
-  });
+ expect(validation.allPassed).toBe(true);
+ if (!validation.allPassed) {
+ console.log('Failed'sTest:', validation.validations.filter(v => !v.passed));
+ }
+ });
+ });
 });
 
-describe('大规模工作流测试', () => {
-  it('应能处理 500+ 节点的工作流', async () => {
-    const { nodes, edges } = generateLinearWorkflow(500);
-    
-    const start = performance.now();
-    const order = topologicalSort(nodes, edges);
-    const sortDuration = performance.now() - start;
+describe('largeScaleWorkflowTest', () => {
+ it('shouldcanProcess 500+ Node'sWorkflow', async () => {
+ const { nodes, edges } = generateLinearWorkflow(500);
+ 
+ const start = performance.now();
+ const order = topologicalSort(nodes, edges);
+ const sortDuration = performance.now() - start;
 
-    console.log(`500 节点拓扑排序: ${sortDuration.toFixed(2)}ms`);
-    
-    expect(order.length).toBe(500);
-    expect(sortDuration).toBeLessThan(50);
-  });
+ console.log(`500 NodeTopologySort: ${sortDuration.toFixed(2)}ms`);
+ 
+ expect(order.length).toBe(500);
+ expect(sortDuration).toBeLessThan(50);
+ });
 
-  it('应能处理高度分支的工作流', async () => {
-    const { nodes, edges } = generateBranchWorkflow(20, 10);
-    
-    const start = performance.now();
-    const order = topologicalSort(nodes, edges);
-    const sortDuration = performance.now() - start;
+ it('shouldcanProcessHeightBranch'sWorkflow', async () => {
+ const { nodes, edges } = generateBranchWorkflow(20, 10);
+ 
+ const start = performance.now();
+ const order = topologicalSort(nodes, edges);
+ const sortDuration = performance.now() - start;
 
-    console.log(`分支工作流 (${nodes.length} 节点) 拓扑排序: ${sortDuration.toFixed(2)}ms`);
-    
-    expect(order.length).toBe(nodes.length);
-    expect(sortDuration).toBeLessThan(20);
-  });
+ console.log(`BranchWorkflow (${nodes.length} Node) TopologySort: ${sortDuration.toFixed(2)}ms`);
+ 
+ expect(order.length).toBe(nodes.length);
+ expect(sortDuration).toBeLessThan(20);
+ });
 });

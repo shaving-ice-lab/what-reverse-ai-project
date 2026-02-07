@@ -1,5 +1,5 @@
 /**
- * 性能测试模块导出
+ * canTestModuleExport
  */
 
 export * from './utils';

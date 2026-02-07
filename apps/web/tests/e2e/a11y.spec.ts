@@ -15,17 +15,17 @@ test("public runtime page passes basic a11y checks", async ({ page }) => {
       return route.fulfill(
         respondOk({
           workspace: { name: "Demo Workspace", slug: "demo" },
-          app: { name: "日报助手", slug: "daily-report" },
+          app: { name: "daily reportAssistant", slug: "daily-report" },
           schema: {
             ui_schema: {
               blocks: [
                 {
                   id: "prompt",
                   type: "input",
-                  label: "提示",
+                  label: "Info",
                   input_key: "prompt",
                   validation: { required: true },
-                  props: { placeholder: "请输入需求" },
+                  props: { placeholder: "Please enterneedrequest" },
                 },
               ],
             },
@@ -37,7 +37,7 @@ test("public runtime page passes basic a11y checks", async ({ page }) => {
     return route.fulfill(
       respondOk({
         workspace: { name: "Demo Workspace", slug: "demo" },
-        app: { name: "日报助手", slug: "daily-report" },
+        app: { name: "daily reportAssistant", slug: "daily-report" },
         access_policy: { access_mode: "public_anonymous" },
         session_id: "sess_1",
       })

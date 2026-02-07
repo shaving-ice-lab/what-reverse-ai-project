@@ -13,7 +13,7 @@ const user = {
 const workspace = {
   id: "ws_123",
   owner_user_id: "user_1",
-  name: "测试工作空间",
+  name: "TestWorkspace",
   slug: "demo",
   icon: "🏢",
   status: "active",
@@ -29,10 +29,10 @@ const draftApp = {
   id: "app_123",
   workspace_id: "ws_123",
   owner_user_id: "user_1",
-  name: "日报助手",
+  name: "daily reportAssistant",
   slug: "daily-report",
   icon: "📄",
-  description: "生成日报",
+  description: "Generatedaily report",
   status: "draft",
   current_version_id: "ver_1",
   pricing_type: "free",
@@ -75,7 +75,7 @@ async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
     const method = request.method();
 
     if (path === "/api/v1/users/me") {
-      return route.fulfill(respondOk({ ...user }));
+      return route.fulfill(respondOk({ ..user }));
     }
 
     if (path === "/api/v1/workspaces") {
@@ -96,7 +96,7 @@ async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
     if (path === "/api/v1/workspaces" && method === "POST") {
       const payload = request.postData() ? JSON.parse(request.postData() as string) : {};
       const created = {
-        ...draftApp,
+        ..draftApp,
         id: "app_456",
         name: payload.name || draftApp.name,
         slug: payload.slug || draftApp.slug,
@@ -115,7 +115,7 @@ async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
     }
 
     if (path === `/api/v1/workspaces/${draftApp.id}/publish` && method === "POST") {
-      const updated = { ...(appStore[0] || draftApp), app_status: "published", published_at: "2026-02-03T10:00:00Z" };
+      const updated = { ..(appStore[0] || draftApp), app_status: "published", published_at: "2026-02-03T10:00:00Z" };
       appStore.splice(0, appStore.length, updated);
       return route.fulfill(respondOk(updated));
     }
@@ -145,22 +145,22 @@ test("create app flow navigates to builder", async ({ page }) => {
   await mockApiRoutes(page, appStore);
 
   await page.goto("/dashboard/apps");
-  await page.getByRole("button", { name: "创建应用" }).click();
-  await page.getByPlaceholder("例如：日报助手").fill("日报助手");
-  await page.getByRole("button", { name: "创建" }).click();
+  await page.getByRole("button", { name: "Create App" }).click();
+  await page.getByPlaceholder("e.g.:daily reportAssistant").fill("daily reportAssistant");
+  await page.getByRole("button", { name: "Create" }).click();
 
   await expect(page).toHaveURL(new RegExp(`/dashboard/app/app_456/builder`));
 });
 
 test("publish app flow updates status", async ({ page }) => {
-  const appStore: typeof draftApp[] = [{ ...draftApp }];
+  const appStore: typeof draftApp[] = [{ ..draftApp }];
   await seedAuth(page);
   await mockApiRoutes(page, appStore);
 
   await page.goto("/dashboard/apps");
-  await page.getByRole("button", { name: "发布" }).click();
+  await page.getByRole("button", { name: "Publish" }).click();
 
-  await expect(page.getByText("已发布")).toBeVisible();
+  await expect(page.getByText("Published")).toBeVisible();
 });
 
 test("public runtime access renders execute action", async ({ page }) => {
@@ -171,17 +171,17 @@ test("public runtime access renders execute action", async ({ page }) => {
       return route.fulfill(
         respondOk({
           workspace: { name: "Demo Workspace", slug: "demo" },
-          app: { name: "日报助手", slug: "daily-report" },
+          app: { name: "daily reportAssistant", slug: "daily-report" },
           schema: {
             ui_schema: {
               blocks: [
                 {
                   id: "prompt",
                   type: "input",
-                  label: "提示",
+                  label: "Info",
                   input_key: "prompt",
                   validation: { required: true },
-                  props: { placeholder: "请输入需求" },
+                  props: { placeholder: "Please enterneedrequest" },
                 },
               ],
             },
@@ -193,7 +193,7 @@ test("public runtime access renders execute action", async ({ page }) => {
     return route.fulfill(
       respondOk({
         workspace: { name: "Demo Workspace", slug: "demo" },
-        app: { name: "日报助手", slug: "daily-report" },
+        app: { name: "daily reportAssistant", slug: "daily-report" },
         access_policy: { access_mode: "public_anonymous" },
         session_id: "sess_1",
       })
@@ -201,5 +201,5 @@ test("public runtime access renders execute action", async ({ page }) => {
   });
 
   await page.goto("/runtime/demo/daily-report");
-  await expect(page.getByRole("button", { name: "立即执行" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "immediatelyExecute" })).toBeVisible();
 });
