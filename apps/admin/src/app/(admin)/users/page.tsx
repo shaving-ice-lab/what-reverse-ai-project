@@ -42,7 +42,7 @@ import { useAdminCapabilities } from "@/contexts/admin-capabilities";
 
 const ROLE_OPTIONS = ["all", "admin", "creator", "user"] as const;
 const ROLE_LABELS: Record<(typeof ROLE_OPTIONS)[number], string> = {
-  all: "全部角色",
+  all: "All Roles",
   admin: "Admin",
   creator: "Creator",
   user: "User",
@@ -50,9 +50,9 @@ const ROLE_LABELS: Record<(typeof ROLE_OPTIONS)[number], string> = {
 
 const STATUS_OPTIONS = ["all", "active", "suspended"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  active: "正常",
-  suspended: "已暂停",
+  all: "All Statuses",
+  active: "Active",
+  suspended: "Suspended",
 };
 
 export default function UsersPage() {
@@ -167,7 +167,7 @@ export default function UsersPage() {
 
   const updateRoleMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedUser) throw new Error("请选择用户");
+      if (!selectedUser) throw new Error("Please select a user");
       if (localMode) {
         const next = localUsers.map((u) =>
           u.id === selectedUser.id ? { ...u, role: roleDraft } : u
@@ -178,21 +178,21 @@ export default function UsersPage() {
       return adminApi.users.updateRole(selectedUser.id, { role: roleDraft });
     },
     onSuccess: () => {
-      toast.success("角色已更新");
+      toast.success("Role updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       setManageOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新角色失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update role");
     },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedUser) throw new Error("请选择用户");
+      if (!selectedUser) throw new Error("Please select a user");
       const reason = reasonDraft.trim();
       if (statusDraft === "suspended" && !reason) {
-        throw new Error("冻结用户时必须填写原因");
+        throw new Error("A reason is required when suspending a user");
       }
 
       if (localMode) {
@@ -223,13 +223,13 @@ export default function UsersPage() {
       });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       setManageOpen(false);
       setConfirmStatusOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新状态失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update status");
     },
   });
 
@@ -237,10 +237,10 @@ export default function UsersPage() {
   const batchUpdateStatusMutation = useMutation({
     mutationFn: async () => {
       const userIds = Array.from(selectedUserIds);
-      if (userIds.length === 0) throw new Error("请选择用户");
+      if (userIds.length === 0) throw new Error("Please select users");
       const reason = batchReasonDraft.trim();
       if (batchStatusDraft === "suspended" && !reason) {
-        throw new Error("批量冻结用户时必须填写原因");
+        throw new Error("A reason is required when batch suspending users");
       }
 
       if (localMode) {
@@ -266,21 +266,21 @@ export default function UsersPage() {
     },
     onSuccess: (data) => {
       const count = data?.updated || selectedUserIds.size;
-      toast.success(`已批量${batchStatusDraft === "suspended" ? "冻结" : "恢复"} ${count} 个用户`);
+      toast.success(`Batch ${batchStatusDraft === "suspended" ? "suspended" : "restored"} ${count} users`);
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       setBatchStatusOpen(false);
       setSelectedUserIds(new Set());
       setBatchReasonDraft("");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "批量更新状态失败");
+      toast.error(error instanceof Error ? error.message : "Batch status update failed");
     },
   });
 
   const batchUpdateRoleMutation = useMutation({
     mutationFn: async () => {
       const userIds = Array.from(selectedUserIds);
-      if (userIds.length === 0) throw new Error("请选择用户");
+      if (userIds.length === 0) throw new Error("Please select users");
 
       if (localMode) {
         const next = localUsers.map((u) =>
@@ -299,42 +299,42 @@ export default function UsersPage() {
     },
     onSuccess: (data) => {
       const count = data?.updated || selectedUserIds.size;
-      toast.success(`已批量更新 ${count} 个用户角色为 ${ROLE_LABELS[batchRoleDraft]}`);
+      toast.success(`Batch updated ${count} users' role to ${ROLE_LABELS[batchRoleDraft]}`);
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       setBatchRoleOpen(false);
       setSelectedUserIds(new Set());
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "批量更新角色失败");
+      toast.error(error instanceof Error ? error.message : "Batch role update failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="用户管理"
-        description="查看用户状态、角色与最近活动。"
+        title="User Management"
+        description="View user status, roles, and recent activity."
         icon={<Users className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出用户
+              Export Users
             </Button>
             <Button size="sm" disabled>
-              新增管理员
+              Add Admin
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="用户列表"
-        description="支持按邮箱、角色与状态筛选。"
+        title="User List"
+        description="Filter by email, role, and status."
         footer={
           selectedUserIds.size > 0 ? (
             <div className="flex items-center gap-2">
               <Badge variant="info" size="sm">
-                已选 {selectedUserIds.size} 个用户
+                {selectedUserIds.size} users selected
               </Badge>
               <Button
                 variant="outline"
@@ -344,7 +344,7 @@ export default function UsersPage() {
                   setBatchStatusOpen(true);
                 }}
               >
-                批量冻结
+                Batch Suspend
               </Button>
               <Button
                 variant="outline"
@@ -354,25 +354,25 @@ export default function UsersPage() {
                   setBatchStatusOpen(true);
                 }}
               >
-                批量恢复
+                Batch Restore
               </Button>
               <Button
                 size="sm"
                 onClick={() => setBatchRoleOpen(true)}
               >
-                分配角色
+                Assign Role
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedUserIds(new Set())}
               >
-                取消选择
+                Deselect
               </Button>
             </div>
           ) : (
             <div className="text-[12px] text-foreground-muted">
-              选择用户后可进行批量操作
+              Select users for batch operations
             </div>
           )
         }
@@ -382,14 +382,14 @@ export default function UsersPage() {
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索邮箱或 ID"
+              placeholder="Search email or ID"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">角色</span>
+            <span className="text-[11px] text-foreground-muted">Role</span>
             <select
               value={roleFilter}
               onChange={(event) =>
@@ -405,7 +405,7 @@ export default function UsersPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -421,7 +421,7 @@ export default function UsersPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
@@ -433,7 +433,7 @@ export default function UsersPage() {
                   type="button"
                   onClick={toggleSelectAll}
                   className="p-1 rounded hover:bg-surface-200 transition-colors"
-                  aria-label={allRowsSelected ? "取消全选" : "全选"}
+                  aria-label={allRowsSelected ? "Deselect All" : "Select All"}
                 >
                   {allRowsSelected ? (
                     <CheckSquare className="w-4 h-4 text-brand-500" />
@@ -444,11 +444,11 @@ export default function UsersPage() {
                   )}
                 </button>
               </TableHead>
-              <TableHead>用户</TableHead>
-              <TableHead>角色</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>最近登录</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Login</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -458,7 +458,7 @@ export default function UsersPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -468,8 +468,8 @@ export default function UsersPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {usersQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配用户"}
+                    ? "Failed to load. Check API or permission settings."
+                    : "No matching users"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -485,7 +485,7 @@ export default function UsersPage() {
                       type="button"
                       onClick={() => toggleSelectUser(user.id)}
                       className="p-1 rounded hover:bg-surface-200 transition-colors"
-                      aria-label={selectedUserIds.has(user.id) ? "取消选择" : "选择"}
+                      aria-label={selectedUserIds.has(user.id) ? "Deselect" : "Select"}
                     >
                       {selectedUserIds.has(user.id) ? (
                         <CheckSquare className="w-4 h-4 text-brand-500" />
@@ -511,7 +511,7 @@ export default function UsersPage() {
                       variant={user.status === "active" ? "success" : "warning"}
                       size="sm"
                     >
-                      {user.status === "active" ? "正常" : "已暂停"}
+                      {user.status === "active" ? "Active" : "Suspended"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -531,7 +531,7 @@ export default function UsersPage() {
                       }}
                     >
                       <UserCog className="w-4 h-4" />
-                      管理
+                      Manage
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -559,7 +559,7 @@ export default function UsersPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<UserCog className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>用户管理</DialogTitle>
+            <DialogTitle>User Management</DialogTitle>
             <DialogDescription>
               {selectedUser?.email ? (
                 <span className="text-foreground-light">
@@ -567,7 +567,7 @@ export default function UsersPage() {
                   <span className="text-foreground-muted">({selectedUser.id})</span>
                 </span>
               ) : (
-                "调整用户角色与状态。"
+                "Adjust user role and status."
               )}
             </DialogDescription>
           </DialogHeader>
@@ -575,7 +575,7 @@ export default function UsersPage() {
           <div className="space-y-5">
             <div className="rounded-lg border border-border bg-surface-75 p-4">
               <div className="text-[12px] font-medium text-foreground mb-3">
-                角色
+                Role
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <select
@@ -592,20 +592,20 @@ export default function UsersPage() {
                 <Button
                   size="sm"
                   loading={updateRoleMutation.isPending}
-                  loadingText="更新中..."
+                  loadingText="Updating..."
                   onClick={() => updateRoleMutation.mutate()}
                 >
-                  更新角色
+                  Update Role
                 </Button>
               </div>
               <div className="mt-2 text-[11px] text-foreground-muted">
-                后端当前允许：<code>user</code> / <code>admin</code> / <code>creator</code>
+                Backend currently allows: <code>user</code> / <code>admin</code> / <code>creator</code>
               </div>
             </div>
 
             <div className="rounded-lg border border-border bg-surface-75 p-4">
               <div className="text-[12px] font-medium text-foreground mb-3">
-                状态
+                Status
               </div>
               <div className="grid gap-2 sm:grid-cols-[160px_1fr] items-start">
                 <select
@@ -625,7 +625,7 @@ export default function UsersPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={3}
-                    placeholder="原因（冻结用户时必填）"
+                    placeholder="Reason (required for suspension)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -638,7 +638,7 @@ export default function UsersPage() {
                       size="sm"
                       onClick={() => setManageOpen(false)}
                     >
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={statusDraft === "suspended" ? "warning" : "default"}
@@ -646,7 +646,7 @@ export default function UsersPage() {
                       onClick={() => setConfirmStatusOpen(true)}
                       disabled={updateStatusMutation.isPending}
                     >
-                      提交状态变更
+                      Submit Status Change
                     </Button>
                   </div>
                 </div>
@@ -662,14 +662,14 @@ export default function UsersPage() {
         open={confirmStatusOpen}
         onOpenChange={setConfirmStatusOpen}
         type={statusDraft === "suspended" ? "warning" : "info"}
-        title={statusDraft === "suspended" ? "确认冻结该用户？" : "确认恢复该用户？"}
+        title={statusDraft === "suspended" ? "Confirm suspend this user?" : "Confirm restore this user?"}
         description={
           statusDraft === "suspended"
-            ? `将用户置为暂停状态，并记录原因：${reasonDraft.trim() || "（未填写）"}`
-            : "将用户恢复为正常状态。"
+            ? `The user will be suspended. Reason: ${reasonDraft.trim() || "(not provided)"}`
+            : "The user will be restored to active status."
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />
@@ -678,16 +678,16 @@ export default function UsersPage() {
       <ConfirmDialog
         open={batchStatusOpen}
         onOpenChange={setBatchStatusOpen}
-        title={`批量${batchStatusDraft === "suspended" ? "冻结" : "恢复"}用户`}
-        description={`将对已选中的 ${selectedUserIds.size} 个用户进行${batchStatusDraft === "suspended" ? "冻结" : "恢复"}操作。`}
-        confirmLabel={`确认${batchStatusDraft === "suspended" ? "冻结" : "恢复"}`}
+        title={`Batch ${batchStatusDraft === "suspended" ? "Suspend" : "Restore"} Users`}
+        description={`This will ${batchStatusDraft === "suspended" ? "suspend" : "restore"} ${selectedUserIds.size} selected users.`}
+        confirmLabel={`Confirm ${batchStatusDraft === "suspended" ? "Suspend" : "Restore"}`}
         onConfirm={() => batchUpdateStatusMutation.mutate()}
         isLoading={batchUpdateStatusMutation.isPending}
         variant={batchStatusDraft === "suspended" ? "warning" : "default"}
       >
         <div className="space-y-4 py-2">
           <div className="text-[12px] text-foreground-muted">
-            已选用户：
+            Selected users:
           </div>
           <div className="max-h-32 overflow-y-auto space-y-1 rounded-lg border border-border bg-surface-75 p-3">
             {selectedUsers.map((user) => (
@@ -698,11 +698,11 @@ export default function UsersPage() {
           </div>
           {batchStatusDraft === "suspended" && (
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">冻结原因（必填）</label>
+              <label className="text-[12px] text-foreground">Suspension Reason (required)</label>
               <Input
                 value={batchReasonDraft}
                 onChange={(e) => setBatchReasonDraft(e.target.value)}
-                placeholder="请输入批量冻结的原因..."
+                placeholder="Enter reason for batch suspension..."
               />
             </div>
           )}
@@ -713,15 +713,15 @@ export default function UsersPage() {
       <ConfirmDialog
         open={batchRoleOpen}
         onOpenChange={setBatchRoleOpen}
-        title="批量分配角色"
-        description={`将对已选中的 ${selectedUserIds.size} 个用户进行角色变更。`}
-        confirmLabel="确认分配"
+        title="Batch Assign Role"
+        description={`This will change the role for ${selectedUserIds.size} selected users.`}
+        confirmLabel="Confirm Assignment"
         onConfirm={() => batchUpdateRoleMutation.mutate()}
         isLoading={batchUpdateRoleMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="text-[12px] text-foreground-muted">
-            已选用户：
+            Selected users:
           </div>
           <div className="max-h-32 overflow-y-auto space-y-1 rounded-lg border border-border bg-surface-75 p-3">
             {selectedUsers.map((user) => (
@@ -732,7 +732,7 @@ export default function UsersPage() {
             ))}
           </div>
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">目标角色</label>
+            <label className="text-[12px] text-foreground">Target Role</label>
             <div className="flex flex-wrap gap-2">
               {ROLE_OPTIONS.filter((r) => r !== "all").map((role) => (
                 <Button

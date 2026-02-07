@@ -58,7 +58,7 @@ const mockReviewQueue: ReviewItem[] = [
   {
     id: "review-1",
     template_id: "tpl-101",
-    template_name: "商业计划书生成器",
+    template_name: "Business Plan Generator",
     submitter_id: "user-1",
     submitter_email: "creator@example.com",
     status: "pending",
@@ -69,7 +69,7 @@ const mockReviewQueue: ReviewItem[] = [
   {
     id: "review-2",
     template_id: "tpl-102",
-    template_name: "营销文案助手",
+    template_name: "Marketing Copywriting Assistant",
     submitter_id: "user-2",
     submitter_email: "marketer@example.com",
     status: "pending",
@@ -80,7 +80,7 @@ const mockReviewQueue: ReviewItem[] = [
   {
     id: "review-3",
     template_id: "tpl-103",
-    template_name: "技术文档模板",
+    template_name: "Technical Documentation Template",
     submitter_id: "user-3",
     submitter_email: "techwriter@example.com",
     status: "approved",
@@ -91,7 +91,7 @@ const mockReviewQueue: ReviewItem[] = [
   {
     id: "review-4",
     template_id: "tpl-104",
-    template_name: "可疑内容模板",
+    template_name: "Suspicious Content Template",
     submitter_id: "user-4",
     submitter_email: "suspicious@example.com",
     status: "rejected",
@@ -103,10 +103,10 @@ const mockReviewQueue: ReviewItem[] = [
 
 const STATUS_OPTIONS = ["all", "pending", "approved", "rejected"] as const;
 const STATUS_LABELS: Record<string, string> = {
-  all: "全部",
-  pending: "待审核",
-  approved: "已通过",
-  rejected: "已拒绝",
+  all: "All",
+  pending: "Pending",
+  approved: "Approved",
+  rejected: "Rejected",
 };
 
 const STATUS_VARIANTS: Record<string, "warning" | "success" | "destructive" | "secondary"> = {
@@ -163,12 +163,12 @@ export default function TemplateReviewPage() {
       });
     },
     onSuccess: () => {
-      toast.success(reviewDecision === "approved" ? "模板已通过审核" : "模板已拒绝");
+      toast.success(reviewDecision === "approved" ? "Template approved" : "Template rejected");
       setReviewOpen(null);
       setReviewNotes("");
       queryClient.invalidateQueries({ queryKey: ["admin", "templates", "public-review"] });
     },
-    onError: () => toast.error("审核失败"),
+    onError: () => toast.error("Review failed"),
   });
 
   const pendingCount = localQueue.filter((item) => item.status === "pending").length;
@@ -178,44 +178,44 @@ export default function TemplateReviewPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="模板公开审核"
-        description="审核用户提交的公开模板申请。"
+        title="Template Public Review"
+        description="Review user-submitted public template requests."
         icon={<Shield className="w-4 h-4" />}
         backHref="/templates"
-        backLabel="返回模板列表"
+        backLabel="Back to Template List"
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="待审核"
+          title="Pending"
           value={pendingCount.toString()}
-          subtitle="个模板"
+          subtitle="templates"
           trend={pendingCount > 0 ? { value: pendingCount, isPositive: true } : undefined}
         />
         <StatsCard
-          title="已通过"
+          title="Approved"
           value={approvedCount.toString()}
-          subtitle="个模板"
+          subtitle="templates"
         />
         <StatsCard
-          title="已拒绝"
+          title="Rejected"
           value={rejectedCount.toString()}
-          subtitle="个模板"
+          subtitle="templates"
         />
         <StatsCard
-          title="总审核量"
+          title="Total Reviews"
           value={localQueue.length.toString()}
-          subtitle="个申请"
+          subtitle="requests"
         />
       </div>
 
       <SettingsSection
-        title="审核队列"
-        description="用户申请公开的模板列表。"
+        title="Review Queue"
+        description="Templates submitted for public listing."
       >
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
@@ -229,19 +229,19 @@ export default function TemplateReviewPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredQueue.length} 条
+            {filteredQueue.length} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>模板</TableHead>
-              <TableHead>提交者</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>提交时间</TableHead>
-              <TableHead>审核时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Template</TableHead>
+              <TableHead>Submitter</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Submitted</TableHead>
+              <TableHead>Reviewed</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -251,7 +251,7 @@ export default function TemplateReviewPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无审核申请
+                  No review requests
                 </TableCell>
               </TableRow>
             ) : (
@@ -305,7 +305,7 @@ export default function TemplateReviewPage() {
                         disabled={item.status !== "pending"}
                       >
                         <Eye className="w-3.5 h-3.5 mr-1" />
-                        审核
+                        Review
                       </Button>
                     </div>
                   </TableCell>
@@ -320,11 +320,11 @@ export default function TemplateReviewPage() {
       <Dialog open={Boolean(reviewOpen)} onOpenChange={(open) => !open && setReviewOpen(null)}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileText className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>审核公开申请</DialogTitle>
+            <DialogTitle>Review Public Request</DialogTitle>
             <DialogDescription>
               {reviewOpen && (
                 <span className="text-foreground-light">
-                  审核模板：{reviewOpen.template_name}
+                  Reviewing template: {reviewOpen.template_name}
                 </span>
               )}
             </DialogDescription>
@@ -335,22 +335,22 @@ export default function TemplateReviewPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid grid-cols-2 gap-4 text-[12px]">
                   <div>
-                    <div className="text-foreground-muted">模板 ID</div>
+                    <div className="text-foreground-muted">Template ID</div>
                     <div className="text-foreground">{reviewOpen.template_id}</div>
                   </div>
                   <div>
-                    <div className="text-foreground-muted">提交者</div>
+                    <div className="text-foreground-muted">Submitter</div>
                     <div className="text-foreground">{reviewOpen.submitter_email}</div>
                   </div>
                   <div>
-                    <div className="text-foreground-muted">提交时间</div>
+                    <div className="text-foreground-muted">Submitted At</div>
                     <div className="text-foreground">{formatDate(reviewOpen.submitted_at)}</div>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">审核决定</label>
+                <label className="text-[12px] text-foreground">Review Decision</label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -359,7 +359,7 @@ export default function TemplateReviewPage() {
                     onClick={() => setReviewDecision("approved")}
                   >
                     <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                    通过
+                    Approve
                   </Button>
                   <Button
                     type="button"
@@ -368,17 +368,17 @@ export default function TemplateReviewPage() {
                     onClick={() => setReviewDecision("rejected")}
                   >
                     <XCircle className="w-3.5 h-3.5 mr-1" />
-                    拒绝
+                    Reject
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">审核备注</label>
+                <label className="text-[12px] text-foreground">Review Notes</label>
                 <Input
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="输入审核备注..."
+                  placeholder="Enter review notes..."
                 />
               </div>
             </div>
@@ -386,15 +386,15 @@ export default function TemplateReviewPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setReviewOpen(null)}>
-              取消
+              Cancel
             </Button>
             <Button
               variant={reviewDecision === "rejected" ? "destructive" : "default"}
               onClick={() => reviewMutation.mutate()}
               loading={reviewMutation.isPending}
-              loadingText="提交中..."
+              loadingText="Submitting..."
             >
-              提交审核
+              Submit Review
             </Button>
           </DialogFooter>
         </DialogContent>

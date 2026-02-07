@@ -46,11 +46,11 @@ import { workflowRows, executionRows } from "@/lib/mock-data";
 import type { Execution, Workflow, WorkflowVersion } from "@/types/admin";
 
 const STATUS_LABELS: Record<string, string> = {
-  active: "活跃",
-  draft: "草稿",
-  archived: "已归档",
-  suspended: "已暂停",
-  published: "已发布",
+  active: "Active",
+  draft: "Draft",
+  archived: "Archived",
+  suspended: "Suspended",
+  published: "Published",
 };
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "destructive"> = {
@@ -62,12 +62,12 @@ const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "des
 };
 
 const EXECUTION_STATUS_LABELS: Record<string, string> = {
-  pending: "排队中",
-  running: "执行中",
-  completed: "已完成",
-  failed: "失败",
-  cancelled: "已取消",
-  timeout: "超时",
+  pending: "Queued",
+  running: "Running",
+  completed: "Completed",
+  failed: "Failed",
+  cancelled: "Cancelled",
+  timeout: "Timeout",
 };
 
 const EXECUTION_STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "destructive" | "info"> = {
@@ -109,11 +109,11 @@ const mockFailureDistribution = {
   total_failures: 45,
   failure_rate: 3.6,
   distribution: [
-    { reason: "HTTP 超时", count: 18, percentage: 40, sample_execution_id: "exec-f1" },
-    { reason: "LLM 响应格式错误", count: 12, percentage: 26.7, sample_execution_id: "exec-f2" },
-    { reason: "输入验证失败", count: 8, percentage: 17.8, sample_execution_id: "exec-f3" },
-    { reason: "API 限流", count: 5, percentage: 11.1, sample_execution_id: "exec-f4" },
-    { reason: "内部错误", count: 2, percentage: 4.4, sample_execution_id: "exec-f5" },
+    { reason: "HTTP Timeout", count: 18, percentage: 40, sample_execution_id: "exec-f1" },
+    { reason: "LLM Response Format Error", count: 12, percentage: 26.7, sample_execution_id: "exec-f2" },
+    { reason: "Input Validation Failed", count: 8, percentage: 17.8, sample_execution_id: "exec-f3" },
+    { reason: "API Rate Limit", count: 5, percentage: 11.1, sample_execution_id: "exec-f4" },
+    { reason: "Internal Error", count: 2, percentage: 4.4, sample_execution_id: "exec-f5" },
   ],
   recent_failures: [
     { id: "exec-rf1", error_message: "HTTP request timeout after 30s", node_id: "node-1", occurred_at: "2026-02-03T07:45:00Z" },
@@ -210,38 +210,38 @@ export default function WorkflowDetailPage() {
   const replayMutation = useMutation({
     mutationFn: (executionId: string) => adminApi.executions.replay(executionId),
     onSuccess: (data) => {
-      toast.success(`回放执行已创建: ${data.new_execution_id}`);
+      toast.success(`Replay execution created: ${data.new_execution_id}`);
       setReplayOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "workflows"] });
     },
-    onError: () => toast.error("回放失败"),
+    onError: () => toast.error("Replay failed"),
   });
 
   const cancelMutation = useMutation({
     mutationFn: (executionId: string) => adminApi.executions.cancel(executionId, { reason: cancelReason }),
     onSuccess: () => {
-      toast.success("执行已取消");
+      toast.success("Execution cancelled");
       setCancelOpen(null);
       setCancelReason("");
       queryClient.invalidateQueries({ queryKey: ["admin", "workflows"] });
     },
-    onError: () => toast.error("取消失败"),
+    onError: () => toast.error("Cancellation failed"),
   });
 
   const adjustPriorityMutation = useMutation({
     mutationFn: (executionId: string) => adminApi.executions.adjustPriority(executionId, { priority: newPriority }),
     onSuccess: () => {
-      toast.success("优先级已调整");
+      toast.success("Priority adjusted");
       setAdjustPriorityOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "workflows"] });
     },
-    onError: () => toast.error("调整失败"),
+    onError: () => toast.error("Adjustment failed"),
   });
 
   if (!workflowId) {
     return (
       <PageContainer>
-        <PageHeader title="工作流详情" description="无效的工作流 ID" icon={<GitBranch className="w-4 h-4" />} />
+        <PageHeader title="Workflow Details" description="Invalid workflow ID" icon={<GitBranch className="w-4 h-4" />} />
       </PageContainer>
     );
   }
@@ -252,17 +252,17 @@ export default function WorkflowDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={workflow?.name || "工作流详情"}
+        title={workflow?.name || "Workflow Details"}
         description={
           workflow
             ? `${workflow.id}`
             : localMode
-            ? "未找到对应的本地工作流数据"
-            : "正在加载工作流数据..."
+            ? "No matching local workflow data found"
+            : "Loading workflow data..."
         }
         icon={<GitBranch className="w-4 h-4" />}
         backHref="/workflows"
-        backLabel="返回工作流列表"
+        backLabel="Back to Workflows"
         badge={
           workflow ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -278,10 +278,10 @@ export default function WorkflowDetailPage() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" disabled>
-              暂停工作流
+              Pause Workflow
             </Button>
             <Button size="sm" disabled>
-              运行工作流
+              Run Workflow
             </Button>
           </div>
         }
@@ -291,9 +291,9 @@ export default function WorkflowDetailPage() {
       <ConfirmDialog
         open={Boolean(replayOpen)}
         onOpenChange={(open) => !open && setReplayOpen(null)}
-        title="回放执行"
-        description="使用相同输入重新执行该工作流。"
-        confirmLabel="开始回放"
+        title="Replay Execution"
+        description="Re-execute the workflow with the same input."
+        confirmLabel="Start Replay"
         onConfirm={() => replayOpen && replayMutation.mutate(replayOpen)}
         isLoading={replayMutation.isPending}
       />
@@ -301,20 +301,20 @@ export default function WorkflowDetailPage() {
       <ConfirmDialog
         open={Boolean(cancelOpen)}
         onOpenChange={(open) => !open && setCancelOpen(null)}
-        title="取消执行"
-        description="确认要取消此执行吗？"
-        confirmLabel="确认取消"
+        title="Cancel Execution"
+        description="Are you sure you want to cancel this execution?"
+        confirmLabel="Confirm Cancel"
         onConfirm={() => cancelOpen && cancelMutation.mutate(cancelOpen)}
         isLoading={cancelMutation.isPending}
         variant="warning"
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">取消原因</label>
+            <label className="text-[12px] text-foreground">Cancellation Reason</label>
             <Input
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="请输入取消原因..."
+              placeholder="Enter cancellation reason..."
             />
           </div>
         </div>
@@ -323,15 +323,15 @@ export default function WorkflowDetailPage() {
       <ConfirmDialog
         open={Boolean(adjustPriorityOpen)}
         onOpenChange={(open) => !open && setAdjustPriorityOpen(null)}
-        title="调整优先级"
-        description="调整执行在队列中的优先级。"
-        confirmLabel="保存"
+        title="Adjust Priority"
+        description="Adjust the execution priority in the queue."
+        confirmLabel="Save"
         onConfirm={() => adjustPriorityOpen && adjustPriorityMutation.mutate(adjustPriorityOpen)}
         isLoading={adjustPriorityMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">优先级（1-10，数字越大优先级越高）</label>
+            <label className="text-[12px] text-foreground">Priority (1-10, higher number = higher priority)</label>
             <Input
               type="number"
               min={1}
@@ -344,17 +344,17 @@ export default function WorkflowDetailPage() {
       </ConfirmDialog>
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-        <SettingsSection title="基础信息" description="工作流配置与元数据。">
+        <SettingsSection title="Basic Info" description="Workflow configuration and metadata.">
           {!workflow ? (
             <div className="text-[12px] text-foreground-muted">
-              {workflowQuery.isPending && !localMode ? "正在加载..." : "暂无工作流数据"}
+              {workflowQuery.isPending && !localMode ? "Loading..." : "No workflow data"}
             </div>
           ) : (
             <div className="space-y-1">
-              <FormRow label="工作流 ID" description="系统唯一标识">
+              <FormRow label="Workflow ID" description="System unique identifier">
                 <div className="text-[12px] text-foreground">{workflow.id}</div>
               </FormRow>
-              <FormRow label="所属 Workspace" description="工作流归属工作空间">
+              <FormRow label="Workspace" description="Workspace the workflow belongs to">
                 <Link
                   href={`/workspaces/${workflow.workspace_id}`}
                   className="text-[12px] text-foreground hover:text-brand-500 transition-colors"
@@ -362,18 +362,18 @@ export default function WorkflowDetailPage() {
                   {workflow.workspace?.name || workflow.workspace_id}
                 </Link>
               </FormRow>
-              <FormRow label="状态" description="当前运行状态">
+              <FormRow label="Status" description="Current running status">
                 <Badge variant={statusVariant} size="sm">
                   {statusLabel}
                 </Badge>
               </FormRow>
-              <FormRow label="版本" description="当前版本号">
+              <FormRow label="Version" description="Current version number">
                 <div className="text-[12px] text-foreground-light">v{workflow.version || 1}</div>
               </FormRow>
-              <FormRow label="节点数" description="工作流节点数量">
+              <FormRow label="Node Count" description="Number of workflow nodes">
                 <div className="text-[12px] text-foreground-light">{workflow.nodes_count || 0}</div>
               </FormRow>
-              <FormRow label="创建时间" description="工作流创建时间">
+              <FormRow label="Created" description="Workflow creation time">
                 <div className="text-[12px] text-foreground-light">
                   {workflow.created_at ? formatDate(workflow.created_at) : "-"}
                 </div>
@@ -384,57 +384,57 @@ export default function WorkflowDetailPage() {
 
         {/* Execution Timing Analysis */}
         <SettingsSection
-          title="执行耗时分析"
-          description={`最近 ${timingDays} 天的执行性能统计。`}
+          title="Execution Timing Analysis"
+          description={`Execution performance statistics for the last ${timingDays} days.`}
           icon={<Timer className="w-4 h-4" />}
           footer={
             <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
-              <span>时间范围</span>
+              <span>Time Range</span>
               <select
                 value={timingDays}
                 onChange={(e) => setTimingDays(parseInt(e.target.value))}
                 className="h-6 rounded border border-border bg-surface-100 px-2 text-[11px]"
               >
-                <option value={7}>7 天</option>
-                <option value={14}>14 天</option>
-                <option value={30}>30 天</option>
+                <option value={7}>7 days</option>
+                <option value={14}>14 days</option>
+                <option value={30}>30 days</option>
               </select>
             </div>
           }
         >
           {timingAnalysisQuery.isPending && !localMode ? (
-            <div className="text-[12px] text-foreground-muted">正在加载...</div>
+            <div className="text-[12px] text-foreground-muted">Loading...</div>
           ) : timingAnalysisQuery.error && !localMode ? (
-            <div className="text-[12px] text-foreground-muted">加载失败，请检查 API 或权限配置</div>
+            <div className="text-[12px] text-foreground-muted">Failed to load. Please check API or permission configuration.</div>
           ) : timingAnalysis ? (
             <div className="space-y-4">
               <div className="page-grid grid-cols-2 lg:grid-cols-4">
                 <StatsCard
-                  title="总执行数"
+                  title="Total Executions"
                   value={timingAnalysis.total_executions.toLocaleString()}
-                  subtitle="次执行"
+                  subtitle="executions"
                 />
                 <StatsCard
-                  title="平均耗时"
+                  title="Avg Duration"
                   value={`${(timingAnalysis.avg_duration_ms / 1000).toFixed(2)}s`}
-                  subtitle="秒/次"
+                  subtitle="sec/execution"
                 />
                 <StatsCard
-                  title="P95 耗时"
+                  title="P95 Duration"
                   value={`${(timingAnalysis.p95_duration_ms / 1000).toFixed(2)}s`}
-                  subtitle="95% 分位"
+                  subtitle="95th percentile"
                 />
                 <StatsCard
-                  title="P99 耗时"
+                  title="P99 Duration"
                   value={`${(timingAnalysis.p99_duration_ms / 1000).toFixed(2)}s`}
-                  subtitle="99% 分位"
+                  subtitle="99th percentile"
                 />
               </div>
 
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">节点耗时分布</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Node Timing Distribution</div>
                 {timingAnalysis.node_timings.length === 0 ? (
-                  <div className="text-[12px] text-foreground-muted">暂无节点耗时数据</div>
+                  <div className="text-[12px] text-foreground-muted">No node timing data</div>
                 ) : (
                   <div className="space-y-2">
                     {timingAnalysis.node_timings.map((node) => {
@@ -466,60 +466,60 @@ export default function WorkflowDetailPage() {
               </div>
             </div>
           ) : (
-            <div className="text-[12px] text-foreground-muted">暂无耗时分析数据</div>
+            <div className="text-[12px] text-foreground-muted">No timing analysis data</div>
           )}
         </SettingsSection>
       </div>
 
       {/* Failure Distribution */}
       <SettingsSection
-        title="执行失败原因分布"
-        description={`最近 ${failureDays} 天的失败统计与诊断。`}
+        title="Failure Reason Distribution"
+        description={`Failure statistics and diagnostics for the last ${failureDays} days.`}
         icon={<AlertTriangle className="w-4 h-4" />}
         footer={
           <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
-            <span>时间范围</span>
+            <span>Time Range</span>
             <select
               value={failureDays}
               onChange={(e) => setFailureDays(parseInt(e.target.value))}
               className="h-6 rounded border border-border bg-surface-100 px-2 text-[11px]"
             >
-              <option value={7}>7 天</option>
-              <option value={14}>14 天</option>
-              <option value={30}>30 天</option>
+              <option value={7}>7 days</option>
+              <option value={14}>14 days</option>
+              <option value={30}>30 days</option>
             </select>
           </div>
         }
       >
         {failureDistributionQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : failureDistributionQuery.error && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">加载失败，请检查 API 或权限配置</div>
+          <div className="text-[12px] text-foreground-muted">Failed to load. Please check API or permission configuration.</div>
         ) : failureDistribution ? (
           <div className="space-y-4">
             <div className="page-grid grid-cols-2 lg:grid-cols-3">
               <StatsCard
-                title="总失败数"
+                title="Total Failures"
                 value={failureDistribution.total_failures.toString()}
-                subtitle="次失败"
+                subtitle="failures"
               />
               <StatsCard
-                title="失败率"
+                title="Failure Rate"
                 value={`${failureDistribution.failure_rate}%`}
-                subtitle="失败/总执行"
+                subtitle="failures/total"
               />
               <StatsCard
-                title="故障类型"
+                title="Failure Types"
                 value={failureDistribution.distribution.length.toString()}
-                subtitle="种失败原因"
+                subtitle="unique reasons"
               />
             </div>
 
             <div className="page-grid grid-cols-1 lg:grid-cols-2">
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">失败原因分布</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Failure Reason Distribution</div>
                 {failureDistribution.distribution.length === 0 ? (
-                  <div className="text-[12px] text-foreground-muted">暂无失败原因数据</div>
+                  <div className="text-[12px] text-foreground-muted">No failure reason data</div>
                 ) : (
                   <div className="space-y-2">
                     {failureDistribution.distribution.map((item) => (
@@ -543,9 +543,9 @@ export default function WorkflowDetailPage() {
               </div>
 
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">最近失败</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Recent Failures</div>
                 {failureDistribution.recent_failures.length === 0 ? (
-                  <div className="text-[12px] text-foreground-muted">暂无失败样本</div>
+                  <div className="text-[12px] text-foreground-muted">No failure samples</div>
                 ) : (
                   <div className="space-y-3">
                     {failureDistribution.recent_failures.map((failure) => (
@@ -556,7 +556,7 @@ export default function WorkflowDetailPage() {
                         <div className="min-w-0">
                           <div className="text-foreground font-medium truncate">{failure.error_message}</div>
                           <div className="text-foreground-muted mt-0.5">
-                            节点: {failure.node_id}
+                            Node: {failure.node_id}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -579,32 +579,32 @@ export default function WorkflowDetailPage() {
             </div>
           </div>
         ) : (
-          <div className="text-[12px] text-foreground-muted">暂无失败分析数据</div>
+          <div className="text-[12px] text-foreground-muted">No failure analysis data</div>
         )}
       </SettingsSection>
 
       {/* Execution Queue */}
       <SettingsSection
-        title="运行队列"
-        description="当前排队和执行中的任务。"
+        title="Execution Queue"
+        description="Currently queued and running tasks."
         icon={<Activity className="w-4 h-4" />}
       >
         {queueQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : queueQuery.error && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">加载失败，请检查 API 或权限配置</div>
+          <div className="text-[12px] text-foreground-muted">Failed to load. Please check API or permission configuration.</div>
         ) : queueItems.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">当前无排队任务</div>
+          <div className="text-[12px] text-foreground-muted">No queued tasks</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>执行 ID</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>优先级</TableHead>
-                <TableHead>入队时间</TableHead>
-                <TableHead>开始时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Execution ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Queued At</TableHead>
+                <TableHead>Started At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -644,7 +644,7 @@ export default function WorkflowDetailPage() {
                               setAdjustPriorityOpen(item.id);
                             }}
                           >
-                            调整优先级
+                            Adjust Priority
                           </Button>
                           <Button
                             variant="ghost"
@@ -662,7 +662,7 @@ export default function WorkflowDetailPage() {
                           onClick={() => setCancelOpen(item.id)}
                         >
                           <Pause className="w-3.5 h-3.5 mr-1" />
-                          取消
+                          Cancel
                         </Button>
                       )}
                     </div>
@@ -676,22 +676,22 @@ export default function WorkflowDetailPage() {
 
       {/* Recent Executions */}
       <SettingsSection
-        title="最近执行"
-        description="最近的工作流执行记录。"
+        title="Recent Executions"
+        description="Recent workflow execution records."
         icon={<History className="w-4 h-4" />}
       >
         {recentExecutions.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无执行记录</div>
+          <div className="text-[12px] text-foreground-muted">No execution records</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>执行 ID</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>触发方式</TableHead>
-                <TableHead>耗时</TableHead>
-                <TableHead>时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Execution ID</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Trigger</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -730,7 +730,7 @@ export default function WorkflowDetailPage() {
                         onClick={() => setReplayOpen(execution.id)}
                       >
                         <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                        回放
+                        Replay
                       </Button>
                     </div>
                   </TableCell>
@@ -743,19 +743,19 @@ export default function WorkflowDetailPage() {
 
       {/* Version History */}
       <SettingsSection
-        title="版本历史"
-        description="工作流版本变更记录。"
+        title="Version History"
+        description="Workflow version change records."
         icon={<BarChart3 className="w-4 h-4" />}
       >
         {versions.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无版本记录</div>
+          <div className="text-[12px] text-foreground-muted">No version records</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>版本</TableHead>
-                <TableHead>变更说明</TableHead>
-                <TableHead>发布时间</TableHead>
+                <TableHead>Version</TableHead>
+                <TableHead>Changelog</TableHead>
+                <TableHead>Published</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -12,13 +12,13 @@ export default function NotFound() {
           <FileX className="w-6 h-6 text-foreground-light" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-foreground">页面不存在</h1>
+          <h1 className="text-lg font-semibold text-foreground">Page Not Found</h1>
           <p className="text-[12px] text-foreground-light mt-2">
-            该页面可能已被移动或删除，请返回控制台继续操作。
+            This page may have been moved or deleted. Please return to the console to continue.
           </p>
         </div>
         <Link href="/">
-          <Button>返回控制台</Button>
+          <Button>Back to Console</Button>
         </Link>
       </div>
     </div>

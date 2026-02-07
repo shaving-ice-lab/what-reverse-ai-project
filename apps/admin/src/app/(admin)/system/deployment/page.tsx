@@ -54,8 +54,8 @@ export default function SystemDeploymentPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="部署信息"
-        description="查看多地域部署与访问入口配置。"
+        title="Deployment Info"
+        description="View multi-region deployment and access endpoint configurations."
         icon={<ServerCog className="w-4 h-4" />}
         actions={
           <Button
@@ -66,46 +66,46 @@ export default function SystemDeploymentPage() {
               if (!localMode) deploymentQuery.refetch();
             }}
             loading={!localMode && deploymentQuery.isFetching}
-            loadingText="刷新中..."
+            loadingText="Refreshing..."
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
       <div className="grid gap-3 md:grid-cols-3">
         <StatsCard
-          title="覆盖区域"
+          title="Regions Covered"
           value={regionList.length}
-          subtitle="已配置可用区"
+          subtitle="Configured availability zones"
         />
         <StatsCard
           title="Primary Region"
           value={primaryRegion || "-"}
-          subtitle="主区域入口"
+          subtitle="Primary region endpoint"
         />
         <StatsCard
-          title="可用入口"
+          title="Available Endpoints"
           value={Object.keys(regionBaseUrls).length}
-          subtitle="区域 Base URL 数量"
+          subtitle="Number of regional Base URLs"
         />
       </div>
 
-      <SettingsSection title="区域入口" description="查看各区域的 API Base URL 配置。">
+      <SettingsSection title="Regional Endpoints" description="View the API Base URL configuration for each region.">
         {isLoading ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : regionList.length === 0 ? (
           <EmptyState
-            title="暂无部署信息"
-            description="尚未返回区域配置数据。"
+            title="No Deployment Info"
+            description="No regional configuration data returned."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>区域</TableHead>
-                <TableHead>访问入口</TableHead>
-                <TableHead>角色</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Access Endpoint</TableHead>
+                <TableHead>Role</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

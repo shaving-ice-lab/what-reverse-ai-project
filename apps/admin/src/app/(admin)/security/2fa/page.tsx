@@ -141,10 +141,10 @@ const mockSettings: TwoFactorSettings = {
 };
 
 const METHOD_LABELS: Record<TwoFactorConfig["method"], string> = {
-  totp: "身份验证器 (TOTP)",
-  sms: "短信验证",
-  email: "邮箱验证",
-  hardware_key: "硬件密钥",
+  totp: "Authenticator (TOTP)",
+  sms: "SMS Verification",
+  email: "Email Verification",
+  hardware_key: "Hardware Key",
 };
 
 const METHOD_ICONS: Record<TwoFactorConfig["method"], typeof Smartphone> = {
@@ -212,18 +212,18 @@ export default function TwoFactorPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="双因素认证 (2FA)"
-        description="管理管理员账号的双因素认证配置。"
+        title="Two-Factor Authentication (2FA)"
+        description="Manage two-factor authentication settings for admin accounts."
         icon={<Lock className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <Download className="w-3.5 h-3.5 mr-1" />
-              导出报告
+              Export Report
             </Button>
             <Button size="sm" onClick={() => setSettingsModalOpen(true)}>
               <Settings className="w-3.5 h-3.5 mr-1" />
-              全局配置
+              Global Settings
             </Button>
           </div>
         }
@@ -237,7 +237,7 @@ export default function TwoFactorPage() {
               <Shield className="w-5 h-5 text-success-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">已启用</div>
+              <div className="text-[11px] text-foreground-muted">Enabled</div>
               <div className="text-[20px] font-semibold text-foreground">{enabledCount}</div>
             </div>
           </div>
@@ -248,7 +248,7 @@ export default function TwoFactorPage() {
               <AlertTriangle className="w-5 h-5 text-warning-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">待配置</div>
+              <div className="text-[11px] text-foreground-muted">Pending Setup</div>
               <div className="text-[20px] font-semibold text-foreground">{pendingCount}</div>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function TwoFactorPage() {
               <Key className="w-5 h-5 text-foreground" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">硬件密钥</div>
+              <div className="text-[11px] text-foreground-muted">Hardware Key</div>
               <div className="text-[20px] font-semibold text-foreground">{hardwareCount}</div>
             </div>
           </div>
@@ -285,10 +285,10 @@ export default function TwoFactorPage() {
               <Settings className="w-5 h-5 text-brand-500" />
             </div>
             <div>
-              <div className="text-[13px] font-medium text-foreground">全局 2FA 策略</div>
+              <div className="text-[13px] font-medium text-foreground">Global 2FA Policy</div>
               <div className="text-[11px] text-foreground-muted">
-                {settings.enforce_2fa ? "强制所有管理员启用 2FA" : "可选启用 2FA"}
-                {settings.enforce_2fa && ` (宽限期 ${settings.grace_period_days} 天)`}
+                {settings.enforce_2fa ? "All admins are required to enable 2FA" : "2FA is optional"}
+                {settings.enforce_2fa && ` (Grace period: ${settings.grace_period_days} days)`}
               </div>
             </div>
           </div>
@@ -312,7 +312,7 @@ export default function TwoFactorPage() {
               size="sm"
               onClick={() => setSettingsModalOpen(true)}
             >
-              修改配置
+              Edit Settings
             </Button>
           </div>
         </div>
@@ -320,41 +320,41 @@ export default function TwoFactorPage() {
 
       {/* 2FA Configurations */}
       <SettingsSection
-        title="管理员 2FA 状态"
-        description="查看和管理所有管理员的双因素认证配置。"
+        title="Admin 2FA Status"
+        description="View and manage two-factor authentication settings for all admins."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索用户或认证方式"
+              placeholder="Search users or auth methods"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 位管理员
+            {total} admins total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>用户</TableHead>
-              <TableHead>认证方式</TableHead>
-              <TableHead>备用码</TableHead>
-              <TableHead>最后使用</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Auth Method</TableHead>
+              <TableHead>Backup Codes</TableHead>
+              <TableHead>Last Used</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无 2FA 配置
+                  No 2FA configurations found
                 </TableCell>
               </TableRow>
             ) : (
@@ -392,23 +392,23 @@ export default function TwoFactorPage() {
                           {formatRelativeTime(config.last_used_at)}
                         </span>
                       ) : (
-                        <span className="text-[12px] text-foreground-muted">从未使用</span>
+                        <span className="text-[12px] text-foreground-muted">Never used</span>
                       )}
                     </TableCell>
                     <TableCell>
                       {config.enabled && config.verified ? (
                         <Badge variant="success" size="sm">
                           <Check className="w-3 h-3 mr-1" />
-                          已启用
+                          Enabled
                         </Badge>
                       ) : config.enabled && !config.verified ? (
                         <Badge variant="warning" size="sm">
-                          待验证
+                          Pending Verification
                         </Badge>
                       ) : (
                         <Badge variant="outline" size="sm">
                           <X className="w-3 h-3 mr-1" />
-                          未启用
+                          Not Enabled
                         </Badge>
                       )}
                     </TableCell>
@@ -422,7 +422,7 @@ export default function TwoFactorPage() {
                         }}
                       >
                         <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                        重置
+                        Reset
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -451,9 +451,9 @@ export default function TwoFactorPage() {
       <Dialog open={resetModalOpen} onOpenChange={setResetModalOpen}>
         <DialogContent>
           <DialogHeader icon={<AlertTriangle className="w-6 h-6" />} iconVariant="warning">
-            <DialogTitle>重置 2FA</DialogTitle>
+            <DialogTitle>Reset 2FA</DialogTitle>
             <DialogDescription>
-              重置用户的双因素认证配置，用户需要重新设置。
+              Reset the user's two-factor authentication. The user will need to set it up again.
             </DialogDescription>
           </DialogHeader>
 
@@ -462,11 +462,11 @@ export default function TwoFactorPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">用户</span>
+                    <span className="text-foreground-muted">User</span>
                     <span className="text-foreground">{resetUser.user_email}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">当前方式</span>
+                    <span className="text-foreground-muted">Current Method</span>
                     <span className="text-foreground">{METHOD_LABELS[resetUser.method]}</span>
                   </div>
                 </div>
@@ -476,11 +476,11 @@ export default function TwoFactorPage() {
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-warning-500 mt-0.5" />
                   <div className="text-[12px] text-foreground">
-                    <p className="font-medium">注意事项</p>
+                    <p className="font-medium">Important Notes</p>
                     <ul className="text-foreground-light mt-1 list-disc list-inside space-y-0.5">
-                      <li>用户的现有 2FA 配置将被清除</li>
-                      <li>用户需要在下次登录时重新设置 2FA</li>
-                      <li>所有备用码将失效</li>
+                      <li>The user's existing 2FA configuration will be cleared</li>
+                      <li>The user will need to set up 2FA again on next login</li>
+                      <li>All backup codes will be invalidated</li>
                     </ul>
                   </div>
                 </div>
@@ -488,11 +488,11 @@ export default function TwoFactorPage() {
 
               <div>
                 <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                  重置原因 <span className="text-destructive">*</span>
+                  Reset Reason <span className="text-destructive">*</span>
                 </label>
                 <Input
                   inputSize="sm"
-                  placeholder="请输入重置原因"
+                  placeholder="Enter reset reason"
                   value={resetReason}
                   onChange={(e) => setResetReason(e.target.value)}
                 />
@@ -502,7 +502,7 @@ export default function TwoFactorPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setResetModalOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               variant="destructive"
@@ -510,7 +510,7 @@ export default function TwoFactorPage() {
               disabled={!resetReason.trim() || isResetting}
               onClick={handleReset2FA}
             >
-              {isResetting ? "重置中..." : "确认重置"}
+              {isResetting ? "Resetting..." : "Confirm Reset"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -520,18 +520,18 @@ export default function TwoFactorPage() {
       <Dialog open={settingsModalOpen} onOpenChange={setSettingsModalOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Settings className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>全局 2FA 配置</DialogTitle>
+            <DialogTitle>Global 2FA Settings</DialogTitle>
             <DialogDescription>
-              配置双因素认证的全局策略。
+              Configure global two-factor authentication policies.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-surface-75">
               <div>
-                <div className="text-[13px] font-medium text-foreground">强制启用 2FA</div>
+                <div className="text-[13px] font-medium text-foreground">Enforce 2FA</div>
                 <div className="text-[11px] text-foreground-muted mt-0.5">
-                  要求所有管理员必须启用双因素认证
+                  Require all admins to enable two-factor authentication
                 </div>
               </div>
               <Switch
@@ -545,7 +545,7 @@ export default function TwoFactorPage() {
             {settings.enforce_2fa && (
               <div>
                 <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                  宽限期（天）
+                  Grace Period (days)
                 </label>
                 <Input
                   inputSize="sm"
@@ -558,14 +558,14 @@ export default function TwoFactorPage() {
                   }
                 />
                 <div className="text-[11px] text-foreground-muted mt-1">
-                  新管理员可在此期限内完成 2FA 设置
+                  New admins can complete 2FA setup within this period
                 </div>
               </div>
             )}
 
             <div>
               <label className="text-[12px] font-medium text-foreground mb-2 block">
-                允许的认证方式
+                Allowed Authentication Methods
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {(["totp", "sms", "email", "hardware_key"] as const).map((method) => {
@@ -606,9 +606,9 @@ export default function TwoFactorPage() {
 
             <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-surface-75">
               <div>
-                <div className="text-[13px] font-medium text-foreground">敏感操作二次验证</div>
+                <div className="text-[13px] font-medium text-foreground">Re-verify for Sensitive Actions</div>
                 <div className="text-[11px] text-foreground-muted mt-0.5">
-                  执行高风险操作时要求 2FA 验证
+                  Require 2FA verification for high-risk operations
                 </div>
               </div>
               <Switch
@@ -622,10 +622,10 @@ export default function TwoFactorPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setSettingsModalOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button size="sm" disabled={isSaving} onClick={handleSaveSettings}>
-              {isSaving ? "保存中..." : "保存配置"}
+              {isSaving ? "Saving..." : "Save Settings"}
             </Button>
           </DialogFooter>
         </DialogContent>

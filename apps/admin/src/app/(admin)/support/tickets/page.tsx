@@ -29,11 +29,11 @@ import type { SupportTicket, SupportTicketPriority, SupportTicketStatus } from "
 
 const PRIORITY_OPTIONS = ["all", "low", "medium", "high", "urgent"] as const;
 const PRIORITY_LABELS: Record<string, string> = {
-  all: "全部优先级",
-  low: "低",
-  medium: "中",
-  high: "高",
-  urgent: "紧急",
+  all: "All Priorities",
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
 };
 
 const STATUS_OPTIONS = [
@@ -45,12 +45,12 @@ const STATUS_OPTIONS = [
   "closed",
 ] as const;
 const STATUS_LABELS: Record<string, string> = {
-  all: "全部状态",
-  open: "待处理",
-  in_progress: "处理中",
-  waiting_on_customer: "等待用户",
-  resolved: "已解决",
-  closed: "已关闭",
+  all: "All Statuses",
+  open: "Open",
+  in_progress: "In Progress",
+  waiting_on_customer: "Waiting on Customer",
+  resolved: "Resolved",
+  closed: "Closed",
 };
 
 export default function SupportTicketsPage() {
@@ -120,33 +120,33 @@ export default function SupportTicketsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="工单中心"
-        description="跟踪用户反馈与 SLA 处理进度。"
+        title="Ticket Center"
+        description="Track user feedback and SLA processing progress."
         icon={<LifeBuoy className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出工单
+              Export Tickets
             </Button>
-            <Button size="sm">新建工单</Button>
+            <Button size="sm">New Ticket</Button>
           </div>
         }
       />
 
-      <SettingsSection title="待处理工单" description="优先处理高优先级与超时任务。">
+      <SettingsSection title="Pending Tickets" description="Prioritize high-priority and overdue tasks.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索工单标题或 ID"
+              placeholder="Search ticket subject or ID"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">优先级</span>
+            <span className="text-[11px] text-foreground-muted">Priority</span>
             <select
               value={priorityFilter}
               onChange={(event) =>
@@ -162,7 +162,7 @@ export default function SupportTicketsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -178,18 +178,18 @@ export default function SupportTicketsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>工单</TableHead>
-              <TableHead>优先级</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Ticket</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -199,7 +199,7 @@ export default function SupportTicketsPage() {
                   colSpan={5}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -209,8 +209,8 @@ export default function SupportTicketsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {ticketsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配工单"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No matching tickets"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -255,7 +255,7 @@ export default function SupportTicketsPage() {
                     <Link href={`/support/tickets/${ticket.id}`}>
                       <Button variant="ghost" size="sm">
                         <ExternalLink className="w-4 h-4" />
-                        查看详情
+                        View Details
                       </Button>
                     </Link>
                   </TableCell>

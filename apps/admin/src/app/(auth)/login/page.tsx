@@ -21,7 +21,7 @@ function AdminLoginInner() {
 
   const redirectTo = useMemo(() => {
     const raw = searchParams?.get("redirect") || "/";
-    // 安全兜底：避免跳出本站
+    // Safety fallback: prevent redirect to external sites
     if (raw.startsWith("http://") || raw.startsWith("https://")) return "/";
     return raw || "/";
   }, [searchParams]);
@@ -44,7 +44,7 @@ function AdminLoginInner() {
               AgentFlow Admin
             </div>
             <div className="text-[11px] text-foreground-muted">
-              管理员控制台
+              Admin Console
             </div>
           </div>
         </div>
@@ -60,10 +60,10 @@ function AdminLoginInner() {
           </div>
           <div className="min-w-0">
             <div className="text-[14px] font-semibold text-foreground">
-              登录
+              Sign In
             </div>
             <div className="mt-1 text-[12px] text-foreground-light">
-              仅允许管理员账号访问。登录后将校验管理员权限与能力点。
+              Only admin accounts are allowed. Permissions and capabilities will be verified after login.
             </div>
           </div>
         </div>
@@ -77,13 +77,13 @@ function AdminLoginInner() {
               await login({ email, password });
               router.replace(redirectTo);
             } catch {
-              // store 已记录 error
+              // error already recorded in store
             }
           }}
         >
           <div>
             <label className="block text-[11px] text-foreground-muted mb-1">
-              邮箱
+              Email
             </label>
             <Input
               type="email"
@@ -100,7 +100,7 @@ function AdminLoginInner() {
 
           <div>
             <label className="block text-[11px] text-foreground-muted mb-1">
-              密码
+              Password
             </label>
             <Input
               type="password"
@@ -131,14 +131,14 @@ function AdminLoginInner() {
             size="lg"
             className="w-full"
             loading={isLoading}
-            loadingText="正在登录..."
+            loadingText="Signing in..."
           >
-            进入控制台
+            Enter Console
           </Button>
         </form>
 
         <div className="mt-5 text-[11px] text-foreground-muted">
-          如需开通权限，请联系平台管理员将邮箱加入 <code className="px-1 py-0.5 rounded bg-surface-200 border border-border">AdminEmails</code> 白名单。
+          To request access, please contact the platform admin to add your email to the <code className="px-1 py-0.5 rounded bg-surface-200 border border-border">AdminEmails</code> whitelist.
         </div>
       </div>
     </div>

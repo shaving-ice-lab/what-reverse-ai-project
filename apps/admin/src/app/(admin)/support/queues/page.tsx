@@ -148,47 +148,47 @@ export default function SupportQueuesPage() {
     mutationFn: (input: { name: string; description?: string | null; enabled?: boolean }) =>
       adminApi.support.queues.create(input),
     onSuccess: async () => {
-      toast.success("已创建队列");
+      toast.success("Queue created");
       setQueueDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "queues"] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "创建失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Creation failed"),
   });
 
   const updateQueueMutation = useMutation({
     mutationFn: (payload: { id: string; input: { name?: string; description?: string | null; enabled?: boolean } }) =>
       adminApi.support.queues.update(payload.id, payload.input),
     onSuccess: async () => {
-      toast.success("已更新队列");
+      toast.success("Queue updated");
       setQueueDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "queues"] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "更新失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Update failed"),
   });
 
   const addMemberMutation = useMutation({
     mutationFn: (payload: { queueId: string; input: { user_id: string; sort_order?: number } }) =>
       adminApi.support.queues.members.add(payload.queueId, payload.input),
     onSuccess: async () => {
-      toast.success("已添加成员");
+      toast.success("Member added");
       setMemberDraft(toMemberDraft());
       await queryClient.invalidateQueries({
         queryKey: ["admin", "support", "queues", selectedQueue?.id, "members"],
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "添加成员失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to add member"),
   });
 
   const removeMemberMutation = useMutation({
     mutationFn: (payload: { queueId: string; userId: string }) =>
       adminApi.support.queues.members.remove(payload.queueId, payload.userId),
     onSuccess: async () => {
-      toast.success("已移除成员");
+      toast.success("Member removed");
       await queryClient.invalidateQueries({
         queryKey: ["admin", "support", "queues", selectedQueue?.id, "members"],
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "移除失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Removal failed"),
   });
 
   const openCreateQueue = () => {
@@ -206,7 +206,7 @@ export default function SupportQueuesPage() {
   const submitQueueDraft = async () => {
     const name = queueDraft.name.trim();
     if (!name) {
-      toast.error("队列名称为必填项");
+      toast.error("Queue name is required");
       return;
     }
     const input = {
@@ -227,20 +227,20 @@ export default function SupportQueuesPage() {
           updated_at: now,
         };
         setLocalQueues((prev) => [next, ...prev]);
-        toast.success("已创建队列（本地模式）");
+        toast.success("Queue created (local mode)");
         setQueueDialogOpen(false);
         return;
       }
       setLocalQueues((prev) =>
         prev.map((q) => (q.id === editingQueue.id ? { ...q, ...input, updated_at: now } : q))
       );
-      toast.success("已更新队列（本地模式）");
+      toast.success("Queue updated (local mode)");
       setQueueDialogOpen(false);
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
     if (!editingQueue) {
@@ -259,7 +259,7 @@ export default function SupportQueuesPage() {
     if (!selectedQueue) return;
     const userId = memberDraft.userId.trim();
     if (!userId) {
-      toast.error("请填写用户 ID");
+      toast.error("Please enter a User ID");
       return;
     }
     const input = {
@@ -277,13 +277,13 @@ export default function SupportQueuesPage() {
         created_at: now,
       };
       setLocalMembers((prev) => [next, ...prev]);
-      toast.success("已添加成员（本地模式）");
+      toast.success("Member added (local mode)");
       setMemberDraft(toMemberDraft());
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
     await addMemberMutation.mutateAsync({ queueId: selectedQueue.id, input });
@@ -301,12 +301,12 @@ export default function SupportQueuesPage() {
 
     if (localMode) {
       setLocalMembers((prev) => prev.filter((m) => !(m.queue_id === selectedQueue.id && m.user_id === userId)));
-      toast.success("已移除成员（本地模式）");
+      toast.success("Member removed (local mode)");
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
     await removeMemberMutation.mutateAsync({ queueId: selectedQueue.id, userId });
@@ -321,39 +321,39 @@ export default function SupportQueuesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="支持队列"
-        description="管理支持队列与成员，用于工单路由与通知汇聚。"
+        title="Support Queues"
+        description="Manage support queues and members for ticket routing and notification aggregation."
         icon={<UsersRound className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => queuesQuery.refetch()} disabled={localMode}>
-              刷新
+              Refresh
             </Button>
             <Button size="sm" onClick={openCreateQueue} disabled={!canManage && !localMode}>
               <Plus className="w-4 h-4" />
-              新建队列
+              New Queue
             </Button>
           </div>
         }
       />
 
-      <SettingsSection title="队列列表" description="队列可用于工单自动分派（assignee_type=queue）。">
+      <SettingsSection title="Queue List" description="Queues can be used for automatic ticket assignment (assignee_type=queue).">
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索队列名称"
+              placeholder="Search queue name"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">包含已停用</span>
+            <span className="text-[11px] text-foreground-muted">Include disabled</span>
             <Switch checked={includeDisabled} onCheckedChange={setIncludeDisabled} />
           </div>
           <Badge variant="outline" size="sm">
-            共 {rows.length} 条
+            {rows.length} total
           </Badge>
           {localMode ? (
             <Badge variant="secondary" size="sm">
@@ -365,23 +365,23 @@ export default function SupportQueuesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>队列</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Queue</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {queuesQuery.isPending && !localMode ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                  {queuesQuery.error && !localMode ? "加载失败，请检查 API 或权限配置" : "暂无队列"}
+                  {queuesQuery.error && !localMode ? "Failed to load. Please check API or permission settings." : "No queues"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -395,7 +395,7 @@ export default function SupportQueuesPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={queue.enabled ? "success" : "secondary"} size="sm">
-                      {queue.enabled ? "启用" : "停用"}
+                      {queue.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -404,7 +404,7 @@ export default function SupportQueuesPage() {
                   <TableCell className="text-right">
                     <div className="inline-flex items-center gap-2">
                       <Button variant="outline" size="sm" onClick={() => openMembers(queue)} disabled={isBusy}>
-                        成员
+                        Members
                       </Button>
                       <Button
                         variant="ghost"
@@ -413,7 +413,7 @@ export default function SupportQueuesPage() {
                         disabled={(!canManage && !localMode) || isBusy}
                       >
                         <Settings2 className="w-4 h-4" />
-                        编辑
+                        Edit
                       </Button>
                     </div>
                   </TableCell>
@@ -427,32 +427,32 @@ export default function SupportQueuesPage() {
       <Dialog open={queueDialogOpen} onOpenChange={setQueueDialogOpen}>
         <DialogContent>
           <DialogHeader icon={<UsersRound className="w-5 h-5" />} iconVariant={editingQueue ? "info" : "success"}>
-            <DialogTitle>{editingQueue ? "编辑队列" : "新建队列"}</DialogTitle>
-            <DialogDescription>队列用于工单路由与批量通知。</DialogDescription>
+            <DialogTitle>{editingQueue ? "Edit Queue" : "New Queue"}</DialogTitle>
+            <DialogDescription>Queues are used for ticket routing and batch notifications.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
-            <FormRow label="名称" required>
+            <FormRow label="Name" required>
               <Input
                 value={queueDraft.name}
                 onChange={(e) => setQueueDraft((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="VIP Queue"
               />
             </FormRow>
-            <FormRow label="描述">
+            <FormRow label="Description">
               <Input
                 value={queueDraft.description}
                 onChange={(e) => setQueueDraft((prev) => ({ ...prev, description: e.target.value }))}
-                placeholder="企业客户与高优先级工单队列"
+                placeholder="Enterprise clients and high-priority ticket queue"
               />
             </FormRow>
-            <FormRow label="状态">
+            <FormRow label="Status">
               <div
                 className={cn(
                   "h-10 rounded-md border border-border bg-surface-100 px-3 flex items-center justify-between"
                 )}
               >
-                <div className="text-[12px] text-foreground-light">{queueDraft.enabled ? "启用" : "停用"}</div>
+                <div className="text-[12px] text-foreground-light">{queueDraft.enabled ? "Enabled" : "Disabled"}</div>
                 <Switch
                   checked={queueDraft.enabled}
                   onCheckedChange={(checked) => setQueueDraft((prev) => ({ ...prev, enabled: checked }))}
@@ -463,15 +463,15 @@ export default function SupportQueuesPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setQueueDialogOpen(false)} disabled={isBusy}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={submitQueueDraft}
               loading={createQueueMutation.isPending || updateQueueMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
               disabled={(!canManage && !localMode) || isBusy}
             >
-              {editingQueue ? "保存" : "创建"}
+              {editingQueue ? "Save" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -480,14 +480,14 @@ export default function SupportQueuesPage() {
       <Dialog open={membersOpen} onOpenChange={setMembersOpen}>
         <DialogContent size="2xl">
           <DialogHeader icon={<UserPlus className="w-5 h-5" />} iconVariant="info">
-            <DialogTitle>队列成员</DialogTitle>
+            <DialogTitle>Queue Members</DialogTitle>
             <DialogDescription>
               {selectedQueue ? (
                 <>
                   {selectedQueue.name} · <span className="font-mono">{selectedQueue.id}</span>
                 </>
               ) : (
-                "请选择队列"
+                "Please select a queue"
               )}
             </DialogDescription>
           </DialogHeader>
@@ -495,16 +495,16 @@ export default function SupportQueuesPage() {
           {selectedQueue ? (
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-surface-100 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">添加成员</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Add Member</div>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <FormRow label="用户 ID" required>
+                  <FormRow label="User ID" required>
                     <Input
                       value={memberDraft.userId}
                       onChange={(e) => setMemberDraft((prev) => ({ ...prev, userId: e.target.value }))}
                       placeholder="uuid"
                     />
                   </FormRow>
-                  <FormRow label="排序">
+                  <FormRow label="Sort Order">
                     <Input
                       type="number"
                       value={String(memberDraft.sortOrder)}
@@ -520,35 +520,35 @@ export default function SupportQueuesPage() {
                     onClick={addMember}
                     disabled={(!canManage && !localMode) || isBusy}
                     loading={addMemberMutation.isPending}
-                    loadingText="添加中..."
+                    loadingText="Adding..."
                   >
                     <UserPlus className="w-4 h-4" />
-                    添加
+                    Add
                   </Button>
                 </div>
               </div>
 
-              <SettingsSection title="成员列表" description="assignee_type=queue 会解析成员列表作为通知接收者。">
+              <SettingsSection title="Member List" description="assignee_type=queue resolves the member list as notification recipients.">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>用户</TableHead>
-                      <TableHead>排序</TableHead>
-                      <TableHead>创建时间</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Sort Order</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {membersQuery.isPending && !localMode ? (
                       <TableRow>
                         <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                          正在加载...
+                          Loading...
                         </TableCell>
                       </TableRow>
                     ) : memberRows.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                          {membersQuery.error && !localMode ? "加载失败" : "暂无成员"}
+                          {membersQuery.error && !localMode ? "Load failed" : "No members"}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -571,7 +571,7 @@ export default function SupportQueuesPage() {
                               onClick={() => requestRemove(m.user_id)}
                               disabled={(!canManage && !localMode) || isBusy}
                             >
-                              移除
+                              Remove
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -589,10 +589,10 @@ export default function SupportQueuesPage() {
         open={removeConfirmOpen}
         onOpenChange={setRemoveConfirmOpen}
         type="warning"
-        title="确认移除成员？"
-        description="该成员将不再接收该队列的工单通知。"
-        confirmText="移除"
-        cancelText="取消"
+        title="Confirm member removal?"
+        description="This member will no longer receive ticket notifications for this queue."
+        confirmText="Remove"
+        cancelText="Cancel"
         loading={removeMemberMutation.isPending}
         onConfirm={() => void confirmRemove()}
       />

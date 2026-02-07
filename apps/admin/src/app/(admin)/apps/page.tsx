@@ -39,12 +39,12 @@ import type { App } from "@/types/admin";
 
 const STATUS_OPTIONS = ["all", "published", "draft", "deprecated", "archived", "suspended"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  published: "已发布",
-  draft: "草稿",
-  deprecated: "已废弃",
-  archived: "已归档",
-  suspended: "已暂停",
+  all: "All Statuses",
+  published: "Published",
+  draft: "Draft",
+  deprecated: "Deprecated",
+  archived: "Archived",
+  suspended: "Suspended",
 };
 
 export default function AppsPage() {
@@ -167,10 +167,10 @@ export default function AppsPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedApp) throw new Error("请选择应用");
+      if (!selectedApp) throw new Error("Please select an app");
       const reason = reasonDraft.trim();
       if (["deprecated", "archived", "suspended"].includes(statusDraft) && !reason) {
-        throw new Error("敏感状态变更必须填写原因");
+        throw new Error("A reason is required for sensitive status changes");
       }
 
       if (localMode) {
@@ -195,46 +195,46 @@ export default function AppsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("应用状态已更新");
+      toast.success("App status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
       setManageOpen(false);
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="应用管理"
-        description="查看应用状态、所属 Workspace 与版本概览。"
+        title="App Management"
+        description="View app status, workspace ownership, and version overview."
         icon={<Activity className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              批量下架
+              Batch Unpublish
             </Button>
-            <Button size="sm">新建应用</Button>
+            <Button size="sm">Create App</Button>
           </div>
         }
       />
 
-      <SettingsSection title="应用列表" description="支持按状态与 Workspace 筛选。">
+      <SettingsSection title="App List" description="Filter by status and workspace.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索应用名称"
+              placeholder="Search app name"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -259,7 +259,7 @@ export default function AppsPage() {
               {workspaceOptions.map((workspace) => (
                 <option key={workspace} value={workspace}>
                   {workspace === "all"
-                    ? "全部 Workspace"
+                    ? "All Workspaces"
                     : workspaceLabelMap.get(workspace) || workspace}
                 </option>
               ))}
@@ -274,24 +274,24 @@ export default function AppsPage() {
             >
               {ownerOptions.map((owner) => (
                 <option key={owner} value={owner}>
-                  {owner === "all" ? "全部 Owner" : ownerLabelMap.get(owner) || owner}
+                  {owner === "all" ? "All Owners" : ownerLabelMap.get(owner) || owner}
                 </option>
               ))}
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>应用</TableHead>
+              <TableHead>App</TableHead>
               <TableHead>Workspace</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -301,7 +301,7 @@ export default function AppsPage() {
                   colSpan={5}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -311,8 +311,8 @@ export default function AppsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {appsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配应用"}
+                    ? "Failed to load. Check API or permission settings."
+                    : "No matching apps"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -366,7 +366,7 @@ export default function AppsPage() {
                       }}
                     >
                       <Settings2 className="w-4 h-4" />
-                      管理
+                      Manage
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -393,7 +393,7 @@ export default function AppsPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Settings2 className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>应用管理</DialogTitle>
+            <DialogTitle>App Management</DialogTitle>
             <DialogDescription>
               {selectedApp ? (
                 <span className="text-foreground-light">
@@ -401,7 +401,7 @@ export default function AppsPage() {
                   <span className="text-foreground-muted">({selectedApp.id})</span>
                 </span>
               ) : (
-                "调整应用状态。"
+                "Adjust app status."
               )}
             </DialogDescription>
           </DialogHeader>
@@ -409,7 +409,7 @@ export default function AppsPage() {
           <div className="space-y-3">
             <div className="rounded-lg border border-border bg-surface-75 p-4">
               <div className="text-[12px] font-medium text-foreground mb-3">
-                状态
+                Status
               </div>
 
               <div className="grid gap-2 sm:grid-cols-[220px_1fr] items-start">
@@ -430,7 +430,7 @@ export default function AppsPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={3}
-                    placeholder="原因（废弃/归档/暂停时必填）"
+                    placeholder="Reason (required for deprecate/archive/suspend)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -443,7 +443,7 @@ export default function AppsPage() {
                       size="sm"
                       onClick={() => setManageOpen(false)}
                     >
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={["archived"].includes(statusDraft) ? "warning" : "default"}
@@ -451,7 +451,7 @@ export default function AppsPage() {
                       onClick={() => setConfirmOpen(true)}
                       disabled={!canManage || updateStatusMutation.isPending}
                     >
-                      提交状态变更
+                      Submit Status Change
                     </Button>
                   </div>
                 </div>
@@ -465,10 +465,10 @@ export default function AppsPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         type={["deprecated", "archived", "suspended"].includes(statusDraft) ? "warning" : "info"}
-        title="确认执行状态变更？"
-        description={`将应用状态更新为：${statusDraft}。原因：${reasonDraft.trim() || "（未填写）"}`}
-        confirmText="确认"
-        cancelText="取消"
+        title="Confirm status change?"
+        description={`Update app status to: ${statusDraft}. Reason: ${reasonDraft.trim() || "(not provided)"}`}
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

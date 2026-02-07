@@ -78,7 +78,7 @@ const mockApprovals: ApprovalRequest[] = [
     target_name: "test_user@example.com",
     requester_id: "u_admin_001",
     requester_email: "admin@agentflow.ai",
-    reason: "用户请求注销账号，已完成数据备份",
+    reason: "User requested account deletion, data backup completed",
     status: "pending",
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -88,10 +88,10 @@ const mockApprovals: ApprovalRequest[] = [
     action: "admin.billing.refund_process",
     target_type: "refund",
     target_id: "ref_001",
-    target_name: "订单 #ORD-2024-001",
+    target_name: "Order #ORD-2024-001",
     requester_id: "u_finance_001",
     requester_email: "finance@agentflow.ai",
-    reason: "客户投诉服务质量问题，经核实确认",
+    reason: "Customer complaint about service quality, verified and confirmed",
     metadata: { amount: 299.00, currency: "USD" },
     status: "pending",
     expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
@@ -105,7 +105,7 @@ const mockApprovals: ApprovalRequest[] = [
     target_name: "test-workspace",
     requester_id: "u_ops_001",
     requester_email: "ops@agentflow.ai",
-    reason: "测试工作空间，已无使用需求",
+    reason: "Test workspace, no longer needed",
     status: "approved",
     approver_id: "u_admin_001",
     approver_email: "admin@agentflow.ai",
@@ -118,16 +118,16 @@ const mockApprovals: ApprovalRequest[] = [
     action: "admin.earnings.withdrawal_process",
     target_type: "withdrawal",
     target_id: "wd_001",
-    target_name: "提现申请 #WD-2024-001",
+    target_name: "Withdrawal Request #WD-2024-001",
     requester_id: "u_finance_001",
     requester_email: "finance@agentflow.ai",
-    reason: "创作者提现申请，金额：$1,500.00",
+    reason: "Creator withdrawal request, amount: $1,500.00",
     metadata: { amount: 1500.00, currency: "USD", user_email: "creator@example.com" },
     status: "rejected",
     approver_id: "u_admin_001",
     approver_email: "admin@agentflow.ai",
     approved_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    rejection_reason: "账户存在异常交易记录，需进一步核实",
+    rejection_reason: "Account has suspicious transaction records, further verification needed",
     expires_at: new Date(Date.now() + 19 * 60 * 60 * 1000).toISOString(),
     created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
   },
@@ -139,7 +139,7 @@ const mockApprovals: ApprovalRequest[] = [
     target_name: "new_admin@agentflow.ai",
     requester_id: "u_admin_001",
     requester_email: "admin@agentflow.ai",
-    reason: "新员工入职，需要授予运维管理员权限",
+    reason: "New employee onboarding, needs ops admin permissions",
     metadata: { new_role: "ops" },
     status: "expired",
     expires_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -148,11 +148,11 @@ const mockApprovals: ApprovalRequest[] = [
 ];
 
 const STATUS_CONFIG: Record<ApprovalStatus, { label: string; variant: "success" | "warning" | "error" | "outline" }> = {
-  pending: { label: "待审批", variant: "warning" },
-  approved: { label: "已通过", variant: "success" },
-  rejected: { label: "已拒绝", variant: "error" },
-  expired: { label: "已过期", variant: "outline" },
-  cancelled: { label: "已取消", variant: "outline" },
+  pending: { label: "Pending", variant: "warning" },
+  approved: { label: "Approved", variant: "success" },
+  rejected: { label: "Rejected", variant: "error" },
+  expired: { label: "Expired", variant: "outline" },
+  cancelled: { label: "Cancelled", variant: "outline" },
 };
 
 export default function ApprovalsPage() {
@@ -214,8 +214,8 @@ export default function ApprovalsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="敏感操作审批"
-        description="审批高风险管理操作，确保安全合规。"
+        title="Sensitive Action Approvals"
+        description="Approve high-risk admin operations to ensure security and compliance."
         icon={<Shield className="w-4 h-4" />}
       />
 
@@ -227,7 +227,7 @@ export default function ApprovalsPage() {
               <Clock className="w-5 h-5 text-warning-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">待审批</div>
+              <div className="text-[11px] text-foreground-muted">Pending</div>
               <div className="text-[20px] font-semibold text-foreground">{pendingCount}</div>
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function ApprovalsPage() {
               <Check className="w-5 h-5 text-success-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">已通过</div>
+              <div className="text-[11px] text-foreground-muted">Approved</div>
               <div className="text-[20px] font-semibold text-foreground">{approvedCount}</div>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function ApprovalsPage() {
               <X className="w-5 h-5 text-destructive" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">已拒绝</div>
+              <div className="text-[11px] text-foreground-muted">Rejected</div>
               <div className="text-[20px] font-semibold text-foreground">{rejectedCount}</div>
             </div>
           </div>
@@ -257,15 +257,15 @@ export default function ApprovalsPage() {
       </div>
 
       <SettingsSection
-        title="审批请求"
-        description="所有需要审批的高风险操作请求。"
+        title="Approval Requests"
+        description="All high-risk operation requests requiring approval."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索申请人或目标"
+              placeholder="Search requester or target"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -278,34 +278,34 @@ export default function ApprovalsPage() {
               onChange={(e) => setStatusFilter(e.target.value as ApprovalStatus | "all")}
               className="h-7 rounded-md border border-border bg-surface-100 px-2 text-[11px] text-foreground-light focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500"
             >
-              <option value="all">全部状态</option>
-              <option value="pending">待审批</option>
-              <option value="approved">已通过</option>
-              <option value="rejected">已拒绝</option>
-              <option value="expired">已过期</option>
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="expired">Expired</option>
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>操作类型</TableHead>
-              <TableHead>目标</TableHead>
-              <TableHead>申请人</TableHead>
-              <TableHead>申请时间</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Action Type</TableHead>
+              <TableHead>Target</TableHead>
+              <TableHead>Requester</TableHead>
+              <TableHead>Requested At</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无审批请求
+                  No approval requests found
                 </TableCell>
               </TableRow>
             ) : (
@@ -411,7 +411,7 @@ export default function ApprovalsPage() {
       <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileText className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>审批详情</DialogTitle>
+            <DialogTitle>Approval Details</DialogTitle>
             <DialogDescription>
               {selectedApproval?.id}
             </DialogDescription>
@@ -422,35 +422,35 @@ export default function ApprovalsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-3 text-[12px]">
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">操作类型</span>
+                    <span className="text-foreground-muted">Action Type</span>
                     <Badge variant="info" size="sm">
                       {AUDIT_ACTION_LABELS[selectedApproval.action] || selectedApproval.action}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">目标</span>
+                    <span className="text-foreground-muted">Target</span>
                     <span className="text-foreground">
                       {selectedApproval.target_name || selectedApproval.target_id}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">申请人</span>
+                    <span className="text-foreground-muted">Requester</span>
                     <span className="text-foreground">{selectedApproval.requester_email}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">申请时间</span>
+                    <span className="text-foreground-muted">Requested At</span>
                     <span className="text-foreground">
                       {new Date(selectedApproval.created_at).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">过期时间</span>
+                    <span className="text-foreground-muted">Expires At</span>
                     <span className="text-foreground">
                       {new Date(selectedApproval.expires_at).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_CONFIG[selectedApproval.status].variant} size="sm">
                       {STATUS_CONFIG[selectedApproval.status].label}
                     </Badge>
@@ -459,7 +459,7 @@ export default function ApprovalsPage() {
               </div>
 
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-2">申请原因</div>
+                <div className="text-[12px] font-medium text-foreground mb-2">Request Reason</div>
                 <div className="text-[12px] text-foreground-light">
                   {selectedApproval.reason}
                 </div>
@@ -467,7 +467,7 @@ export default function ApprovalsPage() {
 
               {selectedApproval.metadata && Object.keys(selectedApproval.metadata).length > 0 && (
                 <div className="rounded-lg border border-border bg-surface-75 p-4">
-                  <div className="text-[12px] font-medium text-foreground mb-2">附加信息</div>
+                  <div className="text-[12px] font-medium text-foreground mb-2">Additional Information</div>
                   <pre className="text-[11px] font-mono text-foreground-light bg-surface-100 p-3 rounded overflow-x-auto">
                     {JSON.stringify(selectedApproval.metadata, null, 2)}
                   </pre>
@@ -476,14 +476,14 @@ export default function ApprovalsPage() {
 
               {selectedApproval.approver_email && (
                 <div className="rounded-lg border border-border bg-surface-75 p-4">
-                  <div className="text-[12px] font-medium text-foreground mb-2">审批信息</div>
+                  <div className="text-[12px] font-medium text-foreground mb-2">Approval Information</div>
                   <div className="grid gap-2 text-[12px]">
                     <div className="flex justify-between">
-                      <span className="text-foreground-muted">审批人</span>
+                      <span className="text-foreground-muted">Approver</span>
                       <span className="text-foreground">{selectedApproval.approver_email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-foreground-muted">审批时间</span>
+                      <span className="text-foreground-muted">Approved At</span>
                       <span className="text-foreground">
                         {selectedApproval.approved_at
                           ? new Date(selectedApproval.approved_at).toLocaleString()
@@ -492,7 +492,7 @@ export default function ApprovalsPage() {
                     </div>
                     {selectedApproval.rejection_reason && (
                       <div className="pt-2 border-t border-border">
-                        <div className="text-foreground-muted mb-1">拒绝原因</div>
+                        <div className="text-foreground-muted mb-1">Rejection Reason</div>
                         <div className="text-foreground">{selectedApproval.rejection_reason}</div>
                       </div>
                     )}
@@ -513,7 +513,7 @@ export default function ApprovalsPage() {
                     handleOpenAction(selectedApproval, "reject");
                   }}
                 >
-                  拒绝
+                  Reject
                 </Button>
                 <Button
                   size="sm"
@@ -522,7 +522,7 @@ export default function ApprovalsPage() {
                     handleOpenAction(selectedApproval, "approve");
                   }}
                 >
-                  通过
+                  Approve
                 </Button>
               </>
             )}
@@ -538,12 +538,12 @@ export default function ApprovalsPage() {
             iconVariant={actionType === "approve" ? "success" : "error"}
           >
             <DialogTitle>
-              {actionType === "approve" ? "通过审批" : "拒绝审批"}
+              {actionType === "approve" ? "Approve Request" : "Reject Request"}
             </DialogTitle>
             <DialogDescription>
               {actionType === "approve"
-                ? "确认通过此审批请求，操作将被执行。"
-                : "确认拒绝此审批请求，请说明原因。"}
+                ? "Confirm approval of this request. The action will be executed."
+                : "Confirm rejection of this request. Please provide a reason."}
             </DialogDescription>
           </DialogHeader>
 
@@ -552,13 +552,13 @@ export default function ApprovalsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">操作类型</span>
+                    <span className="text-foreground-muted">Action Type</span>
                     <span className="text-foreground">
                       {AUDIT_ACTION_LABELS[selectedApproval.action] || selectedApproval.action}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">目标</span>
+                    <span className="text-foreground-muted">Target</span>
                     <span className="text-foreground">
                       {selectedApproval.target_name || selectedApproval.target_id}
                     </span>
@@ -571,7 +571,7 @@ export default function ApprovalsPage() {
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 text-warning-500 mt-0.5" />
                     <div className="text-[12px] text-foreground">
-                      通过后操作将立即执行，请确认已审核相关信息。
+                      The action will be executed immediately upon approval. Please confirm you have reviewed the relevant information.
                     </div>
                   </div>
                 </div>
@@ -580,11 +580,11 @@ export default function ApprovalsPage() {
               {actionType === "reject" && (
                 <div>
                   <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                    拒绝原因 <span className="text-destructive">*</span>
+                    Rejection Reason <span className="text-destructive">*</span>
                   </label>
                   <Input
                     inputSize="sm"
-                    placeholder="请输入拒绝原因"
+                    placeholder="Enter rejection reason"
                     value={actionReason}
                     onChange={(e) => setActionReason(e.target.value)}
                   />
@@ -595,7 +595,7 @@ export default function ApprovalsPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setActionModalOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               variant={actionType === "approve" ? "default" : "destructive"}
@@ -604,10 +604,10 @@ export default function ApprovalsPage() {
               onClick={handleProcessAction}
             >
               {isProcessing
-                ? "处理中..."
+                ? "Processing..."
                 : actionType === "approve"
-                ? "确认通过"
-                : "确认拒绝"}
+                ? "Confirm Approval"
+                : "Confirm Rejection"}
             </Button>
           </DialogFooter>
         </DialogContent>

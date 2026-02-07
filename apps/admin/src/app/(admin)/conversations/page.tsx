@@ -47,10 +47,10 @@ import { usePermission } from "@/hooks/usePermission";
 
 const STATUS_OPTIONS = ["all", "active", "archived", "deleted"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  active: "活跃",
-  archived: "已归档",
-  deleted: "已删除",
+  all: "All Statuses",
+  active: "Active",
+  archived: "Archived",
+  deleted: "Deleted",
 };
 
 const STATUS_BADGE_MAP: Record<ConversationStatus, "success" | "warning" | "info" | "error"> = {
@@ -131,7 +131,7 @@ export default function ConversationsPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedConversation) throw new Error("请选择对话");
+      if (!selectedConversation) throw new Error("Please select a conversation");
 
       if (localMode) {
         const next = localConversations.map((conv) =>
@@ -147,48 +147,48 @@ export default function ConversationsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations"] });
       setManageOpen(false);
       setConfirmArchiveOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新状态失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update status");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="对话管理"
-        description="查看与管理所有 AI 对话记录。"
+        title="Conversation Management"
+        description="View and manage all AI conversation records."
         icon={<MessageSquare className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出列表
+              Export List
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="对话列表"
-        description="支持按标题、用户、状态筛选。"
+        title="Conversation List"
+        description="Filter by title, user, or status."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索标题、ID 或用户邮箱"
+              placeholder="Search by title, ID, or user email"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -204,21 +204,21 @@ export default function ConversationsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>对话</TableHead>
-              <TableHead>用户</TableHead>
+              <TableHead>Conversation</TableHead>
+              <TableHead>User</TableHead>
               <TableHead>Workspace</TableHead>
-              <TableHead>消息数</TableHead>
-              <TableHead>模型</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>最后活跃</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Messages</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Active</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -228,7 +228,7 @@ export default function ConversationsPage() {
                   colSpan={8}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -238,8 +238,8 @@ export default function ConversationsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {conversationsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配对话"}
+                    ? "Failed to load. Please check API or permission configuration."
+                    : "No matching conversations"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -247,7 +247,7 @@ export default function ConversationsPage() {
                 <TableRow key={conv.id}>
                   <TableCell>
                     <div className="text-[12px] font-medium text-foreground">
-                      {conv.title || "未命名对话"}
+                      {conv.title || "Untitled Conversation"}
                     </div>
                     <div className="text-[11px] text-foreground-muted font-mono">
                       {conv.id.slice(0, 16)}...
@@ -331,9 +331,9 @@ export default function ConversationsPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<MessageSquare className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>对话管理</DialogTitle>
+            <DialogTitle>Conversation Management</DialogTitle>
             <DialogDescription>
-              {selectedConversation?.title || "未命名对话"}
+              {selectedConversation?.title || "Untitled Conversation"}
             </DialogDescription>
           </DialogHeader>
 
@@ -342,17 +342,17 @@ export default function ConversationsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_BADGE_MAP[selectedConversation.status]} size="sm">
                       {STATUS_LABELS[selectedConversation.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">消息数</span>
+                    <span className="text-foreground-muted">Messages</span>
                     <span className="text-foreground">{selectedConversation.message_count}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">模型</span>
+                    <span className="text-foreground-muted">Model</span>
                     <span className="text-foreground">{selectedConversation.model || "-"}</span>
                   </div>
                 </div>
@@ -360,7 +360,7 @@ export default function ConversationsPage() {
             )}
 
             <div className="rounded-lg border border-border bg-surface-75 p-4">
-              <div className="text-[12px] font-medium text-foreground mb-3">状态管理</div>
+              <div className="text-[12px] font-medium text-foreground mb-3">Status Management</div>
               <div className="grid gap-2 sm:grid-cols-[160px_1fr] items-start">
                 <select
                   value={statusDraft}
@@ -379,7 +379,7 @@ export default function ConversationsPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={2}
-                    placeholder="原因（可选）"
+                    placeholder="Reason (optional)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -388,7 +388,7 @@ export default function ConversationsPage() {
                   />
                   <div className="flex items-center justify-end gap-2">
                     <Button variant="outline" size="sm" onClick={() => setManageOpen(false)}>
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={statusDraft === "deleted" ? "warning" : "default"}
@@ -396,7 +396,7 @@ export default function ConversationsPage() {
                       disabled={!canManage}
                       onClick={() => setConfirmArchiveOpen(true)}
                     >
-                      提交变更
+                      Submit Changes
                     </Button>
                   </div>
                 </div>
@@ -414,18 +414,18 @@ export default function ConversationsPage() {
         type={statusDraft === "deleted" ? "warning" : "info"}
         title={
           statusDraft === "deleted"
-            ? "确认删除该对话？"
+            ? "Confirm delete this conversation?"
             : statusDraft === "archived"
-            ? "确认归档该对话？"
-            : "确认更新状态？"
+            ? "Confirm archive this conversation?"
+            : "Confirm status update?"
         }
         description={
           statusDraft === "deleted"
-            ? "删除后数据将被移除，此操作不可恢复。"
-            : "确认更新对话状态。"
+            ? "Data will be removed after deletion. This action cannot be undone."
+            : "Confirm conversation status update."
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

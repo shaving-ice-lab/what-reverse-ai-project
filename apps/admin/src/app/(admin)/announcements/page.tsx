@@ -49,17 +49,17 @@ import { deepClone, formatDate, formatRelativeTime } from "@/lib/utils";
 import type { Announcement } from "@/types/announcement";
 
 const TYPE_OPTIONS = [
-  { value: "all", label: "全部类型" },
-  { value: "feature", label: "新功能" },
-  { value: "improvement", label: "优化" },
-  { value: "notice", label: "公告" },
-  { value: "warning", label: "警告" },
+  { value: "all", label: "All Types" },
+  { value: "feature", label: "New Feature" },
+  { value: "improvement", label: "Improvement" },
+  { value: "notice", label: "Notice" },
+  { value: "warning", label: "Warning" },
 ];
 
 const STATUS_OPTIONS = [
-  { value: "all", label: "全部状态" },
-  { value: "active", label: "已发布" },
-  { value: "inactive", label: "已下线" },
+  { value: "all", label: "All Statuses" },
+  { value: "active", label: "Published" },
+  { value: "inactive", label: "Unpublished" },
 ];
 
 const typeBadgeVariant: Record<string, "info" | "warning" | "success" | "error" | "secondary"> = {
@@ -235,18 +235,18 @@ export default function AnnouncementsPage() {
     mutationFn: async () => {
       const title = titleDraft.trim();
       const description = descriptionDraft.trim();
-      if (!title) throw new Error("标题不能为空");
-      if (!description) throw new Error("公告内容不能为空");
+      if (!title) throw new Error("Title cannot be empty");
+      if (!description) throw new Error("Announcement content cannot be empty");
 
       const priority = Number(priorityDraft);
       if (Number.isNaN(priority)) {
-        throw new Error("优先级必须为数字");
+        throw new Error("Priority must be a number");
       }
 
       const startsAt = toIsoString(startsAtDraft);
       const endsAt = toIsoString(endsAtDraft);
       if (startsAt && endsAt && new Date(endsAt).getTime() <= new Date(startsAt).getTime()) {
-        throw new Error("结束时间需晚于开始时间");
+        throw new Error("End time must be after start time");
       }
 
       if (localMode) {
@@ -281,7 +281,7 @@ export default function AnnouncementsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("公告已创建");
+      toast.success("Announcement created");
       if (!localMode) {
         queryClient.invalidateQueries({ queryKey: ["admin", "announcements"] });
       }
@@ -295,7 +295,7 @@ export default function AnnouncementsPage() {
       setIsActiveDraft(true);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "创建公告失败");
+      toast.error(error instanceof Error ? error.message : "Failed to create announcement");
     },
   });
 
@@ -319,14 +319,14 @@ export default function AnnouncementsPage() {
       return adminApi.announcements.update(input.id, { is_active: input.is_active });
     },
     onSuccess: () => {
-      toast.success(nextActiveState ? "公告已发布" : "公告已下线");
+      toast.success(nextActiveState ? "Announcement published" : "Announcement unpublished");
       if (!localMode) {
         queryClient.invalidateQueries({ queryKey: ["admin", "announcements"] });
       }
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新公告失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update announcement");
     },
   });
 
@@ -338,8 +338,8 @@ export default function AnnouncementsPage() {
 
   const dateWindow = useMemo(() => {
     return announcements.reduce<Record<string, string>>((acc, item) => {
-      const startsAt = isZeroTime(item.starts_at) ? "立即" : formatDate(item.starts_at);
-      const endsAt = item.ends_at && !isZeroTime(item.ends_at) ? formatDate(item.ends_at) : "长期";
+      const startsAt = isZeroTime(item.starts_at) ? "Immediately" : formatDate(item.starts_at);
+      const endsAt = item.ends_at && !isZeroTime(item.ends_at) ? formatDate(item.ends_at) : "Ongoing";
       acc[item.id] = `${startsAt} · ${endsAt}`;
       return acc;
     }, {});
@@ -367,29 +367,29 @@ export default function AnnouncementsPage() {
 
   const saveTemplates = () => {
     if (!templatesDirty) {
-      toast.message("没有需要保存的变更");
+      toast.message("No changes to save");
       return;
     }
     if (!localMode) {
-      toast.error("通知模板 API 尚未接入");
+      toast.error("Notification template API not yet connected");
       return;
     }
     setLocalTemplates(deepClone(draftTemplates));
     setTemplatesDirty(false);
-    toast.success("已保存通知模板（本地模式）");
+    toast.success("Notification templates saved (local mode)");
   };
 
   const resetTemplates = () => {
     setDraftTemplates(deepClone(localTemplates));
     setTemplatesDirty(false);
-    toast.message("已重置通知模板");
+    toast.message("Notification templates reset");
   };
 
   const previewRecipient = previewContext["user.email"] || "admin@agentflow.ai";
   const canEditTemplates = localMode;
   const templateChannelLabel = selectedTemplate
     ? CHANNEL_LABELS[selectedTemplate.channel]
-    : "未知";
+    : "Unknown";
   const templateChannelBadge = selectedTemplate
     ? CHANNEL_BADGE[selectedTemplate.channel]
     : "secondary";
@@ -397,8 +397,8 @@ export default function AnnouncementsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="公告管理"
-        description="发布平台公告并管理展示周期。"
+        title="Announcement Management"
+        description="Publish platform announcements and manage display periods."
         icon={<Bell className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -410,12 +410,12 @@ export default function AnnouncementsPage() {
                 if (!localMode) listQuery.refetch();
               }}
               loading={!localMode && listQuery.isFetching}
-              loadingText="刷新中..."
+              loadingText="Refreshing..."
             >
-              刷新
+              Refresh
             </Button>
             <Button size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => setCreateOpen(true)}>
-              新建公告
+              New Announcement
             </Button>
           </div>
         }
@@ -423,26 +423,26 @@ export default function AnnouncementsPage() {
 
       <div className="grid gap-3 md:grid-cols-3">
         <StatsCard
-          title="当前列表已读"
+          title="Current List Reads"
           value={stats.totalReads}
-          subtitle={`已加载 ${announcements.length} 条公告`}
+          subtitle={`${announcements.length} announcements loaded`}
         />
         <StatsCard
-          title="平均阅读率"
+          title="Average Read Rate"
           value={`${stats.averageRate.toFixed(1)}%`}
-          subtitle={stats.totalUsers ? `总用户 ${stats.totalUsers}` : "暂无用户统计"}
+          subtitle={stats.totalUsers ? `Total users: ${stats.totalUsers}` : "No user stats available"}
         />
         <StatsCard
-          title="已发布"
+          title="Published"
           value={stats.activeCount}
-          subtitle={`筛选范围共 ${total} 条`}
+          subtitle={`${total} total in filter`}
         />
       </div>
 
-      <SettingsSection title="公告列表" description="支持按类型与状态筛选。">
+      <SettingsSection title="Announcement List" description="Filter by type and status.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">类型</span>
+            <span className="text-[11px] text-foreground-muted">Type</span>
             <select
               value={typeFilter}
               onChange={(event) => setTypeFilter(event.target.value)}
@@ -456,7 +456,7 @@ export default function AnnouncementsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
@@ -470,25 +470,25 @@ export default function AnnouncementsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         {isLoading ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : announcements.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无公告</div>
+          <div className="text-[12px] text-foreground-muted">No announcements</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>公告</TableHead>
-                <TableHead>类型</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>阅读</TableHead>
-                <TableHead>生效周期</TableHead>
-                <TableHead>优先级</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Announcement</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Reads</TableHead>
+                <TableHead>Active Period</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -513,7 +513,7 @@ export default function AnnouncementsPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={item.is_active ? "success" : "secondary"} size="sm">
-                        {item.is_active ? "已发布" : "已下线"}
+                        {item.is_active ? "Published" : "Unpublished"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-[12px] text-foreground-light">
@@ -532,11 +532,11 @@ export default function AnnouncementsPage() {
                           size="sm"
                           onClick={() => openToggle(item)}
                         >
-                          {item.is_active ? "下线" : "发布"}
+                          {item.is_active ? "Unpublish" : "Publish"}
                         </Button>
                       </div>
                       <div className="mt-1 text-[11px] text-foreground-muted">
-                        更新于 {formatRelativeTime(item.updated_at)}
+                        Updated {formatRelativeTime(item.updated_at)}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -562,12 +562,12 @@ export default function AnnouncementsPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="系统通知模板与发送预览"
-        description="配置关键通知模板并快速预览实际发送效果。"
+        title="System Notification Templates & Preview"
+        description="Configure key notification templates and preview actual delivery."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <Badge variant="outline" size="sm">
-            {templatesDirty ? "已修改（未保存）" : "已同步"}
+            {templatesDirty ? "Modified (unsaved)" : "Synced"}
           </Badge>
           {localMode ? (
             <Badge variant="secondary" size="sm">
@@ -575,14 +575,14 @@ export default function AnnouncementsPage() {
             </Badge>
           ) : (
             <Badge variant="secondary" size="sm">
-              只读预览
+              Read-only preview
             </Badge>
           )}
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-3">
-            <FormRow label="通知模板" description="选择需要配置的系统通知模板。">
+            <FormRow label="Notification Template" description="Select the system notification template to configure.">
               <select
                 value={selectedTemplateId}
                 onChange={(event) => setSelectedTemplateId(event.target.value)}
@@ -596,7 +596,7 @@ export default function AnnouncementsPage() {
               </select>
             </FormRow>
 
-            <FormRow label="通道 / 语言" description="通知投递的默认通道与语言。">
+            <FormRow label="Channel / Language" description="Default delivery channel and language for notifications.">
               <div className="flex items-center gap-2">
                 <Badge variant={templateChannelBadge} size="sm">
                   {templateChannelLabel}
@@ -605,15 +605,15 @@ export default function AnnouncementsPage() {
                   {selectedTemplate?.locale || "-"}
                 </Badge>
                 <Badge variant={selectedTemplate?.enabled ? "success" : "secondary"} size="sm">
-                  {selectedTemplate?.enabled ? "已启用" : "已停用"}
+                  {selectedTemplate?.enabled ? "Enabled" : "Disabled"}
                 </Badge>
               </div>
             </FormRow>
 
-            <FormRow label="启用状态" description="关闭后仍保留模板内容，但不会发送。">
+            <FormRow label="Enable Status" description="When disabled, template content is preserved but not sent.">
               <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
                 <span className="text-[12px] text-foreground-light">
-                  {selectedTemplate?.enabled ? "已启用" : "已停用"}
+                  {selectedTemplate?.enabled ? "Enabled" : "Disabled"}
                 </span>
                 <Switch
                   checked={selectedTemplate?.enabled ?? false}
@@ -623,27 +623,27 @@ export default function AnnouncementsPage() {
               </div>
             </FormRow>
 
-            <FormRow label="标题模板" description="支持 {{variable}} 变量占位符。">
+            <FormRow label="Title Template" description="Supports {{variable}} placeholders.">
               <Input
                 value={selectedTemplate?.title || ""}
                 onChange={(event) => updateTemplate({ title: event.target.value })}
-                placeholder="输入通知标题"
+                placeholder="Enter notification title"
                 disabled={!selectedTemplate || !canEditTemplates}
               />
             </FormRow>
 
-            <FormRow label="内容模板" description="建议保留关键信息字段。" horizontal={false}>
+            <FormRow label="Content Template" description="Recommended to keep key information fields." horizontal={false}>
               <textarea
                 value={selectedTemplate?.content || ""}
                 onChange={(event) => updateTemplate({ content: event.target.value })}
                 rows={6}
-                placeholder="输入通知内容..."
+                placeholder="Enter notification content..."
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500"
                 disabled={!selectedTemplate || !canEditTemplates}
               />
             </FormRow>
 
-            <FormRow label="可用变量" description="用于模板渲染的动态字段。">
+            <FormRow label="Available Variables" description="Dynamic fields used for template rendering.">
               <div className="flex flex-wrap items-center gap-2">
                 {selectedTemplate?.variables?.length ? (
                   selectedTemplate.variables.map((token) => (
@@ -652,28 +652,28 @@ export default function AnnouncementsPage() {
                     </Badge>
                   ))
                 ) : (
-                  <span className="text-[11px] text-foreground-muted">暂无变量</span>
+                  <span className="text-[11px] text-foreground-muted">No variables</span>
                 )}
               </div>
             </FormRow>
 
             <div className="flex items-center justify-end gap-2">
               <Button variant="outline" size="sm" onClick={resetTemplates} disabled={!canEditTemplates}>
-                重置
+                Reset
               </Button>
               <Button size="sm" onClick={saveTemplates} disabled={!canEditTemplates}>
-                保存模板
+                Save Templates
               </Button>
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="rounded-lg border border-border bg-surface-75 p-4">
-              <div className="text-[11px] text-foreground-muted">预览接收人</div>
+              <div className="text-[11px] text-foreground-muted">Preview Recipient</div>
               <div className="text-[12px] text-foreground">{previewRecipient}</div>
-              <div className="mt-3 text-[11px] text-foreground-muted">预览标题</div>
+              <div className="mt-3 text-[11px] text-foreground-muted">Preview Title</div>
               <div className="text-[12px] text-foreground">{previewTitle || "-"}</div>
-              <div className="mt-3 text-[11px] text-foreground-muted">预览内容</div>
+              <div className="mt-3 text-[11px] text-foreground-muted">Preview Content</div>
               <div className="text-[12px] text-foreground-light whitespace-pre-wrap">
                 {previewContent || "-"}
               </div>
@@ -681,20 +681,20 @@ export default function AnnouncementsPage() {
 
             <div className="flex items-center justify-between rounded-lg border border-border bg-surface-75 px-4 py-3">
               <div>
-                <div className="text-[12px] font-medium text-foreground">发送预览</div>
+                <div className="text-[12px] font-medium text-foreground">Send Preview</div>
                 <div className="text-[11px] text-foreground-muted">
-                  将当前模板内容发送给预览接收人。
+                  Send current template content to the preview recipient.
                 </div>
               </div>
               <Button
                 size="sm"
                 onClick={() => {
                   if (!selectedTemplate) return;
-                  toast.success(`已发送预览至 ${previewRecipient}`);
+                  toast.success(`Preview sent to ${previewRecipient}`);
                 }}
                 disabled={!selectedTemplate}
               >
-                发送预览
+                Send Preview
               </Button>
             </div>
           </div>
@@ -704,32 +704,32 @@ export default function AnnouncementsPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Bell className="w-5 h-5" />} iconVariant="info">
-            <DialogTitle>新建公告</DialogTitle>
-            <DialogDescription>发布平台公告并设置展示周期。</DialogDescription>
+            <DialogTitle>New Announcement</DialogTitle>
+            <DialogDescription>Publish a platform announcement and set the display period.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <div className="text-[11px] text-foreground-muted mb-1">标题</div>
+              <div className="text-[11px] text-foreground-muted mb-1">Title</div>
               <Input
                 value={titleDraft}
                 onChange={(event) => setTitleDraft(event.target.value)}
-                placeholder="例如：新功能上线通知"
+                placeholder="e.g., New Feature Launch Notification"
               />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted mb-1">内容</div>
+              <div className="text-[11px] text-foreground-muted mb-1">Content</div>
               <textarea
                 value={descriptionDraft}
                 onChange={(event) => setDescriptionDraft(event.target.value)}
                 rows={4}
-                placeholder="描述公告内容..."
+                placeholder="Describe the announcement..."
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500"
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">类型</div>
+                <div className="text-[11px] text-foreground-muted mb-1">Type</div>
                 <select
                   value={typeDraft}
                   onChange={(event) => setTypeDraft(event.target.value)}
@@ -743,7 +743,7 @@ export default function AnnouncementsPage() {
                 </select>
               </div>
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">优先级</div>
+                <div className="text-[11px] text-foreground-muted mb-1">Priority</div>
                 <Input
                   type="number"
                   value={priorityDraft}
@@ -754,7 +754,7 @@ export default function AnnouncementsPage() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">开始时间</div>
+                <div className="text-[11px] text-foreground-muted mb-1">Start Time</div>
                 <Input
                   type="datetime-local"
                   value={startsAtDraft}
@@ -762,7 +762,7 @@ export default function AnnouncementsPage() {
                 />
               </div>
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">结束时间</div>
+                <div className="text-[11px] text-foreground-muted mb-1">End Time</div>
                 <Input
                   type="datetime-local"
                   value={endsAtDraft}
@@ -772,9 +772,9 @@ export default function AnnouncementsPage() {
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
               <div>
-                <div className="text-[12px] font-medium text-foreground">立即发布</div>
+                <div className="text-[12px] font-medium text-foreground">Publish Immediately</div>
                 <div className="text-[11px] text-foreground-light">
-                  关闭后创建为下线状态
+                  When disabled, creates in unpublished state
                 </div>
               </div>
               <Switch checked={isActiveDraft} onCheckedChange={setIsActiveDraft} />
@@ -783,15 +783,15 @@ export default function AnnouncementsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               size="sm"
               loading={createMutation.isPending}
-              loadingText="创建中..."
+              loadingText="Creating..."
               onClick={() => createMutation.mutate()}
             >
-              创建公告
+              Create Announcement
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -801,14 +801,14 @@ export default function AnnouncementsPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         type={nextActiveState ? "info" : "warning"}
-        title={nextActiveState ? "确认发布该公告？" : "确认下线该公告？"}
+        title={nextActiveState ? "Confirm publish this announcement?" : "Confirm unpublish this announcement?"}
         description={
           selectedAnnouncement
             ? `${selectedAnnouncement.title} · ${selectedAnnouncement.id}`
-            : "请选择公告"
+            : "Please select an announcement"
         }
-        confirmText={nextActiveState ? "发布" : "下线"}
-        cancelText="取消"
+        confirmText={nextActiveState ? "Publish" : "Unpublish"}
+        cancelText="Cancel"
         loading={toggleMutation.isPending}
         onConfirm={() => {
           if (!selectedAnnouncement) return;

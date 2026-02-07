@@ -66,15 +66,15 @@ const mockExportJobs = [
 ];
 
 const ACTION_LABELS: Record<string, string> = {
-  "user.login": "用户登录",
-  "user.logout": "用户登出",
-  "user.role_change": "角色变更",
-  "workspace.create": "创建工作空间",
-  "workspace.update": "更新工作空间",
-  "workspace.delete": "删除工作空间",
-  "app.create": "创建应用",
-  "app.deploy": "部署应用",
-  "config.change": "配置变更",
+  "user.login": "User Login",
+  "user.logout": "User Logout",
+  "user.role_change": "Role Change",
+  "workspace.create": "Create Workspace",
+  "workspace.update": "Update Workspace",
+  "workspace.delete": "Delete Workspace",
+  "app.create": "Create App",
+  "app.deploy": "Deploy App",
+  "config.change": "Config Change",
 };
 
 export default function AuditLogsPage() {
@@ -123,11 +123,11 @@ export default function AuditLogsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("导出任务已创建");
+      toast.success("Export job created");
       setExportOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "security", "audit-logs"] });
     },
-    onError: () => toast.error("创建导出任务失败"),
+    onError: () => toast.error("Failed to create export job"),
   });
 
   const updatePolicyMutation = useMutation({
@@ -142,30 +142,30 @@ export default function AuditLogsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("留存策略已更新");
+      toast.success("Retention policy updated");
       setPolicyOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "security", "audit-logs", "policy"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="审计日志"
-        description="查看系统审计日志，管理导出与留存策略。"
+        title="Audit Logs"
+        description="View system audit logs, manage exports and retention policies."
         icon={<History className="w-4 h-4" />}
         backHref="/security"
-        backLabel="返回安全概览"
+        backLabel="Back to Security Overview"
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setPolicyOpen(true)}>
               <Settings className="w-3.5 h-3.5 mr-1" />
-              留存策略
+              Retention Policy
             </Button>
             <Button size="sm" onClick={() => setExportOpen(true)}>
               <FileDown className="w-3.5 h-3.5 mr-1" />
-              导出日志
+              Export Logs
             </Button>
           </div>
         }
@@ -173,55 +173,55 @@ export default function AuditLogsPage() {
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="总日志数"
+          title="Total Logs"
           value="1.2M"
-          subtitle="条记录"
+          subtitle="records"
         />
         <StatsCard
-          title="今日日志"
+          title="Today's Logs"
           value="4,521"
-          subtitle="条记录"
+          subtitle="records"
         />
         <StatsCard
-          title="默认留存"
-          value={`${mockRetentionPolicy.default_retention_days}天`}
-          subtitle="留存期限"
+          title="Default Retention"
+          value={`${mockRetentionPolicy.default_retention_days} days`}
+          subtitle="retention period"
         />
         <StatsCard
-          title="归档状态"
-          value={mockRetentionPolicy.archive_enabled ? "已启用" : "已停用"}
-          subtitle="自动归档"
+          title="Archive Status"
+          value={mockRetentionPolicy.archive_enabled ? "Enabled" : "Disabled"}
+          subtitle="auto-archive"
         />
       </div>
 
       <SettingsSection
-        title="最近日志"
-        description="系统操作审计记录。"
+        title="Recent Logs"
+        description="System operation audit records."
       >
         <div className="flex items-center gap-2 mb-4">
           <div className="w-[300px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索操作、用户或目标 ID"
+              placeholder="Search actions, users, or target IDs"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredLogs.length} 条
+            {filteredLogs.length} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>操作</TableHead>
-              <TableHead>目标</TableHead>
-              <TableHead>操作者</TableHead>
-              <TableHead>IP 地址</TableHead>
-              <TableHead>时间</TableHead>
+              <TableHead>Action</TableHead>
+              <TableHead>Target</TableHead>
+              <TableHead>Actor</TableHead>
+              <TableHead>IP Address</TableHead>
+              <TableHead>Time</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -231,7 +231,7 @@ export default function AuditLogsPage() {
                   colSpan={5}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无日志记录
+                  No log records found
                 </TableCell>
               </TableRow>
             ) : (
@@ -266,17 +266,17 @@ export default function AuditLogsPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="导出历史"
-        description="已创建的日志导出任务。"
+        title="Export History"
+        description="Previously created log export jobs."
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>时间范围</TableHead>
-              <TableHead>格式</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Time Range</TableHead>
+              <TableHead>Format</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -286,7 +286,7 @@ export default function AuditLogsPage() {
                   colSpan={5}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无导出任务
+                  No export jobs found
                 </TableCell>
               </TableRow>
             ) : (
@@ -305,7 +305,7 @@ export default function AuditLogsPage() {
                       variant={job.status === "completed" ? "success" : job.status === "running" ? "info" : "warning"}
                       size="sm"
                     >
-                      {job.status === "completed" ? "已完成" : job.status === "running" ? "进行中" : "失败"}
+                      {job.status === "completed" ? "Completed" : job.status === "running" ? "In Progress" : "Failed"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -315,7 +315,7 @@ export default function AuditLogsPage() {
                     {job.status === "completed" && job.download_url && (
                       <Button variant="ghost" size="sm">
                         <Download className="w-3.5 h-3.5 mr-1" />
-                        下载
+                        Download
                       </Button>
                     )}
                   </TableCell>
@@ -330,16 +330,16 @@ export default function AuditLogsPage() {
       <Dialog open={exportOpen} onOpenChange={setExportOpen}>
         <DialogContent size="md">
           <DialogHeader icon={<FileDown className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>导出审计日志</DialogTitle>
+            <DialogTitle>Export Audit Logs</DialogTitle>
             <DialogDescription>
-              选择时间范围和导出格式。
+              Select a time range and export format.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">开始日期</label>
+                <label className="text-[12px] text-foreground">Start Date</label>
                 <Input
                   type="date"
                   value={exportStartDate}
@@ -347,7 +347,7 @@ export default function AuditLogsPage() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">结束日期</label>
+                <label className="text-[12px] text-foreground">End Date</label>
                 <Input
                   type="date"
                   value={exportEndDate}
@@ -357,7 +357,7 @@ export default function AuditLogsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] text-foreground">导出格式</label>
+              <label className="text-[12px] text-foreground">Export Format</label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -381,14 +381,14 @@ export default function AuditLogsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setExportOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => exportMutation.mutate()}
               loading={exportMutation.isPending}
-              loadingText="创建中..."
+              loadingText="Creating..."
             >
-              开始导出
+              Start Export
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -398,15 +398,15 @@ export default function AuditLogsPage() {
       <Dialog open={policyOpen} onOpenChange={setPolicyOpen}>
         <DialogContent size="md">
           <DialogHeader icon={<Archive className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>留存策略设置</DialogTitle>
+            <DialogTitle>Retention Policy Settings</DialogTitle>
             <DialogDescription>
-              配置审计日志的留存期限和归档规则。
+              Configure audit log retention periods and archival rules.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">默认留存天数</label>
+              <label className="text-[12px] text-foreground">Default Retention (days)</label>
               <Input
                 type="number"
                 min={30}
@@ -414,11 +414,11 @@ export default function AuditLogsPage() {
                 value={defaultRetention}
                 onChange={(e) => setDefaultRetention(parseInt(e.target.value) || 90)}
               />
-              <p className="text-[11px] text-foreground-muted">常规日志的留存期限</p>
+              <p className="text-[11px] text-foreground-muted">Retention period for regular logs</p>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">敏感日志留存天数</label>
+              <label className="text-[12px] text-foreground">Sensitive Log Retention (days)</label>
               <Input
                 type="number"
                 min={90}
@@ -426,14 +426,14 @@ export default function AuditLogsPage() {
                 value={sensitiveRetention}
                 onChange={(e) => setSensitiveRetention(parseInt(e.target.value) || 365)}
               />
-              <p className="text-[11px] text-foreground-muted">涉及安全和合规的日志留存期限</p>
+              <p className="text-[11px] text-foreground-muted">Retention period for security and compliance logs</p>
             </div>
 
             <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-surface-75">
               <div>
-                <div className="text-[12px] font-medium text-foreground">启用自动归档</div>
+                <div className="text-[12px] font-medium text-foreground">Enable Auto-Archive</div>
                 <div className="text-[11px] text-foreground-muted">
-                  到期日志自动归档至 {mockRetentionPolicy.archive_destination}
+                  Expired logs are automatically archived to {mockRetentionPolicy.archive_destination}
                 </div>
               </div>
               <Switch
@@ -445,14 +445,14 @@ export default function AuditLogsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setPolicyOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => updatePolicyMutation.mutate()}
               loading={updatePolicyMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -58,9 +58,9 @@ interface Template {
 const mockTemplates: Template[] = [
   {
     id: "tpl-1",
-    name: "通用助手",
-    description: "适用于大多数场景的通用对话模板",
-    system_prompt: "你是一个有用的AI助手，友好且专业地回答用户问题。",
+    name: "General Assistant",
+    description: "A general-purpose conversation template suitable for most scenarios",
+    system_prompt: "You are a helpful AI assistant, answering user questions in a friendly and professional manner.",
     model: "gpt-4",
     parameters: { temperature: 0.7, max_tokens: 2048 },
     is_default: true,
@@ -69,9 +69,9 @@ const mockTemplates: Template[] = [
   },
   {
     id: "tpl-2",
-    name: "代码助手",
-    description: "专注于代码编写和技术问题的模板",
-    system_prompt: "你是一个专业的编程助手，擅长编写清晰、高效的代码。",
+    name: "Code Assistant",
+    description: "A template focused on coding and technical questions",
+    system_prompt: "You are a professional programming assistant, skilled at writing clear and efficient code.",
     model: "gpt-4",
     parameters: { temperature: 0.3, max_tokens: 4096 },
     is_default: false,
@@ -80,9 +80,9 @@ const mockTemplates: Template[] = [
   },
   {
     id: "tpl-3",
-    name: "写作助手",
-    description: "帮助用户进行创意写作和内容创作",
-    system_prompt: "你是一个创意写作助手，帮助用户撰写各种类型的文本内容。",
+    name: "Writing Assistant",
+    description: "Helps users with creative writing and content creation",
+    system_prompt: "You are a creative writing assistant, helping users compose various types of text content.",
     model: "gpt-4-turbo",
     parameters: { temperature: 0.9, max_tokens: 4096 },
     is_default: false,
@@ -183,11 +183,11 @@ export default function ConversationTemplatesPage() {
       return adminApi.conversations.createTemplate(input);
     },
     onSuccess: () => {
-      toast.success(selectedTemplate ? "模板已更新" : "模板已创建");
+      toast.success(selectedTemplate ? "Template updated" : "Template created");
       setEditOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "templates"] });
     },
-    onError: () => toast.error("保存失败"),
+    onError: () => toast.error("Save failed"),
   });
 
   const deleteMutation = useMutation({
@@ -199,11 +199,11 @@ export default function ConversationTemplatesPage() {
       return adminApi.conversations.deleteTemplate(templateId);
     },
     onSuccess: () => {
-      toast.success("模板已删除");
+      toast.success("Template deleted");
       setDeleteOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "templates"] });
     },
-    onError: () => toast.error("删除失败"),
+    onError: () => toast.error("Delete failed"),
   });
 
   const setDefaultMutation = useMutation({
@@ -217,57 +217,57 @@ export default function ConversationTemplatesPage() {
       return adminApi.conversations.setDefaultTemplate(templateId);
     },
     onSuccess: () => {
-      toast.success("默认模板已设置");
+      toast.success("Default template set");
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "templates"] });
     },
-    onError: () => toast.error("设置失败"),
+    onError: () => toast.error("Setting failed"),
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="对话模板管理"
-        description="管理对话系统的预设模板与提示词配置。"
+        title="Conversation Template Management"
+        description="Manage preset templates and prompt configurations for the conversation system."
         icon={<FileText className="w-4 h-4" />}
         backHref="/conversations"
-        backLabel="返回对话列表"
+        backLabel="Back to Conversations"
         actions={
           <Button size="sm" onClick={openCreateDialog}>
             <Plus className="w-3.5 h-3.5 mr-1" />
-            新建模板
+            New Template
           </Button>
         }
       />
 
       <SettingsSection
-        title="模板列表"
-        description="已配置的对话模板。"
+        title="Template List"
+        description="Configured conversation templates."
       >
         <div className="flex items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索模板名称或描述"
+              placeholder="Search template name or description"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredTemplates.length} 个模板
+            {filteredTemplates.length} templates
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>模板名称</TableHead>
-              <TableHead>模型</TableHead>
-              <TableHead>参数</TableHead>
-              <TableHead>使用次数</TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Template Name</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>Parameters</TableHead>
+              <TableHead>Usage Count</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -277,7 +277,7 @@ export default function ConversationTemplatesPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无模板
+                  No templates
                 </TableCell>
               </TableRow>
             ) : (
@@ -291,7 +291,7 @@ export default function ConversationTemplatesPage() {
                           {template.is_default && (
                             <Badge variant="success" size="sm">
                               <Star className="w-3 h-3 mr-0.5" />
-                              默认
+                              Default
                             </Badge>
                           )}
                         </div>
@@ -357,24 +357,24 @@ export default function ConversationTemplatesPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileText className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>{selectedTemplate ? "编辑模板" : "新建模板"}</DialogTitle>
+            <DialogTitle>{selectedTemplate ? "Edit Template" : "New Template"}</DialogTitle>
             <DialogDescription>
-              配置对话模板的基本信息和模型参数。
+              Configure template basic info and model parameters.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">模板名称</label>
+                <label className="text-[12px] text-foreground">Template Name</label>
                 <Input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  placeholder="输入模板名称"
+                  placeholder="Enter template name"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">模型</label>
+                <label className="text-[12px] text-foreground">Model</label>
                 <select
                   value={formModel}
                   onChange={(e) => setFormModel(e.target.value)}
@@ -390,21 +390,21 @@ export default function ConversationTemplatesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">描述</label>
+              <label className="text-[12px] text-foreground">Description</label>
               <Input
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
-                placeholder="简短描述模板用途"
+                placeholder="Brief description of template purpose"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">系统提示词</label>
+              <label className="text-[12px] text-foreground">System Prompt</label>
               <textarea
                 value={formSystemPrompt}
                 onChange={(e) => setFormSystemPrompt(e.target.value)}
                 rows={4}
-                placeholder="输入系统提示词..."
+                    placeholder="Enter system prompt..."
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30"
               />
             </div>
@@ -436,14 +436,14 @@ export default function ConversationTemplatesPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => saveMutation.mutate()}
               loading={saveMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -453,9 +453,9 @@ export default function ConversationTemplatesPage() {
       <ConfirmDialog
         open={Boolean(deleteOpen)}
         onOpenChange={(open) => !open && setDeleteOpen(null)}
-        title="删除模板"
-        description="确认要删除此模板吗？此操作不可撤销。"
-        confirmLabel="确认删除"
+        title="Delete Template"
+        description="Are you sure you want to delete this template? This action cannot be undone."
+        confirmLabel="Confirm Delete"
         onConfirm={() => deleteOpen && deleteMutation.mutate(deleteOpen)}
         isLoading={deleteMutation.isPending}
         variant="danger"

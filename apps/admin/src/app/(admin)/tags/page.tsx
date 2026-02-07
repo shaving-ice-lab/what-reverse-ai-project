@@ -45,10 +45,10 @@ import { usePermission } from "@/hooks/usePermission";
 
 const CATEGORY_OPTIONS = ["all", "type", "industry", "tier"] as const;
 const CATEGORY_LABELS: Record<(typeof CATEGORY_OPTIONS)[number], string> = {
-  all: "全部分类",
-  type: "类型",
-  industry: "行业",
-  tier: "层级",
+  all: "All Categories",
+  type: "Type",
+  industry: "Industry",
+  tier: "Tier",
 };
 
 export default function TagsPage() {
@@ -144,8 +144,8 @@ export default function TagsPage() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      if (!nameDraft.trim()) throw new Error("请填写标签名称");
-      if (!slugDraft.trim()) throw new Error("请填写标签 Slug");
+      if (!nameDraft.trim()) throw new Error("Please enter a tag name");
+      if (!slugDraft.trim()) throw new Error("Please enter a tag slug");
 
       if (localMode) {
         const newTag: Tag = {
@@ -172,19 +172,19 @@ export default function TagsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("标签已创建");
+      toast.success("Tag created");
       queryClient.invalidateQueries({ queryKey: ["admin", "tags"] });
       setEditOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "创建失败");
+      toast.error(error instanceof Error ? error.message : "Creation failed");
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedTag) throw new Error("请选择标签");
-      if (!nameDraft.trim()) throw new Error("请填写标签名称");
+      if (!selectedTag) throw new Error("Please select a tag");
+      if (!nameDraft.trim()) throw new Error("Please enter a tag name");
 
       if (localMode) {
         const next = localTags.map((tag) =>
@@ -213,18 +213,18 @@ export default function TagsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("标签已更新");
+      toast.success("Tag updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "tags"] });
       setEditOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedTag) throw new Error("请选择标签");
+      if (!selectedTag) throw new Error("Please select a tag");
 
       if (localMode) {
         setLocalTags((prev) => prev.filter((tag) => tag.id !== selectedTag.id));
@@ -234,49 +234,49 @@ export default function TagsPage() {
       return adminApi.tags.delete(selectedTag.id);
     },
     onSuccess: () => {
-      toast.success("标签已删除");
+      toast.success("Tag deleted");
       queryClient.invalidateQueries({ queryKey: ["admin", "tags"] });
       setConfirmDeleteOpen(false);
       setEditOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "删除失败");
+      toast.error(error instanceof Error ? error.message : "Delete failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="标签管理"
-        description="管理模板与内容的标签体系。"
+        title="Tag Management"
+        description="Manage the tag system for templates and content."
         icon={<TagIcon className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button size="sm" disabled={!canManage} onClick={openNewTag}>
               <Plus className="w-3.5 h-3.5 mr-1" />
-              新建标签
+              New Tag
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="标签列表"
-        description="支持按名称、分类筛选。"
+        title="Tag List"
+        description="Filter by name and category."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索名称或 Slug"
+              placeholder="Search name or slug"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">分类</span>
+            <span className="text-[11px] text-foreground-muted">Category</span>
             <select
               value={categoryFilter}
               onChange={(event) =>
@@ -292,19 +292,19 @@ export default function TagsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>标签</TableHead>
+              <TableHead>Tag</TableHead>
               <TableHead>Slug</TableHead>
-              <TableHead>分类</TableHead>
-              <TableHead>使用次数</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Usage Count</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -314,7 +314,7 @@ export default function TagsPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -324,8 +324,8 @@ export default function TagsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {tagsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配标签"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No matching tags"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -401,21 +401,21 @@ export default function TagsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<TagIcon className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>{isNew ? "新建标签" : "编辑标签"}</DialogTitle>
+            <DialogTitle>{isNew ? "New Tag" : "Edit Tag"}</DialogTitle>
             <DialogDescription>
-              {isNew ? "创建新的标签用于分类模板与内容" : `编辑标签: ${selectedTag?.name}`}
+              {isNew ? "Create a new tag for categorizing templates and content" : `Edit tag: ${selectedTag?.name}`}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-[12px] text-foreground-muted mb-1 block">名称 *</label>
+                <label className="text-[12px] text-foreground-muted mb-1 block">Name *</label>
                 <Input
                   inputSize="sm"
                   value={nameDraft}
                   onChange={(e) => setNameDraft(e.target.value)}
-                  placeholder="标签名称"
+                  placeholder="Tag name"
                 />
               </div>
               <div>
@@ -431,7 +431,7 @@ export default function TagsPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-[12px] text-foreground-muted mb-1 block">分类</label>
+                <label className="text-[12px] text-foreground-muted mb-1 block">Category</label>
                 <select
                   value={categoryDraft}
                   onChange={(e) => setCategoryDraft(e.target.value)}
@@ -445,7 +445,7 @@ export default function TagsPage() {
                 </select>
               </div>
               <div>
-                <label className="text-[12px] text-foreground-muted mb-1 block">颜色</label>
+                <label className="text-[12px] text-foreground-muted mb-1 block">Color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -465,12 +465,12 @@ export default function TagsPage() {
             </div>
 
             <div>
-              <label className="text-[12px] text-foreground-muted mb-1 block">描述</label>
+              <label className="text-[12px] text-foreground-muted mb-1 block">Description</label>
               <textarea
                 value={descriptionDraft}
                 onChange={(e) => setDescriptionDraft(e.target.value)}
                 rows={2}
-                placeholder="标签描述（可选）"
+                placeholder="Tag description (optional)"
                 className={cn(
                   "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                   "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -490,20 +490,20 @@ export default function TagsPage() {
                   className="text-error-default"
                 >
                   <Trash2 className="w-3.5 h-3.5 mr-1" />
-                  删除
+                  Delete
                 </Button>
               )}
               <div className="flex items-center gap-2 ml-auto">
                 <Button variant="outline" size="sm" onClick={() => setEditOpen(false)}>
-                  取消
+                  Cancel
                 </Button>
                 <Button
                   size="sm"
                   loading={isNew ? createMutation.isPending : updateMutation.isPending}
-                  loadingText="保存中..."
+                  loadingText="Saving..."
                   onClick={() => (isNew ? createMutation.mutate() : updateMutation.mutate())}
                 >
-                  {isNew ? "创建" : "保存"}
+                  {isNew ? "Create" : "Save"}
                 </Button>
               </div>
             </div>
@@ -515,10 +515,10 @@ export default function TagsPage() {
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
         type="warning"
-        title="确认删除该标签？"
-        description={`删除后标签 "${selectedTag?.name}" 将被移除，此操作不可恢复。`}
-        confirmText="确认删除"
-        cancelText="取消"
+        title="Confirm delete this tag?"
+        description={`Tag "${selectedTag?.name}" will be removed after deletion. This action cannot be undone.`}
+        confirmText="Confirm Delete"
+        cancelText="Cancel"
         loading={deleteMutation.isPending}
         onConfirm={() => deleteMutation.mutate()}
       />

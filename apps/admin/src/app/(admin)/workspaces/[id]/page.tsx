@@ -53,10 +53,10 @@ import {
 import type { App, Workspace, WorkspaceMember } from "@/types/admin";
 
 const STATUS_LABELS: Record<string, string> = {
-  active: "正常",
-  suspended: "已暂停",
-  cold_storage: "冷存储",
-  deleted: "已删除",
+  active: "Active",
+  suspended: "Suspended",
+  cold_storage: "Cold Storage",
+  deleted: "Deleted",
 };
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "destructive"> = {
@@ -67,11 +67,11 @@ const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "des
 };
 
 const APP_STATUS_LABELS: Record<string, string> = {
-  published: "已发布",
-  draft: "草稿",
-  deprecated: "已废弃",
-  archived: "已归档",
-  suspended: "已暂停",
+  published: "Published",
+  draft: "Draft",
+  deprecated: "Deprecated",
+  archived: "Archived",
+  suspended: "Suspended",
 };
 
 const PLAN_OPTIONS = ["free", "pro", "enterprise"] as const;
@@ -114,8 +114,8 @@ const mockLogArchives = [
 ];
 
 const mockPlanHistory = [
-  { id: "ph-1", from_plan: "pro", to_plan: "enterprise", changed_by: "ray@agentflow.ai", reason: "业务扩展需要", created_at: "2026-01-15T10:00:00Z" },
-  { id: "ph-2", from_plan: "free", to_plan: "pro", changed_by: "ray@agentflow.ai", reason: "试用期结束升级", created_at: "2025-12-20T08:00:00Z" },
+  { id: "ph-1", from_plan: "pro", to_plan: "enterprise", changed_by: "ray@agentflow.ai", reason: "Business expansion needed", created_at: "2026-01-15T10:00:00Z" },
+  { id: "ph-2", from_plan: "free", to_plan: "pro", changed_by: "ray@agentflow.ai", reason: "Trial period ended, upgrade", created_at: "2025-12-20T08:00:00Z" },
 ];
 
 export default function WorkspaceDetailPage() {
@@ -196,10 +196,10 @@ export default function WorkspaceDetailPage() {
   const exportDataMutation = useMutation({
     mutationFn: () => adminApi.workspaces.exportData(workspaceId, { format: exportFormat, include_logs: true }),
     onSuccess: () => {
-      toast.success("数据导出任务已创建");
+      toast.success("Data export task created");
       setExportDataOpen(false);
     },
-    onError: () => toast.error("导出失败"),
+    onError: () => toast.error("Export failed"),
   });
 
   const createArchiveMutation = useMutation({
@@ -208,59 +208,59 @@ export default function WorkspaceDetailPage() {
       end_date: archiveEndDate,
     }),
     onSuccess: () => {
-      toast.success("日志归档任务已创建");
+      toast.success("Log archive task created");
       setCreateArchiveOpen(false);
       setArchiveStartDate("");
       setArchiveEndDate("");
     },
-    onError: () => toast.error("归档失败"),
+    onError: () => toast.error("Archive failed"),
   });
 
   const dbMigrateMutation = useMutation({
     mutationFn: () => adminApi.workspaces.triggerDbMigration(workspaceId, { reason: migrateReason }),
     onSuccess: () => {
-      toast.success("数据库迁移任务已启动");
+      toast.success("Database migration started");
       setDbMigrateOpen(false);
       setMigrateReason("");
     },
-    onError: () => toast.error("迁移启动失败"),
+    onError: () => toast.error("Migration failed to start"),
   });
 
   const rotateKeyMutation = useMutation({
     mutationFn: () => adminApi.workspaces.rotateDbKey(workspaceId, { reason: rotateKeyReason }),
     onSuccess: () => {
-      toast.success("密钥轮换已完成");
+      toast.success("Key rotation completed");
       setRotateKeyOpen(false);
       setRotateKeyReason("");
     },
-    onError: () => toast.error("密钥轮换失败"),
+    onError: () => toast.error("Key rotation failed"),
   });
 
   const updatePlanMutation = useMutation({
     mutationFn: () => adminApi.workspaces.updatePlan(workspaceId, { plan: newPlan, reason: planChangeReason }),
     onSuccess: () => {
-      toast.success("计划已更新");
+      toast.success("Plan updated");
       setUpdatePlanOpen(false);
       setPlanChangeReason("");
       queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
     },
-    onError: () => toast.error("计划更新失败"),
+    onError: () => toast.error("Plan update failed"),
   });
 
   const removeMemberMutation = useMutation({
-    mutationFn: (userId: string) => adminApi.workspaces.removeMember(workspaceId, userId, { reason: "管理员移除" }),
+    mutationFn: (userId: string) => adminApi.workspaces.removeMember(workspaceId, userId, { reason: "Removed by admin" }),
     onSuccess: () => {
-      toast.success("成员已移除");
+      toast.success("Member removed");
       setRemoveMemberOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
     },
-    onError: () => toast.error("移除成员失败"),
+    onError: () => toast.error("Failed to remove member"),
   });
 
   if (!workspaceId) {
     return (
       <PageContainer>
-        <PageHeader title="Workspace 详情" description="无效的 Workspace ID" icon={<Building2 className="w-4 h-4" />} />
+        <PageHeader title="Workspace Details" description="Invalid workspace ID" icon={<Building2 className="w-4 h-4" />} />
       </PageContainer>
     );
   }
@@ -273,17 +273,17 @@ export default function WorkspaceDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={workspace?.name || "Workspace 详情"}
+        title={workspace?.name || "Workspace Details"}
         description={
           workspace
             ? `${workspace.slug || "-"} · ${workspace.id}`
             : localMode
-            ? "未找到对应的本地 Workspace 数据"
-            : "正在加载 Workspace 数据..."
+            ? "Local workspace data not found"
+            : "Loading workspace data..."
         }
         icon={<Building2 className="w-4 h-4" />}
         backHref="/workspaces"
-        backLabel="返回 Workspace 列表"
+        backLabel="Back to Workspace List"
         badge={
           workspace ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -305,13 +305,13 @@ export default function WorkspaceDetailPage() {
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setExportDataOpen(true)}>
               <FileDown className="w-3.5 h-3.5 mr-1" />
-              导出数据
+              Export Data
             </Button>
             <Button size="sm" onClick={() => {
               setNewPlan(workspace?.plan || "pro");
               setUpdatePlanOpen(true);
             }}>
-              调整计划
+              Adjust Plan
             </Button>
           </div>
         }
@@ -321,15 +321,15 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={exportDataOpen}
         onOpenChange={setExportDataOpen}
-        title="导出 Workspace 数据"
-        description="导出该工作空间的所有配置、成员和应用数据。"
-        confirmLabel="开始导出"
+        title="Export Workspace Data"
+        description="Export all configuration, member, and app data for this workspace."
+        confirmLabel="Start Export"
         onConfirm={() => exportDataMutation.mutate()}
         isLoading={exportDataMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">导出格式</label>
+            <label className="text-[12px] text-foreground">Export Format</label>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -355,16 +355,16 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={createArchiveOpen}
         onOpenChange={setCreateArchiveOpen}
-        title="创建日志归档"
-        description="将指定时间范围的日志打包归档。"
-        confirmLabel="创建归档"
+        title="Create Log Archive"
+        description="Archive logs within a specified date range."
+        confirmLabel="Create Archive"
         onConfirm={() => createArchiveMutation.mutate()}
         isLoading={createArchiveMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">开始日期</label>
+              <label className="text-[12px] text-foreground">Start Date</label>
               <Input
                 type="date"
                 value={archiveStartDate}
@@ -372,7 +372,7 @@ export default function WorkspaceDetailPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">结束日期</label>
+              <label className="text-[12px] text-foreground">End Date</label>
               <Input
                 type="date"
                 value={archiveEndDate}
@@ -386,20 +386,20 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={dbMigrateOpen}
         onOpenChange={setDbMigrateOpen}
-        title="数据库迁移"
-        description="启动数据库迁移任务，此操作可能需要较长时间。"
-        confirmLabel="开始迁移"
+        title="Database Migration"
+        description="Start a database migration task. This may take a while."
+        confirmLabel="Start Migration"
         onConfirm={() => dbMigrateMutation.mutate()}
         isLoading={dbMigrateMutation.isPending}
         variant="warning"
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">迁移原因（必填）</label>
+            <label className="text-[12px] text-foreground">Migration Reason (required)</label>
             <Input
               value={migrateReason}
               onChange={(e) => setMigrateReason(e.target.value)}
-              placeholder="请输入迁移原因..."
+              placeholder="Enter migration reason..."
             />
           </div>
         </div>
@@ -408,20 +408,20 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={rotateKeyOpen}
         onOpenChange={setRotateKeyOpen}
-        title="轮换加密密钥"
-        description="轮换数据库加密密钥，旧密钥将在 24 小时后失效。"
-        confirmLabel="确认轮换"
+        title="Rotate Encryption Key"
+        description="Rotate the database encryption key. The old key will expire after 24 hours."
+        confirmLabel="Confirm Rotation"
         onConfirm={() => rotateKeyMutation.mutate()}
         isLoading={rotateKeyMutation.isPending}
         variant="warning"
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">轮换原因（必填）</label>
+            <label className="text-[12px] text-foreground">Rotation Reason (required)</label>
             <Input
               value={rotateKeyReason}
               onChange={(e) => setRotateKeyReason(e.target.value)}
-              placeholder="请输入轮换原因..."
+              placeholder="Enter rotation reason..."
             />
           </div>
         </div>
@@ -430,15 +430,15 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={updatePlanOpen}
         onOpenChange={setUpdatePlanOpen}
-        title="调整计划"
-        description="更改该 Workspace 的订阅计划。"
-        confirmLabel="确认调整"
+        title="Adjust Plan"
+        description="Change the subscription plan for this workspace."
+        confirmLabel="Confirm Adjustment"
         onConfirm={() => updatePlanMutation.mutate()}
         isLoading={updatePlanMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">目标计划</label>
+            <label className="text-[12px] text-foreground">Target Plan</label>
             <div className="flex gap-2">
               {PLAN_OPTIONS.map((plan) => (
                 <Button
@@ -454,11 +454,11 @@ export default function WorkspaceDetailPage() {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">变更原因（必填）</label>
+            <label className="text-[12px] text-foreground">Change Reason (required)</label>
             <Input
               value={planChangeReason}
               onChange={(e) => setPlanChangeReason(e.target.value)}
-              placeholder="请输入计划变更原因..."
+              placeholder="Enter plan change reason..."
             />
           </div>
         </div>
@@ -467,29 +467,29 @@ export default function WorkspaceDetailPage() {
       <ConfirmDialog
         open={Boolean(removeMemberOpen)}
         onOpenChange={(open) => !open && setRemoveMemberOpen(null)}
-        title="移除成员"
-        description="确认要将该成员从工作空间中移除吗？"
-        confirmLabel="确认移除"
+        title="Remove Member"
+        description="Are you sure you want to remove this member from the workspace?"
+        confirmLabel="Confirm Removal"
         onConfirm={() => removeMemberOpen && removeMemberMutation.mutate(removeMemberOpen)}
         isLoading={removeMemberMutation.isPending}
         variant="danger"
       />
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-        <SettingsSection title="基础信息" description="Workspace 配置与归属信息。">
+        <SettingsSection title="Basic Information" description="Workspace configuration and ownership.">
           {!workspace ? (
             <div className="text-[12px] text-foreground-muted">
-              {workspaceQuery.isPending && !localMode ? "正在加载..." : "暂无 Workspace 数据"}
+              {workspaceQuery.isPending && !localMode ? "Loading..." : "No workspace data available"}
             </div>
           ) : (
             <div className="space-y-1">
-              <FormRow label="Workspace ID" description="系统唯一标识">
+              <FormRow label="Workspace ID" description="System unique identifier">
                 <div className="text-[12px] text-foreground">{workspace.id}</div>
               </FormRow>
-              <FormRow label="Slug" description="URL 与路由标识">
+              <FormRow label="Slug" description="URL and routing identifier">
                 <div className="text-[12px] text-foreground-light">{workspace.slug}</div>
               </FormRow>
-              <FormRow label="Owner" description="Workspace 所属用户">
+              <FormRow label="Owner" description="Workspace owner">
                 <div className="space-y-1">
                   <Link
                     href={`/users/${workspace.owner_user_id}`}
@@ -502,32 +502,32 @@ export default function WorkspaceDetailPage() {
                   </div>
                 </div>
               </FormRow>
-              <FormRow label="状态" description="当前运行状态">
+              <FormRow label="Status" description="Current running status">
                 <div className="flex items-center gap-2">
                   <Badge variant={statusVariant} size="sm">
                     {statusLabel}
                   </Badge>
                   {workspace.status_reason ? (
                     <span className="text-[11px] text-foreground-muted">
-                      原因：{workspace.status_reason}
+                      Reason: {workspace.status_reason}
                     </span>
                   ) : null}
                 </div>
               </FormRow>
-              <FormRow label="计划" description="当前计费计划">
+              <FormRow label="Plan" description="Current billing plan">
                 <div className="text-[12px] text-foreground-light">{workspace.plan}</div>
               </FormRow>
-              <FormRow label="区域" description="数据中心区域">
+              <FormRow label="Region" description="Data center region">
                 <div className="text-[12px] text-foreground-light">
                   {workspace.region || "-"}
                 </div>
               </FormRow>
-              <FormRow label="创建时间" description="Workspace 创建时间">
+              <FormRow label="Created At" description="Workspace creation time">
                 <div className="text-[12px] text-foreground-light">
                   {workspace.created_at ? formatDate(workspace.created_at) : "-"}
                 </div>
               </FormRow>
-              <FormRow label="更新时间" description="最近一次配置变更">
+              <FormRow label="Updated At" description="Most recent configuration change">
                 <div className="text-[12px] text-foreground-light">
                   {workspace.updated_at ? formatRelativeTime(workspace.updated_at) : "-"}
                 </div>
@@ -538,13 +538,13 @@ export default function WorkspaceDetailPage() {
 
         {/* Quota & Usage View */}
         <SettingsSection
-          title="配额与用量"
-          description="资源配额使用情况。"
+          title="Quota & Usage"
+          description="Resource quota utilization."
           icon={<TrendingUp className="w-4 h-4" />}
         >
           {!workspace ? (
             <div className="text-[12px] text-foreground-muted">
-              {workspaceQuery.isPending && !localMode ? "正在加载..." : "暂无配额数据"}
+              {workspaceQuery.isPending && !localMode ? "Loading..." : "No quota data available"}
             </div>
           ) : (
             <div className="space-y-3">
@@ -552,11 +552,11 @@ export default function WorkspaceDetailPage() {
                 const percent = Math.round((value.used / value.limit) * 100);
                 const isWarning = percent >= 80;
                 const labels: Record<string, string> = {
-                  members: "成员数",
-                  apps: "应用数",
-                  executions_per_month: "月执行量",
-                  storage_gb: "存储 (GB)",
-                  api_calls_per_minute: "API 调用/分钟",
+                  members: "Members",
+                  apps: "Apps",
+                  executions_per_month: "Monthly Executions",
+                  storage_gb: "Storage (GB)",
+                  api_calls_per_minute: "API Calls/min",
                 };
                 return (
                   <div key={key} className="space-y-1">
@@ -585,45 +585,45 @@ export default function WorkspaceDetailPage() {
 
       {/* DB Operations */}
       <SettingsSection
-        title="数据库运维"
-        description="数据库状态、备份与密钥管理。"
+        title="Database Operations"
+        description="Database status, backups, and key management."
         icon={<Database className="w-4 h-4" />}
         footer={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setDbMigrateOpen(true)}>
               <RefreshCw className="w-3.5 h-3.5 mr-1" />
-              数据库迁移
+              DB Migration
             </Button>
             <Button variant="outline" size="sm" onClick={() => setRotateKeyOpen(true)}>
               <Key className="w-3.5 h-3.5 mr-1" />
-              轮换密钥
+              Rotate Key
             </Button>
           </div>
         }
       >
         {!workspace ? (
-          <div className="text-[12px] text-foreground-muted">暂无数据库信息</div>
+          <div className="text-[12px] text-foreground-muted">No database info available</div>
         ) : (
           <div className="page-grid grid-cols-2 lg:grid-cols-4">
             <StatsCard
-              title="数据库状态"
-              value={mockDbInfo.status === "healthy" ? "正常" : "异常"}
-              subtitle="运行状态"
+              title="DB Status"
+              value={mockDbInfo.status === "healthy" ? "Healthy" : "Unhealthy"}
+              subtitle="Running status"
             />
             <StatsCard
-              title="数据库大小"
+              title="DB Size"
               value={`${(mockDbInfo.size_mb / 1024).toFixed(1)} GB`}
-              subtitle="存储占用"
+              subtitle="Storage used"
             />
             <StatsCard
-              title="连接数"
+              title="Connections"
               value={mockDbInfo.connection_count.toString()}
-              subtitle="活跃连接"
+              subtitle="Active connections"
             />
             <StatsCard
-              title="最近备份"
+              title="Last Backup"
               value={formatRelativeTime(mockDbInfo.last_backup_at)}
-              subtitle="自动备份"
+              subtitle="Automatic backup"
             />
           </div>
         )}
@@ -631,26 +631,26 @@ export default function WorkspaceDetailPage() {
 
       {/* Data Export & Log Archives */}
       <SettingsSection
-        title="数据导出与日志归档"
-        description="导出工作空间数据，管理历史日志归档。"
+        title="Data Export & Log Archives"
+        description="Export workspace data and manage historical log archives."
         icon={<Archive className="w-4 h-4" />}
         footer={
           <Button variant="outline" size="sm" onClick={() => setCreateArchiveOpen(true)}>
             <Archive className="w-3.5 h-3.5 mr-1" />
-            创建归档
+            Create Archive
           </Button>
         }
       >
         {mockLogArchives.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无日志归档</div>
+          <div className="text-[12px] text-foreground-muted">No log archives</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>归档文件</TableHead>
-                <TableHead>大小</TableHead>
-                <TableHead>创建时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Archive File</TableHead>
+                <TableHead>Size</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -668,7 +668,7 @@ export default function WorkspaceDetailPage() {
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm">
                       <Download className="w-3.5 h-3.5 mr-1" />
-                      下载
+                      Download
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -680,26 +680,26 @@ export default function WorkspaceDetailPage() {
 
       {/* Member Management */}
       <SettingsSection
-        title="成员与角色管理"
-        description="Workspace 成员列表与角色分配。"
+        title="Members & Role Management"
+        description="Workspace member list and role assignment."
         icon={<Users className="w-4 h-4" />}
       >
         {!workspace ? (
           <div className="text-[12px] text-foreground-muted">
-            {workspaceQuery.isPending && !localMode ? "正在加载..." : "暂无成员数据"}
+            {workspaceQuery.isPending && !localMode ? "Loading..." : "No member data available"}
           </div>
         ) : members.length === 0 ? (
           <div className="text-[12px] text-foreground-muted">
-            {localMode ? "暂无本地成员数据" : "暂无成员数据"}
+            {localMode ? "No local member data" : "No member data available"}
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>成员</TableHead>
-                <TableHead>角色</TableHead>
-                <TableHead>加入时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Member</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -752,12 +752,12 @@ export default function WorkspaceDetailPage() {
 
       {/* Plan History */}
       <SettingsSection
-        title="计划变更历史"
-        description="订阅计划变更记录。"
+        title="Plan Change History"
+        description="Subscription plan change records."
         icon={<History className="w-4 h-4" />}
       >
         {mockPlanHistory.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无计划变更记录</div>
+          <div className="text-[12px] text-foreground-muted">No plan change records</div>
         ) : (
           <div className="space-y-3">
             {mockPlanHistory.map((history) => (
@@ -791,23 +791,23 @@ export default function WorkspaceDetailPage() {
       </SettingsSection>
 
       {/* Related Apps */}
-      <SettingsSection title="关联应用" description="Workspace 下的应用列表。">
+      <SettingsSection title="Related Apps" description="Apps under this workspace.">
         {!workspace ? (
           <div className="text-[12px] text-foreground-muted">
-            {workspaceQuery.isPending && !localMode ? "正在加载..." : "暂无应用数据"}
+            {workspaceQuery.isPending && !localMode ? "Loading..." : "No app data available"}
           </div>
         ) : apps.length === 0 ? (
           <div className="text-[12px] text-foreground-muted">
-            {localMode ? "暂无本地应用数据" : "暂无应用数据"}
+            {localMode ? "No local app data" : "No app data available"}
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>应用</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>更新时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>App</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Updated</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -835,7 +835,7 @@ export default function WorkspaceDetailPage() {
                   <TableCell className="text-right">
                     <Link href={`/apps/${app.id}`}>
                       <Button variant="ghost" size="sm">
-                        查看详情
+                        View Details
                       </Button>
                     </Link>
                   </TableCell>
@@ -847,14 +847,14 @@ export default function WorkspaceDetailPage() {
       </SettingsSection>
 
       {/* Activity Logs */}
-      <SettingsSection title="运维日志" description="关键操作与风险记录。">
+      <SettingsSection title="Operations Log" description="Critical operations and risk records.">
         {!workspace ? (
           <div className="text-[12px] text-foreground-muted">
-            {workspaceQuery.isPending && !localMode ? "正在加载..." : "暂无日志数据"}
+            {workspaceQuery.isPending && !localMode ? "Loading..." : "No log data available"}
           </div>
         ) : activityLogs.length === 0 ? (
           <div className="text-[12px] text-foreground-muted">
-            {localMode ? "暂无本地日志记录" : "该模块仅在本地模式展示"}
+            {localMode ? "No local log records" : "This module is only shown in local mode"}
           </div>
         ) : (
           <div className="space-y-3">
@@ -881,12 +881,12 @@ export default function WorkspaceDetailPage() {
                     size="sm"
                   >
                     {log.severity === "success"
-                      ? "正常"
+                      ? "Normal"
                       : log.severity === "warning"
-                      ? "注意"
+                      ? "Warning"
                       : log.severity === "error"
-                      ? "高危"
-                      : "信息"}
+                      ? "Critical"
+                      : "Info"}
                   </Badge>
                   <div className="flex items-center gap-1 text-[11px] text-foreground-muted">
                     <Clock className="w-3.5 h-3.5" />

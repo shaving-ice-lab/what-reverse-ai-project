@@ -52,44 +52,44 @@ const errorRate = totalExecutions > 0 ? ((failedExecutions / totalExecutions) * 
 
 const dashboardStats = [
   {
-    title: "总用户数",
+    title: "Total Users",
     value: totalUsers.toLocaleString(),
-    subtitle: `${activeUsers} 活跃`,
+    subtitle: `${activeUsers} active`,
     trend: { value: 3.2, isPositive: true },
     icon: <Users className="w-4 h-4" />,
   },
   {
     title: "Workspace",
     value: totalWorkspaces.toLocaleString(),
-    subtitle: `${activeWorkspaces} 已启用`,
+    subtitle: `${activeWorkspaces} enabled`,
     trend: { value: 1.1, isPositive: true },
     icon: <Building2 className="w-4 h-4" />,
   },
   {
-    title: "应用",
+    title: "Apps",
     value: totalApps.toLocaleString(),
-    subtitle: `${publishedApps} 已发布`,
+    subtitle: `${publishedApps} published`,
     trend: { value: 2.5, isPositive: true },
     icon: <AppWindow className="w-4 h-4" />,
   },
   {
-    title: "执行记录",
+    title: "Executions",
     value: totalExecutions.toLocaleString(),
-    subtitle: `${failedExecutions} 失败`,
+    subtitle: `${failedExecutions} failed`,
     trend: { value: 5.8, isPositive: true },
     icon: <Play className="w-4 h-4" />,
   },
   {
-    title: "错误率",
+    title: "Error Rate",
     value: `${errorRate}%`,
-    subtitle: "近 24 小时",
+    subtitle: "Last 24 hours",
     trend: { value: 0.3, isPositive: parseFloat(errorRate) < 1 },
     icon: <AlertTriangle className="w-4 h-4" />,
   },
   {
-    title: "待处理工单",
+    title: "Pending Tickets",
     value: "7",
-    subtitle: "需支持团队处理",
+    subtitle: "Requires support team",
     trend: { value: 2, isPositive: false },
     icon: <LifeBuoy className="w-4 h-4" />,
   },
@@ -112,15 +112,15 @@ export default function AdminDashboardPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Admin 控制台"
-        description="统一管理用户、Workspace、应用与系统治理能力。"
+        title="Admin Console"
+        description="Manage users, workspaces, apps, and system governance."
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href="/security/audit-logs">审计日志</Link>
+              <Link href="/security/audit-logs">Audit Logs</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/announcements">新建公告</Link>
+              <Link href="/announcements">New Announcement</Link>
             </Button>
           </div>
         }
@@ -141,8 +141,8 @@ export default function AdminDashboardPage() {
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]">
         <SettingsSection
-          title="待处理事项"
-          description="需要优先处理的审核、退款与异常队列。"
+          title="Pending Actions"
+          description="Priority review, refund, and exception queues."
           compact
         >
           <div className="space-y-3">
@@ -171,8 +171,8 @@ export default function AdminDashboardPage() {
         </SettingsSection>
 
         <SettingsSection
-          title="系统健康"
-          description="关键服务状态与负载概览。"
+          title="System Health"
+          description="Key service status and load overview."
           compact
         >
           <div className="space-y-3">
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
                   variant={item.status === "healthy" ? "success" : "warning"}
                   size="sm"
                 >
-                  {item.status === "healthy" ? "正常" : "注意"}
+                  {item.status === "healthy" ? "Healthy" : "Warning"}
                 </Badge>
               </div>
             ))}
@@ -201,7 +201,7 @@ export default function AdminDashboardPage() {
         </SettingsSection>
       </div>
 
-      <SettingsSection title="全局待办入口" description="快速进入工单、审核与退款处理。">
+      <SettingsSection title="Global To-Do Hub" description="Quick access to tickets, reviews, and refund processing.">
         <div className="grid gap-3 md:grid-cols-3">
           {globalTodoEntries.map((entry) => (
             <div
@@ -223,7 +223,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
               <Button asChild variant="outline" size="sm">
-                <Link href={entry.href}>进入</Link>
+                <Link href={entry.href}>Enter</Link>
               </Button>
             </div>
           ))}
@@ -231,22 +231,22 @@ export default function AdminDashboardPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="最近审计事件"
-        description="关键操作与高风险变更的审计记录。"
+        title="Recent Audit Events"
+        description="Audit records of critical operations and high-risk changes."
         footer={
           <Button asChild variant="outline" size="sm">
-            <Link href="/security/audit-logs">查看全部审计</Link>
+            <Link href="/security/audit-logs">View All Audits</Link>
           </Button>
         }
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>操作者</TableHead>
-              <TableHead>动作</TableHead>
-              <TableHead>目标</TableHead>
-              <TableHead>时间</TableHead>
-              <TableHead className="text-right">级别</TableHead>
+              <TableHead>Actor</TableHead>
+              <TableHead>Action</TableHead>
+              <TableHead>Target</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead className="text-right">Severity</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -270,12 +270,12 @@ export default function AdminDashboardPage() {
                     size="sm"
                   >
                     {event.severity === "success"
-                      ? "正常"
+                      ? "Normal"
                       : event.severity === "info"
-                      ? "信息"
+                      ? "Info"
                       : event.severity === "warning"
-                      ? "注意"
-                      : "高危"}
+                      ? "Warning"
+                      : "Critical"}
                   </Badge>
                 </TableCell>
               </TableRow>

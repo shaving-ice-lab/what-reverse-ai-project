@@ -78,7 +78,7 @@ export default function SystemFeaturesPage() {
     mutationFn: async () => {
       const patch = buildPatch();
       if (Object.keys(patch).length === 0) {
-        throw new Error("未检测到变更");
+        throw new Error("No changes detected");
       }
       if (localMode) {
         return source;
@@ -86,14 +86,14 @@ export default function SystemFeaturesPage() {
       return systemApi.updateFeatures(patch);
     },
     onSuccess: () => {
-      toast.success("功能开关已更新");
+      toast.success("Feature flags updated");
       setDirty(false);
       if (!localMode) {
         queryClient.invalidateQueries({ queryKey: ["system", "features"] });
       }
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
@@ -103,8 +103,8 @@ export default function SystemFeaturesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="功能开关"
-        description="集中管理系统级功能开关。"
+        title="Feature Flags"
+        description="Centralized management of system-level feature flags."
         icon={<SlidersHorizontal className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -116,40 +116,40 @@ export default function SystemFeaturesPage() {
                 if (!localMode) featuresQuery.refetch();
               }}
               loading={!localMode && featuresQuery.isFetching}
-              loadingText="刷新中..."
+              loadingText="Refreshing..."
             >
-              刷新
+              Refresh
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/system/health">查看健康</Link>
+              <Link href="/system/health">View Health</Link>
             </Button>
             <Button
               size="sm"
               loading={updateMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
               disabled={!hasChanges || isLoading}
               onClick={() => updateMutation.mutate()}
             >
-              保存更改
+              Save Changes
             </Button>
           </div>
         }
       />
 
       <div className="grid gap-3 md:grid-cols-3">
-        <StatsCard title="已启用" value={stats.enabledCount} subtitle="当前环境" />
-        <StatsCard title="已关闭" value={stats.disabledCount} subtitle="需人工开启" />
-        <StatsCard title="开关总数" value={stats.total} subtitle="系统级配置" />
+        <StatsCard title="Enabled" value={stats.enabledCount} subtitle="Current environment" />
+        <StatsCard title="Disabled" value={stats.disabledCount} subtitle="Requires manual activation" />
+        <StatsCard title="Total Flags" value={stats.total} subtitle="System-level config" />
       </div>
 
-      <SettingsSection title="开关配置" description="修改后需保存，立即对路由生效。">
+      <SettingsSection title="Flag Configuration" description="Changes require saving and take effect on routes immediately.">
         {isLoading ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : (
           <div className="space-y-1">
             <ToggleRow
-              label="Workspace 功能"
-              description="工作空间创建与成员管理"
+              label="Workspace Features"
+              description="Workspace creation and member management"
               checked={draft.workspaceEnabled}
               onCheckedChange={(checked) => {
                 setDirty(true);
@@ -158,7 +158,7 @@ export default function SystemFeaturesPage() {
             />
             <ToggleRow
               label="App Runtime"
-              description="应用运行时与在线执行入口"
+              description="Application runtime and online execution endpoint"
               checked={draft.workspaceRuntimeEnabled}
               onCheckedChange={(checked) => {
                 setDirty(true);
@@ -166,8 +166,8 @@ export default function SystemFeaturesPage() {
               }}
             />
             <ToggleRow
-              label="Domain 绑定"
-              description="自定义域名与证书管理"
+              label="Domain Binding"
+              description="Custom domain and certificate management"
               checked={draft.domainEnabled}
               onCheckedChange={(checked) => {
                 setDirty(true);
@@ -176,9 +176,9 @@ export default function SystemFeaturesPage() {
             />
             <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
               <Badge variant={hasChanges ? "warning" : "secondary"} size="sm">
-                {hasChanges ? "待保存" : "已同步"}
+                {hasChanges ? "Unsaved" : "Synced"}
               </Badge>
-              变更会影响运行时与管理路由的可用性。
+              Changes will affect the availability of runtime and management routes.
             </div>
           </div>
         )}

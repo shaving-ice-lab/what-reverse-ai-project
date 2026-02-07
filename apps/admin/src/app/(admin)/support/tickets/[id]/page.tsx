@@ -36,18 +36,18 @@ const STATUS_OPTIONS = [
 ] as const satisfies readonly SupportTicketStatus[];
 
 const STATUS_LABELS: Record<SupportTicketStatus, string> = {
-  open: "待处理",
-  in_progress: "处理中",
-  waiting_on_customer: "等待用户",
-  resolved: "已解决",
-  closed: "已关闭",
+  open: "Open",
+  in_progress: "In Progress",
+  waiting_on_customer: "Waiting on Customer",
+  resolved: "Resolved",
+  closed: "Closed",
 };
 
 const PRIORITY_LABELS: Record<string, string> = {
-  low: "低",
-  medium: "中",
-  high: "高",
-  urgent: "紧急",
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
 };
 
 type SlaStage = "response" | "update" | "resolve";
@@ -63,17 +63,17 @@ const SLA_DEFAULTS: Record<
 };
 
 const SLA_LABELS: Record<SlaStage, string> = {
-  response: "首次响应",
-  update: "进展更新",
-  resolve: "问题解决",
+  response: "First Response",
+  update: "Progress Update",
+  resolve: "Resolution",
 };
 
 const SLA_STAGE_ORDER: SlaStage[] = ["response", "update", "resolve"];
 
 const SLA_ESCALATIONS: Array<{ key: SlaStage; label: string; owner: string }> = [
-  { key: "response", label: "首次响应超时升级至", owner: "Support L2" },
-  { key: "update", label: "进展更新超时升级至", owner: "Ops" },
-  { key: "resolve", label: "最终解决超时升级至", owner: "负责人" },
+  { key: "response", label: "First response timeout escalates to", owner: "Support L2" },
+  { key: "update", label: "Progress update timeout escalates to", owner: "Ops" },
+  { key: "resolve", label: "Resolution timeout escalates to", owner: "Owner" },
 ];
 
 function formatDuration(ms: number): string {
@@ -82,15 +82,15 @@ function formatDuration(ms: number): string {
   const hours = Math.floor((minutes % (60 * 24)) / 60);
   const mins = minutes % 60;
 
-  if (days > 0) return `${days} 天 ${hours} 小时`;
-  if (hours > 0) return `${hours} 小时 ${mins} 分钟`;
-  return `${mins} 分钟`;
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins}m`;
 }
 
 function formatDateTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString("zh-CN", {
+  return date.toLocaleString("en-US", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -117,37 +117,37 @@ function getSlaStatus(dueAt: string | null | undefined, now: Date) {
   if (!dueAt) {
     return {
       variant: "secondary" as const,
-      label: "未配置",
-      detail: "未设置 SLA 目标",
+      label: "Not Configured",
+      detail: "No SLA target set",
     };
   }
   const due = new Date(dueAt);
   if (Number.isNaN(due.getTime())) {
     return {
       variant: "secondary" as const,
-      label: "时间无效",
-      detail: "SLA 时间解析失败",
+      label: "Invalid Time",
+      detail: "Failed to parse SLA time",
     };
   }
   const diff = due.getTime() - now.getTime();
   if (diff <= 0) {
     return {
       variant: "error" as const,
-      label: "已超时",
-      detail: `超时 ${formatDuration(diff)}`,
+      label: "Overdue",
+      detail: `Overdue by ${formatDuration(diff)}`,
     };
   }
   if (diff <= 30 * 60 * 1000) {
     return {
       variant: "warning" as const,
-      label: "即将到期",
-      detail: `剩余 ${formatDuration(diff)}`,
+      label: "Due Soon",
+      detail: `${formatDuration(diff)} remaining`,
     };
   }
   return {
     variant: "success" as const,
-    label: "进行中",
-    detail: `剩余 ${formatDuration(diff)}`,
+      label: "On Track",
+      detail: `${formatDuration(diff)} remaining`,
   };
 }
 
@@ -251,16 +251,16 @@ export default function SupportTicketDetailPage() {
     const diff = new Date(next.dueAt).getTime() - now.getTime();
     return {
       ...next,
-      countdown: `剩余 ${formatDuration(diff)}`,
+      countdown: `${formatDuration(diff)} remaining`,
     };
   }, [escalationSteps, now]);
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!ticket) throw new Error("工单不存在");
+      if (!ticket) throw new Error("Ticket not found");
       const note = statusNote.trim();
       if (localMode) {
-        // 本地模式：仅提示，不落库
+        // Local mode: display only, no persistence
         return { ticket: { ...ticket, status: statusDraft, status_note: note || null } };
       }
       return adminApi.support.tickets.updateStatus(ticket.id, {
@@ -269,7 +269,7 @@ export default function SupportTicketDetailPage() {
       });
     },
     onSuccess: () => {
-      toast.success("工单状态已更新");
+      toast.success("Ticket status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "support", "ticket", ticketId] });
       queryClient.invalidateQueries({
         queryKey: ["admin", "support", "tickets"],
@@ -278,7 +278,7 @@ export default function SupportTicketDetailPage() {
       setStatusNote("");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
@@ -288,9 +288,9 @@ export default function SupportTicketDetailPage() {
 
   const createCommentMutation = useMutation({
     mutationFn: async () => {
-      if (!ticket) throw new Error("工单不存在");
+      if (!ticket) throw new Error("Ticket not found");
       const body = commentBody.trim();
-      if (!body) throw new Error("请输入评论内容");
+      if (!body) throw new Error("Please enter comment content");
 
       if (localMode) {
         const next: SupportTicketComment = {
@@ -312,21 +312,21 @@ export default function SupportTicketDetailPage() {
       });
     },
     onSuccess: () => {
-      toast.success("评论已添加");
+      toast.success("Comment added");
       setCommentBody("");
       queryClient.invalidateQueries({
         queryKey: ["admin", "support", "ticket", ticketId, "comments"],
       });
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "添加评论失败");
+      toast.error(error instanceof Error ? error.message : "Failed to add comment");
     },
   });
 
   if (!ticketId) {
     return (
       <PageContainer>
-        <PageHeader title="工单详情" description="无效的工单 ID" icon={<LifeBuoy className="w-4 h-4" />} />
+        <PageHeader title="Ticket Details" description="Invalid ticket ID" icon={<LifeBuoy className="w-4 h-4" />} />
       </PageContainer>
     );
   }
@@ -334,17 +334,17 @@ export default function SupportTicketDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={ticket?.subject || "工单详情"}
+        title={ticket?.subject || "Ticket Details"}
         description={
           ticket
             ? `${ticket.reference} · ${ticket.requester_email}`
             : localMode
-            ? "未找到对应的本地工单数据"
-            : "正在加载工单数据..."
+            ? "No matching local ticket data found"
+            : "Loading ticket data..."
         }
         icon={<LifeBuoy className="w-4 h-4" />}
         backHref="/support/tickets"
-        backLabel="返回工单列表"
+        backLabel="Back to Tickets"
         badge={
           ticket ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -379,29 +379,29 @@ export default function SupportTicketDetailPage() {
             }}
             disabled={localMode}
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-        <SettingsSection title="工单信息" description="基础信息、描述与 SLA。">
+        <SettingsSection title="Ticket Information" description="Basic info, description, and SLA.">
           {!ticket ? (
             <div className="text-[12px] text-foreground-muted">
-              {ticketQuery.isPending && !localMode ? "正在加载..." : "暂无工单数据"}
+              {ticketQuery.isPending && !localMode ? "Loading..." : "No ticket data"}
             </div>
           ) : (
             <div className="space-y-1">
-              <FormRow label="Reference" description="用于对外引用与检索">
+              <FormRow label="Reference" description="Used for external reference and search">
                 <div className="text-[12px] text-foreground">{ticket.reference}</div>
               </FormRow>
-              <FormRow label="请求方" description="工单发起人信息">
+              <FormRow label="Requester" description="Ticket requester information">
                 <div className="space-y-1">
                   <div className="text-[12px] text-foreground">{ticket.requester_name || "-"}</div>
                   <div className="text-[12px] text-foreground-light">{ticket.requester_email}</div>
                 </div>
               </FormRow>
-              <FormRow label="分类 / 渠道" description="用于路由与统计">
+              <FormRow label="Category / Channel" description="Used for routing and analytics">
                 <div className="flex flex-wrap items-center gap-2 text-[12px] text-foreground-light">
                   <Badge variant="outline" size="sm">
                     {ticket.category || "-"}
@@ -411,17 +411,17 @@ export default function SupportTicketDetailPage() {
                   </Badge>
                 </div>
               </FormRow>
-              <FormRow label="创建时间" description="工单创建时间（UTC）">
+              <FormRow label="Created At" description="Ticket creation time (UTC)">
                 <div className="text-[12px] text-foreground-light">
                   {ticket.created_at ? formatDate(ticket.created_at) : "-"}
                 </div>
               </FormRow>
-              <FormRow label="更新时间" description="最近一次更新">
+              <FormRow label="Updated At" description="Last update">
                 <div className="text-[12px] text-foreground-light">
                   {ticket.updated_at ? formatRelativeTime(ticket.updated_at) : "-"}
                 </div>
               </FormRow>
-              <FormRow label="描述" description="用户提交的详细说明" horizontal={false}>
+              <FormRow label="Description" description="Detailed description submitted by the user" horizontal={false}>
                 <div className="rounded-lg border border-border bg-surface-75 p-4 text-[12px] text-foreground-light whitespace-pre-wrap">
                   {ticket.description}
                 </div>
@@ -431,16 +431,16 @@ export default function SupportTicketDetailPage() {
         </SettingsSection>
 
         <div className="space-y-4 lg:space-y-6">
-          <SettingsSection title="状态流转" description="更新状态并记录处理备注。">
+          <SettingsSection title="Status Workflow" description="Update status and record processing notes.">
             {!ticket ? (
               <div className="text-[12px] text-foreground-muted">
-                {ticketQuery.isPending && !localMode ? "正在加载..." : "暂无工单数据"}
+                {ticketQuery.isPending && !localMode ? "Loading..." : "No ticket data"}
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="grid gap-2 sm:grid-cols-[220px_1fr] items-start">
                   <div>
-                    <div className="text-[11px] text-foreground-muted mb-1">状态</div>
+                    <div className="text-[11px] text-foreground-muted mb-1">Status</div>
                     <select
                       value={statusDraft}
                       onChange={(e) => setStatusDraft(e.target.value as SupportTicketStatus)}
@@ -455,12 +455,12 @@ export default function SupportTicketDetailPage() {
                   </div>
 
                   <div>
-                    <div className="text-[11px] text-foreground-muted mb-1">备注（可选）</div>
+                    <div className="text-[11px] text-foreground-muted mb-1">Note (optional)</div>
                     <textarea
                       value={statusNote}
                       onChange={(e) => setStatusNote(e.target.value)}
                       rows={3}
-                      placeholder="例如：已联系用户补充信息 / 已回滚配置 / 等待账单核对..."
+                      placeholder="e.g. Contacted user for more info / Rolled back config / Waiting for billing verification..."
                       className={cn(
                         "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                         "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -479,21 +479,21 @@ export default function SupportTicketDetailPage() {
                       setStatusNote("");
                     }}
                   >
-                    重置
+                    Reset
                   </Button>
                   <Button
                     size="sm"
                     loading={updateStatusMutation.isPending}
-                    loadingText="更新中..."
+                    loadingText="Updating..."
                     onClick={() => setConfirmStatusOpen(true)}
                   >
-                    更新状态
+                    Update Status
                   </Button>
                 </div>
 
                 {ticket.status_note ? (
                   <div className="rounded-lg border border-border bg-surface-75 p-4">
-                    <div className="text-[11px] text-foreground-muted mb-1">最近备注</div>
+                    <div className="text-[11px] text-foreground-muted mb-1">Latest Note</div>
                     <div className="text-[12px] text-foreground-light whitespace-pre-wrap">
                       {ticket.status_note}
                     </div>
@@ -504,12 +504,12 @@ export default function SupportTicketDetailPage() {
           </SettingsSection>
 
           <SettingsSection
-            title="SLA 计时与升级策略"
-            description="跟踪首次响应、进展更新与最终解决的截止时间，并提示升级节点。"
+            title="SLA Tracking & Escalation Policy"
+            description="Track deadlines for first response, progress updates, and resolution, with escalation alerts."
           >
             {!ticket ? (
               <div className="text-[12px] text-foreground-muted">
-                {ticketQuery.isPending && !localMode ? "正在加载..." : "暂无工单数据"}
+                {ticketQuery.isPending && !localMode ? "Loading..." : "No ticket data"}
               </div>
             ) : (
               <div className="space-y-4">
@@ -532,7 +532,7 @@ export default function SupportTicketDetailPage() {
                         </div>
                         <div className="mt-2 text-[12px] text-foreground-light">{status.detail}</div>
                         <div className="mt-3 text-[11px] text-foreground-muted">
-                          截止：{dueAt ? formatDateTime(dueAt) : "-"}
+                          Due: {dueAt ? formatDateTime(dueAt) : "-"}
                         </div>
                       </div>
                     );
@@ -542,11 +542,11 @@ export default function SupportTicketDetailPage() {
                 <div className="rounded-lg border border-border bg-surface-75 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <AlertTriangle className="w-4 h-4 text-foreground-muted" />
-                    <div className="text-[12px] font-medium text-foreground">升级策略</div>
+                    <div className="text-[12px] font-medium text-foreground">Escalation Policy</div>
                   </div>
                   <div className="space-y-2">
                     {escalationSteps.length === 0 ? (
-                      <div className="text-[12px] text-foreground-muted">暂无 SLA 升级规则</div>
+                      <div className="text-[12px] text-foreground-muted">No SLA escalation rules</div>
                     ) : (
                       escalationSteps.map((rule) => {
                         const badgeVariant: "secondary" | "error" | "outline" = !rule.dueAt
@@ -555,10 +555,10 @@ export default function SupportTicketDetailPage() {
                           ? "error"
                           : "outline";
                         const badgeLabel = !rule.dueAt
-                          ? "未配置"
+                          ? "Not Configured"
                           : rule.triggered
-                          ? "已触发"
-                          : "待触发";
+                          ? "Triggered"
+                          : "Pending";
                         return (
                           <div key={rule.key} className="flex items-center justify-between gap-3">
                             <div className="min-w-0">
@@ -566,7 +566,7 @@ export default function SupportTicketDetailPage() {
                                 {rule.label} {rule.owner}
                               </div>
                               <div className="text-[11px] text-foreground-muted">
-                                触发时间：{rule.dueAt ? formatDateTime(rule.dueAt) : "-"}
+                                Trigger time: {rule.dueAt ? formatDateTime(rule.dueAt) : "-"}
                               </div>
                             </div>
                             <Badge variant={badgeVariant} size="sm">
@@ -579,8 +579,8 @@ export default function SupportTicketDetailPage() {
                   </div>
                   <div className="mt-3 text-[11px] text-foreground-muted">
                     {nextEscalation
-                      ? `下一步升级：${nextEscalation.label} ${nextEscalation.owner}（${nextEscalation.countdown}）`
-                      : "暂无待触发升级或 SLA 未配置"}
+                      ? `Next escalation: ${nextEscalation.label} ${nextEscalation.owner} (${nextEscalation.countdown})`
+                      : "No pending escalations or SLA not configured"}
                   </div>
                 </div>
               </div>
@@ -590,8 +590,8 @@ export default function SupportTicketDetailPage() {
       </div>
 
       <SettingsSection
-        title="评论与内部备注"
-        description="支持区分对外评论与内部备注（默认内部）。"
+        title="Comments & Internal Notes"
+        description="Distinguish between public comments and internal notes (defaults to internal)."
         footer={
           <div className="flex items-center gap-2">
             <Button
@@ -600,7 +600,7 @@ export default function SupportTicketDetailPage() {
               onClick={() => commentsQuery.refetch()}
               disabled={localMode}
             >
-              刷新评论
+              Refresh Comments
             </Button>
           </div>
         }
@@ -609,12 +609,12 @@ export default function SupportTicketDetailPage() {
           <div className="rounded-lg border border-border bg-surface-75 p-4">
             <div className="flex items-center gap-2 mb-3">
               <MessageSquare className="w-4 h-4 text-foreground-muted" />
-              <div className="text-[12px] font-medium text-foreground">添加评论</div>
+              <div className="text-[12px] font-medium text-foreground">Add Comment</div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">作者名</div>
+                <div className="text-[11px] text-foreground-muted mb-1">Author Name</div>
                 <Input
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
@@ -624,19 +624,19 @@ export default function SupportTicketDetailPage() {
               </div>
 
               <ToggleRow
-                label="内部备注"
-                description="开启后仅管理员可见；关闭后视为对外回复。"
+                label="Internal Note"
+                description="When enabled, only visible to admins; when disabled, treated as a public reply."
                 checked={isInternal}
                 onCheckedChange={setIsInternal}
               />
 
               <div>
-                <div className="text-[11px] text-foreground-muted mb-1">内容</div>
+                <div className="text-[11px] text-foreground-muted mb-1">Content</div>
                 <textarea
                   value={commentBody}
                   onChange={(e) => setCommentBody(e.target.value)}
                   rows={4}
-                  placeholder="输入评论内容..."
+                  placeholder="Enter comment..."
                   className={cn(
                     "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                     "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -650,21 +650,21 @@ export default function SupportTicketDetailPage() {
                 className="w-full"
                 leftIcon={<Send className="w-4 h-4" />}
                 loading={createCommentMutation.isPending}
-                loadingText="发送中..."
+                loadingText="Sending..."
                 onClick={() => createCommentMutation.mutate()}
                 disabled={!ticket}
               >
-                发送
+                Send
               </Button>
             </div>
           </div>
 
           <div className="space-y-2">
             {commentsQuery.isPending && !localMode ? (
-              <div className="text-[12px] text-foreground-muted">正在加载评论...</div>
+              <div className="text-[12px] text-foreground-muted">Loading comments...</div>
             ) : comments.length === 0 ? (
               <div className="rounded-lg border border-border bg-surface-75 p-6 text-center text-[12px] text-foreground-muted">
-                暂无评论
+                No comments
               </div>
             ) : (
               comments.map((comment) => (
@@ -685,7 +685,7 @@ export default function SupportTicketDetailPage() {
                       variant={comment.is_internal ? "secondary" : "info"}
                       size="sm"
                     >
-                      {comment.is_internal ? "内部" : "对外"}
+                      {comment.is_internal ? "Internal" : "Public"}
                     </Badge>
                   </div>
                   <div className="mt-3 text-[12px] text-foreground-light whitespace-pre-wrap">
@@ -702,10 +702,10 @@ export default function SupportTicketDetailPage() {
         open={confirmStatusOpen}
         onOpenChange={setConfirmStatusOpen}
         type="info"
-        title="确认更新工单状态？"
-        description={`状态将更新为：${STATUS_LABELS[statusDraft]}。备注：${statusNote.trim() || "（无）"}`}
-        confirmText="确认"
-        cancelText="取消"
+        title="Confirm status update?"
+        description={`Status will be updated to: ${STATUS_LABELS[statusDraft]}. Note: ${statusNote.trim() || "(none)"}`}
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

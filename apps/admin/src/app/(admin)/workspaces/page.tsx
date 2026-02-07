@@ -40,11 +40,11 @@ import type { Workspace } from "@/types/admin";
 
 const STATUS_OPTIONS = ["all", "active", "suspended", "cold_storage", "deleted"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  active: "正常",
-  suspended: "已暂停",
-  cold_storage: "冷存储",
-  deleted: "已删除",
+  all: "All Statuses",
+  active: "Active",
+  suspended: "Suspended",
+  cold_storage: "Cold Storage",
+  deleted: "Deleted",
 };
 
 export default function WorkspacesPage() {
@@ -143,10 +143,10 @@ export default function WorkspacesPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedWorkspace) throw new Error("请选择 Workspace");
+      if (!selectedWorkspace) throw new Error("Please select a workspace");
       const reason = reasonDraft.trim();
       if (["suspended", "deleted", "cold_storage"].includes(statusDraft) && !reason) {
-        throw new Error("敏感状态变更必须填写原因");
+        throw new Error("A reason is required for sensitive status changes");
       }
 
       if (localMode) {
@@ -170,46 +170,46 @@ export default function WorkspacesPage() {
       });
     },
     onSuccess: () => {
-      toast.success("Workspace 状态已更新");
+      toast.success("Workspace status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
       setManageOpen(false);
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="Workspace 管理"
-        description="查看 Workspace 状态、计划与成员规模。"
+        title="Workspace Management"
+        description="View workspace status, plans, and member count."
         icon={<Building2 className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出列表
+              Export List
             </Button>
-            <Button size="sm">创建 Workspace</Button>
+            <Button size="sm">Create Workspace</Button>
           </div>
         }
       />
 
-      <SettingsSection title="Workspace 列表" description="支持按 Owner 与状态筛选。">
+      <SettingsSection title="Workspace List" description="Filter by owner and status.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索 Workspace"
+              placeholder="Search workspace"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -233,17 +233,17 @@ export default function WorkspacesPage() {
             >
               {ownerOptions.map((owner) => (
                 <option key={owner} value={owner}>
-                  {owner === "all" ? "全部 Owner" : ownerLabelMap.get(owner) || owner}
+                  {owner === "all" ? "All Owners" : ownerLabelMap.get(owner) || owner}
                 </option>
               ))}
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">含已删除</span>
+            <span className="text-[11px] text-foreground-muted">Include Deleted</span>
             <Switch checked={includeDeleted} onCheckedChange={setIncludeDeleted} />
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
@@ -252,9 +252,9 @@ export default function WorkspacesPage() {
             <TableRow>
               <TableHead>Workspace</TableHead>
               <TableHead>Owner</TableHead>
-              <TableHead>计划</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Plan</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -264,7 +264,7 @@ export default function WorkspacesPage() {
                   colSpan={5}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -274,8 +274,8 @@ export default function WorkspacesPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {workspacesQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配 Workspace"}
+                    ? "Failed to load. Check API or permission settings."
+                    : "No matching workspaces"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -331,7 +331,7 @@ export default function WorkspacesPage() {
                       }}
                     >
                       <Settings2 className="w-4 h-4" />
-                      管理
+                      Manage
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -358,7 +358,7 @@ export default function WorkspacesPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Settings2 className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>Workspace 管理</DialogTitle>
+            <DialogTitle>Workspace Management</DialogTitle>
             <DialogDescription>
               {selectedWorkspace ? (
                 <span className="text-foreground-light">
@@ -366,7 +366,7 @@ export default function WorkspacesPage() {
                   <span className="text-foreground-muted">({selectedWorkspace.id})</span>
                 </span>
               ) : (
-                "调整 Workspace 状态。"
+                "Adjust workspace status."
               )}
             </DialogDescription>
           </DialogHeader>
@@ -374,7 +374,7 @@ export default function WorkspacesPage() {
           <div className="space-y-3">
             <div className="rounded-lg border border-border bg-surface-75 p-4">
               <div className="text-[12px] font-medium text-foreground mb-3">
-                状态
+                Status
               </div>
 
               <div className="grid gap-2 sm:grid-cols-[220px_1fr] items-start">
@@ -395,7 +395,7 @@ export default function WorkspacesPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={3}
-                    placeholder="原因（冻结/删除/冷存储时必填）"
+                    placeholder="Reason (required for suspend/delete/cold storage)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -408,7 +408,7 @@ export default function WorkspacesPage() {
                       size="sm"
                       onClick={() => setManageOpen(false)}
                     >
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={["deleted"].includes(statusDraft) ? "destructive-fill" : "default"}
@@ -416,7 +416,7 @@ export default function WorkspacesPage() {
                       onClick={() => setConfirmOpen(true)}
                       disabled={!canManage || updateStatusMutation.isPending}
                     >
-                      提交状态变更
+                      Submit Status Change
                     </Button>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ export default function WorkspacesPage() {
 
               {selectedWorkspace?.status_updated_at ? (
                 <div className="mt-3 text-[11px] text-foreground-muted">
-                  最近变更：{formatRelativeTime(selectedWorkspace.status_updated_at)}
+                  Last changed: {formatRelativeTime(selectedWorkspace.status_updated_at)}
                 </div>
               ) : null}
             </div>
@@ -436,10 +436,10 @@ export default function WorkspacesPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         type={["deleted"].includes(statusDraft) ? "error" : "warning"}
-        title="确认执行状态变更？"
-        description={`将 Workspace 状态更新为：${statusDraft}。原因：${reasonDraft.trim() || "（未填写）"}`}
-        confirmText="确认"
-        cancelText="取消"
+        title="Confirm status change?"
+        description={`Update workspace status to: ${statusDraft}. Reason: ${reasonDraft.trim() || "(not provided)"}`}
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

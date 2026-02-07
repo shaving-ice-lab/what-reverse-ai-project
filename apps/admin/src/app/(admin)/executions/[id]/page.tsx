@@ -46,12 +46,12 @@ const STATUS_BADGE_MAP: Record<ExecutionStatus, "success" | "warning" | "info" |
 };
 
 const STATUS_LABELS: Record<ExecutionStatus, string> = {
-  success: "成功",
-  running: "运行中",
-  pending: "待执行",
-  failed: "失败",
-  cancelled: "已取消",
-  timeout: "超时",
+  success: "Success",
+  running: "Running",
+  pending: "Pending",
+  failed: "Failed",
+  cancelled: "Cancelled",
+  timeout: "Timeout",
 };
 
 const STATUS_ICONS: Record<ExecutionStatus, React.ReactNode> = {
@@ -65,10 +65,10 @@ const STATUS_ICONS: Record<ExecutionStatus, React.ReactNode> = {
 
 const TRIGGER_LABELS: Record<string, string> = {
   webhook: "Webhook",
-  schedule: "定时任务",
-  event: "事件触发",
-  api: "API 调用",
-  manual: "手动执行",
+  schedule: "Scheduled",
+  event: "Event Trigger",
+  api: "API Call",
+  manual: "Manual",
 };
 
 export default function ExecutionDetailPage() {
@@ -96,7 +96,7 @@ export default function ExecutionDetailPage() {
   if (executionQuery.isPending && !localMode) {
     return (
       <PageContainer>
-        <div className="py-20 text-center text-[12px] text-foreground-muted">正在加载...</div>
+        <div className="py-20 text-center text-[12px] text-foreground-muted">Loading...</div>
       </PageContainer>
     );
   }
@@ -105,7 +105,7 @@ export default function ExecutionDetailPage() {
     return (
       <PageContainer>
         <div className="py-20 text-center text-[12px] text-foreground-muted">
-          执行记录不存在或无权访问
+          Execution record not found or access denied
         </div>
       </PageContainer>
     );
@@ -114,22 +114,22 @@ export default function ExecutionDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="执行详情"
-        description={`执行 ID: ${execution.id}`}
+        title="Execution Details"
+        description={`Execution ID: ${execution.id}`}
         icon={<Play className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" asChild>
               <Link href="/executions">
                 <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-                返回列表
+                Back to List
               </Link>
             </Button>
             {execution.workflow && (
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/workflows/${execution.workflow.id}`}>
                   <GitBranch className="w-3.5 h-3.5 mr-1" />
-                  查看工作流
+                  View Workflow
                 </Link>
               </Button>
             )}
@@ -138,42 +138,42 @@ export default function ExecutionDetailPage() {
       />
 
       <div className="page-grid grid-cols-1 lg:grid-cols-2">
-        <SettingsSection title="执行信息" description="基本状态与耗时" compact>
+        <SettingsSection title="Execution Info" description="Basic status and duration" compact>
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">状态</div>
+              <div className="text-[12px] text-foreground-muted">Status</div>
               <Badge variant={STATUS_BADGE_MAP[execution.status]} size="sm">
                 {STATUS_LABELS[execution.status]}
               </Badge>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">触发方式</div>
+              <div className="text-[12px] text-foreground-muted">Trigger</div>
               <Badge variant="outline" size="sm">
                 {TRIGGER_LABELS[execution.trigger_type] || execution.trigger_type}
               </Badge>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">版本</div>
+              <div className="text-[12px] text-foreground-muted">Version</div>
               <div className="text-[12px] text-foreground">v{execution.version}</div>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">耗时</div>
+              <div className="text-[12px] text-foreground-muted">Duration</div>
               <div className="text-[12px] text-foreground">
                 {execution.duration_ms ? `${execution.duration_ms}ms` : "-"}
               </div>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">重试次数</div>
+              <div className="text-[12px] text-foreground-muted">Retries</div>
               <div className="text-[12px] text-foreground">{execution.retries || 0}</div>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">开始时间</div>
+              <div className="text-[12px] text-foreground-muted">Start Time</div>
               <div className="text-[12px] text-foreground">
                 {execution.started_at ? new Date(execution.started_at).toLocaleString() : "-"}
               </div>
             </div>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
-              <div className="text-[12px] text-foreground-muted">结束时间</div>
+              <div className="text-[12px] text-foreground-muted">End Time</div>
               <div className="text-[12px] text-foreground">
                 {execution.completed_at ? new Date(execution.completed_at).toLocaleString() : "-"}
               </div>
@@ -181,12 +181,12 @@ export default function ExecutionDetailPage() {
           </div>
         </SettingsSection>
 
-        <SettingsSection title="关联信息" description="工作流与 Workspace" compact>
+        <SettingsSection title="Related Info" description="Workflow and workspace" compact>
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-75 px-3 py-2">
               <div className="flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-foreground-muted" />
-                <div className="text-[12px] text-foreground-muted">工作流</div>
+                <div className="text-[12px] text-foreground-muted">Workflow</div>
               </div>
               {execution.workflow ? (
                 <Link
@@ -221,12 +221,12 @@ export default function ExecutionDetailPage() {
             <div className="mt-4 p-3 rounded-lg bg-error-default/10 border border-error-default/20">
               <div className="flex items-center gap-2 text-error-default mb-2">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-[12px] font-medium">错误信息</span>
+                <span className="text-[12px] font-medium">Error Message</span>
               </div>
               <div className="text-[12px] text-foreground-light">{execution.error_message}</div>
               {execution.error_code && (
                 <div className="mt-1 text-[11px] text-foreground-muted">
-                  错误码: <code>{execution.error_code}</code>
+                  Error Code: <code>{execution.error_code}</code>
                 </div>
               )}
             </div>
@@ -234,7 +234,7 @@ export default function ExecutionDetailPage() {
 
           {execution.trigger_data && Object.keys(execution.trigger_data).length > 0 && (
             <div className="mt-4">
-              <div className="text-[12px] font-medium text-foreground mb-2">触发数据</div>
+              <div className="text-[12px] font-medium text-foreground mb-2">Trigger Data</div>
               <pre className="p-3 rounded-lg bg-surface-100 border border-border text-[11px] text-foreground-light overflow-auto max-h-[200px]">
                 {JSON.stringify(execution.trigger_data, null, 2)}
               </pre>
@@ -244,12 +244,12 @@ export default function ExecutionDetailPage() {
       </div>
 
       <SettingsSection
-        title="节点执行轨迹"
-        description="各节点执行状态与耗时"
+        title="Node Execution Trace"
+        description="Execution status and duration for each node"
       >
         {nodes.length === 0 ? (
           <div className="py-10 text-center text-[12px] text-foreground-muted">
-            暂无节点执行记录
+            No node execution records
           </div>
         ) : (
           <div className="space-y-2">
@@ -288,7 +288,7 @@ export default function ExecutionDetailPage() {
                       </div>
                     </div>
                     <div className="text-[11px] text-foreground-muted">
-                      节点 ID: {node.node_id}
+                      Node ID: {node.node_id}
                     </div>
                     {node.error_message && (
                       <div className="mt-2 p-2 rounded bg-error-default/10 text-[11px] text-error-default">

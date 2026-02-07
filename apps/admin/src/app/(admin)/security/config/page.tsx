@@ -48,17 +48,17 @@ import { usePermission } from "@/hooks/usePermission";
 
 const CATEGORY_OPTIONS = ["all", "system", "billing", "ai", "integrations"] as const;
 const CATEGORY_LABELS: Record<(typeof CATEGORY_OPTIONS)[number], string> = {
-  all: "全部分类",
-  system: "系统",
-  billing: "计费",
+  all: "All Categories",
+  system: "System",
+  billing: "Billing",
   ai: "AI",
-  integrations: "集成",
+  integrations: "Integrations",
 };
 
 const VALUE_TYPE_LABELS: Record<string, string> = {
-  string: "字符串",
-  number: "数字",
-  boolean: "布尔",
+  string: "String",
+  number: "Number",
+  boolean: "Boolean",
   json: "JSON",
 };
 
@@ -135,8 +135,8 @@ export default function ConfigPage() {
   // Mutations
   const updateConfigMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedConfig) throw new Error("请选择配置项");
-      if (!editValue.trim()) throw new Error("值不能为空");
+      if (!selectedConfig) throw new Error("Please select a config item");
+      if (!editValue.trim()) throw new Error("Value cannot be empty");
 
       if (localMode) {
         const next = localConfigs.map((cfg) =>
@@ -160,13 +160,13 @@ export default function ConfigPage() {
       });
     },
     onSuccess: () => {
-      toast.success("配置已更新");
+      toast.success("Configuration updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "config"] });
       setEditModalOpen(false);
       setConfirmActionOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新失败");
+      toast.error(error instanceof Error ? error.message : "Update failed");
     },
   });
 
@@ -180,8 +180,8 @@ export default function ConfigPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="配置中心"
-        description="管理系统配置参数与敏感配置项。"
+        title="Configuration Center"
+        description="Manage system configuration parameters and sensitive settings."
         icon={<Settings2 className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -195,29 +195,29 @@ export default function ConfigPage() {
               ) : (
                 <Eye className="w-3.5 h-3.5 mr-1" />
               )}
-              {showSecrets ? "隐藏敏感值" : "显示敏感值"}
+              {showSecrets ? "Hide Sensitive Values" : "Show Sensitive Values"}
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="配置项"
-        description="系统运行参数与第三方集成配置。"
+        title="Configuration Items"
+        description="System runtime parameters and third-party integration settings."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索配置键或描述"
+              placeholder="Search config key or description"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">分类</span>
+            <span className="text-[11px] text-foreground-muted">Category</span>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
@@ -231,34 +231,34 @@ export default function ConfigPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>键</TableHead>
-              <TableHead>值</TableHead>
-              <TableHead>类型</TableHead>
-              <TableHead>分类</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Key</TableHead>
+              <TableHead>Value</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Updated At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {configsQuery.isPending && !localMode ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
                   {configsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无配置项"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No configuration items found"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -298,7 +298,7 @@ export default function ConfigPage() {
                     {formatRelativeTime(cfg.updated_at)}
                     {cfg.updater && (
                       <div className="text-[11px] text-foreground-muted">
-                        由 {cfg.updater.email}
+                        by {cfg.updater.email}
                       </div>
                     )}
                   </TableCell>
@@ -341,7 +341,7 @@ export default function ConfigPage() {
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Settings2 className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>编辑配置</DialogTitle>
+            <DialogTitle>Edit Configuration</DialogTitle>
             <DialogDescription>
               {selectedConfig?.key}
             </DialogDescription>
@@ -352,14 +352,14 @@ export default function ConfigPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">类型</span>
+                    <span className="text-foreground-muted">Type</span>
                     <Badge variant="outline" size="sm">
                       {VALUE_TYPE_LABELS[selectedConfig.value_type]}
                     </Badge>
                   </div>
                   {selectedConfig.description && (
                     <div>
-                      <span className="text-foreground-muted">描述</span>
+                      <span className="text-foreground-muted">Description</span>
                       <div className="text-foreground mt-1">{selectedConfig.description}</div>
                     </div>
                   )}
@@ -370,13 +370,13 @@ export default function ConfigPage() {
                 <div className="flex items-start gap-2 p-3 rounded-md bg-warning-default/10 border border-warning-default/20">
                   <AlertCircle className="w-4 h-4 text-warning-default shrink-0 mt-0.5" />
                   <div className="text-[12px] text-foreground-light">
-                    这是一个敏感配置项。修改后请确保值正确，错误的值可能导致系统故障。
+                    This is a sensitive configuration item. Please ensure the value is correct after modification, as incorrect values may cause system failures.
                   </div>
                 </div>
               )}
 
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">新值</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">New Value</div>
                 {selectedConfig.value_type === "boolean" ? (
                   <select
                     value={editValue}
@@ -391,7 +391,7 @@ export default function ConfigPage() {
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     rows={4}
-                    placeholder="输入 JSON 格式的值"
+                    placeholder="Enter value in JSON format"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2 font-mono",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -404,16 +404,16 @@ export default function ConfigPage() {
                     type={selectedConfig.value_type === "number" ? "number" : "text"}
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    placeholder={selectedConfig.is_secret ? "输入新值" : `当前值：${selectedConfig.value}`}
+                    placeholder={selectedConfig.is_secret ? "Enter new value" : `Current value: ${selectedConfig.value}`}
                   />
                 )}
 
-                <div className="mt-4 text-[12px] font-medium text-foreground mb-2">变更原因</div>
+                <div className="mt-4 text-[12px] font-medium text-foreground mb-2">Change Reason</div>
                 <textarea
                   value={reasonDraft}
                   onChange={(e) => setReasonDraft(e.target.value)}
                   rows={2}
-                  placeholder="请填写变更原因（可选）"
+                  placeholder="Enter change reason (optional)"
                   className={cn(
                     "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                     "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -427,7 +427,7 @@ export default function ConfigPage() {
                     size="sm"
                     onClick={() => setEditModalOpen(false)}
                   >
-                    取消
+                    Cancel
                   </Button>
                   <Button
                     size="sm"
@@ -435,7 +435,7 @@ export default function ConfigPage() {
                     onClick={() => setConfirmActionOpen(true)}
                   >
                     <Save className="w-3.5 h-3.5 mr-1" />
-                    保存
+                    Save
                   </Button>
                 </div>
               </div>
@@ -451,10 +451,10 @@ export default function ConfigPage() {
         open={confirmActionOpen}
         onOpenChange={setConfirmActionOpen}
         type="warning"
-        title="确认修改配置？"
-        description={`将配置 "${selectedConfig?.key}" 的值更新为新值。此操作将被记录到审计日志。`}
-        confirmText="确认修改"
-        cancelText="取消"
+        title="Confirm Configuration Change?"
+        description={`Update the value of "${selectedConfig?.key}" to the new value. This action will be recorded in the audit log.`}
+        confirmText="Confirm Change"
+        cancelText="Cancel"
         loading={updateConfigMutation.isPending}
         onConfirm={() => {
           updateConfigMutation.mutate();

@@ -19,9 +19,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentFlow Admin - 管理控制台",
-  description: "统一管理用户、工作空间、应用与运营能力的 Admin 控制台",
-  keywords: ["Admin", "AgentFlow", "管理后台", "控制台"],
+  title: "AgentFlow Admin - Admin Console",
+  description: "Unified admin console for managing users, workspaces, apps, and operations",
+  keywords: ["Admin", "AgentFlow", "Admin Dashboard", "Console"],
   authors: [{ name: "AgentFlow Team" }],
 };
 
@@ -31,7 +31,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-mono antialiased terminal-strong`}
       >

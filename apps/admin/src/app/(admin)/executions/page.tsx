@@ -49,13 +49,13 @@ import { usePermission } from "@/hooks/usePermission";
 
 const STATUS_OPTIONS = ["all", "success", "running", "pending", "failed", "cancelled", "timeout"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  success: "成功",
-  running: "运行中",
-  pending: "待执行",
-  failed: "失败",
-  cancelled: "已取消",
-  timeout: "超时",
+  all: "All Statuses",
+  success: "Success",
+  running: "Running",
+  pending: "Pending",
+  failed: "Failed",
+  cancelled: "Cancelled",
+  timeout: "Timeout",
 };
 
 const STATUS_BADGE_MAP: Record<ExecutionStatus, "success" | "warning" | "info" | "error"> = {
@@ -69,10 +69,10 @@ const STATUS_BADGE_MAP: Record<ExecutionStatus, "success" | "warning" | "info" |
 
 const TRIGGER_LABELS: Record<string, string> = {
   webhook: "Webhook",
-  schedule: "定时任务",
-  event: "事件触发",
-  api: "API 调用",
-  manual: "手动执行",
+  schedule: "Scheduled",
+  event: "Event Trigger",
+  api: "API Call",
+  manual: "Manual",
 };
 
 export default function ExecutionsPage() {
@@ -155,11 +155,11 @@ export default function ExecutionsPage() {
 
   const cancelMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedExecution) throw new Error("请选择执行记录");
+      if (!selectedExecution) throw new Error("Please select an execution");
       if (localMode) {
         const next = localExecutions.map((ex) =>
           ex.id === selectedExecution.id
-            ? { ...ex, status: "cancelled" as ExecutionStatus, error_message: reasonDraft || "用户取消" }
+            ? { ...ex, status: "cancelled" as ExecutionStatus, error_message: reasonDraft || "Cancelled by user" }
             : ex
         );
         setLocalExecutions(next);
@@ -168,68 +168,68 @@ export default function ExecutionsPage() {
       return adminApi.executions.cancel(selectedExecution.id, { reason: reasonDraft });
     },
     onSuccess: () => {
-      toast.success("执行已取消");
+      toast.success("Execution cancelled");
       queryClient.invalidateQueries({ queryKey: ["admin", "executions"] });
       setManageOpen(false);
       setConfirmCancelOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "取消执行失败");
+      toast.error(error instanceof Error ? error.message : "Failed to cancel execution");
     },
   });
 
   const retryMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedExecution) throw new Error("请选择执行记录");
+      if (!selectedExecution) throw new Error("Please select an execution");
       if (localMode) {
-        toast.success("（本地模式）重试已模拟触发");
+        toast.success("(Local mode) Retry simulated");
         return { execution: selectedExecution };
       }
       return adminApi.executions.retry(selectedExecution.id);
     },
     onSuccess: () => {
-      toast.success("重试已触发");
+      toast.success("Retry triggered");
       queryClient.invalidateQueries({ queryKey: ["admin", "executions"] });
       setManageOpen(false);
       setConfirmRetryOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "重试失败");
+      toast.error(error instanceof Error ? error.message : "Retry failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="执行记录"
-        description="查看与管理所有工作流的执行历史。"
+        title="Execution Records"
+        description="View and manage execution history for all workflows."
         icon={<Play className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出记录
+              Export Records
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="执行列表"
-        description="支持按状态、工作流筛选，点击查看节点轨迹。"
+        title="Execution List"
+        description="Filter by status and workflow. Click to view node trace."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索执行 ID 或工作流名称"
+              placeholder="Search execution ID or workflow name"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -246,7 +246,7 @@ export default function ExecutionsPage() {
           </div>
           {workflowId && (
             <Badge variant="outline" size="sm" className="gap-1">
-              工作流: {workflowId.slice(0, 12)}...
+              Workflow: {workflowId.slice(0, 12)}...
               <button
                 onClick={() => setWorkflowId("")}
                 className="ml-1 hover:text-foreground"
@@ -256,20 +256,20 @@ export default function ExecutionsPage() {
             </Badge>
           )}
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>执行 ID</TableHead>
-              <TableHead>工作流</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>触发方式</TableHead>
-              <TableHead>耗时</TableHead>
-              <TableHead>开始时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Execution ID</TableHead>
+              <TableHead>Workflow</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Trigger</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Started</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -279,7 +279,7 @@ export default function ExecutionsPage() {
                   colSpan={7}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -289,8 +289,8 @@ export default function ExecutionsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {executionsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配执行记录"}
+                    ? "Failed to load. Check API or permission settings."
+                    : "No matching execution records"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -367,14 +367,14 @@ export default function ExecutionsPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Play className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>执行记录管理</DialogTitle>
+            <DialogTitle>Execution Management</DialogTitle>
             <DialogDescription>
               {selectedExecution?.id ? (
                 <span className="text-foreground-light font-mono">
                   {selectedExecution.id}
                 </span>
               ) : (
-                "管理执行记录。"
+                "Manage execution records."
               )}
             </DialogDescription>
           </DialogHeader>
@@ -384,19 +384,19 @@ export default function ExecutionsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_BADGE_MAP[selectedExecution.status]} size="sm">
                       {STATUS_LABELS[selectedExecution.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">工作流</span>
+                    <span className="text-foreground-muted">Workflow</span>
                     <span className="text-foreground">
                       {selectedExecution.workflow?.name || "-"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">耗时</span>
+                    <span className="text-foreground-muted">Duration</span>
                     <span className="text-foreground">
                       {selectedExecution.duration_ms ? `${selectedExecution.duration_ms}ms` : "-"}
                     </span>
@@ -405,7 +405,7 @@ export default function ExecutionsPage() {
                     <div className="mt-2 p-2 rounded bg-error-default/10 border border-error-default/20">
                       <div className="flex items-center gap-1 text-error-default mb-1">
                         <AlertTriangle className="w-3.5 h-3.5" />
-                        <span className="font-medium">错误信息</span>
+                        <span className="font-medium">Error Message</span>
                       </div>
                       <div className="text-[11px] text-foreground-light">
                         {selectedExecution.error_message}
@@ -418,12 +418,12 @@ export default function ExecutionsPage() {
 
             {(selectedExecution?.status === "running" || selectedExecution?.status === "pending") && (
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">取消执行</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Cancel Execution</div>
                 <textarea
                   value={reasonDraft}
                   onChange={(e) => setReasonDraft(e.target.value)}
                   rows={2}
-                  placeholder="取消原因（可选）"
+                    placeholder="Cancellation reason (optional)"
                   className={cn(
                     "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                     "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -438,7 +438,7 @@ export default function ExecutionsPage() {
                     onClick={() => setConfirmCancelOpen(true)}
                   >
                     <XCircle className="w-3.5 h-3.5 mr-1" />
-                    取消执行
+                    Cancel Execution
                   </Button>
                 </div>
               </div>
@@ -446,9 +446,9 @@ export default function ExecutionsPage() {
 
             {(selectedExecution?.status === "failed" || selectedExecution?.status === "timeout") && (
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">重试执行</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Retry Execution</div>
                 <p className="text-[11px] text-foreground-muted mb-2">
-                  将使用相同的输入数据重新触发该工作流执行。
+                  This will re-trigger the workflow execution with the same input data.
                 </p>
                 <div className="flex justify-end">
                   <Button
@@ -458,7 +458,7 @@ export default function ExecutionsPage() {
                     onClick={() => setConfirmRetryOpen(true)}
                   >
                     <RotateCcw className="w-3.5 h-3.5 mr-1" />
-                    重试
+                    Retry
                   </Button>
                 </div>
               </div>
@@ -468,13 +468,13 @@ export default function ExecutionsPage() {
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/executions/${selectedExecution?.id}`}>
                   <Clock className="w-3.5 h-3.5 mr-1" />
-                  查看详情
+                  View Details
                 </Link>
               </Button>
               {selectedExecution?.workflow && (
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/workflows/${selectedExecution.workflow.id}`}>
-                    查看工作流
+                    View Workflow
                   </Link>
                 </Button>
               )}
@@ -489,10 +489,10 @@ export default function ExecutionsPage() {
         open={confirmCancelOpen}
         onOpenChange={setConfirmCancelOpen}
         type="warning"
-        title="确认取消执行？"
-        description="取消后无法恢复，当前执行将被标记为已取消。"
-        confirmText="确认取消"
-        cancelText="返回"
+        title="Confirm cancel execution?"
+        description="This cannot be undone. The current execution will be marked as cancelled."
+        confirmText="Confirm Cancel"
+        cancelText="Go Back"
         loading={cancelMutation.isPending}
         onConfirm={() => cancelMutation.mutate()}
       />
@@ -501,10 +501,10 @@ export default function ExecutionsPage() {
         open={confirmRetryOpen}
         onOpenChange={setConfirmRetryOpen}
         type="info"
-        title="确认重试执行？"
-        description="将使用相同的输入数据创建新的执行记录。"
-        confirmText="确认重试"
-        cancelText="取消"
+        title="Confirm retry execution?"
+        description="A new execution record will be created with the same input data."
+        confirmText="Confirm Retry"
+        cancelText="Cancel"
         loading={retryMutation.isPending}
         onConfirm={() => retryMutation.mutate()}
       />

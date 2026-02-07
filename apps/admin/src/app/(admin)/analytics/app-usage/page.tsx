@@ -79,8 +79,8 @@ export default function AppUsagePage() {
   return (
     <PageContainer>
       <PageHeader
-        title="应用用量与成本"
-        description="追踪各应用的运行次数、Token 消耗与成本归因。"
+        title="App Usage & Cost"
+        description="Track run counts, token consumption, and cost attribution per app."
         icon={<AppWindow className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export default function AppUsagePage() {
             </select>
             <Button variant="outline" size="sm">
               <RefreshCcw className="w-3.5 h-3.5 mr-1" />
-              刷新
+              Refresh
             </Button>
           </div>
         }
@@ -106,68 +106,68 @@ export default function AppUsagePage() {
       <div className="page-grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           icon={<Zap className="w-4 h-4" />}
-          title="总运行次数"
+          title="Total Runs"
           value={totalRuns.toLocaleString()}
-          subtitle="所有应用合计"
+          subtitle="All apps combined"
         />
         <StatsCard
           icon={<DollarSign className="w-4 h-4" />}
-          title="总成本"
+          title="Total Cost"
           value={`$${totalCost.toFixed(2)}`}
-          subtitle="Token 消耗成本"
+          subtitle="Token consumption cost"
         />
         <StatsCard
           icon={<TrendingUp className="w-4 h-4" />}
-          title="总 Token 使用"
+          title="Total Token Usage"
           value={(totalTokens / 1000000).toFixed(2) + "M"}
-          subtitle="百万 Token"
+          subtitle="Million tokens"
         />
         <StatsCard
           icon={<AlertCircle className="w-4 h-4" />}
-          title="错误率"
+          title="Error Rate"
           value={`${errorRate}%`}
-          subtitle={`${totalFailedRuns.toLocaleString()} 次失败`}
+          subtitle={`${totalFailedRuns.toLocaleString()} failures`}
           trend={parseFloat(errorRate) > 3 ? { value: parseFloat(errorRate), isPositive: false } : undefined}
         />
       </div>
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.5fr_1fr]">
         <SettingsSection
-          title="应用用量明细"
-          description="各应用的运行次数、成本与 Token 消耗。"
+          title="App Usage Details"
+          description="Run counts, costs, and token consumption per app."
         >
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <div className="w-[260px]">
               <Input
                 variant="search"
                 inputSize="sm"
-                placeholder="搜索应用或 Workspace"
+                placeholder="Search apps or workspaces"
                 leftIcon={<Search className="w-3.5 h-3.5" />}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <Badge variant="outline" size="sm">
-              共 {total} 条
+              {total} total
             </Badge>
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>应用</TableHead>
+                <TableHead>App</TableHead>
                 <TableHead>Workspace</TableHead>
-                <TableHead className="text-right">运行次数</TableHead>
-                <TableHead className="text-right">成功率</TableHead>
-                <TableHead className="text-right">Token 用量</TableHead>
-                <TableHead className="text-right">成本</TableHead>
+                <TableHead className="text-right">Runs</TableHead>
+                <TableHead className="text-right">Success Rate</TableHead>
+                <TableHead className="text-right">Token Usage</TableHead>
+                <TableHead className="text-right">Cost</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pagedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                    暂无用量数据
+                    No usage data available
                   </TableCell>
                 </TableRow>
               ) : (
@@ -238,8 +238,8 @@ export default function AppUsagePage() {
         </SettingsSection>
 
         <SettingsSection
-          title="成本 Top 5"
-          description="本月成本最高的应用。"
+          title="Top 5 by Cost"
+          description="Apps with the highest cost this month."
         >
           <div className="space-y-3">
             {topAppsByCost.map((app, index) => {
@@ -285,13 +285,13 @@ export default function AppUsagePage() {
 
           <div className="mt-4 p-3 rounded-md bg-surface-100 border border-border">
             <div className="flex items-center justify-between text-[12px]">
-              <span className="text-foreground-muted">活跃用户总数</span>
+              <span className="text-foreground-muted">Total Active Users</span>
               <span className="font-medium text-foreground">
                 {localMetrics.reduce((sum, m) => sum + m.unique_users, 0).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-[12px] mt-2">
-              <span className="text-foreground-muted">峰值并发</span>
+              <span className="text-foreground-muted">Peak Concurrency</span>
               <span className="font-medium text-foreground">
                 {Math.max(...localMetrics.map(m => m.peak_concurrent_users)).toLocaleString()}
               </span>

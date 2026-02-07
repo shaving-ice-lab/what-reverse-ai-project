@@ -47,11 +47,11 @@ type TaskStatus = "pending" | "processing" | "completed" | "failed";
 
 const STATUS_OPTIONS = ["all", "pending", "processing", "completed", "failed"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  pending: "待处理",
-  processing: "处理中",
-  completed: "已完成",
-  failed: "失败",
+  all: "All Statuses",
+  pending: "Pending",
+  processing: "Processing",
+  completed: "Completed",
+  failed: "Failed",
 };
 
 const STATUS_BADGE_MAP: Record<TaskStatus, "success" | "warning" | "info" | "error"> = {
@@ -132,35 +132,35 @@ export default function CreativeTasksPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="创意任务"
-        description="查看所有 AI 创意生成任务与状态。"
+        title="Creative Tasks"
+        description="View all AI creative generation tasks and statuses."
         icon={<Sparkles className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出记录
+              Export Records
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="任务列表"
-        description="支持按标题、用户、状态筛选。"
+        title="Task List"
+        description="Filter by title, user, or status."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索标题、ID 或用户邮箱"
+              placeholder="Search by title, ID, or user email"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -176,21 +176,21 @@ export default function CreativeTasksPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>任务</TableHead>
-              <TableHead>用户</TableHead>
+              <TableHead>Task</TableHead>
+              <TableHead>User</TableHead>
               <TableHead>Workspace</TableHead>
-              <TableHead>模型</TableHead>
+              <TableHead>Model</TableHead>
               <TableHead>Tokens</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -200,7 +200,7 @@ export default function CreativeTasksPage() {
                   colSpan={8}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -210,8 +210,8 @@ export default function CreativeTasksPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {tasksQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配任务"}
+                    ? "Failed to load. Please check API or permission configuration."
+                    : "No matching tasks"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -302,8 +302,8 @@ export default function CreativeTasksPage() {
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Sparkles className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>任务详情</DialogTitle>
-            <DialogDescription>{selectedTask?.title || "创意任务"}</DialogDescription>
+            <DialogTitle>Task Details</DialogTitle>
+            <DialogDescription>{selectedTask?.title || "Creative Task"}</DialogDescription>
           </DialogHeader>
 
           {selectedTask && (
@@ -315,34 +315,34 @@ export default function CreativeTasksPage() {
                     <span className="text-foreground font-mono">{selectedTask.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_BADGE_MAP[selectedTask.status]} size="sm">
                       {STATUS_LABELS[selectedTask.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">模型</span>
+                    <span className="text-foreground-muted">Model</span>
                     <span className="text-foreground">{selectedTask.model || "-"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">Tokens 使用</span>
+                    <span className="text-foreground-muted">Tokens Used</span>
                     <span className="text-foreground">
                       {selectedTask.tokens_used?.toLocaleString() || "-"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">模板 ID</span>
+                    <span className="text-foreground-muted">Template ID</span>
                     <span className="text-foreground">{selectedTask.template_id || "-"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">创建时间</span>
+                    <span className="text-foreground-muted">Created</span>
                     <span className="text-foreground">
                       {new Date(selectedTask.created_at).toLocaleString()}
                     </span>
                   </div>
                   {selectedTask.completed_at && (
                     <div className="flex justify-between">
-                      <span className="text-foreground-muted">完成时间</span>
+                      <span className="text-foreground-muted">Completed</span>
                       <span className="text-foreground">
                         {new Date(selectedTask.completed_at).toLocaleString()}
                       </span>
@@ -354,12 +354,12 @@ export default function CreativeTasksPage() {
               <div className="flex items-center gap-2">
                 {selectedTask.user && (
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/users/${selectedTask.user.id}`}>查看用户</Link>
+                    <Link href={`/users/${selectedTask.user.id}`}>View User</Link>
                   </Button>
                 )}
                 {selectedTask.workspace && (
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/workspaces/${selectedTask.workspace.id}`}>查看 Workspace</Link>
+                    <Link href={`/workspaces/${selectedTask.workspace.id}`}>View Workspace</Link>
                   </Button>
                 )}
               </div>

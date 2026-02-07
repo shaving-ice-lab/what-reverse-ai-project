@@ -52,7 +52,7 @@ const mockModerationQueue = [
     id: "mod-1",
     conversation_id: "conv-123",
     message_id: "msg-456",
-    content_preview: "这是一段包含敏感词汇的内容预览...",
+    content_preview: "This is a content preview containing sensitive vocabulary...",
     flags: ["profanity", "sensitive"],
     severity: "high",
     status: "pending",
@@ -62,7 +62,7 @@ const mockModerationQueue = [
     id: "mod-2",
     conversation_id: "conv-124",
     message_id: "msg-457",
-    content_preview: "另一段可能违规的内容...",
+    content_preview: "Another piece of potentially violating content...",
     flags: ["spam"],
     severity: "medium",
     status: "pending",
@@ -72,7 +72,7 @@ const mockModerationQueue = [
     id: "mod-3",
     conversation_id: "conv-125",
     message_id: "msg-458",
-    content_preview: "用户投诉的不当内容...",
+    content_preview: "Inappropriate content reported by users...",
     flags: ["harassment"],
     severity: "high",
     status: "escalated",
@@ -81,19 +81,19 @@ const mockModerationQueue = [
 ];
 
 const mockModerationRules = [
-  { id: "rule-1", name: "敏感词过滤", pattern: "sensitive_words_list", action: "block", severity: "high", enabled: true },
-  { id: "rule-2", name: "垃圾信息检测", pattern: "spam_patterns", action: "flag", severity: "medium", enabled: true },
-  { id: "rule-3", name: "骚扰内容检测", pattern: "harassment_patterns", action: "flag", severity: "high", enabled: true },
-  { id: "rule-4", name: "广告链接过滤", pattern: "ad_urls", action: "block", severity: "low", enabled: false },
+  { id: "rule-1", name: "Sensitive Word Filter", pattern: "sensitive_words_list", action: "block", severity: "high", enabled: true },
+  { id: "rule-2", name: "Spam Detection", pattern: "spam_patterns", action: "flag", severity: "medium", enabled: true },
+  { id: "rule-3", name: "Harassment Detection", pattern: "harassment_patterns", action: "flag", severity: "high", enabled: true },
+  { id: "rule-4", name: "Ad Link Filter", pattern: "ad_urls", action: "block", severity: "low", enabled: false },
 ];
 
 const STATUS_OPTIONS = ["all", "pending", "approved", "rejected", "escalated"] as const;
 const STATUS_LABELS: Record<string, string> = {
-  all: "全部",
-  pending: "待审核",
-  approved: "已通过",
-  rejected: "已拒绝",
-  escalated: "已升级",
+  all: "All",
+  pending: "Pending",
+  approved: "Approved",
+  rejected: "Rejected",
+  escalated: "Escalated",
 };
 
 const SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary"> = {
@@ -103,12 +103,12 @@ const SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary">
 };
 
 const FLAG_LABELS: Record<string, string> = {
-  profanity: "不当言论",
-  sensitive: "敏感内容",
-  spam: "垃圾信息",
-  harassment: "骚扰行为",
-  violence: "暴力内容",
-  adult: "成人内容",
+  profanity: "Profanity",
+  sensitive: "Sensitive Content",
+  spam: "Spam",
+  harassment: "Harassment",
+  violence: "Violent Content",
+  adult: "Adult Content",
 };
 
 type ModerationItem = (typeof mockModerationQueue)[number];
@@ -152,16 +152,16 @@ export default function ConversationModerationPage() {
     onSuccess: () => {
       toast.success(
         reviewDecision === "approve"
-          ? "内容已通过审核"
+          ? "Content approved"
           : reviewDecision === "reject"
-          ? "内容已拒绝"
-          : "内容已升级处理"
+          ? "Content rejected"
+          : "Content escalated"
       );
       setReviewOpen(null);
       setReviewNotes("");
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "moderation"] });
     },
-    onError: () => toast.error("审核失败"),
+    onError: () => toast.error("Review failed"),
   });
 
   const toggleRuleMutation = useMutation({
@@ -175,10 +175,10 @@ export default function ConversationModerationPage() {
       return adminApi.conversations.updateModerationRule(ruleId, { enabled });
     },
     onSuccess: () => {
-      toast.success("规则已更新");
+      toast.success("Rule updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "moderation", "rules"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const pendingCount = localQueue.filter((item) => item.status === "pending").length;
@@ -187,50 +187,50 @@ export default function ConversationModerationPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="敏感内容审核"
-        description="审核和管理对话中的敏感内容。"
+        title="Content Moderation"
+        description="Review and manage sensitive content in conversations."
         icon={<Shield className="w-4 h-4" />}
         backHref="/conversations"
-        backLabel="返回对话列表"
+        backLabel="Back to Conversations"
         actions={
           <Button variant="outline" size="sm" onClick={() => setRulesOpen(true)}>
             <Filter className="w-3.5 h-3.5 mr-1" />
-            审核规则
+            Moderation Rules
           </Button>
         }
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="待审核"
+          title="Pending Review"
           value={pendingCount.toString()}
-          subtitle="条内容"
+          subtitle="items"
           trend={pendingCount > 0 ? { value: pendingCount, isPositive: true } : undefined}
         />
         <StatsCard
-          title="已升级"
+          title="Escalated"
           value={escalatedCount.toString()}
-          subtitle="需人工处理"
+          subtitle="Requires manual review"
         />
         <StatsCard
-          title="今日审核"
+          title="Reviewed Today"
           value="42"
-          subtitle="条内容"
+          subtitle="items"
         />
         <StatsCard
-          title="自动过滤"
+          title="Auto-filtered"
           value="128"
-          subtitle="条内容"
+          subtitle="items"
         />
       </div>
 
       <SettingsSection
-        title="审核队列"
-        description="需要人工审核的内容列表。"
+        title="Review Queue"
+        description="Content requiring manual review."
       >
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
@@ -244,19 +244,19 @@ export default function ConversationModerationPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredQueue.length} 条
+            {filteredQueue.length} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>内容预览</TableHead>
-              <TableHead>标记</TableHead>
-              <TableHead>严重程度</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>上报时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Content Preview</TableHead>
+              <TableHead>Flags</TableHead>
+              <TableHead>Severity</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Reported</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -266,7 +266,7 @@ export default function ConversationModerationPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无待审核内容
+                  No content pending review
                 </TableCell>
               </TableRow>
             ) : (
@@ -296,7 +296,7 @@ export default function ConversationModerationPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={SEVERITY_VARIANTS[item.severity] || "secondary"} size="sm">
-                      {item.severity === "high" ? "高" : item.severity === "medium" ? "中" : "低"}
+                      {item.severity === "high" ? "High" : item.severity === "medium" ? "Medium" : "Low"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -331,7 +331,7 @@ export default function ConversationModerationPage() {
                         disabled={item.status !== "pending" && item.status !== "escalated"}
                       >
                         <Eye className="w-3.5 h-3.5 mr-1" />
-                        审核
+                        Review
                       </Button>
                     </div>
                   </TableCell>
@@ -346,33 +346,33 @@ export default function ConversationModerationPage() {
       <Dialog open={Boolean(reviewOpen)} onOpenChange={(open) => !open && setReviewOpen(null)}>
         <DialogContent size="lg">
           <DialogHeader icon={<Shield className="w-6 h-6" />} iconVariant="warning">
-            <DialogTitle>内容审核</DialogTitle>
+            <DialogTitle>Content Review</DialogTitle>
             <DialogDescription>
-              审核标记的内容并做出处理决定。
+              Review flagged content and make a decision.
             </DialogDescription>
           </DialogHeader>
 
           {reviewOpen && (
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-2">内容预览</div>
+                <div className="text-[12px] font-medium text-foreground mb-2">Content Preview</div>
                 <div className="text-[12px] text-foreground-light">{reviewOpen.content_preview}</div>
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <div className="text-[12px] text-foreground-muted">标记：</div>
+                <div className="text-[12px] text-foreground-muted">Flags:</div>
                 {reviewOpen.flags.map((flag) => (
                   <Badge key={flag} variant="outline" size="sm">
                     {FLAG_LABELS[flag] || flag}
                   </Badge>
                 ))}
                 <Badge variant={SEVERITY_VARIANTS[reviewOpen.severity]} size="sm">
-                  {reviewOpen.severity === "high" ? "高风险" : reviewOpen.severity === "medium" ? "中风险" : "低风险"}
+                  {reviewOpen.severity === "high" ? "High Risk" : reviewOpen.severity === "medium" ? "Medium Risk" : "Low Risk"}
                 </Badge>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">审核决定</label>
+                <label className="text-[12px] text-foreground">Review Decision</label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -381,7 +381,7 @@ export default function ConversationModerationPage() {
                     onClick={() => setReviewDecision("approve")}
                   >
                     <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                    通过
+                    Approve
                   </Button>
                   <Button
                     type="button"
@@ -390,7 +390,7 @@ export default function ConversationModerationPage() {
                     onClick={() => setReviewDecision("reject")}
                   >
                     <XCircle className="w-3.5 h-3.5 mr-1" />
-                    拒绝
+                    Reject
                   </Button>
                   <Button
                     type="button"
@@ -399,17 +399,17 @@ export default function ConversationModerationPage() {
                     onClick={() => setReviewDecision("escalate")}
                   >
                     <AlertTriangle className="w-3.5 h-3.5 mr-1" />
-                    升级
+                    Escalate
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">审核备注</label>
+                <label className="text-[12px] text-foreground">Review Notes</label>
                 <Input
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="输入审核备注..."
+                  placeholder="Enter review notes..."
                 />
               </div>
             </div>
@@ -417,15 +417,15 @@ export default function ConversationModerationPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setReviewOpen(null)}>
-              取消
+              Cancel
             </Button>
             <Button
               variant={reviewDecision === "reject" ? "destructive" : "default"}
               onClick={() => reviewMutation.mutate()}
               loading={reviewMutation.isPending}
-              loadingText="提交中..."
+              loadingText="Submitting..."
             >
-              提交审核
+              Submit Review
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -435,9 +435,9 @@ export default function ConversationModerationPage() {
       <Dialog open={rulesOpen} onOpenChange={setRulesOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Filter className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>审核规则配置</DialogTitle>
+            <DialogTitle>Moderation Rules Configuration</DialogTitle>
             <DialogDescription>
-              管理自动内容审核规则。
+              Manage automatic content moderation rules.
             </DialogDescription>
           </DialogHeader>
 
@@ -451,11 +451,11 @@ export default function ConversationModerationPage() {
                   <div className="flex items-center gap-2 text-[12px] font-medium text-foreground">
                     {rule.name}
                     <Badge variant={SEVERITY_VARIANTS[rule.severity]} size="sm">
-                      {rule.severity === "high" ? "高" : rule.severity === "medium" ? "中" : "低"}
+                      {rule.severity === "high" ? "High" : rule.severity === "medium" ? "Medium" : "Low"}
                     </Badge>
                   </div>
                   <div className="text-[11px] text-foreground-muted mt-0.5">
-                    动作: {rule.action === "block" ? "阻止" : "标记"}
+                    Action: {rule.action === "block" ? "Block" : "Flag"}
                   </div>
                 </div>
                 <Switch
@@ -470,7 +470,7 @@ export default function ConversationModerationPage() {
 
           <DialogFooter>
             <Button onClick={() => setRulesOpen(false)}>
-              关闭
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

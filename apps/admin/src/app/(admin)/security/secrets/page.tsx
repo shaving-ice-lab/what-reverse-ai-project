@@ -48,18 +48,18 @@ import { usePermission } from "@/hooks/usePermission";
 
 const SCOPE_OPTIONS = ["all", "system", "workspace", "app"] as const;
 const SCOPE_LABELS: Record<(typeof SCOPE_OPTIONS)[number], string> = {
-  all: "全部范围",
-  system: "系统",
+  all: "All Scopes",
+  system: "System",
   workspace: "Workspace",
-  app: "应用",
+  app: "App",
 };
 
 const STATUS_OPTIONS = ["all", "active", "rotated", "disabled"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  active: "活跃",
-  rotated: "已轮换",
-  disabled: "已禁用",
+  all: "All Statuses",
+  active: "Active",
+  rotated: "Rotated",
+  disabled: "Disabled",
 };
 
 const STATUS_BADGE: Record<string, "success" | "warning" | "error"> = {
@@ -154,7 +154,7 @@ export default function SecretsPage() {
   // Mutations
   const rotateSecretMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedSecret) throw new Error("请选择密钥");
+      if (!selectedSecret) throw new Error("Please select a secret");
 
       if (localMode) {
         const next = localSecrets.map((sec) =>
@@ -173,19 +173,19 @@ export default function SecretsPage() {
       return adminApi.security.secrets.rotate(selectedSecret.id, { reason: reasonDraft });
     },
     onSuccess: () => {
-      toast.success("密钥已轮换");
+      toast.success("Secret rotated");
       queryClient.invalidateQueries({ queryKey: ["admin", "secrets"] });
       setDetailModalOpen(false);
       setConfirmActionOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "轮换失败");
+      toast.error(error instanceof Error ? error.message : "Rotation failed");
     },
   });
 
   const disableSecretMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedSecret) throw new Error("请选择密钥");
+      if (!selectedSecret) throw new Error("Please select a secret");
 
       if (localMode) {
         const next = localSecrets.map((sec) =>
@@ -204,13 +204,13 @@ export default function SecretsPage() {
       return adminApi.security.secrets.disable(selectedSecret.id, { reason: reasonDraft });
     },
     onSuccess: () => {
-      toast.success("密钥已禁用");
+      toast.success("Secret disabled");
       queryClient.invalidateQueries({ queryKey: ["admin", "secrets"] });
       setDetailModalOpen(false);
       setConfirmActionOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "禁用失败");
+      toast.error(error instanceof Error ? error.message : "Disable failed");
     },
   });
 
@@ -225,50 +225,50 @@ export default function SecretsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="密钥管理"
-        description="管理系统密钥、API 密钥与加密凭证。"
+        title="Secrets Management"
+        description="Manage system secrets, API keys, and encryption credentials."
         icon={<Key className="w-4 h-4" />}
       />
 
       <div className="page-grid grid-cols-1 sm:grid-cols-3">
         <StatsCard
           icon={<Shield className="w-4 h-4" />}
-          title="活跃密钥"
+          title="Active Secrets"
           value={activeSecrets.toString()}
-          subtitle="正在使用"
+          subtitle="in use"
         />
         <StatsCard
           icon={<RotateCcw className="w-4 h-4" />}
-          title="已轮换"
+          title="Rotated"
           value={rotatedSecrets.toString()}
-          subtitle="待清理"
+          subtitle="pending cleanup"
         />
         <StatsCard
           icon={<Clock className="w-4 h-4" />}
-          title="即将到期"
+          title="Expiring Soon"
           value={expiringSecrets.toString()}
-          subtitle="30 天内"
+          subtitle="within 30 days"
           trend={expiringSecrets > 0 ? { value: expiringSecrets, isPositive: false } : undefined}
         />
       </div>
 
       <SettingsSection
-        title="密钥列表"
-        description="查看和管理所有系统密钥。"
+        title="Secrets List"
+        description="View and manage all system secrets."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索密钥名称或前缀"
+              placeholder="Search secret name or prefix"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">范围</span>
+            <span className="text-[11px] text-foreground-muted">Scope</span>
             <select
               value={scopeFilter}
               onChange={(e) => setScopeFilter(e.target.value)}
@@ -282,7 +282,7 @@ export default function SecretsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -296,35 +296,35 @@ export default function SecretsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>名称</TableHead>
-              <TableHead>密钥前缀</TableHead>
-              <TableHead>范围</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>最近使用</TableHead>
-              <TableHead>到期时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Key Prefix</TableHead>
+              <TableHead>Scope</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Used</TableHead>
+              <TableHead>Expires At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {secretsQuery.isPending && !localMode ? (
               <TableRow>
                 <TableCell colSpan={7} className="py-10 text-center text-[12px] text-foreground-muted">
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="py-10 text-center text-[12px] text-foreground-muted">
                   {secretsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无密钥数据"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No secrets found"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -356,7 +356,7 @@ export default function SecretsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
-                    {sec.last_used_at ? formatRelativeTime(sec.last_used_at) : "从未使用"}
+                    {sec.last_used_at ? formatRelativeTime(sec.last_used_at) : "Never used"}
                   </TableCell>
                   <TableCell>
                     {sec.expires_at ? (
@@ -374,7 +374,7 @@ export default function SecretsPage() {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-[12px] text-foreground-muted">永不过期</span>
+                      <span className="text-[12px] text-foreground-muted">Never expires</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -438,7 +438,7 @@ export default function SecretsPage() {
             iconVariant={actionType === "rotate" ? "warning" : "error"}
           >
             <DialogTitle>
-              {actionType === "rotate" ? "轮换密钥" : "禁用密钥"}
+              {actionType === "rotate" ? "Rotate Secret" : "Disable Secret"}
             </DialogTitle>
             <DialogDescription>
               {selectedSecret?.name}
@@ -450,25 +450,25 @@ export default function SecretsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">密钥前缀</span>
+                    <span className="text-foreground-muted">Key Prefix</span>
                     <code className="font-mono text-foreground">{selectedSecret.key_prefix}***</code>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">范围</span>
+                    <span className="text-foreground-muted">Scope</span>
                     <Badge variant="outline" size="sm">
                       {SCOPE_LABELS[selectedSecret.scope as keyof typeof SCOPE_LABELS]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_BADGE[selectedSecret.status]} size="sm">
                       {STATUS_LABELS[selectedSecret.status as keyof typeof STATUS_LABELS]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">最近使用</span>
+                    <span className="text-foreground-muted">Last Used</span>
                     <span className="text-foreground">
-                      {selectedSecret.last_used_at ? formatRelativeTime(selectedSecret.last_used_at) : "从未使用"}
+                      {selectedSecret.last_used_at ? formatRelativeTime(selectedSecret.last_used_at) : "Never used"}
                     </span>
                   </div>
                 </div>
@@ -486,18 +486,18 @@ export default function SecretsPage() {
                 )} />
                 <div className="text-[12px] text-foreground-light">
                   {actionType === "rotate"
-                    ? "轮换密钥会生成新的密钥值，旧密钥将标记为已轮换。请确保所有使用此密钥的服务已更新配置。"
-                    : "禁用密钥后，所有使用此密钥的请求将被拒绝。此操作不可逆。"}
+                    ? "Rotating will generate a new secret value and mark the old one as rotated. Ensure all services using this secret have updated their configuration."
+                    : "Disabling this secret will reject all requests using it. This action is irreversible."}
                 </div>
               </div>
 
               <div className="rounded-lg border border-border bg-surface-75 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">操作原因</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Reason</div>
                 <textarea
                   value={reasonDraft}
                   onChange={(e) => setReasonDraft(e.target.value)}
                   rows={2}
-                  placeholder="请填写操作原因"
+                  placeholder="Enter reason for this action"
                   className={cn(
                     "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                     "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -511,7 +511,7 @@ export default function SecretsPage() {
                     size="sm"
                     onClick={() => setDetailModalOpen(false)}
                   >
-                    取消
+                    Cancel
                   </Button>
                   <Button
                     variant={actionType === "disable" ? "destructive" : "default"}
@@ -522,12 +522,12 @@ export default function SecretsPage() {
                     {actionType === "rotate" ? (
                       <>
                         <RotateCcw className="w-3.5 h-3.5 mr-1" />
-                        确认轮换
+                        Confirm Rotation
                       </>
                     ) : (
                       <>
                         <XCircle className="w-3.5 h-3.5 mr-1" />
-                        确认禁用
+                        Confirm Disable
                       </>
                     )}
                   </Button>
@@ -545,14 +545,14 @@ export default function SecretsPage() {
         open={confirmActionOpen}
         onOpenChange={setConfirmActionOpen}
         type={actionType === "rotate" ? "warning" : "error"}
-        title={actionType === "rotate" ? "确认轮换密钥？" : "确认禁用密钥？"}
+        title={actionType === "rotate" ? "Confirm Secret Rotation?" : "Confirm Secret Disable?"}
         description={
           actionType === "rotate"
-            ? "轮换后旧密钥将不再有效，请确保已更新所有相关服务配置。"
-            : "禁用后此密钥将永久失效，所有使用此密钥的请求将被拒绝。"
+            ? "After rotation, the old secret will no longer be valid. Ensure all related service configurations have been updated."
+            : "After disabling, this secret will be permanently invalidated. All requests using it will be rejected."
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={rotateSecretMutation.isPending || disableSecretMutation.isPending}
         onConfirm={() => {
           if (actionType === "rotate") {

@@ -70,9 +70,9 @@ const SEVERITY_CONFIG: Record<
   AlertSeverity,
   { label: string; variant: "info" | "warning" | "error"; icon: React.ReactNode }
 > = {
-  info: { label: "提示", variant: "info", icon: <Info className="w-3.5 h-3.5" /> },
-  warning: { label: "警告", variant: "warning", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
-  critical: { label: "严重", variant: "error", icon: <AlertCircle className="w-3.5 h-3.5" /> },
+  info: { label: "Info", variant: "info", icon: <Info className="w-3.5 h-3.5" /> },
+  warning: { label: "Warning", variant: "warning", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  critical: { label: "Critical", variant: "error", icon: <AlertCircle className="w-3.5 h-3.5" /> },
 };
 
 const TREND_ICONS = {
@@ -88,7 +88,7 @@ const getUtilizationColor = (percent: number): string => {
 };
 
 const formatValue = (value: number, unit: string): string => {
-  if (unit === "%" || unit === "次" || unit === "连接" || unit === "任务") {
+  if (unit === "%" || unit === "calls" || unit === "connections" || unit === "tasks") {
     return value.toLocaleString();
   }
   if (unit === "TB" || unit === "GB" || unit === "Gbps") {
@@ -131,20 +131,20 @@ export default function SystemCapacityPage() {
   const acknowledgeMutation = useMutation({
     mutationFn: async (alertId: string) => systemApi.acknowledgeAlert(alertId),
     onSuccess: () => {
-      toast.success("告警已确认");
+      toast.success("Alert acknowledged");
       queryClient.invalidateQueries({ queryKey: ["system", "capacity", "alerts"] });
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "确认失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Acknowledgment failed"),
   });
 
   const toggleRuleMutation = useMutation({
     mutationFn: async ({ ruleId, enabled }: { ruleId: string; enabled: boolean }) =>
       systemApi.updateQuotaRule(ruleId, { enabled }),
     onSuccess: () => {
-      toast.success("规则已更新");
+      toast.success("Rule updated");
       queryClient.invalidateQueries({ queryKey: ["system", "capacity", "rules"] });
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "更新失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Update failed"),
   });
 
   const isRefreshing = metricsQuery.isFetching || alertsQuery.isFetching || rulesQuery.isFetching;
@@ -152,15 +152,15 @@ export default function SystemCapacityPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="系统容量与配额"
-        description="监控系统资源使用情况与配额预警规则。"
+        title="System Capacity & Quotas"
+        description="Monitor system resource usage and quota alert rules."
         icon={<Activity className="w-4 h-4" />}
         actions={
           <Button
             variant="outline"
             size="sm"
             loading={isRefreshing}
-            loadingText="刷新中..."
+            loadingText="Refreshing..."
             leftIcon={<RefreshCcw className="w-4 h-4" />}
             onClick={() => {
               metricsQuery.refetch();
@@ -169,14 +169,14 @@ export default function SystemCapacityPage() {
             }}
             disabled={localMode}
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
       {/* Active Alerts */}
       {alerts.length > 0 && (
-        <SettingsSection title="活跃告警" description="当前需要关注的容量告警。">
+        <SettingsSection title="Active Alerts" description="Current capacity alerts requiring attention.">
           <div className="space-y-3">
             {alerts.map((alert) => {
               const severityConfig = SEVERITY_CONFIG[alert.severity];
@@ -209,18 +209,18 @@ export default function SystemCapacityPage() {
                         </Badge>
                         {isAcknowledged && (
                           <Badge variant="secondary" size="sm">
-                            已确认
+                            Acknowledged
                           </Badge>
                         )}
                       </div>
                       <div className="text-[11px] text-foreground-light mb-2">{alert.message}</div>
                       <div className="flex items-center gap-4 text-[11px] text-foreground-muted">
                         <span>
-                          阈值: {alert.threshold_percent}% → 当前: {alert.current_percent}%
+                          Threshold: {alert.threshold_percent}% → Current: {alert.current_percent}%
                         </span>
-                        <span>触发于: {formatRelativeTime(alert.triggered_at)}</span>
+                        <span>Triggered: {formatRelativeTime(alert.triggered_at)}</span>
                         {isAcknowledged && (
-                          <span>确认人: {alert.acknowledged_by}</span>
+                          <span>Acknowledged by: {alert.acknowledged_by}</span>
                         )}
                       </div>
                     </div>
@@ -233,7 +233,7 @@ export default function SystemCapacityPage() {
                         loading={acknowledgeMutation.isPending}
                         disabled={localMode}
                       >
-                        确认
+                        Acknowledge
                       </Button>
                     )}
                   </div>
@@ -245,7 +245,7 @@ export default function SystemCapacityPage() {
       )}
 
       {/* Capacity Metrics */}
-      <SettingsSection title="资源使用概览" description="当前系统资源使用情况。">
+      <SettingsSection title="Resource Usage Overview" description="Current system resource usage.">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {metrics.map((metric) => {
             const icon = RESOURCE_ICONS[metric.resource];
@@ -300,7 +300,7 @@ export default function SystemCapacityPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-foreground-muted">使用率</span>
+                  <span className="text-foreground-muted">Utilization</span>
                   <span
                     className={
                       metric.utilization_percent >= 90
@@ -315,7 +315,7 @@ export default function SystemCapacityPage() {
                 </div>
 
                 <div className="text-[10px] text-foreground-muted mt-1">
-                  更新于 {formatRelativeTime(metric.last_updated)}
+                  Updated {formatRelativeTime(metric.last_updated)}
                 </div>
               </div>
             );
@@ -324,24 +324,24 @@ export default function SystemCapacityPage() {
       </SettingsSection>
 
       {/* Quota Rules */}
-      <SettingsSection title="预警规则" description="配置资源使用预警阈值与通知渠道。">
+      <SettingsSection title="Alert Rules" description="Configure resource usage alert thresholds and notification channels.">
         {rules.length === 0 ? (
           <EmptyState
             icon={<Bell className="w-5 h-5" />}
-            title="暂无预警规则"
-            description="当前没有配置预警规则。"
+            title="No Alert Rules"
+            description="No alert rules have been configured."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>规则名称</TableHead>
-                <TableHead>资源类型</TableHead>
-                <TableHead>警告阈值</TableHead>
-                <TableHead>严重阈值</TableHead>
-                <TableHead>通知渠道</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead className="text-right">启用</TableHead>
+                <TableHead>Rule Name</TableHead>
+                <TableHead>Resource Type</TableHead>
+                <TableHead>Warning Threshold</TableHead>
+                <TableHead>Critical Threshold</TableHead>
+                <TableHead>Notification Channel</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Enabled</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -389,12 +389,12 @@ export default function SystemCapacityPage() {
                         {rule.enabled ? (
                           <>
                             <Bell className="w-3 h-3" />
-                            启用
+                            Enabled
                           </>
                         ) : (
                           <>
                             <BellOff className="w-3 h-3" />
-                            禁用
+                            Disabled
                           </>
                         )}
                       </Badge>

@@ -72,7 +72,7 @@ function parseSlaOverrides(raw: string): Record<string, number> {
   if (!trimmed) return {};
   const parsed = JSON.parse(trimmed) as unknown;
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("SLA Overrides 必须是 JSON 对象");
+    throw new Error("SLA Overrides must be a JSON object");
   }
   const out: Record<string, number> = {};
   for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
@@ -139,12 +139,12 @@ export default function SupportChannelsPage() {
       sla_overrides?: Record<string, number>;
     }) => adminApi.support.channels.create(input),
     onSuccess: async () => {
-      toast.success("已创建支持渠道");
+      toast.success("Support channel created");
       setDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "channels"] });
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "创建失败");
+      toast.error(err instanceof Error ? err.message : "Creation failed");
     },
   });
 
@@ -152,12 +152,12 @@ export default function SupportChannelsPage() {
     mutationFn: (payload: { id: string; input: Parameters<typeof adminApi.support.channels.update>[1] }) =>
       adminApi.support.channels.update(payload.id, payload.input),
     onSuccess: async () => {
-      toast.success("已更新支持渠道");
+      toast.success("Support channel updated");
       setDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "channels"] });
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "更新失败");
+      toast.error(err instanceof Error ? err.message : "Update failed");
     },
   });
 
@@ -177,7 +177,7 @@ export default function SupportChannelsPage() {
     const key = draft.key.trim();
     const name = draft.name.trim();
     if (!key || !name) {
-      toast.error("Key 与名称为必填项");
+      toast.error("Key and Name are required");
       return;
     }
 
@@ -185,7 +185,7 @@ export default function SupportChannelsPage() {
     try {
       slaOverrides = parseSlaOverrides(draft.slaOverridesJson);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "SLA Overrides 解析失败");
+      toast.error(err instanceof Error ? err.message : "Failed to parse SLA Overrides");
       return;
     }
 
@@ -215,7 +215,7 @@ export default function SupportChannelsPage() {
           sla_overrides: input.sla_overrides,
         };
         setLocalChannels((prev) => [next, ...prev]);
-        toast.success("已创建支持渠道（本地模式）");
+        toast.success("Support channel created (local mode)");
         setDialogOpen(false);
         return;
       }
@@ -232,13 +232,13 @@ export default function SupportChannelsPage() {
             : item
         )
       );
-      toast.success("已更新支持渠道（本地模式）");
+      toast.success("Support channel updated (local mode)");
       setDialogOpen(false);
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
 
@@ -254,41 +254,41 @@ export default function SupportChannelsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="支持渠道"
-        description="配置渠道入口、联系信息与 SLA 规则。"
+        title="Support Channels"
+        description="Configure channel entry points, contact info, and SLA rules."
         icon={<LifeBuoy className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => channelsQuery.refetch()} disabled={localMode}>
-              刷新
+              Refresh
             </Button>
             <Button size="sm" onClick={openCreate} disabled={!canManage && !localMode}>
               <Plus className="w-4 h-4" />
-              新建渠道
+              New Channel
             </Button>
           </div>
         }
       />
 
-      <SettingsSection title="渠道列表" description="用于工单来源识别与通知模板分流。">
+      <SettingsSection title="Channel List" description="Used for ticket source identification and notification template routing.">
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索渠道名称 / key / contact"
+              placeholder="Search channel name / key / contact"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">包含已停用</span>
+            <span className="text-[11px] text-foreground-muted">Include disabled</span>
             <Switch checked={includeDisabled} onCheckedChange={setIncludeDisabled} />
           </div>
 
           <Badge variant="outline" size="sm">
-            共 {rows.length} 条
+            {rows.length} total
           </Badge>
 
           {localMode ? (
@@ -301,24 +301,24 @@ export default function SupportChannelsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>渠道</TableHead>
-              <TableHead>状态</TableHead>
+              <TableHead>Channel</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>SLA</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {channelsQuery.isPending && !localMode ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-10 text-center text-[12px] text-foreground-muted">
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-10 text-center text-[12px] text-foreground-muted">
-                  {channelsQuery.error && !localMode ? "加载失败，请检查 API 或权限配置" : "暂无渠道配置"}
+                  {channelsQuery.error && !localMode ? "Failed to load. Please check API or permission settings." : "No channels configured"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -339,7 +339,7 @@ export default function SupportChannelsPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={channel.enabled ? "success" : "secondary"} size="sm">
-                      {channel.enabled ? "启用" : "停用"}
+                      {channel.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -365,7 +365,7 @@ export default function SupportChannelsPage() {
                       disabled={(!canManage && !localMode) || isBusy}
                     >
                       <Settings2 className="w-4 h-4" />
-                      编辑
+                      Edit
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -381,14 +381,14 @@ export default function SupportChannelsPage() {
             icon={<Settings2 className="w-5 h-5" />}
             iconVariant={editing ? "info" : "success"}
           >
-            <DialogTitle>{editing ? "编辑渠道" : "新建渠道"}</DialogTitle>
+            <DialogTitle>{editing ? "Edit Channel" : "New Channel"}</DialogTitle>
             <DialogDescription>
-              渠道用于区分工单来源，并作为通知模板的分流维度。
+              Channels are used to distinguish ticket sources and serve as a routing dimension for notification templates.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
-            <FormRow label="Key" required description="建议使用短小英文 key（例如 email/dashboard/system）。">
+            <FormRow label="Key" required description="Use a short key (e.g. email/dashboard/system).">
               <Input
                 value={draft.key}
                 onChange={(e) => setDraft((prev) => ({ ...prev, key: e.target.value }))}
@@ -396,19 +396,19 @@ export default function SupportChannelsPage() {
               />
             </FormRow>
 
-            <FormRow label="名称" required>
+            <FormRow label="Name" required>
               <Input
                 value={draft.name}
                 onChange={(e) => setDraft((prev) => ({ ...prev, name: e.target.value }))}
-                placeholder="系统渠道"
+                placeholder="System Channel"
               />
             </FormRow>
 
-            <FormRow label="描述">
+            <FormRow label="Description">
               <Input
                 value={draft.description}
                 onChange={(e) => setDraft((prev) => ({ ...prev, description: e.target.value }))}
-                placeholder="用于系统告警与默认通知的内部渠道"
+                placeholder="Internal channel for system alerts and default notifications"
               />
             </FormRow>
 
@@ -421,7 +421,7 @@ export default function SupportChannelsPage() {
             </FormRow>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <FormRow label="排序" description="数字越小越靠前。">
+              <FormRow label="Sort Order" description="Lower numbers appear first.">
                 <Input
                   type="number"
                   value={String(draft.sortOrder)}
@@ -431,14 +431,14 @@ export default function SupportChannelsPage() {
                 />
               </FormRow>
 
-              <FormRow label="状态">
+              <FormRow label="Status">
                 <div
                   className={cn(
                     "h-10 rounded-md border border-border bg-surface-100 px-3 flex items-center justify-between"
                   )}
                 >
                   <div className="text-[12px] text-foreground-light">
-                    {draft.enabled ? "启用" : "停用"}
+                    {draft.enabled ? "Enabled" : "Disabled"}
                   </div>
                   <Switch
                     checked={draft.enabled}
@@ -452,7 +452,7 @@ export default function SupportChannelsPage() {
 
             <FormRow
               label="SLA Overrides (JSON)"
-              description='可选。示例：{ "first_response_minutes": 60, "resolve_minutes": 2880 }'
+              description='Optional. Example: { "first_response_minutes": 60, "resolve_minutes": 2880 }'
             >
               <textarea
                 value={draft.slaOverridesJson}
@@ -470,15 +470,15 @@ export default function SupportChannelsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={isBusy}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={submitDraft}
               loading={isBusy}
-              loadingText={editing ? "保存中..." : "创建中..."}
+              loadingText={editing ? "Saving..." : "Creating..."}
               disabled={(!canManage && !localMode) || isBusy}
             >
-              {editing ? "保存" : "创建"}
+              {editing ? "Save" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>

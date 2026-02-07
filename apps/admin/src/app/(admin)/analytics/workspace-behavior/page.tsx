@@ -89,8 +89,8 @@ export default function WorkspaceBehaviorPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Workspace 行为分析"
-        description="追踪各 Workspace 的用户活跃度、留存率与功能使用情况。"
+        title="Workspace Behavior Analytics"
+        description="Track user activity, retention rates, and feature usage across workspaces."
         icon={<Activity className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ export default function WorkspaceBehaviorPage() {
             </select>
             <Button variant="outline" size="sm">
               <RefreshCcw className="w-3.5 h-3.5 mr-1" />
-              刷新
+              Refresh
             </Button>
           </div>
         }
@@ -116,47 +116,47 @@ export default function WorkspaceBehaviorPage() {
       <div className="page-grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           icon={<Users className="w-4 h-4" />}
-          title="日活用户 (DAU)"
+          title="Daily Active Users (DAU)"
           value={totalDAU.toLocaleString()}
-          subtitle="所有 Workspace 合计"
+          subtitle="All workspaces combined"
         />
         <StatsCard
           icon={<Users className="w-4 h-4" />}
-          title="月活用户 (MAU)"
+          title="Monthly Active Users (MAU)"
           value={totalMAU.toLocaleString()}
-          subtitle="所有 Workspace 合计"
+          subtitle="All workspaces combined"
         />
         <StatsCard
           icon={<Clock className="w-4 h-4" />}
-          title="平均会话时长"
-          value={`${avgSessionDuration} 分钟`}
-          subtitle="跨 Workspace 平均"
+          title="Avg Session Duration"
+          value={`${avgSessionDuration} min`}
+          subtitle="Average across workspaces"
         />
         <StatsCard
           icon={<TrendingUp className="w-4 h-4" />}
-          title="7 日留存率"
+          title="7-Day Retention"
           value={`${avgRetention7d}%`}
-          subtitle="跨 Workspace 平均"
+          subtitle="Average across workspaces"
         />
       </div>
 
       <SettingsSection
-        title="Workspace 行为指标"
-        description="各 Workspace 的用户活跃度与留存数据明细。"
+        title="Workspace Behavior Metrics"
+        description="User activity and retention data details per workspace."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索 Workspace 名称"
+              placeholder="Search workspace name"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
@@ -167,18 +167,18 @@ export default function WorkspaceBehaviorPage() {
               <TableHead className="text-right">DAU</TableHead>
               <TableHead className="text-right">WAU</TableHead>
               <TableHead className="text-right">MAU</TableHead>
-              <TableHead className="text-right">会话数</TableHead>
-              <TableHead className="text-right">平均时长</TableHead>
-              <TableHead className="text-right">7日留存</TableHead>
-              <TableHead className="text-right">30日留存</TableHead>
-              <TableHead className="text-right">流失率</TableHead>
+              <TableHead className="text-right">Sessions</TableHead>
+              <TableHead className="text-right">Avg Duration</TableHead>
+              <TableHead className="text-right">7d Retention</TableHead>
+              <TableHead className="text-right">30d Retention</TableHead>
+              <TableHead className="text-right">Churn Rate</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无行为数据
+                    No behavior data available
                 </TableCell>
               </TableRow>
             ) : (
@@ -205,7 +205,7 @@ export default function WorkspaceBehaviorPage() {
                     {m.total_sessions.toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right text-[12px] text-foreground-light">
-                    {m.avg_session_duration_min.toFixed(1)} 分
+                    {m.avg_session_duration_min.toFixed(1)} min
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
@@ -262,8 +262,8 @@ export default function WorkspaceBehaviorPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="功能使用分布"
-        description="各 Workspace 的主要功能使用情况。"
+        title="Feature Usage Distribution"
+        description="Primary feature usage across workspaces."
       >
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {pagedData.slice(0, 4).map((m) => (

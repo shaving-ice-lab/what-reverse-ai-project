@@ -53,7 +53,7 @@ interface Rule {
 const mockRules: Rule[] = [
   {
     id: "rule-1",
-    name: "API 调用计费",
+    name: "API Call Billing",
     type: "usage",
     config: { rate_per_call: 0.001, free_tier: 1000 },
     enabled: true,
@@ -62,7 +62,7 @@ const mockRules: Rule[] = [
   },
   {
     id: "rule-2",
-    name: "存储空间计费",
+    name: "Storage Billing",
     type: "storage",
     config: { rate_per_gb: 0.02, included_gb: 10 },
     enabled: true,
@@ -71,7 +71,7 @@ const mockRules: Rule[] = [
   },
   {
     id: "rule-3",
-    name: "工作流执行计费",
+    name: "Workflow Execution Billing",
     type: "execution",
     config: { rate_per_execution: 0.01, batch_discount: 0.1 },
     enabled: true,
@@ -80,7 +80,7 @@ const mockRules: Rule[] = [
   },
   {
     id: "rule-4",
-    name: "LLM Token 计费",
+    name: "LLM Token Billing",
     type: "llm",
     config: { rate_per_1k_tokens: 0.03, model_multipliers: { "gpt-4": 3, "gpt-3.5-turbo": 1 } },
     enabled: true,
@@ -93,43 +93,43 @@ const mockChangeHistory = [
   {
     id: "ch-1",
     rule_id: "rule-4",
-    rule_name: "LLM Token 计费",
+    rule_name: "LLM Token Billing",
     change_type: "update",
     old_value: { rate_per_1k_tokens: 0.02 },
     new_value: { rate_per_1k_tokens: 0.03 },
     changed_by: "admin@agentflow.ai",
-    reason: "调整 GPT-4 定价以匹配成本",
+    reason: "Adjusted GPT-4 pricing to match costs",
     created_at: "2026-02-01T09:00:00Z",
   },
   {
     id: "ch-2",
     rule_id: "rule-1",
-    rule_name: "API 调用计费",
+    rule_name: "API Call Billing",
     change_type: "update",
     old_value: { free_tier: 500 },
     new_value: { free_tier: 1000 },
     changed_by: "admin@agentflow.ai",
-    reason: "扩大免费额度",
+    reason: "Expanded free tier allowance",
     created_at: "2026-01-15T10:00:00Z",
   },
   {
     id: "ch-3",
     rule_id: "rule-2",
-    rule_name: "存储空间计费",
+    rule_name: "Storage Billing",
     change_type: "update",
     old_value: { rate_per_gb: 0.025 },
     new_value: { rate_per_gb: 0.02 },
     changed_by: "finance@agentflow.ai",
-    reason: "降低存储成本",
+    reason: "Reduced storage cost",
     created_at: "2026-01-10T08:00:00Z",
   },
 ];
 
 const TYPE_LABELS: Record<string, string> = {
-  usage: "用量计费",
-  storage: "存储计费",
-  execution: "执行计费",
-  llm: "LLM 计费",
+  usage: "Usage Billing",
+  storage: "Storage Billing",
+  execution: "Execution Billing",
+  llm: "LLM Billing",
 };
 
 export default function BillingRulesPage() {
@@ -167,7 +167,7 @@ export default function BillingRulesPage() {
       try {
         parsedConfig = JSON.parse(editConfig);
       } catch {
-        throw new Error("配置格式无效");
+        throw new Error("Invalid configuration format");
       }
       if (localMode) {
         setLocalRules((prev) =>
@@ -182,11 +182,11 @@ export default function BillingRulesPage() {
       return adminApi.billing.rules.update(editOpen.id, { config: parsedConfig });
     },
     onSuccess: () => {
-      toast.success("规则已更新");
+      toast.success("Rule updated");
       setEditOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "billing", "rules"] });
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "更新失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Update failed"),
   });
 
   const toggleRuleMutation = useMutation({
@@ -200,10 +200,10 @@ export default function BillingRulesPage() {
       return adminApi.billing.rules.update(ruleId, { enabled });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "billing", "rules"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const openEditDialog = (rule: Rule) => {
@@ -214,32 +214,32 @@ export default function BillingRulesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="计费规则管理"
-        description="管理计费规则配置与变更审计。"
+        title="Billing Rules Management"
+        description="Manage billing rule configurations and change auditing."
         icon={<Settings className="w-4 h-4" />}
         backHref="/billing"
-        backLabel="返回计费概览"
+        backLabel="Back to Billing Overview"
         actions={
           <Button variant="outline" size="sm" onClick={() => setHistoryOpen(true)}>
             <History className="w-3.5 h-3.5 mr-1" />
-            变更历史
+            Change History
           </Button>
         }
       />
 
       <SettingsSection
-        title="计费规则"
-        description="当前生效的计费规则配置。"
+        title="Billing Rules"
+        description="Currently active billing rule configurations."
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>规则名称</TableHead>
-              <TableHead>类型</TableHead>
-              <TableHead>配置</TableHead>
-              <TableHead>最后更新</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Rule Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Configuration</TableHead>
+              <TableHead>Last Updated</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -249,7 +249,7 @@ export default function BillingRulesPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rules.length === 0 ? (
@@ -259,8 +259,8 @@ export default function BillingRulesPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {rulesQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无计费规则"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No billing rules"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -282,7 +282,7 @@ export default function BillingRulesPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={rule.enabled ? "success" : "secondary"} size="sm">
-                      {rule.enabled ? "启用" : "停用"}
+                      {rule.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -313,7 +313,7 @@ export default function BillingRulesPage() {
       <Dialog open={Boolean(editOpen)} onOpenChange={(open) => !open && setEditOpen(null)}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileText className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>编辑计费规则</DialogTitle>
+            <DialogTitle>Edit Billing Rule</DialogTitle>
             <DialogDescription>
               {editOpen && (
                 <span className="text-foreground-light">{editOpen.name}</span>
@@ -323,7 +323,7 @@ export default function BillingRulesPage() {
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">规则配置 (JSON)</label>
+              <label className="text-[12px] text-foreground">Rule Configuration (JSON)</label>
               <textarea
                 value={editConfig}
                 onChange={(e) => setEditConfig(e.target.value)}
@@ -331,21 +331,21 @@ export default function BillingRulesPage() {
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground font-mono placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30"
               />
               <p className="text-[11px] text-foreground-muted">
-                请确保配置格式正确，修改后将立即生效。
+                Please ensure the configuration format is correct. Changes will take effect immediately.
               </p>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(null)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => updateRuleMutation.mutate()}
               loading={updateRuleMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -355,9 +355,9 @@ export default function BillingRulesPage() {
       <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
         <DialogContent size="xl">
           <DialogHeader icon={<History className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>规则变更历史</DialogTitle>
+            <DialogTitle>Rule Change History</DialogTitle>
             <DialogDescription>
-              计费规则的变更记录与审计日志。
+              Change records and audit log for billing rules.
             </DialogDescription>
           </DialogHeader>
 
@@ -365,12 +365,12 @@ export default function BillingRulesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>规则</TableHead>
-                  <TableHead>变更类型</TableHead>
-                  <TableHead>变更内容</TableHead>
-                  <TableHead>变更原因</TableHead>
-                  <TableHead>操作人</TableHead>
-                  <TableHead>时间</TableHead>
+                  <TableHead>Rule</TableHead>
+                  <TableHead>Change Type</TableHead>
+                  <TableHead>Changes</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Changed By</TableHead>
+                  <TableHead>Time</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -380,7 +380,7 @@ export default function BillingRulesPage() {
                       colSpan={6}
                       className="py-10 text-center text-[12px] text-foreground-muted"
                     >
-                      正在加载...
+                      Loading...
                     </TableCell>
                   </TableRow>
                 ) : history.length === 0 ? (
@@ -390,8 +390,8 @@ export default function BillingRulesPage() {
                       className="py-10 text-center text-[12px] text-foreground-muted"
                     >
                       {historyQuery.error && !localMode
-                        ? "加载失败，请检查 API 或权限配置"
-                        : "暂无变更记录"}
+                        ? "Failed to load. Please check API or permission settings."
+                        : "No change records"}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -402,7 +402,7 @@ export default function BillingRulesPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="info" size="sm">
-                          {item.change_type === "update" ? "更新" : item.change_type}
+                          {item.change_type === "update" ? "Update" : item.change_type}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-[11px] text-foreground-light max-w-[200px]">
@@ -438,7 +438,7 @@ export default function BillingRulesPage() {
 
           <DialogFooter>
             <Button onClick={() => setHistoryOpen(false)}>
-              关闭
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

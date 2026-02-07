@@ -74,9 +74,9 @@ interface BillingDashboardProps {
 }
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-  { key: "invoices", label: "账单发票", icon: <FileText className="w-4 h-4" /> },
-  { key: "withdrawals", label: "提现处理", icon: <Wallet className="w-4 h-4" /> },
-  { key: "refunds", label: "退款申请", icon: <RotateCcw className="w-4 h-4" /> },
+  { key: "invoices", label: "Invoices", icon: <FileText className="w-4 h-4" /> },
+  { key: "withdrawals", label: "Withdrawals", icon: <Wallet className="w-4 h-4" /> },
+  { key: "refunds", label: "Refund Requests", icon: <RotateCcw className="w-4 h-4" /> },
 ];
 
 const TAB_ROUTES: Record<TabKey, string> = {
@@ -87,13 +87,13 @@ const TAB_ROUTES: Record<TabKey, string> = {
 
 const INVOICE_STATUS_OPTIONS = ["all", "draft", "pending", "paid", "failed", "refunded", "cancelled"] as const;
 const INVOICE_STATUS_LABELS: Record<(typeof INVOICE_STATUS_OPTIONS)[number], string> = {
-  all: "全部",
-  draft: "草稿",
-  pending: "待支付",
-  paid: "已支付",
-  failed: "失败",
-  refunded: "已退款",
-  cancelled: "已取消",
+  all: "All",
+  draft: "Draft",
+  pending: "Pending",
+  paid: "Paid",
+  failed: "Failed",
+  refunded: "Refunded",
+  cancelled: "Cancelled",
 };
 const INVOICE_STATUS_BADGE: Record<InvoiceStatus, "success" | "warning" | "info" | "error"> = {
   draft: "info",
@@ -106,12 +106,12 @@ const INVOICE_STATUS_BADGE: Record<InvoiceStatus, "success" | "warning" | "info"
 
 const WITHDRAWAL_STATUS_OPTIONS = ["all", "pending", "processing", "completed", "rejected", "cancelled"] as const;
 const WITHDRAWAL_STATUS_LABELS: Record<(typeof WITHDRAWAL_STATUS_OPTIONS)[number], string> = {
-  all: "全部",
-  pending: "待处理",
-  processing: "处理中",
-  completed: "已完成",
-  rejected: "已拒绝",
-  cancelled: "已取消",
+  all: "All",
+  pending: "Pending",
+  processing: "Processing",
+  completed: "Completed",
+  rejected: "Rejected",
+  cancelled: "Cancelled",
 };
 const WITHDRAWAL_STATUS_BADGE: Record<WithdrawalStatus, "success" | "warning" | "info" | "error"> = {
   pending: "warning",
@@ -123,12 +123,12 @@ const WITHDRAWAL_STATUS_BADGE: Record<WithdrawalStatus, "success" | "warning" | 
 
 const REFUND_STATUS_OPTIONS = ["all", "pending", "approved", "rejected", "processed", "failed"] as const;
 const REFUND_STATUS_LABELS: Record<(typeof REFUND_STATUS_OPTIONS)[number], string> = {
-  all: "全部",
-  pending: "待处理",
-  approved: "已批准",
-  rejected: "已拒绝",
-  processed: "已处理",
-  failed: "失败",
+  all: "All",
+  pending: "Pending",
+  approved: "Approved",
+  rejected: "Rejected",
+  processed: "Processed",
+  failed: "Failed",
 };
 const REFUND_STATUS_BADGE: Record<RefundStatus, "success" | "warning" | "info" | "error"> = {
   pending: "warning",
@@ -337,8 +337,8 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
   // Mutations
   const processWithdrawalMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedWithdrawal) throw new Error("请选择提现申请");
-      if (actionType === "reject" && !reasonDraft.trim()) throw new Error("拒绝时必须填写原因");
+      if (!selectedWithdrawal) throw new Error("Please select a withdrawal request");
+      if (actionType === "reject" && !reasonDraft.trim()) throw new Error("A reason is required when rejecting");
 
       if (localMode) {
         const next = localWithdrawals.map((wd) =>
@@ -364,20 +364,20 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
       return { withdrawal: selectedWithdrawal };
     },
     onSuccess: () => {
-      toast.success(actionType === "approve" ? "提现已批准" : "提现已拒绝");
+      toast.success(actionType === "approve" ? "Withdrawal approved" : "Withdrawal rejected");
       queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
       setWithdrawalModalOpen(false);
       setConfirmActionOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "处理失败");
+      toast.error(error instanceof Error ? error.message : "Processing failed");
     },
   });
 
   const processRefundMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedRefund) throw new Error("请选择退款申请");
-      if (actionType === "reject" && !reasonDraft.trim()) throw new Error("拒绝时必须填写原因");
+      if (!selectedRefund) throw new Error("Please select a refund request");
+      if (actionType === "reject" && !reasonDraft.trim()) throw new Error("A reason is required when rejecting");
 
       if (localMode) {
         const next = localRefunds.map((rf) =>
@@ -401,13 +401,13 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
       });
     },
     onSuccess: () => {
-      toast.success(actionType === "approve" ? "退款已批准" : "退款已拒绝");
+      toast.success(actionType === "approve" ? "Refund approved" : "Refund rejected");
       queryClient.invalidateQueries({ queryKey: ["admin", "billing"] });
       setRefundModalOpen(false);
       setConfirmActionOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "处理失败");
+      toast.error(error instanceof Error ? error.message : "Processing failed");
     },
   });
 
@@ -426,14 +426,14 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
   return (
     <PageContainer>
       <PageHeader
-        title="计费与收益"
-        description="管理账单发票、提现申请与退款处理。"
+        title="Billing & Earnings"
+        description="Manage invoices, withdrawal requests, and refund processing."
         icon={<CreditCard className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <Download className="w-3.5 h-3.5 mr-1" />
-              导出报表
+              Export Report
             </Button>
           </div>
         }
@@ -442,35 +442,35 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
       <div className="page-grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           icon={<TrendingUp className="w-4 h-4" />}
-          title="本月收入"
+          title="Monthly Revenue"
           value={`$${totalRevenue.toFixed(2)}`}
-          subtitle="已支付账单"
+          subtitle="Paid invoices"
         />
         <StatsCard
           icon={<Wallet className="w-4 h-4" />}
-          title="已提现"
+          title="Withdrawn"
           value={`$${totalWithdrawn.toFixed(2)}`}
-          subtitle="累计提现金额"
+          subtitle="Total withdrawn amount"
         />
         <StatsCard
           icon={<ArrowUpRight className="w-4 h-4" />}
-          title="待处理提现"
+          title="Pending Withdrawals"
           value={pendingWithdrawals.toString()}
-          subtitle="需要审核"
+          subtitle="Requires review"
           trend={pendingWithdrawals > 0 ? { value: pendingWithdrawals, isPositive: false } : undefined}
         />
         <StatsCard
           icon={<RotateCcw className="w-4 h-4" />}
-          title="待处理退款"
+          title="Pending Refunds"
           value={pendingRefunds.toString()}
-          subtitle="需要审核"
+          subtitle="Requires review"
           trend={pendingRefunds > 0 ? { value: pendingRefunds, isPositive: false } : undefined}
         />
       </div>
 
       <SettingsSection
-        title="计费管理"
-        description="查看账单、处理提现与退款申请。"
+        title="Billing Management"
+        description="View invoices, process withdrawals and refund requests."
       >
         {/* Tabs */}
         <div className="flex items-center gap-1 mb-4 border-b border-border">
@@ -500,10 +500,10 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
               inputSize="sm"
               placeholder={
                 activeTab === "invoices"
-                  ? "搜索发票号或 Workspace"
+                  ? "Search invoice number or workspace"
                   : activeTab === "withdrawals"
-                  ? "搜索 ID 或用户邮箱"
-                  : "搜索 ID 或 Workspace"
+                  ? "Search ID or user email"
+                  : "Search ID or workspace"
               }
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
@@ -511,7 +511,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -525,7 +525,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
@@ -534,27 +534,27 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>发票号</TableHead>
+                <TableHead>Invoice No.</TableHead>
                 <TableHead>Workspace</TableHead>
-                <TableHead>金额</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>账期</TableHead>
-                <TableHead>支付时间</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Billing Period</TableHead>
+                <TableHead>Paid At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invoicesQuery.isPending && !localMode ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                    正在加载...
+                    Loading...
                   </TableCell>
                 </TableRow>
               ) : pagedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
                     {invoicesQuery.error && !localMode
-                      ? "加载失败，请检查 API 或权限配置"
-                      : "暂无账单数据"}
+                      ? "Failed to load. Please check API or permission settings."
+                      : "No invoice data"}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -602,27 +602,27 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>申请人</TableHead>
-                <TableHead>金额</TableHead>
-                <TableHead>支付方式</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>申请时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Applicant</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Payment Method</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Requested At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {withdrawalsQuery.isPending && !localMode ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                    正在加载...
+                    Loading...
                   </TableCell>
                 </TableRow>
               ) : pagedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
                     {withdrawalsQuery.error && !localMode
-                      ? "加载失败，请检查 API 或权限配置"
-                      : "暂无提现申请"}
+                      ? "Failed to load. Please check API or permission settings."
+                      : "No withdrawal requests"}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -645,7 +645,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
                     </TableCell>
                     <TableCell className="text-[12px] text-foreground-light">
                       {wd.payment_method === "bank_transfer"
-                        ? "银行转账"
+                        ? "Bank Transfer"
                         : wd.payment_method === "paypal"
                         ? "PayPal"
                         : wd.payment_method}
@@ -684,26 +684,26 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Workspace</TableHead>
-                <TableHead>金额</TableHead>
-                <TableHead>原因</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>申请时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Requested At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {refundsQuery.isPending && !localMode ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                    正在加载...
+                    Loading...
                   </TableCell>
                 </TableRow>
               ) : pagedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
                     {refundsQuery.error && !localMode
-                      ? "加载失败，请检查 API 或权限配置"
-                      : "暂无退款申请"}
+                      ? "Failed to load. Please check API or permission settings."
+                      : "No refund requests"}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -774,9 +774,9 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
       <Dialog open={withdrawalModalOpen} onOpenChange={setWithdrawalModalOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Wallet className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>提现申请详情</DialogTitle>
+            <DialogTitle>Withdrawal Request Details</DialogTitle>
             <DialogDescription>
-              {selectedWithdrawal?.user?.email || "提现申请"}
+              {selectedWithdrawal?.user?.email || "Withdrawal Request"}
             </DialogDescription>
           </DialogHeader>
 
@@ -785,32 +785,32 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">金额</span>
+                    <span className="text-foreground-muted">Amount</span>
                     <span className="text-foreground font-medium">
                       ${selectedWithdrawal.amount.toFixed(2)} {selectedWithdrawal.currency}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={WITHDRAWAL_STATUS_BADGE[selectedWithdrawal.status]} size="sm">
                       {WITHDRAWAL_STATUS_LABELS[selectedWithdrawal.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">支付方式</span>
+                    <span className="text-foreground-muted">Payment Method</span>
                     <span className="text-foreground">
-                      {selectedWithdrawal.payment_method === "bank_transfer" ? "银行转账" : "PayPal"}
+                      {selectedWithdrawal.payment_method === "bank_transfer" ? "Bank Transfer" : "PayPal"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">申请时间</span>
+                    <span className="text-foreground-muted">Requested At</span>
                     <span className="text-foreground">
                       {new Date(selectedWithdrawal.requested_at).toLocaleString()}
                     </span>
                   </div>
                   {selectedWithdrawal.rejection_reason && (
                     <div className="mt-2 p-2 rounded bg-error-default/10 border border-error-default/20">
-                      <div className="text-[11px] text-error-default font-medium">拒绝原因</div>
+                      <div className="text-[11px] text-error-default font-medium">Rejection Reason</div>
                       <div className="text-[11px] text-foreground-light mt-1">
                         {selectedWithdrawal.rejection_reason}
                       </div>
@@ -821,12 +821,12 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
 
               {selectedWithdrawal.status === "pending" && (
                 <div className="rounded-lg border border-border bg-surface-75 p-4">
-                  <div className="text-[12px] font-medium text-foreground mb-3">处理提现</div>
+                  <div className="text-[12px] font-medium text-foreground mb-3">Process Withdrawal</div>
                   <textarea
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={2}
-                    placeholder="处理备注（拒绝时必填）"
+                    placeholder="Processing notes (required when rejecting)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2 mb-3",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -844,7 +844,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
                       }}
                     >
                       <XCircle className="w-3.5 h-3.5 mr-1" />
-                      拒绝
+                      Reject
                     </Button>
                     <Button
                       size="sm"
@@ -855,7 +855,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
                       }}
                     >
                       <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                      批准
+                      Approve
                     </Button>
                   </div>
                 </div>
@@ -871,9 +871,9 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
       <Dialog open={refundModalOpen} onOpenChange={setRefundModalOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<RotateCcw className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>退款申请详情</DialogTitle>
+            <DialogTitle>Refund Request Details</DialogTitle>
             <DialogDescription>
-              {selectedRefund?.workspace?.name || "退款申请"}
+              {selectedRefund?.workspace?.name || "Refund Request"}
             </DialogDescription>
           </DialogHeader>
 
@@ -882,30 +882,30 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">金额</span>
+                    <span className="text-foreground-muted">Amount</span>
                     <span className="text-foreground font-medium">
                       ${selectedRefund.amount.toFixed(2)} {selectedRefund.currency}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={REFUND_STATUS_BADGE[selectedRefund.status]} size="sm">
                       {REFUND_STATUS_LABELS[selectedRefund.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">申请时间</span>
+                    <span className="text-foreground-muted">Requested At</span>
                     <span className="text-foreground">
                       {new Date(selectedRefund.requested_at).toLocaleString()}
                     </span>
                   </div>
                   <div className="mt-2">
-                    <span className="text-foreground-muted">退款原因</span>
+                    <span className="text-foreground-muted">Refund Reason</span>
                     <div className="text-foreground mt-1">{selectedRefund.reason}</div>
                   </div>
                   {selectedRefund.rejection_reason && (
                     <div className="mt-2 p-2 rounded bg-error-default/10 border border-error-default/20">
-                      <div className="text-[11px] text-error-default font-medium">拒绝原因</div>
+                      <div className="text-[11px] text-error-default font-medium">Rejection Reason</div>
                       <div className="text-[11px] text-foreground-light mt-1">
                         {selectedRefund.rejection_reason}
                       </div>
@@ -916,12 +916,12 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
 
               {selectedRefund.status === "pending" && (
                 <div className="rounded-lg border border-border bg-surface-75 p-4">
-                  <div className="text-[12px] font-medium text-foreground mb-3">处理退款</div>
+                  <div className="text-[12px] font-medium text-foreground mb-3">Process Refund</div>
                   <textarea
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={2}
-                    placeholder="处理备注（拒绝时必填）"
+                    placeholder="Processing notes (required when rejecting)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2 mb-3",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -939,7 +939,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
                       }}
                     >
                       <XCircle className="w-3.5 h-3.5 mr-1" />
-                      拒绝
+                      Reject
                     </Button>
                     <Button
                       size="sm"
@@ -950,7 +950,7 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
                       }}
                     >
                       <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                      批准
+                      Approve
                     </Button>
                   </div>
                 </div>
@@ -967,14 +967,14 @@ function BillingDashboard({ initialTab = "invoices" }: BillingDashboardProps) {
         open={confirmActionOpen}
         onOpenChange={setConfirmActionOpen}
         type={actionType === "approve" ? "info" : "warning"}
-        title={actionType === "approve" ? "确认批准？" : "确认拒绝？"}
+        title={actionType === "approve" ? "Confirm Approval?" : "Confirm Rejection?"}
         description={
           actionType === "approve"
-            ? "批准后将立即处理该申请。"
-            : `拒绝原因：${reasonDraft.trim() || "（未填写）"}`
+            ? "Once approved, this request will be processed immediately."
+            : `Rejection reason: ${reasonDraft.trim() || "(not provided)"}`
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={processWithdrawalMutation.isPending || processRefundMutation.isPending}
         onConfirm={() => {
           if (selectedWithdrawal && withdrawalModalOpen) {

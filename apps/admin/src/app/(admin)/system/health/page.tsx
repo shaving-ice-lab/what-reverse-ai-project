@@ -61,8 +61,8 @@ export default function SystemHealthPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="系统健康"
-        description="监控关键服务可用性与性能指标。"
+        title="System Health"
+        description="Monitor critical service availability and performance metrics."
         icon={<Server className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export default function SystemHealthPage() {
               variant="outline"
               size="sm"
               loading={isRefreshing}
-              loadingText="刷新中..."
+              loadingText="Refreshing..."
               leftIcon={<RefreshCcw className="w-4 h-4" />}
               onClick={() => {
                 healthQuery.refetch();
@@ -78,23 +78,23 @@ export default function SystemHealthPage() {
               }}
               disabled={localMode}
             >
-              刷新状态
+              Refresh Status
             </Button>
             <Button size="sm" variant="outline" asChild>
-              <Link href="/system/deployment">查看部署信息</Link>
+              <Link href="/system/deployment">View Deployment</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/system/features">管理开关</Link>
+              <Link href="/system/features">Manage Flags</Link>
             </Button>
           </div>
         }
       />
 
-      <SettingsSection title="核心服务" description="关键链路服务状态概览。">
+      <SettingsSection title="Core Services" description="Overview of critical service statuses.">
         {healthQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : healthItems.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无健康数据</div>
+          <div className="text-[12px] text-foreground-muted">No health data available</div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {healthItems.map((item) => {
@@ -106,10 +106,10 @@ export default function SystemHealthPage() {
                   : "warning";
               const label =
                 item.status === "healthy"
-                  ? "正常"
+                  ? "Healthy"
                   : item.status === "down"
-                  ? "故障"
-                  : "注意";
+                  ? "Down"
+                  : "Warning";
               return (
                 <div
                   key={item.name}
@@ -134,37 +134,37 @@ export default function SystemHealthPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="功能开关"
-        description="当前环境启用的系统能力。"
+        title="Feature Flags"
+        description="System capabilities enabled in the current environment."
       >
         <div className="space-y-1">
           <FormRow
-            label="Workspace 功能"
-            description="工作空间创建与成员管理"
+            label="Workspace Features"
+            description="Workspace creation and member management"
           >
             <Badge variant={featureFlags.workspaceEnabled ? "success" : "secondary"} size="sm">
-              {featureFlags.workspaceEnabled ? "启用" : "关闭"}
+              {featureFlags.workspaceEnabled ? "Enabled" : "Disabled"}
             </Badge>
           </FormRow>
           <FormRow
             label="Workspace Runtime"
-            description="应用运行时与在线执行入口"
+            description="Application runtime and online execution endpoint"
           >
             <Badge variant={featureFlags.workspaceRuntimeEnabled ? "success" : "secondary"} size="sm">
-              {featureFlags.workspaceRuntimeEnabled ? "启用" : "关闭"}
+              {featureFlags.workspaceRuntimeEnabled ? "Enabled" : "Disabled"}
             </Badge>
           </FormRow>
           <FormRow
-            label="Domain 绑定"
-            description="自定义域名与证书管理"
+            label="Domain Binding"
+            description="Custom domain and certificate management"
           >
             <Badge variant={featureFlags.domainEnabled ? "success" : "secondary"} size="sm">
-              {featureFlags.domainEnabled ? "启用" : "关闭"}
+              {featureFlags.domainEnabled ? "Enabled" : "Disabled"}
             </Badge>
           </FormRow>
           <div className="text-[11px] text-foreground-muted flex items-center gap-1">
             <SlidersHorizontal className="w-3.5 h-3.5" />
-            当前展示为只读视图，可前往功能开关页调整。
+            This is a read-only view. Go to the Feature Flags page to make changes.
           </div>
         </div>
       </SettingsSection>

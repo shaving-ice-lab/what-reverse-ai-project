@@ -71,7 +71,7 @@ const mockSessions: AdminSession[] = [
     browser: "Chrome 120",
     os: "macOS 14.2",
     ip_address: "192.168.1.100",
-    location: "北京, 中国",
+    location: "Beijing, China",
     is_current: true,
     last_active_at: new Date().toISOString(),
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -86,7 +86,7 @@ const mockSessions: AdminSession[] = [
     browser: "Safari",
     os: "iOS 17.2",
     ip_address: "10.0.0.50",
-    location: "上海, 中国",
+    location: "Shanghai, China",
     is_current: false,
     last_active_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
     created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
@@ -101,7 +101,7 @@ const mockSessions: AdminSession[] = [
     browser: "Edge 120",
     os: "Windows 11",
     ip_address: "172.16.0.25",
-    location: "深圳, 中国",
+    location: "Shenzhen, China",
     is_current: false,
     last_active_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
@@ -116,7 +116,7 @@ const mockSessions: AdminSession[] = [
     browser: "Safari",
     os: "iPadOS 17",
     ip_address: "192.168.2.88",
-    location: "广州, 中国",
+    location: "Guangzhou, China",
     is_current: false,
     last_active_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
     created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
@@ -189,14 +189,14 @@ export default function SessionsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="会话管理"
-        description="查看和管理管理员登录会话，支持强制终止会话。"
+        title="Session Management"
+        description="View and manage admin login sessions with force termination support."
         icon={<Shield className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <RefreshCw className="w-3.5 h-3.5 mr-1" />
-              刷新
+              Refresh
             </Button>
             <Button
               variant="destructive"
@@ -204,7 +204,7 @@ export default function SessionsPage() {
               onClick={() => setTerminateAllModalOpen(true)}
             >
               <LogOut className="w-3.5 h-3.5 mr-1" />
-              终止所有会话
+              Terminate All Sessions
             </Button>
           </div>
         }
@@ -218,7 +218,7 @@ export default function SessionsPage() {
               <Monitor className="w-5 h-5 text-brand-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">活跃会话</div>
+              <div className="text-[11px] text-foreground-muted">Active Sessions</div>
               <div className="text-[20px] font-semibold text-foreground">{activeCount}</div>
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function SessionsPage() {
               <Shield className="w-5 h-5 text-success-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">在线管理员</div>
+              <div className="text-[11px] text-foreground-muted">Online Admins</div>
               <div className="text-[20px] font-semibold text-foreground">{uniqueUsers}</div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function SessionsPage() {
               <Smartphone className="w-5 h-5 text-warning-500" />
             </div>
             <div>
-              <div className="text-[11px] text-foreground-muted">移动设备</div>
+              <div className="text-[11px] text-foreground-muted">Mobile Devices</div>
               <div className="text-[20px] font-semibold text-foreground">{mobileCount}</div>
             </div>
           </div>
@@ -248,41 +248,41 @@ export default function SessionsPage() {
       </div>
 
       <SettingsSection
-        title="活跃会话"
-        description="所有管理员的登录会话列表，支持按用户、设备或 IP 搜索。"
+        title="Active Sessions"
+        description="All admin login sessions. Search by user, device, or IP address."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[280px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索用户、设备或 IP 地址"
+              placeholder="Search user, device, or IP address"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 个会话
+            {total} sessions
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>用户</TableHead>
-              <TableHead>设备</TableHead>
-              <TableHead>位置</TableHead>
-              <TableHead>最后活跃</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Device</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Last Active</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无活跃会话
+                  No active sessions
                 </TableCell>
               </TableRow>
             ) : (
@@ -311,7 +311,7 @@ export default function SessionsPage() {
                         <MapPin className="w-3 h-3 text-foreground-muted" />
                         <div>
                           <div className="text-[12px] text-foreground-light">
-                            {session.location || "未知位置"}
+                            {session.location || "Unknown location"}
                           </div>
                           <div className="text-[11px] text-foreground-muted font-mono">
                             {maskIpAddress(session.ip_address)}
@@ -329,9 +329,9 @@ export default function SessionsPage() {
                     </TableCell>
                     <TableCell>
                       {session.is_current ? (
-                        <Badge variant="success" size="sm">当前会话</Badge>
+                        <Badge variant="success" size="sm">Current Session</Badge>
                       ) : (
-                        <Badge variant="outline" size="sm">活跃</Badge>
+                        <Badge variant="outline" size="sm">Active</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -345,7 +345,7 @@ export default function SessionsPage() {
                           }}
                         >
                           <LogOut className="w-3.5 h-3.5 mr-1" />
-                          终止
+                          Terminate
                         </Button>
                       )}
                     </TableCell>
@@ -375,9 +375,9 @@ export default function SessionsPage() {
       <Dialog open={terminateModalOpen} onOpenChange={setTerminateModalOpen}>
         <DialogContent>
           <DialogHeader icon={<AlertTriangle className="w-6 h-6" />} iconVariant="warning">
-            <DialogTitle>终止会话</DialogTitle>
+            <DialogTitle>Terminate Session</DialogTitle>
             <DialogDescription>
-              确定要终止此会话吗？用户将被强制登出。
+              Are you sure you want to terminate this session? The user will be forced to log out.
             </DialogDescription>
           </DialogHeader>
 
@@ -386,27 +386,27 @@ export default function SessionsPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">用户</span>
+                    <span className="text-foreground-muted">User</span>
                     <span className="text-foreground">{selectedSession.user_email}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">设备</span>
+                    <span className="text-foreground-muted">Device</span>
                     <span className="text-foreground">{selectedSession.device_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">位置</span>
-                    <span className="text-foreground">{selectedSession.location || "未知"}</span>
+                    <span className="text-foreground-muted">Location</span>
+                    <span className="text-foreground">{selectedSession.location || "Unknown"}</span>
                   </div>
                 </div>
               </div>
 
               <div>
                 <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                  终止原因 <span className="text-destructive">*</span>
+                  Termination Reason <span className="text-destructive">*</span>
                 </label>
                 <Input
                   inputSize="sm"
-                  placeholder="请输入终止原因"
+                  placeholder="Enter termination reason"
                   value={terminateReason}
                   onChange={(e) => setTerminateReason(e.target.value)}
                 />
@@ -420,7 +420,7 @@ export default function SessionsPage() {
               size="sm"
               onClick={() => setTerminateModalOpen(false)}
             >
-              取消
+              Cancel
             </Button>
             <Button
               variant="destructive"
@@ -428,7 +428,7 @@ export default function SessionsPage() {
               disabled={!terminateReason.trim() || isTerminating}
               onClick={handleTerminateSession}
             >
-              {isTerminating ? "终止中..." : "确认终止"}
+              {isTerminating ? "Terminating..." : "Confirm Terminate"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -438,9 +438,9 @@ export default function SessionsPage() {
       <Dialog open={terminateAllModalOpen} onOpenChange={setTerminateAllModalOpen}>
         <DialogContent>
           <DialogHeader icon={<AlertTriangle className="w-6 h-6" />} iconVariant="error">
-            <DialogTitle>终止所有会话</DialogTitle>
+            <DialogTitle>Terminate All Sessions</DialogTitle>
             <DialogDescription>
-              此操作将强制登出所有管理员（包括您自己），确定继续吗？
+              This will force log out all admins (including yourself). Are you sure you want to continue?
             </DialogDescription>
           </DialogHeader>
 
@@ -448,9 +448,9 @@ export default function SessionsPage() {
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive mt-0.5" />
               <div className="text-[12px] text-foreground">
-                <p className="font-medium">危险操作</p>
+                <p className="font-medium">Dangerous Operation</p>
                 <p className="text-foreground-light mt-1">
-                  共有 {activeCount} 个活跃会话将被终止，所有管理员需要重新登录。
+                  {activeCount} active sessions will be terminated. All admins will need to log in again.
                 </p>
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function SessionsPage() {
               size="sm"
               onClick={() => setTerminateAllModalOpen(false)}
             >
-              取消
+              Cancel
             </Button>
             <Button
               variant="destructive"
@@ -470,7 +470,7 @@ export default function SessionsPage() {
               disabled={isTerminating}
               onClick={handleTerminateAll}
             >
-              {isTerminating ? "终止中..." : "确认终止所有会话"}
+              {isTerminating ? "Terminating..." : "Confirm Terminate All Sessions"}
             </Button>
           </DialogFooter>
         </DialogContent>

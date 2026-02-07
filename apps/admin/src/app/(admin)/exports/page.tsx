@@ -53,12 +53,12 @@ import type { ExportJob, ExportJobStatus, ExportFormat } from "@/types/admin";
 
 const STATUS_OPTIONS = ["all", "pending", "running", "completed", "failed", "cancelled"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  pending: "等待中",
-  running: "进行中",
-  completed: "已完成",
-  failed: "失败",
-  cancelled: "已取消",
+  all: "All Statuses",
+  pending: "Pending",
+  running: "In Progress",
+  completed: "Completed",
+  failed: "Failed",
+  cancelled: "Cancelled",
 };
 const STATUS_BADGE: Record<ExportJobStatus, "success" | "warning" | "info" | "error"> = {
   pending: "warning",
@@ -70,12 +70,12 @@ const STATUS_BADGE: Record<ExportJobStatus, "success" | "warning" | "info" | "er
 
 const MODULE_OPTIONS = ["users", "workspaces", "apps", "tickets", "audit_logs", "executions"] as const;
 const MODULE_LABELS: Record<string, string> = {
-  users: "用户",
-  workspaces: "Workspace",
-  apps: "应用",
-  tickets: "工单",
-  audit_logs: "审计日志",
-  executions: "执行记录",
+  users: "Users",
+  workspaces: "Workspaces",
+  apps: "Apps",
+  tickets: "Tickets",
+  audit_logs: "Audit Logs",
+  executions: "Executions",
 };
 
 const FORMAT_OPTIONS: ExportFormat[] = ["csv", "xlsx", "json"];
@@ -133,7 +133,7 @@ export default function ExportsPage() {
   // Create mutation
   const createJobMutation = useMutation({
     mutationFn: async () => {
-      if (!newJobName.trim()) throw new Error("请输入导出任务名称");
+      if (!newJobName.trim()) throw new Error("Please enter an export job name");
 
       if (localMode) {
         const newJob: ExportJob = {
@@ -166,13 +166,13 @@ export default function ExportsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("导出任务已创建");
+      toast.success("Export job created");
       queryClient.invalidateQueries({ queryKey: ["admin", "exports"] });
       setCreateModalOpen(false);
       setNewJobName("");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "创建失败");
+      toast.error(error instanceof Error ? error.message : "Creation failed");
     },
   });
 
@@ -203,13 +203,13 @@ export default function ExportsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="数据导出"
-        description="创建和管理数据导出任务，支持 CSV、Excel 和 JSON 格式。"
+        title="Data Export"
+        description="Create and manage data export jobs. Supports CSV, Excel, and JSON formats."
         icon={<Download className="w-4 h-4" />}
         actions={
           <Button size="sm" onClick={() => setCreateModalOpen(true)}>
             <Plus className="w-3.5 h-3.5 mr-1" />
-            新建导出
+            New Export
           </Button>
         }
       />
@@ -217,42 +217,42 @@ export default function ExportsPage() {
       <div className="page-grid grid-cols-1 sm:grid-cols-3">
         <StatsCard
           icon={<CheckCircle className="w-4 h-4" />}
-          title="已完成"
+          title="Completed"
           value={completedJobs.toString()}
-          subtitle="导出任务"
+          subtitle="export jobs"
         />
         <StatsCard
           icon={<Loader2 className="w-4 h-4" />}
-          title="进行中"
+          title="In Progress"
           value={runningJobs.toString()}
-          subtitle="导出任务"
+          subtitle="export jobs"
         />
         <StatsCard
           icon={<AlertCircle className="w-4 h-4" />}
-          title="失败"
+          title="Failed"
           value={failedJobs.toString()}
-          subtitle="导出任务"
+          subtitle="export jobs"
           trend={failedJobs > 0 ? { value: failedJobs, isPositive: false } : undefined}
         />
       </div>
 
       <SettingsSection
-        title="导出任务列表"
-        description="查看和管理所有数据导出任务。"
+        title="Export Job List"
+        description="View and manage all data export jobs."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索任务名称或模块"
+              placeholder="Search job name or module"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -266,28 +266,28 @@ export default function ExportsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>任务名称</TableHead>
-              <TableHead>模块</TableHead>
-              <TableHead>格式</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>记录数</TableHead>
-              <TableHead>文件大小</TableHead>
-              <TableHead>创建时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Job Name</TableHead>
+              <TableHead>Module</TableHead>
+              <TableHead>Format</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Records</TableHead>
+              <TableHead>File Size</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无导出任务
+                  No export jobs
                 </TableCell>
               </TableRow>
             ) : (
@@ -368,20 +368,20 @@ export default function ExportsPage() {
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
         <DialogContent size="md">
           <DialogHeader icon={<Download className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>新建导出任务</DialogTitle>
+            <DialogTitle>New Export Job</DialogTitle>
             <DialogDescription>
-              选择要导出的数据模块和格式
+              Select the data module and format to export
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
               <label className="block text-[12px] font-medium text-foreground mb-1.5">
-                任务名称
+                Job Name
               </label>
               <Input
                 inputSize="sm"
-                placeholder="例如：用户列表导出 - 2026-02"
+                placeholder="e.g., User List Export - 2026-02"
                 value={newJobName}
                 onChange={(e) => setNewJobName(e.target.value)}
               />
@@ -389,7 +389,7 @@ export default function ExportsPage() {
 
             <div>
               <label className="block text-[12px] font-medium text-foreground mb-1.5">
-                数据模块
+                Data Module
               </label>
               <select
                 value={newJobModule}
@@ -406,7 +406,7 @@ export default function ExportsPage() {
 
             <div>
               <label className="block text-[12px] font-medium text-foreground mb-1.5">
-                导出格式
+                Export Format
               </label>
               <div className="flex items-center gap-2">
                 {FORMAT_OPTIONS.map((fmt) => (
@@ -434,7 +434,7 @@ export default function ExportsPage() {
               size="sm"
               onClick={() => setCreateModalOpen(false)}
             >
-              取消
+              Cancel
             </Button>
             <Button
               size="sm"
@@ -442,7 +442,7 @@ export default function ExportsPage() {
               loading={createJobMutation.isPending}
               onClick={() => createJobMutation.mutate()}
             >
-              创建任务
+              Create Job
             </Button>
           </DialogFooter>
         </DialogContent>

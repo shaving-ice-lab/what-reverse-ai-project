@@ -147,47 +147,47 @@ export default function SupportTeamsPage() {
     mutationFn: (input: { name: string; description?: string | null; enabled?: boolean }) =>
       adminApi.support.teams.create(input),
     onSuccess: async () => {
-      toast.success("已创建团队");
+      toast.success("Team created");
       setTeamDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "teams"] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "创建失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Creation failed"),
   });
 
   const updateTeamMutation = useMutation({
     mutationFn: (payload: { id: string; input: { name?: string; description?: string | null; enabled?: boolean } }) =>
       adminApi.support.teams.update(payload.id, payload.input),
     onSuccess: async () => {
-      toast.success("已更新团队");
+      toast.success("Team updated");
       setTeamDialogOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "support", "teams"] });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "更新失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Update failed"),
   });
 
   const addMemberMutation = useMutation({
     mutationFn: (payload: { teamId: string; input: { user_id: string; role?: string | null; sort_order?: number } }) =>
       adminApi.support.teams.members.add(payload.teamId, payload.input),
     onSuccess: async () => {
-      toast.success("已添加成员");
+      toast.success("Member added");
       setMemberDraft(toMemberDraft());
       await queryClient.invalidateQueries({
         queryKey: ["admin", "support", "teams", selectedTeam?.id, "members"],
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "添加成员失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to add member"),
   });
 
   const removeMemberMutation = useMutation({
     mutationFn: (payload: { teamId: string; userId: string }) =>
       adminApi.support.teams.members.remove(payload.teamId, payload.userId),
     onSuccess: async () => {
-      toast.success("已移除成员");
+      toast.success("Member removed");
       await queryClient.invalidateQueries({
         queryKey: ["admin", "support", "teams", selectedTeam?.id, "members"],
       });
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "移除失败"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Removal failed"),
   });
 
   const openCreateTeam = () => {
@@ -205,7 +205,7 @@ export default function SupportTeamsPage() {
   const submitTeamDraft = async () => {
     const name = teamDraft.name.trim();
     if (!name) {
-      toast.error("团队名称为必填项");
+      toast.error("Team name is required");
       return;
     }
     const input = {
@@ -226,7 +226,7 @@ export default function SupportTeamsPage() {
           updated_at: now,
         };
         setLocalTeams((prev) => [next, ...prev]);
-        toast.success("已创建团队（本地模式）");
+        toast.success("Team created (local mode)");
         setTeamDialogOpen(false);
         return;
       }
@@ -237,13 +237,13 @@ export default function SupportTeamsPage() {
             : t
         )
       );
-      toast.success("已更新团队（本地模式）");
+      toast.success("Team updated (local mode)");
       setTeamDialogOpen(false);
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
 
@@ -263,7 +263,7 @@ export default function SupportTeamsPage() {
     if (!selectedTeam) return;
     const userId = memberDraft.userId.trim();
     if (!userId) {
-      toast.error("请填写用户 ID");
+      toast.error("Please enter a User ID");
       return;
     }
 
@@ -284,13 +284,13 @@ export default function SupportTeamsPage() {
         created_at: now,
       };
       setLocalMembers((prev) => [next, ...prev]);
-      toast.success("已添加成员（本地模式）");
+      toast.success("Member added (local mode)");
       setMemberDraft(toMemberDraft());
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
 
@@ -309,12 +309,12 @@ export default function SupportTeamsPage() {
 
     if (localMode) {
       setLocalMembers((prev) => prev.filter((m) => !(m.team_id === selectedTeam.id && m.user_id === userId)));
-      toast.success("已移除成员（本地模式）");
+      toast.success("Member removed (local mode)");
       return;
     }
 
     if (!canManage) {
-      toast.error("无权限执行该操作");
+      toast.error("You do not have permission to perform this action");
       return;
     }
     await removeMemberMutation.mutateAsync({ teamId: selectedTeam.id, userId });
@@ -329,39 +329,39 @@ export default function SupportTeamsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="支持团队"
-        description="管理支持团队与成员编排，用于工单路由与通知分发。"
+        title="Support Teams"
+        description="Manage support teams and member assignments for ticket routing and notification distribution."
         icon={<Users2 className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => teamsQuery.refetch()} disabled={localMode}>
-              刷新
+              Refresh
             </Button>
             <Button size="sm" onClick={openCreateTeam} disabled={!canManage && !localMode}>
               <Plus className="w-4 h-4" />
-              新建团队
+              New Team
             </Button>
           </div>
         }
       />
 
-      <SettingsSection title="团队列表" description="团队可用于工单自动分派（assignee_type=team）。">
+      <SettingsSection title="Team List" description="Teams can be used for automatic ticket assignment (assignee_type=team).">
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索团队名称"
+              placeholder="Search team name"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">包含已停用</span>
+            <span className="text-[11px] text-foreground-muted">Include disabled</span>
             <Switch checked={includeDisabled} onCheckedChange={setIncludeDisabled} />
           </div>
           <Badge variant="outline" size="sm">
-            共 {rows.length} 条
+            {rows.length} total
           </Badge>
           {localMode ? (
             <Badge variant="secondary" size="sm">
@@ -373,23 +373,23 @@ export default function SupportTeamsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>团队</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Team</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {teamsQuery.isPending && !localMode ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-10 text-center text-[12px] text-foreground-muted">
-                  {teamsQuery.error && !localMode ? "加载失败，请检查 API 或权限配置" : "暂无团队"}
+                  {teamsQuery.error && !localMode ? "Failed to load. Please check API or permission settings." : "No teams"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -403,7 +403,7 @@ export default function SupportTeamsPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={team.enabled ? "success" : "secondary"} size="sm">
-                      {team.enabled ? "启用" : "停用"}
+                      {team.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -413,7 +413,7 @@ export default function SupportTeamsPage() {
                     <div className="inline-flex items-center gap-2">
                       <Button variant="outline" size="sm" onClick={() => openMembers(team)} disabled={isBusy}>
                         <LifeBuoy className="w-4 h-4" />
-                        成员
+                        Members
                       </Button>
                       <Button
                         variant="ghost"
@@ -422,7 +422,7 @@ export default function SupportTeamsPage() {
                         disabled={(!canManage && !localMode) || isBusy}
                       >
                         <Settings2 className="w-4 h-4" />
-                        编辑
+                        Edit
                       </Button>
                     </div>
                   </TableCell>
@@ -436,32 +436,32 @@ export default function SupportTeamsPage() {
       <Dialog open={teamDialogOpen} onOpenChange={setTeamDialogOpen}>
         <DialogContent>
           <DialogHeader icon={<Users2 className="w-5 h-5" />} iconVariant={editingTeam ? "info" : "success"}>
-            <DialogTitle>{editingTeam ? "编辑团队" : "新建团队"}</DialogTitle>
-            <DialogDescription>团队用于工单路由与值班编排。</DialogDescription>
+            <DialogTitle>{editingTeam ? "Edit Team" : "New Team"}</DialogTitle>
+            <DialogDescription>Teams are used for ticket routing and on-call scheduling.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
-            <FormRow label="名称" required>
+            <FormRow label="Name" required>
               <Input
                 value={teamDraft.name}
                 onChange={(e) => setTeamDraft((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Support L1"
               />
             </FormRow>
-            <FormRow label="描述">
+            <FormRow label="Description">
               <Input
                 value={teamDraft.description}
                 onChange={(e) => setTeamDraft((prev) => ({ ...prev, description: e.target.value }))}
-                placeholder="一线支持与常见问题处理"
+                placeholder="Front-line support and common issue handling"
               />
             </FormRow>
-            <FormRow label="状态">
+            <FormRow label="Status">
               <div
                 className={cn(
                   "h-10 rounded-md border border-border bg-surface-100 px-3 flex items-center justify-between"
                 )}
               >
-                <div className="text-[12px] text-foreground-light">{teamDraft.enabled ? "启用" : "停用"}</div>
+                <div className="text-[12px] text-foreground-light">{teamDraft.enabled ? "Enabled" : "Disabled"}</div>
                 <Switch
                   checked={teamDraft.enabled}
                   onCheckedChange={(checked) => setTeamDraft((prev) => ({ ...prev, enabled: checked }))}
@@ -472,15 +472,15 @@ export default function SupportTeamsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setTeamDialogOpen(false)} disabled={isBusy}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={submitTeamDraft}
               loading={createTeamMutation.isPending || updateTeamMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
               disabled={(!canManage && !localMode) || isBusy}
             >
-              {editingTeam ? "保存" : "创建"}
+              {editingTeam ? "Save" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -489,14 +489,14 @@ export default function SupportTeamsPage() {
       <Dialog open={membersOpen} onOpenChange={setMembersOpen}>
         <DialogContent size="2xl">
           <DialogHeader icon={<UserPlus className="w-5 h-5" />} iconVariant="info">
-            <DialogTitle>团队成员</DialogTitle>
+            <DialogTitle>Team Members</DialogTitle>
             <DialogDescription>
               {selectedTeam ? (
                 <>
                   {selectedTeam.name} · <span className="font-mono">{selectedTeam.id}</span>
                 </>
               ) : (
-                "请选择团队"
+                "Please select a team"
               )}
             </DialogDescription>
           </DialogHeader>
@@ -504,23 +504,23 @@ export default function SupportTeamsPage() {
           {selectedTeam ? (
             <div className="space-y-4">
               <div className="rounded-lg border border-border bg-surface-100 p-4">
-                <div className="text-[12px] font-medium text-foreground mb-3">添加成员</div>
+                <div className="text-[12px] font-medium text-foreground mb-3">Add Member</div>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                  <FormRow label="用户 ID" required>
+                  <FormRow label="User ID" required>
                     <Input
                       value={memberDraft.userId}
                       onChange={(e) => setMemberDraft((prev) => ({ ...prev, userId: e.target.value }))}
                       placeholder="uuid"
                     />
                   </FormRow>
-                  <FormRow label="角色（可选）">
+                  <FormRow label="Role (optional)">
                     <Input
                       value={memberDraft.role}
                       onChange={(e) => setMemberDraft((prev) => ({ ...prev, role: e.target.value }))}
                       placeholder="primary / oncall"
                     />
                   </FormRow>
-                  <FormRow label="排序">
+                  <FormRow label="Sort Order">
                     <Input
                       type="number"
                       value={String(memberDraft.sortOrder)}
@@ -536,39 +536,39 @@ export default function SupportTeamsPage() {
                     onClick={addMember}
                     disabled={(!canManage && !localMode) || isBusy}
                     loading={addMemberMutation.isPending}
-                    loadingText="添加中..."
+                    loadingText="Adding..."
                   >
                     <UserPlus className="w-4 h-4" />
-                    添加
+                    Add
                   </Button>
                 </div>
               </div>
 
               <SettingsSection
-                title="成员列表"
-                description="assignee_type=team 时会解析成员列表作为通知接收者。"
+                title="Member List"
+                description="assignee_type=team resolves the member list as notification recipients."
               >
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>用户</TableHead>
-                      <TableHead>角色</TableHead>
-                      <TableHead>排序</TableHead>
-                      <TableHead>创建时间</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Sort Order</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {membersQuery.isPending && !localMode ? (
                       <TableRow>
                         <TableCell colSpan={5} className="py-10 text-center text-[12px] text-foreground-muted">
-                          正在加载...
+                          Loading...
                         </TableCell>
                       </TableRow>
                     ) : memberRows.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="py-10 text-center text-[12px] text-foreground-muted">
-                          {membersQuery.error && !localMode ? "加载失败" : "暂无成员"}
+                          {membersQuery.error && !localMode ? "Load failed" : "No members"}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -596,7 +596,7 @@ export default function SupportTeamsPage() {
                               onClick={() => requestRemove(m.user_id)}
                               disabled={(!canManage && !localMode) || isBusy}
                             >
-                              移除
+                              Remove
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -614,10 +614,10 @@ export default function SupportTeamsPage() {
         open={removeConfirmOpen}
         onOpenChange={setRemoveConfirmOpen}
         type="warning"
-        title="确认移除成员？"
-        description="该成员将不再接收该团队的工单通知。"
-        confirmText="移除"
-        cancelText="取消"
+        title="Confirm member removal?"
+        description="This member will no longer receive ticket notifications for this team."
+        confirmText="Remove"
+        cancelText="Cancel"
         loading={removeMemberMutation.isPending}
         onConfirm={() => void confirmRemove()}
       />

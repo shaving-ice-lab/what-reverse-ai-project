@@ -41,44 +41,44 @@ import { formatRelativeTime } from "@/lib/utils";
 import type { BackgroundJob, JobStatus, JobType } from "@/types/ops";
 
 const JOB_TYPE_OPTIONS: { value: JobType | ""; label: string }[] = [
-  { value: "", label: "全部类型" },
-  { value: "export", label: "导出" },
-  { value: "migration", label: "迁移" },
-  { value: "backup", label: "备份" },
-  { value: "cleanup", label: "清理" },
-  { value: "sync", label: "同步" },
-  { value: "report", label: "报表" },
+  { value: "", label: "All Types" },
+  { value: "export", label: "Export" },
+  { value: "migration", label: "Migration" },
+  { value: "backup", label: "Backup" },
+  { value: "cleanup", label: "Cleanup" },
+  { value: "sync", label: "Sync" },
+  { value: "report", label: "Report" },
 ];
 
 const JOB_STATUS_OPTIONS: { value: JobStatus | ""; label: string }[] = [
-  { value: "", label: "全部状态" },
-  { value: "pending", label: "待执行" },
-  { value: "running", label: "运行中" },
-  { value: "completed", label: "已完成" },
-  { value: "failed", label: "已失败" },
-  { value: "cancelled", label: "已取消" },
+  { value: "", label: "All Statuses" },
+  { value: "pending", label: "Pending" },
+  { value: "running", label: "Running" },
+  { value: "completed", label: "Completed" },
+  { value: "failed", label: "Failed" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 const PAGE_SIZES = [10, 20, 50];
 
 const JOB_TYPE_LABELS: Record<JobType, string> = {
-  export: "导出",
-  migration: "迁移",
-  backup: "备份",
-  cleanup: "清理",
-  sync: "同步",
-  report: "报表",
+  export: "Export",
+  migration: "Migration",
+  backup: "Backup",
+  cleanup: "Cleanup",
+  sync: "Sync",
+  report: "Report",
 };
 
 const JOB_STATUS_CONFIG: Record<
   JobStatus,
   { label: string; variant: "success" | "warning" | "error" | "secondary" | "info"; icon: React.ReactNode }
 > = {
-  pending: { label: "待执行", variant: "secondary", icon: <Clock className="w-3.5 h-3.5" /> },
-  running: { label: "运行中", variant: "info", icon: <Loader2 className="w-3.5 h-3.5 animate-spin" /> },
-  completed: { label: "已完成", variant: "success", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-  failed: { label: "已失败", variant: "error", icon: <XCircle className="w-3.5 h-3.5" /> },
-  cancelled: { label: "已取消", variant: "warning", icon: <StopCircle className="w-3.5 h-3.5" /> },
+  pending: { label: "Pending", variant: "secondary", icon: <Clock className="w-3.5 h-3.5" /> },
+  running: { label: "Running", variant: "info", icon: <Loader2 className="w-3.5 h-3.5 animate-spin" /> },
+  completed: { label: "Completed", variant: "success", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  failed: { label: "Failed", variant: "error", icon: <XCircle className="w-3.5 h-3.5" /> },
+  cancelled: { label: "Cancelled", variant: "warning", icon: <StopCircle className="w-3.5 h-3.5" /> },
 };
 
 export default function OpsJobsPage() {
@@ -125,24 +125,24 @@ export default function OpsJobsPage() {
   const cancelMutation = useMutation({
     mutationFn: async (job: BackgroundJob) => opsApi.cancelJob(job.id),
     onSuccess: () => {
-      toast.success("任务已取消");
+      toast.success("Job cancelled");
       queryClient.invalidateQueries({ queryKey: ["ops", "jobs"] });
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "取消失败");
+      toast.error(error instanceof Error ? error.message : "Cancellation failed");
     },
   });
 
   const retryMutation = useMutation({
     mutationFn: async (job: BackgroundJob) => opsApi.retryJob(job.id),
     onSuccess: () => {
-      toast.success("任务已重新提交");
+      toast.success("Job resubmitted");
       queryClient.invalidateQueries({ queryKey: ["ops", "jobs"] });
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "重试失败");
+      toast.error(error instanceof Error ? error.message : "Retry failed");
     },
   });
 
@@ -155,28 +155,28 @@ export default function OpsJobsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="任务与作业监控"
-        description="查看和管理后台任务、导出作业与数据迁移进度。"
+        title="Jobs & Task Monitoring"
+        description="View and manage background jobs, export tasks, and data migration progress."
         icon={<Server className="w-4 h-4" />}
         actions={
           <Button
             variant="outline"
             size="sm"
             loading={listQuery.isFetching}
-            loadingText="刷新中..."
+            loadingText="Refreshing..."
             leftIcon={<RefreshCcw className="w-4 h-4" />}
             onClick={() => listQuery.refetch()}
             disabled={localMode}
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
-      <SettingsSection title="作业列表" description="筛选与查看后台任务状态。">
+      <SettingsSection title="Job List" description="Filter and view background job statuses.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">类型</span>
+            <span className="text-[11px] text-foreground-muted">Type</span>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as JobType | "")}
@@ -190,7 +190,7 @@ export default function OpsJobsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as JobStatus | "")}
@@ -204,7 +204,7 @@ export default function OpsJobsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">每页</span>
+            <span className="text-[11px] text-foreground-muted">Per Page</span>
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
@@ -218,7 +218,7 @@ export default function OpsJobsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {jobs.length} 条
+            {jobs.length} total
           </Badge>
           <div className="ml-auto flex items-center gap-2">
             <Button
@@ -227,10 +227,10 @@ export default function OpsJobsPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={!canPrev}
             >
-              上一页
+              Previous
             </Button>
             <Badge variant="secondary" size="sm">
-              第 {page} 页
+              Page {page}
             </Badge>
             <Button
               variant="outline"
@@ -238,30 +238,30 @@ export default function OpsJobsPage() {
               onClick={() => setPage((p) => p + 1)}
               disabled={!canNext}
             >
-              下一页
+              Next
             </Button>
           </div>
         </div>
 
         {listQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : jobs.length === 0 ? (
           <EmptyState
             icon={<Server className="w-5 h-5" />}
-            title="暂无任务"
-            description="当前没有符合条件的后台任务。"
+            title="No Jobs"
+            description="No background jobs match the current filters."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>任务</TableHead>
-                <TableHead>类型</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>进度</TableHead>
-                <TableHead>发起人</TableHead>
-                <TableHead>创建时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Job</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead>Initiated By</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -338,7 +338,7 @@ export default function OpsJobsPage() {
                             asChild
                           >
                             <a href={job.result_url} target="_blank" rel="noopener noreferrer">
-                              下载
+                              Download
                             </a>
                           </Button>
                         )}
@@ -350,7 +350,7 @@ export default function OpsJobsPage() {
                             onClick={() => openConfirm(job, "retry")}
                             disabled={localMode}
                           >
-                            重试
+                            Retry
                           </Button>
                         )}
                         {canCancel && (
@@ -361,7 +361,7 @@ export default function OpsJobsPage() {
                             onClick={() => openConfirm(job, "cancel")}
                             disabled={localMode}
                           >
-                            取消
+                            Cancel
                           </Button>
                         )}
                       </div>
@@ -378,10 +378,10 @@ export default function OpsJobsPage() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         type={actionType === "cancel" ? "warning" : "info"}
-        title={actionType === "cancel" ? "确认取消该任务？" : "确认重新提交该任务？"}
-        description={selectedJob ? `${selectedJob.name}` : "请选择任务"}
-        confirmText={actionType === "cancel" ? "取消任务" : "重新提交"}
-        cancelText="返回"
+        title={actionType === "cancel" ? "Confirm cancellation of this job?" : "Confirm resubmission of this job?"}
+        description={selectedJob ? `${selectedJob.name}` : "Please select a job"}
+        confirmText={actionType === "cancel" ? "Cancel Job" : "Resubmit"}
+        cancelText="Back"
         loading={cancelMutation.isPending || retryMutation.isPending}
         onConfirm={() => {
           if (!selectedJob || !actionType) return;

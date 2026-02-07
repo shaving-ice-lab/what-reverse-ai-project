@@ -21,14 +21,14 @@ export default function AdminForbiddenPage() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <div className="text-[14px] font-semibold text-foreground">
-                无权限访问
+                Access Denied
               </div>
               <Badge variant="outline" size="sm">
                 403
               </Badge>
             </div>
             <div className="mt-1 text-[12px] text-foreground-light">
-              当前账号已登录，但不在管理员白名单中，或缺少所需权限能力点。请切换账号或联系管理员开通权限。
+              Your account is logged in but is not on the admin whitelist, or lacks the required permission capabilities. Please switch accounts or contact an admin to grant access.
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@ export default function AdminForbiddenPage() {
             onClick={() => router.back()}
             leftIcon={<Lock className="w-4 h-4" />}
           >
-            返回上一页
+            Go Back
           </Button>
           <Button
             onClick={async () => {
@@ -48,12 +48,12 @@ export default function AdminForbiddenPage() {
             }}
             leftIcon={<LogIn className="w-4 h-4" />}
           >
-            重新登录
+            Sign In Again
           </Button>
         </div>
 
         <div className="mt-5 text-[11px] text-foreground-muted">
-          也可以先回到 <Link className="text-brand-500 hover:underline" href="/">控制台首页</Link>，或确认后端配置的管理员白名单（`Security.AdminEmails`）。
+          You can also go back to the <Link className="text-brand-500 hover:underline" href="/">Console Home</Link>, or verify the admin whitelist in backend config (`Security.AdminEmails`).
         </div>
       </div>
     </div>

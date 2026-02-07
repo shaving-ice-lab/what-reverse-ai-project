@@ -53,11 +53,11 @@ import {
 import type { App, AppDomain, AppVersion } from "@/types/admin";
 
 const STATUS_LABELS: Record<string, string> = {
-  published: "已发布",
-  draft: "草稿",
-  deprecated: "已废弃",
-  archived: "已归档",
-  suspended: "已暂停",
+  published: "Published",
+  draft: "Draft",
+  deprecated: "Deprecated",
+  archived: "Archived",
+  suspended: "Suspended",
 };
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "destructive"> = {
@@ -69,16 +69,16 @@ const STATUS_VARIANTS: Record<string, "success" | "warning" | "secondary" | "des
 };
 
 const VERSION_STATUS_LABELS: Record<string, string> = {
-  stable: "稳定版",
-  candidate: "候选版",
-  deprecated: "已废弃",
+  stable: "Stable",
+  candidate: "Candidate",
+  deprecated: "Deprecated",
 };
 
 const DOMAIN_STATUS_LABELS: Record<string, string> = {
-  verified: "已验证",
-  active: "已启用",
-  pending: "待验证",
-  blocked: "已拦截",
+  verified: "Verified",
+  active: "Active",
+  pending: "Pending",
+  blocked: "Blocked",
 };
 
 function getParamId(params: ReturnType<typeof useParams>) {
@@ -98,8 +98,8 @@ const mockReviews: Array<{
   notes: string;
   created_at: string;
 }> = [
-  { id: "rev-1", reviewer_id: "user-1", reviewer_email: "reviewer@agentflow.ai", decision: "approved", notes: "符合上架要求", created_at: "2026-01-15T08:00:00Z" },
-  { id: "rev-2", reviewer_id: "user-2", reviewer_email: "admin@agentflow.ai", decision: "pending", notes: "等待补充文档", created_at: "2026-02-01T08:00:00Z" },
+  { id: "rev-1", reviewer_id: "user-1", reviewer_email: "reviewer@agentflow.ai", decision: "approved", notes: "Meets listing requirements", created_at: "2026-01-15T08:00:00Z" },
+  { id: "rev-2", reviewer_id: "user-2", reviewer_email: "admin@agentflow.ai", decision: "pending", notes: "Awaiting additional documentation", created_at: "2026-02-01T08:00:00Z" },
 ];
 
 const mockRatings = {
@@ -191,33 +191,33 @@ export default function AppDetailPage() {
   const rollbackVersionMutation = useMutation({
     mutationFn: (versionId: string) => adminApi.apps.rollbackVersion(appId, versionId, { reason: rollbackReason }),
     onSuccess: () => {
-      toast.success("版本已回滚");
+      toast.success("Version rolled back");
       setRollbackVersionOpen(null);
       setRollbackReason("");
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("回滚失败"),
+    onError: () => toast.error("Rollback failed"),
   });
 
   const promoteVersionMutation = useMutation({
     mutationFn: (versionId: string) => adminApi.apps.promoteVersion(appId, versionId, { target_status: "stable" }),
     onSuccess: () => {
-      toast.success("版本已提升为稳定版");
+      toast.success("Version promoted to stable");
       setPromoteVersionOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("提升失败"),
+    onError: () => toast.error("Promotion failed"),
   });
 
   const submitReviewMutation = useMutation({
     mutationFn: () => adminApi.apps.submitReview(appId, { decision: reviewDecision, notes: reviewNotes }),
     onSuccess: () => {
-      toast.success(`审核${reviewDecision === "approved" ? "通过" : "拒绝"}已提交`);
+      toast.success(`Review ${reviewDecision === "approved" ? "approval" : "rejection"} submitted`);
       setSubmitReviewOpen(false);
       setReviewNotes("");
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("提交审核失败"),
+    onError: () => toast.error("Failed to submit review"),
   });
 
   const updatePolicyMutation = useMutation({
@@ -226,48 +226,48 @@ export default function AppDetailPage() {
       require_captcha: policyRequireCaptcha,
     }),
     onSuccess: () => {
-      toast.success("访问策略已更新");
+      toast.success("Access policy updated");
       setUpdatePolicyOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const addDomainMutation = useMutation({
     mutationFn: () => adminApi.apps.addDomain(appId, { domain: newDomain }),
     onSuccess: () => {
-      toast.success("域名已添加");
+      toast.success("Domain added");
       setAddDomainOpen(false);
       setNewDomain("");
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("添加域名失败"),
+    onError: () => toast.error("Failed to add domain"),
   });
 
   const removeDomainMutation = useMutation({
     mutationFn: (domainId: string) => adminApi.apps.removeDomain(appId, domainId),
     onSuccess: () => {
-      toast.success("域名已移除");
+      toast.success("Domain removed");
       setRemoveDomainOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "apps"] });
     },
-    onError: () => toast.error("移除失败"),
+    onError: () => toast.error("Removal failed"),
   });
 
   const retryWebhookMutation = useMutation({
     mutationFn: ({ webhookId, logId }: { webhookId: string; logId: string }) =>
       adminApi.apps.retryWebhook(appId, webhookId, logId),
     onSuccess: () => {
-      toast.success("Webhook 已重试");
+      toast.success("Webhook retried");
       setRetryWebhookOpen(null);
     },
-    onError: () => toast.error("重试失败"),
+    onError: () => toast.error("Retry failed"),
   });
 
   if (!appId) {
     return (
       <PageContainer>
-        <PageHeader title="应用详情" description="无效的应用 ID" icon={<Activity className="w-4 h-4" />} />
+        <PageHeader title="App Details" description="Invalid app ID" icon={<Activity className="w-4 h-4" />} />
       </PageContainer>
     );
   }
@@ -278,17 +278,17 @@ export default function AppDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={app?.name || "应用详情"}
+        title={app?.name || "App Details"}
         description={
           app
             ? `${app.slug} · ${app.id}`
             : localMode
-            ? "未找到对应的本地应用数据"
-            : "正在加载应用数据..."
+            ? "Local app data not found"
+            : "Loading app data..."
         }
         icon={<Activity className="w-4 h-4" />}
         backHref="/apps"
-        backLabel="返回应用列表"
+        backLabel="Back to App List"
         badge={
           app ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -300,11 +300,11 @@ export default function AppDetailPage() {
               </Badge>
               {app.published_at ? (
                 <Badge variant="secondary" size="sm">
-                  已发布
+                  Published
                 </Badge>
               ) : (
                 <Badge variant="warning" size="sm">
-                  未发布
+                  Unpublished
                 </Badge>
               )}
             </div>
@@ -313,10 +313,10 @@ export default function AppDetailPage() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setSubmitReviewOpen(true)}>
-              提交审核
+              Submit Review
             </Button>
             <Button size="sm" disabled>
-              下架应用
+              Unpublish App
             </Button>
           </div>
         }
@@ -326,20 +326,20 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={Boolean(rollbackVersionOpen)}
         onOpenChange={(open) => !open && setRollbackVersionOpen(null)}
-        title="回滚版本"
-        description="确认要将应用回滚到此版本吗？"
-        confirmLabel="确认回滚"
+        title="Rollback Version"
+        description="Are you sure you want to rollback the app to this version?"
+        confirmLabel="Confirm Rollback"
         onConfirm={() => rollbackVersionOpen && rollbackVersionMutation.mutate(rollbackVersionOpen)}
         isLoading={rollbackVersionMutation.isPending}
         variant="warning"
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">回滚原因（必填）</label>
+            <label className="text-[12px] text-foreground">Rollback Reason (required)</label>
             <Input
               value={rollbackReason}
               onChange={(e) => setRollbackReason(e.target.value)}
-              placeholder="请输入回滚原因..."
+              placeholder="Enter rollback reason..."
             />
           </div>
         </div>
@@ -348,9 +348,9 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={Boolean(promoteVersionOpen)}
         onOpenChange={(open) => !open && setPromoteVersionOpen(null)}
-        title="提升版本"
-        description="将此版本提升为稳定版本。"
-        confirmLabel="确认提升"
+        title="Promote Version"
+        description="Promote this version to stable."
+        confirmLabel="Confirm Promotion"
         onConfirm={() => promoteVersionOpen && promoteVersionMutation.mutate(promoteVersionOpen)}
         isLoading={promoteVersionMutation.isPending}
       />
@@ -358,16 +358,16 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={submitReviewOpen}
         onOpenChange={setSubmitReviewOpen}
-        title="提交上架审核"
-        description="对该应用的市场上架申请进行审核。"
-        confirmLabel="提交审核"
+        title="Submit Listing Review"
+        description="Review this app's marketplace listing application."
+        confirmLabel="Submit Review"
         onConfirm={() => submitReviewMutation.mutate()}
         isLoading={submitReviewMutation.isPending}
         variant={reviewDecision === "rejected" ? "danger" : "default"}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">审核决定</label>
+            <label className="text-[12px] text-foreground">Review Decision</label>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -376,7 +376,7 @@ export default function AppDetailPage() {
                 onClick={() => setReviewDecision("approved")}
               >
                 <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                通过
+                Approve
               </Button>
               <Button
                 type="button"
@@ -385,16 +385,16 @@ export default function AppDetailPage() {
                 onClick={() => setReviewDecision("rejected")}
               >
                 <XCircle className="w-3.5 h-3.5 mr-1" />
-                拒绝
+                Reject
               </Button>
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">审核备注</label>
+            <label className="text-[12px] text-foreground">Review Notes</label>
             <Input
               value={reviewNotes}
               onChange={(e) => setReviewNotes(e.target.value)}
-              placeholder="请输入审核备注..."
+              placeholder="Enter review notes..."
             />
           </div>
         </div>
@@ -403,15 +403,15 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={updatePolicyOpen}
         onOpenChange={setUpdatePolicyOpen}
-        title="更新访问策略"
-        description="配置应用的访问控制策略。"
-        confirmLabel="保存"
+        title="Update Access Policy"
+        description="Configure the app's access control policy."
+        confirmLabel="Save"
         onConfirm={() => updatePolicyMutation.mutate()}
         isLoading={updatePolicyMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">访问模式</label>
+            <label className="text-[12px] text-foreground">Access Mode</label>
             <div className="flex gap-2">
               {["public", "private", "restricted"].map((mode) => (
                 <Button
@@ -421,15 +421,15 @@ export default function AppDetailPage() {
                   size="sm"
                   onClick={() => setPolicyAccessMode(mode)}
                 >
-                  {mode === "public" ? "公开" : mode === "private" ? "私有" : "受限"}
+                  {mode === "public" ? "Public" : mode === "private" ? "Private" : "Restricted"}
                 </Button>
               ))}
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[12px] text-foreground">验证码保护</div>
-              <div className="text-[11px] text-foreground-muted">访问时需要验证码</div>
+              <div className="text-[12px] text-foreground">CAPTCHA Protection</div>
+              <div className="text-[11px] text-foreground-muted">Requires CAPTCHA on access</div>
             </div>
             <Switch
               checked={policyRequireCaptcha}
@@ -442,15 +442,15 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={addDomainOpen}
         onOpenChange={setAddDomainOpen}
-        title="添加域名"
-        description="为应用绑定自定义域名。"
-        confirmLabel="添加"
+        title="Add Domain"
+        description="Bind a custom domain to this app."
+        confirmLabel="Add"
         onConfirm={() => addDomainMutation.mutate()}
         isLoading={addDomainMutation.isPending}
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">域名</label>
+            <label className="text-[12px] text-foreground">Domain</label>
             <Input
               value={newDomain}
               onChange={(e) => setNewDomain(e.target.value)}
@@ -463,9 +463,9 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={Boolean(removeDomainOpen)}
         onOpenChange={(open) => !open && setRemoveDomainOpen(null)}
-        title="移除域名"
-        description="确认要移除该域名绑定吗？"
-        confirmLabel="确认移除"
+        title="Remove Domain"
+        description="Are you sure you want to remove this domain binding?"
+        confirmLabel="Confirm Removal"
         onConfirm={() => removeDomainOpen && removeDomainMutation.mutate(removeDomainOpen)}
         isLoading={removeDomainMutation.isPending}
         variant="danger"
@@ -474,28 +474,28 @@ export default function AppDetailPage() {
       <ConfirmDialog
         open={Boolean(retryWebhookOpen)}
         onOpenChange={(open) => !open && setRetryWebhookOpen(null)}
-        title="重试 Webhook"
-        description="重新发送此 Webhook 投递。"
-        confirmLabel="确认重试"
+        title="Retry Webhook"
+        description="Resend this webhook delivery."
+        confirmLabel="Confirm Retry"
         onConfirm={() => retryWebhookOpen && retryWebhookMutation.mutate(retryWebhookOpen)}
         isLoading={retryWebhookMutation.isPending}
       />
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-        <SettingsSection title="基础信息" description="应用元数据与归属信息。">
+        <SettingsSection title="Basic Information" description="App metadata and ownership.">
           {!app ? (
             <div className="text-[12px] text-foreground-muted">
-              {appQuery.isPending && !localMode ? "正在加载..." : "暂无应用数据"}
+              {appQuery.isPending && !localMode ? "Loading..." : "No app data available"}
             </div>
           ) : (
             <div className="space-y-1">
-              <FormRow label="应用 ID" description="系统唯一标识">
+              <FormRow label="App ID" description="System unique identifier">
                 <div className="text-[12px] text-foreground">{app.id}</div>
               </FormRow>
-              <FormRow label="Slug" description="应用访问标识">
+              <FormRow label="Slug" description="App access identifier">
                 <div className="text-[12px] text-foreground-light">{app.slug}</div>
               </FormRow>
-              <FormRow label="所属 Workspace" description="应用归属工作空间">
+              <FormRow label="Workspace" description="App's parent workspace">
                 <Link
                   href={`/workspaces/${app.workspace_id}`}
                   className="text-[12px] text-foreground hover:text-brand-500 transition-colors"
@@ -503,7 +503,7 @@ export default function AppDetailPage() {
                   {app.workspace?.name || app.workspace_id}
                 </Link>
               </FormRow>
-              <FormRow label="Owner" description="应用负责人">
+              <FormRow label="Owner" description="App owner">
                 <Link
                   href={`/users/${app.owner_user_id}`}
                   className="text-[12px] text-foreground hover:text-brand-500 transition-colors"
@@ -511,15 +511,15 @@ export default function AppDetailPage() {
                   {app.owner?.email || app.owner_user_id}
                 </Link>
               </FormRow>
-              <FormRow label="状态" description="当前发布状态">
+              <FormRow label="Status" description="Current publish status">
                 <Badge variant={statusVariant} size="sm">
                   {statusLabel}
                 </Badge>
               </FormRow>
-              <FormRow label="定价模型" description="应用计费方式">
+              <FormRow label="Pricing Model" description="App billing method">
                 <div className="text-[12px] text-foreground-light">{app.pricing_type}</div>
               </FormRow>
-              <FormRow label="发布时间" description="首次发布上线时间">
+              <FormRow label="Published At" description="First publish date">
                 <div className="text-[12px] text-foreground-light">
                   {app.published_at ? formatDate(app.published_at) : "-"}
                 </div>
@@ -530,8 +530,8 @@ export default function AppDetailPage() {
 
         {/* Market Ratings */}
         <SettingsSection
-          title="市场评分"
-          description="用户评价与评分分布。"
+          title="Market Ratings"
+          description="User reviews and rating distribution."
           icon={<Star className="w-4 h-4" />}
         >
           <div className="space-y-4">
@@ -552,7 +552,7 @@ export default function AppDetailPage() {
                   ))}
                 </div>
                 <div className="text-[11px] text-foreground-muted mt-1">
-                  {mockRatings.total_reviews} 条评价
+                  {mockRatings.total_reviews} reviews
                 </div>
               </div>
             </div>
@@ -581,21 +581,21 @@ export default function AppDetailPage() {
 
       {/* Version Management */}
       <SettingsSection
-        title="版本与发布流程"
-        description="应用版本管理与发布状态。"
+        title="Versions & Release Pipeline"
+        description="App version management and release status."
         icon={<History className="w-4 h-4" />}
       >
         {versions.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无版本记录</div>
+          <div className="text-[12px] text-foreground-muted">No version records</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>版本</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>说明</TableHead>
-                <TableHead>发布时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Version</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Notes</TableHead>
+                <TableHead>Released</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -605,8 +605,8 @@ export default function AppDetailPage() {
                 const statusLabel = rawStatus
                   ? VERSION_STATUS_LABELS[rawStatus] || rawStatus
                   : isCurrent
-                  ? "当前版本"
-                  : "历史版本";
+                  ? "Current"
+                  : "Historical";
                 const statusVariant =
                   rawStatus === "stable"
                     ? "success"
@@ -646,7 +646,7 @@ export default function AppDetailPage() {
                             size="sm"
                             onClick={() => setPromoteVersionOpen(version.id)}
                           >
-                            提升
+                            Promote
                           </Button>
                         )}
                         {!isCurrent && (
@@ -655,7 +655,7 @@ export default function AppDetailPage() {
                             size="sm"
                             onClick={() => setRollbackVersionOpen(version.id)}
                           >
-                            回滚
+                            Rollback
                           </Button>
                         )}
                       </div>
@@ -670,17 +670,17 @@ export default function AppDetailPage() {
 
       {/* Market Review */}
       <SettingsSection
-        title="市场上架审核"
-        description="应用上架审核记录与决策。"
+        title="Marketplace Listing Review"
+        description="App listing review records and decisions."
         icon={<Shield className="w-4 h-4" />}
         footer={
           <Button variant="outline" size="sm" onClick={() => setSubmitReviewOpen(true)}>
-            新增审核
+            New Review
           </Button>
         }
       >
         {mockReviews.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无审核记录</div>
+          <div className="text-[12px] text-foreground-muted">No review records</div>
         ) : (
           <div className="space-y-3">
             {mockReviews.map((review) => (
@@ -697,7 +697,7 @@ export default function AppDetailPage() {
                     ) : (
                       <Clock className="w-4 h-4 text-warning-400" />
                     )}
-                    {review.decision === "approved" ? "通过" : review.decision === "rejected" ? "拒绝" : "待审核"}
+                    {review.decision === "approved" ? "Approved" : review.decision === "rejected" ? "Rejected" : "Pending"}
                   </div>
                   <div className="text-[11px] text-foreground-light mt-1">{review.notes}</div>
                 </div>
@@ -715,17 +715,17 @@ export default function AppDetailPage() {
 
       {/* Access Policy */}
       <SettingsSection
-        title="访问策略"
-        description="访问控制与安全策略配置。"
+        title="Access Policy"
+        description="Access control and security policy configuration."
         icon={<Settings className="w-4 h-4" />}
         footer={
           <Button variant="outline" size="sm" onClick={() => setUpdatePolicyOpen(true)}>
-            编辑策略
+            Edit Policy
           </Button>
         }
       >
         {!app ? (
-          <div className="text-[12px] text-foreground-muted">暂无策略数据</div>
+          <div className="text-[12px] text-foreground-muted">No policy data available</div>
         ) : localMode && policies.length > 0 ? (
           <div className="space-y-3">
             {policies.map((policy) => (
@@ -738,51 +738,51 @@ export default function AppDetailPage() {
                   <div className="text-[11px] text-foreground-light mt-1">{policy.description}</div>
                 </div>
                 <Badge variant={policy.enabled ? "success" : "secondary"} size="sm">
-                  {policy.enabled ? "启用" : "停用"}
+                  {policy.enabled ? "Enabled" : "Disabled"}
                 </Badge>
               </div>
             ))}
           </div>
         ) : accessPolicy ? (
           <div className="space-y-1">
-            <FormRow label="访问模式" description="App 的访问控制等级">
+            <FormRow label="Access Mode" description="App's access control level">
               <Badge variant="outline" size="sm">{accessPolicy.access_mode}</Badge>
             </FormRow>
-            <FormRow label="数据等级" description="默认数据分级策略">
+            <FormRow label="Data Classification" description="Default data classification policy">
               <Badge variant="secondary" size="sm">{accessPolicy.data_classification}</Badge>
             </FormRow>
-            <FormRow label="验证码" description="访问时是否强制验证码">
+            <FormRow label="CAPTCHA" description="Whether CAPTCHA is required on access">
               <Badge variant={accessPolicy.require_captcha ? "warning" : "secondary"} size="sm">
-                {accessPolicy.require_captcha ? "启用" : "关闭"}
+                {accessPolicy.require_captcha ? "Enabled" : "Disabled"}
               </Badge>
             </FormRow>
           </div>
         ) : (
-          <div className="text-[12px] text-foreground-muted">暂无访问策略</div>
+          <div className="text-[12px] text-foreground-muted">No access policy configured</div>
         )}
       </SettingsSection>
 
       {/* Domain Binding */}
       <SettingsSection
-        title="域名绑定"
-        description="自定义域名与访问入口。"
+        title="Domain Binding"
+        description="Custom domains and access endpoints."
         icon={<Globe className="w-4 h-4" />}
         footer={
           <Button variant="outline" size="sm" onClick={() => setAddDomainOpen(true)}>
-            添加域名
+            Add Domain
           </Button>
         }
       >
         {domains.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无域名配置</div>
+          <div className="text-[12px] text-foreground-muted">No domains configured</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>域名</TableHead>
-                <TableHead>状态</TableHead>
+                <TableHead>Domain</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>SSL</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -797,7 +797,7 @@ export default function AppDetailPage() {
                       </a>
                     </div>
                     {(domain as { primary?: boolean }).primary && (
-                      <Badge variant="info" size="sm" className="mt-1">主域名</Badge>
+                      <Badge variant="info" size="sm" className="mt-1">Primary</Badge>
                     )}
                   </TableCell>
                   <TableCell>
@@ -818,7 +818,7 @@ export default function AppDetailPage() {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="ghost" size="sm" disabled>
-                        验证
+                        Verify
                       </Button>
                       <Button
                         variant="ghost"
@@ -838,21 +838,21 @@ export default function AppDetailPage() {
 
       {/* Webhook Management */}
       <SettingsSection
-        title="Webhook 管理"
-        description="Webhook 配置与投递日志。"
+        title="Webhook Management"
+        description="Webhook configuration and delivery logs."
         icon={<Webhook className="w-4 h-4" />}
       >
         {mockWebhooks.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无 Webhook 配置</div>
+          <div className="text-[12px] text-foreground-muted">No webhooks configured</div>
         ) : (
           <div className="space-y-4">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>URL</TableHead>
-                  <TableHead>事件</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead>Events</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -870,7 +870,7 @@ export default function AppDetailPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={webhook.status === "active" ? "success" : "secondary"} size="sm">
-                        {webhook.status === "active" ? "活跃" : "停用"}
+                        {webhook.status === "active" ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -879,7 +879,7 @@ export default function AppDetailPage() {
                         size="sm"
                         onClick={() => setViewWebhookLogsOpen(webhook.id)}
                       >
-                        查看日志
+                        View Logs
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -890,19 +890,19 @@ export default function AppDetailPage() {
             {viewWebhookLogsOpen && (
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-[12px] font-medium text-foreground">投递日志</div>
+                  <div className="text-[12px] font-medium text-foreground">Delivery Logs</div>
                   <Button variant="ghost" size="sm" onClick={() => setViewWebhookLogsOpen(null)}>
-                    关闭
+                    Close
                   </Button>
                 </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>事件</TableHead>
-                      <TableHead>状态码</TableHead>
-                      <TableHead>响应时间</TableHead>
-                      <TableHead>时间</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead>Event</TableHead>
+                      <TableHead>Status Code</TableHead>
+                      <TableHead>Response Time</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -931,7 +931,7 @@ export default function AppDetailPage() {
                               onClick={() => setRetryWebhookOpen({ webhookId: viewWebhookLogsOpen, logId: log.id })}
                             >
                               <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                              重试
+                              Retry
                             </Button>
                           )}
                         </TableCell>

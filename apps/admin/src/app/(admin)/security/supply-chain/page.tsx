@@ -99,11 +99,11 @@ const mockScanResults = {
 
 const SEVERITY_OPTIONS = ["all", "critical", "high", "medium", "low"] as const;
 const SEVERITY_LABELS: Record<string, string> = {
-  all: "全部",
-  critical: "严重",
-  high: "高",
-  medium: "中",
-  low: "低",
+  all: "All",
+  critical: "Critical",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
 };
 
 const SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary" | "info"> = {
@@ -152,10 +152,10 @@ export default function SupplyChainPage() {
       return adminApi.security.supplyChain.triggerScan();
     },
     onSuccess: () => {
-      toast.success("扫描已启动");
+      toast.success("Scan started");
       queryClient.invalidateQueries({ queryKey: ["admin", "security", "supply-chain"] });
     },
-    onError: () => toast.error("启动扫描失败"),
+    onError: () => toast.error("Failed to start scan"),
   });
 
   const dismissMutation = useMutation({
@@ -169,12 +169,12 @@ export default function SupplyChainPage() {
       });
     },
     onSuccess: () => {
-      toast.success("漏洞已忽略");
+      toast.success("Vulnerability dismissed");
       setDismissOpen(null);
       setDismissReason("");
       queryClient.invalidateQueries({ queryKey: ["admin", "security", "supply-chain"] });
     },
-    onError: () => toast.error("操作失败"),
+    onError: () => toast.error("Operation failed"),
   });
 
   const highSeverityCount = scanResults.items.filter((item) => item.severity === "high" || item.severity === "critical").length;
@@ -182,11 +182,11 @@ export default function SupplyChainPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="供应链扫描"
-        description="检测和管理依赖项中的安全漏洞。"
+        title="Supply Chain Scanning"
+        description="Detect and manage security vulnerabilities in dependencies."
         icon={<Box className="w-4 h-4" />}
         backHref="/security"
-        backLabel="返回安全概览"
+        backLabel="Back to Security Overview"
         actions={
           <Button
             variant="outline"
@@ -195,21 +195,21 @@ export default function SupplyChainPage() {
             loading={triggerScanMutation.isPending}
           >
             <RefreshCw className="w-3.5 h-3.5 mr-1" />
-            重新扫描
+            Rescan
           </Button>
         }
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="总依赖项"
+          title="Total Dependencies"
           value={scanResults.summary.total_dependencies.toString()}
-          subtitle="个包"
+          subtitle="packages"
         />
         <StatsCard
-          title="漏洞数"
+          title="Vulnerabilities"
           value={scanResults.summary.vulnerable.toString()}
-          subtitle="个漏洞"
+          subtitle="found"
           trend={
             scanResults.summary.vulnerable > 0
               ? { value: scanResults.summary.vulnerable, isPositive: false }
@@ -217,34 +217,34 @@ export default function SupplyChainPage() {
           }
         />
         <StatsCard
-          title="高危漏洞"
+          title="High Severity"
           value={highSeverityCount.toString()}
-          subtitle="需立即处理"
+          subtitle="needs immediate action"
         />
         <StatsCard
-          title="最近扫描"
+          title="Last Scan"
           value={formatRelativeTime(scanResults.summary.last_scan)}
-          subtitle="上次更新"
+          subtitle="last updated"
         />
       </div>
 
       <SettingsSection
-        title="漏洞列表"
-        description="检测到的依赖项安全漏洞。"
+        title="Vulnerability List"
+        description="Detected dependency security vulnerabilities."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索包名或 CVE"
+              placeholder="Search package name or CVE"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">严重性</span>
+            <span className="text-[11px] text-foreground-muted">Severity</span>
             <select
               value={severityFilter}
               onChange={(e) => setSeverityFilter(e.target.value as typeof severityFilter)}
@@ -258,20 +258,20 @@ export default function SupplyChainPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredItems.length} 个漏洞
+            {filteredItems.length} vulnerabilities
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>包名</TableHead>
-              <TableHead>当前版本</TableHead>
-              <TableHead>推荐版本</TableHead>
+              <TableHead>Package</TableHead>
+              <TableHead>Current Version</TableHead>
+              <TableHead>Recommended Version</TableHead>
               <TableHead>CVE</TableHead>
-              <TableHead>严重性</TableHead>
-              <TableHead>描述</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Severity</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -283,7 +283,7 @@ export default function SupplyChainPage() {
                 >
                   <div className="flex flex-col items-center gap-2">
                     <CheckCircle className="w-8 h-8 text-brand-500" />
-                    <span>未检测到漏洞</span>
+                    <span>No vulnerabilities detected</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -320,7 +320,7 @@ export default function SupplyChainPage() {
                     <div className="flex items-center justify-end gap-1">
                       {vuln.fix_available && (
                         <Button variant="ghost" size="sm" disabled>
-                          升级
+                          Upgrade
                         </Button>
                       )}
                       <Button
@@ -331,7 +331,7 @@ export default function SupplyChainPage() {
                           setDismissReason("");
                         }}
                       >
-                        忽略
+                        Dismiss
                       </Button>
                     </div>
                   </TableCell>
@@ -346,20 +346,20 @@ export default function SupplyChainPage() {
       <ConfirmDialog
         open={Boolean(dismissOpen)}
         onOpenChange={(open) => !open && setDismissOpen(null)}
-        title="忽略漏洞"
-        description={`确认要忽略 ${dismissOpen?.package_name} 的漏洞吗？`}
-        confirmLabel="确认忽略"
+        title="Dismiss Vulnerability"
+        description={`Are you sure you want to dismiss the vulnerability for ${dismissOpen?.package_name}?`}
+        confirmLabel="Confirm Dismiss"
         onConfirm={() => dismissMutation.mutate()}
         isLoading={dismissMutation.isPending}
         variant="warning"
       >
         <div className="space-y-4 py-2">
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">忽略原因（必填）</label>
+            <label className="text-[12px] text-foreground">Dismiss Reason (required)</label>
             <Input
               value={dismissReason}
               onChange={(e) => setDismissReason(e.target.value)}
-              placeholder="请输入忽略原因..."
+              placeholder="Enter dismiss reason..."
             />
           </div>
         </div>

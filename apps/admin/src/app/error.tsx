@@ -22,17 +22,17 @@ export default function GlobalError({ error, reset }: ErrorProps) {
           <AlertTriangle className="w-6 h-6 text-destructive" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-foreground">系统出现异常</h1>
+          <h1 className="text-lg font-semibold text-foreground">System Error</h1>
           <p className="text-[12px] text-foreground-light mt-2">
-            我们已记录此错误，请稍后重试或返回首页。
+            This error has been logged. Please try again later or return to the homepage.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3">
           <Button variant="outline" onClick={reset}>
-            重试
+            Retry
           </Button>
           <Link href="/">
-            <Button>返回控制台</Button>
+            <Button>Back to Console</Button>
           </Link>
         </div>
       </div>

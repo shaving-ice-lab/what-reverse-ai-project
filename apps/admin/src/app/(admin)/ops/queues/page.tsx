@@ -39,12 +39,12 @@ const QUEUE_OPTIONS = [
 const PAGE_SIZES = [10, 20, 50];
 
 const STATE_LABELS: Record<string, string> = {
-  "1": "处理中",
-  "2": "待处理",
-  "3": "已计划",
-  "4": "重试中",
-  "5": "已归档",
-  "6": "聚合中",
+  "1": "Processing",
+  "2": "Pending",
+  "3": "Scheduled",
+  "4": "Retrying",
+  "5": "Archived",
+  "6": "Aggregating",
 };
 
 const isZeroTime = (value?: string) =>
@@ -98,31 +98,31 @@ export default function DeadQueuePage() {
 
   const retryMutation = useMutation({
     mutationFn: async (task: DeadTask) => {
-      if (!task.id) throw new Error("任务 ID 无效");
+      if (!task.id) throw new Error("Invalid task ID");
       return opsApi.retryDeadTask(queue, task.id);
     },
     onSuccess: () => {
-      toast.success("任务已重试");
+      toast.success("Task retried");
       queryClient.invalidateQueries({ queryKey: ["ops", "dead-tasks"] });
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "重试失败");
+      toast.error(error instanceof Error ? error.message : "Retry failed");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (task: DeadTask) => {
-      if (!task.id) throw new Error("任务 ID 无效");
+      if (!task.id) throw new Error("Invalid task ID");
       return opsApi.deleteDeadTask(queue, task.id);
     },
     onSuccess: () => {
-      toast.success("任务已删除");
+      toast.success("Task deleted");
       queryClient.invalidateQueries({ queryKey: ["ops", "dead-tasks"] });
       setConfirmOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "删除失败");
+      toast.error(error instanceof Error ? error.message : "Deletion failed");
     },
   });
 
@@ -145,8 +145,8 @@ export default function DeadQueuePage() {
   return (
     <PageContainer>
       <PageHeader
-        title="死信队列"
-        description="查看失败任务并执行重试或删除。"
+        title="Dead Letter Queue"
+        description="View failed tasks and retry or delete them."
         icon={<AlertTriangle className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -154,12 +154,12 @@ export default function DeadQueuePage() {
               variant="outline"
               size="sm"
               loading={listQuery.isFetching}
-              loadingText="刷新中..."
+              loadingText="Refreshing..."
               leftIcon={<RefreshCcw className="w-4 h-4" />}
               onClick={() => listQuery.refetch()}
               disabled={localMode}
             >
-              刷新
+              Refresh
             </Button>
             <Badge variant="outline" size="sm">
               {queue}
@@ -168,10 +168,10 @@ export default function DeadQueuePage() {
         }
       />
 
-      <SettingsSection title="队列任务" description="筛选与查看死信队列任务。">
+      <SettingsSection title="Queue Tasks" description="Filter and view dead letter queue tasks.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">队列</span>
+            <span className="text-[11px] text-foreground-muted">Queue</span>
             <select
               value={queue}
               onChange={(event) => setQueue(event.target.value)}
@@ -186,7 +186,7 @@ export default function DeadQueuePage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">每页</span>
+            <span className="text-[11px] text-foreground-muted">Per Page</span>
             <select
               value={pageSize}
               onChange={(event) => setPageSize(Number(event.target.value))}
@@ -201,7 +201,7 @@ export default function DeadQueuePage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {tasks.length} 条
+            {tasks.length} total
           </Badge>
           <div className="ml-auto flex items-center gap-2">
             <Button
@@ -210,10 +210,10 @@ export default function DeadQueuePage() {
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               disabled={!canPrev || localMode}
             >
-              上一页
+              Previous
             </Button>
             <Badge variant="secondary" size="sm">
-              第 {page} 页
+              Page {page}
             </Badge>
             <Button
               variant="outline"
@@ -221,7 +221,7 @@ export default function DeadQueuePage() {
               onClick={() => setPage((prev) => prev + 1)}
               disabled={!canNext || localMode}
             >
-              下一页
+              Next
             </Button>
           </div>
         </div>
@@ -229,27 +229,27 @@ export default function DeadQueuePage() {
         {localMode ? (
           <EmptyState
             icon={<AlertTriangle className="w-5 h-5" />}
-            title="本地模式未接入队列"
-            description="请连接服务端后查看死信队列数据。"
+            title="Queue not connected in local mode"
+            description="Please connect to the server to view dead letter queue data."
           />
         ) : listQuery.isPending ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : tasks.length === 0 ? (
           <EmptyState
             icon={<AlertTriangle className="w-5 h-5" />}
-            title="暂无死信任务"
-            description="当前队列没有失败任务。"
+            title="No Dead Letter Tasks"
+            description="No failed tasks in the current queue."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>任务</TableHead>
-                <TableHead>重试</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>上次失败</TableHead>
-                <TableHead>错误摘要</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>Task</TableHead>
+                <TableHead>Retries</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Last Failed</TableHead>
+                <TableHead>Error Summary</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -278,7 +278,7 @@ export default function DeadQueuePage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary" size="sm">
-                      {STATE_LABELS[task.state || ""] || task.state || "未知"}
+                      {STATE_LABELS[task.state || ""] || task.state || "Unknown"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -295,7 +295,7 @@ export default function DeadQueuePage() {
                         leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
                         onClick={() => openConfirm(task, "retry")}
                       >
-                        重试
+                        Retry
                       </Button>
                       <Button
                         variant="destructive-fill"
@@ -303,7 +303,7 @@ export default function DeadQueuePage() {
                         leftIcon={<Trash2 className="w-3.5 h-3.5" />}
                         onClick={() => openConfirm(task, "delete")}
                       >
-                        删除
+                        Delete
                       </Button>
                     </div>
                   </TableCell>
@@ -320,16 +320,16 @@ export default function DeadQueuePage() {
         type={actionType === "delete" ? "error" : "warning"}
         title={
           actionType === "delete"
-            ? "确认删除该任务？"
-            : "确认重试该任务？"
+            ? "Confirm deletion of this task?"
+            : "Confirm retry of this task?"
         }
         description={
           selectedTask
-            ? `${selectedTask.type || "未知任务"} · ${selectedTask.id}`
-            : "请选择任务"
+            ? `${selectedTask.type || "Unknown task"} · ${selectedTask.id}`
+            : "Please select a task"
         }
-        confirmText={actionType === "delete" ? "删除" : "重试"}
-        cancelText="取消"
+        confirmText={actionType === "delete" ? "Delete" : "Retry"}
+        cancelText="Cancel"
         loading={retryMutation.isPending || deleteMutation.isPending}
         onConfirm={() => {
           if (!selectedTask || !actionType) return;

@@ -26,36 +26,36 @@ import type { OpsSop } from "@/types/ops";
 const LOCAL_SOPS: OpsSop[] = [
   {
     key: "ops-support-sops",
-    title: "支持与运维 SOP",
-    summary: "客服、故障排查与应急处理流程。",
+    title: "Support & Ops SOP",
+    summary: "Customer service, troubleshooting, and incident response procedures.",
     severity: "P2",
     owners: ["support"],
     triggers: [],
     preconditions: [],
     steps: [],
-    references: [{ label: "文档", target: "docs/operations/OPS-SUPPORT-SOPS.md" }],
+    references: [{ label: "Docs", target: "docs/operations/OPS-SUPPORT-SOPS.md" }],
   },
   {
     key: "sql-schema-index",
-    title: "SQL Schema 与索引规范",
-    summary: "数据库索引与约束约定。",
+    title: "SQL Schema & Index Standards",
+    summary: "Database index and constraint conventions.",
     severity: "P2",
     owners: ["database"],
     triggers: [],
     preconditions: [],
     steps: [],
-    references: [{ label: "文档", target: "docs/operations/SQL-SCHEMA-INDEX-CONSTRAINTS.md" }],
+    references: [{ label: "Docs", target: "docs/operations/SQL-SCHEMA-INDEX-CONSTRAINTS.md" }],
   },
   {
     key: "test-case-template",
-    title: "测试用例模板",
-    summary: "测试与验收用例参考模板。",
+    title: "Test Case Template",
+    summary: "Reference templates for test and acceptance cases.",
     severity: "P3",
     owners: ["qa"],
     triggers: [],
     preconditions: [],
     steps: [],
-    references: [{ label: "文档", target: "docs/operations/TEST-CASE-TEMPLATES.md" }],
+    references: [{ label: "Docs", target: "docs/operations/TEST-CASE-TEMPLATES.md" }],
   },
 ];
 
@@ -83,34 +83,34 @@ export default function OpsSopsPage() {
   const handleCopy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
-      toast.success("已复制 SOP 标识");
+      toast.success("SOP identifier copied");
     } catch {
-      toast.error("复制失败，请手动复制");
+      toast.error("Copy failed, please copy manually");
     }
   };
 
   return (
     <PageContainer>
       <PageHeader
-        title="运维 SOP 文档"
-        description="集中查看运维与支持 SOP 文档入口。"
+        title="Ops SOP Documents"
+        description="Centralized access to ops and support SOP documents."
         icon={<BookOpen className="w-4 h-4" />}
       />
 
-      <SettingsSection title="SOP 文档目录" description="按需查看运维 SOP 的关键信息与标识。">
+      <SettingsSection title="SOP Document Directory" description="View key information and identifiers for ops SOPs.">
         {hasError ? (
-          <EmptyState title="加载失败" description="无法获取 SOP 列表，请检查服务或权限。" />
+          <EmptyState title="Load Failed" description="Unable to fetch SOP list. Please check the service or permissions." />
         ) : sops.length === 0 && !isLoading ? (
-          <EmptyState title="暂无 SOP 文档" description="未配置任何运维 SOP 文档。" />
+          <EmptyState title="No SOP Documents" description="No ops SOP documents have been configured." />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>SOP</TableHead>
-                <TableHead>级别</TableHead>
+                <TableHead>Severity</TableHead>
                 <TableHead>Owner</TableHead>
                 <TableHead>Key</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,7 +120,7 @@ export default function OpsSopsPage() {
                     colSpan={5}
                     className="py-10 text-center text-[12px] text-foreground-muted"
                   >
-                    正在加载...
+                    Loading...
                   </TableCell>
                 </TableRow>
               ) : (
@@ -133,7 +133,7 @@ export default function OpsSopsPage() {
                           {sop.title}
                         </div>
                         <div className="text-[11px] text-foreground-muted">
-                          {sop.summary || "暂无摘要"}
+                          {sop.summary || "No summary"}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -154,7 +154,7 @@ export default function OpsSopsPage() {
                           leftIcon={<Copy className="w-4 h-4" />}
                           onClick={() => handleCopy(copyValue)}
                         >
-                          复制标识
+                          Copy ID
                         </Button>
                       </TableCell>
                     </TableRow>

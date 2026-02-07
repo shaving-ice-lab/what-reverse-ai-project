@@ -50,25 +50,25 @@ const mockComplianceStatus = {
     { id: "iso27001", name: "ISO 27001", status: "in_progress", score: 65, last_audit: "2025-12-01T00:00:00Z", controls_passed: 78, controls_total: 120 },
   ],
   recent_findings: [
-    { id: "f-1", severity: "medium", title: "缺少数据加密审计日志", framework: "SOC 2", status: "open", created_at: "2026-02-01T10:00:00Z" },
-    { id: "f-2", severity: "low", title: "访问控制策略待更新", framework: "GDPR", status: "in_progress", created_at: "2026-01-28T14:00:00Z" },
-    { id: "f-3", severity: "high", title: "敏感数据存储策略不符合 HIPAA 要求", framework: "HIPAA", status: "open", created_at: "2026-01-25T09:00:00Z" },
+    { id: "f-1", severity: "medium", title: "Missing data encryption audit logs", framework: "SOC 2", status: "open", created_at: "2026-02-01T10:00:00Z" },
+    { id: "f-2", severity: "low", title: "Access control policy needs update", framework: "GDPR", status: "in_progress", created_at: "2026-01-28T14:00:00Z" },
+    { id: "f-3", severity: "high", title: "Sensitive data storage policy does not meet HIPAA requirements", framework: "HIPAA", status: "open", created_at: "2026-01-25T09:00:00Z" },
   ],
 };
 
 const mockFrameworkControls = [
-  { id: "ctrl-1", name: "访问控制管理", status: "passed", evidence: ["access-policy.pdf"], notes: "已通过年度审核" },
-  { id: "ctrl-2", name: "数据加密要求", status: "passed", evidence: ["encryption-audit.pdf"], notes: "AES-256 加密已部署" },
-  { id: "ctrl-3", name: "日志审计要求", status: "failed", evidence: [], notes: "需要补充审计日志" },
-  { id: "ctrl-4", name: "备份与恢复", status: "passed", evidence: ["backup-test-report.pdf"], notes: "每日备份，RTO < 4小时" },
-  { id: "ctrl-5", name: "安全意识培训", status: "in_progress", evidence: [], notes: "培训计划进行中" },
+  { id: "ctrl-1", name: "Access Control Management", status: "passed", evidence: ["access-policy.pdf"], notes: "Passed annual review" },
+  { id: "ctrl-2", name: "Data Encryption Requirements", status: "passed", evidence: ["encryption-audit.pdf"], notes: "AES-256 encryption deployed" },
+  { id: "ctrl-3", name: "Log Audit Requirements", status: "failed", evidence: [], notes: "Audit logs need to be supplemented" },
+  { id: "ctrl-4", name: "Backup & Recovery", status: "passed", evidence: ["backup-test-report.pdf"], notes: "Daily backups, RTO < 4 hours" },
+  { id: "ctrl-5", name: "Security Awareness Training", status: "in_progress", evidence: [], notes: "Training plan in progress" },
 ];
 
 const STATUS_LABELS: Record<string, string> = {
-  compliant: "合规",
-  partial: "部分合规",
-  in_progress: "审核中",
-  non_compliant: "不合规",
+  compliant: "Compliant",
+  partial: "Partially Compliant",
+  in_progress: "Under Review",
+  non_compliant: "Non-Compliant",
 };
 
 const STATUS_VARIANTS: Record<string, "success" | "warning" | "info" | "destructive"> = {
@@ -79,10 +79,10 @@ const STATUS_VARIANTS: Record<string, "success" | "warning" | "info" | "destruct
 };
 
 const CONTROL_STATUS_LABELS: Record<string, string> = {
-  passed: "通过",
-  failed: "未通过",
-  in_progress: "进行中",
-  not_applicable: "不适用",
+  passed: "Passed",
+  failed: "Failed",
+  in_progress: "In Progress",
+  not_applicable: "N/A",
 };
 
 const FINDING_SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary"> = {
@@ -123,11 +123,11 @@ export default function CompliancePage() {
       });
     },
     onSuccess: () => {
-      toast.success("控制项已更新");
+      toast.success("Control updated");
       setEditControlOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "security", "compliance"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const openEditControl = (control: Control) => {
@@ -139,43 +139,43 @@ export default function CompliancePage() {
   return (
     <PageContainer>
       <PageHeader
-        title="合规视图"
-        description="查看和管理合规框架状态与控制项。"
+        title="Compliance Overview"
+        description="View and manage compliance framework status and controls."
         icon={<Shield className="w-4 h-4" />}
         backHref="/security"
-        backLabel="返回安全概览"
+        backLabel="Back to Security Overview"
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="合规分数"
+          title="Compliance Score"
           value={`${complianceStatus.overall_score}%`}
-          subtitle="总体评分"
+          subtitle="overall score"
           trend={{
             value: complianceStatus.overall_score,
             isPositive: complianceStatus.overall_score >= 80,
           }}
         />
         <StatsCard
-          title="合规框架"
+          title="Compliance Frameworks"
           value={complianceStatus.frameworks.length.toString()}
-          subtitle="个框架"
+          subtitle="frameworks"
         />
         <StatsCard
-          title="待处理发现"
+          title="Open Findings"
           value={complianceStatus.recent_findings.filter((f) => f.status === "open").length.toString()}
-          subtitle="个问题"
+          subtitle="issues"
         />
         <StatsCard
-          title="已通过控制"
+          title="Controls Passed"
           value={complianceStatus.frameworks.reduce((sum, f) => sum + f.controls_passed, 0).toString()}
-          subtitle="个控制项"
+          subtitle="controls"
         />
       </div>
 
       <SettingsSection
-        title="合规框架"
-        description="已启用的合规框架及其状态。"
+        title="Compliance Frameworks"
+        description="Enabled compliance frameworks and their status."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {complianceStatus.frameworks.map((framework) => (
@@ -191,7 +191,7 @@ export default function CompliancePage() {
                     <span className="text-[14px] font-medium text-foreground">{framework.name}</span>
                   </div>
                   <div className="text-[11px] text-foreground-muted mt-1">
-                    最近审核: {formatDate(framework.last_audit)}
+                    Last Audit: {formatDate(framework.last_audit)}
                   </div>
                 </div>
                 <Badge variant={STATUS_VARIANTS[framework.status]} size="sm">
@@ -201,7 +201,7 @@ export default function CompliancePage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-[12px]">
-                  <span className="text-foreground-muted">合规分数</span>
+                  <span className="text-foreground-muted">Compliance Score</span>
                   <span className="text-foreground font-medium">{framework.score}%</span>
                 </div>
                 <div className="h-2 bg-surface-200 rounded-full overflow-hidden">
@@ -214,7 +214,7 @@ export default function CompliancePage() {
                   />
                 </div>
                 <div className="text-[11px] text-foreground-muted">
-                  {framework.controls_passed} / {framework.controls_total} 控制项通过
+                  {framework.controls_passed} / {framework.controls_total} controls passed
                 </div>
               </div>
             </div>
@@ -223,20 +223,20 @@ export default function CompliancePage() {
       </SettingsSection>
 
       <SettingsSection
-        title="最近发现"
-        description="需要关注的合规问题。"
+        title="Recent Findings"
+        description="Compliance issues that need attention."
       >
         {complianceStatus.recent_findings.length === 0 ? (
-          <div className="text-[12px] text-foreground-muted">暂无发现</div>
+          <div className="text-[12px] text-foreground-muted">No findings</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>问题</TableHead>
-                <TableHead>框架</TableHead>
-                <TableHead>严重性</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>发现时间</TableHead>
+                <TableHead>Issue</TableHead>
+                <TableHead>Framework</TableHead>
+                <TableHead>Severity</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Discovered At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -252,7 +252,7 @@ export default function CompliancePage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={FINDING_SEVERITY_VARIANTS[finding.severity]} size="sm">
-                      {finding.severity === "high" ? "高" : finding.severity === "medium" ? "中" : "低"}
+                      {finding.severity === "high" ? "High" : finding.severity === "medium" ? "Medium" : "Low"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -260,7 +260,7 @@ export default function CompliancePage() {
                       variant={finding.status === "open" ? "warning" : finding.status === "in_progress" ? "info" : "success"}
                       size="sm"
                     >
-                      {finding.status === "open" ? "待处理" : finding.status === "in_progress" ? "处理中" : "已关闭"}
+                      {finding.status === "open" ? "Open" : finding.status === "in_progress" ? "In Progress" : "Closed"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -279,7 +279,7 @@ export default function CompliancePage() {
           <DialogHeader icon={<FileCheck className="w-6 h-6" />} iconVariant="info">
             <DialogTitle>{detailsOpen?.name}</DialogTitle>
             <DialogDescription>
-              查看和管理合规控制项状态。
+              View and manage compliance control status.
             </DialogDescription>
           </DialogHeader>
 
@@ -287,11 +287,11 @@ export default function CompliancePage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>控制项</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>证据</TableHead>
-                  <TableHead>备注</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead>Control</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Evidence</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -318,7 +318,7 @@ export default function CompliancePage() {
                     </TableCell>
                     <TableCell className="text-[11px] text-foreground-muted">
                       {control.evidence.length > 0 ? (
-                        <span>{control.evidence.length} 个文件</span>
+                        <span>{control.evidence.length} file(s)</span>
                       ) : (
                         "-"
                       )}
@@ -343,7 +343,7 @@ export default function CompliancePage() {
 
           <DialogFooter>
             <Button onClick={() => setDetailsOpen(null)}>
-              关闭
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -353,7 +353,7 @@ export default function CompliancePage() {
       <Dialog open={Boolean(editControlOpen)} onOpenChange={(open) => !open && setEditControlOpen(null)}>
         <DialogContent size="md">
           <DialogHeader icon={<Shield className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>编辑控制项</DialogTitle>
+            <DialogTitle>Edit Control</DialogTitle>
             <DialogDescription>
               {editControlOpen?.name}
             </DialogDescription>
@@ -361,7 +361,7 @@ export default function CompliancePage() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[12px] text-foreground">状态</label>
+              <label className="text-[12px] text-foreground">Status</label>
               <div className="flex flex-wrap gap-2">
                 {["passed", "failed", "in_progress", "not_applicable"].map((status) => (
                   <Button
@@ -381,27 +381,27 @@ export default function CompliancePage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">备注</label>
+              <label className="text-[12px] text-foreground">Notes</label>
               <textarea
                 value={controlNotes}
                 onChange={(e) => setControlNotes(e.target.value)}
                 rows={3}
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30"
-                placeholder="输入备注..."
+                placeholder="Enter notes..."
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditControlOpen(null)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => updateControlMutation.mutate()}
               loading={updateControlMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

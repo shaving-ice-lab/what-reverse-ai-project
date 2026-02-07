@@ -74,7 +74,7 @@ const mockWhitelist: IpWhitelistEntry[] = [
     id: "wl_001",
     ip_address: "192.168.1.0/24",
     cidr: "/24",
-    description: "公司内网",
+    description: "Company Intranet",
     type: "cidr",
     enabled: true,
     created_by: "admin@agentflow.ai",
@@ -86,7 +86,7 @@ const mockWhitelist: IpWhitelistEntry[] = [
   {
     id: "wl_002",
     ip_address: "10.0.0.100",
-    description: "运维服务器",
+    description: "Operations Server",
     type: "single",
     enabled: true,
     created_by: "ops@agentflow.ai",
@@ -99,7 +99,7 @@ const mockWhitelist: IpWhitelistEntry[] = [
     id: "wl_003",
     ip_address: "172.16.0.0/16",
     cidr: "/16",
-    description: "VPN 网段",
+    description: "VPN Subnet",
     type: "cidr",
     enabled: true,
     created_by: "admin@agentflow.ai",
@@ -111,7 +111,7 @@ const mockWhitelist: IpWhitelistEntry[] = [
   {
     id: "wl_004",
     ip_address: "203.0.113.50",
-    description: "外部审计服务器",
+    description: "External Audit Server",
     type: "single",
     enabled: false,
     created_by: "finance@agentflow.ai",
@@ -122,12 +122,12 @@ const mockWhitelist: IpWhitelistEntry[] = [
 ];
 
 const mockRegions: RegionRestriction[] = [
-  { id: "r_001", region: "CN", region_name: "中国", allowed: true, created_at: new Date().toISOString() },
-  { id: "r_002", region: "HK", region_name: "中国香港", allowed: true, created_at: new Date().toISOString() },
-  { id: "r_003", region: "TW", region_name: "中国台湾", allowed: true, created_at: new Date().toISOString() },
-  { id: "r_004", region: "SG", region_name: "新加坡", allowed: true, created_at: new Date().toISOString() },
-  { id: "r_005", region: "JP", region_name: "日本", allowed: false, created_at: new Date().toISOString() },
-  { id: "r_006", region: "US", region_name: "美国", allowed: false, created_at: new Date().toISOString() },
+  { id: "r_001", region: "CN", region_name: "China", allowed: true, created_at: new Date().toISOString() },
+  { id: "r_002", region: "HK", region_name: "Hong Kong", allowed: true, created_at: new Date().toISOString() },
+  { id: "r_003", region: "TW", region_name: "Taiwan", allowed: true, created_at: new Date().toISOString() },
+  { id: "r_004", region: "SG", region_name: "Singapore", allowed: true, created_at: new Date().toISOString() },
+  { id: "r_005", region: "JP", region_name: "Japan", allowed: false, created_at: new Date().toISOString() },
+  { id: "r_006", region: "US", region_name: "United States", allowed: false, created_at: new Date().toISOString() },
 ];
 
 export default function IpWhitelistPage() {
@@ -207,22 +207,22 @@ export default function IpWhitelistPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="IP 白名单与区域限制"
-        description="配置允许访问管理后台的 IP 地址和地区范围。"
+        title="IP Whitelist & Region Restrictions"
+        description="Configure allowed IP addresses and regions for admin panel access."
         icon={<Shield className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <Upload className="w-3.5 h-3.5 mr-1" />
-              导入
+              Import
             </Button>
             <Button variant="outline" size="sm">
               <Download className="w-3.5 h-3.5 mr-1" />
-              导出
+              Export
             </Button>
             <Button size="sm" onClick={handleOpenAddModal}>
               <Plus className="w-3.5 h-3.5 mr-1" />
-              添加 IP
+              Add IP
             </Button>
           </div>
         }
@@ -237,9 +237,9 @@ export default function IpWhitelistPage() {
                 <Shield className="w-5 h-5 text-brand-500" />
               </div>
               <div>
-                <div className="text-[13px] font-medium text-foreground">IP 白名单</div>
+                <div className="text-[13px] font-medium text-foreground">IP Whitelist</div>
                 <div className="text-[11px] text-foreground-muted">
-                  {enabledCount} 条规则已启用
+                  {enabledCount} rules enabled
                 </div>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function IpWhitelistPage() {
           {!whitelistEnabled && (
             <div className="mt-3 flex items-center gap-2 text-[11px] text-warning-600 bg-warning-500/10 rounded-md px-2 py-1.5">
               <AlertTriangle className="w-3.5 h-3.5" />
-              IP 白名单已禁用，所有 IP 均可访问
+              IP whitelist is disabled, all IPs can access
             </div>
           )}
         </Card>
@@ -263,9 +263,9 @@ export default function IpWhitelistPage() {
                 <Globe className="w-5 h-5 text-success-500" />
               </div>
               <div>
-                <div className="text-[13px] font-medium text-foreground">区域限制</div>
+                <div className="text-[13px] font-medium text-foreground">Region Restrictions</div>
                 <div className="text-[11px] text-foreground-muted">
-                  允许 {allowedRegions} 个地区访问
+                  {allowedRegions} regions allowed
                 </div>
               </div>
             </div>
@@ -277,7 +277,7 @@ export default function IpWhitelistPage() {
           {!regionEnabled && (
             <div className="mt-3 flex items-center gap-2 text-[11px] text-warning-600 bg-warning-500/10 rounded-md px-2 py-1.5">
               <AlertTriangle className="w-3.5 h-3.5" />
-              区域限制已禁用，所有地区均可访问
+              Region restrictions are disabled, all regions can access
             </div>
           )}
         </Card>
@@ -285,41 +285,41 @@ export default function IpWhitelistPage() {
 
       {/* IP Whitelist */}
       <SettingsSection
-        title="IP 白名单"
-        description="配置允许访问的 IP 地址或 CIDR 网段。"
+        title="IP Whitelist"
+        description="Configure allowed IP addresses or CIDR ranges."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索 IP 或描述"
+              placeholder="Search IP or description"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条规则
+            {total} rules total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>IP 地址/网段</TableHead>
-              <TableHead>描述</TableHead>
-              <TableHead>类型</TableHead>
-              <TableHead>匹配次数</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>IP Address/Range</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Match Count</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pagedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-[12px] text-foreground-muted">
-                  暂无 IP 白名单规则
+                  No IP whitelist rules found
                 </TableCell>
               </TableRow>
             ) : (
@@ -333,19 +333,19 @@ export default function IpWhitelistPage() {
                   <TableCell>
                     <div className="text-[12px] text-foreground">{entry.description}</div>
                     <div className="text-[11px] text-foreground-muted">
-                      由 {entry.created_by} 创建
+                      Created by {entry.created_by}
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" size="sm">
-                      {entry.type === "cidr" ? "CIDR 网段" : "单个 IP"}
+                      {entry.type === "cidr" ? "CIDR Range" : "Single IP"}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="text-[12px] text-foreground">{entry.match_count.toLocaleString()}</div>
                     {entry.last_matched_at && (
                       <div className="text-[11px] text-foreground-muted">
-                        最后匹配 {formatRelativeTime(entry.last_matched_at)}
+                        Last matched {formatRelativeTime(entry.last_matched_at)}
                       </div>
                     )}
                   </TableCell>
@@ -353,12 +353,12 @@ export default function IpWhitelistPage() {
                     {entry.enabled ? (
                       <Badge variant="success" size="sm">
                         <Check className="w-3 h-3 mr-1" />
-                        启用
+                        Enabled
                       </Badge>
                     ) : (
                       <Badge variant="outline" size="sm">
                         <X className="w-3 h-3 mr-1" />
-                        禁用
+                        Disabled
                       </Badge>
                     )}
                   </TableCell>
@@ -406,8 +406,8 @@ export default function IpWhitelistPage() {
 
       {/* Region Restrictions */}
       <SettingsSection
-        title="区域限制"
-        description="配置允许访问的地区。未在列表中的地区默认禁止访问。"
+        title="Region Restrictions"
+        description="Configure allowed regions. Regions not in the list are denied by default."
       >
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {mockRegions.map((region) => (
@@ -432,42 +432,42 @@ export default function IpWhitelistPage() {
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent>
           <DialogHeader icon={<Shield className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>{editingEntry ? "编辑 IP 规则" : "添加 IP 规则"}</DialogTitle>
+            <DialogTitle>{editingEntry ? "Edit IP Rule" : "Add IP Rule"}</DialogTitle>
             <DialogDescription>
-              {editingEntry ? "修改 IP 白名单规则配置。" : "添加新的 IP 白名单规则。"}
+              {editingEntry ? "Modify IP whitelist rule configuration." : "Add a new IP whitelist rule."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
               <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                IP 地址/网段 <span className="text-destructive">*</span>
+                IP Address/Range <span className="text-destructive">*</span>
               </label>
               <Input
                 inputSize="sm"
-                placeholder="例如：192.168.1.0/24 或 10.0.0.100"
+                placeholder="e.g., 192.168.1.0/24 or 10.0.0.100"
                 value={formData.ip_address}
                 onChange={(e) => setFormData({ ...formData, ip_address: e.target.value })}
               />
               <div className="text-[11px] text-foreground-muted mt-1">
-                支持单个 IP 或 CIDR 格式的网段
+                Supports single IP or CIDR format ranges
               </div>
             </div>
 
             <div>
               <label className="text-[12px] font-medium text-foreground mb-1.5 block">
-                描述 <span className="text-destructive">*</span>
+                Description <span className="text-destructive">*</span>
               </label>
               <Input
                 inputSize="sm"
-                placeholder="例如：公司内网"
+                placeholder="e.g., Company Intranet"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
             </div>
 
             <div>
-              <label className="text-[12px] font-medium text-foreground mb-1.5 block">类型</label>
+              <label className="text-[12px] font-medium text-foreground mb-1.5 block">Type</label>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -478,7 +478,7 @@ export default function IpWhitelistPage() {
                     onChange={() => setFormData({ ...formData, type: "single" })}
                     className="accent-brand-500"
                   />
-                  <span className="text-[12px] text-foreground">单个 IP</span>
+                  <span className="text-[12px] text-foreground">Single IP</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -489,7 +489,7 @@ export default function IpWhitelistPage() {
                     onChange={() => setFormData({ ...formData, type: "cidr" })}
                     className="accent-brand-500"
                   />
-                  <span className="text-[12px] text-foreground">CIDR 网段</span>
+                  <span className="text-[12px] text-foreground">CIDR Range</span>
                 </label>
               </div>
             </div>
@@ -497,14 +497,14 @@ export default function IpWhitelistPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setModalOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               size="sm"
               disabled={!formData.ip_address.trim() || !formData.description.trim() || isSaving}
               onClick={handleSave}
             >
-              {isSaving ? "保存中..." : "保存"}
+              {isSaving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -514,9 +514,9 @@ export default function IpWhitelistPage() {
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent>
           <DialogHeader icon={<AlertTriangle className="w-6 h-6" />} iconVariant="warning">
-            <DialogTitle>删除 IP 规则</DialogTitle>
+            <DialogTitle>Delete IP Rule</DialogTitle>
             <DialogDescription>
-              确定要删除此 IP 白名单规则吗？此操作不可恢复。
+              Are you sure you want to delete this IP whitelist rule? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
@@ -524,11 +524,11 @@ export default function IpWhitelistPage() {
             <div className="rounded-lg border border-border bg-surface-75 p-4">
               <div className="grid gap-2 text-[12px]">
                 <div className="flex justify-between">
-                  <span className="text-foreground-muted">IP 地址</span>
+                  <span className="text-foreground-muted">IP Address</span>
                   <code className="font-mono text-foreground">{deletingEntry.ip_address}</code>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-foreground-muted">描述</span>
+                  <span className="text-foreground-muted">Description</span>
                   <span className="text-foreground">{deletingEntry.description}</span>
                 </div>
               </div>
@@ -537,10 +537,10 @@ export default function IpWhitelistPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button variant="destructive" size="sm" disabled={isSaving} onClick={handleDelete}>
-              {isSaving ? "删除中..." : "确认删除"}
+              {isSaving ? "Deleting..." : "Confirm Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -32,9 +32,9 @@ import type { ModelUsage } from "@/types/admin";
 
 const PERIOD_OPTIONS = ["7d", "30d", "90d"] as const;
 const PERIOD_LABELS: Record<(typeof PERIOD_OPTIONS)[number], string> = {
-  "7d": "近 7 天",
-  "30d": "近 30 天",
-  "90d": "近 90 天",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "90d": "Last 90 days",
 };
 
 export default function ModelUsagePage() {
@@ -78,8 +78,8 @@ export default function ModelUsagePage() {
   return (
     <PageContainer>
       <PageHeader
-        title="模型用量分析"
-        description="查看各模型的调用量、Token 消耗与成本估算。"
+        title="Model Usage Analytics"
+        description="View call volume, token consumption, and cost estimates per model."
         icon={<BarChart3 className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -101,10 +101,10 @@ export default function ModelUsagePage() {
               disabled={usageQuery.isFetching}
             >
               <RefreshCw className={`w-3.5 h-3.5 mr-1 ${usageQuery.isFetching ? "animate-spin" : ""}`} />
-              刷新
+              Refresh
             </Button>
             <Button variant="outline" size="sm">
-              导出报表
+              Export Report
             </Button>
           </div>
         }
@@ -113,54 +113,54 @@ export default function ModelUsagePage() {
       <div className="page-grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           icon={<Zap className="w-4 h-4" />}
-          title="总调用次数"
+          title="Total Calls"
           value={totals.total_calls.toLocaleString()}
           subtitle={PERIOD_LABELS[period]}
         />
         <StatsCard
           icon={<TrendingUp className="w-4 h-4" />}
-          title="总 Token 消耗"
+          title="Total Token Consumption"
           value={formatTokens(totals.total_tokens)}
-          subtitle="输入 + 输出"
+          subtitle="Input + Output"
         />
         <StatsCard
           icon={<Coins className="w-4 h-4" />}
-          title="预估成本"
+          title="Estimated Cost"
           value={`$${totals.cost_estimate.toFixed(2)}`}
-          subtitle="基于官方定价"
+          subtitle="Based on official pricing"
         />
         <StatsCard
           icon={<BarChart3 className="w-4 h-4" />}
-          title="活跃模型"
+          title="Active Models"
           value={rows.length.toString()}
-          subtitle="有调用记录"
+          subtitle="With call records"
         />
       </div>
 
       <SettingsSection
-        title="模型明细"
-        description="各模型的详细用量与成本分布"
+        title="Model Details"
+        description="Detailed usage and cost distribution per model"
       >
         {usageQuery.isPending && !localMode ? (
           <div className="py-10 text-center text-[12px] text-foreground-muted">
-            正在加载...
+            Loading...
           </div>
         ) : rows.length === 0 ? (
           <div className="py-10 text-center text-[12px] text-foreground-muted">
-            暂无用量数据
+            No usage data available
           </div>
         ) : (
           <>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>模型</TableHead>
-                  <TableHead className="text-right">调用次数</TableHead>
-                  <TableHead className="text-right">输入 Tokens</TableHead>
-                  <TableHead className="text-right">输出 Tokens</TableHead>
-                  <TableHead className="text-right">总 Tokens</TableHead>
-                  <TableHead className="text-right">预估成本</TableHead>
-                  <TableHead className="text-right">占比</TableHead>
+                  <TableHead>Model</TableHead>
+                  <TableHead className="text-right">Calls</TableHead>
+                  <TableHead className="text-right">Input Tokens</TableHead>
+                  <TableHead className="text-right">Output Tokens</TableHead>
+                  <TableHead className="text-right">Total Tokens</TableHead>
+                  <TableHead className="text-right">Est. Cost</TableHead>
+                  <TableHead className="text-right">Share</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,7 +212,7 @@ export default function ModelUsagePage() {
             </Table>
 
             <div className="mt-6 p-4 rounded-lg border border-border bg-surface-75">
-              <div className="text-[12px] font-medium text-foreground mb-3">用量分布</div>
+              <div className="text-[12px] font-medium text-foreground mb-3">Usage Distribution</div>
               <div className="flex flex-wrap gap-4">
                 {rows.map((row) => {
                   const percentage = totals.total_tokens > 0
@@ -233,8 +233,8 @@ export default function ModelUsagePage() {
       </SettingsSection>
 
       <SettingsSection
-        title="成本优化建议"
-        description="基于用量数据的优化建议"
+        title="Cost Optimization Tips"
+        description="Optimization suggestions based on usage data"
       >
         <div className="space-y-3">
           <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-surface-75">
@@ -243,10 +243,10 @@ export default function ModelUsagePage() {
             </div>
             <div>
               <div className="text-[12px] font-medium text-foreground">
-                考虑使用更小的模型
+                Consider using smaller models
               </div>
               <div className="text-[11px] text-foreground-muted mt-1">
-                对于简单任务，使用 GPT-3.5-turbo 替代 GPT-4 可节省约 90% 成本。
+                For simple tasks, using GPT-3.5-turbo instead of GPT-4 can save ~90% in costs.
               </div>
             </div>
           </div>
@@ -256,10 +256,10 @@ export default function ModelUsagePage() {
             </div>
             <div>
               <div className="text-[12px] font-medium text-foreground">
-                启用响应缓存
+                Enable response caching
               </div>
               <div className="text-[11px] text-foreground-muted mt-1">
-                对于重复查询启用缓存可减少 20-40% 的 API 调用。
+                Enabling caching for repeated queries can reduce API calls by 20-40%.
               </div>
             </div>
           </div>
@@ -269,10 +269,10 @@ export default function ModelUsagePage() {
             </div>
             <div>
               <div className="text-[12px] font-medium text-foreground">
-                优化 Prompt 长度
+                Optimize prompt length
               </div>
               <div className="text-[11px] text-foreground-muted mt-1">
-                精简系统提示词和上下文可有效减少输入 Token 消耗。
+                Streamlining system prompts and context can effectively reduce input token consumption.
               </div>
             </div>
           </div>

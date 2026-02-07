@@ -47,11 +47,11 @@ import { usePermission } from "@/hooks/usePermission";
 
 const STATUS_OPTIONS = ["all", "active", "draft", "archived", "disabled"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  active: "运行中",
-  draft: "草稿",
-  archived: "已归档",
-  disabled: "已禁用",
+  all: "All Statuses",
+  active: "Running",
+  draft: "Draft",
+  archived: "Archived",
+  disabled: "Disabled",
 };
 
 const STATUS_BADGE_MAP: Record<WorkflowStatus, "success" | "warning" | "info" | "error"> = {
@@ -63,10 +63,10 @@ const STATUS_BADGE_MAP: Record<WorkflowStatus, "success" | "warning" | "info" | 
 
 const TRIGGER_LABELS: Record<string, string> = {
   webhook: "Webhook",
-  schedule: "定时任务",
-  event: "事件触发",
-  api: "API 调用",
-  manual: "手动执行",
+  schedule: "Scheduled",
+  event: "Event Triggered",
+  api: "API Call",
+  manual: "Manual",
 };
 
 export default function WorkflowsPage() {
@@ -143,10 +143,10 @@ export default function WorkflowsPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedWorkflow) throw new Error("请选择工作流");
+      if (!selectedWorkflow) throw new Error("Please select a workflow");
       const reason = reasonDraft.trim();
       if ((statusDraft === "disabled" || statusDraft === "archived") && !reason) {
-        throw new Error("禁用或归档工作流时必须填写原因");
+        throw new Error("A reason is required when disabling or archiving a workflow");
       }
 
       if (localMode) {
@@ -163,48 +163,48 @@ export default function WorkflowsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "workflows"] });
       setManageOpen(false);
       setConfirmStatusOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新状态失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update status");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="工作流管理"
-        description="查看与管理所有 Workspace 的工作流定义与版本。"
+        title="Workflow Management"
+        description="View and manage all workspace workflow definitions and versions."
         icon={<GitBranch className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出列表
+              Export List
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="工作流列表"
-        description="支持按名称、状态筛选，点击查看详情与执行历史。"
+        title="Workflow List"
+        description="Filter by name or status. Click to view details and execution history."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索名称或 ID"
+              placeholder="Search by name or ID"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -220,20 +220,20 @@ export default function WorkflowsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>工作流</TableHead>
+              <TableHead>Workflow</TableHead>
               <TableHead>Workspace</TableHead>
-              <TableHead>触发方式</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>版本</TableHead>
-              <TableHead>最近执行</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Trigger</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Version</TableHead>
+              <TableHead>Last Execution</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -243,7 +243,7 @@ export default function WorkflowsPage() {
                   colSpan={7}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -253,8 +253,8 @@ export default function WorkflowsPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {workflowsQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配工作流"}
+                    ? "Failed to load. Please check API or permission configuration."
+                    : "No matching workflows"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -327,7 +327,7 @@ export default function WorkflowsPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<GitBranch className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>工作流管理</DialogTitle>
+            <DialogTitle>Workflow Management</DialogTitle>
             <DialogDescription>
               {selectedWorkflow?.name ? (
                 <span className="text-foreground-light">
@@ -335,14 +335,14 @@ export default function WorkflowsPage() {
                   <span className="text-foreground-muted">({selectedWorkflow.slug})</span>
                 </span>
               ) : (
-                "调整工作流状态。"
+                "Adjust workflow status."
               )}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-5">
             <div className="rounded-lg border border-border bg-surface-75 p-4">
-              <div className="text-[12px] font-medium text-foreground mb-3">状态</div>
+              <div className="text-[12px] font-medium text-foreground mb-3">Status</div>
               <div className="grid gap-2 sm:grid-cols-[160px_1fr] items-start">
                 <select
                   value={statusDraft}
@@ -361,7 +361,7 @@ export default function WorkflowsPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={3}
-                    placeholder="原因（禁用或归档时必填）"
+                    placeholder="Reason (required when disabling or archiving)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -370,7 +370,7 @@ export default function WorkflowsPage() {
                   />
                   <div className="flex items-center justify-end gap-2">
                     <Button variant="outline" size="sm" onClick={() => setManageOpen(false)}>
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={statusDraft === "disabled" ? "warning" : "default"}
@@ -378,7 +378,7 @@ export default function WorkflowsPage() {
                       onClick={() => setConfirmStatusOpen(true)}
                       disabled={updateStatusMutation.isPending}
                     >
-                      提交状态变更
+                      Submit Status Change
                     </Button>
                   </div>
                 </div>
@@ -389,12 +389,12 @@ export default function WorkflowsPage() {
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/workflows/${selectedWorkflow?.id}`}>
                   <Play className="w-3.5 h-3.5 mr-1" />
-                  查看详情
+                  View Details
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/executions?workflow_id=${selectedWorkflow?.id}`}>
-                  查看执行记录
+                  View Execution History
                 </Link>
               </Button>
             </div>
@@ -410,20 +410,20 @@ export default function WorkflowsPage() {
         type={statusDraft === "disabled" ? "warning" : "info"}
         title={
           statusDraft === "disabled"
-            ? "确认禁用该工作流？"
+            ? "Confirm disable this workflow?"
             : statusDraft === "archived"
-            ? "确认归档该工作流？"
-            : "确认更新状态？"
+            ? "Confirm archive this workflow?"
+            : "Confirm status update?"
         }
         description={
           statusDraft === "disabled"
-            ? `将工作流置为禁用状态，所有触发将被暂停。原因：${reasonDraft.trim() || "（未填写）"}`
+            ? `The workflow will be disabled and all triggers will be paused. Reason: ${reasonDraft.trim() || "(not provided)"}`
             : statusDraft === "archived"
-            ? `将工作流归档，不再显示于活跃列表。原因：${reasonDraft.trim() || "（未填写）"}`
-            : "确认更新工作流状态。"
+            ? `The workflow will be archived and no longer shown in the active list. Reason: ${reasonDraft.trim() || "(not provided)"}`
+            : "Confirm workflow status update."
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

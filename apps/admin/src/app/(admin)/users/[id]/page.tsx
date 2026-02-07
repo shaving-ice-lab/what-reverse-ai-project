@@ -53,8 +53,8 @@ import {
 import type { User } from "@/types/auth";
 
 const STATUS_LABELS: Record<string, { label: string; variant: "success" | "warning" | "error" }> = {
-  active: { label: "正常", variant: "success" },
-  suspended: { label: "已暂停", variant: "warning" },
+  active: { label: "Active", variant: "success" },
+  suspended: { label: "Suspended", variant: "warning" },
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -66,8 +66,8 @@ const ROLE_LABELS: Record<string, string> = {
 const ADMIN_ROLE_OPTIONS: Array<{ value: AdminRole | ""; label: string; description: string }> = [
   {
     value: "",
-    label: "自动（未配置）",
-    description: "按 admin_roles/admin_emails 或默认策略生效",
+    label: "Auto (Not Configured)",
+    description: "Uses admin_roles/admin_emails or default policy",
   },
   ...(["super_admin", "ops", "support", "finance", "reviewer", "viewer"] as AdminRole[]).map((role) => ({
     value: role,
@@ -90,10 +90,10 @@ const ACTIVITY_VARIANTS: Record<string, "info" | "warning" | "error" | "success"
 };
 
 const RISK_FLAG_OPTIONS = [
-  { value: "none", label: "无风险", variant: "success" as const },
-  { value: "low", label: "低风险", variant: "info" as const },
-  { value: "medium", label: "中风险", variant: "warning" as const },
-  { value: "high", label: "高风险", variant: "error" as const },
+  { value: "none", label: "No Risk", variant: "success" as const },
+  { value: "low", label: "Low Risk", variant: "info" as const },
+  { value: "medium", label: "Medium Risk", variant: "warning" as const },
+  { value: "high", label: "High Risk", variant: "error" as const },
 ];
 
 function getParamId(params: ReturnType<typeof useParams>) {
@@ -200,14 +200,14 @@ export default function AdminUserDetailPage() {
 
   const adminRoleLabel = adminRoleRaw
     ? ADMIN_ROLE_LABELS[adminRoleRaw as AdminRole] || adminRoleRaw
-    : "未配置";
+    : "Not Configured";
 
   const adminRoleDescription =
     adminRoleRaw && ADMIN_ROLE_DESCRIPTIONS[adminRoleRaw as AdminRole]
       ? ADMIN_ROLE_DESCRIPTIONS[adminRoleRaw as AdminRole]
       : adminRoleRaw
-      ? "未识别的管理员角色"
-      : "未配置管理员角色";
+      ? "Unrecognized admin role"
+      : "No admin role configured";
 
   // User assets data
   const userAssets = useMemo(() => {
@@ -315,7 +315,7 @@ export default function AdminUserDetailPage() {
   if (!userId) {
     return (
       <PageContainer>
-        <PageHeader title="用户详情" description="无效的用户 ID" icon={<UserRound className="w-4 h-4" />} />
+        <PageHeader title="User Details" description="Invalid user ID" icon={<UserRound className="w-4 h-4" />} />
       </PageContainer>
     );
   }
@@ -334,17 +334,17 @@ export default function AdminUserDetailPage() {
   return (
     <PageContainer>
       <PageHeader
-        title={user?.display_name || user?.email || "用户详情"}
+        title={user?.display_name || user?.email || "User Details"}
         description={
           user
             ? `${user.email} · ${user.id}`
             : localMode
-            ? "未找到对应的本地用户数据"
-            : "正在加载用户数据..."
+            ? "Local user data not found"
+            : "Loading user data..."
         }
         icon={<UserRound className="w-4 h-4" />}
         backHref="/users"
-        backLabel="返回用户列表"
+        backLabel="Back to User List"
         badge={
           user ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -356,11 +356,11 @@ export default function AdminUserDetailPage() {
               </Badge>
               {user.email_verified ? (
                 <Badge variant="success" size="sm">
-                  邮箱已验证
+                  Email Verified
                 </Badge>
               ) : (
                 <Badge variant="warning" size="sm">
-                  邮箱未验证
+                  Email Not Verified
                 </Badge>
               )}
               {riskFlagConfig && riskFlagConfig.value !== "none" && (
@@ -380,7 +380,7 @@ export default function AdminUserDetailPage() {
               disabled={!user}
             >
               <LogOut className="w-3.5 h-3.5 mr-1" />
-              强制下线
+              Force Logout
             </Button>
             <Button
               variant="outline"
@@ -389,7 +389,7 @@ export default function AdminUserDetailPage() {
               disabled={!user}
             >
               <Key className="w-3.5 h-3.5 mr-1" />
-              重置密码
+              Reset Password
             </Button>
             <Button
               size="sm"
@@ -401,7 +401,7 @@ export default function AdminUserDetailPage() {
               disabled={!user}
             >
               <ShieldAlert className="w-3.5 h-3.5 mr-1" />
-              风险标记
+              Risk Flag
             </Button>
           </div>
         }
@@ -411,23 +411,23 @@ export default function AdminUserDetailPage() {
       <ConfirmDialog
         open={forceLogoutOpen}
         onOpenChange={setForceLogoutOpen}
-        title="强制下线"
-        description="将立即终止该用户的所有活跃会话，用户需要重新登录。"
-        confirmLabel="确认下线"
+        title="Force Logout"
+        description="This will immediately terminate all active sessions. The user will need to log in again."
+        confirmLabel="Confirm Logout"
         onConfirm={() => forceLogoutMutation.mutate(forceLogoutReason)}
         isLoading={forceLogoutMutation.isPending}
         variant="warning"
       >
         <div className="space-y-3 py-2">
           <div className="text-[12px] text-foreground-muted">
-            用户：{user?.email}
+            User: {user?.email}
           </div>
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">操作原因（必填）</label>
+            <label className="text-[12px] text-foreground">Reason (required)</label>
             <Input
               value={forceLogoutReason}
               onChange={(e) => setForceLogoutReason(e.target.value)}
-              placeholder="请输入强制下线的原因..."
+              placeholder="Enter reason for force logout..."
             />
           </div>
         </div>
@@ -436,19 +436,19 @@ export default function AdminUserDetailPage() {
       <ConfirmDialog
         open={resetPasswordOpen}
         onOpenChange={setResetPasswordOpen}
-        title="重置密码"
-        description="将为该用户生成临时密码并发送至注册邮箱。"
-        confirmLabel="确认重置"
+        title="Reset Password"
+        description="A temporary password will be generated and sent to the user's email."
+        confirmLabel="Confirm Reset"
         onConfirm={() => resetPasswordMutation.mutate()}
         isLoading={resetPasswordMutation.isPending}
         variant="warning"
       >
         <div className="space-y-3 py-2">
           <div className="text-[12px] text-foreground-muted">
-            用户：{user?.email}
+            User: {user?.email}
           </div>
           <div className="text-[12px] text-foreground-light">
-            临时密码将通过邮件发送至用户邮箱，用户首次登录后需要设置新密码。
+            A temporary password will be sent to the user's email. The user will need to set a new password on first login.
           </div>
         </div>
       </ConfirmDialog>
@@ -456,19 +456,19 @@ export default function AdminUserDetailPage() {
       <ConfirmDialog
         open={riskFlagOpen}
         onOpenChange={setRiskFlagOpen}
-        title="设置风险标记"
-        description="为该用户设置风险等级标记，用于风控与审核参考。"
-        confirmLabel="确认设置"
+        title="Set Risk Flag"
+        description="Set a risk level flag for this user, used for risk control and review reference."
+        confirmLabel="Confirm"
         onConfirm={() => riskFlagMutation.mutate({ flag: riskFlag, reason: riskFlagReason })}
         isLoading={riskFlagMutation.isPending}
         variant={riskFlag === "high" ? "danger" : riskFlag === "medium" ? "warning" : "default"}
       >
         <div className="space-y-4 py-2">
           <div className="text-[12px] text-foreground-muted">
-            用户：{user?.email}
+            User: {user?.email}
           </div>
           <div className="space-y-2">
-            <label className="text-[12px] text-foreground">风险等级</label>
+            <label className="text-[12px] text-foreground">Risk Level</label>
             <div className="flex flex-wrap gap-2">
               {RISK_FLAG_OPTIONS.map((opt) => (
                 <Button
@@ -484,11 +484,11 @@ export default function AdminUserDetailPage() {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[12px] text-foreground">标记原因（必填）</label>
+            <label className="text-[12px] text-foreground">Reason (required)</label>
             <Input
               value={riskFlagReason}
               onChange={(e) => setRiskFlagReason(e.target.value)}
-              placeholder="请输入风险标记的原因..."
+              placeholder="Enter reason for risk flag..."
             />
           </div>
         </div>
@@ -497,29 +497,29 @@ export default function AdminUserDetailPage() {
       <ConfirmDialog
         open={Boolean(terminateSessionOpen)}
         onOpenChange={(open) => !open && setTerminateSessionOpen(null)}
-        title="终止会话"
-        description="将终止该设备的登录会话。"
-        confirmLabel="确认终止"
+        title="Terminate Session"
+        description="This will terminate the login session on this device."
+        confirmLabel="Confirm Termination"
         onConfirm={() => terminateSessionOpen && terminateSessionMutation.mutate(terminateSessionOpen)}
         isLoading={terminateSessionMutation.isPending}
         variant="warning"
       />
 
       <div className="page-grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-        <SettingsSection title="基础信息" description="账户资料、状态与权限信息。">
+        <SettingsSection title="Basic Information" description="Account profile, status, and permission details.">
           {!user ? (
             <div className="text-[12px] text-foreground-muted">
-              {userQuery.isPending && !localMode ? "正在加载..." : "暂无用户数据"}
+              {userQuery.isPending && !localMode ? "Loading..." : "No user data available"}
             </div>
           ) : (
             <div className="space-y-1">
-              <FormRow label="用户 ID" description="用于后台检索与审计">
+              <FormRow label="User ID" description="Used for backend lookup and auditing">
                 <div className="text-[12px] text-foreground">{user.id}</div>
               </FormRow>
-              <FormRow label="邮箱" description="登录与通知邮箱">
+              <FormRow label="Email" description="Login and notification email">
                 <div className="text-[12px] text-foreground">{user.email}</div>
               </FormRow>
-              <FormRow label="用户名" description="展示名称与别名">
+              <FormRow label="Username" description="Display name and alias">
                 <div className="space-y-1">
                   <div className="text-[12px] text-foreground">
                     {user.display_name || user.username || "-"}
@@ -529,17 +529,17 @@ export default function AdminUserDetailPage() {
                   </div>
                 </div>
               </FormRow>
-              <FormRow label="角色" description="权限角色与能力点">
+              <FormRow label="Role" description="Permission role and capabilities">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" size="sm">
                     {roleLabel}
                   </Badge>
                   <span className="text-[11px] text-foreground-muted">
-                    可在用户列表中调整
+                    Can be adjusted in the user list
                   </span>
                 </div>
               </FormRow>
-              <FormRow label="管理员角色" description="控制 Admin Console 权限分配">
+              <FormRow label="Admin Role" description="Controls Admin Console permission assignment">
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <select
@@ -555,7 +555,7 @@ export default function AdminUserDetailPage() {
                       ))}
                     </select>
                     <Badge variant="outline" size="sm">
-                      当前：{adminRoleLabel}
+                      Current: {adminRoleLabel}
                     </Badge>
                   </div>
                   <div className="text-[11px] text-foreground-muted">{adminRoleDescription}</div>
@@ -563,7 +563,7 @@ export default function AdminUserDetailPage() {
                     <Input
                       value={adminRoleReason}
                       onChange={(e) => setAdminRoleReason(e.target.value)}
-                      placeholder="变更原因（必填）"
+                      placeholder="Reason for change (required)"
                       disabled={adminRoleActionDisabled}
                     />
                     <Button
@@ -574,52 +574,52 @@ export default function AdminUserDetailPage() {
                       }
                       disabled={!canSubmitAdminRole}
                     >
-                      保存管理员角色
+                      Save Admin Role
                     </Button>
                     {adminRoleActionDisabled && (
                       <span className="text-[11px] text-foreground-muted">
-                        {localMode ? "本地模式不可保存" : "无权限修改管理员角色"}
+                        {localMode ? "Cannot save in local mode" : "No permission to modify admin role"}
                       </span>
                     )}
                   </div>
                 </div>
               </FormRow>
-              <FormRow label="状态" description="当前账号状态">
+              <FormRow label="Status" description="Current account status">
                 <div className="flex items-center gap-2">
                   <Badge variant={statusConfig?.variant || "warning"} size="sm">
                     {statusConfig?.label || user.status}
                   </Badge>
                   {user.status_reason ? (
                     <span className="text-[11px] text-foreground-muted">
-                      原因：{user.status_reason}
+                      Reason: {user.status_reason}
                     </span>
                   ) : null}
                 </div>
               </FormRow>
-              <FormRow label="风险标记" description="风控风险等级">
+              <FormRow label="Risk Flag" description="Risk control level">
                 <div className="flex items-center gap-2">
                   <Badge variant={riskFlagConfig?.variant || "success"} size="sm">
-                    {riskFlagConfig?.label || "无风险"}
+                    {riskFlagConfig?.label || "No Risk"}
                   </Badge>
                 </div>
               </FormRow>
-              <FormRow label="注册时间" description="首次创建账号的时间">
+              <FormRow label="Registration Date" description="Date the account was first created">
                 <div className="text-[12px] text-foreground-light">
                   {user.created_at ? formatDate(user.created_at) : "-"}
                 </div>
               </FormRow>
-              <FormRow label="最近登录" description="最近一次登录时间">
+              <FormRow label="Last Login" description="Most recent login time">
                 <div className="text-[12px] text-foreground-light">
                   {user.last_login_at ? formatRelativeTime(user.last_login_at) : "-"}
                 </div>
               </FormRow>
-              <FormRow label="更新时间" description="用户信息最近变更">
+              <FormRow label="Updated At" description="Most recent profile change">
                 <div className="text-[12px] text-foreground-light">
                   {user.updated_at ? formatDate(user.updated_at) : "-"}
                 </div>
               </FormRow>
               {user.status_updated_at ? (
-                <FormRow label="状态更新时间" description="敏感状态变更记录">
+                <FormRow label="Status Updated At" description="Sensitive status change record">
                   <div className="text-[12px] text-foreground-light">
                     {formatDate(user.status_updated_at)}
                   </div>
@@ -630,8 +630,8 @@ export default function AdminUserDetailPage() {
         </SettingsSection>
 
         <SettingsSection
-          title="活跃会话"
-          description="当前登录设备与会话管理。"
+          title="Active Sessions"
+          description="Current login devices and session management."
           footer={
             <Button
               variant="outline"
@@ -639,17 +639,17 @@ export default function AdminUserDetailPage() {
               onClick={() => setForceLogoutOpen(true)}
               disabled={sessions.length === 0}
             >
-              终止所有会话
+              Terminate All Sessions
             </Button>
           }
         >
           {!user ? (
             <div className="text-[12px] text-foreground-muted">
-              {userQuery.isPending && !localMode ? "正在加载..." : "暂无会话信息"}
+              {userQuery.isPending && !localMode ? "Loading..." : "No session data available"}
             </div>
           ) : sessions.length === 0 ? (
             <div className="text-[12px] text-foreground-muted">
-              暂无活跃会话
+              No active sessions
             </div>
           ) : (
             <div className="space-y-3">
@@ -669,14 +669,14 @@ export default function AdminUserDetailPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-[11px] text-foreground-muted text-right">
-                      <div>活跃于 {formatRelativeTime(session.last_active_at)}</div>
+                      <div>Active {formatRelativeTime(session.last_active_at)}</div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setTerminateSessionOpen(session.id)}
                     >
-                      终止
+                      Terminate
                     </Button>
                   </div>
                 </div>
@@ -688,40 +688,40 @@ export default function AdminUserDetailPage() {
 
       {/* User Assets Section */}
       <SettingsSection
-        title="用户资产视图"
-        description="工作空间、应用与用量汇总。"
+        title="User Assets Overview"
+        description="Workspaces, apps, and usage summary."
         icon={<Database className="w-4 h-4" />}
       >
         {!user ? (
           <div className="text-[12px] text-foreground-muted">
-            {userQuery.isPending && !localMode ? "正在加载..." : "暂无资产数据"}
+            {userQuery.isPending && !localMode ? "Loading..." : "No asset data available"}
           </div>
         ) : (
           <div className="space-y-6">
             {/* Usage Stats */}
             <div className="page-grid grid-cols-2 lg:grid-cols-4">
               <StatsCard
-                title="总执行量"
+                title="Total Executions"
                 value={userAssets.usage.total_executions.toLocaleString()}
-                subtitle="累计工作流执行"
+                subtitle="Cumulative workflow executions"
                 icon={<Zap className="w-4 h-4" />}
               />
               <StatsCard
-                title="近 30 天执行"
+                title="Last 30 Days"
                 value={userAssets.usage.last_30_days_executions.toLocaleString()}
-                subtitle="近期活跃度"
+                subtitle="Recent activity"
                 icon={<Clock className="w-4 h-4" />}
               />
               <StatsCard
-                title="Token 消耗"
+                title="Token Usage"
                 value={`${(userAssets.usage.total_tokens / 1000000).toFixed(1)}M`}
-                subtitle="累计 Token"
+                subtitle="Total tokens"
                 icon={<Zap className="w-4 h-4" />}
               />
               <StatsCard
-                title="存储占用"
+                title="Storage Used"
                 value={`${userAssets.usage.total_storage_mb} MB`}
-                subtitle="文件与数据"
+                subtitle="Files and data"
                 icon={<Database className="w-4 h-4" />}
               />
             </div>
@@ -730,18 +730,18 @@ export default function AdminUserDetailPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-[13px] font-medium text-foreground">
                 <Building2 className="w-4 h-4" />
-                关联工作空间（{userAssets.workspaces.length}）
+                Associated Workspaces ({userAssets.workspaces.length})
               </div>
               {userAssets.workspaces.length === 0 ? (
-                <div className="text-[12px] text-foreground-muted">暂无关联工作空间</div>
+                <div className="text-[12px] text-foreground-muted">No associated workspaces</div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>工作空间</TableHead>
-                      <TableHead>角色</TableHead>
-                      <TableHead>加入时间</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead>Workspace</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Joined</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -761,7 +761,7 @@ export default function AdminUserDetailPage() {
                         <TableCell className="text-right">
                           <Link href={`/workspaces/${ws.id}`}>
                             <Button variant="ghost" size="sm">
-                              查看
+                              View
                             </Button>
                           </Link>
                         </TableCell>
@@ -776,18 +776,18 @@ export default function AdminUserDetailPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-[13px] font-medium text-foreground">
                 <AppWindow className="w-4 h-4" />
-                创建的应用（{userAssets.apps.length}）
+                Created Apps ({userAssets.apps.length})
               </div>
               {userAssets.apps.length === 0 ? (
-                <div className="text-[12px] text-foreground-muted">暂无创建的应用</div>
+                <div className="text-[12px] text-foreground-muted">No apps created</div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>应用</TableHead>
-                      <TableHead>所属工作空间</TableHead>
-                      <TableHead>状态</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead>App</TableHead>
+                      <TableHead>Workspace</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -810,7 +810,7 @@ export default function AdminUserDetailPage() {
                         <TableCell className="text-right">
                           <Link href={`/apps/${app.id}`}>
                             <Button variant="ghost" size="sm">
-                              查看
+                              View
                             </Button>
                           </Link>
                         </TableCell>
@@ -825,24 +825,24 @@ export default function AdminUserDetailPage() {
       </SettingsSection>
 
       <div className="page-grid grid-cols-1 lg:grid-cols-2">
-        <SettingsSection title="最近登录" description="登录设备与风控记录。">
+        <SettingsSection title="Recent Logins" description="Login devices and risk control records.">
           {!user ? (
             <div className="text-[12px] text-foreground-muted">
-              {userQuery.isPending && !localMode ? "正在加载..." : "暂无登录信息"}
+              {userQuery.isPending && !localMode ? "Loading..." : "No login data available"}
             </div>
           ) : loginEvents.length === 0 ? (
             <div className="text-[12px] text-foreground-muted">
-              {localMode ? "暂无本地登录事件" : "该模块仅在本地模式展示"}
+              {localMode ? "No local login events" : "This module is only shown in local mode"}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>时间</TableHead>
-                  <TableHead>设备</TableHead>
-                  <TableHead>位置</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Device</TableHead>
+                  <TableHead>Location</TableHead>
                   <TableHead>IP</TableHead>
-                  <TableHead className="text-right">结果</TableHead>
+                  <TableHead className="text-right">Result</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -866,10 +866,10 @@ export default function AdminUserDetailPage() {
                         size="sm"
                       >
                         {event.status === "success"
-                          ? "成功"
+                          ? "Success"
                           : event.status === "blocked"
-                          ? "已拦截"
-                          : "验证中"}
+                          ? "Blocked"
+                          : "Verifying"}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -880,28 +880,28 @@ export default function AdminUserDetailPage() {
         </SettingsSection>
 
         <SettingsSection
-          title="活动历史"
-          description="账号活动、风险与权限变更记录。"
+          title="Activity History"
+          description="Account activity, risk, and permission change records."
           footer={
             <div className="flex items-center gap-2">
               <Link href="/security/audit-logs">
                 <Button variant="outline" size="sm">
-                  查看全部审计
+                  View All Audits
                 </Button>
               </Link>
               <Button variant="outline" size="sm" disabled>
-                导出记录
+                Export Records
               </Button>
             </div>
           }
         >
           {!user ? (
             <div className="text-[12px] text-foreground-muted">
-              {userQuery.isPending && !localMode ? "正在加载..." : "暂无活动数据"}
+              {userQuery.isPending && !localMode ? "Loading..." : "No activity data available"}
             </div>
           ) : activityLogs.length === 0 ? (
             <div className="text-[12px] text-foreground-muted">
-              {localMode ? "暂无本地活动记录" : "该模块仅在本地模式展示"}
+              {localMode ? "No local activity records" : "This module is only shown in local mode"}
             </div>
           ) : (
             <div className="space-y-3">
@@ -922,12 +922,12 @@ export default function AdminUserDetailPage() {
                   <div className="flex items-center gap-3 text-right">
                     <Badge variant={ACTIVITY_VARIANTS[log.severity] || "info"} size="sm">
                       {log.severity === "success"
-                        ? "正常"
+                        ? "Normal"
                         : log.severity === "warning"
-                        ? "注意"
+                        ? "Warning"
                         : log.severity === "error"
-                        ? "高危"
-                        : "信息"}
+                        ? "Critical"
+                        : "Info"}
                     </Badge>
                     <div className="flex items-center gap-1 text-[11px] text-foreground-muted">
                       <Clock className="w-3.5 h-3.5" />

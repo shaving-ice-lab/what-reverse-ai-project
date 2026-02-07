@@ -42,7 +42,7 @@ import { formatRelativeTime, truncate } from "@/lib/utils";
 import type { LogLevel, LogSource, SystemLog, LogDownloadRequest, JobStatus } from "@/types/ops";
 
 const LOG_LEVEL_OPTIONS: { value: LogLevel | ""; label: string }[] = [
-  { value: "", label: "全部级别" },
+  { value: "", label: "All Levels" },
   { value: "debug", label: "Debug" },
   { value: "info", label: "Info" },
   { value: "warn", label: "Warn" },
@@ -51,7 +51,7 @@ const LOG_LEVEL_OPTIONS: { value: LogLevel | ""; label: string }[] = [
 ];
 
 const LOG_SOURCE_OPTIONS: { value: LogSource | ""; label: string }[] = [
-  { value: "", label: "全部来源" },
+  { value: "", label: "All Sources" },
   { value: "api", label: "API" },
   { value: "worker", label: "Worker" },
   { value: "scheduler", label: "Scheduler" },
@@ -77,11 +77,11 @@ const DOWNLOAD_STATUS_CONFIG: Record<
   JobStatus,
   { label: string; variant: "secondary" | "info" | "success" | "error" | "warning" }
 > = {
-  pending: { label: "排队中", variant: "secondary" },
-  running: { label: "生成中", variant: "info" },
-  completed: { label: "已完成", variant: "success" },
-  failed: { label: "失败", variant: "error" },
-  cancelled: { label: "已取消", variant: "warning" },
+  pending: { label: "Queued", variant: "secondary" },
+  running: { label: "Generating", variant: "info" },
+  completed: { label: "Completed", variant: "success" },
+  failed: { label: "Failed", variant: "error" },
+  cancelled: { label: "Cancelled", variant: "warning" },
 };
 
 const formatBytes = (bytes: number): string => {
@@ -92,7 +92,7 @@ const formatBytes = (bytes: number): string => {
 
 const formatTimestamp = (ts: string): string => {
   const date = new Date(ts);
-  return date.toLocaleString("zh-CN", {
+  return date.toLocaleString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
@@ -152,7 +152,7 @@ export default function OpsLogsPage() {
   // Create download mutation
   const createDownloadMutation = useMutation({
     mutationFn: async () => {
-      const name = `日志导出 - ${new Date().toLocaleDateString("zh-CN")}`;
+      const name = `Log Export - ${new Date().toLocaleDateString("en-US")}`;
       return opsApi.createLogDownload({
         name,
         level: levelFilter ? [levelFilter] : undefined,
@@ -161,19 +161,19 @@ export default function OpsLogsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("日志导出任务已创建");
+      toast.success("Log export task created");
       queryClient.invalidateQueries({ queryKey: ["ops", "log-downloads"] });
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "创建导出任务失败");
+      toast.error(error instanceof Error ? error.message : "Failed to create export task");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="系统日志"
-        description="查看系统日志并下载日志归档。"
+        title="System Logs"
+        description="View system logs and download log archives."
         icon={<FileText className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -185,13 +185,13 @@ export default function OpsLogsPage() {
               loading={createDownloadMutation.isPending}
               disabled={localMode}
             >
-              导出日志
+              Export Logs
             </Button>
             <Button
               variant="outline"
               size="sm"
               loading={logsQuery.isFetching}
-              loadingText="刷新中..."
+              loadingText="Refreshing..."
               leftIcon={<RefreshCcw className="w-4 h-4" />}
               onClick={() => {
                 logsQuery.refetch();
@@ -199,7 +199,7 @@ export default function OpsLogsPage() {
               }}
               disabled={localMode}
             >
-              刷新
+              Refresh
             </Button>
           </div>
         }
@@ -207,7 +207,7 @@ export default function OpsLogsPage() {
 
       {/* Download history section */}
       {downloads.length > 0 && (
-        <SettingsSection title="导出历史" description="最近的日志导出任务。">
+        <SettingsSection title="Export History" description="Recent log export tasks.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {downloads.slice(0, 6).map((dl) => {
               const statusConfig = DOWNLOAD_STATUS_CONFIG[dl.status];
@@ -239,14 +239,14 @@ export default function OpsLogsPage() {
                       asChild
                     >
                       <a href={dl.file_url} target="_blank" rel="noopener noreferrer">
-                        下载
+                        Download
                       </a>
                     </Button>
                   )}
                   {dl.status === "running" && (
                     <div className="mt-2 flex items-center gap-2 text-[11px] text-brand-400">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      正在生成...
+                      Generating...
                     </div>
                   )}
                 </div>
@@ -257,10 +257,10 @@ export default function OpsLogsPage() {
       )}
 
       {/* Logs section */}
-      <SettingsSection title="日志查询" description="实时查看系统日志记录。">
+      <SettingsSection title="Log Query" description="View system log entries in real time.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">级别</span>
+            <span className="text-[11px] text-foreground-muted">Level</span>
             <select
               value={levelFilter}
               onChange={(e) => setLevelFilter(e.target.value as LogLevel | "")}
@@ -274,7 +274,7 @@ export default function OpsLogsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">来源</span>
+            <span className="text-[11px] text-foreground-muted">Source</span>
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value as LogSource | "")}
@@ -291,14 +291,14 @@ export default function OpsLogsPage() {
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-muted" />
             <Input
               type="text"
-              placeholder="搜索日志..."
+              placeholder="Search logs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-7 w-48 pl-7 text-[11px]"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">每页</span>
+            <span className="text-[11px] text-foreground-muted">Per Page</span>
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
@@ -312,7 +312,7 @@ export default function OpsLogsPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {logs.length} 条
+            {logs.length} total
           </Badge>
           <div className="ml-auto flex items-center gap-2">
             <Button
@@ -321,10 +321,10 @@ export default function OpsLogsPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={!canPrev}
             >
-              上一页
+              Previous
             </Button>
             <Badge variant="secondary" size="sm">
-              第 {page} 页
+              Page {page}
             </Badge>
             <Button
               variant="outline"
@@ -332,29 +332,29 @@ export default function OpsLogsPage() {
               onClick={() => setPage((p) => p + 1)}
               disabled={!canNext}
             >
-              下一页
+              Next
             </Button>
           </div>
         </div>
 
         {logsQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : logs.length === 0 ? (
           <EmptyState
             icon={<FileText className="w-5 h-5" />}
-            title="暂无日志"
-            description="当前没有符合条件的日志记录。"
+            title="No Logs"
+            description="No log entries match the current filters."
           />
         ) : (
           <div className="rounded-lg border border-border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">时间</TableHead>
-                  <TableHead className="w-[70px]">级别</TableHead>
-                  <TableHead className="w-[80px]">来源</TableHead>
-                  <TableHead className="w-[120px]">服务</TableHead>
-                  <TableHead>消息</TableHead>
+                  <TableHead className="w-[100px]">Time</TableHead>
+                  <TableHead className="w-[70px]">Level</TableHead>
+                  <TableHead className="w-[80px]">Source</TableHead>
+                  <TableHead className="w-[120px]">Service</TableHead>
+                  <TableHead>Message</TableHead>
                   <TableHead className="w-[100px]">Trace ID</TableHead>
                 </TableRow>
               </TableHeader>

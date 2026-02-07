@@ -48,11 +48,11 @@ import { usePermission } from "@/hooks/usePermission";
 
 const STATUS_OPTIONS = ["all", "draft", "published", "featured", "archived"] as const;
 const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  all: "全部状态",
-  draft: "草稿",
-  published: "已发布",
-  featured: "精选",
-  archived: "已归档",
+  all: "All Statuses",
+  draft: "Draft",
+  published: "Published",
+  featured: "Featured",
+  archived: "Archived",
 };
 
 const STATUS_BADGE_MAP: Record<TemplateStatus, "success" | "warning" | "info" | "error"> = {
@@ -63,11 +63,11 @@ const STATUS_BADGE_MAP: Record<TemplateStatus, "success" | "warning" | "info" | 
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  product: "产品",
-  marketing: "营销",
-  communication: "沟通",
-  analytics: "分析",
-  other: "其他",
+  product: "Product",
+  marketing: "Marketing",
+  communication: "Communication",
+  analytics: "Analytics",
+  other: "Other",
 };
 
 export default function TemplatesPage() {
@@ -145,7 +145,7 @@ export default function TemplatesPage() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedTemplate) throw new Error("请选择模板");
+      if (!selectedTemplate) throw new Error("Please select a template");
 
       if (localMode) {
         const next = localTemplates.map((tmpl) =>
@@ -161,13 +161,13 @@ export default function TemplatesPage() {
       });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "templates"] });
       setManageOpen(false);
       setConfirmStatusOpen(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "更新状态失败");
+      toast.error(error instanceof Error ? error.message : "Failed to update status");
     },
   });
 
@@ -186,46 +186,46 @@ export default function TemplatesPage() {
       });
     },
     onSuccess: (_, template) => {
-      toast.success(template.is_featured ? "已取消精选" : "已设为精选");
+      toast.success(template.is_featured ? "Removed from featured" : "Set as featured");
       queryClient.invalidateQueries({ queryKey: ["admin", "templates"] });
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "操作失败");
+      toast.error(error instanceof Error ? error.message : "Operation failed");
     },
   });
 
   return (
     <PageContainer>
       <PageHeader
-        title="模板管理"
-        description="管理公开与精选模板库。"
+        title="Template Management"
+        description="Manage public and featured template library."
         icon={<FileText className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
-              导出列表
+              Export List
             </Button>
           </div>
         }
       />
 
       <SettingsSection
-        title="模板列表"
-        description="支持按名称、状态、分类筛选。"
+        title="Template List"
+        description="Filter by name, status, and category."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="w-[260px]">
             <Input
               variant="search"
               inputSize="sm"
-              placeholder="搜索名称或 Slug"
+              placeholder="Search name or slug"
               leftIcon={<Search className="w-3.5 h-3.5" />}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -241,21 +241,21 @@ export default function TemplatesPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {total} 条
+            {total} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>模板</TableHead>
-              <TableHead>分类</TableHead>
-              <TableHead>可见性</TableHead>
-              <TableHead>使用次数</TableHead>
-              <TableHead>评分</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>更新时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Template</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Visibility</TableHead>
+              <TableHead>Usage Count</TableHead>
+              <TableHead>Rating</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -265,7 +265,7 @@ export default function TemplatesPage() {
                   colSpan={8}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
@@ -275,8 +275,8 @@ export default function TemplatesPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {templatesQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无匹配模板"}
+                    ? "Failed to load. Check API or permission settings."
+                    : "No matching templates"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -303,12 +303,12 @@ export default function TemplatesPage() {
                       {tmpl.is_public ? (
                         <>
                           <Globe className="w-3.5 h-3.5 text-success" />
-                          <span className="text-[11px] text-success">公开</span>
+                          <span className="text-[11px] text-success">Public</span>
                         </>
                       ) : (
                         <>
                           <Lock className="w-3.5 h-3.5 text-foreground-muted" />
-                          <span className="text-[11px] text-foreground-muted">私有</span>
+                          <span className="text-[11px] text-foreground-muted">Private</span>
                         </>
                       )}
                     </div>
@@ -334,7 +334,7 @@ export default function TemplatesPage() {
                         size="sm"
                         disabled={!canApprove}
                         onClick={() => toggleFeaturedMutation.mutate(tmpl)}
-                        title={tmpl.is_featured ? "取消精选" : "设为精选"}
+                        title={tmpl.is_featured ? "Remove from featured" : "Set as featured"}
                       >
                         {tmpl.is_featured ? (
                           <StarOff className="w-4 h-4" />
@@ -381,9 +381,9 @@ export default function TemplatesPage() {
       <Dialog open={manageOpen} onOpenChange={setManageOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileText className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>模板管理</DialogTitle>
+            <DialogTitle>Template Management</DialogTitle>
             <DialogDescription>
-              {selectedTemplate?.name || "管理模板状态"}
+              {selectedTemplate?.name || "Manage template status"}
             </DialogDescription>
           </DialogHeader>
 
@@ -392,27 +392,27 @@ export default function TemplatesPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid gap-2 text-[12px]">
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">状态</span>
+                    <span className="text-foreground-muted">Status</span>
                     <Badge variant={STATUS_BADGE_MAP[selectedTemplate.status]} size="sm">
                       {STATUS_LABELS[selectedTemplate.status]}
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">分类</span>
+                    <span className="text-foreground-muted">Category</span>
                     <span className="text-foreground">
                       {CATEGORY_LABELS[selectedTemplate.category] || selectedTemplate.category}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">使用次数</span>
+                    <span className="text-foreground-muted">Usage Count</span>
                     <span className="text-foreground">
                       {selectedTemplate.use_count.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground-muted">精选</span>
+                    <span className="text-foreground-muted">Featured</span>
                     <span className="text-foreground">
-                      {selectedTemplate.is_featured ? "是" : "否"}
+                      {selectedTemplate.is_featured ? "Yes" : "No"}
                     </span>
                   </div>
                 </div>
@@ -420,7 +420,7 @@ export default function TemplatesPage() {
             )}
 
             <div className="rounded-lg border border-border bg-surface-75 p-4">
-              <div className="text-[12px] font-medium text-foreground mb-3">状态管理</div>
+              <div className="text-[12px] font-medium text-foreground mb-3">Status Management</div>
               <div className="grid gap-2 sm:grid-cols-[160px_1fr] items-start">
                 <select
                   value={statusDraft}
@@ -439,7 +439,7 @@ export default function TemplatesPage() {
                     value={reasonDraft}
                     onChange={(e) => setReasonDraft(e.target.value)}
                     rows={2}
-                    placeholder="原因（可选）"
+                    placeholder="Reason (optional)"
                     className={cn(
                       "w-full rounded-md border border-border bg-surface-100 px-3 py-2",
                       "text-[12px] text-foreground placeholder:text-foreground-muted",
@@ -448,7 +448,7 @@ export default function TemplatesPage() {
                   />
                   <div className="flex items-center justify-end gap-2">
                     <Button variant="outline" size="sm" onClick={() => setManageOpen(false)}>
-                      取消
+                      Cancel
                     </Button>
                     <Button
                       variant={statusDraft === "archived" ? "warning" : "default"}
@@ -456,7 +456,7 @@ export default function TemplatesPage() {
                       disabled={!canEdit}
                       onClick={() => setConfirmStatusOpen(true)}
                     >
-                      提交变更
+                      Submit Change
                     </Button>
                   </div>
                 </div>
@@ -474,16 +474,16 @@ export default function TemplatesPage() {
         type={statusDraft === "archived" ? "warning" : "info"}
         title={
           statusDraft === "archived"
-            ? "确认归档该模板？"
-            : "确认更新状态？"
+            ? "Confirm archive this template?"
+            : "Confirm status update?"
         }
         description={
           statusDraft === "archived"
-            ? "归档后模板将不再显示于公开列表。"
-            : "确认更新模板状态。"
+            ? "Once archived, the template will no longer appear in the public list."
+            : "Confirm updating the template status."
         }
-        confirmText="确认"
-        cancelText="取消"
+        confirmText="Confirm"
+        cancelText="Cancel"
         loading={updateStatusMutation.isPending}
         onConfirm={() => updateStatusMutation.mutate()}
       />

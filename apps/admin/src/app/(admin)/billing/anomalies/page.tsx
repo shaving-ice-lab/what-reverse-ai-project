@@ -47,7 +47,7 @@ const mockAnomalies = [
     type: "overcharge",
     workspace_id: "ws-101",
     workspace_name: "Acme Corp",
-    description: "API 调用计费超出预期",
+    description: "API call billing exceeded expectations",
     amount: 1250.00,
     expected_amount: 850.00,
     severity: "high",
@@ -60,7 +60,7 @@ const mockAnomalies = [
     type: "duplicate",
     workspace_id: "ws-102",
     workspace_name: "TechStart Inc",
-    description: "重复扣款",
+    description: "Duplicate charge",
     amount: 99.00,
     expected_amount: 0,
     severity: "medium",
@@ -73,7 +73,7 @@ const mockAnomalies = [
     type: "undercharge",
     workspace_id: "ws-103",
     workspace_name: "Design Studio",
-    description: "折扣计算错误导致少收",
+    description: "Discount calculation error caused undercharge",
     amount: 45.00,
     expected_amount: 89.00,
     severity: "low",
@@ -85,18 +85,18 @@ const mockAnomalies = [
 
 const STATUS_OPTIONS = ["all", "pending", "resolved", "dismissed"] as const;
 const STATUS_LABELS: Record<string, string> = {
-  all: "全部",
-  pending: "待处理",
-  resolved: "已纠正",
-  dismissed: "已忽略",
+  all: "All",
+  pending: "Pending",
+  resolved: "Corrected",
+  dismissed: "Dismissed",
 };
 
 const SEVERITY_OPTIONS = ["all", "high", "medium", "low"] as const;
 const SEVERITY_LABELS: Record<string, string> = {
-  all: "全部",
-  high: "高",
-  medium: "中",
-  low: "低",
+  all: "All",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
 };
 
 const SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary"> = {
@@ -106,10 +106,10 @@ const SEVERITY_VARIANTS: Record<string, "destructive" | "warning" | "secondary">
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  overcharge: "多收",
-  undercharge: "少收",
-  duplicate: "重复扣款",
-  missing: "漏扣",
+  overcharge: "Overcharge",
+  undercharge: "Undercharge",
+  duplicate: "Duplicate",
+  missing: "Missing",
 };
 
 type Anomaly = (typeof mockAnomalies)[number];
@@ -171,13 +171,13 @@ export default function BillingAnomaliesPage() {
       });
     },
     onSuccess: () => {
-      toast.success(resolveAction === "correct" ? "异常已纠正" : "异常已忽略");
+      toast.success(resolveAction === "correct" ? "Anomaly corrected" : "Anomaly dismissed");
       setResolveOpen(null);
       setResolveNotes("");
       setCorrectionAmount(0);
       queryClient.invalidateQueries({ queryKey: ["admin", "billing", "anomalies"] });
     },
-    onError: () => toast.error("处理失败"),
+    onError: () => toast.error("Processing failed"),
   });
 
   const pendingCount = anomaliesSource.filter((item) => item.status === "pending").length;
@@ -188,44 +188,44 @@ export default function BillingAnomaliesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="计费异常管理"
-        description="检测和处理计费异常情况。"
+        title="Billing Anomaly Management"
+        description="Detect and resolve billing anomalies."
         icon={<AlertTriangle className="w-4 h-4" />}
         backHref="/billing"
-        backLabel="返回计费概览"
+        backLabel="Back to Billing Overview"
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="待处理异常"
+          title="Pending Anomalies"
           value={pendingCount.toString()}
-          subtitle="个异常"
+          subtitle="anomalies"
           trend={pendingCount > 0 ? { value: pendingCount, isPositive: true } : undefined}
         />
         <StatsCard
-          title="涉及金额"
+          title="Amount Involved"
           value={`$${totalAmount.toFixed(2)}`}
-          subtitle="差异总额"
+          subtitle="Total discrepancy"
         />
         <StatsCard
-          title="今日检测"
+          title="Detected Today"
           value="8"
-          subtitle="个异常"
+          subtitle="anomalies"
         />
         <StatsCard
-          title="本月纠正"
+          title="Corrected This Month"
           value="$2,450"
-          subtitle="已纠正金额"
+          subtitle="Corrected amount"
         />
       </div>
 
       <SettingsSection
-        title="异常列表"
-        description="检测到的计费异常记录。"
+        title="Anomaly List"
+        description="Detected billing anomaly records."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
@@ -239,7 +239,7 @@ export default function BillingAnomaliesPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">严重性</span>
+            <span className="text-[11px] text-foreground-muted">Severity</span>
             <select
               value={severityFilter}
               onChange={(e) => setSeverityFilter(e.target.value as typeof severityFilter)}
@@ -253,21 +253,21 @@ export default function BillingAnomaliesPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {filteredAnomalies.length} 条
+            {filteredAnomalies.length} total
           </Badge>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>工作空间</TableHead>
-              <TableHead>类型</TableHead>
-              <TableHead>描述</TableHead>
-              <TableHead>金额差异</TableHead>
-              <TableHead>严重性</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>检测时间</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Workspace</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Amount Discrepancy</TableHead>
+              <TableHead>Severity</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Detected At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -277,7 +277,7 @@ export default function BillingAnomaliesPage() {
                   colSpan={8}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  正在加载...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : filteredAnomalies.length === 0 ? (
@@ -287,8 +287,8 @@ export default function BillingAnomaliesPage() {
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
                   {anomaliesQuery.error && !localMode
-                    ? "加载失败，请检查 API 或权限配置"
-                    : "暂无异常记录"}
+                    ? "Failed to load. Please check API or permission settings."
+                    : "No anomaly records"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -314,7 +314,7 @@ export default function BillingAnomaliesPage() {
                     <div className="text-[12px]">
                       <div className="text-foreground">${anomaly.amount.toFixed(2)}</div>
                       <div className="text-foreground-muted">
-                        预期: ${anomaly.expected_amount.toFixed(2)}
+                        Expected: ${anomaly.expected_amount.toFixed(2)}
                       </div>
                     </div>
                   </TableCell>
@@ -353,7 +353,7 @@ export default function BillingAnomaliesPage() {
                       disabled={anomaly.status !== "pending"}
                     >
                       <Eye className="w-3.5 h-3.5 mr-1" />
-                      处理
+                      Resolve
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -367,7 +367,7 @@ export default function BillingAnomaliesPage() {
       <Dialog open={Boolean(resolveOpen)} onOpenChange={(open) => !open && setResolveOpen(null)}>
         <DialogContent size="lg">
           <DialogHeader icon={<DollarSign className="w-6 h-6" />} iconVariant="warning">
-            <DialogTitle>处理计费异常</DialogTitle>
+            <DialogTitle>Resolve Billing Anomaly</DialogTitle>
             <DialogDescription>
               {resolveOpen && (
                 <span className="text-foreground-light">
@@ -382,15 +382,15 @@ export default function BillingAnomaliesPage() {
               <div className="rounded-lg border border-border bg-surface-75 p-4">
                 <div className="grid grid-cols-3 gap-4 text-[12px]">
                   <div>
-                    <div className="text-foreground-muted">实际金额</div>
+                    <div className="text-foreground-muted">Actual Amount</div>
                     <div className="text-foreground font-medium">${resolveOpen.amount.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div className="text-foreground-muted">预期金额</div>
+                    <div className="text-foreground-muted">Expected Amount</div>
                     <div className="text-foreground font-medium">${resolveOpen.expected_amount.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div className="text-foreground-muted">差异</div>
+                    <div className="text-foreground-muted">Discrepancy</div>
                     <div className="text-destructive-400 font-medium">
                       ${Math.abs(resolveOpen.amount - resolveOpen.expected_amount).toFixed(2)}
                     </div>
@@ -399,7 +399,7 @@ export default function BillingAnomaliesPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">处理方式</label>
+                <label className="text-[12px] text-foreground">Resolution Method</label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -408,7 +408,7 @@ export default function BillingAnomaliesPage() {
                     onClick={() => setResolveAction("correct")}
                   >
                     <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                    纠正
+                    Correct
                   </Button>
                   <Button
                     type="button"
@@ -417,14 +417,14 @@ export default function BillingAnomaliesPage() {
                     onClick={() => setResolveAction("dismiss")}
                   >
                     <XCircle className="w-3.5 h-3.5 mr-1" />
-                    忽略
+                    Dismiss
                   </Button>
                 </div>
               </div>
 
               {resolveAction === "correct" && (
                 <div className="space-y-1">
-                  <label className="text-[12px] text-foreground">纠正金额</label>
+                  <label className="text-[12px] text-foreground">Correction Amount</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -435,11 +435,11 @@ export default function BillingAnomaliesPage() {
               )}
 
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">处理备注</label>
+                <label className="text-[12px] text-foreground">Resolution Notes</label>
                 <Input
                   value={resolveNotes}
                   onChange={(e) => setResolveNotes(e.target.value)}
-                  placeholder="输入处理备注..."
+                  placeholder="Enter resolution notes..."
                 />
               </div>
             </div>
@@ -447,14 +447,14 @@ export default function BillingAnomaliesPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setResolveOpen(null)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => resolveMutation.mutate()}
               loading={resolveMutation.isPending}
-              loadingText="处理中..."
+              loadingText="Processing..."
             >
-              确认处理
+              Confirm
             </Button>
           </DialogFooter>
         </DialogContent>

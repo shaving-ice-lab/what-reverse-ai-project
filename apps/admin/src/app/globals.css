@@ -2,37 +2,37 @@
 
 /* ============================================
    Supabase Dashboard Design System
-   完全复刻 Supabase 风格的颜色系统
+   Faithfully replicated Supabase-style color system
    ============================================ */
 
 @theme {
-  /* ===== 背景色 (Background) - 精确匹配 Supabase 截图 ===== */
+  /* ===== Background - Precisely matched to Supabase screenshots ===== */
   --color-background: #111111;
   --color-background-200: #181818;
   --color-background-studio: #0f0f0f;
   --color-background-alternative: #0b0b0b;
   --color-background-overlay: rgba(0, 0, 0, 0.7);
 
-  /* ===== Surface 层级 - Supabase 卡片/表面 ===== */
+  /* ===== Surface Levels - Supabase card/surface ===== */
   --color-surface-75: #1a1a1a;
   --color-surface-100: #1f1f1f;
   --color-surface-200: #242424;
   --color-surface-300: #2b2b2b;
   --color-surface-400: #333333;
 
-  /* ===== 文字色 (Foreground) - Supabase 文字 ===== */
+  /* ===== Foreground - Supabase text colors ===== */
   --color-foreground: #ededed;
   --color-foreground-light: #b0b0b0;
   --color-foreground-lighter: #7a7a7a;
   --color-foreground-muted: #5a5a5a;
 
-  /* ===== 边框色 (Border) - Supabase 边框 ===== */
+  /* ===== Border - Supabase borders ===== */
   --color-border: #2a2a2a;
   --color-border-muted: #242424;
   --color-border-strong: #3a3a3a;
   --color-border-stronger: #4a4a4a;
 
-  /* ===== 品牌绿色 (Brand) - Supabase 品牌色 ===== */
+  /* ===== Brand Green - Supabase brand color ===== */
   --color-brand-200: #1a3a2a;
   --color-brand-300: #1f4a35;
   --color-brand-400: #2a6348;
@@ -40,50 +40,50 @@
   --color-brand-600: #5fd9a3;
   --color-brand: #3ECF8E;
 
-  /* ===== 主色 (Primary) ===== */
+  /* ===== Primary ===== */
   --color-primary: #3ECF8E;
   --color-primary-foreground: #171717;
 
-  /* ===== 次要色 (Secondary) ===== */
+  /* ===== Secondary ===== */
   --color-secondary: #262626;
   --color-secondary-foreground: #ededed;
 
-  /* ===== 静音色 (Muted) ===== */
+  /* ===== Muted ===== */
   --color-muted: #262626;
   --color-muted-foreground: #a3a3a3;
 
-  /* ===== 强调色 (Accent) ===== */
+  /* ===== Accent ===== */
   --color-accent: #262626;
   --color-accent-foreground: #ededed;
 
-  /* ===== 卡片 (Card) ===== */
+  /* ===== Card ===== */
   --color-card: #1f1f1f;
   --color-card-foreground: #ededed;
 
-  /* ===== 弹窗 (Popover) ===== */
+  /* ===== Popover ===== */
   --color-popover: #1f1f1f;
   --color-popover-foreground: #ededed;
 
-  /* ===== 破坏性 (Destructive) ===== */
+  /* ===== Destructive ===== */
   --color-destructive: #ef4444;
   --color-destructive-200: #3b1818;
   --color-destructive-400: #dc2626;
   --color-destructive-foreground: #ededed;
 
-  /* ===== 警告 (Warning) ===== */
+  /* ===== Warning ===== */
   --color-warning: #f59e0b;
   --color-warning-200: #3b2e0a;
   --color-warning-400: #d97706;
 
-  /* ===== 成功 (Success) - 使用 Brand 色 ===== */
+  /* ===== Success - Uses Brand color ===== */
   --color-success: #3ECF8E;
   --color-success-200: #1a3a2a;
 
-  /* ===== 输入框 (Input) ===== */
+  /* ===== Input ===== */
   --color-input: #262626;
   --color-ring: #3ECF8E;
 
-  /* ===== 圆角 (Radius) ===== */
+  /* ===== Radius ===== */
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
@@ -161,7 +161,7 @@
     color: #ededed;
   }
   
-  /* ===== 滚动条样式 - Supabase 风格 ===== */
+  /* ===== Scrollbar Styles - Supabase style ===== */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -197,7 +197,7 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
-  /* ===== 动画 - 淡入向上 ===== */
+  /* ===== Animation - Fade In Up ===== */
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -212,7 +212,7 @@
     animation: fadeInUp 300ms ease-out;
   }
 
-  /* ===== 动画 - 淡入 ===== */
+  /* ===== Animation - Fade In ===== */
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -228,7 +228,7 @@
     animation: fadeIn 300ms ease-out;
   }
 
-  /* ===== 动画 - 滚动 ===== */
+  /* ===== Animation - Scroll ===== */
   @keyframes scroll {
     0% {
       transform: translateX(0);
@@ -244,7 +244,7 @@
     animation-play-state: paused;
   }
 
-  /* ===== 动画 - 闪烁 (光标) ===== */
+  /* ===== Animation - Blink (Cursor) ===== */
   @keyframes blink {
     0%, 100% {
       opacity: 1;
@@ -257,7 +257,7 @@
     animation: blink 1s step-end infinite;
   }
 
-  /* ===== 动画 - 柔和脉冲 ===== */
+  /* ===== Animation - Soft Pulse ===== */
   @keyframes pulse-soft {
     0%, 100% {
       opacity: 1;
@@ -270,12 +270,12 @@
     animation: pulse-soft 2s ease-in-out infinite;
   }
 
-  /* ===== 滚动行为 ===== */
+  /* ===== Scroll Behavior ===== */
   .scroll-smooth {
     scroll-behavior: smooth;
   }
 
-  /* ===== 动画 - 卡片悬浮 ===== */
+  /* ===== Animation - Card Lift ===== */
   @keyframes cardLift {
     from {
       transform: translateY(0);
@@ -290,7 +290,7 @@
     animation: cardLift 200ms ease-out forwards;
   }
 
-  /* ===== 动画 - 交错淡入 ===== */
+  /* ===== Animation - Stagger Fade In ===== */
   @keyframes staggerFadeIn {
     from {
       opacity: 0;
@@ -313,7 +313,7 @@
   .animate-stagger-in:nth-child(7) { animation-delay: 300ms; }
   .animate-stagger-in:nth-child(8) { animation-delay: 350ms; }
 
-  /* ===== 动画 - 闪光 (加载) ===== */
+  /* ===== Animation - Shimmer (Loading) ===== */
   @keyframes shimmer {
     0% {
       background-position: -200% 0;
@@ -333,7 +333,7 @@
     animation: shimmer 1.5s infinite;
   }
 
-  /* ===== 动画 - 缩放进入 ===== */
+  /* ===== Animation - Scale In ===== */
   @keyframes scaleIn {
     from {
       opacity: 0;
@@ -348,7 +348,7 @@
     animation: scaleIn 200ms ease-out;
   }
 
-  /* ===== 动画 - 从右滑入 ===== */
+  /* ===== Animation - Slide In Right ===== */
   @keyframes slideInRight {
     from {
       opacity: 0;
@@ -363,7 +363,7 @@
     animation: slideInRight 300ms ease-out;
   }
 
-  /* ===== 动画 - 从左滑入 ===== */
+  /* ===== Animation - Slide In Left ===== */
   @keyframes slideInLeft {
     from {
       opacity: 0;
@@ -378,7 +378,7 @@
     animation: slideInLeft 300ms ease-out;
   }
 
-  /* ===== 动画 - 渐变文字 (品牌绿色) ===== */
+  /* ===== Animation - Gradient Text (Brand Green) ===== */
   @keyframes gradientFlow {
     0%, 100% {
       background-position: 0% 50%;
@@ -401,7 +401,7 @@
     animation: gradientFlow 3s ease infinite;
   }
 
-  /* ===== 发光效果 (品牌绿色) ===== */
+  /* ===== Glow Effect (Brand Green) ===== */
   .glow-brand {
     box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
   }
@@ -415,12 +415,12 @@
     box-shadow: 0 0 30px rgba(62, 207, 142, 0.4);
   }
 
-  /* ===== Supabase 标准过渡 ===== */
+  /* ===== Supabase Standard Transitions ===== */
   .transition-supabase {
     transition: all 150ms ease;
   }
 
-  /* ===== 聚焦环 (品牌绿色) ===== */
+  /* ===== Focus Ring (Brand Green) ===== */
   .focus-ring-brand:focus {
     outline: none;
     box-shadow: 0 0 0 2px #171717, 0 0 0 4px #3ECF8E;
@@ -428,7 +428,7 @@
 
 }
 
-/* ===== 亮色主题 (可选) ===== */
+/* ===== Light Theme (Optional) ===== */
 @layer base {
   .light {
     --color-background: #ffffff;
@@ -480,7 +480,7 @@
     --terminal-noise-color: rgba(0, 0, 0, 0.04);
   }
   
-  /* 亮色模式滚动条 */
+  /* Light mode scrollbar */
   .light ::-webkit-scrollbar-thumb {
     background: #d4d4d4;
   }
@@ -517,9 +517,9 @@
 }
 
 @layer utilities {
-  /* ===== Supabase 排版系统 ===== */
+  /* ===== Supabase Typography System ===== */
 
-  /* 页面标题 - 24px, semibold */
+  /* Page title - 24px, semibold */
   .text-page-title {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -527,7 +527,7 @@
     letter-spacing: 0.05em;
   }
 
-  /* 章节标题 - 20px, semibold */
+  /* Section title - 20px, semibold */
   .text-section-title {
     font-size: 1.25rem;
     line-height: 1.75rem;
@@ -535,14 +535,14 @@
     letter-spacing: 0.05em;
   }
 
-  /* 卡片标题 - 16px, semibold */
+  /* Card title - 16px, semibold */
   .text-card-title {
     font-size: 1rem;
     line-height: 1.5rem;
     font-weight: 600;
   }
 
-  /* 分类标签 - 11px, uppercase, tracking-wider */
+  /* Category label - 11px, uppercase, tracking-wider */
   .text-category {
     font-size: 0.6875rem;
     line-height: 1rem;
@@ -552,7 +552,7 @@
     color: var(--color-foreground-light);
   }
 
-  /* 表格头 - 12px, semibold */
+  /* Table header - 12px, semibold */
   .text-table-header {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -562,26 +562,26 @@
     color: var(--color-foreground-light);
   }
 
-  /* 描述文本 - 14px, regular, gray */
+  /* Description text - 14px, regular, gray */
   .text-description {
     font-size: 0.875rem;
     line-height: 1.25rem;
     color: var(--color-foreground-light);
   }
 
-  /* 小文本 - 12px */
+  /* Small text - 12px */
   .text-small {
     font-size: 0.75rem;
     line-height: 1rem;
   }
 
-  /* 极小文本 - 11px */
+  /* Extra small text - 11px */
   .text-xs-custom {
     font-size: 0.6875rem;
     line-height: 0.875rem;
   }
 
-  /* 统计数字 - 24px, semibold */
+  /* Stat number - 24px, semibold */
   .text-stat-number {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -589,7 +589,7 @@
     letter-spacing: -0.02em;
   }
 
-  /* 大统计数字 - 32px, bold */
+  /* Large stat number - 32px, bold */
   .text-stat-large {
     font-size: 2rem;
     line-height: 2.5rem;
@@ -731,7 +731,7 @@
     @apply text-[13px] leading-5 text-foreground-light;
   }
 
-  /* 常见标题尺寸覆盖（避免页面内手写尺寸过大） */
+  /* Common heading size overrides (prevent oversized handwritten sizes in pages) */
   .dashboard-page h1.text-2xl,
   .dashboard-page h1.text-3xl,
   .dashboard-page h1.text-4xl {

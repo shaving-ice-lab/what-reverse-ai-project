@@ -85,8 +85,8 @@ export default function SystemErrorCodesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="错误码清单"
-        description="汇总系统错误码与含义，支持检索与筛选。"
+        title="Error Code Registry"
+        description="Summary of system error codes and meanings, with search and filter support."
         icon={<AlertTriangle className="w-4 h-4" />}
         actions={
           <Button
@@ -97,38 +97,38 @@ export default function SystemErrorCodesPage() {
               if (!localMode) codesQuery.refetch();
             }}
             loading={!localMode && codesQuery.isFetching}
-            loadingText="刷新中..."
+            loadingText="Refreshing..."
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
       <div className="grid gap-3 md:grid-cols-3">
-        <StatsCard title="错误码总数" value={stats.total} subtitle="已录入定义" />
-        <StatsCard title="4xx 错误" value={stats.clientErrors} subtitle="客户端类" />
-        <StatsCard title="5xx 错误" value={stats.serverErrors} subtitle="服务端类" />
+        <StatsCard title="Total Error Codes" value={stats.total} subtitle="Definitions recorded" />
+        <StatsCard title="4xx Errors" value={stats.clientErrors} subtitle="Client-side" />
+        <StatsCard title="5xx Errors" value={stats.serverErrors} subtitle="Server-side" />
       </div>
 
-      <SettingsSection title="错误码列表" description="按模块或关键词过滤。">
+      <SettingsSection title="Error Code List" description="Filter by module or keyword.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="relative w-full max-w-[240px]">
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
             <Input
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
-              placeholder="搜索错误码或描述"
+              placeholder="Search error codes or descriptions"
               className="pl-8"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">模块</span>
+            <span className="text-[11px] text-foreground-muted">Module</span>
             <select
               value={moduleFilter}
               onChange={(event) => setModuleFilter(event.target.value)}
               className="h-8 rounded-md border border-border bg-surface-100 px-2 text-[12px] text-foreground-light focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500"
             >
-              <option value="all">全部模块</option>
+              <option value="all">All Modules</option>
               {moduleOptions.map((module) => (
                 <option key={module} value={module}>
                   {module}
@@ -137,25 +137,25 @@ export default function SystemErrorCodesPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {filtered.length} 条
+            {filtered.length} results
           </Badge>
         </div>
 
         {isLoading ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : filtered.length === 0 ? (
           <EmptyState
-            title="暂无错误码"
-            description="没有匹配到错误码记录。"
+            title="No Error Codes"
+            description="No matching error code records found."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>错误码</TableHead>
-                <TableHead>模块</TableHead>
+                <TableHead>Error Code</TableHead>
+                <TableHead>Module</TableHead>
                 <TableHead>HTTP</TableHead>
-                <TableHead>说明</TableHead>
+                <TableHead>Description</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

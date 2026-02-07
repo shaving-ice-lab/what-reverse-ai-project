@@ -64,7 +64,7 @@ interface Subscription {
 const mockSubscriptions: Subscription[] = [
   {
     id: "sub-1",
-    name: "日活跃用户报告",
+    name: "Daily Active Users Report",
     metric_keys: ["dau", "mau", "user_retention"],
     frequency: "daily",
     delivery_method: "email",
@@ -75,7 +75,7 @@ const mockSubscriptions: Subscription[] = [
   },
   {
     id: "sub-2",
-    name: "周收入摘要",
+    name: "Weekly Revenue Summary",
     metric_keys: ["revenue", "mrr", "churn_rate"],
     frequency: "weekly",
     delivery_method: "email",
@@ -86,7 +86,7 @@ const mockSubscriptions: Subscription[] = [
   },
   {
     id: "sub-3",
-    name: "API 性能告警",
+    name: "API Performance Alert",
     metric_keys: ["api_latency", "error_rate", "throughput"],
     frequency: "daily",
     delivery_method: "webhook",
@@ -98,18 +98,18 @@ const mockSubscriptions: Subscription[] = [
 ];
 
 const mockAvailableMetrics = [
-  { key: "dau", name: "日活跃用户", category: "用户", description: "每日活跃用户数" },
-  { key: "mau", name: "月活跃用户", category: "用户", description: "每月活跃用户数" },
-  { key: "user_retention", name: "用户留存率", category: "用户", description: "用户留存百分比" },
-  { key: "revenue", name: "收入", category: "财务", description: "总收入金额" },
-  { key: "mrr", name: "月度经常性收入", category: "财务", description: "MRR 金额" },
-  { key: "churn_rate", name: "流失率", category: "财务", description: "用户流失百分比" },
-  { key: "api_latency", name: "API 延迟", category: "性能", description: "平均 API 响应时间" },
-  { key: "error_rate", name: "错误率", category: "性能", description: "请求错误百分比" },
-  { key: "throughput", name: "吞吐量", category: "性能", description: "每秒请求数" },
-  { key: "executions", name: "执行数", category: "用量", description: "工作流执行次数" },
-  { key: "conversations", name: "对话数", category: "用量", description: "对话会话数" },
-  { key: "storage_used", name: "存储使用", category: "用量", description: "已使用存储空间" },
+  { key: "dau", name: "Daily Active Users", category: "Users", description: "Number of daily active users" },
+  { key: "mau", name: "Monthly Active Users", category: "Users", description: "Number of monthly active users" },
+  { key: "user_retention", name: "User Retention Rate", category: "Users", description: "User retention percentage" },
+  { key: "revenue", name: "Revenue", category: "Finance", description: "Total revenue amount" },
+  { key: "mrr", name: "Monthly Recurring Revenue", category: "Finance", description: "MRR amount" },
+  { key: "churn_rate", name: "Churn Rate", category: "Finance", description: "User churn percentage" },
+  { key: "api_latency", name: "API Latency", category: "Performance", description: "Average API response time" },
+  { key: "error_rate", name: "Error Rate", category: "Performance", description: "Request error percentage" },
+  { key: "throughput", name: "Throughput", category: "Performance", description: "Requests per second" },
+  { key: "executions", name: "Executions", category: "Usage", description: "Workflow execution count" },
+  { key: "conversations", name: "Conversations", category: "Usage", description: "Conversation session count" },
+  { key: "storage_used", name: "Storage Used", category: "Usage", description: "Used storage space" },
 ];
 
 const mockExportJobs = [
@@ -118,9 +118,9 @@ const mockExportJobs = [
 ];
 
 const FREQUENCY_LABELS: Record<string, string> = {
-  daily: "每日",
-  weekly: "每周",
-  monthly: "每月",
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
 };
 
 type Metric = (typeof mockAvailableMetrics)[number];
@@ -223,11 +223,11 @@ export default function MetricsSubscriptionsPage() {
       return adminApi.metricsSubscriptions.create(input);
     },
     onSuccess: () => {
-      toast.success(selectedSubscription ? "订阅已更新" : "订阅已创建");
+      toast.success(selectedSubscription ? "Subscription updated" : "Subscription created");
       setEditOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "analytics", "subscriptions"] });
     },
-    onError: () => toast.error("保存失败"),
+    onError: () => toast.error("Save failed"),
   });
 
   const deleteMutation = useMutation({
@@ -239,11 +239,11 @@ export default function MetricsSubscriptionsPage() {
       return adminApi.metricsSubscriptions.delete(subscriptionId);
     },
     onSuccess: () => {
-      toast.success("订阅已删除");
+      toast.success("Subscription deleted");
       setDeleteOpen(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "analytics", "subscriptions"] });
     },
-    onError: () => toast.error("删除失败"),
+    onError: () => toast.error("Delete failed"),
   });
 
   const toggleEnabledMutation = useMutation({
@@ -257,10 +257,10 @@ export default function MetricsSubscriptionsPage() {
       return adminApi.metricsSubscriptions.update(subscriptionId, { enabled });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "analytics", "subscriptions"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const exportMutation = useMutation({
@@ -277,10 +277,10 @@ export default function MetricsSubscriptionsPage() {
       });
     },
     onSuccess: () => {
-      toast.success("导出任务已创建");
+      toast.success("Export job created");
       setExportOpen(false);
     },
-    onError: () => toast.error("创建导出任务失败"),
+    onError: () => toast.error("Failed to create export job"),
   });
 
   const enabledCount = subscriptions.filter((s) => s.enabled).length;
@@ -288,20 +288,20 @@ export default function MetricsSubscriptionsPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="指标订阅与导出"
-        description="订阅关键指标报告，按需导出数据。"
+        title="Metrics Subscriptions & Export"
+        description="Subscribe to key metric reports and export data on demand."
         icon={<BarChart3 className="w-4 h-4" />}
         backHref="/analytics"
-        backLabel="返回分析概览"
+        backLabel="Back to Analytics"
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
               <FileDown className="w-3.5 h-3.5 mr-1" />
-              导出指标
+              Export Metrics
             </Button>
             <Button size="sm" onClick={openCreateDialog}>
               <Plus className="w-3.5 h-3.5 mr-1" />
-              新建订阅
+              New Subscription
             </Button>
           </div>
         }
@@ -309,41 +309,41 @@ export default function MetricsSubscriptionsPage() {
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="活跃订阅"
+          title="Active Subscriptions"
           value={enabledCount.toString()}
-          subtitle="个订阅"
+          subtitle="subscriptions"
         />
         <StatsCard
-          title="可用指标"
+          title="Available Metrics"
           value={mockAvailableMetrics.length.toString()}
-          subtitle="个指标"
+          subtitle="metrics"
         />
         <StatsCard
-          title="今日发送"
+          title="Sent Today"
           value="12"
-          subtitle="封报告"
+          subtitle="reports"
         />
         <StatsCard
-          title="本月导出"
+          title="Exports This Month"
           value={mockExportJobs.length.toString()}
-          subtitle="次导出"
+          subtitle="exports"
         />
       </div>
 
       <SettingsSection
-        title="订阅列表"
-        description="已配置的指标报告订阅。"
+        title="Subscription List"
+        description="Configured metric report subscriptions."
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>订阅名称</TableHead>
-              <TableHead>指标</TableHead>
-              <TableHead>频率</TableHead>
-              <TableHead>发送方式</TableHead>
-              <TableHead>最近发送</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Subscription Name</TableHead>
+              <TableHead>Metrics</TableHead>
+              <TableHead>Frequency</TableHead>
+              <TableHead>Delivery</TableHead>
+              <TableHead>Last Sent</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -353,7 +353,7 @@ export default function MetricsSubscriptionsPage() {
                   colSpan={7}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无订阅
+                  No subscriptions
                 </TableCell>
               </TableRow>
             ) : (
@@ -388,7 +388,7 @@ export default function MetricsSubscriptionsPage() {
                       ) : (
                         <Webhook className="w-3.5 h-3.5" />
                       )}
-                      {subscription.delivery_method === "email" ? "邮件" : "Webhook"}
+                      {subscription.delivery_method === "email" ? "Email" : "Webhook"}
                     </div>
                   </TableCell>
                   <TableCell className="text-[12px] text-foreground-muted">
@@ -396,7 +396,7 @@ export default function MetricsSubscriptionsPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={subscription.enabled ? "success" : "secondary"} size="sm">
-                      {subscription.enabled ? "启用" : "停用"}
+                      {subscription.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -434,24 +434,24 @@ export default function MetricsSubscriptionsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Bell className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>{selectedSubscription ? "编辑订阅" : "新建订阅"}</DialogTitle>
+            <DialogTitle>{selectedSubscription ? "Edit Subscription" : "New Subscription"}</DialogTitle>
             <DialogDescription>
-              配置指标报告的订阅设置。
+              Configure metric report subscription settings.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 max-h-[400px] overflow-y-auto">
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">订阅名称</label>
+              <label className="text-[12px] text-foreground">Subscription Name</label>
               <Input
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder="输入订阅名称"
+                placeholder="Enter subscription name"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] text-foreground">选择指标</label>
+              <label className="text-[12px] text-foreground">Select Metrics</label>
               <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto p-2 rounded-lg border border-border bg-surface-75">
                 {mockAvailableMetrics.map((metric) => (
                   <button
@@ -481,7 +481,7 @@ export default function MetricsSubscriptionsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">发送频率</label>
+                <label className="text-[12px] text-foreground">Frequency</label>
                 <div className="flex gap-2">
                   {(["daily", "weekly", "monthly"] as const).map((freq) => (
                     <Button
@@ -497,7 +497,7 @@ export default function MetricsSubscriptionsPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">发送方式</label>
+                <label className="text-[12px] text-foreground">Delivery Method</label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -506,7 +506,7 @@ export default function MetricsSubscriptionsPage() {
                     onClick={() => setFormDeliveryMethod("email")}
                   >
                     <Mail className="w-3.5 h-3.5 mr-1" />
-                    邮件
+                    Email
                   </Button>
                   <Button
                     type="button"
@@ -523,26 +523,26 @@ export default function MetricsSubscriptionsPage() {
 
             <div className="space-y-1">
               <label className="text-[12px] text-foreground">
-                {formDeliveryMethod === "email" ? "收件人邮箱" : "Webhook URL"}
+                {formDeliveryMethod === "email" ? "Recipient Emails" : "Webhook URL"}
               </label>
               <Input
                 value={formRecipients}
                 onChange={(e) => setFormRecipients(e.target.value)}
-                placeholder={formDeliveryMethod === "email" ? "多个邮箱用逗号分隔" : "输入 Webhook URL"}
+                placeholder={formDeliveryMethod === "email" ? "Separate multiple emails with commas" : "Enter Webhook URL"}
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => saveMutation.mutate()}
               loading={saveMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -552,15 +552,15 @@ export default function MetricsSubscriptionsPage() {
       <Dialog open={exportOpen} onOpenChange={setExportOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<FileDown className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>导出指标数据</DialogTitle>
+            <DialogTitle>Export Metrics Data</DialogTitle>
             <DialogDescription>
-              选择指标、时间范围和导出格式。
+              Select metrics, time range, and export format.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 max-h-[400px] overflow-y-auto">
             <div className="space-y-2">
-              <label className="text-[12px] text-foreground">选择指标</label>
+              <label className="text-[12px] text-foreground">Select Metrics</label>
               <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto p-2 rounded-lg border border-border bg-surface-75">
                 {mockAvailableMetrics.map((metric) => (
                   <button
@@ -587,7 +587,7 @@ export default function MetricsSubscriptionsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">开始日期</label>
+                <label className="text-[12px] text-foreground">Start Date</label>
                 <Input
                   type="date"
                   value={exportStartDate}
@@ -595,7 +595,7 @@ export default function MetricsSubscriptionsPage() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">结束日期</label>
+                <label className="text-[12px] text-foreground">End Date</label>
                 <Input
                   type="date"
                   value={exportEndDate}
@@ -606,7 +606,7 @@ export default function MetricsSubscriptionsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">导出格式</label>
+                <label className="text-[12px] text-foreground">Export Format</label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -627,7 +627,7 @@ export default function MetricsSubscriptionsPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[12px] text-foreground">数据粒度</label>
+                <label className="text-[12px] text-foreground">Granularity</label>
                 <div className="flex gap-2">
                   {(["hourly", "daily", "weekly"] as const).map((gran) => (
                     <Button
@@ -637,7 +637,7 @@ export default function MetricsSubscriptionsPage() {
                       size="sm"
                       onClick={() => setExportGranularity(gran)}
                     >
-                      {gran === "hourly" ? "小时" : gran === "daily" ? "天" : "周"}
+                      {gran === "hourly" ? "Hourly" : gran === "daily" ? "Daily" : "Weekly"}
                     </Button>
                   ))}
                 </div>
@@ -647,14 +647,14 @@ export default function MetricsSubscriptionsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setExportOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => exportMutation.mutate()}
               loading={exportMutation.isPending}
-              loadingText="创建中..."
+              loadingText="Creating..."
             >
-              开始导出
+              Start Export
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -664,9 +664,9 @@ export default function MetricsSubscriptionsPage() {
       <ConfirmDialog
         open={Boolean(deleteOpen)}
         onOpenChange={(open) => !open && setDeleteOpen(null)}
-        title="删除订阅"
-        description="确认要删除此订阅吗？此操作不可撤销。"
-        confirmLabel="确认删除"
+        title="Delete Subscription"
+        description="Are you sure you want to delete this subscription? This action cannot be undone."
+        confirmLabel="Confirm Delete"
         onConfirm={() => deleteOpen && deleteMutation.mutate(deleteOpen)}
         isLoading={deleteMutation.isPending}
         variant="danger"

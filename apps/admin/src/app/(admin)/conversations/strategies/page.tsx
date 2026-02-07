@@ -45,7 +45,7 @@ const mockStrategies = [
   {
     id: "strat-1",
     model: "gpt-4",
-    system_prompt: "你是一个专业的AI助手，提供准确、有帮助的回答。",
+    system_prompt: "You are a professional AI assistant, providing accurate and helpful answers.",
     temperature: 0.7,
     max_tokens: 4096,
     rate_limit: 60,
@@ -55,7 +55,7 @@ const mockStrategies = [
   {
     id: "strat-2",
     model: "gpt-4-turbo",
-    system_prompt: "你是一个高效的AI助手，快速回答用户问题。",
+    system_prompt: "You are an efficient AI assistant, quickly answering user questions.",
     temperature: 0.5,
     max_tokens: 8192,
     rate_limit: 100,
@@ -65,7 +65,7 @@ const mockStrategies = [
   {
     id: "strat-3",
     model: "gpt-3.5-turbo",
-    system_prompt: "你是一个友好的AI助手。",
+    system_prompt: "You are a friendly AI assistant.",
     temperature: 0.8,
     max_tokens: 2048,
     rate_limit: 200,
@@ -75,7 +75,7 @@ const mockStrategies = [
   {
     id: "strat-4",
     model: "claude-3-opus",
-    system_prompt: "你是Claude，一个有帮助、无害、诚实的AI助手。",
+    system_prompt: "You are Claude, a helpful, harmless, and honest AI assistant.",
     temperature: 0.7,
     max_tokens: 4096,
     rate_limit: 30,
@@ -85,7 +85,7 @@ const mockStrategies = [
   {
     id: "strat-5",
     model: "claude-3-sonnet",
-    system_prompt: "你是Claude，一个有帮助、无害、诚实的AI助手。",
+    system_prompt: "You are Claude, a helpful, harmless, and honest AI assistant.",
     temperature: 0.6,
     max_tokens: 4096,
     rate_limit: 60,
@@ -152,11 +152,11 @@ export default function ModelStrategiesPage() {
       return adminApi.conversations.updateModelStrategy(selectedStrategy.id, input);
     },
     onSuccess: () => {
-      toast.success("策略已更新");
+      toast.success("Strategy updated");
       setEditOpen(false);
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "model-strategies"] });
     },
-    onError: () => toast.error("保存失败"),
+    onError: () => toast.error("Save failed"),
   });
 
   const toggleEnabledMutation = useMutation({
@@ -170,10 +170,10 @@ export default function ModelStrategiesPage() {
       return adminApi.conversations.updateModelStrategy(strategyId, { enabled });
     },
     onSuccess: () => {
-      toast.success("状态已更新");
+      toast.success("Status updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "conversations", "model-strategies"] });
     },
-    onError: () => toast.error("更新失败"),
+    onError: () => toast.error("Update failed"),
   });
 
   const enabledCount = strategies.filter((s) => s.enabled).length;
@@ -182,49 +182,49 @@ export default function ModelStrategiesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="模型提示词与策略管理"
-        description="配置 AI 模型的系统提示词、参数和使用限制。"
+        title="Model Prompt & Strategy Management"
+        description="Configure AI model system prompts, parameters, and usage limits."
         icon={<Bot className="w-4 h-4" />}
         backHref="/conversations"
-        backLabel="返回对话列表"
+        backLabel="Back to Conversations"
       />
 
       <div className="page-grid grid-cols-2 lg:grid-cols-4 mb-6">
         <StatsCard
-          title="已配置模型"
+          title="Configured Models"
           value={strategies.length.toString()}
-          subtitle="个模型"
+          subtitle="models"
         />
         <StatsCard
-          title="已启用"
+          title="Enabled"
           value={enabledCount.toString()}
-          subtitle="个模型"
+          subtitle="models"
         />
         <StatsCard
-          title="日成本上限"
+          title="Daily Cost Limit"
           value={`$${totalCostLimit}`}
-          subtitle="总预算"
+          subtitle="total budget"
         />
         <StatsCard
-          title="总速率限制"
+          title="Total Rate Limit"
           value={strategies.filter((s) => s.enabled).reduce((sum, s) => sum + s.rate_limit, 0).toString()}
-          subtitle="请求/分钟"
+          subtitle="requests/min"
         />
       </div>
 
       <SettingsSection
-        title="模型策略配置"
-        description="为每个 AI 模型配置独立的参数和限制。"
+        title="Model Strategy Configuration"
+        description="Configure independent parameters and limits for each AI model."
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>模型</TableHead>
-              <TableHead>系统提示词</TableHead>
-              <TableHead>参数</TableHead>
-              <TableHead>限制</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>System Prompt</TableHead>
+              <TableHead>Parameters</TableHead>
+              <TableHead>Limits</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -234,7 +234,7 @@ export default function ModelStrategiesPage() {
                   colSpan={6}
                   className="py-10 text-center text-[12px] text-foreground-muted"
                 >
-                  暂无模型配置
+                  No model configurations
                 </TableCell>
               </TableRow>
             ) : (
@@ -273,7 +273,7 @@ export default function ModelStrategiesPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={strategy.enabled ? "success" : "secondary"} size="sm">
-                      {strategy.enabled ? "已启用" : "已禁用"}
+                      {strategy.enabled ? "Enabled" : "Disabled"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -304,22 +304,22 @@ export default function ModelStrategiesPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent size="lg">
           <DialogHeader icon={<Settings className="w-6 h-6" />} iconVariant="info">
-            <DialogTitle>编辑模型策略</DialogTitle>
+            <DialogTitle>Edit Model Strategy</DialogTitle>
             <DialogDescription>
               {selectedStrategy?.model && (
-                <span className="text-foreground-light">配置 {selectedStrategy.model} 的参数和限制。</span>
+                <span className="text-foreground-light">Configure parameters and limits for {selectedStrategy.model}.</span>
               )}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-[12px] text-foreground">系统提示词</label>
+              <label className="text-[12px] text-foreground">System Prompt</label>
               <textarea
                 value={formSystemPrompt}
                 onChange={(e) => setFormSystemPrompt(e.target.value)}
                 rows={4}
-                placeholder="输入系统提示词..."
+                    placeholder="Enter system prompt..."
                 className="w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-[12px] text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/30"
               />
             </div>
@@ -335,7 +335,7 @@ export default function ModelStrategiesPage() {
                   value={formTemperature}
                   onChange={(e) => setFormTemperature(parseFloat(e.target.value) || 0.7)}
                 />
-                <p className="text-[11px] text-foreground-muted">控制输出的随机性 (0-2)</p>
+                <p className="text-[11px] text-foreground-muted">Controls output randomness (0-2)</p>
               </div>
               <div className="space-y-1">
                 <label className="text-[12px] text-foreground">Max Tokens</label>
@@ -346,13 +346,13 @@ export default function ModelStrategiesPage() {
                   value={formMaxTokens}
                   onChange={(e) => setFormMaxTokens(parseInt(e.target.value) || 4096)}
                 />
-                <p className="text-[11px] text-foreground-muted">单次响应的最大 token 数</p>
+                <p className="text-[11px] text-foreground-muted">Maximum tokens per response</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">速率限制 (请求/分钟)</label>
+                <label className="text-[12px] text-foreground">Rate Limit (requests/min)</label>
                 <Input
                   type="number"
                   min={1}
@@ -360,10 +360,10 @@ export default function ModelStrategiesPage() {
                   value={formRateLimit}
                   onChange={(e) => setFormRateLimit(parseInt(e.target.value) || 60)}
                 />
-                <p className="text-[11px] text-foreground-muted">每分钟最大请求数</p>
+                <p className="text-[11px] text-foreground-muted">Maximum requests per minute</p>
               </div>
               <div className="space-y-1">
-                <label className="text-[12px] text-foreground">日成本上限 ($)</label>
+                <label className="text-[12px] text-foreground">Daily Cost Limit ($)</label>
                 <Input
                   type="number"
                   min={0}
@@ -371,21 +371,21 @@ export default function ModelStrategiesPage() {
                   value={formCostLimit}
                   onChange={(e) => setFormCostLimit(parseInt(e.target.value) || 100)}
                 />
-                <p className="text-[11px] text-foreground-muted">每日 API 调用成本上限</p>
+                <p className="text-[11px] text-foreground-muted">Daily API call cost limit</p>
               </div>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button
               onClick={() => saveMutation.mutate()}
               loading={saveMutation.isPending}
-              loadingText="保存中..."
+              loadingText="Saving..."
             >
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -36,52 +36,52 @@ import { formatRelativeTime } from "@/lib/utils";
 import type { ChangeStatus, ChangeType, OpsChange } from "@/types/ops";
 
 const CHANGE_TYPE_OPTIONS: { value: ChangeType | ""; label: string }[] = [
-  { value: "", label: "全部类型" },
-  { value: "config", label: "配置变更" },
-  { value: "feature_flag", label: "功能开关" },
-  { value: "secret", label: "密钥轮换" },
-  { value: "deployment", label: "部署变更" },
-  { value: "scaling", label: "扩缩容" },
-  { value: "maintenance", label: "维护操作" },
+  { value: "", label: "All Types" },
+  { value: "config", label: "Config Change" },
+  { value: "feature_flag", label: "Feature Flag" },
+  { value: "secret", label: "Secret Rotation" },
+  { value: "deployment", label: "Deployment Change" },
+  { value: "scaling", label: "Scaling" },
+  { value: "maintenance", label: "Maintenance" },
 ];
 
 const CHANGE_STATUS_OPTIONS: { value: ChangeStatus | ""; label: string }[] = [
-  { value: "", label: "全部状态" },
-  { value: "pending", label: "待审批" },
-  { value: "approved", label: "已批准" },
-  { value: "rejected", label: "已拒绝" },
-  { value: "applied", label: "已应用" },
-  { value: "rolled_back", label: "已回滚" },
+  { value: "", label: "All Statuses" },
+  { value: "pending", label: "Pending Approval" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+  { value: "applied", label: "Applied" },
+  { value: "rolled_back", label: "Rolled Back" },
 ];
 
 const CHANGE_TYPE_CONFIG: Record<ChangeType, { label: string; icon: React.ReactNode }> = {
-  config: { label: "配置变更", icon: <Settings2 className="w-3.5 h-3.5" /> },
-  feature_flag: { label: "功能开关", icon: <GitBranch className="w-3.5 h-3.5" /> },
-  secret: { label: "密钥轮换", icon: <Shield className="w-3.5 h-3.5" /> },
-  deployment: { label: "部署变更", icon: <Play className="w-3.5 h-3.5" /> },
-  scaling: { label: "扩缩容", icon: <History className="w-3.5 h-3.5" /> },
-  maintenance: { label: "维护操作", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  config: { label: "Config Change", icon: <Settings2 className="w-3.5 h-3.5" /> },
+  feature_flag: { label: "Feature Flag", icon: <GitBranch className="w-3.5 h-3.5" /> },
+  secret: { label: "Secret Rotation", icon: <Shield className="w-3.5 h-3.5" /> },
+  deployment: { label: "Deployment Change", icon: <Play className="w-3.5 h-3.5" /> },
+  scaling: { label: "Scaling", icon: <History className="w-3.5 h-3.5" /> },
+  maintenance: { label: "Maintenance", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
 };
 
 const CHANGE_STATUS_CONFIG: Record<
   ChangeStatus,
   { label: string; variant: "secondary" | "info" | "success" | "error" | "warning" }
 > = {
-  pending: { label: "待审批", variant: "warning" },
-  approved: { label: "已批准", variant: "info" },
-  rejected: { label: "已拒绝", variant: "error" },
-  applied: { label: "已应用", variant: "success" },
-  rolled_back: { label: "已回滚", variant: "secondary" },
+  pending: { label: "Pending Approval", variant: "warning" },
+  approved: { label: "Approved", variant: "info" },
+  rejected: { label: "Rejected", variant: "error" },
+  applied: { label: "Applied", variant: "success" },
+  rolled_back: { label: "Rolled Back", variant: "secondary" },
 };
 
 const RISK_LEVEL_CONFIG: Record<
   string,
   { label: string; variant: "secondary" | "info" | "warning" | "error" }
 > = {
-  low: { label: "低", variant: "secondary" },
-  medium: { label: "中", variant: "info" },
-  high: { label: "高", variant: "warning" },
-  critical: { label: "严重", variant: "error" },
+  low: { label: "Low", variant: "secondary" },
+  medium: { label: "Medium", variant: "info" },
+  high: { label: "High", variant: "warning" },
+  critical: { label: "Critical", variant: "error" },
 };
 
 const PAGE_SIZES = [10, 20, 50];
@@ -133,45 +133,45 @@ export default function OpsChangesPage() {
   const approveMutation = useMutation({
     mutationFn: async (change: OpsChange) => opsApi.approveChange(change.id),
     onSuccess: () => {
-      toast.success("变更已批准");
+      toast.success("Change approved");
       queryClient.invalidateQueries({ queryKey: ["ops", "changes"] });
       setDialogOpen(false);
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "批准失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Approval failed"),
   });
 
   const rejectMutation = useMutation({
     mutationFn: async ({ change, reason }: { change: OpsChange; reason: string }) =>
       opsApi.rejectChange(change.id, reason),
     onSuccess: () => {
-      toast.success("变更已拒绝");
+      toast.success("Change rejected");
       queryClient.invalidateQueries({ queryKey: ["ops", "changes"] });
       setDialogOpen(false);
       setRejectReason("");
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "拒绝失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Rejection failed"),
   });
 
   const applyMutation = useMutation({
     mutationFn: async (change: OpsChange) => opsApi.applyChange(change.id),
     onSuccess: () => {
-      toast.success("变更已应用");
+      toast.success("Change applied");
       queryClient.invalidateQueries({ queryKey: ["ops", "changes"] });
       setDialogOpen(false);
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "应用失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Application failed"),
   });
 
   const rollbackMutation = useMutation({
     mutationFn: async ({ change, reason }: { change: OpsChange; reason: string }) =>
       opsApi.rollbackChange(change.id, reason),
     onSuccess: () => {
-      toast.success("变更已回滚");
+      toast.success("Change rolled back");
       queryClient.invalidateQueries({ queryKey: ["ops", "changes"] });
       setDialogOpen(false);
       setRejectReason("");
     },
-    onError: (error) => toast.error(error instanceof Error ? error.message : "回滚失败"),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Rollback failed"),
   });
 
   const openDialog = (change: OpsChange, type: "approve" | "reject" | "apply" | "rollback") => {
@@ -189,7 +189,7 @@ export default function OpsChangesPage() {
         break;
       case "reject":
         if (!rejectReason.trim()) {
-          toast.error("请填写拒绝原因");
+          toast.error("Please provide a reason for rejection");
           return;
         }
         rejectMutation.mutate({ change: selectedChange, reason: rejectReason });
@@ -199,7 +199,7 @@ export default function OpsChangesPage() {
         break;
       case "rollback":
         if (!rejectReason.trim()) {
-          toast.error("请填写回滚原因");
+          toast.error("Please provide a reason for rollback");
           return;
         }
         rollbackMutation.mutate({ change: selectedChange, reason: rejectReason });
@@ -216,28 +216,28 @@ export default function OpsChangesPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="运维变更记录"
-        description="查看和审批运维变更请求。"
+        title="Ops Change Log"
+        description="View and approve ops change requests."
         icon={<FileText className="w-4 h-4" />}
         actions={
           <Button
             variant="outline"
             size="sm"
             loading={listQuery.isFetching}
-            loadingText="刷新中..."
+            loadingText="Refreshing..."
             leftIcon={<RefreshCcw className="w-4 h-4" />}
             onClick={() => listQuery.refetch()}
             disabled={localMode}
           >
-            刷新
+            Refresh
           </Button>
         }
       />
 
-      <SettingsSection title="变更列表" description="审批与追踪运维变更。">
+      <SettingsSection title="Change List" description="Approve and track ops changes.">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">类型</span>
+            <span className="text-[11px] text-foreground-muted">Type</span>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as ChangeType | "")}
@@ -251,7 +251,7 @@ export default function OpsChangesPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">状态</span>
+            <span className="text-[11px] text-foreground-muted">Status</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as ChangeStatus | "")}
@@ -265,7 +265,7 @@ export default function OpsChangesPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-foreground-muted">每页</span>
+            <span className="text-[11px] text-foreground-muted">Per Page</span>
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
@@ -279,7 +279,7 @@ export default function OpsChangesPage() {
             </select>
           </div>
           <Badge variant="outline" size="sm">
-            共 {changes.length} 条
+            {changes.length} total
           </Badge>
           <div className="ml-auto flex items-center gap-2">
             <Button
@@ -288,10 +288,10 @@ export default function OpsChangesPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={!canPrev}
             >
-              上一页
+              Previous
             </Button>
             <Badge variant="secondary" size="sm">
-              第 {page} 页
+              Page {page}
             </Badge>
             <Button
               variant="outline"
@@ -299,18 +299,18 @@ export default function OpsChangesPage() {
               onClick={() => setPage((p) => p + 1)}
               disabled={!canNext}
             >
-              下一页
+              Next
             </Button>
           </div>
         </div>
 
         {listQuery.isPending && !localMode ? (
-          <div className="text-[12px] text-foreground-muted">正在加载...</div>
+          <div className="text-[12px] text-foreground-muted">Loading...</div>
         ) : changes.length === 0 ? (
           <EmptyState
             icon={<FileText className="w-5 h-5" />}
-            title="暂无变更记录"
-            description="当前没有符合条件的变更记录。"
+            title="No Change Records"
+            description="No change records match the current filters."
           />
         ) : (
           <div className="space-y-3">
@@ -349,7 +349,7 @@ export default function OpsChangesPage() {
                           {statusConfig.label}
                         </Badge>
                         <Badge variant={riskConfig.variant} size="sm">
-                          风险: {riskConfig.label}
+                          Risk: {riskConfig.label}
                         </Badge>
                       </div>
                       <div className="text-[11px] text-foreground-muted mt-0.5">
@@ -369,7 +369,7 @@ export default function OpsChangesPage() {
                             }}
                             disabled={localMode}
                           >
-                            批准
+                            Approve
                           </Button>
                           <Button
                             variant="destructive-outline"
@@ -381,7 +381,7 @@ export default function OpsChangesPage() {
                             }}
                             disabled={localMode}
                           >
-                            拒绝
+                            Reject
                           </Button>
                         </>
                       )}
@@ -396,7 +396,7 @@ export default function OpsChangesPage() {
                           }}
                           disabled={localMode}
                         >
-                          应用
+                          Apply
                         </Button>
                       )}
                       {canRollback && (
@@ -410,7 +410,7 @@ export default function OpsChangesPage() {
                           }}
                           disabled={localMode}
                         >
-                          回滚
+                          Rollback
                         </Button>
                       )}
                     </div>
@@ -419,24 +419,24 @@ export default function OpsChangesPage() {
                   {isExpanded && (
                     <div className="border-t border-border p-4 bg-surface-50 space-y-4">
                       <div>
-                        <div className="text-[11px] text-foreground-muted mb-1">描述</div>
+                        <div className="text-[11px] text-foreground-muted mb-1">Description</div>
                         <div className="text-[12px] text-foreground-light">{change.description}</div>
                       </div>
 
                       <div>
-                        <div className="text-[11px] text-foreground-muted mb-2">变更内容</div>
+                        <div className="text-[11px] text-foreground-muted mb-2">Change Details</div>
                         <div className="rounded-md border border-border bg-surface-100 overflow-hidden">
                           <table className="w-full text-[11px]">
                             <thead>
                               <tr className="border-b border-border">
                                 <th className="text-left px-3 py-2 text-foreground-muted font-medium">
-                                  字段
+                                  Field
                                 </th>
                                 <th className="text-left px-3 py-2 text-foreground-muted font-medium">
-                                  原值
+                                  Old Value
                                 </th>
                                 <th className="text-left px-3 py-2 text-foreground-muted font-medium">
-                                  新值
+                                  New Value
                                 </th>
                               </tr>
                             </thead>
@@ -459,7 +459,7 @@ export default function OpsChangesPage() {
 
                       {change.rollback_plan && (
                         <div>
-                          <div className="text-[11px] text-foreground-muted mb-1">回滚计划</div>
+                          <div className="text-[11px] text-foreground-muted mb-1">Rollback Plan</div>
                           <div className="text-[12px] text-foreground-light whitespace-pre-wrap font-mono bg-surface-100 rounded-md p-3 border border-border">
                             {change.rollback_plan}
                           </div>
@@ -469,7 +469,7 @@ export default function OpsChangesPage() {
                       <div className="flex flex-wrap gap-4 text-[11px] text-foreground-muted">
                         {change.approved_by && (
                           <div>
-                            审批人: <span className="text-foreground-light">{change.approver_email}</span>
+                            Approver: <span className="text-foreground-light">{change.approver_email}</span>
                             {change.approved_at && (
                               <span className="ml-1">({formatRelativeTime(change.approved_at)})</span>
                             )}
@@ -477,7 +477,7 @@ export default function OpsChangesPage() {
                         )}
                         {change.applied_by && (
                           <div>
-                            执行人: <span className="text-foreground-light">{change.applier_email}</span>
+                            Executor: <span className="text-foreground-light">{change.applier_email}</span>
                             {change.applied_at && (
                               <span className="ml-1">({formatRelativeTime(change.applied_at)})</span>
                             )}
@@ -485,7 +485,7 @@ export default function OpsChangesPage() {
                         )}
                         {change.rolled_back_at && (
                           <div>
-                            回滚时间: <span className="text-foreground-light">{formatRelativeTime(change.rolled_back_at)}</span>
+                            Rollback Time: <span className="text-foreground-light">{formatRelativeTime(change.rolled_back_at)}</span>
                           </div>
                         )}
                       </div>
@@ -504,12 +504,12 @@ export default function OpsChangesPage() {
         type={dialogType === "approve" || dialogType === "apply" ? "info" : "warning"}
         title={
           dialogType === "approve"
-            ? "确认批准该变更？"
+            ? "Confirm approval of this change?"
             : dialogType === "reject"
-            ? "确认拒绝该变更？"
+            ? "Confirm rejection of this change?"
             : dialogType === "apply"
-            ? "确认应用该变更？"
-            : "确认回滚该变更？"
+            ? "Confirm applying this change?"
+            : "Confirm rollback of this change?"
         }
         description={
           <div className="space-y-3">
@@ -517,7 +517,7 @@ export default function OpsChangesPage() {
             {(dialogType === "reject" || dialogType === "rollback") && (
               <div>
                 <Input
-                  placeholder={dialogType === "reject" ? "请填写拒绝原因" : "请填写回滚原因"}
+                  placeholder={dialogType === "reject" ? "Please enter the reason for rejection" : "Please enter the reason for rollback"}
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   className="mt-2"
@@ -528,14 +528,14 @@ export default function OpsChangesPage() {
         }
         confirmText={
           dialogType === "approve"
-            ? "批准"
+            ? "Approve"
             : dialogType === "reject"
-            ? "拒绝"
+            ? "Reject"
             : dialogType === "apply"
-            ? "应用"
-            : "回滚"
+            ? "Apply"
+            : "Rollback"
         }
-        cancelText="取消"
+        cancelText="Cancel"
         loading={isLoading}
         onConfirm={handleConfirm}
       />
