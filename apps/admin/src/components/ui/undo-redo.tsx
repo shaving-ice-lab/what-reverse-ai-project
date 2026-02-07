@@ -208,14 +208,14 @@ function UndoRedoToast({ action, type, onUndo, onDismiss }: UndoRedoToastProps) 
             <Redo2 className="w-4 h-4 text-foreground-muted" />
           )}
           <span className="text-sm text-foreground">
-            {type === "undo" ? "已撤销" : "已重做"}：{action.label}
+            {type === "undo" ? "Undone" : "Redone"}: {action.label}
           </span>
         </div>
         <button
           onClick={onUndo}
           className="text-sm text-brand-500 hover:text-brand-400 font-medium"
         >
-          {type === "undo" ? "重做" : "撤销"}
+          {type === "undo" ? "Redo" : "Undo"}
         </button>
         <button
           onClick={onDismiss}
@@ -246,7 +246,7 @@ export function UndoRedoButtons({ className }: UndoRedoButtonsProps) {
         size="sm"
         onClick={undo}
         disabled={!canUndo}
-        title="撤销 (⌘Z)"
+        title="Undo (⌘Z)"
       >
         <Undo2 className="w-4 h-4" />
       </Button>
@@ -255,7 +255,7 @@ export function UndoRedoButtons({ className }: UndoRedoButtonsProps) {
         size="sm"
         onClick={redo}
         disabled={!canRedo}
-        title="重做 (⌘⇧Z)"
+        title="Redo (⌘⇧Z)"
       >
         <Redo2 className="w-4 h-4" />
       </Button>

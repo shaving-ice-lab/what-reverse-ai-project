@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 交互状态组件
- * 统一 hover/active/disabled/loading 状态的视觉表现
+ * Interaction State Components
+ * Unified visual representation of hover/active/disabled/loading states
  */
 
 import * as React from "react";
@@ -10,62 +10,62 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ============================================
-// 交互状态配置
+// Interaction state configuration
 // ============================================
 
 export const INTERACTION_STATES = {
-  // 默认状态
+  // Default state
   default: {
     background: "bg-surface-100",
     text: "text-foreground",
     border: "border-border",
   },
-  // 悬浮状态
+  // Hover state
   hover: {
     background: "hover:bg-surface-200",
     text: "hover:text-foreground",
     border: "hover:border-border-strong",
     transition: "transition-all duration-150 ease-in-out",
   },
-  // 激活/按下状态
+  // Active/pressed state
   active: {
     background: "active:bg-surface-300",
     text: "active:text-foreground",
     border: "active:border-border-stronger",
   },
-  // 聚焦状态
+  // Focus state
   focus: {
     ring: "focus:ring-2 focus:ring-brand-500/40 focus:ring-offset-1 focus:ring-offset-background",
     outline: "focus:outline-none",
     border: "focus:border-brand-500",
   },
-  // 禁用状态
+  // Disabled state
   disabled: {
     opacity: "opacity-50",
     cursor: "cursor-not-allowed",
     pointer: "pointer-events-none",
   },
-  // 选中状态
+  // Selected state
   selected: {
     background: "bg-brand-200/20",
     text: "text-brand-500",
     border: "border-brand-500/40",
   },
-  // 危险状态
+  // Danger state
   danger: {
     background: "bg-destructive-200",
     text: "text-destructive",
     border: "border-destructive/30",
     hover: "hover:bg-destructive/20",
   },
-  // 警告状态
+  // Warning state
   warning: {
     background: "bg-warning-200",
     text: "text-warning",
     border: "border-warning/30",
     hover: "hover:bg-warning/20",
   },
-  // 成功状态
+  // Success state
   success: {
     background: "bg-success-200",
     text: "text-success",
@@ -75,7 +75,7 @@ export const INTERACTION_STATES = {
 } as const;
 
 // ============================================
-// 加载状态指示器
+// Loading state indicator
 // ============================================
 
 interface LoadingSpinnerProps {
@@ -115,7 +115,7 @@ export function LoadingSpinner({
 }
 
 // ============================================
-// 加载覆盖层
+// Loading overlay
 // ============================================
 
 interface LoadingOverlayProps {
@@ -127,7 +127,7 @@ interface LoadingOverlayProps {
 
 export function LoadingOverlay({
   visible,
-  message = "加载中...",
+  message = "Loading...",
   blur = true,
   className,
 }: LoadingOverlayProps) {
@@ -150,7 +150,7 @@ export function LoadingOverlay({
 }
 
 // ============================================
-// 禁用容器
+// Disabled container
 // ============================================
 
 interface DisabledContainerProps {
@@ -189,7 +189,7 @@ export function DisabledContainer({
 }
 
 // ============================================
-// 交互式区域
+// Interactive area
 // ============================================
 
 interface InteractiveAreaBaseProps {
@@ -219,34 +219,34 @@ export function InteractiveArea({
   ...props
 }: InteractiveAreaProps) {
   const sharedClassName = cn(
-    // 基础样式
+    // Base styles
     "relative rounded-lg border",
     INTERACTION_STATES.default.background,
     INTERACTION_STATES.default.border,
     INTERACTION_STATES.hover.transition,
-    // 交互状态
+    // Interaction states
     !disabled && !loading && [
       INTERACTION_STATES.hover.background,
       INTERACTION_STATES.hover.border,
       INTERACTION_STATES.active.background,
     ],
-    // 聚焦状态
+    // Focus state
     as === "button" && [
       INTERACTION_STATES.focus.outline,
       INTERACTION_STATES.focus.ring,
     ],
-    // 选中状态
+    // Selected state
     selected && [
       INTERACTION_STATES.selected.background,
       INTERACTION_STATES.selected.border,
     ],
-    // 危险状态
+    // Danger state
     danger && [
       INTERACTION_STATES.danger.background,
       INTERACTION_STATES.danger.border,
       !disabled && INTERACTION_STATES.danger.hover,
     ],
-    // 禁用状态
+    // Disabled state
     (disabled || loading) && [
       INTERACTION_STATES.disabled.opacity,
       INTERACTION_STATES.disabled.cursor,
@@ -287,7 +287,7 @@ export function InteractiveArea({
 }
 
 // ============================================
-// 状态指示点
+// Status indicator dot
 // ============================================
 
 interface StatusDotProps {
@@ -331,7 +331,7 @@ export function StatusDot({
 }
 
 // ============================================
-// 状态标签
+// Status label
 // ============================================
 
 interface StatusLabelProps {
@@ -370,7 +370,7 @@ export function StatusLabel({
 }
 
 // ============================================
-// 进度条
+// Progress bar
 // ============================================
 
 interface ProgressBarProps {
@@ -431,7 +431,7 @@ export function ProgressBar({
 }
 
 // ============================================
-// 脉冲动画容器
+// Pulse animation container
 // ============================================
 
 interface PulseContainerProps {
@@ -459,7 +459,7 @@ export function PulseContainer({
 }
 
 // ============================================
-// 骨架加载动画
+// Skeleton loading animation
 // ============================================
 
 interface SkeletonLoaderProps {

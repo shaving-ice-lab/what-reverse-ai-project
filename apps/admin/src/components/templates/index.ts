@@ -1,4 +1,4 @@
 /**
- * Admin 页面模板导出
+ * Admin page template exports
  */
 export * from "./page-templates"

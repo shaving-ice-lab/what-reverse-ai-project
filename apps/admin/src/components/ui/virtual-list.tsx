@@ -183,7 +183,7 @@ export function VirtualList<T>({
           >
             {loadingComponent || (
               <div className="py-4 text-center text-sm text-foreground-muted">
-                加载更多...
+                Loading more...
               </div>
             )}
           </div>
@@ -364,7 +364,7 @@ export function VirtualTable<T>({
               className="absolute left-0 right-0 py-4 text-center text-sm text-foreground-muted"
               style={{ top: totalHeight }}
             >
-              加载更多...
+              Loading more...
             </div>
           )}
         </div>

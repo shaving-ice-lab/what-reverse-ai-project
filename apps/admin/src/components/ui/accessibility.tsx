@@ -12,7 +12,7 @@ interface SkipLinkProps {
   children?: ReactNode;
 }
 
-export function SkipLink({ href = "#main-content", children = "跳转到主内容" }: SkipLinkProps) {
+export function SkipLink({ href = "#main-content", children = "Skip to main content" }: SkipLinkProps) {
   return (
     <a
       href={href}
@@ -241,7 +241,7 @@ interface LoadingIndicatorProps {
 
 export function LoadingIndicator({
   loading,
-  label = "加载中",
+  label = "Loading",
   children,
 }: LoadingIndicatorProps) {
   return (

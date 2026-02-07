@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Button 按钮组件 - Supabase 风格：品牌绿色主按钮
+ * Button Component - Supabase Style: brand green primary button
  */
 const buttonVariants = cva(
   [
@@ -19,78 +19,78 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // 主按钮 - Supabase 品牌绿色
+        // Primary button - Supabase brand green
         default: [
           "bg-brand-500 text-background",
           "hover:bg-brand-600",
           "active:bg-brand-400",
         ].join(" "),
-        // 次要按钮 - Supabase surface 背景
+        // Secondary button - Supabase surface background
         secondary: [
           "bg-surface-100 text-foreground border border-border",
           "hover:bg-surface-200 hover:border-border-strong",
           "active:bg-surface-400",
         ].join(" "),
-        // 破坏性按钮 - 轮廓
+        // Destructive button - outline
         destructive: [
           "bg-transparent text-destructive-400 border border-destructive-400/50",
           "hover:bg-destructive-200 hover:text-destructive hover:border-destructive-400",
         ].join(" "),
-        // 破坏性按钮 - 轮廓（别名）
+        // Destructive button - outline (alias)
         "destructive-outline": [
           "bg-transparent text-destructive-400 border border-destructive-400/50",
           "hover:bg-destructive-200 hover:text-destructive hover:border-destructive-400",
         ].join(" "),
-        // 破坏性按钮 - 填充
+        // Destructive button - filled
         "destructive-fill": [
           "bg-destructive-400 text-white",
           "hover:bg-destructive",
         ].join(" "),
-        // 幽灵按钮 - Supabase 风格
+        // Ghost button - Supabase style
         ghost: [
           "bg-transparent text-foreground-light",
           "hover:bg-surface-200 hover:text-foreground",
           "active:bg-surface-300",
         ].join(" "),
-        // 链接按钮
+        // Link button
         link: [
           "text-brand-500 underline-offset-4",
           "hover:underline hover:text-brand-600",
           "p-0 h-auto font-normal",
         ].join(" "),
-        // 轮廓按钮 - Supabase 风格
+        // Outline button - Supabase style
         outline: [
           "border border-border bg-transparent text-foreground-light",
           "hover:bg-surface-200 hover:text-foreground hover:border-border-strong",
           "active:bg-surface-300",
         ].join(" "),
-        // 品牌轮廓按钮
+        // Brand outline button
         "outline-primary": [
           "border border-brand-500/40 bg-transparent text-brand-500",
           "hover:bg-brand-200 hover:border-brand-500",
         ].join(" "),
-        // CTA 按钮
+        // CTA button
         cta: [
           "bg-brand-500 text-background-studio font-semibold",
           "hover:bg-brand-600",
         ].join(" "),
-        // 渐变按钮
+        // Gradient button
         gradient: [
           "bg-brand-500 text-background-studio font-semibold",
           "hover:bg-brand-600",
           "border-0",
         ].join(" "),
-        // 发光按钮
+        // Glow button
         glow: [
           "bg-brand-500 text-background-studio font-semibold",
           "hover:bg-brand-600 hover:shadow-brand-500/25 hover:shadow-lg",
         ].join(" "),
-        // 玻璃按钮
+        // Glass button
         glass: [
           "bg-surface-100/60 text-foreground border border-border/50 backdrop-blur-sm",
           "hover:bg-surface-200/80",
         ].join(" "),
-        // 警告按钮
+        // Warning button
         warning: [
           "bg-warning-200 text-warning border border-warning/30",
           "hover:bg-warning/20 hover:text-warning",
@@ -142,7 +142,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }, ref) => {
     const Comp = asChild ? Slot : "button"
     
-    // 加载图标
+    // Loading spinner
     const LoadingSpinner = (
       <svg
         className="animate-spin h-4 w-4"
@@ -201,7 +201,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button"
 
 /**
- * IconButton - 图标按钮包装器
+ * IconButton - Icon Button Wrapper
  */
 interface IconButtonProps extends Omit<ButtonProps, "children" | "leftIcon" | "rightIcon"> {
   icon: React.ReactNode
@@ -220,7 +220,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
 IconButton.displayName = "IconButton"
 
 /**
- * ButtonGroup - 按钮组
+ * ButtonGroup - Button Group
  */
 interface ButtonGroupProps {
   children: React.ReactNode

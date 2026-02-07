@@ -75,19 +75,19 @@ const defaultOperatorsByType: Record<FilterField["type"], FilterOperator[]> = {
 };
 
 const operatorLabels: Record<FilterOperator, string> = {
-  equals: "等于",
-  not_equals: "不等于",
-  contains: "包含",
-  not_contains: "不包含",
-  starts_with: "开头是",
-  ends_with: "结尾是",
-  greater_than: "大于",
-  less_than: "小于",
-  between: "介于",
-  in: "属于",
-  not_in: "不属于",
-  is_empty: "为空",
-  is_not_empty: "不为空",
+  equals: "Equals",
+  not_equals: "Not equals",
+  contains: "Contains",
+  not_contains: "Does not contain",
+  starts_with: "Starts with",
+  ends_with: "Ends with",
+  greater_than: "Greater than",
+  less_than: "Less than",
+  between: "Between",
+  in: "In",
+  not_in: "Not in",
+  is_empty: "Is empty",
+  is_not_empty: "Is not empty",
 };
 
 // ============================================
@@ -156,7 +156,7 @@ export function MultiFilter({ fields, value, onChange, className }: MultiFilterP
         className={cn(activeCount > 0 && "border-brand-500/50")}
       >
         <Filter className="w-4 h-4 mr-1" />
-        筛选
+        Filter
         {activeCount > 0 && (
           <Badge variant="default" size="sm" className="ml-1.5 h-5 px-1.5">
             {activeCount}
@@ -175,10 +175,10 @@ export function MultiFilter({ fields, value, onChange, className }: MultiFilterP
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-foreground">筛选条件</span>
+                <span className="text-sm font-medium text-foreground">Filter conditions</span>
                 {activeCount > 0 && (
                   <Badge variant="outline" size="sm">
-                    {activeCount} 个条件
+                    {activeCount} conditions
                   </Badge>
                 )}
               </div>
@@ -187,7 +187,7 @@ export function MultiFilter({ fields, value, onChange, className }: MultiFilterP
                   onClick={clearAll}
                   className="text-xs text-foreground-muted hover:text-destructive transition-colors"
                 >
-                  清除全部
+                  Clear all
                 </button>
               )}
             </div>
@@ -196,7 +196,7 @@ export function MultiFilter({ fields, value, onChange, className }: MultiFilterP
             <div className="space-y-2 mb-3">
               {value.conditions.length === 0 ? (
                 <div className="py-6 text-center text-sm text-foreground-muted">
-                  暂无筛选条件
+                  No filter conditions
                 </div>
               ) : (
                 value.conditions.map((condition, index) => (
@@ -222,16 +222,16 @@ export function MultiFilter({ fields, value, onChange, className }: MultiFilterP
               className="w-full justify-start text-foreground-muted hover:text-foreground"
             >
               <Plus className="w-4 h-4 mr-1" />
-              添加筛选条件
+              Add filter condition
             </Button>
 
             {/* Footer */}
             <div className="flex justify-end gap-2 pt-3 mt-3 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                取消
+                Cancel
               </Button>
               <Button size="sm" onClick={() => setIsOpen(false)}>
-                应用筛选
+                Apply filters
               </Button>
             </div>
           </div>
@@ -290,7 +290,7 @@ function FilterConditionRow({
               : "bg-warning/10 border-warning/30 text-warning"
           )}
         >
-          {logic === "and" ? "且" : "或"}
+          {logic === "and" ? "AND" : "OR"}
         </button>
       )}
       {!showLogic && <div className="w-10 shrink-0" />}
@@ -376,7 +376,7 @@ function FilterValueInput({ field, operator, value, onChange }: FilterValueInput
         onChange={(e) => onChange(e.target.value)}
         className="flex-1 h-8 px-2 text-sm bg-background border border-border rounded focus:outline-none focus:border-brand-500"
       >
-        <option value="">选择...</option>
+        <option value="">Select...</option>
         {field.options?.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -394,8 +394,8 @@ function FilterValueInput({ field, operator, value, onChange }: FilterValueInput
         onChange={(e) => onChange(e.target.value === "true")}
         className="flex-1 h-8 px-2 text-sm bg-background border border-border rounded focus:outline-none focus:border-brand-500"
       >
-        <option value="true">是</option>
-        <option value="false">否</option>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
       </select>
     );
   }
@@ -419,7 +419,7 @@ function FilterValueInput({ field, operator, value, onChange }: FilterValueInput
         type="number"
         value={String(value || "")}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : "")}
-        placeholder="输入数值..."
+        placeholder="Enter a number..."
         className="flex-1 h-8 px-2 text-sm bg-background border border-border rounded focus:outline-none focus:border-brand-500"
       />
     );
@@ -431,7 +431,7 @@ function FilterValueInput({ field, operator, value, onChange }: FilterValueInput
       type="text"
       value={String(value || "")}
       onChange={(e) => onChange(e.target.value)}
-      placeholder="输入关键词..."
+      placeholder="Enter keyword..."
       className="flex-1 h-8 px-2 text-sm bg-background border border-border rounded focus:outline-none focus:border-brand-500"
     />
   );
@@ -466,8 +466,8 @@ function MultiSelectInput({ options, value, onChange }: MultiSelectInputProps) {
       >
         <span className="flex-1 truncate">
           {value.length === 0
-            ? "选择..."
-            : `已选 ${value.length} 项`}
+            ? "Select..."
+            : `${value.length} selected`}
         </span>
         <ChevronDown className="w-3 h-3 text-foreground-muted" />
       </button>
@@ -531,7 +531,7 @@ export function ActiveFilters({ fields, filters, onRemove, onClearAll }: ActiveF
           <Fragment key={condition.id}>
             {index > 0 && (
               <span className="text-xs text-foreground-muted">
-                {filters.logic === "and" ? "且" : "或"}
+                {filters.logic === "and" ? "AND" : "OR"}
               </span>
             )}
             <Badge
@@ -556,7 +556,7 @@ export function ActiveFilters({ fields, filters, onRemove, onClearAll }: ActiveF
         onClick={onClearAll}
         className="text-xs text-foreground-muted hover:text-foreground transition-colors"
       >
-        清除全部
+        Clear all
       </button>
     </div>
   );

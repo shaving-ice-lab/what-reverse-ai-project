@@ -327,7 +327,7 @@ function TourOverlay({
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-brand-500" />
             <span className="text-xs font-medium text-foreground-muted">
-              步骤 {stepIndex + 1} / {totalSteps}
+              Step {stepIndex + 1} of {totalSteps}
             </span>
           </div>
           <button
@@ -366,18 +366,18 @@ function TourOverlay({
             {stepIndex > 0 && (
               <Button variant="ghost" size="sm" onClick={onPrev}>
                 <ArrowLeft className="w-4 h-4 mr-1" />
-                上一步
+                Previous
               </Button>
             )}
             <Button size="sm" onClick={onNext}>
               {stepIndex === totalSteps - 1 ? (
                 <>
                   <Check className="w-4 h-4 mr-1" />
-                  完成
+                  Finish
                 </>
               ) : (
                 <>
-                  下一步
+                  Next
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </>
               )}
@@ -427,15 +427,15 @@ export function resetTourCompletion(tourId?: string): void {
 
 export const adminDashboardTour: Tour = {
   id: "admin-dashboard-intro",
-  name: "Admin 控制台入门",
+  name: "Admin Console Getting Started",
   steps: [
     {
       id: "welcome",
       target: '[data-tour="sidebar"]',
-      title: "欢迎使用 Admin 控制台",
+      title: "Welcome to Admin Console",
       content: (
         <p>
-          这是 AgentFlow 的管理控制台，您可以在这里管理用户、Workspace、应用等所有资源。
+          This is the AgentFlow admin console where you can manage users, workspaces, apps, and all other resources.
         </p>
       ),
       placement: "right",
@@ -443,10 +443,10 @@ export const adminDashboardTour: Tour = {
     {
       id: "search",
       target: '[data-tour="global-search"]',
-      title: "全局搜索",
+      title: "Global Search",
       content: (
         <p>
-          使用 <kbd className="px-1 py-0.5 bg-background-hover rounded">⌘K</kbd> 快速搜索用户、Workspace、工单等任何资源。
+          Use <kbd className="px-1 py-0.5 bg-background-hover rounded">⌘K</kbd> to quickly search for users, workspaces, tickets, and any other resources.
         </p>
       ),
       placement: "bottom",
@@ -454,10 +454,10 @@ export const adminDashboardTour: Tour = {
     {
       id: "users",
       target: '[data-tour="nav-users"]',
-      title: "用户管理",
+      title: "User Management",
       content: (
         <p>
-          在这里管理所有用户，包括查看用户信息、调整角色和状态。
+          Manage all users here, including viewing user information, adjusting roles and statuses.
         </p>
       ),
       placement: "right",
@@ -465,10 +465,10 @@ export const adminDashboardTour: Tour = {
     {
       id: "support",
       target: '[data-tour="nav-support"]',
-      title: "工单中心",
+      title: "Support Center",
       content: (
         <p>
-          处理用户提交的支持工单，跟踪 SLA 状态。
+          Handle user-submitted support tickets and track SLA status.
         </p>
       ),
       placement: "right",
@@ -476,10 +476,10 @@ export const adminDashboardTour: Tour = {
     {
       id: "system",
       target: '[data-tour="nav-system"]',
-      title: "系统治理",
+      title: "System Governance",
       content: (
         <p>
-          监控系统健康状态，管理功能开关和运维操作。
+          Monitor system health, manage feature flags, and perform operations.
         </p>
       ),
       placement: "right",

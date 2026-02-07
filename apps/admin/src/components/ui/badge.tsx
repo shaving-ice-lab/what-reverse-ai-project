@@ -1,7 +1,7 @@
 /**
- * Badge 徽章组件 - 增强版
+ * Badge Component - Enhanced
  * 
- * 支持多种样式、尺寸、动画和交互效果
+ * Supports multiple styles, sizes, animations and interaction effects
  */
 
 import * as React from "react"
@@ -17,7 +17,7 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        // Supabase default/primary: 品牌绿色
+        // Supabase default/primary: brand green
         default: [
           "bg-surface-200",
           "border-border",
@@ -28,25 +28,25 @@ const badgeVariants = cva(
           "border-brand-400/30",
           "text-brand-500",
         ].join(" "),
-        // Supabase secondary: 灰色
+        // Supabase secondary: gray
         secondary: [
           "bg-surface-200",
           "border-border",
           "text-foreground-light",
         ].join(" "),
-        // Supabase success: 绿色
+        // Supabase success: green
         success: [
           "bg-brand-200",
           "border-brand-400/30",
           "text-brand-500",
         ].join(" "),
-        // Supabase warning: 橙色
+        // Supabase warning: orange
         warning: [
           "bg-warning-200",
           "border-warning/30",
           "text-warning",
         ].join(" "),
-        // Supabase error/destructive: 红色
+        // Supabase error/destructive: red
         error: [
           "bg-destructive-200",
           "border-destructive/30",
@@ -57,31 +57,31 @@ const badgeVariants = cva(
           "border-destructive/30",
           "text-destructive",
         ].join(" "),
-        // info: 蓝色
+        // info: blue
         info: [
           "bg-blue-500/15",
           "border-blue-500/30",
           "text-blue-400",
         ].join(" "),
-        // violet: 紫色
+        // violet: purple
         violet: [
           "bg-violet-500/15",
           "border-violet-500/30",
           "text-violet-400",
         ].join(" "),
-        // pink: 粉色
+        // pink: pink
         pink: [
           "bg-pink-500/15",
           "border-pink-500/30",
           "text-pink-400",
         ].join(" "),
-        // Supabase outline: 边框样式
+        // Supabase outline: border style
         outline: [
           "bg-transparent",
           "border-border",
           "text-foreground-light",
         ].join(" "),
-        // solid 变体 - Supabase 风格
+        // solid variant - Supabase style
         "solid-primary": [
           "bg-brand-500",
           "border-brand-500",
@@ -97,7 +97,7 @@ const badgeVariants = cva(
           "border-destructive",
           "text-white",
         ].join(" "),
-        // gradient 变体
+        // gradient variant
         gradient: [
           "bg-gradient-to-r from-brand-500 to-brand-400",
           "border-transparent",
@@ -139,19 +139,19 @@ const badgeVariants = cva(
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {
-  /** 左侧图标 */
+  /** Left icon */
   icon?: React.ReactNode
-  /** 点击关闭回调 */
+  /** Close callback */
   onClose?: () => void
-  /** 是否可交互 */
+  /** Whether interactive */
   interactive?: boolean
-  /** 数字（显示为徽章数字） */
+  /** Number (displayed as badge number) */
   count?: number
-  /** 最大数字，超过显示 {max}+ */
+  /** Max number, displays {max}+ when exceeded */
   maxCount?: number
-  /** 是否显示为点 */
+  /** Whether to display as dot */
   dot?: boolean
-  /** 点的颜色 */
+  /** Dot color */
   dotColor?: string
 }
 
@@ -170,19 +170,19 @@ function Badge({
   children, 
   ...props 
 }: BadgeProps) {
-  // 处理数字显示
+  // Handle number display
   const displayCount = count !== undefined 
     ? count > maxCount 
       ? `${maxCount}+` 
       : count.toString()
     : null
 
-  // Ping 动画效果
+  // Ping animation effect
   const pingEffect = animation === "ping" && (
     <span className="absolute inset-0 rounded-full animate-ping opacity-75 bg-current" />
   )
 
-  // Glow 动画效果
+  // Glow animation effect
   const glowClass = animation === "glow" && "shadow-[0_0_10px_currentColor]"
 
   return (
@@ -197,7 +197,7 @@ function Badge({
     >
       {pingEffect}
       
-      {/* 点模式 */}
+      {/* Dot mode */}
       {dot && (
         <span 
           className="w-2 h-2 rounded-full"
@@ -205,19 +205,19 @@ function Badge({
         />
       )}
       
-      {/* 图标 */}
+      {/* Icon */}
       {icon && !dot && (
         <span className="shrink-0 -ml-0.5">{icon}</span>
       )}
       
-      {/* 内容或数字 */}
+      {/* Content or number */}
       {displayCount !== null ? (
         <span className="tabular-nums">{displayCount}</span>
       ) : (
         children
       )}
       
-      {/* 关闭按钮 */}
+      {/* Close button */}
       {onClose && (
         <button
           type="button"
@@ -235,14 +235,14 @@ function Badge({
 }
 
 /**
- * BadgeGroup - 徽章组
+ * BadgeGroup - Badge Group
  */
 interface BadgeGroupProps {
   children: React.ReactNode
   className?: string
-  /** 最大显示数量 */
+  /** Maximum display count */
   max?: number
-  /** 是否可折叠 */
+  /** Whether collapsible */
   collapsible?: boolean
 }
 
@@ -269,7 +269,7 @@ function BadgeGroup({
 }
 
 /**
- * StatusBadge - 状态徽章
+ * StatusBadge - Status Badge
  */
 interface StatusBadgeProps {
   status: "online" | "offline" | "busy" | "away" | "dnd"
@@ -279,11 +279,11 @@ interface StatusBadgeProps {
 }
 
 const statusConfig = {
-  online: { color: "hsl(var(--brand-500))", label: "在线", bgColor: "bg-brand-500/15" },
-  offline: { color: "#6B7280", label: "离线", bgColor: "bg-surface-200/50" },
-  busy: { color: "#EF4444", label: "忙碌", bgColor: "bg-red-500/15" },
-  away: { color: "#F59E0B", label: "离开", bgColor: "bg-amber-500/15" },
-  dnd: { color: "#EF4444", label: "请勿打扰", bgColor: "bg-red-500/15" },
+  online: { color: "hsl(var(--brand-500))", label: "Online", bgColor: "bg-brand-500/15" },
+  offline: { color: "#6B7280", label: "Offline", bgColor: "bg-surface-200/50" },
+  busy: { color: "#EF4444", label: "Busy", bgColor: "bg-red-500/15" },
+  away: { color: "#F59E0B", label: "Away", bgColor: "bg-amber-500/15" },
+  dnd: { color: "#EF4444", label: "Do Not Disturb", bgColor: "bg-red-500/15" },
 }
 
 function StatusBadge({ 
@@ -318,7 +318,7 @@ function StatusBadge({
 }
 
 /**
- * NotificationBadge - 通知徽章（用于包裹元素）
+ * NotificationBadge - Notification Badge (wraps elements)
  */
 interface NotificationBadgeProps {
   children: React.ReactNode

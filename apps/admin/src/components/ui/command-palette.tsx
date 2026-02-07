@@ -46,13 +46,13 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 const typeLabels: Record<string, string> = {
-  user: "用户",
+  user: "User",
   workspace: "Workspace",
-  app: "应用",
-  ticket: "工单",
-  workflow: "工作流",
-  execution: "执行",
-  page: "页面",
+  app: "App",
+  ticket: "Ticket",
+  workflow: "Workflow",
+  execution: "Execution",
+  page: "Page",
 };
 
 // Mock search function - replace with actual API call
@@ -89,42 +89,42 @@ const searchResources = async (query: string): Promise<SearchResult[]> => {
       id: "user-1",
       type: "user",
       title: "admin@agentflow.ai",
-      subtitle: "SuperAdmin • 活跃",
+      subtitle: "SuperAdmin • Active",
       href: "/users/usr_1",
     },
     {
       id: "user-2",
       type: "user",
       title: "test@example.com",
-      subtitle: "普通用户 • 活跃",
+      subtitle: "User • Active",
       href: "/users/usr_2",
     },
     {
       id: "ws-1",
       type: "workspace",
       title: "AgentFlow Team",
-      subtitle: "Pro 计划 • 5 成员",
+      subtitle: "Pro plan • 5 members",
       href: "/workspaces/ws_1",
     },
     {
       id: "app-1",
       type: "app",
-      title: "智能客服助手",
-      subtitle: "已发布 • AgentFlow Team",
+      title: "Smart Customer Service Assistant",
+      subtitle: "Published • AgentFlow Team",
       href: "/apps/app_1",
     },
     {
       id: "ticket-1",
       type: "ticket",
-      title: "#TK-2024001 登录问题",
-      subtitle: "待处理 • 高优先级",
+      title: "#TK-2024001 Login Issue",
+      subtitle: "Pending • High Priority",
       href: "/support/tickets/tk_1",
     },
     {
       id: "workflow-1",
       type: "workflow",
-      title: "文档分析流程",
-      subtitle: "活跃 • 120 次执行",
+      title: "Document Analysis Workflow",
+      subtitle: "Active • 120 executions",
       href: "/workflows/wf_1",
     },
   ];
@@ -237,7 +237,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="搜索用户、Workspace、应用、工单..."
+              placeholder="Search users, workspaces, apps, tickets..."
               className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
               autoFocus
             />
@@ -259,7 +259,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             {loading && query && (
               <div className="px-4 py-8 text-center text-sm text-foreground-muted">
                 <div className="inline-block w-5 h-5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin mb-2" />
-                <p>搜索中...</p>
+                <p>Searching...</p>
               </div>
             )}
 
@@ -267,10 +267,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <div className="px-4 py-8 text-center">
                 <AlertCircle className="w-8 h-8 text-foreground-muted mx-auto mb-2" />
                 <p className="text-sm text-foreground-muted">
-                  未找到 "{query}" 相关结果
+                  No results found for "{query}"
                 </p>
                 <p className="text-xs text-foreground-muted mt-1">
-                  尝试使用不同的关键词搜索
+                  Try searching with different keywords
                 </p>
               </div>
             )}
@@ -340,13 +340,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             {!query && (
               <div className="py-2">
                 <div className="px-4 py-1.5 text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
-                  快速跳转
+                  Quick Navigation
                 </div>
                 {[
-                  { title: "用户管理", href: "/users", icon: Users },
+                  { title: "User Management", href: "/users", icon: Users },
                   { title: "Workspace", href: "/workspaces", icon: Building2 },
-                  { title: "工单中心", href: "/support/tickets", icon: LifeBuoy },
-                  { title: "系统健康", href: "/system/health", icon: Server },
+                  { title: "Ticket Center", href: "/support/tickets", icon: LifeBuoy },
+                  { title: "System Health", href: "/system/health", icon: Server },
                 ].map((item) => (
                   <button
                     key={item.href}
@@ -370,19 +370,19 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               <kbd className="inline-flex h-4 items-center rounded border border-border px-1 font-mono">
                 ↑↓
               </kbd>
-              导航
+              Navigate
             </span>
             <span className="flex items-center gap-1">
               <kbd className="inline-flex h-4 items-center rounded border border-border px-1 font-mono">
                 ↵
               </kbd>
-              选择
+              Select
             </span>
             <span className="flex items-center gap-1">
               <kbd className="inline-flex h-4 items-center rounded border border-border px-1 font-mono">
                 esc
               </kbd>
-              关闭
+              Close
             </span>
           </div>
         </div>

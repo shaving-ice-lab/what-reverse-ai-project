@@ -1,13 +1,13 @@
 /**
- * Admin 设计系统导出
+ * Admin design system exports
  * 
- * 使用方式:
+ * Usage:
  * import { CHART_COLORS, INTERACTION_STATES } from '@/design-system'
  */
 
-// 从 UI 组件重新导出设计系统常量
+// Re-export design system constants from UI components
 export {
-  // 数据密度配置
+  // Data density configuration
   DENSITY_CONFIGS,
   type DataDensity,
   type ColumnDef,
@@ -16,7 +16,7 @@ export {
 } from "@/components/ui/data-table"
 
 export {
-  // 交互状态配置
+  // Interaction states configuration
   INTERACTION_STATES,
   SPINNER_SIZES,
   SPINNER_COLORS,
@@ -29,17 +29,17 @@ export {
 } from "@/components/ui/interaction-states"
 
 export {
-  // 图表配色和样式
+  // Chart colors and styles
   CHART_COLORS,
   CHART_PALETTE,
   CHART_THEME,
   CHART_SIZES,
 } from "@/components/ui/chart-styles"
 
-// 设计系统常量
+// Design system constants
 export const DESIGN_SYSTEM_VERSION = "1.0.0"
 
-// 色彩系统
+// Color system
 export const COLORS = {
   brand: {
     50: "#ecfdf5",
@@ -83,7 +83,7 @@ export const COLORS = {
   },
 } as const
 
-// 字体大小
+// Font sizes
 export const FONT_SIZES = {
   xs: "10px",
   sm: "11px",
@@ -96,7 +96,7 @@ export const FONT_SIZES = {
   "4xl": "24px",
 } as const
 
-// 间距
+// Spacing
 export const SPACING = {
   0: "0",
   1: "4px",
@@ -110,7 +110,7 @@ export const SPACING = {
   12: "48px",
 } as const
 
-// 圆角
+// Border radius
 export const RADIUS = {
   none: "0",
   sm: "4px",
@@ -120,7 +120,7 @@ export const RADIUS = {
   full: "9999px",
 } as const
 
-// 阴影
+// Shadows
 export const SHADOWS = {
   sm: "0 1px 2px rgba(0, 0, 0, 0.2)",
   md: "0 1px 3px rgba(0, 0, 0, 0.2)",
@@ -129,7 +129,7 @@ export const SHADOWS = {
   glow: "0 0 20px rgba(62, 207, 142, 0.3)",
 } as const
 
-// 动画时长
+// Animation durations
 export const DURATIONS = {
   fast: "150ms",
   normal: "200ms",
@@ -137,7 +137,7 @@ export const DURATIONS = {
   slower: "500ms",
 } as const
 
-// 缓动函数
+// Easing functions
 export const EASINGS = {
   default: "ease",
   in: "ease-in",

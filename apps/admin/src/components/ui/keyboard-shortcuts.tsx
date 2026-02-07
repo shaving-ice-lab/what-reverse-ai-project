@@ -158,7 +158,7 @@ function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="md">
         <DialogHeader>
-          <DialogTitle>键盘快捷键</DialogTitle>
+          <DialogTitle>Keyboard Shortcuts</DialogTitle>
         </DialogHeader>
 
         <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto">
@@ -184,15 +184,15 @@ function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialog
           {/* Built-in shortcuts */}
           <div>
             <h4 className="text-xs font-medium text-foreground-muted uppercase tracking-wide mb-2">
-              通用
+              General
             </h4>
             <div className="space-y-1">
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-foreground">显示快捷键帮助</span>
+                <span className="text-sm text-foreground">Show keyboard shortcuts</span>
                 <KeyCombo keys={["?"]} />
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-foreground">全局搜索</span>
+                <span className="text-sm text-foreground">Global search</span>
                 <KeyCombo keys={["cmd", "k"]} />
               </div>
             </div>
@@ -201,7 +201,7 @@ function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcutsDialog
 
         <div className="pt-2 border-t border-border">
           <p className="text-xs text-foreground-muted text-center">
-            按 <kbd className="px-1 py-0.5 bg-background-hover rounded text-foreground">?</kbd> 随时查看快捷键
+            Press <kbd className="px-1 py-0.5 bg-background-hover rounded text-foreground">?</kbd> to view shortcuts anytime
           </p>
         </div>
       </DialogContent>

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Admin 页面模板
- * 列表页 / 详情页 / 编辑页 三类标准模板
+ * Admin page templates
+ * List page / Detail page / Edit page standard templates
  */
 
 import * as React from "react";
@@ -35,7 +35,7 @@ import {
 } from "@/components/dashboard/page-layout";
 
 // ============================================
-// 列表页模板
+// List Page Template
 // ============================================
 
 interface ListPageFilter {
@@ -47,27 +47,27 @@ interface ListPageFilter {
 }
 
 interface ListPageTemplateProps {
-  // 页面信息
+  // Page info
   title: string;
   description?: string;
   icon?: React.ReactNode;
-  // 数据状态
+  // Data state
   loading?: boolean;
   error?: Error | string | null;
-  // 搜索
+  // Search
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
-  // 筛选器
+  // Filters
   filters?: ListPageFilter[];
-  // 分页
+  // Pagination
   page?: number;
   pageSize?: number;
   total?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
-  // 操作按钮
+  // Action buttons
   primaryAction?: {
     label: string;
     icon?: React.ReactNode;
@@ -82,7 +82,7 @@ interface ListPageTemplateProps {
     href?: string;
     disabled?: boolean;
   }[];
-  // 批量操作
+  // Batch actions
   batchActions?: {
     label: string;
     icon?: React.ReactNode;
@@ -92,11 +92,11 @@ interface ListPageTemplateProps {
   }[];
   selectedCount?: number;
   onClearSelection?: () => void;
-  // 刷新
+  // Refresh
   onRefresh?: () => void;
-  // 导出
+  // Export
   onExport?: () => void;
-  // 空状态
+  // Empty state
   emptyState?: {
     icon?: React.ReactNode;
     title: string;
@@ -107,9 +107,9 @@ interface ListPageTemplateProps {
       href?: string;
     };
   };
-  // 内容
+  // Content
   children: React.ReactNode;
-  // 额外工具栏内容
+  // Extra toolbar content
   toolbarExtra?: React.ReactNode;
   className?: string;
 }
@@ -120,7 +120,7 @@ export function ListPageTemplate({
   icon,
   loading = false,
   error = null,
-  searchPlaceholder = "搜索...",
+  searchPlaceholder = "Search...",
   searchValue = "",
   onSearchChange,
   filters = [],
@@ -196,16 +196,16 @@ export function ListPageTemplate({
       />
 
       <SettingsSection
-        title="数据列表"
-        description={`共 ${total} 条记录`}
+        title="Data List"
+        description={`${total} records total`}
         footer={
           hasSelection && batchActions.length > 0 ? (
             <div className="flex items-center gap-2">
               <span className="text-[11px] text-foreground-muted">
-                已选择 {selectedCount} 项
+                {selectedCount} items selected
               </span>
               <Button variant="ghost" size="sm" onClick={onClearSelection}>
-                取消选择
+                Clear selection
               </Button>
               {batchActions.map((action, index) => (
                 <Button
@@ -223,10 +223,10 @@ export function ListPageTemplate({
           ) : undefined
         }
       >
-        {/* 工具栏 */}
+        {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex flex-wrap items-center gap-2">
-            {/* 搜索框 */}
+            {/* Search box */}
             {onSearchChange && (
               <div className="w-[240px]">
                 <Input
@@ -239,7 +239,7 @@ export function ListPageTemplate({
                 />
               </div>
             )}
-            {/* 筛选器 */}
+            {/* Filters */}
             {filters.map((filter) => (
               <div key={filter.id} className="flex items-center gap-1.5">
                 <span className="text-[11px] text-foreground-muted">
@@ -258,9 +258,9 @@ export function ListPageTemplate({
                 </select>
               </div>
             ))}
-            {/* 总数徽章 */}
+            {/* Total badge */}
             <Badge variant="outline" size="sm">
-              共 {total} 条
+              {total} total
             </Badge>
           </div>
 
@@ -272,7 +272,7 @@ export function ListPageTemplate({
                 size="icon-sm"
                 onClick={onRefresh}
                 disabled={loading}
-                aria-label="刷新"
+                aria-label="Refresh"
               >
                 <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
               </Button>
@@ -282,7 +282,7 @@ export function ListPageTemplate({
                 variant="ghost"
                 size="icon-sm"
                 onClick={onExport}
-                aria-label="导出"
+                aria-label="Export"
               >
                 <Download className="w-4 h-4" />
               </Button>
@@ -290,15 +290,15 @@ export function ListPageTemplate({
           </div>
         </div>
 
-        {/* 内容区域 */}
+        {/* Content area */}
         {error ? (
           <ErrorState
-            title="加载失败"
+            title="Failed to load"
             error={error}
             onRetry={onRefresh}
           />
         ) : loading ? (
-          <LoadingState message="正在加载数据..." />
+          <LoadingState message="Loading data..." />
         ) : total === 0 && emptyState ? (
           <EmptyState
             icon={emptyState.icon}
@@ -317,7 +317,7 @@ export function ListPageTemplate({
           children
         )}
 
-        {/* 分页 */}
+        {/* Pagination */}
         {total > 0 && onPageChange && (
           <div className="mt-4">
             <FullPagination
@@ -339,7 +339,7 @@ export function ListPageTemplate({
 }
 
 // ============================================
-// 详情页模板
+// Detail Page Template
 // ============================================
 
 interface DetailSection {
@@ -352,20 +352,20 @@ interface DetailSection {
 }
 
 interface DetailPageTemplateProps {
-  // 页面信息
+  // Page info
   title: string;
   subtitle?: string;
   description?: string;
   icon?: React.ReactNode;
   badge?: React.ReactNode;
-  // 返回
+  // Back navigation
   backHref?: string;
   backLabel?: string;
-  // 数据状态
+  // Data state
   loading?: boolean;
   error?: Error | string | null;
   notFound?: boolean;
-  // 操作按钮
+  // Action buttons
   primaryAction?: {
     label: string;
     icon?: React.ReactNode;
@@ -389,12 +389,12 @@ interface DetailPageTemplateProps {
     danger?: boolean;
     disabled?: boolean;
   }[];
-  // 详情区块
+  // Detail sections
   sections?: DetailSection[];
-  // 侧边栏
+  // Sidebar
   sidebar?: React.ReactNode;
   sidebarWidth?: "narrow" | "default" | "wide";
-  // 标签页
+  // Tabs
   tabs?: {
     id: string;
     label: string;
@@ -402,9 +402,9 @@ interface DetailPageTemplateProps {
   }[];
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
-  // 刷新
+  // Refresh
   onRefresh?: () => void;
-  // 内容
+  // Content
   children?: React.ReactNode;
   className?: string;
 }
@@ -416,7 +416,7 @@ export function DetailPageTemplate({
   icon,
   badge,
   backHref,
-  backLabel = "返回",
+  backLabel = "Back",
   loading = false,
   error = null,
   notFound = false,
@@ -441,25 +441,25 @@ export function DetailPageTemplate({
     wide: "w-[320px]",
   };
 
-  // 错误状态
+  // Error state
   if (error) {
     return (
       <PageContainer>
         <div className="py-12">
-          <ErrorState title="加载失败" error={error} onRetry={onRefresh} />
+          <ErrorState title="Failed to load" error={error} onRetry={onRefresh} />
         </div>
       </PageContainer>
     );
   }
 
-  // 未找到状态
+  // Not found state
   if (notFound) {
     return (
       <PageContainer>
         <div className="py-12">
           <EmptyState
-            title="资源不存在"
-            description="您访问的资源不存在或已被删除"
+            title="Resource not found"
+            description="The resource you are looking for does not exist or has been deleted"
             action={
               backHref
                 ? { label: backLabel, onClick: () => window.history.back() }
@@ -471,12 +471,12 @@ export function DetailPageTemplate({
     );
   }
 
-  // 加载状态
+  // Loading state
   if (loading) {
     return (
       <PageContainer>
         <div className="py-12">
-          <LoadingState message="正在加载..." />
+          <LoadingState message="Loading..." />
         </div>
       </PageContainer>
     );
@@ -484,7 +484,7 @@ export function DetailPageTemplate({
 
   return (
     <PageContainer className={className}>
-      {/* 头部 */}
+      {/* Header */}
       <PageHeader
         title={title}
         description={description}
@@ -499,7 +499,7 @@ export function DetailPageTemplate({
                 variant="ghost"
                 size="icon-sm"
                 onClick={onRefresh}
-                aria-label="刷新"
+                aria-label="Refresh"
               >
                 <RefreshCw className="w-4 h-4" />
               </Button>
@@ -593,7 +593,7 @@ export function DetailPageTemplate({
           </div>
         }
       >
-        {/* 标签页 */}
+        {/* Tabs */}
         {tabs && tabs.length > 0 && (
           <div className="flex items-center gap-1 border-b border-border">
             {tabs.map((tab) => (
@@ -622,9 +622,9 @@ export function DetailPageTemplate({
         )}
       </PageHeader>
 
-      {/* 内容区域 */}
+      {/* Content area */}
       <div className={cn("flex gap-6", sidebar && "items-start")}>
-        {/* 主内容 */}
+        {/* Main content */}
         <div className="flex-1 min-w-0 space-y-4">
           {sections.map((section) => (
             <SettingsSection
@@ -638,7 +638,7 @@ export function DetailPageTemplate({
           {children}
         </div>
 
-        {/* 侧边栏 */}
+        {/* Sidebar */}
         {sidebar && (
           <div className={cn("shrink-0", widthClass[sidebarWidth])}>
             {sidebar}
@@ -650,7 +650,7 @@ export function DetailPageTemplate({
 }
 
 // ============================================
-// 编辑页模板
+// Edit Page Template
 // ============================================
 
 interface FormField {
@@ -670,25 +670,25 @@ interface FormSection {
 }
 
 interface EditPageTemplateProps {
-  // 页面信息
+  // Page info
   title: string;
   description?: string;
   icon?: React.ReactNode;
-  // 返回
+  // Back navigation
   backHref?: string;
   backLabel?: string;
-  // 数据状态
+  // Data state
   loading?: boolean;
   saving?: boolean;
-  // 表单区块
+  // Form sections
   sections?: FormSection[];
-  // 操作按钮
+  // Action buttons
   onSave?: () => void;
   onCancel?: () => void;
   saveLabel?: string;
   cancelLabel?: string;
   saveDisabled?: boolean;
-  // 危险操作
+  // Danger zone
   dangerZone?: {
     title: string;
     description: string;
@@ -698,9 +698,9 @@ interface EditPageTemplateProps {
       loading?: boolean;
     }[];
   };
-  // 内容
+  // Content
   children?: React.ReactNode;
-  // 底部额外内容
+  // Footer extra content
   footer?: React.ReactNode;
   className?: string;
 }
@@ -710,14 +710,14 @@ export function EditPageTemplate({
   description,
   icon,
   backHref,
-  backLabel = "返回",
+  backLabel = "Back",
   loading = false,
   saving = false,
   sections = [],
   onSave,
   onCancel,
-  saveLabel = "保存",
-  cancelLabel = "取消",
+  saveLabel = "Save",
+  cancelLabel = "Cancel",
   saveDisabled = false,
   dangerZone,
   children,
@@ -728,7 +728,7 @@ export function EditPageTemplate({
     return (
       <PageContainer>
         <div className="py-12">
-          <LoadingState message="正在加载..." />
+          <LoadingState message="Loading..." />
         </div>
       </PageContainer>
     );
@@ -736,7 +736,7 @@ export function EditPageTemplate({
 
   return (
     <PageContainer className={className}>
-      {/* 头部 */}
+      {/* Header */}
       <PageHeader
         title={title}
         description={description}
@@ -756,7 +756,7 @@ export function EditPageTemplate({
                 onClick={onSave}
                 disabled={saveDisabled}
                 loading={saving}
-                loadingText="保存中..."
+                loadingText="Saving..."
               >
                 {saveLabel}
               </Button>
@@ -765,7 +765,7 @@ export function EditPageTemplate({
         }
       />
 
-      {/* 表单区块 */}
+      {/* Form sections */}
       <div className="space-y-6">
         {sections.map((section) => (
           <SettingsSection
@@ -806,7 +806,7 @@ export function EditPageTemplate({
 
         {children}
 
-        {/* 危险区域 */}
+        {/* Danger zone */}
         {dangerZone && (
           <SettingsSection
             title={dangerZone.title}
@@ -829,7 +829,7 @@ export function EditPageTemplate({
         )}
       </div>
 
-      {/* 底部操作栏（固定） */}
+      {/* Bottom action bar (sticky) */}
       {(onSave || footer) && (
         <div className="sticky bottom-0 mt-6 -mx-6 px-6 py-4 bg-background-studio border-t border-border">
           <div className="flex items-center justify-between">
@@ -846,7 +846,7 @@ export function EditPageTemplate({
                   onClick={onSave}
                   disabled={saveDisabled}
                   loading={saving}
-                  loadingText="保存中..."
+                  loadingText="Saving..."
                 >
                   {saveLabel}
                 </Button>
@@ -860,7 +860,7 @@ export function EditPageTemplate({
 }
 
 // ============================================
-// 导出
+// Exports
 // ============================================
 
 export type {

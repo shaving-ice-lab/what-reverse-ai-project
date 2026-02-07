@@ -57,29 +57,29 @@ export function AdminShell({ children }: AdminShellProps) {
       {
         id: "go-dashboard",
         keys: ["g", "d"],
-        label: "前往总览",
-        category: "导航",
+        label: "Go to Overview",
+        category: "Navigation",
         handler: () => router.push("/"),
       },
       {
         id: "go-users",
         keys: ["g", "u"],
-        label: "前往用户管理",
-        category: "导航",
+        label: "Go to Users",
+        category: "Navigation",
         handler: () => router.push("/users"),
       },
       {
         id: "go-tickets",
         keys: ["g", "t"],
-        label: "前往工单中心",
-        category: "导航",
+        label: "Go to Tickets",
+        category: "Navigation",
         handler: () => router.push("/support/tickets"),
       },
       {
         id: "go-system",
         keys: ["g", "s"],
-        label: "前往系统健康",
-        category: "导航",
+        label: "Go to System Health",
+        category: "Navigation",
         handler: () => router.push("/system/health"),
       },
     ];
@@ -121,7 +121,7 @@ export function AdminShell({ children }: AdminShellProps) {
 
   const buildBreadcrumbs = () => {
     if (!pathname || pathname === "/") {
-      return [{ href: "/", label: "总览" }];
+      return [{ href: "/", label: "Overview" }];
     }
 
     const segments = pathname.split("/").filter(Boolean);
@@ -211,7 +211,7 @@ export function AdminShell({ children }: AdminShellProps) {
               data-tour="global-search"
             >
               <Search className="w-3.5 h-3.5 text-foreground-muted" />
-              <span className="flex-1 text-sm text-foreground-muted">搜索用户 / Workspace / 工单...</span>
+              <span className="flex-1 text-sm text-foreground-muted">Search users / workspaces / tickets...</span>
               <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-background px-1.5 font-mono text-[10px] text-foreground-muted">
                 ⌘K
               </kbd>
@@ -223,7 +223,7 @@ export function AdminShell({ children }: AdminShellProps) {
                 variant="ghost"
                 size="sm"
                 onClick={showKeyboardHelp}
-                title="键盘快捷键 (?)"
+                title="Keyboard Shortcuts (?)"
                 className="hidden sm:flex"
               >
                 <Keyboard className="w-4 h-4" />
@@ -244,24 +244,24 @@ export function AdminShell({ children }: AdminShellProps) {
               </Badge>
               <Link href="/system/health">
                 <Button variant="outline" size="sm">
-                  系统状态
+                  System Status
                 </Button>
               </Link>
               <Link href="/support/tickets">
-                <Button size="sm">待处理工单</Button>
+                <Button size="sm">Pending Tickets</Button>
               </Link>
               <Button
                 variant="outline"
                 size="sm"
                 loading={isLoading}
-                loadingText="退出中..."
+                loadingText="Signing out..."
                 onClick={async () => {
                   await logout();
                   router.replace("/login");
                 }}
               >
                 <LogOut className="w-4 h-4" />
-                退出
+                Sign Out
               </Button>
             </div>
           </header>

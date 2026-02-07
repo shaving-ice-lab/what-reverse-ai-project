@@ -1,19 +1,19 @@
 "use client";
 
 /**
- * Admin 图表样式与配色系统
- * 统一所有图表的视觉风格，与 Supabase 设计系统一致
+ * Admin Chart Styles & Color System
+ * Unified visual style for all charts, consistent with Supabase design system
  */
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
 // ============================================
-// 图表配色系统
+// Chart color system
 // ============================================
 
 export const CHART_COLORS = {
-  // 主色系列 - 品牌绿色渐变
+  // Primary series - brand green gradient
   primary: {
     solid: "#3ECF8E",
     light: "#5fd9a3",
@@ -21,7 +21,7 @@ export const CHART_COLORS = {
     gradient: ["#3ECF8E", "#5fd9a3"],
     area: "rgba(62, 207, 142, 0.2)",
   },
-  // 次色系列 - 蓝色
+  // Secondary series - blue
   secondary: {
     solid: "#3b82f6",
     light: "#60a5fa",
@@ -29,7 +29,7 @@ export const CHART_COLORS = {
     gradient: ["#3b82f6", "#60a5fa"],
     area: "rgba(59, 130, 246, 0.2)",
   },
-  // 第三色系列 - 紫色
+  // Third series - purple
   tertiary: {
     solid: "#8b5cf6",
     light: "#a78bfa",
@@ -37,7 +37,7 @@ export const CHART_COLORS = {
     gradient: ["#8b5cf6", "#a78bfa"],
     area: "rgba(139, 92, 246, 0.2)",
   },
-  // 第四色系列 - 橙色
+  // Fourth series - orange
   quaternary: {
     solid: "#f59e0b",
     light: "#fbbf24",
@@ -45,7 +45,7 @@ export const CHART_COLORS = {
     gradient: ["#f59e0b", "#fbbf24"],
     area: "rgba(245, 158, 11, 0.2)",
   },
-  // 语义色
+  // Semantic colors
   success: {
     solid: "#3ECF8E",
     light: "#5fd9a3",
@@ -64,7 +64,7 @@ export const CHART_COLORS = {
     dark: "#dc2626",
     area: "rgba(239, 68, 68, 0.2)",
   },
-  // 中性色
+  // Neutral colors
   neutral: {
     solid: "#6b7280",
     light: "#9ca3af",
@@ -73,7 +73,7 @@ export const CHART_COLORS = {
   },
 } as const;
 
-// 调色板 - 用于多系列图表
+// Palette - for multi-series charts
 export const CHART_PALETTE = [
   CHART_COLORS.primary.solid,
   CHART_COLORS.secondary.solid,
@@ -86,37 +86,37 @@ export const CHART_PALETTE = [
 ];
 
 // ============================================
-// 图表基础样式配置
+// Chart base style configuration
 // ============================================
 
 export const CHART_THEME = {
-  // 背景色
+  // Background color
   background: "transparent",
-  // 文字颜色
+  // Text color
   text: {
     primary: "#ededed",
     secondary: "#b0b0b0",
     muted: "#7a7a7a",
   },
-  // 网格线
+  // Grid lines
   grid: {
     color: "#2a2a2a",
     strokeWidth: 1,
   },
-  // 轴线
+  // Axis lines
   axis: {
     color: "#2a2a2a",
     strokeWidth: 1,
     tickSize: 4,
     tickColor: "#7a7a7a",
   },
-  // 图例
+  // Legend
   legend: {
     fontSize: 11,
     fontWeight: 500,
     color: "#b0b0b0",
   },
-  // 提示框
+  // Tooltip
   tooltip: {
     background: "#1f1f1f",
     border: "#2a2a2a",
@@ -126,7 +126,7 @@ export const CHART_THEME = {
     color: "#ededed",
     shadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
   },
-  // 动画
+  // Animation
   animation: {
     duration: 300,
     easing: "ease-out",
@@ -134,7 +134,7 @@ export const CHART_THEME = {
 } as const;
 
 // ============================================
-// 图表尺寸预设
+// Chart size presets
 // ============================================
 
 export const CHART_SIZES = {
@@ -147,7 +147,7 @@ export const CHART_SIZES = {
 } as const;
 
 // ============================================
-// 简易图表组件 - 迷你趋势图
+// Simple chart component - mini sparkline
 // ============================================
 
 interface SparklineProps {
@@ -207,7 +207,7 @@ export function Sparkline({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* 最后一个点 */}
+      {/* Last point */}
       <circle
         cx={points[points.length - 1].x}
         cy={points[points.length - 1].y}
@@ -219,7 +219,7 @@ export function Sparkline({
 }
 
 // ============================================
-// 简易图表组件 - 迷你柱状图
+// Simple chart component - mini bar chart
 // ============================================
 
 interface MiniBarChartProps {
@@ -270,7 +270,7 @@ export function MiniBarChart({
 }
 
 // ============================================
-// 简易图表组件 - 进度环
+// Simple chart component - progress ring
 // ============================================
 
 interface ProgressRingProps {
@@ -302,7 +302,7 @@ export function ProgressRing({
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
       <svg width={size} height={size} className="-rotate-90">
-        {/* 背景环 */}
+        {/* Background ring */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -311,7 +311,7 @@ export function ProgressRing({
           stroke={bgColor}
           strokeWidth={strokeWidth}
         />
-        {/* 进度环 */}
+        {/* Progress ring */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -335,7 +335,7 @@ export function ProgressRing({
 }
 
 // ============================================
-// 图表图例组件
+// Chart legend component
 // ============================================
 
 interface ChartLegendItem {
@@ -382,7 +382,7 @@ export function ChartLegend({
 }
 
 // ============================================
-// 图表提示框组件
+// Chart tooltip component
 // ============================================
 
 interface ChartTooltipProps {
@@ -447,7 +447,7 @@ export function ChartTooltip({
 }
 
 // ============================================
-// 图表容器组件
+// Chart container component
 // ============================================
 
 interface ChartContainerProps {
@@ -476,7 +476,7 @@ export function ChartContainer({
         className
       )}
     >
-      {/* 头部 */}
+      {/* Header */}
       {(title || actions) && (
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
@@ -493,12 +493,12 @@ export function ChartContainer({
         </div>
       )}
 
-      {/* 图表内容 */}
+      {/* Chart content */}
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center h-[200px]">
             <div className="animate-pulse text-[11px] text-foreground-muted">
-              加载中...
+              Loading...
             </div>
           </div>
         ) : (
@@ -506,14 +506,14 @@ export function ChartContainer({
         )}
       </div>
 
-      {/* 图例 */}
+      {/* Legend */}
       {legend && <div className="mt-4 pt-3 border-t border-border">{legend}</div>}
     </div>
   );
 }
 
 // ============================================
-// 统计变化指示器
+// Stat change indicator
 // ============================================
 
 interface StatChangeProps {

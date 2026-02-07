@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Switch 开关组件 - Manus 风格（支持亮/暗主题）
+ * Switch Component - Manus Style (supports light/dark themes)
  */
 
 import * as React from "react"

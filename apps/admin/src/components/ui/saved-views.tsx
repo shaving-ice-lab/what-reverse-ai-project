@@ -202,7 +202,7 @@ export function SavedViewsDropdown({
       >
         <span className="flex items-center gap-2">
           <Bookmark className="w-4 h-4" />
-          {activeView ? activeView.name : "所有数据"}
+          {activeView ? activeView.name : "All data"}
         </span>
         <ChevronDown className="w-3 h-3 ml-2" />
       </Button>
@@ -222,7 +222,7 @@ export function SavedViewsDropdown({
                 !activeViewId && "bg-brand-500/10 text-brand-500"
               )}
             >
-              所有数据
+              All data
               {!activeViewId && <Check className="w-4 h-4 ml-auto" />}
             </button>
 
@@ -285,7 +285,7 @@ export function SavedViewsDropdown({
                       className="w-full px-3 py-1.5 flex items-center gap-2 text-xs text-left hover:bg-background-hover"
                     >
                       <Edit2 className="w-3 h-3" />
-                      编辑
+                      Edit
                     </button>
                     {!view.isDefault && (
                       <button
@@ -297,7 +297,7 @@ export function SavedViewsDropdown({
                         className="w-full px-3 py-1.5 flex items-center gap-2 text-xs text-left hover:bg-background-hover"
                       >
                         <Star className="w-3 h-3" />
-                        设为默认
+                        Set as default
                       </button>
                     )}
                     <button
@@ -309,7 +309,7 @@ export function SavedViewsDropdown({
                       className="w-full px-3 py-1.5 flex items-center gap-2 text-xs text-left text-destructive hover:bg-background-hover"
                     >
                       <Trash2 className="w-3 h-3" />
-                      删除
+                      Delete
                     </button>
                   </div>
                 )}
@@ -327,7 +327,7 @@ export function SavedViewsDropdown({
               className="w-full px-3 py-2 flex items-center gap-2 text-sm text-left text-brand-500 hover:bg-background-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
-              保存当前视图
+              Save current view
             </button>
           </div>
         </>
@@ -389,18 +389,18 @@ export function SaveViewDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="sm">
         <DialogHeader>
-          <DialogTitle>{view ? "编辑视图" : "保存视图"}</DialogTitle>
+          <DialogTitle>{view ? "Edit View" : "Save View"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div>
             <label className="text-xs font-medium text-foreground-muted uppercase tracking-wide">
-              视图名称
+              View name
             </label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例如：待处理工单"
+              placeholder="e.g., Pending tickets"
               className="mt-2"
               autoFocus
             />
@@ -409,10 +409,10 @@ export function SaveViewDialog({
           {!view && (
             <div className="p-3 bg-background-hover rounded-lg">
               <p className="text-xs text-foreground-muted">
-                当前筛选条件将被保存为此视图的默认条件。
+                Current filter conditions will be saved as this view's default conditions.
                 {Object.keys(currentFilters).length === 0 && (
                   <span className="block mt-1 text-warning">
-                    提示：当前没有任何筛选条件
+                    Note: There are no filter conditions currently
                   </span>
                 )}
               </p>
@@ -425,11 +425,11 @@ export function SaveViewDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              取消
+              Cancel
             </Button>
             <Button type="submit" disabled={!name.trim()} loading={loading}>
               <BookmarkPlus className="w-4 h-4 mr-1" />
-              {view ? "保存" : "创建视图"}
+              {view ? "Save" : "Create view"}
             </Button>
           </div>
         </form>
@@ -467,7 +467,7 @@ export function QuickFilters({ filters, activeFilterId, onSelect }: QuickFilters
             : "border-border hover:border-foreground-muted text-foreground-muted"
         )}
       >
-        全部
+        All
       </button>
       {filters.map((filter) => (
         <button

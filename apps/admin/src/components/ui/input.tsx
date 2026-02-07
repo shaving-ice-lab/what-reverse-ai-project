@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Input 输入框组件 - Supabase 风格：深色背景、绿色焦点
+ * Input Component - Supabase Style: dark background, green focus
  */
 const inputVariants = cva(
   [
@@ -18,35 +18,35 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        // Supabase 默认输入框样式
+        // Supabase default input style
         default: [
           "border-border bg-surface-100",
           "hover:border-border-strong",
           "focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500",
         ].join(" "),
-        // 更深背景
+        // Darker background
         dark: [
           "bg-surface-200 border-border",
           "hover:border-border-strong",
           "focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500",
         ].join(" "),
-        // 透明背景
+        // Transparent background
         ghost: [
           "border-transparent bg-surface-100",
           "hover:bg-surface-200 hover:border-border",
           "focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:bg-surface-200",
         ].join(" "),
-        // 错误状态
+        // Error state
         error: [
           "border-destructive-400/60 bg-surface-200",
           "focus:outline-none focus:ring-1 focus:ring-destructive/30 focus:border-destructive-400",
         ].join(" "),
-        // 成功状态
+        // Success state
         success: [
           "border-brand-500/60 bg-surface-200",
           "focus:outline-none focus:ring-1 focus:ring-brand-500/30 focus:border-brand-500",
         ].join(" "),
-        // 搜索框样式
+        // Search input style
         search: [
           "border-border bg-surface-100",
           "hover:bg-surface-200",
@@ -54,7 +54,7 @@ const inputVariants = cva(
         ].join(" "),
       },
       inputSize: {
-        // Supabase 尺寸
+        // Supabase sizes
         default: "h-8 px-3 py-1.5",
         sm: "h-7 text-[12px] px-3 py-1",
         lg: "h-10 px-4 py-2",
@@ -71,11 +71,11 @@ const inputVariants = cva(
 export interface InputProps
   extends Omit<React.ComponentProps<"input">, "size">,
     VariantProps<typeof inputVariants> {
-  /** 错误状态 */
+  /** Error state */
   error?: boolean
-  /** 左侧图标 */
+  /** Left icon */
   leftIcon?: React.ReactNode
-  /** 右侧图标 */
+  /** Right icon */
   rightIcon?: React.ReactNode
 }
 

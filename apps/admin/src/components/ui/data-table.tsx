@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Admin 数据表格组件
- * 支持数据密度切换、行内操作、排序、筛选、导出
+ * Admin Data Table Component
+ * Supports data density toggle, inline actions, sorting, filtering, export
  */
 
 import * as React from "react";
@@ -32,7 +32,7 @@ import {
 import { LoadingState, EmptyState, Skeleton } from "./data-states";
 
 // ============================================
-// 数据密度配置
+// Data density configuration
 // ============================================
 
 export type DataDensity = "compact" | "default" | "comfortable";
@@ -66,32 +66,32 @@ const DENSITY_CONFIGS: Record<DataDensity, DensityConfig> = {
 };
 
 // ============================================
-// 列定义类型
+// Column definition types
 // ============================================
 
 export interface ColumnDef<T> {
-  /** 列唯一标识 */
+  /** Column unique identifier */
   id: string;
-  /** 列标题 */
+  /** Column title */
   header: string;
-  /** 数据访问器 */
+  /** Data accessor */
   accessor: keyof T | ((row: T) => React.ReactNode);
-  /** 是否可排序 */
+  /** Whether sortable */
   sortable?: boolean;
-  /** 列宽度 */
+  /** Column width */
   width?: string;
-  /** 对齐方式 */
+  /** Alignment */
   align?: "left" | "center" | "right";
-  /** 是否默认隐藏 */
+  /** Whether hidden by default */
   hidden?: boolean;
-  /** 单元格渲染器 */
+  /** Cell renderer */
   cell?: (row: T, index: number) => React.ReactNode;
-  /** 头部渲染器 */
+  /** Header renderer */
   headerCell?: () => React.ReactNode;
 }
 
 // ============================================
-// 排序状态
+// Sort state
 // ============================================
 
 export interface SortState {
@@ -100,7 +100,7 @@ export interface SortState {
 }
 
 // ============================================
-// 行操作定义
+// Row action definition
 // ============================================
 
 export interface RowAction<T> {
@@ -108,44 +108,44 @@ export interface RowAction<T> {
   label: string;
   icon?: React.ReactNode;
   onClick: (row: T) => void;
-  /** 是否危险操作 */
+  /** Whether dangerous action */
   danger?: boolean;
-  /** 是否禁用 */
+  /** Whether disabled */
   disabled?: boolean | ((row: T) => boolean);
-  /** 是否显示 */
+  /** Whether visible */
   hidden?: boolean | ((row: T) => boolean);
 }
 
 // ============================================
-// DataTable 组件
+// DataTable Component
 // ============================================
 
 interface DataTableProps<T> {
-  /** 数据源 */
+  /** Data source */
   data: T[];
-  /** 列定义 */
+  /** Column definitions */
   columns: ColumnDef<T>[];
-  /** 行唯一键 */
+  /** Row unique key */
   rowKey: keyof T | ((row: T) => string);
-  /** 数据密度 */
+  /** Data density */
   density?: DataDensity;
-  /** 是否可切换密度 */
+  /** Whether density toggle enabled */
   showDensityToggle?: boolean;
-  /** 是否显示列配置 */
+  /** Whether column toggle shown */
   showColumnToggle?: boolean;
-  /** 行操作 */
+  /** Row actions */
   rowActions?: RowAction<T>[];
-  /** 是否显示行内操作（悬浮显示） */
+  /** Whether to show inline actions (on hover) */
   showInlineActions?: boolean;
-  /** 排序状态 */
+  /** Sort state */
   sortState?: SortState;
-  /** 排序变化回调 */
+  /** Sort change callback */
   onSortChange?: (sort: SortState) => void;
-  /** 行点击回调 */
+  /** Row click callback */
   onRowClick?: (row: T) => void;
-  /** 是否加载中 */
+  /** Whether loading */
   loading?: boolean;
-  /** 空状态配置 */
+  /** Empty state configuration */
   emptyState?: {
     icon?: React.ReactNode;
     title: string;
@@ -155,29 +155,29 @@ interface DataTableProps<T> {
       onClick: () => void;
     };
   };
-  /** 工具栏额外内容 */
+  /** Toolbar extra content */
   toolbar?: React.ReactNode;
-  /** 是否显示刷新按钮 */
+  /** Whether refresh button shown */
   showRefresh?: boolean;
-  /** 刷新回调 */
+  /** Refresh callback */
   onRefresh?: () => void;
-  /** 是否显示导出按钮 */
+  /** Whether export button shown */
   showExport?: boolean;
-  /** 导出回调 */
+  /** Export callback */
   onExport?: () => void;
-  /** 选中行 */
+  /** Selected rows */
   selectedRows?: T[];
-  /** 选中变化回调 */
+  /** Selection change callback */
   onSelectionChange?: (rows: T[]) => void;
-  /** 是否启用多选 */
+  /** Whether multi-select enabled */
   selectable?: boolean;
-  /** 表格样式 */
+  /** Table style */
   className?: string;
-  /** 是否显示边框 */
+  /** Whether bordered */
   bordered?: boolean;
-  /** 是否显示斑马纹 */
+  /** Whether striped */
   striped?: boolean;
-  /** 是否悬浮高亮 */
+  /** Whether hover highlight */
   hoverable?: boolean;
 }
 
@@ -216,20 +216,20 @@ export function DataTable<T extends Record<string, unknown>>({
 
   const config = DENSITY_CONFIGS[currentDensity];
 
-  // 获取行的唯一键
+  // Get row unique key
   const getRowKey = (row: T): string => {
     if (typeof rowKey === "function") return rowKey(row);
     return String(row[rowKey]);
   };
 
-  // 获取单元格值
+  // Get cell value
   const getCellValue = (row: T, column: ColumnDef<T>, index: number): React.ReactNode => {
     if (column.cell) return column.cell(row, index);
     if (typeof column.accessor === "function") return column.accessor(row);
     return row[column.accessor] as React.ReactNode;
   };
 
-  // 处理排序
+  // Handle sorting
   const handleSort = (columnId: string) => {
     if (!onSortChange) return;
     const newDirection =
@@ -246,7 +246,7 @@ export function DataTable<T extends Record<string, unknown>>({
     });
   };
 
-  // 处理行选择
+  // Handle row selection
   const handleRowSelect = (row: T) => {
     if (!onSelectionChange) return;
     const key = getRowKey(row);
@@ -258,7 +258,7 @@ export function DataTable<T extends Record<string, unknown>>({
     }
   };
 
-  // 全选/取消全选
+  // Select all / deselect all
   const handleSelectAll = () => {
     if (!onSelectionChange) return;
     if (selectedRows.length === data.length) {
@@ -268,7 +268,7 @@ export function DataTable<T extends Record<string, unknown>>({
     }
   };
 
-  // 渲染排序图标
+  // Render sort icon
   const renderSortIcon = (columnId: string) => {
     if (sortState?.column !== columnId) {
       return <ChevronsUpDown className={cn("opacity-40", config.iconSize)} />;
@@ -279,12 +279,12 @@ export function DataTable<T extends Record<string, unknown>>({
     return <ChevronDown className={cn("text-brand-500", config.iconSize)} />;
   };
 
-  // 可见列
+  // Visible columns
   const displayColumns = columns.filter((c) => visibleColumns.includes(c.id));
 
   return (
     <div className={cn("space-y-3", className)}>
-      {/* 工具栏 */}
+      {/* Toolbar */}
       {(showDensityToggle || showColumnToggle || showRefresh || showExport || toolbar) && (
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">{toolbar}</div>
@@ -295,13 +295,13 @@ export function DataTable<T extends Record<string, unknown>>({
                 size="icon-sm"
                 onClick={onRefresh}
                 disabled={loading}
-                aria-label="刷新"
+                aria-label="Refresh"
               >
                 <RefreshCw className={cn(config.iconSize, loading && "animate-spin")} />
               </Button>
             )}
             {showExport && (
-              <Button variant="ghost" size="icon-sm" onClick={onExport} aria-label="导出">
+              <Button variant="ghost" size="icon-sm" onClick={onExport} aria-label="Export">
                 <Download className={config.iconSize} />
               </Button>
             )}
@@ -324,7 +324,7 @@ export function DataTable<T extends Record<string, unknown>>({
         </div>
       )}
 
-      {/* 表格 */}
+      {/* Table */}
       <div
         className={cn(
           "rounded-lg overflow-hidden",
@@ -381,7 +381,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <TableCell
                   colSpan={displayColumns.length + (selectable ? 1 : 0) + (rowActions ? 1 : 0)}
                 >
-                  <LoadingState message="加载中..." size="sm" />
+                  <LoadingState message="Loading..." size="sm" />
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
@@ -391,7 +391,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 >
                   <EmptyState
                     icon={emptyState?.icon}
-                    title={emptyState?.title || "暂无数据"}
+                    title={emptyState?.title || "No data"}
                     description={emptyState?.description}
                     action={emptyState?.action}
                   />
@@ -475,7 +475,7 @@ export function DataTable<T extends Record<string, unknown>>({
 }
 
 // ============================================
-// 密度切换组件
+// Density toggle component
 // ============================================
 
 interface DensityToggleProps {
@@ -488,9 +488,9 @@ function DensityToggle({ density, onDensityChange, iconSize }: DensityToggleProp
   const [open, setOpen] = React.useState(false);
 
   const densityOptions: { value: DataDensity; label: string }[] = [
-    { value: "compact", label: "紧凑" },
-    { value: "default", label: "默认" },
-    { value: "comfortable", label: "宽松" },
+    { value: "compact", label: "Compact" },
+    { value: "default", label: "Default" },
+    { value: "comfortable", label: "Comfortable" },
   ];
 
   return (
@@ -499,7 +499,7 @@ function DensityToggle({ density, onDensityChange, iconSize }: DensityToggleProp
         variant="ghost"
         size="icon-sm"
         onClick={() => setOpen(!open)}
-        aria-label="数据密度"
+        aria-label="Data density"
       >
         <Settings2 className={iconSize} />
       </Button>
@@ -530,7 +530,7 @@ function DensityToggle({ density, onDensityChange, iconSize }: DensityToggleProp
 }
 
 // ============================================
-// 列配置组件
+// Column toggle component
 // ============================================
 
 interface ColumnToggleProps<T> {
@@ -562,7 +562,7 @@ function ColumnToggle<T>({
         variant="ghost"
         size="icon-sm"
         onClick={() => setOpen(!open)}
-        aria-label="列配置"
+        aria-label="Column settings"
       >
         <Columns className={iconSize} />
       </Button>
@@ -592,7 +592,7 @@ function ColumnToggle<T>({
 }
 
 // ============================================
-// 行内操作组件（悬浮显示）
+// Inline row actions component (shown on hover)
 // ============================================
 
 interface InlineRowActionsProps<T> {
@@ -607,7 +607,7 @@ function InlineRowActions<T>({ row, actions, iconSize }: InlineRowActionsProps<T
     return !action.hidden;
   });
 
-  // 只显示前2个操作，其余放入更多菜单
+  // Only show first 2 actions, rest go into more menu
   const primaryActions = visibleActions.slice(0, 2);
   const moreActions = visibleActions.slice(2);
 
@@ -638,7 +638,7 @@ function InlineRowActions<T>({ row, actions, iconSize }: InlineRowActionsProps<T
 }
 
 // ============================================
-// 行操作菜单组件
+// Row actions menu component
 // ============================================
 
 interface RowActionsMenuProps<T> {
@@ -663,7 +663,7 @@ function RowActionsMenu<T>({ row, actions, iconSize }: RowActionsMenuProps<T>) {
         variant="ghost"
         size="icon-xs"
         onClick={() => setOpen(!open)}
-        aria-label="更多操作"
+        aria-label="More actions"
       >
         <MoreHorizontal className={iconSize} />
       </Button>
@@ -703,7 +703,7 @@ function RowActionsMenu<T>({ row, actions, iconSize }: RowActionsMenuProps<T>) {
 }
 
 // ============================================
-// 表格骨架屏
+// Table skeleton
 // ============================================
 
 interface DataTableSkeletonProps {

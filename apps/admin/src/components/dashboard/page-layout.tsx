@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Dashboard 页面布局组件 - Supabase 风格
- * 统一的页面头部、内容区域、侧边栏布局
+ * Dashboard Page Layout Components - Supabase Style
+ * Unified page header, content area, and sidebar layout
  */
 
 import React from "react";
@@ -11,11 +11,11 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-// ===== 页面容器 =====
+// ===== Page Container =====
 interface PageContainerProps {
   children: React.ReactNode;
   className?: string;
-  /** 是否全宽（无内边距） */
+  /** Whether to use full width (no padding) */
   fullWidth?: boolean;
 }
 
@@ -35,24 +35,24 @@ export function PageContainer({ children, className, fullWidth = false }: PageCo
   );
 }
 
-// ===== 页面头部 =====
+// ===== Page Header =====
 interface PageHeaderProps {
-  /** 页面标题 */
+  /** Page title */
   title: string;
-  /** 眉题/分类 */
+  /** Eyebrow / category */
   eyebrow?: string;
-  /** 标题图标 */
+  /** Title icon */
   icon?: React.ReactNode;
-  /** 页面描述 */
+  /** Page description */
   description?: string;
-  /** 面包屑或返回链接 */
+  /** Breadcrumb or back link */
   backHref?: string;
   backLabel?: string;
-  /** 标题旁徽章/标签 */
+  /** Badge / tag next to title */
   badge?: React.ReactNode;
-  /** 右侧操作区 */
+  /** Right-side action area */
   actions?: React.ReactNode;
-  /** 子元素（标签页等） */
+  /** Children (tabs, etc.) */
   children?: React.ReactNode;
   className?: string;
 }
@@ -63,7 +63,7 @@ export function PageHeader({
   icon,
   description, 
   backHref, 
-  backLabel = "返回",
+  backLabel = "Back",
   badge,
   actions,
   children,
@@ -71,7 +71,7 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <div className={cn("mb-5 space-y-3", className)}>
-      {/* 返回链接 */}
+      {/* Back link */}
       {backHref && (
         <Link 
           href={backHref} 
@@ -82,7 +82,7 @@ export function PageHeader({
         </Link>
       )}
       
-      {/* 标题行 */}
+      {/* Title row */}
       <div className="page-header">
         <div className="min-w-0">
           <div className="flex items-start gap-3">
@@ -104,7 +104,7 @@ export function PageHeader({
         {actions && <div className="page-toolbar shrink-0">{actions}</div>}
       </div>
       
-      {/* 子内容（标签页等） */}
+      {/* Child content (tabs, etc.) */}
       {children && (
         <div className="mt-3">
           {children}
@@ -114,19 +114,19 @@ export function PageHeader({
   );
 }
 
-// ===== 设置/表单区块 =====
+// ===== Settings / Form Section =====
 interface SettingsSectionProps {
-  /** 区块标题 */
+  /** Section title */
   title: string;
-  /** 区块描述 */
+  /** Section description */
   description?: string;
-  /** 图标 */
+  /** Icon */
   icon?: React.ReactNode;
-  /** 内容 */
+  /** Content */
   children: React.ReactNode;
-  /** 底部操作栏 */
+  /** Footer action bar */
   footer?: React.ReactNode;
-  /** 是否紧凑模式 */
+  /** Whether to use compact mode */
   compact?: boolean;
   className?: string;
 }
@@ -145,7 +145,7 @@ export function SettingsSection({
       "page-panel overflow-hidden",
       className
     )}>
-      {/* 头部 */}
+      {/* Header */}
       <div className={cn(
         "page-panel-header",
         compact ? "px-4 py-3" : "px-5 py-4"
@@ -175,12 +175,12 @@ export function SettingsSection({
         </div>
       </div>
       
-      {/* 内容 */}
+      {/* Content */}
       <div className={cn(compact ? "p-4" : "p-5")}>
         {children}
       </div>
       
-      {/* 底部操作栏 */}
+      {/* Footer action bar */}
       {footer && (
         <div className={cn(
           "border-t border-border bg-surface-75 flex justify-end",
@@ -193,19 +193,19 @@ export function SettingsSection({
   );
 }
 
-// ===== 表单行（Supabase 风格：左标签+描述，右控件） =====
+// ===== Form Row (Supabase style: left label + description, right control) =====
 interface FormRowProps {
-  /** 标签 */
+  /** Label */
   label: string;
-  /** 描述 */
+  /** Description */
   description?: string;
-  /** 控件 */
+  /** Control */
   children: React.ReactNode;
-  /** 是否必填 */
+  /** Whether required */
   required?: boolean;
-  /** 是否有错误 */
+  /** Error message */
   error?: string;
-  /** 是否水平布局（默认是） */
+  /** Whether to use horizontal layout (default: true) */
   horizontal?: boolean;
   className?: string;
 }
@@ -225,7 +225,7 @@ export function FormRow({
       horizontal && "grid grid-cols-2 gap-8 items-start",
       className
     )}>
-      {/* 左侧：标签和描述 */}
+      {/* Left side: label and description */}
       <div>
         <label className="text-[12px] font-medium text-foreground">
           {label}
@@ -238,7 +238,7 @@ export function FormRow({
         )}
       </div>
       
-      {/* 右侧：控件 */}
+      {/* Right side: control */}
       <div className="space-y-1.5">
         {children}
         {error && (
@@ -249,7 +249,7 @@ export function FormRow({
   );
 }
 
-// ===== Toggle 行（开关设置） =====
+// ===== Toggle Row (Switch setting) =====
 interface ToggleRowProps {
   label: string;
   description?: string;
@@ -283,7 +283,7 @@ export function ToggleRow({
   );
 }
 
-// ===== 空状态 =====
+// ===== Empty State =====
 interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
@@ -338,7 +338,7 @@ export function EmptyState({
   );
 }
 
-// ===== 分类头部（大写灰色小标题） =====
+// ===== Category Header (Uppercase gray subtitle) =====
 interface CategoryHeaderProps {
   children: React.ReactNode;
   className?: string;
@@ -355,7 +355,7 @@ export function CategoryHeader({ children, className }: CategoryHeaderProps) {
   );
 }
 
-// ===== 统计卡片 =====
+// ===== Stats Card =====
 interface StatsCardProps {
   icon?: React.ReactNode;
   title: string;
@@ -409,7 +409,7 @@ export function StatsCard({
   );
 }
 
-// ===== 带侧边栏的页面布局 =====
+// ===== Page Layout with Sidebar =====
 interface PageWithSidebarProps {
   sidebar: React.ReactNode;
   children: React.ReactNode;
@@ -433,7 +433,7 @@ export function PageWithSidebar({
 
   return (
     <div className={cn("flex h-full overflow-hidden", className)}>
-      {/* 侧边栏 */}
+      {/* Sidebar */}
       <div className={cn(
         "shrink-0 border-r border-border bg-background-studio overflow-y-auto",
         widthClass[sidebarWidth]
@@ -448,7 +448,7 @@ export function PageWithSidebar({
         </div>
       </div>
       
-      {/* 主内容 - 使用 overflow-y-auto 允许滚动 */}
+      {/* Main content - uses overflow-y-auto for scrolling */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="px-6 py-5">
           {children}
@@ -458,7 +458,7 @@ export function PageWithSidebar({
   );
 }
 
-// ===== 侧边栏导航项 =====
+// ===== Sidebar Nav Item =====
 interface SidebarNavItemProps {
   href: string;
   label: string;
@@ -502,7 +502,7 @@ export function SidebarNavItem({
   );
 }
 
-// ===== 侧边栏分组 =====
+// ===== Sidebar Nav Group =====
 interface SidebarNavGroupProps {
   title?: string;
   children: React.ReactNode;

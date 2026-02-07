@@ -139,9 +139,9 @@ export function BatchActionBar({
             <Check className="w-4 h-4 text-brand-500" />
           </div>
           <span className="text-sm text-foreground">
-            已选择{" "}
+            Selected{" "}
             <span className="font-semibold text-brand-500">{selectedCount}</span>
-            /{totalCount} 项
+            /{totalCount} items
           </span>
         </div>
 
@@ -191,10 +191,10 @@ export function BatchActionBar({
         <BatchConfirmDialog
           open={true}
           onOpenChange={(open) => !open && setConfirmAction(null)}
-          title={confirmAction.confirmTitle || "确认操作"}
+          title={confirmAction.confirmTitle || "Confirm Action"}
           message={
             confirmAction.confirmMessage ||
-            `确定要对 ${selectedCount} 个项目执行此操作吗？`
+            `Are you sure you want to perform this action on ${selectedCount} items?`
           }
           variant={confirmAction.variant}
           onConfirm={() => executeAction(confirmAction)}
@@ -231,7 +231,7 @@ function BatchActionDropdown({
         onClick={() => setOpen(!open)}
       >
         <MoreHorizontal className="w-4 h-4" />
-        更多
+        More
         <ChevronDown className="w-3 h-3 ml-1" />
       </Button>
 
@@ -312,15 +312,15 @@ function BatchConfirmDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            取消
+            Cancel
           </Button>
           <Button
             variant={variant === "destructive" ? "destructive" : "default"}
             onClick={onConfirm}
             loading={loading}
-            loadingText="处理中..."
+            loadingText="Processing..."
           >
-            确认
+            Confirm
           </Button>
         </div>
       </DialogContent>
@@ -356,7 +356,7 @@ export function SelectAllCheckbox({
           : "border-border hover:border-foreground-muted",
         disabled && "opacity-50 cursor-not-allowed"
       )}
-      aria-label={isAllSelected ? "取消全选" : "全选"}
+      aria-label={isAllSelected ? "Deselect all" : "Select all"}
     >
       {isAllSelected && <Check className="w-3 h-3 text-white" />}
       {isPartiallySelected && !isAllSelected && (
@@ -387,7 +387,7 @@ export function RowCheckbox({ isSelected, onToggle, disabled }: RowCheckboxProps
           : "border-border hover:border-foreground-muted",
         disabled && "opacity-50 cursor-not-allowed"
       )}
-      aria-label={isSelected ? "取消选择" : "选择"}
+      aria-label={isSelected ? "Deselect" : "Select"}
     >
       {isSelected && <Check className="w-3 h-3 text-white" />}
     </button>

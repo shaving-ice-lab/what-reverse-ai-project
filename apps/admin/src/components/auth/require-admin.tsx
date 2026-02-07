@@ -12,7 +12,7 @@ import type { AdminCapability } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-function FullPageLoading({ label = "正在加载..." }: { label?: string }) {
+function FullPageLoading({ label = "Loading..." }: { label?: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background-studio">
       <div className="flex flex-col items-center gap-3">
@@ -87,7 +87,7 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
   }, [capabilitiesQuery.error, pathname, router, search]);
 
   if (!isInitialized || authLoading) {
-    return <FullPageLoading label="正在初始化认证..." />;
+    return <FullPageLoading label="Initializing authentication..." />;
   }
 
   if (!isAuthenticated) {
@@ -95,7 +95,7 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
   }
 
   if (capabilitiesQuery.isPending) {
-    return <FullPageLoading label="正在验证管理员权限..." />;
+    return <FullPageLoading label="Verifying admin permissions..." />;
   }
 
   if (capabilitiesQuery.error) {
@@ -117,10 +117,10 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
             </div>
             <div className="min-w-0">
               <div className="text-[14px] font-semibold text-foreground">
-                管理员权限校验失败
+                Admin Permission Verification Failed
               </div>
               <div className="mt-1 text-[12px] text-foreground-light">
-                {error?.message || "无法获取管理员能力清单，请稍后重试。"}
+                {error?.message || "Unable to retrieve admin capabilities. Please try again later."}
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Badge variant="outline" size="sm">
@@ -141,7 +141,7 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
               size="sm"
               onClick={() => capabilitiesQuery.refetch()}
             >
-              重试
+              Retry
             </Button>
             <Button
               size="sm"
@@ -150,7 +150,7 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
                 router.replace("/login");
               }}
             >
-              退出登录
+              Sign Out
             </Button>
           </div>
         </div>
@@ -169,7 +169,7 @@ function RequireAdminInner({ children }: { children: ReactNode }) {
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={<FullPageLoading label="正在验证访问权限..." />}>
+    <Suspense fallback={<FullPageLoading label="Verifying access permissions..." />}>
       <RequireAdminInner>{children}</RequireAdminInner>
     </Suspense>
   );

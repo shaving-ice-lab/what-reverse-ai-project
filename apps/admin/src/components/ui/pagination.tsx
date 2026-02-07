@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Pagination 分页组件
+ * Pagination Component
  *
- * 支持：
- * - 多种样式变体
- * - 页码输入跳转
- * - 每页数量选择
- * - 简洁/完整模式
+ * Supports:
+ * - Multiple style variants
+ * - Page number input navigation
+ * - Page size selection
+ * - Simple/full mode
  */
 
 import * as React from "react"
@@ -21,23 +21,23 @@ import {
 import { cn } from "@/lib/utils"
 
 interface PaginationProps {
-  /** 当前页码（1-indexed） */
+  /** Current page (1-indexed) */
   page: number
-  /** 总页数 */
+  /** Total pages */
   totalPages: number
-  /** 页码变化回调 */
+  /** Page change callback */
   onPageChange: (page: number) => void
-  /** 显示的页码按钮数量 */
+  /** Number of page buttons to show */
   siblingCount?: number
-  /** 是否显示首尾页按钮 */
+  /** Whether to show first/last buttons */
   showFirstLast?: boolean
-  /** 是否显示页码输入 */
+  /** Whether to show page input */
   showInput?: boolean
-  /** 变体 */
+  /** Variant */
   variant?: "default" | "outline" | "ghost" | "simple"
-  /** 尺寸 */
+  /** Size */
   size?: "sm" | "default" | "lg"
-  /** 是否禁用 */
+  /** Whether disabled */
   disabled?: boolean
   className?: string
 }
@@ -174,14 +174,14 @@ function Pagination({
   return (
     <nav
       className={cn("flex items-center gap-1", className)}
-      aria-label="分页导航"
+      aria-label="Pagination"
     >
       {showFirstLast && (
         <button
           onClick={() => onPageChange(1)}
           disabled={disabled || page === 1}
           className={getButtonStyles(false, disabled || page === 1)}
-          aria-label="第一页"
+          aria-label="First page"
         >
           <ChevronsLeft className={iconSizes[size]} />
         </button>
@@ -191,7 +191,7 @@ function Pagination({
         onClick={() => onPageChange(page - 1)}
         disabled={disabled || page === 1}
         className={getButtonStyles(false, disabled || page === 1)}
-        aria-label="上一页"
+        aria-label="Previous page"
       >
         <ChevronLeft className={iconSizes[size]} />
       </button>
@@ -218,7 +218,7 @@ function Pagination({
             onClick={() => onPageChange(pageNum as number)}
             disabled={disabled}
             className={getButtonStyles(page === pageNum, disabled)}
-            aria-label={`第 ${pageNum} 页`}
+            aria-label={`Page ${pageNum}`}
             aria-current={page === pageNum ? "page" : undefined}
           >
             {pageNum}
@@ -230,7 +230,7 @@ function Pagination({
         onClick={() => onPageChange(page + 1)}
         disabled={disabled || page === totalPages}
         className={getButtonStyles(false, disabled || page === totalPages)}
-        aria-label="下一页"
+        aria-label="Next page"
       >
         <ChevronRight className={iconSizes[size]} />
       </button>
@@ -240,7 +240,7 @@ function Pagination({
           onClick={() => onPageChange(totalPages)}
           disabled={disabled || page === totalPages}
           className={getButtonStyles(false, disabled || page === totalPages)}
-          aria-label="最后一页"
+          aria-label="Last page"
         >
           <ChevronsRight className={iconSizes[size]} />
         </button>
@@ -248,7 +248,7 @@ function Pagination({
 
       {showInput && (
         <form onSubmit={handleInputSubmit} className="flex items-center gap-2 ml-2">
-          <span className="text-sm text-foreground-light">跳转</span>
+          <span className="text-sm text-foreground-light">Go to</span>
           <input
             type="text"
             value={inputValue}
@@ -261,7 +261,7 @@ function Pagination({
               sizeStyles[size]
             )}
           />
-          <span className="text-sm text-foreground-light">页</span>
+          <span className="text-sm text-foreground-light"></span>
         </form>
       )}
     </nav>
@@ -269,7 +269,7 @@ function Pagination({
 }
 
 /**
- * PaginationInfo - 分页信息
+ * PaginationInfo - Pagination Info
  */
 interface PaginationInfoProps {
   page: number
@@ -289,16 +289,16 @@ function PaginationInfo({
 
   return (
     <p className={cn("text-sm text-foreground-light", className)}>
-      显示 <span className="font-medium text-foreground">{start}</span> -{" "}
-      <span className="font-medium text-foreground">{end}</span> 条，共{" "}
+      Showing <span className="font-medium text-foreground">{start}</span> -{" "}
+      <span className="font-medium text-foreground">{end}</span> of{" "}
       <span className="font-medium text-foreground">{total.toLocaleString()}</span>{" "}
-      条
+      results
     </p>
   )
 }
 
 /**
- * PageSizeSelect - 每页数量选择
+ * PageSizeSelect - Page Size Select
  */
 interface PageSizeSelectProps {
   value: number
@@ -317,7 +317,7 @@ function PageSizeSelect({
 }: PageSizeSelectProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-sm text-foreground-light">每页</span>
+      <span className="text-sm text-foreground-light">Per page</span>
       <select
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -335,26 +335,26 @@ function PageSizeSelect({
           </option>
         ))}
       </select>
-      <span className="text-sm text-foreground-light">条</span>
+      <span className="text-sm text-foreground-light">items</span>
     </div>
   )
 }
 
 /**
- * FullPagination - 完整分页组件
+ * FullPagination - Full Pagination Component
  */
 interface FullPaginationProps extends PaginationProps {
-  /** 每页数量 */
+  /** Page size */
   pageSize: number
-  /** 总数据条数 */
+  /** Total data count */
   total: number
-  /** 每页数量变化回调 */
+  /** Page size change callback */
   onPageSizeChange?: (size: number) => void
-  /** 每页数量选项 */
+  /** Page size options */
   pageSizeOptions?: number[]
-  /** 是否显示分页信息 */
+  /** Whether to show pagination info */
   showInfo?: boolean
-  /** 是否显示每页数量选择 */
+  /** Whether to show page size changer */
   showSizeChanger?: boolean
 }
 
@@ -409,7 +409,7 @@ function FullPagination({
 }
 
 /**
- * SimplePagination - 简洁分页
+ * SimplePagination - Simple Pagination
  */
 interface SimplePaginationProps {
   page: number
@@ -440,7 +440,7 @@ function SimplePagination({
         )}
       >
         <ChevronLeft className="w-4 h-4" />
-        上一页
+        Previous
       </button>
 
       <span className="text-sm text-foreground-light">
@@ -458,7 +458,7 @@ function SimplePagination({
           "disabled:opacity-50 disabled:cursor-not-allowed"
         )}
       >
-        下一页
+        Next
         <ChevronRight className="w-4 h-4" />
       </button>
     </div>

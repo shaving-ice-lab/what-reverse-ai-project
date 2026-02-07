@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Dialog 对话框组件 - 增强版
+ * Dialog Component - Enhanced
  * 
- * 支持：
- * - 多种动画效果
- * - 多种尺寸
- * - 位置变体
- * - 图标和状态
+ * Supports:
+ * - Multiple animation effects
+ * - Multiple sizes
+ * - Position variants
+ * - Icons and states
  */
 
 import * as React from "react"
@@ -24,7 +24,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.Close
 
-// Overlay 变体
+// Overlay variants
 const overlayVariants = cva(
   [
     "fixed inset-0 z-50",
@@ -62,7 +62,7 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-// Content 变体 - Supabase 风格
+// Content variants - Supabase style
 const contentVariants = cva(
   [
     "fixed z-50 w-full",
@@ -160,7 +160,7 @@ const DialogContent = React.forwardRef<
             "hover:rotate-90"
           )}>
             <X className="h-4 w-4" />
-            <span className="sr-only">关闭</span>
+            <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -169,11 +169,11 @@ const DialogContent = React.forwardRef<
 })
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
-// Header 增强
+// Header enhanced
 interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 图标 */
+  /** Icon */
   icon?: React.ReactNode
-  /** 图标颜色/变体 */
+  /** Icon color/variant */
   iconVariant?: "default" | "success" | "warning" | "error" | "info"
 }
 
@@ -229,7 +229,7 @@ const DialogFooter = ({
 )
 DialogFooter.displayName = "DialogFooter"
 
-// Title 增强
+// Title enhanced
 interface DialogTitleProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> {
   size?: "sm" | "default" | "lg"
 }
@@ -265,7 +265,7 @@ const DialogDescription = React.forwardRef<
 DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 /**
- * AlertDialog - 警告对话框
+ * AlertDialog - Alert Dialog
  */
 interface AlertDialogProps {
   open?: boolean
@@ -300,8 +300,8 @@ function AlertDialog({
   title,
   description,
   type = "info",
-  confirmText = "确认",
-  cancelText = "取消",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
   onConfirm,
   onCancel,
   loading = false,
@@ -350,7 +350,7 @@ function AlertDialog({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                处理中...
+                Processing...
               </span>
             ) : confirmText}
           </button>
@@ -361,7 +361,7 @@ function AlertDialog({
 }
 
 /**
- * DrawerDialog - 抽屉式对话框
+ * DrawerDialog - Drawer Dialog
  */
 interface DrawerDialogProps {
   open?: boolean
@@ -418,7 +418,7 @@ function DrawerDialog({
             "focus:outline-none focus:ring-2 focus:ring-brand-500/50"
           )}>
             <X className="h-4 w-4" />
-            <span className="sr-only">关闭</span>
+            <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
           
           {(title || description) && (
@@ -436,8 +436,8 @@ function DrawerDialog({
 }
 
 /**
- * ConfirmDialog - 确认对话框
- * 支持多种变体和自定义内容
+ * ConfirmDialog - Confirm Dialog
+ * Supports multiple variants and custom content
  */
 interface ConfirmDialogProps {
   open?: boolean
@@ -471,8 +471,8 @@ function ConfirmDialog({
   title,
   description,
   children,
-  confirmLabel = "确认",
-  cancelLabel = "取消",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
   onCancel,
   isLoading = false,
@@ -528,7 +528,7 @@ function ConfirmDialog({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                处理中...
+                Processing...
               </span>
             ) : confirmLabel}
           </button>

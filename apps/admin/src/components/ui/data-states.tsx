@@ -26,7 +26,7 @@ interface LoadingStateProps {
 }
 
 export function LoadingState({
-  message = "加载中...",
+  message = "Loading...",
   size = "md",
   className,
 }: LoadingStateProps) {
@@ -134,16 +134,16 @@ export function NoResultsState({
         <SearchX className="w-6 h-6 text-foreground-muted" />
       </div>
       <h3 className="text-sm font-medium text-foreground mb-1">
-        未找到结果
+        No results found
       </h3>
       {query && (
         <p className="text-xs text-foreground-muted mb-2">
-          搜索 "<span className="text-foreground">{query}</span>" 没有找到匹配项
+          No matches found for "<span className="text-foreground">{query}</span>"
         </p>
       )}
       {suggestions && suggestions.length > 0 && (
         <div className="text-xs text-foreground-muted mb-4">
-          <p className="mb-1">建议：</p>
+          <p className="mb-1">Suggestions:</p>
           <ul className="list-disc list-inside">
             {suggestions.map((s, i) => (
               <li key={i}>{s}</li>
@@ -153,7 +153,7 @@ export function NoResultsState({
       )}
       {onClear && (
         <Button variant="outline" size="sm" onClick={onClear}>
-          清除筛选
+          Clear filters
         </Button>
       )}
     </div>
@@ -173,7 +173,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = "加载失败",
+  title = "Failed to load",
   message,
   error,
   onRetry,
@@ -182,7 +182,7 @@ export function ErrorState({
   const errorMessage =
     message ||
     (error instanceof Error ? error.message : error) ||
-    "发生未知错误，请稍后重试";
+    "An unknown error occurred. Please try again later.";
 
   return (
     <div
@@ -201,7 +201,7 @@ export function ErrorState({
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
           <RefreshCw className="w-4 h-4 mr-1" />
-          重试
+          Retry
         </Button>
       )}
     </div>
@@ -228,14 +228,14 @@ export function NetworkErrorState({ onRetry, className }: NetworkErrorStateProps
       <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mb-4">
         <WifiOff className="w-6 h-6 text-warning" />
       </div>
-      <h3 className="text-sm font-medium text-foreground mb-1">网络连接失败</h3>
+      <h3 className="text-sm font-medium text-foreground mb-1">Network connection failed</h3>
       <p className="text-xs text-foreground-muted max-w-[300px] mb-4">
-        请检查网络连接后重试
+        Please check your network connection and try again
       </p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
           <RefreshCw className="w-4 h-4 mr-1" />
-          重试
+          Retry
         </Button>
       )}
     </div>
@@ -268,15 +268,15 @@ export function ServerErrorState({
         <ServerOff className="w-6 h-6 text-destructive" />
       </div>
       <h3 className="text-sm font-medium text-foreground mb-1">
-        服务器错误 {statusCode && `(${statusCode})`}
+        Server error {statusCode && `(${statusCode})`}
       </h3>
       <p className="text-xs text-foreground-muted max-w-[300px] mb-4">
-        服务暂时不可用，请稍后重试
+        Service temporarily unavailable. Please try again later
       </p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
           <RefreshCw className="w-4 h-4 mr-1" />
-          重试
+          Retry
         </Button>
       )}
     </div>
@@ -295,8 +295,8 @@ interface NotFoundStateProps {
 }
 
 export function NotFoundState({
-  title = "资源不存在",
-  message = "您访问的资源不存在或已被删除",
+  title = "Resource not found",
+  message = "The resource you are looking for does not exist or has been deleted",
   onBack,
   className,
 }: NotFoundStateProps) {
@@ -316,7 +316,7 @@ export function NotFoundState({
       </p>
       {onBack && (
         <Button variant="outline" size="sm" onClick={onBack}>
-          返回上一页
+          Go back
         </Button>
       )}
     </div>

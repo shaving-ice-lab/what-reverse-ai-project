@@ -50,7 +50,7 @@ interface ExportDialogProps {
 export function ExportDialog({
   open,
   onOpenChange,
-  title = "导出数据",
+  title = "Export Data",
   columns,
   onExport,
   defaultFilename = "export",
@@ -117,7 +117,7 @@ export function ExportDialog({
           {selectedCount !== undefined && selectedCount > 0 && (
             <div>
               <label className="text-xs font-medium text-foreground-muted uppercase tracking-wide">
-                导出范围
+                Export Scope
               </label>
               <div className="mt-2 flex gap-3">
                 <button
@@ -129,10 +129,10 @@ export function ExportDialog({
                       : "border-border hover:border-foreground-muted text-foreground-light"
                   )}
                 >
-                  <div className="font-medium">全部数据</div>
+                  <div className="font-medium">All Data</div>
                   {totalCount !== undefined && (
                     <div className="text-xs text-foreground-muted mt-0.5">
-                      共 {totalCount} 条
+                      {totalCount} records total
                     </div>
                   )}
                 </button>
@@ -145,9 +145,9 @@ export function ExportDialog({
                       : "border-border hover:border-foreground-muted text-foreground-light"
                   )}
                 >
-                  <div className="font-medium">已选数据</div>
+                  <div className="font-medium">Selected Data</div>
                   <div className="text-xs text-foreground-muted mt-0.5">
-                    共 {selectedCount} 条
+                    {selectedCount} records total
                   </div>
                 </button>
               </div>
@@ -157,7 +157,7 @@ export function ExportDialog({
           {/* Format Selection */}
           <div>
             <label className="text-xs font-medium text-foreground-muted uppercase tracking-wide">
-              导出格式
+              Export Format
             </label>
             <div className="mt-2 flex gap-2">
               {formatOptions.map((option) => (
@@ -182,20 +182,20 @@ export function ExportDialog({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-medium text-foreground-muted uppercase tracking-wide">
-                导出字段 ({selectedColumns.size}/{columns.length})
+                Export Fields ({selectedColumns.size}/{columns.length})
               </label>
               <div className="flex gap-2">
                 <button
                   onClick={selectAllColumns}
                   className="text-xs text-brand-500 hover:text-brand-400"
                 >
-                  全选
+                  Select All
                 </button>
                 <button
                   onClick={deselectAllColumns}
                   className="text-xs text-foreground-muted hover:text-foreground"
                 >
-                  清空
+                  Clear
                 </button>
               </div>
             </div>
@@ -224,16 +224,16 @@ export function ExportDialog({
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-2 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            Cancel
           </Button>
           <Button
             onClick={handleExport}
             disabled={selectedColumns.size === 0}
             loading={loading}
-            loadingText="导出中..."
+            loadingText="Exporting..."
           >
             <Download className="w-4 h-4 mr-1" />
-            导出
+            Export
           </Button>
         </div>
       </DialogContent>
@@ -273,7 +273,7 @@ export function ExportButton({
         disabled={disabled}
       >
         <Download className="w-4 h-4 mr-1" />
-        导出
+        Export
       </Button>
 
       <ExportDialog

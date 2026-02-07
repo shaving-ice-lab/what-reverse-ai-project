@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * 空白引导与危险操作提示模板
- * 用于引导用户完成首次操作或确认危险操作
+ * Getting Started Guide & Danger Action Prompts
+ * For guiding users through first-time operations or confirming dangerous actions
  */
 
 import * as React from "react";
@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 // ============================================
-// 空白引导组件
+// Getting Started Guide Component
 // ============================================
 
 interface GettingStartedStep {
@@ -57,8 +57,8 @@ export function GettingStartedGuide({
   description,
   steps,
   onSkip,
-  skipLabel = "跳过引导",
-  completedMessage = "所有步骤已完成！",
+  skipLabel = "Skip guide",
+  completedMessage = "All steps completed!",
   className,
 }: GettingStartedGuideProps) {
   const completedCount = steps.filter((s) => s.completed).length;
@@ -71,7 +71,7 @@ export function GettingStartedGuide({
         className
       )}
     >
-      {/* 头部 */}
+      {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-surface-75/70">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -94,7 +94,7 @@ export function GettingStartedGuide({
           )}
         </div>
 
-        {/* 进度条 */}
+        {/* Progress bar */}
         <div className="mt-4 flex items-center gap-3">
           <div className="flex-1 h-1.5 rounded-full bg-surface-300 overflow-hidden">
             <div
@@ -108,7 +108,7 @@ export function GettingStartedGuide({
         </div>
       </div>
 
-      {/* 步骤列表 */}
+      {/* Step list */}
       <div className="divide-y divide-border">
         {allCompleted ? (
           <div className="px-5 py-8 text-center">
@@ -187,7 +187,7 @@ export function GettingStartedGuide({
 }
 
 // ============================================
-// 功能介绍卡片
+// Feature Introduction Cards
 // ============================================
 
 interface FeatureCard {
@@ -265,7 +265,7 @@ export function FeatureIntro({
 }
 
 // ============================================
-// 危险操作确认对话框
+// Danger Confirmation Dialog
 // ============================================
 
 interface DangerConfirmProps {
@@ -273,17 +273,17 @@ interface DangerConfirmProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   description: string;
-  /** 需要输入确认的文本 */
+  /** Text to type for confirmation */
   confirmText?: string;
-  /** 确认按钮文字 */
+  /** Confirm button text */
   confirmLabel?: string;
-  /** 取消按钮文字 */
+  /** Cancel button text */
   cancelLabel?: string;
-  /** 确认操作 */
+  /** Confirm action */
   onConfirm: () => void;
-  /** 是否正在处理 */
+  /** Whether processing */
   loading?: boolean;
-  /** 警告列表 */
+  /** Warning list */
   warnings?: string[];
   className?: string;
 }
@@ -294,8 +294,8 @@ export function DangerConfirm({
   title,
   description,
   confirmText,
-  confirmLabel = "确认删除",
-  cancelLabel = "取消",
+  confirmLabel = "Confirm Delete",
+  cancelLabel = "Cancel",
   onConfirm,
   loading = false,
   warnings = [],
@@ -312,13 +312,13 @@ export function DangerConfirm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 遮罩 */}
+      {/* Overlay */}
       <div
         className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={() => !loading && onOpenChange(false)}
       />
 
-      {/* 对话框 */}
+      {/* Dialog */}
       <div
         className={cn(
           "relative bg-surface-100 border border-destructive/30 rounded-lg shadow-xl w-full max-w-md mx-4",
@@ -326,7 +326,7 @@ export function DangerConfirm({
           className
         )}
       >
-        {/* 头部 */}
+        {/* Header */}
         <div className="p-5 border-b border-border">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
@@ -343,13 +343,13 @@ export function DangerConfirm({
           </div>
         </div>
 
-        {/* 内容 */}
+        {/* Content */}
         <div className="p-5 space-y-4">
-          {/* 警告列表 */}
+          {/* Warning list */}
           {warnings.length > 0 && (
             <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
               <h4 className="text-[12px] font-medium text-destructive mb-2">
-                请注意以下影响：
+                Please note the following impacts:
               </h4>
               <ul className="space-y-1">
                 {warnings.map((warning, index) => (
@@ -365,11 +365,11 @@ export function DangerConfirm({
             </div>
           )}
 
-          {/* 确认输入 */}
+          {/* Confirmation input */}
           {confirmText && (
             <div>
               <label className="block text-[12px] text-foreground-light mb-2">
-                请输入 <code className="px-1 py-0.5 bg-surface-200 rounded text-destructive">{confirmText}</code> 以确认操作：
+                Type <code className="px-1 py-0.5 bg-surface-200 rounded text-destructive">{confirmText}</code> to confirm:
               </label>
               <input
                 type="text"
@@ -390,7 +390,7 @@ export function DangerConfirm({
           )}
         </div>
 
-        {/* 底部 */}
+        {/* Footer */}
         <div className="p-5 pt-0 flex items-center justify-end gap-3">
           <Button
             variant="outline"
@@ -416,7 +416,7 @@ export function DangerConfirm({
 }
 
 // ============================================
-// 警告提示横幅
+// Warning Banner
 // ============================================
 
 interface WarningBannerProps {
@@ -513,7 +513,7 @@ export function WarningBanner({
 }
 
 // ============================================
-// 操作提示卡片
+// Action Tip Card
 // ============================================
 
 interface ActionTipProps {
@@ -590,7 +590,7 @@ export function ActionTip({
 }
 
 // ============================================
-// 帮助链接组件
+// Help Links Component
 // ============================================
 
 interface HelpLink {
@@ -606,7 +606,7 @@ interface HelpLinksProps {
 }
 
 export function HelpLinks({
-  title = "相关帮助",
+  title = "Related Help",
   links,
   className,
 }: HelpLinksProps) {
@@ -641,7 +641,7 @@ export function HelpLinks({
 }
 
 // ============================================
-// 必填原因输入组件
+// Required Reason Input Component
 // ============================================
 
 interface RequiredReasonInputProps {
@@ -658,8 +658,8 @@ interface RequiredReasonInputProps {
 export function RequiredReasonInput({
   value,
   onChange,
-  placeholder = "请输入操作原因（必填）",
-  label = "操作原因",
+  placeholder = "Enter operation reason (required)",
+  label = "Reason for Action",
   minLength = 10,
   maxLength = 500,
   error,
@@ -696,7 +696,7 @@ export function RequiredReasonInput({
             error ? "text-destructive" : "text-foreground-muted"
           )}
         >
-          {error || (value.length > 0 && !isValid && `至少需要 ${minLength} 个字符`)}
+          {error || (value.length > 0 && !isValid && `At least ${minLength} characters required`)}
         </span>
         <span className="text-[11px] text-foreground-muted">
           {value.length}/{maxLength}
@@ -707,7 +707,7 @@ export function RequiredReasonInput({
 }
 
 // ============================================
-// 导出
+// Exports
 // ============================================
 
 export type {

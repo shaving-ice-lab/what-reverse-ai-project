@@ -5,70 +5,70 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Card 卡片组件 - Supabase 风格：深色主题、surface 层级
+ * Card Component - Supabase Style: dark theme, surface levels
  */
 const cardVariants = cva(
   "rounded-lg text-foreground transition-colors duration-150 ease-in-out",
   {
     variants: {
       variant: {
-        // 默认卡片 - Supabase surface-100
+        // Default card - Supabase surface-100
         default: [
           "bg-surface-100 border border-border",
         ].join(" "),
-        // 提升卡片 - 带阴影
+        // Elevated card - with shadow
         elevated: [
           "bg-surface-100 border border-border",
           "shadow-md shadow-black/25",
         ].join(" "),
-        // 轮廓卡片 - 透明背景
+        // Outline card - transparent background
         outline: [
           "bg-transparent border border-border",
         ].join(" "),
-        // 幽灵卡片 - 无边框
+        // Ghost card - no border
         ghost: [
           "bg-transparent border-0",
         ].join(" "),
-        // 静音卡片 - Supabase surface-75
+        // Muted card - Supabase surface-75
         muted: [
           "bg-surface-75 border border-border-muted",
         ].join(" "),
-        // 玻璃卡片 - 毛玻璃效果
+        // Glass card - frosted glass effect
         glass: [
           "bg-surface-100/70 backdrop-blur-xl border border-border/50",
         ].join(" "),
-        // 玻璃卡片 - 更透明
+        // Glass card - more transparent
         "glass-subtle": [
           "bg-surface-100/40 backdrop-blur-lg border border-border/30",
         ].join(" "),
-        // 渐变边框卡片 - 品牌绿色
+        // Gradient border card - brand green
         gradient: [
           "bg-surface-100 border-0 relative",
           "before:absolute before:inset-0 before:rounded-lg before:p-[1px]",
           "before:bg-gradient-to-br before:from-brand-500 before:via-brand-500/50 before:to-transparent",
           "before:-z-10",
         ].join(" "),
-        // 强调卡片 - 左边框品牌绿
+        // Accent card - left border brand green
         accent: [
           "bg-surface-100 border-l-4 border-l-brand-500 border border-border rounded-l-none",
         ].join(" "),
-        // 面板卡片 - Supabase 风格面板
+        // Panel card - Supabase style panel
         panel: [
           "bg-surface-75 border border-border",
         ].join(" "),
-        // 统计卡片 - Supabase 仪表盘统计卡
+        // Stats card - Supabase dashboard stats
         stats: [
           "bg-surface-100 border border-border",
         ].join(" "),
-        // 品牌高亮卡片 - 绿色背景
+        // Brand highlight card - green background
         brand: [
           "bg-brand-200 border border-brand-400/30",
         ].join(" "),
-        // 警告卡片
+        // Warning card
         warning: [
           "bg-warning-200 border border-warning/30",
         ].join(" "),
-        // 错误卡片
+        // Error card
         destructive: [
           "bg-destructive-200 border border-destructive/30",
         ].join(" "),
@@ -79,19 +79,19 @@ const cardVariants = cva(
         shadow: "hover:shadow-lg hover:shadow-black/30",
         lift: "hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5",
         muted: "hover:bg-surface-200",
-        // 交互卡片: Supabase 绿色边框
+        // Interactive card: Supabase green border
         glow: "hover:border-brand-500 hover:shadow-brand-500/10",
         "glow-border": "hover:border-brand-500/50 hover:shadow-sm",
-        // 缩放
+        // Scale
         scale: "hover:scale-[1.02]",
-        // 组合效果
+        // Combined effect
         interactive: "hover:border-border-strong hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5",
       },
       padding: {
         none: "",
         xs: "p-3",
         sm: "p-4",
-        // 默认 padding: 24px
+        // Default padding: 24px
         default: "p-6",
         lg: "p-8",
         xl: "p-10",
@@ -108,11 +108,11 @@ const cardVariants = cva(
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cardVariants> {
-  /** 是否可交互 */
+  /** Whether interactive */
   interactive?: boolean
-  /** 入场动画 */
+  /** Entry animation */
   animation?: "none" | "fade" | "slide-up" | "scale"
-  /** 动画延迟 (ms) */
+  /** Animation delay (ms) */
   animationDelay?: number
 }
 
@@ -156,9 +156,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 Card.displayName = "Card"
 
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 是否显示底部边框 */
+  /** Whether to show bottom border */
   bordered?: boolean
-  /** 右侧操作区 */
+  /** Right action area */
   action?: React.ReactNode
 }
 
@@ -186,7 +186,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
 CardHeader.displayName = "CardHeader"
 
 interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 标题大小 */
+  /** Title size */
   size?: "default" | "sm" | "lg"
 }
 
@@ -220,7 +220,7 @@ const CardDescription = React.forwardRef<
 CardDescription.displayName = "CardDescription"
 
 interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 内边距大小 */
+  /** Padding size */
   padding?: "default" | "sm" | "lg" | "none"
 }
 
@@ -242,9 +242,9 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
 CardContent.displayName = "CardContent"
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 是否显示顶部边框 */
+  /** Whether to show top border */
   bordered?: boolean
-  /** 对齐方式 */
+  /** Alignment */
   align?: "start" | "center" | "end" | "between"
 }
 
@@ -274,12 +274,12 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 CardFooter.displayName = "CardFooter"
 
 /**
- * SpotlightCard - 带有鼠标跟随光效的卡片
+ * SpotlightCard - Card with mouse-following spotlight effect
  */
 interface SpotlightCardProps extends CardProps {
-  /** 光效颜色 */
+  /** Spotlight color */
   spotlightColor?: string
-  /** 光效大小 */
+  /** Spotlight size */
   spotlightSize?: number
 }
 
@@ -317,7 +317,7 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
         onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
-        {/* 光效层 */}
+        {/* Spotlight layer */}
         <div
           className="pointer-events-none absolute inset-0 transition-opacity duration-300"
           style={{
@@ -333,12 +333,12 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
 SpotlightCard.displayName = "SpotlightCard"
 
 /**
- * GlowCard - 发光边框卡片
+ * GlowCard - Glowing Border Card
  */
 interface GlowCardProps extends CardProps {
-  /** 发光颜色 */
+  /** Glow color */
   glowColor?: string
-  /** 是否一直发光 */
+  /** Whether always glowing */
   alwaysGlow?: boolean
 }
 
@@ -352,7 +352,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
   }, ref) => {
     return (
       <div className="relative group">
-        {/* 发光背景 */}
+        {/* Glow background */}
         <div
           className={cn(
             "absolute -inset-0.5 rounded-lg blur-sm transition-opacity duration-300",
@@ -374,7 +374,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
 GlowCard.displayName = "GlowCard"
 
 /**
- * FlipCard - 翻转卡片
+ * FlipCard - Flip Card
  */
 interface FlipCardProps {
   front: React.ReactNode
@@ -425,14 +425,14 @@ function FlipCard({
           transform: !flipOnHover && isFlipped ? "rotateY(180deg)" : flipOnHover ? undefined : "rotateY(0deg)",
         }}
       >
-        {/* 正面 */}
+        {/* Front */}
         <div 
           className="absolute inset-0 backface-hidden"
           style={{ backfaceVisibility: "hidden" }}
         >
           {front}
         </div>
-        {/* 背面 */}
+        {/* Back */}
         <div 
           className="absolute inset-0 backface-hidden rotate-y-180"
           style={{ 
@@ -448,18 +448,18 @@ function FlipCard({
 }
 
 /**
- * ExpandableCard - 可展开卡片
+ * ExpandableCard - Expandable Card
  */
 interface ExpandableCardProps extends CardProps {
-  /** 折叠时的内容 */
+  /** Content when collapsed */
   collapsedContent: React.ReactNode
-  /** 展开时的额外内容 */
+  /** Additional content when expanded */
   expandedContent: React.ReactNode
-  /** 是否展开 */
+  /** Whether expanded */
   expanded?: boolean
-  /** 默认展开 */
+  /** Default expanded */
   defaultExpanded?: boolean
-  /** 展开状态改变回调 */
+  /** Expanded state change callback */
   onExpandedChange?: (expanded: boolean) => void
 }
 
@@ -501,7 +501,7 @@ function ExpandableCard({
 }
 
 /**
- * CardStack - 卡片堆叠效果
+ * CardStack - Card Stack Effect
  */
 interface CardStackProps {
   children: React.ReactNode[]
