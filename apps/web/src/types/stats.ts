@@ -1,81 +1,81 @@
 /**
- * 统计相关类型定义
+ * StatisticsRelatedTypeDefinition
  */
 
 /**
- * 总览统计
+ * OverviewStatistics
  */
 export interface OverviewStats {
-  total_workflows: number;
-  active_workflows: number;
-  total_executions: number;
-  successful_runs: number;
-  failed_runs: number;
-  success_rate: number;
-  total_tokens_used: number;
-  avg_response_time_ms: number;
-  runs_today: number;
-  runs_this_week: number;
-  runs_this_month: number;
+ total_workflows: number;
+ active_workflows: number;
+ total_executions: number;
+ successful_runs: number;
+ failed_runs: number;
+ success_rate: number;
+ total_tokens_used: number;
+ avg_response_time_ms: number;
+ runs_today: number;
+ runs_this_week: number;
+ runs_this_month: number;
 }
 
 /**
- * 每日统计
+ * eachdayStatistics
  */
 export interface DailyStats {
-  date: string;
-  executions: number;
-  successful_runs: number;
-  failed_runs: number;
-  avg_duration_ms: number;
-  tokens_used: number;
+ date: string;
+ executions: number;
+ successful_runs: number;
+ failed_runs: number;
+ avg_duration_ms: number;
+ tokens_used: number;
 }
 
 /**
- * 错误统计
+ * ErrorStatistics
  */
 export interface ErrorStats {
-  error_message: string;
-  count: number;
-  last_occurred: string;
+ error_message: string;
+ count: number;
+ last_occurred: string;
 }
 
 /**
- * 工作流统计
+ * WorkflowStatistics
  */
 export interface WorkflowStats {
-  workflow_id: string;
-  workflow_name: string;
-  total_runs: number;
-  successful_runs: number;
-  failed_runs: number;
-  success_rate: number;
-  avg_duration_ms: number;
-  last_run_at: string | null;
-  recent_trends: DailyStats[];
-  top_errors: ErrorStats[];
+ workflow_id: string;
+ workflow_name: string;
+ total_runs: number;
+ successful_runs: number;
+ failed_runs: number;
+ success_rate: number;
+ avg_duration_ms: number;
+ last_run_at: string | null;
+ recent_trends: DailyStats[];
+ top_errors: ErrorStats[];
 }
 
 /**
- * 统计总览响应
+ * StatisticsOverviewResponse
  */
 export interface OverviewStatsResponse {
-  success: boolean;
-  data: OverviewStats;
+ success: boolean;
+ data: OverviewStats;
 }
 
 /**
- * 执行趋势响应
+ * ExecuteTrendResponse
  */
 export interface ExecutionTrendsResponse {
-  success: boolean;
-  data: DailyStats[];
+ success: boolean;
+ data: DailyStats[];
 }
 
 /**
- * 工作流统计响应
+ * WorkflowStatisticsResponse
  */
 export interface WorkflowStatsResponse {
-  success: boolean;
-  data: WorkflowStats;
+ success: boolean;
+ data: WorkflowStats;
 }

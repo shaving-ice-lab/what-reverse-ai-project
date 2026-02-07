@@ -1,542 +1,542 @@
 /**
- * AI 创意助手类型定义
+ * AI CreativeAssistantTypeDefinition
  * 
- * 用于模板系统、生成任务和文档管理
+ * Used forTemplateSystem, GenerateTaskandDocumentManage
  */
 
-// ===== 模板分类 =====
+// ===== TemplateCategory =====
 
 /**
- * 创意模板分类
+ * CreativeTemplateCategory
  */
 export type CreativeTemplateCategory = 
-  | "business"   // 商业策划类
-  | "content"    // 内容营销类
-  | "product"    // 产品规划类
-  | "marketing"; // 企业服务类
+ | "business" // 
+ | "content" // ContentMarketing
+ | "product" // ProductPlanning
+ | "marketing"; // EnterpriseService
 
-// ===== 输入字段类型 =====
+// ===== InputFieldType =====
 
 /**
- * 输入字段类型
+ * InputFieldType
  */
 export type InputFieldType = 
-  | "text"        // 单行文本
-  | "textarea"    // 多行文本
-  | "number"      // 数字
-  | "select"      // 单选下拉
-  | "multiselect" // 多选下拉
-  | "slider"      // 滑块
-  | "switch"      // 开关
-  | "date";       // 日期
+ | "text" // rowText
+ | "textarea" // multiplerowText
+ | "number" // countchar
+ | "select" // selectdown
+ | "multiselect" // multipleselectdown
+ | "slider" // Slider
+ | "switch" // Toggle
+ | "date"; // Date
 
 /**
- * 下拉选项
+ * downOption
  */
 export interface SelectOption {
-  value: string;
-  label: string;
-  description?: string;
+ value: string;
+ label: string;
+ description?: string;
 }
 
 /**
- * 输入字段验证规则
+ * InputFieldVerifyRule
  */
 export interface InputValidation {
-  required?: boolean;
-  minLength?: number;
-  maxLength?: number;
-  min?: number;
-  max?: number;
-  pattern?: string;
-  patternMessage?: string;
+ required?: boolean;
+ minLength?: number;
+ maxLength?: number;
+ min?: number;
+ max?: number;
+ pattern?: string;
+ patternMessage?: string;
 }
 
 /**
- * 输入字段定义
+ * InputFieldDefinition
  * 
- * 用于定义模板的输入表单字段
+ * Used forDefinitionTemplate'sInputFormField
  */
 export interface InputField {
-  /** 字段唯一标识 */
-  id: string;
-  
-  /** 字段显示标签 */
-  label: string;
-  
-  /** 字段类型 */
-  type: InputFieldType;
-  
-  /** 占位提示文本 */
-  placeholder?: string;
-  
-  /** 帮助说明文本 */
-  helpText?: string;
-  
-  /** 默认值 */
-  defaultValue?: string | number | boolean | string[];
-  
-  /** 下拉选项 (select/multiselect 类型使用) */
-  options?: SelectOption[];
-  
-  /** 验证规则 */
-  validation?: InputValidation;
-  
-  /** 是否启用 AI 建议 */
-  aiSuggest?: boolean;
-  
-  /** AI 建议提示词 (aiSuggest=true 时使用) */
-  aiSuggestPrompt?: string;
-  
-  /** 条件显示 (依赖其他字段的值) */
-  showWhen?: {
-    field: string;
-    operator: "eq" | "neq" | "contains" | "notEmpty";
-    value?: string | number | boolean;
-  };
+ /** Field1Identifier */
+ id: string;
+ 
+ /** FieldDisplayTags */
+ label: string;
+ 
+ /** FieldType */
+ type: InputFieldType;
+ 
+ /** TipText */
+ placeholder?: string;
+ 
+ /** HelpDescriptionText */
+ helpText?: string;
+ 
+ /** Defaultvalue */
+ defaultValue?: string | number | boolean | string[];
+ 
+ /** downOption (select/multiselect TypeUsage) */
+ options?: SelectOption[];
+ 
+ /** VerifyRule */
+ validation?: InputValidation;
+ 
+ /** isnoEnable AI Suggestion */
+ aiSuggest?: boolean;
+ 
+ /** AI SuggestionPrompt (aiSuggest=true timeUsage) */
+ aiSuggestPrompt?: string;
+ 
+ /** ConditionDisplay (DependencyotherheField'svalue) */
+ showWhen?: {
+ field: string;
+ operator: "eq" | "neq" | "contains" | "notEmpty";
+ value?: string | number | boolean;
+ };
 }
 
-// ===== 输出章节类型 =====
+// ===== OutputChapterType =====
 
 /**
- * 输出章节定义
+ * OutputChapterDefinition
  * 
- * 用于定义生成文档的章节结构
+ * Used forDefinitionGenerateDocument'sChapterStructure
  */
 export interface OutputSection {
-  /** 章节唯一标识 */
-  id: string;
-  
-  /** 章节标题 */
-  title: string;
-  
-  /** 章节描述 */
-  description: string;
-  
-  /** 生成该章节的提示词模板 */
-  promptTemplate: string;
-  
-  /** 章节图标 */
-  icon?: string;
-  
-  /** 预计生成时间(秒) */
-  estimatedTime?: number;
-  
-  /** 依赖的前置章节 (需等待这些章节完成) */
-  dependsOn?: string[];
-  
-  /** 是否可以独立重新生成 */
-  regeneratable?: boolean;
-  
-  /** 输出格式 */
-  outputFormat?: "markdown" | "json" | "table" | "list";
+ /** Chapter1Identifier */
+ id: string;
+ 
+ /** ChapterTitle */
+ title: string;
+ 
+ /** ChapterDescription */
+ description: string;
+ 
+ /** GenerateChapter'sPromptTemplate */
+ promptTemplate: string;
+ 
+ /** ChapterIcon */
+ icon?: string;
+ 
+ /** EstimatedGenerateTime(s) */
+ estimatedTime?: number;
+ 
+ /** Dependency'sbeforeChapter (needetcpendingthisChapterDone) */
+ dependsOn?: string[];
+ 
+ /** isnocanwithIndependentre-newGenerate */
+ regeneratable?: boolean;
+ 
+ /** OutputFormat */
+ outputFormat?: "markdown" | "json" | "table" | "list";
 }
 
-// ===== 模板主结构 =====
+// ===== TemplatemainStructure =====
 
 /**
- * 模板示例
+ * TemplateExample
  */
 export interface TemplateExample {
-  /** 示例输入数据 */
-  input: Record<string, unknown>;
-  
-  /** 示例输出 (Markdown 格式) */
-  output: string;
-  
-  /** 示例标题 */
-  title?: string;
-  
-  /** 示例描述 */
-  description?: string;
+ /** ExampleInputData */
+ input: Record<string, unknown>;
+ 
+ /** ExampleOutput (Markdown Format) */
+ output: string;
+ 
+ /** ExampleTitle */
+ title?: string;
+ 
+ /** ExampleDescription */
+ description?: string;
 }
 
 /**
- * 创意模板定义
+ * CreativeTemplateDefinition
  * 
- * AI 创意助手的核心数据结构，定义了模板的完整配置
+ * AI CreativeAssistant'sCoreDataStructure, DefinitionTemplate'sCompleteConfig
  */
 export interface CreativeTemplate {
-  /** 模板唯一标识 */
-  id: string;
-  
-  /** 模板名称 */
-  name: string;
-  
-  /** 模板描述 */
-  description: string;
-  
-  /** 模板图标 */
-  icon: string;
-  
-  /** 模板分类 */
-  category: CreativeTemplateCategory;
-  
-  /** 输入字段定义 */
-  inputs: {
-    /** 必填字段 */
-    required: InputField[];
-    /** 选填字段 */
-    optional: InputField[];
-  };
-  
-  /** 输出章节定义 */
-  outputSections: OutputSection[];
-  
-  /** 关联的工作流ID */
-  workflowId: string;
-  
-  /** 模板示例 */
-  example?: TemplateExample;
-  
-  /** 使用次数 */
-  usageCount: number;
-  
-  /** 评分 (1-5) */
-  rating: number;
-  
-  /** 评价数量 */
-  reviewCount: number;
-  
-  /** 标签 */
-  tags: string[];
-  
-  /** 预计生成时间(秒) */
-  estimatedTime?: number;
-  
-  /** 是否为官方模板 */
-  isOfficial?: boolean;
-  
-  /** 创建者ID */
-  creatorId?: string;
-  
-  /** 创建者名称 */
-  creatorName?: string;
-  
-  /** 版本号 */
-  version: number;
-  
-  /** 创建时间 */
-  createdAt: string;
-  
-  /** 更新时间 */
-  updatedAt: string;
+ /** Template1Identifier */
+ id: string;
+ 
+ /** TemplateName */
+ name: string;
+ 
+ /** TemplateDescription */
+ description: string;
+ 
+ /** TemplateIcon */
+ icon: string;
+ 
+ /** TemplateCategory */
+ category: CreativeTemplateCategory;
+ 
+ /** InputFieldDefinition */
+ inputs: {
+ /** RequiredField */
+ required: InputField[];
+ /** selectField */
+ optional: InputField[];
+ };
+ 
+ /** OutputChapterDefinition */
+ outputSections: OutputSection[];
+ 
+ /** Associate'sWorkflowID */
+ workflowId: string;
+ 
+ /** TemplateExample */
+ example?: TemplateExample;
+ 
+ /** Usagetimescount */
+ usageCount: number;
+ 
+ /** Rating (1-5) */
+ rating: number;
+ 
+ /** ReviewsCount */
+ reviewCount: number;
+ 
+ /** Tags */
+ tags: string[];
+ 
+ /** EstimatedGenerateTime(s) */
+ estimatedTime?: number;
+ 
+ /** isnoasmethodTemplate */
+ isOfficial?: boolean;
+ 
+ /** CreateuserID */
+ creatorId?: string;
+ 
+ /** CreateuserName */
+ creatorName?: string;
+ 
+ /** Version Number */
+ version: number;
+ 
+ /** Created At */
+ createdAt: string;
+ 
+ /** Updated At */
+ updatedAt: string;
 }
 
-// ===== 生成任务类型 =====
+// ===== GenerateTaskType =====
 
 /**
- * 生成任务状态
+ * GenerateTaskStatus
  */
 export type CreativeTaskStatus =
-  | "pending"     // 等待开始
-  | "processing"  // 处理中
-  | "completed"   // 已完成
-  | "failed"      // 失败
-  | "cancelled";  // 已取消
+ | "pending" // etcpendingStart
+ | "processing" // Processing
+ | "completed" // Completed
+ | "failed" // Failed
+ | "cancelled"; // Cancelled
 
 /**
- * 章节生成状态
+ * ChapterGenerateStatus
  */
 export type SectionStatus =
-  | "pending"     // 等待生成
-  | "generating"  // 生成中
-  | "completed"   // 已完成
-  | "failed"      // 失败
-  | "skipped";    // 已跳过
+ | "pending" // etcpendingGenerate
+ | "generating" // Generating
+ | "completed" // Completed
+ | "failed" // Failed
+ | "skipped"; // alreadySkip
 
 /**
- * 章节状态信息
+ * ChapterStatusInfo
  */
 export interface SectionState {
-  /** 章节ID */
-  sectionId: string;
-  
-  /** 章节状态 */
-  status: SectionStatus;
-  
-  /** 生成的内容 */
-  content?: string;
-  
-  /** 开始时间 */
-  startedAt?: string;
-  
-  /** 完成时间 */
-  completedAt?: string;
-  
-  /** 耗时(毫秒) */
-  durationMs?: number;
-  
-  /** 错误信息 */
-  error?: string;
-  
-  /** Token 消耗 */
-  tokenUsage?: {
-    prompt: number;
-    completion: number;
-    total: number;
-  };
+ /** ChapterID */
+ sectionId: string;
+ 
+ /** ChapterStatus */
+ status: SectionStatus;
+ 
+ /** Generate'sContent */
+ content?: string;
+ 
+ /** StartTime */
+ startedAt?: string;
+ 
+ /** DoneTime */
+ completedAt?: string;
+ 
+ /** Duration(s) */
+ durationMs?: number;
+ 
+ /** ErrorInfo */
+ error?: string;
+ 
+ /** Token Consumption */
+ tokenUsage?: {
+ prompt: number;
+ completion: number;
+ total: number;
+ };
 }
 
 /**
- * Token 使用统计
+ * Token UsageStatistics
  */
 export interface TokenUsageStats {
-  prompt: number;
-  completion: number;
-  total: number;
+ prompt: number;
+ completion: number;
+ total: number;
 }
 
 /**
- * 创意生成任务
+ * CreativeGenerateTask
  * 
- * 记录一次生成任务的完整状态
+ * Record1timesGenerateTask'sCompleteStatus
  */
 export interface CreativeTask {
-  /** 任务唯一标识 */
-  id: string;
-  
-  /** 用户ID */
-  userId: string;
-  
-  /** 使用的模板ID */
-  templateId: string;
-  
-  /** 用户输入数据 */
-  inputs: Record<string, unknown>;
-  
-  /** 任务状态 */
-  status: CreativeTaskStatus;
-  
-  /** 各章节状态 */
-  sections: Record<string, SectionState>;
-  
-  /** 完成的章节数 */
-  completedSections: number;
-  
-  /** 总章节数 */
-  totalSections: number;
-  
-  /** 进度百分比 (0-100) */
-  progress: number;
-  
-  /** 最终输出 (Markdown 格式) */
-  outputMarkdown?: string;
-  
-  /** 输出元数据 */
-  outputMetadata?: {
-    title: string;
-    wordCount: number;
-    characterCount: number;
-  };
-  
-  /** 搜索结果缓存 */
-  searchCache?: Record<string, unknown>;
-  
-  /** Token 消耗统计 */
-  tokenUsage: TokenUsageStats;
-  
-  /** 预计剩余时间(秒) */
-  estimatedRemainingTime?: number;
-  
-  /** 错误信息 */
-  errorMessage?: string;
-  
-  /** 开始时间 */
-  startedAt?: string;
-  
-  /** 完成时间 */
-  completedAt?: string;
-  
-  /** 创建时间 */
-  createdAt: string;
+ /** Task1Identifier */
+ id: string;
+ 
+ /** UserID */
+ userId: string;
+ 
+ /** Usage'sTemplateID */
+ templateId: string;
+ 
+ /** UserInputData */
+ inputs: Record<string, unknown>;
+ 
+ /** TaskStatus */
+ status: CreativeTaskStatus;
+ 
+ /** ChapterStatus */
+ sections: Record<string, SectionState>;
+ 
+ /** Done'sChaptercount */
+ completedSections: number;
+ 
+ /** totalChaptercount */
+ totalSections: number;
+ 
+ /** ProgressPercentage (0-100) */
+ progress: number;
+ 
+ /** mostOutput (Markdown Format) */
+ outputMarkdown?: string;
+ 
+ /** OutputData */
+ outputMetadata?: {
+ title: string;
+ wordCount: number;
+ characterCount: number;
+ };
+ 
+ /** SearchResultCache */
+ searchCache?: Record<string, unknown>;
+ 
+ /** Token ConsumptionStatistics */
+ tokenUsage: TokenUsageStats;
+ 
+ /** EstimatedRemainingTime(s) */
+ estimatedRemainingTime?: number;
+ 
+ /** ErrorInfo */
+ errorMessage?: string;
+ 
+ /** StartTime */
+ startedAt?: string;
+ 
+ /** DoneTime */
+ completedAt?: string;
+ 
+ /** Created At */
+ createdAt: string;
 }
 
-// ===== 文档类型 =====
+// ===== DocumentType =====
 
 /**
- * 文档章节
+ * DocumentChapter
  */
 export interface DocumentSection {
-  /** 章节ID */
-  id: string;
-  
-  /** 章节标题 */
-  title: string;
-  
-  /** 章节内容 (Markdown) */
-  content: string;
-  
-  /** 章节顺序 */
-  order: number;
-  
-  /** 是否已编辑 */
-  isEdited?: boolean;
-  
-  /** 版本号 */
-  version: number;
-  
-  /** 历史版本 */
-  history?: {
-    content: string;
-    editedAt: string;
-    version: number;
-  }[];
+ /** ChapterID */
+ id: string;
+ 
+ /** ChapterTitle */
+ title: string;
+ 
+ /** ChapterContent (Markdown) */
+ content: string;
+ 
+ /** ChapterOrder */
+ order: number;
+ 
+ /** isnoalreadyEdit */
+ isEdited?: boolean;
+ 
+ /** Version Number */
+ version: number;
+ 
+ /** Version History */
+ history?: {
+ content: string;
+ editedAt: string;
+ version: number;
+ }[];
 }
 
 /**
- * 分享设置
+ * ShareSettings
  */
 export interface ShareSettings {
-  /** 分享ID (用于生成分享链接) */
-  shareId: string;
-  
-  /** 是否公开 */
-  isPublic: boolean;
-  
-  /** 访问密码 (可选) */
-  password?: string;
-  
-  /** 过期时间 (可选) */
-  expiresAt?: string;
-  
-  /** 是否允许下载 */
-  allowDownload: boolean;
-  
-  /** 访问次数 */
-  viewCount: number;
+ /** ShareID (Used forGenerateShareLink) */
+ shareId: string;
+ 
+ /** isnoPublic */
+ isPublic: boolean;
+ 
+ /** AccessPassword (Optional) */
+ password?: string;
+ 
+ /** ExpiredTime (Optional) */
+ expiresAt?: string;
+ 
+ /** isnoAllowDownload */
+ allowDownload: boolean;
+ 
+ /** Accesstimescount */
+ viewCount: number;
 }
 
 /**
- * 创意文档
+ * CreativeDocument
  * 
- * 生成任务完成后保存的文档
+ * GenerateTaskDoneafterSave'sDocument
  */
 export interface CreativeDocument {
-  /** 文档唯一标识 */
-  id: string;
-  
-  /** 用户ID */
-  userId: string;
-  
-  /** 关联的任务ID */
-  taskId: string;
-  
-  /** 使用的模板ID */
-  templateId: string;
-  
-  /** 文档标题 */
-  title: string;
-  
-  /** 完整内容 (Markdown 格式) */
-  content: string;
-  
-  /** 章节列表 */
-  sections: DocumentSection[];
-  
-  /** 版本号 */
-  version: number;
-  
-  /** 父版本ID (用于版本追溯) */
-  parentId?: string;
-  
-  /** 分享设置 */
-  share?: ShareSettings;
-  
-  /** 是否收藏 */
-  isStarred: boolean;
-  
-  /** 标签 */
-  tags: string[];
-  
-  /** 创建时间 */
-  createdAt: string;
-  
-  /** 更新时间 */
-  updatedAt: string;
+ /** Document1Identifier */
+ id: string;
+ 
+ /** UserID */
+ userId: string;
+ 
+ /** Associate'sTaskID */
+ taskId: string;
+ 
+ /** Usage'sTemplateID */
+ templateId: string;
+ 
+ /** DocumentTitle */
+ title: string;
+ 
+ /** CompleteContent (Markdown Format) */
+ content: string;
+ 
+ /** ChapterList */
+ sections: DocumentSection[];
+ 
+ /** Version Number */
+ version: number;
+ 
+ /** VersionID (Used forVersion) */
+ parentId?: string;
+ 
+ /** ShareSettings */
+ share?: ShareSettings;
+ 
+ /** isnoFavorite */
+ isStarred: boolean;
+ 
+ /** Tags */
+ tags: string[];
+ 
+ /** Created At */
+ createdAt: string;
+ 
+ /** Updated At */
+ updatedAt: string;
 }
 
-// ===== SSE 事件类型 =====
+// ===== SSE EventType =====
 
 /**
- * SSE 事件类型
+ * SSE EventType
  */
 export type CreativeSSEEventType =
-  | "task:started"        // 任务开始
-  | "section:start"       // 章节开始生成
-  | "section:content"     // 章节内容片段
-  | "section:complete"    // 章节生成完成
-  | "section:error"       // 章节生成失败
-  | "task:progress"       // 任务进度更新
-  | "task:complete"       // 任务完成
-  | "task:error"          // 任务失败
-  | "search:start"        // 搜索开始
-  | "search:complete";    // 搜索完成
+ | "task:started" // TaskStart
+ | "section:start" // ChapterStartGenerate
+ | "section:content" // ChapterContentFragment
+ | "section:complete" // ChapterGenerateDone
+ | "section:error" // ChapterGenerateFailed
+ | "task:progress" // TaskProgressUpdate
+ | "task:complete" // TaskDone
+ | "task:error" // TaskFailed
+ | "search:start" // SearchStart
+ | "search:complete"; // SearchDone
 
 /**
- * SSE 事件载荷
+ * SSE EventPayload
  */
 export interface CreativeSSEEvent {
-  type: CreativeSSEEventType;
-  data: {
-    taskId: string;
-    sectionId?: string;
-    content?: string;
-    progress?: number;
-    error?: string;
-    metadata?: Record<string, unknown>;
-  };
-  timestamp: string;
+ type: CreativeSSEEventType;
+ data: {
+ taskId: string;
+ sectionId?: string;
+ content?: string;
+ progress?: number;
+ error?: string;
+ metadata?: Record<string, unknown>;
+ };
+ timestamp: string;
 }
 
-// ===== API 请求/响应类型 =====
+// ===== API Request/ResponseType =====
 
 /**
- * 创建生成任务请求
+ * CreateGenerateTaskRequest
  */
 export interface CreateTaskRequest {
-  templateId: string;
-  inputs: Record<string, unknown>;
+ templateId: string;
+ inputs: Record<string, unknown>;
 }
 
 /**
- * 创建生成任务响应
+ * CreateGenerateTaskResponse
  */
 export interface CreateTaskResponse {
-  taskId: string;
-  status: CreativeTaskStatus;
-  estimatedTime: number;
+ taskId: string;
+ status: CreativeTaskStatus;
+ estimatedTime: number;
 }
 
 /**
- * 重新生成章节请求
+ * re-newGenerateChapterRequest
  */
 export interface RegenerateSectionRequest {
-  documentId: string;
-  sectionId: string;
-  instruction?: string;
+ documentId: string;
+ sectionId: string;
+ instruction?: string;
 }
 
 /**
- * 文档导出格式
+ * DocumentExportFormat
  */
 export type ExportFormat = "markdown" | "pdf" | "docx" | "html";
 
 /**
- * 创建分享链接请求
+ * CreateShareLinkRequest
  */
 export interface CreateShareRequest {
-  documentId: string;
-  password?: string;
-  expiresInDays?: number;
-  allowDownload?: boolean;
+ documentId: string;
+ password?: string;
+ expiresInDays?: number;
+ allowDownload?: boolean;
 }
 
 /**
- * 创建分享链接响应
+ * CreateShareLinkResponse
  */
 export interface CreateShareResponse {
-  shareId: string;
-  shareUrl: string;
-  expiresAt?: string;
+ shareId: string;
+ shareUrl: string;
+ expiresAt?: string;
 }

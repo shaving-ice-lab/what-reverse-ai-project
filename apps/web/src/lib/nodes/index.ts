@@ -1,19 +1,19 @@
 /**
- * 节点系统导出
+ * NodeSystemExport
  */
 
-// 类型
+// Type
 export * from "./types";
 
-// 工具函数
+// Toolcount
 export * from "./utils";
 
-// 节点清单与版本策略
+// NodeChecklistandVersionPolicy
 export * from "./catalog";
 export * from "./versioning";
 
-// 执行器
+// Execute
 export * from "./executors";
 
-// 重新导出常用项
+// re-newExportuse
 export { getNodeExecutor, registerNodeExecutor, nodeExecutors } from "./executors";

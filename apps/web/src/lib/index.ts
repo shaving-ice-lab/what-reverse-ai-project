@@ -1,5 +1,5 @@
 /**
- * Lib 导出入口
+ * Lib ExportEntry
  */
 
 export * from "./utils";

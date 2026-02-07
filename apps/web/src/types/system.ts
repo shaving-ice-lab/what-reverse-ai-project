@@ -1,45 +1,45 @@
 /**
- * 系统相关类型定义
+ * SystemRelatedTypeDefinition
  */
 
 /**
- * 系统健康状态
+ * SystemHealthStatus
  */
 export interface SystemHealth {
-  /** 服务名称 */
-  name: string;
-  /** 状态: healthy, degraded, down */
-  status: "healthy" | "degraded" | "down";
-  /** 延迟 (毫秒) */
-  latency_ms: number;
-  /** 图标 */
-  icon?: string;
+ /** ServiceName */
+ name: string;
+ /** Status: healthy, degraded, down */
+ status: "healthy" | "degraded" | "down";
+ /** Latency (s) */
+ latency_ms: number;
+ /** Icon */
+ icon?: string;
 }
 
 /**
- * 系统公告
+ * SystemAnnouncement
  */
 export interface Announcement {
-  /** 公告 ID */
-  id: string;
-  /** 标题 */
-  title: string;
-  /** 描述 */
-  description: string;
-  /** 类型: feature, improvement, notice, warning */
-  type: "feature" | "improvement" | "notice" | "warning";
-  /** 是否已读 */
-  is_read?: boolean;
-  /** 创建时间 */
-  created_at: string;
+ /** Announcement ID */
+ id: string;
+ /** Title */
+ title: string;
+ /** Description */
+ description: string;
+ /** Type: feature, improvement, notice, warning */
+ type: "feature" | "improvement" | "notice" | "warning";
+ /** isnoalreadyread */
+ is_read?: boolean;
+ /** Created At */
+ created_at: string;
 }
 
 /**
- * 格式化的系统健康状态（用于前端显示）
+ * Format'sSystemHealthStatus(Used forbeforeendpointDisplay)
  */
 export interface FormattedSystemHealth {
-  name: string;
-  status: "healthy" | "degraded" | "down";
-  latency: string;
-  icon: React.ComponentType<{ className?: string }>;
+ name: string;
+ status: "healthy" | "degraded" | "down";
+ latency: string;
+ icon: React.ComponentType<{ className?: string }>;
 }

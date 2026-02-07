@@ -1,347 +1,347 @@
 /**
- * 本地 LLM 类型定义
- * @description 用于本地 LLM 集成的类型定义（Ollama/LM Studio 等）
+ * Local LLM TypeDefinition
+ * @description Used forLocal LLM Integration'sTypeDefinition(Ollama/LM Studio etc)
  */
 
 // ============================================================================
-// 基础类型
+// BasicType
 // ============================================================================
 
 /**
- * LLM 提供者类型
+ * LLM ProvideuserType
  */
 export type LLMProviderType = 'ollama' | 'lm-studio' | 'llama-cpp';
 
 /**
- * 本地模型信息
+ * LocalModelInfo
  */
 export interface LocalModelInfo {
-  /** 模型名称 */
-  name: string;
-  /** 模型标识 */
-  model: string;
-  /** 模型大小（字节） */
-  size: number;
-  /** 模型摘要 */
-  digest: string;
-  /** 修改时间 */
-  modifiedAt: string;
-  /** 详细信息 */
-  details?: ModelDetails;
+ /** ModelName */
+ name: string;
+ /** ModelIdentifier */
+ model: string;
+ /** ModelSize(Bytes) */
+ size: number;
+ /** ModelSummary */
+ digest: string;
+ /** Modified At */
+ modifiedAt: string;
+ /** DetailedInfo */
+ details?: ModelDetails;
 }
 
 /**
- * 模型详细信息
+ * ModelDetailedInfo
  */
 export interface ModelDetails {
-  /** 模型家族 */
-  family?: string;
-  /** 参数规模 */
-  parameterSize?: string;
-  /** 量化级别 */
-  quantizationLevel?: string;
-  /** 格式 */
-  format?: string;
+ /** Model */
+ family?: string;
+ /** ParameterScale */
+ parameterSize?: string;
+ /** Level */
+ quantizationLevel?: string;
+ /** Format */
+ format?: string;
 }
 
 // ============================================================================
-// Ollama 相关类型
+// Ollama RelatedType
 // ============================================================================
 
 /**
- * Ollama 配置
+ * Ollama Config
  */
 export interface OllamaConfig {
-  /** 基础 URL */
-  baseUrl: string;
-  /** 请求超时（毫秒） */
-  timeout: number;
-  /** 最大重试次数 */
-  maxRetries: number;
+ /** Basic URL */
+ baseUrl: string;
+ /** Request timeout(s) */
+ timeout: number;
+ /** MaximumRetrytimescount */
+ maxRetries: number;
 }
 
 /**
- * Ollama 状态
+ * Ollama Status
  */
 export interface OllamaStatus {
-  /** 是否运行中 */
-  running: boolean;
-  /** 版本号 */
-  version?: string;
-  /** 已安装模型数量 */
-  modelsCount: number;
+ /** isnoRun */
+ running: boolean;
+ /** Version Number */
+ version?: string;
+ /** alreadyInstallModelCount */
+ modelsCount: number;
 }
 
 /**
- * 拉取进度
+ * PullProgress
  */
 export interface PullProgress {
-  /** 状态 */
-  status: string;
-  /** 摘要 */
-  digest?: string;
-  /** 总大小 */
-  total?: number;
-  /** 已完成大小 */
-  completed?: number;
+ /** Status */
+ status: string;
+ /** Summary */
+ digest?: string;
+ /** totalSize */
+ total?: number;
+ /** CompletedSize */
+ completed?: number;
 }
 
 // ============================================================================
-// 聊天相关类型
+// ChatRelatedType
 // ============================================================================
 
 /**
- * 聊天消息
+ * ChatMessage
  */
 export interface ChatMessage {
-  /** 角色 */
-  role: 'system' | 'user' | 'assistant';
-  /** 内容 */
-  content: string;
-  /** 图片（可选，用于多模态） */
-  images?: string[];
+ /** Role */
+ role: 'system' | 'user' | 'assistant';
+ /** Content */
+ content: string;
+ /** Image(Optional, Used formultipleModal) */
+ images?: string[];
 }
 
 /**
- * 聊天选项
+ * ChatOption
  */
 export interface ChatOptions {
-  /** 模型名称 */
-  model?: string;
-  /** 消息列表 */
-  messages: ChatMessage[];
-  /** 是否流式 */
-  stream?: boolean;
-  /** 温度（0-1） */
-  temperature?: number;
-  /** Top P 采样 */
-  topP?: number;
-  /** Top K 采样 */
-  topK?: number;
-  /** 最大生成 token 数 */
-  maxTokens?: number;
-  /** 停止词 */
-  stop?: string[];
+ /** ModelName */
+ model?: string;
+ /** MessageList */
+ messages: ChatMessage[];
+ /** isnoStreaming */
+ stream?: boolean;
+ /** Temperature(0-1) */
+ temperature?: number;
+ /** Top P Sampling */
+ topP?: number;
+ /** Top K Sampling */
+ topK?: number;
+ /** MaximumGenerate token count */
+ maxTokens?: number;
+ /** Stop */
+ stop?: string[];
 }
 
 /**
- * 聊天响应
+ * ChatResponse
  */
 export interface ChatResponse {
-  /** 回复内容 */
-  content: string;
-  /** 使用的模型 */
-  model: string;
-  /** token 使用统计 */
-  usage: TokenUsage;
-  /** 完成原因 */
-  finishReason: 'stop' | 'length' | 'error';
-  /** 完整的原始消息 */
-  message?: ChatMessage;
+ /** ReplyContent */
+ content: string;
+ /** Usage'sModel */
+ model: string;
+ /** token UsageStatistics */
+ usage: TokenUsage;
+ /** DoneReason */
+ finishReason: 'stop' | 'length' | 'error';
+ /** Complete'sOriginalMessage */
+ message?: ChatMessage;
 }
 
 /**
- * Token 使用统计
+ * Token UsageStatistics
  */
 export interface TokenUsage {
-  /** Prompt token 数 */
-  promptTokens: number;
-  /** 生成 token 数 */
-  completionTokens: number;
-  /** 总 token 数 */
-  totalTokens: number;
+ /** Prompt token count */
+ promptTokens: number;
+ /** Generate token count */
+ completionTokens: number;
+ /** total token count */
+ totalTokens: number;
 }
 
 /**
- * 流式输出块
+ * Streaming Outputblock
  */
 export interface StreamChunk {
-  /** 内容片段 */
-  content: string;
-  /** 是否完成 */
-  done: boolean;
-  /** 模型名称 */
-  model?: string;
+ /** ContentFragment */
+ content: string;
+ /** isnoDone */
+ done: boolean;
+ /** ModelName */
+ model?: string;
 }
 
 // ============================================================================
-// 嵌入相关类型
+// EmbeddingRelatedType
 // ============================================================================
 
 /**
- * 嵌入请求选项
+ * EmbeddingRequestOption
  */
 export interface EmbedOptions {
-  /** 模型名称 */
-  model?: string;
-  /** 要嵌入的文本 */
-  text: string;
+ /** ModelName */
+ model?: string;
+ /** needEmbedding'sText */
+ text: string;
 }
 
 /**
- * 嵌入响应
+ * EmbeddingResponse
  */
 export interface EmbedResponse {
-  /** 嵌入向量 */
-  embedding: number[];
-  /** 模型名称 */
-  model: string;
+ /** EmbeddingVector */
+ embedding: number[];
+ /** ModelName */
+ model: string;
 }
 
 // ============================================================================
-// Provider 接口
+// Provider Interface
 // ============================================================================
 
 /**
- * 本地 LLM 提供者接口
+ * Local LLM ProvideuserInterface
  */
 export interface LocalLLMProvider {
-  /** 提供者类型 */
-  readonly type: LLMProviderType;
+ /** ProvideuserType */
+ readonly type: LLMProviderType;
 
-  /** 检查服务是否可用 */
-  isAvailable(): Promise<boolean>;
+ /** CheckServiceisnoAvailable */
+ isAvailable(): Promise<boolean>;
 
-  /** 列出可用模型 */
-  listModels(): Promise<LocalModelInfo[]>;
+ /** ListAvailableModel */
+ listModels(): Promise<LocalModelInfo[]>;
 
-  /** 下载模型 */
-  pullModel(modelName: string, onProgress?: (progress: PullProgress) => void): Promise<void>;
+ /** DownloadModel */
+ pullModel(modelName: string, onProgress?: (progress: PullProgress) => void): Promise<void>;
 
-  /** 删除模型 */
-  deleteModel(modelName: string): Promise<void>;
+ /** DeleteModel */
+ deleteModel(modelName: string): Promise<void>;
 
-  /** 聊天 */
-  chat(options: ChatOptions): Promise<ChatResponse>;
+ /** Chat */
+ chat(options: ChatOptions): Promise<ChatResponse>;
 
-  /** 流式聊天 */
-  chatStream(options: ChatOptions): AsyncIterable<StreamChunk>;
+ /** StreamingChat */
+ chatStream(options: ChatOptions): AsyncIterable<StreamChunk>;
 
-  /** 文本嵌入 */
-  embed(text: string, model?: string): Promise<number[]>;
+ /** TextEmbedding */
+ embed(text: string, model?: string): Promise<number[]>;
 
-  /** 取消请求 */
-  cancel(requestId: string): void;
+ /** CancelRequest */
+ cancel(requestId: string): void;
 }
 
 // ============================================================================
-// 推荐模型
+// RecommendedModel
 // ============================================================================
 
 /**
- * 推荐模型信息
+ * RecommendedModelInfo
  */
 export interface RecommendedModel {
-  /** 模型名称 */
-  name: string;
-  /** 描述 */
-  description: string;
-  /** 大小（人类可读） */
-  size: string;
-  /** 能力标签 */
-  capabilities: string[];
-  /** 最小内存要求（GB） */
-  minMemory?: number;
+ /** ModelName */
+ name: string;
+ /** Description */
+ description: string;
+ /** Size (human readable) */
+ size: string;
+ /** Capability tags */
+ capabilities: string[];
+ /** Minimum memory required (GB) */
+ minMemory?: number;
 }
 
 /**
- * 推荐模型列表
+ * RecommendedModelList
  */
 export const RECOMMENDED_MODELS: RecommendedModel[] = [
-  {
-    name: 'llama3.2:latest',
-    description: 'Meta 最新开源模型，平衡性能和效率',
-    size: '2.0 GB',
-    capabilities: ['聊天', '推理', '代码'],
-    minMemory: 8,
-  },
-  {
-    name: 'qwen2.5:7b',
-    description: '阿里通义千问，中文能力强',
-    size: '4.4 GB',
-    capabilities: ['聊天', '中文', '代码'],
-    minMemory: 8,
-  },
-  {
-    name: 'deepseek-coder:6.7b',
-    description: '专注代码生成的模型',
-    size: '3.8 GB',
-    capabilities: ['代码', '补全', '解释'],
-    minMemory: 8,
-  },
-  {
-    name: 'nomic-embed-text',
-    description: '文本嵌入模型，用于语义搜索',
-    size: '274 MB',
-    capabilities: ['嵌入', '搜索'],
-    minMemory: 4,
-  },
-  {
-    name: 'phi3:mini',
-    description: '微软 Phi-3 轻量模型',
-    size: '2.3 GB',
-    capabilities: ['聊天', '推理'],
-    minMemory: 4,
-  },
-  {
-    name: 'gemma2:2b',
-    description: 'Google Gemma 2 轻量版',
-    size: '1.6 GB',
-    capabilities: ['聊天', '推理'],
-    minMemory: 4,
-  },
+ {
+ name: 'llama3.2:latest',
+ description: 'Meta latest open source model, balanced capability and speed',
+ size: '2.0 GB',
+ capabilities: ['Chat', 'Inference', 'Code'],
+ minMemory: 8,
+ },
+ {
+ name: 'qwen2.5:7b',
+ description: 'Alibaba Tongyi Qianwen, powerful capabilities',
+ size: '4.4 GB',
+ capabilities: ['Chat', '', 'Code'],
+ minMemory: 8,
+ },
+ {
+ name: 'deepseek-coder:6.7b',
+ description: 'Code generation focused model',
+ size: '3.8 GB',
+ capabilities: ['Code', 'all', 'Explain'],
+ minMemory: 8,
+ },
+ {
+ name: 'nomic-embed-text',
+ description: 'Text embedding model, used for semantic search',
+ size: '274 MB',
+ capabilities: ['Embedding', 'Search'],
+ minMemory: 4,
+ },
+ {
+ name: 'phi3:mini',
+ description: 'Microsoft Phi-3 Model',
+ size: '2.3 GB',
+ capabilities: ['Chat', 'Inference'],
+ minMemory: 4,
+ },
+ {
+ name: 'gemma2:2b',
+ description: 'Google Gemma 2 version',
+ size: '1.6 GB',
+ capabilities: ['Chat', 'Inference'],
+ minMemory: 4,
+ },
 ];
 
 // ============================================================================
-// 错误类型
+// ErrorType
 // ============================================================================
 
 /**
- * LLM 错误类型
+ * LLM ErrorType
  */
 export class LLMError extends Error {
-  constructor(
-    message: string,
-    public code: LLMErrorCode,
-    public details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = 'LLMError';
-  }
+ constructor(
+ message: string,
+ public code: LLMErrorCode,
+ public details?: Record<string, unknown>
+ ) {
+ super(message);
+ this.name = 'LLMError';
+ }
 }
 
 /**
- * LLM 错误代码
+ * LLM ErrorCode
  */
 export type LLMErrorCode =
-  | 'CONNECTION_ERROR'
-  | 'MODEL_NOT_FOUND'
-  | 'GENERATION_ERROR'
-  | 'TIMEOUT'
-  | 'CANCELLED'
-  | 'INVALID_REQUEST'
-  | 'RATE_LIMITED'
-  | 'UNKNOWN';
+ | 'CONNECTION_ERROR'
+ | 'MODEL_NOT_FOUND'
+ | 'GENERATION_ERROR'
+ | 'TIMEOUT'
+ | 'CANCELLED'
+ | 'INVALID_REQUEST'
+ | 'RATE_LIMITED'
+ | 'UNKNOWN';
 
 // ============================================================================
-// 工具函数类型
+// ToolcountType
 // ============================================================================
 
 /**
- * 格式化字节数
+ * FormatBytescount
  */
 export function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+ if (bytes === 0) return '0 B';
+ const k = 1024;
+ const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+ const i = Math.floor(Math.log(bytes) / Math.log(k));
+ return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + '' + sizes[i];
 }
 
 /**
- * 解析模型名称获取参数规模
+ * ParseModelNameFetchParameterScale
  */
 export function parseModelSize(modelName: string): string | undefined {
-  const match = modelName.match(/(\d+(?:\.\d+)?[bBmM])/);
-  return match ? match[1].toUpperCase() : undefined;
+ const match = modelName.match(/(\d+(?:\.\d+)?[bBmM])/);
+ return match ? match[1].toUpperCase() : undefined;
 }

@@ -1,1179 +1,1179 @@
 /**
- * Workspace API 服务
- * 工作空间管理相关接口
+ * Workspace API Service
+ * WorkspaceManageRelatedInterface
  */
 
 import { request, API_BASE_URL } from "./shared";
 
-// ===== 类型定义 =====
+// ===== TypeDefinition =====
 
 export interface Workspace {
-  id: string;
-  owner_user_id: string;
-  name: string;
-  slug: string;
-  icon?: string;
-  description?: string;
-  status: "active" | "suspended" | "deleted";
-  plan: "free" | "pro" | "enterprise";
-  region?: string;
-  settings_json?: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
-  
-  // App 相关字段（Workspace 现在就是 App）
-  app_status: "draft" | "published" | "deprecated" | "archived";
-  current_version_id?: string;
-  pricing_type?: "free" | "paid" | "subscription";
-  price?: number;
-  published_at?: string;
-  
-  // 访问策略字段（原 AppAccessPolicy）
-  access_mode: "private" | "public_auth" | "public_anonymous";
-  data_classification?: string;
-  rate_limit_json?: Record<string, unknown>;
-  allowed_origins?: string[];
-  require_captcha?: boolean;
-  
-  // 关联数据
-  current_version?: WorkspaceVersion;
+ id: string;
+ owner_user_id: string;
+ name: string;
+ slug: string;
+ icon?: string;
+ description?: string;
+ status: "active" | "suspended" | "deleted";
+ plan: "free" | "pro" | "enterprise";
+ region?: string;
+ settings_json?: Record<string, unknown>;
+ created_at: string;
+ updated_at: string;
+ deleted_at?: string;
+ 
+ // App RelatedField(Workspace atthenis App)
+ app_status: "draft" | "published" | "deprecated" | "archived";
+ current_version_id?: string;
+ pricing_type?: "free" | "paid" | "subscription";
+ price?: number;
+ published_at?: string;
+ 
+ // AccessPolicyField( AppAccessPolicy)
+ access_mode: "private" | "public_auth" | "public_anonymous";
+ data_classification?: string;
+ rate_limit_json?: Record<string, unknown>;
+ allowed_origins?: string[];
+ require_captcha?: boolean;
+ 
+ // AssociateData
+ current_version?: WorkspaceVersion;
 }
 
-// 为兼容性保留 App 类型作为 Workspace 的别名
+// asCompatibleRetain App Typeas Workspace 'sAlias
 export type App = Workspace;
 
-// Workspace 版本（原 AppVersion）
+// Workspace Version( AppVersion)
 export interface WorkspaceVersion {
-  id: string;
-  workspace_id: string;
-  version: string;
-  changelog?: string;
-  workflow_id?: string;
-  ui_schema?: Record<string, unknown>;
-  db_schema?: Record<string, unknown>;
-  config_json?: Record<string, unknown>;
-  created_by?: string;
-  created_at: string;
+ id: string;
+ workspace_id: string;
+ version: string;
+ changelog?: string;
+ workflow_id?: string;
+ ui_schema?: Record<string, unknown>;
+ db_schema?: Record<string, unknown>;
+ config_json?: Record<string, unknown>;
+ created_by?: string;
+ created_at: string;
 }
 
-// 为兼容性保留 AppVersion 类型
+// asCompatibleRetain AppVersion Type
 export type AppVersion = WorkspaceVersion;
 
-// Workspace 域名（原 AppDomain）
+// Workspace Domain( AppDomain)
 export interface WorkspaceDomain {
-  id: string;
-  workspace_id: string;
-  domain: string;
-  status: "pending" | "verifying" | "verified" | "active" | "failed" | "blocked";
-  blocked_at?: string;
-  blocked_reason?: string;
-  domain_expires_at?: string;
-  domain_expiry_notified_at?: string;
-  verification_token?: string;
-  verified_at?: string;
-  ssl_status?: "pending" | "issuing" | "issued" | "failed" | "expired";
-  ssl_issued_at?: string;
-  ssl_expires_at?: string;
-  ssl_expiry_notified_at?: string;
-  created_at: string;
-  updated_at: string;
+ id: string;
+ workspace_id: string;
+ domain: string;
+ status: "pending" | "verifying" | "verified" | "active" | "failed" | "blocked";
+ blocked_at?: string;
+ blocked_reason?: string;
+ domain_expires_at?: string;
+ domain_expiry_notified_at?: string;
+ verification_token?: string;
+ verified_at?: string;
+ ssl_status?: "pending" | "issuing" | "issued" | "failed" | "expired";
+ ssl_issued_at?: string;
+ ssl_expires_at?: string;
+ ssl_expiry_notified_at?: string;
+ created_at: string;
+ updated_at: string;
 }
 
-// 为兼容性保留 AppDomain 类型
+// asCompatibleRetain AppDomain Type
 export type AppDomain = WorkspaceDomain;
 
-// 域名验证信息
+// DomainVerifyInfo
 export interface DomainVerificationInfo {
-  txt_name: string;
-  txt_value: string;
-  cname_target: string;
+ txt_name: string;
+ txt_value: string;
+ cname_target: string;
 }
 
-// Workspace 域名绑定结果
+// Workspace DomainBindResult
 export interface WorkspaceDomainBindingResult {
-  domain: WorkspaceDomain;
-  verification?: DomainVerificationInfo;
-  verified?: boolean;
-  method?: string;
+ domain: WorkspaceDomain;
+ verification?: DomainVerificationInfo;
+ verified?: boolean;
+ method?: string;
 }
 
-// Workspace 执行记录
+// Workspace ExecuteRecord
 export interface WorkspaceExecution {
-  id: string;
-  workspace_id: string;
-  workflow_id: string;
-  session_id?: string;
-  status: "pending" | "running" | "completed" | "failed" | "cancelled";
-  inputs?: Record<string, unknown>;
-  outputs?: Record<string, unknown>;
-  error_message?: string;
-  duration_ms?: number;
-  started_at?: string;
-  completed_at?: string;
-  created_at: string;
+ id: string;
+ workspace_id: string;
+ workflow_id: string;
+ session_id?: string;
+ status: "pending" | "running" | "completed" | "failed" | "cancelled";
+ inputs?: Record<string, unknown>;
+ outputs?: Record<string, unknown>;
+ error_message?: string;
+ duration_ms?: number;
+ started_at?: string;
+ completed_at?: string;
+ created_at: string;
 }
 
-// Workspace 指标
+// Workspace Metrics
 export interface WorkspaceMetrics {
-  total_executions: number;
-  success_count: number;
-  failure_count: number;
-  success_rate: number;
-  avg_duration_ms: number;
-  total_tokens: number;
-  executions_by_day: Array<{ date: string; count: number }>;
+ total_executions: number;
+ success_count: number;
+ failure_count: number;
+ success_rate: number;
+ avg_duration_ms: number;
+ total_tokens: number;
+ executions_by_day: Array<{ date: string; count: number }>;
 }
 
 export interface WorkspaceMember {
-  id: string;
-  workspace_id: string;
-  user_id: string;
-  role_id: string;
-  role_name: string;
-  status: "active" | "pending" | "suspended";
-  invited_by?: string;
-  joined_at?: string;
-  created_at: string;
-  updated_at: string;
-  // 用户信息（join 返回）
-  user?: {
-    id: string;
-    username: string;
-    email: string;
-    avatar?: string;
-  };
+ id: string;
+ workspace_id: string;
+ user_id: string;
+ role_id: string;
+ role_name: string;
+ status: "active" | "pending" | "suspended";
+ invited_by?: string;
+ joined_at?: string;
+ created_at: string;
+ updated_at: string;
+ // UserInfo(join Back)
+ user?: {
+ id: string;
+ username: string;
+ email: string;
+ avatar?: string;
+ };
 }
 
 export interface WorkspaceRole {
-  id: string;
-  workspace_id: string;
-  name: string;
-  permissions_json: Record<string, boolean>;
-  is_system: boolean;
-  created_at: string;
-  updated_at: string;
+ id: string;
+ workspace_id: string;
+ name: string;
+ permissions_json: Record<string, boolean>;
+ is_system: boolean;
+ created_at: string;
+ updated_at: string;
 }
 
 export interface WorkspaceQuota {
-  plan: string;
-  requests: { used: number; limit: number };
-  tokens: { used: number; limit: number };
-  storage: { used: number; limit: number };
-  bandwidth: { used: number; limit: number };
-  apps: { used: number; limit: number };
+ plan: string;
+ requests: { used: number; limit: number };
+ tokens: { used: number; limit: number };
+ storage: { used: number; limit: number };
+ bandwidth: { used: number; limit: number };
+ apps: { used: number; limit: number };
 }
 
 export type LogArchiveStatus = "pending" | "processing" | "completed" | "failed";
 export type LogArchiveType = "execution_logs" | "audit_logs";
 
 export interface LogArchiveJob {
-  id: string;
-  workspace_id: string;
-  status: LogArchiveStatus;
-  archive_type: LogArchiveType;
-  range_start?: string;
-  range_end?: string;
-  file_name?: string;
-  file_size?: number;
-  error?: string;
-  created_at: string;
-  started_at?: string;
-  completed_at?: string;
-  expires_at?: string;
-  download_url?: string;
+ id: string;
+ workspace_id: string;
+ status: LogArchiveStatus;
+ archive_type: LogArchiveType;
+ range_start?: string;
+ range_end?: string;
+ file_name?: string;
+ file_size?: number;
+ error?: string;
+ created_at: string;
+ started_at?: string;
+ completed_at?: string;
+ expires_at?: string;
+ download_url?: string;
 }
 
 export interface LogArchiveRequest {
-  archive_type: LogArchiveType;
-  range_start?: string;
-  range_end?: string;
+ archive_type: LogArchiveType;
+ range_start?: string;
+ range_end?: string;
 }
 
 export interface LogArchiveListParams {
-  archive_type?: LogArchiveType;
+ archive_type?: LogArchiveType;
 }
 
 export interface LogArchiveReplayParams {
-  dataset?: string;
-  from?: string;
-  to?: string;
-  limit?: number;
-  offset?: number;
-  execution_id?: string;
-  workflow_id?: string;
-  user_id?: string;
-  node_id?: string;
-  node_type?: string;
-  status?: string;
-  action?: string;
-  actor_user_id?: string;
-  target_type?: string;
-  target_id?: string;
+ dataset?: string;
+ from?: string;
+ to?: string;
+ limit?: number;
+ offset?: number;
+ execution_id?: string;
+ workflow_id?: string;
+ user_id?: string;
+ node_id?: string;
+ node_type?: string;
+ status?: string;
+ action?: string;
+ actor_user_id?: string;
+ target_type?: string;
+ target_id?: string;
 }
 
 export interface LogArchiveReplayResult {
-  records: Record<string, unknown>[];
-  next_offset?: number;
+ records: Record<string, unknown>[];
+ next_offset?: number;
 }
 
 export interface CreateWorkspaceRequest {
-  name: string;
-  slug: string;
-  icon?: string;
-  region?: string;
+ name: string;
+ slug: string;
+ icon?: string;
+ region?: string;
 }
 
 export interface UpdateWorkspaceRequest {
-  name?: string;
-  slug?: string;
-  icon?: string;
-  plan?: "free" | "pro" | "enterprise";
+ name?: string;
+ slug?: string;
+ icon?: string;
+ plan?: "free" | "pro" | "enterprise";
 }
 
 export interface InviteMemberRequest {
-  email: string;
-  role: string;
+ email: string;
+ role: string;
 }
 
 export interface UpdateMemberRoleRequest {
-  role_id: string;
+ role_id: string;
 }
 
-// ===== Workspace API Key 类型 =====
+// ===== Workspace API Key Type =====
 
 export interface WorkspaceApiKey {
-  id: string;
-  workspace_id: string;
-  user_id: string;
-  provider: string;
-  name: string;
-  key_preview?: string;
-  scopes: string[];
-  is_active: boolean;
-  last_used_at?: string;
-  last_rotated_at?: string;
-  revoked_at?: string;
-  revoked_reason?: string;
-  created_at: string;
-  updated_at: string;
+ id: string;
+ workspace_id: string;
+ user_id: string;
+ provider: string;
+ name: string;
+ key_preview?: string;
+ scopes: string[];
+ is_active: boolean;
+ last_used_at?: string;
+ last_rotated_at?: string;
+ revoked_at?: string;
+ revoked_reason?: string;
+ created_at: string;
+ updated_at: string;
 }
 
 export interface CreateWorkspaceApiKeyRequest {
-  provider: string;
-  name: string;
-  key: string;
-  scopes?: string[];
+ provider: string;
+ name: string;
+ key: string;
+ scopes?: string[];
 }
 
 export interface RotateWorkspaceApiKeyRequest {
-  name?: string;
-  key: string;
-  scopes?: string[];
+ name?: string;
+ key: string;
+ scopes?: string[];
 }
 
-// ===== Workspace 集成类型 =====
+// ===== Workspace IntegrationType =====
 
 export type IntegrationStatus = "connected" | "disconnected" | "error" | "pending";
 export type IntegrationType = "webhook" | "oauth" | "connector";
 
 export interface WorkspaceIntegration {
-  id: string;
-  workspace_id: string;
-  type: IntegrationType;
-  provider: string;
-  name: string;
-  status: IntegrationStatus;
-  config_json?: Record<string, unknown>;
-  last_sync_at?: string;
-  error_message?: string;
-  created_at: string;
-  updated_at: string;
+ id: string;
+ workspace_id: string;
+ type: IntegrationType;
+ provider: string;
+ name: string;
+ status: IntegrationStatus;
+ config_json?: Record<string, unknown>;
+ last_sync_at?: string;
+ error_message?: string;
+ created_at: string;
+ updated_at: string;
 }
 
 export interface WebhookConfig {
-  url: string;
-  secret?: string;
-  events: string[];
-  is_active: boolean;
+ url: string;
+ secret?: string;
+ events: string[];
+ is_active: boolean;
 }
 
 export interface OAuthConnection {
-  provider: string;
-  scopes: string[];
-  access_token_preview?: string;
-  refresh_token_preview?: string;
-  expires_at?: string;
+ provider: string;
+ scopes: string[];
+ access_token_preview?: string;
+ refresh_token_preview?: string;
+ expires_at?: string;
 }
 
 export interface ConnectorConfig {
-  connector_type: string;
-  endpoint?: string;
-  credentials_preview?: string;
+ connector_type: string;
+ endpoint?: string;
+ credentials_preview?: string;
 }
 
-// ===== API 响应类型 =====
+// ===== API ResponseType =====
 
 interface ApiResponse<T> {
-  code: string;
-  message: string;
-  data: T;
+ code: string;
+ message: string;
+ data: T;
 }
 
 interface ListResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  page_size: number;
+ items: T[];
+ total: number;
+ page: number;
+ page_size: number;
 }
 
-// ===== 后端响应类型（用于对齐已实现的 user/webhook API）=====
+// ===== afterendpointResponseType(Used forforalreadyImplement's user/webhook API)=====
 
 type BackendUserApiKey = {
-  id: string;
-  provider: string;
-  name: string;
-  key_preview?: string | null;
-  scopes?: string[] | null;
-  is_active?: boolean;
-  last_used_at?: string | null;
-  last_rotated_at?: string | null;
-  revoked_at?: string | null;
-  revoked_reason?: string | null;
-  created_at?: string;
+ id: string;
+ provider: string;
+ name: string;
+ key_preview?: string | null;
+ scopes?: string[] | null;
+ is_active?: boolean;
+ last_used_at?: string | null;
+ last_rotated_at?: string | null;
+ revoked_at?: string | null;
+ revoked_reason?: string | null;
+ created_at?: string;
 };
 
 type BackendWebhookEndpoint = {
-  id: string;
-  name: string;
-  url: string;
-  events: string[];
-  signing_enabled: boolean;
-  secret_preview?: string | null;
-  is_active: boolean;
-  last_triggered_at?: string | null;
-  created_at: string;
-  updated_at: string;
+ id: string;
+ name: string;
+ url: string;
+ events: string[];
+ signing_enabled: boolean;
+ secret_preview?: string | null;
+ is_active: boolean;
+ last_triggered_at?: string | null;
+ created_at: string;
+ updated_at: string;
 };
 
 function toWorkspaceApiKey(workspaceId: string, item: BackendUserApiKey): WorkspaceApiKey {
-  const createdAt = item.created_at || new Date().toISOString();
-  const updatedAt = item.last_rotated_at || createdAt;
-  return {
-    id: item.id,
-    workspace_id: workspaceId,
-    user_id: "",
-    provider: item.provider,
-    name: item.name,
-    key_preview: item.key_preview ?? undefined,
-    scopes: item.scopes ?? [],
-    is_active: Boolean(item.is_active ?? true),
-    last_used_at: item.last_used_at ?? undefined,
-    last_rotated_at: item.last_rotated_at ?? undefined,
-    revoked_at: item.revoked_at ?? undefined,
-    revoked_reason: item.revoked_reason ?? undefined,
-    created_at: createdAt,
-    updated_at: updatedAt,
-  };
+ const createdAt = item.created_at || new Date().toISOString();
+ const updatedAt = item.last_rotated_at || createdAt;
+ return {
+ id: item.id,
+ workspace_id: workspaceId,
+ user_id: "",
+ provider: item.provider,
+ name: item.name,
+ key_preview: item.key_preview ?? undefined,
+ scopes: item.scopes ?? [],
+ is_active: Boolean(item.is_active ?? true),
+ last_used_at: item.last_used_at ?? undefined,
+ last_rotated_at: item.last_rotated_at ?? undefined,
+ revoked_at: item.revoked_at ?? undefined,
+ revoked_reason: item.revoked_reason ?? undefined,
+ created_at: createdAt,
+ updated_at: updatedAt,
+ };
 }
 
 function toWebhookIntegration(workspaceId: string, endpoint: BackendWebhookEndpoint): WorkspaceIntegration {
-  const lastSync = endpoint.last_triggered_at || endpoint.updated_at;
-  return {
-    id: endpoint.id,
-    workspace_id: workspaceId,
-    type: "webhook",
-    provider: "webhook",
-    name: endpoint.name,
-    status: endpoint.is_active ? "connected" : "disconnected",
-    config_json: {
-      url: endpoint.url,
-      events: endpoint.events,
-      signing_enabled: endpoint.signing_enabled,
-      secret_preview: endpoint.secret_preview ?? undefined,
-      is_active: endpoint.is_active,
-    },
-    last_sync_at: lastSync,
-    created_at: endpoint.created_at,
-    updated_at: endpoint.updated_at,
-  };
+ const lastSync = endpoint.last_triggered_at || endpoint.updated_at;
+ return {
+ id: endpoint.id,
+ workspace_id: workspaceId,
+ type: "webhook",
+ provider: "webhook",
+ name: endpoint.name,
+ status: endpoint.is_active ? "connected" : "disconnected",
+ config_json: {
+ url: endpoint.url,
+ events: endpoint.events,
+ signing_enabled: endpoint.signing_enabled,
+ secret_preview: endpoint.secret_preview ?? undefined,
+ is_active: endpoint.is_active,
+ },
+ last_sync_at: lastSync,
+ created_at: endpoint.created_at,
+ updated_at: endpoint.updated_at,
+ };
 }
 
 // ===== Workspace API =====
 
 export const workspaceApi = {
-  /**
-   * 获取用户的工作空间列表
-   */
-  async list(): Promise<Workspace[]> {
-    const response = await request<ApiResponse<ListResponse<Workspace> | { workspaces?: Workspace[] } | Workspace[]>>(
-      "/workspaces"
-    );
-    const payload = response.data as any;
-    if (Array.isArray(payload?.items)) return payload.items as Workspace[];
-    if (Array.isArray(payload?.workspaces)) return payload.workspaces as Workspace[];
-    if (Array.isArray(payload)) return payload as Workspace[];
-    return [];
-  },
+ /**
+ * FetchUser'sWorkspaceList
+ */
+ async list(): Promise<Workspace[]> {
+ const response = await request<ApiResponse<ListResponse<Workspace> | { workspaces?: Workspace[] } | Workspace[]>>(
+ "/workspaces"
+ );
+ const payload = response.data as any;
+ if (Array.isArray(payload?.items)) return payload.items as Workspace[];
+ if (Array.isArray(payload?.workspaces)) return payload.workspaces as Workspace[];
+ if (Array.isArray(payload)) return payload as Workspace[];
+ return [];
+ },
 
-  /**
-   * 获取单个工作空间详情
-   */
-  async get(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
-      `/workspaces/${id}`
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * FetchWorkspaceDetails
+ */
+ async get(id: string): Promise<Workspace> {
+ const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
+ `/workspaces/${id}`
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 通过 slug 获取工作空间
-   */
-  async getBySlug(slug: string): Promise<Workspace> {
-    const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
-      `/workspaces/by-slug/${slug}`
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * Via slug FetchWorkspace
+ */
+ async getBySlug(slug: string): Promise<Workspace> {
+ const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
+ `/workspaces/by-slug/${slug}`
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 创建工作空间
-   */
-  async create(data: CreateWorkspaceRequest): Promise<Workspace> {
-    const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>("/workspaces", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * CreateWorkspace
+ */
+ async create(data: CreateWorkspaceRequest): Promise<Workspace> {
+ const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>("/workspaces", {
+ method: "POST",
+ body: JSON.stringify(data),
+ });
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 更新工作空间
-   */
-  async update(id: string, data: UpdateWorkspaceRequest): Promise<Workspace> {
-    const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
-      `/workspaces/${id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * UpdateWorkspace
+ */
+ async update(id: string, data: UpdateWorkspaceRequest): Promise<Workspace> {
+ const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
+ `/workspaces/${id}`,
+ {
+ method: "PATCH",
+ body: JSON.stringify(data),
+ }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 获取工作空间成员列表
-   */
-  async getMembers(workspaceId: string): Promise<WorkspaceMember[]> {
-    const response = await request<ApiResponse<ListResponse<WorkspaceMember> | { members?: WorkspaceMember[] } | WorkspaceMember[]>>(
-      `/workspaces/${workspaceId}/members`
-    );
-    const payload = response.data as any;
-    if (Array.isArray(payload?.items)) return payload.items as WorkspaceMember[];
-    if (Array.isArray(payload?.members)) return payload.members as WorkspaceMember[];
-    if (Array.isArray(payload)) return payload as WorkspaceMember[];
-    return [];
-  },
+ /**
+ * FetchWorkspaceMemberList
+ */
+ async getMembers(workspaceId: string): Promise<WorkspaceMember[]> {
+ const response = await request<ApiResponse<ListResponse<WorkspaceMember> | { members?: WorkspaceMember[] } | WorkspaceMember[]>>(
+ `/workspaces/${workspaceId}/members`
+ );
+ const payload = response.data as any;
+ if (Array.isArray(payload?.items)) return payload.items as WorkspaceMember[];
+ if (Array.isArray(payload?.members)) return payload.members as WorkspaceMember[];
+ if (Array.isArray(payload)) return payload as WorkspaceMember[];
+ return [];
+ },
 
-  /**
-   * 邀请成员
-   */
-  async inviteMember(
-    workspaceId: string,
-    data: InviteMemberRequest
-  ): Promise<WorkspaceMember> {
-    const response = await request<ApiResponse<{ member: WorkspaceMember } | WorkspaceMember>>(
-      `/workspaces/${workspaceId}/members`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
-    const payload = response.data as any;
-    return (payload?.member as WorkspaceMember) ?? (payload as WorkspaceMember);
-  },
+ /**
+ * InviteMember
+ */
+ async inviteMember(
+ workspaceId: string,
+ data: InviteMemberRequest
+ ): Promise<WorkspaceMember> {
+ const response = await request<ApiResponse<{ member: WorkspaceMember } | WorkspaceMember>>(
+ `/workspaces/${workspaceId}/members`,
+ {
+ method: "POST",
+ body: JSON.stringify(data),
+ }
+ );
+ const payload = response.data as any;
+ return (payload?.member as WorkspaceMember) ?? (payload as WorkspaceMember);
+ },
 
-  /**
-   * 更新成员角色
-   */
-  async updateMemberRole(
-    workspaceId: string,
-    memberId: string,
-    data: UpdateMemberRoleRequest
-  ): Promise<WorkspaceMember> {
-    const response = await request<ApiResponse<{ member: WorkspaceMember } | WorkspaceMember>>(
-      `/workspaces/${workspaceId}/members/${memberId}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }
-    );
-    const payload = response.data as any;
-    return (payload?.member as WorkspaceMember) ?? (payload as WorkspaceMember);
-  },
+ /**
+ * UpdateMemberRole
+ */
+ async updateMemberRole(
+ workspaceId: string,
+ memberId: string,
+ data: UpdateMemberRoleRequest
+ ): Promise<WorkspaceMember> {
+ const response = await request<ApiResponse<{ member: WorkspaceMember } | WorkspaceMember>>(
+ `/workspaces/${workspaceId}/members/${memberId}`,
+ {
+ method: "PATCH",
+ body: JSON.stringify(data),
+ }
+ );
+ const payload = response.data as any;
+ return (payload?.member as WorkspaceMember) ?? (payload as WorkspaceMember);
+ },
 
-  /**
-   * 移除成员
-   */
-  async removeMember(workspaceId: string, memberId: string): Promise<void> {
-    await request<ApiResponse<null>>(
-      `/workspaces/${workspaceId}/members/${memberId}`,
-      {
-        method: "DELETE",
-      }
-    );
-  },
+ /**
+ * RemoveMember
+ */
+ async removeMember(workspaceId: string, memberId: string): Promise<void> {
+ await request<ApiResponse<null>>(
+ `/workspaces/${workspaceId}/members/${memberId}`,
+ {
+ method: "DELETE",
+ }
+ );
+ },
 
-  /**
-   * 获取工作空间角色列表
-   */
-  async getRoles(workspaceId: string): Promise<WorkspaceRole[]> {
-    const response = await request<ApiResponse<ListResponse<WorkspaceRole>>>(
-      `/workspaces/${workspaceId}/roles`
-    );
-    return response.data?.items || [];
-  },
+ /**
+ * FetchWorkspaceRoleList
+ */
+ async getRoles(workspaceId: string): Promise<WorkspaceRole[]> {
+ const response = await request<ApiResponse<ListResponse<WorkspaceRole>>>(
+ `/workspaces/${workspaceId}/roles`
+ );
+ return response.data?.items || [];
+ },
 
-  /**
-   * 获取工作空间配额使用情况
-   */
-  async getQuota(workspaceId: string): Promise<WorkspaceQuota> {
-    const response = await request<ApiResponse<WorkspaceQuota>>(
-      `/billing/workspaces/${workspaceId}/quota`
-    );
-    return response.data;
-  },
+ /**
+ * FetchWorkspaceQuotaUsageSituation
+ */
+ async getQuota(workspaceId: string): Promise<WorkspaceQuota> {
+ const response = await request<ApiResponse<WorkspaceQuota>>(
+ `/billing/workspaces/${workspaceId}/quota`
+ );
+ return response.data;
+ },
 
-  /**
-   * 创建日志归档任务
-   */
-  async requestLogArchive(
-    workspaceId: string,
-    data: LogArchiveRequest
-  ): Promise<LogArchiveJob> {
-    const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
-      `/workspaces/${workspaceId}/log-archives`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
-    return response.data.archive;
-  },
+ /**
+ * CreateLogsArchiveTask
+ */
+ async requestLogArchive(
+ workspaceId: string,
+ data: LogArchiveRequest
+ ): Promise<LogArchiveJob> {
+ const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
+ `/workspaces/${workspaceId}/log-archives`,
+ {
+ method: "POST",
+ body: JSON.stringify(data),
+ }
+ );
+ return response.data.archive;
+ },
 
-  /**
-   * 获取日志归档任务列表
-   */
-  async listLogArchives(
-    workspaceId: string,
-    params?: LogArchiveListParams
-  ): Promise<LogArchiveJob[]> {
-    const search = new URLSearchParams();
-    if (params?.archive_type) {
-      search.set("archive_type", params.archive_type);
-    }
-    const query = search.toString();
-    const response = await request<ApiResponse<{ archives: LogArchiveJob[] }>>(
-      `/workspaces/${workspaceId}/log-archives${query ? `?${query}` : ""}`
-    );
-    return response.data?.archives || [];
-  },
+ /**
+ * FetchLogsArchiveTaskList
+ */
+ async listLogArchives(
+ workspaceId: string,
+ params?: LogArchiveListParams
+ ): Promise<LogArchiveJob[]> {
+ const search = new URLSearchParams();
+ if (params?.archive_type) {
+ search.set("archive_type", params.archive_type);
+ }
+ const query = search.toString();
+ const response = await request<ApiResponse<{ archives: LogArchiveJob[] }>>(
+ `/workspaces/${workspaceId}/log-archives${query ? `?${query}` : ""}`
+ );
+ return response.data?.archives || [];
+ },
 
-  /**
-   * 获取日志归档任务详情
-   */
-  async getLogArchive(workspaceId: string, archiveId: string): Promise<LogArchiveJob> {
-    const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
-      `/workspaces/${workspaceId}/log-archives/${archiveId}`
-    );
-    return response.data.archive;
-  },
+ /**
+ * FetchLogsArchiveTaskDetails
+ */
+ async getLogArchive(workspaceId: string, archiveId: string): Promise<LogArchiveJob> {
+ const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
+ `/workspaces/${workspaceId}/log-archives/${archiveId}`
+ );
+ return response.data.archive;
+ },
 
-  /**
-   * 下载日志归档包
-   */
-  async downloadLogArchive(workspaceId: string, archiveId: string): Promise<Blob> {
-    const { getStoredTokens } = await import("./shared");
-    const tokens = getStoredTokens();
-    const response = await fetch(
-      `${API_BASE_URL}/workspaces/${workspaceId}/log-archives/${archiveId}/download`,
-      {
-        headers: {
-          ...(tokens?.accessToken && {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          }),
-        },
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`Archive download failed: ${response.statusText}`);
-    }
-    return response.blob();
-  },
+ /**
+ * DownloadLogsArchive
+ */
+ async downloadLogArchive(workspaceId: string, archiveId: string): Promise<Blob> {
+ const { getStoredTokens } = await import("./shared");
+ const tokens = getStoredTokens();
+ const response = await fetch(
+ `${API_BASE_URL}/workspaces/${workspaceId}/log-archives/${archiveId}/download`,
+ {
+ headers: {
+ ...(tokens?.accessToken && {
+ Authorization: `Bearer ${tokens.accessToken}`,
+ }),
+ },
+ }
+ );
+ if (!response.ok) {
+ throw new Error(`Archive download failed: ${response.statusText}`);
+ }
+ return response.blob();
+ },
 
-  /**
-   * 归档回放
-   */
-  async replayLogArchive(
-    workspaceId: string,
-    archiveId: string,
-    params?: LogArchiveReplayParams
-  ): Promise<LogArchiveReplayResult> {
-    const search = new URLSearchParams();
-    if (params?.dataset) search.set("dataset", params.dataset);
-    if (params?.from) search.set("from", params.from);
-    if (params?.to) search.set("to", params.to);
-    if (params?.limit) search.set("limit", String(params.limit));
-    if (params?.offset) search.set("offset", String(params.offset));
-    if (params?.execution_id) search.set("execution_id", params.execution_id);
-    if (params?.workflow_id) search.set("workflow_id", params.workflow_id);
-    if (params?.user_id) search.set("user_id", params.user_id);
-    if (params?.node_id) search.set("node_id", params.node_id);
-    if (params?.node_type) search.set("node_type", params.node_type);
-    if (params?.status) search.set("status", params.status);
-    if (params?.action) search.set("action", params.action);
-    if (params?.actor_user_id) search.set("actor_user_id", params.actor_user_id);
-    if (params?.target_type) search.set("target_type", params.target_type);
-    if (params?.target_id) search.set("target_id", params.target_id);
-    const query = search.toString();
-    const response = await request<ApiResponse<LogArchiveReplayResult>>(
-      `/workspaces/${workspaceId}/log-archives/${archiveId}/replay${query ? `?${query}` : ""}`
-    );
-    return response.data;
-  },
+ /**
+ * ArchiveReplay
+ */
+ async replayLogArchive(
+ workspaceId: string,
+ archiveId: string,
+ params?: LogArchiveReplayParams
+ ): Promise<LogArchiveReplayResult> {
+ const search = new URLSearchParams();
+ if (params?.dataset) search.set("dataset", params.dataset);
+ if (params?.from) search.set("from", params.from);
+ if (params?.to) search.set("to", params.to);
+ if (params?.limit) search.set("limit", String(params.limit));
+ if (params?.offset) search.set("offset", String(params.offset));
+ if (params?.execution_id) search.set("execution_id", params.execution_id);
+ if (params?.workflow_id) search.set("workflow_id", params.workflow_id);
+ if (params?.user_id) search.set("user_id", params.user_id);
+ if (params?.node_id) search.set("node_id", params.node_id);
+ if (params?.node_type) search.set("node_type", params.node_type);
+ if (params?.status) search.set("status", params.status);
+ if (params?.action) search.set("action", params.action);
+ if (params?.actor_user_id) search.set("actor_user_id", params.actor_user_id);
+ if (params?.target_type) search.set("target_type", params.target_type);
+ if (params?.target_id) search.set("target_id", params.target_id);
+ const query = search.toString();
+ const response = await request<ApiResponse<LogArchiveReplayResult>>(
+ `/workspaces/${workspaceId}/log-archives/${archiveId}/replay${query ? `?${query}` : ""}`
+ );
+ return response.data;
+ },
 
-  /**
-   * 删除日志归档包
-   */
-  async deleteLogArchive(workspaceId: string, archiveId: string): Promise<void> {
-    await request<ApiResponse<null>>(
-      `/workspaces/${workspaceId}/log-archives/${archiveId}`,
-      { method: "DELETE" }
-    );
-  },
+ /**
+ * DeleteLogsArchive
+ */
+ async deleteLogArchive(workspaceId: string, archiveId: string): Promise<void> {
+ await request<ApiResponse<null>>(
+ `/workspaces/${workspaceId}/log-archives/${archiveId}`,
+ { method: "DELETE" }
+ );
+ },
 
-  // ===== Workspace API Key 方法 =====
+ // ===== Workspace API Key Method =====
 
-  /**
-   * 获取工作空间 API 密钥列表
-   */
-  async listApiKeys(workspaceId: string): Promise<WorkspaceApiKey[]> {
-    // 后端已实现的是用户级别 API Key：GET /users/me/api-keys
-    const response = await request<ApiResponse<BackendUserApiKey[] | { items?: BackendUserApiKey[] }>>(
-      `/users/me/api-keys`
-    );
-    const payload: any = response.data as any;
-    const items: BackendUserApiKey[] = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload?.items)
-        ? payload.items
-        : [];
-    return items.map((item) => toWorkspaceApiKey(workspaceId, item));
-  },
+ /**
+ * FetchWorkspace API KeyList
+ */
+ async listApiKeys(workspaceId: string): Promise<WorkspaceApiKey[]> {
+ // afterendpointalreadyImplement'sisUserLevel API Key: GET /users/me/api-keys
+ const response = await request<ApiResponse<BackendUserApiKey[] | { items?: BackendUserApiKey[] }>>(
+ `/users/me/api-keys`
+ );
+ const payload: any = response.data as any;
+ const items: BackendUserApiKey[] = Array.isArray(payload)
+ ? payload
+ : Array.isArray(payload?.items)
+ ? payload.items
+ : [];
+ return items.map((item) => toWorkspaceApiKey(workspaceId, item));
+ },
 
-  /**
-   * 创建工作空间 API 密钥
-   */
-  async createApiKey(
-    workspaceId: string,
-    data: CreateWorkspaceApiKeyRequest
-  ): Promise<WorkspaceApiKey> {
-    // 对齐后端：POST /users/me/api-keys
-    const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
-      `/users/me/api-keys`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          provider: data.provider,
-          name: data.name,
-          key: data.key,
-          scopes: data.scopes || [],
-        }),
-      }
-    );
-    const payload: any = response.data as any;
-    const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
-    return toWorkspaceApiKey(workspaceId, item);
-  },
+ /**
+ * CreateWorkspace API Key
+ */
+ async createApiKey(
+ workspaceId: string,
+ data: CreateWorkspaceApiKeyRequest
+ ): Promise<WorkspaceApiKey> {
+ // forafterendpoint: POST /users/me/api-keys
+ const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
+ `/users/me/api-keys`,
+ {
+ method: "POST",
+ body: JSON.stringify({
+ provider: data.provider,
+ name: data.name,
+ key: data.key,
+ scopes: data.scopes || [],
+ }),
+ }
+ );
+ const payload: any = response.data as any;
+ const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
+ return toWorkspaceApiKey(workspaceId, item);
+ },
 
-  /**
-   * 轮换工作空间 API 密钥
-   */
-  async rotateApiKey(
-    workspaceId: string,
-    keyId: string,
-    data: RotateWorkspaceApiKeyRequest
-  ): Promise<WorkspaceApiKey> {
-    const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
-      `/users/me/api-keys/${keyId}/rotate`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: data.name,
-          key: data.key,
-          scopes: data.scopes || [],
-        }),
-      }
-    );
-    const payload: any = response.data as any;
-    const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
-    return toWorkspaceApiKey(workspaceId, item);
-  },
+ /**
+ * RotationWorkspace API Key
+ */
+ async rotateApiKey(
+ workspaceId: string,
+ keyId: string,
+ data: RotateWorkspaceApiKeyRequest
+ ): Promise<WorkspaceApiKey> {
+ const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
+ `/users/me/api-keys/${keyId}/rotate`,
+ {
+ method: "POST",
+ body: JSON.stringify({
+ name: data.name,
+ key: data.key,
+ scopes: data.scopes || [],
+ }),
+ }
+ );
+ const payload: any = response.data as any;
+ const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
+ return toWorkspaceApiKey(workspaceId, item);
+ },
 
-  /**
-   * 禁用工作空间 API 密钥
-   */
-  async revokeApiKey(
-    workspaceId: string,
-    keyId: string,
-    reason?: string
-  ): Promise<WorkspaceApiKey> {
-    const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
-      `/users/me/api-keys/${keyId}/revoke`,
-      {
-        method: "POST",
-        body: JSON.stringify({ reason }),
-      }
-    );
-    const payload: any = response.data as any;
-    const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
-    return toWorkspaceApiKey(workspaceId, item);
-  },
+ /**
+ * DisableWorkspace API Key
+ */
+ async revokeApiKey(
+ workspaceId: string,
+ keyId: string,
+ reason?: string
+ ): Promise<WorkspaceApiKey> {
+ const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
+ `/users/me/api-keys/${keyId}/revoke`,
+ {
+ method: "POST",
+ body: JSON.stringify({ reason }),
+ }
+ );
+ const payload: any = response.data as any;
+ const item: BackendUserApiKey = (payload?.api_key as BackendUserApiKey) ?? (payload as BackendUserApiKey);
+ return toWorkspaceApiKey(workspaceId, item);
+ },
 
-  /**
-   * 删除工作空间 API 密钥
-   */
-  async deleteApiKey(_workspaceId: string, keyId: string): Promise<void> {
-    await request<ApiResponse<{ message?: string }>>(`/users/me/api-keys/${keyId}`, { method: "DELETE" });
-  },
+ /**
+ * DeleteWorkspace API Key
+ */
+ async deleteApiKey(_workspaceId: string, keyId: string): Promise<void> {
+ await request<ApiResponse<{ message?: string }>>(`/users/me/api-keys/${keyId}`, { method: "DELETE" });
+ },
 
-  // ===== Workspace 集成方法 =====
+ // ===== Workspace IntegrationMethod =====
 
-  /**
-   * 获取工作空间集成列表
-   */
-  async listIntegrations(workspaceId: string): Promise<WorkspaceIntegration[]> {
-    // 现阶段后端已实现的是 Webhook（默认工作空间）：GET /webhooks
-    const response = await request<ApiResponse<BackendWebhookEndpoint[] | { webhooks?: BackendWebhookEndpoint[] }>>(
-      `/webhooks`
-    );
-    const payload: any = response.data as any;
-    const endpoints: BackendWebhookEndpoint[] = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload?.webhooks)
-        ? payload.webhooks
-        : [];
-    return endpoints.map((endpoint) => toWebhookIntegration(workspaceId, endpoint));
-  },
+ /**
+ * FetchWorkspaceIntegrationList
+ */
+ async listIntegrations(workspaceId: string): Promise<WorkspaceIntegration[]> {
+ // PhaseafterendpointalreadyImplement'sis Webhook(DefaultWorkspace): GET /webhooks
+ const response = await request<ApiResponse<BackendWebhookEndpoint[] | { webhooks?: BackendWebhookEndpoint[] }>>(
+ `/webhooks`
+ );
+ const payload: any = response.data as any;
+ const endpoints: BackendWebhookEndpoint[] = Array.isArray(payload)
+ ? payload
+ : Array.isArray(payload?.webhooks)
+ ? payload.webhooks
+ : [];
+ return endpoints.map((endpoint) => toWebhookIntegration(workspaceId, endpoint));
+ },
 
-  /**
-   * 创建 Webhook 集成
-   */
-  async createWebhook(
-    workspaceId: string,
-    data: { name: string; config: WebhookConfig }
-  ): Promise<WorkspaceIntegration> {
-    const secret = data.config.secret?.trim();
-    const signingEnabled = Boolean(secret);
-    const response = await request<ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>>(
-      `/webhooks`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: data.name,
-          url: data.config.url,
-          events: data.config.events,
-          secret: secret || undefined,
-          signing_enabled: signingEnabled,
-          is_active: data.config.is_active,
-        }),
-      }
-    );
-    const payload: any = response.data as any;
-    const endpoint: BackendWebhookEndpoint =
-      (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint);
-    return toWebhookIntegration(workspaceId, endpoint);
-  },
+ /**
+ * Create Webhook Integration
+ */
+ async createWebhook(
+ workspaceId: string,
+ data: { name: string; config: WebhookConfig }
+ ): Promise<WorkspaceIntegration> {
+ const secret = data.config.secret?.trim();
+ const signingEnabled = Boolean(secret);
+ const response = await request<ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>>(
+ `/webhooks`,
+ {
+ method: "POST",
+ body: JSON.stringify({
+ name: data.name,
+ url: data.config.url,
+ events: data.config.events,
+ secret: secret || undefined,
+ signing_enabled: signingEnabled,
+ is_active: data.config.is_active,
+ }),
+ }
+ );
+ const payload: any = response.data as any;
+ const endpoint: BackendWebhookEndpoint =
+ (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint);
+ return toWebhookIntegration(workspaceId, endpoint);
+ },
 
-  /**
-   * 更新集成状态
-   */
-  async updateIntegration(
-    workspaceId: string,
-    integrationId: string,
-    data: Partial<WorkspaceIntegration>
-  ): Promise<WorkspaceIntegration> {
-    // 目前仅对齐 webhook：PATCH /webhooks/:id
-    const config: any = (data?.config_json as any) || {};
-    const body: Record<string, unknown> = {};
-    if (typeof data?.name === "string") body.name = data.name;
-    if (typeof config?.url === "string") body.url = config.url;
-    if (Array.isArray(config?.events)) body.events = config.events;
-    if (typeof config?.secret === "string" && config.secret.trim()) {
-      body.secret = config.secret.trim();
-      body.signing_enabled = true;
-    } else if (typeof config?.signing_enabled === "boolean") {
-      body.signing_enabled = config.signing_enabled;
-    }
-    if (typeof config?.is_active === "boolean") {
-      body.is_active = config.is_active;
-    } else if (typeof data?.status === "string") {
-      if (data.status === "connected") body.is_active = true;
-      if (data.status === "disconnected") body.is_active = false;
-    }
+ /**
+ * UpdateIntegrationStatus
+ */
+ async updateIntegration(
+ workspaceId: string,
+ integrationId: string,
+ data: Partial<WorkspaceIntegration>
+ ): Promise<WorkspaceIntegration> {
+ // itembeforeonlyfor webhook: PATCH /webhooks/:id
+ const config: any = (data?.config_json as any) || {};
+ const body: Record<string, unknown> = {};
+ if (typeof data?.name === "string") body.name = data.name;
+ if (typeof config?.url === "string") body.url = config.url;
+ if (Array.isArray(config?.events)) body.events = config.events;
+ if (typeof config?.secret === "string" && config.secret.trim()) {
+ body.secret = config.secret.trim();
+ body.signing_enabled = true;
+ } else if (typeof config?.signing_enabled === "boolean") {
+ body.signing_enabled = config.signing_enabled;
+ }
+ if (typeof config?.is_active === "boolean") {
+ body.is_active = config.is_active;
+ } else if (typeof data?.status === "string") {
+ if (data.status === "connected") body.is_active = true;
+ if (data.status === "disconnected") body.is_active = false;
+ }
 
-    const response = await request<ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>>(
-      `/webhooks/${integrationId}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(body),
-      }
-    );
-    const payload: any = response.data as any;
-    const endpoint: BackendWebhookEndpoint =
-      (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint);
-    return toWebhookIntegration(workspaceId, endpoint);
-  },
+ const response = await request<ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>>(
+ `/webhooks/${integrationId}`,
+ {
+ method: "PATCH",
+ body: JSON.stringify(body),
+ }
+ );
+ const payload: any = response.data as any;
+ const endpoint: BackendWebhookEndpoint =
+ (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint);
+ return toWebhookIntegration(workspaceId, endpoint);
+ },
 
-  /**
-   * 删除集成
-   */
-  async deleteIntegration(_workspaceId: string, integrationId: string): Promise<void> {
-    await request<ApiResponse<{ message?: string }>>(`/webhooks/${integrationId}`, { method: "DELETE" });
-  },
+ /**
+ * DeleteIntegration
+ */
+ async deleteIntegration(_workspaceId: string, integrationId: string): Promise<void> {
+ await request<ApiResponse<{ message?: string }>>(`/webhooks/${integrationId}`, { method: "DELETE" });
+ },
 };
 
-// ===== App 访问策略类型（兼容旧代码） =====
+// ===== App AccessPolicyType(CompatibleoldCode) =====
 
 export interface AppAccessPolicy {
-  access_mode: Workspace["access_mode"];
-  data_classification?: string;
-  rate_limit_json?: Record<string, unknown>;
-  allowed_origins?: string[];
-  require_captcha?: boolean;
+ access_mode: Workspace["access_mode"];
+ data_classification?: string;
+ rate_limit_json?: Record<string, unknown>;
+ allowed_origins?: string[];
+ require_captcha?: boolean;
 }
 
-// 为兼容性保留 WorkspaceAccessPolicy 别名
+// asCompatibleRetain WorkspaceAccessPolicy Alias
 export type WorkspaceAccessPolicy = AppAccessPolicy;
 
-// 版本对比结果
+// VersionforcompareResult
 export interface AppVersionDiff {
-  from_version: string;
-  to_version: string;
-  changes: Record<string, unknown>;
-  summary?: string;
+ from_version: string;
+ to_version: string;
+ changes: Record<string, unknown>;
+ summary?: string;
 }
 
-// App 指标（兼容别名）
+// App Metrics(CompatibleAlias)
 export type AppMetrics = WorkspaceMetrics;
 
-// App 执行记录（兼容别名）
+// App ExecuteRecord(CompatibleAlias)
 export type AppExecution = WorkspaceExecution;
 
-// ===== appApi 兼容层 =====
-// Workspace = App，appApi 方法映射到 workspaceApi 或直接调用 workspace 端点
+// ===== appApi Compatible =====
+// Workspace = App, appApi MethodMappingto workspaceApi orDirectCall workspace Endpoint
 
 export const appApi = {
-  /**
-   * 获取应用列表（即 Workspace 列表，可选按 workspace_id 过滤）
-   */
-  async list(params?: {
-    workspace_id?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<{ items: Workspace[]; total: number }> {
-    const search = new URLSearchParams();
-    if (params?.workspace_id) search.set("workspace_id", params.workspace_id);
-    if (params?.page) search.set("page", String(params.page));
-    if (params?.pageSize) search.set("page_size", String(params.pageSize));
-    const query = search.toString();
-    const response = await request<ApiResponse<any>>(
-      `/workspaces${query ? `?${query}` : ""}`
-    );
-    const payload = response.data as any;
-    const items: Workspace[] = Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload?.workspaces)
-        ? payload.workspaces
-        : Array.isArray(payload)
-          ? payload
-          : [];
-    return { items, total: payload?.total ?? items.length };
-  },
+ /**
+ * FetchAppList(now Workspace List, Optionalby workspace_id Filter)
+ */
+ async list(params?: {
+ workspace_id?: string;
+ page?: number;
+ pageSize?: number;
+ }): Promise<{ items: Workspace[]; total: number }> {
+ const search = new URLSearchParams();
+ if (params?.workspace_id) search.set("workspace_id", params.workspace_id);
+ if (params?.page) search.set("page", String(params.page));
+ if (params?.pageSize) search.set("page_size", String(params.pageSize));
+ const query = search.toString();
+ const response = await request<ApiResponse<any>>(
+ `/workspaces${query ? `?${query}` : ""}`
+ );
+ const payload = response.data as any;
+ const items: Workspace[] = Array.isArray(payload?.items)
+ ? payload.items
+ : Array.isArray(payload?.workspaces)
+ ? payload.workspaces
+ : Array.isArray(payload)
+ ? payload
+ : [];
+ return { items, total: payload?.total ?? items.length };
+ },
 
-  /**
-   * 获取单个应用（Workspace）详情
-   */
-  async get(id: string): Promise<Workspace> {
-    return workspaceApi.get(id);
-  },
+ /**
+ * FetchApp(Workspace)Details
+ */
+ async get(id: string): Promise<Workspace> {
+ return workspaceApi.get(id);
+ },
 
-  /**
-   * 创建应用（即创建 Workspace）
-   */
-  async create(data: {
-    name: string;
-    slug?: string;
-    description?: string;
-    workspace_id?: string;
-  }): Promise<Workspace> {
-    return workspaceApi.create({
-      name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-      icon: undefined,
-      region: undefined,
-    });
-  },
+ /**
+ * CreateApp(nowCreate Workspace)
+ */
+ async create(data: {
+ name: string;
+ slug?: string;
+ description?: string;
+ workspace_id?: string;
+ }): Promise<Workspace> {
+ return workspaceApi.create({
+ name: data.name,
+ slug: data.slug || data.name.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+ icon: undefined,
+ region: undefined,
+ });
+ },
 
-  /**
-   * 发布应用（Workspace）
-   */
-  async publish(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/publish`,
-      { method: "POST" }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * PublishApp(Workspace)
+ */
+ async publish(id: string): Promise<Workspace> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/publish`,
+ { method: "POST" }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 下线应用
-   */
-  async deprecate(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/deprecate`,
-      { method: "POST" }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * downlineApp
+ */
+ async deprecate(id: string): Promise<Workspace> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/deprecate`,
+ { method: "POST" }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 归档应用
-   */
-  async archive(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/archive`,
-      { method: "POST" }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * ArchiveApp
+ */
+ async archive(id: string): Promise<Workspace> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/archive`,
+ { method: "POST" }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 回滚版本
-   */
-  async rollback(id: string, versionId: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/rollback`,
-      { method: "POST", body: JSON.stringify({ version_id: versionId }) }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * RollbackVersion
+ */
+ async rollback(id: string, versionId: string): Promise<Workspace> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/rollback`,
+ { method: "POST", body: JSON.stringify({ version_id: versionId }) }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 
-  /**
-   * 获取版本列表
-   */
-  async getVersions(
-    id: string,
-    params?: { page?: number; page_size?: number }
-  ): Promise<{ items: WorkspaceVersion[]; total: number }> {
-    const search = new URLSearchParams();
-    if (params?.page) search.set("page", String(params.page));
-    if (params?.page_size) search.set("page_size", String(params.page_size));
-    const query = search.toString();
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/versions${query ? `?${query}` : ""}`
-    );
-    const payload = response.data as any;
-    const items: WorkspaceVersion[] = Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload?.versions)
-        ? payload.versions
-        : Array.isArray(payload)
-          ? payload
-          : [];
-    return { items, total: payload?.total ?? items.length };
-  },
+ /**
+ * FetchVersionList
+ */
+ async getVersions(
+ id: string,
+ params?: { page?: number; page_size?: number }
+ ): Promise<{ items: WorkspaceVersion[]; total: number }> {
+ const search = new URLSearchParams();
+ if (params?.page) search.set("page", String(params.page));
+ if (params?.page_size) search.set("page_size", String(params.page_size));
+ const query = search.toString();
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/versions${query ? `?${query}` : ""}`
+ );
+ const payload = response.data as any;
+ const items: WorkspaceVersion[] = Array.isArray(payload?.items)
+ ? payload.items
+ : Array.isArray(payload?.versions)
+ ? payload.versions
+ : Array.isArray(payload)
+ ? payload
+ : [];
+ return { items, total: payload?.total ?? items.length };
+ },
 
-  /**
-   * 版本对比
-   */
-  async compareVersions(
-    id: string,
-    fromVersionId: string,
-    toVersionId: string
-  ): Promise<Record<string, unknown>> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/versions/compare?from=${fromVersionId}&to=${toVersionId}`
-    );
-    return response.data;
-  },
+ /**
+ * Versionforcompare
+ */
+ async compareVersions(
+ id: string,
+ fromVersionId: string,
+ toVersionId: string
+ ): Promise<Record<string, unknown>> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/versions/compare?from=${fromVersionId}&to=${toVersionId}`
+ );
+ return response.data;
+ },
 
-  /**
-   * 获取访问策略
-   */
-  async getAccessPolicy(id: string): Promise<AppAccessPolicy> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/access-policy`
-    );
-    const payload = response.data as any;
-    return (payload?.policy as AppAccessPolicy) ?? (payload as AppAccessPolicy);
-  },
+ /**
+ * FetchAccessPolicy
+ */
+ async getAccessPolicy(id: string): Promise<AppAccessPolicy> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/access-policy`
+ );
+ const payload = response.data as any;
+ return (payload?.policy as AppAccessPolicy) ?? (payload as AppAccessPolicy);
+ },
 
-  /**
-   * 更新访问策略
-   */
-  async updateAccessPolicy(
-    id: string,
-    data: Partial<AppAccessPolicy>
-  ): Promise<AppAccessPolicy> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/access-policy`,
-      { method: "PATCH", body: JSON.stringify(data) }
-    );
-    const payload = response.data as any;
-    return (payload?.policy as AppAccessPolicy) ?? (payload as AppAccessPolicy);
-  },
+ /**
+ * UpdateAccessPolicy
+ */
+ async updateAccessPolicy(
+ id: string,
+ data: Partial<AppAccessPolicy>
+ ): Promise<AppAccessPolicy> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/access-policy`,
+ { method: "PATCH", body: JSON.stringify(data) }
+ );
+ const payload = response.data as any;
+ return (payload?.policy as AppAccessPolicy) ?? (payload as AppAccessPolicy);
+ },
 
-  /**
-   * 获取域名列表
-   */
-  async getDomains(id: string): Promise<WorkspaceDomain[]> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/domains`
-    );
-    const payload = response.data as any;
-    return Array.isArray(payload?.domains)
-      ? payload.domains
-      : Array.isArray(payload?.items)
-        ? payload.items
-        : Array.isArray(payload)
-          ? payload
-          : [];
-  },
+ /**
+ * FetchDomainList
+ */
+ async getDomains(id: string): Promise<WorkspaceDomain[]> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/domains`
+ );
+ const payload = response.data as any;
+ return Array.isArray(payload?.domains)
+ ? payload.domains
+ : Array.isArray(payload?.items)
+ ? payload.items
+ : Array.isArray(payload)
+ ? payload
+ : [];
+ },
 
-  /**
-   * 绑定域名
-   */
-  async bindDomain(
-    id: string,
-    data: { domain: string }
-  ): Promise<WorkspaceDomainBindingResult> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/domains`,
-      { method: "POST", body: JSON.stringify(data) }
-    );
-    return response.data as WorkspaceDomainBindingResult;
-  },
+ /**
+ * BindDomain
+ */
+ async bindDomain(
+ id: string,
+ data: { domain: string }
+ ): Promise<WorkspaceDomainBindingResult> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/domains`,
+ { method: "POST", body: JSON.stringify(data) }
+ );
+ return response.data as WorkspaceDomainBindingResult;
+ },
 
-  /**
-   * 验证域名
-   */
-  async verifyDomain(
-    id: string,
-    domainId: string
-  ): Promise<WorkspaceDomain> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/domains/${domainId}/verify`,
-      { method: "POST" }
-    );
-    const payload = response.data as any;
-    return (payload?.domain as WorkspaceDomain) ?? (payload as WorkspaceDomain);
-  },
+ /**
+ * VerifyDomain
+ */
+ async verifyDomain(
+ id: string,
+ domainId: string
+ ): Promise<WorkspaceDomain> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/domains/${domainId}/verify`,
+ { method: "POST" }
+ );
+ const payload = response.data as any;
+ return (payload?.domain as WorkspaceDomain) ?? (payload as WorkspaceDomain);
+ },
 
-  /**
-   * 删除域名
-   */
-  async deleteDomain(id: string, domainId: string): Promise<void> {
-    await request<ApiResponse<null>>(
-      `/workspaces/${id}/domains/${domainId}`,
-      { method: "DELETE" }
-    );
-  },
+ /**
+ * DeleteDomain
+ */
+ async deleteDomain(id: string, domainId: string): Promise<void> {
+ await request<ApiResponse<null>>(
+ `/workspaces/${id}/domains/${domainId}`,
+ { method: "DELETE" }
+ );
+ },
 
-  /**
-   * 更新 UI Schema
-   */
-  async updateUISchema(
-    id: string,
-    data: { ui_schema: Record<string, unknown> }
-  ): Promise<WorkspaceVersion> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/ui-schema`,
-      { method: "PATCH", body: JSON.stringify(data) }
-    );
-    const payload = response.data as any;
-    return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion);
-  },
+ /**
+ * Update UI Schema
+ */
+ async updateUISchema(
+ id: string,
+ data: { ui_schema: Record<string, unknown> }
+ ): Promise<WorkspaceVersion> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/ui-schema`,
+ { method: "PATCH", body: JSON.stringify(data) }
+ );
+ const payload = response.data as any;
+ return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion);
+ },
 
-  /**
-   * 获取执行列表
-   */
-  async getExecutions(
-    id: string,
-    params?: { page?: number; page_size?: number; status?: string }
-  ): Promise<{ items: WorkspaceExecution[]; total: number }> {
-    const search = new URLSearchParams();
-    if (params?.page) search.set("page", String(params.page));
-    if (params?.page_size) search.set("page_size", String(params.page_size));
-    if (params?.status) search.set("status", params.status);
-    const query = search.toString();
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/executions${query ? `?${query}` : ""}`
-    );
-    const payload = response.data as any;
-    const items = Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload)
-        ? payload
-        : [];
-    return { items, total: payload?.total ?? items.length };
-  },
+ /**
+ * FetchExecuteList
+ */
+ async getExecutions(
+ id: string,
+ params?: { page?: number; page_size?: number; status?: string }
+ ): Promise<{ items: WorkspaceExecution[]; total: number }> {
+ const search = new URLSearchParams();
+ if (params?.page) search.set("page", String(params.page));
+ if (params?.page_size) search.set("page_size", String(params.page_size));
+ if (params?.status) search.set("status", params.status);
+ const query = search.toString();
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/executions${query ? `?${query}` : ""}`
+ );
+ const payload = response.data as any;
+ const items = Array.isArray(payload?.items)
+ ? payload.items
+ : Array.isArray(payload)
+ ? payload
+ : [];
+ return { items, total: payload?.total ?? items.length };
+ },
 
-  /**
-   * 获取指标
-   */
-  async getMetrics(id: string, params?: { days?: number }): Promise<WorkspaceMetrics> {
-    const search = new URLSearchParams();
-    if (params?.days) search.set("days", String(params.days));
-    const query = search.toString();
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/metrics${query ? `?${query}` : ""}`
-    );
-    return response.data as WorkspaceMetrics;
-  },
+ /**
+ * FetchMetrics
+ */
+ async getMetrics(id: string, params?: { days?: number }): Promise<WorkspaceMetrics> {
+ const search = new URLSearchParams();
+ if (params?.days) search.set("days", String(params.days));
+ const query = search.toString();
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/metrics${query ? `?${query}` : ""}`
+ );
+ return response.data as WorkspaceMetrics;
+ },
 
-  /**
-   * 取消执行
-   */
-  async cancelExecution(executionId: string): Promise<void> {
-    await request<ApiResponse<null>>(
-      `/executions/${executionId}/cancel`,
-      { method: "POST" }
-    );
-  },
+ /**
+ * CancelExecute
+ */
+ async cancelExecution(executionId: string): Promise<void> {
+ await request<ApiResponse<null>>(
+ `/executions/${executionId}/cancel`,
+ { method: "POST" }
+ );
+ },
 
-  /**
-   * 更新公开页 SEO 信息
-   */
-  async updatePublicSEO(
-    id: string,
-    data: { title?: string; description?: string; keywords?: string[] }
-  ): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/seo`,
-      { method: "PATCH", body: JSON.stringify(data) }
-    );
-    const payload = response.data as any;
-    return (payload?.workspace as Workspace) ?? (payload as Workspace);
-  },
+ /**
+ * UpdatePublicpage SEO Info
+ */
+ async updatePublicSEO(
+ id: string,
+ data: { title?: string; description?: string; keywords?: string[] }
+ ): Promise<Workspace> {
+ const response = await request<ApiResponse<any>>(
+ `/workspaces/${id}/seo`,
+ { method: "PATCH", body: JSON.stringify(data) }
+ );
+ const payload = response.data as any;
+ return (payload?.workspace as Workspace) ?? (payload as Workspace);
+ },
 };
 
 export default workspaceApi;

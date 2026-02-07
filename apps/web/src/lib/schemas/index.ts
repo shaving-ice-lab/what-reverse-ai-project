@@ -1,7 +1,7 @@
 /**
- * Schema 验证模块
+ * Schema VerifyModule
  * 
- * 使用 Zod 进行运行时数据验证
+ * Usage Zod ProceedRuntimeDataVerify
  */
 
 export * from "./creative-template.schema";

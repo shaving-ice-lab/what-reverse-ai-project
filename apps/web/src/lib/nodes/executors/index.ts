@@ -1,5 +1,5 @@
 /**
- * 节点执行器导出
+ * NodeExecuteExport
  */
 
 export * from "./llm";
@@ -9,7 +9,7 @@ export * from "./data";
 export * from "./text";
 export * from "./io";
 
-// 执行器注册表
+// ExecuteSign Up
 import { llmChatExecutor } from "./llm";
 import { httpExecutor } from "./http";
 import { conditionExecutor, loopExecutor } from "./logic";
@@ -19,60 +19,60 @@ import { inputExecutor, outputExecutor } from "./io";
 import type { NodeExecutor } from "../types";
 
 /**
- * 所有可用的节点执行器
+ * AllAvailable'sNodeExecute
  */
 export const nodeExecutors: Record<string, NodeExecutor> = {
-  // AI 节点
-  llm: llmChatExecutor,
-  "llm-chat": llmChatExecutor,
-  
-  // 集成节点
-  http: httpExecutor,
-  "http-request": httpExecutor,
-  
-  // 逻辑节点
-  condition: conditionExecutor,
-  "if-else": conditionExecutor,
-  loop: loopExecutor,
-  "for-each": loopExecutor,
-  
-  // 数据节点
-  variable: variableExecutor,
-  "set-variable": variableExecutor,
-  transform: transformExecutor,
-  "data-transform": transformExecutor,
-  merge: mergeExecutor,
-  "data-merge": mergeExecutor,
-  db_select: databaseExecutor,
-  db_insert: databaseExecutor,
-  db_update: databaseExecutor,
-  db_delete: databaseExecutor,
-  db_migrate: databaseExecutor,
-  
-  // 输入输出节点
-  input: inputExecutor,
-  output: outputExecutor,
-  
-  // 文本节点
-  template: templateExecutor,
-  "text-template": templateExecutor,
-  regex: regexExecutor,
-  "regex-extract": regexExecutor,
-  "split-join": splitJoinExecutor,
-  "text-split": splitJoinExecutor,
-  "text-join": splitJoinExecutor,
+ // AI Node
+ llm: llmChatExecutor,
+ "llm-chat": llmChatExecutor,
+ 
+ // IntegrationNode
+ http: httpExecutor,
+ "http-request": httpExecutor,
+ 
+ // LogicNode
+ condition: conditionExecutor,
+ "if-else": conditionExecutor,
+ loop: loopExecutor,
+ "for-each": loopExecutor,
+ 
+ // DataNode
+ variable: variableExecutor,
+ "set-variable": variableExecutor,
+ transform: transformExecutor,
+ "data-transform": transformExecutor,
+ merge: mergeExecutor,
+ "data-merge": mergeExecutor,
+ db_select: databaseExecutor,
+ db_insert: databaseExecutor,
+ db_update: databaseExecutor,
+ db_delete: databaseExecutor,
+ db_migrate: databaseExecutor,
+ 
+ // InputOutputNode
+ input: inputExecutor,
+ output: outputExecutor,
+ 
+ // TextNode
+ template: templateExecutor,
+ "text-template": templateExecutor,
+ regex: regexExecutor,
+ "regex-extract": regexExecutor,
+ "split-join": splitJoinExecutor,
+ "text-split": splitJoinExecutor,
+ "text-join": splitJoinExecutor,
 };
 
 /**
- * 获取节点执行器
+ * FetchNodeExecute
  */
 export function getNodeExecutor(nodeType: string): NodeExecutor | null {
-  return nodeExecutors[nodeType] || null;
+ return nodeExecutors[nodeType] || null;
 }
 
 /**
- * 注册自定义节点执行器
+ * Sign UpCustomNodeExecute
  */
 export function registerNodeExecutor(type: string, executor: NodeExecutor): void {
-  nodeExecutors[type] = executor;
+ nodeExecutors[type] = executor;
 }

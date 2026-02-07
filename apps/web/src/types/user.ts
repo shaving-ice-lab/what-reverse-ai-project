@@ -1,121 +1,121 @@
 /**
- * 用户相关类型定义
+ * UserRelatedTypeDefinition
  */
 
-// ===== 用户实体 =====
+// ===== UserEntity =====
 
 export interface User {
-  id: string;
-  email: string;
-  username: string;
-  displayName: string | null;
-  avatarUrl: string | null;
-  bio: string | null;
-  
-  // OAuth 关联
-  githubId: string | null;
-  googleId: string | null;
-  
-  // 统计
-  workflowCount: number;
-  agentCount: number;
-  followerCount: number;
-  followingCount: number;
-  
-  // 订阅
-  plan: UserPlan;
-  planExpiresAt: string | null;
-  
-  // 设置
-  settings: UserSettings;
-  
-  // 时间
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt: string | null;
+ id: string;
+ email: string;
+ username: string;
+ displayName: string | null;
+ avatarUrl: string | null;
+ bio: string | null;
+ 
+ // OAuth Associate
+ githubId: string | null;
+ googleId: string | null;
+ 
+ // Statistics
+ workflowCount: number;
+ agentCount: number;
+ followerCount: number;
+ followingCount: number;
+ 
+ // Subscription
+ plan: UserPlan;
+ planExpiresAt: string | null;
+ 
+ // Settings
+ settings: UserSettings;
+ 
+ // Time
+ createdAt: string;
+ updatedAt: string;
+ lastLoginAt: string | null;
 }
 
 export type UserPlan = "free" | "pro" | "enterprise";
 
 export interface UserSettings {
-  theme: "light" | "dark" | "system";
-  language: "zh-CN" | "en-US";
-  defaultModel: string;
-  notifications: {
-    email: boolean;
-    browser: boolean;
-    executionComplete: boolean;
-    executionFailed: boolean;
-    weeklyDigest: boolean;
-  };
-  privacy: {
-    showActivity: boolean;
-    showWorkflows: boolean;
-  };
+ theme: "light" | "dark" | "system";
+ language: "zh-CN" | "en-US";
+ defaultModel: string;
+ notifications: {
+ email: boolean;
+ browser: boolean;
+ executionComplete: boolean;
+ executionFailed: boolean;
+ weeklyDigest: boolean;
+ };
+ privacy: {
+ showActivity: boolean;
+ showWorkflows: boolean;
+ };
 }
 
-// ===== API 密钥 =====
+// ===== API Key =====
 
 export interface ApiKey {
-  id: string;
-  userId: string;
-  provider: ApiKeyProvider;
-  name: string;
-  keyPreview: string;
-  isActive: boolean;
-  lastUsedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
+ id: string;
+ userId: string;
+ provider: ApiKeyProvider;
+ name: string;
+ keyPreview: string;
+ isActive: boolean;
+ lastUsedAt: string | null;
+ createdAt: string;
+ updatedAt: string;
 }
 
 export type ApiKeyProvider =
-  | "openai"
-  | "anthropic"
-  | "google"
-  | "azure"
-  | "ollama"
-  | "custom";
+ | "openai"
+ | "anthropic"
+ | "google"
+ | "azure"
+ | "ollama"
+ | "custom";
 
-// ===== 认证相关 =====
+// ===== AuthenticationRelated =====
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+ email: string;
+ password: string;
 }
 
 export interface RegisterRequest {
-  email: string;
-  username: string;
-  password: string;
+ email: string;
+ username: string;
+ password: string;
 }
 
 export interface TokenPair {
-  accessToken: string;
-  refreshToken: string;
+ accessToken: string;
+ refreshToken: string;
 }
 
 export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
+ user: User;
+ accessToken: string;
+ refreshToken: string;
 }
 
-// ===== 用户操作 =====
+// ===== UserAction =====
 
 export interface UpdateUserRequest {
-  displayName?: string;
-  bio?: string;
-  avatarUrl?: string;
-  settings?: Partial<UserSettings>;
+ displayName?: string;
+ bio?: string;
+ avatarUrl?: string;
+ settings?: Partial<UserSettings>;
 }
 
 export interface ChangePasswordRequest {
-  oldPassword: string;
-  newPassword: string;
+ oldPassword: string;
+ newPassword: string;
 }
 
 export interface CreateApiKeyRequest {
-  provider: ApiKeyProvider;
-  name: string;
-  key: string;
+ provider: ApiKeyProvider;
+ name: string;
+ key: string;
 }

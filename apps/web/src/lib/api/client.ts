@@ -151,7 +151,7 @@ function extractErrorInfo(payload: Partial<ApiResponse<unknown>> | undefined) {
     (fallback.error_message as string) ||
     payload?.message ||
     (error?.message as string) ||
-    "请求失败";
+ "RequestFailed";
   const code =
     (fallback.error_code as string) ||
     payload?.code ||
@@ -225,12 +225,12 @@ function normalizeError(error: unknown): ApiError {
 
   if (error instanceof Error) {
     if (error.name === "AbortError") {
-      return new ApiError("请求超时", "TIMEOUT", 408);
+ return new ApiError("Request timeout", "TIMEOUT", 408);
     }
     return new ApiError(error.message, "NETWORK_ERROR", 0);
   }
 
-  return new ApiError("未知错误", "UNKNOWN_ERROR", 0);
+ return new ApiError("UnknownError", "UNKNOWN_ERROR", 0);
 }
 
 function shouldRetry(error: ApiError, method: string): boolean {
@@ -297,7 +297,7 @@ async function performRequest<T>(
     const refreshed = await refreshAccessToken();
     if (!refreshed) {
       clearTokens();
-      throw new ApiError("登录已过期，请重新登录", "TOKEN_EXPIRED", 401);
+ throw new ApiError("Sign InExpired, Pleasere-newSign In", "TOKEN_EXPIRED", 401);
     }
 
     const retryHeaders = buildHeaders();
@@ -372,7 +372,7 @@ export async function requestRaw<T>(
     }
   }
 
-  throw new ApiError("请求失败", "REQUEST_FAILED", 0);
+ throw new ApiError("RequestFailed", "REQUEST_FAILED", 0);
 }
 
 export async function request<T>(

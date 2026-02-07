@@ -1,105 +1,105 @@
 /**
- * 通知系统类型定义
+ * NotificationsSystemTypeDefinition
  */
 
-// 通知类型
+// NotificationsType
 export type NotificationType =
-  | "follow"   // 关注通知
-  | "comment"  // 评论通知
-  | "reply"    // 回复通知
-  | "like"     // 点赞通知
-  | "mention"  // @提及通知
-  | "system"   // 系统通知
-  | "income";  // 收入通知
+ | "follow" // FollowNotifications
+ | "comment" // CommentNotifications
+ | "reply" // ReplyNotifications
+ | "like" // LikeNotifications
+ | "mention" // @andNotifications
+ | "system" // SystemNotifications
+ | "income"; // EarningsNotifications
 
-// 通知关联用户
+// NotificationsAssociateUser
 export interface NotificationUser {
-  id: string;
-  username: string;
-  displayName?: string;
-  avatarUrl?: string;
+ id: string;
+ username: string;
+ displayName?: string;
+ avatarUrl?: string;
 }
 
-// 通知详情
+// NotificationsDetails
 export interface NotificationItem {
-  id: string;
-  type: NotificationType;
-  title: string;
-  content?: string;
-  actor?: NotificationUser;
-  targetType?: string;
-  targetId?: string;
-  metadata?: Record<string, unknown>;
-  isRead: boolean;
-  readAt?: string;
-  createdAt: string;
+ id: string;
+ type: NotificationType;
+ title: string;
+ content?: string;
+ actor?: NotificationUser;
+ targetType?: string;
+ targetId?: string;
+ metadata?: Record<string, unknown>;
+ isRead: boolean;
+ readAt?: string;
+ createdAt: string;
 }
 
-// 未读数统计
+// not yetreadcountStatistics
 export interface UnreadCount {
-  total: number;
-  byType: Record<NotificationType, number>;
+ total: number;
+ byType: Record<NotificationType, number>;
 }
 
 // =====================
-// 通用 API 响应
+// use API Response
 // =====================
 
 export interface ApiMeta {
-  total?: number;
-  page?: number;
-  page_size?: number;
+ total?: number;
+ page?: number;
+ page_size?: number;
 }
 
 export interface ApiResponse<T> {
-  code: string;
-  message: string;
-  data: T;
-  meta?: ApiMeta;
+ code: string;
+ message: string;
+ data: T;
+ meta?: ApiMeta;
 }
 
 // =====================
-// 请求参数类型
+// RequestParameterType
 // =====================
 
-// 通知列表请求参数
+// NotificationsListRequestParameter
 export interface ListNotificationsParams {
-  type?: NotificationType;
-  isRead?: boolean;
-  page?: number;
-  pageSize?: number;
+ type?: NotificationType;
+ isRead?: boolean;
+ page?: number;
+ pageSize?: number;
 }
 
-// 批量标记已读请求
+// BatchMarkalreadyreadRequest
 export interface MarkMultipleAsReadRequest {
-  ids: string[];
+ ids: string[];
 }
 
 // =====================
-// 响应类型
+// ResponseType
 // =====================
 
-// 通知列表响应
+// NotificationsListResponse
 export interface ListNotificationsResponse {
-  items: NotificationItem[];
-  meta: {
-    total: number;
-    page: number;
-    pageSize: number;
-  };
+ items: NotificationItem[];
+ meta: {
+ total: number;
+ page: number;
+ pageSize: number;
+ };
 }
 
-// 通知详情响应
+// NotificationsDetailsResponse
 export interface GetNotificationResponse {
-  data: NotificationItem;
+ data: NotificationItem;
 }
 
-// 未读数响应
+// not yetreadcountResponse
 export interface GetUnreadCountResponse {
-  data: UnreadCount;
+ data: UnreadCount;
 }
 
-// 通用操作响应
+// useActionResponse
 export interface NotificationActionResponse {
-  message?: string;
+ message?: string;
 }

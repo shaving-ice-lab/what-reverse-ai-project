@@ -1,37 +1,37 @@
 /**
- * 标签相关类型定义
+ * TagsRelatedTypeDefinition
  */
 
 /**
- * 工作流标签
+ * WorkflowTags
  */
 export interface Tag {
-  /** 标签 ID */
-  id: string;
-  /** 用户 ID */
-  user_id: string;
-  /** 标签名称 */
-  name: string;
-  /** 标签颜色 */
-  color: string;
-  /** 创建时间 */
-  created_at: string;
+ /** Tags ID */
+ id: string;
+ /** User ID */
+ user_id: string;
+ /** TagsName */
+ name: string;
+ /** TagsColor */
+ color: string;
+ /** Created At */
+ created_at: string;
 }
 
 /**
- * 带使用数量的标签
+ * UsageCount'sTags
  */
 export interface TagWithCount extends Tag {
-  /** 使用数量 */
-  count: number;
+ /** UsageCount */
+ count: number;
 }
 
 /**
- * 前端展示用的标签
+ * beforeendpointShowcaseuse'sTags
  */
 export interface WorkflowTag {
-  id: string;
-  name: string;
-  color: string;
-  count: number;
+ id: string;
+ name: string;
+ color: string;
+ count: number;
 }

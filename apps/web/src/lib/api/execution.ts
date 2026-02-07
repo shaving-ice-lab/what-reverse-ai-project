@@ -1,5 +1,5 @@
 /**
- * 执行记录 API 服务
+ * ExecuteRecord API Service
  */
 
 import type {
@@ -12,11 +12,11 @@ import type {
 import { request } from "./shared";
 
 /**
- * 执行记录 API
+ * ExecuteRecord API
  */
 export const executionApi = {
   /**
-   * 获取执行记录列表
+ * FetchExecuteRecordList
    */
   async list(params?: ListExecutionsParams): Promise<ListExecutionsResponse> {
     const searchParams = new URLSearchParams();
@@ -34,14 +34,14 @@ export const executionApi = {
   },
 
   /**
-   * 获取执行详情
+ * FetchExecuteDetails
    */
   async get(executionId: string): Promise<GetExecutionResponse> {
     return request<GetExecutionResponse>(`/executions/${executionId}`);
   },
 
   /**
-   * 取消执行
+ * CancelExecute
    */
   async cancel(executionId: string): Promise<CancelExecutionResponse> {
     return request<CancelExecutionResponse>(`/executions/${executionId}/cancel`, {
@@ -50,7 +50,7 @@ export const executionApi = {
   },
 
   /**
-   * 重试执行
+ * RetryExecute
    */
   async retry(executionId: string): Promise<RetryExecutionResponse> {
     return request<RetryExecutionResponse>(`/executions/${executionId}/retry`, {
@@ -59,7 +59,7 @@ export const executionApi = {
   },
 
   /**
-   * 获取工作流的执行记录
+ * FetchWorkflow'sExecuteRecord
    */
   async listByWorkflow(
     workflowId: string,

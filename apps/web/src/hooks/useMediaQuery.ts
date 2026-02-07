@@ -3,68 +3,68 @@
 import { useState, useEffect } from "react";
 
 /**
- * 媒体查询 Hook
- * 用于响应式设计
+ * MediaQuery Hook
+ * Used forResponseDesign
  */
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+ const [matches, setMatches] = useState(false);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    
-    // 初始值
-    setMatches(mediaQuery.matches);
+ useEffect(() => {
+ const mediaQuery = window.matchMedia(query);
+ 
+ // Initialvalue
+ setMatches(mediaQuery.matches);
 
-    // 监听变化
-    const handler = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+ // Listen
+ const handler = (event: MediaQueryListEvent) => {
+ setMatches(event.matches);
+ };
 
-    mediaQuery.addEventListener("change", handler);
-    
-    return () => {
-      mediaQuery.removeEventListener("change", handler);
-    };
-  }, [query]);
+ mediaQuery.addEventListener("change", handler);
+ 
+ return () => {
+ mediaQuery.removeEventListener("change", handler);
+ };
+ }, [query]);
 
-  return matches;
+ return matches;
 }
 
-// 预设断点
+// PresetBreakpoint
 export const breakpoints = {
-  sm: "(min-width: 640px)",
-  md: "(min-width: 768px)",
-  lg: "(min-width: 1024px)",
-  xl: "(min-width: 1280px)",
-  "2xl": "(min-width: 1536px)",
+ sm: "(min-width: 640px)",
+ md: "(min-width: 768px)",
+ lg: "(min-width: 1024px)",
+ xl: "(min-width: 1280px)",
+ "2xl": "(min-width: 1536px)",
 };
 
-// 预设 hooks
+// Preset hooks
 export function useIsMobile(): boolean {
-  return !useMediaQuery(breakpoints.md);
+ return !useMediaQuery(breakpoints.md);
 }
 
 export function useIsTablet(): boolean {
-  const isMd = useMediaQuery(breakpoints.md);
-  const isLg = useMediaQuery(breakpoints.lg);
-  return isMd && !isLg;
+ const isMd = useMediaQuery(breakpoints.md);
+ const isLg = useMediaQuery(breakpoints.lg);
+ return isMd && !isLg;
 }
 
 export function useIsDesktop(): boolean {
-  return useMediaQuery(breakpoints.lg);
+ return useMediaQuery(breakpoints.lg);
 }
 
-// 方向检测
+// methodDetect
 export function useIsPortrait(): boolean {
-  return useMediaQuery("(orientation: portrait)");
+ return useMediaQuery("(orientation: portrait)");
 }
 
 export function useIsLandscape(): boolean {
-  return useMediaQuery("(orientation: landscape)");
+ return useMediaQuery("(orientation: landscape)");
 }
 
-// 触摸设备检测
+// TouchDeviceDetect
 export function useIsTouchDevice(): boolean {
-  return useMediaQuery("(hover: none) and (pointer: coarse)");
+ return useMediaQuery("(hover: none) and (pointer: coarse)");
 }

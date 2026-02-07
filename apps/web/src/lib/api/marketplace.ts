@@ -1,5 +1,5 @@
 /**
- * 应用市场 API 服务
+ * AppMarketplace API Service
  */
 
 import { request } from "./shared";

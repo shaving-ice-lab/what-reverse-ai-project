@@ -1,6 +1,6 @@
 /**
- * API 入口
- * 统一导出 client 与模块 API
+ * API Entry
+ * 1Export client andModule API
  */
 
 export * from "./api/client";

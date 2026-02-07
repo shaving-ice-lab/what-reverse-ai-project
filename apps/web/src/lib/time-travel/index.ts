@@ -1,7 +1,7 @@
 /**
- * 时间旅行调试模块
+ * TimerowDebugModule
  * 
- * 提供执行快照的存储、查询和管理功能
+ * ProvideExecuteSnapshot'sStorage, QueryandManageFeatures
  */
 
 export * from "./snapshot-store";

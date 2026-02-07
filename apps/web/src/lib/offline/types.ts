@@ -1,267 +1,267 @@
 /**
- * 离线模式类型定义
- * @description 离线支持相关的类型定义
+ * OfflineTypeDefinition
+ * @description OfflineSupportRelated'sTypeDefinition
  */
 
 // ============================================================================
-// 网络状态
+// NetworkStatus
 // ============================================================================
 
 /**
- * 网络状态类型
+ * NetworkStatusType
  */
 export type NetworkStatus = 'online' | 'offline' | 'slow';
 
 /**
- * 网络质量
+ * Network
  */
 export interface NetworkQuality {
-  /** 连接类型 */
-  effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
-  /** 往返时间 (ms) */
-  rtt: number;
-  /** 下行带宽 (Mbps) */
-  downlink: number;
-  /** 是否启用数据节省模式 */
-  saveData: boolean;
+ /** ConnectType */
+ effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
+ /** Time (ms) */
+ rtt: number;
+ /** downrowBandwidth (Mbps) */
+ downlink: number;
+ /** isnoEnableDataSave */
+ saveData: boolean;
 }
 
 /**
- * 连接状态信息
+ * ConnectStatusInfo
  */
 export interface ConnectionInfo {
-  /** 是否在线 */
-  isOnline: boolean;
-  /** 网络状态 */
-  status: NetworkStatus;
-  /** 网络质量 */
-  quality?: NetworkQuality;
-  /** 上次在线时间 */
-  lastOnlineAt?: Date;
-  /** 上次离线时间 */
-  lastOfflineAt?: Date;
+ /** isnoOnline */
+ isOnline: boolean;
+ /** NetworkStatus */
+ status: NetworkStatus;
+ /** Network */
+ quality?: NetworkQuality;
+ /** ontimesOnlineTime */
+ lastOnlineAt?: Date;
+ /** ontimesOfflineTime */
+ lastOfflineAt?: Date;
 }
 
 // ============================================================================
-// 离线队列
+// OfflineQueue
 // ============================================================================
 
 /**
- * 离线操作类型
+ * OfflineActionType
  */
 export type OfflineOperationType =
-  | 'workflow:create'
-  | 'workflow:update'
-  | 'workflow:delete'
-  | 'execution:create'
-  | 'settings:update'
-  | 'api:request';
+ | 'workflow:create'
+ | 'workflow:update'
+ | 'workflow:delete'
+ | 'execution:create'
+ | 'settings:update'
+ | 'api:request';
 
 /**
- * 离线操作状态
+ * OfflineActionStatus
  */
 export type OfflineOperationStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
+ | 'pending'
+ | 'processing'
+ | 'completed'
+ | 'failed'
+ | 'cancelled';
 
 /**
- * 离线操作项
+ * OfflineAction
  */
 export interface OfflineOperation<T = unknown> {
-  /** 操作 ID */
-  id: string;
-  /** 操作类型 */
-  type: OfflineOperationType;
-  /** 操作数据 */
-  data: T;
-  /** 创建时间 */
-  createdAt: Date;
-  /** 状态 */
-  status: OfflineOperationStatus;
-  /** 重试次数 */
-  retryCount: number;
-  /** 最大重试次数 */
-  maxRetries: number;
-  /** 错误信息 */
-  error?: string;
-  /** 优先级 (越小越优先) */
-  priority: number;
-  /** 元数据 */
-  metadata?: Record<string, unknown>;
+ /** Action ID */
+ id: string;
+ /** ActionType */
+ type: OfflineOperationType;
+ /** ActionData */
+ data: T;
+ /** Created At */
+ createdAt: Date;
+ /** Status */
+ status: OfflineOperationStatus;
+ /** Retrytimescount */
+ retryCount: number;
+ /** MaximumRetrytimescount */
+ maxRetries: number;
+ /** ErrorInfo */
+ error?: string;
+ /** Priority (smallPriority) */
+ priority: number;
+ /** Data */
+ metadata?: Record<string, unknown>;
 }
 
 /**
- * 离线队列配置
+ * OfflineQueueConfig
  */
 export interface OfflineQueueConfig {
-  /** 最大队列长度 */
-  maxSize: number;
-  /** 默认最大重试次数 */
-  defaultMaxRetries: number;
-  /** 重试间隔 (ms) */
-  retryInterval: number;
-  /** 是否启用持久化 */
-  persistToStorage: boolean;
-  /** 存储键名 */
-  storageKey: string;
+ /** MaximumQueueLength */
+ maxSize: number;
+ /** DefaultMaximumRetrytimescount */
+ defaultMaxRetries: number;
+ /** Retrybetween (ms) */
+ retryInterval: number;
+ /** isnoEnablePersistent */
+ persistToStorage: boolean;
+ /** Storagekey */
+ storageKey: string;
 }
 
 /**
- * 离线队列状态
+ * OfflineQueueStatus
  */
 export interface OfflineQueueState {
-  /** 队列长度 */
-  length: number;
-  /** 待处理数量 */
-  pendingCount: number;
-  /** 处理中数量 */
-  processingCount: number;
-  /** 失败数量 */
-  failedCount: number;
-  /** 是否正在同步 */
-  isSyncing: boolean;
+ /** QueueLength */
+ length: number;
+ /** PendingCount */
+ pendingCount: number;
+ /** ProcessingCount */
+ processingCount: number;
+ /** FailedCount */
+ failedCount: number;
+ /** isnoSyncing */
+ isSyncing: boolean;
 }
 
 // ============================================================================
-// 离线存储
+// OfflineStorage
 // ============================================================================
 
 /**
- * 离线存储项
+ * OfflineStorage
  */
 export interface OfflineStorageItem<T = unknown> {
-  /** 键名 */
-  key: string;
-  /** 数据 */
-  value: T;
-  /** 过期时间 */
-  expiresAt?: Date;
-  /** 创建时间 */
-  createdAt: Date;
-  /** 更新时间 */
-  updatedAt: Date;
-  /** 版本 */
-  version: number;
+ /** key */
+ key: string;
+ /** Data */
+ value: T;
+ /** ExpiredTime */
+ expiresAt?: Date;
+ /** Created At */
+ createdAt: Date;
+ /** Updated At */
+ updatedAt: Date;
+ /** Version */
+ version: number;
 }
 
 /**
- * 缓存策略
+ * CachePolicy
  */
 export type CacheStrategy =
-  | 'cache-first'
-  | 'network-first'
-  | 'stale-while-revalidate'
-  | 'network-only'
-  | 'cache-only';
+ | 'cache-first'
+ | 'network-first'
+ | 'stale-while-revalidate'
+ | 'network-only'
+ | 'cache-only';
 
 /**
- * 缓存配置
+ * CacheConfig
  */
 export interface CacheConfig {
-  /** 缓存策略 */
-  strategy: CacheStrategy;
-  /** 过期时间 (ms) */
-  ttl: number;
-  /** 最大缓存条目数 */
-  maxEntries: number;
+ /** CachePolicy */
+ strategy: CacheStrategy;
+ /** ExpiredTime (ms) */
+ ttl: number;
+ /** MaximumCacheitemcount */
+ maxEntries: number;
 }
 
 // ============================================================================
-// 离线功能配置
+// OfflineFeaturesConfig
 // ============================================================================
 
 /**
- * 离线功能矩阵
+ * OfflineFeaturesMatrix
  */
 export interface OfflineCapabilities {
-  /** 查看工作流 */
-  viewWorkflows: boolean;
-  /** 编辑工作流 */
-  editWorkflows: boolean;
-  /** 执行工作流（仅本地 LLM） */
-  executeWorkflows: 'full' | 'local-only' | 'disabled';
-  /** 查看执行记录 */
-  viewExecutions: boolean;
-  /** 浏览 Agent 商店 */
-  browseStore: 'full' | 'cached' | 'disabled';
-  /** 用户设置 */
-  userSettings: boolean;
+ /** ViewWorkflow */
+ viewWorkflows: boolean;
+ /** EditWorkflow */
+ editWorkflows: boolean;
+ /** ExecuteWorkflow(onlyLocal LLM) */
+ executeWorkflows: 'full' | 'local-only' | 'disabled';
+ /** ViewExecuteRecord */
+ viewExecutions: boolean;
+ /** Browse Agent Store */
+ browseStore: 'full' | 'cached' | 'disabled';
+ /** UserSettings */
+ userSettings: boolean;
 }
 
 /**
- * 默认离线功能配置
+ * DefaultOfflineFeaturesConfig
  */
 export const DEFAULT_OFFLINE_CAPABILITIES: OfflineCapabilities = {
-  viewWorkflows: true,
-  editWorkflows: true,
-  executeWorkflows: 'local-only',
-  viewExecutions: true,
-  browseStore: 'cached',
-  userSettings: true,
+ viewWorkflows: true,
+ editWorkflows: true,
+ executeWorkflows: 'local-only',
+ viewExecutions: true,
+ browseStore: 'cached',
+ userSettings: true,
 };
 
 // ============================================================================
-// 事件类型
+// EventType
 // ============================================================================
 
 /**
- * 离线事件类型
+ * OfflineEventType
  */
 export type OfflineEventType =
-  | 'online'
-  | 'offline'
-  | 'queue:add'
-  | 'queue:process'
-  | 'queue:complete'
-  | 'queue:fail'
-  | 'sync:start'
-  | 'sync:complete'
-  | 'sync:error';
+ | 'online'
+ | 'offline'
+ | 'queue:add'
+ | 'queue:process'
+ | 'queue:complete'
+ | 'queue:fail'
+ | 'sync:start'
+ | 'sync:complete'
+ | 'sync:error';
 
 /**
- * 离线事件
+ * OfflineEvent
  */
 export interface OfflineEvent {
-  type: OfflineEventType;
-  timestamp: Date;
-  data?: unknown;
+ type: OfflineEventType;
+ timestamp: Date;
+ data?: unknown;
 }
 
 // ============================================================================
-// 工具函数
+// Toolcount
 // ============================================================================
 
 /**
- * 生成离线操作 ID
+ * GenerateOfflineAction ID
  */
 export function generateOfflineId(): string {
-  return `offline_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+ return `offline_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
- * 检查操作是否过期
+ * CheckActionisnoExpired
  */
 export function isOperationExpired(
-  operation: OfflineOperation,
-  maxAge: number = 24 * 60 * 60 * 1000 // 默认 24 小时
+ operation: OfflineOperation,
+ maxAge: number = 24 * 60 * 60 * 1000 // Default 24 h
 ): boolean {
-  const age = Date.now() - new Date(operation.createdAt).getTime();
-  return age > maxAge;
+ const age = Date.now() - new Date(operation.createdAt).getTime();
+ return age > maxAge;
 }
 
 /**
- * 按优先级和时间排序操作
+ * byPriorityandTimeSortAction
  */
 export function sortOperations(operations: OfflineOperation[]): OfflineOperation[] {
-  return [...operations].sort((a, b) => {
-    // 先按优先级排序
-    if (a.priority !== b.priority) {
-      return a.priority - b.priority;
-    }
-    // 再按创建时间排序
-    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-  });
+ return [...operations].sort((a, b) => {
+ // firstbyPrioritySort
+ if (a.priority !== b.priority) {
+ return a.priority - b.priority;
+ }
+ // againbyCreated AtSort
+ return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+ });
 }

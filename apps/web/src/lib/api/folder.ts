@@ -1,5 +1,5 @@
 /**
- * 文件夹 API 服务
+ * Folder API Service
  */
 
 import { request } from "./shared";
@@ -57,14 +57,14 @@ export interface BatchMoveResponse {
 
 export const folderApi = {
   /**
-   * 获取文件夹列表
+ * FetchFolderList
    */
   async list(): Promise<FolderListResponse> {
     return request<FolderListResponse>("/folders");
   },
 
   /**
-   * 创建文件夹
+ * CreateFolder
    */
   async create(data: CreateFolderRequest): Promise<FolderResponse> {
     return request<FolderResponse>("/folders", {
@@ -74,14 +74,14 @@ export const folderApi = {
   },
 
   /**
-   * 获取文件夹详情
+ * FetchFolderDetails
    */
   async get(id: string): Promise<FolderResponse> {
     return request<FolderResponse>(`/folders/${id}`);
   },
 
   /**
-   * 更新文件夹
+ * UpdateFolder
    */
   async update(id: string, data: UpdateFolderRequest): Promise<FolderResponse> {
     return request<FolderResponse>(`/folders/${id}`, {
@@ -91,7 +91,7 @@ export const folderApi = {
   },
 
   /**
-   * 删除文件夹
+ * DeleteFolder
    */
   async delete(id: string): Promise<{ success: boolean; data: { success: boolean; message: string } }> {
     return request<{ success: boolean; data: { success: boolean; message: string } }>(`/folders/${id}`, {
@@ -100,7 +100,7 @@ export const folderApi = {
   },
 
   /**
-   * 移动工作流到文件夹
+ * MoveWorkflowtoFolder
    */
   async moveWorkflow(workflowId: string, folderId: string | null): Promise<{ success: boolean; data: { success: boolean; message: string } }> {
     return request<{ success: boolean; data: { success: boolean; message: string } }>(`/workflows/${workflowId}/folder`, {
@@ -110,7 +110,7 @@ export const folderApi = {
   },
 
   /**
-   * 批量移动工作流
+ * BatchMoveWorkflow
    */
   async batchMove(workflowIds: string[], folderId: string | null): Promise<BatchMoveResponse> {
     return request<BatchMoveResponse>("/workflows/batch/move", {

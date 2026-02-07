@@ -1,5 +1,5 @@
 /**
- * Stores 导出入口
+ * Stores ExportEntry
  */
 
 export * from "./useAuthStore";
