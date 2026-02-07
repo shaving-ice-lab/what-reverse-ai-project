@@ -448,7 +448,7 @@ func (s *runtimeService) TrackAnonymousAccess(ctx context.Context, entry *Runtim
 		if session != nil && session.BlockedAt == nil {
 			blockedAt := now
 			session.BlockedAt = &blockedAt
-			session.BlockReason = stringPtrOrNil("blacklist")
+			session.BlockedReason = stringPtrOrNil("blacklist")
 			_ = s.workspaceRepo.UpdateSession(ctx, session)
 		}
 		if err := s.recordRuntimeEvent(ctx, entry.Workspace.ID, session, RuntimeEventAccessBlocked, buildRiskPayload(meta, ipHash, userAgentHash, []string{"blacklist"}, entity.JSON{
@@ -555,7 +555,7 @@ func (s *runtimeService) authorizeAccessMode(workspace *entity.Workspace, userID
 		if userID == nil {
 			return ErrRuntimeAuthRequired
 		}
-		if workspace.OwnerUserID != nil && *userID != *workspace.OwnerUserID {
+		if workspace.OwnerUserID != uuid.Nil && *userID != workspace.OwnerUserID {
 			return ErrRuntimeAccessDenied
 		}
 		return nil
@@ -575,7 +575,7 @@ func (s *runtimeService) authorizeClassification(ctx context.Context, workspace 
 	}
 
 	if requirement.requireOwner {
-		if userID == nil || workspace.OwnerUserID == nil || *userID != *workspace.OwnerUserID {
+		if userID == nil || workspace.OwnerUserID == uuid.Nil || *userID != workspace.OwnerUserID {
 			return ErrRuntimeAccessDenied
 		}
 		return nil
@@ -584,7 +584,7 @@ func (s *runtimeService) authorizeClassification(ctx context.Context, workspace 
 	if userID == nil {
 		return ErrRuntimeAuthRequired
 	}
-	if workspace.OwnerUserID != nil && *userID == *workspace.OwnerUserID {
+	if workspace.OwnerUserID != uuid.Nil && *userID == workspace.OwnerUserID {
 		return nil
 	}
 
@@ -661,7 +661,7 @@ func (s *runtimeService) recordRuntimeEvent(ctx context.Context, workspaceID uui
 	}
 	return s.workspaceRepo.CreateEvent(ctx, &entity.WorkspaceEvent{
 		WorkspaceID: workspaceID,
-		SessionID:   &session.ID,
+		SessionID:   session.ID,
 		EventType:   normalized,
 		Payload:     payloadForLog,
 	})

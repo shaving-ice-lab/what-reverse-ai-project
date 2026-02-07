@@ -67,6 +67,7 @@ var (
 	ErrWorkspaceDBSchemaMigrationBlocked           = errors.New("workspace db schema migration blocked by precheck")
 	ErrWorkspaceDBSchemaMigrationNotApproved       = errors.New("workspace db schema migration not approved")
 	ErrWorkspaceDBSchemaMigrationInvalidVerifySQL  = errors.New("workspace db schema migration verify sql invalid")
+	ErrDBSchemaReviewerNotFound                    = errors.New("db schema reviewer not found")
 )
 
 // WorkspaceDatabaseService 工作空间数据库服务接口

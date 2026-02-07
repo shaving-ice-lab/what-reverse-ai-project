@@ -22,6 +22,9 @@ const (
 	defaultSSLExpiryWarningDays      = 14
 	defaultSSLAutoRenewDays          = 7
 	defaultDomainLifecycleBatchLimit = 200
+
+	sslIssueRetryBase = 10 * time.Minute
+	sslIssueRetryMax  = 24 * time.Hour
 )
 
 // DomainLifecycleReport 域名生命周期巡检报告
