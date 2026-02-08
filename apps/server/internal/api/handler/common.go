@@ -91,27 +91,6 @@ func errorResponseWithDetails(c echo.Context, status int, code, message string, 
 	return c.JSON(status, resp)
 }
 
-func requireAdminCapability(c echo.Context, adminService service.AdminService, capabilityKey string) error {
-	key := strings.TrimSpace(capabilityKey)
-	if key == "" {
-		return nil
-	}
-	if adminService == nil {
-		return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "权限校验服务不可用")
-	}
-	user := middleware.GetAuthUser(c)
-	if user == nil {
-		return errorResponse(c, http.StatusUnauthorized, "UNAUTHORIZED", "未授权访问")
-	}
-	capabilities := adminService.CapabilitiesForUser(user)
-	for _, cap := range capabilities {
-		if cap.Key == key {
-			return nil
-		}
-	}
-	return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问")
-}
-
 func buildQuotaExceededDetails(result *service.ConsumeUsageResult) map[string]interface{} {
 	if result == nil {
 		return nil

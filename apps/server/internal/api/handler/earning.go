@@ -16,14 +16,12 @@ import (
 // EarningHandler 收入处理器
 type EarningHandler struct {
 	earningService service.EarningService
-	adminService   service.AdminService
 }
 
 // NewEarningHandler 创建收入处理器实例
-func NewEarningHandler(earningService service.EarningService, adminService service.AdminService) *EarningHandler {
+func NewEarningHandler(earningService service.EarningService) *EarningHandler {
 	return &EarningHandler{
 		earningService: earningService,
-		adminService:   adminService,
 	}
 }
 
@@ -316,145 +314,4 @@ func (h *EarningHandler) RequestWithdrawal(c echo.Context) error {
 	}
 
 	return successResponse(c, withdrawal)
-}
-
-// =====================
-// 管理员 API
-// =====================
-
-// AdminListWithdrawals 管理员获取提现列表
-// GET /api/v1/admin/earnings/withdrawals
-func (h *EarningHandler) AdminListWithdrawals(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "earnings.read"); err != nil {
-		return err
-	}
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	pageSize, _ := strconv.Atoi(c.QueryParam("page_size"))
-	if page <= 0 {
-		page = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	params := repository.WithdrawalListParams{
-		Status:   c.QueryParam("status"),
-		Page:     page,
-		PageSize: pageSize,
-	}
-
-	withdrawals, total, err := h.earningService.ListWithdrawals(c.Request().Context(), uuid.Nil, params)
-	if err != nil {
-		return errorResponse(c, http.StatusInternalServerError, "LIST_FAILED", "获取提现记录失败")
-	}
-
-	return successResponseWithMeta(c, withdrawals, map[string]interface{}{
-		"total":     total,
-		"page":      page,
-		"page_size": pageSize,
-	})
-}
-
-// AdminProcessWithdrawal 管理员处理提现
-// POST /api/v1/admin/earnings/withdrawals/:id/process
-func (h *EarningHandler) AdminProcessWithdrawal(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "earnings.approve"); err != nil {
-		return err
-	}
-	adminID := middleware.GetUserID(c)
-	adminUID, err := uuid.Parse(adminID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	withdrawalID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "提现 ID 无效")
-	}
-
-	var req struct {
-		Approved bool   `json:"approved"`
-		Reason   string `json:"reason"`
-	}
-
-	if err := c.Bind(&req); err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
-	}
-
-	if err := h.earningService.ProcessWithdrawal(c.Request().Context(), withdrawalID, adminUID, req.Approved, req.Reason); err != nil {
-		switch err {
-		case service.ErrWithdrawalNotFound:
-			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "提现记录不存在")
-		case service.ErrInvalidWithdrawalStatus:
-			return errorResponse(c, http.StatusBadRequest, "INVALID_STATUS", "提现状态不允许处理")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "PROCESS_FAILED", "处理提现失败")
-		}
-	}
-
-	return successResponse(c, map[string]string{"message": "处理成功"})
-}
-
-// AdminRunSettlement 管理员运行结算
-// POST /api/v1/admin/earnings/settlements/run
-func (h *EarningHandler) AdminRunSettlement(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "earnings.approve"); err != nil {
-		return err
-	}
-	adminID := middleware.GetUserID(c)
-	adminUID, err := uuid.Parse(adminID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	settlement, err := h.earningService.RunSettlement(c.Request().Context(), adminUID)
-	if err != nil {
-		return errorResponse(c, http.StatusInternalServerError, "SETTLEMENT_FAILED", err.Error())
-	}
-
-	return successResponse(c, settlement)
-}
-
-// AdminConfirmEarning 管理员确认收入
-// POST /api/v1/admin/earnings/:id/confirm
-func (h *EarningHandler) AdminConfirmEarning(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "earnings.approve"); err != nil {
-		return err
-	}
-	earningID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "收入 ID 无效")
-	}
-
-	if err := h.earningService.ConfirmEarning(c.Request().Context(), earningID); err != nil {
-		return errorResponse(c, http.StatusInternalServerError, "CONFIRM_FAILED", "确认收入失败")
-	}
-
-	return successResponse(c, map[string]string{"message": "确认成功"})
-}
-
-// AdminRefundEarning 管理员退款收入
-// POST /api/v1/admin/earnings/:id/refund
-func (h *EarningHandler) AdminRefundEarning(c echo.Context) error {
-	if err := requireAdminCapability(c, h.adminService, "earnings.approve"); err != nil {
-		return err
-	}
-	earningID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "收入 ID 无效")
-	}
-
-	var req struct {
-		Reason string `json:"reason"`
-	}
-
-	if err := c.Bind(&req); err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
-	}
-
-	if err := h.earningService.RefundEarning(c.Request().Context(), earningID, req.Reason); err != nil {
-		return errorResponse(c, http.StatusInternalServerError, "REFUND_FAILED", "退款失败")
-	}
-
-	return successResponse(c, map[string]string{"message": "退款成功"})
 }

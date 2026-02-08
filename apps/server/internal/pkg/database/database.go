@@ -160,9 +160,6 @@ func Migrate(db *gorm.DB) error {
 		&entity.ReviewComment{},
 		&entity.ReviewChecklist{},
 
-		// 同步相关
-		&entity.SyncRecord{},
-
 		// Agent 相关
 		&entity.Agent{},
 		&entity.Review{},

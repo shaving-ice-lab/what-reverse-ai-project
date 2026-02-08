@@ -428,18 +428,6 @@ func (s *Server) setupRoutes() {
 		notificationService,
 		supportNotificationTemplateService,
 	)
-	adminService := service.NewAdminService(
-		userRepo,
-		workspaceRepo,
-		workspaceMemberRepo,
-		sessionRepo,
-		executionRepo,
-		workspaceQuotaRepo,
-		activityService,
-		auditLogService,
-		s.config.Security.AdminEmails,
-		s.config.Security.AdminRoles,
-	)
 	planWBSService := service.NewPlanWBSService()
 	planModuleService := service.NewPlanModuleService(planModuleRepo, planTaskRepo, workspaceService, planWBSService)
 	planVersionService := service.NewPlanVersionService(planVersionRepo, planModuleRepo, workspaceService)
@@ -504,15 +492,6 @@ func (s *Server) setupRoutes() {
 	agentHandler := handler.NewAgentHandler(agentService)
 	opsSupportHandler := handler.NewOpsSupportHandler(opsSupportService)
 	supportTicketHandler := handler.NewSupportTicketHandler(supportTicketService, supportSettingsService, captchaVerifier)
-	adminHandler := handler.NewAdminHandler(
-		adminService,
-		announcementService,
-		supportTicketService,
-		supportSettingsService,
-		supportTicketCommentService,
-		supportRoutingService,
-		supportNotificationTemplateService,
-	)
 	planWBSHandler := handler.NewPlanWBSHandler(planWBSService)
 	planModuleHandler := handler.NewPlanModuleHandler(planModuleService)
 	planVersionHandler := handler.NewPlanVersionHandler(planVersionService)
@@ -582,7 +561,7 @@ func (s *Server) setupRoutes() {
 	tagHandler := handler.NewTagHandler(tagService)
 	webhookHandler := handler.NewWebhookHandler(webhookService)
 	connectorHandler := handler.NewConnectorHandler(connectorService, secretService)
-	systemHandler := handler.NewSystemHandler(systemService, featureFlagsService, &s.config.Deployment, adminService)
+	systemHandler := handler.NewSystemHandler(systemService, featureFlagsService, &s.config.Deployment)
 	opsHandler := handler.NewOpsHandler(opsService, s.taskQueue)
 	creativeTemplateHandler := handler.NewCreativeTemplateHandler(creativeTemplateService)
 	creativeTaskHandler := handler.NewCreativeTaskHandler(creativeTaskService, nil)
@@ -591,7 +570,7 @@ func (s *Server) setupRoutes() {
 	commentHandler := handler.NewCommentHandler(commentService)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 	shareHandler := handler.NewShareHandler(shareService, s.config.Server.BaseURL)
-	earningHandler := handler.NewEarningHandler(earningService, adminService)
+	earningHandler := handler.NewEarningHandler(earningService)
 
 	// 对话相关处理器
 	conversationHandler := handler.NewConversationHandler(conversationService, workspaceService)
@@ -1292,73 +1271,6 @@ func (s *Server) setupRoutes() {
 		}
 	}
 
-	// 管理员路由 (需要认证 + 管理员权限)
-	admin := v1.Group("/admin")
-	admin.Use(middleware.Auth(&s.config.JWT))
-	admin.Use(middleware.RequireAdmin(userRepo, s.config.Security.AdminEmails))
-	{
-		admin.GET("/capabilities", adminHandler.GetCapabilities)
-		admin.GET("/users", adminHandler.ListUsers)
-		admin.GET("/users/:id", adminHandler.GetUser)
-		admin.PATCH("/users/:id/status", adminHandler.UpdateUserStatus)
-		admin.PATCH("/users/:id/role", adminHandler.UpdateUserRole)
-		admin.PATCH("/users/:id/admin-role", adminHandler.UpdateUserAdminRole)
-		admin.GET("/workspaces", adminHandler.ListWorkspaces)
-		admin.GET("/workspaces/:id", adminHandler.GetWorkspace)
-		admin.PATCH("/workspaces/:id/status", adminHandler.UpdateWorkspaceStatus)
-		admin.PATCH("/workspaces/:id/publish-status", adminHandler.UpdateWorkspacePublishStatus)
-		admin.GET("/announcements", adminHandler.ListAnnouncements)
-		admin.POST("/announcements", adminHandler.CreateAnnouncement)
-		admin.PATCH("/announcements/:id", adminHandler.UpdateAnnouncement)
-		admin.PATCH("/system/features", systemHandler.UpdateFeatures)
-
-		// 运维与客服 SOP
-		adminOps := admin.Group("/ops")
-		{
-			adminOps.GET("/sops", opsSupportHandler.ListSOPs)
-			adminOps.GET("/sops/:key", opsSupportHandler.GetSOP)
-		}
-
-		// 客户支持工单
-		adminSupport := admin.Group("/support")
-		{
-			adminSupport.GET("/channels", adminHandler.ListSupportChannels)
-			adminSupport.POST("/channels", adminHandler.CreateSupportChannel)
-			adminSupport.PATCH("/channels/:id", adminHandler.UpdateSupportChannel)
-			adminSupport.GET("/teams", adminHandler.ListSupportTeams)
-			adminSupport.POST("/teams", adminHandler.CreateSupportTeam)
-			adminSupport.PATCH("/teams/:id", adminHandler.UpdateSupportTeam)
-			adminSupport.GET("/teams/:id/members", adminHandler.ListSupportTeamMembers)
-			adminSupport.POST("/teams/:id/members", adminHandler.AddSupportTeamMember)
-			adminSupport.DELETE("/teams/:id/members/:userId", adminHandler.RemoveSupportTeamMember)
-			adminSupport.GET("/queues", adminHandler.ListSupportQueues)
-			adminSupport.POST("/queues", adminHandler.CreateSupportQueue)
-			adminSupport.PATCH("/queues/:id", adminHandler.UpdateSupportQueue)
-			adminSupport.GET("/queues/:id/members", adminHandler.ListSupportQueueMembers)
-			adminSupport.POST("/queues/:id/members", adminHandler.AddSupportQueueMember)
-			adminSupport.DELETE("/queues/:id/members/:userId", adminHandler.RemoveSupportQueueMember)
-			adminSupport.GET("/routing-rules", adminHandler.ListSupportAssignmentRules)
-			adminSupport.POST("/routing-rules", adminHandler.CreateSupportAssignmentRule)
-			adminSupport.PATCH("/routing-rules/:id", adminHandler.UpdateSupportAssignmentRule)
-			adminSupport.GET("/notification-templates", adminHandler.GetSupportNotificationTemplates)
-			adminSupport.PUT("/notification-templates", adminHandler.UpdateSupportNotificationTemplates)
-			adminSupport.GET("/tickets", adminHandler.ListSupportTickets)
-			adminSupport.GET("/tickets/:id", adminHandler.GetSupportTicket)
-			adminSupport.GET("/tickets/:id/comments", adminHandler.ListSupportTicketComments)
-			adminSupport.POST("/tickets/:id/comments", adminHandler.CreateSupportTicketComment)
-			adminSupport.PATCH("/tickets/:id/status", adminHandler.UpdateSupportTicketStatus)
-		}
-
-		// 收入管理
-		adminEarnings := admin.Group("/earnings")
-		{
-			adminEarnings.GET("/withdrawals", earningHandler.AdminListWithdrawals)
-			adminEarnings.POST("/withdrawals/:id/process", earningHandler.AdminProcessWithdrawal)
-			adminEarnings.POST("/settlements/run", earningHandler.AdminRunSettlement)
-			adminEarnings.POST("/:id/confirm", earningHandler.AdminConfirmEarning)
-			adminEarnings.POST("/:id/refund", earningHandler.AdminRefundEarning)
-		}
-	}
 }
 
 // Start 启动服务器
