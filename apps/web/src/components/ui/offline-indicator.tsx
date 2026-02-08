@@ -120,7 +120,7 @@ export function OfflineIndicator({
  <span className="font-medium text-sm">{statusText[status]}</span>
  {hasPendingOperations && (
  <Badge variant="secondary" className="text-xs">
- {queueState.pendingCount} pendingSync
+ {queueState.pendingCount} Pending Sync
  </Badge>
  )}
  {hasFailedOperations && (
@@ -131,7 +131,7 @@ export function OfflineIndicator({
  </div>
  {status === 'offline' && (
  <p className="text-xs text-[var(--color-muted-foreground)]">
- ChangewillatRestoreNetworkafterSync
+ Changes will be synced when the network is restored
  </p>
  )}
  </div>
@@ -152,7 +152,7 @@ export function OfflineIndicator({
  <RefreshCw className={cn('h-4 w-4', queueState.isSyncing && 'animate-spin')} />
  </Button>
  </TooltipTrigger>
- <TooltipContent>NowSync</TooltipContent>
+ <TooltipContent>Sync Now</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
@@ -239,7 +239,7 @@ export function OfflineBanner({ className }: { className?: string }) {
  )}
  >
  <CloudOff className="h-4 w-4" />
- <span>youCurrentatOfflineStatus</span>
+ <span>You are currently offline</span>
  </div>
  );
 }
@@ -275,7 +275,7 @@ export function OnlineStatusBadge({ className }: { className?: string }) {
  <div className="text-xs">
  <p className="font-medium">{statusText[status]}</p>
  {queueState.pendingCount > 0 && (
- <p className="mt-0.5">{queueState.pendingCount} pendingSync</p>
+ <p className="mt-0.5">{queueState.pendingCount} Pending Sync</p>
  )}
  </div>
  </TooltipContent>

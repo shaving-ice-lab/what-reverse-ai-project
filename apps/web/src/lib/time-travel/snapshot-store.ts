@@ -1,11 +1,11 @@
 /**
- * SnapshotStorageService
+ * Snapshot Storage Service
  * 
- * ProvideExecuteSnapshot'sPersistentStorageFeatures, SupportmultipletypeStorageafterendpoint: 
+ * Provides persistent storage features for execution snapshots. Supports multiple storage backends:
  * - IndexedDB (Web Default)
- * - LocalStorage (DowngradePlan)
- * - Tauri SQLite (faceendpoint)
- * - Memory (Testuse)
+ * - LocalStorage (Fallback)
+ * - Tauri SQLite (Desktop)
+ * - Memory (Testing)
  */
 
 import type {
@@ -29,7 +29,7 @@ import { DEFAULT_STORE_CONFIG, DB_VERSION } from "./types";
 import { compressSnapshot, decompressSnapshot } from "./snapshot-utils";
 
 /**
- * SnapshotStorageService
+ * Snapshot storage service
  */
 export class SnapshotStore implements ISnapshotStore {
  private config: SnapshotStoreConfig;
@@ -42,9 +42,9 @@ export class SnapshotStore implements ISnapshotStore {
  this.config = { ...DEFAULT_STORE_CONFIG, ...config };
  }
 
- /**
- * InitialStorage
- */
+/**
+  * Initialize storage
+  */
  async initialize(): Promise<void> {
  if (this.initialized) return;
 
@@ -60,10 +60,10 @@ export class SnapshotStore implements ISnapshotStore {
  }
 
  /**
- * DetectAvailable'sStorageafterendpoint
- */
+  * Detect available storage backend
+  */
  private detectBackend(): StorageBackend {
- // Checkisnoat Tauri Environment
+ // Check if running in Tauri environment
  if (typeof window !== "undefined" && "__TAURI__" in window) {
  return "tauri";
  }
@@ -78,13 +78,13 @@ export class SnapshotStore implements ISnapshotStore {
  return "localstorage";
  }
 
- // DowngradetoinStorage
+ // Fall back to in-memory storage
  return "memory";
  }
 
- /**
- * Initial IndexedDB
- */
+/**
+  * Initialize IndexedDB
+  */
  private async initIndexedDB(): Promise<void> {
  return new Promise((resolve, reject) => {
  const request = indexedDB.open(
@@ -105,13 +105,13 @@ export class SnapshotStore implements ISnapshotStore {
  request.onupgradeneeded = (event) => {
  const db = (event.target as IDBOpenDBRequest).result;
 
- // CreateSnapshotStorage
+ // Create snapshot object store
  if (!db.objectStoreNames.contains(this.config.storeName!)) {
  const store = db.createObjectStore(this.config.storeName!, {
  keyPath: "executionId",
  });
 
- // CreateIndex
+ // Create indexes
  store.createIndex("workflowId", "workflowId", { unique: false });
  store.createIndex("status", "status", { unique: false });
  store.createIndex("startedAt", "startedAt", { unique: false });
@@ -123,17 +123,17 @@ export class SnapshotStore implements ISnapshotStore {
  });
  }
 
- /**
- * SaveExecuteSnapshot
- */
+/**
+  * Save execution snapshot
+  */
  async saveSnapshot(snapshot: ExecutionSnapshot): Promise<void> {
  await this.ensureInitialized();
 
  const options = this.config.defaultOptions;
  let dataToStore = snapshot;
 
- // CompressProcess
- if (options?.compress) {
+// Apply compression if enabled
+    if (options?.compress) {
  dataToStore = await compressSnapshot(snapshot, options.compressionLevel);
  }
 
@@ -156,9 +156,9 @@ export class SnapshotStore implements ISnapshotStore {
  this.log("Snapshot saved:", snapshot.executionId);
  }
 
- /**
- * FetchExecuteSnapshot
- */
+/**
+  * Get execution snapshot
+  */
  async getSnapshot(executionId: string): Promise<ExecutionSnapshot | null> {
  await this.ensureInitialized();
 
@@ -179,17 +179,17 @@ export class SnapshotStore implements ISnapshotStore {
  break;
  }
 
- // CompressProcess
- if (snapshot && snapshot.metadata?.compressed) {
+// Decompress if needed
+    if (snapshot && snapshot.metadata?.compressed) {
  snapshot = await decompressSnapshot(snapshot);
  }
 
  return snapshot;
  }
 
- /**
- * DeleteExecuteSnapshot
- */
+/**
+  * Delete execution snapshot
+  */
  async deleteSnapshot(executionId: string): Promise<void> {
  await this.ensureInitialized();
 
@@ -212,9 +212,9 @@ export class SnapshotStore implements ISnapshotStore {
  this.log("Snapshot deleted:", executionId);
  }
 
- /**
- * QuerySnapshotList
- */
+/**
+  * Query snapshot list
+  */
  async querySnapshots(
  params: SnapshotQueryParams = {}
  ): Promise<SnapshotListItem[]> {
@@ -240,9 +240,9 @@ export class SnapshotStore implements ISnapshotStore {
  return results;
  }
 
- /**
- * FetchSnapshotCount
- */
+/**
+  * Get snapshot count
+  */
  async getSnapshotCount(workflowId?: string): Promise<number> {
  await this.ensureInitialized();
 
@@ -260,9 +260,9 @@ export class SnapshotStore implements ISnapshotStore {
  }
  }
 
- /**
- * Clean upExpiredSnapshot
- */
+/**
+  * Clean up expired snapshots
+  */
  async cleanupSnapshots(
  options?: SnapshotStorageOptions
  ): Promise<number> {
@@ -280,7 +280,7 @@ export class SnapshotStore implements ISnapshotStore {
  const maxAge = opts.maxAgeDays ? opts.maxAgeDays * 24 * 60 * 60 * 1000 : 0;
  const maxCount = opts.maxSnapshots || Infinity;
 
- // byTimeClean up
+ // Clean up by age
  if (maxAge > 0) {
  for (const snapshot of snapshots) {
  const snapshotDate = new Date(snapshot.startedAt);
@@ -291,7 +291,7 @@ export class SnapshotStore implements ISnapshotStore {
  }
  }
 
- // byCountClean up
+ // Clean up by count
  const currentCount = await this.getSnapshotCount();
  if (currentCount > maxCount) {
  const toDelete = snapshots.slice(0, currentCount - maxCount);
@@ -307,9 +307,9 @@ export class SnapshotStore implements ISnapshotStore {
  return deletedCount;
  }
 
- /**
- * UpdateNodeSnapshot
- */
+/**
+  * Update node snapshot
+  */
  async updateNodeSnapshot(
  executionId: string,
  nodeId: string,
@@ -324,7 +324,7 @@ export class SnapshotStore implements ISnapshotStore {
 
  snapshot.nodeSnapshots[nodeId] = nodeSnapshot;
  
- // UpdateSummary
+ // Update summary
  this.updateSummary(snapshot);
 
  await this.saveSnapshot(snapshot);
@@ -336,9 +336,9 @@ export class SnapshotStore implements ISnapshotStore {
  });
  }
 
- /**
- * ExportSnapshotas JSON
- */
+/**
+  * Export snapshot as JSON
+  */
  async exportSnapshot(executionId: string): Promise<string> {
  const snapshot = await this.getSnapshot(executionId);
  if (!snapshot) {
@@ -348,20 +348,20 @@ export class SnapshotStore implements ISnapshotStore {
  return JSON.stringify(snapshot, null, 2);
  }
 
- /**
- * ImportSnapshot
- */
+/**
+  * Import snapshot
+  */
  async importSnapshot(jsonData: string): Promise<ExecutionSnapshot> {
  const snapshot = JSON.parse(jsonData) as ExecutionSnapshot;
  
- // VerifySnapshotStructure
+ // Validate snapshot structure
  this.validateSnapshot(snapshot);
 
  await this.saveSnapshot(snapshot);
  return snapshot;
  }
 
- // ===== IndexedDB Implement =====
+ // ===== IndexedDB Implementation =====
 
  private async saveToIndexedDB(snapshot: ExecutionSnapshot): Promise<void> {
  return new Promise((resolve, reject) => {
@@ -521,7 +521,7 @@ export class SnapshotStore implements ISnapshotStore {
  });
  }
 
- // ===== LocalStorage Implement =====
+ // ===== LocalStorage Implementation =====
 
  private getLocalStorageKey(executionId: string): string {
  return `${this.config.dbName}:${executionId}`;
@@ -535,10 +535,10 @@ export class SnapshotStore implements ISnapshotStore {
  const key = this.getLocalStorageKey(snapshot.executionId);
  localStorage.setItem(key, JSON.stringify(snapshot));
 
- // UpdateIndex
- const indexKey = this.getLocalStorageIndexKey();
- const index = JSON.parse(localStorage.getItem(indexKey) || "[]") as string[];
- if (!index.includes(snapshot.executionId)) {
+// Update index
+    const indexKey = this.getLocalStorageIndexKey();
+    const index = JSON.parse(localStorage.getItem(indexKey) || "[]") as string[];
+    if (!index.includes(snapshot.executionId)) {
  index.push(snapshot.executionId);
  localStorage.setItem(indexKey, JSON.stringify(index));
  }
@@ -554,10 +554,10 @@ export class SnapshotStore implements ISnapshotStore {
  const key = this.getLocalStorageKey(executionId);
  localStorage.removeItem(key);
 
- // UpdateIndex
- const indexKey = this.getLocalStorageIndexKey();
- const index = JSON.parse(localStorage.getItem(indexKey) || "[]") as string[];
- const newIndex = index.filter((id) => id !== executionId);
+// Update index
+    const indexKey = this.getLocalStorageIndexKey();
+    const index = JSON.parse(localStorage.getItem(indexKey) || "[]") as string[];
+    const newIndex = index.filter((id) => id !== executionId);
  localStorage.setItem(indexKey, JSON.stringify(newIndex));
  }
 
@@ -575,7 +575,7 @@ export class SnapshotStore implements ISnapshotStore {
  }
  }
 
- // AppFilterandSort(Implement)
+ // Apply filter and sort (simplified implementation)
  return results.slice(0, params.pageSize || 20);
  }
 
@@ -597,7 +597,7 @@ export class SnapshotStore implements ISnapshotStore {
  return count;
  }
 
- // ===== Tauri Implement =====
+ // ===== Tauri Implementation =====
 
  private async saveToTauri(snapshot: ExecutionSnapshot): Promise<void> {
  const { invoke } = await import("@tauri-apps/api/core");
@@ -628,7 +628,7 @@ export class SnapshotStore implements ISnapshotStore {
  return invoke("count_snapshots", { workflowId });
  }
 
- // ===== Memory Implement =====
+ // ===== Memory Implementation =====
 
  private queryFromMemory(params: SnapshotQueryParams): SnapshotListItem[] {
  let results = Array.from(this.memoryStore.values()).map(
@@ -656,7 +656,7 @@ export class SnapshotStore implements ISnapshotStore {
  return count;
  }
 
- // ===== AuxiliaryMethod =====
+ // ===== Helper Methods =====
 
  private async ensureInitialized(): Promise<void> {
  if (!this.initialized) {
@@ -720,17 +720,17 @@ export class SnapshotStore implements ISnapshotStore {
  }
  }
 
- /**
- * AddEventListen
- */
+/**
+  * Add event listener
+  */
  addEventListener(listener: SnapshotStoreEventListener): () => void {
  this.listeners.add(listener);
  return () => this.listeners.delete(listener);
  }
 
- /**
- * DestroyStorage
- */
+/**
+  * Destroy storage instance
+  */
  destroy(): void {
  if (this.db) {
  this.db.close();
@@ -742,12 +742,12 @@ export class SnapshotStore implements ISnapshotStore {
  }
 }
 
-// ===== exampleInstance =====
+// ===== Singleton Instance =====
 
 let snapshotStoreInstance: SnapshotStore | null = null;
 
 /**
- * FetchSnapshotStorageexample
+ * Get snapshot store instance
  */
 export function getSnapshotStore(
  config?: Partial<SnapshotStoreConfig>
@@ -759,7 +759,7 @@ export function getSnapshotStore(
 }
 
 /**
- * ResetSnapshotStorage(Used forTest)
+ * Reset snapshot store (used for testing)
  */
 export function resetSnapshotStore(): void {
  if (snapshotStoreInstance) {

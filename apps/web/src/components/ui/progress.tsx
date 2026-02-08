@@ -1,40 +1,40 @@
 "use client"
 
 /**
- * Progress ProgressComponent - Enhanced
+ * Progress Component - Enhanced
  * 
- * Support: 
- * - lineProgress Bar
- * - RingProgress
- * - SegmentProgress
- * - AnimationEffect
+ * Supports: 
+ * - Linear progress bar
+ * - Circular progress
+ * - Segmented progress
+ * - Animation effects
  */
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-// ============ lineProgress Bar ============
+// ============ Linear Progress Bar ============
 
 interface ProgressProps {
- /** Progressvalue (0-100) */
+ /** Progress value (0-100) */
  value?: number
- /** Maximumvalue */
+ /** Maximum value */
  max?: number
- /** Dimension */
+ /** Size */
  size?: "xs" | "sm" | "default" | "lg"
- /** ColorVariant */
+ /** Color variant */
  variant?: "default" | "success" | "warning" | "error" | "gradient"
- /** isnoDisplay */
+ /** Whether to show stripes */
  striped?: boolean
- /** isnoAnimation */
+ /** Whether to animate */
  animated?: boolean
- /** isnonotOKStatus */
+ /** Whether indeterminate */
  indeterminate?: boolean
- /** isnoDisplaycountvalue */
+ /** Whether to show value */
  showValue?: boolean
- /** FormatcountvalueDisplay */
+ /** Format value display */
  formatValue?: (value: number, max: number) => string
- /** Tags */
+ /** Label */
  label?: string
  className?: string
 }
@@ -75,7 +75,7 @@ function Progress({
 
  return (
  <div className={cn("w-full", className)}>
- {/* Tagsandcountvalue */}
+ {/* Label and value */}
  {(label || showValue) && (
  <div className="flex items-center justify-between mb-1.5">
  {label && (
@@ -157,26 +157,26 @@ function Progress({
  )
 }
 
-// ============ RingProgress ============
+// ============ Circular Progress ============
 
 interface CircularProgressProps {
- /** Progressvalue (0-100) */
+ /** Progress value (0-100) */
  value?: number
- /** Dimension (px) */
+ /** Size (px) */
  size?: number
- /** lineWidth */
+ /** Stroke width */
  strokeWidth?: number
- /** ColorVariant */
+ /** Color variant */
  variant?: "default" | "success" | "warning" | "error" | "gradient"
- /** isnonotOKStatus */
+ /** Whether indeterminate */
  indeterminate?: boolean
- /** isnoDisplaycountvalue */
+ /** Whether to show value */
  showValue?: boolean
- /** FormatcountvalueDisplay */
+ /** Format value display */
  formatValue?: (value: number) => string
- /** centerContent */
+ /** Center content */
  children?: React.ReactNode
- /** OrbitColor */
+ /** Track color */
  trackColor?: string
  className?: string
 }
@@ -223,7 +223,7 @@ function CircularProgress({
  indeterminate && "animate-spin"
  )}
  >
- {/* GradientDefinition */}
+ {/* Gradient definition */}
  {variant === "gradient" && (
  <defs>
  <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -233,7 +233,7 @@ function CircularProgress({
  </defs>
  )}
  
- {/* Orbit */}
+ {/* Track */}
  <circle
  cx={size / 2}
  cy={size / 2}
@@ -259,7 +259,7 @@ function CircularProgress({
  />
  </svg>
  
- {/* centerContent */}
+ {/* Center content */}
  <div className="absolute inset-0 flex items-center justify-center">
  {children || (showValue && (
  <span className="text-sm font-medium tabular-nums text-foreground">
@@ -271,22 +271,22 @@ function CircularProgress({
  )
 }
 
-// ============ SegmentProgress ============
+// ============ Segmented Progress ============
 
 interface SegmentedProgressProps {
- /** SegmentData */
+ /** Segment data */
  segments: Array<{
  value: number
  color?: string
  label?: string
  }>
- /** totalvalue */
+ /** Total value */
  total?: number
- /** Dimension */
+ /** Size */
  size?: "sm" | "default" | "lg"
- /** isnoDisplayTags */
+ /** Whether to show labels */
  showLabels?: boolean
- /** Segmentbetween */
+ /** Gap between segments */
  gap?: number
  className?: string
 }
@@ -341,7 +341,7 @@ function SegmentedProgress({
  })}
  </div>
 
- {/* Tags */}
+ {/* Labels */}
  {showLabels && (
  <div className="flex flex-wrap gap-3 mt-2">
  {segments.map((segment, index) => (
@@ -366,16 +366,16 @@ function SegmentedProgress({
 // ============ StepProgress ============
 
 interface StepProgressProps {
- /** Step */
+ /** Steps */
  steps: Array<{
  label: string
  description?: string
  }>
- /** CurrentStep (from 0 Start) */
+ /** Current step (0-indexed) */
  current: number
- /** method */
+ /** Direction */
  direction?: "horizontal" | "vertical"
- /** Dimension */
+ /** Size */
  size?: "sm" | "default" | "lg"
  className?: string
 }
@@ -439,7 +439,7 @@ function StepProgress({
  )}
  </div>
 
- {/* Connectline */}
+ {/* Connector line */}
  {!isLast && (
  <div
  className={cn(
@@ -453,7 +453,7 @@ function StepProgress({
  )}
  </div>
 
- {/* Tags */}
+ {/* Labels */}
  <div className={cn(
  direction === "vertical" ? "ml-3" : "mt-2 text-center",
  "min-w-0"
@@ -479,20 +479,20 @@ function StepProgress({
  )
 }
 
-// ============ Progressgroup ============
+// ============ Progress Ring Group ============
 
 interface ProgressRingGroupProps {
- /** RingProgressData */
+ /** Ring progress data */
  rings: Array<{
  value: number
  color?: string
  label?: string
  }>
- /** BasicDimension */
+ /** Base size */
  size?: number
- /** lineWidth */
+ /** Stroke width */
  strokeWidth?: number
- /** between */
+ /** Gap */
  gap?: number
  className?: string
 }
@@ -521,7 +521,7 @@ function ProgressRingGroup({
 
  return (
  <React.Fragment key={index}>
- {/* Orbit */}
+ {/* Track */}
  <circle
  cx={size / 2}
  cy={size / 2}

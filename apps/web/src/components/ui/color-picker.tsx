@@ -1,24 +1,24 @@
 "use client"
 
 /**
- * ColorPicker Color PickerComponent
+ * Color Picker Component
  * 
  * Support: 
- * - PresetColor
- * - CustomColorInput
- * - OpacityControl
- * - GradientSelect
+ * - Preset colors
+ * - Custom color input
+ * - Opacity control
+ * - Gradient selection
  */
 
 import * as React from "react"
 import { Check, Pipette, Copy, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// PresetColor
+// Preset colors
 const presetColors = [
- // Theme - Manus Orange
- "#f97316", "#fb923c", "#ea580c",
- // Blue
+  // Theme - Manus Orange
+  "#f97316", "#fb923c", "#ea580c",
+  // Blue
  "#3B82F6", "#2563EB", "#1D4ED8",
  // Purple
  "#8B5CF6", "#7C3AED", "#6D28D9",
@@ -37,23 +37,23 @@ const presetColors = [
 ]
 
 interface ColorPickerProps {
- /** CurrentColorvalue */
- value?: string
- /** DefaultColor */
- defaultValue?: string
- /** ColorCallback */
- onChange?: (color: string) => void
- /** PresetColorList */
- presets?: string[]
- /** isnoDisplayOpacityControl */
- showAlpha?: boolean
- /** isnoDisplayInput */
- showInput?: boolean
- /** isnoAllowCustomColor */
- allowCustom?: boolean
- /** isnoDisable */
- disabled?: boolean
- className?: string
+  /** Current color value */
+  value?: string
+  /** Default color */
+  defaultValue?: string
+  /** Color change callback */
+  onChange?: (color: string) => void
+  /** Preset color list */
+  presets?: string[]
+  /** Whether to display opacity control */
+  showAlpha?: boolean
+  /** Whether to display input field */
+  showInput?: boolean
+  /** Whether to allow custom colors */
+  allowCustom?: boolean
+  /** Whether disabled */
+  disabled?: boolean
+  className?: string
 }
 
 function ColorPicker({
@@ -71,12 +71,12 @@ function ColorPicker({
  const [inputValue, setInputValue] = React.useState(defaultValue)
  const [copied, setCopied] = React.useState(false)
  
- const value = controlledValue ?? internalValue
+  const value = controlledValue ?? internalValue
 
- // SyncInputvalue
- React.useEffect(() => {
- setInputValue(value)
- }, [value])
+  // Sync input value
+  React.useEffect(() => {
+    setInputValue(value)
+  }, [value])
 
  const handleColorChange = (color: string) => {
  if (disabled) return
@@ -91,7 +91,7 @@ function ColorPicker({
  const newValue = e.target.value
  setInputValue(newValue)
  
- // VerifyColorFormat
+ // Verify color format
  if (/^#[0-9A-Fa-f]{6}$/.test(newValue) || /^#[0-9A-Fa-f]{3}$/.test(newValue)) {
  handleColorChange(newValue)
  }
@@ -109,7 +109,7 @@ function ColorPicker({
 
  return (
  <div className={cn("space-y-3", className)}>
- {/* CurrentColorPreview */}
+ {/* Current color preview */}
  <div className="flex items-center gap-3">
  <div
  className="w-12 h-12 rounded-lg border border-border shadow-sm"
@@ -134,7 +134,7 @@ function ColorPicker({
  placeholder="#000000"
  />
  
- {/* ActionButton */}
+ {/* Action buttons */}
  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
  {allowCustom && (
  <label className="p-2 rounded-md hover:bg-muted cursor-pointer transition-colors">
@@ -163,7 +163,7 @@ function ColorPicker({
  )}
  </div>
 
- {/* PresetColor */}
+ {/* Preset colors */}
  <div className="grid grid-cols-8 gap-2">
  {presets.map((color) => (
  <button
@@ -195,7 +195,7 @@ function ColorPicker({
 }
 
 /**
- * ColorSwatch - Colorblock
+ * ColorSwatch - Color swatch
  */
 interface ColorSwatchProps {
  color: string
@@ -244,7 +244,7 @@ function ColorSwatch({
 }
 
 /**
- * ColorPalette - Color
+ * ColorPalette - Color palette
  */
 interface ColorPaletteProps {
  colors: string[][]
@@ -279,7 +279,7 @@ function ColorPalette({
 }
 
 /**
- * GradientPicker - GradientSelect
+ * GradientPicker - Gradient selector
  */
 interface GradientPickerProps {
  value?: string
@@ -361,7 +361,7 @@ function SimpleColorPicker({
 }
 
 /**
- * ColorPickerPopover - Pop upColor Picker
+ * ColorPickerPopover - Popover color picker
  */
 interface ColorPickerPopoverProps extends ColorPickerProps {
  /** Trigger */
@@ -420,7 +420,7 @@ function ColorPickerPopover({
  )
 }
 
-// Helper Functioncount: DetermineColorisnoasLight
+// Helper Functions: Determine if Color is Light
 function isLightColor(color: string): boolean {
  const hex = color.replace("#", "")
  const r = parseInt(hex.substr(0, 2), 16)

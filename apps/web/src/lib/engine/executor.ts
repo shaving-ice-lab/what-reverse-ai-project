@@ -1,5 +1,5 @@
 /**
- * WorkflowExecuteEngine
+ * Workflow Execution Engine
  */
 
 import { generateId } from "@/lib/utils";
@@ -23,7 +23,7 @@ import type {
 } from "./types";
 
 /**
- * DefaultExecuteConfig
+ * Default execution configuration
  */
 const DEFAULT_CONFIG: Required<ExecutionConfig> = {
  timeout: 600000, // 10 min
@@ -41,7 +41,7 @@ const DEFAULT_CONFIG: Required<ExecutionConfig> = {
 };
 
 /**
- * WorkflowExecuteEngine
+ * Workflow Execution Engine
  */
 export class WorkflowExecutor {
  private state: WorkflowExecutionState;
@@ -55,19 +55,19 @@ export class WorkflowExecutor {
  constructor(input: ExecutionInput) {
  const { workflow, inputs = {}, config = {} } = input;
 
- // andConfig
+ // Merge configuration
  this.config = { ...DEFAULT_CONFIG, ...config };
 
- // Analytics DAG
+ // Analyze DAG
  this.dag = analyzeDAG(workflow.nodes, workflow.edges);
 
- // BuildNodeMapping
+ // Build node mapping
  this.nodeMap = new Map();
  for (const node of workflow.nodes) {
  this.nodeMap.set(node.id, node);
  }
 
- // InitialStatus
+ // Initialize state
  const executionId = generateId();
  this.state = {
  executionId,
@@ -82,7 +82,7 @@ export class WorkflowExecutor {
  logs: [],
  };
 
- // InitialNodeStatus
+ // Initialize node states
  for (const node of workflow.nodes) {
  this.state.nodeStates[node.id] = {
  nodeId: node.id,
@@ -96,7 +96,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * AddEventListen
+ * Add event listener
  */
  addEventListener(listener: ExecutionEventListener): () => void {
  this.listeners.add(listener);
@@ -104,7 +104,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * TriggerEvent
+ * Trigger event
  */
  private emit(event: ExecutionEvent): void {
  for (const listener of this.listeners) {
@@ -117,7 +117,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * AddLogs
+ * Add log entry
  */
  private log(level: LogEntry["level"], message: string, data?: unknown): void {
  const log: LogEntry = {
@@ -132,7 +132,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * UpdateStatus
+ * Update state
  */
  private updateState(partial: Partial<WorkflowExecutionState>): void {
  this.state = { ...this.state, ...partial };
@@ -140,7 +140,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * UpdateNodeStatus
+ * Update node state
  */
  private updateNodeState(
  nodeId: string,
@@ -154,10 +154,10 @@ export class WorkflowExecutor {
  }
 
  /**
- * ExecuteWorkflow
+ * Execute workflow
  */
  async execute(): Promise<ExecutionResult> {
- // CheckLoopDependency
+ // Check for circular dependencies
  if (this.dag.hasCircle) {
  const error = {
  code: "CIRCULAR_DEPENDENCY",
@@ -167,7 +167,7 @@ export class WorkflowExecutor {
  return this.buildResult("failed", error);
  }
 
- // CheckisnohasNode
+ // Check if there are any start nodes
  if (this.dag.startNodes.length === 0) {
  const error = {
  code: "NO_START_NODE",
@@ -177,16 +177,16 @@ export class WorkflowExecutor {
  return this.buildResult("failed", error);
  }
 
- // StartExecute
+ // Start execution
  this.updateState({ status: "running", startTime: new Date().toISOString() });
  this.emit({ type: "start", executionId: this.state.executionId, timestamp: new Date().toISOString() });
  this.log("info", "Workflow execution started");
 
  try {
- // ExecutemainLoop
+ // Main execution loop
  await this.executeLoop();
 
- // CheckExecuteResult
+ // Check execution result
  const allCompleted = Object.values(this.state.nodeStates).every(
  (ns) => ns.status === "completed" || ns.status === "cancelled"
  );
@@ -212,7 +212,7 @@ export class WorkflowExecutor {
  return this.buildResult("completed");
  }
 
- // outsideStatus
+ // Unexpected state
  const error = {
  code: "UNEXPECTED_STATE",
  message: "Workflow ended in unexpected state",
@@ -231,35 +231,35 @@ export class WorkflowExecutor {
  }
 
  /**
- * ExecuteLoop
+ * Execution loop
  */
  private async executeLoop(): Promise<void> {
  const completedNodes = new Set(this.state.completedNodeIds);
  const runningNodes = new Set(this.state.currentNodeIds);
 
  while (true) {
- // CheckCancel
+ // Check for cancellation
  if (this.abortController.signal.aborted) {
  break;
  }
 
- // FetchcanExecuteNode
+ // Get executable nodes
  const executableNodes = getExecutableNodes(
  this.dag.nodes,
  completedNodes,
  runningNodes
  );
 
- // NocanExecuteNode
+ // No executable nodes remaining
  if (executableNodes.length === 0 && runningNodes.size === 0) {
  break;
  }
 
- // LimitConcurrencycount
+ // Limit concurrency
  const availableSlots = this.config.maxConcurrency - runningNodes.size;
  const nodesToExecute = executableNodes.slice(0, availableSlots);
 
- // LaunchNodeExecute
+ // Launch node execution
  for (const nodeId of nodesToExecute) {
  runningNodes.add(nodeId);
  this.state.currentNodeIds.push(nodeId);
@@ -284,14 +284,14 @@ export class WorkflowExecutor {
  this.runningPromises.set(nodeId, promise);
  }
 
- // etcpending1NodeDone
+ // Wait for at least one node to complete
  if (this.runningPromises.size > 0) {
  await Promise.race(this.runningPromises.values());
  }
 
- // CheckisnohasFailedNode
+ // Check if any nodes have failed
  if (this.state.failedNodeIds.length > 0) {
- // etcpendingAllcurrentlyatRun'sNodeDone
+ // Wait for all currently running nodes to complete
  await Promise.all(this.runningPromises.values());
  break;
  }
@@ -299,7 +299,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * ExecuteNode
+ * Execute a single node
  */
  private async executeNode(nodeId: string): Promise<void> {
  const node = this.nodeMap.get(nodeId);
@@ -307,11 +307,11 @@ export class WorkflowExecutor {
  throw new Error(`Node ${nodeId} not found`);
  }
 
- // FetchNodeTypeandExecute
+ // Get node type and executor
  const nodeType = node.type || "unknown";
  const executor = getNodeExecutor(nodeType);
 
- // UpdateStatus
+ // Update status
  this.updateNodeState(nodeId, {
  status: "running",
  startTime: new Date().toISOString(),
@@ -320,10 +320,10 @@ export class WorkflowExecutor {
  this.config.onNodeStart(nodeId);
  this.log("info", `Executing node: ${nodeId} (${nodeType})`);
 
- // CollectInput
+ // Collect inputs
  const inputs = this.collectNodeInputs(nodeId);
 
- // BuildExecuteContext
+ // Build execution context
  const context: NodeContext = {
  nodeId,
  nodeType,
@@ -336,7 +336,7 @@ export class WorkflowExecutor {
  let result: NodeResult;
 
  if (!executor) {
- // NoExecute, MarkasDone
+ // No executor found, mark as done
  this.log("warn", `No executor for node type: ${nodeType}`);
  result = {
  success: true,
@@ -350,7 +350,7 @@ export class WorkflowExecutor {
  ],
  };
  } else {
- // ExecuteNode
+ // Execute node
  try {
  result = await executor.execute(context);
  } catch (error) {
@@ -367,7 +367,7 @@ export class WorkflowExecutor {
  }
  }
 
- // ProcessResult
+ // Process result
  const endTime = new Date().toISOString();
  const startTime = this.state.nodeStates[nodeId].startTime || endTime;
  const duration = new Date(endTime).getTime() - new Date(startTime).getTime();
@@ -382,7 +382,7 @@ export class WorkflowExecutor {
  logs: result.logs,
  });
 
- // UpdateVariable
+ // Update variables
  if (result.outputs) {
  this.state.variables = {
  ...this.state.variables,
@@ -421,7 +421,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * CollectNodeInput
+ * Collect node inputs
  */
  private collectNodeInputs(nodeId: string): Record<string, unknown> {
  const inputs: Record<string, unknown> = {};
@@ -429,7 +429,7 @@ export class WorkflowExecutor {
 
  if (!dagNode) return inputs;
 
- // fromDependencyNodeCollectOutput
+ // Collect outputs from dependency nodes
  for (const depId of dagNode.dependencies) {
  const depState = this.state.nodeStates[depId];
  if (depState?.outputs) {
@@ -441,7 +441,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * BuildExecuteResult
+ * Build execution result
  */
  private buildResult(
  status: ExecutionStatus,
@@ -453,7 +453,7 @@ export class WorkflowExecutor {
 
  this.updateState({ endTime, duration });
 
- // CollectAllNode'sOutput
+ // Collect all node outputs
  const outputs: Record<string, unknown> = {};
  const nodeResults: Record<string, NodeResult> = {};
 
@@ -486,7 +486,7 @@ export class WorkflowExecutor {
  }
 
  /**
- * CancelExecute
+ * Cancel execution
  */
  cancel(): void {
  this.abortController.abort();
@@ -496,14 +496,14 @@ export class WorkflowExecutor {
  }
 
  /**
- * FetchCurrentStatus
+ * Get current state
  */
  getState(): WorkflowExecutionState {
  return { ...this.state };
  }
 
  /**
- * FetchExecute ID
+ * Get execution ID
  */
  getExecutionId(): string {
  return this.state.executionId;
@@ -511,7 +511,7 @@ export class WorkflowExecutor {
 }
 
 /**
- * ExecuteWorkflow'scount
+ * Execute workflow helper function
  */
 export async function executeWorkflow(
  input: ExecutionInput

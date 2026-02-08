@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Help CenterPage - LobeHub Style
+ * Help Center Page - LobeHub Style
  */
 
 import { useState } from "react";
@@ -27,123 +27,123 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// HelpCategory
+// Help Categories
 const categories = [
  {
  icon: Zap,
- title: "Getting StartedGuide",
- description: "QuickStartUsage AgentFlow",
+ title: "Getting Started Guide",
+ description: "Quick start with AgentFlow",
  href: "/docs/getting-started",
  articles: 12,
  },
  {
  icon: BookOpen,
- title: "WorkflowManage",
- description: "Create, EditandRunWorkflow",
+ title: "Workflow Management",
+ description: "Create, edit, and run workflows",
  href: "/docs/guide/workflows",
  articles: 25,
  },
  {
  icon: Settings,
- title: "IntegrationandConnect",
- description: "ConnectThird-partyServiceand API",
+ title: "Integrations & Connections",
+ description: "Connect third-party services and APIs",
  href: "/docs/integrations",
  articles: 45,
  },
  {
  icon: Users,
- title: "TeamCollaboration",
- description: "ManageTeamMemberandPermission",
+ title: "Team Collaboration",
+ description: "Manage team members and permissions",
  href: "/docs/guide/team",
  articles: 8,
  },
  {
  icon: CreditCard,
- title: "BillingandSubscription",
- description: "Billing, InvoiceandSubscriptionManage",
+ title: "Billing & Subscription",
+ description: "Billing, invoices, and subscriptions",
  href: "/docs/billing",
  articles: 10,
  },
  {
  icon: Shield,
- title: "SecurityandPrivacy",
- description: "AccountSecurityandDataProtect",
+ title: "Security & Privacy",
+ description: "Account security and data protection",
  href: "/docs/security",
  articles: 15,
  },
 ];
 
-// Help CenterDirectory
+// Help Center Directory
 const helpDirectory = [
  {
- title: "Getting StartedandOverview",
- description: "from 0 to 1 onandMasterCoreConcept",
+ title: "Getting Started & Overview",
+ description: "From zero to one: core concepts",
  links: [
- { title: "QuickStart", href: "/docs/getting-started" },
- { title: "FeaturesOverview", href: "/docs" },
- { title: "FAQ FAQ", href: "/faq" },
+ { title: "Quick Start", href: "/docs/getting-started" },
+ { title: "Features Overview", href: "/docs" },
+ { title: "FAQ", href: "/faq" },
  ],
  },
  {
- title: "Fault",
- description: "RunandIntegrationIssue",
+ title: "Troubleshooting",
+ description: "Runtime and integration issues",
  links: [
- { title: "FaultGuide", href: "/help/troubleshooting" },
- { title: "RuntimeEntryDescription", href: "/docs" },
- { title: "AccessPolicyandRate Limiting", href: "/docs" },
+ { title: "Troubleshooting Guide", href: "/help/troubleshooting" },
+ { title: "Runtime Overview", href: "/docs" },
+ { title: "Access Policy and Rate Limiting", href: "/docs" },
  ],
  },
  {
- title: "SupportandCollaboration",
- description: "FetchSupportandTeamCollaborationmethod",
+ title: "Support & Collaboration",
+ description: "Support and team collaboration",
  links: [
- { title: "SubmitTicket", href: "/support" },
+ { title: "Submit a Ticket", href: "/support" },
  { title: "Contact Us", href: "/contact" },
- { title: "CommunityDiscussion", href: "/community" },
+ { title: "Community Discussion", href: "/community" },
  ],
  },
  {
- title: "SecurityandCompliance",
- description: "Security, PrivacyandOperationsAssurance",
+ title: "Security & Compliance",
+ description: "Security, privacy, and operations",
  links: [
- { title: "Securitycenter", href: "/security" },
+ { title: "Security Center", href: "/security" },
  { title: "Privacy Policy", href: "/privacy" },
  { title: "Terms of Service", href: "/terms" },
  ],
  },
 ];
 
-// PopularArticle
+// Popular Articles
 const popularArticles = [
- { title: "ifwhatCreate#1Workflow", views: 12500, href: "/docs/guide/first-workflow" },
- { title: "Connect Slack SendNotifications", views: 8900, href: "/docs/integrations/slack" },
- { title: "SettingsScheduledTrigger", views: 7600, href: "/docs/guide/triggers" },
- { title: "InviteTeamMember", views: 5400, href: "/docs/guide/team" },
- { title: "Settings Webhook Trigger", views: 4800, href: "/docs/integrations/webhook" },
- { title: "FaultGuide", views: 4200, href: "/help/troubleshooting" },
+ { title: "How to create your first workflow", views: 12500, href: "/docs/guide/first-workflow" },
+ { title: "Connect Slack and send notifications", views: 8900, href: "/docs/integrations/slack" },
+ { title: "Scheduled Triggers", views: 7600, href: "/docs/guide/triggers" },
+ { title: "Invite Team Members", views: 5400, href: "/docs/guide/team" },
+ { title: "Setting Up Webhook Triggers", views: 4800, href: "/docs/integrations/webhook" },
+ { title: "Troubleshooting Guide", views: 4200, href: "/help/troubleshooting" },
 ];
 
-// Contactmethod
+// Contact Methods
 const contactMethods = [
  {
  icon: LifeBuoy,
- title: "SubmitTicket",
- description: "SLA TrackandProcessProgresscanvisual",
- action: "SubmitTicket",
+ title: "Submit a Ticket",
+ description: "SLA tracking and progress visibility",
+ action: "Submit a Ticket",
  href: "/support",
  },
  {
  icon: Mail,
- title: "SendEmail",
+ title: "Send Email",
  description: "support@agentflow.ai",
- action: "SendEmail",
+ action: "Send Email",
  href: "mailto:support@agentflow.ai",
  },
  {
  icon: Users,
- title: "CommunityForum",
- description: "andotherheUserExchange",
- action: "AccessCommunity",
+ title: "Community Forum",
+ description: "Exchange with other users",
+ action: "Visit Community",
  href: "/community",
  },
 ];
@@ -169,14 +169,14 @@ export default function HelpPage() {
  Help Center
  </h1>
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- SearchFAQResolve, orBrowsedownmethodCategory
+ Search FAQs or browse by category below
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchHelpArticle..."
+ placeholder="Search help articles..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
@@ -189,8 +189,8 @@ export default function HelpPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>HelpCategory</h2>
- <p>byThemeQuicktoyouneedneed'sHelp</p>
+ <h2>Help Categories</h2>
+ <p>Quick help by topic</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -214,7 +214,7 @@ export default function HelpPage() {
  <p className="text-[13px] text-foreground-lighter mb-2 leading-relaxed">
  {category.description}
  </p>
- <span className="text-[12px] text-brand-500">{category.articles} Article</span>
+ <span className="text-[12px] text-brand-500">{category.articles} Articles</span>
  </Link>
  ))}
  </div>
@@ -225,8 +225,8 @@ export default function HelpPage() {
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>Help CenterDirectory</h2>
- <p>byThemeBrowseComplete'sHelpMaterials</p>
+ <h2>Help Center</h2>
+ <p>Browse complete help materials by topic</p>
  </div>
 
  <div className="grid md:grid-cols-2 gap-4">
@@ -265,8 +265,8 @@ export default function HelpPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>PopularArticle</h2>
- <p>mostWelcome'sHelpArticle</p>
+ <h2>Popular Articles</h2>
+ <p>Most popular help articles</p>
  </div>
 
  <div className="space-y-2">
@@ -287,7 +287,7 @@ export default function HelpPage() {
  </span>
  <div className="flex items-center gap-3">
  <span className="text-[11px] text-foreground-lighter">
- {article.views.toLocaleString()} timesView
+ {article.views.toLocaleString()} views
  </span>
  <ArrowRight className="w-4 h-4 text-foreground-lighter group-hover:text-foreground-light transition-colors" />
  </div>
@@ -302,15 +302,15 @@ export default function HelpPage() {
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>QuickLink</h2>
- <p>useResourceEntry</p>
+ <h2>Quick Links</h2>
+ <p>Useful resource links</p>
  </div>
 
  <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
  {[
- { title: "API Document", href: "/docs/api", icon: "📚" },
- { title: "VideoTutorial", href: "/docs/tutorials", icon: "🎬" },
- { title: "FAQ Resolve", href: "/faq", icon: "❓" },
+ { title: "API Documentation", href: "/docs/api", icon: "📚" },
+ { title: "Video Tutorials", href: "/docs/tutorials", icon: "🎬" },
+ { title: "FAQ", href: "/faq", icon: "❓" },
  { title: "Change Log", href: "/whats-new", icon: "📝" },
  ].map((link) => (
  <Link
@@ -337,10 +337,10 @@ export default function HelpPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-4xl mx-auto px-6 text-center">
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- NotoAnswer?
+ Can't find an answer?
  </h2>
  <p className="text-foreground-light mb-10">
- Contact Us'sSupportTeamFetchHelp
+ Contact our support team for help
  </p>
  <div className="grid sm:grid-cols-3 gap-4">
  {contactMethods.map((method) => (

@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * CustomNodeCardComponent
+ * Custom Node Card Component
  * 
- * ShowcaseNode'sBasic Info
+ * Display Node's Basic Information
  */
 
 import {
@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { CustomNode, CustomNodeCategory } from "@/types/custom-node";
 
-// CategoryIconMapping
+// Category Icon Mapping
 const categoryIconMap: Record<CustomNodeCategory, typeof Cpu> = {
  ai: Cpu,
  data: Database,
@@ -35,21 +35,21 @@ const categoryIconMap: Record<CustomNodeCategory, typeof Cpu> = {
  other: Sparkles,
 };
 
-// CategoryNameMapping
+// Category Name Mapping
 const categoryNameMap: Record<CustomNodeCategory, string> = {
  ai: "AI/LLM",
- data: "DataProcess",
+  data: "Data Processing",
  integration: "Integration",
  utility: "Tool",
- logic: "LogicControl",
+ logic: "Logic Control",
  communication: "Communication",
  storage: "Storage",
- other: "otherhe",
+ other: "Other",
 };
 
-// Formatcountchar
+// Format Number
 const formatNumber = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+ if (num >= 10000) return `${(num / 10000).toFixed(1)}w`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
@@ -74,9 +74,9 @@ export function NodeCard({
  className,
 }: NodeCardProps) {
  const CategoryIcon = categoryIconMap[node.category] || Sparkles;
- const categoryName = categoryNameMap[node.category] || "otherhe";
+ const categoryName = categoryNameMap[node.category] || "Other";
 
- // CompactCard
+ // Compact Card
  if (variant === "compact") {
  return (
  <div
@@ -141,7 +141,7 @@ export function NodeCard({
  {node.author.isVerified && (
  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs">
  <CheckCircle2 className="w-3 h-3" />
- Authentication
+ Verified
  </span>
  )}
  </div>
@@ -170,13 +170,13 @@ export function NodeCard({
  {isInstalled ? (
  <div className="flex items-center gap-2">
  {hasUpdate && (
- <span className="px-2 py-1 rounded-md bg-orange-500/10 text-orange-500 text-xs font-medium">
- hasUpdate
- </span>
+                <span className="px-2 py-1 rounded-md bg-orange-500/10 text-orange-500 text-xs font-medium">
+                Update Available
+                </span>
  )}
- <span className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium">
- alreadyInstall
- </span>
+              <span className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium">
+                Already Installed
+                </span>
  </div>
  ) : (
  <button
@@ -195,7 +195,7 @@ export function NodeCard({
  );
  }
 
- // DefaultCard
+ // Default Card
  return (
  <div
  onClick={onClick}
@@ -206,7 +206,7 @@ export function NodeCard({
  className
  )}
  >
- {/* TopDecoration */}
+ {/* Top Decoration */}
  <div className="h-2 bg-linear-to-r from-primary/50 to-primary/20" />
  
  <div className="p-5">

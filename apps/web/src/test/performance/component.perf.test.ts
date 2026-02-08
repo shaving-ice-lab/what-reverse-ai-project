@@ -1,13 +1,13 @@
 /**
- * beforeendpointComponentcanTest
- * @description TestCore UI Component'sRendercan
+ * Frontend Component Performance Test
+ * @description Tests core UI component rendering performance
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { benchmark, createPerformanceSuite, measureMemoryGrowth, formatBytes } from './utils';
 
 /**
- * MockNodeDataGenerate
+ * Mock Node Data Generator
  */
 function generateMockNodes(count: number) {
  return Array.from({ length: count }, (_, i) => ({

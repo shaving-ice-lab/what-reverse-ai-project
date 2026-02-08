@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Markdown PreviewComponent
+ * Markdown Preview Component
  * 
- * Support: 
- * - Markdown Render
- * - DirectoryNavigation
- * - ChapterNavigate
- * - CodeHighlight
+ * Supports: 
+ * - Markdown rendering
+ * - Table of contents navigation
+ * - Chapter navigation
+ * - Code highlighting
  */
 
 import { useMemo, useCallback } from "react";
@@ -26,7 +26,7 @@ export interface MarkdownPreviewProps {
 }
 
 /**
- * from Markdown ContentExtractDirectory
+ * Extract table of contents from Markdown content
  */
 export function extractTableOfContents(content: string): TableOfContentsItem[] {
  const headingRegex = /^(#{1,6})\s+(.+)$/gm;
@@ -48,12 +48,12 @@ export function extractTableOfContents(content: string): TableOfContentsItem[] {
 }
 
 /**
- * Simple's Markdown to HTML Convert
+ * Simple Markdown to HTML converter
  */
 function markdownToHtml(markdown: string): string {
  let html = markdown;
 
- // Title (Add id Used for)
+  // Headings (add id for anchor links)
  html = html.replace(/^######\s+(.+)$/gm, (_, title) => {
  const id = title.toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g, "-").replace(/^-|-$/g, "");
  return `<h6 id="${id}" class="scroll-mt-24">${title}</h6>`;
@@ -79,12 +79,12 @@ function markdownToHtml(markdown: string): string {
  return `<h1 id="${id}" class="scroll-mt-24">${title}</h1>`;
  });
 
- // Codeblock
+  // Code block
  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
  return `<pre class="code-block"><code class="language-${lang || 'text'}">${escapeHtml(code.trim())}</code></pre>`;
  });
 
- // rowinCode
+  // Inline code
  html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
 
  // 
@@ -95,7 +95,7 @@ function markdownToHtml(markdown: string): string {
  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
  html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
 
- // Deleteline
+  // Strikethrough
  html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
 
  // Link
@@ -104,27 +104,27 @@ function markdownToHtml(markdown: string): string {
  // Image
  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="markdown-img" />');
 
- // Separatorline
- html = html.replace(/^---$/gm, '<hr />');
- html = html.replace(/^\*\*\*$/gm, '<hr />');
+  // Horizontal rule
+  html = html.replace(/^---$/gm, '<hr />');
+  html = html.replace(/^\*\*\*$/gm, '<hr />');
 
- // use
+  // Blockquote
  html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
 
- // NoneList
+  // Unordered list
  html = html.replace(/^[\*\-]\s+(.+)$/gm, '<li class="ul-item">$1</li>');
 
- // hasList
+  // Ordered list
  html = html.replace(/^\d+\.\s+(.+)$/gm, '<li class="ol-item">$1</li>');
 
- // WrapperContinuous'sList
+ // Wrap consecutive list items
  html = html.replace(/(<li class="ul-item">[\s\S]*?<\/li>)(\n<li class="ul-item">)/g, '$1$2');
  html = html.replace(/(<li class="ol-item">[\s\S]*?<\/li>)(\n<li class="ol-item">)/g, '$1$2');
 
- // Paragraph (ProcessRemaining'sTextrow)
+ // Paragraphs (process remaining text lines)
  const lines = html.split('\n');
  const processedLines = lines.map((line) => {
- // SkipalreadyProcess's HTML Tags
+ // Skip already processed HTML tags
  if (
  line.trim() === '' ||
  line.startsWith('<h') ||
@@ -154,7 +154,7 @@ function escapeHtml(text: string): string {
 }
 
 /**
- * Markdown PreviewComponent
+ * Markdown Preview Component
  */
 export function MarkdownPreview({
  content,
@@ -177,26 +177,26 @@ export function MarkdownPreview({
  <div
  className={cn(
  "prose prose-zinc dark:prose-invert max-w-none",
- // Titlestyle
+        // Title style
  "prose-h1:text-2xl prose-h1:font-bold prose-h1:text-foreground prose-h1:mb-4 prose-h1:mt-8 prose-h1:pb-2 prose-h1:border-b prose-h1:border-border",
  "prose-h2:text-xl prose-h2:font-semibold prose-h2:text-foreground prose-h2:mb-3 prose-h2:mt-6",
  "prose-h3:text-lg prose-h3:font-semibold prose-h3:text-foreground prose-h3:mb-2 prose-h3:mt-5",
  "prose-h4:text-base prose-h4:font-medium prose-h4:text-foreground prose-h4:mb-2 prose-h4:mt-4",
- // Paragraphstyle
+        // Paragraph style
  "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4",
- // Linkstyle
+        // Link style
  "prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
- // Liststyle
+        // List style
  "prose-li:text-muted-foreground prose-li:my-1",
  "prose-ul:my-4 prose-ol:my-4",
- // usestyle
+        // Blockquote style
  "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-muted prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic",
- // Codestyle
+        // Code style
  "prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none",
  "prose-pre:bg-popover prose-pre:text-foreground prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto",
- // Separatorlinestyle
+        // Horizontal rule style
  "prose-hr:border-border",
- // Tablestyle
+        // Table style
  "prose-table:w-full prose-th:bg-muted prose-th:p-2 prose-td:p-2 prose-td:border prose-td:border-border",
  className
  )}
@@ -207,7 +207,7 @@ export function MarkdownPreview({
 }
 
 /**
- * DirectoryNavigationComponent
+ * Table of Contents Navigation Component
  */
 export interface TableOfContentsProps {
  items: TableOfContentsItem[];

@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * BasicNodeComponent - optimalversion
+ * Basic Node Component - Optimal Version
  * 
- * :
- * - GradientBackgroundHalo
- * - Smooth'sFloatAnimation
- * - selectStatus'sGlowEffect
- * - Port'sPulseAnimation
+ * Features:
+ * - Gradient Background Halo
+ * - Smooth Float Animation
+ * - Selected Status Glow Effect
+ * - Port Pulse Animation
  */
 
 import { memo, useState } from "react";
@@ -80,7 +80,7 @@ export const nodeTypeColors = {
  },
 };
 
-// DataTypeColorandstyle
+// Data Type Color and Style
 const typeColors: Record<string, { bg: string; ring: string }> = {
  string: { bg: "!bg-brand-500", ring: "ring-brand-500/30" },
  number: { bg: "!bg-warning", ring: "ring-warning/30" },
@@ -212,7 +212,7 @@ export const BaseNode = memo(function BaseNode({
  {/* PortRegion */}
  <div className="px-4 py-3">
  <div className="flex justify-between gap-4">
- {/* InputPort */}
+ {/* Input Port */}
  <div className="flex flex-col gap-2">
  {inputs.map((input) => (
  <Port
@@ -225,7 +225,7 @@ export const BaseNode = memo(function BaseNode({
  />
  ))}
  {inputs.length === 0 && (
- <span className="text-[10px] text-foreground-muted italic">NoneInput</span>
+ <span className="text-[10px] text-foreground-muted italic">No Input</span>
  )}
  </div>
 
@@ -242,13 +242,13 @@ export const BaseNode = memo(function BaseNode({
  />
  ))}
  {outputs.length === 0 && (
- <span className="text-[10px] text-foreground-muted italic">NoneOutput</span>
+ <span className="text-[10px] text-foreground-muted italic">No Output</span>
  )}
  </div>
  </div>
  </div>
 
- {/* FooterStatusIndicator - selecttimeDisplay */}
+ {/* Footer Status Indicator - displayed when selected */}
  {selected && (
  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-brand-500/40" />
  )}

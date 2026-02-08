@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * LoadingScreen - allLoadComponent
+ * LoadingScreen - Full-page loading component
  * 
- * ProvidemultipletypeLoadEffect: 
- * - Logo Animation
- * - Progress Bar
+ * Provides multiple loading effect types: 
+ * - Logo animation
+ * - Progress bar
  * - Skeleton
- * - charTip
+ * - Text tip
  */
 
 import { useState, useEffect } from "react";
@@ -31,7 +31,7 @@ export function LoadingScreen({
 }: LoadingScreenProps) {
  const [progress, setProgress] = useState(externalProgress ?? 0);
  
- // MockProgress(ifresultNoenteroutsidesectionProgress)
+ // Simulate progress (if no external progress is provided)
  useEffect(() => {
  if (externalProgress !== undefined) {
  setProgress(externalProgress);
@@ -74,7 +74,7 @@ export function LoadingScreen({
  "bg-background",
  className
  )}>
- {/* BackgroundLight Effect */}
+ {/* Background light effect */}
  <div className="absolute inset-0 overflow-hidden">
  <div 
  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[150px] opacity-20"
@@ -88,7 +88,7 @@ export function LoadingScreen({
  <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 animate-logo-pulse">
  <Layers className="w-8 h-8 text-primary-foreground" />
  </div>
- {/* HaloEffect */}
+ {/* Halo effect */}
  <div className="absolute inset-0 rounded-2xl animate-logo-ring">
  <div className="absolute inset-0 rounded-2xl border-2 border-primary/50" />
  </div>
@@ -109,7 +109,7 @@ export function LoadingScreen({
  </div>
  )}
  
- {/* LoadAnimation */}
+ {/* Loading animation */}
  <div className="flex gap-1.5">
  {[0, 1, 2].map((i) => (
  <div
@@ -173,7 +173,7 @@ export function LoadingScreen({
  if (variant === "skeleton") {
  return (
  <div className={cn("space-y-6 p-6", className)}>
- {/* HeaderSkeleton */}
+ {/* Header skeleton */}
  <div className="flex items-center justify-between">
  <div className="space-y-2">
  <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
@@ -182,7 +182,7 @@ export function LoadingScreen({
  <div className="h-10 w-24 bg-muted rounded-lg animate-pulse" />
  </div>
  
- {/* StatisticsCardSkeleton */}
+ {/* Statistics card skeleton */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {[1, 2, 3, 4].map((i) => (
  <div key={i} className="p-5 bg-card border border-border rounded-xl">
@@ -198,7 +198,7 @@ export function LoadingScreen({
  ))}
  </div>
  
- {/* ContentSkeleton */}
+ {/* Content skeleton */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  <div className="p-6 bg-card border border-border rounded-xl">
  <div className="h-5 w-24 bg-muted rounded animate-pulse mb-4" />
@@ -261,7 +261,7 @@ export function LoadingScreen({
 }
 
 /**
- * PageLoader - PageLoadIndicator
+ * PageLoader - Page load indicator
  */
 interface PageLoaderProps {
  className?: string;
@@ -299,7 +299,7 @@ export function PageLoader({ className }: PageLoaderProps) {
 }
 
 /**
- * SpinnerLoader - SimpleRotateLoader
+ * SpinnerLoader - Simple rotating loader
  */
 interface SpinnerLoaderProps {
  size?: "sm" | "md" | "lg";
@@ -319,7 +319,7 @@ export function SpinnerLoader({ size = "md", className }: SpinnerLoaderProps) {
 }
 
 /**
- * PulseLoader - PulseLoader
+ * PulseLoader - Pulse dot loader
  */
 interface PulseLoaderProps {
  count?: number;

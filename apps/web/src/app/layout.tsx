@@ -3,7 +3,7 @@ import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Bodychar: Space Grotesk - more'sModernchar
+// Body font: Space Grotesk - Modern typeface
 const spaceGrotesk = Space_Grotesk({
  subsets: ["latin"],
  variable: "--font-sans",
@@ -11,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
  weight: ["400", "500", "600", "700"],
 });
 
-// Codechar: IBM Plex Mono - Clear'setcchar
+// Code font: IBM Plex Mono - Clear monospace typeface
 const ibmPlexMono = IBM_Plex_Mono({
  subsets: ["latin"],
  variable: "--font-mono",
@@ -20,8 +20,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
- title: "AgentFlow - AI WorkflowPlatform",
- description: "LocalPriority, CodeCustom, CommunityDriven's AI Agent WorkflowPlatform",
+ title: "AgentFlow - AI Workflow Platform",
+ description: "Local-first, code-customizable, community-driven AI Agent Workflow Platform",
  keywords: ["AI", "Agent", "Workflow", "Automation", "Workflow"],
  authors: [{ name: "AgentFlow Team" }],
 };

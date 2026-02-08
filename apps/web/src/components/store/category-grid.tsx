@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * PopularCategoryEntryComponent
+ * Popular Category Entry Component
  * 
- * Showcase Agent Category'sGridEntry, SupportClickFilter
+ * Showcases agent category grid entries, supports click filtering
  */
 
 import Link from "next/link";
@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { AgentCategory, Category } from "@/types/agent";
 
-// CategoryConfig
+// Category Config
 const categoryConfig: Record<
  AgentCategory,
  {
@@ -34,76 +34,76 @@ const categoryConfig: Record<
  description: string;
  }
 > = {
- content: {
- label: "ContentCreative",
- icon: FileText,
- color: "text-blue-500",
- gradient: "from-blue-500/20 to-blue-600/10",
- description: "Article, Copy, currentGenerate",
- },
- data: {
- label: "DataProcess",
- icon: BarChart3,
- color: "text-purple-500",
- gradient: "from-purple-500/20 to-purple-600/10",
- description: "DataAnalytics, Process, Convert",
- },
- customer: {
- label: "CustomerService",
- icon: MessageSquare,
- color: "text-pink-500",
- gradient: "from-pink-500/20 to-pink-600/10",
- description: "SupportAssistant, FAQ, Ticket",
- },
- productivity: {
- label: "Officerate",
- icon: Users,
- color: "text-primary",
- gradient: "from-primary/20 to-primary/10",
- description: "day, willneed, TaskManage",
- },
- developer: {
- label: "DevelopmentTool",
- icon: Code2,
- color: "text-orange-500",
- gradient: "from-orange-500/20 to-orange-600/10",
- description: "CodeGenerate, API Document, Test",
- },
- research: {
- label: "ResearchAnalytics",
- icon: Globe,
- color: "text-cyan-500",
- gradient: "from-cyan-500/20 to-cyan-600/10",
- description: "MarketplaceSurvey, CompetitorAnalytics, Report",
- },
- education: {
- label: "EducationLearn",
- icon: GraduationCap,
- color: "text-yellow-500",
- gradient: "from-yellow-500/20 to-yellow-600/10",
- description: "CourseDesign, Learn, ",
- },
- finance: {
- label: "FinanceFinance",
- icon: Wallet,
- color: "text-emerald-500",
- gradient: "from-emerald-500/20 to-emerald-600/10",
- description: "FinanceReport, RiskEvaluate, Budget",
- },
- marketing: {
- label: "MarketplaceMarketing",
- icon: TrendingUp,
- color: "text-red-500",
- gradient: "from-red-500/20 to-red-600/10",
- description: "Marketing, AdvertisingCopy, SEO",
- },
- other: {
- label: "otherhe",
- icon: Sparkles,
- color: "text-foreground-light",
- gradient: "from-muted/20 to-muted/10",
- description: "moremultipleCreativeTool",
- },
+  content: {
+    label: "Content & Creative",
+    icon: FileText,
+    color: "text-blue-500",
+    gradient: "from-blue-500/20 to-blue-600/10",
+    description: "Articles, Copywriting, Content Generation",
+  },
+  data: {
+    label: "Data Processing",
+    icon: BarChart3,
+    color: "text-purple-500",
+    gradient: "from-purple-500/20 to-purple-600/10",
+    description: "Data Analytics, Processing, Conversion",
+  },
+  customer: {
+    label: "Customer Service",
+    icon: MessageSquare,
+    color: "text-pink-500",
+    gradient: "from-pink-500/20 to-pink-600/10",
+    description: "Support Assistant, FAQ, Tickets",
+  },
+  productivity: {
+    label: "Productivity",
+    icon: Users,
+    color: "text-primary",
+    gradient: "from-primary/20 to-primary/10",
+    description: "Scheduling, Meetings, Task Management",
+  },
+  developer: {
+    label: "Development Tools",
+    icon: Code2,
+    color: "text-orange-500",
+    gradient: "from-orange-500/20 to-orange-600/10",
+    description: "Code Generation, API Docs, Testing",
+  },
+  research: {
+    label: "Research & Analytics",
+    icon: Globe,
+    color: "text-cyan-500",
+    gradient: "from-cyan-500/20 to-cyan-600/10",
+    description: "Market Research, Competitor Analysis, Reports",
+  },
+  education: {
+    label: "Education & Learning",
+    icon: GraduationCap,
+    color: "text-yellow-500",
+    gradient: "from-yellow-500/20 to-yellow-600/10",
+    description: "Course Design, Learning, Assessment",
+  },
+  finance: {
+    label: "Finance",
+    icon: Wallet,
+    color: "text-emerald-500",
+    gradient: "from-emerald-500/20 to-emerald-600/10",
+    description: "Financial Reports, Risk Evaluation, Budget",
+  },
+  marketing: {
+    label: "Marketing",
+    icon: TrendingUp,
+    color: "text-red-500",
+    gradient: "from-red-500/20 to-red-600/10",
+    description: "Marketing, Ad Copy, SEO",
+  },
+  other: {
+    label: "Other",
+    icon: Sparkles,
+    color: "text-foreground-light",
+    gradient: "from-muted/20 to-muted/10",
+    description: "More creative tools",
+  },
 };
 
 interface CategoryGridProps {
@@ -123,7 +123,7 @@ export function CategoryGrid({
  variant = "card",
  className,
 }: CategoryGridProps) {
- // Usageenter'sCategoryorGenerateDefaultCategory
+ // Use provided categories or generate default categories
  const displayCategories = categories.length > 0
  ? categories
  : (Object.entries(categoryConfig)
@@ -148,7 +148,7 @@ export function CategoryGrid({
  : "bg-card text-foreground-light hover:text-foreground hover:bg-surface-200 border border-border"
  )}
  >
- allsection
+ All
  </button>
  {displayCategories.map((category) => {
  const config = categoryConfig[category.id];

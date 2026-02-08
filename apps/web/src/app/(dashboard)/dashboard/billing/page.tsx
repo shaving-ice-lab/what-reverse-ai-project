@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * BillingandSubscriptionPage - Supabase Style
- * ManageSubscriptionPlan, Usage, PaymentmethodandBillingHistory
+ * Billing and Subscription Page - Supabase Style
+ * Manage Subscription Plans, Usage, Payment Methods and Billing History
  */
 
 import Link from "next/link";
@@ -53,66 +53,66 @@ import {
 
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
 
-// SubscriptionPlan
+// Subscription Plans
 const plans = [
  {
  id: "free",
- name: "Freeversion",
- description: "SuitablepersonExploreandUsage",
+ name: "Free",
+ description: "Ideal for personal exploration and use",
  price: 0,
  priceMonthly: 0,
  current: false,
  features: [
- { name: "eachmonths 100 times API Call", included: true },
- { name: "3 Workflow", included: true },
+ { name: "100 API Calls per month", included: true },
+ { name: "3 Workflows", included: true },
  { name: "1 AI Agent", included: true },
- { name: "BasicModelAccess", included: true },
- { name: "CommunitySupport", included: true },
- { name: "AdvancedModel", included: false },
- { name: "TeamCollaboration", included: false },
- { name: "PrioritySupport", included: false },
+ { name: "Basic Model Access", included: true },
+ { name: "Community Support", included: true },
+ { name: "Advanced Models", included: false },
+ { name: "Team Collaboration", included: false },
+ { name: "Priority Support", included: false },
  ],
  },
  {
  id: "pro",
- name: "Professionalversion",
- description: "SuitableProfessionalUserandsmallTeam",
+ name: "Professional",
+ description: "Ideal for professional users and small teams",
  price: 99,
  priceMonthly: 99,
  current: true,
  popular: true,
  features: [
- { name: "eachmonths 5,000 times API Call", included: true },
- { name: "NonelimitWorkflow", included: true },
- { name: "10 AI Agent", included: true },
- { name: "AdvancedModelAccess", included: true },
- { name: "PriorityEmailSupport", included: true },
- { name: "CustomIntegration", included: true },
- { name: "TeamCollaboration (3person)", included: true },
- { name: "ExclusiveSupport", included: false },
+ { name: "5,000 API Calls per month", included: true },
+ { name: "Unlimited Workflows", included: true },
+ { name: "10 AI Agents", included: true },
+ { name: "Advanced Model Access", included: true },
+ { name: "Priority Email Support", included: true },
+ { name: "Custom Integration", included: true },
+ { name: "Team Collaboration (3 members)", included: true },
+ { name: "Dedicated Support", included: false },
  ],
  },
  {
  id: "business",
  name: "Enterprise",
- description: "SuitablelargeTeamandEnterprise",
+ description: "Ideal for large teams and enterprises",
  price: 299,
  priceMonthly: 299,
  current: false,
  features: [
- { name: "Nonelimit API Call", included: true },
- { name: "NonelimitWorkflow", included: true },
- { name: "Nonelimit AI Agent", included: true },
- { name: "AllModelAccess", included: true },
- { name: "24/7 ExclusiveSupport", included: true },
- { name: "AdvancedSecurityFeatures", included: true },
- { name: "NonelimitTeamMember", included: true },
- { name: "SLA Assurance", included: true },
+ { name: "Unlimited API Calls", included: true },
+ { name: "Unlimited Workflows", included: true },
+ { name: "Unlimited AI Agents", included: true },
+ { name: "All Model Access", included: true },
+ { name: "24/7 Dedicated Support", included: true },
+ { name: "Advanced Security Features", included: true },
+ { name: "Unlimited Team Members", included: true },
+ { name: "SLA Guarantee", included: true },
  ],
  },
 ];
 
-// CurrentUsageSituation
+// Current Usage
 const defaultUsage = {
  apiCalls: { used: 3247, limit: 5000 },
  tokens: { used: 820000, limit: 1000000 },
@@ -122,7 +122,7 @@ const defaultUsage = {
  teamMembers: { used: 2, limit: 3 },
 };
 
-// Paymentmethod
+// Payment Methods
 const paymentMethods = [
  {
  id: "1",
@@ -179,8 +179,8 @@ export default function BillingPage() {
  const formatSignedCurrency = (value: number) =>
  value < 0 ? `-${formatCurrency(Math.abs(value))}` : formatCurrency(value);
  const priceMultiplier = billingCycle === "yearly" ? 0.8 : 1;
- const billingLabel = billingCycle === "yearly" ? "years": "months";
- const billingHint = billingCycle === "yearly" ? "alreadyContains 20% Discount": "Switchyears 20% Discount";
+ const billingLabel = billingCycle === "yearly" ? "yearly": "monthly";
+ const billingHint = billingCycle === "yearly" ? "Includes 20% discount": "Switch to yearly for 20% discount";
  const currentPlanPrice = currentPlan ? Math.round(currentPlan.price * priceMultiplier) : 0;
  const currentPlanHighlights =
  currentPlan?.features.filter((feature) => feature.included).slice(0, 3) ?? [];
@@ -188,7 +188,7 @@ export default function BillingPage() {
  billingCycle === "yearly" ? Math.round((currentPlan?.price ?? 0) * 0.2) : 0;
  const creditBalance = 0;
  const spendLimitDisplay =
- budget && budget.spend_limit > 0 ? formatCurrency(budget.spend_limit): "not yetSettings";
+ budget && budget.spend_limit > 0 ? formatCurrency(budget.spend_limit): "Not configured";
  const invoiceSubtotal = selectedInvoiceSummary?.subtotal ?? (currentPlan?.price ?? 0);
  const invoiceDiscount =
  selectedInvoiceSummary?.discountAmount ?? (discountAmount > 0 ? discountAmount : 0);
@@ -201,11 +201,11 @@ export default function BillingPage() {
  const resolveInvoiceStatusLabel = (status?: InvoiceStatus) => {
  switch (status) {
  case "paid":
- return "alreadyPayment";
+ return "Paid";
  case "failed":
- return "PaymentFailed";
+ return "Payment Failed";
  case "refunded":
- return "alreadyRefund";
+ return "Refunded";
  case "pending":
  default:
  return "Pending";
@@ -245,7 +245,7 @@ export default function BillingPage() {
  const quotaData = await workspaceApi.getQuota(activeWorkspaceId);
  if (isActive) setQuota(quotaData);
  } catch {
- // QuotaInterfacecancannot yetImplementorNonePermission
+ // Quota API may not be implemented yet or insufficient permissions
  }
 
  try {
@@ -255,7 +255,7 @@ export default function BillingPage() {
  setSpendCapEnabled(settings.spend_limit_enabled);
  }
  } catch {
- // BudgetInterfacecancannot yetImplementorNonePermission
+ // Budget API may not be implemented yet or insufficient permissions
  }
  } finally {
  if (isActive) setQuotaLoading(false);
@@ -287,7 +287,7 @@ export default function BillingPage() {
  });
  } catch (error) {
  if (!isActive) return;
- setInvoiceError(error instanceof Error ? error.message: "FetchBillingFailed");
+ setInvoiceError(error instanceof Error ? error.message: "Failed to fetch billing information");
  setInvoices([]);
  setSelectedInvoiceId(null);
  setSelectedInvoiceDetail(null);
@@ -331,7 +331,7 @@ export default function BillingPage() {
  };
  }, [activeWorkspaceId, selectedInvoiceId]);
 
- // LoadWorkspaceUsageStatistics
+ // Load workspace usage statistics
  useEffect(() => {
  if (!activeWorkspaceId) return;
  let isActive = true;
@@ -345,13 +345,13 @@ export default function BillingPage() {
  setWorkspaceUsageStats(stats);
  } catch (error) {
  if (!isActive) return;
- setWorkspaceUsageError(error instanceof Error ? error.message: "FetchWorkspaceUsageFailed");
- // UsageExampleData
+ setWorkspaceUsageError(error instanceof Error ? error.message: "Failed to fetch workspace usage data");
+ // Example usage data
  setWorkspaceUsageStats([
  {
  id: "1",
  workspace_id: activeWorkspaceId,
- workspace_name: "SmartSupportAssistant",
+ workspace_name: "Smart Support Assistant",
  workspace_icon: "🤖",
  period_start: "2026-01-01",
  period_end: "2026-01-31",
@@ -364,7 +364,7 @@ export default function BillingPage() {
  {
  id: "2",
  workspace_id: activeWorkspaceId,
- workspace_name: "DocumentAnalytics",
+ workspace_name: "Document Analytics",
  workspace_icon: "📄",
  period_start: "2026-01-01",
  period_end: "2026-01-31",
@@ -377,7 +377,7 @@ export default function BillingPage() {
  {
  id: "3",
  workspace_id: activeWorkspaceId,
- workspace_name: "DataExtractWorkflow",
+ workspace_name: "Data Extract Workflow",
  workspace_icon: "📊",
  period_start: "2026-01-01",
  period_end: "2026-01-31",
@@ -390,7 +390,7 @@ export default function BillingPage() {
  {
  id: "4",
  workspace_id: activeWorkspaceId,
- workspace_name: "Marketing CopyGenerate",
+ workspace_name: "Marketing Copy Generator",
  workspace_icon: "✍️",
  period_start: "2026-01-01",
  period_end: "2026-01-31",
@@ -442,19 +442,19 @@ export default function BillingPage() {
  };
 
  const buildUsageHelper = (used: number, limit: number, unit?: string, digits = 0) => {
- if (limit <= 0) return "notlimit";
+ if (limit <= 0) return "No limit";
  const remaining = limit - used;
  const formatted = formatNumber(Math.abs(remaining), digits);
  const unitLabel = unit ? ` ${unit}` : "";
- if (remaining < 0) return `alreadyExcess ${formatted}${unitLabel}`;
- return `Remaining ${formatted}${unitLabel}`;
+ if (remaining < 0) return `Exceeded by ${formatted}${unitLabel}`;
+ return `${formatted}${unitLabel} remaining`;
  };
 
  const usageItems = [
  {
  id: "apiCalls",
- label: "API Call",
- caption: "monthsRequestQuota",
+ label: "API Calls",
+ caption: "Monthly request quota",
  icon: Zap,
  used: resolvedUsage.apiCalls.used,
  limit: resolvedUsage.apiCalls.limit,
@@ -463,7 +463,7 @@ export default function BillingPage() {
  {
  id: "tokens",
  label: "Token Usage",
- caption: "ModelConsumption",
+ caption: "Model consumption",
  icon: Bot,
  used: resolvedUsage.tokens.used,
  limit: resolvedUsage.tokens.limit,
@@ -471,8 +471,8 @@ export default function BillingPage() {
  },
  {
  id: "storage",
- label: "StorageEmptybetween",
- caption: "forStorage",
+ label: "Storage Space",
+ caption: "File storage",
  icon: Database,
  used: resolvedUsage.storage.used,
  limit: resolvedUsage.storage.limit,
@@ -487,8 +487,8 @@ export default function BillingPage() {
  },
  {
  id: "bandwidth",
- label: "BandwidthUsage",
- caption: "NetworkTransfer",
+ label: "Bandwidth Usage",
+ caption: "Network transfer",
  icon: Globe,
  used: resolvedUsage.bandwidth.used,
  limit: resolvedUsage.bandwidth.limit,
@@ -503,8 +503,8 @@ export default function BillingPage() {
  },
  {
  id: "apps",
- label: "AppCount",
- caption: "canCreateApp",
+ label: "App Count",
+ caption: "Available app slots",
  icon: LayoutGrid,
  used: resolvedUsage.apps.used,
  limit: resolvedUsage.apps.limit,
@@ -512,15 +512,15 @@ export default function BillingPage() {
  },
  {
  id: "teamMembers",
- label: "TeamMember",
- caption: "Member",
+ label: "Team Members",
+ caption: "Members",
  icon: Users,
  used: resolvedUsage.teamMembers.used,
  limit: resolvedUsage.teamMembers.limit,
  helper: buildUsageHelper(
  resolvedUsage.teamMembers.used,
  resolvedUsage.teamMembers.limit,
- "person"
+ "members"
  ),
  },
  ];
@@ -542,16 +542,16 @@ export default function BillingPage() {
  ? usagePercentages.reduce((sum, item) => sum + item.percent, 0) / usagePercentages.length
  : 0;
  const quotaStatus =
- maxUsagePercent >= 1 ? "alreadyExcess": maxUsagePercent >= 0.8 ? "onlimit": "Health";
+ maxUsagePercent >= 1 ? "Exceeded": maxUsagePercent >= 0.8 ? "Near limit": "Healthy";
  const quotaStatusVariant = maxUsagePercent >= 1 ? "error" : maxUsagePercent >= 0.8 ? "warning" : "success";
- const quotaSourceLabel = quota ? "Real-timeData": "ExampleData";
+ const quotaSourceLabel = quota ? "Real-time data": "Sample data";
 
  return (
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="SubscriptionandBilling"
- description="ManagePlan, Quota, PaymentmethodandInvoiceRecord"
+ title="Subscription & Billing"
+ description="Manage plans, quotas, payment methods, and invoice records"
  actions={(
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -566,13 +566,13 @@ export default function BillingPage() {
  size="sm"
  leftIcon={<ExternalLink className="w-3.5 h-3.5" />}
  >
- ContactSales
+ Contact Sales
  </Button>
  <Button
  size="sm"
  rightIcon={<ArrowUpRight className="w-3.5 h-3.5" />}
  >
- UpgradePlan
+ Upgrade Plan
  </Button>
  </div>
  )}
@@ -580,29 +580,29 @@ export default function BillingPage() {
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Crown className="w-3.5 h-3.5" />
- CurrentPlan {currentPlan?.name || "Professionalversion"}
+ Current Plan: {currentPlan?.name || "Professional"}
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Calendar className="w-3.5 h-3.5" />
- Billingmethod {billingLabel}
+ Billing: {billingLabel}
  </span>
  <span className="inline-flex items-center gap-1.5">
  <TrendingUp className="w-3.5 h-3.5" />
- Discount {billingCycle === "yearly" ? "20%": "None"}
+ Discount: {billingCycle === "yearly" ? "20%": "None"}
  </span>
  </div>
  </PageHeader>
- <Callout variant="info" title="UpgradeGuide">
- CurrentQuotaUsagewillBusinessGrowthQuickon, SuggestionbeforeEvaluateUpgradeorPleaseoutsideQuota.
+ <Callout variant="info" title="Upgrade Guide">
+ Your quota usage is growing rapidly with your business. We recommend evaluating an upgrade or requesting additional quota before limits are reached.
  <div className="mt-3 flex flex-wrap gap-2">
  <Button asChild size="sm">
  <Link href="/dashboard/upgrade">
- UpgradePlan
+ Upgrade Plan
  <ArrowUpRight className="w-3.5 h-3.5" />
  </Link>
  </Button>
  <Button asChild variant="outline" size="sm">
- <Link href="/dashboard/support-tickets?category=billing">PleaseoutsideQuota</Link>
+ <Link href="/dashboard/support-tickets?category=billing">Request Additional Quota</Link>
  </Button>
  </div>
  </Callout>
@@ -611,12 +611,12 @@ export default function BillingPage() {
  <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-brand-500/10 blur-3xl" />
  <div className="page-panel-header flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="page-caption">CurrentPlan</p>
+ <p className="page-caption">Current Plan</p>
  <h2 className="text-section-title text-foreground">
- {currentPlan?.name || "Professionalversion"}
+ {currentPlan?.name || "Professional"}
  </h2>
  <p className="page-panel-description">
- {currentPlan?.description || "faceProfessionalUserandsmallTeam'scanPlan"}
+ {currentPlan?.description || "A plan designed for professional users and small teams"}
  </p>
  </div>
  <div className="flex items-center gap-2">
@@ -624,7 +624,7 @@ export default function BillingPage() {
  Active
  </Badge>
  <Button variant="outline" size="sm">
- ManageSubscription
+ Manage Subscription
  </Button>
  </div>
  </div>
@@ -636,7 +636,7 @@ export default function BillingPage() {
  </div>
  <div className="space-y-1">
  <div className="flex items-center gap-2">
- <h3 className="text-card-title">{currentPlan?.name || "Professionalversion"}</h3>
+ <h3 className="text-card-title">{currentPlan?.name || "Professional"}</h3>
  {currentPlan?.popular && (
  <Badge variant="primary" size="sm">
  <Star className="w-3 h-3" />
@@ -653,11 +653,11 @@ export default function BillingPage() {
  {formatCurrency(currentPlanPrice)}
  </div>
  <p className="text-xs text-foreground-muted">
- /months · {billingLabel} · {billingHint}
+ /month · {billingLabel} · {billingHint}
  </p>
  </div>
  <Badge variant="secondary" size="sm">
- downtimesRenew: 2026-02-28
+ Next renewal: 2026-02-28
  </Badge>
  </div>
  <div className="page-grid sm:grid-cols-2">
@@ -666,28 +666,28 @@ export default function BillingPage() {
  <p className="text-sm font-medium text-foreground tabular-nums">
  {resolvedUsage.teamMembers.used} / {resolvedUsage.teamMembers.limit}
  </p>
- <p className="text-xs text-foreground-light">alreadyAllocate</p>
+ <p className="text-xs text-foreground-light">Allocated</p>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <p className="text-xs text-foreground-muted">StorageEmptybetween</p>
+ <p className="text-xs text-foreground-muted">Storage Space</p>
  <p className="text-sm font-medium text-foreground tabular-nums">
- {formatNumber(resolvedUsage.storage.used, 1)} GB /{""}
- {formatNumber(resolvedUsage.storage.limit, 1)} GB
+{formatNumber(resolvedUsage.storage.used, 1)} GB /{" "}
+                {formatNumber(resolvedUsage.storage.limit, 1)} GB
  </p>
- <p className="text-xs text-foreground-light">currentmonthsUsage</p>
+ <p className="text-xs text-foreground-light">Current month usage</p>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <p className="text-xs text-foreground-muted">API Call</p>
+ <p className="text-xs text-foreground-muted">API Calls</p>
  <p className="text-sm font-medium text-foreground tabular-nums">
- {formatNumber(resolvedUsage.apiCalls.used)} /{""}
- {formatNumber(resolvedUsage.apiCalls.limit)}
+{formatNumber(resolvedUsage.apiCalls.used)} /{" "}
+                {formatNumber(resolvedUsage.apiCalls.limit)}
  </p>
- <p className="text-xs text-foreground-light">currentmonthsUsage</p>
+ <p className="text-xs text-foreground-light">Current month usage</p>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <p className="text-xs text-foreground-muted">Supportetc</p>
- <p className="text-sm font-medium text-foreground">StandardSupport</p>
- <p className="text-xs text-foreground-light">24 hResponse</p>
+ <p className="text-xs text-foreground-muted">Support Level</p>
+ <p className="text-sm font-medium text-foreground">Standard Support</p>
+ <p className="text-xs text-foreground-light">24h response time</p>
  </div>
  </div>
  {currentPlanHighlights.length > 0 && (
@@ -703,10 +703,10 @@ export default function BillingPage() {
  </div>
  <div className="space-y-4">
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <p className="text-xs text-foreground-muted mb-3">BillingSummary</p>
+ <p className="text-xs text-foreground-muted mb-3">Billing Summary</p>
  <div className="space-y-2 text-sm">
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">small</span>
+ <span className="text-foreground-light">Subtotal</span>
  <span className="text-foreground tabular-nums">
  {formatCurrency(invoiceSubtotal)}
  </span>
@@ -727,7 +727,7 @@ export default function BillingPage() {
  </div>
  <div className="h-px bg-border my-2" />
  <div className="flex items-center justify-between font-medium">
- <span className="text-foreground">Estimatedtotal</span>
+ <span className="text-foreground">Estimated Total</span>
  <span className="text-foreground tabular-nums">
  {formatCurrency(invoiceTotal)}
  </span>
@@ -735,7 +735,7 @@ export default function BillingPage() {
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <p className="text-xs text-foreground-muted mb-3">QuickAction</p>
+ <p className="text-xs text-foreground-muted mb-3">Quick Actions</p>
  <div className="space-y-2">
  <Button
  variant="outline"
@@ -750,7 +750,7 @@ export default function BillingPage() {
  loading={invoiceDownloadId === selectedInvoice?.id}
  loadingText="Download"
  >
- DownloadcurrentInvoice
+ Download Current Invoice
  </Button>
  <Button
  variant="ghost"
@@ -758,13 +758,13 @@ export default function BillingPage() {
  className="w-full justify-between"
  rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
  >
- UpdatePaymentmethod
+ Update Payment Method
  </Button>
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="flex items-center justify-between mb-3">
- <p className="text-xs text-foreground-muted">useBalance</p>
+ <p className="text-xs text-foreground-muted">Credits Balance</p>
  <Badge variant="secondary" size="xs">
  Auto
  </Badge>
@@ -773,10 +773,10 @@ export default function BillingPage() {
  <span className="text-2xl font-semibold text-foreground tabular-nums">
  {formatCurrency(creditBalance)}
  </span>
- <span className="text-xs text-foreground-muted">canUsed fornot yetcomeBilling</span>
+ <span className="text-xs text-foreground-muted">Can be applied to future billing</span>
  </div>
  <p className="text-xs text-foreground-muted mt-2">
- BalancewillPriorityPlanandExcessUsageCost.
+ Credits will be applied to plan and overage costs first.
  </p>
  <Button
  variant="ghost"
@@ -784,7 +784,7 @@ export default function BillingPage() {
  className="mt-3 w-full justify-between"
  rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
  >
- valueQuota
+ Top Up Credits
  </Button>
  </div>
  </div>
@@ -794,8 +794,8 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">QuotaUsageDashboard</h3>
- <p className="page-panel-description">byWorkspaceQuotaReal-timeStatistics</p>
+ <h3 className="page-panel-title">Quota Usage Dashboard</h3>
+ <p className="page-panel-description">Real-time quota statistics by workspace</p>
  </div>
  <div className="flex items-center gap-2">
  {quotaLoading && (
@@ -804,24 +804,24 @@ export default function BillingPage() {
  </Badge>
  )}
  <Button variant="outline" size="sm">
- PurchaseoutsideQuota
+ Purchase Additional Quota
  </Button>
  </div>
  </div>
  <div className="p-6 space-y-4">
  <div className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-border bg-surface-75 p-4">
  <div className="space-y-2">
- <p className="text-xs text-foreground-muted">QuotaHealth</p>
+ <p className="text-xs text-foreground-muted">Quota Health</p>
  <div className="flex flex-wrap items-center gap-2">
  <Badge variant={quotaStatusVariant} size="sm">
  {quotaStatus}
  </Badge>
  <span className="text-xs text-foreground-light">
- mostUsagerate {Math.round(maxUsagePercent * 100)}%
+ Peak usage: {Math.round(maxUsagePercent * 100)}%
  </span>
  </div>
  <p className="text-xs text-foreground-muted">
- AverageUsagerate {Math.round(averageUsagePercent * 100)}% · {quotaSourceLabel}
+ Average usage: {Math.round(averageUsagePercent * 100)}% · {quotaSourceLabel}
  </p>
  </div>
  <div className="flex items-center gap-3">
@@ -833,8 +833,8 @@ export default function BillingPage() {
  formatValue={(value) => `${Math.round(value)}%`}
  />
  <div className="text-xs text-foreground-muted space-y-1">
- <p>QuotaPriorityShowcase</p>
- <p>Suggestion 20% SecurityEdge</p>
+ <p>Priority quota display</p>
+ <p>Recommend 20% safety margin</p>
  </div>
  </div>
  </div>
@@ -842,12 +842,12 @@ export default function BillingPage() {
  {usageAlertItems.length > 0 && (
  <Callout
  variant={overLimitItems.length > 0 ? "error" : "warning"}
- title={overLimitItems.length > 0 ? "alreadyTriggerExcess": "Quotanowwilluse"}
+ title={overLimitItems.length > 0 ? "Quota Exceeded": "Quota Nearly Exhausted"}
  >
  <p>
  {overLimitItems.length > 0
- ? "PartialResourcealreadyExceedPlanQuota, SuggestionNowUpgradeorPleaseoutsideQuota, AvoidImpactBusinessStable."
-: "keyResourcenowwillReachQuotaonlimit, PleasebeforePlanningUpgradeorSupplementQuota."}
+ ? "Some resources have exceeded the plan quota. We recommend upgrading now or requesting additional quota to avoid disrupting your business."
+: "Key resources are approaching quota limits. Please plan an upgrade or supplement your quota in advance."}
  </p>
  <div className="flex flex-wrap gap-2 mt-3">
  {usageAlertItems.map((item) => (
@@ -863,12 +863,12 @@ export default function BillingPage() {
  <div className="flex flex-wrap gap-2 mt-3">
  <Button asChild size="sm">
  <Link href="/dashboard/upgrade">
- UpgradePlan
+ Upgrade Plan
  <ArrowUpRight className="w-3.5 h-3.5" />
  </Link>
  </Button>
  <Button asChild variant="outline" size="sm">
- <Link href="/dashboard/support-tickets?category=billing">PleaseoutsideQuota</Link>
+ <Link href="/dashboard/support-tickets?category=billing">Request Additional Quota</Link>
  </Button>
  </div>
  </Callout>
@@ -950,8 +950,8 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">byApp Statistics</h3>
- <p className="page-panel-description">AppViewUsageandCost, atforandoptimal</p>
+ <h3 className="page-panel-title">Per-App Statistics</h3>
+ <p className="page-panel-description">View usage and cost per app for analysis and optimization</p>
  </div>
  <div className="flex items-center gap-2">
  {workspaceUsageLoading && (
@@ -960,7 +960,7 @@ export default function BillingPage() {
  </Badge>
  )}
  <Button variant="outline" size="sm" rightIcon={<Download className="w-3.5 h-3.5" />}>
- ExportReport
+ Export Report
  </Button>
  </div>
  </div>
@@ -983,10 +983,10 @@ export default function BillingPage() {
  <tr className="bg-surface-75">
  <td colSpan={7} className="px-4 py-6 text-center text-foreground-muted">
  {workspaceUsageError
- ? `LoadFailed: ${workspaceUsageError}`
+ ? `Failed to load: ${workspaceUsageError}`
  : workspaceUsageLoading
- ? "LoadingWorkspaceUsageData..."
-: "NoneWorkspaceUsageData"}
+ ? "Loading workspace usage data..."
+: "No workspace usage data"}
  </td>
  </tr>
  ) : (
@@ -1073,8 +1073,8 @@ export default function BillingPage() {
  </div>
  <p className="text-xs text-foreground-muted mt-3">
  {workspaceUsageStats.length === 0
- ? "NoneAppData"
-: `Display ${workspaceUsageStats.length} App'scurrentmonthsUsageStatistics`}
+ ? "No app data"
+: `Showing current month usage for ${workspaceUsageStats.length} apps`}
  </p>
  </div>
  </section>
@@ -1082,11 +1082,11 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">CostControl</h3>
- <p className="page-panel-description">MaintainBudgetcan, AvoidExcessCost</p>
+ <h3 className="page-panel-title">Cost Control</h3>
+ <p className="page-panel-description">Manage budget controls to avoid overage costs</p>
  </div>
  <Button variant="outline" size="sm">
- Adjustonlimit
+ Adjust Limits
  </Button>
  </div>
  <div className="p-6 grid md:grid-cols-2 gap-4">
@@ -1097,26 +1097,26 @@ export default function BillingPage() {
  <TrendingUp className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">Payoutonlimit</p>
- <p className="text-xs text-foreground-muted">ExceedQuotatime'sSecurityvalue</p>
+ <p className="text-sm font-medium text-foreground">Spend Limit</p>
+ <p className="text-xs text-foreground-muted">Security threshold when quota is exceeded</p>
  </div>
  </div>
  <div className="flex items-center gap-2">
  <Badge variant={spendCapEnabled ? "secondary" : "warning"} size="sm">
- {spendCapEnabled ? "Enabled": "alreadyClose"}
+ {spendCapEnabled ? "Enabled": "Disabled"}
  </Badge>
  <Switch
  checked={spendCapEnabled}
  onCheckedChange={setSpendCapEnabled}
- aria-label="SwitchPayoutonlimit"
+ aria-label="Toggle spend limit"
  />
  </div>
  </div>
  <p className="text-xs text-foreground-muted">
- EnableafterExcessRequestwilltoLimit, AvoidoutsideCost.
+ When enabled, excess requests will be rate-limited to avoid additional costs.
  </p>
  <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-foreground-light">
- <span>Currentonlimit</span>
+ <span>Current limit</span>
  <div className="flex items-center gap-2">
  <Input
  value={spendLimitDisplay}
@@ -1135,8 +1135,8 @@ export default function BillingPage() {
  <Crown className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">ContainsQuota</p>
- <p className="text-xs text-foreground-muted">CurrentPlanAvailable'sBasicQuota</p>
+ <p className="text-sm font-medium text-foreground">Included Quota</p>
+ <p className="text-xs text-foreground-muted">Basic quota included in current plan</p>
  </div>
  </div>
  <div className="page-grid grid-cols-2 gap-2 text-xs lg:gap-2">
@@ -1153,19 +1153,19 @@ export default function BillingPage() {
  </span>
  </div>
  <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
- <span className="text-foreground-light">StorageEmptybetween</span>
+ <span className="text-foreground-light">Storage Space</span>
  <span className="text-foreground tabular-nums">
  {formatNumber(resolvedUsage.storage.limit, 1)} GB
  </span>
  </div>
  <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
- <span className="text-foreground-light">AppCount</span>
+ <span className="text-foreground-light">App Count</span>
  <span className="text-foreground tabular-nums">
  {formatNumber(resolvedUsage.apps.limit)}
  </span>
  </div>
  <div className="flex items-center justify-between rounded-md border border-border bg-surface-200/60 px-2 py-1">
- <span className="text-foreground-light">TeamMember</span>
+ <span className="text-foreground-light">Team Members</span>
  <span className="text-foreground tabular-nums">
  {formatNumber(resolvedUsage.teamMembers.limit)}
  </span>
@@ -1178,8 +1178,8 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  <div>
- <h3 className="page-panel-title">Planforcompare</h3>
- <p className="page-panel-description">Based onTeamScaleSelectmore'sPlan</p>
+ <h3 className="page-panel-title">Plan Comparison</h3>
+ <p className="page-panel-description">Select the right plan based on your team size</p>
  </div>
  <div className="flex items-center gap-1 rounded-md bg-surface-200 border border-border p-1">
  <button
@@ -1191,7 +1191,7 @@ export default function BillingPage() {
  : "text-foreground-muted hover:text-foreground"
  )}
  >
- months
+ Monthly
  </button>
  <button
  onClick={() => setBillingCycle("yearly")}
@@ -1202,7 +1202,7 @@ export default function BillingPage() {
  : "text-foreground-muted hover:text-foreground"
  )}
  >
- years
+ Yearly
  <Badge variant="primary" size="xs">
  20%
  </Badge>
@@ -1237,11 +1237,11 @@ export default function BillingPage() {
  <span className="text-stat-number tabular-nums">
  {formatCurrency(computedPrice)}
  </span>
- <span className="text-xs text-foreground-muted">/months</span>
+ <span className="text-xs text-foreground-muted">/month</span>
  </div>
  {plan.current ? (
  <Button variant="outline" size="sm" className="w-full" disabled>
- CurrentPlan
+ Current Plan
  </Button>
  ) : (
  <Button
@@ -1250,10 +1250,10 @@ export default function BillingPage() {
  className={cn("w-full", plan.id === "business" && "text-foreground-light")}
  >
  {plan.id === "business"
- ? "ContactSales"
+ ? "Contact Sales"
  : plan.price === 0
- ? "StartUsage"
-: "UpgradetothisPlan"}
+ ? "Get Started"
+: "Upgrade to this Plan"}
  </Button>
  )}
  <div className="space-y-2 text-sm">
@@ -1282,11 +1282,11 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">Paymentmethod</h3>
- <p className="page-panel-description">Used forAutoRenewandInvoicePayment</p>
+ <h3 className="page-panel-title">Payment Methods</h3>
+ <p className="page-panel-description">Used for auto-renewal and invoice payments</p>
  </div>
  <Button variant="outline" size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>
- Addmethod
+ Add Method
  </Button>
  </div>
  <div className="p-6 space-y-3">
@@ -1303,7 +1303,7 @@ export default function BillingPage() {
  <p className="text-sm font-medium text-foreground">
  {method.brand} •••• {method.last4}
  </p>
- <p className="text-xs text-foreground-muted">to: {method.expiry}</p>
+ <p className="text-xs text-foreground-muted">Expires: {method.expiry}</p>
  </div>
  </div>
  <div className="flex items-center gap-2">
@@ -1324,8 +1324,8 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">BillingHistory</h3>
- <p className="page-panel-description">Recent 6 months'sPaymentRecord</p>
+ <h3 className="page-panel-title">Billing History</h3>
+ <p className="page-panel-description">Payment records from the last 6 months</p>
  </div>
  <Button
  variant="outline"
@@ -1340,7 +1340,7 @@ export default function BillingPage() {
  <div className="mb-5 rounded-md border border-border bg-surface-75 p-4">
  <div className="flex flex-wrap items-start justify-between gap-3">
  <div className="space-y-1">
- <p className="text-xs text-foreground-muted">BillingDetail</p>
+ <p className="text-xs text-foreground-muted">Billing Detail</p>
  <div className="flex flex-wrap items-center gap-2">
  <p className="text-sm font-medium text-foreground">
  {selectedInvoiceSummary.description}
@@ -1357,7 +1357,7 @@ export default function BillingPage() {
  </p>
  {selectedInvoiceSummary.paidAt && (
  <p className="text-xs text-foreground-muted">
- PaymentTime {selectedInvoiceSummary.paidAt}
+ Paid at: {selectedInvoiceSummary.paidAt}
  </p>
  )}
  </div>
@@ -1375,10 +1375,10 @@ export default function BillingPage() {
  loading={invoiceDownloadId === selectedInvoiceSummary.id}
  loadingText="Download"
  >
- DownloadInvoice
+ Download Invoice
  </Button>
  <Button variant="ghost" size="sm" leftIcon={<Receipt className="w-3.5 h-3.5" />}>
- ViewReceipt
+ View Receipt
  </Button>
  </div>
  </div>
@@ -1427,10 +1427,10 @@ export default function BillingPage() {
  <tr className="bg-surface-75">
  <td colSpan={6} className="px-4 py-6 text-center text-foreground-muted">
  {invoiceError
- ? `BillingLoadFailed: ${invoiceError}`
+ ? `Failed to load billing: ${invoiceError}`
  : invoiceLoading
- ? "LoadingBilling..."
-: "NoneBillingRecord"}
+ ? "Loading billing records..."
+: "No billing records"}
  </td>
  </tr>
  ) : (
@@ -1465,7 +1465,7 @@ export default function BillingPage() {
  size="sm"
  onClick={() => setSelectedInvoiceId(bill.id)}
  >
- ViewDetail
+ View Details
  </Button>
  <Button
  variant="ghost"
@@ -1486,8 +1486,8 @@ export default function BillingPage() {
  </div>
  <p className="text-xs text-foreground-muted mt-3">
  {invoices.length === 0
- ? "NoneBillingRecord"
-: `Display 1 ${invoices.length} , ${invoices.length} Record`}
+ ? "No billing records"
+: `Showing ${invoices.length} of ${invoices.length} records`}
  </p>
  </div>
  </section>
@@ -1497,11 +1497,11 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">BillingInboxperson</h3>
- <p className="page-panel-description">AllBillingNotificationswillSendthisEmail</p>
+ <h3 className="page-panel-title">Billing Contacts</h3>
+ <p className="page-panel-description">All billing notifications will be sent to these emails</p>
  </div>
  <Button variant="outline" size="sm">
- ManageInboxperson
+ Manage Contacts
  </Button>
  </div>
  <div className="p-6 space-y-4">
@@ -1509,11 +1509,11 @@ export default function BillingPage() {
  <Label htmlFor="billing-email">Email Address</Label>
  <Input id="billing-email" defaultValue={billingContact.primaryEmail} />
  <p className="text-xs text-foreground-muted">
- Invoice, PaymentReminderandChangeNotificationsallwillSyncSendthisEmail.
+ Invoices, payment reminders, and change notifications will be sent to this email.
  </p>
  </div>
  <div className="space-y-2">
- <Label variant="optional">outsideInboxperson</Label>
+ <Label variant="optional">Additional Recipients</Label>
  <div className="flex flex-wrap items-center gap-2">
  {billingContact.additionalEmails.map((email) => (
  <Badge key={email} variant="secondary" size="sm">
@@ -1526,7 +1526,7 @@ export default function BillingPage() {
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-3 text-xs text-foreground-muted">
- outsideInboxpersonwillReceiveandmainEmail1'sBillingandPaymentReminder.
+ Additional inbox recipients will receive billing and payment reminders via email.
  </div>
  </div>
  </section>
@@ -1534,11 +1534,11 @@ export default function BillingPage() {
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">BillingAddressandInfo</h3>
- <p className="page-panel-description">Used forGenerateComplianceInvoiceandInfo</p>
+ <h3 className="page-panel-title">Billing Address & Information</h3>
+ <p className="page-panel-description">Used for generating compliant invoices and tax information</p>
  </div>
  <Button variant="outline" size="sm">
- SaveChange
+ Save Changes
  </Button>
  </div>
  <div className="p-6 space-y-4">
@@ -1549,26 +1549,26 @@ export default function BillingPage() {
  </div>
  <div className="space-y-2">
  <Label htmlFor="billing-tax-id" variant="optional">
- 
+ Tax ID
  </Label>
  <Input id="billing-tax-id" defaultValue={billingAddress.taxId} />
  </div>
  </div>
  <div className="page-grid md:grid-cols-2 gap-4 lg:gap-4">
  <div className="space-y-2">
- <Label htmlFor="billing-line1">Addressrow 1</Label>
+ <Label htmlFor="billing-line1">Address Line 1</Label>
  <Input id="billing-line1" defaultValue={billingAddress.line1} />
  </div>
  <div className="space-y-2">
  <Label htmlFor="billing-line2" variant="optional">
- Addressrow 2
+ Address Line 2
  </Label>
  <Input id="billing-line2" defaultValue={billingAddress.line2} />
  </div>
  </div>
  <div className="page-grid md:grid-cols-3 gap-4 lg:gap-4">
  <div className="space-y-2">
- <Label htmlFor="billing-country">/</Label>
+ <Label htmlFor="billing-country">Country / Region</Label>
  <Input id="billing-country" defaultValue={billingAddress.country} />
  </div>
  <div className="space-y-2">
@@ -1576,24 +1576,24 @@ export default function BillingPage() {
  <Input id="billing-city" defaultValue={billingAddress.city} />
  </div>
  <div className="space-y-2">
- <Label htmlFor="billing-state">/</Label>
+ <Label htmlFor="billing-state">State / Province</Label>
  <Input id="billing-state" defaultValue={billingAddress.state} />
  </div>
  </div>
  <div className="page-grid md:grid-cols-2 gap-4 lg:gap-4">
  <div className="space-y-2">
- <Label htmlFor="billing-postal"></Label>
+ <Label htmlFor="billing-postal">Postal Code</Label>
  <Input id="billing-postal" defaultValue={billingAddress.postalCode} />
  </div>
  <div className="space-y-2">
  <Label htmlFor="billing-contact" variant="optional">
- ContactPhone
+ Contact Phone
  </Label>
- <Input id="billing-contact" placeholder="Fill inOptionalContactmethod" />
+ <Input id="billing-contact" placeholder="Enter optional contact phone" />
  </div>
  </div>
  <div className="text-xs text-foreground-muted">
- ChangeonlyImpactnot yetcomeBilling, HistoryBillingnotwillUpdate.
+ Changes will only affect future billing. Historical records will not be updated.
  </div>
  </div>
  </section>
@@ -1606,9 +1606,9 @@ export default function BillingPage() {
  <Gift className="w-6 h-6 text-brand-500" />
  </div>
  <div className="flex-1">
- <h4 className="text-card-title">InviteFriends, ObtainRewards</h4>
+ <h4 className="text-card-title">Invite Friends, Earn Rewards</h4>
  <p className="text-description mt-1">
- eachSuccessInvite1FriendsSign Up, methodallwillObtain 1000 timesoutsideAPI CallQuota.
+ For each friend you successfully invite to sign up, both of you will receive 1,000 bonus API calls.
  </p>
  </div>
  <Button
@@ -1616,7 +1616,7 @@ export default function BillingPage() {
  className="bg-brand-500 text-background hover:bg-brand-600"
  rightIcon={<ExternalLink className="w-3.5 h-3.5" />}
  >
- NowInvite
+ Invite Now
  </Button>
  </div>
  </section>

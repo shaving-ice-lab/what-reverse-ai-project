@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationImportDialogComponent
- * SupportImport JSON Format'sConversation
+ * Conversation Import Dialog Component
+ * Supports importing JSON format conversations
  */
 
 import { useState, useCallback } from "react";
@@ -55,7 +55,7 @@ export function ImportDialog({
  totalMessages: number;
  } | null>(null);
  
- // FormStatus
+  // Form State
  const [title, setTitle] = useState("");
  const [folderId, setFolderId] = useState<string>("");
 
@@ -67,20 +67,20 @@ export function ImportDialog({
  setError(null);
  setResult(null);
 
- // ParseFile
+    // Parse File
  const reader = new FileReader();
  reader.onload = (event) => {
  try {
  const content = event.target?.result as string;
  const data = JSON.parse(content);
 
- // VerifyDataFormat
+      // Verify data format
  if (!data.title && !data.messages) {
- setError("Invalid'sConversationFileFormat");
+ setError("Invalid conversation file format");
  return;
  }
 
- // ConvertasImportFormat
+      // Convert to import format
  const importData: ImportConversationRequest = {
  workspaceId,
  title: data.title || selectedFile.name.replace(/\.\w+$/, ""),
@@ -101,12 +101,12 @@ export function ImportDialog({
  setParsedData(importData);
  setTitle(importData.title);
  } catch {
- setError("FileParseFailed, PleaseEnsureFileisValid's JSON Format");
+ setError("File parse failed. Please ensure the file is valid JSON.");
  }
  };
 
  reader.onerror = () => {
- setError("FileReadFailed");
+ setError("File read failed");
  };
 
  reader.readAsText(selectedFile);
@@ -136,7 +136,7 @@ export function ImportDialog({
  onSuccess?.();
  }
  } catch (err) {
- setError("ImportFailed, PleaseRetry");
+    setError("Import failed, please retry");
  console.error("Import failed:", err);
  } finally {
  setImporting(false);
@@ -165,17 +165,17 @@ export function ImportDialog({
  <DialogHeader>
  <DialogTitle className="flex items-center gap-2">
  <Upload className="w-5 h-5" />
- ImportConversation
+            Import Conversation
  </DialogTitle>
  <DialogDescription>
- from JSON FileImportConversationRecord
+            Import conversation records from a JSON file
  </DialogDescription>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
- {/* FileUpload */}
+          {/* File Upload */}
  <div className="space-y-2">
- <Label>SelectFile</Label>
+ <Label>Select file</Label>
  <div
  className={cn(
  "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
@@ -202,7 +202,7 @@ export function ImportDialog({
  ) : (
  <div>
  <p className="text-sm text-muted-foreground">
- ClickorDrag & DropFiletothis
+                Click or drag & drop a file here
  </p>
  <p className="text-xs text-muted-foreground">
  Support JSON Format
@@ -212,24 +212,24 @@ export function ImportDialog({
  </div>
  </div>
 
- {/* ParseResult */}
+          {/* Parse Result */}
  {parsedData && (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label htmlFor="title">ConversationTitle</Label>
+ <Label htmlFor="title">Conversation title</Label>
  <Input
  id="title"
  value={title}
  onChange={(e) => setTitle(e.target.value)}
- placeholder="InputConversationTitle"
+ placeholder="Enter conversation title"
  />
  </div>
 
  <div className="space-y-2">
- <Label>TargetFolder</Label>
+ <Label>Target folder</Label>
  <Select value={folderId} onValueChange={setFolderId}>
  <SelectTrigger>
- <SelectValue placeholder="SelectFolder(Optional)" />
+ <SelectValue placeholder="Select folder (optional)" />
  </SelectTrigger>
  <SelectContent>
  <SelectItem value="">Directory</SelectItem>
@@ -244,7 +244,7 @@ export function ImportDialog({
 
  <div className="p-3 rounded-lg bg-muted text-sm">
  <p className="text-muted-foreground">
- willImport <span className="font-medium text-foreground">{parsedData.messages.length}</span> Message
+              Will import <span className="font-medium text-foreground">{parsedData.messages.length}</span> messages
  </p>
  {parsedData.model && (
  <p className="text-muted-foreground">
@@ -255,7 +255,7 @@ export function ImportDialog({
  </div>
  )}
 
- {/* ErrorTip */}
+          {/* Error Alert */}
  {error && (
  <Alert variant="destructive">
  <AlertCircle className="w-4 h-4" />
@@ -263,12 +263,12 @@ export function ImportDialog({
  </Alert>
  )}
 
- {/* SuccessTip */}
+          {/* Success Alert */}
  {result?.success && (
  <Alert className="border-emerald-500 bg-emerald-500/10">
  <CheckCircle className="w-4 h-4 text-emerald-500" />
  <AlertDescription className="text-emerald-700 dark:text-emerald-400">
- ImportSuccess!alreadyImport {result.importedCount} / {result.totalMessages} Message
+            Import successful! Imported {result.importedCount} / {result.totalMessages} messages
  </AlertDescription>
  </Alert>
  )}

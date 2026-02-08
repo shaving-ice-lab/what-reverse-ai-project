@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AboutWePage - LobeHub Style
+ * About Page - LobeHub Style
  */
 
 import { useState, useEffect } from "react";
@@ -25,47 +25,47 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Companyin
+// Company Milestones
 const milestones = [
- { year: "2023", event: "AgentFlow currently" },
- { year: "2023", event: "ObtaintypeFunding" },
- { year: "2024", event: "ProductcurrentlyPublish" },
- { year: "2024", event: "UserBreakthrough 10,000" },
- { year: "2025", event: "Obtain A Funding" },
- { year: "2025", event: "UserBreakthrough 50,000" },
- { year: "2026", event: "AI Agent 2.0 Publish" },
+ { year: "2023", event: "AgentFlow Founded" },
+ { year: "2023", event: "Secured Seed Funding" },
+ { year: "2024", event: "Product Officially Launched" },
+ { year: "2024", event: "Reached 10,000 Users" },
+ { year: "2025", event: "Secured Series A Funding" },
+ { year: "2025", event: "Reached 50,000 Users" },
+ { year: "2026", event: "AI Agent 2.0 Released" },
 ];
 
-// Corevalue
+// Core Values
 const values = [
- { icon: Target, title: "makeDriven", description: "WepoweratleteachpersonallcanEasyUsage AI Automation, ReleaseCreatepower." },
- { icon: Heart, title: "Useron", description: "User'sSuccessisWeMaximum'sAchievement, WeAlwaysUser." },
- { icon: Sparkles, title: "", description: "atProduct, TechnologyandServiceon, notUserExpect." },
- { icon: Globe, title: "OpenCollaboration", description: "Open Source, andCommunityGrowth, more'sProduct." },
+ { icon: Target, title: "Mission Driven", description: "We empower everyone to easily use AI automation and unleash their creative potential." },
+ { icon: Heart, title: "User First", description: "User success is our greatest achievement. We always put users first." },
+ { icon: Sparkles, title: "Relentless Innovation", description: "Constantly exceeding user expectations in product, technology, and service." },
+ { icon: Globe, title: "Open Collaboration", description: "Open source, growing with the community to build better products together." },
 ];
 
-// TeamMember
+// Team Members
 const team = [
- { name: "", role: "CEO & Jointperson", bio: "Continuoususer, beforeinProducttotal, 10+ yearsEnterpriseServiceExperience", social: { linkedin: "#", twitter: "#" } },
- { name: "Li Hua", role: "CTO & Jointperson", bio: "beforeBytesTechnologyExpert, AI/ML DomainExpert, Open SourceCommunityActiveContributionuser", social: { linkedin: "#", twitter: "#" } },
- { name: "Wang Fang", role: "CPO", bio: "beforeTencentProductOwner, FocusEnterprise-gradeProductDesign, UserExperienceExpert", social: { linkedin: "#" } },
- { name: "Chen Wei", role: "VP of Engineering", bio: "beforeMeituanTechnologytotal, DistributionSystemExpert, TechnologyArchitect", social: { linkedin: "#" } },
+ { name: "Zhang Lei", role: "CEO & Co-Founder", bio: "Serial entrepreneur, former VP of Product, 10+ years of enterprise service experience", social: { linkedin: "#", twitter: "#" } },
+ { name: "Li Hua", role: "CTO & Co-Founder", bio: "Former ByteDance tech expert, AI/ML domain specialist, active open source community contributor", social: { linkedin: "#", twitter: "#" } },
+ { name: "Wang Fang", role: "CPO", bio: "Former Tencent product director, focused on enterprise-grade product design, UX expert", social: { linkedin: "#" } },
+ { name: "Chen Wei", role: "VP of Engineering", bio: "Former Meituan tech lead, distributed systems expert, technology architect", social: { linkedin: "#" } },
 ];
 
-// Investmentmethod
+// Investors
 const investors = [
- { name: "Sequoia Capitalcurrent" },
+ { name: "Sequoia Capital China" },
  { name: "Hillhouse Ventures" },
- { name: "Source Code Capitalcurrent" },
+ { name: "Source Code Capital" },
  { name: "Matrix Partners" },
 ];
 
-// DataStatistics
+// Statistics
 const stats = [
  { value: "50K+", label: "Active Users" },
- { value: "100+", label: "EnterpriseCustomer" },
- { value: "50+", label: "TeamMember" },
- { value: "3", label: "allOffice" },
+ { value: "100+", label: "Enterprise Customers" },
+ { value: "50+", label: "Team Members" },
+ { value: "3", label: "Global Offices" },
 ];
 
 export default function AboutPage() {
@@ -107,7 +107,7 @@ export default function AboutPage() {
  "transition-all duration-700 delay-200",
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}>
- AgentFlow at 2023 years, poweratleteachpersonallcanEasyUsage AI AutomationTechnology, Releaseperson'sCreatepower
+ Founded in 2023, AgentFlow empowers everyone to easily use AI automation technology and unleash their creative potential
  </p>
  </div>
  </section>
@@ -141,12 +141,12 @@ export default function AboutPage() {
  more intelligence.
  </h2>
  <p className="text-foreground-light mb-4 leading-relaxed">
- We, not yetcomeeachpersonallwillhasSelf's AI Assistant, HelpProcessdayWork'sre-Task.
- AgentFlow poweratBuildmostuse's AI WorkflowPlatform.
+ We believe everyone will have their own AI assistant to help handle daily repetitive tasks.
+ AgentFlow is dedicated to building the most user-friendly AI workflow platform.
  </p>
  <p className="text-foreground-light leading-relaxed">
- Viacanvisual'sWorkflowEditandSmart AI Agent, WeHelpUserQuickBuildAutomationFlow.
- NoneneedProgramming, nowcanImplementComplex'sBusinessAutomation.
+ With our visual workflow editor and smart AI agents, we help users quickly build automated workflows.
+ No programming needed — anyone can implement complex business automation.
  </p>
  </div>
  <div className="flex items-center justify-center">
@@ -163,8 +163,8 @@ export default function AboutPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>Corevalue</h2>
- <p>thisvalueWe'seach1Decision</p>
+ <h2>Core Values</h2>
+ <p>These values guide every decision we make</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -227,8 +227,8 @@ export default function AboutPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>CoreTeam</h2>
- <p>comeallCompany'soptimalpersononly</p>
+ <h2>Core Team</h2>
+ <p>The best talent from leading companies</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -270,7 +270,7 @@ export default function AboutPage() {
  <section className="py-16 sm:py-20">
  <div className="max-w-4xl mx-auto px-6 text-center">
  <p className="text-[13px] text-foreground-muted uppercase tracking-widest font-medium mb-8">
- Investmentmethod
+ Backed By
  </p>
  <div className="flex flex-wrap items-center justify-center gap-4">
  {investors.map((investor) => (
@@ -286,15 +286,15 @@ export default function AboutPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-4xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>allOffice</h2>
+ <h2>Global Offices</h2>
  <p>Our locations</p>
  </div>
 
  <div className="grid sm:grid-cols-3 gap-4">
  {[
- { city: "Beijing", address: " SOHO T1", type: "totalsection" },
- { city: "on", address: "new", type: "section" },
- { city: "Shenzhen", address: "", type: "section" },
+ { city: "Beijing", address: "Zhongguancun SOHO T1", type: "headquarters" },
+ { city: "Shanghai", address: "Zhangjiang Hi-Tech Park", type: "branch" },
+ { city: "Shenzhen", address: "Nanshan Science & Technology Park", type: "branch" },
  ].map((office) => (
  <div key={office.city} className="p-5 rounded-2xl bg-surface-100/30 border border-border/30 hover:border-border/60 transition-colors">
  <div className="flex items-center gap-2 mb-2">
@@ -302,7 +302,7 @@ export default function AboutPage() {
  <MapPin className="w-3.5 h-3.5 text-foreground-light" />
  </div>
  <span className="font-semibold text-foreground text-[14px]">{office.city}</span>
- {office.type === "totalsection" && (
+ {office.type === "headquarters" && (
  <span className="px-2 py-0.5 rounded-full bg-surface-200/80 text-foreground-lighter text-[10px] font-medium">HQ</span>
  )}
  </div>
@@ -321,11 +321,11 @@ export default function AboutPage() {
  <Zap className="w-5 h-5 text-background" />
  </div>
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">Join our journey</h2>
- <p className="text-foreground-light mb-10">Wecurrentlyatoptimal'spersononly, 1CreateAutomation'snot yetcome</p>
+ <p className="text-foreground-light mb-10">We&apos;re looking for the best talent to shape the future of automation together</p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
  <Link href="/careers">
  <Button className="h-12 px-8 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-full">
- ViewOpen
+ View Open Positions
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

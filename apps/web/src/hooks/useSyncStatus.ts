@@ -1,6 +1,6 @@
 /**
- * SyncStatus Hook
- * @description ManageDataSyncStatus's React Hook
+ * Sync Status Hook
+ * @description React hook for managing data sync status
  */
 
 'use client';
@@ -19,69 +19,69 @@ import type {
 } from '@/lib/sync';
 
 /**
- * Hook BackType
+ * Hook return type
  */
 export interface UseSyncStatusReturn {
- /** SyncEngineStatus */
+ /** Sync engine state */
  state: SyncEngineState;
- /** isnoSyncing */
+ /** Whether syncing is in progress */
  isSyncing: boolean;
- /** isnoEnabledSync */
+ /** Whether sync is enabled */
  isEnabled: boolean;
- /** isnoOnline */
+ /** Whether online */
  isOnline: boolean;
- /** pendingSyncCount */
+ /** Pending sync count */
  pendingCount: number;
- /** ConflictList */
+ /** Conflict list */
  conflicts: Conflict[];
- /** ontimesSyncResult */
+ /** Last sync result */
  lastSyncResult: SyncResult | null;
- /** ontimesSyncTime */
+ /** Last sync time */
  lastSyncAt: Date | null;
- /** TriggerSync */
+ /** Trigger sync */
  sync: () => Promise<SyncResult>;
- /** LaunchAutoSync */
+ /** Start auto sync */
  startAutoSync: () => void;
- /** StopAutoSync */
+ /** Stop auto sync */
  stopAutoSync: () => void;
- /** RecordChange */
+ /** Record a change */
  recordChange: <T>(
  entityType: EntityType,
  entityId: string,
  operation: OperationType,
  data: T
  ) => Promise<void>;
- /** ResolveConflict */
+ /** Resolve a conflict */
  resolveConflict: (index: number, resolution: 'local' | 'cloud') => Promise<void>;
- /** UpdateConfig */
+ /** Update configuration */
  updateConfig: (config: Partial<SyncConfig>) => void;
 }
 
 /**
- * Hook ConfigOption
+ * Hook configuration options
  */
 interface UseSyncStatusOptions {
- /** isnoAutoLaunchSync */
+ /** Whether to auto-start sync */
  autoStart?: boolean;
- /** InitialConfig */
+ /** Initial configuration */
  config?: Partial<SyncConfig>;
- /** SyncDoneCallback */
+ /** Sync complete callback */
  onSyncComplete?: (result: SyncResult) => void;
- /** ConflictCallback */
+ /** Conflict callback */
  onConflict?: (conflicts: Conflict[]) => void;
- /** ErrorCallback */
+ /** Error callback */
  onError?: (error: Error) => void;
 }
 
 /**
- * LocalStorageImplement (Usage localStorage asSimpleImplement, canUpgradeas IndexedDB)
- * TODO: Upgradeas IndexedDB withSupportlargeDataandmore'sOfflineSupport
+ * Local storage implementation (uses localStorage as simple implementation, can be upgraded to IndexedDB)
+ * TODO: Upgrade to IndexedDB to support large data and better offline support
  */
 function createLocalStorage() {
  const STORAGE_KEY = 'agentflow_sync_changes';
  const LAST_SYNC_KEY = 'agentflow_last_sync';
 
- // from localStorage FetchChangeList
+ // Get change list from localStorage
  const getStoredChanges = (): ChangeRecord[] => {
  if (typeof window === 'undefined') return [];
  try {
@@ -92,13 +92,13 @@ function createLocalStorage() {
  }
  };
 
- // SaveChangeListto localStorage
+ // Save change list to localStorage
  const saveStoredChanges = (changes: ChangeRecord[]) => {
  if (typeof window === 'undefined') return;
  try {
  localStorage.setItem(STORAGE_KEY, JSON.stringify(changes));
  } catch (err) {
- console.error('SaveSyncChangeFailed:', err);
+ console.error('Failed to save sync changes:', err);
  }
  };
 
@@ -144,11 +144,11 @@ function createLocalStorage() {
  try {
  localStorage.setItem(LAST_SYNC_KEY, time.toISOString());
  } catch (err) {
- console.error('SaveSyncTimeFailed:', err);
+ console.error('Failed to save sync time:', err);
  }
  },
  async applyChange(_change: ChangeRecord) {
- // ChangewillViaNormal's API CallApp, thisinnotneedneedoutsideAction
+ // Changes are applied via the normal API calls, no additional action needed here
  },
  async clearAll() {
  if (typeof window === 'undefined') return;
@@ -159,17 +159,17 @@ function createLocalStorage() {
 }
 
 /**
- * Cloud API Implement
- * ViaExisting's workflowApi etcInterfaceProceedSyncAction
+ * Cloud API implementation
+ * Syncs via existing workflowApi and other interfaces
  */
 function createCloudApi() {
  const API_BASE_URL = getApiBaseUrl();
 
  return {
  async getChangesSince(_since: Date | null): Promise<ChangeRecord[]> {
- // FetchCloudChange
- // CurrentImplement: BackEmptycountgroup, asmainneedDataVia's API Fetch
- // TODO: ImplementSyncEndpoint
+ // Get cloud changes
+ // Current implementation: returns empty array, as main data is fetched via dedicated APIs
+ // TODO: Implement sync endpoint
  return [];
  },
  async pushChanges(changes: ChangeRecord[]) {
@@ -186,12 +186,12 @@ function createCloudApi() {
 
  for (const change of changes) {
  try {
- // Based onEntityTypeandActionTypeCallforshould's API
+ // Call the appropriate API based on entity type and operation type
  const endpoint = getEndpointForChange(change);
  const method = getMethodForOperation(change.operation);
  
  if (!endpoint) {
- successful.push(change.id); // NoneneedSync'sChangevisualasSuccess
+ successful.push(change.id); // Changes that don't need syncing are treated as successful
  continue;
  }
 
@@ -223,7 +223,7 @@ function createCloudApi() {
 }
 
 /**
- * Based onChangeFetch API Endpoint
+ * Get API endpoint based on change
  */
 function getEndpointForChange(change: ChangeRecord): string | null {
  switch (change.entityType) {
@@ -234,7 +234,7 @@ function getEndpointForChange(change: ChangeRecord): string | null {
  if (change.operation === 'create') return '/folders';
  return `/folders/${change.entityId}`;
  case 'execution':
- // ExecuteRecordnotneedneedCustomerendpointPush
+ // Execution records don't need to be pushed to a custom endpoint
  return null;
  default:
  return null;
@@ -242,7 +242,7 @@ function getEndpointForChange(change: ChangeRecord): string | null {
 }
 
 /**
- * Based onActionTypeFetch HTTP Method
+ * Get HTTP method based on operation type
  */
 function getMethodForOperation(operation: OperationType): string {
  switch (operation) {
@@ -258,7 +258,7 @@ function getMethodForOperation(operation: OperationType): string {
 }
 
 /**
- * SyncStatus Hook
+ * Sync Status Hook
  */
 export function useSyncStatus(
  options: UseSyncStatusOptions = {}
@@ -271,7 +271,7 @@ export function useSyncStatus(
  onError,
  } = options;
 
- // Status
+ // State
  const [state, setState] = useState<SyncEngineState>({
  isSyncing: false,
  isEnabled: false,
@@ -284,17 +284,17 @@ export function useSyncStatus(
  const [lastSyncResult, setLastSyncResult] = useState<SyncResult | null>(null);
  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
 
- // Config
+ // Configuration
  const [config, setConfig] = useState<Partial<SyncConfig>>(initialConfig || {});
 
- // SyncEngineuse(LatencyInitial)
+ // Sync engine ref (lazy initialization)
  const engineRef = useRef<{
  localStorage: ReturnType<typeof createLocalStorage>;
  cloudApi: ReturnType<typeof createCloudApi>;
  autoSyncInterval: ReturnType<typeof setInterval> | null;
  } | null>(null);
 
- // Initial
+ // Initialize
  useEffect(() => {
  if (!engineRef.current) {
  engineRef.current = {
@@ -304,7 +304,7 @@ export function useSyncStatus(
  };
  }
 
- // ListenOnlineStatus
+ // Listen for online status changes
  const handleOnline = () => {
  setState((prev) => ({ ...prev, isOnline: true }));
  };
@@ -323,14 +323,14 @@ export function useSyncStatus(
  window.removeEventListener('online', handleOnline);
  window.removeEventListener('offline', handleOffline);
  }
- // Clean upAutoSync
+ // Clean up auto sync
  if (engineRef.current?.autoSyncInterval) {
  clearInterval(engineRef.current.autoSyncInterval);
  }
  };
  }, []);
 
- // AutoLaunch
+ // Auto start
  useEffect(() => {
  if (autoStart && engineRef.current) {
  startAutoSync();
@@ -338,7 +338,7 @@ export function useSyncStatus(
  }, [autoStart]);
 
  /**
- * ExecuteSync
+ * Execute sync
  */
  const sync = useCallback(async (): Promise<SyncResult> => {
  if (!engineRef.current) {
@@ -359,13 +359,13 @@ export function useSyncStatus(
  const startTime = Date.now();
  const { localStorage, cloudApi } = engineRef.current;
 
- // FetchpendingSyncChange
+ // Get pending sync changes
  const pendingChanges = await localStorage.getPendingChanges();
  
- // PushChange
+ // Push changes
  const result = await cloudApi.pushChanges(pendingChanges);
 
- // UpdateStatus
+ // Update status
  for (const id of result.successful) {
  await localStorage.updateChangeStatus(id, 'synced');
  }
@@ -384,7 +384,7 @@ export function useSyncStatus(
  setLastSyncAt(new Date());
  await localStorage.setLastSyncTime(new Date());
 
- // UpdatependingSyncCount
+ // Update pending sync count
  const newPendingChanges = await localStorage.getPendingChanges();
  setState((prev) => ({
  ...prev,
@@ -410,7 +410,7 @@ export function useSyncStatus(
  }, [state.isSyncing, state.isOnline, onSyncComplete, onError]);
 
  /**
- * LaunchAutoSync
+ * Start auto sync
  */
  const startAutoSync = useCallback(() => {
  if (!engineRef.current) return;
@@ -423,12 +423,12 @@ export function useSyncStatus(
 
  setState((prev) => ({ ...prev, isEnabled: true }));
 
- // NowExecute1times
+ // Execute immediately
  sync();
  }, [config.interval, sync]);
 
  /**
- * StopAutoSync
+ * Stop auto sync
  */
  const stopAutoSync = useCallback(() => {
  if (!engineRef.current) return;
@@ -440,7 +440,7 @@ export function useSyncStatus(
  }, []);
 
  /**
- * RecordChange
+ * Record a change
  */
  const recordChange = useCallback(
  async <T>(
@@ -466,7 +466,7 @@ export function useSyncStatus(
 
  await localStorage.saveChange(change);
 
- // UpdatependingSyncCount
+ // Update pending sync count
  const pendingChanges = await localStorage.getPendingChanges();
  setState((prev) => ({ ...prev, pendingCount: pendingChanges.length }));
  },
@@ -474,7 +474,7 @@ export function useSyncStatus(
  );
 
  /**
- * ResolveConflict
+ * Resolve a conflict
  */
  const resolveConflict = useCallback(
  async (index: number, resolution: 'local' | 'cloud'): Promise<void> => {
@@ -499,12 +499,12 @@ export function useSyncStatus(
  );
 
  /**
- * UpdateConfig
+ * Update configuration
  */
  const updateConfig = useCallback((newConfig: Partial<SyncConfig>) => {
  setConfig((prev) => ({ ...prev, ...newConfig }));
 
- // ifresultcurrentlyatAutoSyncandbetweenChange, re-
+ // If currently auto syncing and interval changed, restart
  if (engineRef.current?.autoSyncInterval && newConfig.interval) {
  stopAutoSync();
  startAutoSync();

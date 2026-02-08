@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * RatingDistributionComponent
+ * Rating Distribution Component
  * 
- * Showcase Agent 'sRatingDistribution
+ * Showcase Agent's Rating Distribution
  */
 
 import { Star } from "lucide-react";
@@ -30,7 +30,7 @@ export function RatingDistribution({
 }: RatingDistributionProps) {
  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
  
- // CalculateeachRating'sPercentage
+ // Calculate percentage for each rating
  const getPercentage = (count: number) => {
  if (total === 0) return 0;
  return (count / total) * 100;
@@ -38,7 +38,7 @@ export function RatingDistribution({
 
  return (
  <div className={cn("space-y-4", className)}>
- {/* totalRating */}
+ {/* Overall Rating */}
  <div className="flex items-center gap-4">
  <div className="text-center">
  <div className="text-4xl font-bold text-foreground">{avgRating.toFixed(1)}</div>

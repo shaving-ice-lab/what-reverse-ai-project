@@ -46,7 +46,7 @@ export function useNodeCatalog(options: UseNodeCatalogOptions = {}): UseNodeCata
  const nodes = response?.data?.nodes ?? [];
  setCustomNodes(nodes);
  } catch (err) {
- const message = err instanceof Error ? err.message: "FetchCustomNodeFailed";
+ const message = err instanceof Error ? err.message : "Failed to fetch custom nodes";
  setError(message);
  setCustomNodes([]);
  } finally {

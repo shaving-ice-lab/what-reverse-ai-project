@@ -16,13 +16,13 @@ export interface FilterNodeProps extends NodeProps {
 }
 
 const filterTypeLabels: Record<string, string> = {
- condition: "ConditionFilter",
- field: "FieldFilter",
- type: "TypeFilter",
- notNull: "EmptyFilter",
- range: "RangeFilter",
- contains: "ContainsFilter",
- regex: "currentlythenFilter",
+ condition: "Condition Filter",
+ field: "Field Filter",
+ type: "Type Filter",
+ notNull: "Not Empty Filter",
+ range: "Range Filter",
+ contains: "Contains Filter",
+ regex: "Regex Filter",
 };
 
 export const FilterNode = memo(function FilterNode({
@@ -53,7 +53,7 @@ export const FilterNode = memo(function FilterNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -68,7 +68,7 @@ export const FilterNode = memo(function FilterNode({
  <Filter className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "DataFilter"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Data Filter"}</h3>
  <p className="text-xs text-foreground-muted">
  {filterTypeLabels[filterType] || filterType}
  </p>
@@ -108,7 +108,7 @@ export const FilterNode = memo(function FilterNode({
  )}
  {config.invert && (
  <span className="inline-flex px-1.5 py-0.5 rounded bg-warning-200 text-warning">
- InvertResult
+ Invert Result
  </span>
  )}
  </div>
@@ -120,7 +120,7 @@ export const FilterNode = memo(function FilterNode({
  Input
  </span>
  <span className="flex items-center gap-1">
- Filterafter
+ Filtered
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
  </span>
  </div>

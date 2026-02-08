@@ -26,7 +26,7 @@ export const TemplateNode = memo(function TemplateNode({
 
  const templatePreview = config.template
  ? config.template.substring(0, 80)
-: "InputTemplateContent...";
+: "Input template content...";
 
  return (
  <div
@@ -37,7 +37,7 @@ export const TemplateNode = memo(function TemplateNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -52,10 +52,10 @@ export const TemplateNode = memo(function TemplateNode({
  <FileText className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "TextTemplate"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Text Template"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Braces className="h-3 w-3" />
- TemplateRender
+ Template Render
  </p>
  </div>
  </div>

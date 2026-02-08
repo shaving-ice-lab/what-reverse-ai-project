@@ -28,14 +28,14 @@ import { edgeTypes } from "./edges";
 import { Workflow, GitBranch, MousePointerClick, Sparkles, Play, Zap, Plus, Bot, Globe, Code2 } from "lucide-react";
 
 /**
- * EditCanvas - Based on React Flow - ProfessionalCleanStyle
+ * Editor Canvas - Based on React Flow - Professional Clean Style
  */
 
 interface EditorCanvasProps {
  showEmptyState?: boolean;
 }
 
-// DataTypeCompatibleMatrix
+// Data Type Compatibility Matrix
 const typeCompatibility: Record<string, string[]> = {
  string: ["string", "any"],
  number: ["number", "any"],
@@ -45,14 +45,14 @@ const typeCompatibility: Record<string, string[]> = {
  any: ["string", "number", "boolean", "object", "array", "any"],
 };
 
-// ChecktypeTypeisnoCompatible
+// Check if port types are compatible
 function areTypesCompatible(sourceType: string, targetType: string): boolean {
  if (sourceType === "any" || targetType === "any") return true;
  const compatibleTypes = typeCompatibility[sourceType];
  return compatibleTypes?.includes(targetType) ?? sourceType === targetType;
 }
 
-// DetectLoopConnect(DFS)
+// Detect Cyclic Connection (DFS)
 function detectCycle(
  edges: Edge[],
  sourceId: string,
@@ -78,7 +78,7 @@ function detectCycle(
  return false;
 }
 
-// DefaultEdgeConfig
+// Default Edge Config
 const defaultEdgeOptions = {
  type: "smoothstep",
  markerEnd: {
@@ -91,7 +91,7 @@ const defaultEdgeOptions = {
  },
 };
 
-// CreateDefaultNodeData
+// Create Default Node Data
 function createDefaultNodeData(type: string, label: string) {
  const baseData = {
  label,
@@ -143,7 +143,7 @@ function createDefaultNodeData(type: string, label: string) {
  case "condition":
  return {
  ...baseData,
- label: label || "ConditionDetermine",
+ label: label || "Condition",
  config: {
  conditions: [],
  logic: "and",
@@ -174,7 +174,7 @@ function createDefaultNodeData(type: string, label: string) {
  label: label || "Code",
  config: {
  language: "javascript",
- code: "// WriteCode\nasync function main(inputs) {\n return { output: inputs };\n}",
+ code: "// Write your code here\nasync function main(inputs) {\n return { output: inputs };\n}",
  timeout: 30000,
  },
  inputs: [{ id: "input", name: "Input", type: "any" }],
@@ -183,7 +183,7 @@ function createDefaultNodeData(type: string, label: string) {
  case "template":
  return {
  ...baseData,
- label: label || "TextTemplate",
+ label: label || "Text template",
  config: {
  template: "",
  },
@@ -205,11 +205,11 @@ function createDefaultNodeData(type: string, label: string) {
  case "input":
  return {
  ...baseData,
- label: label || "FormInput",
+ label: label || "Form input",
  config: {
  inputType: "text",
  name: "input",
- label: "UserInput",
+ label: "User input",
  placeholder: "",
  required: true,
  },
@@ -218,10 +218,10 @@ function createDefaultNodeData(type: string, label: string) {
  case "output":
  return {
  ...baseData,
- label: label || "ResultOutput",
+ label: label || "Result output",
  config: {
  outputType: "text",
- title: "OutputResult",
+ title: "Output result",
  showTimestamp: false,
  },
  inputs: [{ id: "input", name: "Input", type: "any", required: true }],
@@ -307,7 +307,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
 
  const { nodes, edges, setNodes, setEdges, addNode, addEdge: storeAddEdge } = useWorkflowStore();
 
- // Enhanced'sConnectionVerifycount
+ // Enhanced connection validation
  const isValidConnection = useCallback(
  (connection: Connection): boolean => {
  const { source, target, sourceHandle, targetHandle } = connection;
@@ -351,7 +351,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  [nodes, edges]
  );
 
- // NodeProcess
+  // Node Change Handler
  const onNodesChange: OnNodesChange = useCallback(
  (changes) => {
  setNodes(applyNodeChanges(changes, nodes) as typeof nodes);
@@ -359,7 +359,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  [nodes, setNodes]
  );
 
- // EdgeProcess
+  // Edge Change Handler
  const onEdgesChange: OnEdgesChange = useCallback(
  (changes) => {
  setEdges(applyEdgeChanges(changes, edges));
@@ -367,7 +367,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  [edges, setEdges]
  );
 
- // ConnectProcess
+  // Connection Handler
  const onConnect: OnConnect = useCallback(
  (connection) => {
  if (!isValidConnection(connection)) return;
@@ -404,7 +404,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  [storeAddEdge, isValidConnection, nodes]
  );
 
- // Drag & DropProcess
+  // Drag & Drop Handler
  const onDragOver = useCallback((event: React.DragEvent) => {
  event.preventDefault();
  event.dataTransfer.dropEffect = "move";
@@ -436,17 +436,17 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  [screenToFlowPosition, addNode]
  );
 
- // NodeClickProcess
+  // Node Click Handler
  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
  console.log("Node clicked:", node.id);
  }, []);
 
- // CanvasClickProcess
+  // Canvas Click Handler
  const onPaneClick = useCallback(() => {
  useWorkflowStore.getState().clearSelection();
  }, []);
 
- // MiniMap NodeColor - UsageDesignSystemColor
+  // MiniMap Node Color - Uses Design System Colors
  const nodeColor = useCallback((node: Node) => {
  switch (node.type) {
  case "start":
@@ -472,7 +472,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  }
  }, []);
 
- // QuickAddNode
+  // Quick Add Node
  const quickAddNode = useCallback((type: string, label: string) => {
  const position = { x: 400, y: 200 + nodes.length * 100 };
  const newNode: Node = {
@@ -484,23 +484,23 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  addNode(newNode as typeof nodes[number]);
  }, [addNode, nodes.length]);
 
- // Empty StateGuideComponent - Animation
+  // Empty State Guide Component - Animation
  const EmptyStateGuide = () => (
  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
- {/* BackgroundDecorationAnimation */}
- <div className="absolute inset-0 overflow-hidden">
- {/* FloatingDot */}
+        {/* Background Decoration Animation */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating Dot */}
  <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full bg-brand-500/20 animate-pulse" style={{ animationDelay: "0s" }} />
  <div className="absolute top-1/3 right-1/4 w-3 h-3 rounded-full bg-brand-500/20 animate-pulse" style={{ animationDelay: "0.5s" }} />
  <div className="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full bg-brand-200/30 animate-pulse" style={{ animationDelay: "1s" }} />
  <div className="absolute bottom-1/4 right-1/3 w-2 h-2 rounded-full bg-surface-200/60 animate-pulse" style={{ animationDelay: "1.5s" }} />
  
- {/* GradientHalo */}
+          {/* Gradient Halo */}
  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-brand-500/5 blur-3xl animate-pulse" />
  </div>
  
  <div className="flex flex-col items-center gap-6 max-w-md text-center pointer-events-auto animate-fade-in">
- {/* mainIcon - Animation */}
+        {/* Main Icon - Animation */}
  <div className="relative group">
  <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-brand-500/20 to-brand-600/20 flex items-center justify-center border border-brand-500/30 transition-transform duration-300 group-hover:scale-105">
  <Workflow className="w-10 h-10 text-brand-500 transition-transform duration-300 group-hover:rotate-12" />
@@ -513,22 +513,22 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  </div>
  </div>
  
- {/* TitleandDescription */}
- <div className="space-y-2">
- <h3 className="text-xl font-semibold text-foreground">StartBuildWorkflow</h3>
- <p className="text-sm text-foreground-muted leading-relaxed">
- fromLeft sidePanelDrag & DropNodetoCanvas, orUsagedownmethodShortcutButtonQuickStart
- </p>
- </div>
+        {/* Title and Description */}
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-foreground">Start building your workflow</h3>
+          <p className="text-sm text-foreground-muted leading-relaxed">
+            Drag and drop nodes from the left panel to the canvas, or use the shortcut buttons below to get started quickly
+          </p>
+        </div>
  
- {/* QuickStartButton - FloatEffect */}
+        {/* Quick Start Button - Float Effect */}
  <div className="flex flex-wrap justify-center gap-2">
  <button
  onClick={() => quickAddNode("start", "Start")}
  className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-200/40 border border-brand-500/30 text-brand-500 hover:bg-brand-200/70 hover:scale-105 hover:shadow-lg hover:shadow-brand-500/10 transition-all duration-200"
  >
  <Play className="w-4 h-4" />
- <span className="text-sm font-medium">AddStartNode</span>
+ <span className="text-sm font-medium">Add start node</span>
  </button>
  <button
  onClick={() => quickAddNode("llm", "LLM Call")}
@@ -546,10 +546,10 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  </button>
  </div>
  
- {/* Drag & DropTip - Animation */}
+        {/* Drag & Drop Tip - Animation */}
  <div className="flex items-center gap-2 text-xs text-foreground-muted mt-4">
  <MousePointerClick className="w-4 h-4 animate-bounce" style={{ animationDuration: "1.5s" }} />
- <span>orfromLeft sidePanelDrag & DropNodetothis</span>
+            <span>Or drag and drop nodes from the left panel</span>
  </div>
  </div>
  </div>
@@ -565,7 +565,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  backgroundSize: '24px 24px'
  }}
  >
- {/* Empty StateGuide */}
+        {/* Empty State Guide */}
  {showEmptyState && nodes.length === 0 && <EmptyStateGuide />}
  
  <ReactFlow
@@ -591,7 +591,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  proOptions={{ hideAttribution: true }}
  className="bg-transparent!"
  >
- {/* BackgroundGrid - Manus Style */}
+        {/* Background Grid - Manus Style */}
  <Background
  variant={BackgroundVariant.Dots}
  gap={24}
@@ -600,7 +600,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  className="bg-background-studio!"
  />
 
- {/* ControlPanel - optimalstyle */}
+        {/* Control Panel - Optimal Style */}
  <Controls
  showInteractive={false}
  className={cn(
@@ -615,7 +615,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  )}
  />
 
- {/* small - optimalstyle */}
+        {/* MiniMap - Optimal Style */}
  <MiniMap
  nodeColor={nodeColor}
  nodeStrokeColor="transparent"
@@ -632,7 +632,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  }}
  />
 
- {/* CanvasInfoPanel - optimalstyle */}
+        {/* Canvas Info Panel - Optimal Style */}
  <Panel position="top-right" className="m-4!">
  <div className={cn(
  "flex items-center gap-3 px-4 py-2.5 rounded-xl",
@@ -640,7 +640,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  "border border-border/70",
  "shadow-lg shadow-black/20"
  )}>
- {/* Nodecount */}
+          {/* Node Count */}
  <div className="flex items-center gap-2">
  <div className={cn(
  "flex items-center justify-center w-6 h-6 rounded-lg",
@@ -657,7 +657,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  
  <div className="w-px h-8 bg-border" />
  
- {/* Connectcount */}
+          {/* Connection Count */}
  <div className="flex items-center gap-2">
  <div className={cn(
  "flex items-center justify-center w-6 h-6 rounded-lg",
@@ -667,7 +667,7 @@ export function EditorCanvas({ showEmptyState = true }: EditorCanvasProps) {
  <GitBranch className="h-3.5 w-3.5 text-brand-500" />
  </div>
  <div className="flex flex-col">
- <span className="text-[10px] text-foreground-muted leading-none">Connect</span>
+              <span className="text-[10px] text-foreground-muted leading-none">Connections</span>
  <span className="text-sm font-semibold tabular-nums text-foreground">{edges.length}</span>
  </div>
  </div>

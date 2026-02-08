@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * ExecuteTrendChartComponent
+ * Execution Trend Chart Component
  * 
- * SupportLine Chart/faceSwitch, TimeRangeSelect, HoverDisplayDetailedData
- * UsageReal API Data
+ * Supports line chart / area chart toggle, time range selection, and hover detail display
+ * Uses real API data
  */
 
 import { useState, useMemo, useEffect, useCallback } from "react";
@@ -52,7 +52,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  "90d": { label: "90 days", days: 90 },
  };
 
- // LoadData
+ // Load data
  const loadData = useCallback(async () => {
  setIsLoading(true);
  setError(null);
@@ -61,11 +61,12 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  const response = await statsApi.getExecutionTrends(timeRangeConfig[timeRange].days);
  const trends = response.data || [];
  
- // ConvertasChartDataFormat
+ // Convert to chart data format
  const chartData: DataPoint[] = trends.map((t: DailyStats) => {
  const date = new Date(t.date);
  return {
- date: t.date", label: date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" }),
+ date: t.date,
+        label: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
  current: t.executions,
  success: t.successful_runs,
  failed: t.failed_runs,
@@ -74,21 +75,21 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  
  setData(chartData);
  } catch (err) {
- console.error("LoadExecuteTrendFailed:", err);
- setError(err instanceof Error ? err.message: "LoadFailed");
- // UsageEmptyData
+ console.error("Failed to load execution trend:", err);
+ setError(err instanceof Error ? err.message : "Load failed");
+ // Use empty data as fallback
  setData([]);
  } finally {
  setIsLoading(false);
  }
  }, [timeRange]);
 
- // LoadData
+ // Load data on mount and when time range changes
  useEffect(() => {
  loadData();
  }, [loadData]);
 
- // CalculateStatisticsData
+ // Calculate statistics data
  const stats = useMemo(() => {
  if (data.length === 0) {
  return { total: 0, change: 0, successRate: 0 };
@@ -98,7 +99,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  const totalSuccess = data.reduce((sum, d) => sum + d.success, 0);
  const successRate = totalCurrent > 0 ? ((totalSuccess / totalCurrent) * 100) : 0;
  
- // Calculatecompare(beforeafterforcompare)
+ // Calculate change by comparing first half vs second half
  const midPoint = Math.floor(data.length / 2);
  const firstHalf = data.slice(0, midPoint).reduce((sum, d) => sum + d.current, 0);
  const secondHalf = data.slice(midPoint).reduce((sum, d) => sum + d.current, 0);
@@ -116,7 +117,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  return Math.max(...data.map(d => d.current), 1);
  }, [data]);
  
- // Display'sDataCount
+ // Display Data Count
  const displayData = useMemo(() => {
  if (data.length === 0) return [];
  if (timeRange === "7d") return data;
@@ -125,7 +126,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  }, [data, timeRange]);
 
  // Generate SVG Path
- const generatePath = (points: number[]", type: "line" | "area") => {
+ const generatePath = (points: number[], type: "line" | "area") => {
  if (points.length === 0) return "";
  
  const width = 100;
@@ -144,7 +145,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  if (type === "line") {
  return `M ${pathPoints.join(" L ")}`;
  } else {
- // face
+ // Area chart fill path
  const firstX = padding;
  const lastX = padding + (points.length - 1) * xStep;
  return `M ${firstX},${height - padding} L ${pathPoints.join(" L ")} L ${lastX},${height - padding} Z`;
@@ -162,7 +163,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <div className="p-1.5 rounded-lg bg-primary/10 ring-1 ring-primary/20">
  <BarChart2 className="w-4 h-4 text-primary" />
  </div>
- ExecuteTrend
+            Execution Trend
  </h3>
  {isLoading ? (
  <div className="h-8 w-24 bg-muted rounded animate-pulse" />
@@ -193,7 +194,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  
  {/* Control - Enhanced */}
  <div className="flex items-center gap-2">
- {/* RefreshButton */}
+ {/* Refresh Button */}
  <button
  onClick={loadData}
  disabled={isLoading}
@@ -202,7 +203,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
  </button>
  
- {/* ChartTypeSwitch */}
+ {/* Chart Type Switch */}
  <div className="flex items-center bg-muted/50 rounded-xl p-1 ring-1 ring-border/30">
  <button
  onClick={() => setChartType("line")}
@@ -224,13 +225,13 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  ? "bg-primary text-white shadow-sm shadow-primary/30" 
  : "text-muted-foreground hover:text-foreground hover:bg-muted"
  )}
- title="face"
+ title="Area Chart"
  >
  <AreaChart className="w-4 h-4" />
  </button>
  </div>
  
- {/* TimeRangeSelect */}
+ {/* Time Range Select */}
  <div className="flex items-center bg-muted/50 rounded-xl p-1 ring-1 ring-border/30">
  {(Object.keys(timeRangeConfig) as TimeRange[]).map((range) => (
  <button
@@ -250,7 +251,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  </div>
  </div>
 
- {/* ChartRegion */}
+ {/* Chart Region */}
  <div 
  className="relative h-48"
  onMouseLeave={() => setHoveredIndex(null)}
@@ -260,14 +261,14 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-3 ring-1 ring-primary/20">
  <Loader2 className="w-7 h-7 animate-spin text-primary" />
  </div>
- <p className="text-sm text-muted-foreground">LoadTrendData...</p>
+ <p className="text-sm text-muted-foreground">Loading trend data...</p>
  </div>
  ) : error ? (
  <div className="absolute inset-0 flex flex-col items-center justify-center">
  <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mb-3 ring-1 ring-red-500/20">
  <TrendingDown className="w-7 h-7 text-red-500" />
  </div>
- <p className="text-sm font-medium text-foreground mb-1">LoadFailed</p>
+ <p className="text-sm font-medium text-foreground mb-1">Load Failed</p>
  <p className="text-xs text-muted-foreground mb-3">{error}</p>
  <button 
  onClick={loadData}
@@ -282,7 +283,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <BarChart2 className="w-7 h-7 text-muted-foreground" />
  </div>
  <p className="text-sm font-medium text-foreground">No data available</p>
- <p className="text-xs text-muted-foreground mt-1">ExecuteWorkflowafterwillDisplayTrend</p>
+ <p className="text-xs text-muted-foreground mt-1">Run workflows to see trend here</p>
  </div>
  ) : (
  <>
@@ -292,7 +293,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  className="w-full h-full"
  preserveAspectRatio="none"
  >
- {/* Gridline */}
+ {/* Grid Lines */}
  <defs>
  <pattern id="grid" width="10" height="20" patternUnits="userSpaceOnUse">
  <path d="M 10 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-border" />
@@ -300,7 +301,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  </defs>
  <rect width="100" height="100" fill="url(#grid)" opacity="0.5" />
  
- {/* CurrentData */}
+ {/* Current Data */}
  {currentPath && (
  <path
  d={currentPath}
@@ -313,7 +314,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  />
  )}
  
- {/* Data */}
+ {/* Data Points */}
  {displayData.map((point, index) => {
  const x = 5 + (displayData.length > 1 ? index * ((100 - 10) / (displayData.length - 1)) : 45);
  const y = 100 - 5 - (point.current / maxValue) * (100 - 10);
@@ -331,7 +332,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  })}
  </svg>
  
- {/* HoverTip */}
+ {/* Hover Tooltip */}
  {hoveredIndex !== null && displayData[hoveredIndex] && (
  <div 
  className="absolute z-10 bg-popover border border-border rounded-lg shadow-lg p-3 pointer-events-none"
@@ -348,7 +349,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <div className="space-y-1">
  <p className="text-sm">
  <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2" />
- totalExecute: <span className="font-semibold text-foreground">{displayData[hoveredIndex].current}</span>
+ Total Executions: <span className="font-semibold text-foreground">{displayData[hoveredIndex].current}</span>
  </p>
  <p className="text-xs text-muted-foreground">
  Success: {displayData[hoveredIndex].success} / Failed: {displayData[hoveredIndex].failed}
@@ -357,7 +358,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  </div>
  )}
  
- {/* XTags */}
+ {/* X-Axis Labels */}
  <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1">
  {displayData.filter((_, i) => i % Math.ceil(displayData.length / 5) === 0 || i === displayData.length - 1).map((point, index) => (
  <span key={index} className="text-[10px] text-muted-foreground">
@@ -369,11 +370,11 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  )}
  </div>
 
- {/* example - Enhanced */}
+ {/* Legend - Enhanced */}
  <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-border/50">
  <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group">
  <div className="w-3 h-3 rounded-md bg-gradient-to-br from-primary to-primary/80 shadow-sm shadow-primary/30 group-hover:scale-125 transition-transform" />
- <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">Executetimescount</span>
+ <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">Execution Count</span>
  </div>
  <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group">
  <div className="w-3 h-3 rounded-md bg-primary/30 ring-1 ring-primary/20 group-hover:scale-125 transition-transform" />

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * FavoritePage
- * ManageUserFavorite'sWorkflow, Agent, TemplateetcContent
+ * Favorite Page
+ * Manages user's favorite workflows, agents, templates and other content
  */
 
 import { useState, useMemo } from "react";
@@ -50,7 +50,7 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// FavoriteTypeConfig
+// Favorite Type Config
 const typeConfig = {
  workflow: {
  label: "Workflow",
@@ -96,12 +96,12 @@ const typeConfig = {
 
 type FavoriteType = keyof typeof typeConfig;
 
-// MockFavoriteData
+// Mock Favorite Data
 const mockFavorites = [
  {
  id: "fav-1",
- name: "eachdayDataSyncWorkflow",
- description: "AutoSyncmultipleData'sDatatomainDatabase",
+ name: "Daily data sync workflow",
+ description: "Auto-sync data to your main database",
  type: "workflow" as FavoriteType,
  href: "/dashboard/workflows/wf-1",
  createdAt: "2026-01-15T10:00:00",
@@ -111,8 +111,8 @@ const mockFavorites = [
  },
  {
  id: "fav-2",
- name: "SupportSmartAssistant",
- description: "Based on GPT-4 'sSmartSupport Agent, SupportmultipleConversation",
+ name: "Support smart assistant",
+ description: "GPT-4 powered support agent with multi-conversation support",
  type: "agent" as FavoriteType,
  href: "/dashboard/my-agents/agent-1",
  createdAt: "2026-01-20T09:00:00",
@@ -122,52 +122,52 @@ const mockFavorites = [
  },
  {
  id: "fav-3",
- name: "Marketing CopyGenerateTemplate",
- description: "1keyGenerateProductMarketing Copy, SupportmultipletypeStyle",
+name: "Marketing copy template",
+  description: "Generate product marketing copy in multiple styles",
  type: "template" as FavoriteType,
  href: "/dashboard/template-gallery/tpl-1",
  createdAt: "2026-01-10T14:00:00",
  favoritedAt: "2026-01-28T16:45:00",
- author: "ContentTeam",
+    author: "Content Team",
  usageCount: 234,
  },
  {
  id: "fav-4",
- name: "API DevelopmentDocument",
- description: "Complete's REST API InterfaceDocumentandUsageGuide",
+    name: "API Development Document",
+ description: "Complete REST API documentation and usage guide",
  type: "document" as FavoriteType,
  href: "/docs/api",
  createdAt: "2026-01-05T08:00:00",
  favoritedAt: "2026-01-25T11:20:00",
- author: "DevelopmentTeam",
+    author: "Development Team",
  usageCount: 567,
  },
  {
  id: "fav-5",
- name: "UserSign UpNotificationsFlow",
- description: "newUserSign UpafterAutoSendWelcomeEmailandSMS",
+name: "User sign-up notifications flow",
+  description: "Send welcome email and SMS when a new user signs up",
  type: "workflow" as FavoriteType,
  href: "/dashboard/workflows/wf-2",
  createdAt: "2026-01-18T13:00:00",
  favoritedAt: "2026-02-03T09:00:00",
- author: "OperationsTeam",
+    author: "Operations Team",
  usageCount: 78,
  },
  {
  id: "fav-6",
- name: "DataAnalytics Agent",
- description: "SmartDataAnalyticsAssistant, SupportNaturalLanguageQuery",
+    name: "Data Analytics Agent",
+ description: "Smart analytics assistant with natural language queries",
  type: "agent" as FavoriteType,
  href: "/dashboard/my-agents/agent-2",
  createdAt: "2026-01-22T11:00:00",
  favoritedAt: "2026-01-30T15:30:00",
- author: "DataTeam",
+    author: "Data Team",
  usageCount: 45,
  },
  {
  id: "fav-7",
- name: "itemResourceFolder",
- description: "itemRelated'sImage, DocumentandConfigFile",
+ name: "Item resource folder",
+ description: "Related images, documents and config files",
  type: "folder" as FavoriteType,
  href: "/dashboard/files/folder-1",
  createdAt: "2026-01-08T10:00:00",
@@ -177,13 +177,13 @@ const mockFavorites = [
  },
  {
  id: "fav-8",
- name: "E-commerceOrderProcessTemplate",
- description: "AutoProcessOrderStatusUpdateandInventorySync",
+name: "E-commerce order processing template",
+  description: "Auto-update order status and sync inventory",
  type: "template" as FavoriteType,
  href: "/dashboard/template-gallery/tpl-2",
  createdAt: "2026-01-12T16:00:00",
  favoritedAt: "2026-02-01T08:45:00",
- author: "E-commerceTeam",
+    author: "E-commerce Team",
  usageCount: 112,
  },
 ];
@@ -192,13 +192,13 @@ type SortKey = "favoritedAt" | "name" | "usageCount" | "createdAt";
 type ViewMode = "grid" | "list";
 
 const sortOptions: { value: SortKey; label: string }[] = [
- { value: "favoritedAt", label: "FavoriteTime" },
+ { value: "favoritedAt", label: "Favorite time" },
  { value: "name", label: "Name" },
- { value: "usageCount", label: "Usagetimescount" },
+ { value: "usageCount", label: "Usage count" },
  { value: "createdAt", label: "Created At" },
 ];
 
-// FormatTime
+// Format Time
 function formatDate(dateString: string) {
  const date = new Date(dateString);
  const now = new Date();
@@ -207,8 +207,8 @@ function formatDate(dateString: string) {
 
  if (diffDays === 0) return "Today";
  if (diffDays === 1) return "Yesterday";
- if (diffDays < 7) return `${diffDays} daysbefore`;
- if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeksbefore`;
+ if (diffDays < 7) return `${diffDays} days ago`;
+ if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 }
 
@@ -220,7 +220,7 @@ export default function FavoritesPage() {
  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
  const [favorites, setFavorites] = useState(mockFavorites);
 
- // FilterandSort
+  // Filter and Sort
  const visibleFavorites = useMemo(() => {
  const filtered = favorites.filter((fav) => {
  const matchesSearch =
@@ -245,7 +245,7 @@ export default function FavoritesPage() {
  });
  }, [favorites, searchQuery, selectedType, sortBy]);
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedItems);
  if (newSelected.has(id)) {
@@ -272,13 +272,13 @@ export default function FavoritesPage() {
  setSelectedItems(new Set(selectedItems));
  };
 
- // BatchUnfavorite
+  // Batch Unfavorite
  const bulkRemove = () => {
  setFavorites((prev) => prev.filter((fav) => !selectedItems.has(fav.id)));
  setSelectedItems(new Set());
  };
 
- // StatisticsData
+  // Statistics Data
  const stats = {
  total: favorites.length,
  workflows: favorites.filter((f) => f.type === "workflow").length,
@@ -292,30 +292,30 @@ export default function FavoritesPage() {
 
  const statCards = [
  {
- label: "allsectionFavorite",
+ label: "All Favorites",
  value: stats.total,
- helper: "Favoriteitem",
+      helper: "Favorite items",
  icon: Star,
  iconClassName: "bg-warning-200/60 border-warning/30 text-warning",
  },
  {
  label: "Workflow",
  value: stats.workflows,
- helper: "AutomationFlow",
+ helper: "Automation flow",
  icon: Zap,
  iconClassName: "bg-brand-200/60 border-brand-400/40 text-brand-500",
  },
  {
  label: "Agent",
  value: stats.agents,
- helper: "SmartAssistant",
+ helper: "Smart assistant",
  icon: Bot,
  iconClassName: "bg-surface-200 border-border text-foreground-light",
  },
  {
  label: "Template",
  value: stats.templates,
- helper: "PresetTemplate",
+ helper: "Preset template",
  icon: BookOpen,
  iconClassName: "bg-warning-200/60 border-warning/30 text-warning",
  },
@@ -324,12 +324,12 @@ export default function FavoritesPage() {
  return (
  <PageContainer>
  <div className="space-y-6">
- {/* PageHeader */}
+      {/* Page Header */}
  <div className="space-y-3">
  <p className="page-caption">Favorites</p>
  <PageHeader
  title="Favorite"
- description="ManageyouFavorite'sWorkflow, Agent, TemplateandDocument"
+ description="Manage your favorite workflows, agents, templates and documents"
  actions={
  <div className="flex items-center gap-2">
  <ButtonGroup attached>
@@ -368,7 +368,7 @@ export default function FavoritesPage() {
  </PageHeader>
  </div>
 
- {/* StatisticsCard */}
+      {/* Statistics Cards */}
  <section className="page-section">
  <div className="page-grid grid-cols-2 lg:grid-cols-4">
  {statCards.map((stat) => {
@@ -407,7 +407,7 @@ export default function FavoritesPage() {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
  variant="dark"
- placeholder="SearchFavorite..."
+ placeholder="Search favorites..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
@@ -419,7 +419,7 @@ export default function FavoritesPage() {
  <SelectValue placeholder="Type" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionType</SelectItem>
+ <SelectItem value="all">All Types</SelectItem>
  <SelectItem value="workflow">Workflow</SelectItem>
  <SelectItem value="agent">Agent</SelectItem>
  <SelectItem value="template">Template</SelectItem>
@@ -455,7 +455,7 @@ export default function FavoritesPage() {
  </div>
  </section>
 
- {/* BatchAction */}
+      {/* Batch Actions */}
  {hasSelection && (
  <section className="page-panel border-brand-400/40 bg-brand-200/20">
  <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -463,7 +463,7 @@ export default function FavoritesPage() {
  <Badge variant="primary" size="sm">
  {selectedItems.size}
  </Badge>
- alreadySelect {selectedItems.size} Favorite
+ Selected {selectedItems.size} favorite(s)
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="destructive" size="sm" onClick={bulkRemove} leftIcon={<StarOff className="w-4 h-4" />}>
@@ -477,11 +477,11 @@ export default function FavoritesPage() {
  </section>
  )}
 
- {/* FavoriteList */}
+      {/* Favorites List */}
  <section className="page-panel overflow-hidden">
  <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
  <div>
- <p className="page-panel-title">FavoriteList</p>
+ <p className="page-panel-title">Favorites list</p>
  <p className="page-panel-description"> {visibleFavorites.length} Favorite</p>
  </div>
  <div className="flex items-center gap-2">
@@ -500,7 +500,7 @@ export default function FavoritesPage() {
  />
  <span className="text-left">Name</span>
  <span className="hidden md:block text-center">Type</span>
- <span className="hidden md:block text-center">FavoriteTime</span>
+ <span className="hidden md:block text-center">Favorite time</span>
  <span className="text-right">Action</span>
  </div>
 
@@ -509,13 +509,13 @@ export default function FavoritesPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <Star className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NoFavorite</h3>
+ <h3 className="text-base font-medium text-foreground mb-2">No favorites</h3>
  <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
- {searchQuery ? "TryotherheSearchCondition": "FavoriteWorkflow, Agent orTemplateafterwillDisplayatthisin"}
+ {searchQuery ? "Try other search conditions" : "Favorited workflows, agents or templates will appear here"}
  </p>
  <Link href="/dashboard/workflows">
  <Button size="sm" leftIcon={<Zap className="w-4 h-4" />}>
- BrowseWorkflow
+                Browse Workflows
  </Button>
  </Link>
  </div>
@@ -556,7 +556,7 @@ export default function FavoritesPage() {
  <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground-muted mt-1">
  <span>user: {fav.author}</span>
  <span>·</span>
- <span>{fav.usageCount} timesUsage</span>
+                <span>{fav.usageCount} uses</span>
  </div>
  </div>
  </div>
@@ -602,7 +602,7 @@ export default function FavoritesPage() {
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <Copy className="w-4 h-4 mr-2" />
- CopyLink
+                Copy Link
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border" />
  <DropdownMenuItem
@@ -628,13 +628,13 @@ export default function FavoritesPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <Star className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NoFavorite</h3>
+ <h3 className="text-base font-medium text-foreground mb-2">No favorites</h3>
  <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
- {searchQuery ? "TryotherheSearchCondition": "FavoriteWorkflow, Agent orTemplateafterwillDisplayatthisin"}
+ {searchQuery ? "Try other search conditions" : "Favorited workflows, agents or templates will appear here"}
  </p>
  <Link href="/dashboard/workflows">
  <Button size="sm" leftIcon={<Zap className="w-4 h-4" />}>
- BrowseWorkflow
+                Browse Workflows
  </Button>
  </Link>
  </div>
@@ -688,7 +688,7 @@ export default function FavoritesPage() {
 
  <div className="flex items-center justify-between text-[11px] text-foreground-muted">
  <span>{fav.author}</span>
- <span>{fav.usageCount} timesUsage</span>
+                <span>{fav.usageCount} uses</span>
  </div>
  </Link>
  </Card>

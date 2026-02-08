@@ -77,7 +77,7 @@ export default function AppEditorPage({
  workflowId: null,
  workflowData: null,
  isLoading: false,
- error: "CurrentAppUnboundcanEdit'sWorkflowVersion",
+ error: "Current app is not bound; edit workflow version first.",
  }));
  return;
  }
@@ -137,7 +137,7 @@ export default function AppEditorPage({
  }));
  } catch (err) {
  setState((s) => ({ ...s, saveStatus: "error" }));
- console.error("SaveFailed:", err);
+ console.error("Save failed:", err);
  }
  }, [state.workflowData, state.workflowId]);
 
@@ -152,7 +152,7 @@ export default function AppEditorPage({
  }, 3000);
  } catch (err) {
  setState((s) => ({ ...s, executionStatus: "failed" }));
- console.error("ExecuteFailed:", err);
+ console.error("Execution failed:", err);
  }
  }, [state.workflowId]);
 
@@ -182,7 +182,7 @@ export default function AppEditorPage({
  )}
  </div>
  <div className="text-xs text-foreground-muted">
- {state.app?.description || "BindCurrent Version'sWorkflowwithEnterEditStatus"}
+ {state.app?.description || "Bind current version workflow and enter edit mode"}
  </div>
  </div>
  </div>
@@ -205,7 +205,7 @@ export default function AppEditorPage({
  <div className="w-10 h-10 rounded-full bg-surface-200 flex items-center justify-center mb-3">
  <AlertCircle className="h-5 w-5 text-foreground-light" />
  </div>
- <div className="text-sm font-medium text-foreground">NoneOpenEdit</div>
+ <div className="text-sm font-medium text-foreground">No open editor</div>
  <div className="text-xs text-foreground-muted mt-1">{state.error}</div>
  </div>
  ) : state.workflowData ? (
@@ -226,7 +226,7 @@ export default function AppEditorPage({
  />
  ) : (
  <div className="h-full flex items-center justify-center text-sm text-foreground-muted">
- NonecanEdit'sWorkflowVersion
+ No workflow version to edit
  </div>
  )}
  </div>

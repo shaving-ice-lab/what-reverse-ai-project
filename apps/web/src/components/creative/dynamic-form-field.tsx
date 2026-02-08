@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * DynamicFormFieldComponent
+ * Dynamic Form Field Component
  * 
- * Based on InputField TypeDefinitionDynamicRendernotType'sFormWidget
- * SupportVerify, AI Suggestion, ConditionDisplayetcFeatures
+ * Dynamically renders different form widgets based on input field type definitions.
+ * Supports validation, AI suggestions, conditional display, and more.
  */
 
 import { useState, useCallback } from "react";
@@ -54,49 +54,49 @@ export interface DynamicFormFieldProps {
 }
 
 /**
- * VerifyFieldvalue
+ * Validate field value
  */
 export function validateFieldValue(
  value: unknown,
  validation?: InputValidation,
  isRequired?: boolean
 ): string | undefined {
- // RequiredVerify
+  // Required validation
  if (isRequired || validation?.required) {
  if (value === undefined || value === null || value === "") {
- return "thisFieldasRequired";
+      return "This field is required";
  }
  if (Array.isArray(value) && value.length === 0) {
- return "PleasefewSelect1";
+      return "Please select at least one";
  }
  }
 
- // ifresultvalueasEmptyandRequired, SkipotherheVerify
+  // If value is empty and not required, skip other validations
  if (value === undefined || value === null || value === "") {
  return undefined;
  }
 
  const strValue = String(value);
 
- // LengthVerify
- if (validation?.minLength && strValue.length < validation.minLength) {
- return `fewneedneed ${validation.minLength} Character`;
- }
- if (validation?.maxLength && strValue.length > validation.maxLength) {
- return `mostmultipleAllow ${validation.maxLength} Character`;
- }
+  // Length validation
+  if (validation?.minLength && strValue.length < validation.minLength) {
+    return `Must be at least ${validation.minLength} characters`;
+  }
+  if (validation?.maxLength && strValue.length > validation.maxLength) {
+    return `Cannot exceed ${validation.maxLength} characters`;
+  }
 
- // countvalueRangeVerify
- if (typeof value === "number") {
- if (validation?.min !== undefined && value < validation.min) {
- return `notcansmallat ${validation.min}`;
- }
- if (validation?.max !== undefined && value > validation.max) {
- return `notcanlargeat ${validation.max}`;
- }
- }
+  // Numeric range validation
+  if (typeof value === "number") {
+    if (validation?.min !== undefined && value < validation.min) {
+      return `Cannot be less than ${validation.min}`;
+    }
+    if (validation?.max !== undefined && value > validation.max) {
+      return `Cannot be greater than ${validation.max}`;
+    }
+  }
 
- // currentlythenVerify
+  // Pattern validation
  if (validation?.pattern) {
  const regex = new RegExp(validation.pattern);
  if (!regex.test(strValue)) {
@@ -108,7 +108,7 @@ export function validateFieldValue(
 }
 
 /**
- * CheckConditionDisplay
+ * Check conditional display
  */
 export function checkShowCondition(
  field: InputField,
@@ -137,7 +137,7 @@ export function checkShowCondition(
 }
 
 /**
- * DynamicFormFieldComponent
+ * Dynamic Form Field Component
  */
 export function DynamicFormField({
  field,
@@ -151,12 +151,12 @@ export function DynamicFormField({
  const [aiLoading, setAiLoading] = useState(false);
  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
 
- // CheckConditionDisplay
+  // Check conditional display
  if (!checkShowCondition(field, allValues)) {
  return null;
  }
 
- // AI SuggestionProcess
+  // AI suggestion handler
  const handleAISuggest = useCallback(async () => {
  if (!onAISuggest || !field.aiSuggestPrompt) return;
 
@@ -171,7 +171,7 @@ export function DynamicFormField({
  }
  }, [onAISuggest, field.id, field.aiSuggestPrompt]);
 
- // App AI Suggestion
+  // Apply AI suggestion
  const applyAISuggestion = useCallback(() => {
  if (aiSuggestion) {
  onChange(aiSuggestion);
@@ -179,7 +179,7 @@ export function DynamicFormField({
  }
  }, [aiSuggestion, onChange]);
 
- // RenderFormWidget
+  // Render form widget
  const renderControl = () => {
  switch (field.type) {
  case "text":
@@ -274,7 +274,7 @@ export function DynamicFormField({
  >
  <span className="truncate">
  {selectedValues.length > 0
- ? `alreadySelect ${selectedValues.length} `
+                  ? `${selectedValues.length} selected`
 : field.placeholder || "Please select..."}
  </span>
  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -352,7 +352,7 @@ export function DynamicFormField({
  htmlFor={field.id}
  className="text-sm text-muted-foreground cursor-pointer"
  >
- {value ? "is": "no"}
+              {value ? "Enabled": "Disabled"}
  </Label>
  </div>
  );
@@ -386,7 +386,7 @@ export function DynamicFormField({
 
  return (
  <div className="space-y-2">
- {/* Tagsrow */}
+    {/* Label row */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Label
@@ -410,7 +410,7 @@ export function DynamicFormField({
  )}
  </div>
 
- {/* AI SuggestionButton */}
+      {/* AI Suggestion Button */}
  {field.aiSuggest && onAISuggest && (
  <Button
  type="button"
@@ -430,10 +430,10 @@ export function DynamicFormField({
  )}
  </div>
 
- {/* FormWidget */}
+    {/* Form Widget */}
  {renderControl()}
 
- {/* AI SuggestionResult */}
+    {/* AI Suggestion Result */}
  {aiSuggestion && (
  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
  <div className="flex items-start justify-between gap-2">
@@ -452,13 +452,13 @@ export function DynamicFormField({
  onClick={applyAISuggestion}
  className="h-7 bg-primary hover:bg-primary/90 text-primary-foreground"
  >
- use
+              Apply
  </Button>
  </div>
  </div>
  )}
 
- {/* ErrorInfo */}
+    {/* Error Info */}
  {error && (
  <div className="flex items-center gap-1 text-xs text-red-500">
  <AlertCircle className="w-3 h-3" />
@@ -466,7 +466,7 @@ export function DynamicFormField({
  </div>
  )}
 
- {/* Charactercount(TextType) */}
+    {/* Character count (text types) */}
  {(field.type === "text" || field.type === "textarea") &&
  field.validation?.maxLength && (
  <div className="text-right text-xs text-muted-foreground">

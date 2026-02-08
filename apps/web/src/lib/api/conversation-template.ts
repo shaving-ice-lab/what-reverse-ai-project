@@ -72,7 +72,7 @@ export interface ListTemplatesParams {
 
 export const conversationTemplateApi = {
  /**
- * FetchTemplateList
+ * Fetch Template List
  */
  async list(params?: ListTemplatesParams): Promise<TemplateListResponse> {
  const searchParams = new URLSearchParams();
@@ -169,7 +169,7 @@ export const conversationTemplateApi = {
  },
 
  /**
- * UsageTemplate
+ * Use Template
  */
  async use(id: string): Promise<ConversationTemplate> {
  const response = await request<{ success: boolean; template: ConversationTemplate }>(

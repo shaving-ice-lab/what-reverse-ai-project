@@ -1,10 +1,9 @@
 "use client";
 
 /**
- * File/Knowledge BasePage - Layout
- * and workflows PageLayoutstyle1
- * Left side: FolderFilter + Knowledge BaseList
- * Right side: Overview + FileList
+ * File / Knowledge Base Page
+ * Layout with sidebar for folder filtering and knowledge base list,
+ * main content for overview and file list
  */
 
 import { useState } from "react";
@@ -59,9 +58,9 @@ import {
  LayoutGrid,
 } from "lucide-react";
 
-// FolderStructure
+// Folder Structure
 const folders = [
- { id: "all", name: "allsectionFile", count: 24 },
+ { id: "all", name: "All Files", count: 24 },
  { id: "documents", name: "Document", count: 12 },
  { id: "images", name: "Image", count: 5 },
  { id: "code", name: "Code", count: 4 },
@@ -72,29 +71,29 @@ const folders = [
 const knowledgeBases = [
  {
  id: "kb-1",
- name: "ProductDocument",
- description: "ProductDescription, FAQ, HelpDocument",
+    name: "Product Docs",
+    description: "Product descriptions, FAQ, help documents",
  fileCount: 45,
  vectorCount: 12800,
- lastUpdated: "2hbefore",
+ lastUpdated: "2 hours ago",
  status: "active",
  },
  {
  id: "kb-2",
- name: "TechnologyMaterials",
- description: "API Document, DevelopmentGuide, ArchitectureDocument",
+    name: "Technical Docs",
+    description: "API docs, development guides, architecture documents",
  fileCount: 28,
  vectorCount: 8500,
- lastUpdated: "1daysbefore",
+ lastUpdated: "1 day ago",
  status: "active",
  },
  {
  id: "kb-3",
- name: "CustomerFeedback",
- description: "UserFeedback, SurveyReport, ReviewsData",
+    name: "Customer Feedback",
+    description: "User feedback, survey reports, reviews data",
  fileCount: 15,
  vectorCount: 4200,
- lastUpdated: "3daysbefore",
+ lastUpdated: "3 days ago",
  status: "indexing",
  },
 ];
@@ -108,10 +107,10 @@ const files = [
  size: "2.4 MB",
  folder: "documents",
  uploadedAt: "2026-01-30",
- updatedAt: "2hbefore",
+ updatedAt: "2 hours ago",
  starred: true,
  indexed: true,
- knowledgeBase: "ProductDocument",
+    knowledgeBase: "Product Docs",
  },
  {
  id: "2",
@@ -120,10 +119,10 @@ const files = [
  size: "156 KB",
  folder: "documents",
  uploadedAt: "2026-01-28",
- updatedAt: "1daysbefore",
+ updatedAt: "1 day ago",
  starred: false,
  indexed: true,
- knowledgeBase: "TechnologyMaterials",
+    knowledgeBase: "Technical Docs",
  },
  {
  id: "3",
@@ -132,7 +131,7 @@ const files = [
  size: "4.8 MB",
  folder: "datasets",
  uploadedAt: "2026-01-25",
- updatedAt: "3daysbefore",
+ updatedAt: "3 days ago",
  starred: true,
  indexed: false,
  knowledgeBase: null,
@@ -144,7 +143,7 @@ const files = [
  size: "1.2 MB",
  folder: "images",
  uploadedAt: "2026-01-24",
- updatedAt: "4daysbefore",
+ updatedAt: "4 days ago",
  starred: false,
  indexed: false,
  knowledgeBase: null,
@@ -156,10 +155,10 @@ const files = [
  size: "45 KB",
  folder: "code",
  uploadedAt: "2026-01-22",
- updatedAt: "6daysbefore",
+ updatedAt: "6 days ago",
  starred: false,
  indexed: true,
- knowledgeBase: "TechnologyMaterials",
+    knowledgeBase: "Technical Docs",
  },
  {
  id: "6",
@@ -168,7 +167,7 @@ const files = [
  size: "3.6 MB",
  folder: "documents",
  uploadedAt: "2026-01-20",
- updatedAt: "1weeksbefore",
+ updatedAt: "1 week ago",
  starred: false,
  indexed: false,
  knowledgeBase: null,
@@ -180,7 +179,7 @@ const files = [
  size: "8.2 MB",
  folder: "images",
  uploadedAt: "2026-01-18",
- updatedAt: "2weeksbefore",
+ updatedAt: "2 weeks ago",
  starred: true,
  indexed: false,
  knowledgeBase: null,
@@ -192,14 +191,14 @@ const files = [
  size: "15.4 MB",
  folder: "datasets",
  uploadedAt: "2026-01-15",
- updatedAt: "2weeksbefore",
+ updatedAt: "2 weeks ago",
  starred: false,
  indexed: true,
- knowledgeBase: "CustomerFeedback",
+    knowledgeBase: "Customer Feedback",
  },
 ];
 
-// FetchFileIcon
+// Get File Icon
 const getFileIcon = (type: string) => {
  switch (type) {
  case "document":
@@ -215,7 +214,7 @@ const getFileIcon = (type: string) => {
  }
 };
 
-// StorageUsageSituation
+// Storage Usage
 const storageUsage = {
  used: 2.4,
  limit: 10,
@@ -227,7 +226,7 @@ const storageUsage = {
  ],
 };
 
-// SidebarComponent
+// Sidebar Component
 function FilesSidebar({
  selectedFolder,
  setSelectedFolder,
@@ -246,7 +245,7 @@ function FilesSidebar({
 
  return (
  <div className="space-y-1">
- {/* FolderFilter */}
+    {/* Folder Filter */}
  <SidebarNavGroup title="Folder">
  {folders.map((folder) => (
  <button
@@ -274,13 +273,13 @@ function FilesSidebar({
  ))}
  </SidebarNavGroup>
 
- {/* CreateFolder */}
- <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors mt-2">
- <Plus className="w-3.5 h-3.5" />
- CreateFolder
+    {/* Create Folder */}
+      <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors mt-2">
+        <Plus className="w-3.5 h-3.5" />
+        Create Folder
  </button>
 
- {/* Separatorline */}
+      {/* Separator */}
  <div className="h-px bg-border my-3" />
 
  {/* Knowledge Base */}
@@ -305,17 +304,17 @@ function FilesSidebar({
  ))}
  <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors">
  <Plus className="w-3.5 h-3.5" />
- CreateKnowledge Base
+        Create Knowledge Base
  </button>
  </SidebarNavGroup>
 
- {/* Separatorline */}
+      {/* Separator */}
  <div className="h-px bg-border my-3" />
 
- {/* StorageUsage */}
- <div className="px-2 py-2">
- <div className="flex items-center justify-between text-[11px] mb-2">
- <span className="text-foreground-muted">StorageUsage</span>
+      {/* Storage Usage */}
+      <div className="px-2 py-2">
+        <div className="flex items-center justify-between text-[11px] mb-2">
+          <span className="text-foreground-muted">Storage Usage</span>
  <span className="text-foreground font-medium">
  {storageUsage.used} / {storageUsage.limit} GB
  </span>
@@ -352,7 +351,7 @@ export default function FilesPage() {
  const [isDragging, setIsDragging] = useState(false);
  const [sortBy, setSortBy] = useState<SortBy>("updated");
 
- // FilterFile
+  // Filter Files
  const filteredFiles = files.filter((file) => {
  const matchesSearch = file.name
  .toLowerCase()
@@ -362,7 +361,7 @@ export default function FilesPage() {
  return matchesSearch && matchesFolder;
  });
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedFiles);
  if (newSelected.has(id)) {
@@ -390,7 +389,7 @@ export default function FilesPage() {
 
  const activeFolder = folders.find((folder) => folder.id === selectedFolder);
 
- // StatisticsData
+  // Statistics
  const stats = {
  total: files.length,
  indexed: files.filter((f) => f.indexed).length,
@@ -400,12 +399,12 @@ export default function FilesPage() {
  };
 
  const sortOptions: Array<{ value: SortBy; label: string }> = [
- { value: "updated", label: "RecentUpdate" },
+    { value: "updated", label: "Recently Updated" },
  { value: "name", label: "Name" },
  { value: "size", label: "Size" },
  ];
 
- // SortFile
+  // Sort Files
  const sortedFiles = [...filteredFiles].sort((a, b) => {
  switch (sortBy) {
  case "name":
@@ -417,11 +416,11 @@ export default function FilesPage() {
  );
  case "updated":
  default:
- return 0; // MaintainOrder(alreadybyUpdated AtSort)
+      return 0; // Maintain order (already sorted by update time)
  }
  });
 
- // RecentUpdate'sFile
+  // Most Recently Updated File
  const mostRecentFile = files[0];
 
  return (
@@ -442,17 +441,17 @@ export default function FilesPage() {
  <div className="flex items-start justify-between">
  <div>
  <h1 className="text-[18px] font-semibold text-foreground">
- FileManage
+          File Management
  </h1>
  <p className="text-[12px] text-foreground-light mt-1">
- ManageUploadFile, Knowledge BaseIndexandVectorData
+ Manage uploads, knowledge base index and vector data
  </p>
  </div>
  <div className="flex items-center gap-2">
  {isSelectionMode ? (
  <>
  <span className="text-[12px] text-foreground-light">
- alreadySelect {selectedFiles.size} 
+              {selectedFiles.size} selected
  </span>
  <Button variant="outline" size="sm" onClick={resetSelection}>
  Cancel
@@ -471,44 +470,44 @@ export default function FilesPage() {
  size="sm"
  leftIcon={<FolderPlus className="h-3.5 w-3.5" />}
  >
- CreateFolder
+              Create Folder
  </Button>
  <Button size="sm" leftIcon={<Upload className="h-3.5 w-3.5" />}>
- UploadFile
+              Upload File
  </Button>
  </>
  )}
  </div>
  </div>
 
- {/* OverviewPanel */}
+        {/* Overview Panel */}
  <div className="page-panel">
  <div className="page-panel-header">
  <h2 className="page-panel-title">Overview</h2>
- <p className="page-panel-description">StorageUsageandkeyMetrics</p>
+ <p className="page-panel-description">Storage usage and key metrics</p>
  </div>
  <div className="p-4">
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
  <p className="text-[11px] text-foreground-muted mb-1">
- totalFilecount
+                Total Files
  </p>
  <p className="text-lg font-semibold text-foreground">
  {stats.total}
  </p>
  <p className="text-[11px] text-foreground-muted">
- {stats.starred} alreadyFavorite
+                {stats.starred} favorited
  </p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
  <p className="text-[11px] text-foreground-muted mb-1">
- alreadyIndex
+                Indexed
  </p>
  <p className="text-lg font-semibold text-foreground">
  {stats.indexed}
  </p>
  <p className="text-[11px] text-foreground-muted">
- {Math.round((stats.indexed / stats.total) * 100)}% Coveragerate
+                {Math.round((stats.indexed / stats.total) * 100)}% coverage
  </p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
@@ -517,12 +516,12 @@ export default function FilesPage() {
  {stats.knowledgeBases}
  </p>
  <p className="text-[11px] text-foreground-muted">
- {(stats.totalVectors / 1000).toFixed(1)}kVector
+                {(stats.totalVectors / 1000).toFixed(1)}k vectors
  </p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
  <p className="text-[11px] text-foreground-muted mb-1">
- StorageUsage
+                Storage Usage
  </p>
  <p className="text-lg font-semibold text-brand-500">
  {Math.round((storageUsage.used / storageUsage.limit) * 100)}%
@@ -533,12 +532,12 @@ export default function FilesPage() {
  </div>
  </div>
 
- {/* RecentUpdate */}
- {mostRecentFile && (
- <div className="pt-4 border-t border-border">
- <div className="flex items-center justify-between mb-3">
- <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
- RecentUpdate
+          {/* Recently Updated */}
+            {mostRecentFile && (
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
+                    Recently Updated
  </span>
  <span className="text-[11px] text-foreground-muted">
  {mostRecentFile.updatedAt}
@@ -564,12 +563,12 @@ export default function FilesPage() {
  </span>
  {mostRecentFile.indexed && (
  <Badge variant="primary" size="xs">
- alreadyIndex
+                Indexed
  </Badge>
  )}
  </div>
  <p className="text-[11px] text-foreground-light">
- {mostRecentFile.size} · Uploadat {mostRecentFile.uploadedAt}
+                {mostRecentFile.size} · Uploaded on {mostRecentFile.uploadedAt}
  </p>
  </div>
  </div>
@@ -587,7 +586,7 @@ export default function FilesPage() {
  </div>
  </div>
 
- {/* FileListPanel */}
+      {/* File List Panel */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
@@ -647,7 +646,7 @@ export default function FilesPage() {
  {/* Toolbar */}
  <div className="px-4 py-3 border-b border-border flex items-center gap-3">
  <Input
- placeholder="SearchFile..."
+ placeholder="Search files..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  variant="search"
@@ -688,7 +687,7 @@ export default function FilesPage() {
  </DropdownMenu>
  </div>
 
- {/* Drag & DropUploadRegion */}
+          {/* Drag & Drop Upload Region */}
  <div
  className={cn("relative", isDragging && "bg-surface-75/50")}
  onDragOver={(e) => {
@@ -701,22 +700,22 @@ export default function FilesPage() {
  setIsDragging(false);
  }}
  >
- {/* Drag & DropUploadOverlay */}
+            {/* Drag & Drop Upload Overlay */}
  {isDragging && (
  <div className="absolute inset-4 z-20 rounded-md border-2 border-dashed border-brand-500 bg-background-overlay flex items-center justify-center pointer-events-none">
  <div className="text-center">
  <Upload className="w-8 h-8 text-brand-500 mx-auto mb-2" />
  <p className="text-[13px] font-medium text-foreground">
- ReleaseFilewithUpload
+                Drop files to upload
  </p>
  </div>
  </div>
  )}
 
- {/* ListView */}
+            {/* List View */}
  {sortedFiles.length > 0 && viewMode === "list" && (
  <div>
- {/* head */}
+              {/* Header */}
  <div className="hidden lg:grid grid-cols-[1fr_80px_100px_120px_80px] gap-4 px-4 py-2 border-b border-border text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
  {isSelectionMode && <span className="w-5" />}
  <span>File</span>
@@ -725,7 +724,7 @@ export default function FilesPage() {
  <span>Knowledge Base</span>
  <span className="text-right">Action</span>
  </div>
- {/* List */}
+              {/* File List */}
  <div className="divide-y divide-border">
  {sortedFiles.map((file) => {
  const FileIcon = getFileIcon(file.type);
@@ -743,7 +742,7 @@ export default function FilesPage() {
  isSelectionMode && toggleSelect(file.id)
  }
  >
- {/* FileInfo */}
+                  {/* File Info */}
  <div className="flex items-center gap-3 min-w-0">
  {isSelectionMode && (
  <Checkbox
@@ -771,7 +770,7 @@ export default function FilesPage() {
  )}
  </div>
  <p className="text-[11px] text-foreground-light truncate">
- Uploadat {file.uploadedAt}
+                Uploaded on {file.uploadedAt}
  </p>
  </div>
  </div>
@@ -826,7 +825,7 @@ export default function FilesPage() {
  icon={<Edit3 />}
  className="cursor-pointer"
  >
- re-Naming
+                  Rename
  </DropdownMenuItem>
  <DropdownMenuItem
  icon={<Star />}
@@ -838,7 +837,7 @@ export default function FilesPage() {
  icon={<Brain />}
  className="cursor-pointer"
  >
- AddtoKnowledge Base
+                  Add to Knowledge Base
  </DropdownMenuItem>
  <DropdownMenuSeparator />
  <DropdownMenuItem
@@ -851,7 +850,7 @@ export default function FilesPage() {
  icon={<LinkIcon />}
  className="cursor-pointer"
  >
- CopyLink
+                  Copy Link
  </DropdownMenuItem>
  <DropdownMenuSeparator />
  <DropdownMenuItem
@@ -865,7 +864,7 @@ export default function FilesPage() {
  </DropdownMenu>
  </div>
 
- {/* MoveendpointInfo */}
+                  {/* Mobile Info */}
  <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted lg:hidden">
  <span>{file.size}</span>
  <span>{file.updatedAt}</span>
@@ -880,7 +879,7 @@ export default function FilesPage() {
  </div>
  )}
 
- {/* GridView */}
+          {/* Grid View */}
  {sortedFiles.length > 0 && viewMode === "grid" && (
  <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
  {sortedFiles.map((file) => {
@@ -931,7 +930,7 @@ export default function FilesPage() {
  </p>
 
  <div className="flex items-center justify-between text-[10px] text-foreground-muted">
- <span>{file.knowledgeBase || "not yetIndex"}</span>
+              <span>{file.knowledgeBase || "Not indexed"}</span>
  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
  <button
  className="p-1 rounded hover:bg-surface-200 transition-colors"
@@ -960,12 +959,12 @@ export default function FilesPage() {
  <FolderOpen className="w-5 h-5 text-foreground-muted" />
  </div>
  <h3 className="text-[13px] font-medium text-foreground mb-1">
- {searchQuery ? "NotoMatch'sFile": "Not yetFile"}
+ {searchQuery ? "No matching files" : "No files yet"}
  </h3>
  <p className="text-[11px] text-foreground-light mb-4 max-w-xs mx-auto">
  {searchQuery
- ? "TryUsageotherheKeywords"
-: "Drag & DropFiletothisorClickUploadStartBuildKnowledge Base"}
+ ? "Try other keywords"
+: "Drag & drop files here or click to upload and start building your knowledge base"}
  </p>
  {searchQuery ? (
  <Button
@@ -976,11 +975,11 @@ export default function FilesPage() {
  setSelectedFolder("all");
  }}
  >
- ClearFilter
+ Clear Filter
  </Button>
  ) : (
  <Button size="sm" leftIcon={<Upload className="w-3.5 h-3.5" />}>
- UploadFile
+              Upload File
  </Button>
  )}
  </div>

@@ -63,7 +63,7 @@ export const DelayNode = memo(function DelayNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -80,7 +80,7 @@ export const DelayNode = memo(function DelayNode({
  <div className="flex-1 min-w-0">
  <h3 className="font-medium text-sm truncate">{data.label || "Latency"}</h3>
  <p className="text-xs text-foreground-muted">
- {isRandom ? "Randometcpending": "etcpendingTime"}
+ {isRandom ? "Random Delay" : "Fixed Delay"}
  </p>
  </div>
  </div>

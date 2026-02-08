@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Divider SplitlineComponent
+ * Divider Component
  * 
- * Support: 
- * - Horizontal/Verticalmethod
- * - multipletypestyleVariant
- * - charSplit
- * - GradientEffect
+ * Supports:
+ * - Horizontal/vertical orientation
+ * - Multiple style variants
+ * - Text dividers
+ * - Gradient effects
  */
 
 import * as React from "react"
@@ -42,19 +42,19 @@ const dividerVariants = cva(
  },
  },
  compoundVariants: [
- // Horizontalmethodbetween
+     // Horizontal spacing
  { orientation: "horizontal", spacing: "xs", className: "my-1" },
  { orientation: "horizontal", spacing: "sm", className: "my-2" },
  { orientation: "horizontal", spacing: "default", className: "my-4" },
  { orientation: "horizontal", spacing: "lg", className: "my-6" },
  { orientation: "horizontal", spacing: "xl", className: "my-8" },
- // Verticalmethodbetween
+     // Vertical spacing
  { orientation: "vertical", spacing: "xs", className: "mx-1" },
  { orientation: "vertical", spacing: "sm", className: "mx-2" },
  { orientation: "vertical", spacing: "default", className: "mx-4" },
  { orientation: "vertical", spacing: "lg", className: "mx-6" },
  { orientation: "vertical", spacing: "xl", className: "mx-8" },
- // linestyle
+     // Line style
  { variant: "dashed", orientation: "horizontal", className: "h-0 border-t border-dashed" },
  { variant: "dashed", orientation: "vertical", className: "w-0 border-l border-dashed" },
  { variant: "dotted", orientation: "horizontal", className: "h-0 border-t border-dotted" },
@@ -71,7 +71,7 @@ const dividerVariants = cva(
 export interface DividerProps
  extends React.HTMLAttributes<HTMLDivElement>,
  VariantProps<typeof dividerVariants> {
- /** Splitline */
+ /** Divider thickness */
  thickness?: number
 }
 
@@ -100,12 +100,12 @@ function Divider({
 }
 
 /**
- * DividerWithText - char'sSplitline
+ * DividerWithText - Divider with text label
  */
 interface DividerWithTextProps extends Omit<DividerProps, "orientation"> {
- /** char */
+ /** Text position */
  textPosition?: "left" | "center" | "right"
- /** charContent */
+ /** Text content */
  children?: React.ReactNode
 }
 
@@ -163,12 +163,12 @@ function DividerWithText({
 }
 
 /**
- * DividerWithIcon - Icon'sSplitline
+ * DividerWithIcon - Divider with icon
  */
 interface DividerWithIconProps extends Omit<DividerProps, "orientation"> {
  /** Icon */
  icon: React.ReactNode
- /** IconBackground */
+ /** Icon background */
  iconBg?: string
 }
 
@@ -224,7 +224,7 @@ function DividerWithIcon({
 }
 
 /**
- * SectionDivider - ChapterSplitline
+ * SectionDivider - Section Divider
  */
 interface SectionDividerProps {
  title: string
@@ -256,12 +256,12 @@ function SectionDivider({
 }
 
 /**
- * ListDivider - ListSplitline
+ * ListDivider - List Divider
  */
 interface ListDividerProps {
- /** Indent(Used forhasIcon'sList) */
+ /** Indent (Used for lists with icons) */
  inset?: boolean
- /** Indent */
+ /** Indent size */
  insetSize?: number
  className?: string
 }

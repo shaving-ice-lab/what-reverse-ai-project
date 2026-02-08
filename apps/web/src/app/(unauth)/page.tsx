@@ -2,7 +2,7 @@
 
 /**
  * Home - AgentFlow page
- * LobeHub Style: DarkTheme, largeWhitespace, GradientDecoration, Modernversion
+ * LobeHub Style: Dark Theme, Large Whitespace, Gradient Decoration, Modern Design
  */
 
 import { useState, useEffect } from "react";
@@ -42,123 +42,123 @@ import { cn } from "@/lib/utils";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 
-// CoreFeatures
+// Core Features
 const features = [
  {
  icon: Bot,
  title: "Smart AI Agent",
- description: "Based onlargeLanguageModel'sSmartAgent, AutoUnderstandRequirementsandExecuteComplexTask",
+    description: "Smart agents powered by large language models that automatically understand requirements and execute complex tasks",
  },
  {
  icon: GitBranch,
- title: "canvisualWorkflow",
- description: "Drag & DropEdit, EasyBuildandManageAutomationWorkflow",
+    title: "Visual Workflow Builder",
+    description: "Drag-and-drop editing to easily build and manage automation workflows",
  },
  {
  icon: Puzzle,
- title: "Rich'sIntegration",
- description: "Support 100+ mainServiceand API 'sNoneIntegration",
+    title: "Rich Integrations",
+    description: "Seamless integration with 100+ popular services and APIs",
  },
  {
  icon: Layers,
- title: "TemplateMarketplace",
- description: "count1000pastVerify'sWorkflowTemplate, 1keyDeploynowcanUsage",
+    title: "Template Marketplace",
+    description: "Thousands of verified workflow templates ready for one-click deployment",
  },
  {
  icon: Shield,
- title: "Enterprise-gradeSecurity",
- description: "SOC 2 Authentication, endpointtoendpointEncrypt, Improve'sPermissionManage",
+    title: "Enterprise-Grade Security",
+    description: "SOC 2 certified, end-to-end encryption, and advanced permission management",
  },
  {
  icon: Globe,
- title: "allDeploy",
- description: "multipleRegionDeploy, LatencyAccess, 99.99% AvailableAssurance",
+    title: "Global Deployment",
+    description: "Multi-region deployment, low-latency access, and 99.99% uptime guarantee",
  },
 ];
 
-// DataStatistics
+// Data Statistics
 const stats = [
  { value: "50,000+", label: "Active Users" },
- { value: "1M+", label: "WorkflowExecute" },
- { value: "99.99%", label: "ServiceAvailable" },
- { value: "100+", label: "IntegrationService" },
+  { value: "1M+", label: "Workflows Executed" },
+  { value: "99.99%", label: "Service Uptime" },
+  { value: "100+", label: "Integrations" },
 ];
 
-// WorkflowStep
+// Workflow Steps
 const workflowSteps = [
  {
  step: 1,
- title: "DescriptionRequirements",
- description: "useNaturalLanguageTell AI youwantneedImplementWhat",
+    title: "Describe Your Requirements",
+    description: "Use natural language to tell AI what you want to accomplish",
  icon: MessageSquare,
  },
  {
  step: 2,
- title: "AI GenerateWorkflow",
- description: "SmartAssistantAutoDesignWorkflowArchitecture",
+    title: "AI Generates Workflow",
+    description: "Smart assistant automatically designs the workflow architecture",
  icon: Bot,
  },
  {
  step: 3,
- title: "canvisualAdjust",
- description: "ViaDrag & DropEditFine-tuningandoptimalFlow",
+    title: "Visual Adjustments",
+    description: "Fine-tune and optimize the flow through drag-and-drop editing",
  icon: Settings,
  },
  {
  step: 4,
- title: "1keyDeploy",
- description: "DeploytoCloud, AutoTriggerExecute",
+    title: "One-Click Deploy",
+    description: "Deploy to the cloud with automatic trigger execution",
  icon: Rocket,
  },
 ];
 
-// CustomerReviews
+// Customer Reviews
 const testimonials = [
  {
- content: "AgentFlow ChangeWe'sWorkmethod.withbeforeneedneedTeam1weeksDone'sDataProcessTask, atneedneedmin.",
- author: "",
- role: "Technologytotal",
- company: "newCompany",
+    content: "AgentFlow transformed how we work. Data processing tasks that used to take a team an entire week now only take minutes.",
+    author: "Zhang Wei",
+    role: "CTO",
+    company: "Startup",
  avatar: "Z",
  },
  {
- content: "canvisualEditGreat, nowmakeNoProgrammingBackground'sColleaguealsocanQuickonCreateAutomationFlow.",
- author: "Li Hua",
- role: "ProductManager",
- company: "E-commercePlatform",
+    content: "The visual editor is amazing — it allows colleagues with no programming background to quickly create automation flows.",
+    author: "Li Hua",
+    role: "Product Manager",
+    company: "E-commerce Platform",
  avatar: "L",
  },
  {
- content: "AI Agent 'sSmartDegreeExceed, itcanUnderstandWe'sBusinessLogicandtooptimalSuggestion.",
- author: "Wang Fang",
- role: "OperationsOwner",
- company: "Finance",
+    content: "The intelligence of the AI Agent exceeded our expectations — it can understand our business logic and provide optimization suggestions.",
+    author: "Wang Fang",
+    role: "Operations Director",
+    company: "Financial Services",
  avatar: "W",
  },
  {
- content: "TemplateMarketplaceinhaslarge'sWorkflow, DirectusethencanSatisfy 80% 'sRequirements, Verymethod.",
- author: "Chen Wei",
- role: "person",
- company: "Company",
+    content: "The template marketplace has a massive selection of workflows. Using them directly satisfies 80% of our needs — it's incredibly convenient.",
+    author: "Chen Wei",
+    role: "Freelancer",
+    company: "Independent",
  avatar: "C",
  },
  {
- content: "Enterprise-grade'sSecurityAssuranceletWecenterwillCoreBusinessFlowMigrationto AgentFlow on.",
- author: "Zhao Li",
- role: "Securitymain",
- company: "largeEnterprise",
+    content: "Enterprise-grade security assurance gave us the confidence to migrate our core business workflows to AgentFlow.",
+    author: "Zhao Li",
+    role: "Security Lead",
+    company: "Enterprise Corp",
  avatar: "ZL",
  },
  {
- content: "CustomerSupportTeamResponsevery, whatIssueallcanat 24 hintoResolve.",
- author: "Sun Qiang",
- role: "IT Manager",
- company: "Manufacturing",
+    content: "The customer support team is incredibly responsive — every issue gets resolved within 24 hours.",
+    author: "Sun Qiang",
+    role: "IT Manager",
+    company: "Manufacturing Co.",
  avatar: "S",
  },
 ];
 
-// Partners/Customer
+// Partners / Customers
 const partners = [
  { name: "TechCorp", logo: "TC" },
  { name: "InnovateLabs", logo: "IL" },
@@ -170,81 +170,81 @@ const partners = [
  { name: "DigitalWave", logo: "DW" },
 ];
 
-// useexampleScenario
+// Use Case Scenarios
 const useCases = [
  {
  icon: ShoppingCart,
- title: "E-commerceOperations",
- description: "AutomationOrderProcess, InventoryManage, CustomerNotifications",
- metrics: "rateImprove 300%",
+    title: "E-commerce Operations",
+    description: "Automated order processing, inventory management, and customer notifications",
+    metrics: "Efficiency improved by 300%",
  },
  {
  icon: Building2,
- title: "EnterpriseOffice",
- description: "ApprovalFlow, day, ReportGenerate",
- metrics: "Save 40 h/weeks",
+    title: "Enterprise Office",
+    description: "Approval workflows, daily scheduling, and report generation",
+    metrics: "Saves 40 hours/week",
  },
  {
  icon: TrendingUp,
- title: "MarketingAutomation",
- description: "multipleChannelContentPublish, DataAnalytics, lineFollow up",
- metrics: "Conversion RateImprove 150%",
+    title: "Marketing Automation",
+    description: "Multi-channel content publishing, data analytics, and lead follow-up",
+    metrics: "Conversion rate improved by 150%",
  },
  {
  icon: HeartPulse,
- title: "HealthcareHealth",
- description: "AppointmentManage, userTrack, DataArchive",
- metrics: "ProcessImprove 200%",
+    title: "Healthcare",
+    description: "Appointment management, patient tracking, and data archiving",
+    metrics: "Process efficiency improved by 200%",
  },
  {
  icon: GraduationCap,
- title: "EducationTraining",
- description: "CourseManage, Notifications, CertificateDistribute",
- metrics: "ManagerateImprove 250%",
+    title: "Education & Training",
+    description: "Course management, notifications, and certificate distribution",
+    metrics: "Management efficiency improved by 250%",
  },
  {
  icon: Shield,
- title: "FinanceService",
- description: "Risk ControlReview, ReportGenerate, ComplianceCheck",
- metrics: "RiskReduce 60%",
+    title: "Financial Services",
+    description: "Risk control reviews, report generation, and compliance checks",
+    metrics: "Risk reduced by 60%",
  },
 ];
 
 // FAQ Data
 const faqs = [
  {
- question: "AgentFlow SuitableWhatScale'sEnterpriseUsage?",
- answer: "AgentFlow SuitabletypeScale'sEnterpriseUsage.frompersonusertolargeEnterprise, WeProvideFlexible'sPlan.FreeVersionSuitablepersonandsmallTeamGetting Started, EnterpriseVersionthenProvidemoremultipleAdvancedFeatures, morelarge'sUsageandExclusiveSupportService.",
+    question: "What size companies is AgentFlow suitable for?",
+    answer: "AgentFlow is suitable for companies of all sizes. From individual users to large enterprises, we offer flexible plans. The free version is great for individuals and small teams getting started, while the enterprise version provides advanced features, larger usage limits, and dedicated support.",
  },
  {
- question: "needneedProgrammingonlycanUsage??",
- answer: "completeallnotneedneed!AgentFlow 'scanvisualEditletwhatpersonallcanViaDrag & DropmethodCreateWorkflow.time, We's AI AssistantcanwithBased onNaturalLanguageDescriptionAutoGenerateWorkflow.",
+    question: "Do I need programming skills to use AgentFlow?",
+    answer: "Not at all! AgentFlow's visual editor lets anyone create workflows through drag-and-drop. Additionally, our AI assistant can automatically generate workflows based on natural language descriptions.",
  },
  {
- question: "DataSecurityifwhatAssurance?",
- answer: "WeVeryre-visualDataSecurity.AgentFlow Via SOC 2 Type II Authentication, AllDataTransferalluse TLS 1.3 Encrypt, StaticDataUsage AES-256 Encrypt.",
+    question: "How is data security ensured?",
+    answer: "We take data security very seriously. AgentFlow is SOC 2 Type II certified, all data transfers use TLS 1.3 encryption, and data at rest is protected with AES-256 encryption.",
  },
  {
- question: "canwithandExistingSystemIntegration??",
- answer: "canwith!AgentFlow Support 100+ mainService'sNativeIntegration, Include Slack, EnterpriseWeChat, DingTalk, Notion, Feishu, GitHub etc.timeSupportVia Webhook and API andwhatCustomSystemIntegration.",
+    question: "Can AgentFlow integrate with existing systems?",
+    answer: "Absolutely! AgentFlow supports native integration with 100+ popular services, including Slack, Microsoft Teams, Notion, GitHub, and more. It also supports integration with any custom system via Webhooks and APIs.",
  },
  {
- question: "FreeusehasWhatLimit?",
- answer: "Freeuseas 14 days, betweencanwithUsageAllProfessionalversionFeatures, NoneneedBinduse.useEndafter, youcanwithSelectContinueUsageFreeversion, orUpgradetoPaidVersion.",
+    question: "What are the limitations of the free trial?",
+    answer: "The free trial lasts 14 days, during which you can access all professional features with no credit card required. After the trial ends, you can continue using the free tier or upgrade to a paid plan.",
  },
  {
- question: "ifwhatFetchTechnologySupport?",
- answer: "WeProvidemultipletypeSupportChannel: OnlineDocumentandTutorial, CommunityForum, EmailSupport(24hinResponse).PaidUserstillcanwithObtainPriorityTechnologySupport, EnterpriseUsermorehasExclusiveCustomerManager.",
+    question: "How can I get technical support?",
+    answer: "We provide multiple support channels: online documentation and tutorials, community forums, and email support (24-hour response time). Paid users also receive priority technical support, and enterprise users get a dedicated account manager.",
  },
 ];
 
-// IntegrationServiceIcon
+// Integration Service Icons
 const integrations = [
  "OpenAI", "Claude", "Slack", "Feishu", "GitHub", "Notion",
  "Shopify", "Stripe", "MySQL", "PostgreSQL", "Redis", "AWS",
 ];
 
-// Support'sModel
+// Supported Models
 const aiModels = [
  { name: "OpenAI", label: "GPT-4" },
  { name: "Anthropic", label: "Claude" },
@@ -276,7 +276,7 @@ export default function HomePage() {
  HERO SECTION - LobeHub Style
  ============================================ */}
  <section className="relative pt-32 sm:pt-40 lg:pt-48 pb-20 sm:pb-28 overflow-hidden">
- {/* GradientBackgroundDecoration */}
+ {/* Gradient Background Decoration */}
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial pointer-events-none opacity-60" />
 
@@ -296,11 +296,11 @@ export default function HomePage() {
  <span className="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-500 text-[11px] font-medium">
  News
  </span>
- <span>AI Agent 2.0 allnewPublish — moreSmart, morelarge</span>
+    <span>AI Agent 2.0 is here — smarter and more powerful than ever</span>
  <ArrowRight className="w-3 h-3" />
  </Link>
 
- {/* mainTitle */}
+ {/* Main Title */}
  <h1
  className={cn(
  "text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]",
@@ -310,7 +310,7 @@ export default function HomePage() {
  >
  <span className="text-foreground">Built for you</span>
  <br />
- <span className="gradient-text-brand">theSuper Individual</span>
+            <span className="gradient-text-brand">The Super Individual</span>
  </h1>
 
  {/* Subtitle */}
@@ -321,8 +321,8 @@ export default function HomePage() {
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}
  >
- atAgentFlow willyou's AI Team1: Based onPersonalizationRequirementsFlexibleCustomizeSmart Agent Features, 
- ResolveIssue, ImproveProductionpower, Explorenot yetcomeWork
+AgentFlow assembles your AI team: Flexibly customize smart agent features based on your personalized requirements,
+            solve problems, boost productivity, and explore new ways to work
  </p>
 
  {/* CTA Button */}
@@ -343,7 +343,7 @@ export default function HomePage() {
  "shadow-lg shadow-white/5"
  )}
  >
- StartUsage
+            Get Started
  <ArrowRight className="w-4 h-4 ml-1" />
  </Button>
  </Link>
@@ -368,11 +368,11 @@ export default function HomePage() {
  </section>
 
  {/* ============================================
- OverviewTagsCard - LobeHub Style
+ Overview Tags Card - LobeHub Style
  ============================================ */}
  <section className="relative py-16 sm:py-20">
  <div className="max-w-6xl mx-auto px-6">
- {/* ModelSupportBanner */}
+ {/* Model Support Banner */}
  <div className="flex items-center justify-center gap-2 mb-16 flex-wrap">
  <span className="text-[13px] text-foreground-lighter mr-2">Powered by</span>
  {aiModels.map((model) => (
@@ -388,7 +388,7 @@ export default function HomePage() {
  ))}
  </div>
 
- {/* DataStatistics */}
+ {/* Data Statistics */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
  {stats.map((stat) => (
  <div key={stat.label} className="text-center">
@@ -400,7 +400,7 @@ export default function HomePage() {
  ))}
  </div>
 
- {/* FeaturesCardGrid */}
+ {/* Features Card Grid */}
  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
  {features.map((feature, idx) => {
  const Icon = feature.icon;
@@ -437,10 +437,10 @@ export default function HomePage() {
  <span>Workflow</span>
  </div>
  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
- fromtoonline, <span className="gradient-text-brand">need4</span>
- </h2>
- <p className="text-lg text-foreground-light leading-relaxed">
- NoneneedProgramming, useNaturalLanguageDescriptionRequirements, AI youDone1
+            From idea to production in <span className="gradient-text-brand">just 4 steps</span>
+          </h2>
+          <p className="text-lg text-foreground-light leading-relaxed">
+            No coding required — describe your needs in natural language and let AI handle the rest
  </p>
  </div>
 
@@ -459,7 +459,7 @@ export default function HomePage() {
  : "bg-surface-100/20 border border-transparent hover:bg-surface-100/40 hover:border-border/20"
  )}
  >
- {/* StepNumber */}
+ {/* Step Number */}
  <div className={cn(
  "text-[11px] font-medium uppercase tracking-widest mb-4 transition-colors duration-300",
  isActive ? "text-brand-500" : "text-foreground-muted"
@@ -489,16 +489,16 @@ export default function HomePage() {
  </section>
 
  {/* ============================================
- UsageScenario - LobeHub Style
+ Usage Scenarios - LobeHub Style
  ============================================ */}
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
- can
- </h2>
- <p className="text-lg text-foreground-light leading-relaxed">
- fromTooltoPartner, atrowRelease AI Automation'spower
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            Use Cases
+          </h2>
+          <p className="text-lg text-foreground-light leading-relaxed">
+            From tool to partner — fully unleash the power of AI automation
  </p>
  </div>
 
@@ -529,21 +529,21 @@ export default function HomePage() {
  </section>
 
  {/* ============================================
- IntegrationService - LobeHub ModelScrollStyle
+ Integration Service - LobeHub Model Scroll Style
  ============================================ */}
  <section className="py-24 sm:py-32 overflow-hidden">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
- 100+ Integration, <span className="gradient-text-brand">NoneConnect</span>
- </h2>
- <p className="text-lg text-foreground-light leading-relaxed">
- andyoucurrentlyatUsage'sToolNoneIntegration
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            100+ Integrations, <span className="gradient-text-brand">Seamlessly Connected</span>
+          </h2>
+          <p className="text-lg text-foreground-light leading-relaxed">
+            Seamlessly integrate with the tools you already use
  </p>
  </div>
  </div>
 
- {/* ScrollLogo */}
+ {/* Scrolling Logos */}
  <div className="relative">
  <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
  <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
@@ -568,16 +568,16 @@ export default function HomePage() {
  </section>
 
  {/* ============================================
- UserReviews - LobeHub Style
+ User Reviews - LobeHub Style
  ============================================ */}
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
- UserDriven'sShareCommunity
- </h2>
- <p className="text-lg text-foreground-light leading-relaxed">
- comeallUser'sRealFeedback
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            A Community Built on User Stories
+          </h2>
+          <p className="text-lg text-foreground-light leading-relaxed">
+            Real feedback from real users
  </p>
  </div>
 
@@ -618,7 +618,7 @@ export default function HomePage() {
  <section className="py-16 sm:py-20">
  <div className="max-w-6xl mx-auto px-6">
  <p className="text-[13px] text-foreground-muted text-center mb-10 uppercase tracking-widest font-medium">
- alloptimalTeam
+        Trusted by Leading Teams
  </p>
  <div className="flex items-center justify-center gap-8 md:gap-12 flex-wrap">
  {partners.map((partner) => (
@@ -640,10 +640,10 @@ export default function HomePage() {
  <div className="max-w-3xl mx-auto px-6">
  <div className="text-center mb-16">
  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">FAQ</h2>
- <p className="text-foreground-light">
- NoAnswertoyouwant'sIssue, Welcome{""}
- <Link href="/contact" className="text-foreground hover:underline underline-offset-4">
- Contact Us
+          <p className="text-foreground-light">
+            Don't see the answer you're looking for? {""}
+            <Link href="/contact" className="text-foreground hover:underline underline-offset-4">
+              Contact Us
  </Link>
  </p>
  </div>
@@ -682,10 +682,10 @@ export default function HomePage() {
 
  <div className="flex items-center justify-center gap-4 mt-10">
  <Link href="/support" className="text-[13px] text-foreground-lighter hover:text-foreground-light transition-colors">
- CommunitySupport
- </Link>
- <Link href="/contact" className="text-[13px] text-foreground-lighter hover:text-foreground-light transition-colors">
- EmailSupport
+        Community Support
+        </Link>
+        <Link href="/contact" className="text-[13px] text-foreground-lighter hover:text-foreground-light transition-colors">
+          Email Support
  </Link>
  </div>
  </div>
@@ -695,23 +695,23 @@ export default function HomePage() {
  Footer CTA - LobeHub Style
  ============================================ */}
  <section className="relative py-24 sm:py-32 overflow-hidden">
- {/* BackgroundGradient */}
+ {/* Background Gradient */}
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
 
  <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
  AgentFlow
  </h2>
- <p className="text-xl sm:text-2xl text-foreground-light mb-4 font-medium">
- toSelf1more'slarge
+          <p className="text-xl sm:text-2xl text-foreground-light mb-4 font-medium">
+            Empower yourself to do more
  </p>
  <p className="text-foreground-lighter mb-10 max-w-lg mx-auto">
- EnablelargeCluster, .you'sSmart Agent, 1allat.
+ Empower your team. Your smart agents, all in one place.
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/register">
  <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90 transition-all duration-200">
- FreeExperience
+            Try for Free
  <ArrowRight className="w-4 h-4 ml-1" />
  </Button>
  </Link>

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * AppPreferencesPage - Supabase Style
- * outside, Language, DefaultSettingsetc
+ * App Preferences Page - Supabase Style
+ * Appearance, Language, Default Settings, etc.
  */
 
 import { useState } from "react";
@@ -38,26 +38,26 @@ import {
  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// ThemeOption
+// Theme Options
 const themeOptions = [
  { id: "light", label: "Light", icon: Sun, preview: "bg-surface-100" },
  { id: "dark", label: "Dark", icon: Moon, preview: "bg-background-studio" },
  { id: "system", label: "System", icon: Monitor, preview: "bg-surface-100" },
 ];
 
-// LanguageOption
+// Language Options
 const languageOptions = [
  { id: "zh-CN", label: "", flag: "🇨🇳" },
  { id: "zh-TW", label: "", flag: "🇹🇼" },
  { id: "en-US", label: "English", flag: "🇺🇸" },
- { id: "ja-JP", label: "daycurrent", flag: "🇯🇵" },
+  { id: "ja-JP", label: "Japanese", flag: "🇯🇵" },
 ];
 
-// charSizeOption
+// Font Size Options
 const fontSizeOptions = [
- { id: "small", label: "small", size: "14px" },
- { id: "medium", label: "", size: "16px" },
- { id: "large", label: "large", size: "18px" },
+  { id: "small", label: "Small", size: "14px" },
+  { id: "medium", label: "Medium", size: "16px" },
+  { id: "large", label: "Large", size: "18px" },
 ];
 
 // Default AI Model
@@ -68,7 +68,7 @@ const defaultModels = [
  { id: "gemini-pro", label: "Gemini Pro", provider: "Google" },
 ];
 
-// ToggleComponent
+// Toggle Component
 function Toggle({
  checked,
  onChange,
@@ -109,7 +109,7 @@ export default function PreferencesPage() {
  const [isSaving, setIsSaving] = useState(false);
  const [saved, setSaved] = useState(false);
 
- // SaveSettings
+  // Save Settings
  const handleSave = async () => {
  setIsSaving(true);
  await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -118,7 +118,7 @@ export default function PreferencesPage() {
  setTimeout(() => setSaved(false), 3000);
  };
 
- // ResetSettings
+  // Reset Settings
  const handleReset = () => {
  setTheme("dark");
  setLanguage("zh-CN");
@@ -137,8 +137,8 @@ export default function PreferencesPage() {
  <div className="space-y-6">
  <PageHeader
  eyebrow="Settings"
- title="AppPreference"
- description="Customyou'sUsageExperience"
+        title="App Preferences"
+ description="Customize your experience"
  actions={(
  <div className="flex items-center gap-2">
  <Button
@@ -148,7 +148,7 @@ export default function PreferencesPage() {
  className="border-border text-foreground-light hover:text-foreground"
  >
  <RotateCcw className="w-4 h-4 mr-2" />
- ResetDefault
+            Reset to Default
  </Button>
  <Button
  size="sm"
@@ -169,7 +169,7 @@ export default function PreferencesPage() {
  ) : (
  <>
  <Save className="w-4 h-4 mr-2" />
- SaveChange
+            Save Changes
  </>
  )}
  </Button>
@@ -178,16 +178,16 @@ export default function PreferencesPage() {
  />
 
  <div className="page-section">
- {/* outsideSettings */}
- <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
- <Palette className="w-4 h-4 text-brand-500" />
- </div>
- <div>
- <h2 className="page-panel-title">outsideSettings</h2>
- <p className="page-panel-description mt-1">Customfaceoutside</p>
+        {/* Appearance Settings */}
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
+                  <Palette className="w-4 h-4 text-brand-500" />
+                </div>
+                <div>
+                  <h2 className="page-panel-title">Appearance</h2>
+                  <p className="page-panel-description mt-1">Customize the look and feel</p>
  </div>
  </div>
  </div>
@@ -221,11 +221,11 @@ export default function PreferencesPage() {
  </div>
  </div>
 
- {/* charSize */}
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-[13px] font-medium text-foreground">charSize</h4>
- <p className="text-xs text-foreground-muted">AdjustfacecharSize</p>
+          {/* Font Size */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-medium text-foreground">Font Size</h4>
+                <p className="text-xs text-foreground-muted">Adjust the interface font size</p>
  </div>
  <div className="flex items-center gap-2">
  {fontSizeOptions.map((option) => (
@@ -245,11 +245,11 @@ export default function PreferencesPage() {
  </div>
  </div>
 
- {/* AnimationEffect */}
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-[13px] font-medium text-foreground">AnimationEffect</h4>
- <p className="text-xs text-foreground-muted">EnablefaceAnimationandpastEffect</p>
+          {/* Animation Effects */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-medium text-foreground">Animation Effects</h4>
+ <p className="text-xs text-foreground-muted">Enable page animation and transition effects</p>
  </div>
  <Toggle checked={animationEnabled} onChange={setAnimationEnabled} />
  </div>
@@ -257,32 +257,32 @@ export default function PreferencesPage() {
  {/* Compact */}
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-[13px] font-medium text-foreground">Compact</h4>
- <p className="text-xs text-foreground-muted">fewfaceElementbetween</p>
+            <h4 className="text-[13px] font-medium text-foreground">Compact Mode</h4>
+                <p className="text-xs text-foreground-muted">Reduce spacing between interface elements</p>
  </div>
  <Toggle checked={compactMode} onChange={setCompactMode} />
  </div>
  </div>
  </div>
 
- {/* LanguageandRegion */}
- <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
- <Globe className="w-4 h-4 text-brand-500" />
- </div>
- <div>
- <h2 className="page-panel-title">LanguageandRegion</h2>
- <p className="page-panel-description mt-1">SettingsDisplayLanguage</p>
+        {/* Language and Region */}
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
+                  <Globe className="w-4 h-4 text-brand-500" />
+                </div>
+                <div>
+                  <h2 className="page-panel-title">Language and Region</h2>
+ <p className="page-panel-description mt-1">Set display language</p>
  </div>
  </div>
  </div>
 
  <div className="p-6 flex items-center justify-between">
  <div>
- <h4 className="text-[13px] font-medium text-foreground">faceLanguage</h4>
- <p className="text-xs text-foreground-muted">SelectDisplayLanguage</p>
+            <h4 className="text-[13px] font-medium text-foreground">Display Language</h4>
+ <p className="text-xs text-foreground-muted">Select display language</p>
  </div>
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
@@ -310,16 +310,16 @@ export default function PreferencesPage() {
  </div>
  </div>
 
- {/* DefaultSettings */}
- <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
- <Settings className="w-4 h-4 text-brand-500" />
- </div>
- <div>
- <h2 className="page-panel-title">DefaultSettings</h2>
- <p className="page-panel-description mt-1">ConfigDefaultrowas</p>
+        {/* Default Settings */}
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center">
+                  <Settings className="w-4 h-4 text-brand-500" />
+                </div>
+                <div>
+                  <h2 className="page-panel-title">Default Settings</h2>
+                  <p className="page-panel-description mt-1">Configure default behaviors</p>
  </div>
  </div>
  </div>
@@ -329,7 +329,7 @@ export default function PreferencesPage() {
  <div className="flex items-center justify-between">
  <div>
  <h4 className="text-[13px] font-medium text-foreground">Default AI Model</h4>
- <p className="text-xs text-foreground-muted">newConversationUsage'sDefaultModel</p>
+ <p className="text-xs text-foreground-muted">Default model for new conversations</p>
  </div>
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
@@ -357,38 +357,38 @@ export default function PreferencesPage() {
  </DropdownMenu>
  </div>
 
- {/* AutoSave */}
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-[13px] font-medium text-foreground">AutoSave</h4>
- <p className="text-xs text-foreground-muted">AutoSaveWorkflowandDocumentChange</p>
+          {/* Auto Save */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-medium text-foreground">Auto Save</h4>
+ <p className="text-xs text-foreground-muted">Auto-save workflow and document changes</p>
  </div>
  <Toggle checked={autoSave} onChange={setAutoSave} />
  </div>
 
- {/* */}
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-[13px] font-medium text-foreground">Tip</h4>
- <p className="text-xs text-foreground-muted">ActionDonetimePlayTip</p>
+          {/* Sound Effects */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-medium text-foreground">Sound Effects</h4>
+                <p className="text-xs text-foreground-muted">Play a sound when an action completes</p>
  </div>
  <Toggle checked={soundEffects} onChange={setSoundEffects} />
  </div>
 
- {/* WelcomePage */}
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-[13px] font-medium text-foreground">DisplayWelcomePage</h4>
- <p className="text-xs text-foreground-muted">Sign InafterDisplayQuickGetting StartedGuide</p>
+          {/* Welcome Page */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-[13px] font-medium text-foreground">Display welcome page</h4>
+                <p className="text-xs text-foreground-muted">Show a quick start guide after signing in</p>
  </div>
  <Toggle checked={showWelcome} onChange={setShowWelcome} />
  </div>
 
- {/* DefaultWorkflowView */}
+          {/* Default Workflow View */}
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-[13px] font-medium text-foreground">WorkflowDefaultView</h4>
- <p className="text-xs text-foreground-muted">WorkflowList'sDefaultShowcasemethod</p>
+ <h4 className="text-[13px] font-medium text-foreground">Workflow default view</h4>
+ <p className="text-xs text-foreground-muted">Default way to display workflow list</p>
  </div>
  <div className="flex items-center gap-2">
  <button
@@ -418,13 +418,13 @@ export default function PreferencesPage() {
  </div>
  </div>
 
- {/* TipInfo */}
- <div className="page-panel bg-brand-200/40 border-brand-400/30">
- <div className="p-4 flex items-start gap-3">
- <Info className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
- <div>
- <p className="text-[13px] text-foreground">
- ChangewillatSaveafterNowTake Effect.PartialSettingscancanneedneedRefreshPage.
+        {/* Info Notice */}
+          <div className="page-panel bg-brand-200/40 border-brand-400/30">
+            <div className="p-4 flex items-start gap-3">
+              <Info className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[13px] text-foreground">
+                  Changes take effect after saving. Some settings may require a page refresh.
  </p>
  </div>
  </div>

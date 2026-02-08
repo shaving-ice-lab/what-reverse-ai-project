@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * TimerowDebug - ExecuteTimelineComponent
+ * Time-travel Debug - Execution Timeline Component
  * 
  * Features: 
- * - DisplayWorkflowExecute'seachStep
- * - DisplayNodeStatusIconandExecuteTime
- * - SupportStepClickInteractive, BacktracktoExecute
- * - HighlightCurrentselect'sStep
+ * - Display each step of workflow execution
+ * - Display node status icons and execution time
+ * - Support step click interaction, backtrack to execution point
+ * - Highlight currently selected step
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -51,30 +51,30 @@ import type {
 } from '@/types/time-travel';
 import type { ExecutionStatus } from '@/types/execution';
 
-// ===== TypeDefinition =====
+// ===== Type Definitions =====
 
 interface ExecutionTimelineProps {
- /** ExecuteSnapshot(ifresulthas) */
- snapshot?: ExecutionSnapshot | null;
- /** TimelineViewData(ifresulthas) */
- timelineView?: TimelineView | null;
- /** Currentselect'sStepIndex */
- selectedStepIndex?: number;
- /** StepClickCallback */
- onStepClick?: (step: TimelineStep, index: number) => void;
- /** re-NodeCallback */
- onRerunNode?: (nodeId: string) => void;
- /** isnoLoading */
- isLoading?: boolean;
- /** isnoCollapse */
- collapsed?: boolean;
- /** CollapseSwitchCallback */
- onToggleCollapse?: () => void;
- /** CustomClass Name */
+  /** Execution Snapshot (if available) */
+  snapshot?: ExecutionSnapshot | null;
+  /** Timeline View Data (if available) */
+  timelineView?: TimelineView | null;
+  /** Currently selected step index */
+  selectedStepIndex?: number;
+  /** Step Click Callback */
+  onStepClick?: (step: TimelineStep, index: number) => void;
+  /** Rerun Node Callback */
+  onRerunNode?: (nodeId: string) => void;
+  /** Whether loading */
+  isLoading?: boolean;
+  /** Whether collapsed */
+  collapsed?: boolean;
+  /** Collapse Toggle Callback */
+  onToggleCollapse?: () => void;
+  /** Custom Class Name */
  className?: string;
 }
 
-// ===== NodeIconMapping =====
+// ===== Node Icon Mapping =====
 
 const nodeIconMap: Record<string, React.ElementType> = {
  start: Play,
@@ -96,7 +96,7 @@ const nodeIconMap: Record<string, React.ElementType> = {
  default: Box,
 };
 
-// ===== StatusColorConfig =====
+// ===== Status Color Config =====
 
 const statusConfig: Record<NodeStatus, { 
  color: string; 
@@ -149,10 +149,10 @@ const statusConfig: Record<NodeStatus, {
  },
 };
 
-// ===== Helper Functioncount =====
+// ===== Helper Functions =====
 
 /**
- * FormatExecuteTime
+ * Format execution duration
  */
 function formatDuration(ms: number): string {
  if (ms < 1000) {
@@ -167,7 +167,7 @@ function formatDuration(ms: number): string {
 }
 
 /**
- * FormatTime
+ * Format timestamp
  */
 function formatTimestamp(timestamp: string): string {
  try {
@@ -183,13 +183,13 @@ function formatTimestamp(timestamp: string): string {
 }
 
 /**
- * FetchNodeIcon
+ * Get node icon
  */
 function getNodeIcon(nodeType: string): React.ElementType {
  return nodeIconMap[nodeType] || nodeIconMap.default;
 }
 
-// ===== TimelineStepComponent =====
+// ===== Timeline Step Component =====
 
 interface TimelineStepItemProps {
  step: TimelineStep;
@@ -222,7 +222,7 @@ function TimelineStepItem({
  )}
  onClick={onClick}
  >
- {/* Connectline */}
+      {/* Connecting line */}
  {!isLast && (
  <div
  className={cn(
@@ -232,7 +232,7 @@ function TimelineStepItem({
  />
  )}
 
- {/* StatusIcon */}
+      {/* Status Icon */}
  <div
  className={cn(
  'relative z-10 shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
@@ -254,7 +254,7 @@ function TimelineStepItem({
 
  {/* Content */}
  <div className="flex-1 min-w-0 pt-0.5">
- {/* Titlerow */}
+        {/* Title row */}
  <div className="flex items-center gap-2 flex-wrap">
  <div className="flex items-center gap-1.5">
  <NodeIcon className="w-3.5 h-3.5 text-foreground-muted" />
@@ -266,7 +266,7 @@ function TimelineStepItem({
  </span>
  </div>
  
- {/* StepIndex */}
+        {/* Step Index */}
  <Badge
  variant="outline"
  className={cn(
@@ -279,7 +279,7 @@ function TimelineStepItem({
  </Badge>
  </div>
 
- {/* TimeandDescription */}
+        {/* Time and Description */}
  <div className="flex items-center gap-2 mt-1 text-xs">
  <span className="text-foreground-muted tabular-nums">
  {formatTimestamp(step.startedAt)}
@@ -305,15 +305,15 @@ function TimelineStepItem({
  )}
  </div>
 
- {/* ErrorTip */}
- {step.hasError && (
- <div className="mt-1.5 text-xs text-destructive bg-destructive-200 rounded px-2 py-1">
- ExecuteFailed, ClickViewDetails
+        {/* Error Tip */}
+        {step.hasError && (
+          <div className="mt-1.5 text-xs text-destructive bg-destructive-200 rounded px-2 py-1">
+            Execution failed. Click to view details.
  </div>
  )}
  </div>
 
- {/* ActionButton */}
+      {/* Action Button */}
  <div className={cn(
  'flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity',
  isSelected && 'opacity-100'
@@ -327,7 +327,7 @@ function TimelineStepItem({
  onRerun();
  }}
  className="h-6 w-6 p-0 text-foreground-muted hover:text-brand-500 hover:bg-brand-200/60"
- title="re-newRunthisNode"
+          title="Rerun this node"
  >
  <RotateCcw className="w-3.5 h-3.5" />
  </Button>
@@ -341,7 +341,7 @@ function TimelineStepItem({
  );
 }
 
-// ===== mainComponent =====
+// ===== Main Component =====
 
 export function ExecutionTimeline({
  snapshot,
@@ -356,14 +356,14 @@ export function ExecutionTimeline({
 }: ExecutionTimelineProps) {
  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | undefined>(selectedStepIndex);
  
- // fromSnapshotorTimelineViewFetchStep
+  // Get steps from Snapshot or TimelineView
  const steps = useMemo(() => {
  if (timelineView?.steps) {
  return timelineView.steps;
  }
  
  if (snapshot) {
- // fromSnapshotCreateStep
+      // Create steps from Snapshot
  return snapshot.executionOrder.map((nodeId, index) => {
  const nodeSnapshot = snapshot.nodeSnapshots[nodeId];
  if (!nodeSnapshot) return null;
@@ -386,7 +386,7 @@ export function ExecutionTimeline({
  return [];
  }, [snapshot, timelineView, localSelectedIndex]);
 
- // FetchStepDescription
+  // Get step description
  function getStepDescription(nodeSnapshot: NodeSnapshot): string | undefined {
  const { nodeType, metadata, status, error } = nodeSnapshot;
 
@@ -410,22 +410,22 @@ export function ExecutionTimeline({
  }
  }
 
- // ProcessStepClick
+  // Handle step click
  const handleStepClick = useCallback((step: TimelineStep, index: number) => {
  setLocalSelectedIndex(index);
  onStepClick?.(step, index);
  }, [onStepClick]);
 
- // Processre-
+  // Handle rerun
  const handleRerun = useCallback((nodeId: string) => {
  onRerunNode?.(nodeId);
  }, [onRerunNode]);
 
- // ExecuteStatus
+  // Execution status
  const executionStatus = timelineView?.status || snapshot?.status || 'pending';
  const totalDuration = timelineView?.durationMs || snapshot?.durationMs;
 
- // ifresultCollapse, DisplayStreamlineView
+  // If collapsed, show streamlined view
  if (collapsed) {
  return (
  <div 
@@ -455,23 +455,23 @@ export function ExecutionTimeline({
  <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface-75/80">
  <div className="flex items-center gap-2">
  <Clock className="w-4 h-4 text-foreground-muted" />
- <h3 className="text-sm font-medium text-foreground">ExecuteTimeline</h3>
+          <h3 className="text-sm font-medium text-foreground">Execution Timeline</h3>
  {steps.length > 0 && (
  <Badge variant="outline" className="text-xs">
- {steps.length} Step
+              {steps.length} Steps
  </Badge>
  )}
  </div>
  
  <div className="flex items-center gap-2">
- {/* totalDuration */}
- {totalDuration && (
- <span className="text-xs text-foreground-muted tabular-nums">
- totalDuration: {formatDuration(totalDuration)}
+        {/* Total Duration */}
+            {totalDuration && (
+              <span className="text-xs text-foreground-muted tabular-nums">
+                Total: {formatDuration(totalDuration)}
  </span>
  )}
  
- {/* ExecuteStatus */}
+            {/* Execution Status */}
  <Badge
  variant="outline"
  className={cn(
@@ -480,14 +480,14 @@ export function ExecutionTimeline({
  statusConfig[executionStatus as NodeStatus]?.textColor
  )}
  >
- {executionStatus === 'completed' && 'Done'}
- {executionStatus === 'running' && 'Run'}
- {executionStatus === 'failed' && 'Failed'}
- {executionStatus === 'pending' && 'etcpending'}
- {executionStatus === 'cancelled' && 'Cancelled'}
+              {executionStatus === 'completed' && 'Done'}
+              {executionStatus === 'running' && 'Running'}
+              {executionStatus === 'failed' && 'Failed'}
+              {executionStatus === 'pending' && 'Pending'}
+              {executionStatus === 'cancelled' && 'Cancelled'}
  </Badge>
  
- {/* CollapseButton */}
+            {/* Collapse Button */}
  {onToggleCollapse && (
  <Button
  size="sm"
@@ -501,17 +501,17 @@ export function ExecutionTimeline({
  </div>
  </div>
 
- {/* TimelineList */}
+      {/* Timeline List */}
  <ScrollArea className="flex-1">
  <div className="p-4 space-y-1">
  {isLoading ? (
- // LoadStatus
+            // Loading state
  <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
  <Loader2 className="w-6 h-6 animate-spin mb-2" />
  <span className="text-sm">Loading...</span>
  </div>
  ) : steps.length > 0 ? (
- // StepList
+            // Step list
  steps.map((step, index) => (
  <TimelineStepItem
  key={step.nodeId}
@@ -529,14 +529,14 @@ export function ExecutionTimeline({
  <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
  <Clock className="w-5 h-5 text-foreground-muted/50" />
  </div>
- <p className="text-sm font-medium text-foreground-muted">NoneExecuteRecord</p>
- <p className="text-xs text-foreground-muted/70 mt-1">RunWorkflowafterwillatthisDisplayExecuteStep</p>
+              <p className="text-sm font-medium text-foreground-muted">No Execution Records</p>
+              <p className="text-xs text-foreground-muted/70 mt-1">Run a workflow to see execution steps here</p>
  </div>
  )}
  </div>
  </ScrollArea>
 
- {/* FooterSummary */}
+    {/* Footer Summary */}
  {steps.length > 0 && snapshot?.summary && (
  <div className="px-4 py-3 border-t border-border bg-surface-75/80">
  <div className="flex items-center justify-between text-xs">
@@ -548,7 +548,7 @@ export function ExecutionTimeline({
  Failed: <span className="text-destructive">{snapshot.summary.failedNodes}</span>
  </span>
  <span className="text-foreground-muted">
- Skip: <span className="text-warning">{snapshot.summary.skippedNodes}</span>
+                  Skipped: <span className="text-warning">{snapshot.summary.skippedNodes}</span>
  </span>
  </div>
  {snapshot.summary.totalTokensUsed && snapshot.summary.totalTokensUsed > 0 && (

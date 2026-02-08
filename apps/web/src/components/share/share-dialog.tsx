@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * ShareDialogComponent
+ * Share Dialog Component
  * 
  * Features: 
- * - GenerateShareLink
- * - Generate2R Code
- * - GenerateEmbeddingCode
- * - SocialPlatformShare
+ * - Generate share link
+ * - Generate QR code
+ * - Generate embed code
+ * - Social platform sharing
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -42,7 +42,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
-// ShareType
+// Share type
 export type ShareType = "agent" | "workflow" | "document" | "profile";
 
 interface ShareDialogProps {
@@ -55,7 +55,7 @@ interface ShareDialogProps {
  coverImage?: string;
 }
 
-// SocialPlatformConfig
+// Social platform config
 const socialPlatforms = [
  {
  id: "twitter",
@@ -86,7 +86,7 @@ const socialPlatforms = [
  name: "WeChat",
  icon: MessageCircle,
  color: "bg-[#07C160]",
- getUrl: () => "", // WeChatneedneedShare
+ getUrl: () => "", // WeChat requires QR code sharing
  isQRCode: true,
  },
  {
@@ -125,15 +125,15 @@ export function ShareDialog({
  const [expiresIn, setExpiresIn] = useState<"never" | "1d" | "7d" | "30d">("never");
  const canvasRef = useRef<HTMLCanvasElement>(null);
 
- // GenerateShareLink
+ // Generate share link
  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
  const shareUrl = `${baseUrl}/share/${type}/${shareId}`;
  const shareText = `${title}${description ? ` - ${description}` : ""}`;
 
- // GenerateEmbeddingCode
+ // Generate embed code
  const embedCode = `<iframe src="${shareUrl}/embed" width="100%" height="400" frameborder="0" allowfullscreen></iframe>`;
 
- // Generate2R Code
+ // Generate QR code
  useEffect(() => {
  if (open) {
  generateQRCode(shareUrl);
@@ -142,7 +142,7 @@ export function ShareDialog({
 
  const generateQRCode = async (url: string) => {
  try {
- // Usage QRCode API Generate2R Code
+ // Use QR Code API to generate QR code
  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
  setQrCodeUrl(qrApiUrl);
  } catch (error) {
@@ -150,7 +150,7 @@ export function ShareDialog({
  }
  };
 
- // CopyLink
+ // Copy link
  const copyLink = async () => {
  try {
  await navigator.clipboard.writeText(shareUrl);
@@ -161,7 +161,7 @@ export function ShareDialog({
  }
  };
 
- // CopyEmbeddingCode
+ // Copy embed code
  const copyEmbedCode = async () => {
  try {
  await navigator.clipboard.writeText(embedCode);
@@ -172,7 +172,7 @@ export function ShareDialog({
  }
  };
 
- // Download2R Code
+ // Download QR code
  const downloadQRCode = () => {
  const link = document.createElement("a");
  link.href = qrCodeUrl;
@@ -180,10 +180,10 @@ export function ShareDialog({
  link.click();
  };
 
- // SocialShare
+ // Social share
  const handleSocialShare = (platform: typeof socialPlatforms[0]) => {
  if (platform.isQRCode) {
- // WeChatDisplay2R Code
+ // WeChat: display QR code
  return;
  }
  const url = platform.getUrl(shareUrl, shareText, title);
@@ -201,7 +201,7 @@ export function ShareDialog({
  Share
  </DialogTitle>
  <DialogDescription className="text-muted-foreground">
- Share"{title}"tootherheperson
+             Share &ldquo;{title}&rdquo; with others
  </DialogDescription>
  </DialogHeader>
 
@@ -213,22 +213,22 @@ export function ShareDialog({
  </TabsTrigger>
  <TabsTrigger value="qrcode" className="flex-1">
  <QrCode className="h-4 w-4 mr-2" />
- 2R Code
+              QR Code
  </TabsTrigger>
  <TabsTrigger value="embed" className="flex-1">
  <Code className="h-4 w-4 mr-2" />
- Embedding
- </TabsTrigger>
- <TabsTrigger value="social" className="flex-1">
+              Embed
+             </TabsTrigger>
+             <TabsTrigger value="social" className="flex-1">
  <Share2 className="h-4 w-4 mr-2" />
  Social
  </TabsTrigger>
  </TabsList>
 
- {/* LinkShare */}
+ {/* Link Sharing */}
  <TabsContent value="link" className="mt-4 space-y-4">
  <div className="space-y-2">
- <Label className="text-muted-foreground">ShareLink</Label>
+ <Label className="text-muted-foreground">Share Link</Label>
  <div className="flex gap-2">
  <Input
  value={shareUrl}
@@ -247,7 +247,7 @@ export function ShareDialog({
  {copied ? (
  <>
  <Check className="h-4 w-4 mr-2" />
- alreadyCopy
+ Copied
  </>
  ) : (
  <>
@@ -259,18 +259,18 @@ export function ShareDialog({
  </div>
  </div>
 
- {/* ShareSettings */}
- <div className="space-y-4 pt-4 border-t border-border">
- <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
- <Settings className="h-4 w-4" />
- ShareSettings
+{/* Share Settings */}
+             <div className="space-y-4 pt-4 border-t border-border">
+               <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+                 <Settings className="h-4 w-4" />
+                 Share Settings
  </h4>
  
  <div className="flex items-center justify-between">
  <div>
- <Label className="text-muted-foreground">PublicAccess</Label>
- <p className="text-xs text-muted-foreground">
- whatpersonallcanwithViaLinkAccess
+<Label className="text-muted-foreground">Public Access</Label>
+                   <p className="text-xs text-muted-foreground">
+                     Anyone with the link can access
  </p>
  </div>
  <Switch checked={isPublic} onCheckedChange={setIsPublic} />
@@ -278,9 +278,9 @@ export function ShareDialog({
 
  <div className="flex items-center justify-between">
  <div>
- <Label className="text-muted-foreground">PasswordProtect</Label>
- <p className="text-xs text-muted-foreground">
- needneedInputPasswordonlycanAccess
+<Label className="text-muted-foreground">Password Protection</Label>
+                   <p className="text-xs text-muted-foreground">
+                     A password is required to access
  </p>
  </div>
  <Switch checked={hasPassword} onCheckedChange={setHasPassword} />
@@ -289,7 +289,7 @@ export function ShareDialog({
  {hasPassword && (
  <Input
  type="password"
- placeholder="SettingsAccessPassword"
+                 placeholder="Set access password"
  value={password}
  onChange={(e) => setPassword(e.target.value)}
  className="bg-muted border-border"
@@ -298,7 +298,7 @@ export function ShareDialog({
  </div>
  </TabsContent>
 
- {/* 2R CodeShare */}
+ {/* QR Code Sharing */}
  <TabsContent value="qrcode" className="mt-4 space-y-4">
  <div className="flex flex-col items-center">
  <div className="p-4 bg-white rounded-xl border border-border">
@@ -313,7 +313,7 @@ export function ShareDialog({
  )}
  </div>
  <p className="text-sm text-muted-foreground mt-3">
- Scan2R CodeAccess
+               Scan QR code to access
  </p>
  <Button
  variant="outline"
@@ -321,15 +321,15 @@ export function ShareDialog({
  className="mt-4 border-border"
  >
  <Download className="h-4 w-4 mr-2" />
- Download2R Code
+               Download QR Code
  </Button>
  </div>
  </TabsContent>
 
- {/* EmbeddingCode */}
+ {/* Embed Code */}
  <TabsContent value="embed" className="mt-4 space-y-4">
  <div className="space-y-2">
- <Label className="text-muted-foreground">EmbeddingCode</Label>
+ <Label className="text-muted-foreground">Embed Code</Label>
  <Textarea
  value={embedCode}
  readOnly
@@ -348,12 +348,12 @@ export function ShareDialog({
  {embedCopied ? (
  <>
  <Check className="h-4 w-4 mr-2" />
- alreadyCopy
- </>
- ) : (
- <>
- <Copy className="h-4 w-4 mr-2" />
- CopyCode
+                    Copied
+                   </>
+                 ) : (
+                   <>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Code
  </>
  )}
  </Button>
@@ -365,14 +365,14 @@ export function ShareDialog({
  <div className="rounded-lg border border-border overflow-hidden">
  <div className="bg-muted h-40 flex items-center justify-center">
  <p className="text-sm text-muted-foreground">
- EmbeddingContentPreview
+                   Embed content preview
  </p>
  </div>
  </div>
  </div>
  </TabsContent>
 
- {/* SocialShare */}
+ {/* Social Sharing */}
  <TabsContent value="social" className="mt-4">
  <div className="grid grid-cols-3 gap-3">
  {socialPlatforms.map((platform) => {
@@ -399,10 +399,10 @@ export function ShareDialog({
  })}
  </div>
 
- {/* ShareTip */}
- <div className="mt-4 p-3 rounded-lg bg-muted">
- <p className="text-xs text-muted-foreground">
- SharetoSocialPlatformtime, willAutoTitleandDescription.WeChatSharePleaseUsage2R CodeFeatures.
+{/* Share Tip */}
+               <div className="mt-4 p-3 rounded-lg bg-muted">
+                 <p className="text-xs text-muted-foreground">
+                   When sharing to social platforms, the title and description are included automatically. For WeChat sharing, please use the QR code feature.
  </p>
  </div>
  </TabsContent>
@@ -412,7 +412,7 @@ export function ShareDialog({
  );
 }
 
-// ShareButtonComponent
+// Share Button Component
 interface ShareButtonProps {
  type: ShareType;
  title: string;

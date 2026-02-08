@@ -1,31 +1,31 @@
 /**
- * UserActivityRelatedTypeDefinition
+ * User Activity Related Type Definition
  */
 
 /**
- * UserActivityRecord
+ * User Activity Record
  */
 export interface UserActivity {
  /** Activity ID */
  id: string;
- /** ActionType */
+ /** Action Type */
  action: string;
- /** RelatedEntityType */
+ /** Related Entity Type */
  entity_type?: string;
- /** RelatedEntity ID */
+ /** Related Entity ID */
  entity_id?: string;
- /** DeviceInfo */
+ /** Device Information */
  device?: string;
  /** IP Address */
  ip?: string;
- /** */
+ /** Location */
  location?: string;
  /** Created At */
  created_at: string;
 }
 
 /**
- * Format'sActivityRecord(Used forbeforeendpointDisplay)
+ * Formatted Activity Record (Used for Frontend Display)
  */
 export interface FormattedActivity {
  id: string;

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * App ListandManagepage - Supabase Style
- * AppList, StatusFilter, CreateEntry, PublishAction
+ * App List and Management Page - Supabase Style
+ * App List, Status Filter, Create Entry, Publish Action
  */
 
 import React, { useState, useEffect } from "react";
@@ -79,11 +79,11 @@ import {
 } from "@/lib/permissions";
 import { PermissionAction } from "@/components/permissions/permission-action";
 
-// StatusConfig
+// Status Config
 const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
  draft: { label: "Draft", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Edit3 },
  published: { label: "Published", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- deprecated: { label: "alreadydownline", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
+ deprecated: { label: "Deprecated", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
  archived: { label: "Archived", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Archive },
 };
 
@@ -95,22 +95,22 @@ const statusOrder: Record<string, number> = {
 };
 
 const sortOptions = [
- { value: "updated_desc", label: "RecentUpdate" },
- { value: "updated_asc", label: "mostUpdate" },
+ { value: "updated_desc", label: "Recently Updated" },
+ { value: "updated_asc", label: "Oldest Updated" },
  { value: "name_asc", label: "Name A-Z" },
  { value: "name_desc", label: "Name Z-A" },
- { value: "status", label: "StatusPriority" },
+ { value: "status", label: "Status Priority" },
 ];
 
-// AccessConfig
+// Access Config
 const accessModeConfig: Record<string, { label: string; icon: React.ElementType; description: string }> = {
- private: { label: "Private", icon: Lock, description: "onlyMembercanAccess" },
- public_auth: { label: "needSign In", icon: Users, description: "Sign InUsercanAccess" },
- public_anonymous: { label: "Public", icon: Globe, description: "whatpersoncanAccess" },
+ private: { label: "Private", icon: Lock, description: "Only members can access" },
+ public_auth: { label: "Requires Sign In", icon: Users, description: "Signed-in users can access" },
+ public_anonymous: { label: "Public", icon: Globe, description: "Anyone can access" },
 };
 
 const visibilityOptions = [
- { value: "all", label: "can" },
+ { value: "all", label: "All Visibility" },
  ...Object.entries(accessModeConfig).map(([key, config]) => ({
  value: key,
  label: config.label,
@@ -118,16 +118,16 @@ const visibilityOptions = [
 ];
 
 const domainStatusOptions = [
- { value: "all", label: "DomainStatus" },
+ { value: "all", label: "Domain Status" },
  { value: "bound", label: "Bound" },
  { value: "unbound", label: "Unbound" },
 ];
 
 const timeRangeOptions = [
- { value: "all", label: "allsectionTime" },
- { value: "7d", label: " 7 days" },
- { value: "30d", label: " 30 days" },
- { value: "90d", label: " 90 days" },
+ { value: "all", label: "All Time" },
+ { value: "7d", label: "Last 7 days" },
+ { value: "30d", label: "Last 30 days" },
+ { value: "90d", label: "Last 90 days" },
 ];
 
 export default function AppsPage() {
@@ -157,12 +157,12 @@ export default function AppsPage() {
  const [isBulkArchiving, setIsBulkArchiving] = useState(false);
  const [bulkActionError, setBulkActionError] = useState<string | null>(null);
  
- // CreateAppDialog
+ // Create App Dialog
  const [showCreateDialog, setShowCreateDialog] = useState(false);
  const [createForm, setCreateForm] = useState({ name: "", slug: "", description: "" });
  const [isCreating, setIsCreating] = useState(false);
 
- // LoadData
+ // Load Data
  useEffect(() => {
  loadData();
  }, [workspaceId]);
@@ -189,7 +189,7 @@ export default function AppsPage() {
  }
  };
 
- // AutoGenerate slug
+ // Auto-generate slug
  const handleNameChange = (name: string) => {
  setCreateForm({
  ...createForm,
@@ -201,7 +201,7 @@ export default function AppsPage() {
  });
  };
 
- // CreateApp
+ // Create App
  const handleCreate = async () => {
  if (!createForm.name || !createForm.slug) return;
 
@@ -223,7 +223,7 @@ export default function AppsPage() {
  }
  };
 
- // PublishApp
+ // Publish App
  const handlePublish = async (appId: string) => {
  try {
  await appApi.publish(appId);
@@ -233,7 +233,7 @@ export default function AppsPage() {
  }
  };
 
- // downlineApp
+ // Deprecate App
  const handleDeprecate = async (appId: string) => {
  try {
  await appApi.deprecate(appId);
@@ -243,7 +243,7 @@ export default function AppsPage() {
  }
  };
 
- // ArchiveApp
+ // Archive App
  const handleArchive = async (appId: string) => {
  try {
  await appApi.archive(appId);
@@ -253,7 +253,7 @@ export default function AppsPage() {
  }
  };
 
- // FilterApp
+ // Filter Apps
  const filteredApps = apps.filter((app) => {
  const matchesSearch =
  app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -381,7 +381,7 @@ export default function AppsPage() {
  await loadData();
  } catch (error) {
  console.error("Failed to bulk publish:", error);
- setBulkActionError("BatchPublishFailed, Please try again laterRetry.");
+ setBulkActionError("Batch publish failed. Please try again later.");
  } finally {
  setIsBulkPublishing(false);
  }
@@ -389,7 +389,7 @@ export default function AppsPage() {
 
  const handleBulkArchive = async (appsToArchive: App[]) => {
  if (appsToArchive.length === 0) return;
- const confirmed = window.confirm("OKneedBatchArchiveselect'sApp??");
+ const confirmed = window.confirm("Archive selected app(s)?");
  if (!confirmed) return;
  try {
  setIsBulkArchiving(true);
@@ -401,7 +401,7 @@ export default function AppsPage() {
  await loadData();
  } catch (error) {
  console.error("Failed to bulk archive:", error);
- setBulkActionError("BatchArchiveFailed, Please try again laterRetry.");
+ setBulkActionError("Batch archive failed. Please try again later.");
  } finally {
  setIsBulkArchiving(false);
  }
@@ -436,7 +436,7 @@ export default function AppsPage() {
  const selectedApps = sortedApps.filter((app) => selectedAppIds.has(app.id));
  const publishableApps = selectedApps.filter((app) => app.status === "draft");
 
- // FetchStatusConfig
+ // Get Status Config
  const getStatusConfig = (status: string) => {
  return statusConfig[status] || statusConfig.draft;
  };
@@ -456,9 +456,9 @@ export default function AppsPage() {
  <div className="space-y-6">
  {/* PageHeader */}
  <PageHeader
- title="AppManage"
+ title="App management"
  eyebrow={workspace?.name}
- description="ManageWorkspace'sApp, PublishandMonitorRunStatus"
+ description="Manage workspace apps, publish and monitor run status"
  actions={
  <div className="flex items-center gap-2">
  <Button variant="outline" size="sm" asChild>
@@ -470,7 +470,7 @@ export default function AppsPage() {
  <PermissionAction
  permissions={permissions}
  required={["workspace_create", "workspace_edit"]}
- label="CreateApp"
+ label="Create app"
  icon={Plus}
  size="sm"
  onClick={() => setShowCreateDialog(true)}
@@ -478,7 +478,7 @@ export default function AppsPage() {
  </div>
  }
  >
- {/* StatisticsInfo */}
+ {/* Statistics Info */}
  <div className="flex flex-wrap items-center gap-4 text-[12px] text-foreground-muted">
  <span className="flex items-center gap-1.5">
  <Bot className="w-3.5 h-3.5" />
@@ -491,12 +491,12 @@ export default function AppsPage() {
  </div>
  </PageHeader>
 
- {/* SearchandFilter */}
+ {/* Search and Filter */}
  <div className="flex flex-wrap items-center gap-3">
  <div className="relative flex-1 min-w-[220px] max-w-md">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchApp..."
+ placeholder="Search apps..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-75 border-border focus:bg-surface-100 focus:border-brand-500"
@@ -505,10 +505,10 @@ export default function AppsPage() {
 
  <Select value={statusFilter} onValueChange={setStatusFilter}>
  <SelectTrigger className="w-[130px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="StatusFilter" />
+ <SelectValue placeholder="Status filter" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Status</SelectItem>
  {Object.entries(statusConfig).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -519,7 +519,7 @@ export default function AppsPage() {
 
  <Select value={visibilityFilter} onValueChange={setVisibilityFilter}>
  <SelectTrigger className="w-[120px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="can" />
+ <SelectValue placeholder="Visibility" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {visibilityOptions.map((option) => (
@@ -532,7 +532,7 @@ export default function AppsPage() {
 
  <Select value={domainFilter} onValueChange={setDomainFilter}>
  <SelectTrigger className="w-[120px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="DomainStatus" />
+ <SelectValue placeholder="Domain status" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {domainStatusOptions.map((option) => (
@@ -545,7 +545,7 @@ export default function AppsPage() {
 
  <Select value={timeRangeFilter} onValueChange={setTimeRangeFilter}>
  <SelectTrigger className="w-[120px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="TimeRange" />
+ <SelectValue placeholder="Time range" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {timeRangeOptions.map((option) => (
@@ -573,10 +573,10 @@ export default function AppsPage() {
  {selectedAppIds.size > 0 && (
  <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface-100 px-4 py-3">
  <div className="text-[12px] text-foreground-light">
- alreadySelect {selectedAppIds.size} App
+ {selectedAppIds.size} app(s) selected
  {publishableApps.length > 0 && (
  <span className="text-foreground-muted">
- , other {publishableApps.length} canPublish
+ , {publishableApps.length} can be published
  </span>
  )}
  </div>
@@ -589,13 +589,13 @@ export default function AppsPage() {
  disabled={publishableApps.length === 0 || isBulkPublishing}
  >
  {isBulkPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- BatchPublish
+ Batch Publish
  </Button>
  ) : (
  <PermissionAction
  permissions={permissions}
  required={["workspace_publish"]}
- label="BatchPublish"
+ label="Batch publish"
  icon={Rocket}
  size="sm"
  variant="outline"
@@ -609,13 +609,13 @@ export default function AppsPage() {
  disabled={selectedApps.length === 0 || isBulkArchiving}
  >
  {isBulkArchiving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- BatchArchive
+ Batch Archive
  </Button>
  ) : (
  <PermissionAction
  permissions={permissions}
  required={["workspace_edit"]}
- label="BatchArchive"
+ label="Batch archive"
  icon={Archive}
  size="sm"
  variant="outline"
@@ -628,20 +628,20 @@ export default function AppsPage() {
  </div>
  )}
 
- {/* AppList */}
+ {/* App List */}
  {filteredApps.length === 0 ? (
  <EmptyState
  icon={<Bot className="w-6 h-6" />}
- title={searchQuery || statusFilter !== "all" ? "not yettoMatch'sApp": "NoneApp"}
+ title={searchQuery || statusFilter !== "all" ? "No matching apps" : "No apps"}
  description={
  searchQuery || statusFilter !== "all"
- ? "TryAdjustSearchConditionorFilterCondition"
-: "Createyou's#1App, StartBuild AI Workflow"
+ ? "Try adjusting your search or filter conditions"
+: "Create your first app and start building AI workflows"
  }
  action={
  !searchQuery && statusFilter === "all" && canCreate
  ? {
- label: "CreateApp",
+ label: "Create App",
  onClick: () => setShowCreateDialog(true),
  }
  : undefined
@@ -655,20 +655,20 @@ export default function AppsPage() {
  <Checkbox
  checked={allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false}
  onCheckedChange={(checked) => toggleSelectAll(checked, visibleAppIds)}
- aria-label="Select AllApp"
+ aria-label="Select all apps"
  />
  <span>App</span>
  </div>
  <div className="col-span-2">Status</div>
- <div className="col-span-1">can</div>
+ <div className="col-span-1">Visibility</div>
  <div className="col-span-1">Version</div>
  <div className="col-span-1">Domain</div>
- <div className="col-span-1">RecentRun</div>
+ <div className="col-span-1">Last Run</div>
  <div className="col-span-1">Updated At</div>
  <div className="col-span-2 text-right">Action</div>
  </div>
 
- {/* Approw */}
+ {/* App Row */}
  {sortedApps.map((app) => {
  const status = getStatusConfig(app.status);
  const StatusIcon = status.icon;
@@ -681,13 +681,13 @@ export default function AppsPage() {
  key={app.id}
  className="grid grid-cols-12 gap-4 px-4 py-4 border-b border-border last:border-b-0 hover:bg-surface-75 transition-colors"
  >
- {/* AppInfo */}
+ {/* App Info */}
  <div className="col-span-3">
  <div className="flex items-start gap-3">
  <Checkbox
  checked={selectedAppIds.has(app.id)}
  onCheckedChange={(checked) => toggleSelectApp(app.id, checked)}
- aria-label={`SelectApp ${app.name}`}
+ aria-label={`Select app ${app.name}`}
  className="mt-2"
  />
  <Link
@@ -709,7 +709,7 @@ export default function AppsPage() {
  /{workspace?.slug}/{app.slug}
  </p>
  <p className="text-[10px] text-foreground-muted mt-1">
- Updateat {formatShortDate(app.updated_at)}
+ Updated at {formatShortDate(app.updated_at)}
  </p>
  </div>
  </Link>
@@ -727,7 +727,7 @@ export default function AppsPage() {
  </Badge>
  </div>
 
- {/* can */}
+ {/* Visibility */}
  <div className="col-span-1 flex items-center">
  <span className="flex items-center gap-1 text-[11px] text-foreground-light">
  <AccessIcon className="w-3.5 h-3.5" />
@@ -749,7 +749,7 @@ export default function AppsPage() {
  </span>
  </div>
 
- {/* RecentRun */}
+ {/* Last Run */}
  <div className="col-span-1 flex items-center">
  <span className="text-[11px] text-foreground-light">
  {resolveLastRun(app)}
@@ -793,7 +793,7 @@ export default function AppsPage() {
  </Button>
  )}
 
- {/* moremultipleAction */}
+ {/* More Actions */}
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -807,7 +807,7 @@ export default function AppsPage() {
  className="flex items-center gap-2 text-[12px]"
  >
  <Eye className="w-4 h-4" />
- AppOverview
+ App Overview
  </Link>
  </DropdownMenuItem>
  <DropdownMenuItem asChild>
@@ -816,7 +816,7 @@ export default function AppsPage() {
  className="flex items-center gap-2 text-[12px]"
  >
  <Edit3 className="w-4 h-4" />
- EditApp
+ Edit App
  </Link>
  </DropdownMenuItem>
  <DropdownMenuItem
@@ -824,7 +824,7 @@ export default function AppsPage() {
  className="flex items-center gap-2 text-[12px]"
  >
  <Copy className="w-4 h-4" />
- {copiedAppId === app.id ? "alreadyCopyLink": "CopyLink"}
+ {copiedAppId === app.id ? "Link Copied": "Copy Link"}
  </DropdownMenuItem>
  <DropdownMenuItem asChild>
  <Link
@@ -832,7 +832,7 @@ export default function AppsPage() {
  className="flex items-center gap-2 text-[12px]"
  >
  <BarChart3 className="w-4 h-4" />
- RunMonitor
+ Run Monitor
  </Link>
  </DropdownMenuItem>
  <DropdownMenuItem asChild>
@@ -841,7 +841,7 @@ export default function AppsPage() {
  className="flex items-center gap-2 text-[12px]"
  >
  <Globe className="w-4 h-4" />
- DomainManage
+ Domain Management
  </Link>
  </DropdownMenuItem>
 
@@ -853,7 +853,7 @@ export default function AppsPage() {
  className="text-[12px] text-warning"
  >
  <Pause className="w-4 h-4 mr-2" />
- downlineApp
+ Deprecate App
  </DropdownMenuItem>
  )}
 
@@ -862,7 +862,7 @@ export default function AppsPage() {
  className="text-[12px] text-destructive"
  >
  <Archive className="w-4 h-4 mr-2" />
- ArchiveApp
+ Archive App
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
@@ -874,23 +874,23 @@ export default function AppsPage() {
  )}
  </div>
 
- {/* CreateAppDialog */}
+ {/* Create App Dialog */}
  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">CreateApp</DialogTitle>
+ <DialogTitle className="text-foreground">Create App</DialogTitle>
  <DialogDescription className="text-foreground-light">
- Create1new's AI App
+ Create a new AI app
  </DialogDescription>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- AppName <span className="text-destructive">*</span>
+ App Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="exampleif: dayAssistant"
+ placeholder="e.g. Daily Assistant"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
@@ -918,10 +918,10 @@ export default function AppsPage() {
 
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- Description(Optional)
+ Description (Optional)
  </label>
  <Input
- placeholder="needDescriptionAppFeatures..."
+ placeholder="Describe app features..."
  value={createForm.description}
  onChange={(e) =>
  setCreateForm({ ...createForm, description: e.target.value })

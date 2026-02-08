@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Notification SettingsPage
+ * Notification Settings Page
  * Supabase Style: Minimal, Professional
  */
 
@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// NotificationsType
+// Notification Type
 interface NotificationSetting {
  id: string;
  title: string;
@@ -34,34 +34,34 @@ interface NotificationSetting {
  inApp: boolean;
 }
 
-// NotificationsCategory
+// Notification Categories
 const notificationCategories = [
  {
  id: "workflow",
- title: "WorkflowNotifications",
+ title: "Workflow notifications",
  icon: Zap,
- description: "andWorkflowExecuteRelated'sNotifications",
+ description: "Notifications related to workflow execution",
  settings: [
  {
  id: "workflow_complete",
- title: "WorkflowDone",
- description: "WorkflowExecuteDonetimeNotifications",
+ title: "Workflow done",
+ description: "Notify when a workflow completes",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "workflow_failed",
- title: "WorkflowFailed",
- description: "WorkflowExecuteFailedtimeNotifications",
+ title: "Workflow failed",
+ description: "Notify when a workflow fails",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "workflow_scheduled",
- title: "ScheduledTaskReminder",
- description: "ScheduledWorkflowExecutebeforeReminder",
+ title: "Scheduled task reminder",
+ description: "Remind before scheduled workflow runs",
  email: false,
  push: true,
  inApp: true,
@@ -70,30 +70,30 @@ const notificationCategories = [
  },
  {
  id: "team",
- title: "TeamCollaboration",
+ title: "Team collaboration",
  icon: Users,
- description: "TeamMemberandCollaborationRelatedNotifications",
+ description: "Team and collaboration notifications",
  settings: [
  {
  id: "team_invite",
- title: "TeamInvite",
- description: "toTeamInvitetimeNotifications",
+ title: "Team invite",
+ description: "Notify when invited to a team",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "team_mention",
- title: "@and",
- description: "atCommentorDiscussionbyandtimeNotifications",
+ title: "Mentions",
+ description: "Notify on comments or @mentions",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "workflow_shared",
- title: "WorkflowShare",
- description: "haspersonandyouShareWorkflowtimeNotifications",
+ title: "Workflow shared",
+ description: "Notify when someone shares a workflow with you",
  email: false,
  push: true,
  inApp: true,
@@ -102,30 +102,30 @@ const notificationCategories = [
  },
  {
  id: "system",
- title: "SystemNotifications",
+ title: "System notifications",
  icon: Bell,
- description: "SystemStatusandMaintainRelatedNotifications",
+ description: "System status and maintenance notifications",
  settings: [
  {
  id: "system_maintenance",
- title: "PlanMaintain",
- description: "SystemPlanMaintainbeforeNotifications",
+ title: "Planned maintenance",
+ description: "Notify before scheduled maintenance",
  email: true,
  push: false,
  inApp: true,
  },
  {
  id: "system_incident",
- title: "SystemFault",
- description: "OccurSystemFaulttimeNotifications",
+ title: "System incident",
+ description: "Notify when a system incident occurs",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "feature_update",
- title: "FeaturesUpdate",
- description: "newFeaturesPublishtimeNotifications",
+ title: "Feature updates",
+ description: "Notify when new features are released",
  email: true,
  push: false,
  inApp: true,
@@ -134,30 +134,30 @@ const notificationCategories = [
  },
  {
  id: "billing",
- title: "BillingNotifications",
+ title: "Billing notifications",
  icon: CreditCard,
- description: "SubscriptionandBillingRelatedNotifications",
+ description: "Subscription and billing notifications",
  settings: [
  {
  id: "billing_invoice",
- title: "BillingGenerate",
- description: "newBillingGeneratetimeNotifications",
+ title: "Invoice generated",
+ description: "Notify when a new invoice is generated",
  email: true,
  push: false,
  inApp: true,
  },
  {
  id: "billing_payment",
- title: "PaymentConfirm",
- description: "PaymentSuccesstimeNotifications",
+ title: "Payment confirmed",
+ description: "Notify when payment succeeds",
  email: true,
  push: false,
  inApp: true,
  },
  {
  id: "billing_quota",
- title: "QuotaWarning",
- description: "UsageQuotaonlimittimeNotifications",
+ title: "Quota warning",
+ description: "Notify when usage approaches quota limit",
  email: true,
  push: true,
  inApp: true,
@@ -166,22 +166,22 @@ const notificationCategories = [
  },
  {
  id: "security",
- title: "SecurityNotifications",
+ title: "Security notifications",
  icon: Shield,
- description: "AccountSecurityRelatedNotifications",
+ description: "Account security notifications",
  settings: [
  {
  id: "security_login",
- title: "newDeviceSign In",
- description: "fromnewDeviceSign IntimeNotifications",
+ title: "New device sign-in",
+ description: "Notify when signing in from a new device",
  email: true,
  push: true,
  inApp: true,
  },
  {
  id: "security_password",
- title: "PasswordChange",
- description: "PasswordChangetimeNotifications",
+ title: "Password change",
+ description: "Notify when password is changed",
  email: true,
  push: false,
  inApp: true,
@@ -189,7 +189,7 @@ const notificationCategories = [
  {
  id: "security_api_key",
  title: "API Key Activity",
- description: "API Key CreateorUsagetimeNotifications",
+ description: "Notify when an API key is created or used",
  email: false,
  push: false,
  inApp: true,
@@ -198,7 +198,7 @@ const notificationCategories = [
  },
 ];
 
-// ToggleComponent
+// Toggle Component
 function Toggle({
  checked,
  onChange,
@@ -234,7 +234,7 @@ export default function NotificationsSettingsPage() {
  const [isSaving, setIsSaving] = useState(false);
  const [saved, setSaved] = useState(false);
 
- // UpdateSettings
+  // Update Settings
  const updateSetting = (
  categoryId: string,
  settingId: string,
@@ -256,7 +256,7 @@ export default function NotificationsSettingsPage() {
  setSaved(false);
  };
 
- // SwitchCategory
+  // Toggle Category
  const toggleCategory = (
  categoryId: string,
  field: "email" | "push" | "inApp",
@@ -277,7 +277,7 @@ export default function NotificationsSettingsPage() {
  setSaved(false);
  };
 
- // SaveSettings
+  // Save Settings
  const handleSave = async () => {
  setIsSaving(true);
  await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -292,7 +292,7 @@ export default function NotificationsSettingsPage() {
  <PageHeader
  eyebrow="Settings"
  title="Notification Settings"
- description="ManageyouReceiveNotifications'smethodandrate"
+ description="Manage how and how often you receive notifications"
  actions={(
  <Button
  onClick={handleSave}
@@ -313,14 +313,14 @@ export default function NotificationsSettingsPage() {
  ) : (
  <>
  <Save className="mr-2 w-4 h-4" />
- SaveChange
+            Save Changes
  </>
  )}
  </Button>
  )}
  />
 
- {/* NotificationsChannelDescription */}
+      {/* Notification Channel Descriptions */}
  <div className="page-section">
  <div className="page-grid sm:grid-cols-2 lg:grid-cols-3">
  <div className="page-panel p-4">
@@ -331,7 +331,7 @@ export default function NotificationsSettingsPage() {
  <span className="text-[13px] font-medium text-foreground">Email</span>
  </div>
  <p className="text-xs text-foreground-muted">
- ViaEmailReceivere-needNotifications
+            Receive notifications via email
  </p>
  </div>
  <div className="page-panel p-4">
@@ -342,7 +342,7 @@ export default function NotificationsSettingsPage() {
  <span className="text-[13px] font-medium text-foreground">Push</span>
  </div>
  <p className="text-xs text-foreground-muted">
- BrowseorMoveendpointPush Notifications
+            Browser or mobile push notifications
  </p>
  </div>
  <div className="page-panel p-4">
@@ -350,27 +350,27 @@ export default function NotificationsSettingsPage() {
  <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center">
  <Bell className="w-4 h-4 text-brand-500" />
  </div>
- <span className="text-[13px] font-medium text-foreground">Appin</span>
+            <span className="text-[13px] font-medium text-foreground">In-App</span>
  </div>
  <p className="text-xs text-foreground-muted">
- atAgentFlow AppinDisplayNotifications
+            Display notifications within AgentFlow
  </p>
  </div>
  </div>
  </div>
 
- {/* Notification SettingsList */}
+      {/* Notification Settings List */}
  <div className="page-section">
  <div className="space-y-5">
  {settings.map((category) => {
- // CheckisnoAllSettingsallalreadyEnable
+          // Check if all settings are enabled
  const allEmailEnabled = category.settings.every((s) => s.email);
  const allPushEnabled = category.settings.every((s) => s.push);
  const allInAppEnabled = category.settings.every((s) => s.inApp);
 
  return (
  <div key={category.id} className="page-panel overflow-hidden">
- {/* CategoryHeader */}
+              {/* Category Header */}
  <div className="page-panel-header">
  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
  <div className="flex items-center gap-3">
@@ -409,7 +409,7 @@ export default function NotificationsSettingsPage() {
  </div>
  <div className="flex items-center gap-2">
  <span className="text-[11px] text-foreground-muted w-8 text-center">
- Appin
+                    In-App
  </span>
  <Toggle
  checked={allInAppEnabled}
@@ -422,7 +422,7 @@ export default function NotificationsSettingsPage() {
  </div>
  </div>
 
- {/* SettingsList */}
+              {/* Settings List */}
  <div className="divide-y divide-border">
  {category.settings.map((setting) => (
  <div
@@ -472,32 +472,32 @@ export default function NotificationsSettingsPage() {
  </div>
  </div>
 
- {/* allSettings */}
- <div className="page-section">
- <div className="page-panel">
- <div className="page-panel-header">
- <h3 className="page-panel-title">allSettings</h3>
- <p className="page-panel-description mt-1">1ControlNotificationsRhythm</p>
+      {/* Global Settings */}
+        <div className="page-section">
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <h3 className="page-panel-title">Global Settings</h3>
+              <p className="page-panel-description mt-1">Control your notification preferences</p>
  </div>
  <div className="p-6 space-y-4">
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-[13px] font-medium text-foreground">
- 
- </h4>
- <p className="text-xs text-foreground-muted">
- atSpecifyTimeinPauseAllPush Notifications
+              <h4 className="text-[13px] font-medium text-foreground">
+                Do Not Disturb
+              </h4>
+              <p className="text-xs text-foreground-muted">
+                Pause all push notifications during specified times
  </p>
  </div>
  <Toggle checked={false} onChange={() => {}} />
  </div>
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-[13px] font-medium text-foreground">
- eachdaySummary
+              <h4 className="text-[13px] font-medium text-foreground">
+                Daily Summary
  </h4>
  <p className="text-xs text-foreground-muted">
- willUrgentNotificationstotalaseachdayEmailSummary
+ Urgent notifications and daily email summary
  </p>
  </div>
  <Toggle checked={true} onChange={() => {}} />

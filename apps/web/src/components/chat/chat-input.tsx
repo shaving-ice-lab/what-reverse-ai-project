@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ChatInputComponent
- * SupportTextInput, FileUpload, VoiceInputetc
+ * Chat Input Component
+ * Supports text input, file upload, voice input, etc.
  */
 
 import { useState, useRef, useCallback, KeyboardEvent } from "react";
@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/tooltip";
 
 // ============================================
-// TypeDefinition
+// Type Definitions
 // ============================================
 
 interface Attachment {
@@ -70,14 +70,14 @@ interface ChatInputProps {
 }
 
 // ============================================
-// mainInputComponent
+// Main Input Component
 // ============================================
 
 export function ChatInput({
  onSend,
  onCancel,
  isLoading = false,
- placeholder = "InputMessage...",
+  placeholder = "Type a message...",
  maxLength = 10000,
  showAttachments = true,
  showVoice = true,
@@ -97,7 +97,7 @@ export function ChatInput({
 
  const canSend = (message.trim().length > 0 || attachments.length > 0) && !disabled && !isLoading;
 
- // AutoAdjustHeight
+  // Auto-adjust height
  const adjustHeight = useCallback(() => {
  const textarea = textareaRef.current;
  if (textarea) {
@@ -148,14 +148,14 @@ export function ChatInput({
 
  const toggleRecording = () => {
  setIsRecording(!isRecording);
- // TODO: ImplementVoiceFeatures
+    // TODO: Implement voice features
  };
 
  const currentModel = models.find((m) => m.id === selectedModel);
 
  return (
  <div className={cn("border-t border-border bg-background-studio/95 backdrop-blur", className)}>
- {/* AttachmentPreview */}
+    {/* Attachment Preview */}
  {attachments.length > 0 && (
  <div className="flex flex-wrap gap-2 px-0 pt-4">
  {attachments.map((attachment) => (
@@ -186,7 +186,7 @@ export function ChatInput({
  </div>
  )}
 
- {/* InputRegion */}
+      {/* Input Area */}
  <div className="py-4">
  <div
  className={cn(
@@ -196,7 +196,7 @@ export function ChatInput({
  : "border-border bg-surface-100/70 hover:border-border-strong"
  )}
  >
- {/* AttachmentButton */}
+          {/* Attachment Button */}
  {showAttachments && (
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
@@ -215,27 +215,27 @@ export function ChatInput({
  className="text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
  <ImageIcon className="w-4 h-4 mr-2 text-brand-500" />
- UploadImage
+              Upload Image
  </DropdownMenuItem>
  <DropdownMenuItem
  onClick={() => handleFileSelect("file")}
  className="text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
  <FileText className="w-4 h-4 mr-2 text-foreground-muted" />
- UploadFile
+              Upload File
  </DropdownMenuItem>
  <DropdownMenuItem
  onClick={() => handleFileSelect("code")}
  className="text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
  <Code className="w-4 h-4 mr-2 text-foreground-muted" />
- UploadCode
+              Upload Code
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  )}
 
- {/* TextInput */}
+          {/* Text Input */}
  <Textarea
  ref={textareaRef}
  value={message}
@@ -252,7 +252,7 @@ export function ChatInput({
  rows={1}
  />
 
- {/* charcountStatistics */}
+          {/* Character count */}
  {message.length > maxLength * 0.8 && (
  <span
  className={cn(
@@ -264,7 +264,7 @@ export function ChatInput({
  </span>
  )}
 
- {/* VoiceButton */}
+          {/* Voice Button */}
  {showVoice && (
  <TooltipProvider>
  <Tooltip>
@@ -287,13 +287,13 @@ export function ChatInput({
  </Button>
  </TooltipTrigger>
  <TooltipContent>
- {isRecording ? "Stop": "VoiceInput"}
+                {isRecording ? "Stop": "Voice input"}
  </TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
 
- {/* Send/StopButton */}
+          {/* Send/Stop Button */}
  {isLoading ? (
  <Button
  size="icon"
@@ -315,7 +315,7 @@ export function ChatInput({
  )}
  </div>
 
- {/* FooterToolbar */}
+        {/* Footer Toolbar */}
  <div className="flex items-center justify-between mt-2 px-1">
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
  {showModels && currentModel && (
@@ -341,12 +341,12 @@ export function ChatInput({
  </DropdownMenuContent>
  </DropdownMenu>
  )}
- <span>byEnter Send, Shift+Enter row</span>
+            <span>Enter to send, Shift+Enter for new line</span>
  </div>
  </div>
  </div>
 
- {/* Hide'sFileInput */}
+    {/* Hidden file input */}
  <input
  ref={fileInputRef}
  type="file"
@@ -359,7 +359,7 @@ export function ChatInput({
 }
 
 // ============================================
-// QuickReplySuggestion
+// Quick Reply Suggestions
 // ============================================
 
 interface QuickRepliesProps {
@@ -391,7 +391,7 @@ export function QuickReplies({
 }
 
 // ============================================
-// InputStatusIndicator
+// Typing Status Indicator
 // ============================================
 
 interface TypingIndicatorProps {
@@ -414,7 +414,7 @@ export function TypingIndicator({
  <span className="w-2 h-2 rounded-full bg-foreground-muted animate-bounce" style={{ animationDelay: "150ms" }} />
  <span className="w-2 h-2 rounded-full bg-foreground-muted animate-bounce" style={{ animationDelay: "300ms" }} />
  </div>
- <span>{userName} currentlyatInput...</span>
+      <span>{userName} is typing...</span>
  </div>
  );
 }

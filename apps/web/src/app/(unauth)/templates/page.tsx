@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TemplateMarketplacePage - LobeHub StyleDesign
+ * TemplateMarketplacePage - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -24,22 +24,22 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Category
+// Categories
 const categories = [
- { id: "all", name: "allsection", icon: Sparkles },
- { id: "automation", name: "Automation", icon: Zap },
- { id: "ai", name: "AI Assistant", icon: Bot },
- { id: "data", name: "DataProcess", icon: BarChart3 },
- { id: "communication", name: "Newsletter", icon: MessageSquare },
- { id: "development", name: "Development", icon: Code },
+  { id: "all", name: "All", icon: Sparkles },
+  { id: "automation", name: "Automation", icon: Zap },
+  { id: "ai", name: "AI Assistant", icon: Bot },
+  { id: "data", name: "Data Processing", icon: BarChart3 },
+  { id: "communication", name: "Communication", icon: MessageSquare },
+  { id: "development", name: "Development", icon: Code },
 ];
 
-// TemplateData
+// Template Data
 const templates = [
  {
  id: "1",
- name: "SmartSupportBot",
- description: "7x24 hAutoReplyCustomerIssue, SupportmultipleChannelConnect",
+    name: "Smart Support Bot",
+    description: "24/7 automated customer responses with multi-channel support",
  category: "ai",
  author: "AgentFlow",
  rating: 4.9,
@@ -50,20 +50,20 @@ const templates = [
  },
  {
  id: "2",
- name: "GitHub PR AutoReview",
- description: "AutoReview Pull Request, CheckCodeandStandard",
+    name: "GitHub PR Auto-Review",
+    description: "Automatically review pull requests, check code quality and standards",
  category: "development",
  author: "DevTools",
  rating: 4.8,
  downloads: 8900,
  icon: "🔍",
- tags: ["GitHub", "CodeReview", "CI/CD"],
+    tags: ["GitHub", "Code Review", "CI/CD"],
  featured: true,
  },
  {
  id: "3",
- name: "Social MediaContentPublish",
- description: "1keyPublishContenttomultipleSocial MediaPlatform",
+    name: "Social Media Content Publisher",
+    description: "Publish content to multiple social media platforms with one click",
  category: "automation",
  author: "ContentAI",
  rating: 4.7,
@@ -74,62 +74,62 @@ const templates = [
  },
  {
  id: "4",
- name: "SaleslineRating",
- description: "AutoEvaluateSalesline, PriorityFollow upvalueCustomer",
+    name: "Sales Lead Scoring",
+    description: "Automatically evaluate sales leads and prioritize high-value customers",
  category: "data",
  author: "SalesBot",
  rating: 4.6,
  downloads: 5400,
  icon: "📊",
- tags: ["Sales", "CRM", "DataAnalytics"],
+    tags: ["Sales", "CRM", "Data Analytics"],
  featured: false,
  },
  {
  id: "5",
- name: "EmailAutoReply",
- description: "SmartCategoryEmailandAutoSendReply",
+    name: "Email Auto-Reply",
+    description: "Intelligently categorize emails and send automated replies",
  category: "communication",
  author: "MailBot",
  rating: 4.8,
  downloads: 7800,
  icon: "📧",
- tags: ["Email", "Automation", "rate"],
+    tags: ["Email", "Automation", "Productivity"],
  featured: true,
  },
  {
  id: "6",
- name: "DataReportGenerate",
- description: "AutototalDataandGeneratecanvisualReport",
+    name: "Data Report Generator",
+    description: "Automatically aggregate data and generate visual reports",
  category: "data",
  author: "DataViz",
  rating: 4.7,
  downloads: 6100,
  icon: "📈",
- tags: ["Data", "Report", "canvisual"],
+    tags: ["Data", "Report", "Visualization"],
  featured: false,
  },
  {
  id: "7",
- name: "willneedGenerate",
- description: "willwillasStructure'swillneed",
+    name: "Meeting Notes Generator",
+    description: "Convert meeting recordings into structured meeting notes",
  category: "ai",
  author: "MeetingAI",
  rating: 4.9,
  downloads: 9200,
  icon: "📝",
- tags: ["will", "AI", "Voicechar"],
+    tags: ["Meetings", "AI", "Transcription"],
  featured: true,
  },
  {
  id: "8",
- name: "Bug Bot",
- description: "AutoCategoryandAllocate Bug toshould'sDevelopmentperson",
+    name: "Bug Triage Bot",
+    description: "Automatically categorize and assign bugs to the right developers",
  category: "development",
  author: "BugBot",
  rating: 4.5,
  downloads: 4300,
  icon: "🐛",
- tags: ["Bug", "itemManage", "Automation"],
+    tags: ["Bug", "Project Management", "Automation"],
  featured: false,
  },
 ];
@@ -158,22 +158,22 @@ export default function TemplatesPage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Sparkles className="h-4 w-4" />
- 120+ FeaturedTemplate
+            120+ Featured Templates
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- TemplateMarketplace
+            Template Marketplace
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-8">
- fromFeaturedTemplateStart, QuickBuildyou'sAutomationWorkflow
+ Start with curated templates to quickly build your automation workflows
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-12 h-12 rounded-full bg-surface-100/30 border-border/30"
@@ -209,7 +209,7 @@ export default function TemplatesPage() {
  {activeCategory === "all" && searchQuery === "" && (
  <section className="py-12 px-6">
  <div className="max-w-6xl mx-auto">
- <h2 className="lobe-section-header mb-6">FeaturedRecommended</h2>
+          <h2 className="lobe-section-header mb-6">Featured Recommendations</h2>
  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
  {featuredTemplates.map((template) => (
  <Link
@@ -253,18 +253,18 @@ export default function TemplatesPage() {
  <div className="max-w-6xl mx-auto">
  <div className="flex items-center justify-between mb-6">
  <h2 className="lobe-section-header">
- {activeCategory === "all" ? "AllTemplate": categories.find((c) => c.id === activeCategory)?.name}
+              {activeCategory === "all" ? "All Templates" : categories.find((c) => c.id === activeCategory)?.name}
  </h2>
  <span className="text-[12px] text-foreground-lighter">
- {filteredTemplates.length} Template
+              {filteredTemplates.length} Templates
  </span>
  </div>
 
  {filteredTemplates.length === 0 ? (
  <div className="text-center py-16">
  <Sparkles className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
- <h3 className="text-[15px] font-medium text-foreground mb-2">NotoMatch'sTemplate</h3>
- <p className="text-[13px] text-foreground-light mb-6">TryAdjustFilterConditionorSearchKeywords</p>
+              <h3 className="text-[15px] font-medium text-foreground mb-2">No matching templates found</h3>
+              <p className="text-[13px] text-foreground-light mb-6">Try adjusting your filter or search keywords</p>
  <Button
  variant="outline"
  className="rounded-full border-border/50 text-foreground-light"
@@ -273,7 +273,7 @@ export default function TemplatesPage() {
  setActiveCategory("all");
  }}
  >
- ClearFilter
+              Clear Filters
  </Button>
  </div>
  ) : (
@@ -340,11 +340,11 @@ export default function TemplatesPage() {
  {/* CTA */}
  <section className="py-16 px-6">
  <div className="max-w-4xl mx-auto text-center">
- <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">notto'sTemplate?</h2>
- <p className="text-[13px] text-foreground-light mb-6">fromStartCreateyou'sCustomWorkflow</p>
+ <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Can't Find the Right Template?</h2>
+ <p className="text-[13px] text-foreground-light mb-6">Create your own custom workflow from scratch</p>
  <Link href="/dashboard/workflows/new">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- CreateWorkflow
+            Create Workflow
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

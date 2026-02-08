@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ConditionBuildComponent - Minimalist Style
+ * Condition Builder Component - Minimalist Style
  */
 
 import {
@@ -25,19 +25,19 @@ import { generateId } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 const operators = [
- { value: "eq", label: "etcat", symbol: "==" },
- { value: "neq", label: "notetcat", symbol: "!=" },
- { value: "gt", label: "largeat", symbol: ">" },
- { value: "gte", label: "largeatetcat", symbol: ">=" },
- { value: "lt", label: "smallat", symbol: "<" },
- { value: "lte", label: "smallatetcat", symbol: "<=" },
+ { value: "eq", label: "Equals", symbol: "==" },
+ { value: "neq", label: "Not equals", symbol: "!=" },
+ { value: "gt", label: "Greater than", symbol: ">" },
+ { value: "gte", label: "Greater than or equal", symbol: ">=" },
+    { value: "lt", label: "Less than", symbol: "<" },
+    { value: "lte", label: "Less than or equal", symbol: "<=" },
  { value: "contains", label: "Contains", symbol: "∋" },
- { value: "notContains", label: "notContains", symbol: "∌" },
- { value: "startsWith", label: "headis", symbol: "^" },
- { value: "endsWith", label: "tailis", symbol: "$" },
- { value: "matches", label: "Matchcurrentlythen", symbol: "~" },
- { value: "empty", label: "asEmpty", symbol: "∅" },
- { value: "notEmpty", label: "Empty", symbol: "≠∅" },
+ { value: "notContains", label: "Does not contain", symbol: "∌" },
+ { value: "startsWith", label: "Starts with", symbol: "^" },
+ { value: "endsWith", label: "Ends with", symbol: "$" },
+    { value: "matches", label: "Matches regex", symbol: "~" },
+ { value: "empty", label: "Is empty", symbol: "∅" },
+ { value: "notEmpty", label: "Is not empty", symbol: "≠∅" },
 ];
 
 export interface Condition {
@@ -87,7 +87,7 @@ function ConditionRow({
  <Input
  value={condition.left}
  onChange={(e) => onUpdate({ ...condition, left: e.target.value })}
- placeholder="{{Variable}} orvalue"
+ placeholder="{{Variable}} or value"
  className="h-8 pr-8 font-mono text-sm"
  />
  <div className="absolute right-1 top-1/2 -translate-y-1/2">
@@ -123,7 +123,7 @@ function ConditionRow({
  <Input
  value={condition.right}
  onChange={(e) => onUpdate({ ...condition, right: e.target.value })}
- placeholder="{{Variable}} orvalue"
+ placeholder="{{Variable}} or value"
  className="h-8 pr-8 font-mono text-sm"
  />
  <div className="absolute right-1 top-1/2 -translate-y-1/2">
@@ -253,8 +253,8 @@ function ConditionGroupEditor({
  onClick={addCondition}
  >
  <Plus className="h-3.5 w-3.5 mr-1" />
- AddCondition
- </Button>
+Add Condition
+    </Button>
  </div>
  );
 }
@@ -332,14 +332,14 @@ export function ConditionBuilder({
  onClick={addGroup}
  >
  <Plus className="h-3.5 w-3.5 mr-1" />
- AddConditiongroup
+ Add Condition Group
  </Button>
 
  {groups.length > 0 && (
  <div className="mt-3 p-3 rounded-md border border-border bg-surface-200">
  <div className="text-xs font-medium text-foreground-muted mb-1.5 flex items-center gap-1">
  <Code2 className="h-3.5 w-3.5" />
- ConditionPreview
+ Condition Preview
  </div>
  <code className="text-xs break-all font-mono p-2 block rounded bg-surface-100 border border-border">
  {groups.map((group, gi) => {

@@ -1,5 +1,5 @@
 /**
- * Cache ModuleTest
+ * Cache Module Test
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -11,7 +11,7 @@ import {
 } from "../cache";
 
 describe("CACHE_TIMES", () => {
- it("ShouldDefinitioncurrently'sCacheTime", () => {
+ it("Should define correct cache times", () => {
  expect(CACHE_TIMES.INSTANT).toBe(0);
  expect(CACHE_TIMES.SHORT).toBe(60 * 1000);
  expect(CACHE_TIMES.MEDIUM).toBe(5 * 60 * 1000);
@@ -23,7 +23,7 @@ describe("CACHE_TIMES", () => {
 
 describe("queryKeys", () => {
  describe("user", () => {
- it("ShouldGeneratecurrently'sUserRelatedkey", () => {
+  it("Should generate correct user-related keys", () => {
  expect(queryKeys.user.all).toEqual(["user"]);
  expect(queryKeys.user.profile()).toEqual(["user", "profile"]);
  expect(queryKeys.user.settings()).toEqual(["user", "settings"]);
@@ -31,7 +31,7 @@ describe("queryKeys", () => {
  });
 
  describe("workflows", () => {
- it("ShouldGeneratecurrently'sWorkflowRelatedkey", () => {
+  it("Should generate correct workflow-related keys", () => {
  expect(queryKeys.workflows.all).toEqual(["workflows"]);
  expect(queryKeys.workflows.lists()).toEqual(["workflows", "list"]);
  expect(queryKeys.workflows.list({ status: "active" })).toEqual([
@@ -53,7 +53,7 @@ describe("queryKeys", () => {
  });
 
  describe("apiKeys", () => {
- it("ShouldGeneratecurrently's API KeyRelatedkey", () => {
+  it("Should generate correct API key-related keys", () => {
  expect(queryKeys.apiKeys.all).toEqual(["apiKeys"]);
  expect(queryKeys.apiKeys.list()).toEqual(["apiKeys", "list"]);
  expect(queryKeys.apiKeys.providers()).toEqual(["apiKeys", "providers"]);
@@ -61,7 +61,7 @@ describe("queryKeys", () => {
  });
 
  describe("executions", () => {
- it("ShouldGeneratecurrently'sExecuteRelatedkey", () => {
+  it("Should generate correct execution-related keys", () => {
  expect(queryKeys.executions.all).toEqual(["executions"]);
  expect(queryKeys.executions.detail("exec-123")).toEqual([
  "executions",
@@ -77,7 +77,7 @@ describe("queryKeys", () => {
  });
 
  describe("store", () => {
- it("ShouldGeneratecurrently'sStoreRelatedkey", () => {
+  it("Should generate correct store-related keys", () => {
  expect(queryKeys.store.all).toEqual(["store"]);
  expect(queryKeys.store.agents({ category: "ai" })).toEqual([
  "store",
@@ -100,36 +100,36 @@ describe("localCache", () => {
  localStorage.clear();
  });
 
- it("ShouldcurrentlySettingsandFetchCache", () => {
- const data = { name: "test" };
- localCache.set("test-key", data);
+ it("Should correctly set and get cache", () => {
+  const data = { name: "test" };
+  localCache.set("test-key", data);
 
- expect(localStorage.setItem).toHaveBeenCalled();
+  expect(localStorage.setItem).toHaveBeenCalled();
  });
 
- it("ShouldcurrentlyDeleteCache", () => {
+ it("Should correctly delete cache", () => {
  localCache.remove("test-key");
  expect(localStorage.removeItem).toHaveBeenCalledWith("agentflow_cache_test-key");
  });
 });
 
 describe("dedupeRequest", () => {
- it("Shouldgore-ConcurrencyRequest", async () => {
- const mockFn = vi.fn().mockResolvedValue("result");
+ it("Should ignore duplicate concurrent requests", async () => {
+  const mockFn = vi.fn().mockResolvedValue("result");
 
- // timeSame'sRequest
- const promise1 = dedupeRequest("key", mockFn);
- const promise2 = dedupeRequest("key", mockFn);
+  // Same concurrent requests
+  const promise1 = dedupeRequest("key", mockFn);
+  const promise2 = dedupeRequest("key", mockFn);
 
- const [result1, result2] = await Promise.all([promise1, promise2]);
+  const [result1, result2] = await Promise.all([promise1, promise2]);
 
- // countShouldbyCall1times
- expect(mockFn).toHaveBeenCalledTimes(1);
+  // Function should be called only once
+  expect(mockFn).toHaveBeenCalledTimes(1);
  expect(result1).toBe("result");
  expect(result2).toBe("result");
  });
 
- it("not key 'sRequestShouldExecute", async () => {
+ it("Different keys should execute separately", async () => {
  const mockFn = vi.fn().mockResolvedValue("result");
 
  await Promise.all([
@@ -140,7 +140,7 @@ describe("dedupeRequest", () => {
  expect(mockFn).toHaveBeenCalledTimes(2);
  });
 
- it("RequestDoneafterShouldAllownewRequest", async () => {
+ it("After request completion should allow new request", async () => {
  const mockFn = vi.fn().mockResolvedValue("result");
 
  await dedupeRequest("key", mockFn);

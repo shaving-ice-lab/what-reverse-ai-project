@@ -1,33 +1,33 @@
 /**
- * LLM NodeExecute
- * Support OpenAI, Claude, LocalModeletc
+ * LLM Node Executor
+ * Supports OpenAI, Claude, local models, etc.
  */
 
 import type {
- NodeContext,
- NodeResult,
- NodeExecutor,
- LLMConfig,
- LLMMessage,
- LLMResponse,
- StreamCallback,
+  NodeContext,
+  NodeResult,
+  NodeExecutor,
+  LLMConfig,
+  LLMMessage,
+  LLMResponse,
+  StreamCallback,
 } from "../types";
 import {
- renderTemplate,
- withRetry,
- withTimeout,
- createNodeError,
+  renderTemplate,
+  withRetry,
+  withTimeout,
+  createNodeError,
 } from "../utils";
 
-// LLM ProviderConfig
+// LLM Provider configuration
 interface LLMProvider {
- name: string;
- baseUrl: string;
- models: string[];
- defaultHeaders?: Record<string, string>;
+  name: string;
+  baseUrl: string;
+  models: string[];
+  defaultHeaders?: Record<string, string>;
 }
 
-// inProvider
+// Built-in providers
 const PROVIDERS: Record<string, LLMProvider> = {
  openai: {
  name: "OpenAI",
@@ -47,40 +47,40 @@ const PROVIDERS: Record<string, LLMProvider> = {
 };
 
 /**
- * FetchModelforshould'sProvider
+ * Get provider for model
  */
 function getProviderForModel(model: string): LLMProvider | null {
- for (const [key, provider] of Object.entries(PROVIDERS)) {
- if (provider.models.some((m) => model.toLowerCase().includes(m.toLowerCase()))) {
- return provider;
- }
- }
- // DefaultUsage OpenAI CompatibleInterface
- return PROVIDERS.openai;
+  for (const [key, provider] of Object.entries(PROVIDERS)) {
+    if (provider.models.some((m) => model.toLowerCase().includes(m.toLowerCase()))) {
+      return provider;
+    }
+  }
+  // Default to OpenAI compatible interface
+  return PROVIDERS.openai;
 }
 
 /**
- * Build LLM Messagecountgroup
+ * Build LLM message list
  */
 function buildMessages(
- config: LLMConfig,
- variables: Record<string, unknown>,
- historyMessages?: LLMMessage[]
+  config: LLMConfig,
+  variables: Record<string, unknown>,
+  historyMessages?: LLMMessage[]
 ): LLMMessage[] {
- const messages: LLMMessage[] = [];
- 
- // SystemTip
- if (config.systemPrompt) {
- const rendered = renderTemplate(config.systemPrompt, variables);
- messages.push({ role: "system", content: rendered });
- }
- 
- // HistoryMessage
- if (historyMessages && historyMessages.length > 0) {
- messages.push(...historyMessages);
- }
- 
- // UserTip
+  const messages: LLMMessage[] = [];
+  
+  // System prompt
+  if (config.systemPrompt) {
+    const rendered = renderTemplate(config.systemPrompt, variables);
+    messages.push({ role: "system", content: rendered });
+  }
+  
+  // History messages
+  if (historyMessages && historyMessages.length > 0) {
+    messages.push(...historyMessages);
+  }
+  
+  // User prompt
  if (config.userPrompt) {
  const rendered = renderTemplate(config.userPrompt, variables);
  messages.push({ role: "user", content: rendered });
@@ -90,7 +90,7 @@ function buildMessages(
 }
 
 /**
- * Call OpenAI CompatibleInterface
+ * Call OpenAI compatible API
  */
 async function callOpenAICompatible(
  baseUrl: string,
@@ -124,16 +124,16 @@ async function callOpenAICompatible(
  
  if (!response.ok) {
  const errorText = await response.text();
- throw new Error(`LLM API Error: ${response.status} - ${errorText}`);
- }
- 
- // StreamingResponse
- if (config.streaming && response.body) {
- return handleStreamResponse(response.body, onStream);
- }
- 
- // StreamingResponse
- const data = await response.json();
+    throw new Error(`LLM API Error: ${response.status} - ${errorText}`);
+  }
+  
+  // Streaming response
+  if (config.streaming && response.body) {
+    return handleStreamResponse(response.body, onStream);
+  }
+  
+  // Non-streaming response
+  const data = await response.json();
  const choice = data.choices?.[0];
  
  return {
@@ -149,7 +149,7 @@ async function callOpenAICompatible(
 }
 
 /**
- * ProcessStreamingResponse
+ * Process streaming response
  */
 async function handleStreamResponse(
  body: ReadableStream<Uint8Array>,
@@ -187,20 +187,20 @@ async function handleStreamResponse(
  
  if (delta) {
  content += delta;
- onStream?.(delta, false);
- }
- 
- // Update usage (ifresultProvide)
- if (parsed.usage) {
- usage = {
- promptTokens: parsed.usage.prompt_tokens ?? 0,
- completionTokens: parsed.usage.completion_tokens ?? 0,
- totalTokens: parsed.usage.total_tokens ?? 0,
- };
- }
- } catch {
- // SkipInvalid's JSON
- }
+                  onStream?.(delta, false);
+                }
+                
+                // Update usage if provided
+                if (parsed.usage) {
+                  usage = {
+                    promptTokens: parsed.usage.prompt_tokens ?? 0,
+                    completionTokens: parsed.usage.completion_tokens ?? 0,
+                    totalTokens: parsed.usage.total_tokens ?? 0,
+                  };
+                }
+              } catch {
+                // Skip invalid JSON
+              }
  }
  }
  }
@@ -224,53 +224,53 @@ export const llmChatExecutor: NodeExecutor<LLMConfig> = {
  async execute(context): Promise<NodeResult> {
  const { nodeConfig, variables, inputs, abortSignal } = context;
  const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- // Fetch API Key (fromEnvironmentVariableorConfig)
- const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || 
- (inputs.apiKey as string) || "";
- 
- if (!apiKey) {
- return {
- success: false,
- outputs: {},
- error: createNodeError(
- "MISSING_API_KEY",
- "API Key is required for LLM calls",
- undefined,
- false
- ),
- };
- }
- 
- // FetchProvider
- const provider = getProviderForModel(nodeConfig.model);
- if (!provider) {
- return {
- success: false,
- outputs: {},
- error: createNodeError(
- "UNSUPPORTED_MODEL",
- `Model ${nodeConfig.model} is not supported`,
- undefined,
- false
- ),
- };
- }
- 
- // BuildMessage
- const historyMessages = inputs.messages as LLMMessage[] | undefined;
- const messages = buildMessages(nodeConfig, variables, historyMessages);
- 
- logs.push({
- level: "info",
- message: `Calling ${provider.name} API with model ${nodeConfig.model}`,
- timestamp: new Date().toISOString(),
- data: { messagesCount: messages.length },
- });
- 
- // ExecuteCall (RetryandTimeout)
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      // Get API key from environment variable or config
+      const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || 
+        (inputs.apiKey as string) || "";
+      
+      if (!apiKey) {
+        return {
+          success: false,
+          outputs: {},
+          error: createNodeError(
+            "MISSING_API_KEY",
+            "API Key is required for LLM calls",
+            undefined,
+            false
+          ),
+        };
+      }
+      
+      // Get provider
+      const provider = getProviderForModel(nodeConfig.model);
+      if (!provider) {
+        return {
+          success: false,
+          outputs: {},
+          error: createNodeError(
+            "UNSUPPORTED_MODEL",
+            `Model ${nodeConfig.model} is not supported`,
+            undefined,
+            false
+          ),
+        };
+      }
+      
+      // Build messages
+      const historyMessages = inputs.messages as LLMMessage[] | undefined;
+      const messages = buildMessages(nodeConfig, variables, historyMessages);
+      
+      logs.push({
+        level: "info",
+        message: `Calling ${provider.name} API with model ${nodeConfig.model}`,
+        timestamp: new Date().toISOString(),
+        data: { messagesCount: messages.length },
+      });
+      
+      // Execute call with retry and timeout
  const timeout = nodeConfig.timeout ?? 60000;
  const retries = nodeConfig.retryCount ?? 0;
  const retryDelay = nodeConfig.retryDelay ?? 1000;

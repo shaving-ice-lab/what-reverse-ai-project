@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * WorkflowNodeCardComponent
- * Used forShowcaseandSelectWorkflowNodeType
+ * Workflow Node Card Component
+ * Used for showcasing and selecting workflow node types
  */
 
 import { ReactNode } from "react";
@@ -15,19 +15,19 @@ import {
 } from "@/lib/nodes/catalog";
 
 // ============================================
-// NodeTypeDefinition
+// Node Type Definition
 // ============================================
 
 export type NodeType = WorkflowNodeCatalogEntry;
 
-// DefinitionNodeType
+// Define Node Types
 export const nodeTypes: NodeType[] = BUILTIN_WORKFLOW_NODES;
 
-// NodeCategory
+// Node Categories
 export const nodeCategories = WORKFLOW_NODE_CATEGORIES;
 
 // ============================================
-// NodeSelectCard
+// Node Select Card
 // ============================================
 
 interface NodeSelectCardProps {
@@ -70,7 +70,7 @@ export function NodeSelectCard({
  {node.description}
  </p>
  {node.compatibility && !node.compatibility.compatible && (
- <p className="text-xs text-red-500 mt-2">VersionnotCompatible</p>
+ <p className="text-xs text-red-500 mt-2">Version Not Compatible</p>
  )}
  </div>
  </button>
@@ -78,7 +78,7 @@ export function NodeSelectCard({
 }
 
 // ============================================
-// youNodeCard
+// Mini Node Card
 // ============================================
 
 interface MiniNodeCardProps {
@@ -136,7 +136,7 @@ export function MiniNodeCard({
 }
 
 // ============================================
-// NodeConnect
+// Node Connector
 // ============================================
 
 interface NodeConnectorProps {
@@ -179,7 +179,7 @@ export function NodeConnector({
 }
 
 // ============================================
-// NodeExecuteStatusCard
+// Node Execution Status Card
 // ============================================
 
 interface NodeExecutionCardProps {
@@ -202,7 +202,7 @@ export function NodeExecutionCard({
  const getStatusConfig = () => {
  switch (status) {
  case "pending":
- return { color: "text-foreground-light", bg: "bg-surface-200", label: "pendingExecute" };
+ return { color: "text-foreground-light", bg: "bg-surface-200", label: "Pending" };
  case "running":
  return { color: "text-blue-500", bg: "bg-blue-500/10", label: "Execute" };
  case "success":

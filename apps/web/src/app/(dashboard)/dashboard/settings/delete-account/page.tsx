@@ -23,30 +23,30 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-// Deletebefore'sCheck
+// Pre-delete checks
 const preDeleteChecks = [
  {
  id: "workflows",
- title: "WorkflowData",
- description: "you'sAllWorkflowwillbyPermanentDelete",
+ title: "Workflow Data",
+ description: "All your workflows will be permanently deleted",
  icon: Trash2,
  },
  {
  id: "templates",
- title: "TemplateandFavorite",
- description: "youCreateandFavorite'sTemplatewillbyRemove",
+ title: "Templates and Favorites",
+ description: "Your created and favorited templates will be removed",
  icon: Trash2,
  },
  {
  id: "api-keys",
  title: "API Key",
- description: "All API KeywillExpire",
+ description: "All API keys will expire",
  icon: Shield,
  },
  {
  id: "billing",
- title: "SubscriptionandBilling",
- description: "SubscriptionwillbyCancel, notwillagainCost",
+ title: "Subscription and Billing",
+ description: "Your subscription will be cancelled and you will not be charged again",
  icon: CheckCircle,
  },
 ];
@@ -62,7 +62,7 @@ export default function DeleteAccountPage() {
  const [isDeleting, setIsDeleting] = useState(false);
  const [error, setError] = useState<string | null>(null);
 
- const expectedText = "DeleteI'sAccount";
+ const expectedText = "Delete My Account";
  const isConfirmValid = confirmText === expectedText;
 
  const handleDelete = async () => {
@@ -75,11 +75,11 @@ export default function DeleteAccountPage() {
  // Mock API Call
  await new Promise(resolve => setTimeout(resolve, 2000));
  
- // Sign OutandNavigate
+ // Sign Out and Navigate
  await logout();
  router.push("/?deleted=true");
  } catch (err) {
- setError("DeleteAccountFailed, Please try again laterRetry");
+ setError("Failed to delete account. Please try again later.");
  setIsDeleting(false);
  }
  };
@@ -89,17 +89,17 @@ export default function DeleteAccountPage() {
  <div className="space-y-6">
  <PageHeader
  eyebrow="Settings"
- title="DeleteAccount"
- description="thisActionnotcan, PleaseCautionAction"
+ title="Delete Account"
+ description="This action is irreversible. Please proceed with caution."
  backHref="/dashboard/settings"
- backLabel="BackSettings"
+ backLabel="Back to Settings"
  />
 
  <div className="page-divider" />
 
  <div className="page-section">
 
- {/* StepIndicator */}
+ {/* Step Indicator */}
  <div className="flex items-center gap-2 mb-8">
  {[1, 2, 3].map((s) => (
  <div
@@ -112,16 +112,16 @@ export default function DeleteAccountPage() {
  ))}
  </div>
 
- {/* Step 1: afterresult */}
+ {/* Step 1: Review Impact */}
  {step === 1 && (
  <div className="space-y-6">
  <div className="p-5 rounded-md bg-destructive-200 border border-destructive/30">
  <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
  <AlertTriangle className="w-4 h-4 text-destructive" />
- DeleteAccountwillCausewithdownafterresult
+ Deleting your account will have the following consequences
  </h3>
  <p className="text-[13px] text-foreground-light">
- PleaseReadwithdownContent, EnsureyouDeleteAccount'sImpact.
+ Please read the following carefully to understand the impact of deleting your account.
  </p>
  </div>
 
@@ -142,21 +142,21 @@ export default function DeleteAccountPage() {
  ))}
  </div>
 
- {/* ExportDataTip */}
+ {/* Export Data Tip */}
  <div className="p-4 rounded-md bg-surface-100/60 border border-border">
  <div className="flex items-center gap-3">
  <Download className="w-4 h-4 text-foreground-muted" />
  <div className="flex-1">
  <p className="text-[13px] text-foreground">
- SuggestionatDeletebeforeExportyou'sData
+ We suggest exporting your data before deleting your account
  </p>
  <p className="text-xs text-foreground-muted">
- youcanwithatSettingsPageExportAllWorkflowandConfig
+ You can export all workflows and configurations on the Settings page
  </p>
  </div>
  <Link href="/dashboard/settings#data">
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
- ExportData
+ Export Data
  </Button>
  </Link>
  </div>
@@ -172,30 +172,30 @@ export default function DeleteAccountPage() {
  onClick={() => setStep(2)}
  className="flex-1 bg-destructive hover:bg-destructive/90 text-background"
  >
- Ialready, Continue
+ I Understand, Continue
  </Button>
  </div>
  </div>
  )}
 
- {/* Step 2: SelectReason */}
+ {/* Step 2: Select Reason */}
  {step === 2 && (
  <div className="space-y-6">
  <div className="p-5 rounded-md bg-surface-100 border border-border">
  <h3 className="text-sm font-medium text-foreground mb-4">
- PleaseTellWeyouLeave'sReason
+ Please tell us why you're leaving
  </h3>
  <p className="text-[13px] text-foreground-light mb-4">
- you'sFeedbackwillHelpWeImproveProduct(Optional)
+ Your feedback will help us improve our product (optional)
  </p>
 
  <div className="space-y-2">
  {[
- "ProductnotSatisfyI'sRequirements",
+ "Product does not meet my requirements",
  "Price",
- "UsageotherheProduct",
- "Company/itemalreadyEnd",
- "otherheReason",
+ "Switching to another product",
+ "Company/project has ended",
+ "Other reasons",
  ].map((r) => (
  <button
  key={r}
@@ -212,9 +212,9 @@ export default function DeleteAccountPage() {
  ))}
  </div>
 
- {reason === "otherheReason" && (
+ {reason === "Other reasons" && (
  <textarea
- placeholder="PleaseTellWeSpecificReason..."
+ placeholder="Please tell us the specific reason..."
  className="w-full mt-4 p-3 rounded-md bg-surface-200 border border-border text-foreground text-[13px] resize-none h-24"
  />
  )}
@@ -238,16 +238,16 @@ export default function DeleteAccountPage() {
  </div>
  )}
 
- {/* Step 3: ConfirmDelete */}
+ {/* Step 3: Confirm Delete */}
  {step === 3 && (
  <div className="space-y-6">
  <div className="p-5 rounded-md bg-destructive-200 border border-destructive/30">
  <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
  <AlertTriangle className="w-4 h-4 text-destructive" />
- mostafterConfirm
+ Final Confirmation
  </h3>
  <p className="text-[13px] text-foreground-light">
- thisActionwillPermanentDeleteyou'sAccountandAllData, NoneRestore.
+ This action will permanently delete your account and all data. This cannot be restored.
  </p>
  </div>
 
@@ -261,7 +261,7 @@ export default function DeleteAccountPage() {
  <div className="space-y-4">
  <div>
  <Label className="text-[13px] text-foreground">
- Please enter <span className="font-mono text-destructive">"{expectedText}"</span> withConfirm
+ Please enter <span className="font-mono text-destructive">"{expectedText}"</span> to confirm
  </Label>
  <Input
  value={confirmText}
@@ -272,12 +272,12 @@ export default function DeleteAccountPage() {
  </div>
 
  <div>
- <Label className="text-[13px] text-foreground">Please enteryou'sPassword</Label>
+ <Label className="text-[13px] text-foreground">Please enter your password</Label>
  <Input
  type="password"
  value={password}
  onChange={(e) => setPassword(e.target.value)}
- placeholder="InputPasswordConfirm"
+ placeholder="Enter your password to confirm"
  className="mt-2 h-9 bg-surface-200 border-border"
  />
  </div>
@@ -300,12 +300,12 @@ export default function DeleteAccountPage() {
  {isDeleting ? (
  <>
  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
- Delete...
+ Deleting...
  </>
  ) : (
  <>
  <Trash2 className="w-4 h-4 mr-2" />
- PermanentDeleteAccount
+ Permanently Delete Account
  </>
  )}
  </Button>

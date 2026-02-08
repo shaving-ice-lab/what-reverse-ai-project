@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * CreativeuserDataAnalyticsPage
+ * Creator Data Analytics Page
  *
- * Supabase Style: Minimal, Professional, Datacanvisual
+ * Supabase Style: Minimal, Professional, Data Visualization
  */
 
 import { useState } from "react";
@@ -44,7 +44,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// TimeRangeOption
+// Time Range Options
 
 const timeRanges = [
 
@@ -54,16 +54,16 @@ const timeRanges = [
 
  { id: "90d", label: "Recent 90 days" },
 
- { id: "1y", label: "Recent 1 years" },
+  { id: "1y", label: "Recent 1 year" },
 
 ];
 
-// OverviewStatistics
+// Overview Statistics
 
 const overviewStats = [
 
  {
- label: "totalBrowse",
+ label: "Total Views",
 
  value: "125,678",
 
@@ -73,7 +73,7 @@ const overviewStats = [
 
  icon: Eye,
 
- description: "onIncrease 14,230 times",
+    description: "Increased by 14,230",
 
  },
 
@@ -88,12 +88,12 @@ const overviewStats = [
 
  icon: Users,
 
- description: "onIncrease 3,521 person",
+    description: "Increased by 3,521",
 
  },
 
  {
- label: "AverageRating",
+ label: "Average rating",
 
  value: "4.8",
 
@@ -108,30 +108,30 @@ const overviewStats = [
  },
 
  {
- label: "Usagetimescount",
+    label: "Usage Count",
 
- value: "89,234",
+    value: "89,234",
 
- change: "+15.7%",
+    change: "+15.7%",
 
- trend: "up",
+    trend: "up",
 
- icon: Zap,
+    icon: Zap,
 
- description: "onIncrease 12,156 times",
+    description: "Increased by 12,156",
 
  },
 
 ];
 
-// PopularWork
+// Popular Works
 
 const topWorks = [
 
  {
  id: "1",
 
- title: "SmartSupportAssistantTemplate",
+ title: "Smart support assistant template",
 
  type: "Template",
 
@@ -148,7 +148,7 @@ const topWorks = [
  {
  id: "2",
 
- title: "DataSyncWorkflow",
+ title: "Data sync workflow",
 
  type: "Workflow",
 
@@ -165,7 +165,7 @@ const topWorks = [
  {
  id: "3",
 
- title: "EmailAutoReply Agent",
+ title: "Email auto-reply agent",
 
  type: "Agent",
 
@@ -182,7 +182,7 @@ const topWorks = [
  {
  id: "4",
 
- title: "ReportGenerateTemplate",
+ title: "Report generation template",
 
  type: "Template",
 
@@ -199,7 +199,7 @@ const topWorks = [
  {
  id: "5",
 
- title: "Social MediaManageWorkflow",
+ title: "Social media management workflow",
 
  type: "Workflow",
 
@@ -215,7 +215,7 @@ const topWorks = [
 
 ];
 
-// UserSource
+// Traffic Sources
 
 const trafficSources = [
 
@@ -223,15 +223,15 @@ const trafficSources = [
 
  { source: "Recommended", percentage: 28, color: "bg-brand-400" },
 
- { source: "CategoryBrowse", percentage: 22, color: "bg-surface-300" },
+  { source: "Category Browse", percentage: 22, color: "bg-surface-300" },
 
- { source: "DirectAccess", percentage: 10, color: "bg-brand-400" },
+  { source: "Direct Access", percentage: 10, color: "bg-brand-400" },
 
- { source: "otherhe", percentage: 5, color: "bg-surface-200" },
+ { source: "Other", percentage: 5, color: "bg-surface-200" },
 
 ];
 
-// eachdayData
+// Daily data
 
 const dailyData = [
 
@@ -255,11 +255,11 @@ const dailyData = [
 
 const goals = [
 
- { label: "monthsBrowseTarget", current: 125678, target: 150000, unit: "times" },
+ { label: "Monthly browse target", current: 125678, target: 150000, unit: "times" },
 
- { label: "AddUserTarget", current: 3521, target: 5000, unit: "person" },
+ { label: "Add user target", current: 3521, target: 5000, unit: "person" },
 
- { label: "EarningsTarget", current: 2815, target: 4000, unit: "" },
+ { label: "Earnings target", current: 2815, target: 4000, unit: "" },
 
 ];
 
@@ -268,7 +268,7 @@ export default function CreatorAnalyticsPage() {
 
  const [activeMetric, setActiveMetric] = useState<"views" | "uses" | "revenue">("views");
 
- // FetchChartMaximumvalue
+ // Get chart max value
 
  const maxValue = Math.max(...dailyData.map((d) => d[activeMetric]));
 
@@ -282,7 +282,7 @@ export default function CreatorAnalyticsPage() {
  <div className="page-caption">Creator</div>
  </div>
  <PageHeader
- title="DataAnalytics"
+ title="Data analytics"
  backHref="/dashboard/creator"
  backLabel="Back"
  actions={(
@@ -305,7 +305,7 @@ export default function CreatorAnalyticsPage() {
  </div>
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Download className="w-4 h-4 mr-2" />
- ExportReport
+              Export Report
  </Button>
  </div>
  )}
@@ -389,7 +389,7 @@ export default function CreatorAnalyticsPage() {
 
  <div className="flex items-center justify-between mb-6">
 
- <h3 className="page-panel-title">TrendAnalytics</h3>
+ <h3 className="page-panel-title">Trend analytics</h3>
 
  <div className="flex items-center gap-1 p-1 rounded-md bg-surface-200">
 
@@ -397,7 +397,7 @@ export default function CreatorAnalyticsPage() {
 
  { id: "views" as const, label: "Browse" },
 
- { id: "uses" as const, label: "Usagetimescount" },
+                { id: "uses" as const, label: "Usage Count" },
 
  { id: "revenue" as const, label: "Earnings" },
 
@@ -523,7 +523,7 @@ export default function CreatorAnalyticsPage() {
 
  <div className="flex items-center justify-between mb-6">
 
- <h3 className="page-panel-title">PopularWork</h3>
+ <h3 className="page-panel-title">Popular work</h3>
 
  <Button variant="ghost" size="sm" className="text-foreground-light">
 
@@ -572,7 +572,7 @@ export default function CreatorAnalyticsPage() {
 
  <div className="text-[13px] font-medium text-foreground">
 
- {work.views.toLocaleString()} Browse
+                {work.views.toLocaleString()} views
 
  </div>
 
@@ -596,7 +596,7 @@ export default function CreatorAnalyticsPage() {
 
  <h3 className="page-panel-title">Target</h3>
 
- <span className="text-xs text-foreground-muted">currentmonths</span>
+              <span className="text-xs text-foreground-muted">Current month</span>
 
  </div>
 
@@ -661,11 +661,11 @@ export default function CreatorAnalyticsPage() {
 
  <div>
 
- <h4 className="text-[13px] font-medium text-foreground mb-1">optimalSuggestion</h4>
+                  <h4 className="text-[13px] font-medium text-foreground mb-1">Optimization Suggestion</h4>
 
  <p className="text-xs text-foreground-light">
 
- you'sTemplateatweeksUsageIncrease, Suggestionatweeks5PublishnewWorkwithObtainmore'sExposure.
+ Your template usage increased this week. Publish new work to get more exposure.
 
  </p>
 
@@ -683,7 +683,7 @@ export default function CreatorAnalyticsPage() {
 
  <div className="mt-8 page-panel p-6">
 
- <h3 className="page-panel-title mb-6">DataInsights</h3>
+ <h3 className="page-panel-title mb-6">Data insights</h3>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -692,44 +692,44 @@ export default function CreatorAnalyticsPage() {
  {
  icon: Clock,
 
- title: "mostPublishTime",
+              title: "Peak publish time",
 
- value: "weeks3 10:00",
+              value: "Wed 10:00 AM",
 
- description: "timePublishWorkAverageBrowsemost",
+ description: "Time when published work gets most views",
 
  },
 
  {
  icon: Users,
 
- title: "UserRetention Rate",
+ title: "User retention rate",
 
  value: "68.5%",
 
- description: "UsagepastyouWork'sUseragaintimesUsage'scompareexample",
+ description: "Compare your past work usage with other users",
 
  },
 
  {
  icon: Star,
 
- title: "ReviewsResponserate",
+ title: "Reviews response rate",
 
  value: "92%",
 
- description: "youReplyUserReviews'scompareexample",
+ description: "Your reply to user reviews (comparison example)",
 
  },
 
  {
  icon: Award,
 
- title: "CreativeuserRanking",
+ title: "Creative user ranking",
 
  value: "Top 5%",
 
- description: "youatAllCreativeuser'sRanking",
+ description: "Your ranking among all creative users",
 
  },
 

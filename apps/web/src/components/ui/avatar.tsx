@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Avatar AvatarComponent - Enhanced
+ * Avatar Component - Enhanced
  * 
- * Support: 
- * - multipletypeDimension
- * - StatusIndicator
- * - Avatargroup
- * - EdgeandShapeVariant
+ * Supports:
+ * - Multiple sizes
+ * - Status indicator
+ * - Avatar group
+ * - Border and shape variants
  */
 
 import * as React from "react"
@@ -15,7 +15,7 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-// DimensionVariant
+// Size Variants
 const avatarVariants = cva(
  "relative flex shrink-0 overflow-hidden",
  {
@@ -76,7 +76,7 @@ const AvatarImage = React.forwardRef<
 ))
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
-// GradientBackground
+// Gradient Backgrounds
 const fallbackGradients = [
  "bg-gradient-to-br from-violet-500 to-purple-600",
  "bg-gradient-to-br from-blue-500 to-cyan-500",
@@ -88,9 +88,9 @@ const fallbackGradients = [
 
 interface AvatarFallbackProps 
  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback> {
- /** UsageGradientBackground */
+ /** Use gradient background */
  gradient?: boolean
- /** GradientIndex(Used for1)*/
+ /** Gradient index (auto-generated based on content) */
  gradientIndex?: number
 }
 
@@ -98,7 +98,7 @@ const AvatarFallback = React.forwardRef<
  React.ElementRef<typeof AvatarPrimitive.Fallback>,
  AvatarFallbackProps
 >(({ className, gradient, gradientIndex, children, ...props }, ref) => {
- // Based onContentGenerate1'sGradientIndex
+ // Generate gradient index based on content
  const index = gradientIndex ?? (
  typeof children === "string" 
  ? children.charCodeAt(0) % fallbackGradients.length 
@@ -124,7 +124,7 @@ const AvatarFallback = React.forwardRef<
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
 
 /**
- * AvatarWithStatus - StatusIndicator'sAvatar
+ * AvatarWithStatus - Avatar with status indicator
  */
 type StatusType = "online" | "offline" | "busy" | "away" | "dnd"
 
@@ -141,9 +141,9 @@ interface AvatarWithStatusProps extends AvatarProps {
  alt?: string
  fallback?: string
  status?: StatusType
- /** StatusIndicator */
+ /** Status indicator position */
  statusPosition?: "top-right" | "bottom-right" | "top-left" | "bottom-left"
- /** isnoUsageGradientBackground */
+ /** Whether to use gradient background */
  gradient?: boolean
 }
 
@@ -199,24 +199,24 @@ function AvatarWithStatus({
 }
 
 /**
- * AvatarGroup - Avatargroup
+ * AvatarGroup - Avatar Group
  */
 interface AvatarGroupProps {
- /** AvatarData */
+ /** Avatar data */
  avatars: Array<{
- src?: string
- alt?: string
- fallback?: string
+   src?: string
+   alt?: string
+   fallback?: string
  }>
- /** MaximumDisplayCount */
+ /** Maximum display count */
  max?: number
- /** Dimension */
+ /** Size */
  size?: AvatarProps["size"]
  /** Shape */
  shape?: AvatarProps["shape"]
- /** re- (value margin) */
+ /** Overlap (negative margin value) */
  overlap?: number
- /** isnoUsageGradientBackground */
+ /** Whether to use gradient background */
  gradient?: boolean
  className?: string
 }
@@ -267,14 +267,14 @@ function AvatarGroup({
 }
 
 /**
- * AvatarWithBadge - Badge'sAvatar
+ * AvatarWithBadge - Avatar with badge
  */
 interface AvatarWithBadgeProps extends AvatarWithStatusProps {
- /** BadgeContent(countcharorIcon) */
+ /** Badge content (count or icon) */
  badge?: React.ReactNode
- /** Badge */
+ /** Badge position */
  badgePosition?: "top-right" | "bottom-right" | "top-left" | "bottom-left"
- /** BadgeColor */
+ /** Badge color */
  badgeColor?: string
 }
 
@@ -315,12 +315,12 @@ function AvatarWithBadge({
 }
 
 /**
- * EditableAvatar - canEditAvatar
+ * EditableAvatar - Editable Avatar
  */
 interface EditableAvatarProps extends AvatarWithStatusProps {
- /** ClickEditCallback */
+ /** Edit click callback */
  onEdit?: () => void
- /** EditIcon */
+ /** Edit icon */
  editIcon?: React.ReactNode
 }
 
@@ -334,7 +334,7 @@ function EditableAvatar({
  <div className={cn("relative inline-block group", className)}>
  <AvatarWithStatus {...props} />
  
- {/* EditOverlay */}
+ {/* Edit Overlay */}
  <button
  onClick={onEdit}
  className={cn(

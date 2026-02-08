@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TicketDetailspage - Supabase Style
+ * Ticket Details Page - Supabase Style
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -41,24 +41,24 @@ type StatusHistoryItem = {
 const statusOptions = [
  { id: "open", label: "Pending" },
  { id: "in_progress", label: "Processing" },
- { id: "waiting_on_customer", label: "etcpendingUser" },
- { id: "resolved", label: "alreadyResolve" },
- { id: "closed", label: "alreadyClose" },
+ { id: "waiting_on_customer", label: "Waiting for User" },
+ { id: "resolved", label: "Resolved" },
+ { id: "closed", label: "Closed" },
 ];
 
 const statusStyleMap: Record<string, { label: string; bg: string; color: string; dot: string }> = {
  open: { label: "Pending", bg: "bg-surface-200", color: "text-foreground-light", dot: "bg-foreground-muted" },
  in_progress: { label: "Processing", bg: "bg-warning-200", color: "text-warning", dot: "bg-warning" },
- waiting_on_customer: { label: "etcpendingUser", bg: "bg-brand-200/60", color: "text-brand-500", dot: "bg-brand-500" },
- resolved: { label: "alreadyResolve", bg: "bg-brand-200", color: "text-brand-500", dot: "bg-brand-500" },
- closed: { label: "alreadyClose", bg: "bg-surface-200", color: "text-foreground-muted", dot: "bg-foreground-muted" },
+ waiting_on_customer: { label: "Waiting for User", bg: "bg-brand-200/60", color: "text-brand-500", dot: "bg-brand-500" },
+ resolved: { label: "Resolved", bg: "bg-brand-200", color: "text-brand-500", dot: "bg-brand-500" },
+ closed: { label: "Closed", bg: "bg-surface-200", color: "text-foreground-muted", dot: "bg-foreground-muted" },
 };
 
 const priorityStyleMap: Record<string, { label: string; bg: string; color: string }> = {
  critical: { label: "Urgent", bg: "bg-destructive-200", color: "text-destructive" },
- high: { label: "", bg: "bg-warning-200", color: "text-warning" },
- normal: { label: "", bg: "bg-brand-200", color: "text-brand-500" },
- low: { label: "", bg: "bg-surface-200", color: "text-foreground-muted" },
+  high: { label: "High", bg: "bg-warning-200", color: "text-warning" },
+  normal: { label: "Normal", bg: "bg-brand-200", color: "text-brand-500" },
+  low: { label: "Low", bg: "bg-surface-200", color: "text-foreground-muted" },
 };
 
 const formatDate = (value?: string) => {
@@ -123,7 +123,7 @@ export default function SupportTicketDetailPage() {
  })
  .catch((error) => {
  if (!active) return;
- setErrorMessage((error as Error).message || "LoadFailed");
+ setErrorMessage((error as Error).message || "Load Failed");
  })
  .finally(() => {
  if (active) setIsLoading(false);
@@ -200,7 +200,7 @@ export default function SupportTicketDetailPage() {
  ticket.status !== "closed" &&
  new Date(ticket.sla_resolve_due_at).getTime() < Date.now();
  const assigneeLabel = useMemo(() => {
- if (!ticket?.assignee_value) return "not yetDispatch";
+ if (!ticket?.assignee_value) return "Not Yet Dispatched";
  const assigneeType = ticket.assignee_type || "team";
  if (assigneeType === "team") {
  return `${teamLookup[ticket.assignee_value] || ticket.assignee_value} · Team`;
@@ -224,7 +224,7 @@ export default function SupportTicketDetailPage() {
  });
  setTicket(response.ticket);
  } catch (error) {
- setErrorMessage((error as Error).message || "UpdateFailed");
+ setErrorMessage((error as Error).message || "Update Failed");
  } finally {
  setIsUpdating(false);
  }
@@ -241,7 +241,7 @@ export default function SupportTicketDetailPage() {
  setComments((prev) => [...prev, response.comment]);
  setCommentDraft("");
  } catch (error) {
- setErrorMessage((error as Error).message || "CommentSubmitFailed");
+ setErrorMessage((error as Error).message || "Comment Submit Failed");
  } finally {
  setCommentSubmitting(false);
  }
@@ -258,13 +258,13 @@ export default function SupportTicketDetailPage() {
  onClick={() => router.push("/dashboard/support-tickets")}
  >
  <ArrowLeft className="w-4 h-4 mr-1.5" />
- BackList
+ Back to List
  </Button>
  <div>
  <p className="page-caption">Support</p>
  <h1 className="page-title flex items-center gap-2">
  <LifeBuoy className="w-5 h-5 text-brand-500" />
- TicketDetails
+ Ticket Details
  </h1>
  </div>
  </div>
@@ -283,7 +283,7 @@ export default function SupportTicketDetailPage() {
  </div>
  ) : !ticket ? (
  <div className="page-panel py-16 text-center text-sm text-foreground-muted">
- not yettoTicket
+ Ticket Not Found
  </div>
  ) : (
  <div className="page-grid xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
@@ -304,34 +304,34 @@ export default function SupportTicketDetailPage() {
  </Badge>
  {slaResponseOverdue && (
  <Badge variant="secondary" className="bg-destructive-200 text-destructive text-[11px] px-2 py-0.5">
- Response SLA alreadyTimeout
+ Response SLA Timed Out
  </Badge>
  )}
  {slaUpdateOverdue && (
  <Badge variant="secondary" className="bg-destructive-200 text-destructive text-[11px] px-2 py-0.5">
- Update SLA alreadyTimeout
+ Update SLA Timed Out
  </Badge>
  )}
  {slaResolveOverdue && (
  <Badge variant="secondary" className="bg-destructive-200 text-destructive text-[11px] px-2 py-0.5">
- Resolve SLA alreadyTimeout
+ Resolve SLA Timed Out
  </Badge>
  )}
  </div>
  <div className="grid sm:grid-cols-2 gap-4">
  <div className="rounded-md border border-border bg-surface-75/60 p-4">
- <div className="text-xs text-foreground-muted">Contactperson</div>
+ <div className="text-xs text-foreground-muted">Contact Person</div>
  <div className="text-sm text-foreground mt-1">
- {ticket.requester_name || "not yetProvide"}
+ {ticket.requester_name || "Not Provided"}
  </div>
  <div className="text-xs text-foreground-muted mt-1">
  {ticket.requester_email}
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75/60 p-4">
- <div className="text-xs text-foreground-muted">TimeInfo</div>
+ <div className="text-xs text-foreground-muted">Time Info</div>
  <div className="text-sm text-foreground mt-1">
- Create: {formatDate(ticket.created_at)}
+                    Created: {formatDate(ticket.created_at)}
  </div>
  <div className="text-xs text-foreground-muted mt-1">
  Response SLA Deadline: {formatDate(ticket.sla_response_due_at)}
@@ -345,7 +345,7 @@ export default function SupportTicketDetailPage() {
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75/60 p-4">
- <div className="text-xs text-foreground-muted mb-2">IssueDescription</div>
+ <div className="text-xs text-foreground-muted mb-2">Issue Description</div>
  <p className="text-sm text-foreground-light whitespace-pre-line">
  {ticket.description}
  </p>
@@ -355,13 +355,13 @@ export default function SupportTicketDetailPage() {
 
  <div className="page-panel">
  <div className="page-panel-header">
- <h2 className="page-panel-title">StatusWorkflow</h2>
- <p className="page-panel-description">TrackTicketProcesspast</p>
+ <h2 className="page-panel-title">Status Workflow</h2>
+ <p className="page-panel-description">Track ticket progress</p>
  </div>
  <div className="p-5 space-y-3">
  {history.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-10 text-center text-sm text-foreground-muted">
- NoneStatusWorkflowRecord
+ No workflow records for this status
  </div>
  ) : (
  history.map((item, index) => (
@@ -381,7 +381,7 @@ export default function SupportTicketDetailPage() {
  )}
  {item.actor_user_id && (
  <div className="mt-2 text-xs text-foreground-muted">
- Actionperson: {item.actor_user_id}
+ Action by: {item.actor_user_id}
  </div>
  )}
  </div>
@@ -393,17 +393,17 @@ export default function SupportTicketDetailPage() {
 
  <div className="page-panel">
  <div className="page-panel-header">
- <h2 className="page-panel-title">CommentandCollaboration</h2>
- <p className="page-panel-description">RecordProcessNotesandTeamCollaboration</p>
+ <h2 className="page-panel-title">Comments and Collaboration</h2>
+ <p className="page-panel-description">Record process notes and team collaboration</p>
  </div>
  <div className="p-5 space-y-4">
  {commentLoading ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-8 text-center text-sm text-foreground-muted">
- CommentLoading...
+                    Loading comments...
  </div>
  ) : comments.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-8 text-center text-sm text-foreground-muted">
- NoneComment
+ No Comments
  </div>
  ) : (
  <div className="space-y-3">
@@ -411,7 +411,7 @@ export default function SupportTicketDetailPage() {
  <div key={comment.id} className="rounded-md border border-border bg-surface-75/60 p-4">
  <div className="flex items-center justify-between text-xs text-foreground-muted">
  <span>
- {comment.author_name || comment.author_user_id || "SupportTeam"}
+ {comment.author_name || comment.author_user_id || "Support Team"}
  </span>
  <span>{formatDate(comment.created_at)}</span>
  </div>
@@ -423,7 +423,7 @@ export default function SupportTicketDetailPage() {
  variant="secondary"
  className="mt-3 bg-surface-200 text-foreground-muted text-[11px]"
  >
- InternalComment
+ Internal Comment
  </Badge>
  )}
  </div>
@@ -432,18 +432,18 @@ export default function SupportTicketDetailPage() {
  )}
 
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
- <label className="text-xs font-medium text-foreground">AddComment</label>
+ <label className="text-xs font-medium text-foreground">Add Comment</label>
  <textarea
  value={commentDraft}
  onChange={(e) => setCommentDraft(e.target.value)}
  rows={4}
- placeholder="RecordProcessProgressorSupplementInfo..."
+ placeholder="Record process progress or add info..."
  className="w-full px-3 py-2 rounded-md bg-surface-200 border border-border text-foreground resize-none"
  />
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
  <Switch checked={commentInternal} onCheckedChange={setCommentInternal} />
- MarkasInternalComment
+ Mark as Internal Comment
  </div>
  <Button
  size="sm"
@@ -451,7 +451,7 @@ export default function SupportTicketDetailPage() {
  onClick={submitComment}
  disabled={commentSubmitting}
  >
- {commentSubmitting ? "Send...": "SendComment"}
+ {commentSubmitting ? "Sending...": "Send Comment"}
  </Button>
  </div>
  </div>
@@ -462,8 +462,8 @@ export default function SupportTicketDetailPage() {
  <div className="space-y-6">
  <div className="page-panel">
  <div className="page-panel-header">
- <h3 className="page-panel-title">UpdateStatus</h3>
- <p className="page-panel-description">SyncmostnewProcessProgress</p>
+ <h3 className="page-panel-title">Update Status</h3>
+ <p className="page-panel-description">Sync latest process progress</p>
  </div>
  <div className="p-5 space-y-4">
  <div>
@@ -481,11 +481,11 @@ export default function SupportTicketDetailPage() {
  </select>
  </div>
  <div>
- <label className="text-xs font-medium text-foreground">ProcessNotes</label>
+ <label className="text-xs font-medium text-foreground">Process Notes</label>
  <Input
  value={noteDraft}
  onChange={(e) => setNoteDraft(e.target.value)}
- placeholder="select"
+                    placeholder="Optional"
  className="mt-2 h-9 bg-surface-200 border-border text-foreground"
  />
  </div>
@@ -495,15 +495,15 @@ export default function SupportTicketDetailPage() {
  onClick={submitStatusUpdate}
  disabled={isUpdating}
  >
- {isUpdating ? "Update...": "ConfirmUpdate"}
+ {isUpdating ? "Updating...": "Confirm Update"}
  </Button>
  </div>
  </div>
 
  <div className="page-panel">
  <div className="page-panel-header">
- <h3 className="page-panel-title">AssociateResource</h3>
- <p className="page-panel-description">QuickViewRelated Workspace/App</p>
+ <h3 className="page-panel-title">Associated Resources</h3>
+ <p className="page-panel-description">Quick view related workspace/app</p>
  </div>
  <div className="p-5 space-y-3 text-sm text-foreground-light">
  <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ export default function SupportTicketDetailPage() {
 
  <div className="rounded-md border border-border bg-surface-75/60 px-4 py-3 text-xs text-foreground-muted flex items-start gap-2">
  <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
- needInfo, PleaseUsageStatusNotesRecordProcessandTime.
+ Need more info? Please use the status notes to record process and timeline.
  </div>
  </div>
  </div>
@@ -531,7 +531,7 @@ export default function SupportTicketDetailPage() {
 
  <div className="mt-6">
  <Link href="/dashboard/support-tickets" className="text-xs text-foreground-muted hover:text-foreground">
- BackTicketList
+ Back to Ticket List
  </Link>
  </div>
  </div>

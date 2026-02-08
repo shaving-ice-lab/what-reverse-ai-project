@@ -41,30 +41,30 @@ describe("WorkspacesPage", () => {
  render(<WorkspacesPage />);
 
  // etcpendingWorkspaceDataLoadDone（NameAppearatSidebarand/ormainContent）
- const testWsElements = await screen.findAllByText("TestWorkspace");
+ const testWsElements = await screen.findAllByText("Test Workspace");
  expect(testWsElements.length).toBeGreaterThan(0);
 
  // mainContent，workspace NameRenderat <h3> Tags
  const testWsCards = testWsElements.filter((el) => el.tagName === "H3");
  expect(testWsCards.length).toBeGreaterThan(0);
 
- // "CreateWorkspace" Buttonat
- const createButtons = screen.getAllByRole("button", { name: "CreateWorkspace" });
+ // "Create Workspace" button
+ const createButtons = screen.getAllByRole("button", { name: "Create Workspace" });
  expect(createButtons.length).toBeGreaterThan(0);
 
  // InputSearch "analytics" (Match slug: "analytics" 's "AnalyticsWorkspace")
- const searchInput = screen.getByPlaceholderText("Search Workspace");
+ const searchInput = screen.getByPlaceholderText("Search workspaces");
  fireEvent.change(searchInput, { target: { value: "analytics" } });
 
- // Searchafter，mainContentnotagainDisplay "TestWorkspace" 'sCard（<h3>）
+ // After search, main content should not display "Test Workspace" card (<h3>)
  // Note：Sidebar recentWorkspaces notSearchFilterImpact
  await waitFor(() => {
- const allTestWs = screen.queryAllByText("TestWorkspace");
+ const allTestWs = screen.queryAllByText("Test Workspace");
  const cardH3 = allTestWs.find((el) => el.tagName === "H3");
  expect(cardH3).toBeUndefined();
  });
 
  // "AnalyticsWorkspace" can
- expect(screen.getAllByText("AnalyticsWorkspace").length).toBeGreaterThan(0);
+ expect(screen.getAllByText("Analytics Workspace").length).toBeGreaterThan(0);
  });
 });

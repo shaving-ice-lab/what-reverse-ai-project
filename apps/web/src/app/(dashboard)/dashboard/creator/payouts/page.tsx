@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * CreativeuserWithdrawSettingsPage
+ * Creator Withdraw Settings Page
  *
- * Supabase Style: Minimal, Professional, FinanceManage
+ * Supabase Style: Minimal, Professional, Finance Management
  */
 
 import { useState } from "react";
@@ -47,52 +47,52 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// WithdrawAccountType
+// Withdrawal Account Types
 
 const accountTypes = [
 
  {
  id: "bank",
 
- name: "row",
+ name: "Bank Transfer",
 
  icon: Building,
 
- description: "SupportinAllrow",
+ description: "Supported by all banks",
 
- fee: "Renew",
+ fee: "Free",
 
  },
 
  {
  id: "alipay",
 
- name: "Payment",
+ name: "Alipay",
 
  icon: CreditCard,
 
- description: "Quickto",
+ description: "Quick transfer",
 
- fee: "Renew",
+ fee: "Free",
 
  },
 
  {
  id: "wechat",
 
- name: "WeChatPayment",
+ name: "WeChat Pay",
 
  icon: CreditCard,
 
- description: "Withdraw",
+ description: "WeChat Withdraw",
 
- fee: "Renew",
+ fee: "Free",
 
  },
 
 ];
 
-// MockBoundAccount
+// Mock Bound Accounts
 
 const boundAccounts = [
 
@@ -101,7 +101,7 @@ const boundAccounts = [
 
  type: "bank",
 
- name: "row",
+ name: "Bank Transfer",
 
  account: "**** **** **** 6789",
 
@@ -116,7 +116,7 @@ const boundAccounts = [
 
  type: "alipay",
 
- name: "Payment",
+ name: "Alipay",
 
  account: "138****5678",
 
@@ -128,7 +128,7 @@ const boundAccounts = [
 
 ];
 
-// WithdrawRecord
+// Withdrawal Records
 
 const payoutHistory = [
 
@@ -139,7 +139,7 @@ const payoutHistory = [
 
  status: "completed",
 
- account: "row ****6789",
+ account: "Bank ****6789",
 
  createdAt: "2026-01-28 14:30",
 
@@ -154,7 +154,7 @@ const payoutHistory = [
 
  status: "completed",
 
- account: "Payment 138****5678",
+ account: "Alipay 138****5678",
 
  createdAt: "2026-01-20 10:15",
 
@@ -169,7 +169,7 @@ const payoutHistory = [
 
  status: "pending",
 
- account: "row ****6789",
+ account: "Bank ****6789",
 
  createdAt: "2026-01-30 09:00",
 
@@ -179,19 +179,19 @@ const payoutHistory = [
 
 ];
 
-// WithdrawRule
+// Withdrawal Rules
 
 const payoutRules = [
 
- { label: "mostWithdrawAmount", value: "¥100" },
+ { label: "Minimum withdrawal amount", value: "¥100" },
 
- { label: "mostAmount", value: "¥50,000" },
+ { label: "Maximum amount", value: "¥50,000" },
 
- { label: "eachdayWithdrawtimescount", value: "3 times" },
+ { label: "Daily withdrawal limit", value: "3 times" },
 
- { label: "toTime", value: "1-3 Business Day" },
+ { label: "Processing time", value: "1-3 Business Days" },
 
- { label: "Renew", value: "Free" },
+ { label: "Fee", value: "Free" },
 
 ];
 
@@ -206,14 +206,14 @@ export default function PayoutsPage() {
 
  const [selectedAccount, setSelectedAccount] = useState(boundAccounts[0]?.id || "");
 
- // canWithdrawBalance
+ // Available withdrawal balance
 
  const availableBalance = 3256.78;
 
- // ProcessWithdraw
+ // Process Withdrawal
 
  const handleWithdraw = () => {
- // MockWithdraw
+ // Mock Withdrawal
 
  setShowWithdraw(false);
 
@@ -231,7 +231,7 @@ export default function PayoutsPage() {
  <div className="page-caption">Creator</div>
  </div>
  <PageHeader
- title="WithdrawManage"
+ title="Withdrawal Management"
  backHref="/dashboard/creator/earnings"
  backLabel="Back"
  actions={(
@@ -241,7 +241,7 @@ export default function PayoutsPage() {
  onClick={() => setShowWithdraw(true)}
  >
  <DollarSign className="w-4 h-4 mr-2" />
- PleaseWithdraw
+ Request Withdrawal
  </Button>
  )}
  />
@@ -260,13 +260,13 @@ export default function PayoutsPage() {
 
  <div>
 
- <div className="text-foreground-light text-[13px] mb-1">canWithdrawBalance</div>
+ <div className="text-foreground-light text-[13px] mb-1">Withdrawable balance</div>
 
  <div className="text-2xl font-semibold text-foreground">{availableBalance.toLocaleString()}</div>
 
  <div className="text-xs text-foreground-muted mt-2">
 
- CumulativeWithdraw: ¥15,500.00 pendingenter: ¥1,200.00
+ Total Withdrawn: ¥15,500.00 · Pending: ¥1,200.00
 
  </div>
 
@@ -284,7 +284,7 @@ export default function PayoutsPage() {
 
  >
 
- NowWithdraw
+ Withdraw Now
 
  </Button>
 
@@ -300,7 +300,7 @@ export default function PayoutsPage() {
 
  <div className="flex items-center justify-between mb-4">
 
- <h2 className="text-sm font-medium text-foreground">WithdrawAccount</h2>
+ <h2 className="text-sm font-medium text-foreground">Withdrawal Accounts</h2>
 
  <Button
 
@@ -316,7 +316,7 @@ export default function PayoutsPage() {
 
  <Plus className="w-4 h-4 mr-2" />
 
- AddAccount
+ Add Account
 
  </Button>
 
@@ -404,11 +404,11 @@ export default function PayoutsPage() {
 
  <Wallet className="w-10 h-10 text-foreground-muted mx-auto mb-4" />
 
- <h3 className="text-[13px] font-medium text-foreground mb-2">NoneWithdrawAccount</h3>
+ <h3 className="text-[13px] font-medium text-foreground mb-2">No withdrawal account</h3>
 
  <p className="text-xs text-foreground-muted mb-4">
 
- AddroworThird-partyPaymentAccountwithProceedWithdraw
+ Add a bank or third-party payment account to proceed with withdrawals
 
  </p>
 
@@ -416,7 +416,7 @@ export default function PayoutsPage() {
 
  <Plus className="w-4 h-4 mr-2" />
 
- AddAccount
+ Add Account
 
  </Button>
 
@@ -432,7 +432,7 @@ export default function PayoutsPage() {
 
  <div className="mb-8">
 
- <h2 className="text-sm font-medium text-foreground mb-4">WithdrawRecord</h2>
+ <h2 className="text-sm font-medium text-foreground mb-4">Withdrawal Records</h2>
 
  <div className="rounded-md border border-border overflow-hidden">
 
@@ -490,7 +490,7 @@ export default function PayoutsPage() {
 
  {payout.status === "pending" && <Clock className="w-3 h-3" />}
 
- {payout.status === "completed" ? "Completed": payout.status === "pending" ? "Processing": "Failed"}
+ {payout.status === "completed" ? "Completed" : payout.status === "pending" ? "Processing" : "Failed"}
 
  </span>
 
@@ -522,7 +522,7 @@ export default function PayoutsPage() {
 
  <Button variant="ghost" size="sm" className="text-foreground-light">
 
- View moreRecord
+ View More Records
 
  <ChevronRight className="w-4 h-4 ml-1" />
 
@@ -540,9 +540,9 @@ export default function PayoutsPage() {
 
  <FileText className="w-4 h-4 text-brand-500" />
 
- WithdrawRule
+ Withdrawal Rules
 
- </h2>
+</h2>
 
  <div className="page-grid sm:grid-cols-2">
 
@@ -567,11 +567,11 @@ export default function PayoutsPage() {
 
  <div>
 
- <h4 className="text-[13px] font-medium text-foreground mb-1">SecurityTip</h4>
+ <h4 className="text-[13px] font-medium text-foreground mb-1">Security Tip</h4>
 
  <p className="text-xs text-foreground-light">
 
- asAssuranceyou'sSecurity, WithdrawbeforePlease confirmAccountInfocurrently.ifIssuePleaseContactSupport.
+ To protect your security, please confirm your account info before withdrawing. Contact support if you have issues.
 
  </p>
 
@@ -592,7 +592,7 @@ export default function PayoutsPage() {
 
  <div className="w-full max-w-md page-panel p-6">
 
- <h3 className="text-sm font-medium text-foreground mb-4">AddWithdrawAccount</h3>
+ <h3 className="text-sm font-medium text-foreground mb-4">Add Withdrawal Account</h3>
 
  {!selectedAccountType ? (
  <div className="space-y-3">
@@ -640,11 +640,11 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- row
+ Bank Name
 
  </label>
 
- <Input placeholder="Please selectrow" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="Please select bank" className="h-9 bg-surface-200 border-border" />
 
  </div>
 
@@ -652,11 +652,11 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- row
+ Account Number
 
  </label>
 
- <Input placeholder="Please enterrow" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="Please enter account number" className="h-9 bg-surface-200 border-border" />
 
  </div>
 
@@ -664,11 +664,11 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- personName
+ Account Holder Name
 
  </label>
 
- <Input placeholder="Please enterpersonName" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="Enter account holder name" className="h-9 bg-surface-200 border-border" />
 
  </div>
 
@@ -683,11 +683,11 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- AccountName
+ Account Name
 
  </label>
 
- <Input placeholder="Please enterFull Name" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="Enter full name" className="h-9 bg-surface-200 border-border" />
 
  </div>
 
@@ -695,11 +695,11 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- {selectedAccountType === "alipay" ? "PaymentAccount": "WeChatAccount"}
+ {selectedAccountType === "alipay" ? "Payment account" : "WeChat account"}
 
  </label>
 
- <Input placeholder="Please enterPhoneorEmail" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="Enter phone or email" className="h-9 bg-surface-200 border-border" />
 
  </div>
 
@@ -735,7 +735,7 @@ export default function PayoutsPage() {
  {selectedAccountType && (
  <Button className="flex-1 bg-brand-500 hover:bg-brand-600 text-background">
 
- ConfirmAdd
+ Confirm
 
  </Button>
 
@@ -756,7 +756,7 @@ export default function PayoutsPage() {
 
  <div className="w-full max-w-md page-panel p-6">
 
- <h3 className="text-sm font-medium text-foreground mb-4">PleaseWithdraw</h3>
+ <h3 className="text-sm font-medium text-foreground mb-4">Request Withdrawal</h3>
 
  <div className="space-y-4">
 
@@ -764,7 +764,7 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- WithdrawAmount
+ Withdrawal Amount
 
  </label>
 
@@ -796,7 +796,7 @@ export default function PayoutsPage() {
 
  <span className="text-foreground-muted">
 
- canWithdraw: {availableBalance.toLocaleString()}
+ Available: {availableBalance.toLocaleString()}
 
  </span>
 
@@ -808,7 +808,7 @@ export default function PayoutsPage() {
 
  >
 
- allsectionWithdraw
+ Withdraw All
 
  </button>
 
@@ -820,7 +820,7 @@ export default function PayoutsPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- WithdrawAccount
+ Withdrawal Account
 
  </label>
 
@@ -890,7 +890,7 @@ export default function PayoutsPage() {
 
  <Clock className="w-4 h-4" />
 
- Estimated 1-3 Business Dayto
+ Estimated 1-3 business days to arrive
 
  </div>
 
@@ -898,7 +898,7 @@ export default function PayoutsPage() {
 
  <Shield className="w-4 h-4" />
 
- currenttimesWithdrawRenew
+ This withdrawal is free of charge
 
  </div>
 
@@ -932,7 +932,7 @@ export default function PayoutsPage() {
 
  >
 
- ConfirmWithdraw
+ Confirm Withdrawal
 
  </Button>
 

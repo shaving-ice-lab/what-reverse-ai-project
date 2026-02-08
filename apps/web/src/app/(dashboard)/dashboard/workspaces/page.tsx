@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Workspace Entrypage - Supabase Style
- * WorkspaceList, Create, Select
+ * Workspace entry page - Supabase style
+ * Workspace list, create, select
  */
 
 import React, { useMemo, useState, useEffect } from "react";
@@ -75,16 +75,16 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 const regionOptions = [
- { value: "cn-east-1", label: "-(on)" },
- { value: "ap-southeast-1", label: "Asia Pacific-new" },
- { value: "us-east-1", label: "-" },
+  { value: "cn-east-1", label: "China East" },
+  { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
+  { value: "us-east-1", label: "US East" },
 ];
 
 const workspaceSidebarLinks = [
  { id: "overview", label: "Overview", icon: LayoutGrid },
  { id: "create", label: "Create Workspace", icon: Plus },
- { id: "guides", label: "PlanandRegion", icon: Crown },
- { id: "list", label: "EmptybetweenList", icon: FolderOpen },
+ { id: "guides", label: "Plans & Regions", icon: Crown },
+ { id: "list", label: "Workspace List", icon: FolderOpen },
 ];
 
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
@@ -127,7 +127,7 @@ export default function WorkspacesPage() {
  setWorkspaces(data);
  } catch (error) {
  console.error("Failed to load workspaces:", error);
- setLoadError("WorkspaceLoadFailed, Please try again laterRetry.");
+ setLoadError("Failed to load workspaces. Please try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -183,10 +183,10 @@ export default function WorkspacesPage() {
 
  const handleJoinWorkspace = () => {
  if (!joinCode.trim()) {
- setJoinHint("Please enterInvite LinkorCode");
+ setJoinHint("Please enter an invite link or code");
  return;
  }
- setJoinHint("alreadyRecordInviteInfo, PleaseContactAdminDoneJoin.");
+ setJoinHint("Invite info recorded. Please contact the admin to complete joining.");
  setShowJoinDialog(false);
  setJoinCode("");
  };
@@ -236,7 +236,7 @@ export default function WorkspacesPage() {
  <div className="space-y-2">
  <Button size="sm" className="w-full" onClick={() => setShowCreateDialog(true)}>
  <Plus className="w-3.5 h-3.5 mr-1.5" />
- CreateWorkspace
+ Create Workspace
  </Button>
  <Button
  variant="outline"
@@ -269,19 +269,19 @@ export default function WorkspacesPage() {
 
  <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-2">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
- QuickSearch
+ Quick Search
  </div>
  <div className="relative">
  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-muted" />
  <Input
- placeholder="Search Workspace"
+ placeholder="Search workspaces"
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-8 h-8 bg-surface-75 border-border focus:bg-surface-100 focus:border-brand-500"
  />
  </div>
  <div className="flex items-center justify-between text-[10px] text-foreground-muted">
- <span>CurrentResult</span>
+ <span>Current results</span>
  <span>
  {filteredWorkspaces.length} / {workspaces.length}
  </span>
@@ -290,7 +290,7 @@ export default function WorkspacesPage() {
 
  <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-3">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
- EmptybetweenOverview
+ Workspace Overview
  </div>
  <div className="grid grid-cols-2 gap-2 text-[11px]">
  <div className="rounded-md border border-border bg-surface-75 px-2 py-2">
@@ -302,7 +302,7 @@ export default function WorkspacesPage() {
  <div className="text-foreground font-semibold">{workspaceStats.active}</div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 px-2 py-2">
- <div className="text-foreground-muted">Pause</div>
+            <div className="text-foreground-muted">Paused</div>
  <div className="text-foreground font-semibold">{workspaceStats.suspended}</div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 px-2 py-2">
@@ -332,10 +332,10 @@ export default function WorkspacesPage() {
  </div>
  </div>
 
- <SidebarNavGroup title="RecentUpdate">
+ <SidebarNavGroup title="Recently Updated">
  {recentWorkspaces.length === 0 ? (
  <div className="px-2 text-[11px] text-foreground-muted">
- NoneUpdateRecord
+ No recent updates
  </div>
  ) : (
  recentWorkspaces.map((workspace) => {
@@ -378,18 +378,18 @@ export default function WorkspacesPage() {
  {/* PageHeader */}
  <PageHeader
  title="Workspace"
- description="Manageyou'sWorkspace, DefaultConfigandPlanInfo, QuickCreateorSwitchtoExistingEmptybetween"
+ description="Manage your workspaces, default configuration and plan info. Quickly create or switch to an existing workspace."
  actions={
  <Button size="sm" onClick={() => setShowCreateDialog(true)}>
  <Plus className="w-4 h-4 mr-1.5" />
- CreateWorkspace
+ Create Workspace
  </Button>
  }
  />
 
  {errorBanner}
 
- {/* DefaultConfigandDescription */}
+        {/* Default Config and Description */}
  <section id="overview" className="grid grid-cols-1 md:grid-cols-3 gap-3">
  <div className="p-4 rounded-md bg-surface-100 border border-border">
  <div className="flex items-start gap-3">
@@ -401,7 +401,7 @@ export default function WorkspacesPage() {
  Default Workspace
  </h3>
  <p className="text-[11px] text-foreground-light leading-relaxed">
- asTeamCollaborationandResourceIsolate'sBasic, App, MemberPermissionandQuotaSettings.
+ A workspace is the foundation for team collaboration and resource isolation, including apps, member permissions and quota settings.
  </p>
  </div>
  </div>
@@ -414,7 +414,7 @@ export default function WorkspacesPage() {
  </div>
  <div className="space-y-1">
  <div className="flex items-center gap-2">
- <h3 className="text-[12px] font-medium text-foreground">PlanandQuota</h3>
+ <h3 className="text-[12px] font-medium text-foreground">Plans & Quotas</h3>
  <Badge
  variant="secondary"
  className={cn(
@@ -427,13 +427,13 @@ export default function WorkspacesPage() {
  </Badge>
  </div>
  <p className="text-[11px] text-foreground-light leading-relaxed">
- newWorkspaceDefaultUsageFreePlan, mostmultipleSupport 3 AppandBasicCallQuota.
+ New workspaces use the Free plan by default, supporting up to 3 apps and basic call quotas.
  </p>
  <Link
  href="/dashboard/billing"
  className="text-[11px] text-brand-500 hover:underline"
  >
- ViewQuotaandUpgrade
+ View quotas & upgrade
  </Link>
  </div>
  </div>
@@ -446,10 +446,10 @@ export default function WorkspacesPage() {
  </div>
  <div>
  <h3 className="text-[12px] font-medium text-foreground mb-1">
- RegionandData
+ Region & Data
  </h3>
  <p className="text-[11px] text-foreground-light leading-relaxed">
- CreatetimeSelectRegion, ImpactRuntimeLatencyandComplianceneed; DefaultRegioncanatSettingsView.
+ Select a region when creating a workspace. This affects runtime latency and compliance needs. Default region can be viewed in settings.
  </p>
  </div>
  </div>
@@ -459,16 +459,16 @@ export default function WorkspacesPage() {
  <section id="create" className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
  <SettingsSection
  title="Create Workspace"
- description="Fill inName, RegionandPlanInfo, CreateaftercanNowSwitch"
+ description="Fill in name, region and plan info. You can switch immediately after creating."
  compact
  >
  <div className="space-y-4">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- WorkspaceName <span className="text-destructive">*</span>
+ Workspace Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="exampleif: I'sTeam"
+ placeholder="e.g. My Team"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
@@ -493,13 +493,13 @@ export default function WorkspacesPage() {
  />
  </div>
  <p className="text-[11px] text-foreground-muted mt-1.5">
- canContainssmallchar, countcharandCharacter
+ Can contain lowercase letters, numbers and hyphens
  </p>
  </div>
 
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- DeployRegion <span className="text-destructive">*</span>
+ Deploy Region <span className="text-destructive">*</span>
  </label>
  <Select
  value={createForm.region}
@@ -508,7 +508,7 @@ export default function WorkspacesPage() {
  }
  >
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectRegion" />
+ <SelectValue placeholder="Select region" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {regionOptions.map((option) => (
@@ -522,7 +522,7 @@ export default function WorkspacesPage() {
 
  <div className="rounded-md border border-border bg-surface-75 px-3 py-3 text-[12px] text-foreground-light">
  <div className="flex items-center justify-between">
- <span>CurrentPlan</span>
+ <span>Current Plan</span>
  <Badge
  variant="secondary"
  className={cn(
@@ -535,7 +535,7 @@ export default function WorkspacesPage() {
  </Badge>
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
- CreateaftercanatSettingsUpgradePlanandQuota.
+ After creating, you can upgrade plan and quotas in settings.
  </p>
  </div>
 
@@ -562,27 +562,27 @@ export default function WorkspacesPage() {
 
  <div id="guides">
  <SettingsSection
- title="PlanandRegionDescription"
- description="QuotaandRegionSelect'sImpact"
+ title="Plans & Region Guide"
+ description="Impact of quota and region selection"
  compact
  >
  <div className="space-y-4 text-[12px] text-foreground-light">
  <div className="rounded-md border border-border bg-surface-75 p-3">
- <p className="font-medium text-foreground mb-1">PlanandQuota</p>
- <p>FreePlancanCreate 3 App, SuitableuseandsmallTeam.</p>
+ <p className="font-medium text-foreground mb-1">Plans & Quotas</p>
+ <p>The Free plan allows up to 3 apps, suitable for personal use and small teams.</p>
  <Link href="/dashboard/billing" className="text-brand-500 hover:underline text-[11px]">
- ViewQuotaDetails
+ View quota details
  </Link>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-3">
- <p className="font-medium text-foreground mb-1">RegionSelect</p>
- <p>RegionImpactAccessLatencyandComplianceneed, SuggestionSelectTargetUserRecent'sRegion.</p>
+ <p className="font-medium text-foreground mb-1">Region Selection</p>
+ <p>Region affects access latency and compliance needs. We recommend selecting a region closest to your target users.</p>
  <p className="text-[11px] text-foreground-muted mt-1">
- CurrentOptionalRegion: {regionOptions.map((option) => option.label).join(" / ")}
+ Available regions: {regionOptions.map((option) => option.label).join(" / ")}
  </p>
  </div>
  <div className="text-[11px] text-foreground-muted">
- needneedJoinExisting Workspace?canatLeft sideQuickEntrySubmitPlease.
+ Need to join an existing workspace? Use the quick entry on the left sidebar to submit a request.
  </div>
  </div>
  </SettingsSection>
@@ -591,17 +591,17 @@ export default function WorkspacesPage() {
 
  <section id="list" className="space-y-3">
  <div>
- <h3 className="text-[13px] font-medium text-foreground">SelectWorkspace</h3>
+ <h3 className="text-[13px] font-medium text-foreground">Select Workspace</h3>
  <p className="text-[12px] text-foreground-light">
- fromyoualreadyJoin'sWorkspaceSelect, orCreatenew'sEmptybetweenStartBuild.
+ Select from workspaces you have joined, or create a new workspace to start building.
  </p>
  {searchQuery && (
  <p className="text-[11px] text-foreground-muted mt-1">
- CurrentSearch: {searchQuery}
+ Searching: {searchQuery}
  </p>
  )}
  </div>
- <span className="text-[11px] text-foreground-muted">ClickCardnowcanSwitch</span>
+ <span className="text-[11px] text-foreground-muted">Click a card to switch workspace</span>
  </section>
 
  {/* WorkspaceList */}
@@ -612,16 +612,16 @@ export default function WorkspacesPage() {
  ) : filteredWorkspaces.length === 0 ? (
  <EmptyState
  icon={<FolderOpen className="w-6 h-6" />}
- title={searchQuery ? "not yettoMatch'sWorkspace": "NoneWorkspace"}
+ title={searchQuery ? "No matching workspaces found" : "No workspaces"}
  description={
  searchQuery
- ? "TryUsageotherheKeywordsSearch"
-: "Createyou's#1Workspace, StartBuildApp"
+ ? "Try searching with different keywords"
+: "Create your first workspace to start building apps"
  }
  action={
  !searchQuery
  ? {
- label: "CreateWorkspace",
+ label: "Create Workspace",
  onClick: () => setShowCreateDialog(true),
  }
  : undefined
@@ -705,19 +705,19 @@ export default function WorkspacesPage() {
  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">CreateWorkspace</DialogTitle>
+ <DialogTitle className="text-foreground">Create Workspace</DialogTitle>
  <DialogDescription className="text-foreground-light">
- Create1new'sWorkspacecomeOrganizationyou'sAppandTeam
+ Create a new workspace to organize your apps and team
  </DialogDescription>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- WorkspaceName <span className="text-destructive">*</span>
+ Workspace Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="exampleif: I'sTeam"
+ placeholder="e.g. My Team"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
@@ -742,13 +742,13 @@ export default function WorkspacesPage() {
  />
  </div>
  <p className="text-[11px] text-foreground-muted mt-1.5">
- canContainssmallchar, countcharandCharacter
+ Can contain lowercase letters, numbers and hyphens
  </p>
  </div>
 
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- DeployRegion <span className="text-destructive">*</span>
+ Deploy Region <span className="text-destructive">*</span>
  </label>
  <Select
  value={createForm.region}
@@ -757,7 +757,7 @@ export default function WorkspacesPage() {
  }
  >
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectRegion" />
+ <SelectValue placeholder="Select region" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {regionOptions.map((option) => (
@@ -772,7 +772,7 @@ export default function WorkspacesPage() {
  <div className="p-3 rounded-md bg-surface-75 text-[12px] text-foreground-light">
  <p className="flex items-center gap-2">
  <Crown className="w-4 h-4 text-foreground-muted" />
- newWorkspacewillUsageFreePlan, mostmultipleSupport 3 App
+ New workspaces will use the Free plan, supporting up to 3 apps
  </p>
  </div>
  </div>
@@ -801,23 +801,23 @@ export default function WorkspacesPage() {
  <DialogHeader>
  <DialogTitle className="text-foreground">Join Workspace</DialogTitle>
  <DialogDescription className="text-foreground-light">
- ViaInvite LinkorInviteJoinalreadyhasWorkspace
+ Join an existing workspace via invite link or invite code
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-4 py-4">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- Invite Link/Invite <span className="text-destructive">*</span>
+ Invite Link / Code <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="PasteInvite LinkorInputInvite"
+ placeholder="Paste invite link or enter invite code"
  value={joinCode}
  onChange={(event) => setJoinCode(event.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
  />
  </div>
  <div className="p-3 rounded-md bg-surface-75 text-[11px] text-foreground-muted">
- needneedAdminSendInvite LinkonlycanDoneJoin.
+ An admin must send an invite link before you can join.
  </div>
  </div>
  <DialogFooter>
@@ -829,7 +829,7 @@ export default function WorkspacesPage() {
  Cancel
  </Button>
  <Button onClick={handleJoinWorkspace} disabled={!joinCode.trim()}>
- SubmitPlease
+ Submit
  </Button>
  </DialogFooter>
  </DialogContent>

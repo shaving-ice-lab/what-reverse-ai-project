@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationHistory/MessagecenterPage - Supabase Style + MinimalTextSidebar
- * use PageWithSidebar 3Layout
+ * Conversation History / Message Center Page - Supabase Style + MinimalTextSidebar
+ * Uses PageWithSidebar 3-column Layout
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
@@ -89,15 +89,15 @@ import type {
 import { formatRelativeTime } from "@/types/conversation";
 import { toast } from "sonner";
 
-// SortOption
+// Sort Options
 const sortOptions = [
- { id: "updated", label: "RecentUpdate", desc: true },
+ { id: "updated", label: "Recent Update", desc: true },
  { id: "created", label: "Created At", desc: true },
  { id: "title", label: "Title", desc: false },
- { id: "messages", label: "Messagecount", desc: true },
+ { id: "messages", label: "Message Count", desc: true },
 ];
 
-// ViewType - Remove timeline
+// View Type
 type ViewType = "list" | "grid";
 
 const LAST_WORKSPACE_STORAGE_KEY = "last_workspace_id";
@@ -120,7 +120,7 @@ const writeStoredWorkspaceId = (workspaceId: string) => {
  }
 };
 
-// SkeletonComponent
+// Skeleton Component
 function ConversationSkeleton({ view }: { view: ViewType }) {
  if (view === "grid") {
  return (
@@ -161,7 +161,7 @@ function ConversationSkeleton({ view }: { view: ViewType }) {
  );
 }
 
-// 'sConversationCardComponent
+// Conversation Card Component
 interface ConversationCardProps {
  conversation: Conversation;
  viewType: ViewType;
@@ -201,7 +201,7 @@ function ConversationCard({
  onDelete,
  onClick,
 }: ConversationCardProps) {
- // GridView
+  // Grid View
  if (viewType === "grid") {
  return (
  <div
@@ -215,7 +215,7 @@ function ConversationCard({
  )}
  onClick={() => isSelectionMode ? onSelect(conversation.id) : onClick(conversation.id)}
  >
- {/* SelectCheckbox */}
+ {/* Select Checkbox */}
  {isSelectionMode && (
  <div 
  className="absolute top-3 left-3 z-10"
@@ -228,7 +228,7 @@ function ConversationCard({
  </div>
  )}
 
- {/* StatusIndicator */}
+ {/* Status Indicator */}
  <div className="absolute top-3 right-3 flex items-center gap-1">
  {conversation.pinned && (
  <Pin className="w-3 h-3 text-brand-500 fill-brand-500" />
@@ -238,7 +238,7 @@ function ConversationCard({
  )}
  </div>
 
- {/* ModelIcon - 1Usage surfaceBackground */}
+ {/* Model Icon */}
  <div className="w-10 h-10 rounded-lg bg-surface-200 border border-border flex items-center justify-center mb-3">
  <Bot className="w-5 h-5 text-foreground-light" />
  </div>
@@ -253,7 +253,7 @@ function ConversationCard({
  {conversation.preview ? (
  <HighlightText text={conversation.preview} search={searchQuery} />
  ) : (
- "NoneMessagePreview"
+ "No message preview"
  )}
  </p>
 
@@ -266,14 +266,14 @@ function ConversationCard({
  <span>{formatRelativeTime(conversation.updatedAt)}</span>
  </div>
 
- {/* ModelTags */}
+ {/* Model Tags */}
  <div className="mt-3 pt-3 border-t border-border">
  <Badge variant="secondary" className="text-[10px] bg-surface-200 text-foreground-muted border-0">
  {conversation.model}
  </Badge>
  </div>
 
- {/* HoverActionButton */}
+ {/* Hover Action Buttons */}
  {!isSelectionMode && (
  <div 
  className="absolute bottom-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -294,20 +294,20 @@ function ConversationCard({
  <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
  <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
  <Edit3 className="w-3.5 h-3.5 mr-2" />
- re-Naming
- </DropdownMenuItem>
- <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
- <Copy className="w-3.5 h-3.5 mr-2" />
- Copy
- </DropdownMenuItem>
- <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
- <FolderOpen className="w-3.5 h-3.5 mr-2" />
- MovetoFolder
- </DropdownMenuItem>
- <DropdownMenuSeparator className="bg-border" />
- <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-[12px]">
- <Download className="w-3.5 h-3.5 mr-2" />
- Export
+                Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
+                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  Copy
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
+                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  Move to Folder
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem onClick={() => onExport(conversation.id, "json")} className="text-[12px]">
+                  <Download className="w-3.5 h-3.5 mr-2" />
+                  Export
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border" />
  <DropdownMenuItem onClick={() => onArchive(conversation.id)} className="text-[12px]">
@@ -376,14 +376,14 @@ function ConversationCard({
  {conversation.preview ? (
  <HighlightText text={conversation.preview} search={searchQuery} />
  ) : (
- <span className="italic">NoneMessagePreview</span>
+ <span className="italic">No message preview</span>
  )}
  </p>
 
  <div className="flex items-center gap-4 text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1">
  <MessageCircle className="w-3 h-3" />
- {conversation.messageCount} Message
+              {conversation.messageCount} messages
  </span>
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -392,7 +392,7 @@ function ConversationCard({
  </div>
  </div>
 
- {/* ActionButton - HoverDisplay */}
+ {/* Action Buttons - Hover Display */}
  {!isSelectionMode && (
  <div
  className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -421,17 +421,17 @@ function ConversationCard({
  <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
  <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
  <Edit3 className="w-3.5 h-3.5 mr-2" />
- re-Naming
- </DropdownMenuItem>
- <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
- <Copy className="w-3.5 h-3.5 mr-2" />
- Copy
- </DropdownMenuItem>
- <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
- <FolderOpen className="w-3.5 h-3.5 mr-2" />
- MovetoFolder
- </DropdownMenuItem>
- <DropdownMenuItem onClick={() => onShare(conversation.id)} className="text-[12px]">
+                Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(conversation.id)} className="text-[12px]">
+                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  Copy
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onMoveToFolder(conversation.id, conversation.folderId)} className="text-[12px]">
+                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  Move to Folder
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onShare(conversation.id)} className="text-[12px]">
  <Share2 className="w-3.5 h-3.5 mr-2" />
  Share
  </DropdownMenuItem>
@@ -462,7 +462,7 @@ function ConversationCard({
  );
 }
 
-// SidebarOptionComponent - FollowMinimalTextStyle
+// Sidebar Option Component
 interface FilterNavItemProps {
  label: string;
  count?: number;
@@ -511,30 +511,30 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  const [pageSize] = useState(20);
  const [operationLoading, setOperationLoading] = useState<string | null>(null);
  
- // ViewandSort
+  // View and Sort
  const [viewType, setViewType] = useState<ViewType>("list");
  const [sortBy, setSortBy] = useState("updated");
  const [sortDesc, setSortDesc] = useState(true);
  const searchInputRef = useRef<HTMLInputElement>(null);
  
- // DialogStatus
+  // Dialog State
  const [folderManageOpen, setFolderManageOpen] = useState(false);
  const [moveToFolderOpen, setMoveToFolderOpen] = useState(false);
  const [moveTargetIds, setMoveTargetIds] = useState<string[]>([]);
  const [moveCurrentFolderId, setMoveCurrentFolderId] = useState<string | undefined>();
  const [importDialogOpen, setImportDialogOpen] = useState(false);
  
- // re-NamingDialogStatus
+  // Rename Dialog State
  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
  const [renameTarget, setRenameTarget] = useState<{ id: string; title: string } | null>(null);
  const [renameValue, setRenameValue] = useState("");
 
  const shouldLogApiError = process.env.NEXT_PUBLIC_DEBUG_API === "true";
  
- // Calculatetotalpagecount
+  // Calculate total page count
  const totalPages = Math.ceil(total / pageSize);
  
- // keyBoard Shortcutskey
+  // Keyboard Shortcuts
  useEffect(() => {
  const handleKeyDown = (e: KeyboardEvent) => {
  if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -555,7 +555,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  return () => window.removeEventListener("keydown", handleKeyDown);
  }, [isSelectionMode]);
 
- // FetchFolderList
+  // Fetch Folder List
  const fetchFolders = useCallback(async () => {
  try {
  const response = await conversationFolderApi.list();
@@ -567,7 +567,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }
  }, [shouldLogApiError]);
 
- // FetchConversationList
+  // Fetch Conversation List
  const fetchConversations = useCallback(async () => {
  setLoading(true);
  setError(null);
@@ -576,7 +576,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  if (!workspaceId) {
  setConversations([]);
  setTotal(0);
- setError("PleasefirstSelectWorkspace");
+ setError("Please select a workspace first");
  setLoading(false);
  return;
  }
@@ -602,7 +602,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  setConversations(response.conversations || []);
  setTotal(response.total || 0);
  } catch (err) {
- setError(err instanceof Error ? err.message: "FetchConversationListFailed");
+ setError(err instanceof Error ? err.message : "Failed to fetch conversation list");
  if (shouldLogApiError) {
  console.error("Failed to fetch conversations:", err);
  }
@@ -620,7 +620,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  fetchConversations();
  }, [fetchConversations]);
 
- // SearchDebounce
+  // Search Debounce
  useEffect(() => {
  const timer = setTimeout(() => {
  setPage(1);
@@ -628,7 +628,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  return () => clearTimeout(timer);
  }, [searchQuery]);
 
- // SwitchFavorite
+  // Toggle Favorite
  const handleToggleStar = async (id: string, currentStarred: boolean) => {
  setOperationLoading(id);
  try {
@@ -643,7 +643,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }
  };
 
- // SwitchPin
+  // Toggle Pin
  const handleTogglePin = async (id: string, currentPinned: boolean) => {
  setOperationLoading(id);
  try {
@@ -658,55 +658,55 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }
  };
 
- // ArchiveConversation
+  // Archive Conversation
  const handleArchive = async (id: string) => {
  setOperationLoading(id);
  try {
  await conversationApi.setArchived(id, true);
  setConversations((prev) => prev.filter((c) => c.id !== id));
- toast.success("ConversationArchived");
- } catch (err) {
- console.error("Failed to archive:", err);
- toast.error("ArchiveFailed");
+    toast.success("Conversation archived");
+    } catch (err) {
+      console.error("Failed to archive:", err);
+      toast.error("Archive failed");
  } finally {
  setOperationLoading(null);
  }
  };
 
- // DeleteConversation
+  // Delete Conversation
  const handleDelete = async (id: string) => {
- if (!confirm("OKneedDeletethisConversation??thisActionnotcanRestore.")) return;
+ if (!confirm("Delete this conversation? This action cannot be undone.")) return;
  
  setOperationLoading(id);
  try {
  await conversationApi.delete(id);
  setConversations((prev) => prev.filter((c) => c.id !== id));
- toast.success("ConversationDeleted");
- } catch (err) {
- console.error("Failed to delete:", err);
- toast.error("DeleteFailed");
+    toast.success("Conversation deleted");
+    } catch (err) {
+      console.error("Failed to delete:", err);
+      toast.error("Delete failed");
  } finally {
  setOperationLoading(null);
  }
  };
 
- // CopyConversation
+  // Duplicate Conversation
  const handleDuplicate = async (id: string) => {
  setOperationLoading(id);
  try {
  const newConversation = await conversationApi.duplicate(id);
  setConversations((prev) => [newConversation, ...prev]);
- toast.success("ConversationalreadyCopy");
+ toast.success("Conversation copied");
  } catch (err) {
  console.error("Failed to duplicate:", err);
- toast.error("CopyFailed");
+    toast.error("Copy failed");
  } finally {
  setOperationLoading(null);
  }
  };
 
- // re-NamingConversation
- const openRenameDialog = (conversation: Conversation) => {
+  // Rename Conversation
+  const openRenameDialog = (conversation: Conversation) => {
  setRenameTarget({ id: conversation.id, title: conversation.title });
  setRenameValue(conversation.title);
  setRenameDialogOpen(true);
@@ -725,23 +725,23 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  );
  setRenameDialogOpen(false);
  setRenameTarget(null);
- toast.success("re-NamingSuccess");
- } catch (err) {
- console.error("Failed to rename:", err);
- toast.error("re-NamingFailed");
+      toast.success("Renamed successfully");
+    } catch (err) {
+      console.error("Failed to rename:", err);
+      toast.error("Rename failed");
  } finally {
  setOperationLoading(null);
  }
  };
 
- // OpenMovetoFolderDialog
+  // Open Move to Folder Dialog
  const openMoveToFolder = (conversationId: string, currentFolderId?: string) => {
  setMoveTargetIds([conversationId]);
  setMoveCurrentFolderId(currentFolderId);
  setMoveToFolderOpen(true);
  };
 
- // BatchMovetoFolder
+  // Batch Move to Folder
  const openBatchMoveToFolder = () => {
  if (selectedConversations.size === 0) return;
  setMoveTargetIds(Array.from(selectedConversations));
@@ -749,7 +749,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  setMoveToFolderOpen(true);
  };
 
- // ExportConversation
+  // Export Conversation
  const handleExport = async (id: string, format: "json" | "markdown" = "json") => {
  const conversation = conversations.find((c) => c.id === id);
  if (!conversation) return;
@@ -762,26 +762,26 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  a.download = `conversation-${conversation.title.slice(0, 30)}.${format === "markdown" ? "md" : "json"}`;
  a.click();
  URL.revokeObjectURL(url);
- toast.success("ExportSuccess");
- } catch (err) {
- console.error("Failed to export:", err);
- toast.error("ExportFailed");
+      toast.success("Export successful");
+    } catch (err) {
+      console.error("Failed to export:", err);
+      toast.error("Export failed");
  }
  };
 
- // ShareConversation
+  // Share Conversation
  const handleShare = async (id: string) => {
  try {
  const result = await conversationApi.share(id, { isPublic: true });
  await navigator.clipboard.writeText(result.shareUrl);
- toast.success("ShareLinkalreadyCopied to clipboard");
+ toast.success("Share link copied to clipboard");
  } catch (err) {
  console.error("Failed to share:", err);
- toast.error("CreateShareLinkFailed");
+ toast.error("Failed to create share link");
  }
  };
 
- // BatchFavorite
+  // Batch Favorite
  const handleBatchStar = async (starred: boolean) => {
  if (selectedConversations.size === 0) return;
  
@@ -797,14 +797,14 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  );
  setSelectedConversations(new Set());
  setIsSelectionMode(false);
- toast.success(starred ? "alreadyFavoriteselectConversation": "alreadyUnfavorite");
+ toast.success(starred ? "Added to favorites" : "Removed from favorites");
  } catch (err) {
  console.error("Failed to batch star:", err);
  toast.error("Operation failed");
  }
  };
 
- // BatchArchive
+  // Batch Archive
  const handleBatchArchive = async () => {
  if (selectedConversations.size === 0) return;
  
@@ -818,17 +818,17 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  );
  setSelectedConversations(new Set());
  setIsSelectionMode(false);
- toast.success("ArchivedselectConversation");
- } catch (err) {
- console.error("Failed to batch archive:", err);
- toast.error("ArchiveFailed");
+      toast.success("Archived selected conversations");
+    } catch (err) {
+      console.error("Failed to batch archive:", err);
+      toast.error("Archive failed");
  }
  };
 
- // BatchDelete
+  // Batch Delete
  const handleBatchDelete = async () => {
  if (selectedConversations.size === 0) return;
- if (!confirm(`OKneedDeleteselect's ${selectedConversations.size} Conversation??thisActionnotcanRestore.`)) return;
+ if (!confirm(`Delete ${selectedConversations.size} selected conversation(s)? This cannot be undone.`)) return;
  
  try {
  await conversationApi.batchDelete({
@@ -839,14 +839,14 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  );
  setSelectedConversations(new Set());
  setIsSelectionMode(false);
- toast.success("DeletedselectConversation");
- } catch (err) {
- console.error("Failed to batch delete:", err);
- toast.error("DeleteFailed");
+      toast.success("Deleted selected conversations");
+    } catch (err) {
+      console.error("Failed to batch delete:", err);
+      toast.error("Delete failed");
  }
  };
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedConversations);
  if (newSelected.has(id)) {
@@ -857,7 +857,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  setSelectedConversations(newSelected);
  };
 
- // Select All/CancelSelect All
+ // Select All / Deselect All
  const toggleSelectAll = () => {
  if (selectedConversations.size === conversations.length) {
  setSelectedConversations(new Set());
@@ -866,30 +866,30 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }
  };
 
- // CreatenewConversation
+  // Create New Conversation
  const handleCreateConversation = async () => {
  try {
  if (!workspaceId) {
- toast.error("PleasefirstSelectWorkspace");
+ toast.error("Please select a workspace first");
  router.push("/dashboard/apps");
  return;
  }
  const newConversation = await conversationApi.create({
  workspaceId,
- title: "newConversation",
+      title: "New Conversation",
  model: "gpt-4",
  });
  router.push(`/dashboard/app/${workspaceId}/conversations/${newConversation.id}`);
  } catch (err) {
  console.error("Failed to create conversation:", err);
- toast.error("CreateConversationFailed");
+ toast.error("Failed to create conversation");
  }
  };
 
- // SortConversationList
+  // Sort Conversation List
  const sortedConversations = useMemo(() => {
  const sorted = [...conversations].sort((a, b) => {
- // PinConversationAlwaysatmostbeforeface
+      // Pinned conversations always appear first
  if (a.pinned && !b.pinned) return -1;
  if (!a.pinned && b.pinned) return 1;
  
@@ -917,24 +917,24 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  return sorted;
  }, [conversations, sortBy, sortDesc]);
 
- // FetchFilterTags
+  // Get Filter Label
  const getFilterLabel = () => {
  switch (filter) {
  case "starred": return "Favorite";
  case "pinned": return "Pin";
  case "archived": return "Archive";
- default: return "allsectionConversation";
+ default: return "All Conversations";
  }
  };
 
- // SidebarContent
+  // Sidebar Content
  const sidebarContent = (
  <div className="space-y-6">
- {/* FilterNavigation */}
+ {/* Filter Navigation */}
  <SidebarNavGroup title="Filter">
  <div className="space-y-0.5">
  <FilterNavItem
- label="allsectionConversation"
+ label="All conversations"
  count={total}
  active={filter === "all" && !selectedFolder}
  onClick={() => {
@@ -973,7 +973,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  </div>
  </SidebarNavGroup>
 
- {/* FolderList */}
+ {/* Folder List */}
  <SidebarNavGroup title="Folder">
  <div className="space-y-0.5">
  {folders.map((folder) => (
@@ -994,7 +994,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  className="w-full h-8 flex items-center gap-2 px-3 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors duration-150"
  >
  <FolderPlus className="w-3.5 h-3.5" />
- ManageFolder
+            Manage Folders
  </button>
  </div>
  </SidebarNavGroup>
@@ -1007,13 +1007,13 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  sidebarTitle="Conversation"
  sidebarWidth="narrow"
  >
- {/* PageHeader */}
+ {/* Page Header */}
  <PageHeader
- title="Conversationcenter"
- description={
- searchQuery
- ? `Search "${searchQuery}" · to ${total} Result`
-: `${getFilterLabel()} · ${total} Conversation`
+        title="Conversation Center"
+        description={
+          searchQuery
+            ? `Search "${searchQuery}" · ${total} results`
+: `${getFilterLabel()} · ${total} conversations`
  }
  actions={
  <div className="flex items-center gap-2">
@@ -1022,7 +1022,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  size="sm"
  className="h-8 border-border text-foreground-light hover:text-foreground"
  onClick={() =>
- workspaceId ? setImportDialogOpen(true): toast.error("PleasefirstSelectWorkspace")
+ workspaceId ? setImportDialogOpen(true) : toast.error("Please select a workspace first")
  }
  disabled={!workspaceId}
  >
@@ -1035,7 +1035,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  onClick={handleCreateConversation}
  >
  <Plus className="w-3.5 h-3.5 mr-1.5" />
- CreateConversation
+              New Conversation
  </Button>
  </div>
  }
@@ -1049,7 +1049,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  <Input
  ref={searchInputRef}
  type="text"
- placeholder="SearchConversation... (Ctrl+K)"
+ placeholder="Search conversations... (Ctrl+K)"
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 pr-8 h-8 text-[12px] bg-surface-100 border-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
@@ -1064,7 +1064,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  )}
  </div>
 
- {/* ViewSwitch */}
+ {/* View Switch */}
  <div className="flex items-center gap-0.5 p-0.5 bg-surface-100 border border-border rounded-md">
  <TooltipProvider>
  <Tooltip>
@@ -1081,7 +1081,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  <LayoutList className="w-4 h-4" />
  </button>
  </TooltipTrigger>
- <TooltipContent>ListView</TooltipContent>
+ <TooltipContent>List view</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  <TooltipProvider>
@@ -1099,7 +1099,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  <LayoutGrid className="w-4 h-4" />
  </button>
  </TooltipTrigger>
- <TooltipContent>GridView</TooltipContent>
+ <TooltipContent>Grid view</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  </div>
@@ -1114,7 +1114,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  </Button>
  </DropdownMenuTrigger>
  <DropdownMenuContent align="end" className="w-40 bg-surface-100 border-border">
- <DropdownMenuLabel className="text-[11px] text-foreground-muted">Sortmethod</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-[11px] text-foreground-muted">Sort Method</DropdownMenuLabel>
  {sortOptions.map((option) => (
  <DropdownMenuItem
  key={option.id}
@@ -1137,7 +1137,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  </DropdownMenuContent>
  </DropdownMenu>
 
- {/* moremultipleAction */}
+ {/* More Actions */}
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <Button variant="outline" size="icon" className="h-8 w-8 border-border text-foreground-light">
@@ -1150,20 +1150,20 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  className="text-[12px]"
  >
  <Check className="w-3.5 h-3.5 mr-2" />
- BatchSelect
+              Batch Select
  </DropdownMenuItem>
  <DropdownMenuItem
  onClick={() => fetchConversations()}
  className="text-[12px]"
  >
  <RefreshCw className="w-3.5 h-3.5 mr-2" />
- RefreshList
+              Refresh List
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  </div>
 
- {/* BatchSelectToolbar */}
+ {/* Batch Select Toolbar */}
  {isSelectionMode && (
  <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-surface-100 border border-border">
  <Checkbox
@@ -1171,7 +1171,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  onCheckedChange={toggleSelectAll}
  />
  <span className="text-[12px] text-foreground">
- alreadySelect <span className="font-medium text-brand-500">{selectedConversations.size}</span> 
+ Selected <span className="font-medium text-brand-500">{selectedConversations.size}</span> 
  </span>
  <div className="flex-1" />
  <div className="flex items-center gap-1">
@@ -1226,9 +1226,9 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  </div>
  )}
 
- {/* mainContent */}
+ {/* Main Content */}
  {loading ? (
- // SkeletonLoad
+    // Skeleton Loading
  <div className={cn(
  viewType === "grid"
  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -1239,13 +1239,13 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  ))}
  </div>
  ) : error ? (
- // ErrorStatus
+    // Error State
  <EmptyState
  icon={<X className="w-6 h-6 text-destructive" />}
- title="LoadFailed"
- description={error}
- action={{
- label: "re-newLoad",
+          title="Load Failed"
+          description={error}
+          action={{
+            label: "Reload",
  onClick: () => fetchConversations(),
  }}
  />
@@ -1253,20 +1253,20 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  // Empty State
  <EmptyState
  icon={<MessageSquare className="w-6 h-6" />}
- title={searchQuery ? "NotoMatch'sConversation": "Startyou's#1timesConversation"}
+ title={searchQuery ? "No matching conversations" : "Start your first conversation"}
  description={
  searchQuery
- ? `not yettoContains "${searchQuery}" 'sConversation`
-: "and AI AssistantExpandConversation, ExploreNonelimitcancan"
+ ? `No conversations contain "${searchQuery}"`
+: "Chat with the AI assistant and explore without limits"
  }
  action={{
- label: searchQuery ? "ClearSearch": "StartnewConversation",
+ label: searchQuery ? "Clear search" : "Start new conversation",
  onClick: searchQuery ? () => setSearchQuery("") : handleCreateConversation,
  }}
  />
  ) : (
  <>
- {/* ConversationList */}
+ {/* Conversation List */}
  {viewType === "grid" ? (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
  {sortedConversations.map((conversation) => (
@@ -1291,7 +1291,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  onClick={(id) =>
  workspaceId
  ? router.push(`/dashboard/app/${workspaceId}/conversations/${id}`)
-: toast.error("PleasefirstSelectWorkspace")
+: toast.error("Please select a workspace first")
  }
  />
  ))}
@@ -1320,7 +1320,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  onClick={(id) =>
  workspaceId
  ? router.push(`/dashboard/app/${workspaceId}/conversations/${id}`)
-: toast.error("PleasefirstSelectWorkspace")
+: toast.error("Please select a workspace first")
  }
  />
  ))}
@@ -1331,7 +1331,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  {totalPages > 1 && (
  <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
  <div className="text-[12px] text-foreground-light">
- <span className="font-medium text-foreground">{total}</span> Conversation
+              <span className="font-medium text-foreground">{total}</span> conversations
  </div>
  <div className="flex items-center gap-2">
  <Button
@@ -1342,7 +1342,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  disabled={page === 1 || loading}
  >
  <ChevronLeft className="w-3.5 h-3.5 mr-1" />
- on1page
+                Previous
  </Button>
  <div className="flex items-center gap-1">
  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -1380,19 +1380,19 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
  disabled={page === totalPages || loading}
  >
- down1page
+                Next
  <ChevronRight className="w-3.5 h-3.5 ml-1" />
  </Button>
  </div>
  <div className="text-[12px] text-foreground-muted">
- # <span className="font-medium text-brand-500">{page}</span> / {totalPages} page
+              Page <span className="font-medium text-brand-500">{page}</span> of {totalPages}
  </div>
  </div>
  )}
  </>
  )}
 
- {/* FolderManageDialog */}
+ {/* Folder Manage Dialog */}
  <ConversationFolderManageDialog
  open={folderManageOpen}
  onOpenChange={setFolderManageOpen}
@@ -1403,7 +1403,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }}
  />
 
- {/* MovetoFolderDialog */}
+ {/* Move to Folder Dialog */}
  <MoveToFolderDialog
  open={moveToFolderOpen}
  onOpenChange={setMoveToFolderOpen}
@@ -1418,17 +1418,17 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  }}
  />
 
- {/* re-NamingDialog */}
+ {/* Rename Dialog */}
  <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
  <DialogContent className="sm:max-w-[400px] bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-[14px] text-foreground">re-NamingConversation</DialogTitle>
+            <DialogTitle className="text-[14px] text-foreground">Rename Conversation</DialogTitle>
  </DialogHeader>
  <div className="py-4">
  <Input
  value={renameValue}
  onChange={(e) => setRenameValue(e.target.value)}
- placeholder="InputnewTitle"
+ placeholder="Enter new title"
  className="h-9 text-[13px] bg-surface-100 border-border focus:ring-brand-500/20"
  autoFocus
  onKeyDown={(e) => {
@@ -1458,7 +1458,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  </DialogContent>
  </Dialog>
 
- {/* ImportDialog */}
+ {/* Import Dialog */}
  <ImportDialog
  workspaceId={workspaceId ?? ""}
  open={importDialogOpen}
@@ -1499,7 +1499,7 @@ export default function ConversationsPage() {
  } catch (error) {
  if (cancelled) return;
  console.error("Failed to resolve app for conversations:", error);
- setRedirectError("NoneLoadAppList, Please try again laterRetry");
+ setRedirectError("Failed to load app list. Please try again.");
  }
  };
 
@@ -1514,7 +1514,7 @@ export default function ConversationsPage() {
  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-center">
  <p className="text-sm text-foreground-muted">{redirectError}</p>
  <Button variant="outline" onClick={() => router.replace("/dashboard/apps")}>
- BackAppList
+          Back to App List
  </Button>
  </div>
  );
@@ -1522,7 +1522,7 @@ export default function ConversationsPage() {
 
  return (
  <div className="min-h-[60vh] flex items-center justify-center text-sm text-foreground-muted">
- currentlyatNavigatetoAppConversation...
+      Navigating to app conversations...
  </div>
  );
 }

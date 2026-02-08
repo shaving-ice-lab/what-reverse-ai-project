@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ShortcutkeyHelpDialog - Minimalist Style
+ * Keyboard Shortcuts Help Dialog - Minimalist Style
  */
 
 import { useState, useEffect } from "react";
@@ -45,53 +45,53 @@ const isMac = typeof window !== "undefined" && navigator.platform.toUpperCase().
 const cmdKey = isMac ? "⌘" : "Ctrl";
 
 const shortcutGroups: ShortcutGroup[] = [
- {
- title: "FileAction",
- shortcuts: [
- { keys: [cmdKey, "S"], description: "SaveWorkflow", icon: <Save className="h-4 w-4" /> },
- { keys: [cmdKey, "Shift", "S"], description: "as", icon: <Save className="h-4 w-4" /> },
- ],
- },
- {
- title: "EditAction",
- shortcuts: [
- { keys: [cmdKey, "Z"], description: "Undo", icon: <Undo2 className="h-4 w-4" /> },
- { keys: [cmdKey, "Shift", "Z"], description: "Redo", icon: <Redo2 className="h-4 w-4" /> },
- { keys: [cmdKey, "C"], description: "CopyselectNode", icon: <Copy className="h-4 w-4" /> },
- { keys: [cmdKey, "V"], description: "PasteNode", icon: <ClipboardPaste className="h-4 w-4" /> },
- { keys: [cmdKey, "D"], description: "CopyandPaste", icon: <Copy className="h-4 w-4" /> },
- { keys: ["Delete"], description: "DeleteselectNode", icon: <Trash2 className="h-4 w-4" /> },
- { keys: [cmdKey, "A"], description: "Select AllNode", icon: <MousePointer2 className="h-4 w-4" /> },
- ],
- },
- {
- title: "ViewControl",
- shortcuts: [
- { keys: [cmdKey, "+"], description: "large", icon: <ZoomIn className="h-4 w-4" /> },
- { keys: [cmdKey, "-"], description: "small", icon: <ZoomOut className="h-4 w-4" /> },
- { keys: [cmdKey, "0"], description: "ResetZoom", icon: <Maximize2 className="h-4 w-4" /> },
- { keys: [cmdKey, "1"], description: "shouldCanvas", icon: <Maximize2 className="h-4 w-4" /> },
- { keys: [cmdKey, "G"], description: "SwitchGrid", icon: <Grid3X3 className="h-4 w-4" /> },
- ],
- },
- {
- title: "NodeAction",
- shortcuts: [
- { keys: [cmdKey, "F"], description: "SearchNode", icon: <Search className="h-4 w-4" /> },
- { keys: ["Enter"], description: "EditselectNode", icon: <MousePointer2 className="h-4 w-4" /> },
- { keys: ["Escape"], description: "Deselect / ClosePanel", icon: <MousePointer2 className="h-4 w-4" /> },
- { keys: ["Tab"], description: "Switchtodown1Node", icon: <MousePointer2 className="h-4 w-4" /> },
- ],
- },
- {
- title: "CanvasNavigation",
- shortcuts: [
- { keys: ["Space", "Drag"], description: "PanCanvas", icon: <MousePointer2 className="h-4 w-4" /> },
- { keys: ["Scroll Wheel"], description: "ondownScroll", icon: <MousePointer2 className="h-4 w-4" /> },
- { keys: [cmdKey, "Scroll Wheel"], description: "ZoomCanvas", icon: <ZoomIn className="h-4 w-4" /> },
- { keys: ["Shift", "Scroll Wheel"], description: "leftrightScroll", icon: <MousePointer2 className="h-4 w-4" /> },
- ],
- },
+  {
+    title: "File Actions",
+    shortcuts: [
+      { keys: [cmdKey, "S"], description: "Save workflow", icon: <Save className="h-4 w-4" /> },
+      { keys: [cmdKey, "Shift", "S"], description: "Save as", icon: <Save className="h-4 w-4" /> },
+    ],
+  },
+  {
+    title: "Edit Actions",
+    shortcuts: [
+      { keys: [cmdKey, "Z"], description: "Undo", icon: <Undo2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "Shift", "Z"], description: "Redo", icon: <Redo2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "C"], description: "Copy selected node", icon: <Copy className="h-4 w-4" /> },
+      { keys: [cmdKey, "V"], description: "Paste node", icon: <ClipboardPaste className="h-4 w-4" /> },
+      { keys: [cmdKey, "D"], description: "Duplicate", icon: <Copy className="h-4 w-4" /> },
+      { keys: ["Delete"], description: "Delete selected node", icon: <Trash2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "A"], description: "Select all nodes", icon: <MousePointer2 className="h-4 w-4" /> },
+    ],
+  },
+  {
+    title: "View Controls",
+    shortcuts: [
+      { keys: [cmdKey, "+"], description: "Zoom in", icon: <ZoomIn className="h-4 w-4" /> },
+      { keys: [cmdKey, "-"], description: "Zoom out", icon: <ZoomOut className="h-4 w-4" /> },
+      { keys: [cmdKey, "0"], description: "Reset zoom", icon: <Maximize2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "1"], description: "Fit to canvas", icon: <Maximize2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "G"], description: "Toggle grid", icon: <Grid3X3 className="h-4 w-4" /> },
+    ],
+  },
+  {
+    title: "Node Actions",
+    shortcuts: [
+      { keys: [cmdKey, "F"], description: "Search nodes", icon: <Search className="h-4 w-4" /> },
+      { keys: ["Enter"], description: "Edit selected node", icon: <MousePointer2 className="h-4 w-4" /> },
+      { keys: ["Escape"], description: "Deselect / Close panel", icon: <MousePointer2 className="h-4 w-4" /> },
+      { keys: ["Tab"], description: "Switch to next node", icon: <MousePointer2 className="h-4 w-4" /> },
+    ],
+  },
+  {
+    title: "Canvas Navigation",
+    shortcuts: [
+      { keys: ["Space", "Drag"], description: "Pan canvas", icon: <MousePointer2 className="h-4 w-4" /> },
+      { keys: ["Scroll Wheel"], description: "Scroll vertically", icon: <MousePointer2 className="h-4 w-4" /> },
+      { keys: [cmdKey, "Scroll Wheel"], description: "Zoom canvas", icon: <ZoomIn className="h-4 w-4" /> },
+      { keys: ["Shift", "Scroll Wheel"], description: "Scroll horizontally", icon: <MousePointer2 className="h-4 w-4" /> },
+    ],
+  },
 ];
 
 function KeyBadge({ children }: { children: React.ReactNode }) {
@@ -149,10 +149,10 @@ export function KeyboardShortcutsDialog({
  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-surface-200">
  <Keyboard className="h-4 w-4" />
  </div>
- ShortcutkeyHelp
+            Keyboard Shortcuts
  </DialogTitle>
  <DialogDescription>
- UsageShortcutkeycanwithmoreEfficientActionEdit
+            Using keyboard shortcuts helps you edit more efficiently
  </DialogDescription>
  </DialogHeader>
 
@@ -175,7 +175,7 @@ export function KeyboardShortcutsDialog({
 
  <div className="pt-3 border-t border-border text-center">
  <p className="text-xs text-foreground-muted flex items-center justify-center gap-1">
- by <KeyBadge>?</KeyBadge> or <KeyBadge>{cmdKey}</KeyBadge> <span>+</span> <KeyBadge>/</KeyBadge> OpenthisHelp
+            Press <KeyBadge>?</KeyBadge> or <KeyBadge>{cmdKey}</KeyBadge> <span>+</span> <KeyBadge>/</KeyBadge> to open this help
  </p>
  </div>
  </DialogContent>

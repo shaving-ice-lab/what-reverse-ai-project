@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * ImageUploadComponent
+ * Image Upload Component
  * 
- * Supportface, Screenshot, Icon'sUploadandPreview
+ * Supports cover, screenshot, icon upload and preview
  */
 
 import { useState, useRef, useCallback } from "react";
@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ImageUploaderProps {
- // alreadyUpload'sImage
+ // Already uploaded images
  images: string[];
  
  // Callback
@@ -58,7 +58,7 @@ export function ImageUploader({
  const [dragIndex, setDragIndex] = useState<number | null>(null);
  const fileInputRef = useRef<HTMLInputElement>(null);
 
- // ProcessFileSelect
+  // Process file selection
  const handleFileSelect = useCallback(
  async (files: FileList | null) => {
  if (!files || files.length === 0) return;
@@ -72,35 +72,35 @@ export function ImageUploader({
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
 
- // CheckFileType
+        // Check file type
  if (!acceptTypes.includes(file.type)) {
- throw new Error(`notSupport'sFileType: ${file.type}`);
+ throw new Error(`Unsupported file type: ${file.type}`);
  }
 
- // CheckFileSize
+    // Check file size
  if (file.size > maxSizeMB * 1024 * 1024) {
- throw new Error(`FileSizenotcanExceed ${maxSizeMB}MB`);
+ throw new Error(`File size cannot exceed ${maxSizeMB}MB`);
  }
 
- // CheckCountLimit
- if (images.length + newImages.length >= maxImages) {
- throw new Error(`mostmultipleUpload ${maxImages} Image`);
+    // Check count limit
+    if (images.length + newImages.length >= maxImages) {
+      throw new Error(`Cannot upload more than ${maxImages} images`);
  }
 
- // MockUpload(ActualitemCallUpload API)
- // const formData = new FormData();
- // formData.append("file", file);
- // const response = await fetch("/api/upload", { method: "POST", body: formData });
- // const { url } = await response.json();
+        // Mock upload (actual implementation should call Upload API)
+        // const formData = new FormData();
+        // formData.append("file", file);
+        // const response = await fetch("/api/upload", { method: "POST", body: formData });
+        // const { url } = await response.json();
 
- // timeUsage Data URL(ActualitemshouldUsageStorage URL)
+        // Temporarily using Data URL (actual implementation should use Storage URL)
  const dataUrl = await readFileAsDataURL(file);
  newImages.push(dataUrl);
  }
 
  onChange([...images, ...newImages]);
  } catch (err) {
- setError(err instanceof Error ? err.message: "UploadFailed");
+ setError(err instanceof Error ? err.message : "Upload failed");
  } finally {
  setIsUploading(false);
  }
@@ -108,7 +108,7 @@ export function ImageUploader({
  [images, maxImages, maxSizeMB, acceptTypes, onChange]
  );
 
- // ReadFileas Data URL
+  // Read file as Data URL
  const readFileAsDataURL = (file: File): Promise<string> => {
  return new Promise((resolve, reject) => {
  const reader = new FileReader();
@@ -118,13 +118,13 @@ export function ImageUploader({
  });
  };
 
- // DeleteImage
+  // Delete image
  const handleRemove = (index: number) => {
  const newImages = images.filter((_, i) => i !== index);
  onChange(newImages);
  };
 
- // Drag & DropSort
+  // Drag & drop sort
  const handleDragStart = (index: number) => {
  setDragIndex(index);
  };
@@ -145,7 +145,7 @@ export function ImageUploader({
  setDragIndex(null);
  };
 
- // ProcessDrag and DropUpload
+ // Process drag and drop upload
  const handleDrop = (e: React.DragEvent) => {
  e.preventDefault();
  handleFileSelect(e.dataTransfer.files);
@@ -155,7 +155,7 @@ export function ImageUploader({
  e.preventDefault();
  };
 
- // ClickUpload
+  // Click to upload
  const handleClick = () => {
  fileInputRef.current?.click();
  };
@@ -179,7 +179,7 @@ export function ImageUploader({
  </label>
  )}
 
- {/* Upload(face/Icon) */}
+ {/* Upload (Cover/Icon) */}
  {isSingle && (
  <div
  className={cn(
@@ -198,7 +198,7 @@ export function ImageUploader({
  <>
  <img
  src={images[0]}
- alt="UploadPreview"
+ alt="Upload preview"
  className={cn(
  "w-full h-full object-cover",
  variant === "icon" ? "rounded-xl" : "rounded-lg"
@@ -213,9 +213,9 @@ export function ImageUploader({
  e.stopPropagation();
  handleClick();
  }}
- >
- more
- </Button>
+                >
+                  Replace
+                </Button>
  <Button
  type="button"
  size="sm"
@@ -237,7 +237,7 @@ export function ImageUploader({
  <>
  <Upload className="w-8 h-8 text-muted-foreground mb-2" />
  <span className="text-sm text-muted-foreground">
- ClickorDrag & DropUpload
+ Click or drag & drop to upload
  </span>
  <span className="text-xs text-muted-foreground/60 mt-1">
  Maximum {maxSizeMB}MB
@@ -249,10 +249,10 @@ export function ImageUploader({
  </div>
  )}
 
- {/* multipleUpload(Screenshot) */}
+ {/* Multiple upload (screenshots) */}
  {!isSingle && (
  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
- {/* alreadyUpload'sImage */}
+ {/* Already uploaded images */}
  {images.map((image, index) => (
  <div
  key={index}
@@ -274,12 +274,12 @@ export function ImageUploader({
  className="w-full h-full object-cover"
  />
  
- {/* Drag & DropHandle */}
+ {/* Drag & Drop Handle */}
  <div className="absolute top-2 left-2 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
  <GripVertical className="w-4 h-4 text-white" />
  </div>
 
- {/* DeleteButton */}
+ {/* Delete Button */}
  <button
  type="button"
  onClick={() => handleRemove(index)}
@@ -288,14 +288,14 @@ export function ImageUploader({
  <X className="w-4 h-4" />
  </button>
 
- {/* Serial NumberMark */}
+ {/* Serial Number */}
  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/50 text-white text-xs">
  {index + 1}
  </div>
  </div>
  ))}
 
- {/* AddmoremultipleButton */}
+ {/* Add More Button */}
  {canAddMore && (
  <div
  className={cn(
@@ -314,7 +314,7 @@ export function ImageUploader({
  <>
  <Plus className="w-6 h-6 text-muted-foreground mb-1" />
  <span className="text-xs text-muted-foreground">
- AddScreenshot
+ Add Screenshot
  </span>
  </>
  )}
@@ -324,7 +324,7 @@ export function ImageUploader({
  </div>
  )}
 
- {/* Hide'sFileInput */}
+ {/* Hidden file input */}
  <input
  ref={fileInputRef}
  type="file"
@@ -334,7 +334,7 @@ export function ImageUploader({
  className="hidden"
  />
 
- {/* ErrorTip */}
+ {/* Error Message */}
  {error && (
  <div className="flex items-center gap-2 text-sm text-destructive">
  <AlertCircle className="w-4 h-4" />
@@ -342,7 +342,7 @@ export function ImageUploader({
  </div>
  )}
 
- {/* AuxiliaryText */}
+ {/* Helper Text */}
  {helperText && (
  <p className="text-xs text-muted-foreground">{helperText}</p>
  )}

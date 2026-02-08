@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * keyBoard ShortcutskeyGuideComponent
- * ShowcaseAllAvailable'skeyBoard Shortcutskey
+ * Keyboard Shortcuts Guide Component
+ * Showcase all available keyboard shortcuts
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -23,43 +23,43 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ShortcutkeyGroup
+// Shortcut Key Groups
 const shortcutGroups = [
  {
  name: "all",
  shortcuts: [
- { keys: ["⌘", "K"], description: "OpenCommandPanel", icon: Search },
- { keys: ["⌘", "N"], description: "CreateConversation", icon: MessageSquare },
- { keys: ["⌘", "W"], description: "CreateWorkflow", icon: Zap },
- { keys: ["⌘", ","], description: "OpenSettings", icon: Settings },
- { keys: ["?"], description: "DisplayShortcutkeyHelp", icon: Keyboard },
- { keys: ["Esc"], description: "CloseModal/Panel", icon: X },
+ { keys: ["⌘", "K"], description: "Open command panel", icon: Search },
+ { keys: ["⌘", "N"], description: "Create conversation", icon: MessageSquare },
+ { keys: ["⌘", "W"], description: "Create workflow", icon: Zap },
+ { keys: ["⌘", ","], description: "Open settings", icon: Settings },
+ { keys: ["?"], description: "Display shortcut help", icon: Keyboard },
+ { keys: ["Esc"], description: "Close modal or panel", icon: X },
  ],
  },
  {
  name: "Navigation",
  shortcuts: [
- { keys: ["G", "H"], description: "BackHome", icon: Home },
- { keys: ["G", "W"], description: "WorkflowList", icon: Zap },
- { keys: ["G", "A"], description: "I's Agent", icon: Bot },
- { keys: ["G", "S"], description: "SettingsPage", icon: Settings },
+ { keys: ["G", "H"], description: "Back Home", icon: Home },
+      { keys: ["G", "W"], description: "Workflow List", icon: Zap },
+      { keys: ["G", "A"], description: "My Agent", icon: Bot },
+      { keys: ["G", "S"], description: "Settings Page", icon: Settings },
  ],
  },
  {
  name: "Conversation",
  shortcuts: [
- { keys: ["Enter"], description: "SendMessage", icon: CornerDownLeft },
- { keys: ["Shift", "Enter"], description: "row", icon: CornerDownLeft },
- { keys: ["⌘", "↑"], description: "Editon1Message", icon: ArrowUp },
- { keys: ["/"], description: "FocusInput", icon: Search },
+      { keys: ["Enter"], description: "Send Message", icon: CornerDownLeft },
+      { keys: ["Shift", "Enter"], description: "New Row", icon: CornerDownLeft },
+      { keys: ["⌘", "↑"], description: "Edit on 1 Message", icon: ArrowUp },
+      { keys: ["/"], description: "Focus Input", icon: Search },
  ],
  },
  {
- name: "CommandPanel",
+ name: "Command panel",
  shortcuts: [
- { keys: ["↑", "↓"], description: "SelectCommand", icon: ArrowDown },
- { keys: ["Enter"], description: "ExecuteselectCommand", icon: CornerDownLeft },
- { keys: ["Tab"], description: "Autoall", icon: Command },
+      { keys: ["↑", "↓"], description: "Select Command", icon: ArrowDown },
+      { keys: ["Enter"], description: "Execute Select Command", icon: CornerDownLeft },
+      { keys: ["Tab"], description: "Auto All", icon: Command },
  ],
  },
 ];
@@ -72,7 +72,7 @@ interface KeyboardShortcutsGuideProps {
 export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGuideProps) {
  const [searchQuery, setSearchQuery] = useState("");
 
- // FilterShortcutkey
+  // Filter Shortcut Key
  const filteredGroups = shortcutGroups.map((group) => ({
  ...group,
  shortcuts: group.shortcuts.filter(
@@ -98,13 +98,13 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
 
  return (
  <>
- {/* BackgroundMask */}
+ {/* Background Mask */}
  <div
  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
  onClick={onClose}
  />
 
- {/* ShortcutkeyPanel */}
+ {/* Shortcut Key Panel */}
  <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-2xl bg-card border border-border shadow-2xl z-50">
  {/* Header */}
  <div className="flex items-center justify-between p-4 border-b border-border">
@@ -113,8 +113,8 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
  <Keyboard className="w-5 h-5 text-primary" />
  </div>
  <div>
- <h2 className="font-semibold text-foreground">keyBoard Shortcutskey</h2>
- <p className="text-sm text-muted-foreground">QuickAccessuseFeatures</p>
+ <h2 className="font-semibold text-foreground">Keyboard Shortcuts</h2>
+ <p className="text-sm text-muted-foreground">Quick access to features</p>
  </div>
  </div>
  <button
@@ -131,7 +131,7 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
  <input
  type="text"
- placeholder="SearchShortcutkey..."
+ placeholder="Search shortcut keys..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="w-full h-10 pl-9 pr-4 rounded-lg bg-muted border-none text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20"
@@ -140,12 +140,12 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
  </div>
  </div>
 
- {/* ShortcutkeyList */}
+ {/* Shortcut Key List */}
  <div className="overflow-y-auto max-h-[calc(80vh-180px)] p-4">
  {filteredGroups.length === 0 ? (
  <div className="text-center py-8">
  <Keyboard className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
- <p className="text-muted-foreground">NotoMatch'sShortcutkey</p>
+ <p className="text-muted-foreground">No matching shortcut keys</p>
  </div>
  ) : (
  <div className="space-y-6">
@@ -188,10 +188,10 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
  )}
  </div>
 
- {/* FooterTip */}
+ {/* Footer Tip */}
  <div className="p-4 border-t border-border bg-muted/30">
  <p className="text-xs text-muted-foreground text-center">
- by <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground">?</kbd> keyAnytimeOpenthisPanel
+ Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground">?</kbd> anytime to open this panel
  </p>
  </div>
  </div>
@@ -199,7 +199,7 @@ export function KeyboardShortcutsGuide({ isOpen, onClose }: KeyboardShortcutsGui
  );
 }
 
-// Shortcutkey Hook
+// Shortcut Key Hook
 export function useKeyboardShortcuts() {
  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
@@ -209,7 +209,7 @@ export function useKeyboardShortcuts() {
  // Listen ? key
  useEffect(() => {
  const handleKeyDown = (e: KeyboardEvent) => {
- // IgnoreInput'sbykey
+ // Ignore key events from input fields
  if (
  e.target instanceof HTMLInputElement ||
  e.target instanceof HTMLTextAreaElement

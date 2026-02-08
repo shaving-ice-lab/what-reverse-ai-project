@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AuthenticationStatusManage
+ * Authentication State Management
  */
 
 import { create } from "zustand";
@@ -33,7 +33,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
  persist(
  (set, get) => ({
- // InitialStatus
+ // Initial state
  user: null,
  tokens: null,
  isAuthenticated: false,
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
  isInitialized: false,
  error: null,
  
- // Initial (from localStorage RestoreStatus)
+ // Initialize (restore state from localStorage)
  initialize: async () => {
  const { tokens, isInitialized } = get();
  
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
  
  try {
  if (tokens?.accessToken) {
- // TryFetchCurrentUserInfo
+ // Try to fetch current user info
  const user = await userApi.getCurrentUser();
  set({
  user,
@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthState>()(
  });
  }
  } catch (error) {
- // Token cancanExpired, TryRefresh
+ // Token may have expired, try refreshing
  try {
  await get().refreshToken();
  const user = await userApi.getCurrentUser();
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
  isLoading: false,
  });
  } catch {
- // RefreshFailed, ClearStatus
+ // Refresh failed, clear state
  set({
  user: null,
  tokens: null,
@@ -89,8 +89,8 @@ export const useAuthStore = create<AuthState>()(
  }
  },
  
- // Sign In
- login: async (data: LoginRequest) => {
+ // Sign in
+   login: async (data: LoginRequest) => {
  set({ isLoading: true, error: null });
  
  try {
@@ -103,17 +103,17 @@ export const useAuthStore = create<AuthState>()(
  isLoading: false,
  isInitialized: true,
  });
- // Zustand persist willAutowill tokens Saveto localStorage
+ // Zustand persist will automatically save tokens to localStorage
  } catch (error) {
  set({
  isLoading: false,
- error: error instanceof Error ? error.message: "Sign InFailed",
+ error: error instanceof Error ? error.message : "Sign in failed",
  });
  throw error;
  }
  },
  
- // Sign Up
+ // Sign up
  register: async (data: RegisterRequest) => {
  set({ isLoading: true, error: null });
  
@@ -123,23 +123,23 @@ export const useAuthStore = create<AuthState>()(
  } catch (error) {
  set({
  isLoading: false,
- error: error instanceof Error ? error.message: "Sign UpFailed",
+ error: error instanceof Error ? error.message : "Sign up failed",
  });
  throw error;
  }
  },
  
- // Sign Out
+ // Sign out
  logout: async () => {
  set({ isLoading: true });
  
  try {
  await authApi.logout();
  } catch {
- // nowmake API CallFailedalsoClearLocalStatus
+ // Even if API call fails, still clear local state
  }
  
- // ClearStatus(Reset isInitialized withdowntimescanwithre-newInitial)
+ // Clear state (reset isInitialized so it can be re-initialized next time)
  set({
  user: null,
  tokens: null,
@@ -147,7 +147,7 @@ export const useAuthStore = create<AuthState>()(
  isLoading: false,
  isInitialized: false,
  });
- // Zustand persist willAutowill tokens: null Saveto localStorage
+ // Zustand persist will automatically save tokens: null to localStorage
  },
  
  // Refresh Token
@@ -164,15 +164,15 @@ export const useAuthStore = create<AuthState>()(
  set({
  tokens: response.tokens,
  });
- // Zustand persist willAutoUpdate localStorage
+ // Zustand persist will automatically update localStorage
  } catch (error) {
- // RefreshFailed, Sign OutUser
+ // Refresh failed, sign out user
  await get().logout();
  throw error;
  }
  },
  
- // FetchCurrentUser
+ // Fetch current user
  fetchCurrentUser: async () => {
  set({ isLoading: true });
  
@@ -186,18 +186,18 @@ export const useAuthStore = create<AuthState>()(
  } catch (error) {
  set({
  isLoading: false,
- error: error instanceof Error ? error.message: "FetchUserInfoFailed",
+ error: error instanceof Error ? error.message : "Failed to fetch user info",
  });
  throw error;
  }
  },
  
- // SettingsUserInfo (completeallReplace)
+ // Set user info (full replacement)
  setUser: (user: User) => {
  set({ user, isAuthenticated: true });
  },
  
- // UpdateUserInfo (PartialUpdate)
+ // Update user info (partial update)
  updateUser: (userData: Partial<User>) => {
  const { user } = get();
  if (user) {
@@ -205,7 +205,7 @@ export const useAuthStore = create<AuthState>()(
  }
  },
  
- // ClearError
+ // Clear error
  clearError: () => {
  set({ error: null });
  },

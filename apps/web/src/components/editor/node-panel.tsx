@@ -38,7 +38,7 @@ import type { NodeCategory } from "@/types/workflow";
  * NodePanel - Manus Style
  */
 
-// Manus StyleNodeTypeColor
+// Manus Style Node Type Colors
 const nodeTypeColors = {
  ai: { bg: "bg-brand-200/60", icon: "text-brand-500" },
  logic: { bg: "bg-surface-200/80", icon: "text-foreground-muted" },
@@ -60,14 +60,14 @@ interface NodeDefinition {
 }
 
 const categories: { id: NodeCategory; label: string }[] = [
- { id: "ai", label: "AI Node" },
- { id: "logic", label: "LogicNode" },
- { id: "data", label: "DataNode" },
- { id: "integration", label: "IntegrationNode" },
- { id: "io", label: "InputOutput" },
- { id: "flow", label: "FlowNode" },
- { id: "text", label: "TextNode" },
- { id: "code", label: "CodeNode" },
+  { id: "ai", label: "AI Nodes" },
+  { id: "logic", label: "Logic Nodes" },
+  { id: "data", label: "Data Nodes" },
+  { id: "integration", label: "Integration Nodes" },
+  { id: "io", label: "Input / Output" },
+  { id: "flow", label: "Flow Nodes" },
+  { id: "text", label: "Text Nodes" },
+  { id: "code", label: "Code Nodes" },
 ];
 
 const nodeDefinitions: NodeDefinition[] = [
@@ -75,16 +75,16 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "llm",
  label: "LLM Call",
- description: "CalllargeLanguageModel",
+ description: "Call large language model",
  icon: <Bot className="w-4 h-4" />,
  category: "ai",
  colorType: "ai",
  },
- // LogicNode
- {
- type: "condition",
- label: "ConditionDetermine",
- description: "If/Else Branch",
+  // Logic Nodes
+  {
+    type: "condition",
+    label: "Condition",
+    description: "If/Else branching logic",
  icon: <GitBranch className="w-4 h-4" />,
  category: "logic",
  colorType: "logic",
@@ -92,40 +92,40 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "loop",
  label: "Loop",
- description: "LoopExecute",
+    description: "Loop execution",
  icon: <Repeat className="w-4 h-4" />,
  category: "logic",
  colorType: "logic",
  },
  {
  type: "delay",
- label: "Latency",
- description: "etcpendingSpecifyTime",
+    label: "Delay",
+    description: "Run after a specified delay",
  icon: <Timer className="w-4 h-4" />,
  category: "logic",
  colorType: "logic",
  },
  {
  type: "error",
- label: "ErrorProcess",
- description: "Try/Catch ErrorCapture",
+    label: "Error Handler",
+    description: "Try/Catch error capture",
  icon: <ShieldAlert className="w-4 h-4" />,
  category: "logic",
  colorType: "logic",
  },
- // DataNode
- {
- type: "variable",
- label: "Variable",
- description: "Settings/FetchVariable",
+  // Data Nodes
+  {
+    type: "variable",
+    label: "Variable",
+    description: "Set or get variables",
  icon: <Variable className="w-4 h-4" />,
  category: "data",
  colorType: "data",
  },
  {
  type: "merge",
- label: "and",
- description: "andmultipleData",
+    label: "Merge",
+    description: "Merge multiple data sources",
  icon: <Merge className="w-4 h-4" />,
  category: "data",
  colorType: "data",
@@ -133,7 +133,7 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "filter",
  label: "Filter",
- description: "FilterData",
+    description: "Filter data",
  icon: <Filter className="w-4 h-4" />,
  category: "data",
  colorType: "data",
@@ -141,15 +141,15 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "db_select",
  label: "DB Query",
- description: "ReadDatarow",
+    description: "Read data rows",
  icon: <Database className="w-4 h-4" />,
  category: "data",
  colorType: "data",
  },
  {
  type: "db_insert",
- label: "DB Add",
- description: "enterDatarow",
+    label: "DB Insert",
+    description: "Insert data rows",
  icon: <Plus className="w-4 h-4" />,
  category: "data",
  colorType: "data",
@@ -157,7 +157,7 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "db_update",
  label: "DB Update",
- description: "UpdateDatarow",
+ description: "Update Data Row",
  icon: <Pencil className="w-4 h-4" />,
  category: "data",
  colorType: "data",
@@ -165,7 +165,7 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "db_delete",
  label: "DB Delete",
- description: "DeleteDatarow",
+ description: "Delete Data Row",
  icon: <Trash2 className="w-4 h-4" />,
  category: "data",
  colorType: "data",
@@ -173,16 +173,16 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "db_migrate",
  label: "DB Migration",
- description: "ExecuteStructureChange",
+    description: "Execute schema changes",
  icon: <ArrowUpDown className="w-4 h-4" />,
  category: "data",
  colorType: "data",
  },
- // IntegrationNode
+  // Integration Nodes
  {
  type: "http",
  label: "HTTP Request",
- description: "Send HTTP Request",
+    description: "Send an HTTP request",
  icon: <Globe className="w-4 h-4" />,
  category: "integration",
  colorType: "integration",
@@ -190,75 +190,75 @@ const nodeDefinitions: NodeDefinition[] = [
  {
  type: "webhook",
  label: "Webhook",
- description: "Receive Webhook Request",
+    description: "Receive a webhook request",
  icon: <Webhook className="w-4 h-4" />,
  category: "integration",
  colorType: "integration",
  },
- // InputOutputNode
- {
- type: "input",
- label: "FormInput",
- description: "Definition App FormInputField",
+  // Input / Output Nodes
+  {
+    type: "input",
+    label: "Form Input",
+    description: "Define app form input fields",
  icon: <FormInput className="w-4 h-4" />,
  category: "io",
  colorType: "io",
  },
  {
  type: "output",
- label: "ResultOutput",
- description: "DefinitionRunResultShowcasemethod",
+    label: "Result Output",
+    description: "Define how results are displayed",
  icon: <FileOutput className="w-4 h-4" />,
  category: "io",
  colorType: "io",
  },
- // FlowNode
- {
- type: "start",
- label: "Start",
- description: "WorkflowEntry",
+  // Flow Nodes
+  {
+    type: "start",
+    label: "Start",
+    description: "Workflow entry point",
  icon: <Play className="w-4 h-4" />,
  category: "flow",
  colorType: "flow",
  },
  {
  type: "end",
- label: "End",
- description: "Workflow",
+    label: "End",
+    description: "Workflow exit point",
  icon: <Square className="w-4 h-4" />,
  category: "flow",
  colorType: "io",
  },
- // TextNode
- {
- type: "template",
- label: "TextTemplate",
- description: "TemplateStringRender",
+  // Text Nodes
+  {
+    type: "template",
+    label: "Text Template",
+    description: "Render template strings",
  icon: <FileText className="w-4 h-4" />,
  category: "text",
  colorType: "text",
  },
  {
  type: "split",
- label: "Split/and",
- description: "TextSplitorand",
+    label: "Split / Merge",
+    description: "Split or merge text",
  icon: <Split className="w-4 h-4" />,
  category: "text",
  colorType: "text",
  },
  {
  type: "documentAssembler",
- label: "Documentgroup",
- description: "IntegrateChapterGenerateDocument",
+    label: "Document Assembler",
+    description: "Generate documents from chapters",
  icon: <BookOpen className="w-4 h-4" />,
  category: "text",
  colorType: "text",
  },
- // CodeNode
+  // Code Nodes
  {
  type: "code",
  label: "JavaScript",
- description: "Execute JS Code",
+    description: "Execute JavaScript code",
  icon: <Code2 className="w-4 h-4" />,
  category: "code",
  colorType: "code",
@@ -275,7 +275,7 @@ function NodeItem({ node }: { node: NodeDefinition }) {
  event.dataTransfer.setData("node/label", node.label);
  event.dataTransfer.effectAllowed = "move";
  
- // CreateCustomDrag & DropPreview
+    // Create custom drag preview
  const dragImage = document.createElement('div');
  dragImage.className = 'fixed pointer-events-none z-50 px-3 py-2 rounded-lg bg-surface-100 border border-brand-500/30 shadow-lg shadow-brand-500/10';
  dragImage.innerHTML = `
@@ -289,7 +289,7 @@ function NodeItem({ node }: { node: NodeDefinition }) {
  document.body.appendChild(dragImage);
  event.dataTransfer.setDragImage(dragImage, 50, 25);
  
- // Clean upDrag & DropPreviewElement
+    // Clean up drag preview element
  requestAnimationFrame(() => {
  document.body.removeChild(dragImage);
  });
@@ -358,7 +358,7 @@ function CategorySection({
 
  return (
  <div className="mb-1">
- {/* CategoryTitle - canCollapse */}
+    {/* Category Title - Collapsible */}
  <button
  onClick={() => setIsOpen(!isOpen)}
  className={cn(
@@ -379,7 +379,7 @@ function CategorySection({
  </span>
  </button>
  
- {/* NodeList - canCollapse */}
+      {/* Node List - Collapsible */}
  <div
  className={cn(
  "overflow-hidden transition-all duration-200 ease-out",
@@ -441,7 +441,7 @@ export function NodePanel() {
  <Search className="w-4 h-4 text-foreground-muted shrink-0" />
  <input 
  type="text" 
- placeholder="SearchNode..." 
+ placeholder="Search nodes..." 
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none flex-1 min-w-0"
@@ -465,7 +465,7 @@ export function NodePanel() {
  key={category.id}
  label={category.label}
  nodes={groupedNodes[category.id]}
- defaultOpen={isSearching || index < 3} // SearchtimeallsectionExpand, nothenDefaultExpandbefore3
+ defaultOpen={isSearching || index < 3} // Expand all when searching, otherwise default expand first 3
  />
  ))}
 
@@ -474,18 +474,18 @@ export function NodePanel() {
  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-surface-100 flex items-center justify-center">
  <Search className="h-5 w-5 opacity-40" />
  </div>
- <p className="text-sm font-medium text-foreground-muted">NotoNode</p>
- <p className="text-xs text-foreground-muted mt-1">TryotherheKeywords</p>
+              <p className="text-sm font-medium text-foreground-muted">No nodes found</p>
+              <p className="text-xs text-foreground-muted mt-1">Try different keywords</p>
  </div>
  )}
  </div>
  </ScrollArea>
 
- {/* FooterTip - moreCompact */}
+    {/* Footer Tip */}
  <div className="p-3 border-t border-border">
  <div className="flex items-center justify-center gap-2 text-[11px] text-foreground-muted py-2 px-3 rounded-md bg-linear-to-r from-surface-100 to-surface-100 border border-dashed border-border/70">
  <GripVertical className="h-3 w-3" />
- <span>Drag & DropNodetoCanvas</span>
+          <span>Drag and drop nodes to canvas</span>
  </div>
  </div>
  </aside>

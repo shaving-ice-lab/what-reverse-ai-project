@@ -27,56 +27,56 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// QuickGetting Started
+// Quick Getting Started
 const quickLinks = [
  {
  icon: Rocket,
- title: "5 minQuickStart",
- description: "fromStartCreateyou's#1Workflow",
+ title: "5-Minute Quick Start",
+ description: "Create your first workflow from scratch",
  href: "/docs/getting-started",
  },
  {
  icon: BookOpen,
- title: "CoreConcept",
- description: "Workflow, Node, TriggeretcCoreConcept",
+    title: "Core Concepts",
+    description: "Workflows, nodes, triggers, and other core concepts",
  href: "/docs/concepts",
  },
  {
  icon: Video,
- title: "VideoTutorial",
- description: "ViaVideoQuickMasterUsageTips",
+    title: "Video Tutorials",
+    description: "Quickly master usage tips through video tutorials",
  href: "/docs/tutorials",
  },
 ];
 
-// DocumentCategory
+// Document Categories
 const categories = [
  {
- title: "UsageGuide",
- icon: BookOpen,
- description: "LearnifwhatUsage AgentFlow",
- links: [
- { title: "CreateWorkflow", href: "/docs/guide/workflows" },
- { title: "Usage AI Agent", href: "/docs/guide/agents" },
- { title: "SettingsTrigger", href: "/docs/guide/triggers" },
- { title: "DataProcess", href: "/docs/guide/data" },
- ],
+    title: "User Guide",
+    icon: BookOpen,
+    description: "Learn how to use AgentFlow",
+    links: [
+      { title: "Create Workflows", href: "/docs/guide/workflows" },
+      { title: "Using AI Agents", href: "/docs/guide/agents" },
+      { title: "Set Up Triggers", href: "/docs/guide/triggers" },
+      { title: "Data Processing", href: "/docs/guide/data" },
+    ],
  },
  {
- title: "IntegrationGuide",
- icon: Puzzle,
- description: "ConnectThird-partyService",
- links: [
- { title: "Slack Integration", href: "/docs/integrations/slack" },
- { title: "GitHub Integration", href: "/docs/integrations/github" },
- { title: "DatabaseConnect", href: "/docs/integrations/database" },
- { title: "Custom Webhook", href: "/docs/integrations/webhook" },
- ],
+    title: "Integration Guide",
+    icon: Puzzle,
+    description: "Connect third-party services",
+    links: [
+      { title: "Slack Integration", href: "/docs/integrations/slack" },
+      { title: "GitHub Integration", href: "/docs/integrations/github" },
+      { title: "Database Connection", href: "/docs/integrations/database" },
+      { title: "Custom Webhook", href: "/docs/integrations/webhook" },
+    ],
  },
  {
  title: "API Reference",
  icon: Code,
- description: "Complete's API Document",
+    description: "Complete API documentation",
  links: [
  { title: "REST API", href: "/docs/api/rest" },
  { title: "Workflow API", href: "/docs/api/workflows" },
@@ -85,24 +85,24 @@ const categories = [
  ],
  },
  {
- title: "AdvancedTheme",
- icon: Settings,
- description: "enterAdvancedFeatures",
- links: [
- { title: "CustomNode", href: "/docs/advanced/custom-nodes" },
- { title: "canoptimal", href: "/docs/advanced/performance" },
- { title: "ErrorProcess", href: "/docs/advanced/error-handling" },
- { title: "PrivateDeploy", href: "/docs/advanced/self-hosted" },
- ],
+    title: "Advanced Topics",
+    icon: Settings,
+    description: "Explore advanced features",
+    links: [
+      { title: "Custom Nodes", href: "/docs/advanced/custom-nodes" },
+      { title: "Performance Optimization", href: "/docs/advanced/performance" },
+      { title: "Error Handling", href: "/docs/advanced/error-handling" },
+      { title: "Self-Hosted Deployment", href: "/docs/advanced/self-hosted" },
+    ],
  },
 ];
 
-// PopularArticle
+// Popular Articles
 const popularArticles = [
- { title: "ifwhatCreate#1 AI Workflow", href: "/docs/guide/first-workflow" },
- { title: "useIntegrationConfigGuide", href: "/docs/integrations/guide" },
- { title: "WorkflowcanoptimalTips", href: "/docs/advanced/performance" },
- { title: "API AuthenticationandAuthorize", href: "/docs/api/authentication" },
+  { title: "How to Create Your First AI Workflow", href: "/docs/guide/first-workflow" },
+  { title: "Integration Configuration Guide", href: "/docs/integrations/guide" },
+  { title: "Workflow Performance Optimization Tips", href: "/docs/advanced/performance" },
+  { title: "API Authentication and Authorization", href: "/docs/api/authentication" },
 ];
 
 export default function DocsPage() {
@@ -117,21 +117,21 @@ export default function DocsPage() {
  <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
  <div className="lobe-badge mb-8">
  <BookOpen className="h-3.5 w-3.5" />
- <span>Documentcenter</span>
- </div>
+            <span>Documentation</span>
+          </div>
 
- <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- Documentcenter
- </h1>
- <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- fromGetting StartedtoExpert, thisinhasyouneedneed's1Materials
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+            Documentation Center
+          </h1>
+          <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
+            From beginner to expert, find all the resources you need here
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchDocument..."
+ placeholder="Search documentation..."
  className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
  />
  </div>
@@ -142,8 +142,8 @@ export default function DocsPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>QuickGetting Started</h2>
- <p>most'smethodStartUsage AgentFlow</p>
+              <h2>Quick Start</h2>
+              <p>The fastest way to start using AgentFlow</p>
  </div>
 
  <div className="grid md:grid-cols-3 gap-4">
@@ -177,8 +177,8 @@ export default function DocsPage() {
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>DocumentCategory</h2>
- <p>byThemeBrowseComplete'sDocumentMaterials</p>
+              <h2>Documentation Categories</h2>
+              <p>Browse complete documentation by topic</p>
  </div>
 
  <div className="grid md:grid-cols-2 gap-4">
@@ -228,8 +228,8 @@ export default function DocsPage() {
  <section className="py-24 sm:py-32">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>PopularArticle</h2>
- <p>mostWelcome'sDocumentContent</p>
+              <h2>Popular Articles</h2>
+              <p>Most popular documentation content</p>
  </div>
 
  <div className="grid sm:grid-cols-2 gap-4">
@@ -261,22 +261,22 @@ export default function DocsPage() {
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
  <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- needneedmoremultipleHelp?
- </h2>
- <p className="text-foreground-light mb-8">
- JoinWe'sCommunityorContactSupportTeam
+            Need More Help?
+          </h2>
+          <p className="text-foreground-light mb-8">
+            Join our community or contact the support team
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/community">
  <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
  <Users className="w-4 h-4 mr-2" />
- JoinCommunity
+              Join Community
  </Button>
  </Link>
  <Link href="/contact">
  <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
  <MessageSquare className="w-4 h-4 mr-2" />
- ContactSupport
+              Contact Support
  </Button>
  </Link>
  </div>

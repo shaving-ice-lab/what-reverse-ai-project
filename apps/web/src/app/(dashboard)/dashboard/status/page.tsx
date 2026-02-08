@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SystemStatusPage
- * DisplayService'sRunStatusandHealthCheck
+ * System Status Page
+ * Display service running status and health checks
  */
 
 import { useState, useEffect } from "react";
@@ -54,10 +54,10 @@ import {
  Minus,
 } from "lucide-react";
 
-// ServiceStatusConfig
+// Service Status Config
 const statusConfig = {
  operational: {
- label: "NormalRun",
+ label: "Operational",
  color: "text-brand-500",
  bg: "bg-brand-500",
  bgLight: "bg-brand-200/70",
@@ -65,7 +65,7 @@ const statusConfig = {
  badgeClassName: "border-brand-500/30",
  },
  degraded: {
- label: "canDecline",
+ label: "Degraded",
  color: "text-warning",
  bg: "bg-warning",
  bgLight: "bg-warning-200/70",
@@ -81,7 +81,7 @@ const statusConfig = {
  badgeClassName: "border-warning/40",
  },
  major: {
- label: "re-largeFault",
+ label: "Major Outage",
  color: "text-destructive",
  bg: "bg-destructive",
  bgLight: "bg-destructive-200/70",
@@ -89,7 +89,7 @@ const statusConfig = {
  badgeClassName: "border-destructive/40",
  },
  maintenance: {
- label: "Maintain",
+ label: "Maintenance",
  color: "text-foreground-light",
  bg: "bg-surface-200",
  bgLight: "bg-surface-200",
@@ -98,119 +98,119 @@ const statusConfig = {
  },
 };
 
-// ServiceList
+// Service List
 const services = [
  {
  id: "api",
  name: "API Service",
- description: "Core API InterfaceService",
+ description: "Core API Interface Service",
  icon: Server,
  status: "operational",
  uptime: 99.98,
  responseTime: 45,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "ai-engine",
  name: "AI Engine",
- description: "AI ModelInferenceService",
+ description: "AI Model Inference Service",
  icon: Cpu,
  status: "operational",
  uptime: 99.95,
  responseTime: 120,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "workflow",
- name: "WorkflowEngine",
- description: "WorkflowExecuteandSchedule",
+ name: "Workflow Engine",
+ description: "Workflow Execution and Scheduling",
  icon: Zap,
  status: "operational",
  uptime: 99.99,
  responseTime: 35,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "database",
  name: "Database",
- description: "mainDatabaseCluster",
+ description: "Primary Database Cluster",
  icon: Database,
  status: "operational",
  uptime: 99.99,
  responseTime: 12,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "storage",
- name: "FileStorage",
- description: "forStorageService",
+ name: "File Storage",
+ description: "Object Storage Service",
  icon: HardDrive,
  status: "degraded",
  uptime: 99.85,
  responseTime: 180,
- lastChecked: "1 minbefore",
- issue: "UploadSpeedhasDecline",
+ lastChecked: "1 min ago",
+ issue: "Upload speed has degraded",
  },
  {
  id: "cdn",
  name: "CDN",
- description: "ContentDistributeNetwork",
+ description: "Content Distribution Network",
  icon: Globe,
  status: "operational",
  uptime: 99.97,
  responseTime: 25,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "websocket",
  name: "WebSocket",
- description: "Real-timeCommunicationService",
+ description: "Real-time Communication Service",
  icon: Wifi,
  status: "operational",
  uptime: 99.92,
  responseTime: 15,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
  {
  id: "auth",
- name: "AuthenticationService",
- description: "UserAuthenticationandAuthorize",
+ name: "Authentication Service",
+ description: "User Authentication and Authorization",
  icon: Shield,
  status: "operational",
  uptime: 99.99,
  responseTime: 28,
- lastChecked: "1 minbefore",
+ lastChecked: "1 min ago",
  },
 ];
 
-// RecentEvent
+// Recent Incidents
 const recentIncidents = [
  {
  id: "1",
- title: "FileStorageServicecanDecline",
+ title: "File Storage Service Degraded",
  status: "investigating",
  severity: "minor",
  startTime: "2026-01-31T09:30:00Z",
  updates: [
- { time: "10:15", message: "alreadyIssue, currentlyatProceedFix" },
- { time: "09:45", message: "currentlyat" },
- { time: "09:30", message: "DetecttoFileUploadSpeedDecline" },
+ { time: "10:15", message: "Issue identified, fix in progress" },
+ { time: "09:45", message: "Investigating" },
+ { time: "09:30", message: "Detected file upload speed degradation" },
  ],
  },
  {
  id: "2",
- title: "PlanMaintain: DatabaseUpgrade",
+ title: "Planned Maintenance: Database Upgrade",
  status: "scheduled",
  severity: "maintenance",
  startTime: "2026-02-01T02:00:00Z",
  endTime: "2026-02-01T04:00:00Z",
  updates: [
- { time: "Preview", message: "willProceedDatabaseVersionUpgrade, EstimatedImpact 2 h" },
+ { time: "Preview", message: "Database version upgrade planned, estimated impact 2 hours" },
  ],
  },
 ];
 
-// HistoryAvailableData(Recent90days)
+// Historical Availability Data (Last 90 days)
 const uptimeHistory = Array.from({ length: 90 }, (_, i) => ({
  date: new Date(Date.now() - (89 - i) * 24 * 60 * 60 * 1000),
  status: Math.random() > 0.05 ? "operational" : Math.random() > 0.5 ? "degraded" : "partial",
@@ -242,7 +242,7 @@ export default function StatusPage() {
  }, 1000);
  };
 
- // AutoRefresh
+ // Auto Refresh
  useEffect(() => {
  const interval = setInterval(() => {
  setLastUpdated(new Date());
@@ -276,7 +276,7 @@ export default function StatusPage() {
  } catch (error) {
  if (!isActive) return;
  console.error("Failed to load plan data:", error);
- setPlanError("PlanningFailed to load data, Please try again laterRetry.");
+ setPlanError("Failed to load planning data. Please try again later.");
  } finally {
  if (isActive) setPlanLoading(false);
  }
@@ -306,7 +306,7 @@ export default function StatusPage() {
  } catch (error) {
  if (!isActive) return;
  console.error("Failed to load observability plan data:", error);
- setObservabilityError("MonitorMetricsandTrackingPlanLoadFailed, Please try again laterRetry.");
+ setObservabilityError("Failed to load monitoring metrics and tracking plans. Please try again later.");
  } finally {
  if (isActive) setObservabilityLoading(false);
  }
@@ -318,7 +318,7 @@ export default function StatusPage() {
  };
  }, []);
 
- // CalculateOverallStatus
+ // Calculate Overall Status
  const overallStatus = services.every((s) => s.status === "operational")
  ? "operational"
  : services.some((s) => s.status === "major")
@@ -334,8 +334,8 @@ export default function StatusPage() {
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="SystemStatus"
- description="Real-timeMonitorAllService'sRunStatusandHealthCheck"
+ title="System Status"
+ description="Real-time monitoring of all service running status and health checks"
  actions={(
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -347,7 +347,7 @@ export default function StatusPage() {
  Refresh
  </Button>
  <Button variant="outline" size="sm" leftIcon={<Bell className="w-4 h-4" />}>
- SubscriptionNotifications
+ Subscribe to Notifications
  </Button>
  </div>
  )}
@@ -355,7 +355,7 @@ export default function StatusPage() {
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5" />
- Updateat {lastUpdated.toLocaleTimeString("zh-CN")}
+ Updated at {lastUpdated.toLocaleTimeString("zh-CN")}
  </span>
  <Badge
  variant={overallConfig.badgeVariant}
@@ -366,21 +366,21 @@ export default function StatusPage() {
  </Badge>
  <span className="inline-flex items-center gap-1.5">
  <Server className="w-3.5 h-3.5" />
- Monitor {services.length} Service
+ Monitoring {services.length} Services
  </span>
  </div>
  </PageHeader>
 
  <div className="page-divider" />
 
- {/* StatusOverview */}
+ {/* Status Overview */}
  <section className="page-grid lg:grid-cols-[2fr_1fr]">
  <div className="page-panel">
  <div className="page-panel-header flex flex-wrap items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">OverallStatus</p>
+ <p className="page-panel-title">Overall Status</p>
  <p className="page-panel-description">
- {overallStatus === "operational" ? "AllSystemRunNormal": "SystematException"}
+ {overallStatus === "operational" ? "All systems operating normally" : "System experiencing issues"}
  </p>
  </div>
  <Badge
@@ -404,19 +404,19 @@ export default function StatusPage() {
  )}
  </div>
  <div className="space-y-1">
- <p className="text-sm font-medium text-foreground">SystemHealth</p>
+ <p className="text-sm font-medium text-foreground">System Health</p>
  <p className="text-[13px] text-foreground-light">
- alreadyMonitor {services.length} CoreService
+ Monitoring {services.length} core services
  </p>
  </div>
  </div>
  <div className="flex flex-wrap gap-6 text-right">
  <div>
- <p className="text-xs text-foreground-muted">30 daysAverageAvailable</p>
+ <p className="text-xs text-foreground-muted">30-Day Avg. Uptime</p>
  <p className="text-2xl font-semibold text-foreground">{avgUptime}%</p>
  </div>
  <div>
- <p className="text-xs text-foreground-muted">ActiveEvent</p>
+ <p className="text-xs text-foreground-muted">Active Incidents</p>
  <p className="text-2xl font-semibold text-foreground">{recentIncidents.length}</p>
  </div>
  </div>
@@ -433,43 +433,43 @@ export default function StatusPage() {
 
  <div className="page-panel">
  <div className="page-panel-header">
- <p className="page-panel-title">MonitorSummary</p>
- <p className="page-panel-description">mostnewRefreshandSubscriptionOverview</p>
+ <p className="page-panel-title">Monitoring Summary</p>
+ <p className="page-panel-description">Latest refresh and subscription overview</p>
  </div>
  <div className="p-5 space-y-4 text-sm">
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">RefreshTime</span>
+ <span className="text-foreground-muted">Last Refreshed</span>
  <span className="font-mono text-foreground">
  {lastUpdated.toLocaleTimeString("zh-CN")}
  </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">MonitorService</span>
+ <span className="text-foreground-muted">Monitored Services</span>
  <span className="text-foreground">{services.length} </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">NotificationsSubscription</span>
+ <span className="text-foreground-muted">Notification Subscription</span>
  <Badge variant="secondary" size="sm" className="bg-surface-200 text-foreground-light">
- not yetSubscription
+ Not Subscribed
  </Badge>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">StatusView</span>
+ <span className="text-foreground-muted">Status View</span>
  <span className="text-foreground">all</span>
  </div>
  </div>
  </div>
  </section>
 
- {/* 90 daysAvailableHistory */}
+ {/* 90-Day Availability History */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">AvailableHistory</p>
- <p className="page-panel-description">Past 90 daysStatusOverview</p>
+ <p className="page-panel-title">Availability History</p>
+ <p className="page-panel-description">Past 90 days status overview</p>
  </div>
  <span className="text-[13px] text-foreground-light">
- OverallAvailable 99.95%
+ Overall Uptime 99.95%
  </span>
  </div>
  <div className="p-5">
@@ -486,7 +486,7 @@ export default function StatusPage() {
  })}
  </div>
  <div className="flex items-center justify-between mt-2 text-xs text-foreground-muted">
- <span>90 daysbefore</span>
+ <span>90 days ago</span>
  <div className="flex items-center gap-4">
  {Object.entries(statusConfig).slice(0, 3).map(([key, config]) => (
  <span key={key} className="flex items-center gap-1">
@@ -500,16 +500,16 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* ServiceList */}
+ {/* Service List */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">ServiceStatus</p>
- <p className="page-panel-description">keyServiceRunSituation</p>
+ <p className="page-panel-title">Service Status</p>
+ <p className="page-panel-description">Key service operational status</p>
  </div>
  <Button variant="outline" size="sm" className="border-border text-foreground-light hover:text-foreground">
  <Download className="w-4 h-4 mr-2" />
- ExportReport
+ Export Report
  </Button>
  </div>
  <div className="divide-y divide-border">
@@ -551,7 +551,7 @@ export default function StatusPage() {
  <p className="text-sm font-medium text-foreground">{service.responseTime}ms</p>
  </div>
  <div>
- <p>CheckTime</p>
+ <p>Last Checked</p>
  <p className="text-sm font-medium text-foreground">{service.lastChecked}</p>
  </div>
  </div>
@@ -562,15 +562,15 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* RecentEvent */}
+ {/* Recent Incidents */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">RecentEvent</p>
- <p className="page-panel-description">mostnewMaintainandAlertRecord</p>
+ <p className="page-panel-title">Recent Incidents</p>
+ <p className="page-panel-description">Recent maintenance and alert records</p>
  </div>
  <Button variant="ghost" size="sm" className="text-foreground-light hover:text-foreground">
- ViewHistory <ExternalLink className="w-4 h-4 ml-1" />
+ View History <ExternalLink className="w-4 h-4 ml-1" />
  </Button>
  </div>
 
@@ -578,8 +578,8 @@ export default function StatusPage() {
  {recentIncidents.length === 0 ? (
  <div className="p-8 rounded-md bg-surface-100 border border-border text-center">
  <CheckCircle2 className="w-10 h-10 text-brand-500 mx-auto mb-4" />
- <p className="text-foreground text-sm font-medium">NoActive'sEvent</p>
- <p className="text-[13px] text-foreground-light">AllSystemRunNormal</p>
+ <p className="text-foreground text-sm font-medium">No Active Incidents</p>
+ <p className="text-[13px] text-foreground-light">All systems operating normally</p>
  </div>
  ) : (
  <div className="space-y-4">
@@ -614,8 +614,8 @@ export default function StatusPage() {
  </div>
  <p className="text-[13px] text-foreground-light">
  {incident.status === "scheduled"
- ? `PlanTime: ${new Date(incident.startTime).toLocaleString("zh-CN")}`
-: `Startat ${new Date(incident.startTime).toLocaleString("zh-CN")}`}
+ ? `Scheduled: ${new Date(incident.startTime).toLocaleString("zh-CN")}`
+: `Started at ${new Date(incident.startTime).toLocaleString("zh-CN")}`}
  </p>
  </div>
  <Badge
@@ -628,10 +628,10 @@ export default function StatusPage() {
  )}
  >
  {incident.status === "scheduled"
- ? "alreadyPlan"
+ ? "Scheduled"
  : incident.status === "investigating"
- ? ""
-: "alreadyResolve"}
+ ? "Investigating"
+: "Resolved"}
  </Badge>
  </div>
 
@@ -653,12 +653,12 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* FaultDrillandshouldContingency */}
+ {/* Incident Drills and Contingency */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">FaultDrillandshouldContingency</p>
- <p className="page-panel-description">DrillChecklist, ResponsibilityandTemplate</p>
+ <p className="page-panel-title">Incident Drills & Contingency</p>
+ <p className="page-panel-description">Drill checklist, responsibilities, and templates</p>
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  Playbook
@@ -667,7 +667,7 @@ export default function StatusPage() {
  <div className="p-5 space-y-4">
  {planLoading ? (
  <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
- LoadingDrillandContingencyData...
+ Loading drill and contingency data...
  </div>
  ) : planError ? (
  <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
@@ -679,14 +679,14 @@ export default function StatusPage() {
  <div className="flex items-center justify-between gap-2">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <Calendar className="w-4 h-4 text-foreground-light" />
- {incidentPlans?.title || "keyFaultDrillPlan"}
+ {incidentPlans?.title || "Key Incident Drill Plan"}
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  {incidentPlans?.drills?.length ?? 0} 
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {incidentPlans?.summary || "NoneDrillPlan."}
+ {incidentPlans?.summary || "No drill plans configured."}
  </p>
  <div className="space-y-3">
  {(incidentPlans?.drills || []).map((drill) => (
@@ -700,7 +700,7 @@ export default function StatusPage() {
  {drill.severity}
  </Badge>
  </div>
- <div className="text-[11px] text-foreground-light">times: {drill.frequency}</div>
+                  <div className="text-[11px] text-foreground-light">Frequency: {drill.frequency}</div>
  <div className="text-[11px] text-foreground-light">
  Scenario: {drill.scenarios.map((scenario) => scenario.title).join(" / ")}
  </div>
@@ -716,7 +716,7 @@ export default function StatusPage() {
  ))}
  {(incidentPlans?.drills || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- NoneDrillitem.
+ No drill items.
  </div>
  )}
  </div>
@@ -730,10 +730,10 @@ export default function StatusPage() {
  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <Shield className="w-4 h-4 text-foreground-light" />
- {incidentOwners?.title || "shouldResponseandRollbackResponsibility"}
+ {incidentOwners?.title || "Incident Response and Rollback Responsibilities"}
  </div>
  <p className="text-[12px] text-foreground-light">
- {incidentOwners?.summary || "NoneResponsibilitypersonConfig."}
+ {incidentOwners?.summary || "No responsibility owners configured."}
  </p>
  <div className="space-y-3">
  {(incidentOwners?.roles || []).map((role) => (
@@ -743,7 +743,7 @@ export default function StatusPage() {
  >
  <div className="text-[13px] text-foreground font-medium">{role.role}</div>
  <div className="text-[11px] text-foreground-light">
- mainOwner: {role.primary} · Backup: {role.backup}
+ Primary: {role.primary} · Backup: {role.backup}
  </div>
  <ul className="list-disc pl-4 text-[11px] text-foreground-light">
  {role.responsibilities.map((item) => (
@@ -754,13 +754,13 @@ export default function StatusPage() {
  ))}
  {(incidentOwners?.roles || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- NoneRoleConfig.
+ No roles configured.
  </div>
  )}
  </div>
  {(incidentOwners?.escalation || []).length > 0 && (
  <div className="rounded-md border border-border bg-background-200 p-3 space-y-1">
- <div className="text-[11px] text-foreground-light">UpgradePath</div>
+ <div className="text-[11px] text-foreground-light">Escalation Path</div>
  {(incidentOwners?.escalation || []).map((item) => (
  <div key={item.level} className="text-[11px] text-foreground">
  {item.level} · {item.condition} · {item.action}
@@ -776,7 +776,7 @@ export default function StatusPage() {
  {postmortemTemplate?.title || "Template"}
  </div>
  <p className="text-[12px] text-foreground-light">
- {postmortemTemplate?.summary || "NoneTemplate."}
+ {postmortemTemplate?.summary || "No template configured."}
  </p>
  <div className="space-y-3">
  {(postmortemTemplate?.sections || []).map((section) => (
@@ -792,14 +792,14 @@ export default function StatusPage() {
  </ul>
  {section.questions.length > 2 && (
  <div className="text-[10px] text-foreground-light">
- stillhas {section.questions.length - 2} Issuenot yetShowcase
+ {section.questions.length - 2} more questions not shown
  </div>
  )}
  </div>
  ))}
  {(postmortemTemplate?.sections || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- NoneTemplateitem.
+ No template items.
  </div>
  )}
  </div>
@@ -819,12 +819,12 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* MonitorMetricscharandTrackingPlan */}
+ {/* Monitoring Metrics and Tracking Plans */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">MonitorMetricscharandTrackingPlan</p>
- <p className="page-panel-description">Prometheus MetricsandbeforeafterendpointTrackingEventDefinition</p>
+ <p className="page-panel-title">Monitoring Metrics & Tracking Plans</p>
+ <p className="page-panel-description">Prometheus metrics and frontend/backend tracking event definitions</p>
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  Observability
@@ -833,7 +833,7 @@ export default function StatusPage() {
  <div className="p-5 space-y-4">
  {observabilityLoading ? (
  <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
- LoadingMonitorMetricsandTrackingPlan...
+ Loading monitoring metrics and tracking plans...
  </div>
  ) : observabilityError ? (
  <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
@@ -845,14 +845,14 @@ export default function StatusPage() {
  <div className="flex items-center justify-between gap-2">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <TrendingUp className="w-4 h-4 text-foreground-light" />
- {metricsDictionary?.title || "Metricschar"}
+ {metricsDictionary?.title || "Metrics Dictionary"}
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  {metricsDictionary?.metrics?.length ?? 0} 
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {metricsDictionary?.summary || "NoneMetricscharDescription."}
+ {metricsDictionary?.summary || "No metrics dictionary description."}
  </p>
  <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
  {(metricsDictionary?.metrics || []).map((metric) => (
@@ -877,7 +877,7 @@ export default function StatusPage() {
  ))}
  {(metricsDictionary?.metrics || []).length === 0 && (
  <div className="px-3 py-3 text-[11px] text-foreground-light">
- NoneMetricsitem.
+ No metrics items.
  </div>
  )}
  </div>
@@ -892,14 +892,14 @@ export default function StatusPage() {
  <div className="flex items-center justify-between gap-2">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <Zap className="w-4 h-4 text-foreground-light" />
- {frontendTrackingPlan?.title || "beforeendpointTrackingEvent"}
+ {frontendTrackingPlan?.title || "Frontend Tracking Events"}
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  {frontendTrackingPlan?.events?.length ?? 0} 
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {frontendTrackingPlan?.summary || "NonebeforeendpointTrackingDescription."}
+ {frontendTrackingPlan?.summary || "No frontend tracking description."}
  </p>
  <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
  {(frontendTrackingPlan?.events || []).map((event) => (
@@ -912,14 +912,14 @@ export default function StatusPage() {
  </div>
  <div className="text-[11px] text-foreground-light">{event.description}</div>
  <div className="text-[10px] text-foreground-light">Trigger: {event.trigger}</div>
- <div className="text-[10px] text-foreground-light">
- : {event.properties.join(", ")}
- </div>
- </div>
- ))}
- {(frontendTrackingPlan?.events || []).length === 0 && (
+                <div className="text-[10px] text-foreground-light">
+                  Properties: {event.properties.join(", ")}
+                </div>
+              </div>
+            ))}
+            {(frontendTrackingPlan?.events || []).length === 0 && (
  <div className="px-3 py-3 text-[11px] text-foreground-light">
- NonebeforeendpointTrackingEvent.
+ No frontend tracking events.
  </div>
  )}
  </div>
@@ -934,14 +934,14 @@ export default function StatusPage() {
  <div className="flex items-center justify-between gap-2">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <Server className="w-4 h-4 text-foreground-light" />
- {backendTrackingPlan?.title || "afterendpointTrackingEvent"}
+ {backendTrackingPlan?.title || "Backend Tracking Events"}
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  {backendTrackingPlan?.events?.length ?? 0} 
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {backendTrackingPlan?.summary || "NoneafterendpointTrackingDescription."}
+ {backendTrackingPlan?.summary || "No backend tracking description."}
  </p>
  <div className="rounded-md border border-border bg-background-200/40 max-h-[360px] overflow-y-auto divide-y divide-border">
  {(backendTrackingPlan?.events || []).map((event) => (
@@ -954,14 +954,14 @@ export default function StatusPage() {
  </div>
  <div className="text-[11px] text-foreground-light">{event.description}</div>
  <div className="text-[10px] text-foreground-light">Trigger: {event.trigger}</div>
- <div className="text-[10px] text-foreground-light">
- : {event.properties.join(", ")}
- </div>
- </div>
- ))}
- {(backendTrackingPlan?.events || []).length === 0 && (
+                <div className="text-[10px] text-foreground-light">
+                  Properties: {event.properties.join(", ")}
+                </div>
+              </div>
+            ))}
+            {(backendTrackingPlan?.events || []).length === 0 && (
  <div className="px-3 py-3 text-[11px] text-foreground-light">
- NoneafterendpointTrackingEvent.
+ No backend tracking events.
  </div>
  )}
  </div>
@@ -976,12 +976,12 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* AvailableandErrorBudget(SRE) */}
+ {/* Availability and Error Budget (SRE) */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-3">
  <div>
- <p className="page-panel-title">AvailableandErrorBudget(SRE)</p>
- <p className="page-panel-description">ErrorBudget, ComposeMonitor, valueSLO andStable</p>
+ <p className="page-panel-title">Availability & Error Budget (SRE)</p>
+ <p className="page-panel-description">Error budget, synthetic monitoring, on-call SLO, and stability</p>
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  SRE
@@ -990,7 +990,7 @@ export default function StatusPage() {
  <div className="p-5 space-y-4">
  {planLoading ? (
  <div className="rounded-lg border border-border bg-surface-100 px-4 py-3 text-xs text-foreground-light">
- Loading SRE PlanningData...
+ Loading SRE planning data...
  </div>
  ) : planError ? (
  <div className="rounded-lg border border-destructive/50 bg-destructive-200/40 px-4 py-3 text-xs text-destructive">
@@ -1009,7 +1009,7 @@ export default function StatusPage() {
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {errorBudgetPolicy?.summary || "NoneErrorBudgetRule."}
+ {errorBudgetPolicy?.summary || "No error budget rules configured."}
  </p>
  <div className="space-y-2">
  {(errorBudgetPolicy?.rules || []).slice(0, 3).map((rule) => (
@@ -1030,7 +1030,7 @@ export default function StatusPage() {
  ))}
  {(errorBudgetPolicy?.rules || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- NoneRuleitem.
+ No rule items.
  </div>
  )}
  </div>
@@ -1040,14 +1040,14 @@ export default function StatusPage() {
  <div className="flex items-center justify-between gap-2">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <Radar className="w-4 h-4 text-foreground-light" />
- {syntheticPlan?.title || "ComposeMonitorPlan"}
+ {syntheticPlan?.title || "Synthetic Monitoring Plan"}
  </div>
  <Badge variant="outline" size="sm" className="border-border text-foreground-light">
  {syntheticPlan?.probes?.length ?? 0} 
  </Badge>
  </div>
  <p className="text-[12px] text-foreground-light">
- {syntheticPlan?.summary || "NoneComposeMonitorConfig."}
+ {syntheticPlan?.summary || "No synthetic monitoring configured."}
  </p>
  <div className="space-y-2">
  {(syntheticPlan?.probes || []).slice(0, 3).map((probe) => (
@@ -1060,13 +1060,13 @@ export default function StatusPage() {
  {probe.method} {probe.target}
  </div>
  <div className="text-[11px] text-foreground-light">
- times {probe.frequency} · Region {probe.locations.join(" / ")}
+                  Frequency: {probe.frequency} · Regions: {probe.locations.join(" / ")}
  </div>
  </div>
  ))}
  {(syntheticPlan?.probes || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- Noneitem.
+ No items.
  </div>
  )}
  </div>
@@ -1075,10 +1075,10 @@ export default function StatusPage() {
  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <PhoneCall className="w-4 h-4 text-foreground-light" />
- {oncallSLO?.title || "valueandResponse SLO"}
+ {oncallSLO?.title || "On-Call & Response SLO"}
  </div>
  <p className="text-[12px] text-foreground-light">
- {oncallSLO?.summary || "Nonevalue SLO Config."}
+ {oncallSLO?.summary || "No on-call SLO configured."}
  </p>
  <div className="space-y-2">
  {(oncallSLO?.targets || []).map((target) => (
@@ -1097,7 +1097,7 @@ export default function StatusPage() {
  ))}
  {(oncallSLO?.targets || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- NoneResponseTarget.
+ No response targets.
  </div>
  )}
  </div>
@@ -1106,10 +1106,10 @@ export default function StatusPage() {
  <div className="rounded-lg border border-border bg-surface-100 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm text-foreground">
  <ShieldCheck className="w-4 h-4 text-foreground-light" />
- {stabilityPlan?.title || "Stable"}
+ {stabilityPlan?.title || "Stability Plan"}
  </div>
  <p className="text-[12px] text-foreground-light">
- {stabilityPlan?.summary || "NoneStablePlan."}
+ {stabilityPlan?.summary || "No stability plan configured."}
  </p>
  <div className="space-y-2">
  {(stabilityPlan?.tracks || []).slice(0, 3).map((track) => (
@@ -1118,7 +1118,7 @@ export default function StatusPage() {
  className="rounded-md border border-border bg-background-200 p-3 space-y-1"
  >
  <div className="text-[12px] text-foreground font-medium">{track.title}</div>
- <div className="text-[11px] text-foreground-light">times: {track.cadence}</div>
+                <div className="text-[11px] text-foreground-light">Cadence: {track.cadence}</div>
  <div className="text-[11px] text-foreground-light">
  Owner: {track.owners.join(" / ")}
  </div>
@@ -1126,7 +1126,7 @@ export default function StatusPage() {
  ))}
  {(stabilityPlan?.tracks || []).length === 0 && (
  <div className="rounded-md border border-dashed border-border p-3 text-[11px] text-foreground-light">
- Noneitem.
+ No items.
  </div>
  )}
  </div>
@@ -1136,21 +1136,21 @@ export default function StatusPage() {
  </div>
  </section>
 
- {/* SubscriptionTip */}
+ {/* Subscription Tip */}
  <section className="page-panel border border-brand-400/30 bg-brand-200/40">
  <div className="page-panel-header">
- <p className="page-panel-title">SubscriptionStatusUpdate</p>
+ <p className="page-panel-title">Subscribe to Status Updates</p>
  <p className="page-panel-description">
- ReceiveSystemStatusChangeandMaintainPlan'sReal-timeNotifications
+ Receive real-time notifications about system status changes and maintenance plans
  </p>
  </div>
  <div className="px-6 pb-6 flex flex-wrap items-center justify-between gap-4">
  <div className="text-[13px] text-foreground-light">
- SupportEmail, Webhook etcmultipletypeNotificationsChannel
+ Supports Email, Webhook, and other notification channels
  </div>
  <div className="flex items-center gap-2">
  <Button variant="outline" size="sm" className="border-border text-foreground-light hover:text-foreground">
- EmailSubscription
+ Email Subscription
  </Button>
  <Button size="sm" className="bg-brand-500 hover:bg-brand-600 text-background">
  Webhook Subscription

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * LoadStatusComponent - Manus Style(Support/Theme)
+ * Loading State Component - Manus Style (Supports theming)
  */
 
 import { cn } from "@/lib/utils";
@@ -129,7 +129,7 @@ export function FullscreenLoader({ visible, message = "Loading..." }: Fullscreen
 }
 
 /**
- * Skeleton BasicComponent - Usage shimmer Animation
+ * Skeleton - Basic component using shimmer animation
  */
 interface SkeletonProps {
  className?: string;

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * TagsInputComponent
- * Used forInputandManagemultipleTags
+ * Tags Input Component
+ * Used for inputting and managing multiple tags
  */
 
 import { useState, useRef, KeyboardEvent } from "react";
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "./badge";
 
 // ============================================
-// TagsInputComponent
+// Tags Input Component
 // ============================================
 
 interface TagInputProps {
@@ -29,7 +29,7 @@ interface TagInputProps {
 export function TagInput({
  value = [],
  onChange,
- placeholder = "InputTagsafterby Enter",
+ placeholder = "Type a tag and press Enter",
  maxTags,
  maxLength = 20,
  allowDuplicates = false,
@@ -80,7 +80,7 @@ export function TagInput({
 
  return (
  <div className={cn("relative", className)}>
- {/* mainInputRegion */}
+ {/* Main Input Area */}
  <div
  onClick={handleContainerClick}
  className={cn(
@@ -92,7 +92,7 @@ export function TagInput({
  disabled && "opacity-50 cursor-not-allowed"
  )}
  >
- {/* alreadyAdd'sTags */}
+ {/* Already Added Tags */}
  {value.map((tag, index) => (
  <Badge
  key={index}
@@ -131,7 +131,7 @@ export function TagInput({
  )}
  </div>
 
- {/* Suggestiondown */}
+ {/* Suggestion Dropdown */}
  {isFocused && inputValue && filteredSuggestions.length > 0 && (
  <div className="absolute z-10 w-full mt-1 p-1 rounded-xl border border-border bg-card shadow-lg">
  {filteredSuggestions.slice(0, 5).map((suggestion, index) => (
@@ -151,7 +151,7 @@ export function TagInput({
  </div>
  )}
 
- {/* LimitTip */}
+ {/* Limit Tip */}
  {maxTags && (
  <p className="text-xs text-foreground-light mt-1">
  {value.length}/{maxTags} Tags
@@ -162,7 +162,7 @@ export function TagInput({
 }
 
 // ============================================
-// SimpleTagsShowcase
+// Simple Tags Display
 // ============================================
 
 interface TagListProps {
@@ -224,7 +224,7 @@ export function TagList({
 }
 
 // ============================================
-// OptionalTagsgroup
+// Selectable Tags Group
 // ============================================
 
 interface SelectableTagsProps {
@@ -280,7 +280,7 @@ export function SelectableTags({
 }
 
 // ============================================
-// Icon'sTags
+// Icon Tags
 // ============================================
 
 interface IconTag {

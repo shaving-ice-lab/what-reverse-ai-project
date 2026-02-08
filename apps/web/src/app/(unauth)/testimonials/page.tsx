@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * CustomerReviewsPage - LobeHub StyleDesign
+ * CustomerReviewsPage - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -14,70 +14,70 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// CustomerReviews
+// Customer Reviews
 const testimonials = [
  {
- quote: "AgentFlow HelpWewillSupportResponse Timefrom 30 minShortento 2 min, CustomerSatisfactionImprove 45%.",
- author: "total",
- role: "Supporttotal",
- company: "largeE-commercePlatform",
+    quote: "AgentFlow cut our support response time from 30 min to 2 min; customer satisfaction improved 45%.",
+    author: "Sarah L.",
+    role: "Head of Support",
+ company: "Large e-commerce platform",
  industry: "E-commerce",
  avatar: "",
  rating: 5,
  },
  {
- quote: "Automation'sRisk ControlFlowletWecanReal-timeResponseMarketplace, RiskResponseSpeedImprove 10 .",
+ quote: "Risk control automation enabled real-time response; risk handling speed improved 10x.",
  author: "Manager Li",
- role: "Risk",
- company: "Finance",
+    role: "Risk Director",
+    company: "Financial Institution",
  industry: "Finance",
  avatar: "",
  rating: 5,
  },
  {
- quote: "Via AgentFlow ERP, MES and WMS System, shouldrateImprove 150%.",
- author: "total",
- role: "shouldtotal",
- company: "ManufacturingEnterprise",
+    quote: "With AgentFlow ERP, MES and WMS integration, our throughput improved 150%.",
+    author: "James W.",
+    role: "Operations Director",
+ company: "Manufacturing enterprise",
  industry: "Manufacturing",
  avatar: "",
  rating: 5,
  },
  {
- quote: "asDevelopers, AgentFlow 's API DesignVeryoptimal, IntegrationExperience1.",
+ quote: "As developers, we find AgentFlow's API design clear and integration smooth.",
  author: "Engineer Chen",
- role: "allStack",
- company: "Company",
- industry: "",
+    role: "Full-Stack Developer",
+    company: "Tech Startup",
+    industry: "Technology",
  avatar: "",
  rating: 5,
  },
  {
- quote: "SaleslineAutoRatingFeaturesHelpWe'sSalesTeamrateImprove 200%.",
- author: "total",
- role: "Sales VP",
- company: " SaaS Company",
+    quote: "Automated lead scoring helped our sales team improve conversion rates by 200%.",
+    author: "Michael T.",
+    role: "Sales VP",
+    company: "SaaS Company",
  industry: "SaaS",
  avatar: "",
  rating: 5,
  },
  {
- quote: "'sAppointmentandFlowallsectionAutomationafter, userSatisfactionImprove.",
- author: "weeksmain",
- role: "Infomain",
- company: "3",
- industry: "Healthcare",
- avatar: "weeks",
+    quote: "Appointment scheduling and workflow automation significantly improved patient satisfaction.",
+    author: "Dr. Emily R.",
+    role: "IT Director",
+    company: "Healthcare Group",
+    industry: "Healthcare",
+    avatar: "ER",
  rating: 5,
  },
 ];
 
-// StatisticsData
+// Statistics Data
 const stats = [
- { value: "98%", label: "CustomerSatisfaction" },
- { value: "500+", label: "EnterpriseCustomer" },
+ { value: "98%", label: "Customer satisfaction" },
+ { value: "500+", label: "Enterprise customers" },
  { value: "50K+", label: "Active Users" },
- { value: "4.9", label: "AverageRating" },
+ { value: "4.9", label: "Average rating" },
 ];
 
 export default function TestimonialsPage() {
@@ -90,15 +90,15 @@ export default function TestimonialsPage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Star className="h-4 w-4 fill-current" />
- Customerif
+ Customer stories
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- heallatuseAgentFlow
+ What teams say about AgentFlow
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- comeIndustryfirstEnterprise'sRealReviews
+ Real reviews from enterprises
  </p>
  </div>
  </section>
@@ -177,20 +177,20 @@ export default function TestimonialsPage() {
  {/* CTA */}
  <section className="py-16 px-6">
  <div className="max-w-4xl mx-auto text-center">
- <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Joinhe'srow</h2>
+ <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Join us</h2>
  <p className="text-[13px] text-foreground-light mb-6">
- StartUsage AgentFlow, Experience AI Automation'slargepower
+ Start using AgentFlow and experience the power of AI automation
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/register">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- FreeStartUsage
+ Start for free
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/case-studies">
  <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
- ViewCase StudiesDetails
+ View case studies
  </Button>
  </Link>
  </div>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * EnterprisePage - LobeHub StyleDesign
+ * Enterprise Page - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -25,77 +25,77 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Enterprise
+// Enterprise Features
 const features = [
  {
  icon: Shield,
- title: "Enterprise-gradeSecurity",
- description: "SOC 2 Type II Authentication, endpointtoendpointEncrypt, Improve'sAudit Log",
- highlights: ["SOC 2 Authentication", "DataEncrypt", "Audit Log"],
+ title: "Enterprise-Grade Security",
+ description: "SOC 2 Type II certification, end-to-end encryption, and comprehensive audit logs",
+ highlights: ["SOC 2 Certified", "Data Encryption", "Audit Logs"],
  },
  {
  icon: Globe,
- title: "PrivateDeploy",
- description: "SupportPrivateandDeploy, Datacompleteall",
- highlights: ["Private", "", "DataLocal"],
+ title: "Private Deployment",
+ description: "Supports private cloud and on-premise deployment with full data sovereignty",
+ highlights: ["Private Cloud", "On-Premise", "Data Localization"],
  },
  {
  icon: Lock,
- title: "AdvancedPermissionManage",
- description: "'sPermissionControl, Support SSO and SCIM",
- highlights: ["SSO Sign In", "SCIM Sync", "RolePermission"],
+ title: "Advanced Permission Management",
+ description: "Fine-grained permission control with SSO and SCIM support",
+ highlights: ["SSO Sign-In", "SCIM Sync", "Role-Based Permissions"],
  },
  {
  icon: Headphones,
- title: "ExclusiveSupport",
- description: "ExclusiveCustomerSuccessManager, 7x24 TechnologySupport",
- highlights: ["ExclusiveCustomerManager", "PriorityResponse", "TrainingService"],
+ title: "Dedicated Support",
+ description: "Dedicated customer success manager with 24/7 technical support",
+ highlights: ["Dedicated Account Manager", "Priority Response", "Training Services"],
  },
  {
  icon: Zap,
- title: "NonelimitExtend",
- description: "NonelimitWorkflow, NonelimitExecutetimescount, NonelimitTeamMember",
- highlights: ["NonelimitWorkflow", "NonelimitExecute", "NonelimitMember"],
+ title: "Unlimited Scalability",
+ description: "Unlimited workflows, unlimited executions, unlimited team members",
+ highlights: ["Unlimited Workflows", "Unlimited Executions", "Unlimited Members"],
  },
  {
  icon: BarChart3,
- title: "AdvancedAnalytics",
- description: "Detailed'sUsageReportandBusinessInsights",
- highlights: ["UsageReport", "canAnalytics", "BusinessInsights"],
+ title: "Advanced Analytics",
+ description: "Detailed usage reports and business insights",
+ highlights: ["Usage Reports", "Performance Analytics", "Business Insights"],
  },
 ];
 
-// CustomerCase Studies
+// Customer Case Studies
 const caseStudies = [
  {
- company: "largeE-commercePlatform",
+ company: "Major E-Commerce Platform",
  industry: "E-commerce",
- result: "SupportrateImprove 300%",
- quote: "AgentFlow HelpWewillSupportResponse Timefrom 30 minShortento 2 min.",
+ result: "Support Efficiency Improved by 300%",
+ quote: "AgentFlow helped us reduce support response time from 30 minutes to 2 minutes.",
  },
  {
- company: "Finance",
+ company: "Financial Institution",
  industry: "Finance",
- result: "Risk ControlResponseImprove 10 ",
- quote: "Automation'sRisk ControlFlowletWecanReal-timeResponseMarketplace.",
+ result: "Risk Response Improved 10x",
+ quote: "Automated risk control workflows enable us to respond to market changes in real time.",
  },
  {
- company: "ManufacturingEnterprise",
+ company: "Manufacturing Enterprise",
  industry: "Manufacturing",
- result: "shouldrateImprove 150%",
- quote: "ViaWorkflowAutomation, WelargeReduceOperationsCost.",
+ result: "Production Efficiency Improved by 150%",
+ quote: "Through workflow automation, we've significantly reduced operational costs.",
  },
 ];
 
-// forcompare
+// Plan Comparison
 const comparison = [
- { feature: "WorkflowCount", standard: "50 ", enterprise: "Nonelimit" },
- { feature: "TeamMember", standard: "10 person", enterprise: "Nonelimit" },
- { feature: "Executetimescount", standard: "10 10000times/months", enterprise: "Nonelimit" },
- { feature: "PrivateDeploy", standard: "no", enterprise: "is" },
- { feature: "SSO Sign In", standard: "no", enterprise: "is" },
- { feature: "ExclusiveSupport", standard: "no", enterprise: "is" },
- { feature: "SLA Assurance", standard: "99.9%", enterprise: "99.99%" },
+ { feature: "Workflow Count", standard: "50", enterprise: "Unlimited" },
+ { feature: "Team Members", standard: "10", enterprise: "Unlimited" },
+ { feature: "Executions", standard: "10,000/month", enterprise: "Unlimited" },
+ { feature: "Private Deployment", standard: "No", enterprise: "Yes" },
+ { feature: "SSO Sign-In", standard: "No", enterprise: "Yes" },
+ { feature: "Dedicated Support", standard: "No", enterprise: "Yes" },
+ { feature: "SLA Guarantee", standard: "99.9%", enterprise: "99.99%" },
 ];
 
 export default function EnterprisePage() {
@@ -126,29 +126,29 @@ export default function EnterprisePage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Building className="h-4 w-4" />
- Enterprise-gradeResolvePlan
+ Enterprise-Grade Solutions
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- asEnterpriseBuild's
+ Built for Enterprise
  <br />
- <span className="text-[#4e8fff]">AutomationPlatform</span>
+ <span className="text-[#4e8fff]">Automation Platform</span>
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-10">
- ObtainEnterprise-gradeSecurity, PrivateDeploy, ExclusiveSupportandNonelimitExtendcanpower
+ Get enterprise-grade security, private deployment, dedicated support, and unlimited scalability
  </p>
 
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="#contact">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- ContactSales
+ Contact Sales
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/demo">
  <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
- AppointmentDemo
+ Schedule a Demo
  </Button>
  </Link>
  </div>
@@ -158,7 +158,7 @@ export default function EnterprisePage() {
  {/* Features */}
  <section className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
- <h2 className="lobe-section-header text-center mb-12">Enterprise-gradeFeatures</h2>
+ <h2 className="lobe-section-header text-center mb-12">Enterprise-Grade Features</h2>
  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
  {features.map((feature) => (
  <div
@@ -196,11 +196,11 @@ export default function EnterprisePage() {
  {/* Comparison */}
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto">
- <h2 className="lobe-section-header text-center mb-12">Enterprise vsStandardversion</h2>
+ <h2 className="lobe-section-header text-center mb-12">Enterprise vs Standard</h2>
  <div className="rounded-2xl border border-border/30 overflow-hidden bg-surface-100/30">
  <div className="grid grid-cols-3 gap-4 p-4 border-b border-border/30 bg-surface-100/50">
  <div className="font-medium text-foreground text-[13px]">Features</div>
- <div className="font-medium text-foreground text-center text-[13px]">Standardversion</div>
+ <div className="font-medium text-foreground text-center text-[13px]">Standard</div>
  <div className="font-medium text-[#4e8fff] text-center text-[13px]">Enterprise</div>
  </div>
  {comparison.map((row) => (
@@ -220,7 +220,7 @@ export default function EnterprisePage() {
  {/* Case Studies */}
  <section className="py-16 px-6">
  <div className="max-w-5xl mx-auto">
- <h2 className="lobe-section-header text-center mb-12">CustomerCase Studies</h2>
+ <h2 className="lobe-section-header text-center mb-12">Customer Case Studies</h2>
  <div className="grid md:grid-cols-3 gap-6">
  {caseStudies.map((study) => (
  <div
@@ -248,19 +248,19 @@ export default function EnterprisePage() {
  {/* Contact Form */}
  <section id="contact" className="py-16 px-6 bg-gradient-section">
  <div className="max-w-2xl mx-auto">
- <h2 className="lobe-section-header text-center mb-4">ContactEnterpriseSalesTeam</h2>
+ <h2 className="lobe-section-header text-center mb-4">Contact Enterprise Sales</h2>
  <p className="text-[13px] text-foreground-light text-center mb-8">
- Fill inForm, Wewillat 1 Business DayinandyouContact
+ Fill out the form below and we&apos;ll contact you within 1 business day
  </p>
 
  {isSubmitted ? (
  <div className="p-8 rounded-2xl bg-[#4e8fff]/5 border border-[#4e8fff]/20 text-center">
  <CheckCircle className="w-12 h-12 text-[#4e8fff] mx-auto mb-4" />
  <h3 className="text-[15px] font-semibold text-foreground mb-2">
- SubmitSuccess!
+ Submitted Successfully!
  </h3>
  <p className="text-[13px] text-foreground-light">
- We'sSalesTeamwillandyouContact
+ Our sales team will be in touch soon
  </p>
  </div>
  ) : (
@@ -274,13 +274,13 @@ export default function EnterprisePage() {
  required
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- placeholder="you'sName"
+ placeholder="Your name"
  className="bg-surface-100/30 border-border/30 rounded-xl"
  />
  </div>
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- WorkEmail *
+ Work Email *
  </label>
  <Input
  type="email"
@@ -295,19 +295,19 @@ export default function EnterprisePage() {
  <div className="grid sm:grid-cols-2 gap-4">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- CompanyName *
+ Company Name *
  </label>
  <Input
  required
  value={formData.company}
  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
- placeholder="you'sCompany"
+ placeholder="Your company"
  className="bg-surface-100/30 border-border/30 rounded-xl"
  />
  </div>
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- ContactPhone
+ Phone Number
  </label>
  <Input
  value={formData.phone}
@@ -319,12 +319,12 @@ export default function EnterprisePage() {
  </div>
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- RequirementsDescription
+ Requirements
  </label>
  <textarea
  value={formData.message}
  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
- placeholder="PleaseSimpleDescriptionyou'sRequirements"
+ placeholder="Please briefly describe your requirements"
  rows={4}
  className="w-full px-3 py-2 rounded-xl bg-surface-100/30 border border-border/30 text-foreground text-[13px] resize-none placeholder:text-foreground-lighter focus:outline-none focus:ring-2 focus:ring-[#4e8fff]/20 focus:border-[#4e8fff]/50"
  />
@@ -338,10 +338,10 @@ export default function EnterprisePage() {
  {isSubmitting ? (
  <>
  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
- Submit...
+ Submitting...
  </>
  ) : (
- "SubmitConsulting"
+ "Submit Inquiry"
  )}
  </Button>
  </form>

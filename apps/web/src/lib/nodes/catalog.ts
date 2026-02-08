@@ -1,5 +1,5 @@
 /**
- * Workflow NodeChecklistandExtendMechanism
+ * Workflow Node Catalog and Extension Mechanism
  */
 
 import {
@@ -59,11 +59,11 @@ export interface WorkflowNodeCatalogEntry {
 }
 
 export const WORKFLOW_NODE_CATEGORIES: WorkflowNodeCategory[] = [
- { id: "ai", name: "AI", description: "SmartGenerateandInference", icon: Bot, color: "#8B5CF6" },
- { id: "http", name: "HTTP", description: "InterfaceandIntegration", icon: Globe, color: "#3B82F6" },
- { id: "db", name: "DB", description: "DataandStorage", icon: Database, color: "#10B981" },
- { id: "ui", name: "UI", description: "InteractiveandShowcase", icon: MousePointerClick, color: "#F97316" },
- { id: "utility", name: "Utility", description: "FlowanduseTool", icon: Settings, color: "#64748B" },
+ { id: "ai", name: "AI", description: "Smart generate and inference", icon: Bot, color: "#8B5CF6" },
+ { id: "http", name: "HTTP", description: "Interface and integration", icon: Globe, color: "#3B82F6" },
+ { id: "db", name: "DB", description: "Data and storage", icon: Database, color: "#10B981" },
+ { id: "ui", name: "UI", description: "Interactive and showcase", icon: MousePointerClick, color: "#F97316" },
+ { id: "utility", name: "Utility", description: "Flow and utility tools", icon: Settings, color: "#64748B" },
 ];
 
 const CATEGORY_STYLE_MAP: Record<
@@ -81,7 +81,7 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  {
  id: "webhook",
  name: "Webhook Trigger",
- description: "Via HTTP RequestTriggerWorkflow",
+ description: "Trigger workflow via HTTP request",
  icon: Webhook,
  category: "http",
  color: "text-orange-500",
@@ -92,8 +92,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "schedule",
- name: "ScheduledTrigger",
- description: "byPlanScheduledExecuteWorkflow",
+ name: "Scheduled Trigger",
+ description: "Execute workflow by schedule plan",
  icon: Clock,
  category: "utility",
  color: "text-blue-500",
@@ -104,8 +104,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "manual",
- name: "ManualTrigger",
- description: "ManualClickExecuteWorkflow",
+    name: "Manual Trigger",
+ description: "Manual click to execute workflow",
  icon: Play,
  category: "ui",
  color: "text-green-500",
@@ -117,7 +117,7 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  {
  id: "ai-chat",
  name: "AI Conversation",
- description: "Call AI ModelProceedConversation",
+ description: "Call AI model to proceed conversation",
  icon: MessageSquare,
  category: "ai",
  color: "text-purple-500",
@@ -129,7 +129,7 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  {
  id: "ai-agent",
  name: "AI Agent",
- description: "CallCustom AI Agent",
+ description: "Call custom AI agent",
  icon: Bot,
  category: "ai",
  color: "text-violet-500",
@@ -152,8 +152,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "email",
- name: "SendEmail",
- description: "SendElectronicEmail Notifications",
+ name: "Send Email",
+ description: "Send email notifications",
  icon: Mail,
  category: "http",
  color: "text-red-500",
@@ -164,8 +164,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "database",
- name: "DatabaseAction",
- description: "readDatabaseData",
+ name: "Database Action",
+ description: "Read database data",
  icon: Database,
  category: "db",
  color: "text-emerald-500",
@@ -176,8 +176,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "condition",
- name: "ConditionDetermine",
- description: "Based onConditionBranchExecute",
+ name: "Condition",
+ description: "Conditional branch execution based on condition",
  icon: GitBranch,
  category: "utility",
  color: "text-amber-500",
@@ -189,7 +189,7 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  {
  id: "loop",
  name: "Loop",
- description: "re-Execute1groupAction",
+ description: "Re-execute a group of actions",
  icon: Repeat,
  category: "utility",
  color: "text-pink-500",
@@ -201,7 +201,7 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  {
  id: "filter",
  name: "Filter",
- description: "FilterandFilterData",
+ description: "Filter and transform data",
  icon: Filter,
  category: "utility",
  color: "text-indigo-500",
@@ -212,8 +212,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "code",
- name: "CodeExecute",
- description: "ExecuteCustomCode",
+ name: "Code Execution",
+ description: "Execute custom code",
  icon: Code,
  category: "utility",
  color: "text-foreground-light",
@@ -224,8 +224,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "transform",
- name: "DataConvert",
- description: "ConvertandProcessDataFormat",
+    name: "Data Convert",
+ description: "Convert and process data format",
  icon: Settings,
  category: "utility",
  color: "text-foreground-light",
@@ -236,8 +236,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "file",
- name: "FileAction",
- description: "ReadandProcessFile",
+ name: "File Action",
+ description: "Read and process file",
  icon: FileText,
  category: "utility",
  color: "text-teal-500",
@@ -248,8 +248,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "input",
- name: "FormInput",
- description: "UserInputandOutput",
+ name: "Form Input",
+ description: "User input and output",
  icon: MousePointerClick,
  category: "ui",
  color: "text-orange-500",
@@ -260,8 +260,8 @@ export const BUILTIN_WORKFLOW_NODES: WorkflowNodeCatalogEntry[] = [
  },
  {
  id: "output",
- name: "ResultOutput",
- description: "ShowcaseorBackmostResult",
+ name: "Result Output",
+ description: "Show or return result",
  icon: CheckCircle2,
  category: "ui",
  color: "text-emerald-500",

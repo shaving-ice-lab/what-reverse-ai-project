@@ -1,7 +1,7 @@
 /**
- * SnapshotToolcount
+ * Snapshot Utilities
  * 
- * ProvideSnapshotCompress, Compress, CreateandVerifyetcAuxiliaryFeatures
+ * Provides snapshot compression, decompression, creation, and validation helper functions
  */
 
 import type {
@@ -16,26 +16,26 @@ import type {
 import type { ExecutionStatus } from "@/types/execution";
 import type { WorkflowExecutionState, NodeExecutionState } from "@/lib/engine/types";
 
-// ===== CompressRelated =====
+// ===== Compression =====
 
 /**
- * CompressSnapshot
- * Usage LZ-String orAlgorithmCompresslargeData
+ * Compress snapshot
+ * Uses LZ-String or similar algorithm to compress large data
  */
 export async function compressSnapshot(
  snapshot: ExecutionSnapshot,
  _level?: number
 ): Promise<ExecutionSnapshot> {
- // CalculateOriginalSize
+ // Calculate original size
  const originalSize = new Blob([JSON.stringify(snapshot)]).size;
 
- // CompressNodeInputOutputData
+ // Compress node input/output data
  const compressedNodeSnapshots: Record<string, NodeSnapshot> = {};
  
  for (const [nodeId, nodeSnapshot] of Object.entries(snapshot.nodeSnapshots)) {
  compressedNodeSnapshots[nodeId] = {
  ...nodeSnapshot,
- // largeDatacanwithProceedCompressProcess
+     // Large data can be compressed
  inputs: compressData(nodeSnapshot.inputs),
  outputs: compressData(nodeSnapshot.outputs),
  };
@@ -58,7 +58,7 @@ export async function compressSnapshot(
 }
 
 /**
- * CompressSnapshot
+ * Decompress snapshot
  */
 export async function decompressSnapshot(
  snapshot: ExecutionSnapshot
@@ -88,25 +88,25 @@ export async function decompressSnapshot(
 }
 
 /**
- * CompressData(Implement)
- * atActualProductioncanwithUsage lz-string or pako 
+ * Compress data (simplified implementation)
+ * In production, you can use lz-string or pako
  */
 function compressData(data: Record<string, unknown>): Record<string, unknown> {
- // Remove undefined value
+ // Remove undefined values
  return JSON.parse(JSON.stringify(data));
 }
 
 /**
- * CompressData
+ * Decompress data
  */
 function decompressData(data: Record<string, unknown>): Record<string, unknown> {
  return data;
 }
 
-// ===== SnapshotCreate =====
+// ===== Snapshot Creation =====
 
 /**
- * fromExecuteStatusCreateSnapshot
+ * Create snapshot from execution state
  */
 export function createSnapshotFromExecution(
  executionState: WorkflowExecutionState,
@@ -115,7 +115,7 @@ export function createSnapshotFromExecution(
 ): ExecutionSnapshot {
  const now = new Date().toISOString();
  
- // ConvertNodeSnapshot
+ // Convert node snapshots
  const nodeSnapshots: Record<string, NodeSnapshot> = {};
  const executionOrder: string[] = [];
 
@@ -127,17 +127,17 @@ export function createSnapshotFromExecution(
  }
  }
 
- // byStartTimeSort
+ // Sort by start time
  executionOrder.sort((a, b) => {
  const aTime = nodeSnapshots[a].startedAt;
  const bTime = nodeSnapshots[b].startedAt;
  return aTime.localeCompare(bTime);
  });
 
- // CalculateSummary
+ // Calculate summary
  const summary = calculateSummary(nodeSnapshots);
 
- // CreateData
+ // Create metadata
  const metadata: SnapshotMetadata = {
  createdAt: now,
  version: "1.0.0",
@@ -172,15 +172,15 @@ export function createSnapshotFromExecution(
 }
 
 /**
- * fromNodeStatusCreateNodeSnapshot
+ * Create node snapshot from node state
  */
 function createNodeSnapshotFromState(
  nodeState: NodeExecutionState
 ): NodeSnapshot {
  return {
  nodeId: nodeState.nodeId,
- nodeName: nodeState.nodeId, // canwithfrom workflowFetchActualName
- nodeType: "unknown", // needneedfrom workflowDefinitionFetch
+   nodeName: nodeState.nodeId, // Can fetch actual name from workflow
+   nodeType: "unknown", // Needs to be fetched from workflow definition
  status: nodeState.status === "completed" ? "completed" 
  : nodeState.status === "failed" ? "failed"
  : nodeState.status === "running" ? "running"
@@ -208,7 +208,7 @@ function createNodeSnapshotFromState(
 }
 
 /**
- * CalculateExecuteSummary
+ * Calculate execution summary
  */
 function calculateSummary(
  nodeSnapshots: Record<string, NodeSnapshot>
@@ -227,10 +227,10 @@ function calculateSummary(
  };
 }
 
-// ===== TimelineRelated =====
+// ===== Timeline =====
 
 /**
- * fromSnapshotCreated AtlineView
+ * Create timeline view from snapshot
  */
 export function createTimelineView(
  snapshot: ExecutionSnapshot,
@@ -267,7 +267,7 @@ export function createTimelineView(
 }
 
 /**
- * FetchNodeIcon
+ * Get node icon
  */
 function getNodeIcon(nodeType: string): string {
  const icons: Record<string, string> = {
@@ -288,7 +288,7 @@ function getNodeIcon(nodeType: string): string {
 }
 
 /**
- * FetchStepDescription
+ * Get step description
  */
 function getStepDescription(nodeSnapshot: NodeSnapshot): string {
  const { nodeType, metadata, status } = nodeSnapshot;
@@ -308,7 +308,7 @@ function getStepDescription(nodeSnapshot: NodeSnapshot): string {
  case "condition":
  return metadata?.conditionBranch
  ? `Branch: ${metadata.conditionBranch}`
-: "ConditionDetermine";
+: "Condition check";
  case "loop":
  return metadata?.loopIterations
  ? `Iteration: ${metadata.currentIteration || 0}/${metadata.loopIterations}`
@@ -318,10 +318,10 @@ function getStepDescription(nodeSnapshot: NodeSnapshot): string {
  }
 }
 
-// ===== SensitiveDataProcess =====
+// ===== Sensitive Data Processing =====
 
 /**
- * RemoveSensitiveData
+ * Remove sensitive data
  */
 export function removeSensitiveData(
  snapshot: ExecutionSnapshot,
@@ -347,7 +347,7 @@ export function removeSensitiveData(
 }
 
 /**
- * Clean upfor'sSensitiveField
+ * Sanitize sensitive fields in an object
  */
 function sanitizeObject(
  obj: Record<string, unknown>,
@@ -373,10 +373,10 @@ function sanitizeObject(
  return result;
 }
 
-// ===== SnapshotCompare =====
+// ===== Snapshot Comparison =====
 
 /**
- * CompareSnapshot'sDiff
+ * Compare snapshot diffs
  */
 export function compareSnapshots(
  snapshotA: ExecutionSnapshot,
@@ -412,7 +412,7 @@ export function compareSnapshots(
 }
 
 /**
- * SnapshotDiff
+ * Snapshot diff
  */
 export interface SnapshotDiff {
  executionIdA: string;
@@ -423,7 +423,7 @@ export interface SnapshotDiff {
 }
 
 /**
- * NodeDiff
+ * Node diff
  */
 export interface NodeDiff {
  nodeId: string;
@@ -432,21 +432,21 @@ export interface NodeDiff {
  nodeB?: NodeSnapshot;
 }
 
-// ===== ExportFormat =====
+// ===== Export Format =====
 
 /**
- * FormatSnapshotascanreadText
+ * Format snapshot as readable text
  */
 export function formatSnapshotAsText(snapshot: ExecutionSnapshot): string {
  const lines: string[] = [
- `ExecuteSnapshot: ${snapshot.executionId}`,
+   `Execution Snapshot: ${snapshot.executionId}`,
  `Workflow: ${snapshot.workflowName || snapshot.workflowId}`,
  `Status: ${snapshot.status}`,
- `StartTime: ${snapshot.startedAt}`,
- `DoneTime: ${snapshot.completedAt || "In Progress"}`,
+   `Start Time: ${snapshot.startedAt}`,
+   `Completion Time: ${snapshot.completedAt || "In Progress"}`,
  `Duration: ${snapshot.durationMs ? `${snapshot.durationMs}ms`: "N/A"}`,
  "",
- "NodeExecuteDetails:",
+   "Node Execution Details:",
  "---",
  ];
 
@@ -464,10 +464,10 @@ export function formatSnapshotAsText(snapshot: ExecutionSnapshot): string {
 
  lines.push("---");
  lines.push("Summary:");
- lines.push(` totalNode: ${snapshot.summary.totalNodes}`);
- lines.push(` Done: ${snapshot.summary.completedNodes}`);
+ lines.push(` Total Nodes: ${snapshot.summary.totalNodes}`);
+ lines.push(` Completed: ${snapshot.summary.completedNodes}`);
  lines.push(` Failed: ${snapshot.summary.failedNodes}`);
- lines.push(` Skip: ${snapshot.summary.skippedNodes}`);
+ lines.push(` Skipped: ${snapshot.summary.skippedNodes}`);
  
  if (snapshot.summary.totalTokensUsed) {
  lines.push(` Token Usage: ${snapshot.summary.totalTokensUsed}`);

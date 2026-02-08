@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * InitialSettingsPage: Naming Workspace + Create#1 App
+ * Initial Settings Page: Name Workspace + Create First App
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -72,14 +72,14 @@ export default function DashboardSetupPage() {
  if (!mounted) return;
  setAppsCount(apps.items?.length ?? 0);
  if (apps.items?.length === 0) {
- const suggestedAppName = `${active.name || "I's"} App`;
+        const suggestedAppName = `${active.name || "My"} App`;
  setAppName(suggestedAppName);
  setAppSlug(slugify(suggestedAppName));
  }
  }
  } catch (err) {
  console.error("Failed to load setup context:", err);
- if (mounted) setError("LoadInitialInfoFailed, Please try again laterRetry");
+      if (mounted) setError("Failed to load initial info. Please try again later.");
  } finally {
  if (mounted) setIsLoading(false);
  }
@@ -165,7 +165,7 @@ export default function DashboardSetupPage() {
  }
  } catch (err) {
  console.error("Failed to finish setup:", err);
- setError(err instanceof Error ? err.message: "InitialFailed, Please try again laterRetry");
+      setError(err instanceof Error ? err.message: "Setup failed. Please try again later.");
  } finally {
  setIsSubmitting(false);
  }
@@ -185,8 +185,8 @@ export default function DashboardSetupPage() {
  <PageContainer>
  <PageHeader
  eyebrow="Setup"
- title="Initialyou'sWorkspace"
- description="Settings Workspace NameandCreateyou's#1App."
+      title="Initialize Your Workspace"
+      description="Set your workspace name and create your first app."
  icon={<Rocket className="w-4 h-4" />}
  badge={
  isDefaultWorkspace ? (
@@ -206,13 +206,13 @@ export default function DashboardSetupPage() {
 
  <SettingsSection
  title="Workspace Naming"
- description="asyou's Workspace 1Identify'sNameandLinkIdentifier."
+      description="Set your workspace name and URL identifier (slug)."
  footer={
  <div className="flex items-center gap-2">
  {isDefaultWorkspace && (
- <Badge variant="outline" size="xs">
- SuggestionEditDefaultName
- </Badge>
+            <Badge variant="outline" size="xs">
+              We suggest editing the default name
+            </Badge>
  )}
  <Button
  onClick={handleSubmit}
@@ -225,10 +225,10 @@ export default function DashboardSetupPage() {
  Saving...
  </>
  ) : (
- <>
- <CheckCircle2 className="w-4 h-4 mr-2" />
- DoneInitial
- </>
+            <>
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Complete Setup
+            </>
  )}
  </Button>
  </div>
@@ -241,25 +241,25 @@ export default function DashboardSetupPage() {
  onChange={(e) => {
  setWorkspaceName(e.target.value);
  }}
- placeholder="exampleif: I'sTeam"
+          placeholder="e.g. My Team"
  />
  </FormRow>
- <FormRow label="Workspace Slug" required description="Used forLinkandIdentifier(canAutoGenerate)">
+        <FormRow label="Workspace Slug" required description="Used for links and identifiers (auto-generated)">
  <Input
  value={workspaceSlug}
  onChange={(e) => {
  setWorkspaceSlugTouched(true);
  setWorkspaceSlug(e.target.value);
  }}
- placeholder="exampleif: my-team"
+          placeholder="e.g. my-team"
  />
  </FormRow>
  </div>
  </SettingsSection>
 
- <SettingsSection
- title="Create#1 App"
- description={hasApps ? "Detecttoalreadyhas App, canDirectContinue.": "Create1App, Used forStartyou's#1item."}
+      <SettingsSection
+        title="Create Your First App"
+        description={hasApps ? "We detected you already have an app. You can continue directly.": "Create an app to get started with your first project."}
  >
  <div className={cn("space-y-4", hasApps && "opacity-60")}>
  <FormRow label="App Name" required={!hasApps}>
@@ -272,26 +272,26 @@ export default function DashboardSetupPage() {
  setAppSlug(slugify(e.target.value));
  }
  }}
- placeholder="exampleif: SupportAutomation"
+          placeholder="e.g. Support Automation"
  disabled={hasApps}
  />
  </FormRow>
- <FormRow label="App Slug" required={!hasApps} description="Used forLinkandIdentifier(canAutoGenerate)">
+        <FormRow label="App Slug" required={!hasApps} description="Used for links and identifiers (auto-generated)">
  <Input
  value={appSlug}
  onChange={(e) => {
  setAppSlugTouched(true);
  setAppSlug(e.target.value);
  }}
- placeholder="exampleif: support-bot"
+          placeholder="e.g. support-bot"
  disabled={hasApps}
  />
  </FormRow>
- <FormRow label="App Description" description="Optional, Used forDescriptionAppuse.">
+        <FormRow label="App Description" description="Optional. Describe your app's purpose.">
  <Input
  value={appDescription}
  onChange={(e) => setAppDescription(e.target.value)}
- placeholder="exampleif: AutoReplyFAQ"
+          placeholder="e.g. Auto-reply FAQ"
  disabled={hasApps}
  />
  </FormRow>

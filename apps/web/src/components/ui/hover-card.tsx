@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * HoverCard FloatCardComponent
+ * HoverCard - Floating Card Component
  * 
- * Used foratHovertimeDisplayRich'sPreviewContent
+ * Displays rich preview content on hover
  */
 
 import * as React from "react"

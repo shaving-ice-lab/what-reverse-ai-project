@@ -33,8 +33,8 @@ type StoredTermsState = {
 export function TermsPrompt({
  storageKey,
  version = "v1",
- title = "PublicAccessUsage",
- description = "ContinueAccessnowRepresentyoualreadyReadandAgreeRelatedUsageandPrivacy Policy.",
+ title = "Public access usage",
+ description = "By continuing, you confirm that you have read and agree to the Terms of Use and Privacy Policy.",
  termsUrl = "/terms",
  onStatusChange,
  className,
@@ -74,7 +74,7 @@ export function TermsPrompt({
  try {
  localStorage.setItem(storageKey, JSON.stringify(payload));
  } catch {
- // IgnoreStorageFailed, AllowContinueAccess
+ // Ignore storage failure, allow continued access
  }
  setAccepted(true);
  setOpen(false);
@@ -103,7 +103,7 @@ export function TermsPrompt({
  className="mt-1"
  />
  <label htmlFor="terms-agree" className="text-sm text-foreground leading-relaxed">
- IalreadyReadandAgree{""}
+ I have read and agree to the{" "}
  <Link href={termsUrl} className="text-primary hover:underline" target="_blank">
  Usage
  </Link>
@@ -114,7 +114,7 @@ export function TermsPrompt({
  <AlertDialogFooter className="mt-6">
  <AlertDialogAction asChild>
  <Button onClick={handleAccept} disabled={!checked}>
- AgreeandContinue
+ Agree and Continue
  </Button>
  </AlertDialogAction>
  </AlertDialogFooter>

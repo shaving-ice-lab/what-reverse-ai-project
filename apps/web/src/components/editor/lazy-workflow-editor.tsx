@@ -5,7 +5,7 @@ import { Loader2, Workflow, Layers, Zap, GitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * LoadWorkflowEdit - Minimalist Style
+ * Lazy Load Workflow Editor - Minimalist Style
  */
 
 function EditorLoader() {
@@ -23,14 +23,14 @@ function EditorLoader() {
  </div>
 
  <div className="text-center">
- <h3 className="text-base font-medium mb-1 text-foreground">LoadEdit</h3>
- <p className="text-sm text-foreground-light">currentlyatInitialWorkflowCanvas...</p>
+        <h3 className="text-base font-medium mb-1 text-foreground">Loading Editor</h3>
+        <p className="text-sm text-foreground-light">Initializing workflow canvas...</p>
  </div>
 
  <div className="flex items-center gap-2">
  {[
  { icon: Layers, label: "Node" },
- { icon: GitBranch, label: "Connect" },
+          { icon: GitBranch, label: "Connections" },
  { icon: Zap, label: "Execute" },
  ].map((item) => (
  <div
@@ -46,7 +46,7 @@ function EditorLoader() {
  <div className="flex items-center gap-2">
  <Loader2 className="h-4 w-4 animate-spin" />
  <span className="text-xs text-foreground-muted">
- timesLoadcancanneedneeds
+          This may take a moment
  </span>
  </div>
  </div>
@@ -73,7 +73,7 @@ interface LazyWorkflowEditorProps {
  edges?: unknown[];
  };
  showEmptyState?: boolean;
- // AddStatus
+  // Additional status
  saveStatus?: SaveStatus;
  lastSavedAt?: Date | null;
  isOnline?: boolean;

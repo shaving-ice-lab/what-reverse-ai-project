@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * newGuideWizardComponent
+ * Onboarding Guide Wizard Component
  * 
- * timesSign InGuideFlow, HighlightkeyFeaturesRegion, StepTutorial
+ * First-time sign-in guided flow, highlighting key feature areas with step-by-step tutorial
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -40,43 +40,43 @@ interface OnboardingStep {
 const onboardingSteps: OnboardingStep[] = [
  {
  id: "welcome",
- title: "WelcomeUsage AgentFlow! 🎉",
- description: "WewillHelpyouQuickPlatform'sCoreFeatures, needminnowcanStartCreateyou's#1 AI Workflow.",
+title: "Welcome to AgentFlow! 🎉",
+    description: "We'll help you quickly learn the platform's core features. In just a few minutes, you can start creating your first AI workflow.",
  icon: Rocket,
  position: "center",
  },
  {
  id: "stats",
- title: "DataOverview",
- description: "thisinShowcaseyou'sWorkflowRunStatus, Success RateandExecuteTimeetckeyMetrics.letyouAnytimeMasterSystemRunSituation.",
+title: "Data Overview",
+    description: "This section shows your workflow run status, success rate, execution time, and other key metrics. Monitor your system's performance at a glance.",
  icon: Target,
  targetSelector: "[data-onboarding='stats']",
  position: "bottom",
  },
  {
  id: "quick-actions",
- title: "QuickStart",
- description: "ViathisEntry, youcanwithQuickCreatenewWorkflow, BrowseTemplate GalleryorViewDocument.",
+title: "Quick Start",
+    description: "From here, you can quickly create a new workflow, browse the template gallery, or view documentation.",
  icon: Zap,
  targetSelector: "[data-onboarding='quick-actions']",
  position: "bottom",
  },
  {
  id: "workflows",
- title: "RecentWorkflow",
- description: "atthisinViewandManageyouRecentUsage'sWorkflow, canwithDirectRun, EditorCopyit.",
+title: "Recent Workflows",
+    description: "View and manage your recently used workflows here. You can directly run, edit, or copy them.",
  icon: Layers,
  targetSelector: "[data-onboarding='workflows']",
  position: "top",
  },
  {
  id: "complete",
- title: "Preparethen!",
- description: "Great!youalreadycurrentFeatures.atcanwithStartCreateyou's#1 AI Workflow.",
+title: "All Set!",
+    description: "Great! You've learned the current features. Now you can start creating your first AI workflow.",
  icon: CheckCircle2,
  position: "center",
  action: {
- label: "CreateI's#1Workflow",
+ label: "Create My First Workflow",
  href: "/dashboard/workflows/new",
  },
  },
@@ -101,7 +101,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  const isFirstStep = currentStep === 0;
  const isLastStep = currentStep === onboardingSteps.length - 1;
 
- // CalculateTargetElement
+ // Calculate target element position
  const updateHighlightPosition = useCallback(() => {
  if (!step.targetSelector) {
  setHighlightPosition(null);
@@ -133,7 +133,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  };
  }, [isOpen, currentStep, updateHighlightPosition]);
 
- // keyNavigation
+ // Keyboard navigation
  useEffect(() => {
  if (!isOpen) return;
 
@@ -174,7 +174,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
 
  const Icon = step.icon;
 
- // CalculateTooltip
+ // Calculate tooltip position
  const getTooltipStyle = () => {
  if (step.position === "center" || !highlightPosition) {
  return {
@@ -220,10 +220,10 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
 
  return (
  <div className="fixed inset-0 z-[100]">
- {/* BackgroundMask - EnhancedBlurEffect */}
+ {/* Background Mask - Enhanced Blur Effect */}
  <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleSkip} />
 
- {/* HighlightRegion - EnhancedEdgeEffect */}
+ {/* Highlight Region - Enhanced Edge Effect */}
  {highlightPosition && (
  <div
  className="absolute rounded-2xl transition-all duration-300 ease-out"
@@ -244,7 +244,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  </div>
  )}
 
- {/* Tooltip - EnhancedvisualEffect */}
+ {/* Tooltip - Enhanced Visual Effect */}
  <div
  className={cn(
  "absolute w-[420px] bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl overflow-hidden",
@@ -252,7 +252,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  )}
  style={getTooltipStyle()}
  >
- {/* TopGradientDecoration */}
+ {/* Top Gradient Decoration */}
  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
  
  {/* Header */}
@@ -304,7 +304,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  )}
  </div>
 
- {/* StepIndicator - Enhanced */}
+ {/* Step Indicator - Enhanced */}
  <div className="flex items-center justify-center gap-2 py-4 border-t border-border/50">
  {onboardingSteps.map((s, index) => (
  <button
@@ -323,7 +323,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  ))}
  </div>
 
- {/* FooterNavigation - Enhanced */}
+ {/* Footer Navigation - Enhanced */}
  <div className="flex items-center justify-between p-4 border-t border-border/50 bg-gradient-to-r from-muted/30 via-transparent to-muted/30">
  <Button
  variant="ghost"
@@ -341,7 +341,7 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  onClick={handleSkip} 
  className="text-muted-foreground hover:text-foreground text-sm"
  >
- SkipGuide
+ Skip Guide
  </Button>
  <Button 
  onClick={handleNext} 
@@ -353,11 +353,11 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  </div>
  </div>
  
- {/* FooterGradientDecoration */}
+ {/* Footer Gradient Decoration */}
  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
  </div>
 
- {/* HelpTip - Enhanced */}
+ {/* Help Tip - Enhanced */}
  <div className="fixed bottom-6 left-6 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-card/50 backdrop-blur-sm ring-1 ring-border text-sm text-foreground/70">
  <div className="flex items-center gap-1.5">
  <kbd className="px-2 py-1 rounded-md bg-muted font-mono text-xs ring-1 ring-border">←</kbd>
@@ -371,20 +371,20 @@ export function OnboardingGuide({ isOpen, onClose, onComplete }: OnboardingGuide
  </div>
  </div>
 
- {/* HelpLink - Enhanced */}
+ {/* Help Link - Enhanced */}
  <a
  href="/docs/getting-started"
  className="fixed bottom-6 right-6 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary/10 to-violet-500/10 backdrop-blur-sm ring-1 ring-primary/20 text-foreground hover:ring-primary/40 transition-all duration-200 text-sm group"
  >
  <BookOpen className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
- <span>ViewCompleteDocument</span>
+ <span>View Full Documentation</span>
  <ChevronRight className="w-4 h-4 text-primary/70 group-hover:translate-x-0.5 transition-transform" />
  </a>
  </div>
  );
 }
 
-// Independent'sTriggerButtonComponent - Enhanced
+// Standalone Trigger Button Component - Enhanced
 interface OnboardingTriggerProps {
  onClick: () => void;
  className?: string;
@@ -403,13 +403,13 @@ export function OnboardingTrigger({ onClick, className }: OnboardingTriggerProps
  className
  )}
  >
- {/* BackgroundAnimationLight Effect */}
+ {/* Background Shimmer Effect */}
  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer" />
  
  <Sparkles className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-200" />
- <span className="relative font-medium">newGuide</span>
+ <span className="relative font-medium">New User Guide</span>
  
- {/* Right sidesmallhead */}
+          {/* Right Side Arrow */}
  <ChevronRight className="w-3.5 h-3.5 text-primary/50 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
  </button>
  );

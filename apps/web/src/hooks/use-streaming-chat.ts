@@ -28,7 +28,7 @@ export function useStreamingChat() {
  message: string,
  options?: StreamingChatOptions
  ): Promise<string> => {
- // firstbefore'sRequest
+ // Cancel previous request
  if (abortControllerRef.current) {
  abortControllerRef.current.abort();
  }
@@ -102,7 +102,7 @@ export function useStreamingChat() {
  throw new Error(parsed.error);
  }
  } catch (parseError) {
- // ifresultnotis JSON, cancanisDirect'sText
+ // If not JSON, treat as direct text
  if (data && !data.startsWith("{")) {
  fullContent += data;
  options?.onToken?.(data);
@@ -131,10 +131,10 @@ export function useStreamingChat() {
  []
  );
 
- /**
- * CancelCurrent'sStreamingRequest
+/**
+ * Cancel current streaming request
  */
- const cancelStream = useCallback(() => {
+const cancelStream = useCallback(() => {
  if (abortControllerRef.current) {
  abortControllerRef.current.abort();
  abortControllerRef.current = null;
@@ -150,7 +150,7 @@ export function useStreamingChat() {
 }
 
 /**
- * Hook Version'sStreamingChatGenerate
+ * Hook version of streaming chat generator
  */
 export async function* streamChatGenerator(
  conversationId: string,

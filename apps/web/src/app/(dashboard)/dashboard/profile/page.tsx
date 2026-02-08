@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * UserpersoncenterPage - Supabase Style
- * ShowcaseUserInfo, ActivityStatistics, AchievementBadge, RecentActivityetc
+ * User Profile Page - Supabase Style
+ * Showcase user info, activity statistics, achievement badges, recent activity, etc.
  */
 
 import { useState } from "react";
@@ -65,7 +65,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageContainer } from "@/components/dashboard/page-layout";
 
-// UserStatisticsData - Supabase Style
+// User Statistics Data - Supabase Style
 
 const userStats = [
  { label: "Workflow", value: 23, icon: Zap, color: "text-brand-500", bgColor: "bg-brand-200/60" },
@@ -74,25 +74,25 @@ const userStats = [
  { label: "Document", value: 42, icon: FileText, color: "text-brand-500", bgColor: "bg-brand-200/60" },
 ];
 
-// AchievementBadge - Supabase Style
+// Achievement Badges - Supabase Style
 
 const achievements = [
 
- { id: "1", name: "User", description: "EarlySign UpUser", icon: Crown, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
+ { id: "1", name: "User", description: "Early sign-up user", icon: Crown, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
 
- { id: "2", name: "Workflowlarge", description: "Create 20+ Workflow", icon: Zap, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
+ { id: "2", name: "Workflow power user", description: "Create 20+ workflows", icon: Zap, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
 
- { id: "3", name: "AI Exploreuser", description: "Usage 3 typewithon AI Model", icon: Sparkles, color: "text-foreground-light", bgColor: "bg-surface-200", unlocked: true },
+ { id: "3", name: "AI explorer", description: "Use 3 or more AI models", icon: Sparkles, color: "text-foreground-light", bgColor: "bg-surface-200", unlocked: true },
 
- { id: "4", name: "CommunityContributionuser", description: "ShareTemplatebyUsage 100+ times", icon: Heart, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
+ { id: "4", name: "Community contributor", description: "Share template used 100+ times", icon: Heart, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: true },
 
- { id: "5", name: "rate", description: "Continuous 30 daysUsagePlatform", icon: Flame, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: false },
+ { id: "5", name: "Active user", description: "Use platform 30 days in a row", icon: Flame, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: false },
 
- { id: "6", name: "Code", description: "GenerateCode 1000+ row", icon: Code, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: false },
+ { id: "6", name: "Code", description: "Generate code 1000+ lines", icon: Code, color: "text-brand-500", bgColor: "bg-brand-200", unlocked: false },
 
 ];
 
-// RecentActivity
+// Recent Activity
 
 const recentActivities = [
 
@@ -110,32 +110,32 @@ const recentActivities = [
 
 ];
 
-// Favorite'sContent
+// Favorite Content
 
 const savedItems = [
 
- { id: "1", title: "AutomationEmailReplyTemplate", type: "template", icon: Layers, uses: 1234 },
+ { id: "1", title: "Automation email reply template", type: "template", icon: Layers, uses: 1234 },
 
- { id: "2", title: "DatacanvisualWorkflow", type: "workflow", icon: BarChart3, uses: 567 },
+ { id: "2", title: "Data visualization workflow", type: "workflow", icon: BarChart3, uses: 567 },
 
- { id: "3", title: "ContentCreativeAssistant", type: "agent", icon: Bot, uses: 890 },
+ { id: "3", title: "Content creative assistant", type: "agent", icon: Bot, uses: 890 },
 
  { id: "4", title: "Social Media", type: "workflow", icon: Calendar, uses: 456 },
 
 ];
 
-// canTags
+// Skill Tags
 
 const skillTags = [
 
- "Automation", "DataAnalytics", "AI Conversation", "ContentCreative", "WorkflowDesign", "API Integration", "EmailProcess", "CustomerService"
+ "Automation", "Data analytics", "AI conversation", "Content creative", "Workflow design", "API integration", "Email process", "Customer service"
 
 ];
 
-// ContributionData (MockPast12weeks'sData)
+// Contribution data (mock data for past 12 weeks)
 
 const contributionData = Array.from({ length: 84 }, (_, i) => ({
- day: i, value: Math.floor(Math.random() * 5), // 0-4 'sActive
+ day: i, value: Math.floor(Math.random() * 5), // 0-4 activity levels
 }));
 
 export default function ProfilePage() {
@@ -145,7 +145,7 @@ export default function ProfilePage() {
 
  const [activeTab, setActiveTab] = useState("overview");
 
- // CopyUserID
+ // Copy User ID
 
  const copyUserId = () => {
  navigator.clipboard.writeText(user?.id || "");
@@ -156,7 +156,7 @@ export default function ProfilePage() {
 
  };
 
- // CalculateUseretcProgress
+ // Calculate User Level Progress
 
  const levelProgress = 75;
 
@@ -167,21 +167,21 @@ export default function ProfilePage() {
  return (
  <PageContainer fullWidth>
 
- {/* TopfaceRegion */}
+ {/* Top Banner Region */}
  <div className="relative h-44 md:h-52 overflow-hidden border-b border-border bg-linear-to-br from-surface-75 via-surface-100 to-surface-200">
  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(62,207,142,0.18),transparent_45%)]" />
  <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(62,207,142,0.12),transparent_55%)]" />
  <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.15] mix-blend-screen" />
  <div className="absolute inset-0 bg-linear-to-t from-background-studio/60 via-transparent to-transparent" />
 
- {/* EditfaceButton */}
+ {/* Edit Banner Button */}
  <button className="absolute right-6 top-6 inline-flex items-center gap-2 rounded-md border border-border/70 bg-surface-75/80 px-3 py-1.5 text-[11px] font-medium text-foreground-light backdrop-blur transition-colors hover:bg-surface-200 hover:text-foreground">
  <ImageIcon className="w-3.5 h-3.5" />
- moreface
- </button>
+More options
+</button>
  </div>
 
- {/* UserInfoCard */}
+ {/* User Info Card */}
 
  <div className="max-w-6xl mx-auto -mt-16 relative px-6">
  <div className="page-panel overflow-hidden">
@@ -199,11 +199,11 @@ export default function ProfilePage() {
  <button className="absolute bottom-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-100 text-foreground-light shadow-sm transition-colors hover:bg-surface-200 hover:text-foreground">
  <Edit3 className="w-3.5 h-3.5" />
  </button>
- {/* OnlineStatus */}
+ {/* Online Status */}
  <div className="absolute bottom-3 right-0 w-4 h-4 rounded-full bg-brand-500 ring-4 ring-surface-100" />
  </div>
 
- {/* UserInfo */}
+ {/* User Info */}
  <div className="flex-1">
  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
  <div className="min-w-0">
@@ -227,7 +227,7 @@ export default function ProfilePage() {
  <button
  onClick={copyUserId}
  className="rounded border border-transparent p-1 text-foreground-muted transition-colors hover:border-border hover:bg-surface-100 hover:text-foreground"
- title="CopyUser ID"
+ title="Copy user ID"
  >
  {copied ? <Check className="w-3 h-3 text-brand-500" /> : <Copy className="w-3 h-3" />}
  </button>
@@ -235,13 +235,13 @@ export default function ProfilePage() {
  </div>
  </div>
 
- {/* ActionButton */}
+ {/* Action Buttons */}
  <div className="flex items-center gap-2">
  <Link href="/dashboard/settings/profile">
  <Button size="sm" className="bg-brand-500 text-background hover:bg-brand-600">
  <Edit3 className="w-4 h-4 mr-2" />
- EditMaterials
- </Button>
+Edit profile
+</Button>
  </Link>
  <Button
  variant="outline"
@@ -264,21 +264,21 @@ export default function ProfilePage() {
  <DropdownMenuContent align="end">
  <DropdownMenuItem>
  <ExternalLink className="w-4 h-4 mr-2" />
- ViewPublicmainpage
+ View Public Profile
  </DropdownMenuItem>
  <DropdownMenuSeparator />
  <DropdownMenuItem>
  <Settings className="w-4 h-4 mr-2" />
- AccountSettings
+ Account Settings
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  </div>
  </div>
 
- {/* UserBio */}
+ {/* User Bio */}
  <p className="text-[13px] text-foreground-light mt-3 max-w-2xl">
- {user?.bio || "AI Automationuser, FocusatImproveWorkrateandExploreSmartResolvePlan."}
+ {user?.bio || "AI automation enthusiast, focused on improving productivity and exploring smart solutions."}
  </p>
 
  {/* Info */}
@@ -289,7 +289,7 @@ export default function ProfilePage() {
  </span>
  <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-100/80 px-3 py-1">
  <Calendar className="w-3.5 h-3.5" />
- 2025 years 6 monthsJoin
+ Joined June 2025
  </span>
  <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-100/80 px-3 py-1">
  <LinkIcon className="w-3.5 h-3.5" />
@@ -299,7 +299,7 @@ export default function ProfilePage() {
  </span>
  </div>
 
- {/* SocialLink */}
+ {/* Social Links */}
  <div className="flex items-center gap-2 mt-4">
  <a
  href="#"
@@ -330,7 +330,7 @@ export default function ProfilePage() {
  </div>
  </div>
 
- {/* StatisticsData */}
+ {/* Statistics Data */}
 
  <div className="grid grid-cols-2 md:grid-cols-4 divide-y divide-border md:divide-y-0 md:divide-x border-t border-border bg-surface-75/40">
  {userStats.map((stat) => (
@@ -355,7 +355,7 @@ export default function ProfilePage() {
 
  </div>
 
- {/* mainContentRegion */}
+ {/* Main Content Region */}
 
  <div className="mt-6 pb-12">
 
@@ -393,21 +393,21 @@ export default function ProfilePage() {
 
  <div className="page-grid md:grid-cols-3">
 
- {/* Left side - etcandContribution */}
+ {/* Left side - Level and Contribution */}
 
  <div className="md:col-span-2 space-y-6">
 
- {/* etcCard */}
+ {/* Level Card */}
 
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Trophy className="w-4 h-4 text-brand-500" />
- <h3 className="page-panel-title">Useretc</h3>
- </div>
- <span className="text-xs text-foreground-light">
- stillneed {pointsToNextLevel} ExperienceUpgrade
- </span>
+<h3 className="page-panel-title">User Level</h3>
+   </div>
+   <span className="text-xs text-foreground-light">
+    {pointsToNextLevel} XP needed to level up
+   </span>
  </div>
 
  <div className="p-6">
@@ -417,20 +417,20 @@ export default function ProfilePage() {
  </div>
  <div className="flex-1">
  <div className="flex items-center justify-between text-[13px] mb-2">
- <span className="text-foreground font-medium">Lv.{currentLevel} rateperson</span>
+ <span className="text-foreground font-medium">Lv.{currentLevel}</span>
  <span className="text-foreground-muted">Lv.{currentLevel + 1}</span>
  </div>
  <Progress value={levelProgress} className="h-1.5 bg-surface-200" />
  <p className="text-xs text-foreground-light mt-2">
- CurrentExperience 1,750 / 2,000
+ Current Experience: 1,750 / 2,000
  </p>
  </div>
  </div>
 
  <div className="flex items-center gap-2 text-xs text-foreground-light">
  <Flame className="w-4 h-4 text-brand-500" />
- <span>currentweeksActive: Continuous 5 days</span>
- <span className="text-brand-500 font-medium">🔥 Maintainhead!</span>
+<span>This week: Active 5 days in a row</span>
+    <span className="text-brand-500 font-medium">🔥 Keep it up!</span>
  </div>
  </div>
  </div>
@@ -441,7 +441,7 @@ export default function ProfilePage() {
  <div className="page-panel-header flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Activity className="w-4 h-4 text-brand-500" />
- <h3 className="page-panel-title">ActiveContribution</h3>
+ <h3 className="page-panel-title">Activity Contribution</h3>
  </div>
  <span className="text-xs text-foreground-light">Past 12 weeks</span>
  </div>
@@ -478,13 +478,13 @@ export default function ProfilePage() {
  </div>
  </div>
 
- {/* canTags */}
+{/* Skill Tags */}
 
  <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center gap-2">
- <Target className="w-4 h-4 text-foreground-light" />
- <h3 className="page-panel-title">canTags</h3>
+  <div className="page-panel-header">
+   <div className="flex items-center gap-2">
+    <Target className="w-4 h-4 text-foreground-light" />
+    <h3 className="page-panel-title">Skills</h3>
  </div>
  </div>
 
@@ -499,7 +499,7 @@ export default function ProfilePage() {
  </span>
  ))}
  <button className="px-3 py-1 rounded-full border border-dashed border-border text-[12px] text-foreground-muted hover:border-brand-500 hover:text-brand-500 transition-colors">
- + Addcan
+ + Add Skill
  </button>
  </div>
  </div>
@@ -507,17 +507,17 @@ export default function ProfilePage() {
 
  </div>
 
- {/* Right side - AchievementFeatured */}
+ {/* Right side - Achievement Showcase */}
 
  <div className="space-y-6">
 
- {/* AchievementShowcase */}
+ {/* Achievement Showcase */}
 
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Award className="w-4 h-4 text-foreground-light" />
- <h3 className="page-panel-title">AchievementBadge</h3>
+ <h3 className="page-panel-title">Achievement Badges</h3>
  </div>
  <Link href="#" className="text-xs text-brand-500 hover:text-brand-600 hover:underline underline-offset-4">
  View all
@@ -552,18 +552,18 @@ export default function ProfilePage() {
  </div>
 
  <p className="text-xs text-foreground-muted mt-4 text-center">
- alreadyUnlock {achievements.filter(a => a.unlocked).length}/{achievements.length} Achievement
+ Unlocked {achievements.filter(a => a.unlocked).length}/{achievements.length} Achievements
  </p>
  </div>
  </div>
 
- {/* RecentActivity */}
+{/* Recent Activity */}
 
  <div className="page-panel">
- <div className="page-panel-header flex items-center justify-between">
- <div className="flex items-center gap-2">
- <Clock className="w-4 h-4 text-foreground-light" />
- <h3 className="page-panel-title">RecentActivity</h3>
+  <div className="page-panel-header flex items-center justify-between">
+   <div className="flex items-center gap-2">
+    <Clock className="w-4 h-4 text-foreground-light" />
+    <h3 className="page-panel-title">Recent Activity</h3>
  </div>
  </div>
 
@@ -588,7 +588,7 @@ export default function ProfilePage() {
  onClick={() => setActiveTab("activity")}
  className="w-full mt-4 py-2 text-xs font-medium text-brand-500 hover:bg-brand-200/60 rounded-md transition-colors"
  >
- View allActivity
+ View All Activity
  </button>
  </div>
  </div>
@@ -605,8 +605,8 @@ export default function ProfilePage() {
  <div className="page-panel overflow-hidden">
  <div className="page-panel-header">
  <div>
- <p className="page-panel-title">allsectionActivity</p>
- <p className="page-panel-description">RecentUpdate {recentActivities.length} </p>
+ <p className="page-panel-title">All Activity</p>
+ <p className="page-panel-description">{recentActivities.length} recent updates</p>
  </div>
  </div>
 
@@ -633,9 +633,9 @@ export default function ProfilePage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <div>
- <p className="page-panel-title">allsectionAchievement</p>
+ <p className="page-panel-title">All Achievements</p>
  <p className="page-panel-description">
- alreadyUnlock {achievements.filter(a => a.unlocked).length}/{achievements.length} Achievement
+ Unlocked {achievements.filter(a => a.unlocked).length}/{achievements.length} Achievements
  </p>
  </div>
  </div>
@@ -671,7 +671,7 @@ export default function ProfilePage() {
  </h4>
  <p className="text-[13px] text-foreground-light">{achievement.description}</p>
  {achievement.unlocked && (
- <p className="text-xs text-brand-500 mt-2">✓ alreadyUnlock</p>
+ <p className="text-xs text-brand-500 mt-2">✓ Unlocked</p>
  )}
  </div>
  </div>
@@ -688,8 +688,8 @@ export default function ProfilePage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <div>
- <p className="page-panel-title">FavoriteContent</p>
- <p className="page-panel-description"> {savedItems.length} Content</p>
+<p className="page-panel-title">Favorite Content</p>
+    <p className="page-panel-description">{savedItems.length} saved items</p>
  </div>
  </div>
 
@@ -711,7 +711,7 @@ export default function ProfilePage() {
  <p className="text-[13px] text-foreground-light mt-1 flex items-center gap-2">
  <span className="capitalize">{item.type}</span>
  <span></span>
- <span>{item.uses.toLocaleString()} timesUsage</span>
+                <span>Used {item.uses.toLocaleString()} times</span>
  </p>
  </div>
  <Bookmark className="w-4 h-4 text-brand-500 fill-brand-500 shrink-0" />

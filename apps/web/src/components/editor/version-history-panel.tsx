@@ -35,14 +35,14 @@ export function VersionHistoryPanel({
  const [loading, setLoading] = useState(false);
  const [selectedVersions, setSelectedVersions] = useState<number[]>([]);
 
- // LoadVersion History
+  // Load version history
  const loadVersions = async () => {
  setLoading(true);
  try {
  const response = await versionApi.list(workflowId, { page: 1, page_size: 50 });
  setVersions(response.data.versions);
  } catch (error) {
- toast.error("LoadVersion HistoryFailed");
+ toast.error("Failed to load version history");
  } finally {
  setLoading(false);
  }
@@ -54,28 +54,28 @@ export function VersionHistoryPanel({
  }
  }, [open, workflowId]);
 
- // RestoreVersion
+  // Restore version
  const handleRestore = async (version: WorkflowVersion) => {
  if (version.version === currentVersion) {
- toast.info("thisalreadyisCurrent Version");
+ toast.info("This is already the current version");
  return;
  }
 
- if (!confirm(`OKneedRestoretoVersion ${version.version} ??Current VersionwillbySaveasnewVersion.`)) {
+ if (!confirm(`Are you sure you want to restore to version ${version.version}? The current version will be saved as a new version.`)) {
  return;
  }
 
  try {
- await versionApi.restore(workflowId, version.version, `RestoretoVersion ${version.version}`);
- toast.success("VersionRestoreSuccess");
+ await versionApi.restore(workflowId, version.version, `Restored to version ${version.version}`);
+ toast.success("Version restored successfully");
  onRestore?.(version);
  setOpen(false);
  } catch (error) {
- toast.error("RestoreFailed, PleaseRetry");
+ toast.error("Restore failed, please try again");
  }
  };
 
- // SelectVersionProceedforcompare
+  // Select version to proceed for comparison
  const toggleVersionSelect = (version: number) => {
  setSelectedVersions((prev) => {
  if (prev.includes(version)) {
@@ -88,7 +88,7 @@ export function VersionHistoryPanel({
  });
  };
 
- // FetchChangeTypeTags
+  // Get change type badges
  const getChangeTypeBadge = (type: string) => {
  const config = {
  create: { label: "Create", variant: "default" as const },
@@ -100,7 +100,7 @@ export function VersionHistoryPanel({
  return <Badge variant={variant}>{label}</Badge>;
  };
 
- // ProcessVersionforcompare
+  // Process version comparison
  const handleCompare = async () => {
  if (selectedVersions.length !== 2) return;
 
@@ -110,12 +110,12 @@ export function VersionHistoryPanel({
  const response = await versionApi.compare(workflowId, v1, v2);
  const diff = response.data.diff;
 
- // DisplayforcompareResultSummary
+      // Display comparison result summary
  toast.success(
- `VersionforcompareDone: ${diff.summary.nodes_change_count} NodeChange, ${diff.summary.edges_change_count} ConnectChange`
+ `Version comparison complete: ${diff.summary.nodes_change_count} node changes, ${diff.summary.edges_change_count} connection changes`
  );
  } catch (error) {
- toast.error("VersionforcompareFailed");
+ toast.error("Version comparison failed.");
  }
  };
 
@@ -141,7 +141,7 @@ export function VersionHistoryPanel({
  onClick={handleCompare}
  >
  <GitCompare className="w-4 h-4 mr-2" />
- forcompareselectVersion
+ Select versions to compare
  </Button>
  )}
  </SheetTitle>
@@ -154,7 +154,7 @@ export function VersionHistoryPanel({
  </div>
  ) : versions.length === 0 ? (
  <div className="text-center py-12 text-foreground-muted">
- NoneVersion History
+ No version history
  </div>
  ) : (
  <div className="space-y-2 pr-4">
@@ -170,13 +170,13 @@ export function VersionHistoryPanel({
  )}
  onClick={() => toggleVersionSelect(version.version)}
  >
- {/* TimelineConnect */}
+              {/* Timeline Connector */}
  {index < versions.length - 1 && (
  <div className="absolute left-6 top-12 w-0.5 h-[calc(100%-24px)] bg-border" />
  )}
 
  <div className="flex items-start gap-3">
- {/* Version NumberDot */}
+              {/* Version Number Dot */}
  <div
  className={cn(
  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0",
@@ -210,8 +210,8 @@ export function VersionHistoryPanel({
  locale: zhCN,
  })}
  </span>
- <span>{version.node_count} Node</span>
- <span>{version.edge_count} Connection</span>
+                    <span>{version.node_count} Nodes</span>
+                    <span>{version.edge_count} Connections</span>
  </div>
 
  {version.creator && (
@@ -229,7 +229,7 @@ export function VersionHistoryPanel({
  )}
  </div>
 
- {/* RestoreButton */}
+              {/* Restore Button */}
  {version.version !== currentVersion && (
  <Button
  size="sm"

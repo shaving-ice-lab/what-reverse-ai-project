@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Contact UsPage - LobeHub Style
+ * Contact Us Page - LobeHub Style
  */
 
 import { useState } from "react";
@@ -24,51 +24,51 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Contactmethod
+// Contact Methods
 const contactMethods = [
  {
  icon: Mail,
- title: "SendEmail",
+ title: "Email Us",
  description: "support@agentflow.ai",
- action: "SendEmail",
+ action: "Send Email",
  href: "mailto:support@agentflow.ai",
  },
  {
  icon: MessageSquare,
- title: "OnlineSupport",
- description: "WorkTime 9:00-18:00",
- action: "StartConversation",
+ title: "Online Support",
+ description: "Business Hours 9:00–18:00",
+ action: "Start Chat",
  href: "#chat",
  },
  {
  icon: Phone,
- title: "PhoneConsulting",
+ title: "Phone Support",
  description: "400-888-8888",
- action: "Phone",
+ action: "Call Us",
  href: "tel:400-888-8888",
  },
 ];
 
-// OfficeAddress
+// Office Locations
 const offices = [
  {
  city: "Beijing",
  address: " xxx ",
- type: "totalsection",
+ type: "headquarters",
  },
  {
- city: "on",
+ city: "Shanghai",
  address: "new xxx ",
- type: "section",
+ type: "branch",
  },
 ];
 
-// ConsultingType
+// Inquiry Types
 const inquiryTypes = [
- { id: "general", label: "1Consulting" },
- { id: "sales", label: "SalesConsulting" },
- { id: "support", label: "TechnologySupport" },
- { id: "partnership", label: "Cooperation" },
+ { id: "general", label: "General Inquiry" },
+ { id: "sales", label: "Sales Inquiry" },
+ { id: "support", label: "Technical Support" },
+ { id: "partnership", label: "Partnership" },
 ];
 
 export default function ContactPage() {
@@ -86,7 +86,7 @@ export default function ContactPage() {
  e.preventDefault();
  setIsSubmitting(true);
  
- // MockSubmit
+ // Mock Submit
  await new Promise(resolve => setTimeout(resolve, 1500));
  
  setIsSubmitting(false);
@@ -111,7 +111,7 @@ export default function ContactPage() {
  Contact Us
  </h1>
  <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
- haswhatIssueorSuggestion?We'sTeamAnytimeasyouProvideHelp.
+ Have a question or suggestion? Our team is here to help anytime.
  </p>
  </div>
  </section>
@@ -156,17 +156,17 @@ export default function ContactPage() {
  {/* Form */}
  <div>
  <h2 className="text-2xl font-bold text-foreground mb-6">
- SendMessage
+ Send a Message
  </h2>
 
  {isSubmitted ? (
  <div className="p-8 rounded-2xl bg-brand-500/5 border border-brand-500/20 text-center">
  <CheckCircle className="w-12 h-12 text-brand-500 mx-auto mb-4" />
  <h3 className="text-lg font-semibold text-foreground mb-2">
- MessagealreadySend!
+ Message Sent!
  </h3>
  <p className="text-foreground-lighter mb-4 text-[13px]">
- Wewillat 1-2 Business DayinReplyyou
+ We&apos;ll reply within 1–2 business days
  </p>
  <Button
  variant="outline"
@@ -182,7 +182,7 @@ export default function ContactPage() {
  });
  }}
  >
- Send1Message
+ Send Another Message
  </Button>
  </div>
  ) : (
@@ -196,7 +196,7 @@ export default function ContactPage() {
  required
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- placeholder="you'sName"
+ placeholder="Your name"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
@@ -217,19 +217,19 @@ export default function ContactPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- CompanyName
+ Company Name
  </label>
  <Input
  value={formData.company}
  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
- placeholder="you'sCompany(select)"
+ placeholder="Your company (optional)"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- ConsultingType
+ Inquiry Type
  </label>
  <select
  value={formData.type}
@@ -246,13 +246,13 @@ export default function ContactPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- MessageContent *
+ Message *
  </label>
  <textarea
  required
  value={formData.message}
  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
- placeholder="PleaseDetailedDescriptionyou'sIssueorRequirements..."
+ placeholder="Please describe your issue or requirements in detail..."
  rows={5}
  className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
  />
@@ -266,12 +266,12 @@ export default function ContactPage() {
  {isSubmitting ? (
  <>
  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
- Send...
+ Sending...
  </>
  ) : (
  <>
  <Send className="w-4 h-4 mr-2" />
- SendMessage
+ Send Message
  </>
  )}
  </Button>
@@ -284,7 +284,7 @@ export default function ContactPage() {
  {/* Offices */}
  <div>
  <h3 className="text-lg font-semibold text-foreground mb-4">
- OfficeAddress
+ Office Locations
  </h3>
  <div className="space-y-4">
  {offices.map((office) => (
@@ -299,7 +299,7 @@ export default function ContactPage() {
  <span className="font-semibold text-foreground text-[14px]">
  {office.city}
  </span>
- {office.type === "totalsection" && (
+ {office.type === "headquarters" && (
  <span className="px-2 py-0.5 rounded-full bg-surface-200/80 text-foreground-lighter text-[10px] font-medium">
  HQ
  </span>
@@ -316,16 +316,16 @@ export default function ContactPage() {
  {/* Working Hours */}
  <div>
  <h3 className="text-lg font-semibold text-foreground mb-4">
- WorkTime
+ Business Hours
  </h3>
  <div className="p-4 rounded-xl bg-surface-100/30 border border-border/30">
  <div className="flex items-center gap-2 text-[13px]">
  <Clock className="w-4 h-4 text-foreground-light" />
- <span className="text-foreground">weeks1weeks5</span>
+ <span className="text-foreground">Monday – Friday</span>
  <span className="text-foreground-lighter">9:00 - 18:00</span>
  </div>
  <p className="text-[11px] text-foreground-muted mt-2 pl-6">
- daycancanAdjust, UrgentIssuePleaseEmail
+ Hours may vary on holidays. For urgent issues, please email us
  </p>
  </div>
  </div>
@@ -336,9 +336,9 @@ export default function ContactPage() {
  Response Time
  </h4>
  <ul className="text-[13px] text-foreground-lighter space-y-1">
- <li>• 1Consulting: 1-2 Business Day</li>
- <li>• TechnologySupport: 24 hin</li>
- <li>• UrgentIssue: 4 hin</li>
+ <li>• General Inquiry: 1–2 business days</li>
+ <li>• Technical Support: within 24 hours</li>
+ <li>• Urgent Issues: within 4 hours</li>
  </ul>
  </div>
  </div>

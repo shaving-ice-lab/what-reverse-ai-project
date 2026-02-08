@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * WebsitePage - LobeHub StyleDesign
+ * WebsitePage - LobeHub Style Design
  */
 
 import { useState, useEffect } from "react";
@@ -25,7 +25,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// WebsiteData
+// Website Data
 const sitemapSections = [
  {
  title: "Product",
@@ -33,11 +33,11 @@ const sitemapSections = [
  color: "#4e8fff",
  links: [
  { name: "Home", href: "/" },
- { name: "FeaturesIntroduction", href: "/features" },
- { name: "PricingPlan", href: "/pricing" },
+ { name: "Features", href: "/features" },
+ { name: "Pricing Plans", href: "/pricing" },
  { name: "Enterprise", href: "/enterprise" },
- { name: "IntegrationApp", href: "/dashboard/integrations" },
- { name: "TemplateMarketplace", href: "/store" },
+ { name: "Integrations", href: "/dashboard/integrations" },
+ { name: "Template Marketplace", href: "/store" },
  ],
  },
  {
@@ -45,23 +45,23 @@ const sitemapSections = [
  icon: Code,
  color: "#3B82F6",
  links: [
- { name: "Developerscenter", href: "/developers" },
- { name: "Documentcenter", href: "/docs" },
- { name: "API Document", href: "/docs/api" },
+ { name: "Developer Center", href: "/developers" },
+ { name: "Documentation", href: "/docs" },
+ { name: "API Documentation", href: "/docs/api" },
  { name: "SDK Download", href: "/docs/sdk" },
  { name: "Change Log", href: "/changelog" },
  { name: "Roadmap", href: "/roadmap" },
  ],
  },
  {
- title: "Resource",
+    title: "Resources",
  icon: Book,
  color: "#8B5CF6",
  links: [
  { name: "Blog", href: "/blog" },
  { name: "Help Center", href: "/help" },
- { name: "LearnResource", href: "/learn/courses" },
- { name: "NetworkWorkshopwill", href: "/webinars" },
+ { name: "Learning Resources", href: "/learn/courses" },
+ { name: "Webinars & Workshops", href: "/webinars" },
  { name: "Newsletter", href: "/newsletter" },
  ],
  },
@@ -70,12 +70,12 @@ const sitemapSections = [
  icon: Users,
  color: "#F59E0B",
  links: [
- { name: "CommunityHome", href: "/community" },
- { name: "WorkShowcase", href: "/showcase" },
- { name: "UsageCase Studies", href: "/use-cases" },
- { name: "CustomerReviews", href: "/testimonials" },
+ { name: "Community Home", href: "/community" },
+ { name: "Work Showcase", href: "/showcase" },
+ { name: "Use Case Studies", href: "/use-cases" },
+ { name: "Customer Reviews", href: "/testimonials" },
  { name: "Case Studies", href: "/case-studies" },
- { name: "Activity", href: "/events" },
+ { name: "Events", href: "/events" },
  ],
  },
  {
@@ -83,10 +83,10 @@ const sitemapSections = [
  icon: Building,
  color: "#EC4899",
  links: [
- { name: "AboutWe", href: "/about" },
- { name: "", href: "/careers" },
+ { name: "About Us", href: "/about" },
+ { name: "Careers", href: "/careers" },
  { name: "Partners", href: "/partners" },
- { name: "Mediacenter", href: "/press" },
+ { name: "Media Center", href: "/press" },
  { name: "Contact Us", href: "/contact" },
  { name: "What's New", href: "/whats-new" },
  ],
@@ -97,20 +97,20 @@ const sitemapSections = [
  color: "#06B6D4",
  links: [
  { name: "FAQ", href: "/faq" },
- { name: "SystemStatus", href: "/status" },
+ { name: "System Status", href: "/status" },
  { name: "Referral Program", href: "/referral-program" },
- { name: "AppointmentDemo", href: "/demo" },
+ { name: "Schedule a Demo", href: "/demo" },
  ],
  },
  {
- title: "LegalandSecurity",
+ title: "Legal and security",
  icon: Shield,
  color: "#EF4444",
  links: [
  { name: "Terms of Service", href: "/terms" },
  { name: "Privacy Policy", href: "/privacy" },
- { name: "Securitycenter", href: "/security" },
- { name: "BrandResource", href: "/brand" },
+ { name: "Security Center", href: "/security" },
+ { name: "Brand Resources", href: "/brand" },
  ],
  },
  {
@@ -124,7 +124,7 @@ const sitemapSections = [
  },
 ];
 
-// outsidesectionResource
+// External Resources
 const externalResources = [
  { name: "GitHub", href: "https://github.com/agentflow", icon: "🐙" },
  { name: "Discord Community", href: "https://discord.gg/agentflow", icon: "💬" },
@@ -141,7 +141,7 @@ export default function SitemapPage() {
  setIsLoaded(true);
  }, []);
 
- // SearchFilter
+ // Search Filter
  const filteredSections = sitemapSections.map(section => ({
  ...section,
  links: section.links.filter(link =>
@@ -180,7 +180,7 @@ export default function SitemapPage() {
  "transition-all duration-700 delay-200",
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}>
- Quicktoyouneedneed'swhatPageorResource
+ Quickly find the page or resource you need
  </p>
 
  {/* Search */}
@@ -193,7 +193,7 @@ export default function SitemapPage() {
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-lighter transition-colors group-focus-within:text-[#4e8fff]" />
  <input
  type="text"
- placeholder="SearchPage..."
+ placeholder="Search pages..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className={cn(
@@ -217,17 +217,17 @@ export default function SitemapPage() {
  <div className="flex items-center gap-2">
  <Layers className="w-4 h-4 text-[#4e8fff]" />
  <span className="font-semibold text-foreground">{totalLinks}</span>
- <span className="text-foreground-lighter">Page</span>
- </div>
- <div className="flex items-center gap-2">
- <Book className="w-4 h-4 text-[#4e8fff]" />
- <span className="font-semibold text-foreground">{sitemapSections.length}</span>
- <span className="text-foreground-lighter">Category</span>
+            <span className="text-foreground-lighter">Pages</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Book className="w-4 h-4 text-[#4e8fff]" />
+            <span className="font-semibold text-foreground">{sitemapSections.length}</span>
+            <span className="text-foreground-lighter">Categories</span>
  </div>
  <div className="flex items-center gap-2">
  <ExternalLink className="w-4 h-4 text-[#4e8fff]" />
  <span className="font-semibold text-foreground">{externalResources.length}</span>
- <span className="text-foreground-lighter">outsidesectionResource</span>
+ <span className="text-foreground-lighter">External Resources</span>
  </div>
  </div>
  </div>
@@ -242,14 +242,14 @@ export default function SitemapPage() {
  <Search className="w-8 h-8 text-foreground-lighter" />
  </div>
  <h3 className="text-[15px] font-semibold text-foreground mb-2">
- Noto &ldquo;{searchQuery}&rdquo;
+            No results for &ldquo;{searchQuery}&rdquo;
  </h3>
- <p className="text-[13px] text-foreground-light mb-6">TryUsageotherheKeywordsSearch</p>
+ <p className="text-[13px] text-foreground-light mb-6">Try other keywords to search</p>
  <button
  onClick={() => setSearchQuery("")}
  className="px-6 py-2.5 rounded-full bg-foreground text-background hover:bg-foreground/90 text-[13px] font-medium transition-colors"
  >
- ClearSearch
+ Clear Search
  </button>
  </div>
  ) : (
@@ -264,7 +264,7 @@ export default function SitemapPage() {
  )}
  style={{ animationDelay: `${sectionIndex * 50}ms` }}
  >
- {/* CategoryHeader */}
+ {/* Category Header */}
  <div className="flex items-center gap-3 mb-5">
  <div
  className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -278,12 +278,12 @@ export default function SitemapPage() {
  <div>
  <h2 className="font-semibold text-foreground text-[13px]">{section.title}</h2>
  <span className="text-[11px] text-foreground-lighter">
- {section.links.length} Page
+                {section.links.length} Pages
  </span>
  </div>
  </div>
 
- {/* LinkList */}
+ {/* Link List */}
  <ul className="space-y-1">
  {section.links.map((link) => (
  <li key={link.href}>
@@ -318,7 +318,7 @@ export default function SitemapPage() {
  <div className="w-8 h-8 rounded-lg bg-surface-100/50 flex items-center justify-center">
  <ExternalLink className="w-4 h-4 text-foreground-lighter" />
  </div>
- <h2 className="font-semibold text-foreground">outsidesectionResource</h2>
+ <h2 className="font-semibold text-foreground">External Resources</h2>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -354,7 +354,7 @@ export default function SitemapPage() {
  </div>
  <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-3">Need help?</h2>
  <p className="text-[13px] text-foreground-light mb-8">
- nottoyouneedneed'sContent?We'sSupportTeamAnytimeasyouProvideHelp
+ Need help? Our support team is here to assist you.
  </p>
  <div className="flex flex-col sm:flex-row gap-3 justify-center">
  <Link href="/help">

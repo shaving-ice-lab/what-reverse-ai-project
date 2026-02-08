@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * DocumentDetailsPage - Supabase Style
+ * Document Details Page - Supabase Style
  */
 
 import { useState, useEffect } from "react";
@@ -28,110 +28,110 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// MockDocumentData
+// Mock document data
 const mockDocuments: Record<string, {
- id: string;
- title: string;
- content: string;
- type: string;
- createdAt: string;
- updatedAt: string;
- wordCount: number;
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+  wordCount: number;
 }> = {
- "1": {
- id: "1",
- title: "Q1 MarketingPlan",
- content: `# Q1 MarketingPlan
+  "1": {
+    id: "1",
+    title: "Q1 Marketing Plan",
+    content: `# Q1 Marketing Plan
 
-## ExecuteSummary
+## Executive Summary
 
-currentQuarterMarketingre-FocusatBrandUpgradeandUserGrowth, ViamultipleChannelIntegrateMarketingPolicy, ImplementUserandBrandImpactpower'sre-Improve.
+This quarter's marketing efforts focus on brand upgrades and user growth, leveraging multi-channel integrated marketing strategies to improve user engagement and brand impact.
 
-## CoreTarget
+## Core Targets
 
-1. **UserGrowthTarget**: AddSign UpUser 50,000+
-2. **BrandExposureTarget**: allExposureto 1000 10000+
-3. **Target**: PaidConversion RateImprove 5%
+1. **User Growth Target**: Add 50,000+ new sign-ups
+2. **Brand Exposure Target**: Achieve 10,000,000+ total impressions
+3. **Conversion Target**: Improve paid conversion rate by 5%
 
-## MarketingPolicy
+## Marketing Strategy
 
-### ContentMarketing
+### Content Marketing
 
-- eachweeksPublish 3-5 TechnologyBlog
-- 2-3 ProductUsageTutorialVideo
-- IndustryWhite PaperResearch
+- Publish 3-5 technology blog posts per week
+- Produce 2-3 product tutorial videos
+- Release industry white paper research
 
-### Social MediaMarketing
+### Social Media Marketing
 
-- WeChatdaymoreOperations
-- Zhihu, JuejinTechnologyCommunityDepthOperations
-- Twitter/LinkedIn InternationalCommunityLayout
+- Daily social media operations
+- Deep engagement in technology communities
+- Twitter/LinkedIn international community outreach
 
-### ActivityMarketing
+### Event Marketing
 
-- lineonLive: eachmonths 2 ProductLive
-- linedownActivity: Beijing, onUserfacewill
-- Industrywill: 2-3 Industrywill
+- Online events: 2 product livestreams per month
+- Offline events: User meetups in major cities
+- Industry conferences: Attend 2-3 industry events
 
-## BudgetAllocate
+## Budget Allocation
 
-| Category | Budget | compare |
+| Category | Budget | Percentage |
 |------|------|------|
 | Content | 50,000 | 25% |
 | Advertising | 80,000 | 40% |
-| ActivityOperations | 50,000 | 25% |
-| otherhe | 20,000 | 10% |
+| Events & Operations | 50,000 | 25% |
+| Other | 20,000 | 10% |
 
-## Time
+## Timeline
 
-- 1months: BrandUpgrade, newonline
-- 2months: MarketingActivity
-- 3months: newVersionPublishwill, Q1 Summary
+- Month 1: Brand upgrade, new website launch
+- Month 2: Marketing campaign execution
+- Month 3: New version release event, Q1 summary
 
-## result
+## Expected Results
 
-ViacurrentQuarter'sMarketingenter, EstimatedImplement: 
+Through this quarter's marketing efforts, we estimate:
 
-- DAU Improve 30%
-- BrandSearchcount
-- IndustryinBrandImprove`, type: "text",
- createdAt: "2026-01-15",
- updatedAt: "10 minbefore",
- wordCount: 458,
- },
- "2": {
- id: "2",
- title: "ProductPublishAnnouncement",
- content: `# AgentFlow 2.3 currentlyPublish
+- DAU improvement of 30%
+- Significant increase in brand search volume
+- Industry brand recognition improvement`, type: "text",
+    createdAt: "2026-01-15",
+    updatedAt: "10 min ago",
+    wordCount: 458,
+  },
+  "2": {
+    id: "2",
+    title: "Product launch announcement",
+    content: `# AgentFlow 2.3 Now Available
 
-Wevery AgentFlow 2.3 VersioncurrentlyPublish!
+We are excited to announce that AgentFlow 2.3 is now available!
 
-## mainneedUpdate
+## Key Updates
 
 ### Multi-Agent Collaboration
 
-allnew's Multi-Agent CollaborationFeatures, Supportmultiple AI Agent Work, ProcessComplex'smultipleStepTask.
+All-new Multi-Agent Collaboration features, supporting multiple AI agents working together to process complex multi-step tasks.
 
-### canoptimal
+### Performance Improvements
 
-- ExecuteSpeedImprove 50%
-- inuseReduce 30%
+- Execution speed improved by 50%
+- Memory usage reduced by 30%
 
-### AddIntegration
+### New Integrations
 
-- FeishuIntegration
-- YuqueKnowledge Base
+- Feishu Integration
+- Yuque Knowledge Base
 - Notion Database
 
-## Upgrademethod
+## How to Upgrade
 
-ifresultyouisExistingUser, SystemalreadyAutoasyouUpgrade.
+If you are an existing user, the system will automatically upgrade for you.
 
-Thank youyou'sSupport!`, type: "text",
- createdAt: "2026-01-20",
- updatedAt: "2 hbefore",
- wordCount: 156,
- },
+Thank you for your support!`, type: "text",
+    createdAt: "2026-01-20",
+    updatedAt: "2 hours ago",
+    wordCount: 156,
+  },
 };
 
 export default function DocumentPage() {
@@ -157,11 +157,11 @@ export default function DocumentPage() {
  <div className="h-full flex items-center justify-center">
  <div className="text-center">
  <FileText className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
- <h2 className="text-lg font-medium text-foreground mb-2">DocumentDoes not exist</h2>
- <p className="text-foreground-muted mb-4">DocumentcancanalreadybyDelete</p>
+<h2 className="text-lg font-medium text-foreground mb-2">Document does not exist</h2>
+  <p className="text-foreground-muted mb-4">This document may have been deleted.</p>
  <Link href="/dashboard/creative">
  <Button className="bg-brand-500 hover:bg-brand-600 text-foreground">
- BackCreativeAssistant
+            Back to Creative Assistant
  </Button>
  </Link>
  </div>
@@ -184,7 +184,7 @@ export default function DocumentPage() {
  };
 
  const handleDelete = async () => {
- if (confirm("OKneedDeletethisDocument??")) {
+ if (confirm("Delete this document? This cannot be undone.")) {
  router.push("/dashboard/creative");
  }
  };
@@ -207,7 +207,7 @@ export default function DocumentPage() {
  <div className="flex items-center gap-3 text-xs text-foreground-muted mt-0.5">
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
- Updateat {document.updatedAt}
+ Updated at {document.updatedAt}
  </span>
  <span>{document.wordCount} char</span>
  </div>
@@ -281,7 +281,7 @@ export default function DocumentPage() {
  <div className="absolute right-0 top-full mt-2 w-48 p-1 rounded-md bg-surface-100 border border-border z-50">
  <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-foreground hover:bg-surface-75 transition-colors">
  <Star className="w-4 h-4" />
- AddtoFavorite
+                  Add to Favorites
  </button>
  <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-foreground hover:bg-surface-75 transition-colors">
  <Share2 className="w-4 h-4" />
@@ -293,7 +293,7 @@ export default function DocumentPage() {
  </button>
  <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-foreground hover:bg-surface-75 transition-colors">
  <Wand2 className="w-4 h-4" />
- AI 
+                  AI Rewrite
  </button>
  <div className="my-1 border-t border-border" />
  <button

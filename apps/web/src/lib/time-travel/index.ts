@@ -1,7 +1,7 @@
 /**
- * TimerowDebugModule
+ * Time Travel Debug Module
  * 
- * ProvideExecuteSnapshot'sStorage, QueryandManageFeatures
+ * Provides execution snapshot storage, query, and management features
  */
 
 export * from "./snapshot-store";

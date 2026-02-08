@@ -1,36 +1,36 @@
 /**
- * endpointtoendpointEncryptService
- * @description Used forDataSynctime'sEncrypt/Decrypt
+ * End-to-End Encryption Service
+ * @description Used for encrypting/decrypting data during sync
  */
 
 /**
- * Encryptafter'sData
+ * Encrypted data
  */
 export interface EncryptedData {
- /** Encryptafter'sContent (Base64) */
+ /** Encrypted content (Base64) */
  ciphertext: string;
- /** InitialVector (Base64) */
+ /** Initialization vector (Base64) */
  iv: string;
- /** value (Base64) */
+ /** Salt value (Base64) */
  salt: string;
- /** AlgorithmVersion */
+ /** Algorithm version */
  version: number;
 }
 
 /**
- * EncryptConfig
+ * Encryption configuration
  */
 export interface EncryptionConfig {
- /** PBKDF2 Iterationtimescount */
+ /** PBKDF2 iteration count */
  iterations: number;
- /** KeyLength (bits) */
+ /** Key length (bits) */
  keyLength: number;
  /** Algorithm */
  algorithm: 'AES-GCM';
 }
 
 /**
- * DefaultEncryptConfig
+ * Default encryption configuration
  */
 const DEFAULT_CONFIG: EncryptionConfig = {
  iterations: 100000,
@@ -39,7 +39,7 @@ const DEFAULT_CONFIG: EncryptionConfig = {
 };
 
 /**
- * endpointtoendpointEncrypt
+ * End-to-end encryption
  */
 export class E2EEncryption {
  private config: EncryptionConfig;
@@ -51,13 +51,13 @@ export class E2EEncryption {
  }
 
  /**
- * InitialEncryptKey
+ * Initialize encryption key
  */
  async initialize(password: string, existingSalt?: Uint8Array): Promise<Uint8Array> {
- // GenerateorUsageExisting'svalue
+ // Generate or use existing salt
  this.salt = existingSalt || crypto.getRandomValues(new Uint8Array(16));
 
- // fromPasswordDeriveKey
+ // Import password as key material
  const passwordKey = await crypto.subtle.importKey(
  'raw',
  new TextEncoder().encode(password),
@@ -66,7 +66,7 @@ export class E2EEncryption {
  ['deriveKey']
  );
 
- // DerivemainKey
+ // Derive master key
  this.masterKey = await crypto.subtle.deriveKey(
  {
  name: 'PBKDF2',
@@ -84,18 +84,18 @@ export class E2EEncryption {
  }
 
  /**
- * CheckisnoalreadyInitial
+ * Check if already initialized
  */
  isInitialized(): boolean {
  return this.masterKey !== null;
  }
 
  /**
- * EncryptData
+ * Encrypt data
  */
  async encrypt(data: unknown): Promise<EncryptedData> {
  if (!this.masterKey || !this.salt) {
- throw new Error('EncryptKeynot yetInitial');
+ throw new Error('Encryption key not yet initialized');
  }
 
  const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -116,11 +116,11 @@ export class E2EEncryption {
  }
 
  /**
- * DecryptData
+ * Decrypt data
  */
  async decrypt<T = unknown>(encrypted: EncryptedData): Promise<T> {
  if (!this.masterKey) {
- throw new Error('EncryptKeynot yetInitial');
+ throw new Error('Encryption key not yet initialized');
  }
 
  const iv = this.base64ToArrayBuffer(encrypted.iv);
@@ -137,7 +137,7 @@ export class E2EEncryption {
  }
 
  /**
- * VerifyPassword
+ * Verify password
  */
  async verifyPassword(password: string, salt: Uint8Array, testData: EncryptedData): Promise<boolean> {
  try {
@@ -151,24 +151,24 @@ export class E2EEncryption {
  }
 
  /**
- * ChangePassword
+ * Change password
  */
  async changePassword(
  oldPassword: string,
  newPassword: string,
  encryptedData: EncryptedData[]
  ): Promise<{ newSalt: Uint8Array; reencryptedData: EncryptedData[] }> {
- // firstuseoldPasswordDecryptAllData
+ // First, decrypt all data with the old password
  const decryptedData: unknown[] = [];
  for (const encrypted of encryptedData) {
  const decrypted = await this.decrypt(encrypted);
  decryptedData.push(decrypted);
  }
 
- // useNew Passwordre-newInitial
+ // Re-initialize with the new password
  const newSalt = await this.initialize(newPassword);
 
- // re-newEncryptAllData
+ // Re-encrypt all data
  const reencryptedData: EncryptedData[] = [];
  for (const data of decryptedData) {
  const encrypted = await this.encrypt(data);
@@ -179,20 +179,20 @@ export class E2EEncryption {
  }
 
  /**
- * GenerateEncryptKeyBackup
+ * Generate encryption key backup
  */
  async exportKey(): Promise<string> {
  if (!this.masterKey) {
- throw new Error('EncryptKeynot yetInitial');
+ throw new Error('Encryption key not yet initialized');
  }
 
- // Note: thisinnotcanDirectExportDeriveKey
- // ActualImplementShouldExportUsed forRestore'sInfo
- throw new Error('KeyExportFeaturesneedneedoutside'sSecurityMeasure');
+ // Note: Cannot directly export a derived key
+ // Actual implementation should export recovery information
+ throw new Error('Key export requires appropriate security measures');
  }
 
  /**
- * ClearKey
+ * Clear keys
  */
  clear(): void {
  this.masterKey = null;
@@ -200,7 +200,7 @@ export class E2EEncryption {
  }
 
  /**
- * ArrayBuffer Base64
+ * Convert ArrayBuffer to Base64
  */
  private arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
@@ -212,7 +212,7 @@ export class E2EEncryption {
  }
 
  /**
- * Base64 ArrayBuffer
+ * Convert Base64 to ArrayBuffer
  */
  private base64ToArrayBuffer(base64: string): ArrayBuffer {
  const binary = atob(base64);
@@ -225,19 +225,19 @@ export class E2EEncryption {
 }
 
 /**
- * CreateEncryptInstance
+ * Create encryption instance
  */
 export function createEncryption(config?: Partial<EncryptionConfig>): E2EEncryption {
  return new E2EEncryption(config);
 }
 
 /**
- * DefaultEncryptInstance
+ * Default encryption instance
  */
 let defaultEncryption: E2EEncryption | null = null;
 
 /**
- * FetchDefaultEncryptInstance
+ * Get default encryption instance
  */
 export function getDefaultEncryption(): E2EEncryption {
  if (!defaultEncryption) {
@@ -247,7 +247,7 @@ export function getDefaultEncryption(): E2EEncryption {
 }
 
 /**
- * SimpleHashcount(Used forSensitiveData)
+ * Simple hash function (used for non-sensitive data)
  */
 export async function simpleHash(text: string): Promise<string> {
  const encoder = new TextEncoder();

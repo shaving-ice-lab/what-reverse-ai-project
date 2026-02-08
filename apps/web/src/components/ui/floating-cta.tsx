@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * FloatingCTA - FloatingQuickActionButton
+ * FloatingCTA - Floating quick action button
  * 
- * FloatatPagerightdown, ProvideQuickConsultingEntry
+ * Floats at the bottom-right of the page, providing quick action entry points
  */
 
 import { useState, useEffect } from "react";
@@ -30,29 +30,29 @@ interface QuickAction {
 const quickActions: QuickAction[] = [
  {
  icon: Sparkles,
- label: "Freeuse",
- description: "NowStartUsage",
+ label: "Try Free",
+ description: "Get started now",
  href: "/register",
  color: "bg-primary text-primary-foreground",
  },
  {
  icon: HelpCircle,
  label: "Help Center",
- description: "ViewFAQ",
+ description: "View FAQ",
  href: "/docs",
  color: "bg-blue-500 text-white",
  },
  {
  icon: FileText,
- label: "ProductDemo",
- description: "AppointmentProductDemo",
+ label: "Product Demo",
+ description: "Book a product demo",
  href: "/contact?type=demo",
  color: "bg-purple-500 text-white",
  },
  {
  icon: Mail,
  label: "Contact Us",
- description: "FetchmoremultipleHelp",
+ description: "Get more help",
  href: "/contact",
  color: "bg-orange-500 text-white",
  },
@@ -65,13 +65,13 @@ export function FloatingCTA() {
 
  useEffect(() => {
  const handleScroll = () => {
- // ScrollExceed 300px afterDisplayFloatingButton
+ // Show floating button after scrolling past 300px
  if (window.scrollY > 300) {
  setHasScrolled(true);
  setIsVisible(true);
  } else {
  setHasScrolled(false);
- // ifresultMenuOpenStatus, Maintaincan
+ // If the menu is open, keep it visible
  if (!isOpen) {
  setIsVisible(false);
  }
@@ -82,7 +82,7 @@ export function FloatingCTA() {
  return () => window.removeEventListener("scroll", handleScroll);
  }, [isOpen]);
 
- // AlwaysatHomeDisplay, butInitialdown
+ // Always display on homepage, but with initial delay
  useEffect(() => {
  const timer = setTimeout(() => {
  setIsVisible(true);
@@ -98,7 +98,7 @@ export function FloatingCTA() {
  isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
  )}
  >
- {/* Expand'sQuick ActionsMenu */}
+ {/* Expanded Quick Actions Menu */}
  <div
  className={cn(
  "flex flex-col gap-2 transition-all duration-300 origin-bottom-right",
@@ -143,7 +143,7 @@ export function FloatingCTA() {
  ))}
  </div>
 
- {/* mainButton */}
+ {/* Main button */}
  <button
  onClick={() => setIsOpen(!isOpen)}
  className={cn(
@@ -154,7 +154,7 @@ export function FloatingCTA() {
  "transition-all duration-300",
  isOpen && "rotate-180 bg-card text-foreground border border-border shadow-black/10"
  )}
- aria-label={isOpen ? "CloseShortcutMenu": "OpenShortcutMenu"}
+ aria-label={isOpen ? "Close shortcut menu" : "Open shortcut menu"}
  >
  {isOpen ? (
  <X className="w-6 h-6" />
@@ -162,13 +162,13 @@ export function FloatingCTA() {
  <MessageCircle className="w-6 h-6" />
  )}
  
- {/* PulseAnimationEffect */}
+ {/* Pulse animation effect */}
  {!isOpen && (
  <span className="absolute inset-0 rounded-full animate-ping bg-primary/30" />
  )}
  </button>
 
- {/* Animationstyle */}
+ {/* Animation styles */}
  <style jsx global>{`
  @keyframes slideInRight {
  from {

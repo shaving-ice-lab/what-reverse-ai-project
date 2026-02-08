@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 /**
- * newUserGuideTutorialComponent - Minimalist Style
+ * New User Onboarding Tutorial Component - Minimalist Style
  */
 
 export interface OnboardingStep {
@@ -293,47 +293,47 @@ function OnboardingOverlay() {
 export const editorOnboardingSteps: OnboardingStep[] = [
  {
  id: "welcome",
- title: "WelcomeUsage AgentFlow",
- description: "QuickifwhatCreateyou's#1Workflow",
+ title: "Welcome to AgentFlow",
+ description: "Learn how to create your first workflow",
  position: "center",
  icon: <Sparkles className="h-5 w-5" />,
  },
  {
  id: "node-panel",
- title: "NodePanel",
- description: "fromLeft sidePanelSelectNodeType, Drag & DroptoCanvasonAddNode",
+ title: "Node Panel",
+ description: "Select a node type from the left panel and drag & drop it onto the canvas to add a node",
  target: "[data-testid='node-panel']",
  position: "right",
  icon: <Layers className="h-5 w-5" />,
  },
  {
  id: "canvas",
- title: "CanvasRegion",
- description: "DragNode, Connectit, byEmptykeyDragcanwithPanCanvas",
+ title: "Canvas Area",
+ description: "Drag nodes, connect them, and hold the spacebar to drag and pan the canvas",
  target: "[data-testid='editor-canvas']",
  position: "center",
  icon: <MousePointer className="h-5 w-5" />,
  },
  {
  id: "config-panel",
- title: "ConfigPanel",
- description: "selectNodeafter, atRight sidePanelConfigNodeParameter",
+ title: "Config Panel",
+ description: "After selecting a node, configure its parameters in the right panel",
  target: "[data-testid='config-panel']",
  position: "left",
  icon: <Settings className="h-5 w-5" />,
  },
  {
  id: "run",
- title: "RunWorkflow",
- description: "ClickRunButtonExecuteWorkflow, Real-timeViewExecuteStatus",
+ title: "Run Workflow",
+ description: "Click the Run button to execute the workflow and view execution status in real-time",
  target: "[data-testid='run-button']",
  position: "bottom",
  icon: <Play className="h-5 w-5" />,
  },
  {
  id: "complete",
- title: "Preparethen",
- description: "StartCreateyou's#1Workflow, by ? keyViewShortcutkey",
+ title: "All Set",
+ description: "Start creating your first workflow. Press ? to view keyboard shortcuts.",
  position: "center",
  icon: <Check className="h-5 w-5" />,
  },
@@ -372,7 +372,7 @@ export function StartTourButton({
  onClick={() => startTour(steps)}
  >
  <Sparkles className="h-4 w-4" />
- StartTutorial
+ Start Tutorial
  </Button>
  );
 }

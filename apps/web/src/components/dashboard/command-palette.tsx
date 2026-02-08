@@ -1,9 +1,8 @@
 "use client";
 
 /**
- * allCommandPanel - Manus Style
-
- * SupportShortcutSearch, CommandExecute, NavigationNavigate
+ * Command Palette - Manus Style
+ * Supports quick search, command execution, and navigation
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -109,9 +108,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "action",
 
- title: "CreateConversation",
+ title: "New Conversation",
 
- description: "Start1new's AI Conversation",
+ description: "Start a new AI conversation",
 
  icon: MessageSquare,
 
@@ -126,9 +125,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "action",
 
- title: "CreateWorkflow",
+ title: "New Workflow",
 
- description: "Createnew'sAutomationWorkflow",
+ description: "Create a new automation workflow",
 
  icon: Zap,
 
@@ -145,7 +144,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  title: "Create Agent",
 
- description: "CreateCustom AI Agent",
+ description: "Create a custom AI agent",
 
  icon: Bot,
 
@@ -158,9 +157,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "action",
 
- title: "GenerateCode",
+ title: "Generate Code",
 
- description: "Usage AI GenerateCode",
+ description: "Use AI to generate code",
 
  icon: Code,
 
@@ -173,9 +172,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "action",
 
- title: "GenerateImage",
+ title: "Generate Image",
 
- description: "Usage AI GenerateImage",
+ description: "Use AI to generate images",
 
  icon: ImageIcon,
 
@@ -197,7 +196,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "navigation",
 
- title: "WorkflowList",
+ title: "Workflows",
 
  icon: Zap,
 
@@ -212,7 +211,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "navigation",
 
- title: "CreativeWorkshop",
+ title: "Creative Workshop",
 
  icon: Palette,
 
@@ -257,7 +256,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "navigation",
 
- title: "I's Agent",
+ title: "My Agents",
 
  icon: Users,
 
@@ -287,7 +286,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "navigation",
 
- title: "Document",
+ title: "Documentation",
 
  icon: FileText,
 
@@ -302,7 +301,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
  },
 
  {
- title: "RecentUsage",
+ title: "Recently Used",
 
  items: [
 
@@ -311,9 +310,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "recent",
 
- title: "CustomerFeedbackAutoProcess",
+ title: "Customer Feedback Auto-Processing",
 
- description: "Workflow Editat 2 hbefore",
+ description: "Workflow edited 2 hours ago",
 
  icon: Zap,
 
@@ -326,9 +325,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "recent",
 
- title: "EmailAssistant Agent",
+ title: "Email Assistant Agent",
 
- description: "Agent Editat Yesterday",
+ description: "Agent edited yesterday",
 
  icon: Bot,
 
@@ -341,9 +340,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
  type: "recent",
 
- title: "DataAnalyticsReport",
+ title: "Data Analytics Report",
 
- description: "Conversation 3 daysbefore",
+ description: "Conversation from 3 days ago",
 
  icon: MessageSquare,
 
@@ -374,7 +373,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  const listRef = useRef<HTMLDivElement>(null);
 
- // FilterCommand
+ // Filter commands
 
  const filteredGroups = commandGroups
 
@@ -399,11 +398,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  .filter((group) => group.items.length > 0);
 
- // Flat'sCommandList
+ // Flattened command list
 
  const flatItems = filteredGroups.flatMap((group) => group.items);
 
- // ExecuteCommand
+ // Execute command
 
  const executeCommand = useCallback(
  (item: CommandItem) => {
@@ -423,7 +422,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  );
 
- // keyNavigation
+ // Keyboard navigation
 
  useEffect(() => {
  if (!isOpen) return;
@@ -483,14 +482,14 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  }, [isOpen, selectedIndex, flatItems, executeCommand, onClose]);
 
- // ResetselectStatus
+ // Reset selection
 
  useEffect(() => {
  setSelectedIndex(0);
 
  }, [query]);
 
- // AutoFocus
+ // Auto focus
 
  useEffect(() => {
  if (isOpen) {
@@ -504,7 +503,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  }, [isOpen]);
 
- // Scrolltoselect
+ // Scroll to selected
 
  useEffect(() => {
  if (listRef.current && flatItems[selectedIndex]) {
@@ -521,14 +520,14 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  if (!isOpen) return null;
 
- // CalculateFlatIndex
+ // Calculate flat index
 
  let flatIndex = -1;
 
  return (
  <>
 
- {/* BackgroundMask */}
+ {/* Background Overlay */}
 
  <div
 
@@ -538,11 +537,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  />
 
- {/* CommandPanel */}
+ {/* Command Panel */}
 
  <div className="fixed left-1/2 top-[20%] -translate-x-1/2 w-full max-w-[600px] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
 
- {/* SearchInput */}
+ {/* Search Input */}
 
  <div className="flex items-center gap-3 p-4 border-b border-border">
 
@@ -558,7 +557,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  onChange={(e) => setQuery(e.target.value)}
 
- placeholder="SearchCommand, PageorFeatures..."
+ placeholder="Search commands, pages, or features..."
 
  className="flex-1 bg-transparent text-foreground text-sm placeholder:text-foreground-light focus:outline-none"
 
@@ -587,7 +586,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  </div>
 
- {/* CommandList */}
+ {/* Command List */}
 
  <div
 
@@ -602,9 +601,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  <Search className="w-10 h-10 text-foreground-light/30 mb-3" />
 
- <p className="text-sm text-foreground-light">not yettoRelatedCommand</p>
+ <p className="text-sm text-foreground-light">No matching commands found</p>
 
- <p className="text-xs text-foreground-light/70 mt-1">TryotherheKeywords</p>
+ <p className="text-xs text-foreground-light/70 mt-1">Try different keywords</p>
 
  </div>
 
@@ -700,7 +699,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  </div>
 
- {/* Shortcutkey */}
+ {/* Shortcut */}
 
  {item.shortcut && (
  <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
@@ -711,7 +710,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  )}
 
- {/* head */}
+ {/* Arrow */}
 
  <ChevronRight
 
@@ -742,7 +741,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
  </div>
 
- {/* FooterTip */}
+ {/* Footer Tips */}
 
  <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
 

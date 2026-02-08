@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * AppGuard CompatibleComponent
- * Workspace = App Architectureandafter, AppGuard Delegateto WorkspaceGuard
+ * AppGuard Compatible Component
+ * In the Workspace = App architecture, AppGuard delegates to WorkspaceGuard
  */
 
 import type { ReactNode } from "react";
@@ -17,8 +17,8 @@ interface AppGuardProps {
 }
 
 export function AppGuard({ children, workspaceId, fallback }: AppGuardProps) {
- // Workspace = App, DirectUsage WorkspaceGuard
- // requiredPermissions outside WorkspaceGuard 's context Process, thisAcceptbutnotneedneedoutsideLogic
+ // Workspace = App, directly use WorkspaceGuard
+ // requiredPermissions are processed within WorkspaceGuard's context, accepted but not needed for external logic
  if (workspaceId) {
  return (
  <WorkspaceGuard workspaceId={workspaceId} fallback={fallback}>
@@ -27,7 +27,7 @@ export function AppGuard({ children, workspaceId, fallback }: AppGuardProps) {
  );
  }
 
- // No workspaceId timeDirectRenderComponent
+ // No workspaceId, directly render children
  return <>{children}</>;
 }
 

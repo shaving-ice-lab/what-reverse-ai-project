@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * App Buildpage - Supabase Style
- * 3Layout: AI Chat / Workflow Canvas / UI Schema Config
+ * App Builder Page - Supabase Style
+ * 3-Panel Layout: AI Chat / Workflow Canvas / UI Schema Config
  */
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
@@ -132,16 +132,16 @@ type GenerateWorkflowPayload = {
 
 const chatQuickActions = [
  {
- label: "GenerateSupport FAQ Assistant",
- prompt: "Create1Support FAQ Assistant, InputasUserIssue, OutputAnswerandafterrowSuggestion.",
+ label: "Generate a Support FAQ Assistant",
+ prompt: "Create a Support FAQ Assistant. Input: user issue. Output: answer and follow-up suggestions.",
  },
  {
- label: "BuildMarketing CopyGenerate",
- prompt: "Generate1Marketing CopyGenerate, InputProductHighlightandTargetperson, OutputmultipleVersionTitleandmainCopy.",
+ label: "Build a Marketing Copy Generator",
+ prompt: "Generate a Marketing Copy Generator. Input: product highlights and target audience. Output: multiple title versions and body copy.",
  },
  {
- label: "Organizewillneed",
- prompt: "BuildwillneedTool, InputwillRecordText, OutputSummary, TodoandOwnerChecklist.",
+ label: "Organize Meeting Notes",
+ prompt: "Build a meeting notes tool. Input: meeting transcript text. Output: summary, to-do items, and owner checklist.",
  },
 ];
 
@@ -235,16 +235,16 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  workspace?.slug && app?.slug ? `/runtime/${workspace.slug}/${app.slug}` : null;
  const accessModeMap = {
  private: {
- label: "PrivateAccess",
- description: "only workspace MembercanAccess, SuitableInternalCollaborationandGrayscaleVerify.",
+ label: "Private Access",
+ description: "Only workspace members can access. Suitable for internal collaboration and testing.",
  },
  public_auth: {
- label: "PublicAccess(needSign In)",
- description: "UserneedSign InafterAccess, SuitableneedneedIdentify'sPublicApp.",
+label: "Public Access (Requires Sign-in)",
+    description: "Users must sign in before accessing. Suitable for public apps that require user identification.",
  },
  public_anonymous: {
- label: "PublicAccess(Anonymous)",
- description: "whatpersoncanAccess, SuggestionEnableRate LimitorVerification CodePreventuse.",
+ label: "Public Access (Anonymous)",
+ description: "Anyone can access. We recommend enabling rate limiting or CAPTCHA to prevent abuse.",
  },
  } as const;
  const accessModeKey = (accessPolicy?.access_mode || "private") as keyof typeof accessModeMap;
@@ -260,53 +260,53 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  const guardrailLabels = [
  rateLimitConfigured ? "Rate Limit": null,
  captchaConfigured ? "Verification Code": null,
- originConfigured ? "AllowDomain": null,
+ originConfigured ? "Allowed Domains": null,
  ].filter(Boolean) as string[];
  const guardrailsSummary =
  guardrailLabels.length > 0
  ? `Enabled: ${guardrailLabels.join(", ")}`
-: "not yetEnableAccessProtect(SuggestionfewEnableRate LimitorVerification Code).";
+: "No access protection enabled yet. We recommend enabling rate limiting or CAPTCHA.";
  const accessPolicyReady = Boolean(accessPolicy?.access_mode);
  const accessPolicyDetail = accessPolicyLoading
- ? "AccessPolicyRead..."
+ ? "Loading access policy..."
  : accessPolicyError
- ? "AccessPolicyLoadFailed, PublishbeforePlease confirmAccess."
+ ? "Failed to load access policy. Please confirm access settings before publishing."
 : `Current: ${accessModeMeta.label}`;
- const publicGuardrailsDetail = isPublicAccess ? guardrailsSummary: "PrivateAccessNoneneedoutsideProtection.";
+ const publicGuardrailsDetail = isPublicAccess ? guardrailsSummary: "Private access does not require external protection.";
  const publishChecklist = [
  {
  key: "saved",
- title: "SavedmostnewEdit",
- passed: !hasChanges,
- required: true,
- detail: !hasChanges ? "": "CurrenthasUnsaved, PleasefirstSave.",
+    title: "Latest Changes Saved",
+    passed: !hasChanges,
+    required: true,
+    detail: !hasChanges ? "" : "You have unsaved changes. Please save first.",
  },
  {
  key: "workflow",
- title: "WorkflowalreadyAssociateVersion",
+ title: "Workflow Associated with Version",
  passed: Boolean(app?.current_version_id || app?.current_version?.workflow_id),
  required: true,
- detail: app?.current_version_id || app?.current_version?.workflow_id ? "": "needneedBindWorkflowVersionafteronlycanPublish.",
+ detail: app?.current_version_id || app?.current_version?.workflow_id ? "" : "You must bind a workflow version before publishing.",
  },
  {
  key: "ui_schema",
- title: "UI Schema alreadyConfig",
+ title: "UI Schema Configured",
  passed: Boolean(app?.current_version?.ui_schema),
  required: false,
  detail: app?.current_version?.ui_schema
  ? ""
-: "not yetConfig UI Schema, willUsageDefaultInputForm.",
+: "UI Schema not configured. The default input form will be used.",
  },
  {
  key: "access_policy",
- title: "AccessPolicyalreadyConfirm",
+ title: "Access Policy Confirmed",
  passed: accessPolicyReady,
  required: false,
  detail: accessPolicyDetail,
  },
  {
  key: "public_guardrails",
- title: "PublicAccessProtectalreadyConfig",
+ title: "Public Access Protection Configured",
  passed: guardrailsReady,
  required: false,
  detail: publicGuardrailsDetail,
@@ -317,7 +317,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  saved: { label: "Saved", color: "text-brand-500" },
  saving: { label: "Saving", color: "text-warning" },
  unsaved: { label: "Unsaved", color: "text-warning" },
- error: { label: "SaveFailed", color: "text-destructive" },
+ error: { label: "Save Failed", color: "text-destructive" },
  };
  const saveStatusMeta = saveStatusMap[saveStatus];
  const lastSavedLabel = lastSavedAt
@@ -385,7 +385,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  };
 
  const buildEmptyWorkflowSnapshot = (name?: string): WorkflowSnapshot => ({
- name: name?.trim() ? name.trim(): "not yetNamingWorkflow",
+ name: name?.trim() ? name.trim(): "Untitled Workflow",
  nodes: [],
  edges: [],
  });
@@ -405,7 +405,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  };
 
  const buildWorkflowDefinitionPayload = (nameOverride?: string) => ({
- name: nameOverride?.trim() || workflowSnapshot?.name || app?.name || "not yetNamingWorkflow",
+ name: nameOverride?.trim() || workflowSnapshot?.name || app?.name || "Untitled Workflow",
  nodes,
  edges,
  });
@@ -461,7 +461,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  const workflow = response.workflow;
  setWorkflowSnapshot({
  id: workflow.id,
- name: workflow.name || app.name || "not yetNamingWorkflow",
+ name: workflow.name || app.name || "Untitled Workflow",
  nodes: workflow.nodes || [],
  edges: workflow.edges || [],
  version: workflow.version,
@@ -472,7 +472,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  .catch((error) => {
  if (cancelled) return;
  console.error("Failed to load workflow:", error);
- setWorkflowError("WorkflowLoadFailed, Please try again laterRetry.");
+ setWorkflowError("Failed to load workflow. Please try again.");
  setWorkflowSnapshot(buildEmptyWorkflowSnapshot(app.name));
  })
  .finally(() => {
@@ -540,7 +540,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  setApp(appData);
  } catch (error) {
  console.error("Failed to load data:", error);
- setLoadError("LoadAppInfoFailed, PleaseCheckPermissionorafterRetry.");
+ setLoadError("Failed to load app info. Please check your permissions and try again.");
  } finally {
  setIsLoading(false);
  }
@@ -574,7 +574,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  } catch (error) {
  console.error("Failed to load access policy:", error);
  setAccessPolicy(null);
- setAccessPolicyError("AccessPolicyLoadFailed");
+ setAccessPolicyError("Failed to load access policy");
  } finally {
  setAccessPolicyLoading(false);
  }
@@ -612,9 +612,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  const payload = response.data;
  const workflowDefinition = parseWorkflowDefinition(payload.workflow_json);
  if (!workflowDefinition) {
- throw new Error("AI Output'sWorkflowFormatInvalid");
+ throw new Error("Invalid workflow format in AI output");
  }
- const workflowFallbackName = app?.name || workflowSnapshot?.name || "not yetNamingWorkflow";
+ const workflowFallbackName = app?.name || workflowSnapshot?.name || "Untitled Workflow";
  const nextSnapshot = extractWorkflowSnapshot(workflowDefinition, workflowFallbackName);
 
  const hasWorkflow = Boolean(app?.current_version?.workflow_id);
@@ -642,7 +642,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  }
 
  if (!workflowId) {
- throw new Error("WorkflowCreateFailed, Please try again laterRetry");
+ throw new Error("Workflow creation failed. Please try again.");
  }
 
  const uiSchema = payload.ui_schema;
@@ -707,14 +707,14 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  const assistantContent =
  payload.explanation && payload.explanation.trim()
  ? `${payload.explanation}${suggestionText}`
-: `alreadyGenerateWorkflowand UI Schema, andSynctoCurrent Version.${suggestionText}`;
+: `Workflow and UI Schema generated and synced to the current version.${suggestionText}`;
  setChatMessages((prev) => [...prev, { role: "assistant", content: assistantContent }]);
  } catch (error) {
  console.error("Failed to generate workflow:", error);
- const message = error instanceof Error ? error.message: "AI GenerateFailed, Please try again laterRetry.";
+ const message = error instanceof Error ? error.message: "AI generation failed. Please try again.";
  setChatMessages((prev) => [
  ...prev,
- { role: "assistant", content: `GenerateFailed: ${message}` },
+ { role: "assistant", content: `Generation failed: ${message}` },
  ]);
  } finally {
  setIsChatting(false);
@@ -751,7 +751,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  }
 
  if (!workflowId) {
- throw new Error("WorkflowSaveFailed, Please try again laterRetry");
+ throw new Error("Workflow save failed. Please try again.");
  }
 
  let updatedVersion: AppVersion | null = null;
@@ -762,7 +762,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  workflow_id: workflowId,
  ui_schema: app?.current_version?.ui_schema || {},
  db_schema: app?.current_version?.db_schema || {},
- changelog: "WorkflowUpdate",
+ changelog: "Workflow update",
  }),
  });
  updatedVersion = normalizeVersionPayload(versionResponse.data);
@@ -782,7 +782,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  setWorkflowSnapshot((prev) => ({
  id: workflowId ?? prev?.id,
- name: definition.name || prev?.name || "not yetNamingWorkflow",
+ name: definition.name || prev?.name || "Untitled Workflow",
  nodes,
  edges,
  version: prev?.version,
@@ -808,7 +808,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  const handleConfirmPublish = async () => {
  if (!publishReady) {
- setPublishWarning("PleasefirstDoneneedCheckafteragainPublish.");
+ setPublishWarning("Please complete all required checks before publishing.");
  return;
  }
  try {
@@ -819,7 +819,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  setPublishDialogOpen(false);
  } catch (error) {
  console.error("Failed to publish:", error);
- setPublishWarning("PublishFailed, Please try again laterRetry.");
+ setPublishWarning("Publish failed. Please try again.");
  } finally {
  setIsPublishing(false);
  }
@@ -867,10 +867,10 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  const inputCount = Object.keys(previewInputs).length;
  const filledCount = Object.values(previewInputs).filter((value) => value?.trim()).length;
  const result = {
- summary: `alreadyReceive ${filledCount}/${inputCount} InputField`,
+ summary: `Received ${filledCount}/${inputCount} input fields`,
  inputs: previewInputs,
  output: {
- message: "RunResultonlyUsed forPreview, PublishaftercanViewRealExecuteOutput.",
+ message: "This result is for preview only. After publishing, you can view actual execution output.",
  status: "preview_success",
  },
  };
@@ -881,7 +881,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  } catch (error) {
  console.error("Preview run failed:", error);
  setPreviewRunStatus("error");
- setPreviewRunError("RunFailed, Please try again laterRetry.");
+ setPreviewRunError("Run failed. Please try again.");
  }
  };
 
@@ -991,7 +991,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  await loadVersions();
  } catch (error) {
  console.error("Failed to save UI schema:", error);
- setUiSchemaError("SaveFailed, PleaseCheckFieldConfigafterRetry.");
+ setUiSchemaError("Save failed. Please check the field configuration and try again.");
  } finally {
  setUiSchemaSaving(false);
  }
@@ -1003,11 +1003,11 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  const handleCompareVersions = async () => {
  if (!compareFrom || !compareTo) {
- setCompareError("Please selectforcompareVersion");
+ setCompareError("Please select versions to compare");
  return;
  }
  if (compareFrom === compareTo) {
- setCompareError("Please selectnotVersionProceedforcompare");
+ setCompareError("Please select different versions to compare");
  return;
  }
  try {
@@ -1017,7 +1017,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  setVersionDiff(diff);
  } catch (error) {
  console.error("Failed to compare versions:", error);
- setCompareError("forcompareFailed, Please try again laterRetry.");
+ setCompareError("Comparison failed. Please try again.");
  } finally {
  setCompareLoading(false);
  }
@@ -1036,11 +1036,11 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="h-full flex items-center justify-center bg-background-studio">
  <EmptyState
  icon={AlertTriangle}
- title="AppLoadFailed"
+ title="Failed to Load App"
  description={loadError}
- action={{ label: "re-newLoad", onClick: loadData, icon: RefreshCw }}
+ action={{ label: "Reload", onClick: loadData, icon: RefreshCw }}
  secondaryAction={{
- label: "BackAppList",
+ label: "Back to Apps",
  onClick: () => router.push("/dashboard/apps"),
  }}
  />
@@ -1095,7 +1095,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  {app?.current_version?.version || "v0.0.0"}
  </div>
  <div className="text-[11px] text-foreground-muted flex items-center gap-1">
- <span>SaveStatus</span>
+ <span>Save Status:</span>
  <span className={cn("font-medium", saveStatusMeta.color)}>{saveStatusMeta.label}</span>
  <span className="text-foreground-muted">· {lastSavedLabel}</span>
  </div>
@@ -1116,7 +1116,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </Button>
  </TooltipTrigger>
  <TooltipContent>
- {leftPanelOpen ? "Hide AI Assistant": "Display AI Assistant"}
+ {leftPanelOpen ? "Hide AI Assistant" : "Show AI Assistant"}
  </TooltipContent>
  </Tooltip>
 
@@ -1132,7 +1132,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </Button>
  </TooltipTrigger>
  <TooltipContent>
- {rightPanelOpen ? "HideConfigPanel": "DisplayConfigPanel"}
+ {rightPanelOpen ? "Hide Config Panel" : "Show Config Panel"}
  </TooltipContent>
  </Tooltip>
 
@@ -1176,7 +1176,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  className="flex items-center gap-2 text-[12px]"
  >
  <Eye className="w-4 h-4" />
- RunMonitor
+ Monitoring
  </Link>
  </DropdownMenuItem>
  <DropdownMenuItem asChild>
@@ -1185,7 +1185,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  className="flex items-center gap-2 text-[12px]"
  >
  <Settings className="w-4 h-4" />
- DomainManage
+ Domain Settings
  </Link>
  </DropdownMenuItem>
  </DropdownMenuContent>
@@ -1196,9 +1196,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <AlertDialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
  <AlertDialogContent>
  <AlertDialogHeader>
- <AlertDialogTitle>PublishbeforeCheckChecklist</AlertDialogTitle>
+ <AlertDialogTitle>Pre-Publish Checklist</AlertDialogTitle>
  <AlertDialogDescription>
- Please confirmkeyafteragainPublish, IncompletewillBlockPublish.
+ Please confirm all required items below before publishing. Incomplete items will block publishing.
  </AlertDialogDescription>
  </AlertDialogHeader>
 
@@ -1226,7 +1226,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  item.required ? "bg-surface-200 text-foreground-muted" : "bg-surface-100 text-foreground-light"
  )}
  >
- {item.required ? "need": "Suggestion"}
+ {item.required ? "Required" : "Recommended"}
  </Badge>
  </div>
  {item.detail &&
@@ -1247,16 +1247,16 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  ) : (
  <Lock className="w-4 h-4 text-foreground-muted" />
  )}
- PublicAccessandPermissionTip
+ Public Access & Permission Info
  <Badge variant="secondary" className="text-[10px] bg-surface-100 text-foreground-light">
  {accessModeMeta.label}
  </Badge>
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
  {accessPolicyLoading
- ? "AccessPolicyRead..."
+ ? "Loading access policy..."
  : accessPolicyError
- ? "AccessPolicyLoadFailed, PublishafterPleasePriorityConfirmAccessPolicy."
+ ? "Failed to load access policy. Please confirm your access policy before publishing."
  : accessModeMeta.description}
  </p>
  {!accessPolicyLoading && !accessPolicyError && (
@@ -1266,7 +1266,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  href={`/dashboard/app/${appId}/domains`}
  className="mt-2 inline-flex items-center gap-1 text-[11px] text-brand-500 hover:text-brand-400"
  >
- beforeAccessPolicyandDomainSettings
+ Go to Access Policy & Domain Settings
  <ExternalLink className="w-3 h-3" />
  </Link>
  </div>
@@ -1282,7 +1282,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  disabled={!publishReady || isPublishing}
  className={cn(!publishReady && "opacity-60")}
  >
- {isPublishing ? "Publishing...": "ConfirmPublish"}
+ {isPublishing ? "Publishing..." : "Confirm Publish"}
  </AlertDialogAction>
  </AlertDialogFooter>
  </AlertDialogContent>
@@ -1306,15 +1306,15 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="text-center">
  <Sparkles className="w-8 h-8 text-foreground-muted mx-auto mb-3" />
  <p className="text-[13px] font-medium text-foreground mb-1">
- AI BuildAssistant
+ AI Build Assistant
  </p>
  <p className="text-[12px] text-foreground-muted">
- DescriptionyouwantneedBuild'sApp, AI willyouGenerateWorkflow
+ Describe the app you want to build, and AI will generate a workflow for you
  </p>
  </div>
  <div className="rounded-md border border-border bg-surface-100/70 p-3">
  <div className="text-[10px] uppercase tracking-[0.2em] text-foreground-muted">
- SuggestionAction
+ Suggested Actions
  </div>
  <div className="mt-2 flex flex-wrap gap-2">
  {chatQuickActions.map((action) => (
@@ -1351,7 +1351,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  {isChatting && (
  <div className="flex items-center gap-2 text-[12px] text-foreground-muted">
  <Loader2 className="w-4 h-4 animate-spin" />
- AI currentlyatThink...
+ AI is thinking...
  </div>
  )}
  </div>
@@ -1360,7 +1360,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="shrink-0 p-3 border-t border-border">
  <div className="flex gap-2">
  <Textarea
- placeholder="Descriptionyouwantneed'sFeatures..."
+ placeholder="Describe the features you need..."
  value={chatInput}
  ref={chatInputRef}
  onChange={(e) => setChatInput(e.target.value)}
@@ -1375,7 +1375,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </div>
  <div className="flex items-center justify-between mt-2">
  <span className="text-[10px] text-foreground-muted">
- Enter SendandGenerate UI/Workflow, Shift+Enter row
+ Enter to send and generate UI/Workflow, Shift+Enter for new line
  </span>
  <Button
  size="sm"
@@ -1410,14 +1410,14 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  APP BOOT SEQUENCE
  </p>
  <h3 className="mt-2 text-[18px] font-semibold text-foreground">
- CreateAppGuideFlow
+ App Creation Guide
  </h3>
  <p className="mt-1 text-[12px] text-foreground-light max-w-xl">
- fromRequirementstoPublish, complete4nowtocanRun's AI App.
+ From requirements to publishing, complete 4 steps to get a running AI app.
  </p>
  </div>
  <Button variant="ghost" size="sm" onClick={handleDismissGuide} className="text-[11px]">
- timeSkip
+ Skip for now
  </Button>
  </div>
 
@@ -1425,23 +1425,23 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  {[
  {
  key: "01",
- title: "Descriptionyou'sApp",
- detail: "at AI AssistantinDescriptionUser, Input, OutputandLimit.",
+title: "Describe Your App",
+    detail: "Describe the users, inputs, outputs, and constraints in the AI assistant.",
  },
  {
  key: "02",
- title: "Workflow",
- detail: "atCanvasNode, EnsureLogicClosed Loop.",
+ title: "Edit Workflow",
+ detail: "Add nodes on the canvas and ensure the logic is complete.",
  },
  {
  key: "03",
- title: "ConfigFormandResult",
- detail: "atRight side UI ConfigDefinitionInputFieldandShowcasestyle.",
+ title: "Configure Form & Output",
+ detail: "Define input fields and display style in the right-side UI config panel.",
  },
  {
  key: "04",
- title: "RunConcurrency",
- detail: "RunCheckOutput, againPublishtoUserAccess.",
+ title: "Test & Publish",
+ detail: "Run to verify output, then publish for users to access.",
  },
  ].map((step) => (
  <div
@@ -1470,7 +1470,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </Button>
  <Button variant="outline" size="sm" className="h-8">
  <Play className="w-4 h-4 mr-1.5" />
- RunWorkflow
+ Run Workflow
  </Button>
  </div>
  </div>
@@ -1485,9 +1485,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="flex-1 flex items-center justify-center px-6">
  <EmptyState
  icon={AlertTriangle}
- title="WorkflowLoadFailed"
+ title="Failed to Load Workflow"
  description={workflowError}
- action={{ label: "re-newLoad", onClick: () => window.location.reload(), icon: RefreshCw }}
+ action={{ label: "Reload", onClick: () => window.location.reload(), icon: RefreshCw }}
  />
  </div>
  ) : (
@@ -1542,22 +1542,22 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="mb-3 rounded-md border border-border bg-surface-100/80 p-3">
  <div className="flex items-center gap-2 text-[12px] font-medium text-foreground">
  <Globe className="w-4 h-4 text-foreground-muted" />
- PublicAccessandPermissionDescription
+ Public Access & Permissions
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
- PublishaftercanConfigAccessPolicyandCustom Domain.PublicAccessneedCautionSettingsRate LimitingandRisk Control.
+ After publishing, you can configure access policies and custom domains. Public access requires careful rate limiting and risk control settings.
  </p>
  {app?.status === "published" && runtimeEntryUrl ? (
  <Link
  href={runtimeEntryUrl}
  className="mt-2 inline-flex items-center gap-1 text-[11px] text-brand-500 hover:text-brand-400"
  >
- AccessEntry
+ Access Entry Point
  <ExternalLink className="w-3.5 h-3.5" />
  </Link>
  ) : (
  <p className="mt-2 text-[11px] text-foreground-muted">
- PublishafterwillGeneratecanAccessEntry.
+ A public access entry point will be generated after publishing.
  </p>
  )}
  </div>
@@ -1567,12 +1567,12 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div>
  <p className="text-[13px] font-medium text-foreground">UI Schema Config</p>
  <p className="text-[11px] text-foreground-muted">
- canvisualEditPublicAccess'sInputFormField
+ Visually edit input form fields for public access
  </p>
  </div>
  <Button size="sm" variant="outline" onClick={handleAddUISchemaField}>
  <Plus className="w-4 h-4 mr-1" />
- AddField
+ Add Field
  </Button>
  </div>
 
@@ -1586,9 +1586,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  {uiSchemaFields.length === 0 ? (
  <EmptyState
  icon={Layout}
- title="Not yetInputField"
- description="AddInputField, DefinitionPublicAccessFormStructureandDefaultvalue."
- action={{ label: "AddField", onClick: handleAddUISchemaField }}
+ title="No Input Fields"
+ description="Add input fields to define the public access form structure and default values."
+ action={{ label: "Add Field", onClick: handleAddUISchemaField }}
  className="py-10"
  />
  ) : (
@@ -1605,7 +1605,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <button
  onClick={() => handleRemoveUISchemaField(index)}
  className="text-foreground-muted hover:text-destructive transition-colors"
- aria-label="DeleteField"
+ aria-label="Delete field"
  >
  <Trash2 className="w-4 h-4" />
  </button>
@@ -1613,7 +1613,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="mt-3 grid gap-2">
  <Input
  className="h-8"
- placeholder="FieldName, exampleif: Title"
+ placeholder="Field name, e.g. Title"
  value={field.label}
  onChange={(event) =>
  handleUpdateUISchemaField(index, { label: event.target.value })
@@ -1621,7 +1621,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  />
  <Input
  className="h-8"
- placeholder="Input Key, exampleif: title"
+ placeholder="Input key, e.g. title"
  value={field.inputKey}
  onChange={(event) =>
  handleUpdateUISchemaField(index, { inputKey: event.target.value })
@@ -1637,16 +1637,16 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  }
  >
  <SelectTrigger>
- <SelectValue placeholder="FieldType" />
+ <SelectValue placeholder="Field type" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="input">TextInput</SelectItem>
- <SelectItem value="select">downSelect</SelectItem>
+ <SelectItem value="input">Text Input</SelectItem>
+ <SelectItem value="select">Dropdown Select</SelectItem>
  </SelectContent>
  </Select>
  <Input
  className="h-8"
- placeholder="Tip"
+ placeholder="Placeholder text"
  value={field.placeholder}
  onChange={(event) =>
  handleUpdateUISchemaField(index, {
@@ -1658,7 +1658,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  {field.type === "select" ? (
  <Input
  className="h-8"
- placeholder="Option, UsageCommaSeparator"
+ placeholder="Options, separated by commas"
  value={field.options}
  onChange={(event) =>
  handleUpdateUISchemaField(index, {
@@ -1676,7 +1676,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  })
  }
  />
- RequiredField
+ Required field
  </label>
  </div>
  </div>
@@ -1686,7 +1686,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  <div className="flex items-center justify-between pt-1">
  <span className="text-[11px] text-foreground-muted">
- {uiSchemaDirty ? "UnsavedEdit": "Saved"}
+ {uiSchemaDirty ? "Unsaved changes" : "Saved"}
  </span>
  <div className="flex items-center gap-2">
  <Button size="sm" variant="ghost" onClick={handleResetUISchema}>
@@ -1703,10 +1703,10 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div>
  <div className="flex items-center gap-2 text-[12px] font-medium text-foreground">
  <GitCompare className="w-4 h-4 text-foreground-muted" />
- Versionforcompare
+ Version Comparison
  </div>
  <p className="mt-1 text-[11px] text-foreground-muted">
- SelectVersionView UI/ConfigDiffSummary.
+ Select versions to view UI/config diff summary.
  </p>
  </div>
  <Button
@@ -1721,14 +1721,14 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  {versionList.length < 2 ? (
  <div className="mt-3 text-[11px] text-foreground-muted">
- VersionCountnot, fewneedneedVersiononlycanforcompare.
+ Not enough versions to compare. At least two versions are needed.
  </div>
  ) : (
  <>
  <div className="mt-3 grid grid-cols-2 gap-2">
  <Select value={compareFrom} onValueChange={setCompareFrom}>
  <SelectTrigger className="h-8">
- <SelectValue placeholder="SelectVersion A" />
+ <SelectValue placeholder="Select version A" />
  </SelectTrigger>
  <SelectContent>
  {versionList.map((version) => (
@@ -1740,7 +1740,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </Select>
  <Select value={compareTo} onValueChange={setCompareTo}>
  <SelectTrigger className="h-8">
- <SelectValue placeholder="SelectVersion B" />
+ <SelectValue placeholder="Select version B" />
  </SelectTrigger>
  <SelectContent>
  {versionList.map((version) => (
@@ -1753,7 +1753,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </div>
  <div className="mt-3 flex items-center gap-2">
  <Button size="sm" onClick={handleCompareVersions} disabled={compareLoading}>
- {compareLoading ? "forcompare...": "Startforcompare"}
+ {compareLoading ? "Comparing..." : "Compare"}
  </Button>
  {compareError ? (
  <span className="text-[11px] text-destructive">{compareError}</span>
@@ -1767,7 +1767,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  </div>
  <div className="mt-2 flex flex-wrap gap-1">
  {versionDiff.changed_fields.length === 0 ? (
- <Badge variant="secondary">NoneDiff</Badge>
+ <Badge variant="secondary">No Differences</Badge>
  ) : (
  versionDiff.changed_fields.map((field) => (
  <Badge key={field} variant="secondary">
@@ -1785,25 +1785,25 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  ) : (
  <div className="space-y-4">
  <div>
- <p className="text-[13px] font-medium text-foreground">Real-timePreview</p>
+ <p className="text-[13px] font-medium text-foreground">Live Preview</p>
  <p className="text-[11px] text-foreground-muted">
- UI Schema ChangewillSynctoPreviewForm, SaveaftercanUsed forPublicAccess.
+ UI Schema changes sync to the preview form in real time. Saved changes will be used for public access.
  </p>
  </div>
 
  {uiSchemaFields.length === 0 ? (
  <EmptyState
  icon={Eye}
- title="NonecanPreviewField"
- description="firstat UI ConfigAddField, againProceedPreview."
- action={{ label: "goConfig", onClick: handleFocusSchema }}
+ title="No Previewable Fields"
+ description="Add fields in the UI Config tab first, then preview here."
+ action={{ label: "Go to Config", onClick: handleFocusSchema }}
  className="py-10"
  />
  ) : (
  <div className="space-y-3">
  <div className="rounded-lg border border-border bg-surface-100/90 p-4">
  <div className="text-[12px] font-medium text-foreground mb-3">
- PreviewInputForm
+ Preview Input Form
  </div>
  <div className="space-y-2">
  {uiSchemaFields.map((field, index) => {
@@ -1812,7 +1812,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  return (
  <div key={`${key}-${index}`} className="space-y-1">
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
- <span className="text-foreground">{field.label || "not yetNamingField"}</span>
+ <span className="text-foreground">{field.label || "Untitled Field"}</span>
  {field.required ? (
  <span className="text-destructive">*</span>
  ) : null}
@@ -1843,7 +1843,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  ) : (
  <Input
  className="h-8"
- placeholder={field.placeholder || "Please enterContent"}
+ placeholder={field.placeholder || "Enter value"}
  value={value}
  onChange={(event) =>
  handlePreviewInputChange(key, event.target.value)
@@ -1858,10 +1858,10 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
  <div className="rounded-lg border border-border bg-surface-100/90 p-4">
  <div className="text-[12px] font-medium text-foreground mb-2">
- InputMappingandPreviewData
+ Input Mapping & Preview Data
  </div>
  <div className="text-[11px] text-foreground-muted mb-2">
- Save UI Schema afterwillGeneratemostnew'sWorkflowInputMapping.
+ Saving the UI schema will generate the latest workflow input mapping.
  </div>
  {(() => {
  const mapping = app?.current_version?.config_json?.input_mapping as
@@ -1877,7 +1877,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  if (!mapping || !hasWarnings) {
  return (
  <div className="text-[11px] text-foreground-muted">
- not yetDetecttoInputMappingRisk.
+ No input mapping issues detected.
  </div>
  );
  }
@@ -1885,17 +1885,17 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="space-y-2 text-[11px]">
  {missingWorkflow.length > 0 ? (
  <div className="text-warning">
- WorkflowMissingField: {missingWorkflow.join(", ")}
+ Missing in workflow: {missingWorkflow.join(", ")}
  </div>
  ) : null}
  {missingSchema.length > 0 ? (
  <div className="text-warning">
- UI Schema MissingField: {missingSchema.join(", ")}
+ Missing in UI Schema: {missingSchema.join(", ")}
  </div>
  ) : null}
  {duplicateTargets.length > 0 ? (
  <div className="text-warning">
- re-MappingField: {duplicateTargets.join(", ")}
+ Duplicate mappings: {duplicateTargets.join(", ")}
  </div>
  ) : null}
  </div>
@@ -1909,9 +1909,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="rounded-lg border border-border bg-surface-100/90 p-4">
  <div className="flex items-start justify-between gap-3">
  <div>
- <div className="text-[12px] font-medium text-foreground">PreviewandRun</div>
+ <div className="text-[12px] font-medium text-foreground">Preview Run</div>
  <div className="text-[11px] text-foreground-muted mt-1">
- UsageCurrentInputQuickRun, ConfirmOutputStructureisno.
+ Quick run with the current inputs to verify the output structure.
  </div>
  </div>
  <Button
@@ -1937,11 +1937,11 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
  <div className="mt-3 space-y-2">
  <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground-muted">
  <Badge variant="secondary">Completed</Badge>
- <span>ExecuteTime: {formatPreviewTimestamp(previewRunAt)}</span>
- <span>Duration: {previewRunDuration !== null ? `${previewRunDuration}ms`: "-"}</span>
+ <span>Executed at: {formatPreviewTimestamp(previewRunAt)}</span>
+ <span>Duration: {previewRunDuration !== null ? `${previewRunDuration}ms` : "-"}</span>
  </div>
  <div className="rounded-md border border-border bg-surface-200/70 px-3 py-2 text-[11px] text-foreground-light">
- {String(previewRunResult.summary || "alreadyGeneratePreviewResult")}
+ {String(previewRunResult.summary || "Preview result generated")}
  </div>
  <pre className="rounded-md bg-surface-200/70 border border-border px-3 py-2 text-[11px] text-foreground-muted whitespace-pre-wrap font-mono">
  {JSON.stringify(previewRunResult, null, 2)}
@@ -1981,7 +1981,7 @@ export default function BuilderPage() {
  return <BuilderPageContent workspaceId={workspaceId} appId={appId} />;
 }
 
-// Plus Icon(lucide-react alreadyhas, thisinisasAvoidre-Import)
+// Plus icon (inlined to avoid duplicate lucide-react import)
 function Plus({ className }: { className?: string }) {
  return (
  <svg

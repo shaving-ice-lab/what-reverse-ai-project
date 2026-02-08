@@ -464,7 +464,7 @@ const securityConfig: Record<
  fillLevel: 1,
  },
  none: {
- label: "NoneProtect",
+ label: "Not Protected",
  color: "text-red-600",
  bg: "bg-red-500/10",
  fillLevel: 0,

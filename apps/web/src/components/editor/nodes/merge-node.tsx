@@ -16,12 +16,12 @@ export interface MergeNodeProps extends NodeProps {
 }
 
 const mergeTypeLabels: Record<string, string> = {
- concat: "countgroupConnect",
- merge: "forand",
- zip: "forand",
- union: "and",
- intersection: "",
- difference: "",
+ concat: "Concatenate",
+ merge: "Merge",
+ zip: "Zip",
+ union: "Union",
+ intersection: "Intersection",
+ difference: "Difference",
 };
 
 export const MergeNode = memo(function MergeNode({
@@ -48,7 +48,7 @@ export const MergeNode = memo(function MergeNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* multipleInputPort */}
+ {/* Multiple Input Ports */}
  {Array.from({ length: inputCount }).map((_, i) => (
  <Handle
  key={`input-${i}`}
@@ -67,7 +67,7 @@ export const MergeNode = memo(function MergeNode({
  <Merge className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "Dataand"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Data Merge"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Layers className="h-3 w-3" />
  {mergeTypeLabels[mergeType] || mergeType}
@@ -78,7 +78,7 @@ export const MergeNode = memo(function MergeNode({
  {/* Content */}
  <div className="px-3 py-2.5 space-y-2 text-xs">
  <div className="flex items-center gap-2">
- <span className="text-foreground-muted">InputCount:</span>
+ <span className="text-foreground-muted">Input Count:</span>
  <span className="font-mono px-1.5 py-0.5 rounded bg-brand-200/60 text-brand-500 font-medium">
  {inputCount}
  </span>
@@ -87,12 +87,12 @@ export const MergeNode = memo(function MergeNode({
  {config.deep && (
  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brand-200/40 text-brand-500">
  <Sparkles className="h-3 w-3" />
- Depthand
+ Deep Merge
  </span>
  )}
  {config.unique && (
  <span className="inline-flex px-1.5 py-0.5 rounded bg-brand-200 text-brand-500">
- gore-
+ Unique
  </span>
  )}
  </div>

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Floating AI AssistantComponent
- * atwhatPageProvidenowtimeHelpandQuick Actions
+ * Floating AI Assistant Component
+ * Provides real-time help and quick actions on any page
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-// MessageType
+// Message type
 interface ChatMessage {
  id: string;
  role: "user" | "assistant";
@@ -40,12 +40,12 @@ interface ChatMessage {
  timestamp: Date;
 }
 
-// ShortcutIssue
+// Quick questions
 const quickQuestions = [
- { icon: Zap, label: "ifwhatCreateWorkflow?", question: "ifwhatCreate1new'sWorkflow?" },
- { icon: Bot, label: "Agent isWhat?", question: "Agent isWhat, ifwhatUsage?" },
- { icon: FileText, label: "ifwhatUploadFile?", question: "ifwhatUploadFiletoKnowledge Base?" },
- { icon: HelpCircle, label: "API Config", question: "ifwhatConfig API Key?" },
+  { icon: Zap, label: "How to create a workflow?", question: "How do I create a new workflow?" },
+  { icon: Bot, label: "What is an Agent?", question: "What is an Agent and how do I use it?" },
+  { icon: FileText, label: "How to upload files?", question: "How do I upload files to the Knowledge Base?" },
+  { icon: HelpCircle, label: "API Configuration", question: "How do I configure an API key?" },
 ];
 
 // Mock AI Response
@@ -53,85 +53,85 @@ const getAssistantResponse = (question: string): string => {
  const lowerQuestion = question.toLowerCase();
 
  if (lowerQuestion.includes("Workflow") || lowerQuestion.includes("workflow")) {
- return `CreateWorkflowVerySimple!
+    return `Creating a workflow is easy!
 
-1. ClickLeft sideNavbar's **Workflow** Icon
-2. Clickrighton's **CreateWorkflow** Button
-3. atEditDrag & DropNodecomeBuildFlow
-4. ConfigeachNode'sParameter
-5. Click **Save** DoneCreate
+1. Click the **Workflow** icon in the left sidebar
+2. Click the **Create Workflow** button on the right
+3. Drag and drop nodes in the editor to build your flow
+4. Configure each node's parameters
+5. Click **Save** to finish
 
-youalsocanwithUsageTemplateQuickStart, Access [Template Gallery](/template-gallery) Select'sTemplate.
+You can also use templates to get started quickly. Visit the [Template Gallery](/template-gallery) to browse available templates.
 
-needneedIyouCreate1Workflow??`;
+Would you like me to help you create a workflow?`;
  }
 
  if (lowerQuestion.includes("agent") || lowerQuestion.includes("Assistant")) {
- return `**Agent** isyou'sSmart AI Assistant!
+    return `**Agent** is your smart AI assistant!
 
-Agent canwith: 
-- 🤖 AutoProcessre-Task
-- 💬 SmartReplyCustomerConsulting
-- 📊 AnalyticsDataandGenerateReport
-- ✍️ ContentCreative
+Agents can help you with: 
+- 🤖 Automate repetitive tasks
+- 💬 Intelligently reply to customer inquiries
+- 📊 Analyze data and generate reports
+- ✍️ Create content
 
-**Create Agent: **
-1. Enter [I's Agent](/my-agents)
+**Create an Agent:**
+1. Go to [My Agents](/my-agents)
 2. Click **Create Agent**
-3. SelectModelandConfigcanpower
-4. SettingsTriggerCondition
+3. Select a model and configure capabilities
+4. Set trigger conditions
 
-eachAgent allcanwithIndependentRun, youSavelargeTime!`;
+Each agent can run independently, saving you a lot of time!`;
  }
 
  if (lowerQuestion.includes("File") || lowerQuestion.includes("Upload") || lowerQuestion.includes("Knowledge Base")) {
- return `UploadFiletoKnowledge Basecanwithlet AI Based onyou'sDataAnswerIssue.
+    return `Upload files to the Knowledge Base so AI can answer questions based on your data.
 
-**Support'sFileFormat: **
-- 📄 Document: PDF, Word, Markdown, TXT
-- 📊 Table: Excel, CSV
-- 🖼️ Image: PNG, JPG, WEBP
-- 💻 Code: typeProgrammingLanguageFile
+**Supported File Formats:**
+- 📄 Documents: PDF, Word, Markdown, TXT
+- 📊 Spreadsheets: Excel, CSV
+- 🖼️ Images: PNG, JPG, WEBP
+- 💻 Code: Any programming language file
 
-**UploadStep: **
-1. Enter [File](/files)
-2. Click **UploadFile** orDrag & DropFile
-3. SelectneedAddto'sKnowledge Base
-4. etcpendingIndexDone
+**Upload Steps:**
+1. Go to [Files](/files)
+2. Click **Upload File** or drag and drop files
+3. Select the Knowledge Base to add them to
+4. Wait for indexing to complete
 
-IndexDoneafter, AI thencanwithBased onthisDocumentAnswerIssue!`;
+Once indexing is done, AI can answer questions based on these documents!`;
  }
 
  if (lowerQuestion.includes("api") || lowerQuestion.includes("Key") || lowerQuestion.includes("Config")) {
- return `Config API KeycanwithUsageyouSelf's AI ModelQuota.
+    return `Configure an API key to use your own AI model quota.
 
-**ConfigStep: **
-1. Enter [Settings → API Key](/settings/api-keys)
-2. Click **AddKey**
-3. SelectServiceProvider(OpenAI, Claude etc)
-4. Inputyou's API Key
-5. SaveandTestConnect
+**Configuration Steps:**
+1. Go to [Settings → API Keys](/settings/api-keys)
+2. Click **Add Key**
+3. Select a service provider (OpenAI, Claude, etc.)
+4. Enter your API key
+5. Save and test the connection
 
-**Support'sService: **
+**Supported Services:**
 - OpenAI (GPT-4, GPT-3.5)
 - Anthropic (Claude 3)
-- LocalModel (Ollama)
+- Local Models (Ollama)
 
-you'sKeywillSecurityEncryptStorage, onlyUsed forCallforshouldService.`;
+Your keys are securely encrypted and only used to call the corresponding services.`;
  }
 
- return `Thank youyou'sAsk!
+  return `Thank you for asking!
 
-Icanwithyou: 
-- 🚀 CreateandManageWorkflow
-- 🤖 Config AI Agent
-- 📁 ManageFileandKnowledge Base
-- ⚙️ SettingsandConfigAccount
-- 📊 DataAnalyticsandReport
+I can help you with: 
+- 🚀 Creating and managing workflows
+- 🤖 Configuring AI Agents
+- 📁 Managing files and Knowledge Bases
+- ⚙️ Account settings and configuration
+- 📊 Data analytics and reports
 
-youcanwithDirectDescriptionyouwantdo's, oruserClickonmethod'sShortcutIssueFetchHelp.
+You can describe what you'd like to do, or click one of the quick questions above to get help.
 
-ifneedmoremultipleHelp, PleaseAccess [Help Center](/help) or [ContactSupport](/feedback).`;
+If you need more help, please visit the [Help Center](/help) or [Contact Support](/feedback).`;
 };
 
 export function FloatingAssistant() {
@@ -276,7 +276,7 @@ export function FloatingAssistant() {
  <div>
  <h3 className="text-sm font-medium text-foreground">AI Assistant</h3>
  {!isMinimized && (
- <p className="text-xs text-muted-foreground">AnytimeasyouProvideHelp</p>
+ <p className="text-xs text-muted-foreground">Here to help anytime</p>
  )}
  </div>
  </div>
@@ -285,7 +285,7 @@ export function FloatingAssistant() {
  <button
  onClick={handleClear}
  className="p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
- title="ClearConversation"
+ title="Clear conversation"
  >
  <Trash2 className="w-4 h-4" />
  </button>
@@ -319,8 +319,8 @@ export function FloatingAssistant() {
  <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
  <Lightbulb className="w-6 h-6 text-muted-foreground" />
  </div>
- <h4 className="text-sm font-medium text-foreground mb-1">hasWhatcanwithyou's?</h4>
- <p className="text-xs text-muted-foreground mb-6">Select1IssueorDirectInput</p>
+ <h4 className="text-sm font-medium text-foreground mb-1">How can I help you?</h4>
+ <p className="text-xs text-muted-foreground mb-6">Select a question or type your own</p>
 
  {/* ShortcutIssue */}
  {showQuickQuestions && (
@@ -412,7 +412,7 @@ export function FloatingAssistant() {
  value={inputValue}
  onChange={(e) => setInputValue(e.target.value)}
  onKeyDown={handleKeyDown}
- placeholder="Inputyou'sIssue..."
+ placeholder="Type your question..."
  className="flex-1 h-10 px-4 rounded-xl bg-muted/50 border border-border text-foreground text-sm placeholder:text-muted-foreground outline-none focus:border-primary/50 transition-colors"
  disabled={isLoading}
  />

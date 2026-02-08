@@ -1,5 +1,5 @@
 /**
- * Button ComponentTest
+ * Button Component Test
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -7,12 +7,12 @@ import { render, screen, fireEvent } from "@/test/utils";
 import { Button } from "../button";
 
 describe("Button", () => {
- it("ShouldcurrentlyRenderText", () => {
- render(<Button>ClickI</Button>);
- expect(screen.getByRole("button", { name: "ClickI" })).toBeInTheDocument();
+ it("Should render text correctly", () => {
+ render(<Button>Click Me</Button>);
+ expect(screen.getByRole("button", { name: "Click Me" })).toBeInTheDocument();
  });
 
- it("ShouldcurrentlyApp variant", () => {
+ it("Should apply variant correctly", () => {
  const { rerender } = render(<Button variant="default">Default</Button>);
  expect(screen.getByRole("button")).toHaveClass("bg-brand-500");
 
@@ -26,7 +26,7 @@ describe("Button", () => {
  expect(screen.getByRole("button")).toHaveClass("bg-transparent");
  });
 
- it("ShouldcurrentlyApp size", () => {
+ it("Should apply size correctly", () => {
  const { rerender } = render(<Button size="default">Default</Button>);
  expect(screen.getByRole("button")).toHaveClass("h-8");
 
@@ -40,7 +40,7 @@ describe("Button", () => {
  expect(screen.getByRole("button")).toHaveClass("h-8", "w-8");
  });
 
- it("ShouldatClicktimeTrigger onClick", () => {
+ it("Should trigger onClick when clicked", () => {
  const handleClick = vi.fn();
  render(<Button onClick={handleClick}>Click</Button>);
 
@@ -48,7 +48,7 @@ describe("Button", () => {
  expect(handleClick).toHaveBeenCalledTimes(1);
  });
 
- it("DisabletimenotShouldTrigger onClick", () => {
+ it("Should not trigger onClick when disabled", () => {
  const handleClick = vi.fn();
  render(
  <Button disabled onClick={handleClick}>
@@ -60,21 +60,21 @@ describe("Button", () => {
  expect(handleClick).not.toHaveBeenCalled();
  });
 
- it("ShouldSupport asChild", () => {
+ it("Should support asChild", () => {
  render(
  <Button asChild>
- <a href="/test">LinkButton</a>
+ <a href="/test">Link Button</a>
  </Button>
  );
- expect(screen.getByRole("link", { name: "LinkButton" })).toBeInTheDocument();
+ expect(screen.getByRole("link", { name: "Link Button" })).toBeInTheDocument();
  });
 
- it("Shouldcurrentlyand className", () => {
+ it("Should merge className correctly", () => {
  render(<Button className="custom-class">Custom</Button>);
  expect(screen.getByRole("button")).toHaveClass("custom-class");
  });
 
- it("ShouldSupport type ", () => {
+ it("Should support type attribute", () => {
  render(<Button type="submit">Submit</Button>);
  expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
  });

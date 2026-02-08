@@ -23,7 +23,7 @@ const resolveRequiredPermissions = (pathname: string): WorkspacePermission[] => 
  return ["workspace_view_metrics"];
 };
 
-// Workspace = App: App 's id thenis workspace ID
+// Workspace = App: app id is workspace ID
 const resolveAppWorkspaceId = (app?: App | null) =>
  app?.id || null;
 
@@ -92,7 +92,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
  <div className="min-h-[60vh] flex items-center justify-center">
  <div className="flex items-center gap-2 text-sm text-foreground-muted">
  <Loader2 className="h-4 w-4 animate-spin" />
- LoadingApp...
+ Loading app...
  </div>
  </div>
  );
@@ -101,16 +101,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
  if (status !== "ready" || !workspaceId || !appId) {
  const message =
  status === "not_found"
- ? "AppDoes not exist"
+ ? "App does not exist"
  : status === "forbidden"
- ? "NoneAccessApp"
-: "AppInfoLoadFailed";
+ ? "No access to app"
+: "Failed to load app info";
  return (
  <ExceptionState
  variant={status === "not_found" ? "not_found" : status === "forbidden" ? "permission" : "error"}
  title={message}
- description="Please confirmAppisnoatandandyouhasAccessPermission."
- action={{ label: "BackAppList", href: "/dashboard/apps" }}
+ description="Please confirm the app exists and you have access."
+ action={{ label: "Back to app list", href: "/dashboard/apps" }}
  />
  );
  }

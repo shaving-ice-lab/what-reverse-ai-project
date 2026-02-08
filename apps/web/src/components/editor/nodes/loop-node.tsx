@@ -26,9 +26,9 @@ export const LoopNode = memo(function LoopNode({
  };
 
  const modeLabels: Record<string, string> = {
- forEach: "Traversecountgroup",
- while: "ConditionLoop",
- count: "Fixedtimescount",
+ forEach: "Traverse Array",
+ while: "Condition Loop",
+ count: "Fixed Iterations",
  };
 
  return (
@@ -40,7 +40,7 @@ export const LoopNode = memo(function LoopNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -57,7 +57,7 @@ export const LoopNode = memo(function LoopNode({
  <div className="flex-1 min-w-0">
  <h3 className="font-medium text-sm truncate">{data.label || "Loop"}</h3>
  <p className="text-xs text-foreground-muted">
- {modeLabels[config.mode || "forEach"] || "LoopExecute"}
+ {modeLabels[config.mode || "forEach"] || "Loop Execute"}
  </p>
  </div>
  </div>
@@ -96,7 +96,7 @@ export const LoopNode = memo(function LoopNode({
  {config.maxIterations && (
  <div className="px-3 pb-2.5">
  <span className="text-xs px-1.5 py-0.5 rounded bg-brand-200/60 text-brand-500">
- MaximumIteration: {config.maxIterations}
+ Max Iterations: {config.maxIterations}
  </span>
  </div>
  )}

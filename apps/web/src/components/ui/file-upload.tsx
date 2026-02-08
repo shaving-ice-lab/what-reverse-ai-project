@@ -2,7 +2,7 @@
 
 /**
  * FileUploadComponent
- * SupportDrag & DropUpload, multipleFile, PreviewetcFeatures
+ * Supports drag & drop upload, multiple files, preview, and other features
  */
 
 import { useState, useRef, useCallback, ReactNode } from "react";
@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { Progress } from "./progress";
 
-// FileTypeIconMapping
+// File type icon mapping
 const getFileIcon = (type: string) => {
  if (type.startsWith("image/")) return FileImage;
  if (type.startsWith("video/")) return FileVideo;
@@ -39,17 +39,17 @@ const getFileIcon = (type: string) => {
  return File;
 };
 
-// FormatFileSize
+// Format file size
 const formatFileSize = (bytes: number) => {
  if (bytes === 0) return "0 B";
  const k = 1024;
  const sizes = ["B", "KB", "MB", "GB"];
  const i = Math.floor(Math.log(bytes) / Math.log(k));
- return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + "" + sizes[i];
+ return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
 // ============================================
-// UploadFileType
+// Upload file type
 // ============================================
 
 export interface UploadFile {
@@ -65,7 +65,7 @@ export interface UploadFile {
 }
 
 // ============================================
-// Drag & DropUploadRegion
+// Drag & drop upload region
 // ============================================
 
 interface DropZoneProps {
@@ -185,10 +185,10 @@ export function DropZone({
  <Upload className="w-6 h-6 text-primary" />
  </div>
  <p className="text-foreground font-medium mb-1">
- {isDragging ? "ReleaseFilewithUpload": "Drag & DropFiletothis, orClickUpload"}
+ {isDragging ? "Release to upload" : "Drag and drop files here, or click to upload"}
  </p>
  <p className="text-sm text-muted-foreground">
- Support {accept || "AllFileType"}, FileMaximum {formatFileSize(maxSize)}
+ Supports {accept || "all file types"}. Max file size: {formatFileSize(maxSize)}
  </p>
  </>
  )}
@@ -298,7 +298,7 @@ export function FileUploadItem({
 }
 
 // ============================================
-// CompleteFileUploadComponent
+// Complete file upload component
 // ============================================
 
 interface FileUploaderProps {
@@ -338,18 +338,18 @@ export function FileUploader({
  const updatedFiles = [...value, ...newFiles].slice(0, maxFiles);
  onChange(updatedFiles);
 
- // MockUpload
+ // Simulate upload
  for (const uploadFile of newFiles) {
  if (onUpload) {
  try {
- // UpdateStatusasUpload
+ // Update status to uploading
  onChange(
  updatedFiles.map((f) =>
  f.id === uploadFile.id ? { ...f, status: "uploading" as const } : f
  )
  );
 
- // MockProgress
+ // Simulate progress
  for (let progress = 0; progress <= 100; progress += 20) {
  await new Promise((resolve) => setTimeout(resolve, 200));
  onChange((prev) =>
@@ -371,13 +371,13 @@ export function FileUploader({
  onChange((prev) =>
  prev.map((f) =>
  f.id === uploadFile.id
- ? {...f, status: "error" as const, error: "UploadFailed" }
+ ? {...f, status: "error" as const, error: "Upload Failed" }
  : f
  )
  );
  }
  } else {
- // NoneActualUpload, DirectMarkSuccess
+ // No actual upload handler, mark as success directly
  const url = URL.createObjectURL(uploadFile.file);
  onChange((prev) =>
  prev.map((f) =>
@@ -425,7 +425,7 @@ export function FileUploader({
 }
 
 // ============================================
-// CompactFileUploadButton
+// Compact file upload button
 // ============================================
 
 interface CompactUploaderProps {
@@ -477,7 +477,7 @@ export function CompactUploader({
  {children || (
  <>
  <Plus className="w-4 h-4 mr-2" />
- UploadFile
+ Upload File
  </>
  )}
  </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ConditionDetermineNode - Minimalist Style
+ * Condition Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -29,7 +29,7 @@ export const ConditionNode = memo(function ConditionNode({
  : "border-border hover:border-warning/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -44,7 +44,7 @@ export const ConditionNode = memo(function ConditionNode({
  <GitBranch className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "ConditionDetermine"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Condition"}</h3>
  <p className="text-xs text-foreground-muted">If / Else</p>
  </div>
  </div>

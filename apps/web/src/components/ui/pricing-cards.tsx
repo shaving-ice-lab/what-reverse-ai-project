@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * PriceCardComponent
- * Used forShowcaseSubscriptionPlanandPricingInfo
+ * Pricing Card Component
+ * Used for showcasing subscription plans and pricing info
  */
 
 import { ReactNode } from "react";
@@ -53,14 +53,14 @@ export function PricingCard({
  description,
  price,
  originalPrice,
- period = "/months",
+ period = "/month",
  features,
  popular,
  current,
  icon: Icon = Zap,
  iconColor = "text-primary",
  iconBg = "bg-primary/10",
- buttonText = "SelectthisPlan",
+ buttonText = "Select this Plan",
  buttonVariant = "default",
  onSelect,
  className,
@@ -77,21 +77,21 @@ export function PricingCard({
  className
  )}
  >
- {/* PopularTags */}
+ {/* Popular badge */}
  {popular && (
  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
  <Star className="w-3 h-3 mr-1 fill-current" />
- mostWelcome
+ Most Popular
  </Badge>
  )}
 
- {/* CurrentPlanTags */}
+ {/* Current plan badge */}
  {current && (
  <Badge
  variant="secondary"
  className="absolute -top-3 left-1/2 -translate-x-1/2"
  >
- CurrentPlan
+ Current Plan
  </Badge>
  )}
 
@@ -127,7 +127,7 @@ export function PricingCard({
  )}
  </div>
 
- {/* FeaturesList */}
+ {/* Features list */}
  <ul className="flex-1 space-y-3 mb-6">
  {features.map((feature, index) => (
  <li
@@ -164,7 +164,7 @@ export function PricingCard({
  disabled={current}
  onClick={onSelect}
  >
- {current ? "CurrentPlan": buttonText}
+ {current ? "Current Plan" : buttonText}
  </Button>
  </div>
  );
@@ -186,9 +186,9 @@ interface PricingToggleProps {
 export function PricingToggle({
  isYearly,
  onToggle,
- monthlyLabel = "months",
- yearlyLabel = "years",
- discount = " 20%",
+ monthlyLabel = "Monthly",
+ yearlyLabel = "Yearly",
+ discount = "Save 20%",
  className,
 }: PricingToggleProps) {
  return (
@@ -312,11 +312,11 @@ interface SimplePricingCardProps {
 export function SimplePricingCard({
  title,
  price,
- period = "/months",
+ period = "/month",
  description,
  features,
  highlighted,
- buttonText = "StartUsage",
+ buttonText = "Get Started",
  onSelect,
  className,
 }: SimplePricingCardProps) {
@@ -377,9 +377,9 @@ interface EnterprisePricingCardProps {
 
 export function EnterprisePricingCard({
  title = "Enterprise",
- description = "aslargeTeamandEnterpriseCustomize'sResolvePlan",
+ description = "Large teams and enterprises can customize their plan.",
  features,
- contactText = "ContactSales",
+ contactText = "Contact Sales",
  onContact,
  className,
 }: EnterprisePricingCardProps) {
@@ -401,7 +401,7 @@ export function EnterprisePricingCard({
  </div>
 
  <div className="mb-6">
- <span className="text-3xl font-bold text-foreground">CustomizePlan</span>
+ <span className="text-3xl font-bold text-foreground">Custom Plan</span>
  </div>
 
  <ul className="space-y-3 mb-6">

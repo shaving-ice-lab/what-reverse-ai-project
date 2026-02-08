@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Createnew Agent Page
- * Supabase Style: Minimal, Professional, WizardCreate
+ * Create New Agent Page
+ * Supabase Style: Minimal, Professional, Wizard Creation
  */
 
 import { useState } from "react";
@@ -33,96 +33,96 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// CreateStep
+// Creation Steps
 const steps = [
- { id: 1, title: "Basic Info", description: "Settings Agent NameandDescription" },
- { id: 2, title: "canpowerConfig", description: "Select Agent 'sCorecanpower" },
- { id: 3, title: "ModelSettings", description: "Config AI ModelParameter" },
- { id: 4, title: "TestPreview", description: "TestConcurrency Agent" },
+ { id: 1, title: "Basic Info", description: "Set agent name and description" },
+ { id: 2, title: "Capabilities", description: "Select the agent's core capabilities" },
+ { id: 3, title: "Model Settings", description: "Configure AI model parameters" },
+ { id: 4, title: "Test & Preview", description: "Test your agent before publishing" },
 ];
 
 // Agent Template
 const agentTemplates = [
  {
  id: "assistant",
- name: "useAssistant",
- description: "multipleFeatures AI Assistant, canProcesstypeTask",
+ name: "General Assistant",
+ description: "A versatile AI assistant that can handle various tasks",
  icon: Bot,
- capabilities: ["Conversation", "TextGenerate", "Q&A"],
+ capabilities: ["Conversation", "Text Generation", "Q&A"],
  },
  {
  id: "coder",
- name: "ProgrammingAssistant",
- description: "FocusatCodeWriteandTechnologyIssue",
+ name: "Programming Assistant",
+ description: "Focused on code writing and technical problems",
  icon: Code,
- capabilities: ["CodeGenerate", "CodeReview", "TechnologyQ&A"],
+ capabilities: ["Code Generation", "Code Review", "Technical Q&A"],
  },
  {
  id: "writer",
- name: "WritingAssistant",
- description: "Professional'sContentCreativeandCopyWrite",
+ name: "Writing Assistant",
+ description: "Professional content creation and copywriting",
  icon: Sparkles,
- capabilities: ["ArticleWriting", "CopyCreative", "Contentoptimal"],
+ capabilities: ["Article Writing", "Copywriting", "Content Optimization"],
  },
  {
  id: "analyst",
- name: "DataAnalytics",
- description: "DataAnalyticsandReportGenerate",
+ name: "Data Analyst",
+ description: "Data analysis and report generation",
  icon: Zap,
- capabilities: ["DataAnalytics", "ReportGenerate", "InsightsExtract"],
+ capabilities: ["Data Analysis", "Report Generation", "Insight Extraction"],
  },
  {
  id: "custom",
  name: "Custom Agent",
- description: "fromStartCreateyou'sExclusive Agent",
+ description: "Create your own custom agent from scratch",
  icon: Settings,
- capabilities: ["completeallCustom"],
+ capabilities: ["Fully Customizable"],
  },
 ];
 
-// AI ModelOption
+// AI Model Options
 const aiModels = [
  {
  id: "gpt-4",
  name: "GPT-4",
  provider: "OpenAI",
- description: "Bestlarge'sModel, SuitableComplexTask",
- speed: "etc",
- quality: "most",
+ description: "The most powerful model, suitable for complex tasks",
+ speed: "Medium",
+ quality: "Highest",
  },
  {
  id: "gpt-3.5-turbo",
  name: "GPT-3.5 Turbo",
  provider: "OpenAI",
- description: "QuickandEconomy, SuitablelargemultiplecountTask",
- speed: "Quick",
- quality: "",
+ description: "Fast and economical, suitable for high-volume tasks",
+ speed: "Fast",
+ quality: "High",
  },
  {
  id: "claude-3",
  name: "Claude 3",
  provider: "Anthropic",
- description: "TextandAnalyticsTask",
- speed: "etc",
- quality: "optimal",
+ description: "Excellent for text comprehension and analysis tasks",
+ speed: "Medium",
+ quality: "Excellent",
  },
  {
  id: "qwen",
- name: "Tongyi1000",
- provider: "in",
- description: "Understandcanpower",
- speed: "Quick",
- quality: "optimal",
+ name: "Qwen",
+ provider: "Alibaba",
+ description: "Strong language understanding capabilities",
+ speed: "Fast",
+ quality: "Excellent",
  },
 ];
 
-// canpowerOption
+// Capability Options
 const capabilities = [
- { id: "chat", name: "Conversation", icon: MessageSquare, description: "NaturalLanguageConversation" },
- { id: "code", name: "Code", icon: Code, description: "CodeGenerateandAnalytics" },
- { id: "write", name: "Writing", icon: Sparkles, description: "ContentCreative" },
- { id: "analyze", name: "Analytics", icon: Zap, description: "DataAnalytics" },
- { id: "search", name: "Search", icon: Eye, description: "NetworkSearch" },
+ { id: "chat", name: "Conversation", icon: MessageSquare, description: "Natural language conversation" },
+ { id: "code", name: "Code", icon: Code, description: "Code generation and analysis" },
+ { id: "write", name: "Writing", icon: Sparkles, description: "Content creation" },
+ { id: "analyze", name: "Analytics", icon: Zap, description: "Data analysis" },
+ { id: "search", name: "Search", icon: Eye, description: "Web search" },
 ];
 
 export default function NewAgentPage() {
@@ -130,7 +130,7 @@ export default function NewAgentPage() {
  const [currentStep, setCurrentStep] = useState(1);
  const [isCreating, setIsCreating] = useState(false);
 
- // FormStatus
+ // Form state
  const [formData, setFormData] = useState({
  name: "",
  description: "",
@@ -141,20 +141,20 @@ export default function NewAgentPage() {
  systemPrompt: "",
  temperature: 0.7,
  maxTokens: 2048,
- welcomeMessage: "you!Iisyou's AI Assistant, hasWhatcanwithHelpyou's?",
+ welcomeMessage: "Hello! I'm your AI assistant. How can I help you?",
  });
 
- // TestConversation
+ // Test conversation
  const [testMessages, setTestMessages] = useState<{ role: string; content: string }[]>([]);
  const [testInput, setTestInput] = useState("");
  const [isTesting, setIsTesting] = useState(false);
 
- // UpdateForm
+ // Update form
  const updateForm = (field: string, value: any) => {
  setFormData((prev) => ({ ...prev, [field]: value }));
  };
 
- // Switchcanpower
+ // Toggle capability
  const toggleCapability = (id: string) => {
  setFormData((prev) => ({
  ...prev,
@@ -164,7 +164,7 @@ export default function NewAgentPage() {
  }));
  };
 
- // SelectTemplate
+ // Select template
  const selectTemplate = (templateId: string) => {
  const template = agentTemplates.find((t) => t.id === templateId);
  if (template) {
@@ -190,7 +190,7 @@ export default function NewAgentPage() {
  }
  };
 
- // SendTestMessage
+ // Send test message
  const sendTestMessage = async () => {
  if (!testInput.trim()) return;
 
@@ -204,7 +204,7 @@ export default function NewAgentPage() {
  
  const aiMessage = {
  role: "assistant",
- content: `thisis ${formData.name || "AI Assistant"} 'sTestReply.Itoyou'sMessage: "${testInput}".atcurrentlyPublishafter, IwillUsage ${formData.model} ModelcomeGeneratemoreSmart'sReply.`,
+ content: `This is a test reply from ${formData.name || "AI Assistant"}. In response to your message: "${testInput}". After publishing, I will use the ${formData.model} model to generate smarter replies.`,
  };
  setTestMessages((prev) => [...prev, aiMessage]);
  setIsTesting(false);
@@ -214,14 +214,14 @@ export default function NewAgentPage() {
  const createAgent = async () => {
  setIsCreating(true);
  
- // MockCreatepast
+ // Mock creation process
  await new Promise((resolve) => setTimeout(resolve, 2000));
  
- // Navigateto Agent List
+ // Navigate to agent list
  router.push("/dashboard/my-agents");
  };
 
- // VerifyCurrentStep
+ // Validate current step
  const isStepValid = () => {
  switch (currentStep) {
  case 1:
@@ -253,7 +253,7 @@ export default function NewAgentPage() {
  <div className="h-5 w-px bg-border-muted" />
  <div>
  <p className="page-caption">Agents</p>
- <h1 className="text-page-title text-foreground">Createnew Agent</h1>
+ <h1 className="text-page-title text-foreground">Create New Agent</h1>
  </div>
  </div>
 
@@ -354,7 +354,7 @@ export default function NewAgentPage() {
  Select Agent Template
  </h2>
  <p className="text-[13px] text-foreground-light">
- Select1TemplateQuickStart, orfromCreateCustom Agent
+ Select a template to get started quickly, or create a custom agent from scratch
  </p>
  </div>
 
@@ -406,7 +406,7 @@ export default function NewAgentPage() {
  <Input
  value={formData.name}
  onChange={(e) => updateForm("name", e.target.value)}
- placeholder="toyou's Agent char"
+ placeholder="Name your agent"
  className="h-9 bg-surface-200 border-border"
  />
  </div>
@@ -429,7 +429,7 @@ export default function NewAgentPage() {
  </div>
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Upload className="w-4 h-4 mr-2" />
- UploadImage
+ Upload Image
  </Button>
  </div>
  </div>
@@ -442,7 +442,7 @@ export default function NewAgentPage() {
  <textarea
  value={formData.description}
  onChange={(e) => updateForm("description", e.target.value)}
- placeholder="Descriptionthis Agent 'sFeaturesanduse..."
+ placeholder="Describe this agent's features and use cases..."
  rows={3}
  className="w-full px-4 py-3 rounded-md bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none text-[13px]"
  />
@@ -452,15 +452,15 @@ export default function NewAgentPage() {
  </div>
  )}
 
- {/* Step 2: canpowerConfig */}
+ {/* Step 2: Capabilities */}
  {currentStep === 2 && (
  <div className="space-y-8">
  <div>
  <h2 className="text-lg font-semibold text-foreground mb-2">
- Config Agent canpower
+ Configure Agent Capabilities
  </h2>
  <p className="text-[13px] text-foreground-light">
- SelectyouHope Agent 'sCorecanpower
+ Select the core capabilities you want for your agent
  </p>
  </div>
 
@@ -493,30 +493,30 @@ export default function NewAgentPage() {
  <div className="space-y-4 pt-6 border-t border-border">
  <h3 className="text-sm font-medium text-foreground">System Prompt</h3>
  <p className="text-xs text-foreground-muted">
- Definition Agent 'sRole, rowasandReplyStyle
+ Define the agent&apos;s role, behavior, and reply style
  </p>
  <textarea
  value={formData.systemPrompt}
  onChange={(e) => updateForm("systemPrompt", e.target.value)}
- placeholder="youis1Professional's AI Assistant..."
+ placeholder="You are a professional AI assistant..."
  rows={6}
  className="w-full px-4 py-3 rounded-md bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none font-mono text-[13px]"
  />
  </div>
 
  <div className="space-y-4">
- <h3 className="text-sm font-medium text-foreground">WelcomeMessage</h3>
+ <h3 className="text-sm font-medium text-foreground">Welcome Message</h3>
  <Input
  value={formData.welcomeMessage}
  onChange={(e) => updateForm("welcomeMessage", e.target.value)}
- placeholder="Agent StartConversationtime'sWelcomeMessage..."
+ placeholder="The welcome message when the agent starts a conversation..."
  className="h-9 bg-surface-200 border-border"
  />
  </div>
  </div>
  )}
 
- {/* Step 3: ModelSettings */}
+ {/* Step 3: Model Settings */}
  {currentStep === 3 && (
  <div className="space-y-8">
  <div>
@@ -524,7 +524,7 @@ export default function NewAgentPage() {
  Select AI Model
  </h2>
  <p className="text-[13px] text-foreground-light">
- SelectmostSuitableyouRequirements's AI Model
+ Select the AI model that best fits your requirements
  </p>
  </div>
 
@@ -556,7 +556,7 @@ export default function NewAgentPage() {
  Speed: <span className="text-foreground">{model.speed}</span>
  </span>
  <span className="text-foreground-muted">
- : <span className="text-foreground">{model.quality}</span>
+ Quality: <span className="text-foreground">{model.quality}</span>
  </span>
  </div>
  </button>
@@ -569,7 +569,7 @@ export default function NewAgentPage() {
  <div className="page-grid sm:grid-cols-2">
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Temperature (Temperature)
+ Temperature
  <span className="ml-2 text-foreground-muted font-normal">
  {formData.temperature}
  </span>
@@ -591,7 +591,7 @@ export default function NewAgentPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Maximum Token count
+ Maximum Tokens
  </label>
  <Input
  type="number"
@@ -607,22 +607,22 @@ export default function NewAgentPage() {
  </div>
  )}
 
- {/* Step 4: TestPreview */}
+ {/* Step 4: Test & Preview */}
  {currentStep === 4 && (
  <div className="space-y-8">
  <div>
  <h2 className="text-lg font-semibold text-foreground mb-2">
- Testyou's Agent
+ Test Your Agent
  </h2>
  <p className="text-[13px] text-foreground-light">
- atPublishbeforeTest Agent 'sConversationEffect
+ Test the agent&apos;s conversation before publishing
  </p>
  </div>
 
  <div className="page-grid lg:grid-cols-2">
- {/* ConfigSummary */}
+ {/* Configuration Summary */}
  <div className="p-5 rounded-md bg-surface-100 border border-border">
- <h3 className="text-sm font-medium text-foreground mb-4">ConfigSummary</h3>
+ <h3 className="text-sm font-medium text-foreground mb-4">Configuration Summary</h3>
  
  <div className="space-y-4">
  <div className="flex items-center gap-4">
@@ -631,10 +631,10 @@ export default function NewAgentPage() {
  </div>
  <div>
  <div className="text-[13px] font-medium text-foreground">
- {formData.name || "not yetNaming Agent"}
+ {formData.name || "Unnamed Agent"}
  </div>
  <div className="text-xs text-foreground-muted">
- {formData.description || "NoneDescription"}
+ {formData.description || "No description"}
  </div>
  </div>
  </div>
@@ -647,9 +647,9 @@ export default function NewAgentPage() {
  </span>
  </div>
  <div className="flex justify-between text-xs">
- <span className="text-foreground-muted">canpower</span>
+ <span className="text-foreground-muted">Capabilities</span>
  <span className="text-foreground">
- {formData.capabilities.length} 
+ {formData.capabilities.length} selected
  </span>
  </div>
  <div className="flex justify-between text-xs">
@@ -660,7 +660,7 @@ export default function NewAgentPage() {
  </div>
  </div>
 
- {/* TestConversation */}
+ {/* Test Conversation */}
  <div className="flex flex-col rounded-md bg-surface-100 border border-border overflow-hidden">
  <div className="p-4 border-b border-border bg-surface-75">
  <div className="flex items-center gap-3">
@@ -671,13 +671,13 @@ export default function NewAgentPage() {
  <div className="text-[13px] font-medium text-foreground">
  {formData.name || "AI Agent"}
  </div>
- <div className="text-xs text-foreground-muted">TestConversation</div>
+ <div className="text-xs text-foreground-muted">Test Conversation</div>
  </div>
  </div>
  </div>
 
  <div className="flex-1 p-4 space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto">
- {/* WelcomeMessage */}
+ {/* Welcome Message */}
  <div className="flex gap-3">
  <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
  <Bot className="w-4 h-4 text-brand-500" />
@@ -687,7 +687,7 @@ export default function NewAgentPage() {
  </div>
  </div>
 
- {/* ConversationMessage */}
+ {/* Conversation Messages */}
  {testMessages.map((msg, index) => (
  <div
  key={index}
@@ -720,7 +720,7 @@ export default function NewAgentPage() {
  <Bot className="w-4 h-4 text-brand-500" />
  </div>
  <div className="px-4 py-2 rounded-md bg-surface-200 text-xs text-foreground-muted">
- currentlyatThink...
+ Thinking...
  </div>
  </div>
  )}
@@ -731,7 +731,7 @@ export default function NewAgentPage() {
  <Input
  value={testInput}
  onChange={(e) => setTestInput(e.target.value)}
- placeholder="InputTestMessage..."
+ placeholder="Enter a test message..."
  className="h-9 bg-surface-200 border-border"
  onKeyDown={(e) => e.key === "Enter" && sendTestMessage()}
  />
@@ -784,7 +784,7 @@ export default function NewAgentPage() {
  onClick={createAgent}
  disabled={isCreating}
  >
- {isCreating ? "Create...": "Create Agent"}
+ {isCreating ? "Creating...": "Create Agent"}
  </Button>
  ) : (
  <Button

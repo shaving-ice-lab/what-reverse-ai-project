@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * ModelSelectComponent
+ * Model Selector Component
  *
  * Features: 
- * - DisplayCloudModelList(OpenAI, Anthropic, Google etc)
- * - DisplayLocal Ollama ModelList
- * - DisplayModelInstallStatus
- * - Display Ollama RunStatus
- * - SupportModelDownloadInteractive
+ * - Displays cloud model list (OpenAI, Anthropic, Google, etc.)
+ * - Displays local Ollama model list
+ * - Shows model installation status
+ * - Shows Ollama service status
+ * - Supports model download interaction
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -47,7 +47,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// ========== TypeDefinition ==========
+// ========== Type Definitions ==========
 
 export interface CloudModel {
  id: string;
@@ -75,27 +75,27 @@ export interface OllamaStatus {
 }
 
 export interface ModelSelectorProps {
- /** Currentselect'sModel */
+ /** Currently selected model */
  value?: string;
- /** ModelCallback */
+ /** Model change callback */
  onChange?: (model: string) => void;
- /** isnoDisable */
+ /** Whether the selector is disabled */
  disabled?: boolean;
- /** DisplayLocalModel */
+ /** Show only local models */
  localOnly?: boolean;
- /** DisplayCloudModel */
+ /** Show only cloud models */
  cloudOnly?: boolean;
- /** CustomTrigger */
+ /** Custom trigger element */
  trigger?: React.ReactNode;
- /** Pop upmethod */
+ /** Popover side */
  side?: "top" | "right" | "bottom" | "left";
- /** formethod */
+ /** Popover alignment */
  align?: "start" | "center" | "end";
- /** CustomClass Name */
+ /** Custom CSS class */
  className?: string;
 }
 
-// ========== PresetCloudModelList ==========
+// ========== Preset Cloud Model List ==========
 
 const CLOUD_MODELS: CloudModel[] = [
  // OpenAI Models
@@ -103,7 +103,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gpt-4o",
  name: "GPT-4o",
  provider: "openai",
- description: "BestmultipleModalModel, SupportImageUnderstand",
+ description: "Best multimodal model with image understanding",
  contextLength: 128000,
  inputPrice: 5,
  outputPrice: 15,
@@ -113,7 +113,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gpt-4o-mini",
  name: "GPT-4o Mini",
  provider: "openai",
- description: "comparemost'sSmartModel",
+ description: "The most capable model",
  contextLength: 128000,
  inputPrice: 0.15,
  outputPrice: 0.6,
@@ -122,7 +122,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gpt-4-turbo",
  name: "GPT-4 Turbo",
  provider: "openai",
- description: "canContextModel",
+ description: "High-capability model with long context",
  contextLength: 128000,
  inputPrice: 10,
  outputPrice: 30,
@@ -131,7 +131,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gpt-3.5-turbo",
  name: "GPT-3.5 Turbo",
  provider: "openai",
- description: "QuickandEconomy",
+ description: "Fast and cost-effective",
  contextLength: 16385,
  inputPrice: 0.5,
  outputPrice: 1.5,
@@ -141,7 +141,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "claude-3-5-sonnet-20241022",
  name: "Claude 3.5 Sonnet",
  provider: "anthropic",
- description: "mostnewBest's Claude Model",
+ description: "The latest and best Claude model",
  contextLength: 200000,
  inputPrice: 3,
  outputPrice: 15,
@@ -150,7 +150,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "claude-3-opus-20240229",
  name: "Claude 3 Opus",
  provider: "anthropic",
- description: "BestInferencecanpower",
+ description: "Best reasoning capabilities",
  contextLength: 200000,
  inputPrice: 15,
  outputPrice: 75,
@@ -159,7 +159,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "claude-3-haiku-20240307",
  name: "Claude 3 Haiku",
  provider: "anthropic",
- description: "QuickandEconomy",
+ description: "Fast and cost-effective",
  contextLength: 200000,
  inputPrice: 0.25,
  outputPrice: 1.25,
@@ -169,7 +169,7 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gemini-1.5-pro",
  name: "Gemini 1.5 Pro",
  provider: "google",
- description: "ContextSupport",
+ description: "Ultra-long context support",
  contextLength: 2000000,
  inputPrice: 3.5,
  outputPrice: 10.5,
@@ -178,28 +178,28 @@ const CLOUD_MODELS: CloudModel[] = [
  id: "gemini-1.5-flash",
  name: "Gemini 1.5 Flash",
  provider: "google",
- description: "QuickEfficient",
+ description: "Fast and efficient",
  contextLength: 1000000,
  inputPrice: 0.075,
  outputPrice: 0.3,
  },
 ];
 
-// PresetcanDownload's Ollama Model
+// Preset downloadable Ollama models
 const DOWNLOADABLE_MODELS = [
- { name: "llama3.2", description: "Meta mostnew Llama 3.2", size: "2GB" },
+ { name: "llama3.2", description: "Meta's latest Llama 3.2", size: "2GB" },
  { name: "llama3.2:1b", description: "Llama 3.2 1B version", size: "1.3GB" },
  { name: "llama3.1", description: "Meta Llama 3.1 8B", size: "4.7GB" },
- { name: "mistral", description: "Mistral 7B can", size: "4.1GB" },
- { name: "qwen2.5", description: "Tongyi1000 2.5", size: "4.4GB" },
- { name: "qwen2.5-coder", description: "Tongyi1000Codeuse", size: "4.7GB" },
- { name: "phi3", description: "Microsoft Phi-3 small", size: "2.2GB" },
- { name: "deepseek-coder-v2", description: "DeepSeekCodeModel", size: "8.9GB" },
+ { name: "mistral", description: "Mistral 7B general-purpose", size: "4.1GB" },
+ { name: "qwen2.5", description: "Qwen 2.5 general-purpose", size: "4.4GB" },
+ { name: "qwen2.5-coder", description: "Qwen 2.5 for coding", size: "4.7GB" },
+ { name: "phi3", description: "Microsoft Phi-3 compact model", size: "2.2GB" },
+ { name: "deepseek-coder-v2", description: "DeepSeek code model", size: "8.9GB" },
  { name: "gemma2", description: "Google Gemma 2", size: "5.4GB" },
- { name: "codellama", description: "Meta Codeuse Llama", size: "3.8GB" },
+ { name: "codellama", description: "Meta's code-optimized Llama", size: "3.8GB" },
 ];
 
-// Provider IconandColorMapping
+// Provider icon and color mapping
 const PROVIDER_CONFIG: Record<
  string,
  { icon: typeof Cloud; color: string; bg: string }
@@ -211,14 +211,14 @@ const PROVIDER_CONFIG: Record<
  ollama: { icon: HardDrive, color: "text-brand-500", bg: "bg-brand-200/60" },
 };
 
-// ========== Formatcount ==========
+// ========== Formatting Utilities ==========
 
 const formatBytes = (bytes: number): string => {
  if (bytes === 0) return "0 B";
  const k = 1024;
  const sizes = ["B", "KB", "MB", "GB", "TB"];
  const i = Math.floor(Math.log(bytes) / Math.log(k));
- return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + "" + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatContextLength = (tokens: number): string => {
@@ -227,7 +227,7 @@ const formatContextLength = (tokens: number): string => {
  return tokens.toString();
 };
 
-// ========== ComponentImplement ==========
+// ========== Component Implementation ==========
 
 export function ModelSelector({
  value,
@@ -254,7 +254,7 @@ export function ModelSelector({
  >(new Map());
  const [deletingModels, setDeletingModels] = useState<Set<string>>(new Set());
 
- // Checkisnoat Tauri Environment
+ // Check if running in Tauri environment
  const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
 
  // Check Ollama Status
@@ -278,7 +278,7 @@ export function ModelSelector({
  }
  }, [isTauri]);
 
- // FetchLocalModelList
+ // Fetch local model list
  const loadLocalModels = useCallback(async () => {
  if (!isTauri || !ollamaStatus?.running) {
  setLocalModels([]);
@@ -299,7 +299,7 @@ export function ModelSelector({
  }
  }, [isTauri, ollamaStatus?.running]);
 
- // DownloadModel
+ // Download model
  const downloadModel = useCallback(
  async (modelName: string) => {
  if (!isTauri) return;
@@ -310,7 +310,7 @@ export function ModelSelector({
  // @ts-ignore - Tauri API
  const { invoke } = await import("@tauri-apps/api/core");
 
- // MockProgress(ActualShoulduseEventListen)
+ // Simulated progress (should use event listeners in production)
  const progressInterval = setInterval(() => {
  setDownloadingModels((prev) => {
  const current = prev.get(modelName) || 0;
@@ -330,11 +330,11 @@ export function ModelSelector({
  return newMap;
  });
 
- toast.success("ModelDownloadDone", {
- description: `${modelName} alreadySuccessInstall`,
+ toast.success("Model downloaded", {
+ description: `${modelName} has been successfully installed`,
  });
 
- // RefreshModelList
+ // Refresh model list
  loadLocalModels();
  } catch (error) {
  setDownloadingModels((prev) => {
@@ -342,15 +342,15 @@ export function ModelSelector({
  newMap.delete(modelName);
  return newMap;
  });
- toast.error("DownloadFailed", {
- description: error instanceof Error ? error.message: "PleaseRetry",
+ toast.error("Download failed", {
+ description: error instanceof Error ? error.message: "Please try again",
  });
  }
  },
  [isTauri, loadLocalModels]
  );
 
- // DeleteModel
+ // Delete model
  const deleteModel = useCallback(
  async (modelName: string) => {
  if (!isTauri) return;
@@ -362,15 +362,15 @@ export function ModelSelector({
  const { invoke } = await import("@tauri-apps/api/core");
  await invoke("delete_ollama_model", { modelName });
 
- toast.success("ModelDeleted", {
- description: `${modelName} alreadyfromLocalRemove`,
+ toast.success("Model deleted", {
+ description: `${modelName} has been removed from local storage`,
  });
 
- // RefreshModelList
+ // Refresh model list
  loadLocalModels();
  } catch (error) {
- toast.error("DeleteFailed", {
- description: error instanceof Error ? error.message: "PleaseRetry",
+ toast.error("Delete failed", {
+ description: error instanceof Error ? error.message: "Please try again",
  });
  } finally {
  setDeletingModels((prev) => {
@@ -396,15 +396,15 @@ export function ModelSelector({
  }
  }, [ollamaStatus?.running, loadLocalModels]);
 
- // FetchCurrentselect'sModelInfo
+ // Get currently selected model info
  const selectedModel = useMemo(() => {
  if (!value) return null;
 
- // firstfromCloudModel
+ // First check cloud models
  const cloudModel = CLOUD_MODELS.find((m) => m.id === value);
  if (cloudModel) return { ...cloudModel, type: "cloud" as const };
 
- // againfromLocalModel
+ // Then check local models
  const localModel = localModels.find(
  (m) => m.name === value || m.model === value
  );
@@ -420,13 +420,13 @@ export function ModelSelector({
  return null;
  }, [value, localModels]);
 
- // ProcessModelSelect
+ // Handle model selection
  const handleSelect = (modelId: string) => {
  onChange?.(modelId);
  setOpen(false);
  };
 
- // alreadyInstall'sLocalModelNameCollection
+ // Installed local model name collection
  const installedModelNames = useMemo(
  () => new Set(localModels.map((m) => m.name.split(":")[0])),
  [localModels]
@@ -478,7 +478,7 @@ export function ModelSelector({
  )}
  </>
  ) : (
- <span className="text-foreground-light">SelectModel...</span>
+ <span className="text-foreground-light">Select a model...</span>
  )}
  </div>
  <ChevronDown className="w-4 h-4 shrink-0 text-foreground-light" />
@@ -504,7 +504,7 @@ export function ModelSelector({
  onClick={() => setActiveTab("cloud")}
  >
  <Cloud className="w-4 h-4" />
- CloudModel
+              Cloud Models
  </button>
  <button
  className={cn(
@@ -516,15 +516,15 @@ export function ModelSelector({
  onClick={() => setActiveTab("local")}
  >
  <HardDrive className="w-4 h-4" />
- LocalModel
+              Local Models
  </button>
  </div>
  )}
 
- {/* CloudModelList */}
+        {/* Cloud Model List */}
  {(activeTab === "cloud" || cloudOnly) && !localOnly && (
  <div className="max-h-[400px] overflow-y-auto">
- {/* byProvider Group */}
+ {/* Group by Provider */}
  {(["openai", "anthropic", "google"] as const).map((provider) => {
  const models = CLOUD_MODELS.filter(
  (m) => m.provider === provider
@@ -604,7 +604,7 @@ export function ModelSelector({
  </div>
  )}
 
- {/* LocalModelList */}
+        {/* Local Model List */}
  {(activeTab === "local" || localOnly) && !cloudOnly && (
  <div className="max-h-[400px] overflow-y-auto">
  {/* Ollama Status */}
@@ -646,23 +646,23 @@ export function ModelSelector({
  {!isTauri && (
  <div className="mt-2 p-2 rounded-lg bg-warning-200 text-warning text-xs flex items-start gap-2">
  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
- <span>LocalModelonlyatfaceAppAvailable</span>
+ <span>Local models are only available in the desktop app</span>
  </div>
  )}
 
  {isTauri && !ollamaStatus?.running && (
  <div className="mt-2 p-2 rounded-lg bg-surface-200 text-foreground-light text-xs flex items-start gap-2">
  <Info className="w-4 h-4 shrink-0 mt-0.5" />
- <span>PleasefirstLaunch Ollama Service: OpenendpointRun `ollama serve`</span>
+ <span>Please start the Ollama service first: open a terminal and run `ollama serve`</span>
  </div>
  )}
  </div>
 
- {/* alreadyInstall'sModel */}
+ {/* Installed Models */}
  {localModels.length > 0 && (
  <div className="p-2">
  <div className="px-2 py-1.5 text-xs text-foreground-light uppercase tracking-wider">
- alreadyInstall ({localModels.length})
+ Installed ({localModels.length})
  </div>
  <div className="space-y-1">
  {localModels.map((model) => (
@@ -710,7 +710,7 @@ export function ModelSelector({
  )}
  </Button>
  </TooltipTrigger>
- <TooltipContent>DeleteModel</TooltipContent>
+ <TooltipContent>Delete model</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  </div>
@@ -719,11 +719,11 @@ export function ModelSelector({
  </div>
  )}
 
- {/* canDownload'sModel */}
+ {/* Downloadable Models */}
  {ollamaStatus?.running && (
  <div className="p-2 border-t border-border">
  <div className="px-2 py-1.5 text-xs text-foreground-light uppercase tracking-wider">
- canDownload'sModel
+ Downloadable Models
  </div>
  <div className="space-y-1">
  {DOWNLOADABLE_MODELS.map((model) => {
@@ -757,7 +757,7 @@ export function ModelSelector({
  </div>
  {isInstalled ? (
  <Badge className="text-[10px] px-1.5 py-0.5 bg-brand-200/60 text-brand-500">
- alreadyInstall
+ Installed
  </Badge>
  ) : isDownloading ? (
  <span className="text-xs text-foreground-light">
@@ -787,9 +787,9 @@ export function ModelSelector({
  !isLoadingModels && (
  <div className="p-6 text-center">
  <HardDrive className="w-10 h-10 mx-auto text-foreground-light/50 mb-3" />
- <p className="text-sm text-foreground-light mb-1">NoneLocalModel</p>
+ <p className="text-sm text-foreground-light mb-1">No local models</p>
  <p className="text-xs text-foreground-light/70">
- fromonmethodListDownloadModelStartUsage
+ Download a model from the list above to get started
  </p>
  </div>
  )}

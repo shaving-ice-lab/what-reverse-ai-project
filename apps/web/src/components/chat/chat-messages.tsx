@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ChatMessageComponent
- * Used forDisplayConversationMessageList
+ * Chat Message Component
+ * Used to display conversation message list
  */
 
 import { useState, useRef, useEffect, ReactNode } from "react";
@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // ============================================
-// TypeDefinition
+// Type Definitions
 // ============================================
 
 export interface ChatMessage {
@@ -60,12 +60,12 @@ export interface ChatMessage {
  disliked?: boolean;
  bookmarked?: boolean;
  attachments?: { type: "image" | "file" | "code"; name: string; url?: string }[];
- parentId?: string; // Reply'sMessage ID
- parentMessage?: ChatMessage; // use'sMessageContent(Used forDisplay)
+  parentId?: string; // Replied message ID
+  parentMessage?: ChatMessage; // Referenced message content (for display)
 }
 
 // ============================================
-// MessageBubble
+// Message Bubble
 // ============================================
 
 interface MessageBubbleProps {
@@ -120,7 +120,7 @@ export function MessageBubble({
  onCopy?.();
  };
 
- // readFeatures
+  // Text-to-speech feature
  const handleSpeak = () => {
  if (typeof window === "undefined" || !window.speechSynthesis) return;
 
@@ -166,13 +166,13 @@ export function MessageBubble({
 
  {/* Content */}
  <div className="flex-1 min-w-0 space-y-2">
- {/* useMessage */}
+        {/* Reply reference */}
  {message.parentMessage && (
  <div className="flex items-start gap-2 p-2 rounded-md bg-surface-100 border border-border border-l-brand-500/40">
  <Reply className="w-4 h-4 text-foreground-muted shrink-0 mt-0.5" />
  <div className="min-w-0">
  <span className="text-xs text-foreground-muted">
- Reply {message.parentMessage.role === "user" ? "you": "AI"}: 
+                Replying to {message.parentMessage.role === "user" ? "You" : "AI"}: 
  </span>
  <p className="text-sm text-foreground-light line-clamp-2">
  {message.parentMessage.content.slice(0, 100)}
@@ -182,10 +182,10 @@ export function MessageBubble({
  </div>
  )}
 
- {/* HeaderInfo */}
+        {/* Header Info */}
  <div className="flex items-center gap-2 text-[13px]">
  <span className="font-medium text-foreground">
- {isUser ? "you": message.model || "AI Assistant"}
+            {isUser ? "You" : message.model || "AI Assistant"}
  </span>
  <span className="text-foreground-light text-xs">
  {message.timestamp.toLocaleTimeString("zh-CN", {
@@ -203,14 +203,14 @@ export function MessageBubble({
  )}
  </div>
 
- {/* MessageContent */}
+        {/* Message Content */}
  {isEditing ? (
  <div className="space-y-2">
  <Textarea
  value={editingContent}
  onChange={(e) => onEditingContentChange?.(e.target.value)}
  className="min-h-[100px] resize-y bg-surface-100"
- placeholder="EditMessageContent..."
+ placeholder="Edit message content..."
  autoFocus
  />
  <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ export function MessageBubble({
  </div>
  )}
 
- {/* MessageExpand/Collapse */}
+        {/* Message Expand/Collapse */}
  {!isEditing && isLongMessage && (
  <button
  onClick={() => setIsExpanded(!isExpanded)}
@@ -247,7 +247,7 @@ export function MessageBubble({
  ) : (
  <>
  <ChevronDown className="w-4 h-4" />
- Expandallsection
+ Expand All
  </>
  )}
  </button>
@@ -270,7 +270,7 @@ export function MessageBubble({
  </div>
  )}
 
- {/* ActionButton */}
+        {/* Action Buttons */}
  {showActions && !isStreaming && (
  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
  <Button
@@ -334,7 +334,7 @@ export function MessageBubble({
  </DropdownMenuItem>
  <DropdownMenuItem onClick={onBookmark} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Bookmark className="w-4 h-4 mr-2" />
- {message.bookmarked ? "Unfavorite": "Favorite"}
+            {message.bookmarked ? "Remove Bookmark" : "Bookmark"}
  </DropdownMenuItem>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Share2 className="w-4 h-4 mr-2" />
@@ -343,13 +343,13 @@ export function MessageBubble({
  <DropdownMenuItem onClick={handleSpeak} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  {isSpeaking ? (
  <>
- <VolumeX className="w-4 h-4 mr-2" />
- Stopread
- </>
- ) : (
- <>
- <Volume2 className="w-4 h-4 mr-2" />
- read
+              <VolumeX className="w-4 h-4 mr-2" />
+              Stop Reading
+            </>
+          ) : (
+            <>
+              <Volume2 className="w-4 h-4 mr-2" />
+              Read Aloud
  </>
  )}
  </DropdownMenuItem>
@@ -377,7 +377,7 @@ export function MessageBubble({
 }
 
 // ============================================
-// MessageList
+// Message List
 // ============================================
 
 interface ChatMessagesProps {
@@ -407,7 +407,7 @@ export function ChatMessages({
 }: ChatMessagesProps) {
  const bottomRef = useRef<HTMLDivElement>(null);
 
- // AutoScrolltoFooter
+  // Auto scroll to bottom
  useEffect(() => {
  bottomRef.current?.scrollIntoView({ behavior: "smooth" });
  }, [messages]);
@@ -444,7 +444,7 @@ export function ChatMessages({
  </Avatar>
  <div className="flex items-center gap-2">
  <Loader2 className="w-4 h-4 animate-spin text-foreground-muted" />
- <span className="text-sm text-foreground-light">AI currentlyatThink...</span>
+            <span className="text-sm text-foreground-light">AI is thinking...</span>
  </div>
  </div>
  )}
@@ -455,7 +455,7 @@ export function ChatMessages({
 }
 
 // ============================================
-// WelcomeMessage
+// Welcome Message
 // ============================================
 
 interface WelcomeMessageProps {
@@ -467,8 +467,8 @@ interface WelcomeMessageProps {
 }
 
 export function WelcomeMessage({
- title = "you!Iis AI Assistant",
- description = "IcanwithHelpyouDonetypeTask, compareifAnswerIssue, Writing, Programmingetc.IWhat!",
+  title = "Hi! I'm Your AI Assistant",
+  description = "I can help you with various tasks, such as answering questions, writing, programming, and more. How can I help you?",
  suggestions = [],
  onSuggestionClick,
  className,
@@ -499,7 +499,7 @@ export function WelcomeMessage({
  {suggestion.label}
  </p>
  <span className="text-[10px] uppercase tracking-wider text-foreground-muted">
- ShortcutStart
+              Quick Start
  </span>
  </div>
  <p className="mt-2 text-xs text-foreground-light line-clamp-1">
@@ -511,8 +511,8 @@ export function WelcomeMessage({
  )}
 
  <div className="flex items-center justify-between rounded-lg border border-border bg-surface-75 px-4 py-3 text-xs text-foreground-muted">
- <span>Tip: SupportUploadFile, VoiceInputandShortcutReply</span>
- <span className="text-brand-500">Enter Send, Shift + Enter row</span>
+          <span>Tip: Supports file upload, voice input, and quick replies</span>
+          <span className="text-brand-500">Enter to send, Shift + Enter for new line</span>
  </div>
  </div>
  </div>
@@ -520,7 +520,7 @@ export function WelcomeMessage({
 }
 
 // ============================================
-// DateDelimiter
+// Date Divider
 // ============================================
 
 interface DateDividerProps {

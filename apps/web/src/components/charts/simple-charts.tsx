@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SimpleChartComponentCollection
- * CSS/SVG Implement'sDatacanvisualComponent
+ * Simple Chart Component Collection
+ * Data visualization components implemented with CSS/SVG
  */
 
 import { useMemo } from "react";
@@ -80,7 +80,7 @@ export function SimpleBarChart({
 }
 
 // ============================================
-// SimpleLine Chart(Usage SVG)
+// Simple Line Chart (SVG-based)
 // ============================================
 
 interface LineChartProps {
@@ -158,7 +158,7 @@ export function SimpleLineChart({
  </g>
  )}
 
- {/* FillRegion */}
+ {/* Fill region */}
  <path
  d={areaD}
  className={cn(fillColor, "transition-all duration-500")}
@@ -335,7 +335,7 @@ export function ProgressRing({
  return (
  <div className={cn("relative inline-flex items-center justify-center", className)}>
  <svg width={size} height={size} className="-rotate-90">
- {/* BackgroundOrbit */}
+ {/* Background track */}
  <circle
  cx={size / 2}
  cy={size / 2}
@@ -372,7 +372,7 @@ export function ProgressRing({
 }
 
 // ============================================
-// youTrend(Sparkline)
+// Sparkline (Trend Chart)
 // ============================================
 
 interface SparklineProps {
@@ -433,7 +433,7 @@ export function Sparkline({
 }
 
 // ============================================
-// countvalueforcompare
+// Comparison Bar Chart
 // ============================================
 
 interface ComparisonBarProps {

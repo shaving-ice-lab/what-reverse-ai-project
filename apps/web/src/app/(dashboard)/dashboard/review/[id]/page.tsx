@@ -6,11 +6,11 @@
  * Supabase Style: Minimal, Clear, Professional
  *
  * Features: 
- * - DisplayReviewitemCompleteInfo
- * - ContentSnapshotPreview
- * - ReviewHistoryRecord
- * - CommentDiscussionFeatures
- * - ReviewAction(Via/Deny/needEdit)
+ * - Display complete review item info
+ * - Content snapshot preview
+ * - Review history records
+ * - Comment and discussion features
+ * - Review actions (Approve/Reject/Request Changes)
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -108,14 +108,14 @@ const statusConfig: Record<
  { label: string; icon: typeof CheckCircle; badge: "success" | "warning" | "destructive" | "secondary" }
 > = {
  pending: { label: "Pending Review", icon: Clock, badge: "warning" },
- in_review: { label: "Review", icon: Loader2, badge: "secondary" },
- approved: { label: "alreadyVia", icon: CheckCircle, badge: "success" },
- rejected: { label: "alreadyDeny", icon: XCircle, badge: "destructive" },
- revision: { label: "needEdit", icon: AlertTriangle, badge: "warning" },
+ in_review: { label: "In Review", icon: Loader2, badge: "secondary" },
+  approved: { label: "Approved", icon: CheckCircle, badge: "success" },
+  rejected: { label: "Rejected", icon: XCircle, badge: "destructive" },
+  revision: { label: "Changes Requested", icon: AlertTriangle, badge: "warning" },
  cancelled: { label: "Cancelled", icon: X, badge: "secondary" },
 };
 
-// itemTypeConfig - Supabase Style
+// Item Type Config - Supabase Style
 
 const itemTypeConfig: Record<ReviewItemType, { label: string; icon: typeof Bot; color: string }> = {
  agent: { label: "Agent", icon: Bot, color: "text-foreground-light" },
@@ -129,34 +129,34 @@ const itemTypeConfig: Record<ReviewItemType, { label: string; icon: typeof Bot; 
  content: { label: "Content", icon: MessageSquare, color: "text-foreground-light" },
 };
 
-// PriorityConfig - Supabase Style
+// Priority Config - Supabase Style
 
 const priorityConfig: Record<
  ReviewPriority,
  { label: string; icon: typeof Zap; badge: "secondary" | "warning" | "destructive" }
 > = {
- low: { label: "", icon: ArrowRight, badge: "secondary" },
+ low: { label: "Low", icon: ArrowRight, badge: "secondary" },
  normal: { label: "Normal", icon: ArrowRight, badge: "secondary" },
- high: { label: "", icon: ArrowUp, badge: "warning" },
+ high: { label: "High", icon: ArrowUp, badge: "warning" },
  urgent: { label: "Urgent", icon: Zap, badge: "destructive" },
 };
 
-// ActionTypeConfig - Supabase Style
+// Action Type Config - Supabase Style
 
 const actionConfig: Record<string, { label: string; icon: typeof CheckCircle; color: string }> = {
- assign: { label: "AllocateReview", icon: User, color: "text-foreground-light" },
+  assign: { label: "Assign Reviewer", icon: User, color: "text-foreground-light" },
 
- review: { label: "StartReview", icon: Eye, color: "text-foreground-light" },
+  review: { label: "Start Review", icon: Eye, color: "text-foreground-light" },
 
- approve: { label: "ViaReview", icon: CheckCircle, color: "text-brand-500" },
+  approve: { label: "Approve", icon: CheckCircle, color: "text-brand-500" },
 
- reject: { label: "DenyReview", icon: XCircle, color: "text-destructive" },
+  reject: { label: "Reject", icon: XCircle, color: "text-destructive" },
 
- request_revision: { label: "needEdit", icon: AlertTriangle, color: "text-warning" },
+  request_revision: { label: "Request Changes", icon: AlertTriangle, color: "text-warning" },
 
- resubmit: { label: "re-newSubmit", icon: RefreshCw, color: "text-foreground-light" },
+  resubmit: { label: "Resubmit", icon: RefreshCw, color: "text-foreground-light" },
 
- cancel: { label: "CancelReview", icon: X, color: "text-foreground-muted" },
+  cancel: { label: "Cancel Review", icon: X, color: "text-foreground-muted" },
 };
 
 export default function ReviewDetailPage() {
@@ -196,7 +196,7 @@ export default function ReviewDetailPage() {
 
  const [isCommenting, setIsCommenting] = useState(false);
 
- // LoadReviewDetails
+  // Load Review Details
 
  const loadReview = useCallback(async () => {
  setIsLoading(true);
@@ -212,7 +212,7 @@ export default function ReviewDetailPage() {
 
  setComments(response.data.comments || []);
 
- // LoadCheckTemplate
+    // Load Checklist Template
 
  if (response.data.itemType) {
  try {
@@ -220,15 +220,15 @@ export default function ReviewDetailPage() {
 
  setChecklist(checklistResponse.data.items.map(item => ({ ...item, checked: false })));
 
- } catch {
- // CheckTemplatecancanDoes not exist, IgnoreError
+      } catch {
+        // Checklist template may not exist, ignore error
 
  }
 
  }
 
  } catch (err) {
- setError(err instanceof Error ? err.message: "LoadFailed");
+    setError(err instanceof Error ? err.message: "Failed to load");
 
  } finally {
  setIsLoading(false);
@@ -237,37 +237,37 @@ export default function ReviewDetailPage() {
 
  }, [reviewId]);
 
- // InitialLoad
+  // Initial Load
 
  useEffect(() => {
  loadReview();
 
  }, [loadReview]);
 
- // ReviewAction
+  // Review Action
 
- const handleReviewAction = async (action: "approve" | "reject" | "request_revision") => {
- const actionLabels = {
- approve: "ViaReview",
+  const handleReviewAction = async (action: "approve" | "reject" | "request_revision") => {
+    const actionLabels = {
+      approve: "Approve Review",
 
- reject: "DenyReview",
+      reject: "Reject Review",
 
- request_revision: "needEdit",
+      request_revision: "Request Changes",
 
- };
+    };
 
  const confirmed = await confirm({
  title: actionLabels[action],
 
  description: action === "approve" 
 
- ? "OKneedViathisReview??ViaafteritemwillcanwithPublish."
+ ? "Approve this review? The item will be published."
 
  : action === "reject"
 
- ? "OKneedDenythisReview??PleaseatdownmethodFill inDenyReason."
+ ? "Reject this review? Please provide a reason below."
 
-: "OKneedneedEdit??SubmituserwilltoEditNotifications.",
+: "Request changes? The submitter will be notified to edit.",
 
  confirmText: "Confirm",
 
@@ -296,7 +296,7 @@ export default function ReviewDetailPage() {
  loadReview();
 
  } catch (err) {
- console.error("ReviewOperation failed:", err);
+    console.error("Review operation failed:", err);
 
  } finally {
  setIsSubmitting(false);
@@ -305,7 +305,7 @@ export default function ReviewDetailPage() {
 
  };
 
- // SendComment
+  // Send Comment
 
  const handleSendComment = async () => {
  if (!newComment.trim()) return;
@@ -325,7 +325,7 @@ export default function ReviewDetailPage() {
  loadReview();
 
  } catch (err) {
- console.error("SendCommentFailed:", err);
+ console.error("Failed to send comment:", err);
 
  } finally {
  setIsCommenting(false);
@@ -334,7 +334,7 @@ export default function ReviewDetailPage() {
 
  };
 
- // SwitchCheck
+  // Toggle Checklist Item
 
  const toggleChecklistItem = (index: number) => {
  setChecklist(prev => prev.map((item, i) => 
@@ -345,7 +345,7 @@ export default function ReviewDetailPage() {
 
  };
 
- // CheckisnoAllRequiredallalreadyselect
+  // Check if all required items are checked
 
  const allRequiredChecked = checklist.filter(c => c.required).every(c => c.checked);
 
@@ -367,7 +367,7 @@ export default function ReviewDetailPage() {
  <AlertCircle className="w-8 h-8 text-destructive" />
  </div>
  <h3 className="text-lg font-semibold text-foreground mb-2">
- {error || "ReviewitemDoes not exist"}
+          {error || "Review item not found"}
  </h3>
  <div className="flex gap-2 mt-4 justify-center">
  <Button variant="outline" onClick={() => router.back()}>
@@ -401,8 +401,8 @@ export default function ReviewDetailPage() {
  const canReview = review.status === "pending" || review.status === "in_review";
 
  const tabs = [
- { label: "ContentPreview", value: "preview" },
- { label: "ReviewHistory", value: "history", count: records.length },
+    { label: "Content Preview", value: "preview" },
+    { label: "Review History", value: "history", count: records.length },
  { label: "Discussion", value: "comments", count: comments.length },
  ];
 
@@ -429,9 +429,9 @@ export default function ReviewDetailPage() {
  eyebrow="Moderation"
  icon={<Shield className="w-4 h-4" />}
  title={review.title}
- description={review.description || "ReviewitemDetailsandAction"}
+ description={review.description || "Review details and actions"}
  backHref="/dashboard/review"
- backLabel="BackList"
+        backLabel="Back to List"
  badge={headerBadges}
  actions={(
  <Button
@@ -456,7 +456,7 @@ export default function ReviewDetailPage() {
  </span>
  <span className="flex items-center gap-1.5">
  <User className="w-3.5 h-3.5" />
- {review.submitter?.username || "UnknownUser"}
+        {review.submitter?.username || "Unknown User"}
  </span>
  <span className="flex items-center gap-1.5 font-mono">
  <Clock className="w-3.5 h-3.5" />
@@ -465,7 +465,7 @@ export default function ReviewDetailPage() {
  {review.revisionCount > 0 && (
  <span className="flex items-center gap-1.5 text-warning">
  <AlertTriangle className="w-3.5 h-3.5" />
- # {review.revisionCount + 1} timesSubmit
+          Submission #{review.revisionCount + 1}
  </span>
  )}
  </div>
@@ -483,7 +483,7 @@ export default function ReviewDetailPage() {
  {review.submissionNote && (
  <Card>
  <CardHeader bordered>
- <CardTitle size="sm">SubmitDescription</CardTitle>
+ <CardTitle size="sm">Submission description</CardTitle>
  </CardHeader>
  <CardContent padding="sm">
  <p className="text-sm text-foreground-muted">{review.submissionNote}</p>
@@ -509,9 +509,9 @@ export default function ReviewDetailPage() {
  >
  <CardTitle size="sm" className="flex items-center gap-2">
  <Eye className="w-4 h-4" />
- ContentSnapshot
+              Content Snapshot
  </CardTitle>
- <CardDescription>mostnewSubmitContent'sSnapshotPreview</CardDescription>
+ <CardDescription>Latest submitted content snapshot preview</CardDescription>
  </CardHeader>
  </button>
  {showSnapshot && (
@@ -543,7 +543,7 @@ export default function ReviewDetailPage() {
  <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
  )}
  <div>
- <div className="text-sm font-medium text-foreground">ReviewFeedback</div>
+ <div className="text-sm font-medium text-foreground">Review feedback</div>
  <p className="text-sm text-foreground-muted mt-1">{review.resultNote}</p>
  </div>
  </div>
@@ -557,7 +557,7 @@ export default function ReviewDetailPage() {
  {records.length === 0 ? (
  <Card variant="muted" padding="lg" className="text-center">
  <History className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
- <p className="text-foreground-muted">NoneReviewRecord</p>
+ <p className="text-foreground-muted">No review records</p>
  </Card>
  ) : (
  <div className="space-y-3">
@@ -616,11 +616,11 @@ export default function ReviewDetailPage() {
  <div className="space-y-4">
  <Card>
  <CardHeader bordered>
- <CardTitle size="sm">AddComment</CardTitle>
+ <CardTitle size="sm">Add comment</CardTitle>
  </CardHeader>
  <CardContent padding="sm" className="space-y-3">
  <Textarea
- placeholder="AddCommentorAsk..."
+ placeholder="Add comment or question..."
  value={newComment}
  onChange={(e) => setNewComment(e.target.value)}
  className="min-h-[90px] resize-none"
@@ -645,7 +645,7 @@ export default function ReviewDetailPage() {
  {comments.length === 0 ? (
  <Card variant="muted" padding="lg" className="text-center">
  <MessageSquare className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
- <p className="text-foreground-muted">NoneComment</p>
+ <p className="text-foreground-muted">No comments</p>
  </Card>
  ) : (
  <div className="space-y-3">
@@ -669,7 +669,7 @@ export default function ReviewDetailPage() {
  {comment.isResolved && (
  <span className="text-xs text-brand-500 flex items-center gap-1">
  <Check className="w-3 h-3" />
- alreadyResolve
+                  Resolved
  </span>
  )}
  </div>
@@ -689,14 +689,14 @@ export default function ReviewDetailPage() {
  <CardHeader bordered>
  <CardTitle size="sm" className="flex items-center gap-2">
  <Shield className="w-4 h-4 text-brand-500" />
- ReviewAction
+              Review Actions
  </CardTitle>
  </CardHeader>
  <CardContent padding="sm" className="space-y-6">
  {checklist.length > 0 && (
  <div className="space-y-3">
  <div className="text-xs font-medium text-foreground-muted uppercase">
- ReviewCheck
+                  Review Checklist
  </div>
  <div className="space-y-2">
  {checklist.map((item, index) => (
@@ -727,9 +727,9 @@ export default function ReviewDetailPage() {
  )}
 
  <div className="space-y-3">
- <div className="text-xs font-medium text-foreground-muted uppercase">ReviewFeedback</div>
+ <div className="text-xs font-medium text-foreground-muted uppercase">Review feedback</div>
  <Textarea
- placeholder="Fill inReviewFeedback(Optional)..."
+ placeholder="Fill in review feedback (optional)..."
  value={reviewComment}
  onChange={(e) => setReviewComment(e.target.value)}
  className="min-h-[100px] resize-none"
@@ -747,7 +747,7 @@ export default function ReviewDetailPage() {
  ) : (
  <CheckCircle className="w-4 h-4 mr-2" />
  )}
- ViaReview
+              Approve
  </Button>
  <Button
  variant="warning"
@@ -760,7 +760,7 @@ export default function ReviewDetailPage() {
  ) : (
  <AlertTriangle className="w-4 h-4 mr-2" />
  )}
- needEdit
+              Request Changes
  </Button>
  <Button
  variant="destructive"
@@ -773,13 +773,13 @@ export default function ReviewDetailPage() {
  ) : (
  <XCircle className="w-4 h-4 mr-2" />
  )}
- DenyReview
+              Reject
  </Button>
  </div>
 
  {checklist.length > 0 && !allRequiredChecked && (
  <p className="text-xs text-foreground-muted text-center">
- PleasefirstDoneAllRequiredCheck
+              Please complete all required checks first
  </p>
  )}
  </CardContent>

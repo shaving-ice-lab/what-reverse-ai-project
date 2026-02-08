@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * LogoCarousel - Logo CarouselComponent
+ * LogoCarousel - Logo Carousel Component
  * 
- * AutoScroll'sBrand/Technology Logo Showcase
+ * Auto-scrolling Brand/Technology Logo Showcase
  */
 
 import { cn } from "@/lib/utils";
@@ -126,7 +126,7 @@ export const integrationLogos: LogoItem[] = [
  { name: "Notion", logo: "📝" },
  { name: "Feishu", logo: "🐦" },
  { name: "DingTalk", logo: "📌" },
- { name: "EnterpriseWeChat", logo: "💼" },
+ { name: "Enterprise WeChat", logo: "💼" },
  { name: "Airtable", logo: "📊" },
  { name: "Zapier", logo: "⚡" },
  { name: "Make", logo: "🔧" },

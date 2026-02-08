@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * UserMaterialsCardComponentCollection
- * ShowcaseUserInfo'scanuseComponent
+ * User Profile Card Component Collection
+ * Reusable components for showcasing user info
  */
 
 import { ReactNode } from "react";
@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // ============================================
-// UserMaterialsCard(Completeversion)
+// User Profile Card (Full version)
 // ============================================
 
 interface UserProfileCardProps {
@@ -81,11 +81,11 @@ export function UserProfileCard({
  case "admin":
  return { label: "Admin", icon: Shield, color: "text-purple-500", bg: "bg-purple-500/10" };
  case "pro":
- return { label: "Professionalversion", icon: Crown, color: "text-amber-500", bg: "bg-amber-500/10" };
+ return { label: "Professional", icon: Crown, color: "text-amber-500", bg: "bg-amber-500/10" };
  case "enterprise":
  return { label: "Enterprise", icon: Star, color: "text-blue-500", bg: "bg-blue-500/10" };
  default:
- return { label: "Freeversion", icon: User, color: "text-muted-foreground", bg: "bg-muted/50" };
+ return { label: "Free Plan", icon: User, color: "text-muted-foreground", bg: "bg-muted/50" };
  }
  };
 
@@ -125,7 +125,7 @@ export function UserProfileCard({
  <DropdownMenuContent align="end" className="w-40">
  <DropdownMenuItem onClick={onEdit}>
  <Edit3 className="w-4 h-4 mr-2" />
- EditMaterials
+ Edit Profile
  </DropdownMenuItem>
  <DropdownMenuItem asChild>
  <Link href="/dashboard/settings">
@@ -169,11 +169,11 @@ export function UserProfileCard({
  )}
  <span className="flex items-center gap-1">
  <Calendar className="w-4 h-4" />
- {user.joinedAt} Join
+ Joined {user.joinedAt}
  </span>
  </div>
 
- {/* StatisticsData */}
+ {/* Statistics */}
  {showStats && user.stats && (
  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
  <div className="text-center">
@@ -201,7 +201,7 @@ export function UserProfileCard({
 }
 
 // ============================================
-// youUserCard
+// Mini User Card
 // ============================================
 
 interface MiniUserCardProps {
@@ -253,7 +253,7 @@ export function MiniUserCard({
 }
 
 // ============================================
-// UserAvatargroup(multiplepersonShowcase)
+// User Avatar Group (multiple person showcase)
 // ============================================
 
 interface AvatarGroupProps {
@@ -383,7 +383,7 @@ export function UserActivityCard({
 }
 
 // ============================================
-// UserrowCard
+// User Rank Card
 // ============================================
 
 interface UserRankCardProps {

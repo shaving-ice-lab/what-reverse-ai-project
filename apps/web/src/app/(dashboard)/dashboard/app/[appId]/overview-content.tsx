@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * App Detailspage - Supabase Style
- * Overview / Status / MetricsSummary
+ * App Details Page - Supabase Style
+ * Overview / Status / Metrics Summary
  */
 
 import React, { useEffect, useState } from "react";
@@ -56,7 +56,7 @@ const statusConfig: Record<
 > = {
  draft: { label: "Draft", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
  published: { label: "Published", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- deprecated: { label: "alreadydownline", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
+  deprecated: { label: "Deprecated", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
  archived: { label: "Archived", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Archive },
 };
 
@@ -64,9 +64,9 @@ const accessModeConfig: Record<
  string,
  { label: string; description: string; icon: React.ElementType }
 > = {
- private: { label: "PrivateAccess", description: "only workspace MembercanAccess", icon: Lock },
- public_auth: { label: "PublicAccess(needSign In)", description: "Sign InUsercanAccess", icon: Users },
- public_anonymous: { label: "PublicAccess(Anonymous)", description: "whatpersoncanAccess", icon: Globe },
+  private: { label: "Private Access", description: "Only workspace members can access", icon: Lock },
+  public_auth: { label: "Public Access (Sign-in Required)", description: "Signed-in users can access", icon: Users },
+  public_anonymous: { label: "Public Access (Anonymous)", description: "Anyone can access", icon: Globe },
 };
 
 // EdgeNavigation
@@ -80,7 +80,7 @@ function AppNav({
  const navItems = [
  { id: "overview", label: "Overview", href: `/dashboard/app/${appId}` },
  { id: "builder", label: "Build", href: `/dashboard/app/${appId}/builder` },
- { id: "publish", label: "PublishSettings", href: `/dashboard/app/${appId}/publish` },
+ { id: "publish", label: "Publish Settings", href: `/dashboard/app/${appId}/publish` },
  { id: "versions", label: "Version History", href: `/dashboard/app/${appId}/versions` },
  { id: "monitoring", label: "Monitor", href: `/dashboard/app/${appId}/monitoring` },
  { id: "domains", label: "Domain", href: `/dashboard/app/${appId}/domains` },
@@ -153,7 +153,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  setLatestExecutionAt(executionsData.items[0]?.created_at || null);
  } catch (error) {
  console.error("Failed to load app overview:", error);
- setLoadError("LoadFailed, Please try again laterRetry.");
+ setLoadError("Load failed. Please try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -239,11 +239,11 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  >
  <PageContainer>
  <PageHeader
- title="AppOverview"
+ title="App Overview"
  eyebrow={workspace?.name}
- description={app?.description || "ViewAppBasic Information, StatusSummaryandRunMetrics."}
+ description={app?.description || "View app basic information, status summary, and run metrics."}
  backHref="/dashboard/apps"
- backLabel="BackAppList"
+ backLabel="Back to App List"
  badge={
  app ? (
  <Badge
@@ -269,7 +269,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <Button size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/builder`}>
  <Rocket className="w-4 h-4 mr-1.5" />
- EnterBuild
+ Open Builder
  </Link>
  </Button>
  </div>
@@ -304,16 +304,16 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <InfoItem label="App ID" value={app?.id} mono />
  <InfoItem label="Owner" value={app?.owner_user_id || "-"} mono />
  <InfoItem label="Created At" value={formatDateTime(app?.created_at)} />
- <InfoItem label="RecentUpdate" value={formatDateTime(app?.updated_at)} />
+ <InfoItem label="Last Updated" value={formatDateTime(app?.updated_at)} />
  <InfoItem label="Workspace" value={workspace?.name || "-"} />
- <InfoItem label="SubscriptionPlan" value={workspace?.plan || "standard"} />
+ <InfoItem label="Subscription Plan" value={workspace?.plan || "standard"} />
  </div>
  </div>
 
  <div className="space-y-4">
  <div className="grid gap-3">
  <SummaryCard
- label="CurrentStatus"
+ label="Current Status"
  value={
  <Badge
  variant="secondary"
@@ -335,31 +335,31 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <SummaryCard
  label="Current Version"
  value={app?.current_version?.version || "v0.0.0"}
- description={app?.current_version?.changelog || "NoneVersionDescription"}
+ description={app?.current_version?.changelog || "No Version Description"}
  icon={<BarChart3 className="w-3.5 h-3.5" />}
  />
  <SummaryCard
- label="RecentRun"
+ label="Recent Run"
  value={lastRunLabel}
- description={latestExecutionAt ? "comeRecent1timesExecute": "NoneExecuteRecord"}
+ description={latestExecutionAt ? "From latest execution": "No execution records"}
  icon={<Clock className="w-3.5 h-3.5" />}
  />
  <SummaryCard
- label="RunEntry"
+ label="Run Entry"
  value={
  runtimeEntryUrl ? (
  <Link
  href={runtimeEntryUrl}
  className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-600"
  >
- OpenRunpage
+ Open Runtime Page
  <ExternalLink className="w-3 h-3" />
  </Link>
  ) : (
- "pendingConfig"
+ "Pending Configuration"
  )
  }
- description="RunEntryBased on workspace / app slug"
+ description="Run entry based on workspace / app slug"
  icon={<Globe className="w-3.5 h-3.5" />}
  />
  </div>
@@ -372,13 +372,13 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/builder`}>
  <Edit3 className="w-3.5 h-3.5 mr-1.5" />
- EditApp
+ Edit App
  </Link>
  </Button>
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/monitoring`}>
  <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
- ViewRunMonitor
+ View Run Monitor
  </Link>
  </Button>
  <Button variant="outline" size="sm" asChild>
@@ -390,7 +390,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/domains`}>
  <Globe className="w-3.5 h-3.5 mr-1.5" />
- BindDomain
+ Bind Domain
  </Link>
  </Button>
  <Button variant="outline" size="sm" asChild>
@@ -403,13 +403,13 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <Button variant="outline" size="sm" asChild>
  <Link href={runtimeEntryUrl}>
  <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
- AccessRunpage
+ Access Runtime Page
  </Link>
  </Button>
  )}
  </div>
  <div className="mt-2 text-[11px] text-foreground-muted">
- UsageBuildpageUpdateWorkflowafter, canatthisViewRunMonitorandforoutsideAccessEntry.
+ After updating the workflow in the Builder page, you can view run monitoring and external access points here.
  </div>
  </div>
  </div>
@@ -417,25 +417,25 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  </SettingsSection>
 
  <SettingsSection
- title="AccessPolicyandDomain"
- description="ConfigAccess, Rate LimitingPolicyandforoutsideAccessEntry"
+title="Access Policy and Domain"
+            description="Configure access and rate limiting policies for external access."
  compact
  >
  <div className="grid md:grid-cols-3 gap-4">
  <SummaryCard
- label="AccessPolicy"
+ label="Access Policy"
  value={access.label}
  description={access.description}
  icon={<AccessIcon className="w-3.5 h-3.5" />}
  />
  <SummaryCard
- label="AnonymousAccess"
- value={anonymousEnabled ? "alreadyEnable": "not yetEnable"}
- description={anonymousEnabled ? "NoneneedSign InnowcanAccess": "needneedSign InoronlyMembercanAccess"}
+label="Anonymous Access"
+                value={anonymousEnabled ? "Enabled": "Not Enabled"}
+                description={anonymousEnabled ? "No sign-in needed to access": "Sign-in required, or only members can access"}
  icon={<Users className="w-3.5 h-3.5" />}
  />
  <SummaryCard
- label="BoundDomain"
+ label="Bound Domains"
  value={domainSummary}
  description={domainHint}
  icon={<Globe className="w-3.5 h-3.5" />}
@@ -445,21 +445,21 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/publish`}>
  <Rocket className="w-3.5 h-3.5 mr-1.5" />
- AccessPolicySettings
+ Access Policy Settings
  </Link>
  </Button>
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/domains`}>
  <Globe className="w-3.5 h-3.5 mr-1.5" />
- ManageDomain
+ Manage Domains
  </Link>
  </Button>
  </div>
  </SettingsSection>
 
  <SettingsSection
- title="VersionandChange"
- description="Current Version, Change LogandRollbackEntry"
+title="Version and Changes"
+            description="Current version, change log, and rollback entry."
  compact
  >
  <div className="grid md:grid-cols-3 gap-3">
@@ -469,38 +469,38 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  value={app?.published_at ? formatDateTime(app.published_at) : "Unpublished"}
  />
  <InfoItem
- label="VersionCreate"
- value={app?.current_version?.created_at?.slice(0, 10) || "NoneRecord"}
+ label="Version Created"
+ value={app?.current_version?.created_at?.slice(0, 10) || "No Record"}
  />
  </div>
  <div className="mt-3 rounded-md border border-border bg-surface-75 px-4 py-3 text-[11px] text-foreground-muted">
- {app?.current_version?.changelog || "NoneVersionChangeDescription, SuggestionatPublishtimeSupplementChange Log."}
+ {app?.current_version?.changelog || "No version change description. We recommend adding a change log when publishing."}
  </div>
  <div className="mt-3 flex flex-wrap gap-2">
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/versions`}>
  <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
- ViewVersion History
+ View Version History
  </Link>
  </Button>
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/builder`}>
  <Rocket className="w-3.5 h-3.5 mr-1.5" />
- ContinueBuild
+ Continue Building
  </Link>
  </Button>
  </div>
  </SettingsSection>
 
  <SettingsSection
- title="UsageandRunMetrics"
- description="Recent 7 daysExecuteStatistics, canandResourceConsumption"
+title="Usage and Run Metrics"
+            description="Last 7 days execution statistics and resource consumption."
  compact
  >
  <div className="grid md:grid-cols-4 gap-3 mb-4">
  <InfoItem label="Requests" value={String(runCount)} />
  <InfoItem label="Token Usage" value={tokenUsageLabel} />
- <InfoItem label="Errorrate" value={errorRateLabel} />
+ <InfoItem label="Error Rate" value={errorRateLabel} />
  <InfoItem label="Response Time" value={avgDurationLabel} />
  </div>
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -510,13 +510,13 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  icon={<Zap className="w-4 h-4" />}
  />
  <MetricCard
- label="Errorrate"
+ label="Error Rate"
  value={metrics ? `${(errorRate * 100).toFixed(1)}%` : "0%"}
  icon={<AlertCircle className="w-4 h-4" />}
  highlight={metrics?.total_executions ? errorRate > 0.1 : false}
  />
  <MetricCard
- label="AverageResponse Time"
+ label="Average Response Time"
  value={avgDurationLabel}
  icon={<Timer className="w-4 h-4" />}
  />
@@ -528,7 +528,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  </div>
  {!metrics && (
  <div className="mt-3 text-[11px] text-foreground-muted">
- MetricsUnavailable, DefaultShowcaseas 0, canatRunMonitorpageViewReal-timeData.
+ Metrics unavailable. Defaults shown as 0. View real-time data on the Run Monitor page.
  </div>
  )}
  </SettingsSection>

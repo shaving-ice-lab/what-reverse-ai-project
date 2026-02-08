@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ActionLogs/Audit LogPage
- * RecordUserAllActionHistory
+ * Action Logs / Audit Log Page
+ * Records all user action history
  */
 
 import { useMemo, useState } from "react";
@@ -64,7 +64,7 @@ import {
  TableRow,
 } from "@/components/ui/table";
 
-// ActionTypeConfig
+// Action Type Config
 const actionTypes = {
  create: { label: "Create", icon: Plus, color: "text-brand-500", bg: "bg-brand-200/70" },
  update: { label: "Update", icon: Edit3, color: "text-brand-500", bg: "bg-brand-200/70" },
@@ -78,7 +78,7 @@ const actionTypes = {
  security: { label: "Security", icon: Shield, color: "text-warning", bg: "bg-warning-200/70" },
 };
 
-// ResourceTypeConfig
+// Resource Type Config
 const resourceTypes = {
  workflow: { label: "Workflow", icon: Zap },
  agent: { label: "Agent", icon: Bot },
@@ -88,7 +88,7 @@ const resourceTypes = {
  settings: { label: "Settings", icon: Settings },
 };
 
-// StatusConfig
+// Status Config
 const statusConfig = {
  success: { label: "Success", icon: CheckCircle, color: "text-brand-500", variant: "success" },
  failed: { label: "Failed", icon: XCircle, color: "text-destructive", variant: "error" },
@@ -96,16 +96,16 @@ const statusConfig = {
  info: { label: "Info", icon: Info, color: "text-foreground-light", variant: "secondary" },
 };
 
-// MockLogsData
+// Mock Logs Data
 const mockLogs = [
  {
  id: "1",
  action: "execute",
  resource: "workflow",
- resourceName: "CustomerFeedbackAutoProcess",
+    resourceName: "Customer Feedback Auto-Processing",
  resourceId: "wf-123",
  status: "success",
- message: "WorkflowExecuteSuccess, Process 15 Feedback",
+    message: "Workflow executed successfully, processed 15 feedback items",
  actor: {
  id: "user-001",
  name: "Chen Yi",
@@ -129,7 +129,7 @@ const mockLogs = [
  resourceName: "WritingAssistant v2",
  resourceId: "ag-456",
  status: "success",
- message: "Createnew Agent Success",
+    message: "New agent created successfully",
  actor: {
  id: "user-002",
  name: "Song Yu",
@@ -149,13 +149,13 @@ const mockLogs = [
  id: "3",
  action: "security",
  resource: "apiKey",
- resourceName: "ProductionEnvironmentKey",
+    resourceName: "Production Environment Key",
  resourceId: "key-789",
  status: "warning",
- message: "API KeynowwillExpired, PleaseandtimeUpdate",
+    message: "API key is about to expire, please update it promptly",
  actor: {
  id: "system",
- name: "SecurityAudit",
+      name: "Security Audit",
  email: "security@reverse.ai",
  role: "System",
  },
@@ -171,10 +171,10 @@ const mockLogs = [
  id: "4",
  action: "delete",
  resource: "conversation",
- resourceName: "TestConversationRecord",
+    resourceName: "Test Conversation Record",
  resourceId: "conv-012",
  status: "success",
- message: "DeleteConversationSuccess",
+    message: "Conversation deleted successfully",
  actor: {
  id: "user-001",
  name: "Chen Yi",
@@ -193,9 +193,9 @@ const mockLogs = [
  id: "5",
  action: "login",
  resource: "account",
- resourceName: "AccountSign In",
+    resourceName: "Account Sign In",
  status: "success",
- message: "UserSign InSuccess",
+    message: "User signed in successfully",
  actor: {
  id: "user-003",
  name: "can",
@@ -215,10 +215,10 @@ const mockLogs = [
  id: "6",
  action: "execute",
  resource: "workflow",
- resourceName: "DataSyncTask",
+ resourceName: "Data Sync Task",
  resourceId: "wf-345",
  status: "failed",
- message: "WorkflowExecuteFailed: ConnectTimeout",
+    message: "Workflow execution failed: Connection timeout",
  actor: {
  id: "user-004",
  name: "weeks",
@@ -242,7 +242,7 @@ const mockLogs = [
  resource: "settings",
  resourceName: "Notification Settings",
  status: "success",
- message: "UpdateNotificationsPreferences",
+    message: "Updated notification preferences",
  actor: {
  id: "user-005",
  name: "Sun Jie",
@@ -262,10 +262,10 @@ const mockLogs = [
  id: "8",
  action: "share",
  resource: "workflow",
- resourceName: "EmailAutoCategory",
+    resourceName: "Email Auto Categorization",
  resourceId: "wf-678",
  status: "success",
- message: "WorkflowalreadySharetoTeamMember",
+    message: "Workflow shared with team members",
  actor: {
  id: "user-002",
  name: "Song Yu",
@@ -282,13 +282,13 @@ const mockLogs = [
  },
 ];
 
-// TimeRangeOption
+// Time Range Options
 const timeRanges = [
  { id: "1h", label: "Recent 1 h" },
  { id: "24h", label: "Recent 24 h" },
  { id: "7d", label: "Recent 7 days" },
  { id: "30d", label: "Recent 30 days" },
- { id: "custom", label: "CustomRange" },
+ { id: "custom", label: "Custom Range" },
 ];
 
 const resultsTabs = [
@@ -313,9 +313,9 @@ function formatTimestamp(timestamp: string | Date) {
  const diffDays = Math.floor(diffMs / 86400000);
 
  if (diffMins < 1) return "Just now";
- if (diffMins < 60) return `${diffMins} minbefore`;
- if (diffHours < 24) return `${diffHours} hbefore`;
- if (diffDays < 7) return `${diffDays} daysbefore`;
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
 
  return date.toLocaleDateString("zh-CN", {
  month: "short",
@@ -479,7 +479,7 @@ export default function LogsPage() {
  downloadFile(csv, `${baseName}.csv`, "text/csv;charset=utf-8");
  };
 
- // FilterLogs
+ // Filter Logs
  const filteredLogs = useMemo(() => {
  const query = searchQuery.trim().toLowerCase();
  const timeLimit = timeRangeLimits[timeRange];
@@ -510,12 +510,12 @@ export default function LogsPage() {
  });
  }, [searchQuery, selectedAction, selectedResource, selectedStatus, selectedActor, timeRange]);
 
- // StatisticsData
+ // Statistics Data
  const stats = useMemo(() => computeStats(mockLogs), []);
  const filteredStats = useMemo(() => computeStats(filteredLogs), [filteredLogs]);
 
  const selectedTimeRangeLabel =
- timeRanges.find((range) => range.id === timeRange)?.label ?? "CustomRange";
+ timeRanges.find((range) => range.id === timeRange)?.label ?? "Custom Range";
 
  const actorOptions = useMemo(() => {
  const map = new Map<string, { id: string; name: string; email?: string; role?: string }>();
@@ -564,7 +564,7 @@ export default function LogsPage() {
  const actor = actorOptions.find((item) => item.id === selectedActor);
  items.push({
  id: "actor",
- label: `Actionuser: ${actor?.name ?? selectedActor}`,
+      label: `Actor: ${actor?.name ?? selectedActor}`,
  });
  }
  if (timeRange !== "24h") {
@@ -593,13 +593,13 @@ export default function LogsPage() {
  const nonResultsState =
  resultsTab === "explain"
  ? {
- title: "NoneExecutePlan",
- description: "RunQueryafterGenerateExplainInfo.",
+      title: "No Execution Plan",
+      description: "Run a query to generate the explain info.",
  icon: <Info className="w-5 h-5" />,
  }
  : {
- title: "NoneChart",
- description: "SaveQueryaftercanViewTrend.",
+      title: "No Chart",
+      description: "Save a query to view trends.",
  icon: <BarChart3 className="w-5 h-5" />,
  };
 
@@ -629,22 +629,22 @@ export default function LogsPage() {
  const quickFilters = [
  {
  id: "failed",
- label: "FailedEvent",
- description: "FailedandExceptionAction",
+    label: "Failed Events",
+    description: "Failed and exceptional actions",
  status: "failed",
  tone: "bg-destructive",
  },
  {
  id: "security",
- label: "SecurityRelated",
- description: "KeyandPermissionChange",
+    label: "Security Related",
+    description: "Key and permission changes",
  action: "security",
  tone: "bg-warning",
  },
  {
  id: "login",
- label: "Sign InActivity",
- description: "Sign InandSign OutRecord",
+    label: "Sign In Activity",
+    description: "Sign in and sign out records",
  action: "login",
  tone: "bg-brand-500",
  },
@@ -678,8 +678,8 @@ export default function LogsPage() {
  <div className="space-y-6">
  <p className="page-caption">Observability</p>
  <PageHeader
- title="ActionLogs"
- description="ViewandTrackyou'sAllActionRecord"
+          title="Action Logs"
+          description="View and track all your action records"
  actions={(
  <div className="flex items-center gap-2">
  <Button
@@ -699,16 +699,16 @@ export default function LogsPage() {
  leftIcon={<Download className="w-4 h-4" />}
  disabled={!canExport}
  >
- ExportLogs
+              Export Logs
  <ChevronDown className="w-3.5 h-3.5" />
  </Button>
  </DropdownMenuTrigger>
  <DropdownMenuContent className="bg-surface-100 border-border">
  <DropdownMenuItem disabled={!canExport} onClick={() => handleExport("csv")}>
- Exportas CSV
+              Export as CSV
  </DropdownMenuItem>
  <DropdownMenuItem disabled={!canExport} onClick={() => handleExport("json")}>
- Exportas JSON
+              Export as JSON
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
@@ -721,7 +721,7 @@ export default function LogsPage() {
  </Badge>
  <span className="inline-flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5" />
- {isRefreshing ? "currentlyatRefresh...": `ontimesRefresh ${formatTimestamp(lastRefreshed)}`}
+            {isRefreshing ? "Refreshing...": `Last refreshed ${formatTimestamp(lastRefreshed)}`}
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Calendar className="w-3.5 h-3.5" />
@@ -734,13 +734,13 @@ export default function LogsPage() {
  </div>
  </PageHeader>
 
- {/* StatisticsCard */}
+ {/* Statistics Cards */}
  <div className="page-grid grid-cols-2 lg:grid-cols-4">
  <StatsCard
  icon={<FileText className="w-4 h-4" />}
- title="totalActioncount"
+          title="Total Actions"
  value={filteredStats.total}
- subtitle={hasActiveFilters ? `Total ${stats.total}`: "CurrentRangein"}
+          subtitle={hasActiveFilters ? `Total ${stats.total}`: "Current range"}
  />
  <StatsCard
  icon={<CheckCircle className="w-4 h-4" />}
@@ -756,20 +756,20 @@ export default function LogsPage() {
  />
  <StatsCard
  icon={<Clock className="w-4 h-4" />}
- title="AverageDuration"
+          title="Average Duration"
  value={formatDuration(filteredStats.avgDuration)}
  subtitle={
  filteredStats.durationCount
- ? `Based on ${filteredStats.durationCount} timesExecute`
-: "NoneDurationData"
+            ? `Based on ${filteredStats.durationCount} executions`
+: "No duration data"
  }
  />
  </div>
 
  <div className="page-panel">
  <div className="page-panel-header">
- <p className="page-panel-title">EventType</p>
- <p className="page-panel-description">byActionandResourceTypeQuickView</p>
+          <p className="page-panel-title">Event Types</p>
+          <p className="page-panel-description">Quick view by action and resource type</p>
  </div>
  <div className="p-4 space-y-3">
  <div className="flex flex-wrap items-center gap-2">
@@ -796,33 +796,33 @@ export default function LogsPage() {
  Coming soon
  </Badge>
  <div>
- <p className="text-sm font-medium text-foreground">newLogsEngine</p>
- <p className="text-[13px] text-foreground-light">
- SupportReal-timeSearchandmore'sFilter.
+            <p className="text-sm font-medium text-foreground">New Logs Engine</p>
+            <p className="text-[13px] text-foreground-light">
+              Supports real-time search and more advanced filters.
  </p>
  </div>
  <Button variant="outline" size="sm" className="w-full justify-center">
- PleaseEarlyAccess
+            Request Early Access
  </Button>
  </div>
 
  <div className="page-panel overflow-hidden">
  <div className="page-panel-header">
  <p className="page-panel-title">Collection</p>
- <p className="page-panel-description">byResourceTypeBrowse</p>
+            <p className="page-panel-description">Browse by resource type</p>
  </div>
  <div className="p-3 space-y-3">
  <div className="flex items-center gap-2">
  <Input
  variant="search"
  inputSize="sm"
- placeholder="SearchCollection..."
+ placeholder="Search collections..."
  value={collectionQuery}
  onChange={(e) => setCollectionQuery(e.target.value)}
  leftIcon={<Search className="w-4 h-4" />}
  className="w-full"
  />
- <Button variant="outline" size="icon-sm" aria-label="AddCollection">
+ <Button variant="outline" size="icon-sm" aria-label="Add collection">
  <Plus className="w-4 h-4" />
  </Button>
  </div>
@@ -838,7 +838,7 @@ export default function LogsPage() {
  )}
  >
  <FileText className="w-4 h-4" />
- <span className="flex-1 text-left">allsectionResource</span>
+              <span className="flex-1 text-left">All Resources</span>
  <span className="text-[11px] text-foreground-muted tabular-nums">
  {stats.total}
  </span>
@@ -875,9 +875,9 @@ export default function LogsPage() {
  <div className="page-panel-header flex items-center justify-between">
  <div>
  <p className="page-panel-title">Query</p>
- <p className="page-panel-description">SaveuseSearchCondition</p>
+            <p className="page-panel-description">Save frequently used search conditions</p>
  </div>
- <Button variant="ghost" size="icon-sm" aria-label="CreateQuery">
+ <Button variant="ghost" size="icon-sm" aria-label="Create query">
  <Plus className="w-4 h-4" />
  </Button>
  </div>
@@ -925,8 +925,8 @@ export default function LogsPage() {
  <div className="page-panel">
  <div className="page-panel-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="page-panel-title">LogsQuery</p>
- <p className="page-panel-description">UsageStructureConditionQuickEvent</p>
+          <p className="page-panel-title">Logs Query</p>
+          <p className="page-panel-description">Use structured conditions to quickly find events</p>
  </div>
  <Badge variant="secondary" size="sm">
  SQL
@@ -935,8 +935,8 @@ export default function LogsPage() {
  <div className="px-6 pb-6 space-y-4">
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div className="flex flex-wrap items-center gap-2">
- <Button variant="outline" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
- enterSource
+              <Button variant="outline" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+                Add Source
  </Button>
  <Button variant="outline" size="sm">
  Template
@@ -957,13 +957,13 @@ export default function LogsPage() {
  ))}
  </DropdownMenuContent>
  </DropdownMenu>
- <Button variant="ghost" size="sm" leftIcon={<ExternalLink className="w-4 h-4" />}>
- FieldReference
+              <Button variant="ghost" size="sm" leftIcon={<ExternalLink className="w-4 h-4" />}>
+                Field Reference
  </Button>
  </div>
  <div className="flex items-center gap-2">
  <Button variant="outline" size="sm">
- SaveQuery
+              Save Query
  </Button>
  <Button size="sm" leftIcon={<Play className="w-4 h-4" />}>
  Run
@@ -974,10 +974,10 @@ export default function LogsPage() {
  value={queryDraft}
  onChange={(e) => setQueryDraft(e.target.value)}
  className="min-h-[140px] w-full rounded-md border border-border bg-surface-200/80 px-3 py-2 text-[12px] font-mono text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-brand-500/40 focus:border-brand-500/40"
- placeholder="InputLogsQueryCondition..."
+                placeholder="Enter log query conditions..."
  />
  <div className="flex items-center justify-between text-xs text-foreground-muted">
- <span>Support SQL andExpressionQuery, ResultwillSynctodownmethodList.</span>
+              <span>Supports SQL and expression queries. Results sync to the list below.</span>
  <span>Result {filteredLogs.length} </span>
  </div>
  </div>
@@ -988,7 +988,7 @@ export default function LogsPage() {
  <div className="page-panel-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
  <p className="page-panel-title">Filter</p>
- <p className="page-panel-description">byAction, ResourceandStatusFilterLogs</p>
+          <p className="page-panel-description">Filter logs by action, resource, and status</p>
  </div>
  <div className="flex items-center gap-2">
  {hasActiveFilters && (
@@ -997,7 +997,7 @@ export default function LogsPage() {
  </Badge>
  )}
  <Button variant="ghost" size="sm" onClick={resetFilters} disabled={!hasActiveFilters}>
- ResetFilter
+            Reset Filters
  </Button>
  </div>
  </div>
@@ -1008,7 +1008,7 @@ export default function LogsPage() {
  <Input
  variant="search"
  inputSize="sm"
- placeholder="SearchActionLogs..."
+              placeholder="Search action logs..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="w-4 h-4" />}
@@ -1018,10 +1018,10 @@ export default function LogsPage() {
 
  <Select value={selectedAction} onValueChange={setSelectedAction}>
  <SelectTrigger className="h-8 w-[150px] bg-surface-100 border-border text-[12px] text-foreground-light">
- <SelectValue placeholder="ActionType" />
+              <SelectValue placeholder="Action Type" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">AllAction</SelectItem>
+            <SelectItem value="all">All Actions</SelectItem>
  {Object.entries(actionTypes).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -1035,7 +1035,7 @@ export default function LogsPage() {
  <SelectValue placeholder="Status" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">AllStatus</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
  {Object.entries(statusConfig).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -1046,10 +1046,10 @@ export default function LogsPage() {
 
  <Select value={selectedResource} onValueChange={setSelectedResource}>
  <SelectTrigger className="h-8 w-[150px] bg-surface-100 border-border text-[12px] text-foreground-light">
- <SelectValue placeholder="ResourceType" />
+              <SelectValue placeholder="Resource Type" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">AllResource</SelectItem>
+            <SelectItem value="all">All Resources</SelectItem>
  {Object.entries(resourceTypes).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -1060,10 +1060,10 @@ export default function LogsPage() {
 
  <Select value={selectedActor} onValueChange={setSelectedActor}>
  <SelectTrigger className="h-8 w-[160px] bg-surface-100 border-border text-[12px] text-foreground-light">
- <SelectValue placeholder="Actionuser" />
+              <SelectValue placeholder="Actor" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">AllActionuser</SelectItem>
+            <SelectItem value="all">All Actors</SelectItem>
  {actorOptions.map((actor) => (
  <SelectItem key={actor.id} value={actor.id}>
  {actor.name}
@@ -1074,7 +1074,7 @@ export default function LogsPage() {
 
  <Select value={timeRange} onValueChange={setTimeRange}>
  <SelectTrigger className="h-8 w-[150px] bg-surface-100 border-border text-[12px] text-foreground-light">
- <SelectValue placeholder="TimeRange" />
+              <SelectValue placeholder="Time Range" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {timeRanges.map((range) => (
@@ -1087,7 +1087,7 @@ export default function LogsPage() {
  </div>
  {hasActiveFilters && (
  <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
- <span>CurrentFilter</span>
+              <span>Current filters:</span>
  {activeFilters.map((filter) => (
  <Badge key={filter.id} variant="outline" size="sm">
  {filter.label}
@@ -1098,11 +1098,11 @@ export default function LogsPage() {
  </div>
  </div>
 
- {/* LogsList */}
+ {/* Logs List */}
  <div className="page-panel">
  <div className="page-panel-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="page-panel-title">LogsList</p>
+          <p className="page-panel-title">Logs List</p>
  <p className="page-panel-description"> {filteredLogs.length} Record</p>
  </div>
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
@@ -1121,10 +1121,10 @@ export default function LogsPage() {
  {filteredLogs.length === 0 ? (
  <EmptyState
  icon={<FileText className="w-5 h-5" />}
- title="NoMatch'sLogs"
- description="TryAdjustFilterConditionorlargeTimeRange."
+              title="No Matching Logs"
+              description="Try adjusting the filter criteria or expanding the time range."
  action={{
- label: "ResetFilter",
+              label: "Reset Filters",
  onClick: resetFilters,
  }}
  />
@@ -1133,9 +1133,9 @@ export default function LogsPage() {
  <TableHeader>
  <TableRow>
  <TableHead className="w-[160px]">Time</TableHead>
- <TableHead className="w-[180px]">Actionuser</TableHead>
+ <TableHead className="w-[180px]">Actor</TableHead>
  <TableHead>Action</TableHead>
- <TableHead>for</TableHead>
+ <TableHead>Resource</TableHead>
  <TableHead className="w-[170px]">Result</TableHead>
  </TableRow>
  </TableHeader>
@@ -1148,7 +1148,7 @@ export default function LogsPage() {
  const ResourceIcon = resourceConfig?.icon || FileText;
  const StatusIcon = status?.icon || Info;
  const actorInitial = log.actor?.name?.slice(0, 1) ?? "U";
- const actorName = log.actor?.name ?? "UnknownUser";
+ const actorName = log.actor?.name ?? "Unknown user";
  const actorMeta = log.actor?.email ?? log.actor?.id ?? "—";
 
  return (
@@ -1257,11 +1257,11 @@ export default function LogsPage() {
  {filteredLogs.length > 0 && (
  <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-surface-75/60">
  <p className="text-xs text-foreground-muted">
- alreadyDisplay {filteredLogs.length} Record
+              Showing {filteredLogs.length} records
  {hasActiveFilters && `, Total ${stats.total} `}
  </p>
  <Button variant="outline" size="sm">
- Load moreLogs
+            Load More Logs
  </Button>
  </div>
  )}
@@ -1274,7 +1274,7 @@ export default function LogsPage() {
  onOpenChange={(open) => {
  if (!open) setSelectedLog(null);
  }}
- title="LogsDetails"
+      title="Log Details"
  description={
  selectedLog
  ? `${selectedLogContext?.action?.label ?? selectedLog.action} · ${
@@ -1315,8 +1315,8 @@ export default function LogsPage() {
  </span>
  <span className="inline-flex items-center gap-1">
  <User className="w-3.5 h-3.5" />
- {selectedLog.actor?.name ?? "UnknownUser"}
- </span>
+{selectedLog.actor?.name ?? "Unknown user"}
+</span>
  {selectedLog.duration !== undefined && (
  <span className="inline-flex items-center gap-1">
  <Play className="w-3.5 h-3.5" />
@@ -1336,16 +1336,16 @@ export default function LogsPage() {
 
  <div className="page-grid md:grid-cols-2">
  <div className="rounded-lg border border-border p-4 space-y-2">
- <p className="text-[11px] text-foreground-muted">Actionuser</p>
+          <p className="text-[11px] text-foreground-muted">Actor</p>
  <div className="flex items-center gap-2">
  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-200 text-[12px] font-semibold text-foreground">
  {selectedLog.actor?.name?.slice(0, 1) ?? "U"}
  </div>
  <div>
  <p className="text-sm font-medium text-foreground">
- {selectedLog.actor?.name ?? "UnknownUser"}
- </p>
- <p className="text-[11px] text-foreground-muted">
+{selectedLog.actor?.name ?? "Unknown user"}
+</p>
+<p className="text-[11px] text-foreground-muted">
  {selectedLog.actor?.email ?? selectedLog.actor?.id ?? "—"}
  </p>
  </div>
@@ -1358,7 +1358,7 @@ export default function LogsPage() {
  </div>
 
  <div className="rounded-lg border border-border p-4 space-y-2">
- <p className="text-[11px] text-foreground-muted">for</p>
+ <p className="text-[11px] text-foreground-muted">Resource</p>
  <div className="flex flex-wrap items-center gap-2">
  <Badge
  variant="secondary"
@@ -1377,7 +1377,7 @@ export default function LogsPage() {
  </div>
 
  <div className="rounded-lg border border-border p-4 space-y-2">
- <p className="text-[11px] text-foreground-muted">AccessEnvironment</p>
+          <p className="text-[11px] text-foreground-muted">Access Environment</p>
  <div className="flex items-center gap-2 text-xs text-foreground-light">
  <Monitor className="w-3.5 h-3.5" />
  <span>{selectedLog.userAgent}</span>
@@ -1389,7 +1389,7 @@ export default function LogsPage() {
  </div>
 
  <div className="rounded-lg border border-border p-4 space-y-2">
- <p className="text-[11px] text-foreground-muted">ExecuteInfo</p>
+          <p className="text-[11px] text-foreground-muted">Execution Info</p>
  <p className="text-xs text-foreground-light">
  Duration {formatDuration(selectedLog.duration)}
  </p>
@@ -1408,14 +1408,14 @@ export default function LogsPage() {
  {selectedMetadataEntries.map(([key, value]) => (
  <div key={key} className="flex items-start justify-between gap-3">
  <span className="text-[11px] uppercase tracking-wide text-foreground-muted">
- {key.replace(/_/g, "")}
+ {key.replace(/_/g, " ")}
  </span>
  <span className="text-[12px] text-foreground">{formatMetadataValue(value)}</span>
  </div>
  ))}
  </div>
  ) : (
- <p className="text-xs text-foreground-muted">NoneData</p>
+            <p className="text-xs text-foreground-muted">No data</p>
  )}
  </div>
  </div>

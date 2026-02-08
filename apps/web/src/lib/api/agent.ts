@@ -14,7 +14,7 @@ import type {
 } from "@/types/agent";
 import { request } from "./shared";
 
-// ResponseType
+// Response Type
 export interface AgentListResponse {
  success: boolean;
  data: Agent[];
@@ -73,8 +73,8 @@ export const agentApi = {
  },
 
  /**
- * FetchFeatured Agent List
- */
+  * Fetch Featured Agent List
+  */
  async getFeatured(): Promise<AgentListResponse> {
  return request<AgentListResponse>("/agents/featured");
  },
@@ -94,8 +94,8 @@ export const agentApi = {
  },
 
  /**
- * FetchCategoryList
- */
+  * Fetch Category List
+  */
  async getCategories(): Promise<CategoryListResponse> {
  return request<CategoryListResponse>("/agents/categories");
  },
@@ -130,7 +130,7 @@ export const agentApi = {
  },
 
  /**
- * Usage Agent(CreateWorkflowcurrent)
+ * Use Agent (creates a workflow instance)
  */
  async use(id: string): Promise<{ success: boolean; data: { workflowId: string } }> {
  return request<{ success: boolean; data: { workflowId: string } }>(`/agents/${id}/use`, {
@@ -139,8 +139,8 @@ export const agentApi = {
  },
 
  /**
- * Fork Agent(CreatecanEditcurrent)
- */
+  * Fork Agent (Create an editable copy)
+  */
  async fork(id: string): Promise<{ success: boolean; data: { agentId: string; workflowId: string } }> {
  return request<{ success: boolean; data: { agentId: string; workflowId: string } }>(`/agents/${id}/fork`, {
  method: "POST",
@@ -157,8 +157,8 @@ export const agentApi = {
  },
 
  /**
- * Fetch Agent ReviewsList
- */
+  * Fetch Agent Reviews List
+  */
  async getReviews(id: string, params?: { page?: number; pageSize?: number }): Promise<ReviewListResponse> {
  const searchParams = new URLSearchParams();
  
@@ -170,8 +170,8 @@ export const agentApi = {
  },
 
  /**
- * CreateReviews
- */
+  * Create Review
+  */
  async createReview(id: string, data: CreateReviewRequest): Promise<{ success: boolean; data: Review }> {
  return request<{ success: boolean; data: Review }>(`/agents/${id}/reviews`, {
  method: "POST",
@@ -180,8 +180,8 @@ export const agentApi = {
  },
 
  /**
- * UpdateReviews
- */
+  * Update Review
+  */
  async updateReview(
  agentId: string,
  reviewId: string,
@@ -194,8 +194,8 @@ export const agentApi = {
  },
 
  /**
- * DeleteReviews
- */
+  * Delete Review
+  */
  async deleteReview(agentId: string, reviewId: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/agents/${agentId}/reviews/${reviewId}`, {
  method: "DELETE",
@@ -203,8 +203,8 @@ export const agentApi = {
  },
 
  /**
- * MarkReviewsashasHelp
- */
+  * Mark Review as Helpful
+  */
  async markReviewHelpful(agentId: string, reviewId: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/agents/${agentId}/reviews/${reviewId}/helpful`, {
  method: "POST",
@@ -212,8 +212,8 @@ export const agentApi = {
  },
 
  /**
- * Fetch Agent AnalyticsData
- */
+  * Fetch Agent Analytics Data
+  */
  async getAnalytics(id: string): Promise<{
  success: boolean;
  data: {

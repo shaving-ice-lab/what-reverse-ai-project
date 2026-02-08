@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Agent rowListComponent
+ * Agent Ranking List Component
  * 
- * ShowcasePopularormostnew Agent 'sLeaderboard
+ * Showcases popular or newest agents in a leaderboard
  */
 
 import Link from "next/link";
@@ -22,14 +22,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Agent } from "@/types/agent";
 
-// Formatcountchar
+// Format count
 const formatCount = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+  if (num >= 10000) return `${(num / 1000).toFixed(0)}K`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
 
-// RankingIcon
+// Ranking Icon
 const getRankIcon = (index: number) => {
  switch (index) {
  case 0:
@@ -43,7 +43,7 @@ const getRankIcon = (index: number) => {
  }
 };
 
-// RankingBackground
+// Ranking Background
 const getRankBgClass = (index: number) => {
  switch (index) {
  case 0:
@@ -71,7 +71,7 @@ interface AgentRankingListProps {
 
 export function AgentRankingList({
  agents,
- title = "Popularrow",
+ title = "Popular",
  subtitle,
  icon: TitleIcon = TrendingUp,
  variant = "popular",

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ActivityPage - LobeHub StyleDesign
+ * Events Page - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -30,84 +30,84 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// ActivityType
+// Event Type
 type EventType = "webinar" | "meetup" | "conference" | "workshop";
 
-// ActivityData
+// Event Data
 const events = [
  {
  id: "1",
- title: "AgentFlow 2026 yearsProductPublishwill",
+ title: "AgentFlow 2026 Product Launch Event",
  type: "conference" as EventType,
  date: "2026-02-15",
  time: "14:00 - 17:00",
- location: "oncenter",
+ location: "Convention Center",
  isOnline: false,
  isUpcoming: true,
  attendees: 500,
- description: "yearsre-ProductPublish, read AgentFlow 3.0 allnewFeaturesandEnterprise-gradeResolvePlan.",
+ description: "Annual product launch showcasing all the new features and enterprise solutions in AgentFlow 3.0.",
  speakers: [
- { name: "", role: "CEO" },
+      { name: "Zhang Wei", role: "CEO" },
  { name: "Li Hua", role: "CTO" },
  ],
- tags: ["ProductPublish", "Enterprise"],
+ tags: ["Product Launch", "Enterprise"],
  registrationUrl: "#",
  },
  {
  id: "2",
- title: "AI Agent DevelopmentPractical Workshop",
+ title: "AI Agent Development Workshop",
  type: "workshop" as EventType,
  date: "2026-02-20",
  time: "19:00 - 21:00",
- location: "lineonLive",
+ location: "Online Livestream",
  isOnline: true,
  isUpcoming: true,
  attendees: 200,
- description: "fromStartBuildSmart Agent, Master AgentFlow CoreDevelopmentcan.",
- speakers: [{ name: "Wang (Engineer)", role: "AdvancedTechnologyExpert" }],
- tags: ["Practical", "Development"],
+ description: "Build a smart agent from scratch and master AgentFlow's core development capabilities.",
+ speakers: [{ name: "Wang (Engineer)", role: "Senior Technical Expert" }],
+ tags: ["Hands-On", "Development"],
  registrationUrl: "#",
  },
  {
  id: "3",
- title: "EnterpriseAutomationlineonWorkshopwill",
+ title: "Enterprise Automation Online Seminar",
  type: "webinar" as EventType,
  date: "2026-02-25",
  time: "10:00 - 11:30",
- location: "lineonLive",
+ location: "Online Livestream",
  isOnline: true,
  isUpcoming: true,
  attendees: 300,
- description: "DiscussEnterpriseifwhatuse AI WorkflowImplementFlowAutomation, andShareCase Studies.",
+ description: "Explore how enterprises can use AI workflows to implement process automation, with real case studies.",
  speakers: [
- { name: "Chen Chen", role: "EnterpriseResolvePlantotal" },
- { name: " 500 CIO", role: "Share" },
+ { name: "Chen Chen", role: "Enterprise Solutions Director" },
+ { name: "Fortune 500 CIO", role: "Guest Speaker" },
  ],
- tags: ["Enterprise", "Case StudiesShare"],
+ tags: ["Enterprise", "Case Studies"],
  registrationUrl: "#",
  },
  {
  id: "4",
- title: "BeijingDevelopers Meetup",
+ title: "Beijing Developer Meetup",
  type: "meetup" as EventType,
  date: "2026-03-01",
  time: "14:00 - 18:00",
- location: "Beijing · ",
+ location: "Beijing",
  isOnline: false,
  isUpcoming: true,
  attendees: 80,
- description: "andBeijingDeveloperslinedownExchange, Share AI DevelopmentExperienceandBest Practices.",
- speakers: [{ name: "CommunityDevelopers", role: "TechnologyShare" }],
- tags: ["Community", "TechnologyExchange"],
+ description: "Meet with Beijing developers in person to share AI development experience and best practices.",
+ speakers: [{ name: "Community Developers", role: "Tech Talk" }],
+ tags: ["Community", "Tech Exchange"],
  registrationUrl: "#",
  },
 ];
 
-// Activity
+// Past Events
 const pastEvents = [
  {
  id: "p1",
- title: "AgentFlow 101: QuickGetting StartedGuide",
+ title: "AgentFlow 101: Quick Start Guide",
  type: "webinar" as EventType,
  date: "2026-01-20",
  attendees: 856,
@@ -116,7 +116,7 @@ const pastEvents = [
  },
  {
  id: "p2",
- title: "ShenzhenDevelopers Meetup",
+ title: "Shenzhen Developer Meetup",
  type: "meetup" as EventType,
  date: "2026-01-15",
  attendees: 65,
@@ -125,7 +125,7 @@ const pastEvents = [
  },
  {
  id: "p3",
- title: "2025 yearsSummary & 2026 PlanningShare",
+ title: "2025 Year in Review & 2026 Roadmap",
  type: "webinar" as EventType,
  date: "2025-12-28",
  attendees: 1200,
@@ -134,12 +134,12 @@ const pastEvents = [
  },
 ];
 
-// ActivityTypeConfig
+// Event Type Config
 const eventTypeConfig: Record<EventType, { label: string; icon: typeof Video; color: string }> = {
- webinar: { label: "lineonWorkshopwill", icon: Video, color: "text-[#4e8fff]" },
- meetup: { label: "linedownwill", icon: Users, color: "text-emerald-400" },
- conference: { label: "largewill", icon: Mic, color: "text-purple-400" },
- workshop: { label: "PracticalWorkshop", icon: Play, color: "text-orange-400" },
+ webinar: { label: "Online Seminar", icon: Video, color: "text-[#4e8fff]" },
+ meetup: { label: "In-Person Meetup", icon: Users, color: "text-emerald-400" },
+ conference: { label: "Conference", icon: Mic, color: "text-purple-400" },
+ workshop: { label: "Workshop", icon: Play, color: "text-orange-400" },
 };
 
 export default function EventsPage() {
@@ -167,30 +167,30 @@ export default function EventsPage() {
  <div className="max-w-6xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <CalendarDays className="h-4 w-4" />
- Activitycenter
+ Event Center
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight mb-6">
- JoinWe's
+ Join Our
  <br />
- <span className="text-[#4e8fff]">CommunityActivity</span>
+ <span className="text-[#4e8fff]">Community Events</span>
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-8">
- lineonlinedownActivity, TechnologyWorkshopwill, Developers Meetup, andallAI user1LearnGrowth
+ Online and in-person events, tech workshops, developer meetups — learn and grow with fellow AI users
  </p>
 
  <div className="flex flex-col sm:flex-row gap-4 justify-center">
  <Link href="#upcoming-events">
  <Button className="h-12 px-8 rounded-full bg-foreground text-background hover:bg-foreground/90 font-semibold">
- Viewnowwillrow'sActivity
+ View Upcoming Events
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
  <Link href="#subscribe">
  <Button variant="outline" className="h-12 px-8 rounded-full border-border/50 text-foreground-light hover:text-foreground">
  <Bell className="mr-2 w-4 h-4" />
- SubscriptionActivityNotifications
+ Subscribe to Event Notifications
  </Button>
  </Link>
  </div>
@@ -202,10 +202,10 @@ export default function EventsPage() {
  <div className="max-w-6xl mx-auto">
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
  {[
- { value: "50+", label: "yearsActivity" },
- { value: "10,000+", label: "andpersoncount" },
- { value: "20+", label: "City" },
- { value: "100+", label: "" },
+ { value: "50+", label: "Events Per Year" },
+ { value: "10,000+", label: "Attendees" },
+ { value: "20+", label: "Cities" },
+ { value: "100+", label: "Speakers" },
  ].map((stat) => (
  <div key={stat.label} className="text-center p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
@@ -220,7 +220,7 @@ export default function EventsPage() {
  <section id="upcoming-events" className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
- <h2 className="lobe-section-header">nowwillrow</h2>
+ <h2 className="lobe-section-header">Upcoming Events</h2>
  <div className="flex items-center gap-2">
  <Filter className="w-4 h-4 text-foreground-lighter" />
  <div className="flex flex-wrap gap-2">
@@ -235,7 +235,7 @@ export default function EventsPage() {
  : "bg-surface-100/30 text-foreground-lighter hover:text-foreground"
  )}
  >
- {type === "all" ? "allsection": eventTypeConfig[type].label}
+              {type === "all" ? "All" : eventTypeConfig[type].label}
  </button>
  ))}
  </div>
@@ -257,19 +257,19 @@ export default function EventsPage() {
  )}
  >
  <div className="flex flex-col lg:flex-row lg:items-start gap-6">
- {/* DateCard */}
+ {/* Date Card */}
  <div className="lg:w-24 shrink-0">
  <div className="w-20 h-20 lg:w-full lg:h-24 rounded-2xl bg-[#4e8fff]/10 flex flex-col items-center justify-center">
  <span className="text-3xl font-bold text-[#4e8fff]">
  {new Date(event.date).getDate()}
  </span>
  <span className="text-[12px] text-[#4e8fff]">
- {new Date(event.date).toLocaleDateString("zh-CN", { month: "short" })}
+ {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
  </span>
  </div>
  </div>
 
- {/* ActivityInfo */}
+ {/* Event Info */}
  <div className="flex-1">
  <div className="flex flex-wrap items-center gap-2 mb-2">
  <span className={cn(
@@ -283,7 +283,7 @@ export default function EventsPage() {
  {event.isOnline && (
  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-100/50 text-[11px] text-foreground-lighter">
  <Globe className="w-3 h-3" />
- lineon
+ Online
  </span>
  )}
  {event.tags.map((tag) => (
@@ -315,13 +315,13 @@ export default function EventsPage() {
  </span>
  <span className="flex items-center gap-1">
  <Users className="w-4 h-4" />
- {event.attendees} personalreadyRegister
+ {event.attendees} registered
  </span>
  </div>
 
- {/* */}
- <div className="flex items-center gap-3 mb-4">
- <span className="text-[12px] text-foreground-lighter"></span>
+            {/* Speakers */}
+            <div className="flex items-center gap-3 mb-4">
+            <span className="text-[12px] text-foreground-lighter">Speakers:</span>
  <div className="flex items-center gap-2">
  {event.speakers.map((speaker, i) => (
  <span
@@ -335,17 +335,17 @@ export default function EventsPage() {
  </div>
  </div>
 
- {/* ActionButton */}
+ {/* Action Buttons */}
  <div className="lg:w-40 shrink-0 flex flex-col gap-2">
  <a href={event.registrationUrl}>
  <Button className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
  <Ticket className="w-4 h-4 mr-2" />
- NowRegister
+ Register Now
  </Button>
  </a>
  <Button variant="outline" className="w-full rounded-full border-border/50 text-foreground-light">
  <Calendar className="w-4 h-4 mr-2" />
- AddtoCalendar
+ Add to Calendar
  </Button>
  </div>
  </div>
@@ -360,7 +360,7 @@ export default function EventsPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="flex items-center justify-between mb-8">
- <h2 className="lobe-section-header">ActivityReplay</h2>
+ <h2 className="lobe-section-header">Event Replays</h2>
  <Button variant="outline" className="rounded-full border-border/50 text-foreground-light">
  View all
  <ArrowRight className="ml-2 w-4 h-4" />
@@ -397,14 +397,14 @@ export default function EventsPage() {
 
  <div className="flex items-center gap-2 text-[12px] text-foreground-lighter mb-4">
  <Users className="w-4 h-4" />
- {event.attendees} personand
+ {event.attendees} attendees
  </div>
 
  {event.hasRecording && (
  <a href={event.recordingUrl}>
  <Button variant="outline" size="sm" className="w-full rounded-full border-border/50 text-foreground-light">
  <Play className="w-4 h-4 mr-2" />
- seeReplay
+ Watch Replay
  </Button>
  </a>
  )}
@@ -425,20 +425,20 @@ export default function EventsPage() {
  <>
  <CheckCircle className="w-12 h-12 text-white mx-auto mb-4" />
  <h2 className="text-2xl font-bold text-white mb-4">
- SubscriptionSuccess!
+ Subscribed Successfully!
  </h2>
  <p className="text-white/80 max-w-md mx-auto">
- Thank youSubscription!WewillathasnewActivitytime#1TimeNotificationsyou.
+ Thanks for subscribing! We&apos;ll notify you as soon as new events are announced.
  </p>
  </>
  ) : (
  <>
  <Bell className="w-12 h-12 text-white/80 mx-auto mb-4" />
  <h2 className="text-2xl font-bold text-white mb-4">
- SubscriptionActivityNotifications
+ Subscribe to Event Notifications
  </h2>
  <p className="text-white/80 mb-8 max-w-md mx-auto">
- #1TimeFetchmostnewActivityInfo, notpastwhatContent
+ Be the first to get the latest event info — never miss a thing
  </p>
  <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
  <Input
@@ -453,7 +453,7 @@ export default function EventsPage() {
  type="submit"
  className="h-12 px-6 bg-white hover:bg-white/90 text-[#4e8fff] font-medium rounded-full shrink-0"
  >
- Subscription
+ Subscribe
  </Button>
  </form>
  </>
@@ -467,10 +467,10 @@ export default function EventsPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto text-center">
  <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">
- wantneedHost AgentFlow Activity?
+ Want to Host an AgentFlow Event?
  </h2>
  <p className="text-[13px] text-foreground-light mb-8 max-w-lg mx-auto">
- ifresultyouwantatyou'sCityOrganization AgentFlow Meetup orTechnologyShare, WewillProvideSupport
+            If you want to organize an AgentFlow meetup or tech talk in your city, we'll provide support
  </p>
  <Link href="/contact?type=event">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">

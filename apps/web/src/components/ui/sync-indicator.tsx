@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * SyncStatusIndicatorComponent
+ * Sync Status Indicator Component
  *
  * Features: 
- * - DisplaySyncStatus(Sync/alreadySync/hasConflict/Error)
- * - ManualSyncTrigger
- * - AutoSyncConfig
- * - ConflictCountTip
+ * - Display sync status (Syncing / Synced / Conflicts / Error)
+ * - Manual sync trigger
+ * - Auto sync configuration
+ * - Conflict count notification
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -40,7 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// ========== TypeDefinition ==========
+// ========== Type Definitions ==========
 
 export type SyncState = "idle" | "syncing" | "synced" | "conflict" | "error" | "offline";
 
@@ -54,29 +54,29 @@ export interface SyncStatus {
 }
 
 export interface SyncIndicatorProps {
- /** SyncStatus */
- status?: SyncStatus | null;
- /** isnoEnableAutoSync */
- autoSyncEnabled?: boolean;
- /** AutoSyncbetween(min) */
- autoSyncInterval?: number;
- /** ManualSyncCallback */
- onSync?: () => Promise<void>;
- /** AutoSyncSwitchCallback */
- onAutoSyncToggle?: (enabled: boolean) => void;
- /** ViewConflictCallback */
- onViewConflicts?: () => void;
- /** OpenSettingsCallback */
- onOpenSettings?: () => void;
- /** isnoDisable */
- disabled?: boolean;
- /** isnoat Tauri Environment */
- isTauri?: boolean;
- /** CustomClass Name */
- className?: string;
+  /** Sync status */
+  status?: SyncStatus | null;
+  /** Whether auto sync is enabled */
+  autoSyncEnabled?: boolean;
+  /** Auto sync interval (minutes) */
+  autoSyncInterval?: number;
+  /** Manual sync callback */
+  onSync?: () => Promise<void>;
+  /** Auto sync toggle callback */
+  onAutoSyncToggle?: (enabled: boolean) => void;
+  /** View conflicts callback */
+  onViewConflicts?: () => void;
+  /** Open settings callback */
+  onOpenSettings?: () => void;
+  /** Whether disabled */
+  disabled?: boolean;
+  /** Whether in Tauri environment */
+  isTauri?: boolean;
+  /** Custom class name */
+  className?: string;
 }
 
-// StatusConfig
+// Status Config
 const STATE_CONFIG: Record<SyncState, {
  icon: typeof Cloud;
  color: string;
@@ -87,31 +87,31 @@ const STATE_CONFIG: Record<SyncState, {
  icon: Cloud,
  color: "text-muted-foreground",
  bgColor: "bg-muted",
- label: "pendingSync",
- },
- syncing: {
- icon: RefreshCw,
- color: "text-blue-400",
- bgColor: "bg-blue-500/10",
- label: "Sync",
- },
- synced: {
- icon: CheckCircle2,
- color: "text-primary",
- bgColor: "bg-primary/10",
- label: "alreadySync",
- },
- conflict: {
- icon: AlertTriangle,
- color: "text-amber-400",
- bgColor: "bg-amber-500/10",
- label: "hasConflict",
- },
- error: {
- icon: CloudOff,
- color: "text-red-400",
- bgColor: "bg-red-500/10",
- label: "SyncFailed",
+    label: "Pending sync",
+  },
+  syncing: {
+    icon: RefreshCw,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10",
+    label: "Syncing",
+  },
+  synced: {
+    icon: CheckCircle2,
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+    label: "Synced",
+  },
+  conflict: {
+    icon: AlertTriangle,
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/10",
+    label: "Conflicts",
+  },
+  error: {
+    icon: CloudOff,
+    color: "text-red-400",
+    bgColor: "bg-red-500/10",
+    label: "Sync failed",
  },
  offline: {
  icon: WifiOff,
@@ -121,19 +121,19 @@ const STATE_CONFIG: Record<SyncState, {
  },
 };
 
-// FormatTime
+// Format Time
 const formatTime = (dateStr?: string): string => {
- if (!dateStr) return "fromnot yetSync";
+  if (!dateStr) return "Never synced";
  
  const date = new Date(dateStr);
  const now = new Date();
  const diff = now.getTime() - date.getTime();
  
  if (diff < 60000) return "Just now";
- if (diff < 3600000) return `${Math.floor(diff / 60000)} minbefore`;
- if (diff < 86400000) return `${Math.floor(diff / 3600000)} hbefore`;
+ if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
+ if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
  
- return date.toLocaleDateString("zh-CN", {
+ return date.toLocaleDateString("en-US", {
  month: "short",
  day: "numeric",
  hour: "2-digit",
@@ -157,7 +157,7 @@ export function SyncIndicator({
  const [isOpen, setIsOpen] = useState(false);
  const [isOnline, setIsOnline] = useState(true);
  
- // ListenOnlineStatus
+  // Listen for online status
  useEffect(() => {
  const handleOnline = () => setIsOnline(true);
  const handleOffline = () => setIsOnline(false);
@@ -172,7 +172,7 @@ export function SyncIndicator({
  };
  }, []);
  
- // AutoSync
+  // Auto sync
  useEffect(() => {
  if (!autoSyncEnabled || !onSync || !isOnline) return;
  
@@ -185,24 +185,24 @@ export function SyncIndicator({
  return () => clearInterval(interval);
  }, [autoSyncEnabled, autoSyncInterval, isOnline, isSyncing, onSync]);
  
- // ProcessManualSync
+  // Handle manual sync
  const handleSync = useCallback(async () => {
  if (isSyncing || !onSync) return;
  
  setIsSyncing(true);
  try {
  await onSync();
- toast.success("SyncDone");
- } catch (error) {
- toast.error("SyncFailed", {
- description: error instanceof Error ? error.message: "PleaseRetry",
+      toast.success("Sync completed");
+    } catch (error) {
+      toast.error("Sync failed", {
+        description: error instanceof Error ? error.message: "Please try again",
  });
  } finally {
  setIsSyncing(false);
  }
  }, [isSyncing, onSync]);
  
- // OKCurrentStatus
+  // Determine current state
  const currentState: SyncState = !isOnline
  ? "offline"
  : isSyncing
@@ -212,7 +212,7 @@ export function SyncIndicator({
  const config = STATE_CONFIG[currentState];
  const Icon = config.icon;
  
- // Tauri EnvironmentDisplayVersion
+  // Non-Tauri environment version
  if (!isTauri) {
  return (
  <TooltipProvider>
@@ -230,7 +230,7 @@ export function SyncIndicator({
  </div>
  </TooltipTrigger>
  <TooltipContent>
- <p>DataAutoSavetoCloud</p>
+ <p>Data is auto-saved to the cloud</p>
  </TooltipContent>
  </Tooltip>
  </TooltipProvider>
@@ -277,7 +277,7 @@ export function SyncIndicator({
  align="end"
  className="w-72 p-0 bg-card border-border"
  >
- {/* StatusHeader */}
+      {/* Status Header */}
  <div className="p-4 border-b border-border">
  <div className="flex items-center justify-between mb-3">
  <div className="flex items-center gap-2">
@@ -299,19 +299,19 @@ export function SyncIndicator({
  )}
  </div>
  
- {/* StatisticsInfo */}
+        {/* Statistics Info */}
  <div className="grid grid-cols-3 gap-2 text-center">
  <div className="p-2 rounded-lg bg-muted">
  <p className="text-lg font-semibold text-foreground">
  {status?.totalSyncedItems || 0}
  </p>
- <p className="text-[10px] text-muted-foreground">alreadySync</p>
- </div>
- <div className="p-2 rounded-lg bg-muted">
- <p className="text-lg font-semibold text-foreground">
- {status?.pendingChanges || 0}
- </p>
- <p className="text-[10px] text-muted-foreground">pendingSync</p>
+            <p className="text-[10px] text-muted-foreground">Synced</p>
+          </div>
+          <div className="p-2 rounded-lg bg-muted">
+            <p className="text-lg font-semibold text-foreground">
+              {status?.pendingChanges || 0}
+            </p>
+            <p className="text-[10px] text-muted-foreground">Pending</p>
  </div>
  <div className="p-2 rounded-lg bg-muted">
  <p className={cn(
@@ -327,14 +327,14 @@ export function SyncIndicator({
  </div>
  </div>
  
- {/* ConflictTip */}
+      {/* Conflict Notice */}
  {status?.conflictsCount && status.conflictsCount > 0 && (
  <div className="px-4 py-3 border-b border-border bg-amber-500/5">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <AlertTriangle className="w-4 h-4 text-amber-400" />
  <span className="text-sm text-amber-400">
- has {status.conflictsCount} ConflictneedneedResolve
+                Has {status.conflictsCount} conflicts to resolve
  </span>
  </div>
  <Button
@@ -352,9 +352,9 @@ export function SyncIndicator({
  </div>
  )}
  
- {/* ActionButton */}
+      {/* Action Buttons */}
  <div className="p-4 space-y-3">
- {/* ManualSync */}
+        {/* Manual Sync */}
  <Button
  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
  disabled={isSyncing || !isOnline}
@@ -368,19 +368,19 @@ export function SyncIndicator({
  ) : (
  <>
  <RefreshCw className="w-4 h-4 mr-2" />
- NowSync
+            Sync Now
  </>
  )}
  </Button>
  
- {/* AutoSyncToggle */}
+        {/* Auto Sync Toggle */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Cloud className="w-4 h-4 text-muted-foreground" />
- <span className="text-sm text-foreground">AutoSync</span>
+ <span className="text-sm text-foreground">Auto sync</span>
  {autoSyncEnabled && (
  <span className="text-[10px] text-muted-foreground">
- each {autoSyncInterval} min
+              every {autoSyncInterval} min
  </span>
  )}
  </div>
@@ -392,7 +392,7 @@ export function SyncIndicator({
  </div>
  </div>
  
- {/* FooterSettings */}
+      {/* Footer Settings */}
  <div className="px-4 py-3 border-t border-border">
  <Button
  variant="ghost"
@@ -404,7 +404,7 @@ export function SyncIndicator({
  }}
  >
  <Settings2 className="w-4 h-4 mr-2" />
- SyncSettings
+          Sync Settings
  </Button>
  </div>
  </PopoverContent>

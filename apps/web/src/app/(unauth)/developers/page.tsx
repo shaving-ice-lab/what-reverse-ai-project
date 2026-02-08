@@ -24,15 +24,15 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// QuickStartCode
+// Quick Start Code
 const quickStartCode = `import { AgentFlow } from '@agentflow/sdk';
 
-// InitialCustomerendpoint
+// Initialize client
 const client = new AgentFlow({
  apiKey: process.env.AGENTFLOW_API_KEY
 });
 
-// ExecuteWorkflow
+// Execute workflow
 const result = await client.workflows.run({
  workflowId: 'wf_123456',
  inputs: { message: 'Hello, World!' }
@@ -50,36 +50,36 @@ const sdks = [
 
 // API Endpoint
 const apiEndpoints = [
- { method: "GET", path: "/v1/workflows", description: "FetchWorkflowList" },
- { method: "POST", path: "/v1/workflows", description: "CreateWorkflow" },
- { method: "POST", path: "/v1/workflows/:id/run", description: "ExecuteWorkflow" },
- { method: "GET", path: "/v1/executions/:id", description: "FetchExecuteStatus" },
+ { method: "GET", path: "/v1/workflows", description: "Fetch workflow list" },
+ { method: "POST", path: "/v1/workflows", description: "Create workflow" },
+ { method: "POST", path: "/v1/workflows/:id/run", description: "Execute workflow" },
+ { method: "GET", path: "/v1/executions/:id", description: "Fetch execution status" },
 ];
 
-// Resource
+// Resources
 const resources = [
  {
  icon: Book,
  title: "API Document",
- description: "Complete's RESTful API ReferenceDocument",
+ description: "Complete RESTful API reference documentation",
  href: "/docs/api",
  },
  {
  icon: Terminal,
  title: "SDK Guide",
- description: "Language SDK 'sUsageGuide",
+ description: "Language SDK usage guide",
  href: "/docs/sdk",
  },
  {
  icon: Code,
- title: "ExampleCode",
- description: "typeScenario'sCodeExample",
+ title: "Example code",
+ description: "Type scenario code example",
  href: "/docs/examples",
  },
  {
  icon: Github,
  title: "GitHub",
- description: "Open SourceitemandExampleRepository",
+ description: "Open source items and example repos",
  href: "https://github.com/agentflow",
  },
 ];
@@ -88,18 +88,18 @@ const resources = [
 const features = [
  {
  icon: Zap,
- title: "can",
- description: "sResponse, SupportConcurrencyCall",
+ title: "Performance",
+ description: "Fast response, concurrent calls",
  },
  {
  icon: Shield,
- title: "Securitycan",
- description: "API Key Authentication, DataEncryptTransfer",
+ title: "Security",
+ description: "API key auth, encrypted data transfer",
  },
  {
  icon: Globe,
- title: "allfaceOpen",
- description: "Workflow, ExecuteRecord, AnalyticsDataallfaceOpen",
+ title: "All APIs Open",
+ description: "Workflows, runs and analytics via open API",
  },
 ];
 
@@ -123,17 +123,17 @@ export default function DevelopersPage() {
  <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
  <div className="lobe-badge mb-8">
  <Code className="h-3.5 w-3.5" />
- <span>DevelopersPlatform</span>
+ <span>Developer platform</span>
  </div>
 
  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- Builddown1
+ Build Your Next
  <br />
- <span className="gradient-text-brand">AutomationApp</span>
+ <span className="gradient-text-brand">Automation app</span>
  </h1>
 
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- large's API, Rich'sSDK, Improve'sDocument, HelpyouQuickIntegration AgentFlow
+ Large API, rich SDK, improved docs. Get started with AgentFlow integration quickly.
  </p>
 
  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -157,7 +157,7 @@ export default function DevelopersPage() {
  <section className="py-24 sm:py-32 px-6">
  <div className="max-w-4xl mx-auto">
  <div className="lobe-section-header">
- <h2>QuickStart</h2>
+ <h2>Quick start</h2>
  <p>Get started in minutes</p>
  </div>
  <div className="rounded-2xl border border-border/30 overflow-hidden bg-surface-100/30">
@@ -170,7 +170,7 @@ export default function DevelopersPage() {
  {copied ? (
  <>
  <Check className="w-4 h-4" />
- alreadyCopy
+ Copied
  </>
  ) : (
  <>
@@ -191,7 +191,7 @@ export default function DevelopersPage() {
  <section className="py-20 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto">
  <div className="lobe-section-header">
- <h2>methodSDK</h2>
+ <h2>Official SDKs</h2>
  <p>Official SDKs for your favorite language</p>
  </div>
  <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -216,7 +216,7 @@ export default function DevelopersPage() {
  : "bg-yellow-500/10 text-yellow-500"
  )}
  >
- {sdk.status === "stable" ? "Stableversion": "Beta"}
+ {sdk.status === "stable" ? "Stable": "Beta"}
  </span>
  </div>
  ))}
@@ -228,7 +228,7 @@ export default function DevelopersPage() {
  <section className="py-24 sm:py-32 px-6">
  <div className="max-w-4xl mx-auto">
  <div className="lobe-section-header">
- <h2>API EndpointPreview</h2>
+ <h2>API Endpoint Preview</h2>
  <p>RESTful API reference</p>
  </div>
  <div className="rounded-2xl border border-border/30 overflow-hidden bg-surface-100/30">
@@ -262,7 +262,7 @@ export default function DevelopersPage() {
  <div className="text-center mt-8">
  <Link href="/docs/api">
  <Button variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50">
- ViewComplete API Reference
+ View Complete API Reference
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
@@ -303,7 +303,7 @@ export default function DevelopersPage() {
  <section className="py-24 sm:py-32 px-6">
  <div className="max-w-4xl mx-auto">
  <div className="lobe-section-header">
- <h2>DevelopmentResource</h2>
+ <h2>Development resources</h2>
  <p>Developer resources</p>
  </div>
  <div className="grid sm:grid-cols-2 gap-4">
@@ -344,14 +344,14 @@ export default function DevelopersPage() {
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
  <div className="max-w-2xl mx-auto px-6 text-center relative z-10">
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- JoinDevelopersCommunity
+ Join the Developer Community
  </h2>
  <p className="text-foreground-light mb-10">
- andotherheDevelopersExchange, FetchTechnologySupport
+ Exchange with other developers and get technical support
  </p>
  <Link href="/community">
  <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">
- JoinCommunity
+ Join Community
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

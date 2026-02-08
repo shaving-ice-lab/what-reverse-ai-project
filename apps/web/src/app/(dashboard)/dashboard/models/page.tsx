@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * AI ModelManagePage
- * View, CompareandConfigAvailable's AI Model
+ * AI Model Management Page
+ * View, compare and configure available AI models
  */
 
 import { useState } from "react";
@@ -44,30 +44,30 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// ModelcanpowerType
+// Model capability types
 const capabilities = {
  chat: { label: "Conversation", icon: MessageSquare, color: "text-brand-500" },
  code: { label: "Code", icon: Code, color: "text-brand-500" },
  analysis: { label: "Analytics", icon: FileText, color: "text-foreground-light" },
  creative: { label: "Creative", icon: Sparkles, color: "text-foreground-light" },
- vision: { label: "visual", icon: ImageIcon, color: "text-foreground-light" },
+ vision: { label: "Vision", icon: ImageIcon, color: "text-foreground-light" },
 };
 
 const compareLimit = 3;
 
 const statusFilters = [
- { id: "all", label: "allsectionModel" },
- { id: "default", label: "DefaultModel" },
- { id: "new", label: "newonline" },
+  { id: "all", label: "All Models" },
+  { id: "default", label: "Default Model" },
+  { id: "new", label: "Newly launched" },
 ] as const;
 
-// ModelData
+// Model Data
 const models = [
  {
  id: "gpt-4-turbo",
  name: "GPT-4 Turbo",
  provider: "OpenAI",
- description: "mostnew's GPT-4 Model, hasmore'sInferencecanpowerandmore'sContextWindow",
+ description: "Latest GPT-4 model with stronger inference and larger context window",
  capabilities: ["chat", "code", "analysis", "creative", "vision"],
  contextWindow: 128000,
  maxOutput: 4096,
@@ -78,13 +78,13 @@ const models = [
  popularity: 98,
  isDefault: true,
  isNew: false,
- tags: ["Recommended", "multipleModal"],
+ tags: ["Recommended", "Multiple models"],
  },
  {
  id: "gpt-4",
  name: "GPT-4",
  provider: "OpenAI",
- description: "large'suseLanguageModel, SuitableComplexTaskandDepthInference",
+ description: "General-purpose language model for complex tasks and deep inference",
  capabilities: ["chat", "code", "analysis", "creative"],
  contextWindow: 8192,
  maxOutput: 4096,
@@ -101,7 +101,7 @@ const models = [
  id: "gpt-3.5-turbo",
  name: "GPT-3.5 Turbo",
  provider: "OpenAI",
- description: "QuickandEconomy'sModel, SuitablelargemultiplecountdayTask",
+ description: "Fast and economical model for high-volume daily tasks",
  capabilities: ["chat", "code", "analysis"],
  contextWindow: 16385,
  maxOutput: 4096,
@@ -118,7 +118,7 @@ const models = [
  id: "claude-3-opus",
  name: "Claude 3 Opus",
  provider: "Anthropic",
- description: "Anthropic Bestlarge'sModel, ComplexAnalyticsandCreativeWriting",
+ description: "Anthropic's top model for complex analytics and creative writing",
  capabilities: ["chat", "code", "analysis", "creative", "vision"],
  contextWindow: 200000,
  maxOutput: 4096,
@@ -135,7 +135,7 @@ const models = [
  id: "claude-3-sonnet",
  name: "Claude 3 Sonnet",
  provider: "Anthropic",
- description: "BalancecanandCost'sendpointModel",
+ description: "Balanced capability and cost endpoint model",
  capabilities: ["chat", "code", "analysis", "creative", "vision"],
  contextWindow: 200000,
  maxOutput: 4096,
@@ -149,27 +149,27 @@ const models = [
  tags: ["Balance"],
  },
  {
- id: "claude-3-haiku",
- name: "Claude 3 Haiku",
- provider: "Anthropic",
- description: "Speedmost's Claude Model, SuitableReal-timeApp",
- capabilities: ["chat", "code", "analysis", "vision"],
- contextWindow: 200000,
- maxOutput: 4096,
- inputPrice: 0.00025,
- outputPrice: 0.00125,
- speed: "very-fast",
- quality: 75,
- popularity: 65,
- isDefault: false,
- isNew: true,
- tags: ["most", "Economy"],
- },
+    id: "claude-3-haiku",
+    name: "Claude 3 Haiku",
+    provider: "Anthropic",
+    description: "Fastest Claude model, suitable for real-time apps",
+    capabilities: ["chat", "code", "analysis", "vision"],
+    contextWindow: 200000,
+    maxOutput: 4096,
+    inputPrice: 0.00025,
+    outputPrice: 0.00125,
+    speed: "very-fast",
+    quality: 75,
+    popularity: 65,
+    isDefault: false,
+    isNew: true,
+    tags: ["Fastest", "Economical"],
+  },
  {
  id: "gemini-pro",
  name: "Gemini Pro",
  provider: "Google",
- description: "Google 'smultipleModal AI Model, SupportTextandImageUnderstand",
+ description: "Google's multimodal AI model for text and image understanding",
  capabilities: ["chat", "code", "analysis", "vision"],
  contextWindow: 32000,
  maxOutput: 8192,
@@ -180,13 +180,13 @@ const models = [
  popularity: 68,
  isDefault: false,
  isNew: false,
- tags: ["multipleModal"],
+ tags: ["Multiple models"],
  },
  {
  id: "llama-3-70b",
  name: "Llama 3 70B",
  provider: "Meta",
- description: "Open Source'slargeLanguageModel, canModel",
+ description: "Open-source large language model",
  capabilities: ["chat", "code", "analysis"],
  contextWindow: 8192,
  maxOutput: 4096,
@@ -201,15 +201,15 @@ const models = [
  },
 ];
 
-// SpeedConfig
+// Speed configuration
 const speedConfig = {
- "very-fast": { label: "", color: "text-brand-500", value: 95 },
- fast: { label: "Quick", color: "text-brand-500", value: 75 },
- medium: { label: "etc", color: "text-foreground-light", value: 50 },
- slow: { label: "", color: "text-foreground-light", value: 25 },
+  "very-fast": { label: "Fastest", color: "text-brand-500", value: 95 },
+  fast: { label: "Fast", color: "text-brand-500", value: 75 },
+  medium: { label: "Medium", color: "text-foreground-light", value: 50 },
+  slow: { label: "Slow", color: "text-foreground-light", value: 25 },
 };
 
-// UsageStatistics
+// Usage Statistics
 const usageStats = {
  totalTokens: 1250000,
  totalCost: 45.80,
@@ -226,7 +226,7 @@ export default function ModelsPage() {
  const [compareMode, setCompareMode] = useState(false);
  const [selectedModels, setSelectedModels] = useState<string[]>([]);
 
- // FetchAllProvider
+ // Fetch All Providers
  const providers = [...new Set(models.map((m) => m.provider))];
 
  const defaultModel = models.find((model) => model.isDefault);
@@ -247,7 +247,7 @@ export default function ModelsPage() {
  selectedCapability !== "all" ||
  statusFilter !== "all";
 
- // FilterandSortModel
+ // Filter and Sort Models
  const filteredModels = models
  .filter((model) => {
  const matchesSearch =
@@ -300,7 +300,7 @@ export default function ModelsPage() {
  <PageHeader
  eyebrow="Models"
  title="AI Model"
- description="Browse, CompareandConfigAvailable's AI Model"
+ description="Browse, compare and configure available AI models"
  actions={(
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -312,14 +312,14 @@ export default function ModelsPage() {
  if (compareMode) setSelectedModels([]);
  }}
  >
- {compareMode ? "ExitCompare": "CompareModel"}
+ {compareMode ? "Exit Compare" : "Compare Models"}
  </Button>
  <Button
  variant="outline"
  size="sm"
  leftIcon={<Settings className="h-4 w-4" />}
  >
- ModelSettings
+ Model Settings
  </Button>
  </div>
  )}
@@ -327,15 +327,15 @@ export default function ModelsPage() {
  <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Brain className="h-3.5 w-3.5" />
- ModelCount {models.length}
+ Models: {models.length}
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Crown className="h-3.5 w-3.5" />
- DefaultModel {defaultModel?.name || "not yetSettings"}
+ Default: {defaultModel?.name || "Not configured"}
  </span>
  {compareMode && (
  <Badge variant="primary" size="xs">
- ComparealreadyEnable · {selectedModels.length}/{compareLimit}
+ Compare enabled · {selectedModels.length}/{compareLimit}
  </Badge>
  )}
  </div>
@@ -349,41 +349,41 @@ export default function ModelsPage() {
  <span>Token Consumption</span>
  <Zap className="h-4 w-4" />
  </div>
- <div className="mt-3 text-stat-number text-foreground">
- {(usageStats.totalTokens / 1000000).toFixed(2)}M
- </div>
- <p className="text-xs text-foreground-light">currentmonthsCalltotal</p>
- </div>
- <div className="page-panel p-4">
- <div className="flex items-center justify-between text-xs text-foreground-muted">
- <span>currentmonthsCost</span>
- <DollarSign className="h-4 w-4" />
- </div>
- <div className="mt-3 text-stat-number text-foreground">
- ${usageStats.totalCost.toFixed(2)}
- </div>
- <p className="text-xs text-foreground-light">byActualBillingStatistics</p>
- </div>
- <div className="page-panel p-4">
- <div className="flex items-center justify-between text-xs text-foreground-muted">
- <span>useModel</span>
- <Star className="h-4 w-4 text-brand-500" />
- </div>
- <div className="mt-3 text-sm font-semibold text-foreground">
- {favoriteModel?.name || "not yetSettings"}
- </div>
- <p className="text-xs text-foreground-light">Past 30 daysCallmost</p>
- </div>
- <div className="page-panel p-4">
- <div className="flex items-center justify-between text-xs text-foreground-muted">
- <span>AverageResponse</span>
- <Clock className="h-4 w-4" />
- </div>
- <div className="mt-3 text-stat-number text-foreground">
- {usageStats.avgResponseTime}ms
- </div>
- <p className="text-xs text-foreground-light">1weeksAverageLatency</p>
- </div>
+              <div className="mt-3 text-stat-number text-foreground">
+                {(usageStats.totalTokens / 1000000).toFixed(2)}M
+              </div>
+              <p className="text-xs text-foreground-light">Total calls this month</p>
+            </div>
+            <div className="page-panel p-4">
+              <div className="flex items-center justify-between text-xs text-foreground-muted">
+                <span>This month's cost</span>
+                <DollarSign className="h-4 w-4" />
+              </div>
+              <div className="mt-3 text-stat-number text-foreground">
+                ${usageStats.totalCost.toFixed(2)}
+              </div>
+              <p className="text-xs text-foreground-light">Based on actual billing</p>
+            </div>
+            <div className="page-panel p-4">
+              <div className="flex items-center justify-between text-xs text-foreground-muted">
+                <span>Most used model</span>
+                <Star className="h-4 w-4 text-brand-500" />
+              </div>
+              <div className="mt-3 text-sm font-semibold text-foreground">
+                {favoriteModel?.name || "Not configured"}
+              </div>
+              <p className="text-xs text-foreground-light">Most called in past 30 days</p>
+            </div>
+            <div className="page-panel p-4">
+              <div className="flex items-center justify-between text-xs text-foreground-muted">
+                <span>Average response</span>
+                <Clock className="h-4 w-4" />
+              </div>
+              <div className="mt-3 text-stat-number text-foreground">
+                {usageStats.avgResponseTime}ms
+              </div>
+              <p className="text-xs text-foreground-light">Average latency last week</p>
+            </div>
  </div>
 
  {compareMode && (
@@ -391,24 +391,24 @@ export default function ModelsPage() {
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-2">
  <Info className="h-4 w-4 text-brand-500" />
- <p className="text-sm font-medium text-foreground">ComparealreadyEnable</p>
+ <p className="text-sm font-medium text-foreground">Compare enabled</p>
  </div>
  <Badge variant="solid-primary" size="sm">
- alreadyselect {selectedModels.length}/{compareLimit}
+ Selected {selectedModels.length}/{compareLimit}
  </Badge>
  </div>
  <p className="mt-2 text-[13px] text-foreground-light">
- Selectmostmultiple {compareLimit} ModelProceedforcompare, ClickCardnowcanJoinorRemove.
+ Select up to {compareLimit} models to compare; click a card to add or remove.
  </p>
  </div>
  )}
 
  <div className="page-panel">
  <div className="page-panel-header flex flex-wrap items-center justify-between gap-3">
- <div>
- <p className="page-panel-title">FilterandSort</p>
- <p className="page-panel-description">bycanpower, ProviderandPriceQuickModel.</p>
- </div>
+          <div>
+            <p className="page-panel-title">Filter and sort</p>
+            <p className="page-panel-description">Filter by capability, provider and price.</p>
+          </div>
  {isFiltering && (
  <Button
  variant="outline"
@@ -420,7 +420,7 @@ export default function ModelsPage() {
  setStatusFilter("all");
  }}
  >
- ClearFilter
+ Clear Filter
  </Button>
  )}
  </div>
@@ -431,7 +431,7 @@ export default function ModelsPage() {
  <Input
  variant="search"
  inputSize="sm"
- placeholder="SearchModelName, DescriptionorKeywords..."
+ placeholder="Search model name, description or keywords..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="h-4 w-4" />}
@@ -443,7 +443,7 @@ export default function ModelsPage() {
  <SelectValue placeholder="Provider" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">AllProvider</SelectItem>
+ <SelectItem value="all">All providers</SelectItem>
  {providers.map((provider) => (
  <SelectItem key={provider} value={provider}>
  {provider}
@@ -452,31 +452,31 @@ export default function ModelsPage() {
  </SelectContent>
  </Select>
 
- <Select value={selectedCapability} onValueChange={setSelectedCapability}>
- <SelectTrigger className="h-8 w-[150px] bg-surface-200 border-border text-foreground-light">
- <SelectValue placeholder="canpower" />
- </SelectTrigger>
- <SelectContent>
- <SelectItem value="all">Allcanpower</SelectItem>
- {Object.entries(capabilities).map(([key, config]) => (
- <SelectItem key={key} value={key}>
- {config.label}
- </SelectItem>
- ))}
- </SelectContent>
- </Select>
+                <Select value={selectedCapability} onValueChange={setSelectedCapability}>
+                  <SelectTrigger className="h-8 w-[150px] bg-surface-200 border-border text-foreground-light">
+                    <SelectValue placeholder="Capability" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All capabilities</SelectItem>
+                    {Object.entries(capabilities).map(([key, config]) => (
+                      <SelectItem key={key} value={key}>
+                        {config.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
- <Select value={sortBy} onValueChange={setSortBy}>
- <SelectTrigger className="h-8 w-[150px] bg-surface-200 border-border text-foreground-light">
- <SelectValue placeholder="Sort" />
- </SelectTrigger>
- <SelectContent>
- <SelectItem value="popularity">byPopularity</SelectItem>
- <SelectItem value="quality">by</SelectItem>
- <SelectItem value="price">byPrice</SelectItem>
- <SelectItem value="speed">bySpeed</SelectItem>
- </SelectContent>
- </Select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-8 w-[150px] bg-surface-200 border-border text-foreground-light">
+                    <SelectValue placeholder="Sort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="popularity">By popularity</SelectItem>
+                    <SelectItem value="quality">By quality</SelectItem>
+                    <SelectItem value="price">By price</SelectItem>
+                    <SelectItem value="speed">By speed</SelectItem>
+                  </SelectContent>
+                </Select>
  </div>
  </div>
 
@@ -502,25 +502,25 @@ export default function ModelsPage() {
  <div className="space-y-4">
  <div className="page-panel">
  <div className="page-panel-header flex flex-wrap items-center justify-between gap-3">
- <div>
- <p className="page-panel-title">ModelList</p>
- <p className="page-panel-description">
- CurrentDisplay {filteredModels.length} Model, byneedSelectandConfig.
- </p>
- </div>
- <Badge variant="secondary" size="xs">
- Display {filteredModels.length} 
- </Badge>
+                <div>
+                  <p className="page-panel-title">Model list</p>
+                  <p className="page-panel-description">
+                    Currently showing {filteredModels.length} models. Select and configure as needed.
+                  </p>
+                </div>
+                <Badge variant="secondary" size="xs">
+                  Showing {filteredModels.length} 
+                </Badge>
  </div>
  <div className="px-6 pb-6 pt-4">
  {filteredModels.length === 0 ? (
  <EmptyState
  icon={<Search className="h-5 w-5" />}
- title="not yettoMatchModel"
- description="TryAdjustKeywords, ProviderorcanpowerFilter."
+title="No matching models"
+  description="Try adjusting keywords, provider or capability filters."
  className="px-0 py-12"
  action={isFiltering ? {
- label: "ClearFilter",
+ label: "Clear Filter",
  onClick: () => {
  setSearchQuery("");
  setSelectedProvider("all");
@@ -648,7 +648,7 @@ export default function ModelsPage() {
  >
  Document
  </Button>
- <Button size="sm">UsagethisModel</Button>
+ <Button size="sm">Use this model</Button>
  </div>
  )}
  </div>
@@ -662,12 +662,12 @@ export default function ModelsPage() {
 
  {selectedModels.length >= 2 && (
  <div className="page-panel">
- <div className="page-panel-header">
- <div>
- <p className="page-panel-title">Modelforcompare</p>
- <p className="page-panel-description">alreadySelect {selectedModels.length} Model</p>
- </div>
- </div>
+                <div className="page-panel-header">
+                  <div>
+                    <p className="page-panel-title">Model comparison</p>
+                    <p className="page-panel-description">Selected {selectedModels.length} model(s)</p>
+                  </div>
+                </div>
  <div className="px-6 pb-6 overflow-x-auto">
  <table className="w-full text-[12px]">
  <thead className="bg-surface-200 text-foreground-muted">
@@ -698,7 +698,7 @@ export default function ModelsPage() {
  })}
  </tr>
  <tr>
- <td className="py-3 px-4 text-foreground-light">ContextWindow</td>
+ <td className="py-3 px-4 text-foreground-light">Context window</td>
  {selectedModels.map((modelId) => {
  const model = models.find((m) => m.id === modelId);
  return (
@@ -709,7 +709,7 @@ export default function ModelsPage() {
  })}
  </tr>
  <tr>
- <td className="py-3 px-4 text-foreground-light">InputPrice</td>
+ <td className="py-3 px-4 text-foreground-light">Input price</td>
  {selectedModels.map((modelId) => {
  const model = models.find((m) => m.id === modelId);
  return (
@@ -720,7 +720,7 @@ export default function ModelsPage() {
  })}
  </tr>
  <tr>
- <td className="py-3 px-4 text-foreground-light">OutputPrice</td>
+ <td className="py-3 px-4 text-foreground-light">Output price</td>
  {selectedModels.map((modelId) => {
  const model = models.find((m) => m.id === modelId);
  return (
@@ -739,120 +739,120 @@ export default function ModelsPage() {
 
  <aside className="space-y-4 lg:sticky lg:top-6 self-start">
  <div className="page-panel">
- <div className="page-panel-header">
- <div>
- <p className="page-panel-title">CompareList</p>
- <p className="page-panel-description">mostmultipleSelect {compareLimit} Model</p>
- </div>
- </div>
- <div className="p-6 space-y-3">
- {compareMode ? (
- <>
- {selectedModelDetails.length === 0 ? (
- <div className="rounded-md border border-dashed border-border-muted bg-surface-100/60 p-4 text-center text-[13px] text-foreground-light">
- SelectModelJoinCompareList.
- </div>
- ) : (
- <div className="space-y-2">
- {selectedModelDetails.map((model) => (
- <div
- key={model.id}
- className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-100 px-3 py-2"
- >
- <div>
- <p className="text-[13px] font-medium text-foreground">{model.name}</p>
- <p className="text-[11px] text-foreground-muted">{model.provider}</p>
- </div>
- <Button
- variant="ghost"
- size="icon-xs"
- onClick={() => toggleModelSelection(model.id)}
- >
- <X className="h-3 w-3" />
- </Button>
- </div>
- ))}
- </div>
- )}
- <div className="flex items-center gap-2 pt-2">
- <Button size="sm" disabled={selectedModelDetails.length < 2}>
- StartCompare
- </Button>
- <Button
- variant="outline"
- size="sm"
- disabled={!selectedModelDetails.length}
- onClick={() => setSelectedModels([])}
- >
- Clear
- </Button>
- </div>
- </>
- ) : (
- <div className="space-y-3">
- <p className="text-[13px] text-foreground-light">
- EnableComparewithforcomparemultipleModel's, SpeedandPrice.
- </p>
- <Button variant="outline" size="sm" onClick={() => setCompareMode(true)}>
- EnableCompare
- </Button>
- </div>
- )}
+              <div className="page-panel-header">
+                <div>
+                  <p className="page-panel-title">Compare list</p>
+                  <p className="page-panel-description">Select up to {compareLimit} models</p>
+                </div>
+              </div>
+              <div className="p-6 space-y-3">
+                {compareMode ? (
+                  <>
+                    {selectedModelDetails.length === 0 ? (
+                      <div className="rounded-md border border-dashed border-border-muted bg-surface-100/60 p-4 text-center text-[13px] text-foreground-light">
+                        Select models to add to comparison list.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {selectedModelDetails.map((model) => (
+                          <div
+                            key={model.id}
+                            className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-100 px-3 py-2"
+                          >
+                            <div>
+                              <p className="text-[13px] font-medium text-foreground">{model.name}</p>
+                              <p className="text-[11px] text-foreground-muted">{model.provider}</p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => toggleModelSelection(model.id)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 pt-2">
+                      <Button size="sm" disabled={selectedModelDetails.length < 2}>
+                        Start comparison
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={!selectedModelDetails.length}
+                        onClick={() => setSelectedModels([])}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-[13px] text-foreground-light">
+                      Enable comparison to compare multiple models by speed and price.
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => setCompareMode(true)}>
+                      Enable comparison
+                    </Button>
+                  </div>
+                )}
  </div>
  </div>
 
  <div className="page-panel">
- <div className="page-panel-header">
- <div>
- <p className="page-panel-title">RecommendedPolicy</p>
- <p className="page-panel-description">Based on, SpeedandPopularitySelectModel.</p>
- </div>
- </div>
- <div className="p-6 space-y-4">
- <div className="flex items-start gap-3">
- <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
- <Shield className="h-4 w-4 text-brand-500" />
- </div>
- <div>
- <p className="text-[13px] font-medium text-foreground">Defaultand</p>
- <p className="text-xs text-foreground-light">
- {defaultModel?.name || "not yetSettings"} asModel.
- </p>
- </div>
- </div>
- <div className="flex items-start gap-3">
- <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
- <Gauge className="h-4 w-4 text-foreground-light" />
- </div>
- <div>
- <p className="text-[13px] font-medium text-foreground">LatencyPriority</p>
- <p className="text-xs text-foreground-light">
- {fastestModel.name}({fastestSpeedLabel})SuitableReal-timeInteractiveScenario.
- </p>
- </div>
- </div>
- <div className="flex items-start gap-3">
- <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
- <Target className="h-4 w-4 text-foreground-light" />
- </div>
- <div>
- <p className="text-[13px] font-medium text-foreground">Priority</p>
- <p className="text-xs text-foreground-light">
- {topQualityModel.name} Ratingmost({topQualityModel.quality}/100).
- </p>
- </div>
- </div>
- <div className="flex items-start gap-3">
- <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
- <TrendingUp className="h-4 w-4 text-foreground-light" />
- </div>
- <div>
- <p className="text-[13px] font-medium text-foreground">PopularSelect</p>
- <p className="text-xs text-foreground-light">
- {mostPopularModel.name} Usageratemost({mostPopularModel.popularity}%).
- </p>
- </div>
- </div>
+              <div className="page-panel-header">
+                <div>
+                  <p className="page-panel-title">Recommended strategy</p>
+                  <p className="page-panel-description">Select models based on quality, speed and popularity.</p>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
+                    <Shield className="h-4 w-4 text-brand-500" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-foreground">Default recommendation</p>
+                    <p className="text-xs text-foreground-light">
+                      {defaultModel?.name || "Not configured"} is the default model.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
+                    <Gauge className="h-4 w-4 text-foreground-light" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-foreground">Latency priority</p>
+                    <p className="text-xs text-foreground-light">
+                      {fastestModel.name} ({fastestSpeedLabel}) suitable for real-time interactive scenarios.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
+                    <Target className="h-4 w-4 text-foreground-light" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-foreground">Quality priority</p>
+                    <p className="text-xs text-foreground-light">
+                      {topQualityModel.name} highest quality ({topQualityModel.quality}/100).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-200">
+                    <TrendingUp className="h-4 w-4 text-foreground-light" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-foreground">Popular choice</p>
+                    <p className="text-xs text-foreground-light">
+                      {mostPopularModel.name} highest usage rate ({mostPopularModel.popularity}%).
+                    </p>
+                  </div>
+                </div>
  </div>
  </div>
  </aside>

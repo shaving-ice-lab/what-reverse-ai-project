@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ExecuteRecordPage
- * ViewandManageWorkflowExecuteHistoryRecord
+ * Execution Records Page
+ * View and manage workflow execution history
  */
 
 import { useState, useMemo } from "react";
@@ -53,7 +53,7 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// ExecuteStatusConfig
+// Execution Status Config
 const statusConfig = {
  completed: {
  label: "Success",
@@ -72,16 +72,16 @@ const statusConfig = {
  borderColor: "border-destructive/30",
  },
  running: {
- label: "Run",
- variant: "warning" as const,
+    label: "Running",
+    variant: "warning" as const,
  icon: Loader2,
  color: "text-warning",
  bgColor: "bg-warning-200/60",
  borderColor: "border-warning/30",
  },
  pending: {
- label: "etcpending",
- variant: "secondary" as const,
+    label: "Pending",
+    variant: "secondary" as const,
  icon: Clock,
  color: "text-foreground-muted",
  bgColor: "bg-surface-200",
@@ -99,12 +99,12 @@ const statusConfig = {
 
 type ExecutionStatus = keyof typeof statusConfig;
 
-// MockExecuteRecordData
+// Mock Execution Record Data
 const mockExecutions = [
  {
  id: "exec-1",
  workflowId: "wf-1",
- workflowName: "eachdayDataSync",
+    workflowName: "Daily Data Sync",
  status: "completed" as ExecutionStatus,
  trigger: "scheduled",
  startedAt: "2026-02-03T10:30:00",
@@ -119,7 +119,7 @@ const mockExecutions = [
  {
  id: "exec-2",
  workflowId: "wf-2",
- workflowName: "UserSign UpNotifications",
+    workflowName: "User Sign-Up Notifications",
  status: "failed" as ExecutionStatus,
  trigger: "webhook",
  startedAt: "2026-02-03T10:15:00",
@@ -129,12 +129,12 @@ const mockExecutions = [
  successNodes: 3,
  failedNodes: 2,
  tokensUsed: 680,
- error: "EmailServiceConnectTimeout",
+    error: "Email service connection timeout",
  },
  {
  id: "exec-3",
  workflowId: "wf-3",
- workflowName: "AI ContentReview",
+    workflowName: "AI Content Review",
  status: "running" as ExecutionStatus,
  trigger: "manual",
  startedAt: "2026-02-03T10:28:00",
@@ -149,7 +149,7 @@ const mockExecutions = [
  {
  id: "exec-4",
  workflowId: "wf-1",
- workflowName: "eachdayDataSync",
+    workflowName: "Daily Data Sync",
  status: "completed" as ExecutionStatus,
  trigger: "scheduled",
  startedAt: "2026-02-02T10:30:00",
@@ -164,7 +164,7 @@ const mockExecutions = [
  {
  id: "exec-5",
  workflowId: "wf-4",
- workflowName: "OrderProcessFlow",
+    workflowName: "Order Processing Flow",
  status: "pending" as ExecutionStatus,
  trigger: "api",
  startedAt: null,
@@ -179,7 +179,7 @@ const mockExecutions = [
  {
  id: "exec-6",
  workflowId: "wf-5",
- workflowName: "Social MediaPublish",
+    workflowName: "Social Media Publishing",
  status: "cancelled" as ExecutionStatus,
  trigger: "manual",
  startedAt: "2026-02-02T15:00:00",
@@ -189,12 +189,12 @@ const mockExecutions = [
  successNodes: 1,
  failedNodes: 0,
  tokensUsed: 320,
- error: "UserManualCancel",
+    error: "Manually cancelled by user",
  },
  {
  id: "exec-7",
  workflowId: "wf-2",
- workflowName: "UserSign UpNotifications",
+    workflowName: "User Sign-Up Notifications",
  status: "completed" as ExecutionStatus,
  trigger: "webhook",
  startedAt: "2026-02-02T09:45:00",
@@ -209,7 +209,7 @@ const mockExecutions = [
  {
  id: "exec-8",
  workflowId: "wf-6",
- workflowName: "ReportGenerateTask",
+    workflowName: "Report Generation Task",
  status: "completed" as ExecutionStatus,
  trigger: "scheduled",
  startedAt: "2026-02-01T08:00:00",
@@ -223,20 +223,20 @@ const mockExecutions = [
  },
 ];
 
-// TimeRangeOption
+// Time Range Options
 const timeRanges = [
- { value: "all", label: "allsectionTime" },
+ { value: "all", label: "All Time" },
  { value: "hour", label: "Recent 1 h" },
  { value: "today", label: "Today" },
  { value: "week", label: "Recent 7 days" },
  { value: "month", label: "Recent 30 days" },
 ];
 
-// TriggerType
+// Trigger Types
 const triggerTypes = [
- { value: "all", label: "allsectionTrigger" },
- { value: "manual", label: "ManualTrigger" },
- { value: "scheduled", label: "ScheduledTrigger" },
+  { value: "all", label: "All Triggers" },
+  { value: "manual", label: "Manual Trigger" },
+  { value: "scheduled", label: "Scheduled Trigger" },
  { value: "webhook", label: "Webhook" },
  { value: "api", label: "API Call" },
 ];
@@ -244,13 +244,13 @@ const triggerTypes = [
 type SortKey = "startedAt" | "duration" | "tokens" | "status";
 
 const sortOptions: { value: SortKey; label: string }[] = [
- { value: "startedAt", label: "StartTime" },
- { value: "duration", label: "Executetime" },
+  { value: "startedAt", label: "Start Time" },
+  { value: "duration", label: "Duration" },
  { value: "tokens", label: "Token Consumption" },
  { value: "status", label: "Status" },
 ];
 
-// FormatTime
+// Format Date
 function formatDate(dateString: string | null) {
  if (!dateString) return "-";
  const date = new Date(dateString);
@@ -261,14 +261,14 @@ function formatDate(dateString: string | null) {
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
  if (diffMins < 1) return "Just now";
- if (diffMins < 60) return `${diffMins} minbefore`;
- if (diffHours < 24) return `${diffHours} hbefore`;
+ if (diffMins < 60) return `${diffMins} min ago`;
+ if (diffHours < 24) return `${diffHours} hours ago`;
  if (diffDays === 1) return "Yesterday";
- if (diffDays < 7) return `${diffDays} daysbefore`;
+ if (diffDays < 7) return `${diffDays} days ago`;
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 }
 
-// Formattime
+// Format Duration
 function formatDuration(ms: number | null) {
  if (ms === null) return "-";
  if (ms < 1000) return `${ms}ms`;
@@ -288,7 +288,7 @@ export default function ExecutionsPage() {
  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
  const [executions, setExecutions] = useState(mockExecutions);
 
- // FilterandSort
+  // Filter and Sort
  const visibleExecutions = useMemo(() => {
  const filtered = executions.filter((exec) => {
  const matchesSearch = exec.workflowName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -337,7 +337,7 @@ export default function ExecutionsPage() {
  });
  }, [executions, searchQuery, selectedStatus, selectedTrigger, timeRange, sortBy]);
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedItems);
  if (newSelected.has(id)) {
@@ -357,20 +357,20 @@ export default function ExecutionsPage() {
  }
  };
 
- // DeleteExecuteRecord
+  // Delete Execution Record
  const deleteExecution = (id: string) => {
  setExecutions((prev) => prev.filter((exec) => exec.id !== id));
  selectedItems.delete(id);
  setSelectedItems(new Set(selectedItems));
  };
 
- // BatchDelete
+  // Bulk Delete
  const bulkDelete = () => {
  setExecutions((prev) => prev.filter((exec) => !selectedItems.has(exec.id)));
  setSelectedItems(new Set());
  };
 
- // StatisticsData
+  // Statistics Data
  const stats = {
  total: executions.length,
  completed: executions.filter((e) => e.status === "completed").length,
@@ -393,9 +393,9 @@ export default function ExecutionsPage() {
 
  const statCards = [
  {
- label: "totalExecutetimescount",
- value: stats.total,
- helper: `${stats.running} Run`,
+      label: "Total Executions",
+      value: stats.total,
+      helper: `${stats.running} Running`,
  icon: Play,
  iconClassName: "bg-brand-200/60 border-brand-400/40 text-brand-500",
  },
@@ -408,16 +408,16 @@ export default function ExecutionsPage() {
  iconClassName: stats.successRate > 80 ? "bg-brand-200/60 border-brand-400/40 text-brand-500" : "bg-warning-200/60 border-warning/30 text-warning",
  },
  {
- label: "Averagetime",
- value: formatDuration(stats.avgDuration),
- helper: "eachtimesExecute",
+      label: "Average Duration",
+      value: formatDuration(stats.avgDuration),
+      helper: "Per execution",
  icon: Timer,
  iconClassName: "bg-surface-200 border-border text-foreground-light",
  },
  {
  label: "Token Consumption",
  value: `${(stats.totalTokens / 1000).toFixed(1)}K`,
- helper: "currentmonthsCumulative",
+      helper: "Cumulative this month",
  icon: Zap,
  iconClassName: "bg-warning-200/60 border-warning/30 text-warning",
  },
@@ -426,12 +426,12 @@ export default function ExecutionsPage() {
  return (
  <PageContainer>
  <div className="space-y-6">
- {/* PageHeader */}
+      {/* Page Header */}
  <div className="space-y-3">
  <p className="page-caption">Executions</p>
  <PageHeader
- title="ExecuteRecord"
- description="ViewandManageWorkflowExecuteHistory"
+ title="Execution records"
+ description="View and manage workflow execution history"
  actions={
  <div className="flex items-center gap-2">
  <Button variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
@@ -439,7 +439,7 @@ export default function ExecutionsPage() {
  </Button>
  <Link href="/dashboard/workflows">
  <Button size="sm" leftIcon={<Zap className="w-4 h-4" />}>
- ViewWorkflow
+                View Workflows
  </Button>
  </Link>
  </div>
@@ -448,11 +448,11 @@ export default function ExecutionsPage() {
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Activity className="w-3.5 h-3.5" />
- {stats.running} Run
+              {stats.running} Running
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5" />
- {stats.pending} etcpending
+              {stats.pending} Pending
  </span>
  <span className="inline-flex items-center gap-1.5">
  <CheckCircle2 className="w-3.5 h-3.5" />
@@ -462,7 +462,7 @@ export default function ExecutionsPage() {
  </PageHeader>
  </div>
 
- {/* StatisticsCard */}
+      {/* Statistics Cards */}
  <section className="page-section">
  <div className="page-grid grid-cols-2 lg:grid-cols-4">
  {statCards.map((stat) => {
@@ -514,7 +514,7 @@ export default function ExecutionsPage() {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
  variant="dark"
- placeholder="SearchWorkflowName..."
+ placeholder="Search workflow name..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
@@ -523,21 +523,21 @@ export default function ExecutionsPage() {
 
  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
  <SelectTrigger className="w-[130px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
- <SelectValue placeholder="ExecuteStatus" />
+ <SelectValue placeholder="Execution status" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Status</SelectItem>
  <SelectItem value="completed">Success</SelectItem>
  <SelectItem value="failed">Failed</SelectItem>
- <SelectItem value="running">Run</SelectItem>
- <SelectItem value="pending">etcpending</SelectItem>
+            <SelectItem value="running">Running</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
  <SelectItem value="cancelled">Cancelled</SelectItem>
  </SelectContent>
  </Select>
 
  <Select value={selectedTrigger} onValueChange={setSelectedTrigger}>
  <SelectTrigger className="w-[130px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
- <SelectValue placeholder="Triggermethod" />
+              <SelectValue placeholder="Trigger method" />
  </SelectTrigger>
  <SelectContent>
  {triggerTypes.map((type) => (
@@ -550,7 +550,7 @@ export default function ExecutionsPage() {
 
  <Select value={timeRange} onValueChange={setTimeRange}>
  <SelectTrigger className="w-[140px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
- <SelectValue placeholder="TimeRange" />
+ <SelectValue placeholder="Time range" />
  </SelectTrigger>
  <SelectContent>
  {timeRanges.map((range) => (
@@ -598,7 +598,7 @@ export default function ExecutionsPage() {
  </div>
  </section>
 
- {/* BatchAction */}
+      {/* Batch Actions */}
  {hasSelection && (
  <section className="page-panel border-brand-400/40 bg-brand-200/20">
  <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -606,11 +606,11 @@ export default function ExecutionsPage() {
  <Badge variant="primary" size="sm">
  {selectedItems.size}
  </Badge>
- alreadySelect {selectedItems.size} Record
+              {selectedItems.size} selected
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
- Exportselect
+              Export Selected
  </Button>
  <Button variant="destructive" size="sm" onClick={bulkDelete} leftIcon={<Trash2 className="w-4 h-4" />}>
  Delete
@@ -623,12 +623,12 @@ export default function ExecutionsPage() {
  </section>
  )}
 
- {/* ExecuteList */}
- <section className="page-panel overflow-hidden">
- <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
- <div>
- <p className="page-panel-title">ExecuteList</p>
- <p className="page-panel-description"> {visibleExecutions.length} ExecuteRecord</p>
+      {/* Execution List */}
+        <section className="page-panel overflow-hidden">
+          <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="page-panel-title">Execution List</p>
+              <p className="page-panel-description">{visibleExecutions.length} execution records</p>
  </div>
  <div className="flex items-center gap-2">
  <Button variant="ghost" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
@@ -645,8 +645,8 @@ export default function ExecutionsPage() {
  />
  <span className="text-left">Workflow</span>
  <span className="hidden md:block text-center">Status</span>
- <span className="hidden md:block text-center">time</span>
- <span className="hidden lg:block text-center">StartTime</span>
+            <span className="hidden md:block text-center">Duration</span>
+              <span className="hidden lg:block text-center">Start Time</span>
  <span className="text-right">Action</span>
  </div>
 
@@ -655,13 +655,13 @@ export default function ExecutionsPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <Play className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NoExecuteRecord</h3>
+ <h3 className="text-base font-medium text-foreground mb-2">No execution records</h3>
  <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
- {searchQuery ? "TryotherheSearchCondition": "RunWorkflowafterwillDisplayExecuteRecord"}
+ {searchQuery ? "Try other search conditions" : "Workflow runs will show execution records here"}
  </p>
  <Link href="/dashboard/workflows">
  <Button size="sm" leftIcon={<Zap className="w-4 h-4" />}>
- ViewWorkflow
+                View Workflows
  </Button>
  </Link>
  </div>
@@ -748,7 +748,7 @@ export default function ExecutionsPage() {
  >
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <Eye className="w-4 h-4 mr-2" />
- ViewDetails
+                  View Details
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <Copy className="w-4 h-4 mr-2" />
@@ -757,7 +757,7 @@ export default function ExecutionsPage() {
  {exec.status === "failed" && (
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <RotateCcw className="w-4 h-4 mr-2" />
- re-newRun
+                  Rerun
  </DropdownMenuItem>
  )}
  <DropdownMenuSeparator className="bg-border" />

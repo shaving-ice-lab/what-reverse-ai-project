@@ -1,8 +1,7 @@
 "use client";
 
 /**
- * Webhook ManagePage - Supabase Style
- * Manage Webhook EndpointandEventSubscription
+ * Webhook management – configure endpoints and event subscriptions.
  */
 
 import { useState } from "react";
@@ -49,56 +48,56 @@ import {
 const webhooks = [
  {
  id: "wh-1",
- name: "WorkflowDoneNotifications",
+    name: "Workflow Completion Notifications",
  url: "https://api.example.com/webhooks/workflow-complete",
  events: ["workflow.completed", "workflow.failed"],
  status: "active",
  createdAt: "2026-01-15",
- lastTriggered: "10 minbefore",
+ lastTriggered: "10 min ago",
  successRate: 98.5,
  totalDeliveries: 1234,
  recentDeliveries: [
- { status: "success", time: "10 minbefore" },
- { status: "success", time: "1 hbefore" },
- { status: "failed", time: "2 hbefore" },
- { status: "success", time: "3 hbefore" },
- { status: "success", time: "5 hbefore" },
+    { status: "success", time: "10 min ago" },
+      { status: "success", time: "1 hour ago" },
+      { status: "failed", time: "2 hours ago" },
+      { status: "success", time: "3 hours ago" },
+      { status: "success", time: "5 hours ago" },
  ],
  },
  {
  id: "wh-2",
- name: "Agent ConversationCallback",
+    name: "Agent Conversation Callback",
  url: "https://api.example.com/webhooks/agent-conversation",
  events: ["agent.conversation.started", "agent.conversation.ended"],
  status: "active",
  createdAt: "2026-01-20",
- lastTriggered: "30 minbefore",
+ lastTriggered: "30 min ago",
  successRate: 100,
  totalDeliveries: 567,
  recentDeliveries: [
- { status: "success", time: "30 minbefore" },
- { status: "success", time: "1 hbefore" },
- { status: "success", time: "2 hbefore" },
+    { status: "success", time: "30 min ago" },
+      { status: "success", time: "1 hour ago" },
+      { status: "success", time: "2 hours ago" },
  ],
  },
  {
  id: "wh-3",
- name: "TeamMemberChange",
+    name: "Team Member Changes",
  url: "https://slack.com/api/webhooks/team-changes",
  events: ["team.member.added", "team.member.removed"],
  status: "paused",
  createdAt: "2026-01-10",
- lastTriggered: "2 daysbefore",
+ lastTriggered: "2 days ago",
  successRate: 95.2,
  totalDeliveries: 89,
  recentDeliveries: [
- { status: "success", time: "2 daysbefore" },
- { status: "failed", time: "3 daysbefore" },
+      { status: "success", time: "2 days ago" },
+      { status: "failed", time: "3 days ago" },
  ],
  },
  {
  id: "wh-4",
- name: "BillingEvent",
+    name: "Billing Events",
  url: "https://billing.example.com/webhooks/events",
  events: ["billing.subscription.created", "billing.payment.success", "billing.payment.failed"],
  status: "active",
@@ -108,12 +107,12 @@ const webhooks = [
  totalDeliveries: 45,
  recentDeliveries: [
  { status: "success", time: "Yesterday" },
- { status: "success", time: "3 daysbefore" },
+ { status: "success", time: "3 days ago" },
  ],
  },
 ];
 
-// canSubscription'sEvent
+// Available events for subscription
 const availableEvents = [
  { group: "Workflow", events: ["workflow.created", "workflow.updated", "workflow.deleted", "workflow.completed", "workflow.failed", "workflow.started"] },
  { group: "Agent", events: ["agent.created", "agent.updated", "agent.deleted", "agent.conversation.started", "agent.conversation.ended"] },
@@ -122,7 +121,7 @@ const availableEvents = [
  { group: "File", events: ["file.uploaded", "file.deleted", "file.shared"] },
 ];
 
-// StatusConfig
+// Status Config
 const statusConfig = {
  active: { label: "Active", color: "text-brand-500", bg: "bg-brand-200", dot: "bg-brand-500" },
  paused: { label: "Paused", color: "text-foreground-light", bg: "bg-surface-200", dot: "bg-warning" },
@@ -153,7 +152,7 @@ export default function WebhooksPage() {
 
  return (
  <div className="min-h-full bg-background-studio">
- {/* PageHeader */}
+ {/* Page Header */}
  <div className="border-b border-border bg-background-studio/95 backdrop-blur">
  <div className="max-w-6xl mx-auto px-6 py-5">
  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
@@ -163,8 +162,8 @@ export default function WebhooksPage() {
  </div>
  <div>
  <p className="page-caption">Integrations</p>
- <h1 className="text-page-title text-foreground">Webhook Manage</h1>
- <p className="text-description">ConfigEventSubscriptionandCallbackEndpoint</p>
+ <h1 className="text-page-title text-foreground">Webhook management</h1>
+ <p className="text-description">Configure event subscription and callback endpoint.</p>
  </div>
  </div>
 
@@ -177,10 +176,10 @@ export default function WebhooksPage() {
  </Button>
  </div>
 
- {/* StatisticsCard */}
+ {/* Statistics Cards */}
  <div className="page-grid grid-cols-2 md:grid-cols-4">
  <div className="page-panel p-4">
- <p className="text-[13px] text-foreground-light mb-1">totalEndpoint</p>
+ <p className="text-[13px] text-foreground-light mb-1">Total endpoints</p>
  <p className="text-xl font-semibold text-foreground">{webhooks.length}</p>
  </div>
  <div className="page-panel p-4">
@@ -188,7 +187,7 @@ export default function WebhooksPage() {
  <p className="text-xl font-semibold text-brand-500">{activeCount}</p>
  </div>
  <div className="page-panel p-4">
- <p className="text-[13px] text-foreground-light mb-1">TodayTrigger</p>
+ <p className="text-[13px] text-foreground-light mb-1">Today's triggers</p>
  <p className="text-xl font-semibold text-foreground">156</p>
  </div>
  <div className="page-panel p-4">
@@ -206,7 +205,7 @@ export default function WebhooksPage() {
  <div className="relative flex-1 max-w-md">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="Search Webhook..."
+ placeholder="Search webhooks..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border-border text-foreground placeholder:text-foreground-muted focus:border-brand-400"
@@ -220,12 +219,12 @@ export default function WebhooksPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 flex items-center justify-center mb-4">
  <Webhook className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">No Webhook</h3>
- <p className="text-[13px] text-foreground-light mb-4">Create Webhook withReceiveEventNotifications</p>
+<h3 className="text-base font-medium text-foreground mb-2">No webhooks</h3>
+ <p className="text-[13px] text-foreground-light mb-4">Create a webhook to receive event notifications.</p>
  <Button onClick={() => setShowCreateModal(true)} className="bg-brand-500 hover:bg-brand-600 text-background">
  <Plus className="w-4 h-4 mr-1" />
- Create#1 Webhook
- </Button>
+ Create webhook
+</Button>
  </div>
  ) : (
  <div className="space-y-4">
@@ -248,7 +247,7 @@ export default function WebhooksPage() {
  </Badge>
  </div>
  <p className="text-xs text-foreground-muted mt-0.5">
- Createat {webhook.createdAt}
+ Created at {webhook.createdAt}
  </p>
  </div>
  </div>
@@ -275,11 +274,11 @@ export default function WebhooksPage() {
  <DropdownMenuContent align="end">
  <DropdownMenuItem>
  <Settings className="w-4 h-4 mr-2" />
- EditConfig
+                Edit Config
  </DropdownMenuItem>
  <DropdownMenuItem>
  <Play className="w-4 h-4 mr-2" />
- TestSend
+                Test Send
  </DropdownMenuItem>
  <DropdownMenuItem>
  {webhook.status === "active" ? (
@@ -324,7 +323,7 @@ export default function WebhooksPage() {
  </Button>
  </div>
 
- {/* EventTags */}
+          {/* Event Tags */}
  <div className="flex flex-wrap gap-2 mb-4">
  {webhook.events.map((event) => (
  <Badge key={event} variant="secondary" className="text-xs font-mono bg-surface-200 text-foreground-light">
@@ -333,11 +332,11 @@ export default function WebhooksPage() {
  ))}
  </div>
 
- {/* StatisticsInfo */}
+          {/* Statistics Info */}
  <div className="flex items-center gap-6 text-[13px] text-foreground-light">
  <span className="flex items-center gap-1.5">
  <Clock className="w-4 h-4" />
- mostafterTrigger: {webhook.lastTriggered}
+ Last Trigger: {webhook.lastTriggered}
  </span>
  <span className="flex items-center gap-1.5">
  <CheckCircle2 className="w-4 h-4 text-brand-500" />
@@ -348,10 +347,10 @@ export default function WebhooksPage() {
  </span>
  </div>
 
- {/* ExpandDetails */}
+          {/* Expanded Details */}
  {selectedWebhook === webhook.id && (
  <div className="mt-4 pt-4 border-t border-border">
- <h4 className="text-[13px] font-medium text-foreground mb-3">RecentRecord</h4>
+              <h4 className="text-[13px] font-medium text-foreground mb-3">Recent Records</h4>
  <div className="space-y-2">
  {webhook.recentDeliveries.map((delivery, index) => (
  <div
@@ -374,7 +373,7 @@ export default function WebhooksPage() {
  ))}
  </div>
  <Button variant="outline" size="sm" className="mt-3 border-border text-foreground-light">
- View allLogs
+            View All Logs
  <ArrowRight className="w-4 h-4 ml-1" />
  </Button>
  </div>
@@ -385,25 +384,25 @@ export default function WebhooksPage() {
  </div>
  )}
 
- {/* DocumentLink */}
+ {/* Document Link */}
  <div className="mt-8 p-5 rounded-md bg-surface-75 border border-border">
  <div className="flex items-start gap-4">
  <div className="w-9 h-9 rounded-md bg-brand-200 flex items-center justify-center shrink-0">
  <Code className="w-4 h-4 text-brand-500" />
  </div>
  <div className="flex-1">
- <h3 className="text-sm font-medium text-foreground mb-1">Webhook DevelopmentGuide</h3>
+ <h3 className="text-sm font-medium text-foreground mb-1">Webhook development guide</h3>
  <p className="text-[13px] text-foreground-light mb-3">
- ifwhatConfigandProcess Webhook Event, IncludeBioVerify, RetryMechanismetc
+ How to configure and process webhook events, including signature verification and retry mechanism.
  </p>
  <div className="flex items-center gap-4">
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Code className="w-4 h-4 mr-1" />
- ViewDocument
+ View documentation
  </Button>
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Shield className="w-4 h-4 mr-1" />
- SecurityBest Practices
+ Security best practices
  </Button>
  </div>
  </div>
@@ -421,7 +420,7 @@ export default function WebhooksPage() {
  <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-surface-100 rounded-md border border-border z-50 max-h-[80vh] overflow-auto">
  <div className="p-5 border-b border-border">
  <h2 className="text-base font-semibold text-foreground">Create Webhook</h2>
- <p className="text-[13px] text-foreground-light">Confignew'sEventSubscriptionEndpoint</p>
+ <p className="text-[13px] text-foreground-light">Configure a new event subscription endpoint.</p>
  </div>
 
  <div className="p-5 space-y-4">
@@ -429,7 +428,7 @@ export default function WebhooksPage() {
  <label className="block text-[13px] font-medium text-foreground mb-2">
  Name
  </label>
- <Input placeholder="exampleif: WorkflowDoneNotifications" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="e.g. Workflow done notifications" className="h-9 bg-surface-200 border-border" />
  </div>
 
  <div>
@@ -441,8 +440,8 @@ export default function WebhooksPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- SubscriptionEvent
- </label>
+Subscription events
+</label>
  <div className="space-y-4 max-h-48 overflow-auto p-3 rounded-md bg-surface-200">
  {availableEvents.map((group) => (
  <div key={group.group}>
@@ -462,17 +461,17 @@ export default function WebhooksPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Secret(Optional)
- </label>
- <div className="flex gap-2">
- <Input type="password" placeholder="Used forBioVerify" className="flex-1 h-9 bg-surface-200 border-border" />
+Secret (optional)
+</label>
+<div className="flex gap-2">
+<Input type="password" placeholder="Used to verify request signature" className="flex-1 h-9 bg-surface-200 border-border" />
  <Button variant="outline" className="border-border text-foreground-light">
  <Key className="w-4 h-4 mr-1" />
  Generate
  </Button>
  </div>
  <p className="text-xs text-foreground-muted mt-1">
- Used forVerify Webhook Request'sBio
+ Used to verify webhook request identity
  </p>
  </div>
  </div>

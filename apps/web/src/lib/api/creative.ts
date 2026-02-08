@@ -1,7 +1,7 @@
 /**
- * AI CreativeAssistant API Customerendpoint
+ * AI Creative Assistant API Client
  * 
- * ProvideTemplate, GenerateTask, DocumentManage's API Call
+ * Provides template, generation task, and document management API calls
  */
 
 import { api } from "./index";
@@ -21,7 +21,7 @@ import type {
 // ===== Template API =====
 
 /**
- * FetchTemplateListParameter
+ * Get template list parameters
  */
 export interface GetTemplatesParams {
  category?: CreativeTemplateCategory;
@@ -33,7 +33,7 @@ export interface GetTemplatesParams {
 }
 
 /**
- * TemplateListResponse
+ * Template list response
  */
 export interface TemplatesResponse {
  items: CreativeTemplate[];
@@ -43,7 +43,7 @@ export interface TemplatesResponse {
 }
 
 /**
- * FetchTemplateList
+ * Get template list
  */
 export async function getTemplates(params?: GetTemplatesParams): Promise<TemplatesResponse> {
  const searchParams = new URLSearchParams();
@@ -61,14 +61,14 @@ export async function getTemplates(params?: GetTemplatesParams): Promise<Templat
 }
 
 /**
- * FetchTemplateDetails
+ * Get template details
  */
 export async function getTemplate(id: string): Promise<CreativeTemplate> {
  return api.get<CreativeTemplate>(`/creative/templates/${id}`);
 }
 
 /**
- * FetchTemplateCategoryList
+ * Get template category list
  */
 export interface TemplateCategoryInfo {
  id: CreativeTemplateCategory;
@@ -83,31 +83,31 @@ export async function getTemplateCategories(): Promise<TemplateCategoryInfo[]> {
 }
 
 /**
- * FetchRecommendedTemplate
+ * Get featured templates
  */
 export async function getFeaturedTemplates(limit = 6): Promise<CreativeTemplate[]> {
  const response = await getTemplates({ featured: true, pageSize: limit });
  return response.items;
 }
 
-// ===== GenerateTask API =====
+// ===== Generation Task API =====
 
 /**
- * CreateGenerateTask
+ * Create generation task
  */
 export async function createTask(data: CreateTaskRequest): Promise<CreateTaskResponse> {
  return api.post<CreateTaskResponse>("/creative/generate", data);
 }
 
 /**
- * FetchTaskStatus
+ * Get task status
  */
 export async function getTaskStatus(taskId: string): Promise<CreativeTask> {
  return api.get<CreativeTask>(`/creative/generate/${taskId}`);
 }
 
 /**
- * FetchTaskList
+ * Get task list
  */
 export interface GetTasksParams {
  status?: string;
@@ -133,14 +133,14 @@ export async function getTasks(params?: GetTasksParams): Promise<TasksResponse> 
 }
 
 /**
- * CancelGenerateTask
+ * Cancel generation task
  */
 export async function cancelTask(taskId: string): Promise<void> {
  return api.post(`/creative/generate/${taskId}/cancel`, {});
 }
 
 /**
- * Create SSE ConnectFetchReal-timeUpdate
+ * Create SSE connection to receive real-time updates
  */
 export function subscribeToTask(taskId: string): EventSource {
  const baseUrl = getApiBaseUrl();
@@ -151,7 +151,7 @@ export function subscribeToTask(taskId: string): EventSource {
 // ===== Document API =====
 
 /**
- * FetchDocumentListParameter
+ * Get document list parameters
  */
 export interface GetDocumentsParams {
  search?: string;
@@ -161,7 +161,7 @@ export interface GetDocumentsParams {
 }
 
 /**
- * DocumentListResponse
+ * Document list response
  */
 export interface DocumentsResponse {
  items: CreativeDocument[];
@@ -171,7 +171,7 @@ export interface DocumentsResponse {
 }
 
 /**
- * FetchDocumentList
+ * Get document list
  */
 export async function getDocuments(params?: GetDocumentsParams): Promise<DocumentsResponse> {
  const searchParams = new URLSearchParams();
@@ -185,14 +185,14 @@ export async function getDocuments(params?: GetDocumentsParams): Promise<Documen
 }
 
 /**
- * FetchDocument
+ * Get document
  */
 export async function getDocument(id: string): Promise<CreativeDocument> {
  return api.get<CreativeDocument>(`/creative/documents/${id}`);
 }
 
 /**
- * UpdateDocument
+ * Update document
  */
 export interface UpdateDocumentData {
  title?: string;
@@ -205,14 +205,14 @@ export async function updateDocument(id: string, data: UpdateDocumentData): Prom
 }
 
 /**
- * DeleteDocument
+ * Delete document
  */
 export async function deleteDocument(id: string): Promise<void> {
  return api.delete(`/creative/documents/${id}`);
 }
 
 /**
- * ExportDocument
+ * Export document
  */
 export async function exportDocument(id: string, format: ExportFormat): Promise<Blob> {
  const baseUrl = getApiBaseUrl();
@@ -225,14 +225,14 @@ export async function exportDocument(id: string, format: ExportFormat): Promise<
  );
  
  if (!response.ok) {
- throw new Error("ExportFailed");
+ throw new Error("Export failed");
  }
  
  return response.blob();
 }
 
 /**
- * re-newGenerateChapter
+ * Regenerate section
  */
 export interface RegenerateSectionRequest {
  sectionId: string;
@@ -259,7 +259,7 @@ export async function regenerateSection(
 }
 
 /**
- * FetchChapterVersion History
+ * Get section version history
  */
 export interface SectionVersion {
  id: string;
@@ -283,7 +283,7 @@ export async function getSectionVersions(
 // ===== Share API =====
 
 /**
- * CreateShareLink
+ * Create share link
  */
 export async function createShare(data: CreateShareRequest): Promise<CreateShareResponse> {
  return api.post<CreateShareResponse>(
@@ -297,14 +297,14 @@ export async function createShare(data: CreateShareRequest): Promise<CreateShare
 }
 
 /**
- * DeleteShare
+ * Delete share
  */
 export async function deleteShare(documentId: string): Promise<void> {
  return api.delete(`/creative/documents/${documentId}/share`);
 }
 
 /**
- * ViaShareLinkFetchDocument (PublicAccess)
+ * Get document via share link (public access)
  */
 export async function getSharedDocument(shareId: string, password?: string): Promise<CreativeDocument> {
  const searchParams = new URLSearchParams();

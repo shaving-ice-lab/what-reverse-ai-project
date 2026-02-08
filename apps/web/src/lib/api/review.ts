@@ -25,11 +25,11 @@ import { request } from "./shared";
  */
 export const reviewApi = {
  // =====================
- // ReviewQueueManage
+ // Review Queue Management
  // =====================
 
  /**
- * FetchReviewQueueList
+ * Fetch review queue list
  */
  async list(params?: ListReviewQueueParams): Promise<ListReviewQueueResponse> {
  const searchParams = new URLSearchParams();
@@ -47,21 +47,21 @@ export const reviewApi = {
  },
 
  /**
- * FetchReviewDetails
+ * Fetch review details
  */
  async get(reviewId: string): Promise<GetReviewDetailResponse> {
  return request<GetReviewDetailResponse>(`/reviews/${reviewId}`);
  },
 
  /**
- * FetchReviewStatistics
+ * Fetch review statistics
  */
  async getStats(): Promise<GetReviewStatsResponse> {
  return request<GetReviewStatsResponse>("/reviews/stats");
  },
 
  /**
- * SubmitReview
+ * Submit review
  */
  async submit(data: SubmitReviewRequest): Promise<SubmitReviewResponse> {
  return request<SubmitReviewResponse>("/reviews", {
@@ -71,7 +71,7 @@ export const reviewApi = {
  },
 
  /**
- * ExecuteReviewAction(Via/Deny/needEdit)
+ * Execute review action (Approve/Reject/Request Changes)
  */
  async review(reviewId: string, data: ReviewActionRequest): Promise<ReviewActionResponse> {
  return request<ReviewActionResponse>(`/reviews/${reviewId}/review`, {
@@ -81,7 +81,7 @@ export const reviewApi = {
  },
 
  /**
- * AllocateReview
+ * Assign reviewer
  */
  async assign(reviewId: string, data: AssignReviewerRequest): Promise<ReviewActionResponse> {
  return request<ReviewActionResponse>(`/reviews/${reviewId}/assign`, {
@@ -91,7 +91,7 @@ export const reviewApi = {
  },
 
  /**
- * CancelReview
+ * Cancel review
  */
  async cancel(reviewId: string, reason?: string): Promise<ReviewActionResponse> {
  return request<ReviewActionResponse>(`/reviews/${reviewId}/cancel`, {
@@ -101,7 +101,7 @@ export const reviewApi = {
  },
 
  /**
- * re-newSubmitReview(Editafter)
+ * Resubmit review (after edits)
  */
  async resubmit(reviewId: string, note?: string): Promise<ReviewActionResponse> {
  return request<ReviewActionResponse>(`/reviews/${reviewId}/resubmit`, {
@@ -111,18 +111,18 @@ export const reviewApi = {
  },
 
  // =====================
- // ReviewComment
+ // Review Comments
  // =====================
 
  /**
- * FetchReviewCommentList
+ * Fetch review comment list
  */
  async getComments(reviewId: string): Promise<{ success: boolean; data: import("@/types/review").ReviewComment[] }> {
  return request(`/reviews/${reviewId}/comments`);
  },
 
  /**
- * CreateComment
+ * Create comment
  */
  async createComment(reviewId: string, data: CreateCommentRequest): Promise<CommentResponse> {
  return request<CommentResponse>(`/reviews/${reviewId}/comments`, {
@@ -132,7 +132,7 @@ export const reviewApi = {
  },
 
  /**
- * DeleteComment
+ * Delete comment
  */
  async deleteComment(reviewId: string, commentId: string): Promise<{ success: boolean; message: string }> {
  return request(`/reviews/${reviewId}/comments/${commentId}`, {
@@ -141,7 +141,7 @@ export const reviewApi = {
  },
 
  /**
- * ResolveComment
+ * Resolve comment
  */
  async resolveComment(reviewId: string, commentId: string): Promise<CommentResponse> {
  return request<CommentResponse>(`/reviews/${reviewId}/comments/${commentId}/resolve`, {
@@ -150,22 +150,22 @@ export const reviewApi = {
  },
 
  // =====================
- // ReviewCheck
+ // Review Checklists
  // =====================
 
  /**
- * FetchReviewCheckTemplate
+ * Fetch review checklist template
  */
  async getChecklist(itemType: ReviewItemType): Promise<GetChecklistResponse> {
  return request<GetChecklistResponse>(`/reviews/checklists/${itemType}`);
  },
 
  // =====================
- // ReviewManage
+ // Reviewer Management
  // =====================
 
  /**
- * FetchReviewList
+ * Fetch reviewer list
  */
  async getReviewers(params?: { isActive?: boolean; page?: number; pageSize?: number }): Promise<ListReviewersResponse> {
  const searchParams = new URLSearchParams();
@@ -183,7 +183,7 @@ export const reviewApi = {
  },
 
  /**
- * FetchI'sReviewTask
+ * Fetch my review tasks
  */
  async getMyTasks(params?: { status?: string; page?: number; pageSize?: number }): Promise<ListReviewQueueResponse> {
  const searchParams = new URLSearchParams();
@@ -201,7 +201,7 @@ export const reviewApi = {
  },
 
  /**
- * FetchISubmit'sReview
+ * Fetch my submitted reviews
  */
  async getMySubmissions(params?: { status?: string; page?: number; pageSize?: number }): Promise<ListReviewQueueResponse> {
  const searchParams = new URLSearchParams();
@@ -219,11 +219,11 @@ export const reviewApi = {
  },
 
  // =====================
- // BatchAction
+ // Batch Actions
  // =====================
 
  /**
- * BatchReview
+ * Batch review
  */
  async batchReview(reviewIds: string[], data: ReviewActionRequest): Promise<{ success: boolean; data: { succeeded: string[]; failed: string[] }; message: string }> {
  return request(`/reviews/batch-review`, {
@@ -233,7 +233,7 @@ export const reviewApi = {
  },
 
  /**
- * BatchAllocate
+ * Batch assign
  */
  async batchAssign(reviewIds: string[], reviewerId: string): Promise<{ success: boolean; data: { succeeded: string[]; failed: string[] }; message: string }> {
  return request(`/reviews/batch-assign`, {

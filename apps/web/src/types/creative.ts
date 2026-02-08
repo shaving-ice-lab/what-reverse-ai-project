@@ -1,37 +1,37 @@
 /**
- * AI CreativeAssistantTypeDefinition
+ * AI Creative Assistant Type Definitions
  * 
- * Used forTemplateSystem, GenerateTaskandDocumentManage
+ * Used for template system, generation tasks, and document management
  */
 
-// ===== TemplateCategory =====
+// ===== Template Category =====
 
 /**
- * CreativeTemplateCategory
+ * Creative template category
  */
 export type CreativeTemplateCategory = 
- | "business" // 
- | "content" // ContentMarketing
- | "product" // ProductPlanning
- | "marketing"; // EnterpriseService
+ | "business" // Business
+ | "content" // Content Marketing
+ | "product" // Product Planning
+ | "marketing"; // Enterprise Service
 
-// ===== InputFieldType =====
+// ===== Input Field Type =====
 
 /**
- * InputFieldType
+ * Input field type
  */
 export type InputFieldType = 
- | "text" // rowText
- | "textarea" // multiplerowText
- | "number" // countchar
- | "select" // selectdown
- | "multiselect" // multipleselectdown
+ | "text" // Single-line text
+ | "textarea" // Multi-line text
+ | "number" // Number
+ | "select" // Dropdown select
+ | "multiselect" // Multi-select dropdown
  | "slider" // Slider
  | "switch" // Toggle
  | "date"; // Date
 
 /**
- * downOption
+ * Dropdown option
  */
 export interface SelectOption {
  value: string;
@@ -40,7 +40,7 @@ export interface SelectOption {
 }
 
 /**
- * InputFieldVerifyRule
+ * Input field validation rules
  */
 export interface InputValidation {
  required?: boolean;
@@ -53,164 +53,164 @@ export interface InputValidation {
 }
 
 /**
- * InputFieldDefinition
+ * Input field definition
  * 
- * Used forDefinitionTemplate'sInputFormField
+ * Used for defining template input form fields
  */
 export interface InputField {
- /** Field1Identifier */
+ /** Field unique identifier */
  id: string;
  
- /** FieldDisplayTags */
+ /** Field display label */
  label: string;
  
- /** FieldType */
+ /** Field type */
  type: InputFieldType;
  
- /** TipText */
+ /** Placeholder text */
  placeholder?: string;
  
- /** HelpDescriptionText */
+ /** Help description text */
  helpText?: string;
  
- /** Defaultvalue */
+ /** Default value */
  defaultValue?: string | number | boolean | string[];
  
- /** downOption (select/multiselect TypeUsage) */
+ /** Dropdown options (used for select/multiselect types) */
  options?: SelectOption[];
  
- /** VerifyRule */
+ /** Validation rules */
  validation?: InputValidation;
  
- /** isnoEnable AI Suggestion */
+ /** Whether to enable AI suggestions */
  aiSuggest?: boolean;
  
- /** AI SuggestionPrompt (aiSuggest=true timeUsage) */
+ /** AI suggestion prompt (used when aiSuggest=true) */
  aiSuggestPrompt?: string;
  
- /** ConditionDisplay (DependencyotherheField'svalue) */
+ /** Conditional display (depends on another field's value) */
  showWhen?: {
- field: string;
- operator: "eq" | "neq" | "contains" | "notEmpty";
- value?: string | number | boolean;
+   field: string;
+   operator: "eq" | "neq" | "contains" | "notEmpty";
+   value?: string | number | boolean;
  };
 }
 
-// ===== OutputChapterType =====
+// ===== Output Section Type =====
 
 /**
- * OutputChapterDefinition
+ * Output section definition
  * 
- * Used forDefinitionGenerateDocument'sChapterStructure
+ * Used for defining generated document section structure
  */
 export interface OutputSection {
- /** Chapter1Identifier */
+ /** Section unique identifier */
  id: string;
  
- /** ChapterTitle */
+ /** Section title */
  title: string;
  
- /** ChapterDescription */
+ /** Section description */
  description: string;
  
- /** GenerateChapter'sPromptTemplate */
+ /** Prompt template for generating this section */
  promptTemplate: string;
  
- /** ChapterIcon */
+ /** Section icon */
  icon?: string;
  
- /** EstimatedGenerateTime(s) */
+ /** Estimated generation time (seconds) */
  estimatedTime?: number;
  
- /** Dependency'sbeforeChapter (needetcpendingthisChapterDone) */
+ /** Dependent preceding sections (must wait for these to complete) */
  dependsOn?: string[];
  
- /** isnocanwithIndependentre-newGenerate */
+ /** Whether it can be independently regenerated */
  regeneratable?: boolean;
  
- /** OutputFormat */
+ /** Output format */
  outputFormat?: "markdown" | "json" | "table" | "list";
 }
 
-// ===== TemplatemainStructure =====
+// ===== Template Main Structure =====
 
 /**
- * TemplateExample
+ * Template example
  */
 export interface TemplateExample {
- /** ExampleInputData */
+ /** Example input data */
  input: Record<string, unknown>;
  
- /** ExampleOutput (Markdown Format) */
+ /** Example output (Markdown format) */
  output: string;
  
- /** ExampleTitle */
+ /** Example title */
  title?: string;
  
- /** ExampleDescription */
+ /** Example description */
  description?: string;
 }
 
 /**
- * CreativeTemplateDefinition
+ * Creative template definition
  * 
- * AI CreativeAssistant'sCoreDataStructure, DefinitionTemplate'sCompleteConfig
+ * AI creative assistant's core data structure, defines the complete template configuration
  */
 export interface CreativeTemplate {
- /** Template1Identifier */
+ /** Template unique identifier */
  id: string;
  
- /** TemplateName */
+ /** Template name */
  name: string;
  
- /** TemplateDescription */
+ /** Template description */
  description: string;
  
- /** TemplateIcon */
+ /** Template icon */
  icon: string;
  
- /** TemplateCategory */
+ /** Template category */
  category: CreativeTemplateCategory;
  
- /** InputFieldDefinition */
+ /** Input field definitions */
  inputs: {
- /** RequiredField */
- required: InputField[];
- /** selectField */
- optional: InputField[];
+   /** Required fields */
+   required: InputField[];
+   /** Optional fields */
+   optional: InputField[];
  };
  
- /** OutputChapterDefinition */
+ /** Output section definitions */
  outputSections: OutputSection[];
  
- /** Associate'sWorkflowID */
+ /** Associated workflow ID */
  workflowId: string;
  
- /** TemplateExample */
+ /** Template example */
  example?: TemplateExample;
  
- /** Usagetimescount */
+ /** Usage count */
  usageCount: number;
  
  /** Rating (1-5) */
  rating: number;
  
- /** ReviewsCount */
+ /** Review count */
  reviewCount: number;
  
  /** Tags */
  tags: string[];
  
- /** EstimatedGenerateTime(s) */
+ /** Estimated generation time (seconds) */
  estimatedTime?: number;
  
- /** isnoasmethodTemplate */
+ /** Whether it is an official template */
  isOfficial?: boolean;
  
- /** CreateuserID */
+ /** Creator user ID */
  creatorId?: string;
  
- /** CreateuserName */
+ /** Creator user name */
  creatorName?: string;
  
  /** Version Number */
@@ -223,63 +223,63 @@ export interface CreativeTemplate {
  updatedAt: string;
 }
 
-// ===== GenerateTaskType =====
+// ===== Generation Task Type =====
 
 /**
- * GenerateTaskStatus
+ * Generation task status
  */
 export type CreativeTaskStatus =
- | "pending" // etcpendingStart
+ | "pending" // Awaiting start
  | "processing" // Processing
  | "completed" // Completed
  | "failed" // Failed
  | "cancelled"; // Cancelled
 
 /**
- * ChapterGenerateStatus
+ * Section generation status
  */
 export type SectionStatus =
- | "pending" // etcpendingGenerate
+ | "pending" // Awaiting generation
  | "generating" // Generating
  | "completed" // Completed
  | "failed" // Failed
- | "skipped"; // alreadySkip
+ | "skipped"; // Skipped
 
 /**
- * ChapterStatusInfo
+ * Section status info
  */
 export interface SectionState {
- /** ChapterID */
+ /** Section ID */
  sectionId: string;
  
- /** ChapterStatus */
+ /** Section status */
  status: SectionStatus;
  
- /** Generate'sContent */
+ /** Generated content */
  content?: string;
  
- /** StartTime */
+ /** Start time */
  startedAt?: string;
  
- /** DoneTime */
+ /** Completion time */
  completedAt?: string;
  
- /** Duration(s) */
+ /** Duration (ms) */
  durationMs?: number;
  
- /** ErrorInfo */
+ /** Error info */
  error?: string;
  
- /** Token Consumption */
+ /** Token consumption */
  tokenUsage?: {
- prompt: number;
- completion: number;
- total: number;
+   prompt: number;
+   completion: number;
+   total: number;
  };
 }
 
 /**
- * Token UsageStatistics
+ * Token usage statistics
  */
 export interface TokenUsageStats {
  prompt: number;
@@ -288,162 +288,162 @@ export interface TokenUsageStats {
 }
 
 /**
- * CreativeGenerateTask
+ * Creative generation task
  * 
- * Record1timesGenerateTask'sCompleteStatus
+ * Records the complete status of a generation task
  */
 export interface CreativeTask {
- /** Task1Identifier */
+ /** Task unique identifier */
  id: string;
  
- /** UserID */
+ /** User ID */
  userId: string;
  
- /** Usage'sTemplateID */
+ /** Template ID used */
  templateId: string;
  
- /** UserInputData */
+ /** User input data */
  inputs: Record<string, unknown>;
  
- /** TaskStatus */
+ /** Task status */
  status: CreativeTaskStatus;
  
- /** ChapterStatus */
+ /** Section states */
  sections: Record<string, SectionState>;
  
- /** Done'sChaptercount */
+ /** Completed section count */
  completedSections: number;
  
- /** totalChaptercount */
+ /** Total section count */
  totalSections: number;
  
- /** ProgressPercentage (0-100) */
+ /** Progress percentage (0-100) */
  progress: number;
  
- /** mostOutput (Markdown Format) */
+ /** Final output (Markdown format) */
  outputMarkdown?: string;
  
- /** OutputData */
+ /** Output metadata */
  outputMetadata?: {
- title: string;
- wordCount: number;
- characterCount: number;
+   title: string;
+   wordCount: number;
+   characterCount: number;
  };
  
- /** SearchResultCache */
+ /** Search result cache */
  searchCache?: Record<string, unknown>;
  
- /** Token ConsumptionStatistics */
+ /** Token consumption statistics */
  tokenUsage: TokenUsageStats;
  
- /** EstimatedRemainingTime(s) */
+ /** Estimated remaining time (seconds) */
  estimatedRemainingTime?: number;
  
- /** ErrorInfo */
+ /** Error info */
  errorMessage?: string;
  
- /** StartTime */
+ /** Start time */
  startedAt?: string;
  
- /** DoneTime */
+ /** Completion time */
  completedAt?: string;
  
  /** Created At */
  createdAt: string;
 }
 
-// ===== DocumentType =====
+// ===== Document Type =====
 
 /**
- * DocumentChapter
+ * Document section
  */
 export interface DocumentSection {
- /** ChapterID */
+ /** Section ID */
  id: string;
  
- /** ChapterTitle */
+ /** Section title */
  title: string;
  
- /** ChapterContent (Markdown) */
+ /** Section content (Markdown) */
  content: string;
  
- /** ChapterOrder */
+ /** Section order */
  order: number;
  
- /** isnoalreadyEdit */
+ /** Whether it has been edited */
  isEdited?: boolean;
  
- /** Version Number */
+ /** Version number */
  version: number;
  
- /** Version History */
+ /** Version history */
  history?: {
- content: string;
- editedAt: string;
- version: number;
+   content: string;
+   editedAt: string;
+   version: number;
  }[];
 }
 
 /**
- * ShareSettings
+ * Share settings
  */
 export interface ShareSettings {
- /** ShareID (Used forGenerateShareLink) */
+ /** Share ID (used for generating share link) */
  shareId: string;
  
- /** isnoPublic */
+ /** Whether it is public */
  isPublic: boolean;
  
- /** AccessPassword (Optional) */
+ /** Access password (optional) */
  password?: string;
  
- /** ExpiredTime (Optional) */
+ /** Expiration time (optional) */
  expiresAt?: string;
  
- /** isnoAllowDownload */
+ /** Whether downloads are allowed */
  allowDownload: boolean;
  
- /** Accesstimescount */
+ /** View count */
  viewCount: number;
 }
 
 /**
- * CreativeDocument
+ * Creative document
  * 
- * GenerateTaskDoneafterSave'sDocument
+ * Document saved after generation task completes
  */
 export interface CreativeDocument {
- /** Document1Identifier */
+ /** Document unique identifier */
  id: string;
  
- /** UserID */
+ /** User ID */
  userId: string;
  
- /** Associate'sTaskID */
+ /** Associated task ID */
  taskId: string;
  
- /** Usage'sTemplateID */
+ /** Template ID used */
  templateId: string;
  
- /** DocumentTitle */
+ /** Document title */
  title: string;
  
- /** CompleteContent (Markdown Format) */
+ /** Complete content (Markdown format) */
  content: string;
  
- /** ChapterList */
+ /** Section list */
  sections: DocumentSection[];
  
- /** Version Number */
+ /** Version number */
  version: number;
  
- /** VersionID (Used forVersion) */
+ /** Parent version ID (for versioning) */
  parentId?: string;
  
- /** ShareSettings */
+ /** Share settings */
  share?: ShareSettings;
  
- /** isnoFavorite */
+ /** Whether it is starred */
  isStarred: boolean;
  
  /** Tags */
@@ -456,43 +456,43 @@ export interface CreativeDocument {
  updatedAt: string;
 }
 
-// ===== SSE EventType =====
+// ===== SSE Event Type =====
 
 /**
- * SSE EventType
+ * SSE event type
  */
 export type CreativeSSEEventType =
- | "task:started" // TaskStart
- | "section:start" // ChapterStartGenerate
- | "section:content" // ChapterContentFragment
- | "section:complete" // ChapterGenerateDone
- | "section:error" // ChapterGenerateFailed
- | "task:progress" // TaskProgressUpdate
- | "task:complete" // TaskDone
- | "task:error" // TaskFailed
- | "search:start" // SearchStart
- | "search:complete"; // SearchDone
+ | "task:started" // Task started
+ | "section:start" // Section generation started
+ | "section:content" // Section content fragment
+ | "section:complete" // Section generation completed
+ | "section:error" // Section generation failed
+ | "task:progress" // Task progress update
+ | "task:complete" // Task completed
+ | "task:error" // Task failed
+ | "search:start" // Search started
+ | "search:complete"; // Search completed
 
 /**
- * SSE EventPayload
+ * SSE event payload
  */
 export interface CreativeSSEEvent {
  type: CreativeSSEEventType;
  data: {
- taskId: string;
- sectionId?: string;
- content?: string;
- progress?: number;
- error?: string;
- metadata?: Record<string, unknown>;
+   taskId: string;
+   sectionId?: string;
+   content?: string;
+   progress?: number;
+   error?: string;
+   metadata?: Record<string, unknown>;
  };
  timestamp: string;
 }
 
-// ===== API Request/ResponseType =====
+// ===== API Request/Response Type =====
 
 /**
- * CreateGenerateTaskRequest
+ * Create generation task request
  */
 export interface CreateTaskRequest {
  templateId: string;
@@ -500,7 +500,7 @@ export interface CreateTaskRequest {
 }
 
 /**
- * CreateGenerateTaskResponse
+ * Create generation task response
  */
 export interface CreateTaskResponse {
  taskId: string;
@@ -509,7 +509,7 @@ export interface CreateTaskResponse {
 }
 
 /**
- * re-newGenerateChapterRequest
+ * Regenerate section request
  */
 export interface RegenerateSectionRequest {
  documentId: string;
@@ -518,12 +518,12 @@ export interface RegenerateSectionRequest {
 }
 
 /**
- * DocumentExportFormat
+ * Document export format
  */
 export type ExportFormat = "markdown" | "pdf" | "docx" | "html";
 
 /**
- * CreateShareLinkRequest
+ * Create share link request
  */
 export interface CreateShareRequest {
  documentId: string;
@@ -533,7 +533,7 @@ export interface CreateShareRequest {
 }
 
 /**
- * CreateShareLinkResponse
+ * Create share link response
  */
 export interface CreateShareResponse {
  shareId: string;

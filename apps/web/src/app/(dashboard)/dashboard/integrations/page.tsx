@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * IntegrationMarketplacePage
- * ShowcaseAvailable'sThird-partyServiceIntegrationandPlugin
+ * Integration Marketplace Page
+ * Showcases available third-party service integrations and plugins
  */
 
 import { useMemo, useState } from "react";
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 import { Download, ExternalLink, Key, Plus, Search, Settings, Star } from "lucide-react";
 
-// CollectionFilter(for Supabase Integrations)
+// Collection filter (for Supabase Integrations)
 const collections = [
  { id: "all", label: "All" },
  { id: "wrappers", label: "Wrappers" },
@@ -37,12 +37,12 @@ const releaseBadgeVariant = {
  beta: "warning",
 } as const;
 
-// IntegrationData
+// Integration data
 const integrations = [
  {
  id: "cron",
  name: "Cron",
- description: "at Postgres ScheduleweeksTask, DrivenProcessandAutomationTrigger.",
+ description: "Schedule tasks, drive processes and automation triggers.",
  collection: "modules",
  icon: "⏱️",
  color: "bg-surface-200",
@@ -51,12 +51,12 @@ const integrations = [
  popular: true,
  installs: 8600,
  rating: 4.8,
- features: ["PlanTask", "TimezoneSchedule", "FailedRetry"],
+ features: ["Scheduled Tasks", "Timezone Scheduling", "Retry on Failure"],
  },
  {
  id: "queues",
  name: "Queues",
- description: "MessageQueue, asWorkflowTaskProvideLatencyandConcurrencyControl.",
+ description: "Message queue for workflow tasks with latency and concurrency control.",
  collection: "modules",
  icon: "📦",
  color: "bg-surface-200",
@@ -65,12 +65,12 @@ const integrations = [
  popular: true,
  installs: 9200,
  rating: 4.7,
- features: ["LatencyQueue", "ConcurrencyControl", "RetryPolicy"],
+ features: ["Latency Queue", "Concurrency Control", "Retry Policy"],
  },
  {
  id: "db-webhooks",
  name: "Database Webhooks",
- description: "willDatabaseEventReal-timePushoutsidesectionSystemorWorkflowEndpoint.",
+ description: "Database events are pushed in real time to external systems or workflow endpoints.",
  collection: "modules",
  icon: "🔗",
  color: "bg-surface-200",
@@ -79,12 +79,12 @@ const integrations = [
  popular: true,
  installs: 6800,
  rating: 4.6,
- features: ["EventSubscription", "BioValidate", "re-Protect"],
+ features: ["Event Subscription", "Payload Validation", "Replay Protection"],
  },
  {
  id: "graphql",
  name: "GraphQL",
- description: "Usage GraphQL QueryWorkflowData, andProvideInteractive IDE.",
+ description: "Query workflow data with GraphQL and an interactive IDE.",
  collection: "graphql",
  icon: "🔺",
  color: "bg-surface-200",
@@ -93,12 +93,12 @@ const integrations = [
  popular: true,
  installs: 10400,
  rating: 4.8,
- features: ["Schema Generate", "GraphiQL", "PermissionControl"],
+ features: ["Schema Generation", "GraphiQL", "Permission Control"],
  },
  {
  id: "vault",
  name: "Vault",
- description: "AppEncryptandKeyManage, ProtectSensitiveand.",
+ description: "App encryption and key management, protect sensitive data.",
  collection: "vault",
  icon: "🛡️",
  color: "bg-surface-200",
@@ -108,12 +108,12 @@ const integrations = [
  popular: false,
  installs: 3500,
  rating: 4.4,
- features: ["KeyRotation", "FieldEncrypt", "Audit Log"],
+ features: ["Key Rotation", "Field Encryption", "Audit Log"],
  },
  {
  id: "slack",
  name: "Slack",
- description: "will AI Workflowand Slack Integration, AutoSendNotificationsandMessage.",
+ description: "AI workflow and Slack integration; auto-send notifications and messages.",
  collection: "wrappers",
  icon: "🔔",
  color: "bg-surface-200",
@@ -122,12 +122,12 @@ const integrations = [
  popular: true,
  installs: 12500,
  rating: 4.8,
- features: ["MessageNotifications", "WorkflowTrigger", "ChannelManage"],
+ features: ["Message Notifications", "Workflow Triggers", "Channel Management"],
  },
  {
  id: "google-drive",
  name: "Google Drive",
- description: "Connect Google Drive, AutoSyncFileandDocument.",
+ description: "Connect Google Drive and auto-sync files and documents.",
  collection: "wrappers",
  icon: "📁",
  color: "bg-surface-200",
@@ -136,12 +136,12 @@ const integrations = [
  popular: true,
  installs: 18200,
  rating: 4.9,
- features: ["FileSync", "AutoBackup", "PermissionManage"],
+ features: ["File Sync", "Auto Backup", "Permission Management"],
  },
  {
  id: "notion",
  name: "Notion",
- description: "and Notion DatabaseIntegration, AutoUpdateandCreatePage.",
+ description: "Notion database integration; auto-update and create pages.",
  collection: "wrappers",
  icon: "📝",
  color: "bg-surface-200",
@@ -150,12 +150,12 @@ const integrations = [
  popular: true,
  installs: 15800,
  rating: 4.7,
- features: ["DatabaseSync", "PageCreate", "ContentExport"],
+ features: ["Database Sync", "Page Creation", "Content Export"],
  },
  {
  id: "github",
  name: "GitHub",
- description: "Connect GitHub Repository, AutomationCodeReviewand Issue Manage.",
+ description: "Connect GitHub; automate code review and issue management.",
  collection: "wrappers",
  icon: "🐙",
  color: "bg-surface-200",
@@ -164,12 +164,12 @@ const integrations = [
  popular: true,
  installs: 9800,
  rating: 4.6,
- features: ["CodeReview", "Issue Automation", "PR Manage"],
+ features: ["Code Review", "Issue Automation", "PR Management"],
  },
  {
  id: "salesforce",
  name: "Salesforce",
- description: "and Salesforce CRM Integration, AutomationCustomerDataManage.",
+ description: "Salesforce CRM integration; automate customer data management.",
  collection: "wrappers",
  icon: "☁️",
  color: "bg-surface-200",
@@ -179,12 +179,12 @@ const integrations = [
  popular: false,
  installs: 5200,
  rating: 4.5,
- features: ["CustomerSync", "SalesAutomation", "ReportGenerate"],
+ features: ["Customer Sync", "Sales Automation", "Report Generation"],
  },
  {
  id: "zapier",
  name: "Zapier",
- description: "Via Zapier Connectcount1000App.",
+ description: "Connect to thousands of apps via Zapier.",
  collection: "wrappers",
  icon: "⚡",
  color: "bg-surface-200",
@@ -193,12 +193,12 @@ const integrations = [
  popular: true,
  installs: 22000,
  rating: 4.8,
- features: ["multipleAppConnect", "AutomationWorkflow", "ConditionTrigger"],
+ features: ["Multi-App Connect", "Automation Workflows", "Conditional Triggers"],
  },
  {
  id: "airtable",
  name: "Airtable",
- description: "and Airtable DatabaseIntegration, ManageStructureData.",
+ description: "Airtable database integration; manage structured data.",
  collection: "wrappers",
  icon: "📊",
  color: "bg-surface-200",
@@ -208,12 +208,12 @@ const integrations = [
  popular: false,
  installs: 7600,
  rating: 4.6,
- features: ["DataSync", "TableManage", "ViewCustomize"],
+ features: ["Data Sync", "Table Management", "View Customization"],
  },
  {
  id: "discord",
  name: "Discord",
- description: "will AI AssistantIntegrationto Discord Service.",
+ description: "AI assistant integration for Discord.",
  collection: "wrappers",
  icon: "🎮",
  color: "bg-surface-200",
@@ -222,12 +222,12 @@ const integrations = [
  popular: false,
  installs: 6400,
  rating: 4.4,
- features: ["BotIntegration", "MessageAutomation", "ChannelManage"],
+ features: ["Bot Integration", "Message Automation", "Channel Management"],
  },
  {
  id: "google-sheets",
  name: "Google Sheets",
- description: "Automation Google TableDataProcessandAnalytics.",
+ description: "Automate Google Sheets data processing and analytics.",
  collection: "wrappers",
  icon: "📈",
  color: "bg-surface-200",
@@ -236,12 +236,12 @@ const integrations = [
  popular: true,
  installs: 14200,
  rating: 4.7,
- features: ["DataImport", "Automation", "ReportGenerate"],
+ features: ["Data Import", "Automation", "Report Generation"],
  },
  {
  id: "jira",
  name: "Jira",
- description: "and Jira Integration, AutomationitemManageand Issue Track.",
+ description: "Jira integration; automate item and issue tracking.",
  collection: "wrappers",
  icon: "📋",
  color: "bg-surface-200",
@@ -251,12 +251,12 @@ const integrations = [
  popular: false,
  installs: 4800,
  rating: 4.5,
- features: ["Issue Sync", "Sprint Manage", "ReportGenerate"],
+ features: ["Issue Sync", "Sprint Management", "Report Generation"],
  },
  {
  id: "mailchimp",
  name: "Mailchimp",
- description: "AutomationEmailMarketingandUserListManage.",
+ description: "Automate email marketing and user list management.",
  collection: "wrappers",
  icon: "📧",
  color: "bg-surface-200",
@@ -265,12 +265,12 @@ const integrations = [
  popular: false,
  installs: 3200,
  rating: 4.3,
- features: ["EmailAutomation", "UserGroup", "MarketingActivity"],
+ features: ["Email Automation", "User Groups", "Marketing Campaigns"],
  },
  {
  id: "hubspot",
  name: "HubSpot",
- description: "CRM andMarketingAutomationIntegration.",
+ description: "CRM and marketing automation integration.",
  collection: "wrappers",
  icon: "🟠",
  color: "bg-surface-200",
@@ -280,7 +280,7 @@ const integrations = [
  popular: false,
  installs: 4100,
  rating: 4.4,
- features: ["CustomerManage", "MarketingAutomation", "SalesAnalytics"],
+ features: ["Customer Management", "Marketing Automation", "Sales Analytics"],
  },
 ];
 
@@ -288,7 +288,7 @@ export default function IntegrationsPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [selectedCollection, setSelectedCollection] = useState("all");
 
- // FilterIntegration
+ // Filter integrations
  const filteredIntegrations = useMemo(() => {
  return integrations.filter((integration) => {
  const matchesSearch =
@@ -321,7 +321,7 @@ export default function IntegrationsPage() {
  <PageHeader
  eyebrow="Integrations"
  title="Extend your database"
- description="1ManageConnect, PermissionandAutomationTrigger, letTeamQuickConnectmethodandCommunityIntegration."
+ description="Manage connections, permissions and automation triggers for your team and community."
  actions={(
  <div className="page-toolbar">
  <Button
@@ -329,23 +329,23 @@ export default function IntegrationsPage() {
  size="sm"
  leftIcon={<Settings className="h-4 w-4" />}
  >
- ManageIntegration
+ Manage Integrations
  </Button>
  <Button size="sm" leftIcon={<Plus className="h-4 w-4" />}>
- AddIntegration
+ Add Integration
  </Button>
  </div>
  )}
  >
  <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
  <Badge variant="secondary" size="xs">
- Connected {installedCount} 
+ {installedCount} Connected
  </Badge>
  <Badge variant="outline" size="xs">
- allsection {totalCount} 
+ {totalCount} Total
  </Badge>
  <Badge variant="outline" size="xs">
- CurrentFilter {filteredCount} 
+ {filteredCount} Filtered
  </Badge>
  </div>
  </PageHeader>
@@ -355,30 +355,30 @@ export default function IntegrationsPage() {
  <div className="text-xs text-foreground-light">Connected</div>
  <div className="mt-2 flex items-end gap-2">
  <span className="text-stat-number text-foreground">{installedCount}</span>
- <span className="text-[11px] text-foreground-muted">Integration</span>
+ <span className="text-[11px] text-foreground-muted">Integrations</span>
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
- CurrentTeamEnabled'sPluginCount
+ Plugins enabled for your team
  </p>
  </div>
  <div className="page-panel p-4">
- <div className="text-xs text-foreground-light">IntegrationTotal</div>
+ <div className="text-xs text-foreground-light">Total integrations</div>
  <div className="mt-2 flex items-end gap-2">
  <span className="text-stat-number text-foreground">{totalCount}</span>
  <span className="text-[11px] text-foreground-muted">Available</span>
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
- ContainsmethodandCommunityMaintain'sConnect
+ Connections maintained by the team and community
  </p>
  </div>
  <div className="page-panel p-4">
- <div className="text-xs text-foreground-light">CurrentFilter</div>
+ <div className="text-xs text-foreground-light">Current filter</div>
  <div className="mt-2 flex items-end gap-2">
  <span className="text-stat-number text-foreground">{filteredCount}</span>
- <span className="text-[11px] text-foreground-muted">Result</span>
+ <span className="text-[11px] text-foreground-muted">Results</span>
  </div>
  <p className="mt-2 text-[11px] text-foreground-muted">
- Based onCategoryandSearchAutoUpdate
+ Auto-updates based on category and search filters
  </p>
  </div>
  </div>
@@ -424,12 +424,12 @@ export default function IntegrationsPage() {
  Integration catalog
  </h2>
  <p className="text-xs text-foreground-light">
- CompatiblemethodPluginandCommunityConnect, SuitablenotTeamScaleandDeploymethod.
+ Compatible plugins and community connectors, suitable for any team size and deployment model.
  </p>
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Badge variant="secondary" size="xs">
- Display {filteredCount} 
+ Showing {filteredCount}
  </Badge>
  <Badge variant="outline" size="xs">
  {activeCollectionLabel}
@@ -448,7 +448,7 @@ export default function IntegrationsPage() {
  />
  </div>
  <span className="text-xs text-foreground-muted">
- SupportNameorDescriptionKeywordsSearch
+ Search by name or description
  </span>
  </div>
  </div>
@@ -459,10 +459,10 @@ export default function IntegrationsPage() {
  <Search className="h-4 w-4 text-foreground-muted" />
  </div>
  <h3 className="mt-4 text-sm font-semibold text-foreground">
- not yettoMatchIntegration
+ No matching integrations
  </h3>
  <p className="mt-1 text-xs text-foreground-light">
- TryAdjustKeywordsorSwitchCategoryTags.
+ Try adjusting your keywords or switching category.
  </p>
  <Button
  variant="outline"
@@ -473,7 +473,7 @@ export default function IntegrationsPage() {
  setSelectedCollection("all");
  }}
  >
- ClearFilter
+ Clear Filters
  </Button>
  </div>
  ) : (
@@ -510,12 +510,12 @@ export default function IntegrationsPage() {
  </Badge>
  {integration.official && (
  <Badge variant="secondary" size="xs">
- method
+ Official
  </Badge>
  )}
  {integration.installed && (
  <Badge variant="primary" size="xs">
- alreadyInstall
+ Installed
  </Badge>
  )}
  {integration.release && (
@@ -600,7 +600,7 @@ export default function IntegrationsPage() {
  <div>
  <h3 className="page-panel-title">Connected</h3>
  <p className="page-panel-description">
- CurrentTeamcurrentlyatUsage'sIntegrationandAuthorizeStatus.
+ Integrations and authorization status currently in use by your team.
  </p>
  </div>
  <Badge variant="secondary" size="xs">
@@ -610,7 +610,7 @@ export default function IntegrationsPage() {
 
  <div className="p-5">
  {installedIntegrations.length === 0 ? (
- <p className="text-xs text-foreground-muted">NoneConnected'sIntegration.</p>
+ <p className="text-xs text-foreground-muted">No integrations connected.</p>
  ) : (
  <div className="space-y-3">
  {installedIntegrations.map((integration) => {
@@ -666,9 +666,9 @@ export default function IntegrationsPage() {
  <Key className="h-4 w-4 text-foreground-muted" />
  </div>
  <div>
- <h3 className="page-panel-title">API Key andPermission</h3>
+ <h3 className="page-panel-title">API Keys & Permissions</h3>
  <p className="page-panel-description">
- CreateKeyandManagePermission, Used forIntegrationCalland Webhook Bio.
+ Create keys and manage permissions for integration and webhook calls.
  </p>
  </div>
  </div>
@@ -680,14 +680,14 @@ export default function IntegrationsPage() {
  className="border-border-muted text-foreground-light hover:text-foreground hover:bg-surface-200"
  asChild
  >
- <Link href="/dashboard/settings/api-keys">beforeAPI Key</Link>
+ <Link href="/dashboard/settings/api-keys">Manage API Keys</Link>
  </Button>
  <Button
  variant="outline"
  size="sm"
  className="border-border-muted text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
- ViewPermissionDescription
+ View Permission Docs
  </Button>
  </div>
  </div>
@@ -698,9 +698,9 @@ export default function IntegrationsPage() {
  <span className="text-base text-brand-500">✦</span>
  </div>
  <div>
- <h3 className="page-panel-title">CustomIntegration</h3>
+ <h3 className="page-panel-title">Custom integration</h3>
  <p className="page-panel-description">
- Usage API, Webhook andQueueTask, whatSystemConnectWorkflow.
+ Use APIs, webhooks, and queue tasks to connect systems to your workflows.
  </p>
  </div>
  </div>
@@ -711,7 +711,7 @@ export default function IntegrationsPage() {
  size="sm"
  className="border-border-muted text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
- ViewDocument
+ View Docs
  </Button>
  <Button
  variant="outline"
@@ -730,9 +730,9 @@ export default function IntegrationsPage() {
  <span className="text-base text-foreground-muted">◎</span>
  </div>
  <div>
- <h3 className="page-panel-title">PermissionandSecurity</h3>
+ <h3 className="page-panel-title">Permissions and security</h3>
  <p className="page-panel-description">
- AllIntegrationallUsageMinimumPermissionPolicy, andSupportnowtimeUndoAccess.
+ All integrations use a minimum-permission policy and support real-time access revocation.
  </p>
  </div>
  </div>
@@ -740,15 +740,15 @@ export default function IntegrationsPage() {
  <div className="p-5 space-y-2 text-xs text-foreground-muted">
  <div className="flex items-center gap-2">
  <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
- OAuth scopesTransparentShowcaseandReview
+ OAuth scopes are transparently displayed and reviewed
  </div>
  <div className="flex items-center gap-2">
  <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
- IntegrationKeyAutoRotationandAlert
+ Integration keys support auto-rotation and alerts
  </div>
  <div className="flex items-center gap-2">
  <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
- LogsUsed forAuditTrack
+ Logs used for audit tracking
  </div>
  </div>
  </div>

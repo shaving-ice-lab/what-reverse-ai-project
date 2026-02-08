@@ -13,14 +13,14 @@ import {
 } from "../loading";
 
 describe("Spinner", () => {
- it("ShouldcurrentlyRender", () => {
+ it("Should render correctly", () => {
  const { container } = render(<Spinner />);
  const svg = container.querySelector("svg");
  expect(svg).toBeInTheDocument();
  expect(svg).toHaveClass("animate-spin");
  });
 
- it("ShouldAppnot'sDimension", () => {
+ it("Should apply correct dimensions", () => {
  const { container, rerender } = render(<Spinner size="sm" />);
  expect(container.querySelector("svg")).toHaveClass("h-4", "w-4");
 
@@ -41,27 +41,27 @@ describe("Spinner", () => {
 });
 
 describe("PageLoader", () => {
- it("ShouldcurrentlyRender", () => {
+ it("Should render correctly", () => {
  const { container } = render(<PageLoader />);
  // PageLoader Contains Spinner (svg) andDefaultMessage
  expect(container.querySelector("svg")).toBeInTheDocument();
  expect(screen.getByText("Loading...")).toBeInTheDocument();
  });
 
- it("ShouldDisplayCustomMessage", () => {
- render(<PageLoader message="DataLoading..." />);
- expect(screen.getByText("DataLoading...")).toBeInTheDocument();
+ it("Should display custom message", () => {
+ render(<PageLoader message="Data Loading..." />);
+ expect(screen.getByText("Data Loading...")).toBeInTheDocument();
  });
 });
 
 describe("FullscreenLoader", () => {
- it("visible=true timeShouldcurrentlyRender", () => {
+ it("Should render correctly when visible=true", () => {
  const { container } = render(<FullscreenLoader visible={true} />);
  expect(container.querySelector("svg")).toBeInTheDocument();
  expect(screen.getByText("Loading...")).toBeInTheDocument();
  });
 
- it("visible=false timenotShouldRender", () => {
+ it("Should not render when visible=false", () => {
  const { container } = render(<FullscreenLoader visible={false} />);
  expect(container.querySelector("svg")).not.toBeInTheDocument();
  });
@@ -73,16 +73,16 @@ describe("FullscreenLoader", () => {
 });
 
 describe("CardSkeleton", () => {
- it("ShouldcurrentlyRender", () => {
+ it("Should render correctly", () => {
  const { container } = render(<CardSkeleton />);
  expect(container.querySelector(".animate-shimmer")).toBeInTheDocument();
  });
 });
 
 describe("ListSkeleton", () => {
- it("ShouldRenderSpecifyCount'sitem", () => {
+ it("Should render specified number of items", () => {
  const { container } = render(<ListSkeleton rows={3} />);
- // each1rowinhasmultiple animate-shimmer Element，byrow'sCountcomeVerify
+ // Each row contains multiple animate-shimmer elements, verify by row count
  const rows = container.querySelectorAll(".flex.items-center.gap-3");
  expect(rows).toHaveLength(3);
  });

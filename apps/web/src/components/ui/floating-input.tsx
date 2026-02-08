@@ -1,14 +1,14 @@
 "use client"
 
 /**
- * FloatingInput - FloatingTagsInputComponent
+ * FloatingInput - Floating label input component
  * 
- * Support: 
- * - FloatingTagsAnimation
- * - VerifyStatus
- * - Charactercount
- * - ClearButton
- * - PasswordDisplay/Hide
+ * Supports: 
+ * - Floating label animation
+ * - Validation status
+ * - Character count
+ * - Clear button
+ * - Password show/hide
  */
 
 import * as React from "react"
@@ -50,7 +50,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
  const [internalValue, setInternalValue] = React.useState(value || "")
  const inputRef = React.useRef<HTMLInputElement>(null)
  
- // and ref
+ // Merge refs
  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
  
  const currentValue = value !== undefined ? value : internalValue
@@ -77,14 +77,14 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
  inputRef.current?.focus()
  }
  
- // StatusColor
+ // Status color
  const statusColor = error 
  ? "border-destructive focus:border-destructive focus:ring-destructive/20" 
  : success 
  ? "border-primary focus:border-primary focus:ring-primary/20"
  : "border-border focus:border-primary focus:ring-primary/20"
  
- // Dimension
+ // Size styles
  const sizeStyles = {
  sm: "h-10 text-sm",
  default: "h-12 text-sm",
@@ -128,7 +128,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
  {...props}
  />
  
- {/* FloatingTags */}
+ {/* Floating label */}
  <label
  className={cn(
  "absolute left-4 px-1 bg-background",
@@ -146,7 +146,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
  {label}
  </label>
  
- {/* Right sideIcon */}
+ {/* Right side icons */}
  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
  {loading && (
  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -188,7 +188,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
  </div>
  </div>
  
- {/* FooterInfo */}
+ {/* Footer info */}
  <div className="flex items-center justify-between mt-1.5 px-1">
  <div className="flex-1">
  {error && (
@@ -228,7 +228,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
 FloatingInput.displayName = "FloatingInput"
 
 /**
- * FloatingTextarea - FloatingTagsText Area
+ * FloatingTextarea - Floating label textarea
  */
 interface FloatingTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
  label: string
@@ -358,7 +358,7 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
 FloatingTextarea.displayName = "FloatingTextarea"
 
 /**
- * SearchInput - SearchInput
+ * SearchInput - Search input component
  */
 interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size"> {
  onSearch?: (value: string) => void
@@ -423,7 +423,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
  
  return (
  <div className={cn("relative", className)}>
- {/* SearchIcon */}
+ {/* Search icon */}
  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
  {loading ? (
  <Loader2 className={cn(iconSizes[inputSize], "animate-spin")} />
@@ -460,7 +460,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
  {...props}
  />
  
- {/* ClearButton */}
+ {/* Clear button */}
  {hasValue && !loading && (
  <button
  type="button"

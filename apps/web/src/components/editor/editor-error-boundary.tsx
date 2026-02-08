@@ -6,7 +6,7 @@ import { AlertTriangle, RefreshCw, Undo2, Download, Bug, Shield } from "lucide-r
 import { Button } from "@/components/ui/button";
 
 /**
- * EdituseErrorEdgeComponent - Minimalist Style
+ * Editor Error Boundary Component - Minimalist Style
  */
 
 interface EditorErrorBoundaryProps {
@@ -101,7 +101,7 @@ export class EditorErrorBoundary extends Component<
  });
  this.props.onRecovery?.();
  } else {
- alert("multipletimesRestoreTryFailed, SuggestionRefreshPage.you'sDataalreadyAutoSave.");
+ alert("Multiple recovery attempts failed. Please refresh the page. Your data has been auto-saved.");
  }
  };
 
@@ -124,16 +124,16 @@ export class EditorErrorBoundary extends Component<
  document.body.removeChild(a);
  URL.revokeObjectURL(url);
  } else {
- alert("NotocanRestore'sData");
+ alert("Unable to restore data.");
  }
  } catch (e) {
  console.error("[EditorErrorBoundary] Export failed:", e);
- alert("ExportFailed");
+ alert("Export failed.");
  }
  };
 
  handleReset = () => {
- if (confirm("OKneedResetEdit??thiswillClearAllUnsaved'sChange.")) {
+ if (confirm("Reset editor? This will clear all unsaved changes.")) {
  localStorage.removeItem(getRecoveryKey(this.props.workflowId));
  window.location.reload();
  }
@@ -156,22 +156,22 @@ export class EditorErrorBoundary extends Component<
  </div>
  </div>
 
- <h2 className="text-lg font-semibold mb-2 text-center">EdittoIssue</h2>
+ <h2 className="text-lg font-semibold mb-2 text-center">Editor Error</h2>
  <p className="text-sm text-foreground-muted text-center mb-4">
- you'sWorkDataalreadyAutoSave
+ Your work has been auto-saved
  </p>
 
  <div className="flex items-center gap-2 p-3 rounded-md bg-brand-200 mb-4">
  <Shield className="h-4 w-4 text-brand-500 shrink-0" />
  <div className="text-sm">
- <p className="font-medium text-brand-500">DataalreadyProtect</p>
+ <p className="font-medium text-brand-500">Data is protected</p>
  </div>
  </div>
 
  {recoveryAttempts > 0 && (
  <div className="flex items-center justify-center p-2 rounded-md bg-warning-200 mb-4">
  <span className="text-xs font-medium text-warning">
- alreadyTryRestore {recoveryAttempts}/{MAX_RECOVERY_ATTEMPTS} times
+ Restore attempted {recoveryAttempts}/{MAX_RECOVERY_ATTEMPTS} times
  </span>
  </div>
  )}
@@ -180,14 +180,14 @@ export class EditorErrorBoundary extends Component<
  {canRetry && (
  <Button onClick={this.handleRetry} className="w-full">
  <RefreshCw className="mr-2 h-4 w-4" />
- TryRestore
- </Button>
- )}
- <div className="grid grid-cols-2 gap-2">
- <Button onClick={this.handleExportData} variant="outline">
- <Download className="mr-2 h-4 w-4" />
- ExportData
- </Button>
+                  Try Restore
+                </Button>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <Button onClick={this.handleExportData} variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export Data
+                </Button>
  <Button 
  onClick={this.handleReset} 
  variant="outline"
@@ -203,8 +203,8 @@ export class EditorErrorBoundary extends Component<
  <details className="mt-4">
  <summary className="cursor-pointer text-xs text-foreground-muted hover:text-foreground flex items-center gap-1">
  <Bug className="h-3.5 w-3.5" />
- ViewDetails
- </summary>
+                  View Details
+                </summary>
  <div className="mt-2 p-3 rounded-md bg-surface-200 overflow-auto max-h-40">
  <p className="font-mono text-xs text-destructive mb-2 break-all">
  {error.toString()}
@@ -229,7 +229,7 @@ export class EditorErrorBoundary extends Component<
 export function safeNodeOperation<T>(
  operation: () => T,
  fallback: T,
- errorMessage = "NodeOperation failed"
+ errorMessage = "Node operation failed"
 ): T {
  try {
  return operation();
@@ -242,7 +242,7 @@ export function safeNodeOperation<T>(
 export async function safeAsyncOperation<T>(
  operation: () => Promise<T>,
  fallback: T,
- errorMessage = "AsyncOperation failed"
+ errorMessage = "Async operation failed"
 ): Promise<T> {
  try {
  return await operation();

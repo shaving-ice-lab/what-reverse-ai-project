@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Tag TagsComponent
+ * Tag Component
  * 
  * Support: 
- * - multipletypeColorVariant
- * - canClose/canSelect
- * - IconandAvatar
- * - InputTags
+ * - Multiple color variants
+ * - Closable/Selectable
+ * - Icon and Avatar
+ * - Tag input
  */
 
 import * as React from "react"
@@ -52,24 +52,24 @@ const tagVariants = cva(
 )
 
 export interface TagProps
- extends React.HTMLAttributes<HTMLSpanElement>,
- VariantProps<typeof tagVariants> {
- /** beforeIcon */
- icon?: LucideIcon | React.ReactNode
- /** Avatar URL */
- avatar?: string
- /** isnocanClose */
- closable?: boolean
- /** CloseCallback */
- onClose?: () => void
- /** isnocanSelect */
- selectable?: boolean
- /** isnoselect */
- selected?: boolean
- /** SelectCallback */
- onSelect?: (selected: boolean) => void
- /** isnoDisable */
- disabled?: boolean
+  extends React.HTMLAttributes<HTMLSpanElement>,
+  VariantProps<typeof tagVariants> {
+  /** Prefix icon */
+  icon?: LucideIcon | React.ReactNode
+  /** Avatar URL */
+  avatar?: string
+  /** Whether closable */
+  closable?: boolean
+  /** Close callback */
+  onClose?: () => void
+  /** Whether selectable */
+  selectable?: boolean
+  /** Whether selected */
+  selected?: boolean
+  /** Select callback */
+  onSelect?: (selected: boolean) => void
+  /** Whether disabled */
+  disabled?: boolean
 }
 
 function Tag({
@@ -173,32 +173,32 @@ function TagGroup({ children, className }: TagGroupProps) {
 }
 
 /**
- * TagInput - TagsInput
+ * Tag Input - Tags Input Component
  */
 interface TagInputProps {
- /** TagsList */
- value?: string[]
- /** valueCallback */
- onChange?: (tags: string[]) => void
- /** Placeholder */
- placeholder?: string
- /** MaximumTagscount */
- maxTags?: number
- /** isnoAllowre- */
- allowDuplicates?: boolean
- /** TagsVariant */
- tagVariant?: TagProps["variant"]
- /** isnoDisable */
- disabled?: boolean
- /** Verifycount */
- validate?: (tag: string) => boolean | string
- className?: string
+  /** Tags list */
+  value?: string[]
+  /** Value change callback */
+  onChange?: (tags: string[]) => void
+  /** Placeholder */
+  placeholder?: string
+  /** Maximum tags count */
+  maxTags?: number
+  /** Whether to allow duplicates */
+  allowDuplicates?: boolean
+  /** Tags variant */
+  tagVariant?: TagProps["variant"]
+  /** Whether disabled */
+  disabled?: boolean
+  /** Validation function */
+  validate?: (tag: string) => boolean | string
+  className?: string
 }
 
 function TagInput({
  value = [],
  onChange,
- placeholder = "InputafterbyEnterAddTags",
+ placeholder = "Type and press Enter to add tags",
  maxTags,
  allowDuplicates = false,
  tagVariant = "default",
@@ -226,20 +226,20 @@ function TagInput({
  if (validate) {
  const result = validate(tag)
  if (result !== true) {
- setError(typeof result === "string" ? result: "Invalid'sTags")
+ setError(typeof result === "string" ? result : "Invalid tags")
  return
  }
  }
 
  // Checkre-
  if (!allowDuplicates && value.includes(tag)) {
- setError("TagsAlready exists")
+ setError("Tag already exists")
  return
  }
 
  // CheckMaximumCount
  if (maxTags && value.length >= maxTags) {
- setError(`mostmultiplecanAdd ${maxTags} Tags`)
+ setError(`You can add at most ${maxTags} tags`)
  return
  }
 
@@ -367,7 +367,7 @@ interface AddTagProps {
 
 function AddTag({
  onClick,
- label = "AddTags",
+ label = "Add tags",
  size = "default",
  className,
 }: AddTagProps) {

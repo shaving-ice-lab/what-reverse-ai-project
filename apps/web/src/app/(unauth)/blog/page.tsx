@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * BlogListPage - LobeHub StyleDarkDesign
+ * Blog List Page - LobeHub Style Dark Design
  */
 
 import { useState, useEffect } from "react";
@@ -79,42 +79,42 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// BlogCategory
+// Blog Categories
 const categories = [
- { name: "allsection", slug: "all", icon: Globe, count: 24 },
- { name: "ProductUpdate", slug: "product", icon: Rocket, count: 6 },
- { name: "TechnologyDepth", slug: "tech", icon: Code2, count: 5 },
- { name: "UsageTips", slug: "tips", icon: Lightbulb, count: 4 },
+ { name: "All", slug: "all", icon: Globe, count: 24 },
+ { name: "Product Updates", slug: "product", icon: Rocket, count: 6 },
+ { name: "Technology Deep Dives", slug: "tech", icon: Code2, count: 5 },
+ { name: "Usage Tips", slug: "tips", icon: Lightbulb, count: 4 },
  { name: "Case Studies", slug: "case-study", icon: Award, count: 4 },
- { name: "IndustryInsights", slug: "industry", icon: BarChart3, count: 3 },
- { name: "SecurityCompliance", slug: "security", icon: Shield, count: 2 },
+ { name: "Industry Insights", slug: "industry", icon: BarChart3, count: 3 },
+ { name: "Security & Compliance", slug: "security", icon: Shield, count: 2 },
 ];
 
-// ContentTypeTags
+// Content Type Tags
 const contentTypes = [
  { name: "Article", icon: FileText, slug: "article" },
  { name: "Video", icon: Video, slug: "video" },
  { name: "Podcast", icon: Podcast, slug: "podcast" },
 ];
 
-// PopularTags
+// Popular Tags
 const trendingTags = [
  { name: "AI Agent", count: 12, hot: true },
- { name: "WorkflowAutomation", count: 8, hot: true },
- { name: "multipleModal", count: 6, hot: false },
+ { name: "Workflow Automation", count: 8, hot: true },
+ { name: "Multimodal", count: 6, hot: false },
  { name: "Enterprise", count: 5, hot: false },
  { name: "API Integration", count: 4, hot: false },
  { name: "Code", count: 4, hot: false },
- { name: "DataProcess", count: 3, hot: false },
- { name: "TeamCollaboration", count: 3, hot: false },
+ { name: "Data Processing", count: 3, hot: false },
+ { name: "Team Collaboration", count: 3, hot: false },
 ];
 
-// Series
+// Blog Series
 const blogSeries = [
  {
  id: "ai-fundamentals",
- title: "AI BasicGetting StartedSeries",
- description: "fromStart AI Workflow, SuitablenewUser",
+ title: "AI Basics: Getting Started Series",
+ description: "Get started with AI workflows, perfect for new users",
  articles: 8,
  totalReadTime: "45 min",
  level: "Getting Started",
@@ -123,8 +123,8 @@ const blogSeries = [
  },
  {
  id: "enterprise-guide",
- title: "Enterprise-gradeDeployGuide",
- description: "Security, Compliance, Available'sEnterprise-gradeBest Practices",
+ title: "Enterprise Deployment Guide",
+ description: "Security, compliance and enterprise best practices",
  articles: 6,
  totalReadTime: "60 min",
  level: "Advanced",
@@ -133,65 +133,65 @@ const blogSeries = [
  },
  {
  id: "integration-mastery",
- title: "Integrationlarge",
- description: "Master 50+ mainAppIntegrationTips",
+ title: "Integration Mastery",
+ description: "Master 50+ app integration tips",
  articles: 12,
  totalReadTime: "90 min",
- level: "",
+ level: "Intermediate",
  color: "blue",
  icon: Globe,
  },
  {
  id: "automation-patterns",
- title: "AutomationDesign",
- description: "AutomationScenario'sResolvePlan",
+ title: "Automation Design Patterns",
+ description: "Automation design patterns and solutions",
  articles: 10,
  totalReadTime: "75 min",
- level: "",
+ level: "Intermediate",
  color: "orange",
  icon: Code2,
  },
 ];
 
-// nowwillHost'sNetworkWorkshopwill
+// Upcoming Webinars
 const upcomingWebinars = [
  {
  id: "webinar-1",
- title: "AI Agent 3.0 Preview: down1SmartWorkflow",
+ title: "AI Agent 3.0 Preview: Next-Gen Smart Workflows",
  date: "2026-02-05",
  time: "14:00 CST",
- speaker: "",
- speakerRole: "Product",
+ speaker: "Zhang Lei",
+ speakerRole: "Product Lead",
  registrations: 1280,
  isLive: false,
  },
  {
  id: "webinar-2",
- title: "Practical: 30 minBuildSmartSupportSystem",
+ title: "Practical: build a smart support system in 30 min",
  date: "2026-02-12",
  time: "15:00 CST",
  speaker: "Li Wei",
- speakerRole: "Technologytotal",
+ speakerRole: "Tech Lead",
  registrations: 856,
  isLive: false,
  },
  {
  id: "webinar-3",
- title: "EnterpriseAutomation: from 0 to 1 'sMethod",
+ title: "Enterprise automation: from 0 to 1",
  date: "2026-02-20",
  time: "10:00 CST",
  speaker: "Chen Xiao",
- speakerRole: "ResolvePlanArchitect",
+ speakerRole: "Solution Architect",
  registrations: 642,
  isLive: false,
  },
 ];
 
-// FreeResourceDownload
+// Free Resource Downloads
 const downloadableResources = [
  {
  id: "ebook-automation",
- title: "2026 WorkflowAutomationWhite Paper",
+ title: "2026 Workflow Automation White Paper",
  type: "E-book",
  format: "PDF",
  pages: 48,
@@ -200,7 +200,7 @@ const downloadableResources = [
  },
  {
  id: "template-pack",
- title: "50+ EfficientWorkflowTemplate",
+ title: "50+ Efficient Workflow Templates",
  type: "Template",
  format: "ZIP",
  templates: 50,
@@ -209,7 +209,7 @@ const downloadableResources = [
  },
  {
  id: "checklist-security",
- title: "EnterpriseSecurityComplianceCheckChecklist",
+ title: "Enterprise Security and Compliance Checklist",
  type: "Checklist",
  format: "PDF",
  items: 120,
@@ -218,7 +218,7 @@ const downloadableResources = [
  },
  {
  id: "integration-guide",
- title: "API IntegrationDevelopersGuide",
+ title: "API Integration Developer Guide",
  type: "Guide",
  format: "PDF",
  pages: 86,
@@ -227,60 +227,60 @@ const downloadableResources = [
  },
 ];
 
-// CommunityFeatured
+// Community Featured
 const communityHighlights = [
  {
  id: "community-1",
- title: "Iifwhatuse AgentFlow AutomationMarketingTeam'sWorkflow",
+ title: "How to use AgentFlow for marketing team workflows",
  author: "David Chen",
- authorCompany: "E-commerceCompany",
+ authorCompany: "E-commerce Company",
  likes: 342,
  comments: 67,
  avatar: null,
  },
  {
  id: "community-2",
- title: "Share: use AI Agent eachdaysSave 3 hDataProcessTime",
+ title: "Share: use AI Agent to save 3h of data processing per day",
  author: "Sarah Liu",
- authorCompany: "DataAnalytics",
+ authorCompany: "Data Analytics",
  likes: 289,
  comments: 45,
  avatar: null,
  },
  {
  id: "community-3",
- title: "fromto1: I's#1SmartSupportBotBuildcenter",
+ title: "From 0 to 1: build your first smart support bot",
  author: "Michael Wang",
- authorCompany: "SaaS user",
+ authorCompany: "SaaS User",
  likes: 256,
  comments: 38,
  avatar: null,
  },
 ];
 
-// readuserReviews
+// Reader Reviews
 const testimonials = [
  {
- quote: "AgentFlow 'sBlogisILearnWorkflowAutomation'sselectResource, Contententeranduse.",
+ quote: "AgentFlow's blog is my go-to for workflow automation and content.",
  author: "Li Ming",
- role: "TechnologyOwner @ Company",
+ role: "Tech Lead @ Startup",
  avatar: null,
  },
  {
- quote: "eachweeksread's Newsletter, HelpIMaintainfor AI IndustryTrend's.",
- author: "",
- role: "ProductManager @ Enterprise",
+ quote: "Read the weekly newsletter to stay on top of AI industry trends.",
+ author: "Zhang Wei",
+ role: "Product Manager @ Enterprise",
  avatar: null,
  },
  {
- quote: "Case StudiesVeryhasReferencevalue, HelpWeQuickAutomationitem.",
+ quote: "Case studies are very helpful for quick automation.",
  author: "Wang Hao",
- role: "Operationstotal @ E-commercePlatform",
+ role: "Operations Lead @ E-commerce Platform",
  avatar: null,
  },
 ];
 
-// currentweeks
+// This Week's Highlights
 const weeklyHighlights = {
  weekNumber: 5,
  year: 2026,
@@ -294,155 +294,155 @@ const weeklyHighlights = {
  hotTopic: "AI Agent 2.0",
 };
 
-// mostnewComment
+// Latest Comments
 const latestComments = [
  {
  id: "comment-1",
  postId: "ai-agent-2-release",
- postTitle: "AI Agent 2.0 currentlyPublish",
- author: "Technologysmall",
- content: "atetcto!multipleModelSupportGreat, pendingmoremultipleIntegrationFeatures.",
- time: "10 minbefore",
+ postTitle: "AI Agent 2.0 Now Released",
+ author: "Tech Enthusiast",
+ content: "Multi-model support is great; more integrations coming soon.",
+ time: "10 min ago",
  likes: 23,
  },
  {
  id: "comment-2",
  postId: "workflow-best-practices",
- postTitle: "WorkflowDesignBest Practices",
- author: "Automationuser",
- content: "ErrorProcessthatPartial, alreadyApptoI'sitem.",
- time: "32 minbefore",
+ postTitle: "Workflow design best practices",
+ author: "Automation User",
+ content: "The error handling section is really helpful — I've already applied it to my projects.",
+ time: "32 min ago",
  likes: 15,
  },
  {
  id: "comment-3",
  postId: "llm-comparison-2026",
- postTitle: "2026 largeLanguageModelforcompareBenchmark",
- author: "AIResearchsmall",
- content: "VeryDetailed'sBenchmark, cannoIncrease1compareAnalytics?",
- time: "1 hbefore",
+ postTitle: "2026 large language model benchmark",
+ author: "AI Researcher",
+ content: "Very detailed benchmarks. Can we add comparison analytics?",
+ time: "1 hour ago",
  likes: 8,
  },
  {
  id: "comment-4",
  postId: "ecommerce-automation",
- postTitle: "E-commerceAutomationall",
- author: "E-commerceOperationsuser",
- content: "InventorySyncthisblockIverymultipleperson, Thank youShare!",
- time: "2 hbefore",
+ postTitle: "E-commerce Automation Guide",
+ author: "E-commerce Ops User",
+ content: "Inventory sync is used by many; thanks for sharing!",
+ time: "2 hours ago",
  likes: 31,
  },
 ];
 
-// PartnersContent
+// Partner Content
 const partnerContent = [
  {
  id: "partner-1",
- title: "ifwhatuse OpenAI API BuildSmartWorkflow",
+ title: "How to use the OpenAI API to build smart workflows",
  partner: "OpenAI",
  partnerLogo: null,
- type: "JointPublish",
+ type: "Joint Publication",
  date: "2026-01-28",
  featured: true,
  },
  {
  id: "partner-2",
- title: "Slack + AgentFlow: TeamrateImprove 200% 's",
+ title: "Slack + AgentFlow: Team Efficiency Improved by 200%",
  partner: "Slack",
  partnerLogo: null,
- type: "CooperationCase Studies",
+ type: "Partnership Case Study",
  date: "2026-01-22",
  featured: false,
  },
  {
  id: "partner-3",
- title: "NativeAutomation: AWS Lambda and AgentFlow Best Practices",
+ title: "Cloud-Native Automation: AWS Lambda and AgentFlow Best Practices",
  partner: "AWS",
  partnerLogo: null,
- type: "TechnologyGuide",
+ type: "Technology Guide",
  date: "2026-01-18",
  featured: false,
  },
 ];
 
-// GraphTheme
+// Knowledge Graph Topics
 const knowledgeTopics = [
- { name: "Getting StartedGuide", count: 15, level: 1, related: ["BasicConcept", "QuickStart"] },
- { name: "WorkflowDesign", count: 28, level: 2, related: ["Node", "Trigger", "Condition"] },
- { name: "AI Integration", count: 32, level: 3, related: ["LLM", "multipleModal", "Prompt"] },
- { name: "EnterpriseApp", count: 18, level: 2, related: ["Security", "Compliance", "Extend"] },
- { name: "IndustryPlan", count: 24, level: 2, related: ["E-commerce", "Finance", "Healthcare"] },
+ { name: "Getting Started Guide", count: 15, level: 1, related: ["Basic Concepts", "Quick Start"] },
+ { name: "Workflow Design", count: 28, level: 2, related: ["Node", "Trigger", "Condition"] },
+ { name: "AI Integration", count: 32, level: 3, related: ["LLM", "Multimodal", "Prompt"] },
+ { name: "Enterprise Applications", count: 18, level: 2, related: ["Security", "Compliance", "Scalability"] },
+ { name: "Industry Solutions", count: 24, level: 2, related: ["E-commerce", "Finance", "Healthcare"] },
  { name: "Developers", count: 20, level: 3, related: ["API", "SDK", "Webhook"] },
 ];
 
-// Read
+// Reading Challenge
 const readingChallenge = {
- title: "2026 years Q1 Read",
+ title: "2026 Q1 Reading Challenge",
  target: 12,
  current: 8,
  participants: 3240,
  endDate: "2026-03-31",
- rewards: ["ExclusiveBadge", "AdvancedTemplate", "PrioritySupport"],
+ rewards: ["Exclusive Badge", "Advanced Template", "Priority Support"],
 };
 
-// in
+// Milestones
 const milestones = [
- { label: "", value: "2023", icon: Rocket },
- { label: "Article", value: "2023.06", icon: FileText },
- { label: "10K Subscription", value: "2024.03", icon: Users },
- { label: "100 10000Read", value: "2024.12", icon: Eye },
+ { label: "Blog Launched", value: "2023", icon: Rocket },
+ { label: "First Article", value: "2023.06", icon: FileText },
+ { label: "10K Subscribers", value: "2024.03", icon: Users },
+ { label: "First 100K Reads", value: "2024.12", icon: Eye },
  { label: "Today", value: "2M+", icon: Heart },
 ];
 
-// StatisticsData
+// Statistics
 const stats = [
- { label: "ArticleTotal", value: "240+", icon: FileText },
- { label: "monthsreaduser", value: "50K+", icon: Users },
- { label: "totalRead", value: "2M+", icon: Eye },
- { label: "SubscriptionUser", value: "12K+", icon: Heart },
+ { label: "Total Articles", value: "240+", icon: FileText },
+ { label: "Monthly Readers", value: "50K+", icon: Users },
+ { label: "Total Reads", value: "2M+", icon: Eye },
+ { label: "Subscribers", value: "12K+", icon: Heart },
 ];
 
-// userTeam
+// Author Team
 const authors = [
  {
- name: "",
- role: "Product",
+ name: "Zhang Lei",
+ role: "Product Lead",
  avatar: null,
  articles: 28,
- specialty: "Product",
+ specialty: "Product Strategy",
  },
  {
  name: "Li Wei",
- role: "Technologytotal",
+ role: "Tech Lead",
  avatar: null,
  articles: 35,
- specialty: "SystemArchitecture",
+ specialty: "System Architecture",
  },
  {
  name: "Wang Hao",
- role: "AI Research",
+ role: "AI Researcher",
  avatar: null,
  articles: 22,
- specialty: "Learn",
+ specialty: "Machine Learning",
  },
  {
  name: "Chen Xiao",
- role: "ResolvePlanArchitect",
+ role: "Solution Architect",
  avatar: null,
  articles: 19,
- specialty: "EnterpriseIntegration",
+ specialty: "Enterprise Integration",
  },
 ];
 
-// BlogArticle
+// Blog Articles
 const blogPosts = [
  {
  id: "ai-agent-2-release",
- title: "AI Agent 2.0 currentlyPublish: moreSmart'sWorkflowAutomation",
- excerpt: "Wevery AI Agent 2.0 'scurrentlyPublish, comemorelarge'sNaturalLanguageUnderstandcanpower, multipleModelSupportandSmartRecommendedFeatures.",
+ title: "AI Agent 2.0: smarter workflow automation",
+ excerpt: "AI Agent 2.0 is here with stronger natural language understanding, multi-model support and smart recommendations.",
  category: "product",
- author: "",
- authorRole: "Product",
+ author: "Zhang Lei",
+ authorRole: "Product Lead",
  date: "2026-01-25",
  readTime: "5 min",
  featured: true,
@@ -450,16 +450,16 @@ const blogPosts = [
  views: 12500,
  likes: 486,
  comments: 89,
- tags: ["AI Agent", "ProductUpdate", "newFeatures"],
+ tags: ["AI Agent", "Product Update", "New Features"],
  contentType: "article",
  },
  {
  id: "workflow-best-practices",
- title: "WorkflowDesignBest Practices: fromGetting StartedtoExpert",
- excerpt: "currentwillShareWeatHelpcount1000UserBuildWorkflowpastSummary'sBest Practices, HelpyouDesignmoreEfficient, morecan'sAutomationFlow.",
+ title: "Workflow design best practices: from getting started to expert",
+ excerpt: "Best practices from 1000+ users to help you design more efficient automation flows.",
  category: "tips",
  author: "Li Wei",
- authorRole: "Technologytotal",
+ authorRole: "Tech Lead",
  date: "2026-01-20",
  readTime: "8 min",
  featured: true,
@@ -467,16 +467,16 @@ const blogPosts = [
  views: 9800,
  likes: 352,
  comments: 67,
- tags: ["Best Practices", "WorkflowDesign", "Tutorial"],
+ tags: ["Best Practices", "Workflow Design", "Tutorial"],
  contentType: "article",
  },
  {
  id: "multimodal-ai-workflows",
- title: "multipleModal AI Workflow: Image, VoiceandText'sNoneIntegration",
- excerpt: "Exploreifwhatat1WorkflowIntegratevisualIdentify, VoiceandNaturalLanguageProcess, BuildcurrentlySmart'sAutomationResolvePlan.",
+ title: "Multimodal AI workflow: image, voice and text in one",
+ excerpt: "Integrate visual, voice and natural language in one workflow for smarter automation.",
  category: "tech",
  author: "Wang Hao",
- authorRole: "AI Research",
+ authorRole: "AI Researcher",
  date: "2026-01-22",
  readTime: "12 min",
  featured: true,
@@ -484,16 +484,16 @@ const blogPosts = [
  views: 8200,
  likes: 298,
  comments: 45,
- tags: ["multipleModalAI", "ImageIdentify", "VoiceProcess"],
+ tags: ["Multimodal AI", "Image Recognition", "Voice Processing"],
  contentType: "article",
  },
  {
  id: "enterprise-automation-trends",
- title: "2026 EnterpriseAutomationTrend: AI Driven'sWorkflow",
- excerpt: "Explore 2026 yearsEnterpriseAutomation'smostnewTrend, AI ifwhatre-EnterpriseWorkflowandImproveOperationsrate.",
+ title: "2026 enterprise automation trend: AI-driven workflows",
+ excerpt: "Explore the latest 2026 trends: AI reshaping enterprise workflows and operations.",
  category: "industry",
  author: "Chen Xiao",
- authorRole: "ResolvePlanArchitect",
+ authorRole: "Solution Architect",
  date: "2026-01-15",
  readTime: "10 min",
  featured: false,
@@ -501,16 +501,16 @@ const blogPosts = [
  views: 7600,
  likes: 245,
  comments: 38,
- tags: ["EnterpriseAutomation", "IndustryTrend", "2026"],
+ tags: ["Enterprise Automation", "Industry Trends", "2026"],
  contentType: "article",
  },
  {
  id: "slack-integration-guide",
- title: "Slack IntegrationcompleteallGuide: BuildEfficientTeamCollaboration",
- excerpt: "DetailedIntroductionifwhatwill AgentFlow and Slack DepthIntegration, ImplementMessageAutomation, WorkflowTriggerandTeamCollaboration.",
+ title: "Slack integration guide: build efficient team collaboration",
+ excerpt: "Deep integration of AgentFlow and Slack for message automation and team workflows.",
  category: "tips",
  author: "Li Wei",
- authorRole: "Technologytotal",
+ authorRole: "Tech Lead",
  date: "2026-01-10",
  readTime: "6 min",
  featured: false,
@@ -518,16 +518,16 @@ const blogPosts = [
  views: 5400,
  likes: 198,
  comments: 32,
- tags: ["Slack", "Integration", "TeamCollaboration"],
+ tags: ["Slack", "Integration", "Team Collaboration"],
  contentType: "article",
  },
  {
  id: "customer-story-startup",
- title: "Customer: CompanyifwhatwillAgentFlow Save 80% re-Work",
- excerpt: "CompanyifwhatUsage AgentFlow AutomationCustomerSupport, DataSyncandInternalFlow, largeImproveTeamrate.",
+ title: "Customer story: how AgentFlow saved 80% rework",
+ excerpt: "How one company used AgentFlow for support, data sync and internal flows.",
  category: "case-study",
  author: "Chen Xiao",
- authorRole: "ResolvePlanArchitect",
+ authorRole: "Solution Architect",
  date: "2026-01-05",
  readTime: "7 min",
  featured: false,
@@ -535,16 +535,16 @@ const blogPosts = [
  views: 6200,
  likes: 276,
  comments: 41,
- tags: ["CustomerCase Studies", "Company", "rateImprove"],
+ tags: ["Customer Case Study", "Startup", "Efficiency Improvement"],
  contentType: "article",
  },
  {
  id: "error-handling-patterns",
- title: "WorkflowErrorProcess: EnsureAutomation'scan",
- excerpt: "enterDiscussWorkflow'sErrorProcessPolicy, IncludeRetryMechanism, DowngradeProcessandAlertNotifications, Ensureyou'sAutomationFlowStableRun.",
+ title: "Workflow error handling: keep automation reliable",
+ excerpt: "Error handling policies: retry, fallback and alerts so your automation runs stably.",
  category: "tech",
  author: "Li Wei",
- authorRole: "Technologytotal",
+ authorRole: "Tech Lead",
  date: "2025-12-28",
  readTime: "9 min",
  featured: false,
@@ -552,16 +552,16 @@ const blogPosts = [
  views: 4800,
  likes: 187,
  comments: 29,
- tags: ["ErrorProcess", "can", "Monitor"],
+ tags: ["Error Handling", "Reliability", "Monitoring"],
  contentType: "article",
  },
  {
  id: "api-rate-limiting",
- title: "API Rate Limitandoptimal: letyou'sWorkflowmoreEfficient",
- excerpt: "ifwhatoptimalWorkflow's API Call, ProcessRate Limit, andImplementEfficient'sDataProcess.",
+ title: "API rate limits and optimization: make workflows more efficient",
+ excerpt: "Optimize workflow API usage, rate limits and data processing.",
  category: "tech",
  author: "Wang Hao",
- authorRole: "AI Research",
+ authorRole: "AI Researcher",
  date: "2025-12-20",
  readTime: "7 min",
  featured: false,
@@ -569,16 +569,16 @@ const blogPosts = [
  views: 3900,
  likes: 156,
  comments: 24,
- tags: ["API", "canoptimal", "Rate Limit"],
+ tags: ["API", "Optimization", "Rate Limit"],
  contentType: "article",
  },
  {
  id: "december-product-update",
- title: "12 monthsProductUpdate: Add 20+ Integrationandcanoptimal",
- excerpt: " 12 months'sProductUpdate, IncludeAdd'sIntegration, canImproveandUserExperienceImprove.",
+ title: "December product update: 20+ integrations and improvements",
+ excerpt: "Latest product update: new integrations and better user experience.",
  category: "product",
- author: "",
- authorRole: "Product",
+ author: "Zhang Lei",
+ authorRole: "Product Lead",
  date: "2025-12-15",
  readTime: "4 min",
  featured: false,
@@ -586,16 +586,16 @@ const blogPosts = [
  views: 5100,
  likes: 203,
  comments: 35,
- tags: ["ProductUpdate", "Integration", "can"],
+ tags: ["Product Update", "Integration", "Improvements"],
  contentType: "article",
  },
  {
  id: "security-compliance-guide",
- title: "EnterpriseSecurityComplianceGuide: SOC 2, GDPR andDataProtect",
- excerpt: "allfaceParse AgentFlow ifwhatHelpEnterpriseSatisfy SOC 2, GDPR etcComplianceneed, ProtectSensitiveDataSecurity.",
+ title: "Enterprise security and compliance: SOC 2, GDPR and data protection",
+ excerpt: "How AgentFlow helps enterprises meet SOC 2, GDPR and protect sensitive data.",
  category: "security",
  author: "Chen Xiao",
- authorRole: "ResolvePlanArchitect",
+ authorRole: "Solution Architect",
  date: "2025-12-12",
  readTime: "11 min",
  featured: false,
@@ -608,11 +608,11 @@ const blogPosts = [
  },
  {
  id: "llm-comparison-2026",
- title: "2026 largeLanguageModelforcompareBenchmark: GPT-5, Claude 4, Gemini Pro",
- excerpt: "WeformainlargeLanguageModelProceedallfaceBenchmark, Inferencecanpower, CodeGenerate, multipleLanguageSupportetcmultiple.",
+ title: "2026 LLM benchmark: GPT-5, Claude 4, Gemini Pro",
+ excerpt: "Benchmark of major LLMs: inference, code generation, multi-language support and more.",
  category: "tech",
  author: "Wang Hao",
- authorRole: "AI Research",
+ authorRole: "AI Researcher",
  date: "2025-12-08",
  readTime: "15 min",
  featured: false,
@@ -625,11 +625,11 @@ const blogPosts = [
  },
  {
  id: "fintech-automation-case",
- title: "FinanceCase Studies: rowifwhatuse AI WorkflowProcess10010000Transaction",
- excerpt: "enterlargerowifwhatuse AgentFlow ImplementTransactionRisk Control, CustomerServiceandReportAutomation.",
+ title: "Finance Case Study: Using AI Workflows to Process 100K+ Transactions",
+ excerpt: "How to use AgentFlow for transaction risk control, customer service and report automation.",
  category: "case-study",
  author: "Chen Xiao",
- authorRole: "ResolvePlanArchitect",
+ authorRole: "Solution Architect",
  date: "2025-12-05",
  readTime: "9 min",
  featured: false,
@@ -637,19 +637,18 @@ const blogPosts = [
  views: 7800,
  likes: 342,
  comments: 56,
- tags: ["Finance", "row", "Risk Control"],
+ tags: ["Finance", "Fintech", "Risk Control"],
  contentType: "article",
  },
 ];
 
-// FetchCategoryName
+// Get Category Name
 const getCategoryName = (slug: string) => {
  return categories.find((c) => c.slug === slug)?.name || slug;
 };
 
-// Formatcountchar
+// Format Number
 const formatNumber = (num: number) => {
- if (num >= 10000) return (num / 10000).toFixed(1) + "10000";
  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
  return num.toString();
 };
@@ -665,7 +664,7 @@ export default function BlogPage() {
  setIsLoaded(true);
  }, []);
 
- // FilterArticle
+ // Filter Articles
  const filteredPosts = blogPosts.filter((post) => {
  const matchesCategory = selectedCategory === "all" || post.category === selectedCategory;
  const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -674,13 +673,13 @@ export default function BlogPage() {
  return matchesCategory && matchesSearch && matchesTag;
  });
 
- // FeaturedArticle
+ // Featured Articles
  const featuredPosts = blogPosts.filter((post) => post.featured);
  
- // Display'sArticleCount
+ // Displayed Articles Count
  const displayedPosts = showMorePosts ? filteredPosts : filteredPosts.slice(0, 9);
  
- // PopularArticle(byReadSort)
+ // Popular Articles (sorted by views)
  const popularPosts = [...blogPosts].sort((a, b) => b.views - a.views).slice(0, 5);
 
  return (
@@ -714,7 +713,7 @@ export default function BlogPage() {
  "transition-all duration-700 delay-200",
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}>
- Explore AI WorkflowAutomation'smostnewTrend, ProductUpdate, TechnologyDepthParseandSuccessCase Studies
+ Explore the latest AI workflow automation trends, product updates and case studies
  </p>
 
  {/* Search */}
@@ -725,7 +724,7 @@ export default function BlogPage() {
  )}>
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
  <Input
- placeholder="SearchArticle, Tutorial, Case Studies..."
+ placeholder="Search articles, tutorials, case studies..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="h-12 pl-11 pr-4 rounded-full bg-surface-100/50 backdrop-blur-sm border-border/30 text-foreground placeholder:text-foreground-lighter focus:border-brand/50 focus:ring-brand/20"
@@ -889,13 +888,13 @@ export default function BlogPage() {
  <div className="flex items-center gap-3 p-4 rounded-xl bg-brand/10 border border-brand/20">
  <Tag className="w-4 h-4 text-brand" />
  <span className="text-[13px] text-foreground">
- currentlyatFilterTags: <span className="font-semibold">{selectedTag}</span>
+ Currently filtering by tag: <span className="font-semibold">{selectedTag}</span>
  </span>
  <button 
  onClick={() => setSelectedTag(null)}
  className="ml-auto text-[13px] text-brand hover:underline"
  >
- ClearFilter
+ Clear Filter
  </button>
  </div>
  </div>
@@ -1019,10 +1018,10 @@ export default function BlogPage() {
  <Search className="w-7 h-7 text-foreground-lighter" />
  </div>
  <h3 className="text-[15px] font-semibold text-foreground mb-2">
- NotoRelatedArticle
+ No related articles
  </h3>
  <p className="text-foreground-light text-[13px] mb-8">
- TryAdjustSearchKeywordsorSelectotherheCategory
+ Try adjusting search keywords or select another category
  </p>
  <Button
  variant="outline"
@@ -1046,7 +1045,7 @@ export default function BlogPage() {
  className="h-11 px-8 rounded-full border-border/30 hover:border-brand/30"
  onClick={() => setShowMorePosts(true)}
  >
- Load moreArticle
+ Load More Articles
  <span className="ml-2 text-[11px] text-foreground-lighter">
  ({filteredPosts.length - 9} )
  </span>
@@ -1061,7 +1060,7 @@ export default function BlogPage() {
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <div className="flex items-center gap-2 mb-5">
  <TrendingUp className="w-4 h-4 text-brand" />
- <h3 className="text-[14px] font-semibold text-foreground">PopularArticle</h3>
+ <h3 className="text-[14px] font-semibold text-foreground">Popular Articles</h3>
  </div>
  <div className="space-y-4">
  {popularPosts.map((post, index) => (
@@ -1085,7 +1084,7 @@ export default function BlogPage() {
  </h4>
  <div className="flex items-center gap-2 mt-1 text-[11px] text-foreground-lighter">
  <Eye className="w-3 h-3" />
- {formatNumber(post.views)} Read
+ {formatNumber(post.views)} reads
  </div>
  </div>
  </Link>
@@ -1097,7 +1096,7 @@ export default function BlogPage() {
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <div className="flex items-center gap-2 mb-5">
  <Users className="w-4 h-4 text-purple-400" />
- <h3 className="text-[14px] font-semibold text-foreground">userTeam</h3>
+ <h3 className="text-[14px] font-semibold text-foreground">Author Team</h3>
  </div>
  <div className="space-y-4">
  {authors.map((author) => (
@@ -1111,7 +1110,7 @@ export default function BlogPage() {
  </div>
  <div className="text-right">
  <span className="text-[13px] font-semibold text-foreground">{author.articles}</span>
- <span className="text-[11px] text-foreground-lighter ml-1"></span>
+ <span className="text-[11px] text-foreground-lighter ml-1">articles</span>
  </div>
  </div>
  ))}
@@ -1120,12 +1119,12 @@ export default function BlogPage() {
 
  {/* Quick Links */}
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-brand/20">
- <h3 className="text-[14px] font-semibold text-foreground mb-4">QuickNavigation</h3>
+ <h3 className="text-[14px] font-semibold text-foreground mb-4">Quick Navigation</h3>
  <div className="space-y-2">
  {[
- { href: "/docs", icon: BookOpen, label: "Documentcenter" },
+ { href: "/docs", icon: BookOpen, label: "Documentation Center" },
  { href: "/templates", icon: Rocket, label: "Template Gallery" },
- { href: "/community", icon: MessageSquare, label: "CommunityDiscussion" },
+ { href: "/community", icon: MessageSquare, label: "Community Discussion" },
  { href: "/changelog", icon: Sparkles, label: "Change Log" },
  ].map((item) => (
  <Link 
@@ -1153,11 +1152,11 @@ export default function BlogPage() {
  <BookOpen className="w-5 h-5 text-brand" />
  <h2 className="text-[20px]">Series</h2>
  </div>
- <p className="text-[13px] text-foreground-light">SystemLearn, enterMasterWorkflowAutomation</p>
+ <p className="text-[13px] text-foreground-light">Learn the system and master workflow automation</p>
  </div>
  <Link href="/learn/courses">
  <Button variant="outline" className="rounded-full border-border/30">
- View allCourse
+ View All Courses
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -1197,7 +1196,7 @@ export default function BlogPage() {
  {series.description}
  </p>
  <div className="flex items-center gap-3 text-[11px] text-foreground-lighter">
- <span>{series.articles} Article</span>
+ <span>{series.articles} Articles</span>
  <span>·</span>
  <span>{series.totalReadTime}</span>
  </div>
@@ -1215,9 +1214,9 @@ export default function BlogPage() {
  <div>
  <div className="lobe-section-header mb-2">
  <Video className="w-5 h-5 text-purple-400" />
- <h2 className="text-[20px]">nowwillHost'sNetworkWorkshopwill</h2>
+ <h2 className="text-[20px]">Upcoming Webinars</h2>
  </div>
- <p className="text-[13px] text-foreground-light">andExpertReal-time, enterLearnAutomationTechnology</p>
+ <p className="text-[13px] text-foreground-light">Interact with experts in real time and learn automation technology</p>
  </div>
  </div>
  <div className="grid md:grid-cols-3 gap-4">
@@ -1228,7 +1227,7 @@ export default function BlogPage() {
  >
  <div className="flex items-center gap-2 mb-4">
  <span className="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[11px] font-medium">
- lineonLive
+ Online Live
  </span>
  <span className="text-[11px] text-foreground-lighter">
  {webinar.date} {webinar.time}
@@ -1249,10 +1248,10 @@ export default function BlogPage() {
  <div className="flex items-center justify-between pt-4 border-t border-border/20">
  <span className="text-[11px] text-foreground-lighter">
  <Users className="w-3 h-3 inline mr-1" />
- {webinar.registrations} personalreadyRegister
+ {webinar.registrations} people already registered
  </span>
  <Button size="sm" className="h-8 px-4 rounded-full bg-foreground text-background text-[11px]">
- NowRegister
+ Register Now
  </Button>
  </div>
  </div>
@@ -1266,7 +1265,7 @@ export default function BlogPage() {
  <div className="max-w-6xl mx-auto">
  <div className="lobe-section-header mb-10">
  <Award className="w-5 h-5 text-brand" />
- <h2 className="text-[20px]">FreeResourceDownload</h2>
+ <h2 className="text-[20px]">Free Resource Downloads</h2>
  </div>
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {downloadableResources.map((resource) => {
@@ -1287,10 +1286,10 @@ export default function BlogPage() {
  </h3>
  <div className="flex items-center justify-between pt-4 border-t border-border/20">
  <span className="text-[11px] text-foreground-lighter">
- {formatNumber(resource.downloads)} timesDownload
+ {formatNumber(resource.downloads)} downloads
  </span>
  <Button size="sm" variant="outline" className="h-7 px-3 rounded-full text-[11px] border-brand/30 text-brand hover:bg-brand/10">
- FreeDownload
+ Free Download
  </Button>
  </div>
  </div>
@@ -1306,11 +1305,11 @@ export default function BlogPage() {
  <div className="flex items-center justify-between mb-10">
  <div className="lobe-section-header">
  <MessageSquare className="w-5 h-5 text-orange-400" />
- <h2 className="text-[20px]">CommunityFeatured</h2>
+ <h2 className="text-[20px]">Community Featured</h2>
  </div>
  <Link href="/community">
  <Button variant="outline" className="rounded-full border-border/30">
- JoinCommunity
+ Join Community
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -1354,8 +1353,8 @@ export default function BlogPage() {
  <section className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="text-[20px] font-semibold text-foreground mb-4">readuserReviews</h2>
- <p className="text-[13px] text-foreground-light">seeseeotherheUserifwhatReviewsWe'sContent</p>
+ <h2 className="text-[20px] font-semibold text-foreground mb-4">User Reviews</h2>
+ <p className="text-[13px] text-foreground-light">See what other users say about our content.</p>
  </div>
  <div className="grid md:grid-cols-3 gap-6">
  {testimonials.map((testimonial, index) => (
@@ -1395,13 +1394,13 @@ export default function BlogPage() {
  <div className="relative text-center">
  <div className="lobe-badge mb-6 mx-auto w-fit">
  <Sparkles className="w-4 h-4" />
- eachweeksFeaturedPush
+ Weekly Featured Newsletter
  </div>
  <h2 className="text-[24px] sm:text-[30px] font-semibold text-foreground mb-4">
  Stay ahead of the curve
  </h2>
  <p className="text-[15px] text-foreground-light mb-8 max-w-xl mx-auto">
- SubscriptionWe's Newsletter, Fetchmostnew'sAI WorkflowAutomationTrend, ProductUpdateandContent
+ Subscribe to our newsletter for the latest AI workflow automation trends, product updates and content
  </p>
  <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-6">
  <Input
@@ -1410,22 +1409,22 @@ export default function BlogPage() {
  className="h-12 flex-1 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter focus:border-brand/50"
  />
  <Button className="h-12 px-8 rounded-full bg-foreground text-background font-semibold hover:bg-foreground/90">
- NowSubscription
+ Subscribe Now
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </div>
  <div className="flex flex-wrap justify-center gap-6 text-[12px] text-foreground-lighter">
  <span className="flex items-center gap-1.5">
  <Users className="w-4 h-4 text-brand" />
- 12,000+ Subscriptionuser
+ 12,000+ Subscribers
  </span>
  <span className="flex items-center gap-1.5">
  <Clock className="w-4 h-4 text-brand" />
- eachweeks3Send
+ 3 issues per week
  </span>
  <span className="flex items-center gap-1.5">
  <Shield className="w-4 h-4 text-brand" />
- AnytimeUnsubscribe
+ Unsubscribe anytime
  </span>
  </div>
  </div>
@@ -1437,21 +1436,21 @@ export default function BlogPage() {
  <section className="py-16 px-6">
  <div className="max-w-4xl mx-auto text-center">
  <h2 className="text-[20px] font-semibold text-foreground mb-4">
- PrepareStartBuildSmartWorkflow??
+ Ready to Build Smart Workflows?
  </h2>
  <p className="text-[13px] text-foreground-light mb-8">
- FreeSign Up, NowExperience AI Agent 'slargeFeatures
+ Sign up for free and experience the full power of AI agents
  </p>
  <div className="flex flex-wrap justify-center gap-4">
  <Link href="/register">
  <Button className="h-12 px-8 rounded-full bg-foreground text-background font-semibold hover:bg-foreground/90">
- FreeStart
+ Get Started Free
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
  <Link href="/demo">
  <Button variant="outline" className="h-12 px-8 rounded-full border-border/30 hover:border-foreground/20">
- AppointmentDemo
+ Book a Demo
  </Button>
  </Link>
  </div>

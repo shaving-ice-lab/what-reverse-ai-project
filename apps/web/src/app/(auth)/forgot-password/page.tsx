@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
 
  // VerifyEmail
  if (!email || !email.includes("@")) {
- setError("Please enterValid'sEmail Address");
+ setError("Please enter a valid email address");
  setIsSubmitting(false);
  return;
  }
@@ -70,14 +70,14 @@ export default function ForgotPasswordPage() {
  </div>
  
  <h1 className="text-[24px] font-semibold text-foreground mb-2">
- EmailalreadySend
+ Email Sent
  </h1>
  
  <p className="text-[15px] text-muted-foreground mb-2">
- Wealready <strong className="text-foreground">{email}</strong> SendPasswordResetLink
+ We've sent a password reset link to <strong className="text-foreground">{email}</strong>
  </p>
  <p className="text-[14px] text-muted-foreground mb-8">
- PleaseCheckyou'sInboxandGarbageEmailFolder
+ Please check your inbox and spam folder
  </p>
 
  <div className="space-y-3">
@@ -88,19 +88,19 @@ export default function ForgotPasswordPage() {
  }}
  className="w-full h-[52px] rounded-xl bg-muted border border-border text-foreground font-medium text-[15px] hover:bg-muted/80 transition-all cursor-pointer active:scale-[0.98]"
  >
- UsageotherheEmail
+ Use Another Email
  </button>
  
  <Link
  href="/login"
  className="flex items-center justify-center gap-2 w-full h-[52px] rounded-xl bg-primary text-primary-foreground font-medium text-[15px] hover:bg-primary/90 transition-all active:scale-[0.98]"
  >
- BackSign In
+ Back to Sign In
  </Link>
  </div>
 
  <p className="text-[14px] text-muted-foreground mt-8">
- NotoEmail?{""}
+ Didn't receive an email?{""}
  <button
  onClick={() => {
  setIsSubmitting(true);
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
  className="text-primary hover:underline cursor-pointer"
  disabled={isSubmitting}
  >
- {isSubmitting ? "Send...": "re-newSend"}
+ {isSubmitting ? "Send...": "Resend"}
  </button>
  </p>
  </div>
@@ -140,7 +140,7 @@ export default function ForgotPasswordPage() {
  Forgot Password?
  </h1>
  <p className="mt-2 text-[15px] text-muted-foreground">
- Inputyou'sEmail Address, WewillSendPasswordResetLink
+ Enter your email address and we'll send you a password reset link
  </p>
  </div>
 
@@ -185,7 +185,7 @@ export default function ForgotPasswordPage() {
  </>
  ) : (
  <>
- SendResetLink
+ Send Reset Link
  <ArrowRight className="w-4 h-4" />
  </>
  )}
@@ -200,15 +200,15 @@ export default function ForgotPasswordPage() {
  className="inline-flex items-center gap-2 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
  >
  <ArrowLeft className="w-4 h-4" />
- BackSign In
+ Back to Sign In
  </Link>
  </div>
 
  {/* FooterLink */}
  <p className="text-center text-[14px] text-muted-foreground mt-6">
- Not yetAccount?{""}
+ Don't have an account?{""}
  <Link href="/register" className="text-foreground hover:text-primary font-medium transition-colors">
- NowSign Up
+ Sign Up Now
  </Link>
  </p>
  </div>

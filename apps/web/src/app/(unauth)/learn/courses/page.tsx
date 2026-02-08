@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * LearnCoursePage - LobeHub StyleDesign
+ * LearnCoursePage - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -27,22 +27,22 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// CourseCategory
+// Course Categories
 const categories = [
- { id: "all", name: "allsectionCourse" },
- { id: "beginner", name: "Getting Started" },
- { id: "intermediate", name: "Advanced" },
- { id: "advanced", name: "Advanced" },
- { id: "ai", name: "AI " },
- { id: "integration", name: "Integration" },
+  { id: "all", name: "All Courses" },
+  { id: "beginner", name: "Beginner" },
+  { id: "intermediate", name: "Intermediate" },
+  { id: "advanced", name: "Advanced" },
+  { id: "ai", name: "AI" },
+  { id: "integration", name: "Integration" },
 ];
 
-// CourseData
+// Course Data
 const courses = [
  {
  id: "getting-started",
- title: "AgentFlow Getting StartedGuide",
- description: "fromStartLearn AgentFlow, MasterWorkflowCreate'sBasic",
+    title: "AgentFlow Getting Started Guide",
+    description: "Learn AgentFlow from scratch and master the basics of workflow creation",
  thumbnail: "/images/courses/getting-started.jpg",
  duration: "45 min",
  lessons: 8,
@@ -52,12 +52,12 @@ const courses = [
  instructor: "AgentFlow Team",
  free: true,
  featured: true,
- topics: ["BasicConcept", "faceIntroduction", "#1Workflow", "NodeConfig"],
+    topics: ["Basic Concepts", "Interface Tour", "First Workflow", "Node Configuration"],
  },
  {
  id: "ai-agent-mastery",
- title: "AI Agent completeallGuide",
- description: "enterLearnifwhatatWorkflowIntegrationandUsage AI Agent",
+    title: "AI Agent Complete Guide",
+    description: "Learn how to integrate and use AI agents in your workflows",
  thumbnail: "/images/courses/ai-agent.jpg",
  duration: "2 h",
  lessons: 15,
@@ -67,12 +67,12 @@ const courses = [
  instructor: "Li Ming",
  free: false,
  featured: true,
- topics: ["AI ModelSelect", "Prompt ", "ContextManage", "OutputParse"],
+    topics: ["AI Model Selection", "Prompt Engineering", "Context Management", "Output Parsing"],
  },
  {
  id: "automation-workflows",
- title: "EnterpriseAutomationPractical",
- description: "LearnifwhatBuildEnterprise-gradeAutomationWorkflow, ImproveTeamrate",
+    title: "Enterprise Automation in Practice",
+    description: "Learn how to build enterprise-grade automation workflows and boost team productivity",
  thumbnail: "/images/courses/automation.jpg",
  duration: "3 h",
  lessons: 20,
@@ -82,27 +82,27 @@ const courses = [
  instructor: "Wang Fang",
  free: false,
  featured: false,
- topics: ["FlowAnalytics", "ErrorProcess", "MonitorAlert", "Best Practices"],
+    topics: ["Flow Analytics", "Error Handling", "Monitoring & Alerts", "Best Practices"],
  },
  {
  id: "api-integration",
- title: "API IntegrationDevelopment",
- description: "Master AgentFlow API, ImplementCustomIntegrationandAutomation",
+    title: "API Integration Development",
+    description: "Master the AgentFlow API to implement custom integrations and automation",
  thumbnail: "/images/courses/api.jpg",
  duration: "2.5 h",
  lessons: 18,
  level: "advanced",
  rating: 4.9,
  students: 3400,
- instructor: "",
- free: false,
- featured: false,
- topics: ["REST API", "Webhook", "SDK Usage", "CustomNode"],
+    instructor: "Zhang Hao",
+    free: false,
+    featured: false,
+    topics: ["REST API", "Webhook", "SDK Usage", "Custom Nodes"],
  },
  {
  id: "data-processing",
- title: "DataProcessandConvert",
- description: "LearnDataClean, ConvertandProcess'sAdvancedTips",
+    title: "Data Processing and Transformation",
+    description: "Learn advanced techniques for data cleaning, transformation, and processing",
  thumbnail: "/images/courses/data.jpg",
  duration: "1.5 h",
  lessons: 12,
@@ -112,12 +112,12 @@ const courses = [
  instructor: "Liu Yang",
  free: true,
  featured: false,
- topics: ["JSON Process", "DataMapping", "BatchAction", "DataVerify"],
+    topics: ["JSON Processing", "Data Mapping", "Batch Operations", "Data Validation"],
  },
  {
  id: "security-compliance",
- title: "SecurityandCompliance",
- description: "WorkflowSecurityBest PracticesandComplianceneed",
+    title: "Security and Compliance",
+    description: "Workflow security best practices and compliance requirements",
  thumbnail: "/images/courses/security.jpg",
  duration: "1 h",
  lessons: 10,
@@ -127,32 +127,32 @@ const courses = [
  instructor: "Chen Jing",
  free: false,
  featured: false,
- topics: ["AuthenticationAuthorize", "DataEncrypt", "Audit Log", "ComplianceCheck"],
+    topics: ["Authentication & Authorization", "Data Encryption", "Audit Logs", "Compliance Checks"],
  },
 ];
 
-// LearnPath
+// Learning Paths
 const learningPaths = [
  {
  id: "beginner",
- title: "userPath",
- description: "Suitable AgentFlow 'snewUser",
+    title: "Beginner Path",
+    description: "Perfect for new AgentFlow users",
  courses: 4,
  duration: "6 h",
  color: "#4e8fff",
  },
  {
  id: "developer",
- title: "DevelopersPath",
- description: "faceneedneed API Integration'sDevelopers",
+    title: "Developer Path",
+    description: "For developers who need API integrations",
  courses: 5,
  duration: "10 h",
  color: "#3B82F6",
  },
  {
  id: "enterprise",
- title: "EnterpriseUserPath",
- description: "Enterprise-gradeAutomationandTeamCollaboration",
+    title: "Enterprise Path",
+    description: "Enterprise-grade automation and team collaboration",
  courses: 6,
  duration: "12 h",
  color: "#8B5CF6",
@@ -182,24 +182,24 @@ export default function CoursesPage() {
  <div className="max-w-6xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <GraduationCap className="h-4 w-4" />
- Learncenter
+            Learning Center
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
  Master AI Workflow
  <br />
- <span className="text-[#4e8fff]">fromGetting StartedtoExpert</span>
+            <span className="text-[#4e8fff]">From Beginner to Expert</span>
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-10">
- ViaSystem'sVideoCourseandPracticeitem, QuickImproveyou'sAgentFlow can
+ Quickly improve your AgentFlow skills through systematic video courses and hands-on exercises
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative mb-8">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground-lighter" />
  <Input
- placeholder="SearchCourse..."
+ placeholder="Search courses..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="h-14 pl-12 pr-4 rounded-full bg-surface-100/30 border-border/30 text-[15px]"
@@ -210,28 +210,28 @@ export default function CoursesPage() {
  <div className="flex flex-wrap justify-center gap-8 text-[12px]">
  <div className="flex items-center gap-2 text-foreground-lighter">
  <Video className="w-4 h-4 text-[#4e8fff]" />
- <span><strong className="text-foreground">{courses.length}</strong> Course</span>
- </div>
- <div className="flex items-center gap-2 text-foreground-lighter">
- <Users className="w-4 h-4 text-[#4e8fff]" />
- <span><strong className="text-foreground">50,000+</strong> </span>
- </div>
- <div className="flex items-center gap-2 text-foreground-lighter">
- <Clock className="w-4 h-4 text-[#4e8fff]" />
- <span><strong className="text-foreground">15+</strong> hContent</span>
- </div>
- <div className="flex items-center gap-2 text-foreground-lighter">
- <Award className="w-4 h-4 text-[#4e8fff]" />
- <span><strong className="text-foreground">4.8</strong> AverageRating</span>
+            <span><strong className="text-foreground">{courses.length}</strong> Courses</span>
+          </div>
+          <div className="flex items-center gap-2 text-foreground-lighter">
+            <Users className="w-4 h-4 text-[#4e8fff]" />
+            <span><strong className="text-foreground">50,000+</strong> Students</span>
+          </div>
+          <div className="flex items-center gap-2 text-foreground-lighter">
+            <Clock className="w-4 h-4 text-[#4e8fff]" />
+            <span><strong className="text-foreground">15+</strong> Hours of Content</span>
+          </div>
+          <div className="flex items-center gap-2 text-foreground-lighter">
+            <Award className="w-4 h-4 text-[#4e8fff]" />
+            <span><strong className="text-foreground">4.8</strong> Average Rating</span>
  </div>
  </div>
  </div>
  </section>
 
- {/* LearnPath */}
+ {/* Learning Paths */}
  <section className="py-12 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
- <h2 className="lobe-section-header mb-6">RecommendedLearnPath</h2>
+          <h2 className="lobe-section-header mb-6">Recommended Learning Paths</h2>
  <div className="grid md:grid-cols-3 gap-4">
  {learningPaths.map((path) => (
  <Link
@@ -256,7 +256,7 @@ export default function CoursesPage() {
  {path.title}
  </h3>
  <p className="text-[11px] text-foreground-lighter">
- {path.courses} Course · {path.duration}
+ {path.courses} Courses · {path.duration}
  </p>
  </div>
  </div>
@@ -267,13 +267,13 @@ export default function CoursesPage() {
  </div>
  </section>
 
- {/* FeaturedCourse */}
+ {/* Featured Courses */}
  {!searchQuery && selectedCategory === "all" && (
  <section className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
  <div className="flex items-center gap-2 mb-6">
  <Star className="w-5 h-5 text-[#4e8fff]" />
- <h2 className="lobe-section-header">FeaturedCourse</h2>
+              <h2 className="lobe-section-header">Featured Courses</h2>
  </div>
  <div className="grid md:grid-cols-2 gap-6">
  {featuredCourses.map((course) => (
@@ -317,7 +317,7 @@ export default function CoursesPage() {
  </span>
  <span className="flex items-center gap-1">
  <Video className="w-3 h-3" />
- {course.lessons} 
+                    {course.lessons} lessons
  </span>
  <span className="flex items-center gap-1">
  <Star className="w-3 h-3 text-yellow-500" />
@@ -332,10 +332,10 @@ export default function CoursesPage() {
  </section>
  )}
 
- {/* CourseCategoryandList */}
+ {/* Course Categories and List */}
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
- {/* CategoryFilter */}
+ {/* Category Filter */}
  <div className="flex flex-wrap gap-2 mb-8">
  {categories.map((category) => (
  <button
@@ -353,7 +353,7 @@ export default function CoursesPage() {
  ))}
  </div>
 
- {/* CourseGrid */}
+ {/* Course Grid */}
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
  {filteredCourses.map((course) => (
  <Link
@@ -394,7 +394,7 @@ export default function CoursesPage() {
  course.level === "intermediate" && "bg-[#4e8fff]/10 text-[#4e8fff]",
  course.level === "advanced" && "bg-purple-400/10 text-purple-400"
  )}>
- {course.level === "beginner" ? "Getting Started": course.level === "intermediate" ? "Advanced": "Advanced"}
+                {course.level === "beginner" ? "Beginner" : course.level === "intermediate" ? "Intermediate" : "Advanced"}
  </span>
  </div>
 
@@ -414,7 +414,7 @@ export default function CoursesPage() {
  </span>
  <span className="flex items-center gap-1">
  <Video className="w-3 h-3" />
- {course.lessons} 
+                    {course.lessons} lessons
  </span>
  </div>
  <div className="flex items-center gap-1 text-[12px]">
@@ -431,8 +431,8 @@ export default function CoursesPage() {
  {filteredCourses.length === 0 && (
  <div className="text-center py-16">
  <GraduationCap className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
- <h3 className="text-[15px] font-medium text-foreground mb-2">NotoRelatedCourse</h3>
- <p className="text-[13px] text-foreground-light mb-6">TryUsageotherheKeywordsorSelectotherheCategory</p>
+            <h3 className="text-[15px] font-medium text-foreground mb-2">No matching courses found</h3>
+            <p className="text-[13px] text-foreground-light mb-6">Try using different keywords or selecting another category</p>
  <Button
  variant="outline"
  className="rounded-full border-border/50 text-foreground-light"
@@ -441,7 +441,7 @@ export default function CoursesPage() {
  setSelectedCategory("all");
  }}
  >
- View allCourse
+              View All Courses
  </Button>
  </div>
  )}
@@ -458,15 +458,15 @@ export default function CoursesPage() {
  <Zap className="w-8 h-8 text-white" />
  </div>
  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
- Startyou'sLearnJourney
+ Start Your Learning Journey
  </h2>
  <p className="text-white/80 mb-8 max-w-md mx-auto">
- JoinExceed 50,000 , 1Master AI Workflow'slargecanpower
+            Join over 50,000 learners and master the full power of AI workflows
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/learn/path/beginner">
  <Button className="h-12 px-8 bg-white hover:bg-white/90 text-[#4e8fff] font-medium rounded-full">
- StartLearn
+                  Start Learning
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
@@ -475,7 +475,7 @@ export default function CoursesPage() {
  variant="outline"
  className="h-12 px-8 border-white/30 text-white hover:bg-white/10 rounded-full"
  >
- FreeSign Up
+                  Sign Up Free
  </Button>
  </Link>
  </div>

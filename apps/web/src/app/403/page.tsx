@@ -2,7 +2,7 @@
 
 /**
  * 403 Forbidden Page - Insufficient permissions
- * Manus Style: Minimal, largeWhitespace, optimal
+ * Manus Style: Minimal, large whitespace, optimal
  */
 
 import { useState, useEffect } from "react";
@@ -30,11 +30,11 @@ const quickLinks = [
  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-// CommonReasonTip
+// Common Reason Tips
 const commonReasons = [
- { icon: Shield, text: "you'sAccountPermissionLevelnot" },
- { icon: Users, text: "ResourceonlylimitSpecificUsergroupAccess" },
- { icon: Lock, text: "Sign InwillcancanExpired" },
+ { icon: Shield, text: "Your account doesn't have sufficient permissions" },
+ { icon: Users, text: "This resource is restricted to specific user groups" },
+ { icon: Lock, text: "Your sign-in session may have expired" },
 ];
 
 export default function ForbiddenPage() {
@@ -48,7 +48,7 @@ export default function ForbiddenPage() {
  <div className="min-h-screen bg-background flex flex-col overflow-hidden">
  <SiteHeader />
 
- {/* Manus StyleBackground */}
+ {/* Manus Style Background */}
  <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
  <div className="absolute inset-0 bg-[linear-gradient(to_bottom,var(--color-background),var(--color-muted)/20)]" />
  <div
@@ -63,7 +63,7 @@ export default function ForbiddenPage() {
  {/* Main Content - Manus Style */}
  <main className="flex-1 flex items-center justify-center px-6 py-16">
  <div className="max-w-md mx-auto text-center">
- {/* 403 countchar - Minimalist Style */}
+ {/* 403 Number - Minimalist Style */}
  <div
  className={cn(
  "mb-8",
@@ -106,10 +106,10 @@ export default function ForbiddenPage() {
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}
  >
- Sorry, youNoAccessthisPage'sPermission.PleaseTryre-newSign In, SwitchAccount, orContactAdminFetchAccessPermission.
+ Sorry, you don&apos;t have permission to access this page. Please try signing in again, switching accounts, or contacting an admin to request access.
  </p>
 
- {/* mainneedAction - Manus StyleButton */}
+ {/* Main Actions - Manus Style Buttons */}
  <div
  className={cn(
  "flex flex-col sm:flex-row gap-3 justify-center mb-12",
@@ -120,7 +120,7 @@ export default function ForbiddenPage() {
  <Link href="/login">
  <Button className="h-11 px-6 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-full">
  <LogIn className="mr-2 w-4 h-4" />
- re-newSign In
+ Sign In Again
  </Button>
  </Link>
  <Button
@@ -129,11 +129,11 @@ export default function ForbiddenPage() {
  onClick={() => window.history.back()}
  >
  <ArrowLeft className="mr-2 w-4 h-4" />
- Backon1page
+ Go Back
  </Button>
  </div>
 
- {/* CommonReasonTip */}
+ {/* Common Reason Tips */}
  <div
  className={cn(
  "mb-8 p-5 rounded-2xl bg-card border border-border text-left",
@@ -142,7 +142,7 @@ export default function ForbiddenPage() {
  )}
  >
  <h3 className="text-sm font-semibold text-foreground mb-3">
- cancan'sReason
+ Possible Reasons
  </h3>
  <ul className="space-y-2">
  {commonReasons.map((reason, index) => (
@@ -166,7 +166,7 @@ export default function ForbiddenPage() {
  )}
  >
  <p className="text-sm text-muted-foreground mb-6">
- orAccesswithdownPage
+ Or visit these pages
  </p>
  <div className="flex flex-wrap justify-center gap-2">
  {quickLinks.map((link) => (
@@ -189,7 +189,7 @@ export default function ForbiddenPage() {
  </div>
  </div>
 
- {/* HelpTip - Manus Style */}
+ {/* Help Tip - Manus Style */}
  <div
  className={cn(
  "mt-12 p-6 rounded-2xl bg-card border border-border",
@@ -203,10 +203,10 @@ export default function ForbiddenPage() {
  </div>
  <div>
  <h3 className="font-semibold text-foreground mb-1 text-sm">
- needneedHelp?
+ Need Help?
  </h3>
  <p className="text-xs text-muted-foreground mb-3">
- ifresultyouasthisis1Error, orneedneedPleaseAccessPermission, We'sSupportTeamAnytimeasyouService
+ If you believe this is an error or need access permissions, our support team is always here to help.
  </p>
  <Link href="/contact">
  <Button
@@ -214,7 +214,7 @@ export default function ForbiddenPage() {
  size="sm"
  className="rounded-full text-xs h-8 px-4 border-border hover:border-warning/30"
  >
- ContactSupport
+ Contact Support
  </Button>
  </Link>
  </div>

@@ -32,94 +32,94 @@ const supportQuickLinks = [
  {
  icon: LifeBuoy,
  title: "Help Center",
- description: "BrowseHelpDirectoryandPopularArticle",
+ description: "Browse help directory and popular articles",
  href: "/help",
  },
  {
  icon: FileText,
- title: "FAQ FAQ",
- description: "QuickIssueAnswer",
+ title: "FAQ",
+ description: "Quick issue answers",
  href: "/faq",
  },
  {
  icon: Wrench,
- title: "FaultGuide",
- description: "byStepRunException",
+ title: "Fault Guide",
+ description: "Step-by-step troubleshooting",
  href: "/help/troubleshooting",
  },
  {
  icon: MessageSquare,
- title: "ContactSupport",
- description: "moremultiplemethodandSupportChannel",
+ title: "Contact Support",
+ description: "Multiple methods and support channels",
  href: "/contact",
  },
 ];
 
 const supportCategories = [
- { id: "general", label: "1Consulting" },
- { id: "technical", label: "TechnologyIssue" },
- { id: "billing", label: "BillingandQuota" },
- { id: "account", label: "AccountandPermission" },
- { id: "security", label: "SecurityandCompliance" },
+ { id: "general", label: "General Consulting" },
+ { id: "technical", label: "Technology Issue" },
+ { id: "billing", label: "Billing and Quota" },
+ { id: "account", label: "Account and Permission" },
+ { id: "security", label: "Security and Compliance" },
  { id: "bug", label: "Bug Report" },
- { id: "feature", label: "FeaturesSuggestion" },
+ { id: "feature", label: "Feature Suggestion" },
 ];
 
 const supportPriorities = [
- { id: "critical", label: "UrgentBlock" },
- { id: "high", label: "Priority" },
- { id: "normal", label: "1Issue" },
- { id: "low", label: "Priority" },
+ { id: "critical", label: "Urgent / Blocking" },
+ { id: "high", label: "High Priority" },
+ { id: "normal", label: "Normal Issue" },
+ { id: "low", label: "Low Priority" },
 ];
 
 const fallbackSLA: SupportSLA = {
  key: "customer_support_sla",
- title: "CustomerSupportResponse SLA",
+ title: "Customer Support Response SLA",
  targets: [
  {
  priority: "critical",
  first_response_minutes: 60,
- first_response_target: "1 hinResponse",
- update_cadence: "each 4 hUpdate",
+ first_response_target: "1 hour initial response",
+ update_cadence: "Every 4 hours update",
  update_cadence_minutes: 240,
- resolution_target: "24 hinProvidePlan",
+ resolution_target: "24 hours to provide plan",
  resolution_minutes: 1440,
- applies_to: ["ProductionBlock", "SecurityEvent", "largeScaleUnavailable"],
+ applies_to: ["Production blocking", "Security event", "Large-scale unavailable"],
  },
  {
  priority: "high",
  first_response_minutes: 240,
- first_response_target: "4 hinResponse",
- update_cadence: "eachdayUpdate",
+ first_response_target: "4 hours initial response",
+ update_cadence: "Daily update",
  update_cadence_minutes: 1440,
- resolution_target: "3 Business DayintoProcessPlan",
+ resolution_target: "3 business days to process plan",
  resolution_minutes: 4320,
- applies_to: ["keyFeaturesException", "Payment/QuotaIssue"],
+ applies_to: ["Key feature exception", "Payment / Quota issue"],
  },
  {
  priority: "normal",
  first_response_minutes: 1440,
- first_response_target: "1 Business DayinResponse",
- update_cadence: "each 3 Business DayUpdate",
+ first_response_target: "1 business day initial response",
+ update_cadence: "Every 3 business days update",
  update_cadence_minutes: 4320,
- resolution_target: "7 Business DayinClosed LooportoAlternativePlan",
+ resolution_target: "7 business days closed loop or alternative plan",
  resolution_minutes: 10080,
- applies_to: ["FeaturesUsageIssue", "IntegrationConsulting"],
+ applies_to: ["Feature usage issue", "Integration consulting"],
  },
  {
  priority: "low",
  first_response_minutes: 4320,
- first_response_target: "3 Business DayinResponse",
- update_cadence: "byneedUpdate",
+ first_response_target: "3 business days initial response",
+ update_cadence: "Update as needed",
  update_cadence_minutes: 0,
- resolution_target: "EnterProductIteration",
+ resolution_target: "Enter product iteration",
  resolution_minutes: 0,
- applies_to: ["SuggestionFeedback", "Experienceoptimal"],
+ applies_to: ["Suggestion / Feedback", "Experience optimization"],
  },
  ],
  notes: [
- "Response SLA withtimesResponseas, ProcessProgresswillbyPriorityUpdate.",
- "Provide workspace/app InfoandLogsScreenshotcan.",
+ "Response SLA: response times and process progress will be updated by priority.",
+ "Providing workspace/app info and log screenshots helps.",
  ],
 };
 
@@ -202,19 +202,19 @@ export default function SupportPage() {
  return [
  {
  key: "email",
- name: "EmailSupport",
+ name: "Email Support",
  description: "support@agentflow.ai",
  contact: "support@agentflow.ai",
  },
  {
  key: "chat",
- name: "OnlineSupport",
- description: "WorkTime 9:00-18:00",
- contact: "OnlineChat",
+ name: "Online Support",
+ description: "Business hours 9:00–18:00",
+ contact: "Online chat",
  },
  {
  key: "phone",
- name: "PhoneConsulting",
+ name: "Phone Consulting",
  description: "400-888-8888",
  contact: "400-888-8888",
  },
@@ -223,7 +223,7 @@ export default function SupportPage() {
  return channels.map((channel) => ({
  key: channel.key,
  name: channel.name,
- description: channel.description || channel.contact || "SupportChannel",
+ description: channel.description || channel.contact || "Support channel",
  contact: channel.contact,
  }));
  }, [channels]);
@@ -280,7 +280,7 @@ export default function SupportPage() {
  setCaptchaRequired(true);
  }
  } else {
- setSubmitError("SubmitFailed, Please try again laterRetry");
+ setSubmitError("Submit failed. Please try again later.");
  }
  } finally {
  setIsSubmitting(false);
@@ -297,13 +297,13 @@ export default function SupportPage() {
  <div className="max-w-5xl mx-auto text-center relative z-10 px-6">
  <div className="lobe-badge mb-8">
  <LifeBuoy className="h-3.5 w-3.5" />
- <span>CustomerSuccessandSupportcenter</span>
- </div>
- <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- letIssuemoreClosed Loop
- </h1>
+<span>Customer Success and Support Center</span>
+</div>
+<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+Let issues move to closed loop
+</h1>
  <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
- fromtoTicketFollow up, Weaseach1UserProvideClear, canTrack'sSupportPath.
+ From ticket submission to follow-up, we provide every user with a clear, trackable support path.
  </p>
  </div>
  </section>
@@ -341,7 +341,7 @@ export default function SupportPage() {
  <div className="max-w-6xl mx-auto">
  <div className="flex items-center gap-2 mb-6">
  <LifeBuoy className="w-5 h-5 text-foreground-light" />
- <h2 className="text-xl font-semibold text-foreground">SupportChannel</h2>
+ <h2 className="text-xl font-semibold text-foreground">Support Channels</h2>
  </div>
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
  {channelCards.map((channel) => {
@@ -377,15 +377,15 @@ export default function SupportPage() {
  <div className="bg-surface-100/30 border border-border/30 rounded-2xl p-6">
  <div className="flex items-center justify-between mb-6">
  <div>
- <h2 className="text-xl font-semibold text-foreground">SubmitTicket</h2>
- <p className="text-[13px] text-foreground-lighter mt-1">
- Fill inkeyInfo, SystemwillAutoTierandCalculateResponse SLA.
- </p>
- </div>
- <div className="hidden sm:flex items-center gap-2 text-[12px] text-foreground-lighter">
- <BadgeCheck className="w-4 h-4 text-brand-500" />
- alreadySupport SLA Track
- </div>
+<h2 className="text-xl font-semibold text-foreground">Submit Ticket</h2>
+<p className="text-[13px] text-foreground-lighter mt-1">
+Fill in key info; the system will auto-tier and calculate response SLA.
+</p>
+</div>
+<div className="hidden sm:flex items-center gap-2 text-[12px] text-foreground-lighter">
+<BadgeCheck className="w-4 h-4 text-brand-500" />
+Support SLA tracking enabled
+</div>
  </div>
 
  {ticket ? (
@@ -393,32 +393,32 @@ export default function SupportPage() {
  <div className="flex items-center gap-3 mb-4">
  <CheckCircle2 className="w-6 h-6 text-brand-500" />
  <div>
- <h3 className="text-lg font-semibold text-foreground">TicketalreadySubmit</h3>
- <p className="text-[13px] text-foreground-lighter">
- ReferenceNumber: <span className="text-foreground font-medium">{ticket.reference}</span>
- </p>
- </div>
- </div>
- <div className="grid sm:grid-cols-2 gap-4 text-sm">
- <div className="rounded-xl border border-border/30 bg-surface-100/30 p-4">
- <div className="text-[11px] text-foreground-muted mb-1">EstimatedResponseDeadline</div>
+<h3 className="text-lg font-semibold text-foreground">Ticket submitted</h3>
+<p className="text-[13px] text-foreground-lighter">
+Reference number: <span className="text-foreground font-medium">{ticket.reference}</span>
+</p>
+</div>
+</div>
+<div className="grid sm:grid-cols-2 gap-4 text-sm">
+<div className="rounded-xl border border-border/30 bg-surface-100/30 p-4">
+<div className="text-[11px] text-foreground-muted mb-1">Estimated response deadline</div>
  <div className="text-foreground font-medium text-[13px]">
  {formatDateTime(ticket.sla_response_due_at)}
  </div>
  </div>
  <div className="rounded-xl border border-border/30 bg-surface-100/30 p-4">
- <div className="text-[11px] text-foreground-muted mb-1">CurrentStatus</div>
- <div className="text-foreground font-medium text-[13px]">{ticket.status}</div>
- </div>
- </div>
- <div className="flex flex-wrap gap-3 mt-6">
- <Button
- variant="outline"
- onClick={() => setTicket(null)}
- className="rounded-full border-border/50 hover:bg-surface-200/50"
- >
- SubmitnewTicket
- </Button>
+<div className="text-[11px] text-foreground-muted mb-1">Current status</div>
+<div className="text-foreground font-medium text-[13px]">{ticket.status}</div>
+</div>
+</div>
+<div className="flex flex-wrap gap-3 mt-6">
+<Button
+variant="outline"
+onClick={() => setTicket(null)}
+className="rounded-full border-border/50 hover:bg-surface-200/50"
+>
+Submit new ticket
+</Button>
  <Link href="/help">
  <Button className="rounded-full bg-foreground hover:bg-foreground/90 text-background">Continue</Button>
  </Link>
@@ -428,13 +428,13 @@ export default function SupportPage() {
  <form onSubmit={handleSubmit} className="space-y-4">
  <div className="grid sm:grid-cols-2 gap-4">
  <div>
- <label className="block text-[13px] font-medium text-foreground mb-2">
- ContactpersonName
- </label>
+<label className="block text-[13px] font-medium text-foreground mb-2">
+Contact person name
+</label>
  <Input
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- placeholder="you'sName(select)"
+ placeholder="Your name (optional)"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
@@ -455,9 +455,9 @@ export default function SupportPage() {
 
  <div className="grid sm:grid-cols-2 gap-4">
  <div>
- <label className="block text-[13px] font-medium text-foreground mb-2">
- IssueCategory
- </label>
+<label className="block text-[13px] font-medium text-foreground mb-2">
+Issue category
+</label>
  <select
  value={formData.category}
  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -491,53 +491,53 @@ export default function SupportPage() {
  <div className="grid sm:grid-cols-2 gap-4">
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Workspace ID(Optional)
- </label>
- <Input
- value={formData.workspaceId}
- onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
- placeholder="Used forQuickEnvironment"
- className="bg-surface-200/50 border-border/30"
- />
- </div>
- <div>
- <label className="block text-[13px] font-medium text-foreground mb-2">
- Workspace ID(Optional)
- </label>
- <Input
- value={formData.workspaceId}
- onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
- placeholder="ifandSpecificWorkspace"
- className="bg-surface-200/50 border-border/30"
- />
+Workspace ID (optional)
+</label>
+<Input
+value={formData.workspaceId}
+onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
+placeholder="Used for quick environment lookup"
+className="bg-surface-200/50 border-border/30"
+/>
+</div>
+<div>
+<label className="block text-[13px] font-medium text-foreground mb-2">
+Workspace ID (optional)
+</label>
+<Input
+value={formData.workspaceId}
+onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
+placeholder="e.g. if linking to a specific workspace"
+className="bg-surface-200/50 border-border/30"
+/>
  </div>
  </div>
 
  <div>
- <label className="block text-[13px] font-medium text-foreground mb-2">
- IssueTitle *
- </label>
+<label className="block text-[13px] font-medium text-foreground mb-2">
+Issue title *
+</label>
  <Input
  required
  value={formData.subject}
  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
- placeholder="PleaseneedDescriptionto'sIssue"
+ placeholder="Please describe your issue"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
 
  <div>
- <label className="block text-[13px] font-medium text-foreground mb-2">
- DetailedDescription *
- </label>
- <textarea
- required
- value={formData.description}
- onChange={(e) => setFormData({ ...formData, description: e.target.value })}
- rows={6}
- placeholder="IncludeStep, ErrorTip, ExpectResultetc"
- className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
- />
+<label className="block text-[13px] font-medium text-foreground mb-2">
+Detailed description *
+</label>
+<textarea
+required
+value={formData.description}
+onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+rows={6}
+placeholder="Include steps to reproduce, error messages, expected result, etc."
+className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
+/>
  </div>
 
  {captchaRequired && (
@@ -548,11 +548,11 @@ export default function SupportPage() {
  <Input
  value={captchaToken}
  onChange={(e) => setCaptchaToken(e.target.value)}
- placeholder="ifEnableVerification Code, PleasePaste token"
+ placeholder="If verification is enabled, paste your token here"
  className="bg-surface-200/50 border-border/30"
  />
  <p className="text-[11px] text-foreground-muted mt-2">
- TipFrequentRequest, PleaseDoneVerification Codeandre-newSubmit.
+ Tip: For frequent requests, complete verification and resubmit.
  </p>
  </div>
  )}
@@ -566,20 +566,20 @@ export default function SupportPage() {
  <div className="flex items-center justify-between">
  <div className="text-[11px] text-foreground-muted flex items-center gap-2">
  <Shield className="w-4 h-4" />
- WewillforSensitiveInfoProceedProcess
- </div>
- <Button type="submit" disabled={isSubmitting} className="rounded-full bg-foreground hover:bg-foreground/90 text-background">
- {isSubmitting ? (
- <>
- <Clock className="w-4 h-4 mr-2 animate-spin" />
- Submit...
- </>
- ) : (
- <>
- <Send className="w-4 h-4 mr-2" />
- SubmitTicket
- </>
- )}
+We will process sensitive info securely.
+</div>
+<Button type="submit" disabled={isSubmitting} className="rounded-full bg-foreground hover:bg-foreground/90 text-background">
+{isSubmitting ? (
+<>
+<Clock className="w-4 h-4 mr-2 animate-spin" />
+Submitting...
+</>
+) : (
+<>
+<Send className="w-4 h-4 mr-2" />
+Submit ticket
+</>
+)}
  </Button>
  </div>
  </form>
@@ -635,13 +635,13 @@ export default function SupportPage() {
  <div className="rounded-2xl border border-border/30 bg-surface-100/30 p-6">
  <div className="flex items-center gap-2 mb-3">
  <CheckCircle2 className="w-5 h-5 text-foreground-light" />
- <h3 className="text-lg font-semibold text-foreground">ProcessFlow</h3>
+ <h3 className="text-lg font-semibold text-foreground">Process Flow</h3>
  </div>
  <ul className="space-y-3 text-[13px] text-foreground-lighter">
- <li>1. AutoTierandCreateTicketNumber</li>
- <li>2. SupportTeamtimesResponseandSync SLA Time</li>
- <li>3. byPriorityUpdateProcess</li>
- <li>4. ResultandClosed LoopConfirm</li>
+ <li>1. Auto-categorize and create ticket number</li>
+ <li>2. Support team responds promptly and tracks SLA</li>
+ <li>3. Process updates based on priority</li>
+ <li>4. Resolve and confirm with closed-loop feedback</li>
  </ul>
  </div>
  </div>

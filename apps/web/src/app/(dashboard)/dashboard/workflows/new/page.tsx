@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * CreatenewWorkflowPage
- * Supabase Style: Densitymore, timesClear, GuideClear
+ * Create New Workflow Page
+ * Supabase Style: Dense layout, clear hierarchy, guided flow
  */
 
 import { useState } from "react";
@@ -36,90 +36,90 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// TriggerType
+// Trigger Types
 const triggers = [
  {
  id: "manual",
- name: "ManualTrigger",
- description: "ManualClickRunWorkflow",
+ name: "Manual Trigger",
+ description: "Manually click to run the workflow",
  icon: Play,
  },
  {
  id: "schedule",
- name: "ScheduledTrigger",
- description: "by'sTimeAutoRun",
+ name: "Scheduled Trigger",
+ description: "Automatically run at a scheduled time",
  icon: Clock,
  },
  {
  id: "webhook",
  name: "Webhook",
- description: "Via HTTP RequestTrigger",
+ description: "Trigger via HTTP request",
  icon: Webhook,
  },
  {
  id: "email",
- name: "EmailTrigger",
- description: "toSpecificEmailtimeTrigger",
+ name: "Email Trigger",
+ description: "Trigger when a specific email is received",
  icon: Mail,
  },
 ];
 
-// TemplateCategory
+// Template Categories
 const templateCategories = [
- { id: "all", name: "allsection" },
+ { id: "all", name: "All" },
  { id: "popular", name: "Popular" },
  { id: "automation", name: "Automation" },
  { id: "ai", name: "AI App" },
  { id: "integration", name: "Integration" },
- { id: "data", name: "DataProcess" },
+ { id: "data", name: "Data Processing" },
 ];
 
-// WorkflowTemplate
+// Workflow Templates
 const templates = [
  {
  id: "blank",
- name: "EmptyWorkflow",
- description: "fromStartCreateyou'sWorkflow",
+ name: "Empty Workflow",
+ description: "Create your workflow from scratch",
  icon: FileText,
  category: "all",
  popular: false,
  },
  {
  id: "ai-assistant",
- name: "AI SmartAssistant",
- description: "Usage AI AutoReplyandProcessTask",
+ name: "AI Smart Assistant",
+ description: "Use AI to automatically reply and process tasks",
  icon: Bot,
  category: "ai",
  popular: true,
  },
  {
  id: "data-sync",
- name: "DataSync",
- description: "atmultipleSystembetweenSyncData",
+ name: "Data Sync",
+ description: "Sync data between multiple systems",
  icon: Database,
  category: "data",
  popular: true,
  },
  {
  id: "notification",
- name: "MessageNotifications",
- description: "AutoSendMessageto Slack, Emailetc",
+ name: "Message Notifications",
+ description: "Automatically send messages to Slack, Email, etc.",
  icon: MessageSquare,
  category: "automation",
  popular: true,
  },
  {
  id: "schedule-report",
- name: "ScheduledReport",
- description: "PeriodicGenerateConcurrencyReport",
+ name: "Scheduled Report",
+ description: "Periodically generate and send reports",
  icon: Calendar,
  category: "automation",
  popular: false,
  },
  {
  id: "form-handler",
- name: "FormProcess",
- description: "AutoProcessFormSubmitData",
+ name: "Form Processing",
+ description: "Automatically process form submission data",
  icon: FileText,
  category: "integration",
  popular: false,
@@ -127,23 +127,23 @@ const templates = [
  {
  id: "crm-sync",
  name: "CRM Sync",
- description: "and CRM SystemBidirectionalSyncData",
+ description: "Bidirectional data sync with CRM systems",
  icon: Users,
  category: "integration",
  popular: false,
  },
  {
  id: "order-process",
- name: "OrderProcess",
- description: "AutomationOrderProcessFlow",
+ name: "Order Processing",
+ description: "Automate the order processing flow",
  icon: ShoppingCart,
  category: "automation",
  popular: false,
  },
  {
  id: "code-review",
- name: "CodeReview",
- description: "AutoReview PR andAddComment",
+ name: "Code Review",
+ description: "Automatically review PRs and add comments",
  icon: Code,
  category: "ai",
  popular: false,
@@ -160,7 +160,7 @@ export default function NewWorkflowPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [isCreating, setIsCreating] = useState(false);
 
- // FilterTemplate
+  // Filter Templates
  const filteredTemplates = templates.filter((template) => {
  const matchesCategory =
  templateCategory === "all" ||
@@ -176,27 +176,27 @@ export default function NewWorkflowPage() {
  const selectedTriggerData = triggers.find((trigger) => trigger.id === selectedTrigger);
 
  const checklistItems = [
- { label: "alreadySelectTemplate", ok: !!selectedTemplate },
- { label: "alreadyNamingWorkflow", ok: !!workflowName },
- { label: "alreadySelectTriggermethod", ok: !!selectedTrigger },
+ { label: "Template selected", ok: !!selectedTemplate },
+ { label: "Workflow named", ok: !!workflowName },
+ { label: "Trigger method selected", ok: !!selectedTrigger },
  ];
 
- // CreateWorkflow
+  // Create Workflow
  const handleCreate = async () => {
  setIsCreating(true);
- // MockCreate
+    // Mock Create
  await new Promise((resolve) => setTimeout(resolve, 1500));
- // NavigatetoEdit
+    // Navigate to Editor
  router.push("/dashboard/editor/new-workflow-id");
  };
 
- // Next
+  // Next Step
  const handleNext = () => {
  if (step === 1 && selectedTemplate) {
  if (selectedTemplate === "blank") {
  setStep(2);
  } else {
- // UsageTemplateDirectCreate
+      // Use template to create directly
  handleCreate();
  }
  } else if (step === 2 && workflowName && selectedTrigger) {
@@ -204,7 +204,7 @@ export default function NewWorkflowPage() {
  }
  };
 
- // CheckisnocanwithContinue
+  // Check if can proceed
  const canProceed = step === 1
  ? !!selectedTemplate
  : workflowName && selectedTrigger;
@@ -214,11 +214,11 @@ export default function NewWorkflowPage() {
  <div className="border-b border-border bg-background-studio">
  <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
  <PageHeader
- title="CreateWorkflow"
- description="SelectTemplate, ConfigTriggerConcurrencyAutomationFlow."
+ title="Create Workflow"
+ description="Select a template, configure a trigger and automate your flow."
  eyebrow="Workflows"
  backHref="/dashboard/workflows"
- backLabel="BackWorkflow"
+ backLabel="Back to Workflows"
  badge={(
  <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-200/40 px-2.5 py-0.5 text-[11px] text-brand-500">
  <Sparkles className="h-3.5 w-3.5" />
@@ -262,7 +262,7 @@ export default function NewWorkflowPage() {
  Trigger {triggers.length}
  </span>
  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-200/60 px-2.5 py-1">
- CurrentStep {step}/2
+ Step {step}/2
  </span>
  </div>
  </PageHeader>
@@ -280,9 +280,9 @@ export default function NewWorkflowPage() {
  Step 1/2
  </div>
  <div>
- <h2 className="text-section-title text-foreground">SelectTemplate</h2>
+ <h2 className="text-section-title text-foreground">Select Template</h2>
  <p className="text-description">
- Select1TemplateQuickStart, orfromEmptyWorkflowStart.
+ Select a template to get started quickly, or start from an empty workflow.
  </p>
  </div>
  </div>
@@ -290,7 +290,7 @@ export default function NewWorkflowPage() {
  <div className="p-6 space-y-6">
  <div className="flex flex-wrap items-center gap-4">
  <Input
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  inputSize="sm"
@@ -377,9 +377,9 @@ export default function NewWorkflowPage() {
  Step 2/2
  </div>
  <div>
- <h2 className="text-section-title text-foreground">ConfigWorkflow</h2>
+ <h2 className="text-section-title text-foreground">Configure Workflow</h2>
  <p className="text-description">
- asyou'sWorkflowNamingandSelectTriggermethod.
+ Name your workflow and select a trigger method.
  </p>
  </div>
  </div>
@@ -387,12 +387,12 @@ export default function NewWorkflowPage() {
  <div className="p-6 space-y-8 max-w-2xl">
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- WorkflowName
+ Workflow Name
  </label>
  <Input
  value={workflowName}
  onChange={(e) => setWorkflowName(e.target.value)}
- placeholder="exampleif: CustomerFeedbackAutoProcess"
+ placeholder="e.g. Customer Feedback Auto-Processing"
  inputSize="sm"
  className="bg-surface-200 border-border"
  />
@@ -400,7 +400,7 @@ export default function NewWorkflowPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-3">
- SelectTriggermethod
+ Select Trigger Method
  </label>
  <div className="page-grid sm:grid-cols-2">
  {triggers.map((trigger) => (
@@ -477,7 +477,7 @@ export default function NewWorkflowPage() {
  </>
  ) : step === 1 && selectedTemplate !== "blank" ? (
  <>
- UsagethisTemplate
+ Use This Template
  <ArrowRight className="ml-2 h-4 w-4" />
  </>
  ) : step === 1 ? (
@@ -487,7 +487,7 @@ export default function NewWorkflowPage() {
  </>
  ) : (
  <>
- CreateWorkflow
+ Create Workflow
  <Zap className="ml-2 h-4 w-4" />
  </>
  )}
@@ -500,14 +500,14 @@ export default function NewWorkflowPage() {
  <>
  <div className="page-panel p-4 space-y-3">
  <div className="flex items-center justify-between">
- <span className="text-xs text-foreground-muted">TemplateOverview</span>
+ <span className="text-xs text-foreground-muted">Template Overview</span>
  <span className={cn(
  "text-[11px] px-2 py-0.5 rounded-full border",
  selectedTemplateData
  ? "border-brand-500/30 bg-brand-200/40 text-brand-500"
  : "border-border bg-surface-200/60 text-foreground-muted"
  )}>
- {selectedTemplateData ? "alreadySelect": "not yetSelect"}
+ {selectedTemplateData ? "Selected": "Not selected"}
  </span>
  </div>
  {selectedTemplateData ? (
@@ -531,28 +531,28 @@ export default function NewWorkflowPage() {
  </span>
  {selectedTemplateData.popular && (
  <span className="rounded-md border border-brand-500/30 bg-brand-200/40 px-2 py-0.5 text-brand-500">
- PopularTemplate
+ Popular Template
  </span>
  )}
  </div>
  </div>
  ) : (
  <div className="rounded-md border border-dashed border-border bg-surface-100/60 p-3 text-xs text-foreground-muted">
- SelectTemplateafterDisplayDetailedInfoandRecommendedTriggermethod.
+ Select a template to see detailed info and recommended trigger methods.
  </div>
  )}
  </div>
 
  <div className="page-panel p-4 space-y-3">
- <div className="text-xs text-foreground-muted">SelectSuggestion</div>
+ <div className="text-xs text-foreground-muted">Selection Tips</div>
  <div className="space-y-2 text-xs text-foreground-muted">
  <div className="flex items-start gap-2">
  <CheckCircle className="mt-0.5 h-3.5 w-3.5 text-brand-500" />
- PrioritySelectPopularTemplate, fewConfigTime.
+ Popular templates require less configuration time.
  </div>
  <div className="flex items-start gap-2">
  <CheckCircle className="mt-0.5 h-3.5 w-3.5 text-brand-500" />
- EmptyTemplateSuitableCustomFlowandComplexLogic.
+ Empty templates are suitable for custom flows and complex logic.
  </div>
  </div>
  </div>
@@ -560,31 +560,31 @@ export default function NewWorkflowPage() {
  ) : (
  <>
  <div className="page-panel p-4 space-y-3">
- <div className="text-xs text-foreground-muted">ConfigSummary</div>
+ <div className="text-xs text-foreground-muted">Configuration Summary</div>
  <div className="space-y-2 text-xs">
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">WorkflowName</span>
+ <span className="text-foreground-muted">Workflow Name</span>
  <span className="text-foreground">
- {workflowName || "not yetNaming"}
+ {workflowName || "Not named yet"}
  </span>
  </div>
  <div className="flex items-center justify-between">
  <span className="text-foreground-muted">Template</span>
  <span className="text-foreground">
- {selectedTemplateData?.name || "not yetSelect"}
+ {selectedTemplateData?.name || "Not selected"}
  </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">Triggermethod</span>
+ <span className="text-foreground-muted">Trigger Method</span>
  <span className="text-foreground">
- {selectedTriggerData?.name || "not yetSelect"}
+ {selectedTriggerData?.name || "Not selected"}
  </span>
  </div>
  </div>
  </div>
 
  <div className="page-panel p-4 space-y-3">
- <div className="text-xs text-foreground-muted">CheckChecklist</div>
+ <div className="text-xs text-foreground-muted">Checklist</div>
  <div className="space-y-2">
  {checklistItems.map((item) => (
  <div

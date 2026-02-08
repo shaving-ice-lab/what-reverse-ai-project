@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Publish Agent DialogComponent
+ * Publish Agent Dialog Component
  * 
- * AllowUserwillWorkflowPublishto Agent Store
+ * Allows users to publish a workflow to the Agent Store
  */
 
 import { useState, useEffect } from "react";
@@ -44,31 +44,31 @@ import { agentApi } from "@/lib/api";
 import type { AgentCategory, PricingType, PublishAgentRequest } from "@/types/agent";
 import { cn } from "@/lib/utils";
 
-// CategoryConfig
+ // Category config
 const CATEGORIES: { id: AgentCategory; label: string; icon: string }[] = [
- { id: "content", label: "ContentCreative", icon: "📝" },
- { id: "data", label: "DataProcess", icon: "📊" },
- { id: "customer", label: "CustomerService", icon: "💬" },
- { id: "productivity", label: "Officerate", icon: "⚡" },
- { id: "developer", label: "DevelopmentTool", icon: "🛠️" },
- { id: "research", label: "ResearchAnalytics", icon: "🔍" },
- { id: "education", label: "EducationLearn", icon: "📚" },
- { id: "finance", label: "FinanceFinance", icon: "💰" },
- { id: "marketing", label: "MarketplaceMarketing", icon: "📈" },
- { id: "other", label: "otherhe", icon: "🎯" },
+ { id: "content", label: "Content Creation", icon: "📝" },
+ { id: "data", label: "Data Processing", icon: "📊" },
+ { id: "customer", label: "Customer Service", icon: "💬" },
+ { id: "productivity", label: "Productivity", icon: "⚡" },
+ { id: "developer", label: "Developer Tools", icon: "🛠️" },
+ { id: "research", label: "Research & Analytics", icon: "🔍" },
+ { id: "education", label: "Education & Learning", icon: "📚" },
+ { id: "finance", label: "Finance", icon: "💰" },
+ { id: "marketing", label: "Marketing", icon: "📈" },
+ { id: "other", label: "Other", icon: "🎯" },
 ];
 
-// PricingTypeConfig
+ // Pricing type config
 const PRICING_TYPES: { id: PricingType; label: string; description: string }[] = [
- { id: "free", label: "Free", description: "whatpersonallcanwithFreeUsage" },
- { id: "paid", label: "timesPaid", description: "User1timesPurchaseafterPermanentUsage" },
- { id: "subscription", label: "Subscription", description: "UserbymonthsPaidUsage" },
+ { id: "free", label: "Free", description: "Anyone can use it for free" },
+ { id: "paid", label: "One-Time Purchase", description: "Users pay once for permanent access" },
+ { id: "subscription", label: "Subscription", description: "Users pay a monthly fee for access" },
 ];
 
-// useTags
+ // Popular tags
 const POPULAR_TAGS = [
- "AI", "Automation", "rateImprove", "DataAnalytics", "TextProcess",
- "ImageProcess", "Support", "ContentGenerate", "Translate", "Code"
+ "AI", "Automation", "Productivity", "Data Analytics", "Text Processing",
+ "Image Processing", "Support", "Content Generation", "Translation", "Code"
 ];
 
 interface PublishAgentDialogProps {
@@ -88,7 +88,7 @@ export function PublishAgentDialog({
  workflowDescription,
  onSuccess,
 }: PublishAgentDialogProps) {
- // FormStatus
+ // Form state
  const [name, setName] = useState(workflowName);
  const [description, setDescription] = useState(workflowDescription || "");
  const [longDescription, setLongDescription] = useState("");
@@ -99,13 +99,13 @@ export function PublishAgentDialog({
  const [tagInput, setTagInput] = useState("");
  const [icon, setIcon] = useState("🤖");
  
- // UI Status
+ // UI state
  const [step, setStep] = useState(1);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
  const [success, setSuccess] = useState(false);
 
- // ResetForm
+ // Reset form
  useEffect(() => {
  if (open) {
  setName(workflowName);
@@ -123,7 +123,7 @@ export function PublishAgentDialog({
  }
  }, [open, workflowName, workflowDescription]);
 
- // AddTags
+ // Add tag
  const handleAddTag = () => {
  const tag = tagInput.trim();
  if (tag && !tags.includes(tag) && tags.length < 10) {
@@ -132,36 +132,36 @@ export function PublishAgentDialog({
  }
  };
 
- // RemoveTags
+ // Remove tag
  const handleRemoveTag = (tag: string) => {
  setTags(tags.filter(t => t !== tag));
  };
 
- // AddPopularTags
+ // Add popular tag
  const handleAddPopularTag = (tag: string) => {
  if (!tags.includes(tag) && tags.length < 10) {
  setTags([...tags, tag]);
  }
  };
 
- // VerifyStep1
+ // Validate step 1
  const validateStep1 = () => {
  if (!name.trim()) {
- setError("Please enter Agent Name");
+ setError("Please enter an agent name");
  return false;
  }
  if (!description.trim()) {
- setError("Please enterBriefDescription");
+ setError("Please enter a brief description");
  return false;
  }
  setError(null);
  return true;
  };
 
- // VerifyStep2
+ // Validate step 2
  const validateStep2 = () => {
  if (pricingType !== "free" && (!price || parseFloat(price) <= 0)) {
- setError("Please enterValid'sPrice");
+ setError("Please enter a valid price");
  return false;
  }
  setError(null);
@@ -183,7 +183,7 @@ export function PublishAgentDialog({
  setStep(step - 1);
  };
 
- // SubmitPublish
+ // Submit for publishing
  const handleSubmit = async () => {
  setIsSubmitting(true);
  setError(null);
@@ -203,13 +203,13 @@ export function PublishAgentDialog({
  
  setSuccess(true);
  
- // LatencyCloseandCallback
+ // Delay close and callback
  setTimeout(() => {
  onOpenChange(false);
  onSuccess?.(response.data.id);
  }, 1500);
  } catch (err) {
- setError(err instanceof Error ? err.message: "PublishFailed, Please try again laterRetry");
+ setError(err instanceof Error ? err.message: "Publish failed. Please try again later.");
  } finally {
  setIsSubmitting(false);
  }
@@ -223,14 +223,14 @@ export function PublishAgentDialog({
  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
  <Bot className="w-5 h-5 text-primary" />
  </div>
- Publishto Agent Store
+ Publish to Agent Store
  </DialogTitle>
  <DialogDescription>
- willyou'sWorkflowPublishas Agent, letmoremultiplepersonUsage
+ Publish your workflow as an agent for others to use
  </DialogDescription>
  </DialogHeader>
 
- {/* StepIndicator */}
+ {/* Step Indicator */}
  <div className="flex items-center justify-center gap-2 py-4">
  {[1, 2, 3].map((s) => (
  <div key={s} className="flex items-center gap-2">
@@ -260,18 +260,18 @@ export function PublishAgentDialog({
  ))}
  </div>
 
- {/* StepContent */}
+ {/* Step Content */}
  <div className="py-4 min-h-[300px]">
  {/* Step 1: Basic Info */}
  {step === 1 && (
  <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-200">
  <div className="grid grid-cols-[80px,1fr] gap-4 items-start">
- {/* IconSelect */}
+ {/* Icon Select */}
  <div>
  <Label className="text-xs text-foreground-light mb-2 block">Icon</Label>
  <button
  onClick={() => {
- // Simple's emoji Select
+ // Simple emoji selector
  const emojis = ["🤖", "⚡", "🎯", "🔮", "💡", "🚀", "✨", "🔧"];
  const currentIndex = emojis.indexOf(icon);
  setIcon(emojis[(currentIndex + 1) % emojis.length]);
@@ -282,7 +282,7 @@ export function PublishAgentDialog({
  </button>
  </div>
 
- {/* NameandCategory */}
+ {/* Name and Category */}
  <div className="space-y-4">
  <div>
  <Label htmlFor="name">Agent Name *</Label>
@@ -290,7 +290,7 @@ export function PublishAgentDialog({
  id="name"
  value={name}
  onChange={(e) => setName(e.target.value)}
- placeholder="toyou's Agent char"
+ placeholder="Name your agent"
  className="mt-1.5"
  />
  </div>
@@ -317,27 +317,27 @@ export function PublishAgentDialog({
  </div>
 
  <div>
- <Label htmlFor="description">BriefDescription *</Label>
+ <Label htmlFor="description">Brief Description *</Label>
  <Textarea
  id="description"
  value={description}
  onChange={(e) => setDescription(e.target.value)}
- placeholder="use1Descriptionthis Agent candoWhat"
+ placeholder="Describe what this agent can do in one sentence"
  className="mt-1.5 resize-none"
  rows={2}
  />
  <p className="text-xs text-foreground-light mt-1">
- {description.length}/200 Character
+ {description.length}/200 characters
  </p>
  </div>
 
  <div>
- <Label htmlFor="longDescription">DetailedIntroduction</Label>
+ <Label htmlFor="longDescription">Detailed Description</Label>
  <Textarea
  id="longDescription"
  value={longDescription}
  onChange={(e) => setLongDescription(e.target.value)}
- placeholder="DetailedIntroductionyou's Agent 'sFeatures, UsageScenario, Featureetc"
+ placeholder="Describe your agent's features, use cases, and capabilities in detail"
  className="mt-1.5 resize-none"
  rows={4}
  />
@@ -345,11 +345,11 @@ export function PublishAgentDialog({
  </div>
  )}
 
- {/* Step 2: PricingandTags */}
+ {/* Step 2: Pricing and Tags */}
  {step === 2 && (
  <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-200">
  <div>
- <Label className="mb-3 block">Pricingmethod</Label>
+ <Label className="mb-3 block">Pricing Model</Label>
  <div className="grid gap-3">
  {PRICING_TYPES.map((type) => (
  <button
@@ -403,7 +403,7 @@ export function PublishAgentDialog({
  )}
 
  <div>
- <Label className="mb-3 block">Tags(mostmultiple10)</Label>
+ <Label className="mb-3 block">Tags (up to 10)</Label>
  <div className="flex flex-wrap gap-2 mb-3">
  {tags.map((tag) => (
  <Badge
@@ -425,7 +425,7 @@ export function PublishAgentDialog({
  <Input
  value={tagInput}
  onChange={(e) => setTagInput(e.target.value)}
- placeholder="InputTags"
+ placeholder="Enter a tag"
  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
  />
  <Button variant="outline" onClick={handleAddTag} disabled={tags.length >= 10}>
@@ -433,7 +433,7 @@ export function PublishAgentDialog({
  </Button>
  </div>
  <div className="mt-3">
- <p className="text-xs text-foreground-light mb-2">PopularTags: </p>
+ <p className="text-xs text-foreground-light mb-2">Popular tags: </p>
  <div className="flex flex-wrap gap-1">
  {POPULAR_TAGS.filter((t) => !tags.includes(t)).slice(0, 6).map((tag) => (
  <button
@@ -450,7 +450,7 @@ export function PublishAgentDialog({
  </div>
  )}
 
- {/* Step 3: ConfirmPublish */}
+ {/* Step 3: Confirm and Publish */}
  {step === 3 && (
  <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-200">
  {success ? (
@@ -462,13 +462,13 @@ export function PublishAgentDialog({
  Published successfully!
  </h3>
  <p className="text-sm text-foreground-light">
- you's Agent alreadySubmitReview, ReviewViaafterwillatStoreon
+ Your agent has been submitted for review. Once approved, it will be available in the store.
  </p>
  </div>
  ) : (
  <>
  <div className="bg-muted/50 rounded-xl p-6">
- <h4 className="text-sm font-medium text-foreground-light mb-4">ConfirmPublishInfo</h4>
+ <h4 className="text-sm font-medium text-foreground-light mb-4">Confirm Publish Details</h4>
  
  <div className="flex items-start gap-4 mb-4">
  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-3xl">
@@ -514,10 +514,10 @@ export function PublishAgentDialog({
  <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20">
  <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
  <div>
- <p className="text-sm font-medium text-foreground">SubmitafterwillOccurWhat?</p>
+ <p className="text-sm font-medium text-foreground">What happens after submission?</p>
  <p className="text-xs text-foreground-light mt-1">
- you's Agent willEnterReviewQueue, Wewillat 1-3 Business DayinDoneReview.
- ReviewViaafter, Agent willAutoatStoreon.
+                    Your agent will enter the review queue. We will complete the review within 1-3 business days.
+                    Once approved, your agent will automatically appear in the store.
  </p>
  </div>
  </div>
@@ -527,7 +527,7 @@ export function PublishAgentDialog({
  )}
  </div>
 
- {/* ErrorTip */}
+ {/* Error Message */}
  {error && (
  <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
  <AlertCircle className="w-4 h-4 shrink-0" />
@@ -535,7 +535,7 @@ export function PublishAgentDialog({
  </div>
  )}
 
- {/* FooterButton */}
+ {/* Footer Buttons */}
  {!success && (
  <DialogFooter className="gap-2 sm:gap-0">
  {step > 1 && (
@@ -561,7 +561,7 @@ export function PublishAgentDialog({
  ) : (
  <>
  <Upload className="w-4 h-4 mr-2" />
- ConfirmPublish
+                Confirm Publish
  </>
  )}
  </Button>

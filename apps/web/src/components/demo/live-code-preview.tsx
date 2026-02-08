@@ -16,35 +16,35 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// CodeExampleConfig
+// Code example config
 const codeExamples = {
  typescript: {
  label: "TypeScript",
  icon: FileCode,
  code: `import { AgentFlow } from '@agentflow/sdk';
 
-// CreateWorkflowInstance
+// Create a workflow instance
 const workflow = new AgentFlow({
- name: 'SmartSupportAssistant',
- description: 'AutoReplyCustomerConsulting'
+  name: 'Smart Support Assistant',
+  description: 'Auto-reply to customer inquiries'
 });
 
 // Add LLM Node
 workflow.addNode({
  type: 'llm',
  model: 'gpt-4',
- prompt: 'youis1Professional'sSupportAssistant...'
+  prompt: 'You are a professional support assistant...'
 });
 
-// RunWorkflow
+// Run the workflow
 const result = await workflow.run({
- input: 'IwantQueryOrderStatus'
+  input: 'I want to check my order status'
 });
 
 console.log(result.output);`,
  output: `{
  "success": true,
- "output": "you!IcomeyouQueryOrderStatus.PleaseProvideyou'sOrder, IwillNowasyouQuery.",
+ "output": "Hello! I can help you check your order status. Please provide your order number and I'll look it up for you.",
  "tokens": 45,
  "duration": "1.2s"
 }`,
@@ -54,34 +54,34 @@ console.log(result.output);`,
  icon: FileCode,
  code: `from agentflow import AgentFlow
 
-# CreateWorkflowInstance
+# Create a workflow instance
 workflow = AgentFlow(
- name="DataAnalyticsAssistant",
- description="AutoAnalyticsDataandGenerateReport"
+  name="Data Analytics Assistant",
+  description="Automatically analyze data and generate reports"
 )
 
-# AddDataProcessNode
+# Add a data processing node
 workflow.add_node(
  type="data",
  operation="transform",
  config={"format": "json"}
 )
 
-# Add AI AnalyticsNode
+# Add an AI analytics node
 workflow.add_node(
  type="llm",
  model="claude-3",
- prompt="AnalyticswithdownDataandGenerateInsights..."
+  prompt="Analyze the following data and generate insights..."
 )
 
-# ExecuteWorkflow
+# Execute the workflow
 result = workflow.run(data=raw_data)
 print(result.insights)`,
  output: `{
  "insights": [
- "SalescompareGrowth 23%",
- "UserConversion RateImprove 15%",
- "Suggestion: optimalProductPagewithImprove"
+    "Sales grew 23% compared to last period",
+    "User conversion rate improved by 15%",
+    "Suggestion: Optimize product page to improve performance"
  ],
  "charts": ["trend_chart.png", "funnel_chart.png"],
  "duration": "3.5s"
@@ -90,7 +90,7 @@ print(result.insights)`,
  curl: {
  label: "cURL",
  icon: Terminal,
- code: `# CreateWorkflow
+ code: `# Create a workflow
 curl -X POST https://api.agentflow.ai/v1/workflows \\
  -H "Authorization: Bearer $API_KEY" \\
  -H "Content-Type: application/json" \\
@@ -104,7 +104,7 @@ curl -X POST https://api.agentflow.ai/v1/workflows \\
  {
  "type": "llm",
  "model": "gpt-4",
- "prompt": "GenerateProfessional'sEmailReply..."
+ "prompt": "Generate a professional email reply..."
  },
  {
  "type": "action",
@@ -123,13 +123,13 @@ curl -X POST https://api.agentflow.ai/v1/workflows \\
 };
 
 export interface LiveCodePreviewProps extends React.HTMLAttributes<HTMLDivElement> {
- /** InitialLanguage */
+  /** Initial language */
  initialLanguage?: keyof typeof codeExamples;
- /** isnoDisplayOutputPanel */
+ /** Whether to display the output panel */
  showOutput?: boolean;
- /** isnoAutoRunDemo */
+ /** Whether to auto-run the demo */
  autoRun?: boolean;
- /** isnoAllowSwitchLanguage */
+ /** Whether to allow language switching */
  allowLanguageSwitch?: boolean;
  /** Title */
  title?: string;
@@ -152,7 +152,7 @@ export function LiveCodePreview({
 
  const currentExample = codeExamples[language];
 
- // AutoRunDemo
+  // Auto-run demo
  useEffect(() => {
  if (autoRun) {
  const timer = setTimeout(() => {
@@ -172,7 +172,7 @@ export function LiveCodePreview({
  setIsRunning(true);
  setShowResult(false);
  
- // MockRun
+    // Mock run
  setTimeout(() => {
  setIsRunning(false);
  setShowResult(true);
@@ -185,7 +185,7 @@ export function LiveCodePreview({
  setIsDropdownOpen(false);
  };
 
- // Simple'sSyntaxHighlight
+ // Simple Syntax Highlighting
  const highlightCode = (code: string) => {
  return code
  .replace(/\b(import|from|const|let|var|function|return|await|async|class|new|if|else|for|while)\b/g, '<span class="text-violet-400">$1</span>')
@@ -333,14 +333,14 @@ export function LiveCodePreview({
  {isRunning && (
  <div className="px-4 py-2 bg-card/50 border-t border-border/30 flex items-center gap-2">
  <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
- <span className="text-xs text-muted-foreground">currentlyatExecute...</span>
+ <span className="text-xs text-muted-foreground">Executing...</span>
  </div>
  )}
  </div>
  );
 }
 
-// version: DisplayCode
+// Simple code display
 export interface SimpleCodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
  code: string;
  language?: string;

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * API KeyManagePage
- * Create, ManageandMonitor API Key
+ * API Key Management Page
+ * Create, Manage and Monitor API Keys
  */
 
 import { useMemo, useState } from "react";
@@ -47,11 +47,11 @@ import {
 import { EmptyState } from "@/components/dashboard/supabase-ui";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// API KeyData
+// API Key Data
 const mockApiKeys = [
  {
  id: "key-1",
- name: "beforeendpointPublishKey",
+ name: "Pre-publish key",
  type: "publishable",
  prefix: "pk-live",
  suffix: "8J4p",
@@ -65,7 +65,7 @@ const mockApiKeys = [
  },
  {
  id: "key-2",
- name: "ProductionEnvironmentKey",
+ name: "Production environment key",
  type: "secret",
  prefix: "sk-prod",
  suffix: "x8Kj",
@@ -79,7 +79,7 @@ const mockApiKeys = [
  },
  {
  id: "key-3",
- name: "TestEnvironmentKey",
+ name: "Test environment key",
  type: "secret",
  prefix: "sk-test",
  suffix: "m3Np",
@@ -107,14 +107,14 @@ const mockApiKeys = [
  },
 ];
 
-// PermissionConfig - Supabase Style
+// Permission Config - Supabase Style
 const permissionConfig = {
  read: { label: "Read", className: "bg-surface-200 text-foreground-light" },
- write: { label: "enter", className: "bg-brand-200 text-brand-500" },
+ write: { label: "Write", className: "bg-brand-200 text-brand-500" },
  delete: { label: "Delete", className: "bg-destructive-200 text-destructive" },
 };
 
-// StatusConfig - Supabase Style
+// Status Config - Supabase Style
 const statusConfig = {
  active: { label: "Active", className: "bg-brand-200 text-brand-500" },
  expired: { label: "Expired", className: "bg-destructive-200 text-destructive" },
@@ -129,7 +129,7 @@ const typeConfig = {
 
 type ApiKey = (typeof mockApiKeys)[number];
 
-// FormatTime
+// Format Time
 function formatLastUsed(dateString: string) {
  const date = new Date(dateString);
  const now = new Date();
@@ -139,11 +139,11 @@ function formatLastUsed(dateString: string) {
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
  if (diffMins < 60) {
- return `${diffMins} minbefore`;
+ return `${diffMins} min ago`;
  } else if (diffHours < 24) {
- return `${diffHours} hbefore`;
+ return `${diffHours} hours ago`;
  } else if (diffDays < 7) {
- return `${diffDays} daysbefore`;
+ return `${diffDays} days ago`;
  } else {
  return date.toLocaleDateString("zh-CN");
  }
@@ -171,7 +171,7 @@ export default function ApiKeysPage() {
  setTimeout(() => setCopiedId(null), 2000);
  };
 
- // SwitchKeycan
+ // Toggle Key Visibility
  const toggleKeyVisibility = (id: string) => {
  const newVisible = new Set(visibleKeys);
  if (newVisible.has(id)) {
@@ -182,12 +182,12 @@ export default function ApiKeysPage() {
  setVisibleKeys(newVisible);
  };
 
- // DeleteKey
+ // Delete Key
  const deleteKey = (id: string) => {
  setApiKeys((prev) => prev.filter((key) => key.id !== id));
  };
 
- // UndoKey
+ // Revoke Key
  const revokeKey = (id: string) => {
  setApiKeys((prev) =>
  prev.map((key) =>
@@ -202,7 +202,7 @@ export default function ApiKeysPage() {
  setShowCreateModal(true);
  };
 
- // CreatenewKey
+ // Create New Key
  const createNewKey = () => {
  const isPublishable = createType === "publishable";
  const keyPrefix = isPublishable ? "pk" : "sk";
@@ -234,7 +234,7 @@ export default function ApiKeysPage() {
  setApiKeys((prev) => [newApiKey, ...prev]);
  };
 
- // CloseCreateModal
+ // Close Create Modal
  const closeCreateModal = () => {
  setShowCreateModal(false);
  setCreatedKey(null);
@@ -244,7 +244,7 @@ export default function ApiKeysPage() {
  setNewKeyExpiry("never");
  };
 
- // SwitchPermission
+ // Toggle Permission
  const togglePermission = (perm: string) => {
  if (createType === "publishable") {
  return;
@@ -384,16 +384,16 @@ export default function ApiKeysPage() {
  <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1">
  <Calendar className="w-3 h-3" />
- Createat {apiKey.createdAt}
+ Created at {apiKey.createdAt}
  </span>
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
- {formatLastUsed(apiKey.lastUsed)} Usage
+ Last used {formatLastUsed(apiKey.lastUsed)}
  </span>
  {apiKey.expiresAt && (
  <span className="flex items-center gap-1 text-warning">
  <AlertTriangle className="w-3 h-3" />
- {apiKey.expiresAt} Expired
+ Expires {apiKey.expiresAt}
  </span>
  )}
  </div>
@@ -409,8 +409,8 @@ export default function ApiKeysPage() {
  );
  })}
  <span className="lg:ml-auto text-foreground-light">
- Usage {apiKey.usageCount.toLocaleString()} /{""}
- {apiKey.usageLimit.toLocaleString()}
+Usage: {apiKey.usageCount.toLocaleString()} /{" "}
+                {apiKey.usageLimit.toLocaleString()}
  </span>
  </div>
  </div>
@@ -436,7 +436,7 @@ export default function ApiKeysPage() {
  </DropdownMenuItem>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <RefreshCw className="w-4 h-4 mr-2" />
- re-newGenerate
+ Regenerate
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border-muted" />
  {apiKey.status === "active" && (
@@ -445,7 +445,7 @@ export default function ApiKeysPage() {
  onClick={() => revokeKey(apiKey.id)}
  >
  <Shield className="w-4 h-4 mr-2" />
- UndoKey
+ Revoke Key
  </DropdownMenuItem>
  )}
  <DropdownMenuItem
@@ -469,7 +469,7 @@ export default function ApiKeysPage() {
  <div className="page-caption text-foreground-muted">Project Settings</div>
  <PageHeader
  title="API Key"
- description="Config publishable and secret API keys, Used forSecurityAccessitemResource."
+ description="Configure publishable and secret API keys for secure access to resources."
  actions={(
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -498,11 +498,11 @@ export default function ApiKeysPage() {
  )}
  >
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
- <span>totalKey {summary.total}</span>
+ <span>Total Keys: {summary.total}</span>
  <span className="h-1 w-1 rounded-full bg-foreground-muted" />
- <span>Active {summary.active}</span>
+ <span>Active: {summary.active}</span>
  <span className="h-1 w-1 rounded-full bg-foreground-muted" />
- <span>totalCall {summary.totalUsage.toLocaleString()}</span>
+ <span>Total Calls: {summary.totalUsage.toLocaleString()}</span>
  </div>
  </PageHeader>
 
@@ -519,7 +519,7 @@ export default function ApiKeysPage() {
  <Input
  value={query}
  onChange={(event) => setQuery(event.target.value)}
- placeholder="SearchKey..."
+ placeholder="Search keys..."
  variant="search"
  inputSize="sm"
  leftIcon={<Search className="w-4 h-4" />}
@@ -569,7 +569,7 @@ export default function ApiKeysPage() {
  <section id="publishable-secret" className="scroll-mt-24 space-y-6">
  <div>
  <h3 className="text-sm font-medium text-foreground">
- Publishable and secretAPI keys
+ Publishable and secret API keys
  </h3>
  <p className="text-[13px] text-foreground-light mt-1">
  Configure keys to securely control access to your project.
@@ -583,7 +583,7 @@ export default function ApiKeysPage() {
  Publishable key
  </h4>
  <p className="text-[13px] text-foreground-light">
- Safe to use in a browser whenRow Level Security is enabled.
+ Safe to use in a browser when Row Level Security is enabled.
  </p>
  </div>
  <Button
@@ -601,8 +601,8 @@ export default function ApiKeysPage() {
  ) : (
  <EmptyState
  icon={Key}
- title="None Publishable key"
- description="Publishable key canUsed forbeforeendpointEnvironment."
+ title="No publishable key"
+ description="Publishable key for client-side / public environment."
  action={{
  label: "Create Publishable key",
  onClick: () => openCreateModal("publishable"),
@@ -637,10 +637,10 @@ export default function ApiKeysPage() {
  <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
  <div>
  <p className="text-sm font-medium text-foreground">
- Secret keys shouldonlyUsed forServiceendpoint
+ Secret keys should only be used for server-side endpoints
  </p>
  <p className="text-[12px] text-foreground-light">
- Pleasewill secret key atCustomerendpointorPublicRepository.
+ Never expose secret keys in client-side code or public repositories.
  </p>
  </div>
  </div>
@@ -653,8 +653,8 @@ export default function ApiKeysPage() {
  ) : (
  <EmptyState
  icon={Shield}
- title="None Secret key"
- description="Create Secret key withServiceendpointSecurityAccess."
+ title="No secret keys"
+ description="Create secret key for server-side secure access."
  action={{
  label: "Create Secret key",
  onClick: () => openCreateModal("secret"),
@@ -671,7 +671,7 @@ export default function ApiKeysPage() {
  Legacy anon, service_role API keys
  </h3>
  <p className="text-[13px] text-foreground-light mt-1">
- RecommendedMigrationtonew's Publishable/Secret keys, oldKeywilluse.
+ We recommend migrating to new publishable/secret keys; the old key will stop working.
  </p>
  </div>
 
@@ -683,7 +683,7 @@ export default function ApiKeysPage() {
  Legacy keys
  </p>
  <p className="text-[12px] text-foreground-light">
- oldKeyuse, PleasePlanningMigrationwithEnsureSecurity.
+ These keys are deprecated. Please plan your migration to ensure security.
  </p>
  </div>
  </div>
@@ -696,8 +696,8 @@ export default function ApiKeysPage() {
  ) : (
  <EmptyState
  icon={Key}
- title="None Legacy key"
- description="NoneneedUsage Legacy key time, canMaintainasEmpty."
+ title="No legacy keys"
+ description="No need to use legacy keys; keep empty if not used."
  />
  )}
  </section>
@@ -721,9 +721,9 @@ export default function ApiKeysPage() {
  <>
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h3 className="page-panel-title">KeyalreadyCreate</h3>
+ <h3 className="page-panel-title">Key created</h3>
  <p className="page-panel-description">
- PleaseNowCopySave, onlycanView1times
+ Please copy and save it now. You can only view it once.
  </p>
  </div>
  <button
@@ -755,14 +755,14 @@ export default function ApiKeysPage() {
  </Badge>
  </div>
  <p className="text-[13px] text-foreground-light mt-1">
- thisisyou11timesViewCompleteKey'swill
+ This is the only time you can view the full key
  </p>
  </div>
  </div>
 
  <div className="p-4 rounded-md bg-surface-75 border border-border">
  <p className="text-xs text-foreground-muted mb-2">
- you's {isPublishable ? "Publishable": "Secret"} key
+ Your {isPublishable ? "Publishable": "Secret"} key
  </p>
  <div className="flex items-center gap-2">
  <code className="flex-1 text-sm font-mono text-foreground break-all">
@@ -787,7 +787,7 @@ export default function ApiKeysPage() {
  <div className="flex items-start gap-2">
  <AlertTriangle className="w-4 h-4 text-warning mt-0.5 shrink-0" />
  <p className="text-xs text-foreground-light">
- ClosethisWindowafterwillNoneagaintimesViewCompleteKey, PleasefirstSave.
+ Close this window after viewing the key; save it first. You won't see it again.
  </p>
  </div>
  </div>
@@ -796,7 +796,7 @@ export default function ApiKeysPage() {
  className="w-full bg-brand-500 hover:bg-brand-600 text-background"
  onClick={closeCreateModal}
  >
- ISavedKey
+ I've Saved the Key
  </Button>
  </div>
  </>
@@ -805,12 +805,12 @@ export default function ApiKeysPage() {
  <div className="page-panel-header flex items-center justify-between">
  <div>
  <h3 className="page-panel-title">
- Createnew {isPublishable ? "Publishable": "Secret"} key
+ Create New {isPublishable ? "Publishable": "Secret"} Key
  </h3>
  <p className="page-panel-description">
  {isPublishable
- ? "canUsed forbeforeendpointEnvironment, needEnable RLS."
-: "onlyUsed forServiceendpoint, AvoidtoCustomerendpoint."}
+ ? "Can be used in client-side environments. Requires RLS to be enabled."
+: "Only for server-side endpoints. Never expose to client-side code."}
  </p>
  </div>
  <button
@@ -824,13 +824,13 @@ export default function ApiKeysPage() {
  <div className="p-6 space-y-5">
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- KeyName
- </label>
+Key name
+</label>
  <Input
  placeholder={
  isPublishable
- ? "exampleif: Web publishable key"
-: "exampleif: ProductionEnvironmentKey"
+ ? "e.g. Web publishable key"
+: "e.g. Production environment key"
  }
  value={newKeyName}
  onChange={(e) => setNewKeyName(e.target.value)}
@@ -871,25 +871,25 @@ export default function ApiKeysPage() {
  </div>
  {isPublishable && (
  <p className="mt-2 text-[12px] text-foreground-muted">
- Publishable key DefaultreadPermission.
+ Publishable keys have read-only permission by default.
  </p>
  )}
  </div>
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- ExpiredTime
+ Expiration
  </label>
  <Select value={newKeyExpiry} onValueChange={setNewKeyExpiry}>
  <SelectTrigger className="h-10 bg-surface-75 border-border">
- <SelectValue placeholder="SelectExpiredTime" />
+ <SelectValue placeholder="Select expiry time" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="never">notExpired</SelectItem>
+ <SelectItem value="never">Never expires</SelectItem>
  <SelectItem value="30">30 days</SelectItem>
  <SelectItem value="90">90 days</SelectItem>
  <SelectItem value="180">180 days</SelectItem>
- <SelectItem value="365">1 years</SelectItem>
+ <SelectItem value="365">1 year</SelectItem>
  </SelectContent>
  </Select>
  </div>
@@ -909,7 +909,7 @@ export default function ApiKeysPage() {
  className="bg-brand-500 hover:bg-brand-600 text-background"
  >
  <Plus className="w-4 h-4 mr-2" />
- CreateKey
+ Create Key
  </Button>
  </div>
  </>

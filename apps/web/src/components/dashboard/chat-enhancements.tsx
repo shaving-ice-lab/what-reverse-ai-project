@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * AI ChatEnhancedComponent - Manus Style
-
- * Contains: MessageBubble, CodeHighlight, Markdown Render, Quick Actionsetc
+ * AI Chat Enhanced Component - Manus Style
+ *
+ * Contains: Message bubble, code highlighting, Markdown rendering, quick actions, etc.
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -70,7 +70,7 @@ import {
  TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// MessageType
+// Message Types
 
 interface Message {
  id: string;
@@ -110,7 +110,7 @@ interface CodeBlock {
  filename?: string;
 }
 
-// AI MessageBubbleComponent
+// AI Message Bubble Component
 
 interface AIMessageBubbleProps {
  message: Message;
@@ -198,11 +198,11 @@ export function AIMessageBubble({
 
  </Avatar>
 
- {/* MessageContent */}
+      {/* Message Content */}
 
  <div className="flex-1 max-w-[85%]">
 
- {/* MessageHeader */}
+      {/* Message Header */}
 
  <div className="flex items-center gap-2 mb-2">
 
@@ -230,7 +230,7 @@ export function AIMessageBubble({
 
  </div>
 
- {/* MessageBody */}
+      {/* Message Body */}
 
  <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-muted/50 border border-border text-sm leading-relaxed text-foreground/80">
 
@@ -250,7 +250,7 @@ export function AIMessageBubble({
 
  </div>
 
- {/* CodeblockShowcase */}
+      {/* Code Block Showcase */}
 
  {message.codeBlocks && message.codeBlocks.length > 0 && (
  <div className="mt-3 space-y-3">
@@ -264,7 +264,7 @@ export function AIMessageBubble({
 
  )}
 
- {/* AttachmentShowcase */}
+      {/* Attachment Showcase */}
 
  {message.attachments && message.attachments.length > 0 && (
  <div className="mt-3 flex flex-wrap gap-2">
@@ -278,7 +278,7 @@ export function AIMessageBubble({
 
  )}
 
- {/* MessageAction */}
+      {/* Message Actions */}
 
  <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
 
@@ -310,7 +310,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- {copied ? "alreadyCopy": "Copy"}
+            {copied ? "Copied": "Copy"}
 
  </TooltipContent>
 
@@ -336,7 +336,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- hasHelp
+            Helpful
 
  </TooltipContent>
 
@@ -362,7 +362,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- NoHelp
+            Not helpful
 
  </TooltipContent>
 
@@ -388,7 +388,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- re-newGenerate
+            Regenerate
 
  </TooltipContent>
 
@@ -420,7 +420,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- {isSpeaking ? "Stopread": "read"}
+            {isSpeaking ? "Stop reading": "Read aloud"}
 
  </TooltipContent>
 
@@ -446,7 +446,7 @@ export function AIMessageBubble({
 
  <TooltipContent side="bottom" className="bg-card text-foreground text-xs">
 
- {showRaw ? "FormatDisplay": "View"}
+            {showRaw ? "Formatted view": "Raw view"}
 
  </TooltipContent>
 
@@ -494,7 +494,7 @@ export function AIMessageBubble({
  );
 }
 
-// UserMessageBubbleComponent
+// User Message Bubble Component
 
 interface UserMessageBubbleProps {
  message: Message;
@@ -520,7 +520,7 @@ export function UserMessageBubble({
 
  <div className="flex gap-4 flex-row-reverse max-w-[85%]">
 
- {/* UserAvatar */}
+    {/* User Avatar */}
 
  <Avatar className="w-8 h-8 shrink-0 ring-2 ring-border">
 
@@ -534,7 +534,7 @@ export function UserMessageBubble({
 
  </Avatar>
 
- {/* MessageContent */}
+      {/* Message Content */}
 
  <div className="text-right">
 
@@ -544,7 +544,7 @@ export function UserMessageBubble({
 
  </div>
 
- {/* AttachmentShowcase */}
+      {/* Attachment Showcase */}
 
  {message.attachments && message.attachments.length > 0 && (
  <div className="mt-2 flex flex-wrap gap-2 justify-end">
@@ -575,7 +575,7 @@ export function UserMessageBubble({
  );
 }
 
-// CodeblockDisplayComponent
+// Code Block Display Component
 
 interface CodeBlockDisplayProps {
  language: string;
@@ -604,7 +604,7 @@ function CodeBlockDisplay({ language, code, filename }: CodeBlockDisplayProps) {
  return (
  <div className="rounded-xl overflow-hidden border border-border bg-card">
 
- {/* CodeblockHeader */}
+    {/* Code Block Header */}
 
  <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border-b border-border">
 
@@ -618,7 +618,7 @@ function CodeBlockDisplay({ language, code, filename }: CodeBlockDisplayProps) {
 
  </span>
 
- <span className="text-[10px] text-muted-foreground/70">{lines} row</span>
+      <span className="text-[10px] text-muted-foreground/70">{lines} lines</span>
 
  </div>
 
@@ -664,7 +664,7 @@ function CodeBlockDisplay({ language, code, filename }: CodeBlockDisplayProps) {
 
  </div>
 
- {/* CodeContent */}
+    {/* Code Content */}
 
  {!collapsed && (
  <div className="p-4 overflow-x-auto">
@@ -684,7 +684,7 @@ function CodeBlockDisplay({ language, code, filename }: CodeBlockDisplayProps) {
  );
 }
 
-// AttachmentPreviewComponent
+// Attachment Preview Component
 
 interface AttachmentPreviewProps {
  attachment: Attachment;
@@ -760,12 +760,12 @@ function AttachmentPreview({ attachment }: AttachmentPreviewProps) {
  );
 }
 
-// Markdown RenderComponent(version)
+// Markdown Render Component (simplified)
 
 function RenderMarkdown({ content }: { content: string }) {
- // Simple's Markdown RenderLogic
+  // Simple Markdown render logic
 
- // atProductionEnvironmentShouldUsage react-markdown etc
+  // In production, use react-markdown or similar
 
  const parts = content.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\))/g);
 
@@ -801,7 +801,7 @@ function RenderMarkdown({ content }: { content: string }) {
 
  }
 
- // LinkMatch
+    // Link Match
 
  const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
 
@@ -838,7 +838,7 @@ function RenderMarkdown({ content }: { content: string }) {
  );
 }
 
-// currentlyatInputIndicator
+// Typing Indicator
 
 interface TypingIndicatorProps {
  modelName?: string;
@@ -887,7 +887,7 @@ export function TypingIndicator({ modelName = "AI" }: TypingIndicatorProps) {
 
  </div>
 
- <span className="text-xs text-muted-foreground">currentlyatThink...</span>
+          <span className="text-xs text-muted-foreground">Thinking...</span>
 
  </div>
 
@@ -898,7 +898,7 @@ export function TypingIndicator({ modelName = "AI" }: TypingIndicatorProps) {
  );
 }
 
-// ShortcutReplySuggestionComponent
+// Quick Reply Suggestion Component
 
 interface SuggestedRepliesProps {
  suggestions: string[];
@@ -932,7 +932,7 @@ export function SuggestedReplies({ suggestions, onSelect }: SuggestedRepliesProp
  );
 }
 
-// ConversationContextTipComponent
+// Conversation Context Indicator Component
 
 interface ContextIndicatorProps {
  contextItems: { type: string; name: string }[];

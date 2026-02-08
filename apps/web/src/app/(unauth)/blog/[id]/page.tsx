@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * BlogDetailsPage - LobeHub StyleDarkDesign
+ * BlogDetailsPage - LobeHub Style Dark Design
  */
 
 import { useState, useEffect } from "react";
@@ -29,7 +29,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// MockBlogArticleData
+// Mock Blog Article Data
 const blogPosts: Record<string, {
  id: string;
  title: string;
@@ -44,186 +44,186 @@ const blogPosts: Record<string, {
 }> = {
  "ai-agent-2-release": {
  id: "ai-agent-2-release",
- title: "AI Agent 2.0 currentlyPublish: moreSmart'sWorkflowAutomation",
- excerpt: "Wevery AI Agent 2.0 'scurrentlyPublish, comemorelarge'sNaturalLanguageUnderstandcanpower, multipleModelSupportandSmartRecommendedFeatures.",
- content: `
-## 
+    title: "AI Agent 2.0 Released: Smarter Workflow Automation",
+    excerpt: "We are excited to announce AI Agent 2.0, featuring more powerful natural language understanding, multi-model support, and smart recommendation features.",
+    content: `
+## Introduction
 
-Today, WeVery AgentFlow AI Agent 2.0 'scurrentlyPublish!thisisWeasmostre-need'sUpdate, come'snewFeaturesand'scanImprove.
+Today, we are thrilled to announce the official release of AgentFlow AI Agent 2.0! This is our most significant update yet, packed with new features and performance improvements.
 
-## mainneedUpdate
+## Key Updates
 
-### 1. multipleModelSupport
+### 1. Multi-Model Support
 
-AI Agent 2.0 atSupportfaceonAllmain'slargeLanguageModel: 
+AI Agent 2.0 now supports all major large language models:
 
-- **GPT-4 Turbo** - OpenAI mostnewBestlarge'sModel
-- **Claude 3** - Anthropic 'snew1Model
-- **Tongyi1000** - inbaba'slargeModel
-- **center1** - 100'slargeModel
-- **LocalModel** - Via Ollama SupportLocalDeploy'sModel
+- **GPT-4 Turbo** - OpenAI's latest and most powerful model
+- **Claude 3** - Anthropic's newest model
+- **Qwen** - A powerful open-source large model
+- **Gemini** - Google's flagship model
+- **Local Models** - Locally deployed models supported via Ollama
 
-youcanwithBased onTaskTypeandCostConsider, FlexibleSelectmostSuitable'sModel.
+You can flexibly choose the most suitable model based on task type and cost considerations.
 
-### 2. NaturalLanguageWorkflow
+### 2. Natural Language Workflows
 
-thisisWemostpending'sFeatures1.atyoucanwithuseNaturalLanguageDescriptionyouwantneedAutomation'sTask, AI willAutoGenerateforshould'sWorkflow.
+This is our most anticipated feature. You can now use natural language to describe the automation tasks you need, and AI will automatically generate the appropriate workflow.
 
-exampleif, youneedneed: "eachtoCustomerEmailtime, AutoCategoryandReplyFAQ", SystemthenwillasyouCreateComplete'sWorkflow.
+For example, if you need: "Automatically categorize each customer email and reply to FAQs," the system will create a complete workflow for you.
 
-### 3. SmartRecommendedSystem
+### 3. Smart Recommendation System
 
-Based onyou'sUsageandIndustryFeature, AI Agent 2.0 willSmartRecommended: 
+Based on your usage patterns and industry characteristics, AI Agent 2.0 will intelligently recommend:
 
-- mostSuitableyou'sWorkflowTemplate
-- cancanneedneed'sNodeandIntegration
-- optimalSuggestionandBest Practices
+- The most suitable workflow templates for you
+- Nodes and integrations you might need
+- Optimization suggestions and best practices
 
-### 4. canlargeImprove
+### 4. Performance Improvements
 
-- ExecuteSpeedImprove **40%**
-- inuseReduce **30%**
-- LaunchTimeShorten **50%**
+- Execution speed improved by **40%**
+- Memory usage reduced by **30%**
+- Startup time shortened by **50%**
 
-## ifwhatUpgrade
+## How to Upgrade
 
-ifresultyouisExistingUser, AI Agent 2.0 alreadyAutoasyouEnable.youneedneedSign InConsole, thencanExperienceAllnewFeatures.
+If you are an existing user, AI Agent 2.0 has already been automatically enabled for you. Simply sign in to the console to experience all the new features.
 
-newUsercanwithViaSign UpFreeAccountNowStartUsage.
+New users can sign up for a free account to start using it right away.
 
-## NextPlan
+## Future Plans
 
-WewillContinueUserFeedback, ContinuousImproveProduct.downcome'sre-methodInclude: 
+We will continue to listen to user feedback and continuously improve the product. Upcoming updates include:
 
-- Moveendpoint App
-- moremultipleThird-partyIntegration
-- TeamCollaborationEnhanced
-- AI WorkflowDebugTool
+- Mobile app
+- More third-party integrations
+- Enhanced team collaboration
+- AI workflow debugging tools
 
-Thank youAllUser'sSupportandFeedback, currentlyisyoulet AgentFlow more!
+Thank you to all our users for your support and feedback — together, let's make AgentFlow even better!
 
 ---
 
-ifresultyouhaswhatIssueorSuggestion, WelcomeViawithdownmethodContact Us: 
+If you have any questions or suggestions, feel free to reach out through the following channels:
 
-- CommunityForum: [community.agentflow.ai](https://community.agentflow.ai)
+- Community Forum: [community.agentflow.ai](https://community.agentflow.ai)
 - Twitter: [@agentflow](https://twitter.com/agentflow)
 - Email: feedback@agentflow.ai
 `,
  category: "product",
- author: "ProductTeam",
- authorRole: "AgentFlow Productsection",
+    author: "Product Team",
+    authorRole: "AgentFlow Product Team",
  date: "2026-01-25",
  readTime: "5 min",
- tags: ["AI Agent", "ProductUpdate", "newFeatures"],
+    tags: ["AI Agent", "Product Update", "New Features"],
  },
  "workflow-best-practices": {
  id: "workflow-best-practices",
- title: "WorkflowDesignBest Practices: fromGetting StartedtoExpert",
- excerpt: "currentwillShareWeatHelpcount1000UserBuildWorkflowpastSummary'sBest Practices, HelpyouDesignmoreEfficient, morecan'sAutomationFlow.",
- content: `
-## 
+    title: "Workflow Design Best Practices: From Beginner to Expert",
+    excerpt: "We share the best practices gathered from helping thousands of users build workflows, to help you design more efficient and powerful automation flows.",
+    content: `
+## Introduction
 
-atHelpcount1000UserBuildWorkflow'spast, Welarge'sExperienceand.currentwillSharethis'sBest Practices, HelpyouDesignmoreEfficient, morecan'sAutomationFlow.
+Having helped thousands of users build workflows, we have accumulated extensive experience. In this article, we will share best practices to help you design more efficient and powerful automation flows.
 
-## 1. fromsmall
+## 1. Start Small
 
-**then: firstfromSimple'sWorkflowStart, IncreaseComplex.**
+**Principle: Begin with simple workflows, then gradually increase complexity.**
 
-verymultipleUser1StartthenwantBuild1Contains10Node'sComplexWorkflow, Resultand.Suggestionyou: 
+Many users try to build a complex workflow with 10+ nodes right from the start, which often leads to issues. Our recommendation:
 
-- firstIdentifymostre-need's 2-3 Step
-- Build1MinimumAvailable'sWorkflow
-- VerifyEffectafteragainExtend
+- First identify the 2-3 most important steps
+- Build a minimum viable workflow
+- Verify effectiveness before expanding
 
-## 2. ReasonableUsageConditionBranch
+## 2. Use Conditional Branches Wisely
 
-ConditionBranchisWorkflowBestlarge'sFeatures1, butalsoEasybyuse.
+Conditional branching is one of the most powerful workflow features, but it can also be easily misused.
 
-### Recommendeddo
+### Recommended
 
-- ConditionDetermineShouldSimpleClear
-- AvoidExceed 3 Nested
-- Usagehas'sBranchName
+- Keep condition checks simple and clear
+- Avoid more than 3 levels of nesting
+- Use meaningful branch names
 
-### notRecommendeddo
+### Not Recommended
 
-- at1NodepastmultipleCondition
-- UsageBlur'sDetermineLogic
-- IgnoreEdgeSituationProcess
+- Placing multiple conditions in a single node
+- Using vague decision logic
+- Ignoring edge case handling
 
-## 3. ErrorProcessisMust's
+## 3. Error Handling is Essential
 
-whatWorkflowallcancantoError, keyisifwhatoptimalProcessit.
+Any workflow can encounter errors — the key is how to handle them properly.
 
-Suggestion'sErrorProcessPolicy: 
+Recommended error handling strategies:
 
-1. **RetryMechanism**: forattimeError, SettingsReasonable'sRetrytimescount
-2. **DowngradeProcess**: mainneedPathFailedtime, SwitchtousePlan
-3. **AlertNotifications**: re-needErrorShouldandtimeNotificationsRelatedperson
-4. **LogsRecord**: Record'sInfowithIssue
+1. **Retry Mechanism**: For transient errors, set a reasonable retry count
+2. **Fallback Processing**: When the primary path fails, switch to a backup plan
+3. **Alert Notifications**: Critical errors should trigger timely notifications to relevant team members
+4. **Log Recording**: Record detailed information for troubleshooting
 
-## 4. canoptimalTips
+## 4. Performance Optimization Tips
 
-### androwExecute
+### Parallel Execution
 
-multipleStepbetweenNoDependencytime, UsageandrowExecutecanwithlargeImprovecan.
+When multiple steps have no dependencies, use parallel execution to significantly improve performance.
 
-### CachePolicy
+### Caching Strategy
 
-foratFrequentAccess'sData, ConsiderUsageCacheAvoidre-Request.
+For frequently accessed data, consider using caching to avoid repeated requests.
 
-### BatchProcess
+### Batch Processing
 
-ProcesslargeDatatime, UsageBatchActionandnotisProcess.
+When processing large datasets, use batch operations instead of processing one by one.
 
-## 5. TestandMonitor
+## 5. Testing and Monitoring
 
-### TestEnvironment
+### Test Environment
 
-AlwaysatTestEnvironmentVerifyWorkflow, ConfirmNoneafteragainDeploytoProductionEnvironment.
+Always verify workflows in a test environment and confirm everything works before deploying to production.
 
-### MonitorMetrics
+### Key Metrics
 
-FollowwithdownkeyMetrics: 
+Monitor the following key metrics:
 
-- ExecuteSuccess Rate
-- AverageExecuteTime
-- ErrorDistribution
-- ResourceConsumption
+- Execution success rate
+- Average execution time
+- Error distribution
+- Resource consumption
 
 ## Summary
 
-'sWorkflowDesignneedneednotPracticeandoptimal.HopethisBest PracticescanHelpyouBuildmore'sAutomationFlow.
+Effective workflow design requires continuous practice and optimization. We hope these best practices help you build better automation flows.
 
-ifresultyouhaswhatIssueorwantShareyou'sExperience, WelcomeatCommunityForumandWeExchange!
+If you have any questions or want to share your experience, feel free to join the community forum and connect with us!
 `,
  category: "tips",
- author: "TechnologyTeam",
- authorRole: "AgentFlow Technologysection",
+    author: "Technology Team",
+    authorRole: "AgentFlow Technology Team",
  date: "2026-01-20",
  readTime: "8 min",
- tags: ["Best Practices", "WorkflowDesign", "Tutorial"],
+    tags: ["Best Practices", "Workflow Design", "Tutorial"],
  },
 };
 
-// RelatedArticle
+// Related Articles
 const relatedPosts = [
  {
  id: "enterprise-automation-trends",
- title: "2026 EnterpriseAutomationTrend: AI Driven'sWorkflow",
+    title: "2026 Enterprise Automation Trends: AI-Driven Workflows",
  date: "2026-01-15",
  readTime: "10 min",
  },
  {
  id: "slack-integration-guide",
- title: "Slack IntegrationcompleteallGuide: BuildEfficientTeamCollaboration",
+    title: "Complete Slack Integration Guide: Building Efficient Team Collaboration",
  date: "2026-01-10",
  readTime: "6 min",
  },
  {
  id: "error-handling-patterns",
- title: "WorkflowErrorProcess: EnsureAutomation'scan",
+    title: "Workflow Error Handling: Ensuring Automation Reliability",
  date: "2025-12-28",
  readTime: "9 min",
  },
@@ -240,17 +240,17 @@ export default function BlogPostPage() {
  
  const post = blogPosts[postId];
 
- // ifresultArticleDoes not exist, Display 404
+ // If article doesn't exist, display 404
  if (!post) {
  return (
  <div className="min-h-screen bg-background">
  <SiteHeader />
  <div className="pt-32 sm:pt-40 pb-16 px-6 text-center">
- <h1 className="text-[20px] font-semibold text-foreground mb-4">ArticleDoes not exist</h1>
- <p className="text-[13px] text-foreground-light mb-8">Sorry, youAccess'sArticleDoes not existoralreadybyDelete</p>
+        <h1 className="text-[20px] font-semibold text-foreground mb-4">Article Not Found</h1>
+                <p className="text-[13px] text-foreground-light mb-8">Sorry, the article you're looking for doesn't exist or has been deleted</p>
  <Link href="/blog">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- BackBlogList
+ Back to Blog
  </Button>
  </Link>
  </div>
@@ -287,15 +287,15 @@ export default function BlogPostPage() {
  className="inline-flex items-center gap-2 text-[13px] text-foreground-light hover:text-foreground mb-8 group"
  >
  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
- BackBlog
- </Link>
+            Back to Blog
+          </Link>
 
  {/* Category & Meta */}
  <div className="flex flex-wrap items-center gap-3 mb-6">
  <span className="lobe-badge">
- {post.category === "product" ? "ProductUpdate": 
- post.category === "tips" ? "UsageTips": 
- post.category === "tech" ? "TechnologyShare": post.category}
+            {post.category === "product" ? "Product Update": 
+            post.category === "tips" ? "Tips & Tricks": 
+            post.category === "tech" ? "Tech Insights": post.category}
  </span>
  <span className="flex items-center gap-1 text-[12px] text-foreground-lighter">
  <Clock className="w-4 h-4" />
@@ -446,7 +446,7 @@ export default function BlogPostPage() {
  <div className="max-w-3xl mx-auto">
  <h2 className="text-[17px] font-semibold text-foreground mb-8 flex items-center gap-2">
  <BookOpen className="w-5 h-5 text-brand" />
- RelatedArticle
+            Related Articles
  </h2>
 
  <div className="space-y-4">
@@ -481,10 +481,10 @@ export default function BlogPostPage() {
  <section className="py-16 px-6">
  <div className="max-w-2xl mx-auto text-center">
  <h2 className="text-[17px] font-semibold text-foreground mb-4">
- SubscriptionWe's Newsletter
+            Subscribe to Our Newsletter
  </h2>
  <p className="text-[13px] text-foreground-light mb-6">
- eachweeksFeaturedmostnewArticleandProductUpdate, DirectSendtoyou'sEmail
+ Get the latest articles and product updates delivered directly to your inbox every week
  </p>
  <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
  <input
@@ -493,8 +493,8 @@ export default function BlogPostPage() {
  className="flex-1 h-11 px-4 rounded-full bg-surface-100/30 border border-border/30 text-foreground placeholder:text-foreground-lighter focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/50"
  />
  <Button className="h-11 px-6 rounded-full bg-foreground text-background font-medium hover:bg-foreground/90">
- Subscription
- </Button>
+            Subscribe
+            </Button>
  </div>
  </div>
  </section>

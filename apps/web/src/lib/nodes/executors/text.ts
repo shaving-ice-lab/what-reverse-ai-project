@@ -1,34 +1,34 @@
 /**
- * TextNodeExecute
- * TemplateRender, currentlythenExtract, Splitand
+ * Text Node Executors
+ * Template rendering, regex extraction, split and join
  */
 
 import type {
- NodeContext,
- NodeResult,
- NodeExecutor,
- TemplateConfig,
+  NodeContext,
+  NodeResult,
+  NodeExecutor,
+  TemplateConfig,
 } from "../types";
 import { renderTemplate, createNodeError } from "../utils";
 
-// ==================== TextTemplateNode ====================
+// ==================== Text Template Node ====================
 
 /**
- * TextTemplateNodeExecute
+ * Text template node executor
  */
 export const templateExecutor: NodeExecutor<TemplateConfig> = {
- type: "template",
- 
- async execute(context): Promise<NodeResult> {
- const { nodeConfig, variables, inputs } = context;
- const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- const allVariables = { ...variables, ...inputs };
- 
- // RenderTemplate
- const rendered = renderTemplate(nodeConfig.template, allVariables);
+  type: "template",
+  
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, variables, inputs } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      const allVariables = { ...variables, ...inputs };
+      
+      // Render template
+      const rendered = renderTemplate(nodeConfig.template, allVariables);
  
  logs.push({
  level: "info",
@@ -76,10 +76,10 @@ export const templateExecutor: NodeExecutor<TemplateConfig> = {
  valid: errors.length === 0,
  errors,
  };
- },
+  },
 };
 
-// ==================== currentlythenExtractNode ====================
+// ==================== Regex Extract Node ====================
 
 interface RegexConfig {
  pattern: string;
@@ -184,10 +184,10 @@ export const regexExecutor: NodeExecutor<RegexConfig> = {
  }
  
  return { valid: errors.length === 0, errors };
- },
+  },
 };
 
-// ==================== TextSplit/andNode ====================
+// ==================== Text Split/Join Node ====================
 
 interface SplitJoinConfig {
  mode: "split" | "join";

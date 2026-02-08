@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SearchHighlightTextComponent
- * willSearchKeywordsatTextHighlightDisplay
+ * Search Highlight Text Component
+ * Highlights search keywords within text content
  */
 
 import { Fragment, useMemo } from "react";
@@ -37,7 +37,7 @@ export function HighlightText({
  
  return splitParts.map((part, index) => ({
  text: part,
- highlight: index % 2 === 1, // countIndexisMatch'sPartial
+ highlight: index % 2 === 1, // Odd indices are the matched parts
  }));
  }, [text, search, caseSensitive]);
 
@@ -56,13 +56,13 @@ export function HighlightText({
  );
 }
 
-// currentlythenSpecialCharacter
+// Escape special regex characters
 function escapeRegExp(string: string): string {
  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
- * HighlightmultipleKeywords
+ * Highlight multiple keywords
  */
 interface MultiHighlightTextProps {
  text: string;

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationDetailsPage - Chatface
- * SupportViewHistoryMessage, SendnewMessage, StreamingResponse
+ * Conversation Details Page - Chat Interface
+ * Supports viewing message history, sending new messages, and streaming responses
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -48,7 +48,7 @@ import { useStreamingChat } from "@/hooks";
 import type { Conversation, Message as ConversationMessage, AIParameters } from "@/types/conversation";
 import { AI_MODELS, formatRelativeTime, getModelDisplayName } from "@/types/conversation";
 
-// willafterendpointMessageFormatConvertasComponentMessageFormat
+// Convert backend message format to component display format
 function toDisplayMessage(msg: ConversationMessage): ChatMessage {
  return {
  id: msg.id,
@@ -63,19 +63,19 @@ function toDisplayMessage(msg: ConversationMessage): ChatMessage {
  };
 }
 
-// AvailableModelList
+// Available Model List
 const AVAILABLE_MODELS = AI_MODELS.map((m) => ({
  id: m.id,
  name: m.name,
  icon: "✨",
 }));
 
-// SuggestionIssue
+// Suggested Questions
 const SUGGESTIONS = [
- { label: "I1Code", prompt: "I1 React Component" },
- { label: "Explain1Concept", prompt: "Explain1downWhatisServiceArchitecture" },
- { label: "SummaryArticleContent", prompt: "ISummarywithdownArticle'smainneedContent" },
- { label: "ProvideSuggestion", prompt: "toI1ImproveWorkrate'sSuggestion" },
+ { label: "Write Code", prompt: "Write a React component" },
+ { label: "Explain a Concept", prompt: "Explain what microservice architecture is" },
+ { label: "Summarize an Article", prompt: "Summarize the main points of this article" },
+ { label: "Give Suggestions", prompt: "Give me a suggestion to improve my productivity" },
 ];
 
 const LAST_WORKSPACE_STORAGE_KEY = "last_workspace_id";
@@ -121,20 +121,20 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
  const [isEditing, setIsEditing] = useState(false);
  const [editTitle, setEditTitle] = useState("");
- const [useStreaming, setUseStreaming] = useState(true); // isnoUsageStreamingResponse
+ const [useStreaming, setUseStreaming] = useState(true); // Whether to use streaming responses
  const abortControllerRef = useRef<AbortController | null>(null);
  
- // MessageEditStatus
+ // Message Edit State
  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
  const [editingContent, setEditingContent] = useState("");
  
- // ReplyStatus
+ // Reply State
  const [replyingToMessage, setReplyingToMessage] = useState<ChatMessage | null>(null);
  
- // ShortcutReplySuggestion
+ // Quick Reply Suggestions
  const [quickReplies, setQuickReplies] = useState<string[]>([]);
  
- // AI ParameterSettings
+ // AI Parameter Settings
  const [aiParams, setAiParams] = useState<AIParameters>({});
  const [settingsOpen, setSettingsOpen] = useState(false);
  
@@ -142,7 +142,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  const { streamChat, cancelStream, isStreaming } = useStreamingChat();
  const conversationsHref = workspaceId ? `/dashboard/app/${workspaceId}/conversations` : "/dashboard/apps";
 
- // LoadConversationDetails
+ // Load Conversation Details
  const fetchConversation = useCallback(async () => {
  if (!conversationId || conversationId === "new") {
  setLoading(false);
@@ -150,7 +150,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
 
  if (!workspaceId) {
- setError("PleasefirstSelectWorkspace");
+ setError("Please select a workspace first");
  setLoading(false);
  return;
  }
@@ -167,7 +167,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  setSelectedModel(conv.model || "gpt-4");
  setEditTitle(conv.title);
  
- // Load AI Parameter
+ // Load AI Parameters
  setAiParams({
  temperature: conv.temperature,
  maxTokens: conv.maxTokens,
@@ -177,7 +177,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  presencePenalty: conv.presencePenalty,
  });
 
- // ConvertMessageFormat(needneedInvertOrder, as API Back'sismostnew'satbefore)
+ // Convert message format (reverse order, as the API returns newest first)
  if (conv.messages && conv.messages.length > 0) {
  const displayMessages = conv.messages
  .map(toDisplayMessage)
@@ -186,7 +186,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  } catch (err) {
  console.error("Failed to fetch conversation:", err);
- setError("LoadConversationFailed, PleaseRetry");
+ setError("Failed to load conversation. Please try again.");
  } finally {
  setLoading(false);
  }
@@ -196,17 +196,17 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  fetchConversation();
  }, [fetchConversation]);
 
- // SendMessage
+ // Send Message
  const handleSend = async (content: string) => {
  if (!content.trim() || sending) return;
 
  let currentConversationId = conversationId;
 
- // ifresultisnewConversation, firstCreateConversation
+ // If this is a new conversation, create it first
  if (conversationId === "new") {
  try {
  if (!workspaceId) {
- setError("PleasefirstSelectWorkspace");
+ setError("Please select a workspace first");
  router.push("/dashboard/apps");
  return;
  }
@@ -217,7 +217,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  });
  currentConversationId = newConv.id;
  setConversation(newConv);
- // Update URL(notRefreshPage)
+ // Update URL (don't refresh page)
  window.history.replaceState(
  null,
  "",
@@ -225,12 +225,12 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  );
  } catch (err) {
  console.error("Failed to create conversation:", err);
- setError("CreateConversationFailed");
+ setError("Failed to create conversation");
  return;
  }
  }
 
- // CreateUserMessagetimeDisplay
+ // Create user message for display
  const tempUserMessageId = `temp-user-${Date.now()}`;
  const userMessage: ChatMessage = {
  id: tempUserMessageId,
@@ -251,7 +251,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  model: selectedModel,
  };
 
- // ClearReplyStatus
+ // Clear reply state
  const replyParentId = replyingToMessage?.id;
  setReplyingToMessage(null);
 
@@ -261,12 +261,12 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
 
  try {
  if (useStreaming) {
- // UsageStreamingResponse
+ // Use streaming response
  const fullContent = await streamChat(currentConversationId, content, {
  workspaceId,
  model: selectedModel,
  onToken: (token) => {
- // Real-timeUpdate AI MessageContent
+ // Update AI message content in real-time
  setMessages((prev) =>
  prev.map((msg) =>
  msg.id === tempAiMessageId
@@ -276,7 +276,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  );
  },
  onComplete: (finalContent) => {
- // StreamingResponseDone, UpdatemostContent
+ // Streaming response complete, update final content
  setMessages((prev) =>
  prev.map((msg) =>
  msg.id === tempAiMessageId
@@ -290,20 +290,20 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  setMessages((prev) =>
  prev.map((msg) =>
  msg.id === tempAiMessageId
- ? {...msg, content: "Sorry, SendMessagetimeAppearError.PleaseRetry." }
+ ? {...msg, content: "Sorry, an error occurred while sending the message. Please try again." }
  : msg
  )
  );
  },
  });
  } else {
- // UsageStreamingResponse
+ // Use standard response
  const response = await conversationApi.chat(currentConversationId, content, {
  workspaceId,
  model: selectedModel,
  });
 
- // UpdateMessageasReal's ID andContent
+ // Update message with real ID and content
  setMessages((prev) =>
  prev.map((msg) => {
  if (msg.id === tempUserMessageId) {
@@ -326,11 +326,11 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  } catch (err) {
  console.error("Failed to send message:", err);
- // DisplayErrorMessage
+ // Display error message
  setMessages((prev) =>
  prev.map((msg) =>
  msg.id === tempAiMessageId
- ? {...msg, content: "Sorry, SendMessagetimeAppearError.PleaseRetry." }
+ ? {...msg, content: "Sorry, an error occurred while sending the message. Please try again." }
  : msg
  )
  );
@@ -338,28 +338,28 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  setSending(false);
  setStreamingMessageId(null);
  
- // GenerateShortcutReplySuggestion(Based onConversationContentGenerate1Suggestion)
+ // Generate quick reply suggestions based on conversation content
  generateQuickReplies();
  }
  };
 
- // GenerateShortcutReplySuggestion
+ // Generate quick reply suggestions
  const generateQuickReplies = () => {
- // Based onRecent'sConversationContentGenerate1use'safterIssue
+ // Generate follow-up questions based on recent conversation
  const suggestions = [
- "ContinueExplain",
- "canexample??",
- "hasWhatneedneedNote's?",
- "Summary1down",
+ "Continue explaining",
+ "Can you give an example?",
+ "Anything I should be aware of?",
+ "Summarize this",
  ];
  setQuickReplies(suggestions);
  };
 
- // CancelSend
+ // Cancel Send
  const handleCancel = () => {
- // CancelStreamingRequest
+ // Cancel streaming request
  cancelStream();
- // CancelNormalRequest
+ // Cancel standard request
  if (abortControllerRef.current) {
  abortControllerRef.current.abort();
  abortControllerRef.current = null;
@@ -368,26 +368,26 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  setStreamingMessageId(null);
  };
 
- // re-newGenerate
+ // Regenerate
  const handleRegenerate = async (messageId: string) => {
  const messageIndex = messages.findIndex((m) => m.id === messageId);
  if (messageIndex === -1) return;
 
- // tobefore'sUserMessage
+ // Find the previous user message
  const prevUserMessage = messages
  .slice(0, messageIndex)
  .reverse()
  .find((m) => m.role === "user");
 
  if (prevUserMessage) {
- // DeleteCurrent AI Messageandafter'sMessage
+ // Delete current AI message and subsequent messages
  setMessages((prev) => prev.slice(0, messageIndex));
- // re-newSend
+ // Resend
  await handleSend(prevUserMessage.content);
  }
  };
 
- // StartEditMessage
+ // Start editing message
  const startEditMessage = (messageId: string) => {
  const message = messages.find((m) => m.id === messageId);
  if (message) {
@@ -396,7 +396,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // SaveMessageEdit
+ // Save message edit
  const saveEditMessage = async () => {
  if (!editingMessageId || !editingContent.trim() || !conversation) return;
 
@@ -421,13 +421,13 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // CancelMessageEdit
+ // Cancel message edit
  const cancelEditMessage = () => {
  setEditingMessageId(null);
  setEditingContent("");
  };
 
- // DeleteMessage
+ // Delete message
  const handleDeleteMessage = async (messageId: string) => {
  if (!conversation) return;
  
@@ -439,14 +439,14 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // MessageFeedback(Like//Favorite)
+ // Message Feedback (Like/Dislike/Bookmark)
  const handleMessageFeedback = async (messageId: string, action: "like" | "dislike" | "bookmark") => {
  if (!conversation) return;
  
  const message = messages.find((m) => m.id === messageId);
  if (!message) return;
 
- // firstOptimisticUpdate UI
+ // Optimistically update UI first
  const newLiked = action === "like" ? !message.liked : (action === "dislike" && message.liked ? false : message.liked);
  const newDisliked = action === "dislike" ? !message.disliked : (action === "like" && message.disliked ? false : message.disliked);
  const newBookmarked = action === "bookmark" ? !message.bookmarked : message.bookmarked;
@@ -460,7 +460,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  );
 
  try {
- // Call API Persistent
+ // Persist via API
  await conversationApi.updateMessageFeedback(conversation.id, messageId, {
  liked: action === "like" ? newLiked : undefined,
  disliked: action === "dislike" ? newDisliked : undefined,
@@ -479,7 +479,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // MessageAction
+ // Message Action
  const handleMessageAction = (action: string, messageId: string) => {
  switch (action) {
  case "regenerate":
@@ -505,12 +505,12 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // CancelReply
+ // Cancel Reply
  const cancelReply = () => {
  setReplyingToMessage(null);
  };
 
- // SwitchFavorite
+ // Toggle Star
  const handleToggleStar = async () => {
  if (!conversation) return;
  try {
@@ -523,7 +523,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // ArchiveConversation
+ // Archive Conversation
  const handleArchive = async () => {
  if (!conversation) return;
  try {
@@ -534,10 +534,10 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // DeleteConversation
+ // Delete Conversation
  const handleDelete = async () => {
  if (!conversation) return;
- if (!confirm("OKneedDeletethisConversation??")) return;
+ if (!confirm("Are you sure you want to delete this conversation?")) return;
  try {
  await conversationApi.delete(conversation.id);
  router.push(conversationsHref);
@@ -546,7 +546,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // UpdateTitle
+ // Update Title
  const handleUpdateTitle = async () => {
  if (!conversation || !editTitle.trim()) return;
  try {
@@ -560,7 +560,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  }
  };
 
- // LoadStatus
+ // Loading State
  if (loading) {
  return (
  <div className="flex h-full items-center justify-center bg-background-studio">
@@ -569,7 +569,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  );
  }
 
- // ErrorStatus
+ // Error State
  if (error) {
  return (
  <div className="flex h-full flex-col items-center justify-center gap-4 bg-background-studio">
@@ -609,7 +609,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  <div className="page-caption flex items-center gap-2">
  <span>Conversation</span>
  <span className="h-1 w-1 rounded-full bg-foreground-muted" />
- <span>{isNewConversation ? "newConversation": "ConversationDetails"}</span>
+ <span>{isNewConversation ? "New Conversation" : "Conversation Details"}</span>
  </div>
 
  {isEditing ? (
@@ -640,7 +640,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  ) : (
  <div className="mt-2 flex items-center gap-2 min-w-0">
  <h1 className="text-[14px] font-medium text-foreground truncate max-w-[360px]">
- {conversation?.title || "newConversation"}
+ {conversation?.title || "New Conversation"}
  </h1>
  {conversation?.starred && (
  <Star className="w-4 h-4 text-warning fill-warning" />
@@ -649,7 +649,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  )}
 
  <p className="mt-1 text-[11px] text-foreground-muted">
- CurrentModel {getModelDisplayName(selectedModel)} · {messageCount} Message · Update {lastUpdatedLabel}
+ Model: {getModelDisplayName(selectedModel)} · {messageCount} Messages · Updated {lastUpdatedLabel}
  </p>
  </div>
  </div>
@@ -669,14 +669,14 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </SheetTrigger>
  <SheetContent className="bg-surface-100 border-border">
  <SheetHeader>
- <SheetTitle className="text-foreground">AI ParameterSettings</SheetTitle>
+ <SheetTitle className="text-foreground">AI Parameter Settings</SheetTitle>
  </SheetHeader>
  <div className="mt-6">
  <AISettingsPanel
  params={aiParams}
  onChange={(params) => {
  setAiParams(params);
- // ifresultConversationAlready exists, SavetoService
+ // If conversation already exists, save to server
  if (conversation) {
  conversationApi.update(conversation.id, params).catch(console.error);
  }
@@ -687,7 +687,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </Sheet>
  </div>
 
- {/* ModelSelect */}
+ {/* Model Select */}
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <Button
@@ -743,7 +743,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  <DropdownMenuContent align="end" className="bg-surface-100 border-border">
  <DropdownMenuItem onClick={() => setIsEditing(true)} className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Edit3 className="w-4 h-4 mr-2" />
- re-Naming
+ Rename
  </DropdownMenuItem>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Share2 className="w-4 h-4 mr-2" />
@@ -769,7 +769,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </div>
  </header>
 
- {/* MessageRegion */}
+ {/* Message Area */}
  <main className="flex-1 overflow-auto scrollbar-thin">
  <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-6">
  <div className="page-panel overflow-hidden">
@@ -777,7 +777,7 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  <div>
  <h2 className="page-panel-title">Message</h2>
  <p className="page-panel-description">
- {messages.length > 0 ? "mostnewConversationContent": "PrepareStartConversation"}
+ {messages.length > 0 ? "Latest Conversation" : "Ready to Start a Conversation"}
  </p>
  </div>
  <span className="text-xs text-foreground-muted">
@@ -786,8 +786,8 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </div>
  {messages.length === 0 ? (
  <WelcomeMessage
- title="StartnewConversation"
- description="Inputyou'sIssueorSelect1SuggestionStartConversation.AI AssistantwillasyouProvideHelp."
+ title="Start a New Conversation"
+ description="Enter your question or select a suggestion to start a conversation. The AI assistant will help you."
  suggestions={SUGGESTIONS}
  onSuggestionClick={handleSend}
  className="min-h-[60vh] border-t border-border/60"
@@ -812,11 +812,11 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
 
  <div className="shrink-0 border-t border-border bg-background-studio/95">
  <div className="mx-auto w-full max-w-5xl px-6">
- {/* ShortcutReplySuggestion */}
+ {/* Quick Reply Suggestions */}
  {!sending && messages.length > 0 && quickReplies.length > 0 && (
  <div className="pt-3 pb-2">
  <div className="mb-2 flex items-center justify-between">
- <span className="page-caption">ShortcutReply</span>
+ <span className="page-caption">Quick Reply</span>
  <Button
  variant="ghost"
  size="sm"
@@ -836,14 +836,14 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </div>
  )}
 
- {/* ReplyIndicator */}
+ {/* Reply Indicator */}
  {replyingToMessage && (
  <div className="mb-2 rounded-md border border-border border-l-2 border-l-brand-500/30 bg-surface-75/80 px-3 py-2">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2 text-[12px]">
  <MessageSquare className="w-4 h-4 text-brand-500" />
  <span className="text-foreground-muted">
- Reply {replyingToMessage.role === "user" ? "you": "AI"}: 
+ Replying to {replyingToMessage.role === "user" ? "you" : "AI"}: 
  </span>
  <span className="text-foreground truncate max-w-[320px] font-medium">
  {replyingToMessage.content.slice(0, 50)}
@@ -862,12 +862,12 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
  </div>
  )}
 
- {/* InputRegion */}
+ {/* Input Area */}
  <ChatInput
  onSend={handleSend}
  onCancel={handleCancel}
  isLoading={sending}
- placeholder={replyingToMessage ? "InputReplyContent...": "InputMessage, by Enter Send..."}
+ placeholder={replyingToMessage ? "Type your reply..." : "Type a message. Press Enter to send..."}
  showModels={false}
  models={AVAILABLE_MODELS}
  selectedModel={selectedModel}
@@ -922,11 +922,11 @@ export default function ChatPage() {
  router.replace(`/dashboard/app/${wsId}/conversations/${conversationId}`);
  return;
  }
- setRedirectError("ConversationUnboundWorkspace, NoneNavigate");
+ setRedirectError("Conversation is not linked to a workspace. Unable to navigate.");
  } catch (error) {
  if (cancelled) return;
  console.error("Failed to resolve app for conversation:", error);
- setRedirectError("LoadConversationFailed, Please try again laterRetry");
+ setRedirectError("Failed to load conversation. Please try again later.");
  }
  };
 
@@ -945,7 +945,7 @@ export default function ChatPage() {
  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-center">
  <p className="text-sm text-foreground-muted">{redirectError}</p>
  <Button variant="outline" onClick={() => router.replace("/dashboard/apps")}>
- BackAppList
+ Back to App List
  </Button>
  </div>
  );
@@ -953,7 +953,7 @@ export default function ChatPage() {
 
  return (
  <div className="min-h-[60vh] flex items-center justify-center text-sm text-foreground-muted">
- currentlyatNavigatetoAppConversation...
+ Redirecting to app conversation...
  </div>
  );
 }

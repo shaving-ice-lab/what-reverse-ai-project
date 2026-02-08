@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * StatisticsDataCardComponentCollection
- * canuse'sDataShowcaseComponent
+ * Statistics Data Card Components
+ * Reusable data showcase component collection
  */
 
 import { ReactNode } from "react";
@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 
 // ============================================
-// BasicStatisticsCard
+// Basic Statistics Card
 // ============================================
 
 interface StatCardProps {
@@ -93,7 +93,7 @@ export function StatCard({
 }
 
 // ============================================
-// youStatisticsCard
+// Mini Statistics Card
 // ============================================
 
 interface MiniStatCardProps {
@@ -134,7 +134,7 @@ export function MiniStatCard({
 }
 
 // ============================================
-// ProgressStatisticsCard
+// Progress Statistics Card
 // ============================================
 
 interface ProgressStatCardProps {
@@ -195,7 +195,7 @@ export function ProgressStatCard({
  </div>
  {showPercentage && (
  <p className="text-[11px] text-foreground-muted mt-2">
- alreadyUsage {percentage.toFixed(1)}%
+ {percentage.toFixed(1)}% used
  </p>
  )}
  </div>
@@ -203,7 +203,7 @@ export function ProgressStatCard({
 }
 
 // ============================================
-// forcompareStatisticsCard
+// Comparative Statistics Card
 // ============================================
 
 interface CompareStatCardProps {
@@ -277,7 +277,7 @@ export function CompareStatCard({
 }
 
 // ============================================
-// StatisticsCardGrid
+// Statistics Card Grid
 // ============================================
 
 interface StatGridProps {
@@ -301,7 +301,7 @@ export function StatGrid({ children, columns = 4, className }: StatGridProps) {
 }
 
 // ============================================
-// Real-timeDataCard
+// Real-time Data Card
 // ============================================
 
 interface LiveStatCardProps {
@@ -334,7 +334,7 @@ export function LiveStatCard({
  className
  )}
  >
- {/* Real-timeIndicator */}
+ {/* Real-time Indicator */}
  {isLive && (
  <div className="absolute top-4 right-4 flex items-center gap-2">
  <span className={cn("w-2 h-2 rounded-full animate-pulse", liveColor)} />

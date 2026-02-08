@@ -1,33 +1,33 @@
 /**
- * TagsRelatedTypeDefinition
+ * Tag Related Type Definition
  */
 
 /**
- * WorkflowTags
+ * Workflow Tag
  */
 export interface Tag {
- /** Tags ID */
+ /** Tag ID */
  id: string;
  /** User ID */
  user_id: string;
- /** TagsName */
+ /** Tag Name */
  name: string;
- /** TagsColor */
+ /** Tag Color */
  color: string;
  /** Created At */
  created_at: string;
 }
 
 /**
- * UsageCount'sTags
+ * Tag with Usage Count
  */
 export interface TagWithCount extends Tag {
- /** UsageCount */
+ /** Usage Count */
  count: number;
 }
 
 /**
- * beforeendpointShowcaseuse'sTags
+ * Tag for Frontend Display
  */
 export interface WorkflowTag {
  id: string;

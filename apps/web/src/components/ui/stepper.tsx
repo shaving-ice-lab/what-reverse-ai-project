@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Stepper StepIndicatorComponent
+ * Stepper - Step Indicator Component
  * 
- * Support: 
- * - Horizontal/VerticalLayout
- * - canClickNavigation
- * - multipletypestyleVariant
- * - Error/DoneStatus
+ * Supports: 
+ * - Horizontal/vertical layout
+ * - Clickable navigation
+ * - Multiple style variants
+ * - Error/completed status
  */
 
 import * as React from "react"
@@ -25,36 +25,36 @@ interface StepConfig {
  description?: string
  /** Icon */
  icon?: LucideIcon | React.ReactNode
- /** Status(AutoCalculate) */
+ /** Status (auto-calculated) */
  status?: StepStatus
- /** isnoOptional(canSkip) */
+ /** Whether this step is optional (can be skipped) */
  optional?: boolean
- /** CustomContent */
+ /** Custom content */
  content?: React.ReactNode
 }
 
 interface StepperProps {
- /** StepConfig */
+ /** Step configuration */
  steps: StepConfig[]
- /** CurrentStep(0-indexed) */
+ /** Current step (0-indexed) */
  currentStep: number
- /** StepCallback */
+ /** Step change callback */
  onStepChange?: (step: number) => void
- /** Layoutmethod */
+ /** Layout orientation */
  orientation?: "horizontal" | "vertical"
  /** Variant */
  variant?: "default" | "circle" | "dots" | "simple"
  /** Dimension */
  size?: "sm" | "default" | "lg"
- /** isnocanClickNavigation */
+ /** Whether steps are clickable for navigation */
  clickable?: boolean
- /** isnoline(MustbyOrder) */
+ /** Whether steps must be completed in order */
  linear?: boolean
- /** isnoDisplayConnectline */
+ /** Whether to show connector lines */
  showConnector?: boolean
- /** ErrorStepList */
+ /** List of step indices with errors */
  errorSteps?: number[]
- /** isnoLoading */
+ /** Whether loading state is active */
  loading?: boolean
  className?: string
 }
@@ -73,7 +73,7 @@ function Stepper({
  loading = false,
  className,
 }: StepperProps) {
- // CalculateStepStatus
+ // Calculate step status
  const getStepStatus = (index: number): StepStatus => {
  if (errorSteps.includes(index)) return "error"
  if (index < currentStep) return "completed"
@@ -81,7 +81,7 @@ function Stepper({
  return "pending"
  }
 
- // isnocanwithClick
+ // Whether the step is clickable
  const canClick = (index: number): boolean => {
  if (!clickable) return false
  if (linear && index > currentStep) return false
@@ -94,7 +94,7 @@ function Stepper({
  }
  }
 
- // Dimensionstyle
+ // Size styles
  const sizeStyles = {
  sm: {
  indicator: "w-6 h-6 text-xs",
@@ -141,7 +141,7 @@ function Stepper({
  )}
  onClick={() => handleStepClick(index)}
  >
- {/* StepIndicator */}
+ {/* Step Indicator */}
  <StepIndicator
  step={index + 1}
  status={status}
@@ -151,7 +151,7 @@ function Stepper({
  loading={loading && status === "current"}
  />
 
- {/* StepContent */}
+ {/* Step Content */}
  <div className={cn(
  orientation === "horizontal" ? "mt-2 text-center" : "",
  "flex flex-col"
@@ -180,7 +180,7 @@ function Stepper({
  </div>
  </div>
 
- {/* Connectline */}
+ {/* Connector line */}
  {showConnector && !isLast && (
  <div className={cn(
  "flex-1",
@@ -200,7 +200,7 @@ function Stepper({
 }
 
 /**
- * StepIndicator - StepIndicator
+ * StepIndicator - Individual step indicator
  */
 interface StepIndicatorProps {
  step: number
@@ -219,7 +219,7 @@ function StepIndicator({
  size = "w-8 h-8 text-sm",
  loading = false,
 }: StepIndicatorProps) {
- // FetchContent
+ // Get indicator content
  const getContent = () => {
  if (loading) {
  return <Loader2 className="w-4 h-4 animate-spin" />
@@ -238,7 +238,7 @@ function StepIndicator({
  return step
  }
 
- // Variantstyle
+ // Variant styles
  if (variant === "dots") {
  return (
  <div className={cn(
@@ -280,7 +280,7 @@ function StepIndicator({
 }
 
 /**
- * StepContent - StepContent
+ * StepContent - Step content container
  */
 interface StepContentProps {
  step: number
@@ -308,7 +308,7 @@ function StepContent({
 }
 
 /**
- * StepperActions - StepActionButton
+ * StepperActions - Step action buttons
  */
 interface StepperActionsProps {
  currentStep: number
@@ -373,7 +373,7 @@ function StepperActions({
 }
 
 /**
- * ProgressStepper - Progress Bar'sStepIndicator
+ * ProgressStepper - Progress bar step indicator
  */
 interface ProgressStepperProps {
  steps: string[]
@@ -398,7 +398,7 @@ function ProgressStepper({
  />
  </div>
 
- {/* StepTags */}
+ {/* Step Labels */}
  <div className="flex justify-between">
  {steps.map((step, index) => (
  <span

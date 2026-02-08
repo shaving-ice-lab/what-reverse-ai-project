@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * AnimatedCounter - AnimationcountcharcountComponent
+ * AnimatedCounter - Animated number counter component
  * 
- * ProvidemultipletypecountcharAnimationEffect: 
- * - Smooth/
- * - SpringEffect
- * - countcharScroll Wheel
- * - FormatSupport(1000, Percentage, Currencyetc)
+ * Provides multiple types of number animation effects:
+ * - Smooth transition
+ * - Spring effect
+ * - Digit scroll wheel
+ * - Format support (thousands, percentage, currency, etc.)
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 
 interface AnimatedCounterProps {
  value: number;
- duration?: number; // AnimationContinuousTime(s)
- delay?: number; // LatencyStartTime
+  duration?: number; // Animation duration (ms)
+  delay?: number; // Delay before starting
  className?: string;
  format?: "number" | "percentage" | "currency" | "compact";
  prefix?: string;
@@ -26,7 +26,7 @@ interface AnimatedCounterProps {
  onComplete?: () => void;
 }
 
-// count
+// Easing functions
 const easingFunctions = {
  linear: (t: number) => t,
  easeOut: (t: number) => 1 - Math.pow(1 - t, 3),
@@ -37,7 +37,7 @@ const easingFunctions = {
  },
 };
 
-// Formatcountchar
+// Format number for display
 const formatNumber = (
  value: number,
  format: AnimatedCounterProps["format"],
@@ -144,9 +144,9 @@ export function AnimatedCounter({
 }
 
 /**
- * RollingCounter - Scroll WheelcountcharAnimation
+ * RollingCounter - Scrolling digit animation
  * 
- * eachcountcharIndependentScroll, Effect
+ * Each digit scrolls independently for a rolling effect
  */
 interface RollingCounterProps {
  value: number;
@@ -217,14 +217,14 @@ function RollingDigit({ digit, className, duration, delay }: RollingDigitProps) 
  </span>
  ))}
  </span>
- {/* PlaceholderMaintainWidth */}
+ {/* Placeholder to maintain width */}
  <span className="invisible">0</span>
  </span>
  );
 }
 
 /**
- * CountUpOnView - EntervisualtimeTriggercountAnimation
+ * CountUpOnView - Triggers count animation when entering viewport
  */
 interface CountUpOnViewProps extends Omit<AnimatedCounterProps, "delay"> {
  threshold?: number;
@@ -269,7 +269,7 @@ export function CountUpOnView({
 }
 
 /**
- * TrendCounter - TrendIndicator'scount
+ * TrendCounter - Counter with trend indicator
  */
 interface TrendCounterProps extends AnimatedCounterProps {
  previousValue?: number;
@@ -317,7 +317,7 @@ export function TrendCounter({
 }
 
 /**
- * ProgressCounter - Progresscount
+ * ProgressCounter - Counter with progress bar
  */
 interface ProgressCounterProps {
  value: number;

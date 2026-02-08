@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SettingsPageLayout - Supabase StyleLayout
- * Left sideNavbar + Right sideContentRegion
+ * Settings Page Layout - Supabase Style
+ * Left sidebar navigation + Right content area
  */
 
 import React from "react";
@@ -23,13 +23,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// SettingsNavigationConfig
+// Settings Navigation Config
 const settingsNavSections = [
  {
- title: "AccountSettings",
+    title: "Account Settings",
  items: [
  {
- label: "useSettings",
+ label: "Settings",
  href: "/dashboard/settings",
  icon: Settings,
  },
@@ -72,7 +72,7 @@ const settingsNavSections = [
  title: "Billing",
  items: [
  {
- label: "SubscriptionPlan",
+      label: "Subscription Plan",
  href: "/dashboard/upgrade",
  icon: CreditCard,
  external: true,
@@ -87,9 +87,9 @@ const settingsNavSections = [
  },
 ];
 
-// DangerAction
+// Danger Actions
 const dangerItem = {
- label: "DeleteAccount",
+  label: "Delete Account",
  href: "/dashboard/settings/delete-account",
  icon: AlertTriangle,
 };
@@ -101,7 +101,7 @@ export default function SettingsLayout({
 }) {
  const pathname = usePathname();
 
- // PreciseMatchorPathwith href head
+  // Exact match or path starts with href
  const isActive = (href: string) => {
  if (href === "/dashboard/settings") {
  return pathname === "/dashboard/settings" || pathname === "/dashboard/settings/preferences";
@@ -111,14 +111,14 @@ export default function SettingsLayout({
 
  return (
  <div className="flex h-full overflow-hidden bg-background-studio">
- {/* Left sideNavbar */}
+      {/* Left Sidebar */}
  <aside className="w-[220px] shrink-0 border-r border-border bg-background-studio overflow-y-auto">
  {/* Title */}
  <div className="px-4 py-3 border-b border-border bg-surface-200/60">
  <h2 className="text-[12px] font-medium text-foreground">Settings</h2>
  </div>
 
- {/* NavigationMenu */}
+        {/* Navigation Menu */}
  <nav className="p-3 space-y-6">
  {settingsNavSections.map((section) => (
  <div key={section.title}>
@@ -166,10 +166,10 @@ export default function SettingsLayout({
  </div>
  ))}
 
- {/* DangerAction */}
- <div>
- <h3 className="px-3 py-2 page-caption">
- DangerRegion
+          {/* Danger Zone */}
+          <div>
+            <h3 className="px-3 py-2 page-caption">
+            Danger Zone
  </h3>
  <Link
  href={dangerItem.href}
@@ -186,27 +186,27 @@ export default function SettingsLayout({
  </div>
  </nav>
 
- {/* FooterUpgradeTip */}
+        {/* Footer Upgrade Banner */}
  <div className="p-3 mt-auto border-t border-border">
  <div className="p-3 rounded-lg bg-surface-100 border border-border">
  <div className="flex items-center gap-2 mb-2">
  <Crown className="w-4 h-4 text-warning" />
- <span className="text-xs font-medium text-foreground">Freeversion</span>
+              <span className="text-xs font-medium text-foreground">Free Version</span>
  </div>
  <p className="text-[11px] text-foreground-muted mb-3">
- UpgradetoProfessionalversionUnlockmoremultipleFeatures
+            Upgrade to Professional to unlock more features
  </p>
  <Link 
  href="/dashboard/upgrade"
  className="block w-full text-center text-[11px] font-medium py-1.5 rounded-md bg-brand-500 text-background hover:bg-brand-600 transition-colors"
  >
- UpgradeProfessionalversion
+            Upgrade to Professional
  </Link>
  </div>
  </div>
  </aside>
 
- {/* Right sideContentRegion */}
+      {/* Right Content Area */}
  <main className="flex-1 overflow-auto bg-background-studio">
  {children}
  </main>

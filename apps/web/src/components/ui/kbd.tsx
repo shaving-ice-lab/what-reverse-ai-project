@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * KBD keyBoard ShortcutskeyComponent
+ * KBD Keyboard Shortcut Component
  * 
- * Used forDisplaykeyBoard Shortcutskeyandgroupkey
+ * Used to display keyboard shortcuts and modifier keys
  */
 
 import * as React from "react"

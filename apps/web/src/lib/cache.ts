@@ -1,34 +1,34 @@
 /**
- * CachePolicyConfig
+ * Cache Policy Configuration
  * 
- * and TanStack Query Usage'sCachePolicy
+ * Cache policies used with TanStack Query
  */
 
-// ===== CacheTimeConstant (s) =====
+// ===== Cache Time Constants (ms) =====
 export const CACHE_TIMES = {
- // nowtimeData(notCache)
+ // Real-time data (no cache)
  INSTANT: 0,
- // Cache(1min)- Frequent'sData
+ // Short cache (1 min) - Frequently changing data
  SHORT: 1 * 60 * 1000,
- // Cache(5min)- Default
+ // Medium cache (5 min) - Default
  MEDIUM: 5 * 60 * 1000,
- // Cache(30min)- few'sData
+ // Long cache (30 min) - Infrequently changing data
  LONG: 30 * 60 * 1000,
- // PersistentCache(1h)- not'sData
+ // Persistent cache (1 h) - Rarely changing data
  PERSISTENT: 60 * 60 * 1000,
- // PermanentCache - StaticData
+ // Permanent cache - Static data
  FOREVER: Infinity,
 };
 
-// ===== not API 'sCachePolicy =====
+// ===== API Cache Policies =====
 export const API_CACHE_CONFIG = {
- // UserRelated
+ // User related
  user: {
  profile: { staleTime: CACHE_TIMES.MEDIUM, gcTime: CACHE_TIMES.LONG },
  settings: { staleTime: CACHE_TIMES.LONG, gcTime: CACHE_TIMES.PERSISTENT },
  },
  
- // WorkflowRelated
+ // Workflow related
  workflow: {
  list: { staleTime: CACHE_TIMES.SHORT, gcTime: CACHE_TIMES.MEDIUM },
  detail: { staleTime: CACHE_TIMES.MEDIUM, gcTime: CACHE_TIMES.LONG },
@@ -41,9 +41,9 @@ export const API_CACHE_CONFIG = {
  providers: { staleTime: CACHE_TIMES.PERSISTENT, gcTime: CACHE_TIMES.FOREVER },
  },
  
- // ExecuteRelated
+ // Execution related
  execution: {
- status: { staleTime: CACHE_TIMES.INSTANT, gcTime: CACHE_TIMES.SHORT }, // Real-timeData
+ status: { staleTime: CACHE_TIMES.INSTANT, gcTime: CACHE_TIMES.SHORT }, // Real-time data
  logs: { staleTime: CACHE_TIMES.SHORT, gcTime: CACHE_TIMES.MEDIUM },
  },
  
@@ -81,7 +81,7 @@ export const queryKeys = {
  providers: () => [...queryKeys.apiKeys.all, "providers"] as const,
  },
  
- // Execute
+ // Executions
  executions: {
  all: ["executions"] as const,
  lists: () => [...queryKeys.executions.all, "list"] as const,
@@ -100,7 +100,7 @@ export const queryKeys = {
  },
 };
 
-// ===== CacheExpireTool =====
+// ===== Cache Invalidation Utility =====
 export function invalidateKeys(queryClient: unknown, keys: readonly string[][]) {
  const client = queryClient as {
  invalidateQueries: (options: { queryKey: readonly string[] }) => void;
@@ -110,7 +110,7 @@ export function invalidateKeys(queryClient: unknown, keys: readonly string[][]) 
  });
 }
 
-// ===== OptimisticUpdateTool =====
+// ===== Optimistic Update Utility =====
 interface OptimisticUpdateOptions<T> {
  queryClient: unknown;
  queryKey: readonly string[];
@@ -129,14 +129,14 @@ export function createOptimisticUpdate<T>({
  setQueryData: (key: readonly string[], data: T) => void;
  };
 
- // Savebefore'sData
+ // Save previous data
  const previousData = client.getQueryData(queryKey);
 
- // OptimisticUpdate
+ // Apply optimistic update
  const newData = updater(previousData);
  client.setQueryData(queryKey, newData);
 
- // BackRollbackcount
+ // Return rollback function
  return {
  previousData,
  rollback: () => {
@@ -145,7 +145,7 @@ export function createOptimisticUpdate<T>({
  }
  },
  onError: (error: Error) => {
- // Rollback
+ // Rollback on error
  if (previousData !== undefined) {
  client.setQueryData(queryKey, previousData);
  }
@@ -154,7 +154,7 @@ export function createOptimisticUpdate<T>({
  };
 }
 
-// ===== LocalStorageCache =====
+// ===== Local Storage Cache =====
 const STORAGE_PREFIX = "agentflow_cache_";
 
 export const localCache = {
@@ -182,7 +182,7 @@ export const localCache = {
  };
  localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(item));
  } catch {
- // IgnoreStorageError
+ // Ignore storage errors
  }
  },
 
@@ -197,20 +197,20 @@ export const localCache = {
  },
 };
 
-// ===== Requestgore- =====
+// ===== Request Deduplication =====
 const pendingRequests = new Map<string, Promise<unknown>>();
 
 export async function dedupeRequest<T>(
  key: string,
  request: () => Promise<T>
 ): Promise<T> {
- // CheckisnohasSameRequestcurrentlyatProceed
+ // Check if there's an identical request currently in progress
  const pending = pendingRequests.get(key);
  if (pending) {
  return pending as Promise<T>;
  }
 
- // CreatenewRequest
+ // Create new request
  const promise = request()
  .finally(() => {
  pendingRequests.delete(key);

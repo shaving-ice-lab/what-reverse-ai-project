@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * WorkflowAnalyticsPie ChartComponent
+ * Workflow Analytics Pie Chart Component
  * 
- * byStatusDistribution, byNodeTypeDistribution, DynamicLoadAnimation
+ * Status Distribution, Node Type Distribution, Dynamic Load Animation
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -21,21 +21,21 @@ interface PieData {
  icon?: string;
 }
 
-// DefaultEmptyData
+// Default Empty Data
 const defaultStatusData: PieData[] = [
  { label: "Run", value: 0, color: "#3B82F6", icon: "🔄" },
  { label: "Completed", value: 0, color: "hsl(var(--primary))", icon: "✅" },
  { label: "Failed", value: 0, color: "#EF4444", icon: "❌" },
- { label: "pendingExecute", value: 0, color: "#F59E0B", icon: "⏳" },
+ { label: "Pending", value: 0, color: "#F59E0B", icon: "⏳" },
 ];
 
 const defaultNodeTypeData: PieData[] = [
  { label: "LLM Node", value: 0, color: "#8B5CF6", icon: "🤖" },
  { label: "HTTP Request", value: 0, color: "#3B82F6", icon: "🌐" },
- { label: "ConditionBranch", value: 0, color: "#10B981", icon: "🔀" },
- { label: "DataConvert", value: 0, color: "#F59E0B", icon: "🔄" },
- { label: "CodeExecute", value: 0, color: "#EC4899", icon: "💻" },
- { label: "otherhe", value: 0, color: "#6B7280", icon: "📦" },
+ { label: "Condition Branch", value: 0, color: "#10B981", icon: "🔀" },
+ { label: "Data Convert", value: 0, color: "#F59E0B", icon: "🔄" },
+ { label: "Code Execute", value: 0, color: "#EC4899", icon: "💻" },
+ { label: "Other", value: 0, color: "#6B7280", icon: "📦" },
 ];
 
 interface WorkflowAnalyticsPieProps {
@@ -51,39 +51,42 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  const [nodeTypeData, setNodeTypeData] = useState<PieData[]>(defaultNodeTypeData);
  const [isLoading, setIsLoading] = useState(true);
 
- // LoadAnalyticsData
+ // Load Analytics Data
  const loadAnalytics = useCallback(async () => {
  setIsLoading(true);
  try {
  const response = await statsApi.getWorkflowAnalytics();
  const analyticsData = response.data;
  
- // UpdateStatusDistributionData
+ // Update Status Distribution Data
  if (analyticsData?.status_distribution) {
  const newStatusData = analyticsData.status_distribution.map((item) => ({
  label: item.label,
- value: item.value", color: item.color,
+ value: item.value,
+ color: item.color,
  icon: item.icon,
  }));
  setStatusData(newStatusData.length > 0 ? newStatusData : defaultStatusData);
  }
  
- // UpdateNodeTypeDistributionData
+ // Update Node Type Distribution Data
  if (analyticsData?.node_type_distribution) {
  const newNodeTypeData = analyticsData.node_type_distribution.map((item) => ({
- label: item.label", value: item.value,
- color: item.color", icon: item.icon,
+ label: item.label,
+ value: item.value,
+ color: item.color,
+ icon: item.icon,
  }));
  setNodeTypeData(newNodeTypeData.length > 0 ? newNodeTypeData : defaultNodeTypeData);
  }
  } catch (err) {
- console.error("LoadWorkflowAnalyticsFailed:", err);
+ console.error("Failed to load workflow analytics:", err);
  } finally {
  setIsLoading(false);
  }
  }, []);
 
- // InitialLoad
+ // Initial Load
  useEffect(() => {
  loadAnalytics();
  }, [loadAnalytics]);
@@ -91,7 +94,7 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  const data = viewType === "status" ? statusData : nodeTypeData;
  const total = data.reduce((sum, item) => sum + item.value, 0);
 
- // enterAnimation
+ // Enter Animation
  useEffect(() => {
  setAnimationProgress(0);
  const timer = setTimeout(() => {
@@ -107,10 +110,10 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  return () => clearTimeout(timer);
  }, [viewType]);
 
- // CalculatePie ChartPath
+ // Calculate Pie Chart Path
  const calculatePieSegments = () => {
  const segments: { path: string; data: PieData; startAngle: number; endAngle: number }[] = [];
- let currentAngle = -90; // fromTopStart
+ let currentAngle = -90; // from top start
 
  data.forEach((item, index) => {
  const angle = (item.value / total) * 360 * animationProgress;
@@ -150,10 +153,10 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  <div className="p-1.5 rounded-lg bg-violet-500/10 ring-1 ring-violet-500/20">
  <PieChart className="w-4 h-4 text-violet-500" />
  </div>
- WorkflowAnalytics
- </h3>
+          Workflow Analytics
+        </h3>
 
- {/* ViewSwitchdown - Enhanced */}
+ {/* View Switch Dropdown - Enhanced */}
  <div className="relative">
  <button
  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -166,12 +169,12 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  {viewType === "status" ? (
  <>
  <Activity className="w-4 h-4 text-violet-500" />
- <span className="font-medium text-foreground">byStatus</span>
+ <span className="font-medium text-foreground">By Status</span>
  </>
  ) : (
  <>
  <Layers className="w-4 h-4 text-violet-500" />
- <span className="font-medium text-foreground">byNodeType</span>
+ <span className="font-medium text-foreground">By Node Type</span>
  </>
  )}
  <ChevronDown className={cn(
@@ -195,7 +198,7 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  )}
  >
  <Activity className="w-4 h-4" />
- <span className="font-medium">byStatusDistribution</span>
+ <span className="font-medium">By Status Distribution</span>
  </button>
  <div className="h-px bg-border/50 mx-2" />
  <button
@@ -211,16 +214,16 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  )}
  >
  <Layers className="w-4 h-4" />
- <span className="font-medium">byNodeType</span>
+ <span className="font-medium">By Node Type</span>
  </button>
  </div>
  )}
  </div>
  </div>
 
- {/* ChartRegion */}
+ {/* Chart Region */}
  {isLoading ? (
- // LoadSkeleton - Enhanced
+ // Load Skeleton - Enhanced
  <div className="flex items-center gap-6">
  <div className="relative w-40 h-40 shrink-0">
  <div className="w-full h-full rounded-full bg-muted/50 animate-pulse ring-2 ring-border/30" />
@@ -268,10 +271,10 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  />
  ))}
  
- {/* center(Optional'sRingEffect) */}
+ {/* Center (Optional Ring Effect) */}
  <circle cx="50" cy="50" r="24" fill="hsl(var(--card))" />
  
- {/* centerchar */}
+ {/* Center Text */}
  <text x="50" y="47" textAnchor="middle" className="fill-foreground text-[8px] font-bold">
  {total}
  </text>
@@ -280,7 +283,7 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  </text>
  </svg>
  
- {/* HoverTip */}
+ {/* Hover Tooltip */}
  {hoveredSegment !== null && (
  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-popover border border-border rounded-lg shadow-lg px-3 py-2 pointer-events-none z-10 whitespace-nowrap">
  <p className="text-xs font-medium text-foreground flex items-center gap-1">
@@ -294,7 +297,7 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  )}
  </div>
 
- {/* example - Enhanced */}
+ {/* Legend - Enhanced */}
  <div className="flex-1 space-y-2">
  {data.map((item, index) => (
  <div
@@ -342,11 +345,11 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  </div>
  )}
 
- {/* FooterStatistics - Enhanced */}
+ {/* Footer Statistics - Enhanced */}
  <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-border/50">
  <div className="text-center p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group">
  <p className="text-xl font-bold text-foreground group-hover:text-violet-500 transition-colors">{data.length}</p>
- <p className="text-xs text-muted-foreground">Categorycount</p>
+ <p className="text-xs text-muted-foreground">Categories</p>
  </div>
  <div className="text-center p-3 rounded-xl bg-gradient-to-br from-primary/10 to-transparent ring-1 ring-primary/20 hover:ring-primary/40 transition-all cursor-pointer group">
  <p className="text-xl font-bold text-primary group-hover:scale-110 transition-transform inline-block">
@@ -359,14 +362,14 @@ export function WorkflowAnalyticsPie({ className }: WorkflowAnalyticsPieProps) {
  }%
  </p>
  <p className="text-xs text-muted-foreground">
- {viewType === "status" ? "Donerate": "LLM compare"}
+ {viewType === "status" ? "Completion Rate" : "LLM Ratio"}
  </p>
  </div>
  <div className="text-center p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group">
  <p className="text-xl font-bold text-foreground group-hover:text-violet-500 transition-colors">
  {data.length > 0 ? Math.max(...data.map(d => d.value)) : 0}
  </p>
- <p className="text-xs text-muted-foreground">Maximumvalue</p>
+ <p className="text-xs text-muted-foreground">Maximum Value</p>
  </div>
  </div>
  </Card>

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * App Version Historypage - Supabase Style
- * VersionList / forcompare / Rollback / Change Log
+ * App Version History Page - Supabase Style
+ * Version List / Comparison / Rollback / Change Log
  */
 
 import React, { useEffect, useState } from "react";
@@ -48,11 +48,11 @@ const versionStatusConfig: Record<
 > = {
  current: { label: "Current", color: "text-brand-500", bgColor: "bg-brand-200" },
  history: { label: "History", color: "text-foreground-muted", bgColor: "bg-surface-200" },
- ahead: { label: "canRestore", color: "text-warning", bgColor: "bg-warning-200" },
+ ahead: { label: "Restorable", color: "text-warning", bgColor: "bg-warning-200" },
 };
 
 const timeRangeOptions = [
- { value: "all", label: "allsectionTime" },
+ { value: "all", label: "All Time" },
  { value: "7d", label: " 7 days" },
  { value: "30d", label: " 30 days" },
  { value: "90d", label: " 90 days" },
@@ -60,10 +60,10 @@ const timeRangeOptions = [
 ];
 
 const sortOptions = [
- { value: "created_desc", label: "Created At(new→old)" },
- { value: "created_asc", label: "Created At(old→new)" },
- { value: "version_desc", label: "Version Number(new→old)" },
- { value: "version_asc", label: "Version Number(old→new)" },
+  { value: "created_desc", label: "Created At (new→old)" },
+  { value: "created_asc", label: "Created At (old→new)" },
+  { value: "version_desc", label: "Version Number (new→old)" },
+  { value: "version_asc", label: "Version Number (old→new)" },
 ];
 
 function AppNav({
@@ -76,7 +76,7 @@ function AppNav({
  const navItems = [
  { id: "overview", label: "Overview", href: `/dashboard/app/${appId}` },
  { id: "builder", label: "Build", href: `/dashboard/app/${appId}/builder` },
- { id: "publish", label: "PublishSettings", href: `/dashboard/app/${appId}/publish` },
+ { id: "publish", label: "Publish Settings", href: `/dashboard/app/${appId}/publish` },
  { id: "versions", label: "Version History", href: `/dashboard/app/${appId}/versions` },
  { id: "monitoring", label: "Monitor", href: `/dashboard/app/${appId}/monitoring` },
  { id: "domains", label: "Domain", href: `/dashboard/app/${appId}/domains` },
@@ -150,7 +150,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
 
  const handleCompare = async () => {
  if (!compareFrom || !compareTo || compareFrom === compareTo) {
- setCompareError("Please selectnotVersionProceedforcompare");
+ setCompareError("Please select different versions to compare.");
  return;
  }
  try {
@@ -160,14 +160,14 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  setVersionDiff(diff);
  } catch (error) {
  console.error("Failed to compare versions:", error);
- setCompareError("VersionforcompareFailed, Please try again laterRetry.");
+ setCompareError("Version comparison failed. Please try again later.");
  } finally {
  setIsComparing(false);
  }
  };
 
  const handleRollback = async (versionId: string) => {
- if (!confirm("ConfirmRollbacktoVersion?thisActionwillCoverageCurrentlineonVersion.")) return;
+ if (!confirm("Confirm rollback to this version? This will overwrite the current live version.")) return;
  try {
  setRollbackId(versionId);
  const updated = await appApi.rollback(appId, versionId);
@@ -181,7 +181,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  };
 
  const handleRestore = async (versionId: string) => {
- if (!confirm("ConfirmRestoretoVersion?thisActionwillCoverageCurrentlineonVersion.")) return;
+ if (!confirm("Confirm restore to this version? This will overwrite the current live version.")) return;
  try {
  setRollbackId(versionId);
  const updated = await appApi.rollback(appId, versionId);
@@ -305,9 +305,9 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  <PageHeader
  title="Version History"
  eyebrow={app?.name}
- description="ViewVersionChange, forcompareDiffandExecuteRollback"
+ description="View version changes, compare diffs, and perform rollbacks."
  backHref={`/dashboard/app/${appId}`}
- backLabel="BackAppOverview"
+ backLabel="Back to App Overview"
  actions={
  <Button variant="outline" size="sm" onClick={loadData}>
  <RefreshCw className="w-4 h-4 mr-1.5" />
@@ -324,14 +324,14 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  />
 
  <SettingsSection
- title="Versionforcompare"
+ title="Version Comparison"
  description="Select two versions to compare differences"
  compact
  >
  <div className="grid md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
  <Select value={compareFrom} onValueChange={setCompareFrom}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectVersion A" />
+ <SelectValue placeholder="Select version A" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {versions.map((version) => (
@@ -343,7 +343,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </Select>
  <Select value={compareTo} onValueChange={setCompareTo}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectVersion B" />
+ <SelectValue placeholder="Select version B" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {versions.map((version) => (
@@ -354,7 +354,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </SelectContent>
  </Select>
  <Button size="sm" onClick={handleCompare} disabled={isComparing}>
- {isComparing ? "forcompare...": "Startforcompare"}
+ {isComparing ? "Comparing...": "Start Comparison"}
  </Button>
  </div>
  {compareError && (
@@ -367,7 +367,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </div>
  <div className="mt-2 flex flex-wrap gap-1">
  {versionDiff.changed_fields.length === 0 ? (
- <Badge variant="secondary">NoneDiff</Badge>
+ <Badge variant="secondary">No Differences</Badge>
  ) : (
  versionDiff.changed_fields.map((field) => (
  <Badge key={field} variant="secondary">
@@ -381,25 +381,25 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </SettingsSection>
 
  <SettingsSection
- title="VersionList"
- description="ViewChange Log, FilterVersionandExecuteRollback/Restore"
+title="Version List"
+            description="View change logs, filter versions, and perform rollback/restore."
  compact
  >
  <div className="flex flex-wrap items-center gap-3 mb-4">
  <Select value={statusFilter} onValueChange={setStatusFilter}>
  <SelectTrigger className="w-[130px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="StatusFilter" />
+ <SelectValue placeholder="Status filter" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Statuses</SelectItem>
  <SelectItem value="current">Current</SelectItem>
  <SelectItem value="history">History</SelectItem>
- <SelectItem value="ahead">canRestore</SelectItem>
+ <SelectItem value="ahead">Restorable</SelectItem>
  </SelectContent>
  </Select>
  <Select value={timeRangeFilter} onValueChange={setTimeRangeFilter}>
  <SelectTrigger className="w-[130px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="TimeRange" />
+ <SelectValue placeholder="Time range" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {timeRangeOptions.map((option) => (
@@ -411,10 +411,10 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </Select>
  <Select value={creatorFilter} onValueChange={setCreatorFilter}>
  <SelectTrigger className="w-[140px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="Createuser" />
+ <SelectValue placeholder="Creator" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionCreateuser</SelectItem>
+ <SelectItem value="all">All Creators</SelectItem>
  {creatorOptions.map((creator) => (
  <SelectItem key={creator} value={creator}>
  {creator}
@@ -438,14 +438,14 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
 
  {sortedVersions.length === 0 ? (
  <div className="py-8 text-center text-[12px] text-foreground-muted">
- NoneFilterCondition'sVersionRecord.
+ No version records match the filter criteria.
  </div>
  ) : (
  <div className="rounded-md border border-border overflow-hidden">
  <div className="grid grid-cols-[1.1fr_0.9fr_1fr_1.2fr_1.8fr_1.6fr] gap-3 px-4 py-2.5 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <span>Version Number</span>
  <span>Status</span>
- <span>Createuser</span>
+ <span>Creator</span>
  <span>Created At</span>
  <span>Notes</span>
  <span className="text-right">Action</span>
@@ -488,7 +488,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  {formatDate(version.created_at)}
  </div>
  <div className="flex items-center text-foreground-muted line-clamp-2">
- {version.changelog || "NoneChange LogDescription"}
+ {version.changelog || "No change log description."}
  </div>
  <div className="flex items-center justify-end gap-2">
  <Button
@@ -501,9 +501,9 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  <Button
  variant="ghost"
  size="sm"
- onClick={() => handlePresetCompare(version.id)}
- >
- forcompare
+onClick={() => handlePresetCompare(version.id)}
+                  >
+                    Compare
  </Button>
  <Button
  variant="outline"
@@ -540,14 +540,14 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </SettingsSection>
 
  <SettingsSection
- title="VersionDescription"
- description="selectVersionViewCreateInfoandChangeSummary"
+title="Version Details"
+            description="Select a version to view creation info and change summary."
  compact
  >
  {!activeVersion ? (
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
  <History className="w-3.5 h-3.5" />
- NoneVersioncanView.
+ No versions to view.
  </div>
  ) : (
  <div className="space-y-3">
@@ -574,7 +574,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  <div className="grid md:grid-cols-3 gap-3">
  <div className="rounded-md border border-border bg-surface-75 px-3 py-2">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- Createuser
+ Creator
  </div>
  <div className="mt-1 text-[12px] text-foreground">
  {resolveCreator(activeVersion)}
@@ -590,16 +590,16 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  </div>
  <div className="rounded-md border border-border bg-surface-75 px-3 py-2">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- VersionNotes
+ Version Notes
  </div>
  <div className="mt-1 text-[12px] text-foreground">
- {activeVersion.changelog || "NoneChange LogDescription"}
+ {activeVersion.changelog || "No change log description."}
  </div>
  </div>
  </div>
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
  <History className="w-3.5 h-3.5" />
- VersionRecordandRollbackwillSynctoRunMonitorandAudit Log.
+ Version records and rollbacks will sync to Run Monitor and Audit Log.
  </div>
  </div>
  )}

@@ -19,52 +19,52 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// QuickGetting StartedStep
+// Quick start steps
 const quickStartSteps = [
  {
  id: 1,
  title: "Install CLI",
- description: "Usage npm or yarn Install AgentFlow CLI Tool",
+ description: "Install the AgentFlow CLI tool using npm or yarn",
  code: "npm install -g @agentflow/cli",
  altCode: "yarn global add @agentflow/cli",
- tip: "RecommendedUsage Node.js 18+ Version",
+ tip: "Recommended: Node.js 18+ required",
  },
  {
  id: 2,
- title: "Sign InAccount",
- description: "Usage CLI Sign Inyou's AgentFlow Account",
- code: "agentflow login",
- tip: "timesUsagewillAutoOpenBrowseProceedAuthentication",
+ title: "Sign In",
+description: "Sign in to your AgentFlow account using the CLI",
+    code: "agentflow login",
+    tip: "First-time use will automatically open the browser for authentication",
  },
  {
  id: 3,
- title: "Createitem",
- description: "Initial1new'sWorkflowitem",
- code: "agentflow init my-workflow",
- tip: "thiswillCreate1ContainsBasicConfig'sitemDirectory",
+title: "Create Project",
+    description: "Initialize a new workflow project",
+    code: "agentflow init my-workflow",
+    tip: "This will create a project directory with basic configuration",
  },
  {
  id: 4,
- title: "EditWorkflow",
- description: "OpenEditDesignyou'sWorkflow",
- code: "cd my-workflow && agentflow dev",
- tip: "thiswillLaunchLocalDevelopmentServiceandcanvisualEdit",
+ title: "Edit Workflow",
+description: "Open the editor to design your workflow",
+    code: "cd my-workflow && agentflow dev",
+    tip: "This will launch a local development server with visual editing",
  },
  {
  id: 5,
- title: "Deployonline",
- description: "willWorkflowDeploytoCloud",
- code: "agentflow deploy",
- tip: "Deployafterwillto1canCall's API Endpoint",
+title: "Deploy",
+    description: "Deploy your workflow to the cloud",
+    code: "agentflow deploy",
+    tip: "After deployment, you'll get a callable API endpoint",
  },
 ];
 
 export interface QuickStartWizardProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoDisplayStepNavigation */
+ /** Whether to display step navigation */
  showNavigation?: boolean;
- /** isnoCompact */
+ /** Whether to use compact mode */
  compact?: boolean;
- /** Doneafter'sCallback */
+ /** Callback after completion */
  onComplete?: () => void;
 }
 
@@ -124,7 +124,7 @@ export function QuickStartWizard({
  </div>
  </div>
 
- {/* StepIndicator */}
+  {/* Step indicator */}
  <div className="flex items-center justify-between mb-8 overflow-x-auto pb-2">
  {quickStartSteps.map((step, index) => {
  const isCompleted = completedSteps.includes(step.id);
@@ -168,7 +168,7 @@ export function QuickStartWizard({
  })}
  </div>
 
- {/* CurrentStepContent */}
+      {/* Current step content */}
  {currentStepData && (
  <div className="bg-card border border-border rounded-2xl p-6 mb-6">
  <div className="flex items-start gap-4 mb-6">
@@ -185,7 +185,7 @@ export function QuickStartWizard({
  </div>
  </div>
 
- {/* Codeblock */}
+          {/* Code block */}
  <div className="bg-background rounded-xl overflow-hidden mb-4">
  <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border/50">
  <span className="text-xs text-muted-foreground">Terminal</span>
@@ -207,10 +207,10 @@ export function QuickStartWizard({
  </div>
  </div>
 
- {/* AlternativeCommand */}
+          {/* Alternative command */}
  {currentStepData.altCode && (
  <div className="flex items-center gap-2 mb-4">
- <span className="text-xs text-muted-foreground">oruserUsage yarn:</span>
+ <span className="text-xs text-muted-foreground">or use yarn:</span>
  <code className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
  {currentStepData.altCode}
  </code>
@@ -225,7 +225,7 @@ export function QuickStartWizard({
  </div>
  )}
 
- {/* NavigationButton */}
+      {/* Navigation buttons */}
  {showNavigation && (
  <div className="flex items-center justify-between">
  <Button
@@ -260,26 +260,26 @@ export function QuickStartWizard({
  );
 }
 
-// CodeSandboxComponent
+// Code Sandbox Component
 export interface CodeSandboxProps extends React.HTMLAttributes<HTMLDivElement> {
- /** InitialCode */
+  /** Initial code */
  initialCode?: string;
- /** Language */
+  /** Programming language */
  language?: string;
- /** isnoread */
+ /** Whether it is read-only */
  readOnly?: boolean;
- /** RunCallback */
+  /** Run callback */
  onRun?: (code: string) => void;
 }
 
 export function CodeSandbox({
- initialCode = `// TryEditCodeandRun
+initialCode = `// Try editing the code and running it
 const workflow = new AgentFlow();
 
 workflow.addNode({
- type: 'llm',
- model: 'gpt-4',
- prompt: 'you, !'
+  type: 'llm',
+  model: 'gpt-4',
+  prompt: 'Hello!'
 });
 
 const result = await workflow.run();
@@ -298,15 +298,15 @@ console.log(result);`,
  setIsRunning(true);
  setOutput("");
  
- // MockRun
+    // Mock run
  await new Promise((resolve) => setTimeout(resolve, 1500));
  
- setOutput(`> ExecuteSuccess
+  setOutput(`> Execution successful
 {
- "success": true,
- "output": "you, !thisis AI 'sReply.",
- "tokens": 28,
- "duration": "0.8s"
+  "success": true,
+  "output": "Hello! This is the AI's reply.",
+  "tokens": 28,
+  "duration": "0.8s"
 }`);
  setIsRunning(false);
  onRun?.(code);
@@ -341,7 +341,7 @@ console.log(result);`,
  </div>
  
  <div className="grid lg:grid-cols-2 divide-x divide-border">
- {/* CodeEdit */}
+    {/* Code editor */}
  <div className="bg-background min-h-[300px]">
  <textarea
  value={code}
@@ -363,7 +363,7 @@ console.log(result);`,
  <span className="text-xs text-muted-foreground">Output</span>
  </div>
  <pre className="p-4 text-sm font-mono text-emerald-400/90 whitespace-pre-wrap">
- {output || "// ClickRunButtonExecuteCode"}
+ {output || "// Click the Run button to execute the code"}
  </pre>
  </div>
  </div>

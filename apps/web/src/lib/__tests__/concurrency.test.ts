@@ -1,5 +1,5 @@
 /**
- * Concurrency ModuleTest
+ * Concurrency Module Tests
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -14,7 +14,7 @@ import {
 } from "../concurrency";
 
 describe("Mutex", () => {
- it("ShouldGuaranteeAccess", async () => {
+ it("should guarantee exclusive access", async () => {
  const mutex = new Mutex();
  const results: number[] = [];
 
@@ -32,24 +32,24 @@ describe("Mutex", () => {
 
  await Promise.all([task1, task2]);
 
- // task1 ShouldcompleteallExecutecompleteagainExecute task2
+ // task1 should complete all execution before task2 starts
  expect(results).toEqual([1, 2, 3]);
  });
 
- it("ShouldcurrentlyRelease", async () => {
+ it("should release correctly", async () => {
  const mutex = new Mutex();
 
  await mutex.acquire();
  mutex.release();
 
- // ShouldcanagaintimesFetch
+ // Should be able to acquire again
  await expect(mutex.acquire()).resolves.toBeUndefined();
  mutex.release();
  });
 });
 
 describe("RWMutex", () => {
- it("ShouldAllowmultipleReadusertimeAccess", async () => {
+ it("should allow multiple readers to access simultaneously", async () => {
  const rwMutex = new RWMutex();
  const results: string[] = [];
 
@@ -67,12 +67,12 @@ describe("RWMutex", () => {
 
  await Promise.all([read1, read2]);
 
- // ReadShouldcanwithExecute
+ // Reads should execute concurrently
  expect(results[0]).toBe("read1-start");
  expect(results[1]).toBe("read2-start");
  });
 
- it("enterShouldAccess", async () => {
+ it("writes should have exclusive access", async () => {
  const rwMutex = new RWMutex();
  const results: string[] = [];
 
@@ -89,13 +89,13 @@ describe("RWMutex", () => {
 
  await Promise.all([write1, write2]);
 
- // enterShouldOrderExecute
+ // Writes should execute sequentially
  expect(results).toEqual(["write1-start", "write1-end", "write2-start", "write2-end"]);
  });
 });
 
 describe("Semaphore", () => {
- it("ShouldLimitConcurrencycount", async () => {
+ it("should limit concurrency count", async () => {
  const semaphore = new Semaphore(2);
  let concurrent = 0;
  let maxConcurrent = 0;
@@ -114,7 +114,7 @@ describe("Semaphore", () => {
  expect(maxConcurrent).toBe(2);
  });
 
- it("withPermit ShouldAutoReleasecan", async () => {
+ it("withPermit should auto-release permits", async () => {
  const semaphore = new Semaphore(1);
 
  await semaphore.withPermit(async () => {
@@ -126,7 +126,7 @@ describe("Semaphore", () => {
 });
 
 describe("AtomicCounter", () => {
- it("Shouldcurrently", () => {
+ it("should increment correctly", () => {
  const counter = new AtomicCounter(0);
 
  expect(counter.increment()).toBe(1);
@@ -134,7 +134,7 @@ describe("AtomicCounter", () => {
  expect(counter.get()).toBe(2);
  });
 
- it("Shouldcurrently", () => {
+ it("should decrement correctly", () => {
  const counter = new AtomicCounter(5);
 
  expect(counter.decrement()).toBe(4);
@@ -142,7 +142,7 @@ describe("AtomicCounter", () => {
  expect(counter.get()).toBe(3);
  });
 
- it("ShouldcurrentlyExecute compareAndSet", () => {
+ it("should execute compareAndSet correctly", () => {
  const counter = new AtomicCounter(5);
 
  expect(counter.compareAndSet(5, 10)).toBe(true);
@@ -152,7 +152,7 @@ describe("AtomicCounter", () => {
  expect(counter.get()).toBe(10);
  });
 
- it("ShouldcurrentlyReset", () => {
+ it("should reset correctly", () => {
  const counter = new AtomicCounter(100);
  counter.reset();
  expect(counter.get()).toBe(0);
@@ -160,18 +160,18 @@ describe("AtomicCounter", () => {
 });
 
 describe("CancellationToken", () => {
- it("InitialStatusShouldisnot yetCancel", () => {
+ it("initial status should not be cancelled", () => {
  const token = new CancellationToken();
  expect(token.isCancelled()).toBe(false);
  });
 
- it("CancelafterStatusShouldisCancelled", () => {
+ it("status should be cancelled after cancel is called", () => {
  const token = new CancellationToken();
  token.cancel();
  expect(token.isCancelled()).toBe(true);
  });
 
- it("ShouldCallCancelCallback", () => {
+ it("should call cancellation callback", () => {
  const token = new CancellationToken();
  const callback = vi.fn();
 
@@ -181,14 +181,14 @@ describe("CancellationToken", () => {
  expect(callback).toHaveBeenCalledTimes(1);
  });
 
- it("throwIfCancelled ShouldatCancelafterThrowError", () => {
+ it("throwIfCancelled should throw error after cancellation", () => {
  const token = new CancellationToken();
  token.cancel();
 
  expect(() => token.throwIfCancelled()).toThrow("Operation cancelled");
  });
 
- it("re-CancelnotShouldre-CallCallback", () => {
+ it("repeated cancellation should not re-trigger callback", () => {
  const token = new CancellationToken();
  const callback = vi.fn();
 
@@ -201,7 +201,7 @@ describe("CancellationToken", () => {
 });
 
 describe("VersionedState", () => {
- it("ShouldcurrentlyFetchInitialvalueandVersion", () => {
+ it("should correctly get initial value and version", () => {
  const state = new VersionedState({ count: 0 });
  const { value, version } = state.get();
 
@@ -209,7 +209,7 @@ describe("VersionedState", () => {
  expect(version).toBe(0);
  });
 
- it("SettingsnewvalueShouldIncreaseVersion", () => {
+ it("setting a new value should increase the version", () => {
  const state = new VersionedState({ count: 0 });
 
  state.set({ count: 1 });
@@ -219,21 +219,21 @@ describe("VersionedState", () => {
  expect(state.getVersion()).toBe(2);
  });
 
- it("compareAndSet ShouldCheckVersion", () => {
+ it("compareAndSet should check version", () => {
  const state = new VersionedState({ count: 0 });
 
- // VersionMatch，ShouldSuccess
+ // Version matches, should succeed
  expect(state.compareAndSet(0, { count: 1 })).toBe(true);
  expect(state.get().value).toEqual({ count: 1 });
 
- // VersionnotMatch，ShouldFailed
+ // Version does not match, should fail
  expect(state.compareAndSet(0, { count: 2 })).toBe(false);
  expect(state.get().value).toEqual({ count: 1 });
  });
 });
 
 describe("RequestSerializer", () => {
- it("ShouldVia Mutex SequenceRequestExecute", async () => {
+ it("should serialize request execution via mutex", async () => {
  const serializer = new RequestSerializer();
  const results: number[] = [];
 
@@ -247,20 +247,20 @@ describe("RequestSerializer", () => {
  return "result2";
  });
 
- // timenot key 'sRequest
+ // Requests with different keys
  const [result1, result2] = await Promise.all([
  serializer.execute("key1", mockFn1),
  serializer.execute("key2", mockFn2),
  ]);
 
- // as Mutex row，RequestShouldallExecute
+ // Due to mutex serialization, all requests should complete
  expect(mockFn1).toHaveBeenCalledTimes(1);
  expect(mockFn2).toHaveBeenCalledTimes(1);
  expect(result1).toBe("result1");
  expect(result2).toBe("result2");
  });
 
- it("hasPending ShouldcurrentlyDetectIn Progress'sRequest", async () => {
+ it("hasPending should correctly detect in-progress requests", async () => {
  const serializer = new RequestSerializer();
  let resolvePromise: () => void;
  const mockFn = vi.fn().mockImplementation(
@@ -272,7 +272,7 @@ describe("RequestSerializer", () => {
 
  const promise = serializer.execute("key", mockFn);
 
- // etcpending mutex FetchandStartExecute
+ // Wait for mutex to acquire and start execution
  await new Promise((r) => setTimeout(r, 10));
 
  expect(serializer.hasPending("key")).toBe(true);

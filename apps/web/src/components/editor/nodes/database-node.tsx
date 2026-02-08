@@ -19,27 +19,27 @@ const operationStyles: Record<string, { label: string; badge: string; hint: stri
  select: {
  label: "SELECT",
  badge: "bg-brand-200/70 text-brand-500",
- hint: "ReadData",
+ hint: "Read Data",
  },
  insert: {
  label: "INSERT",
  badge: "bg-emerald-200/70 text-emerald-600",
- hint: "AddData",
+ hint: "Add Data",
  },
  update: {
  label: "UPDATE",
  badge: "bg-warning-200/70 text-warning",
- hint: "UpdateData",
+ hint: "Update Data",
  },
  delete: {
  label: "DELETE",
  badge: "bg-destructive-200/70 text-destructive",
- hint: "DeleteData",
+ hint: "Delete Data",
  },
  migrate: {
  label: "MIGRATE",
  badge: "bg-surface-200 text-foreground-muted",
- hint: "StructureMigration",
+ hint: "Structure Migration",
  },
 };
 
@@ -88,7 +88,7 @@ export const DatabaseNode = memo(function DatabaseNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -103,7 +103,7 @@ export const DatabaseNode = memo(function DatabaseNode({
  <Database className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "DatabaseAction"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Database Action"}</h3>
  <p className="text-xs text-foreground-muted">{operation.hint}</p>
  </div>
  <span className={cn("px-2 py-0.5 rounded text-[10px] font-mono font-semibold", operation.badge)}>

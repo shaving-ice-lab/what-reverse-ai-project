@@ -4,29 +4,29 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
-// City(forat'sPercentage)
+// Cities (coordinates as percentages)
 const cities = [
- { name: "Beijing", x: 77, y: 35, users: 1245, active: true },
- { name: "on", x: 79, y: 42, users: 987, active: true },
- { name: "Shenzhen", x: 76, y: 52, users: 756, active: true },
- { name: "Hangzhou", x: 79, y: 43, users: 534, active: false },
- { name: "Tokyo", x: 85, y: 38, users: 423, active: true },
- { name: "new", x: 74, y: 62, users: 312, active: false },
- { name: "Silicon Valley", x: 12, y: 38, users: 678, active: true },
- { name: "New York", x: 25, y: 36, users: 456, active: false },
- { name: "London", x: 48, y: 30, users: 345, active: true },
- { name: "Sydney", x: 88, y: 75, users: 234, active: false },
- { name: "Berlin", x: 52, y: 29, users: 189, active: false },
- { name: "multiplemultiple", x: 22, y: 33, users: 167, active: true },
+  { name: "Beijing", x: 77, y: 35, users: 1245, active: true },
+  { name: "Shanghai", x: 79, y: 42, users: 987, active: true },
+  { name: "Shenzhen", x: 76, y: 52, users: 756, active: true },
+  { name: "Hangzhou", x: 79, y: 43, users: 534, active: false },
+  { name: "Tokyo", x: 85, y: 38, users: 423, active: true },
+  { name: "Singapore", x: 74, y: 62, users: 312, active: false },
+  { name: "Silicon Valley", x: 12, y: 38, users: 678, active: true },
+  { name: "New York", x: 25, y: 36, users: 456, active: false },
+  { name: "London", x: 48, y: 30, users: 345, active: true },
+  { name: "Sydney", x: 88, y: 75, users: 234, active: false },
+  { name: "Berlin", x: 52, y: 29, users: 189, active: false },
+  { name: "Toronto", x: 22, y: 33, users: 167, active: true },
 ];
 
 export interface WorldMapProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoDisplayCityTags */
- showLabels?: boolean;
- /** isnoDisplayPulseAnimation */
- showPulse?: boolean;
- /** Height */
- height?: number;
+  /** Whether to display city labels */
+  showLabels?: boolean;
+  /** Whether to display pulse animation */
+  showPulse?: boolean;
+  /** Height */
+  height?: number;
 }
 
 export function WorldMap({
@@ -36,11 +36,11 @@ export function WorldMap({
  className,
  ...props
 }: WorldMapProps) {
- const [activeCities, setActiveCities] = useState(cities);
- const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+  const [activeCities, setActiveCities] = useState(cities);
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null);
 
- // RandomUpdateActiveStatus
- useEffect(() => {
+  // Randomly update active status
+  useEffect(() => {
  const timer = setInterval(() => {
  setActiveCities((prev) =>
  prev.map((city) => ({
@@ -58,23 +58,23 @@ export function WorldMap({
  <div
  className={cn("relative overflow-hidden rounded-xl", className)}
  style={{ height }}
- {...props}
- >
- {/* BackgroundOutline ('sSVG) */}
- <svg
- viewBox="0 0 100 50"
- className="absolute inset-0 w-full h-full"
- preserveAspectRatio="xMidYMid slice"
- >
- <defs>
- <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
- <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
- <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
- </linearGradient>
- </defs>
- 
- {/* 'slargeOutline */}
- <g fill="url(#mapGradient)" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeOpacity="0.3">
+      {...props}
+    >
+      {/* Background map outline (SVG) */}
+      <svg
+        viewBox="0 0 100 50"
+        className="absolute inset-0 w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
+          </linearGradient>
+        </defs>
+        
+        {/* Continent outlines */}
+        <g fill="url(#mapGradient)" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeOpacity="0.3">
  {/* North America */}
  <path d="M5,15 Q15,12 25,15 T35,20 Q30,28 20,30 Q10,28 5,20 Z" />
  {/* South America */}
@@ -87,10 +87,10 @@ export function WorldMap({
  <path d="M60,12 Q75,8 85,15 Q88,25 80,30 Q70,35 65,28 Q58,22 60,12 Z" />
  {/* Oceania */}
  <path d="M82,38 Q90,36 92,42 Q90,48 84,48 Q80,45 82,38 Z" />
- </g>
+        </g>
 
- {/* Connectline */}
- <g stroke="hsl(var(--primary))" strokeWidth="0.1" strokeOpacity="0.2" fill="none">
+        {/* Connection lines */}
+        <g stroke="hsl(var(--primary))" strokeWidth="0.1" strokeOpacity="0.2" fill="none">
  <path d="M12,19 Q30,5 48,15" className="animate-pulse" />
  <path d="M48,15 Q65,10 77,17" className="animate-pulse" style={{ animationDelay: "0.5s" }} />
  <path d="M25,18 Q40,30 77,20" className="animate-pulse" style={{ animationDelay: "1s" }} />
@@ -109,7 +109,7 @@ export function WorldMap({
  onMouseEnter={() => setHoveredCity(city.name)}
  onMouseLeave={() => setHoveredCity(null)}
  >
- {/* PulseEffect */}
+ {/* Pulse effect */}
  {showPulse && city.active && (
  <div
  className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
@@ -132,7 +132,7 @@ export function WorldMap({
  )}
  />
 
- {/* HoverTip */}
+ {/* Hover tooltip */}
  {hoveredCity === city.name && (
  <div
  className={cn(
@@ -144,7 +144,7 @@ export function WorldMap({
  )}
  >
  <p className="font-medium text-foreground">{city.name}</p>
- <p className="text-muted-foreground">{city.users.toLocaleString()} User</p>
+ <p className="text-muted-foreground">{city.users.toLocaleString()} users</p>
  </div>
  )}
 
@@ -157,11 +157,11 @@ export function WorldMap({
  </div>
  ))}
 
- {/* StatisticsInfo */}
+ {/* Statistics info */}
  <div className="absolute bottom-2 left-2 text-xs text-muted-foreground">
  <span className="flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
- {activeCities.filter((c) => c.active).length} ActiveRegion
+ {activeCities.filter((c) => c.active).length} active regions
  </span>
  </div>
 
@@ -190,7 +190,7 @@ export function WorldMap({
  );
 }
 
-// version: onlyDisplay'sDistribution
+// Simplified version: display distribution only
 export function SimpleWorldMap({
  className,
  ...props
@@ -204,7 +204,7 @@ export function SimpleWorldMap({
  )}
  {...props}
  >
- {/* 'sDistribution */}
+ {/* Distribution */}
  {[
  { x: 15, y: 40 },
  { x: 25, y: 35 },

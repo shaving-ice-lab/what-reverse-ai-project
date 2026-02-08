@@ -1,5 +1,5 @@
 /**
- * Input/OutputNodeExecute
+ * Input/Output Node Executors
  */
 
 import type { NodeExecutor, NodeResult } from "../types";
@@ -34,14 +34,14 @@ export const inputExecutor: NodeExecutor<InputConfig> = {
  variables[inputName] ??
  nodeConfig.defaultValue;
 
- if (nodeConfig.required && (value === undefined || value === null)) {
- return {
- success: false,
- outputs: {},
- error: createNodeError("INPUT_REQUIRED", `fewRequiredField: ${inputName}`),
- duration: Date.now() - startTime,
- };
- }
+    if (nodeConfig.required && (value === undefined || value === null)) {
+      return {
+        success: false,
+        outputs: {},
+        error: createNodeError("INPUT_REQUIRED", `Missing required field: ${inputName}`),
+        duration: Date.now() - startTime,
+      };
+    }
 
  return {
  success: true,
@@ -74,7 +74,7 @@ export const outputExecutor: NodeExecutor<OutputConfig> = {
  value,
  output: value,
  type: nodeConfig.outputType ?? "text",
- title: nodeConfig.title ?? "OutputResult",
+ title: nodeConfig.title ?? "Output result",
  showTimestamp: Boolean(nodeConfig.showTimestamp),
  maxLength: nodeConfig.maxLength ?? 0,
  },

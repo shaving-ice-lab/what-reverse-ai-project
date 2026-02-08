@@ -30,10 +30,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// TaskStatus
+// Task Status
 type TaskStatus = "pending" | "running" | "completed" | "failed";
 
-// MockTaskData
+// Mock Task Data
 const mockTasks: Record<string, {
  id: string;
  title: string;
@@ -51,32 +51,32 @@ const mockTasks: Record<string, {
 }> = {
  "task-1": {
  id: "task-1",
- title: "Marketing CopyGenerate",
+ title: "Marketing Copy Generation",
  type: "text",
  status: "completed",
  progress: 100,
  createdAt: "2026-01-30 10:30",
  completedAt: "2026-01-30 10:31",
- prompt: "asWe'snewProduct AgentFlow 2.3 1person'sMarketing Copy, Emphasize Multi-Agent CollaborationFeaturesandcanImprove.",
- result: `🚀 AgentFlow 2.3 Publish!
+ prompt: "Write marketing copy for our new product AgentFlow 2.3, emphasizing multi-agent collaboration features and performance improvements.",
+ result: `🚀 AgentFlow 2.3 is Here!
 
-, AI Collaborationnewtime!
+A new era of AI collaboration!
 
-✨ allnewMulti-Agent CollaborationFeatures
-- multipleAI AgentWork
-- AutoTaskDecomposeandAllocate
-- SmartResulttotalandoptimal
+✨ All-New Multi-Agent Collaboration Features
+- Multiple AI agents working together
+- Automatic task decomposition and allocation
+- Smart result aggregation and optimization
 
-⚡ canImprove
-- ExecuteSpeedImprove 50%
-- inuseReduce 30%
-- letComplexWorkflowmoreSmooth
+⚡ Performance Improvements
+- Execution speed improved by 50%
+- Resource usage reduced by 30%
+- Complex workflows run more smoothly
 
-🔗 moremultipleIntegration, Nonelimitcancan
+🔗 More Integrations, No Limits
 Feishu | Yuque | Notion
-1keyyou'sWorkScenario
+Seamlessly connect to your work scenarios
 
-NowUpgrade, Experience AI Collaboration'sNonelimitcancan!
+Upgrade now and experience the unlimited potential of AI collaboration!
 
 👉 agentflow.ai/upgrade`,
  model: "GPT-4 Turbo",
@@ -85,24 +85,24 @@ NowUpgrade, Experience AI Collaboration'sNonelimitcancan!
  },
  "task-2": {
  id: "task-2",
- title: "CodeoptimalSuggestion",
+ title: "Code Optimization Suggestions",
  type: "code",
  status: "running",
  progress: 65,
  createdAt: "2026-01-30 11:00",
- prompt: "AnalyticsthisCodeandProvideoptimalSuggestion...",
+ prompt: "Analyze this code and provide optimization suggestions...",
  model: "Claude 3",
  tokens: 0,
  },
  "task-3": {
  id: "task-3",
- title: "ImageDescriptionGenerate",
+ title: "Image description generate",
  type: "image",
  status: "failed",
  progress: 0,
  createdAt: "2026-01-30 09:15",
- prompt: "asthisProductGenerateDetailedDescription...",
- error: "ImageFormatnotSupport, PleaseUsage PNG or JPG Format",
+ prompt: "Generate a detailed description for this product...",
+ error: "Image format not supported. Please use PNG or JPG format.",
  model: "GPT-4 Vision",
  tokens: 0,
  },
@@ -110,15 +110,15 @@ NowUpgrade, Experience AI Collaboration'sNonelimitcancan!
 
 // TypeConfig - Supabase Style
 const typeConfig: Record<string, { icon: any; label: string; color: string }> = {
- text: { icon: FileText, label: "charCreative", color: "text-foreground-light" },
- image: { icon: Image, label: "ImageProcess", color: "text-foreground-light" },
- code: { icon: Code, label: "CodeAssistant", color: "text-brand-500" },
- chat: { icon: MessageSquare, label: "SmartConversation", color: "text-foreground-light" },
+ text: { icon: FileText, label: "Text Creation", color: "text-foreground-light" },
+ image: { icon: Image, label: "Image process", color: "text-foreground-light" },
+ code: { icon: Code, label: "Code assistant", color: "text-brand-500" },
+ chat: { icon: MessageSquare, label: "Smart conversation", color: "text-foreground-light" },
 };
 
 // StatusConfig - Supabase Style
 const statusConfig: Record<TaskStatus, { icon: any; label: string; color: string; bgColor: string }> = {
- pending: { icon: Clock, label: "etcpending", color: "text-foreground-muted", bgColor: "bg-surface-200" },
+ pending: { icon: Clock, label: "Pending", color: "text-foreground-muted", bgColor: "bg-surface-200" },
  running: { icon: Loader2, label: "Generating", color: "text-foreground-light", bgColor: "bg-surface-200" },
  completed: { icon: CheckCircle, label: "Completed", color: "text-brand-500", bgColor: "bg-brand-200" },
  failed: { icon: XCircle, label: "Failed", color: "text-destructive", bgColor: "bg-destructive-200" },
@@ -137,11 +137,11 @@ export default function TaskDetailPage() {
  <div className="h-full flex items-center justify-center">
  <div className="text-center">
  <AlertCircle className="w-12 h-12 text-foreground-muted mx-auto mb-4" />
- <h2 className="text-lg font-medium text-foreground mb-2">TaskDoes not exist</h2>
- <p className="text-foreground-muted mb-4">TaskcancanalreadybyDelete</p>
+ <h2 className="text-lg font-medium text-foreground mb-2">Task does not exist</h2>
+ <p className="text-foreground-muted mb-4">Task was cancelled or has already been deleted.</p>
  <Link href="/dashboard/creative">
  <Button className="bg-brand-500 hover:bg-brand-600 text-background">
- BackCreativeAssistant
+ Back to Creative Assistant
  </Button>
  </Link>
  </div>
@@ -221,7 +221,7 @@ export default function TaskDetailPage() {
  ) : (
  <Copy className="w-4 h-4 mr-2" />
  )}
- {copied ? "alreadyCopy": "Copy"}
+ {copied ? "Copied": "Copy"}
  </Button>
  <Button variant="outline">
  <Download className="w-4 h-4 mr-2" />
@@ -240,7 +240,7 @@ export default function TaskDetailPage() {
  {task.status === "running" && (
  <div className="p-4 rounded-md bg-surface-100 border border-border">
  <div className="flex items-center justify-between mb-2">
- <span className="text-sm text-foreground">GenerateProgress</span>
+ <span className="text-sm text-foreground">Generation Progress</span>
  <span className="text-sm text-foreground-muted">{task.progress}%</span>
  </div>
  <div className="h-2 rounded-full bg-surface-200 overflow-hidden">
@@ -258,28 +258,28 @@ export default function TaskDetailPage() {
  <div className="flex items-start gap-3">
  <XCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
  <div>
- <h4 className="font-medium text-destructive mb-1">TaskFailed</h4>
+ <h4 className="font-medium text-destructive mb-1">Task Failed</h4>
  <p className="text-sm text-destructive/80">{task.error}</p>
  </div>
  </div>
  </div>
  )}
 
- {/* OriginalTip */}
+ {/* Input Prompt */}
  <div className="p-5 rounded-md bg-surface-100 border border-border">
  <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
  <Zap className="w-4 h-4 text-foreground-muted" />
- InputTip
+ Input Prompt
  </h3>
  <p className="text-foreground-muted">{task.prompt}</p>
  </div>
 
- {/* GenerateResult */}
+ {/* Generated Result */}
  {task.result && (
  <div className="p-5 rounded-md bg-surface-100 border border-border">
  <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
  <CheckCircle className="w-4 h-4 text-brand-500" />
- GenerateResult
+ Generated Result
  </h3>
  <div className="whitespace-pre-wrap text-foreground-muted leading-relaxed">
  {task.result}
@@ -287,16 +287,16 @@ export default function TaskDetailPage() {
  </div>
  )}
 
- {/* TaskDetails */}
+ {/* Task Details */}
  <div className="p-5 rounded-md bg-surface-100 border border-border">
- <h3 className="text-sm font-medium text-foreground mb-4">TaskDetails</h3>
+ <h3 className="text-sm font-medium text-foreground mb-4">Task Details</h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
  <div>
  <div className="text-xs text-foreground-muted mb-1">Task ID</div>
  <div className="text-sm text-foreground font-mono">{task.id}</div>
  </div>
  <div>
- <div className="text-xs text-foreground-muted mb-1">UsageModel</div>
+ <div className="text-xs text-foreground-muted mb-1">Model Used</div>
  <div className="text-sm text-foreground">{task.model}</div>
  </div>
  <div>
@@ -322,7 +322,7 @@ export default function TaskDetailPage() {
  className="flex items-center gap-3 p-3 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase group"
  >
  <RotateCcw className="w-5 h-5 text-foreground-muted group-hover:text-brand-500" />
- <span className="text-sm text-foreground">re-newGenerate</span>
+ <span className="text-sm text-foreground">Regenerate</span>
  <ChevronRight className="w-4 h-4 text-foreground-muted ml-auto" />
  </Link>
  <Link
@@ -330,7 +330,7 @@ export default function TaskDetailPage() {
  className="flex items-center gap-3 p-3 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase group"
  >
  <Zap className="w-5 h-5 text-foreground-muted group-hover:text-brand-500" />
- <span className="text-sm text-foreground">CreateTask</span>
+ <span className="text-sm text-foreground">Create Task</span>
  <ChevronRight className="w-4 h-4 text-foreground-muted ml-auto" />
  </Link>
  <button
@@ -338,7 +338,7 @@ export default function TaskDetailPage() {
  className="flex items-center gap-3 p-3 rounded-md bg-surface-100 border border-border hover:border-brand-400 transition-supabase group"
  >
  <Copy className="w-5 h-5 text-foreground-muted group-hover:text-brand-500" />
- <span className="text-sm text-foreground">CopyResult</span>
+ <span className="text-sm text-foreground">Copy Result</span>
  <ChevronRight className="w-4 h-4 text-foreground-muted ml-auto" />
  </button>
  </div>

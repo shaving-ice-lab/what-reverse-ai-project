@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Agent DetailsPage
+ * Agent Details Page
  *
- * Supabase Style: Minimal, Professional, DataRich
+ * Supabase Style: Minimal, Professional, Data Rich
  */
 
 import { useState } from "react";
@@ -64,9 +64,9 @@ import { cn } from "@/lib/utils";
 const mockAgent = {
  id: "1",
 
- name: "SupportAssistant",
+ name: "Support Assistant",
 
- description: "SmartSupportBot, canProcessFAQandProvide24/7Support",
+ description: "Smart support bot that can handle FAQs and provide 24/7 support",
 
  status: "active" as const,
 
@@ -74,7 +74,7 @@ const mockAgent = {
 
  createdAt: "2026-01-15",
 
- lastActive: "2 minbefore",
+ lastActive: "2 min ago",
 
  avatar: null,
 
@@ -100,14 +100,14 @@ const mockAgent = {
 
  maxTokens: 2048,
 
- systemPrompt: "youis1Professional'sSupportAssistant, HelpUserResolveIssue...",
+ systemPrompt: "You are a professional support assistant. Help users resolve issues...",
 
- welcomeMessage: "you!IisSmartSupportAssistant, hasWhatcanwithHelpyou's?",
+ welcomeMessage: "Hello! I'm a smart support assistant. How can I help you?",
 
  },
 };
 
-// MockConversationHistory
+// Mock Conversation History
 
 const mockConversations = [
 
@@ -116,9 +116,9 @@ const mockConversations = [
 
  user: "User A",
 
- preview: "PleaseifwhatEditPassword?",
+ preview: "How do I change my password?",
 
- time: "10 minbefore",
+ time: "10 min ago",
 
  messages: 5,
 
@@ -131,9 +131,9 @@ const mockConversations = [
 
  user: "User B",
 
- preview: "ProductWhattime?",
+ preview: "When will the product ship?",
 
- time: "30 minbefore",
+ time: "30 min ago",
 
  messages: 8,
 
@@ -146,9 +146,9 @@ const mockConversations = [
 
  user: "User C",
 
- preview: "IwantPleaseRefund",
+ preview: "I'd like to request a refund",
 
- time: "1 hbefore",
+ time: "1 hour ago",
 
  messages: 12,
 
@@ -161,9 +161,9 @@ const mockConversations = [
 
  user: "User D",
 
- preview: "willRightshasWhich?",
+ preview: "What membership benefits are included?",
 
- time: "2 hbefore",
+ time: "2 hours ago",
 
  messages: 4,
 
@@ -173,7 +173,7 @@ const mockConversations = [
 
 ];
 
-// MockcanData
+// Mock Performance Data
 
 const performanceData = [
 
@@ -227,14 +227,14 @@ export default function AgentDetailPage() {
 
  };
 
- // SwitchRunStatus
+ // Toggle Run Status
 
  const toggleRunning = () => {
  setIsRunning(!isRunning);
 
  };
 
- // SendTestMessage
+ // Send Test Message
 
  const sendTestMessage = async () => {
  if (!testInput.trim()) return;
@@ -252,7 +252,7 @@ export default function AgentDetailPage() {
  const aiMessage = {
  role: "assistant",
 
- content: `Thank youyou'sIssue!About"${testInput}", IcomeasyouResolve...thisis1TestReply.`,
+ content: `Thank you for your question! Regarding "${testInput}", let me help you resolve this... This is a test reply.`,
 
  };
 
@@ -399,7 +399,7 @@ export default function AgentDetailPage() {
 
  { id: "overview" as const, label: "Overview", icon: BarChart3 },
 
- { id: "conversations" as const, label: "ConversationRecord", icon: MessageSquare },
+ { id: "conversations" as const, label: "Conversations", icon: MessageSquare },
 
  { id: "settings" as const, label: "Settings", icon: Settings },
 
@@ -470,13 +470,13 @@ export default function AgentDetailPage() {
 
  <span className="font-medium text-foreground">
 
- {isRunning ? "Run": "Paused"}
+ {isRunning ? "Running": "Paused"}
 
  </span>
 
  <span className="text-sm text-foreground-muted">
 
- mostafterActive: {agent.lastActive}
+ Last active: {agent.lastActive}
 
  </span>
 
@@ -492,7 +492,7 @@ export default function AgentDetailPage() {
 
  <span className="text-foreground-muted">
 
- Createat: <span className="text-foreground">{agent.createdAt}</span>
+ Created: <span className="text-foreground">{agent.createdAt}</span>
 
  </span>
 
@@ -507,7 +507,7 @@ export default function AgentDetailPage() {
  {[
 
  {
- label: "totalConversationcount",
+ label: "Total Conversations",
 
  value: agent.stats.totalConversations.toLocaleString(),
 
@@ -518,7 +518,7 @@ export default function AgentDetailPage() {
  },
 
  {
- label: "totalMessagecount",
+ label: "Total Messages",
 
  value: agent.stats.totalMessages.toLocaleString(),
 
@@ -529,7 +529,7 @@ export default function AgentDetailPage() {
  },
 
  {
- label: "AverageResponse Time",
+ label: "Avg Response Time",
 
  value: agent.stats.avgResponseTime,
 
@@ -606,7 +606,7 @@ export default function AgentDetailPage() {
 
  <div className="p-6 rounded-md bg-surface-100 border border-border">
 
- <h3 className="font-semibold text-foreground mb-4">canTrend</h3>
+ <h3 className="font-semibold text-foreground mb-4">Performance Trends</h3>
 
  <div className="space-y-4">
 
@@ -651,7 +651,7 @@ export default function AgentDetailPage() {
 
  <div className="p-4 border-b border-border bg-surface-75">
 
- <h3 className="font-semibold text-foreground">QuickTest</h3>
+ <h3 className="font-semibold text-foreground">Quick Test</h3>
 
  </div>
 
@@ -714,7 +714,7 @@ export default function AgentDetailPage() {
 
  <div className="px-3 py-2 rounded-md bg-surface-100 text-sm text-foreground-muted">
 
- currentlyatThink...
+ Thinking...
 
  </div>
 
@@ -734,7 +734,7 @@ export default function AgentDetailPage() {
 
  onChange={(e) => setTestInput(e.target.value)}
 
- placeholder="InputTestMessage..."
+ placeholder="Enter a test message..."
 
  className="h-9"
 
@@ -772,7 +772,7 @@ export default function AgentDetailPage() {
 
  <div className="flex items-center justify-between mb-4">
 
- <h3 className="font-semibold text-foreground">RecentConversation</h3>
+ <h3 className="font-semibold text-foreground">Recent Conversations</h3>
 
  <Button variant="ghost" size="sm" onClick={() => setActiveTab("conversations")}>
 
@@ -811,7 +811,7 @@ export default function AgentDetailPage() {
 
  <div className="flex items-center gap-3 text-xs text-foreground-muted">
 
- <span>{conv.messages} Message</span>
+ <span>{conv.messages} messages</span>
 
  <span className={cn(
  "px-1.5 py-0.5 rounded",
@@ -824,7 +824,7 @@ export default function AgentDetailPage() {
 
  )}>
 
- {conv.status === "completed" ? "Completed": "alreadyperson"}
+ {conv.status === "completed" ? "Completed": "Escalated"}
 
  </span>
 
@@ -849,13 +849,13 @@ export default function AgentDetailPage() {
 
  <div className="flex items-center justify-between">
 
- <h2 className="text-lg font-semibold text-foreground">ConversationRecord</h2>
+ <h2 className="text-lg font-semibold text-foreground">Conversation History</h2>
 
  <div className="flex items-center gap-2">
 
  <Input
 
- placeholder="SearchConversation..."
+ placeholder="Search conversations..."
 
  className="w-64 h-9"
 
@@ -917,7 +917,7 @@ export default function AgentDetailPage() {
 
  )}>
 
- {conv.status === "completed" ? "Completed": "alreadyperson"}
+ {conv.status === "completed" ? "Completed": "Escalated"}
 
  </div>
 
@@ -927,11 +927,11 @@ export default function AgentDetailPage() {
 
  <div className="flex items-center gap-4 text-sm text-foreground-muted">
 
- <span>{conv.messages} Message</span>
+ <span>{conv.messages} messages</span>
 
  <Button variant="ghost" size="sm" className="ml-auto">
 
- ViewDetails
+ View Details
 
  <ExternalLink className="w-3 h-3 ml-1" />
 
@@ -998,7 +998,7 @@ export default function AgentDetailPage() {
 
  <div className="p-6 rounded-md bg-surface-100 border border-border">
 
- <h3 className="font-semibold text-foreground mb-4">ModelConfig</h3>
+ <h3 className="font-semibold text-foreground mb-4">Model Configuration</h3>
 
  <div className="page-grid sm:grid-cols-2">
 
@@ -1072,7 +1072,7 @@ export default function AgentDetailPage() {
 
  <Button variant="outline">Cancel</Button>
 
- <Button className="bg-brand-500 hover:bg-brand-600">SaveChange</Button>
+ <Button className="bg-brand-500 hover:bg-brand-600">Save Changes</Button>
 
  </div>
 

@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * FeaturedRecommendedCarouselComponent
+ * Featured Recommended Carousel Component
  * 
- * ShowcaseFeatured Agent 'sCarousel, SupportAutoPlayandManualSwitch
+ * Showcases Featured Agent Carousel with Auto Play and Manual Switch support
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Agent, AgentCategory } from "@/types/agent";
 
-// CategoryIconMapping
+// Category Icon Mapping
 const categoryIconMap: Record<AgentCategory, typeof MessageSquare> = {
  content: FileText,
  data: BarChart3,
@@ -41,9 +41,9 @@ const categoryIconMap: Record<AgentCategory, typeof MessageSquare> = {
  other: Sparkles,
 };
 
-// Formatcountchar
+// Format count
 const formatCount = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+  if (num >= 10000) return `${(num / 1000).toFixed(0)}K`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
@@ -74,7 +74,7 @@ export function FeaturedCarousel({
  setCurrentIndex(index);
  }, []);
 
- // AutoPlay
+  // Auto Play
  useEffect(() => {
  if (isPaused || agents.length <= 1) return;
 
@@ -93,10 +93,10 @@ export function FeaturedCarousel({
  onMouseEnter={() => setIsPaused(true)}
  onMouseLeave={() => setIsPaused(false)}
  >
- {/* mainCard */}
+ {/* Main Card */}
  <Link href={`/store/${currentAgent.slug}`}>
  <div className="group relative overflow-hidden bg-gradient-to-r from-primary to-[#2a6348] p-6 sm:p-8 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all">
- {/* BackgroundDecoration */}
+ {/* Background Decoration */}
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
  <div className="absolute -right-20 -top-20 w-60 h-60 bg-white/5 rounded-full blur-3xl" />
  <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
@@ -104,7 +104,7 @@ export function FeaturedCarousel({
  <div className="relative z-10">
  <div className="flex items-center gap-2 mb-4">
  <TrendingUp className="w-4 h-4 text-white/70" />
- <span className="text-sm font-medium text-white/70">FeaturedRecommended</span>
+ <span className="text-sm font-medium text-white/70">Featured & Recommended</span>
  <span className="ml-2 px-2 py-0.5 rounded-full bg-white/20 text-white text-xs">
  {currentIndex + 1} / {agents.length}
  </span>
@@ -127,7 +127,7 @@ export function FeaturedCarousel({
  </p>
  <div className="flex flex-wrap items-center gap-4 sm:gap-5 text-sm">
  <span className="text-white/70">
- {currentAgent.author?.displayName || currentAgent.author?.username || "method"}
+ {currentAgent.author?.displayName || currentAgent.author?.username || "Unknown"}
  </span>
  <span className="flex items-center gap-1 text-yellow-300">
  <Star className="w-4 h-4 fill-current" />
@@ -146,7 +146,7 @@ export function FeaturedCarousel({
  </div>
 
  <Button className="h-10 px-5 bg-white hover:bg-white/90 text-primary-foreground font-medium rounded-xl shadow-sm shrink-0 hidden sm:flex">
- NowUsage
+              Use Now
  <ArrowUpRight className="ml-1.5 w-4 h-4" />
  </Button>
  </div>
@@ -154,8 +154,8 @@ export function FeaturedCarousel({
  </div>
  </Link>
 
- {/* NavigationButton */}
- {agents.length > 1 && (
+{/* Navigation Buttons */}
+      {agents.length > 1 && (
  <>
  <button
  onClick={(e) => {

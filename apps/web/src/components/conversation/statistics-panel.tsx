@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationStatisticsPanelComponent - ModernDesign
- * DisplayConversationRelated'sStatisticsData
+ * Conversation Statistics Panel Component - Modern Design
+ * Displays conversation-related statistics data
  */
 
 import { useState, useEffect } from "react";
@@ -86,114 +86,114 @@ export function StatisticsPanel({ className }: StatisticsPanelProps) {
  const fetchStats = async () => {
  try {
  setLoading(true);
- const data = await conversationApi.getStatistics();
- setStats(data);
- } catch (err) {
- console.error("Failed to fetch statistics:", err);
- setError("LoadStatisticsDataFailed");
- } finally {
- setLoading(false);
- }
- };
+        const data = await conversationApi.getStatistics();
+        setStats(data);
+      } catch (err) {
+        console.error("Failed to fetch statistics:", err);
+        setError("Failed to load statistics data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
- fetchStats();
- }, []);
+    fetchStats();
+  }, []);
 
- if (loading) {
- return (
- <div className={cn("flex items-center justify-center py-8", className)}>
- <Loader2 className="w-6 h-6 animate-spin text-primary" />
- </div>
- );
- }
+  if (loading) {
+    return (
+      <div className={cn("flex items-center justify-center py-8", className)}>
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
- if (error || !stats) {
- return (
- <div className={cn("text-center py-8 text-foreground-light", className)}>
- {error || "NoneStatisticsData"}
- </div>
- );
- }
+  if (error || !stats) {
+    return (
+      <div className={cn("text-center py-8 text-foreground-light", className)}>
+        {error || "No statistics data"}
+      </div>
+    );
+  }
 
- // Formatcountchar
- const formatNumber = (num: number) => {
+  // Format number
+  const formatNumber = (num: number) => {
  if (num >= 1000000) {
  return (num / 1000000).toFixed(1) + "M";
  }
  if (num >= 1000) {
  return (num / 1000).toFixed(1) + "K";
  }
- return num.toString();
- };
+    return num.toString();
+  };
 
- // Fetchmostuse'sModel
- const topModel = Object.entries(stats.modelUsage || {})
- .sort(([, a], [, b]) => b - a)[0];
+  // Get most used model
+  const topModel = Object.entries(stats.modelUsage || {})
+    .sort(([, a], [, b]) => b - a)[0];
 
- return (
- <div className={cn("space-y-3", className)}>
- {/* Title */}
- <div className="flex items-center gap-2 px-1">
- <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary/20 to-orange-500/20 flex items-center justify-center">
- <Activity className="w-3.5 h-3.5 text-primary" />
- </div>
- <h3 className="text-sm font-semibold text-foreground">StatisticsOverview</h3>
- </div>
+  return (
+    <div className={cn("space-y-3", className)}>
+      {/* Title */}
+      <div className="flex items-center gap-2 px-1">
+        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary/20 to-orange-500/20 flex items-center justify-center">
+          <Activity className="w-3.5 h-3.5 text-primary" />
+        </div>
+        <h3 className="text-sm font-semibold text-foreground">Statistics overview</h3>
+      </div>
 
- {/* CoreStatistics */}
- <div className="grid grid-cols-2 gap-2">
- <StatCard
- title="Conversation"
- value={formatNumber(stats.totalConversations)}
- icon={<MessageSquare className="w-4 h-4" />}
- color="primary"
- />
- <StatCard
- title="Message"
- value={formatNumber(stats.totalMessages)}
- icon={<TrendingUp className="w-4 h-4" />}
- color="blue"
- />
- <StatCard
- title="Favorite"
- value={formatNumber(stats.starredConversations)}
- icon={<Star className="w-4 h-4" />}
- color="amber"
- />
- <StatCard
- title="Tokens"
- value={formatNumber(stats.totalTokenUsage)}
- icon={<Zap className="w-4 h-4" />}
- color="purple"
- />
- </div>
+      {/* Core statistics */}
+      <div className="grid grid-cols-2 gap-2">
+        <StatCard
+          title="Conversations"
+          value={formatNumber(stats.totalConversations)}
+          icon={<MessageSquare className="w-4 h-4" />}
+          color="primary"
+        />
+        <StatCard
+          title="Messages"
+          value={formatNumber(stats.totalMessages)}
+          icon={<TrendingUp className="w-4 h-4" />}
+          color="blue"
+        />
+        <StatCard
+          title="Starred"
+          value={formatNumber(stats.starredConversations)}
+          icon={<Star className="w-4 h-4" />}
+          color="amber"
+        />
+        <StatCard
+          title="Tokens"
+          value={formatNumber(stats.totalTokenUsage)}
+          icon={<Zap className="w-4 h-4" />}
+          color="purple"
+        />
+      </div>
 
- {/* AverageMessagecount */}
- <div className="p-3 rounded-xl border border-border bg-gradient-to-r from-muted/30 to-muted/10">
- <div className="flex items-center justify-between">
- <p className="text-xs text-foreground-light">AverageMessagecount</p>
- <p className="text-sm font-bold text-foreground">
- {stats.averageMessagesPerConversation?.toFixed(1) || 0} /Conversation
- </p>
- </div>
- </div>
+      {/* Average messages per conversation */}
+      <div className="p-3 rounded-xl border border-border bg-gradient-to-r from-muted/30 to-muted/10">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-foreground-light">Average messages</p>
+          <p className="text-sm font-bold text-foreground">
+            {stats.averageMessagesPerConversation?.toFixed(1) || 0} / conversation
+          </p>
+        </div>
+      </div>
 
- {/* mostuseModel */}
- {topModel && (
- <div className="p-3 rounded-xl border border-border bg-card/50">
- <div className="flex items-center justify-between mb-1">
- <p className="text-xs text-foreground-light">mostuseModel</p>
- <span className="text-xs text-foreground-light">{topModel[1]} times</span>
- </div>
- <p className="text-sm font-semibold text-foreground">{topModel[0]}</p>
- </div>
- )}
+      {/* Most used model */}
+      {topModel && (
+        <div className="p-3 rounded-xl border border-border bg-card/50">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs text-foreground-light">Most used model</p>
+            <span className="text-xs text-foreground-light">{topModel[1]} times</span>
+          </div>
+          <p className="text-sm font-semibold text-foreground">{topModel[0]}</p>
+        </div>
+      )}
 
- {/* ModelUsageDistribution */}
- {Object.keys(stats.modelUsage || {}).length > 0 && (
- <div className="p-3 rounded-xl border border-border bg-card/50">
- <p className="text-xs text-foreground-light mb-3">ModelDistribution</p>
- <div className="space-y-2.5">
+      {/* Model usage distribution */}
+      {Object.keys(stats.modelUsage || {}).length > 0 && (
+        <div className="p-3 rounded-xl border border-border bg-card/50">
+          <p className="text-xs text-foreground-light mb-3">Model distribution</p>
+          <div className="space-y-2.5">
  {Object.entries(stats.modelUsage)
  .sort(([, a], [, b]) => b - a)
  .slice(0, 4)

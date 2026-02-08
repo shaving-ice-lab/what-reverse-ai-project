@@ -3,7 +3,7 @@
 /**
  * allExceptionpage - 500/RuntimeError
  * Manus Style: Minimal, largeWhitespace, optimal
- * ProvideRetry, BackHomeandContactSupportEntry
+ * Provides Retry, Back Home and Contact Support entries
  */
 
 import Link from "next/link";
@@ -34,9 +34,9 @@ const quickLinks = [
 
 // RestoreSuggestion
 const recoverySuggestions = [
- { icon: RefreshCw, text: "RefreshPageRetryCurrentAction" },
- { icon: Wifi, text: "CheckNetworkConnectisnoNormal" },
- { icon: Server, text: "afteragain, Servicecancantime" },
+ { icon: RefreshCw, text: "Refresh the page and try again" },
+ { icon: Wifi, text: "Check that your network connection is working" },
+ { icon: Server, text: "Try again later; the service may be temporarily unavailable" },
 ];
 
 export default function GlobalError({
@@ -128,7 +128,7 @@ export default function GlobalError({
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}
  >
- Sorry, PagetooutsideError.WealreadyRecordthisIssue, PleaseTryRefreshPageorafteragain.
+ Sorry, something went wrong. We've logged the issue. Please try refreshing the page or try again later.
  </p>
 
  {/* mainneedAction - Manus StyleButton */}
@@ -152,7 +152,7 @@ export default function GlobalError({
  className="h-11 px-6 rounded-full border-border hover:border-foreground/20"
  >
  <Home className="mr-2 w-4 h-4" />
- BackHome
+ Back Home
  </Button>
  </Link>
  <Button
@@ -161,7 +161,7 @@ export default function GlobalError({
  onClick={() => window.history.back()}
  >
  <ArrowLeft className="mr-2 w-4 h-4" />
- Backon1page
+ Go Back
  </Button>
  </div>
 
@@ -208,7 +208,7 @@ export default function GlobalError({
  )}
  >
  <h3 className="text-sm font-semibold text-foreground mb-3">
- youcanwithTry
+ You can try
  </h3>
  <ul className="space-y-2">
  {recoverySuggestions.map((suggestion, index) => (
@@ -232,7 +232,7 @@ export default function GlobalError({
  )}
  >
  <p className="text-sm text-muted-foreground mb-6">
- orAccesswithdownPage
+ or access the following pages
  </p>
  <div className="flex flex-wrap justify-center gap-2">
  {quickLinks.map((link) => (
@@ -269,10 +269,10 @@ export default function GlobalError({
  </div>
  <div>
  <h3 className="font-semibold text-foreground mb-1 text-sm">
- Issuenot yetResolve?
- </h3>
+Issue not resolved?
+</h3>
  <p className="text-xs text-muted-foreground mb-3">
- ifresultIssueContinuousAppear, PleaseContact Us'sSupportTeam, onErrorCodewithQuickIssue
+ If the issue continues, contact our support team with the error code for faster help.
  </p>
  <Link href="/contact">
  <Button
@@ -280,7 +280,7 @@ export default function GlobalError({
  size="sm"
  className="rounded-full text-xs h-8 px-4 border-border hover:border-destructive/30"
  >
- ContactSupport
+ Contact support
  </Button>
  </Link>
  </div>

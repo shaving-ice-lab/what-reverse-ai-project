@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Agent PreviewComponent
+ * Agent Preview Component
  * 
- * Showcase Agent Publishbefore'sPreviewEffect
+ * Showcase Agent Preview before publishing
  */
 
 import {
@@ -30,18 +30,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { AgentCategory, PricingType } from "@/types/agent";
 
-// CategoryIconandNameMapping
+// Category Icon and Name Mapping
 const categoryMap: Record<AgentCategory, { icon: typeof Bot; name: string }> = {
- content: { icon: FileText", name: "ContentCreative" },
- data: { icon: BarChart3, name: "DataProcess" },
- customer: { icon: MessageSquare, name: "CustomerService" },
- productivity: { icon: Users, name: "Officerate" },
- developer: { icon: Code2, name: "DevelopmentTool" },
- research: { icon: Globe, name: "ResearchAnalytics" },
- education: { icon: GraduationCap, name: "EducationLearn" },
- finance: { icon: Wallet, name: "FinanceFinance" },
- marketing: { icon: TrendingUp, name: "MarketplaceMarketing" },
- other: { icon: Sparkles, name: "otherhe" },
+ content: { icon: FileText, name: "Content Creation" },
+  data: { icon: BarChart3, name: "Data Processing" },
+ customer: { icon: MessageSquare, name: "Customer Service" },
+ productivity: { icon: Users, name: "Productivity" },
+ developer: { icon: Code2, name: "Development Tools" },
+ research: { icon: Globe, name: "Research & Analytics" },
+ education: { icon: GraduationCap, name: "Education & Learning" },
+ finance: { icon: Wallet, name: "Finance" },
+ marketing: { icon: TrendingUp, name: "Marketing" },
+ other: { icon: Sparkles, name: "Other" },
 };
 
 interface AgentPreviewProps {
@@ -57,7 +57,7 @@ interface AgentPreviewProps {
  price: number | null;
  screenshots?: string[];
  
- // MockData
+ // Mock Data
  authorName?: string;
  
  // style
@@ -83,7 +83,7 @@ export function AgentPreview({
  const categoryInfo = category ? categoryMap[category] : null;
  const CategoryIcon = categoryInfo?.icon || Bot;
 
- // CardPreview
+ // Card Preview
  if (variant === "card") {
  return (
  <div className={cn(
@@ -107,7 +107,7 @@ export function AgentPreview({
  </div>
  )}
  
- {/* PriceTags */}
+ {/* Price Tag */}
  <div className="absolute top-3 right-3">
  <span className={cn(
  "px-2.5 py-1 rounded-full text-xs font-medium",
@@ -144,7 +144,7 @@ export function AgentPreview({
 
  {/* Description */}
  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
- {description || "Agent DescriptionwillDisplayatthisin"}
+ {description || "Agent description will be displayed here"}
  </p>
 
  {/* Statistics */}
@@ -186,7 +186,7 @@ export function AgentPreview({
  );
  }
 
- // DetailspagePreview
+ // Detail Page Preview
  return (
  <div className={cn("space-y-6", className)}>
  {/* Hero Section */}
@@ -216,7 +216,7 @@ export function AgentPreview({
  </h1>
 
  <p className="text-muted-foreground mb-4">
- {description || "Agent DescriptionwillDisplayatthisin"}
+ {description || "Agent description will be displayed here"}
  </p>
 
  {/* Stats */}
@@ -245,7 +245,7 @@ export function AgentPreview({
  disabled
  >
  <Play className="w-4 h-4 mr-2" />
- Usagethis Agent
+ Use This Agent
  </Button>
  <Button variant="outline" disabled>
  <Heart className="w-4 h-4 mr-2" />
@@ -272,7 +272,7 @@ export function AgentPreview({
  {/* Screenshots */}
  {screenshots.length > 0 && (
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">ScreenshotPreview</h3>
+ <h3 className="text-sm font-medium text-foreground mb-3">Screenshot Preview</h3>
  <div className="grid grid-cols-3 gap-3">
  {screenshots.slice(0, 3).map((screenshot, index) => (
  <div
@@ -293,7 +293,7 @@ export function AgentPreview({
  {/* Description */}
  {longDescription && (
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">DetailedIntroduction</h3>
+ <h3 className="text-sm font-medium text-foreground mb-3">Detailed Introduction</h3>
  <div className="p-4 rounded-xl bg-card border border-border">
  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
  {longDescription}
@@ -331,7 +331,7 @@ export function AgentPreview({
  className="bg-primary hover:bg-primary/90 text-primary-foreground"
  disabled
  >
- PurchaseandUsage
+ Purchase and Use
  </Button>
  </div>
  </div>

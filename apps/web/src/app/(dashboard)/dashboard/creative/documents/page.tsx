@@ -33,81 +33,81 @@ import { cn } from "@/lib/utils";
 
 // DocumentType
 const documentTypes = [
- { id: "all", name: "allsection" },
- { id: "blog", name: "BlogArticle" },
+ { id: "all", name: "All" },
+ { id: "blog", name: "Blog Article" },
  { id: "social", name: "Social Media" },
  { id: "marketing", name: "Marketing Copy" },
  { id: "email", name: "Email" },
- { id: "product", name: "ProductDescription" },
+ { id: "product", name: "Product Description" },
 ];
 
 // DocumentData
 const documents = [
  {
  id: "doc-1",
- title: "2026yearsAIDevelopmentTrendAnalytics",
+ title: "2026 AI development trend analytics",
  type: "blog",
- excerpt: "enterAnalytics2026yearspersonSmartDomain'smainneedDevelopmentTrend, IncludelargeLanguageModel, multipleModalAIandmainAgent...",
+ excerpt: "2026 smart domain development trends: large language models, multimodal AI and agents...",
  wordCount: 2500,
  createdAt: "2026-01-28",
- updatedAt: "2 hbefore",
+ updatedAt: "2 hours ago",
  starred: true,
  tags: ["AI", "Trend", "Analytics"],
  },
  {
  id: "doc-2",
- title: "newProductPublishSeries",
+ title: "New product launch series",
  type: "social",
- excerpt: "asnewProductPublishPrepare's1Series Twitter , Contains10centerDesign's...",
+ excerpt: "Prepare a Twitter series for new product launch, 10 posts...",
  wordCount: 800,
  createdAt: "2026-01-27",
  updatedAt: "Yesterday",
  starred: false,
- tags: ["Twitter", "ProductPublish", "Marketing"],
+ tags: ["Twitter", "Product Launch", "Marketing"],
  },
  {
  id: "doc-3",
- title: "Q1MarketingActivityPlan",
+ title: "Q1 marketing activity plan",
  type: "marketing",
- excerpt: "Detailed's#1QuarterMarketingActivityPlan, ContainsTarget, Policy, BudgetandExecutePlan...",
+ excerpt: "Q1 marketing plan: targets, policy, budget and execution...",
  wordCount: 3200,
  createdAt: "2026-01-25",
- updatedAt: "3 daysbefore",
+ updatedAt: "3 days ago",
  starred: true,
- tags: ["Marketing", "QuarterPlan", "Activity"],
+ tags: ["Marketing", "Quarterly Plan", "Campaign"],
  },
  {
  id: "doc-4",
- title: "CustomerWelcomeEmailTemplate",
+ title: "Customer welcome email template",
  type: "email",
- excerpt: "asnewCustomerDesign'sWelcomeEmailSeries, Contains3notPhase'sEmailTemplate...",
+ excerpt: "Welcome email series for new customers, 3 phases...",
  wordCount: 1200,
  createdAt: "2026-01-22",
- updatedAt: "1 weeksbefore",
- starred: false,
- tags: ["Email", "Customer", "Template"],
+    updatedAt: "1 week ago",
+    starred: false,
+    tags: ["Email", "Customer", "Template"],
  },
  {
  id: "doc-5",
- title: "SmartAssistantProductDescription",
+ title: "Smart assistant product description",
  type: "product",
- excerpt: "asE-commercePlatformPrepare'sSmartAssistantProductDescription, CoreFeaturesandUservalue...",
+ excerpt: "Smart product descriptions for e-commerce, core features and value...",
  wordCount: 600,
  createdAt: "2026-01-20",
- updatedAt: "1 weeksbefore",
- starred: false,
- tags: ["Product", "E-commerce", "Description"],
+    updatedAt: "1 week ago",
+    starred: false,
+    tags: ["Product", "E-commerce", "Description"],
  },
  {
  id: "doc-6",
- title: "ContentMarketingBest Practices",
+ title: "Content marketing best practices",
  type: "blog",
- excerpt: "SummaryContentMarketing'sBest Practices, HelpEnterpriseImproveContentMarketingEffect...",
+ excerpt: "Content marketing best practices to improve results...",
  wordCount: 1800,
  createdAt: "2026-01-18",
- updatedAt: "2 weeksbefore",
+ updatedAt: "2 weeks ago",
  starred: true,
- tags: ["ContentMarketing", "Best Practices", "Guide"],
+ tags: ["Content Marketing", "Best Practices", "Guide"],
  },
 ];
 
@@ -146,15 +146,15 @@ export default function CreativeDocumentsPage() {
  <p className="page-caption mb-3">Creative</p>
  <div className="flex items-center justify-between mb-6">
  <div>
- <h1 className="text-page-title text-foreground">I'sDocument</h1>
+ <h1 className="text-page-title text-foreground">My documents</h1>
  <p className="text-description">
- ManageyouGenerate'sAllCreativeContent
+ Manage all creative content you generate
  </p>
  </div>
  <Link href="/dashboard/creative/generate">
  <Button className="bg-brand-500 hover:bg-brand-600 text-background">
  <Plus className="mr-2 w-4 h-4" />
- CreateDocument
+ Create Document
  </Button>
  </Link>
  </div>
@@ -170,7 +170,7 @@ export default function CreativeDocumentsPage() {
  <div className="text-stat-number text-foreground">
  {stats.total}
  </div>
- <div className="text-category">totalDocumentcount</div>
+ <div className="text-category">Total Documents</div>
  </div>
  </div>
  </div>
@@ -183,7 +183,7 @@ export default function CreativeDocumentsPage() {
  <div className="text-stat-number text-foreground">
  {stats.starred}
  </div>
- <div className="text-category">FavoriteDocument</div>
+ <div className="text-category">Favorite documents</div>
  </div>
  </div>
  </div>
@@ -196,7 +196,7 @@ export default function CreativeDocumentsPage() {
  <div className="text-stat-number text-foreground">
  {(stats.totalWords / 1000).toFixed(1)}k
  </div>
- <div className="text-category">totalcharcount</div>
+ <div className="text-category">Total Characters</div>
  </div>
  </div>
  </div>
@@ -212,7 +212,7 @@ export default function CreativeDocumentsPage() {
  <div className="relative flex-1 max-w-md">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchDocument..."
+ placeholder="Search documents..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border-border"
@@ -418,13 +418,13 @@ export default function CreativeDocumentsPage() {
  <FileText className="w-10 h-10 text-foreground-muted mx-auto mb-4" />
  <h3 className="text-sm font-medium text-foreground mb-2">
  {searchQuery || selectedType !== "all"
- ? "NotoMatch'sDocument"
-: "Not yetCreateDocument"}
+ ? "No matching documents"
+: "No documents yet"}
  </h3>
  <p className="text-[13px] text-foreground-muted mb-6">
  {searchQuery || selectedType !== "all"
- ? "TryUsageotherheKeywordsorFilterCondition"
-: "StartCreateyou's#1CreativeDocument"}
+ ? "Try other keywords or filter conditions"
+: "Start creating your first creative document"}
  </p>
  {searchQuery || selectedType !== "all" ? (
  <Button
@@ -435,13 +435,13 @@ export default function CreativeDocumentsPage() {
  }}
  className="border-border text-foreground-light"
  >
- ClearFilter
+ Clear Filter
  </Button>
  ) : (
  <Link href="/dashboard/creative/generate">
  <Button className="bg-brand-500 hover:bg-brand-600 text-background">
  <Plus className="mr-2 w-4 h-4" />
- CreateDocument
+ Create Document
  </Button>
  </Link>
  )}

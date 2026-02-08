@@ -152,7 +152,7 @@ export function CodeBlock({
  {copied ? (
  <>
  <Check className="w-4 h-4 mr-1 text-emerald-500" />
- alreadyCopy
+ Copied
  </>
  ) : (
  <>
@@ -221,7 +221,7 @@ export function InlineCode({ children, className }: InlineCodeProps) {
 }
 
 // ============================================
-// endpointOutput
+// Terminal Output
 // ============================================
 
 interface TerminalOutputProps {

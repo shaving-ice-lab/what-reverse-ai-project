@@ -1,6 +1,6 @@
 /**
- * DAG (hasNone) Analytics
- * Used forAnalyticsWorkflowNodeDependencyandExecuteOrder
+ * DAG (Directed Acyclic Graph) Analysis
+ * Used for analyzing workflow node dependencies and execution order
  */
 
 import type { Edge } from "@xyflow/react";
@@ -8,16 +8,16 @@ import type { WorkflowNode } from "@/types/workflow";
 import type { DAGNode, DAGAnalysis } from "./types";
 
 /**
- * AnalyticsWorkflow DAG Structure
+ * Analyze workflow DAG structure
  */
 export function analyzeDAG(
  nodes: WorkflowNode[],
  edges: Edge[]
 ): DAGAnalysis {
- // BuildNodeMapping
+ // Build node mapping
  const nodeMap: Record<string, DAGNode> = {};
  
- // InitialAllNode
+ // Initialize all nodes
  for (const node of nodes) {
  nodeMap[node.id] = {
  id: node.id,
@@ -28,36 +28,36 @@ export function analyzeDAG(
  };
  }
  
- // Based onEdgeDependency
+ // Build dependencies based on edges
  for (const edge of edges) {
  const sourceNode = nodeMap[edge.source];
  const targetNode = nodeMap[edge.target];
  
  if (sourceNode && targetNode) {
- // source is target 'sDependency
+ // source is target's dependency
  targetNode.dependencies.push(edge.source);
- // target is source 'sDependencyuser
+ // target is source's dependent
  sourceNode.dependents.push(edge.target);
  }
  }
  
- // DetectLoopDependency
+ // Detect circular dependencies
  const hasCircle = detectCycle(nodeMap);
  
- // Node (NoDependency'sNode)
+ // Start nodes (nodes with no dependencies)
  const startNodes = Object.keys(nodeMap).filter(
  (id) => nodeMap[id].dependencies.length === 0
  );
  
- // EndNode (NoDependencyuser'sNode)
+ // End nodes (nodes with no dependents)
  const endNodes = Object.keys(nodeMap).filter(
  (id) => nodeMap[id].dependents.length === 0
  );
  
- // CalculateNodeHierarchy (TopologySort)
+ // Calculate node hierarchy (topological sort)
  const levels = calculateLevels(nodeMap, startNodes);
  
- // GenerateExecuteOrder
+ // Generate execution order
  const executionOrder = levels.flat();
  
  return {
@@ -71,7 +71,7 @@ export function analyzeDAG(
 }
 
 /**
- * DetectLoopDependency
+ * Detect circular dependencies
  */
 function detectCycle(nodeMap: Record<string, DAGNode>): boolean {
  const visited = new Set<string>();
@@ -110,7 +110,7 @@ function detectCycle(nodeMap: Record<string, DAGNode>): boolean {
 }
 
 /**
- * CalculateNodeHierarchy (Kahn's Algorithm)
+ * Calculate node hierarchy (Kahn's Algorithm)
  */
 function calculateLevels(
  nodeMap: Record<string, DAGNode>,
@@ -119,23 +119,23 @@ function calculateLevels(
  const levels: string[][] = [];
  const inDegree: Record<string, number> = {};
  
- // Initialenter
+ // Initialize in-degree
  for (const nodeId of Object.keys(nodeMap)) {
  inDegree[nodeId] = nodeMap[nodeId].dependencies.length;
  }
  
- // BFS Layered
+ // BFS layered traversal
  let currentLevel = [...startNodes];
  
  while (currentLevel.length > 0) {
  levels.push(currentLevel);
  
- // UpdateNodeHierarchy
+ // Update node hierarchy
  for (const nodeId of currentLevel) {
  nodeMap[nodeId].level = levels.length - 1;
  }
  
- // down1Node
+ // Collect next level nodes
  const nextLevel: string[] = [];
  
  for (const nodeId of currentLevel) {
@@ -157,7 +157,7 @@ function calculateLevels(
 }
 
 /**
- * FetchNode'sAllonNode
+ * Get all upstream nodes of a node
  */
 export function getUpstreamNodes(
  nodeId: string,
@@ -184,7 +184,7 @@ export function getUpstreamNodes(
 }
 
 /**
- * FetchNode'sAlldownNode
+ * Get all downstream nodes of a node
  */
 export function getDownstreamNodes(
  nodeId: string,
@@ -211,7 +211,7 @@ export function getDownstreamNodes(
 }
 
 /**
- * CheckNodeisnocanwithExecute (AllDependencyallCompleted)
+ * Check if a node can execute (all dependencies are completed)
  */
 export function canExecuteNode(
  nodeId: string,
@@ -225,7 +225,7 @@ export function canExecuteNode(
 }
 
 /**
- * FetchcanwithandrowExecute'sNode
+ * Get nodes that can be executed in parallel
  */
 export function getExecutableNodes(
  nodeMap: Record<string, DAGNode>,
@@ -235,12 +235,12 @@ export function getExecutableNodes(
  const executable: string[] = [];
  
  for (const nodeId of Object.keys(nodeMap)) {
- // SkipCompletedorcurrentlyatRun'sNode
+ // Skip completed or currently running nodes
  if (completedNodes.has(nodeId) || runningNodes.has(nodeId)) {
  continue;
  }
  
- // CheckisnoAllDependencyallCompleted
+ // Check if all dependencies are completed
  if (canExecuteNode(nodeId, nodeMap, completedNodes)) {
  executable.push(nodeId);
  }

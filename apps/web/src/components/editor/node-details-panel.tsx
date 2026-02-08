@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * NodeDetailsPanelComponent
+ * Node Details Panel Component
  *
  * Features: 
- * - DisplayNodeInput JSON
- * - DisplayNodeOutput JSON
- * - DisplayExecuteTime
- * - Display Token Usage
- * - DisplayErrorInfo
+ * - Display node input JSON
+ * - Display node output JSON
+ * - Display execution time
+ * - Display token usage
+ * - Display error info
  */
 
 import { useState, useMemo } from "react";
@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-// ========== TypeDefinition ==========
+// ========== Type Definitions ==========
 
 export type NodeStatus =
  | "pending"
@@ -105,21 +105,21 @@ export interface NodeSnapshot {
 }
 
 export interface NodeDetailsPanelProps {
- /** NodeSnapshotData */
- snapshot: NodeSnapshot | null;
- /** re-NodeCallback */
- onRerunNode?: (nodeId: string, newInputs?: unknown) => void;
- /** EditInputandre-Callback */
- onEditAndRerun?: (nodeId: string) => void;
- /** HighlightNodeCallback */
- onHighlightNode?: (nodeId: string) => void;
- /** isnoLoading */
- isLoading?: boolean;
- /** CustomClass Name */
- className?: string;
+  /** Node snapshot data */
+  snapshot: NodeSnapshot | null;
+  /** Rerun node callback */
+  onRerunNode?: (nodeId: string, newInputs?: unknown) => void;
+  /** Edit input and rerun callback */
+  onEditAndRerun?: (nodeId: string) => void;
+  /** Highlight node callback */
+  onHighlightNode?: (nodeId: string) => void;
+  /** Is loading */
+  isLoading?: boolean;
+  /** Custom class name */
+  className?: string;
 }
 
-// StatusConfig
+// Status Config
 const STATUS_CONFIG: Record<
  NodeStatus,
  { icon: typeof CheckCircle2; color: string; bgColor: string; label: string }
@@ -128,13 +128,13 @@ const STATUS_CONFIG: Record<
  icon: Clock,
  color: "text-foreground-muted",
  bgColor: "bg-surface-200",
- label: "etcpending",
+    label: "Pending",
  },
  running: {
  icon: Loader2,
  color: "text-brand-500",
  bgColor: "bg-brand-200/40",
- label: "Execute",
+    label: "Running",
  },
  completed: {
  icon: CheckCircle2,
@@ -152,7 +152,7 @@ const STATUS_CONFIG: Record<
  icon: ChevronRight,
  color: "text-foreground-muted",
  bgColor: "bg-surface-200",
- label: "alreadySkip",
+    label: "Skipped",
  },
  paused: {
  icon: Clock,
@@ -162,7 +162,7 @@ const STATUS_CONFIG: Record<
  },
 };
 
-// NodeTypeIcon
+// Node Type Icons
 const NODE_TYPE_ICONS: Record<string, typeof Brain> = {
  llm: Brain,
  http: Globe,
@@ -172,7 +172,7 @@ const NODE_TYPE_ICONS: Record<string, typeof Brain> = {
  start: Play,
 };
 
-// FormatTime
+// Format Time
 const formatDuration = (ms: number): string => {
  if (ms < 1000) return `${ms}ms`;
  if (ms < 60000) return `${(ms / 1000).toFixed(2)}s`;
@@ -192,7 +192,7 @@ const formatDateTime = (dateStr: string): string => {
  });
 };
 
-// ========== JSON ViewComponent ==========
+// ========== JSON View Component ==========
 
 interface JsonViewerProps {
  data: unknown;
@@ -222,10 +222,10 @@ function JsonViewer({
  try {
  await navigator.clipboard.writeText(jsonString);
  setCopied(true);
- toast.success("alreadyCopied to clipboard");
+      toast.success("Copied to clipboard");
  setTimeout(() => setCopied(false), 2000);
  } catch {
- toast.error("CopyFailed");
+      toast.error("Copy failed");
  }
  };
 
@@ -296,7 +296,7 @@ function JsonViewer({
  );
 }
 
-// ========== mainComponent ==========
+// ========== Main Component ==========
 
 export function NodeDetailsPanel({
  snapshot,
@@ -328,7 +328,7 @@ export function NodeDetailsPanel({
  )}
  >
  <FileText className="w-10 h-10 mb-3 opacity-50" />
- <p className="text-sm">Select1StepViewDetails</p>
+ <p className="text-sm">Select a step to view details</p>
  </div>
  );
  }
@@ -339,7 +339,7 @@ export function NodeDetailsPanel({
 
  return (
  <div className={cn("flex flex-col h-full", className)}>
- {/* HeaderInfo */}
+      {/* Header Info */}
  <div className="shrink-0 p-4 border-b border-border">
  <div className="flex items-start justify-between mb-3">
  <div className="flex items-center gap-3">
@@ -382,7 +382,7 @@ export function NodeDetailsPanel({
  </div>
  </div>
 
- {/* ActionButton */}
+          {/* Action Buttons */}
  <div className="flex items-center gap-1">
  {onHighlightNode && (
  <TooltipProvider>
@@ -397,7 +397,7 @@ export function NodeDetailsPanel({
  <Cpu className="w-4 h-4 text-foreground-muted" />
  </Button>
  </TooltipTrigger>
- <TooltipContent>atCanvasHighlight</TooltipContent>
+                  <TooltipContent>Highlight on canvas</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
@@ -414,7 +414,7 @@ export function NodeDetailsPanel({
  <RefreshCw className="w-4 h-4 text-foreground-muted" />
  </Button>
  </TooltipTrigger>
- <TooltipContent>re-thisNode</TooltipContent>
+                  <TooltipContent>Rerun this node</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
@@ -431,19 +431,19 @@ export function NodeDetailsPanel({
  <Pencil className="w-4 h-4 text-foreground-muted" />
  </Button>
  </TooltipTrigger>
- <TooltipContent>EditInputandre-</TooltipContent>
+ <TooltipContent>Edit input and re-run</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
  </div>
  </div>
 
- {/* TimeandcanMetrics */}
+        {/* Time and Metrics */}
  <div className="grid grid-cols-2 gap-3">
  <div className="p-2.5 rounded-lg bg-surface-200">
  <div className="flex items-center gap-1.5 mb-1">
  <Clock className="w-3.5 h-3.5 text-foreground-muted" />
- <span className="text-[10px] text-foreground-muted">ExecuteTime</span>
+              <span className="text-[10px] text-foreground-muted">Execution time</span>
  </div>
  <p className="text-sm font-medium text-foreground">
  {formatDuration(snapshot.durationMs)}
@@ -462,8 +462,8 @@ export function NodeDetailsPanel({
  {snapshot.metadata.promptTokens &&
  snapshot.metadata.completionTokens && (
  <p className="text-[10px] text-foreground-muted mt-0.5">
- {snapshot.metadata.promptTokens} +{""}
- {snapshot.metadata.completionTokens}
+                    {snapshot.metadata.promptTokens} + {" "}
+                    {snapshot.metadata.completionTokens}
  </p>
  )}
  </div>
@@ -510,16 +510,16 @@ export function NodeDetailsPanel({
  </div>
  </div>
 
- {/* ContentRegion */}
+      {/* Content Area */}
  <ScrollArea className="flex-1">
  <div className="p-4 space-y-4">
- {/* ErrorInfo */}
+          {/* Error Info */}
  {snapshot.error && (
  <div className="p-3 rounded-lg bg-destructive-200 border border-destructive/30">
  <div className="flex items-center gap-2 mb-2">
  <AlertTriangle className="w-4 h-4 text-destructive" />
  <span className="text-sm font-medium text-destructive">
- ExecuteError
+                  Execution Error
  </span>
  {snapshot.error.code && (
  <Badge
@@ -535,7 +535,7 @@ export function NodeDetailsPanel({
  <Collapsible className="mt-2">
  <CollapsibleTrigger asChild>
  <button className="text-[10px] text-destructive hover:text-destructive">
- ViewStack
+                    View stack trace
  </button>
  </CollapsibleTrigger>
  <CollapsibleContent>
@@ -548,25 +548,25 @@ export function NodeDetailsPanel({
  </div>
  )}
 
- {/* InputData */}
+          {/* Input Data */}
  <JsonViewer
  data={snapshot.inputs}
- title="InputData"
+ title="Input data"
  defaultOpen={true}
  />
 
- {/* OutputData */}
+          {/* Output Data */}
  <JsonViewer
  data={snapshot.outputs}
- title="OutputData"
+ title="Output data"
  defaultOpen={snapshot.status === "completed"}
  />
 
- {/* Parseafter'sConfig */}
- {snapshot.resolvedConfig && (
- <JsonViewer
- data={snapshot.resolvedConfig}
- title="ParseafterConfig"
+          {/* Resolved Config */}
+          {snapshot.resolvedConfig && (
+            <JsonViewer
+              data={snapshot.resolvedConfig}
+              title="Resolved config"
  defaultOpen={false}
  />
  )}

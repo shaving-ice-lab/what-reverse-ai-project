@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Empty StateComponent
- * Used forShowcaseListasEmpty, SearchNo resultsetcScenario
+ * Empty State Component
+ * Used to showcase empty lists, no search results, and similar scenarios
  */
 
 import { ReactNode } from "react";
@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 // ============================================
-// mainEmpty StateComponent
+// Main Empty State Component
 // ============================================
 
 type EmptyStateTone = "neutral" | "info" | "warning" | "error" | "success";
@@ -247,49 +247,49 @@ const exceptionPresets: Record<
 > = {
  empty: {
  title: "No data available",
- description: "CurrentNocanShowcase'sContent",
+    description: "There is currently no content to display",
  icon: Inbox,
  tone: "neutral",
  badge: "EMPTY",
  },
  error: {
- title: "LoadFailed",
- description: "Occur1Error, Please try again laterRetry",
+    title: "Loading Failed",
+    description: "An error occurred. Please try again later.",
  icon: AlertTriangle,
  tone: "error",
  badge: "ERROR",
  },
  permission: {
  title: "Insufficient permissions",
- description: "PleaseCheckPermissionorContactAdminFetchAccess",
+    description: "Please check your permissions or contact an admin to get access",
  icon: ShieldAlert,
  tone: "warning",
  badge: "ACCESS",
  },
  offline: {
- title: "NetworkUnavailable",
- description: "PleaseCheckNetworkConnectafterRetry",
+    title: "Network Unavailable",
+    description: "Please check your network connection and try again",
  icon: WifiOff,
  tone: "warning",
  badge: "OFFLINE",
  },
  maintenance: {
- title: "SystemMaintain",
- description: "CurrentServicecurrentlyatMaintain, Please try again later",
+    title: "System Maintenance",
+    description: "The service is currently under maintenance. Please try again later.",
  icon: Wrench,
  tone: "info",
  badge: "MAINT",
  },
  not_found: {
- title: "not yettoContent",
- description: "NoMatch'sContentoralreadybyRemove",
+    title: "Content Not Found",
+    description: "No matching content was found, or it has already been removed",
  icon: Search,
  tone: "neutral",
  badge: "MISSING",
  },
  rate_limit: {
- title: "RequestpastatFrequent",
- description: "Please try again laterorReduceRequestrate",
+    title: "Too Many Requests",
+    description: "Please try again later or reduce your request rate",
  icon: Timer,
  tone: "warning",
  badge: "LIMIT",
@@ -345,10 +345,10 @@ export function ExceptionState({
 }
 
 // ============================================
-// PresetEmpty StateVariant
+// Preset Empty State Variants
 // ============================================
 
-// SearchNo results
+// Search No Results
 interface SearchEmptyStateProps {
  query?: string;
  onClear?: () => void;
@@ -359,12 +359,12 @@ export function SearchEmptyState({ query, onClear, className }: SearchEmptyState
  return (
  <EmptyState
  icon={Search}
- title={query ? `Noto "${query}" 'sRelatedResult`: "NotoResult"}
- description="TryUsageotherheKeywordsorAdjustFilterCondition"
+      title={query ? `No results found for "${query}"` : "No results found"}
+      description="Try using different keywords or adjusting your filter criteria"
  secondaryAction={
  onClear
  ? {
- label: "ClearSearch",
+            label: "Clear Search",
  onClick: onClear,
  }
  : undefined
@@ -374,7 +374,7 @@ export function SearchEmptyState({ query, onClear, className }: SearchEmptyState
  );
 }
 
-// EmptyFolder
+// Empty Folder
 interface FolderEmptyStateProps {
  onUpload?: () => void;
  className?: string;
@@ -384,12 +384,12 @@ export function FolderEmptyState({ onUpload, className }: FolderEmptyStateProps)
  return (
  <EmptyState
  icon={FolderOpen}
- title="FolderasEmpty"
- description="UploadFileorCreatenewFolderStartOrganizeyou'sContent"
+      title="Folder Is Empty"
+      description="Upload a file or create a new folder to start organizing your content"
  action={
  onUpload
  ? {
- label: "UploadFile",
+            label: "Upload File",
  onClick: onUpload,
  }
  : undefined
@@ -399,7 +399,7 @@ export function FolderEmptyState({ onUpload, className }: FolderEmptyStateProps)
  );
 }
 
-// NoneWorkflow
+// No Workflows
 interface WorkflowEmptyStateProps {
  onCreateClick?: () => void;
  className?: string;
@@ -409,16 +409,16 @@ export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptySt
  return (
  <EmptyState
  icon={Zap}
- title="Not yetWorkflow"
- description="Createyou's#1Workflow, StartAutomationJourney"
+      title="No Workflows Yet"
+      description="Create your first workflow to start your automation journey"
  action={
  onCreateClick
  ? {
- label: "CreateWorkflow",
+            label: "Create Workflow",
  onClick: onCreateClick,
  }
  : {
- label: "CreateWorkflow",
+            label: "Create Workflow",
  href: "/dashboard/workflows/new",
  }
  }
@@ -427,7 +427,7 @@ export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptySt
  );
 }
 
-// NoneConversation
+// No Conversations
 interface ConversationEmptyStateProps {
  className?: string;
 }
@@ -436,10 +436,10 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
  return (
  <EmptyState
  icon={MessageSquare}
- title="StartnewConversation"
- description="and AI AssistantExchange, FetchHelpandInspiration"
+      title="Start a New Conversation"
+      description="Chat with the AI assistant to get help and inspiration"
  action={{
- label: "CreateConversation",
+        label: "New Conversation",
  href: "/dashboard/conversations",
  icon: MessageSquare,
  }}
@@ -448,7 +448,7 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
  );
 }
 
-// None Agent
+// No Agents
 interface AgentEmptyStateProps {
  className?: string;
 }
@@ -457,8 +457,8 @@ export function AgentEmptyState({ className }: AgentEmptyStateProps) {
  return (
  <EmptyState
  icon={Bot}
- title="Not yet Agent"
- description="Createyou's#1 AI Agent, letityouProcessTask"
+      title="No Agents Yet"
+      description="Create your first AI agent to help you process tasks"
  action={{
  label: "Create Agent",
  href: "/dashboard/my-agents/new",
@@ -468,7 +468,7 @@ export function AgentEmptyState({ className }: AgentEmptyStateProps) {
  );
 }
 
-// NoneTeamMember
+// No Team Members
 interface TeamEmptyStateProps {
  onInvite?: () => void;
  className?: string;
@@ -478,12 +478,12 @@ export function TeamEmptyState({ onInvite, className }: TeamEmptyStateProps) {
  return (
  <EmptyState
  icon={Users}
- title="InviteTeamMember"
- description="andTeam1Collaboration, ImproveWorkrate"
+      title="Invite Team Members"
+      description="Collaborate with your team to improve productivity"
  action={
  onInvite
  ? {
- label: "InviteMember",
+            label: "Invite Members",
  onClick: onInvite,
  }
  : undefined
@@ -493,7 +493,7 @@ export function TeamEmptyState({ onInvite, className }: TeamEmptyStateProps) {
  );
 }
 
-// LoadError
+// Load Error
 interface ErrorEmptyStateProps {
  title?: string;
  description?: string;
@@ -502,8 +502,8 @@ interface ErrorEmptyStateProps {
 }
 
 export function ErrorEmptyState({
- title = "LoadFailed",
- description = "Occur1Error, PleaseRetry",
+  title = "Loading Failed",
+  description = "An error occurred. Please try again.",
  onRetry,
  className,
 }: ErrorEmptyStateProps) {
@@ -527,7 +527,7 @@ export function ErrorEmptyState({
  );
 }
 
-// None API Key
+// No API Keys
 interface ApiKeyEmptyStateProps {
  onAddClick?: () => void;
  className?: string;
@@ -537,12 +537,12 @@ export function ApiKeyEmptyState({ onAddClick, className }: ApiKeyEmptyStateProp
  return (
  <EmptyState
  icon={KeyRound}
- title="Not yet API Key"
- description="AddKeywithSecurityAccess API"
+      title="No API Keys Yet"
+      description="Add an API key for secure API access"
  action={
  onAddClick
  ? {
- label: "AddKey",
+            label: "Add Key",
  onClick: onAddClick,
  }
  : undefined
@@ -552,7 +552,7 @@ export function ApiKeyEmptyState({ onAddClick, className }: ApiKeyEmptyStateProp
  );
 }
 
-// NoneDocument
+// No Documents
 interface DocumentEmptyStateProps {
  onCreate?: () => void;
  className?: string;
@@ -562,16 +562,16 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
  return (
  <EmptyState
  icon={FileText}
- title="Not yetDocument"
- description="Createyou's#1Document, StartContentCreative"
+      title="No Documents Yet"
+      description="Create your first document to start creating content"
  action={
  onCreate
  ? {
- label: "CreateDocument",
+            label: "Create Document",
  onClick: onCreate,
  }
  : {
- label: "CreateDocument",
+            label: "Create Document",
  href: "/dashboard/creative/generate",
  }
  }

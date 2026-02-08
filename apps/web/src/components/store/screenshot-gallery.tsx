@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * ScreenshotComponent
+ * Screenshot Gallery Component
  * 
- * Showcase Agent 'sScreenshotandDemoVideo
+ * Showcases Agent screenshots and demo videos
  */
 
 import { useState } from "react";
@@ -36,7 +36,7 @@ export function ScreenshotGallery({
  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
  const [lightboxIndex, setLightboxIndex] = useState(0);
 
- // andAllMedia
+  // All media items
  const mediaItems: Array<{ type: "image" | "video"; url: string }> = [];
  
  if (coverImage) {
@@ -55,7 +55,7 @@ export function ScreenshotGallery({
  return (
  <div className={cn("rounded-xl bg-muted/50 border border-border p-8 text-center", className)}>
  <ImageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
- <p className="text-muted-foreground">NoneScreenshot</p>
+ <p className="text-muted-foreground">No Screenshots</p>
  </div>
  );
  }
@@ -82,7 +82,7 @@ export function ScreenshotGallery({
  return (
  <>
  <div className={cn("space-y-3", className)}>
- {/* mainPreview */}
+ {/* Main Preview */}
  <div className="relative group">
  <div className="aspect-video bg-muted rounded-xl overflow-hidden border border-border">
  {currentItem.type === "video" ? (
@@ -101,7 +101,7 @@ export function ScreenshotGallery({
  )}
  </div>
 
- {/* largeButton */}
+ {/* Enlarge Button */}
  {currentItem.type === "image" && (
  <button
  onClick={() => openLightbox(currentIndex)}
@@ -111,11 +111,11 @@ export function ScreenshotGallery({
  </button>
  )}
 
- {/* NavigationButton */}
- {mediaItems.length > 1 && (
- <>
- <button
- onClick={goToPrev}
+{/* Navigation Buttons */}
+        {mediaItems.length > 1 && (
+          <>
+            <button
+              onClick={goToPrev}
  className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
  >
  <ChevronLeft className="w-5 h-5" />
@@ -129,7 +129,7 @@ export function ScreenshotGallery({
  </>
  )}
 
- {/* IndexIndicator */}
+ {/* Index Indicator */}
  {mediaItems.length > 1 && (
  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm">
  {currentIndex + 1} / {mediaItems.length}
@@ -137,7 +137,7 @@ export function ScreenshotGallery({
  )}
  </div>
 
- {/* ThumbnailList */}
+ {/* Thumbnail List */}
  {mediaItems.length > 1 && (
  <div className="flex gap-2 overflow-x-auto pb-2">
  {mediaItems.map((item, index) => (

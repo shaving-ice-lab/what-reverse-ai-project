@@ -1,6 +1,6 @@
 /**
- * OfflineTypeDefinition
- * @description OfflineSupportRelated'sTypeDefinition
+ * Offline Type Definitions
+ * @description Offline Support Related Type Definitions
  */
 
 // ============================================================================
@@ -8,38 +8,38 @@
 // ============================================================================
 
 /**
- * NetworkStatusType
+ * Network Status Type
  */
 export type NetworkStatus = 'online' | 'offline' | 'slow';
 
 /**
- * Network
+ * Network Quality
  */
 export interface NetworkQuality {
- /** ConnectType */
- effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
- /** Time (ms) */
- rtt: number;
- /** downrowBandwidth (Mbps) */
- downlink: number;
- /** isnoEnableDataSave */
- saveData: boolean;
+  /** Connection Type */
+  effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | 'unknown';
+  /** Round Trip Time (ms) */
+  rtt: number;
+  /** Download Bandwidth (Mbps) */
+  downlink: number;
+  /** Whether to enable data saving */
+  saveData: boolean;
 }
 
 /**
- * ConnectStatusInfo
+ * Connection Status Information
  */
 export interface ConnectionInfo {
- /** isnoOnline */
- isOnline: boolean;
- /** NetworkStatus */
- status: NetworkStatus;
- /** Network */
- quality?: NetworkQuality;
- /** ontimesOnlineTime */
- lastOnlineAt?: Date;
- /** ontimesOfflineTime */
- lastOfflineAt?: Date;
+  /** Whether online */
+  isOnline: boolean;
+  /** Network Status */
+  status: NetworkStatus;
+  /** Network Quality */
+  quality?: NetworkQuality;
+  /** Last online time */
+  lastOnlineAt?: Date;
+  /** Last offline time */
+  lastOfflineAt?: Date;
 }
 
 // ============================================================================
@@ -47,82 +47,82 @@ export interface ConnectionInfo {
 // ============================================================================
 
 /**
- * OfflineActionType
+ * Offline Action Type
  */
 export type OfflineOperationType =
- | 'workflow:create'
- | 'workflow:update'
- | 'workflow:delete'
- | 'execution:create'
- | 'settings:update'
- | 'api:request';
+  | 'workflow:create'
+  | 'workflow:update'
+  | 'workflow:delete'
+  | 'execution:create'
+  | 'settings:update'
+  | 'api:request';
 
 /**
- * OfflineActionStatus
+ * Offline Action Status
  */
 export type OfflineOperationStatus =
- | 'pending'
- | 'processing'
- | 'completed'
- | 'failed'
- | 'cancelled';
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed'
+  | 'cancelled';
 
 /**
- * OfflineAction
+ * Offline Action
  */
 export interface OfflineOperation<T = unknown> {
- /** Action ID */
- id: string;
- /** ActionType */
- type: OfflineOperationType;
- /** ActionData */
- data: T;
- /** Created At */
- createdAt: Date;
- /** Status */
- status: OfflineOperationStatus;
- /** Retrytimescount */
- retryCount: number;
- /** MaximumRetrytimescount */
- maxRetries: number;
- /** ErrorInfo */
- error?: string;
- /** Priority (smallPriority) */
- priority: number;
- /** Data */
- metadata?: Record<string, unknown>;
+  /** Action ID */
+  id: string;
+  /** Action Type */
+  type: OfflineOperationType;
+  /** Action Data */
+  data: T;
+  /** Created At */
+  createdAt: Date;
+  /** Status */
+  status: OfflineOperationStatus;
+  /** Retry count */
+  retryCount: number;
+  /** Maximum retry count */
+  maxRetries: number;
+  /** Error information */
+  error?: string;
+  /** Priority (lower number = higher priority) */
+  priority: number;
+  /** Metadata */
+  metadata?: Record<string, unknown>;
 }
 
 /**
- * OfflineQueueConfig
+ * Offline Queue Config
  */
 export interface OfflineQueueConfig {
- /** MaximumQueueLength */
- maxSize: number;
- /** DefaultMaximumRetrytimescount */
- defaultMaxRetries: number;
- /** Retrybetween (ms) */
- retryInterval: number;
- /** isnoEnablePersistent */
- persistToStorage: boolean;
- /** Storagekey */
- storageKey: string;
+  /** Maximum queue length */
+  maxSize: number;
+  /** Default maximum retry count */
+  defaultMaxRetries: number;
+  /** Retry interval (ms) */
+  retryInterval: number;
+  /** Whether to enable persistence */
+  persistToStorage: boolean;
+  /** Storage key */
+  storageKey: string;
 }
 
 /**
- * OfflineQueueStatus
+ * Offline Queue Status
  */
 export interface OfflineQueueState {
- /** QueueLength */
- length: number;
- /** PendingCount */
- pendingCount: number;
- /** ProcessingCount */
- processingCount: number;
- /** FailedCount */
- failedCount: number;
- /** isnoSyncing */
- isSyncing: boolean;
+  /** Queue length */
+  length: number;
+  /** Pending count */
+  pendingCount: number;
+  /** Processing count */
+  processingCount: number;
+  /** Failed count */
+  failedCount: number;
+  /** Whether syncing */
+  isSyncing: boolean;
 }
 
 // ============================================================================
@@ -130,43 +130,43 @@ export interface OfflineQueueState {
 // ============================================================================
 
 /**
- * OfflineStorage
+ * Offline Storage Item
  */
 export interface OfflineStorageItem<T = unknown> {
- /** key */
- key: string;
- /** Data */
- value: T;
- /** ExpiredTime */
- expiresAt?: Date;
- /** Created At */
- createdAt: Date;
- /** Updated At */
- updatedAt: Date;
- /** Version */
- version: number;
+  /** Key */
+  key: string;
+  /** Data */
+  value: T;
+  /** Expiration time */
+  expiresAt?: Date;
+  /** Created At */
+  createdAt: Date;
+  /** Updated At */
+  updatedAt: Date;
+  /** Version */
+  version: number;
 }
 
 /**
- * CachePolicy
+ * Cache Policy
  */
 export type CacheStrategy =
- | 'cache-first'
- | 'network-first'
- | 'stale-while-revalidate'
- | 'network-only'
- | 'cache-only';
+  | 'cache-first'
+  | 'network-first'
+  | 'stale-while-revalidate'
+  | 'network-only'
+  | 'cache-only';
 
 /**
- * CacheConfig
+ * Cache Config
  */
 export interface CacheConfig {
- /** CachePolicy */
- strategy: CacheStrategy;
- /** ExpiredTime (ms) */
- ttl: number;
- /** MaximumCacheitemcount */
- maxEntries: number;
+  /** Cache policy */
+  strategy: CacheStrategy;
+  /** Time to live (ms) */
+  ttl: number;
+  /** Maximum cache item count */
+  maxEntries: number;
 }
 
 // ============================================================================
@@ -174,21 +174,21 @@ export interface CacheConfig {
 // ============================================================================
 
 /**
- * OfflineFeaturesMatrix
+ * Offline Features Matrix
  */
 export interface OfflineCapabilities {
- /** ViewWorkflow */
- viewWorkflows: boolean;
- /** EditWorkflow */
- editWorkflows: boolean;
- /** ExecuteWorkflow(onlyLocal LLM) */
- executeWorkflows: 'full' | 'local-only' | 'disabled';
- /** ViewExecuteRecord */
- viewExecutions: boolean;
- /** Browse Agent Store */
- browseStore: 'full' | 'cached' | 'disabled';
- /** UserSettings */
- userSettings: boolean;
+  /** View workflows */
+  viewWorkflows: boolean;
+  /** Edit workflows */
+  editWorkflows: boolean;
+  /** Execute workflows (supports local LLM only) */
+  executeWorkflows: 'full' | 'local-only' | 'disabled';
+  /** View execution records */
+  viewExecutions: boolean;
+  /** Browse agent store */
+  browseStore: 'full' | 'cached' | 'disabled';
+  /** User settings */
+  userSettings: boolean;
 }
 
 /**
@@ -235,33 +235,33 @@ export interface OfflineEvent {
 // ============================================================================
 
 /**
- * GenerateOfflineAction ID
+ * Generate Offline Action ID
  */
 export function generateOfflineId(): string {
- return `offline_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  return `offline_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
- * CheckActionisnoExpired
+ * Check if Action is Expired
  */
 export function isOperationExpired(
- operation: OfflineOperation,
- maxAge: number = 24 * 60 * 60 * 1000 // Default 24 h
+  operation: OfflineOperation,
+  maxAge: number = 24 * 60 * 60 * 1000 // Default 24 hours
 ): boolean {
- const age = Date.now() - new Date(operation.createdAt).getTime();
- return age > maxAge;
+  const age = Date.now() - new Date(operation.createdAt).getTime();
+  return age > maxAge;
 }
 
 /**
- * byPriorityandTimeSortAction
+ * Sort Actions by Priority and Time
  */
 export function sortOperations(operations: OfflineOperation[]): OfflineOperation[] {
- return [...operations].sort((a, b) => {
- // firstbyPrioritySort
- if (a.priority !== b.priority) {
- return a.priority - b.priority;
- }
- // againbyCreated AtSort
- return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
- });
+  return [...operations].sort((a, b) => {
+    // First sort by priority
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+    // Then sort by creation time
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
 }

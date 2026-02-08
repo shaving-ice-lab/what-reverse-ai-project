@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Tabs TabComponent - Enhanced
+ * Tabs Component - Enhanced
  * 
  * Support: 
- * - multipletypestyleVariant
- * - SlideIndicatorAnimation
- * - IconandBadge
- * - VerticalLayout
+ * - Multiple style variants
+ * - Slide indicator animation
+ * - Icon and badge
+ * - Vertical layout
  */
 
 import * as React from "react"
@@ -48,37 +48,37 @@ const tabsListVariants = cva(
 )
 
 interface TabsListProps
- extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>,
- VariantProps<typeof tabsListVariants> {
- /** isnoDisplaySlideIndicator */
- showIndicator?: boolean
+  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>,
+  VariantProps<typeof tabsListVariants> {
+  /** Whether to display slide indicator */
+  showIndicator?: boolean
 }
 
 const TabsList = React.forwardRef<
  React.ElementRef<typeof TabsPrimitive.List>,
  TabsListProps
 >(({ className, variant, size, fullWidth, showIndicator, children, ...props }, ref) => {
- const listRef = React.useRef<HTMLDivElement>(null)
- const [indicatorStyle, setIndicatorStyle] = React.useState<React.CSSProperties>({})
+  const listRef = React.useRef<HTMLDivElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = React.useState<React.CSSProperties>({})
 
- // UpdateIndicator
- React.useEffect(() => {
- if (!showIndicator || !listRef.current) return
+  // Update indicator position
+  React.useEffect(() => {
+    if (!showIndicator || !listRef.current) return
 
- const updateIndicator = () => {
- const activeTab = listRef.current?.querySelector('[data-state="active"]') as HTMLElement
- if (activeTab) {
- setIndicatorStyle({
- left: activeTab.offsetLeft,
- width: activeTab.offsetWidth,
- })
- }
- }
+    const updateIndicator = () => {
+      const activeTab = listRef.current?.querySelector('[data-state="active"]') as HTMLElement
+      if (activeTab) {
+        setIndicatorStyle({
+          left: activeTab.offsetLeft,
+          width: activeTab.offsetWidth,
+        })
+      }
+    }
 
- updateIndicator()
+    updateIndicator()
 
- // Listen DOM 
- const observer = new MutationObserver(updateIndicator)
+    // Listen to DOM changes
+    const observer = new MutationObserver(updateIndicator)
  observer.observe(listRef.current, { attributes: true, subtree: true, attributeFilter: ['data-state'] })
 
  return () => observer.disconnect()
@@ -100,7 +100,7 @@ const TabsList = React.forwardRef<
  >
  {children}
  
- {/* SlideIndicator */}
+ {/* Slide indicator */}
  {showIndicator && variant === "underline" && (
  <div
  className="absolute bottom-0 h-0.5 bg-brand-500 transition-all duration-300 ease-out"
@@ -165,9 +165,9 @@ const tabsTriggerVariants = cva(
 interface TabsTriggerProps
  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>,
  VariantProps<typeof tabsTriggerVariants> {
- /** Left sideIcon */
+ /** Left side icon */
  icon?: React.ReactNode
- /** Right sideBadge */
+ /** Right side badge */
  badge?: React.ReactNode
 }
 
@@ -190,9 +190,9 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 // TabsContent Variant
 interface TabsContentProps
  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> {
- /** isnoEnableAnimation */
+ /** Whether to enable animation */
  animated?: boolean
- /** Animationmethod */
+ /** Animation direction */
  animationDirection?: "horizontal" | "vertical" | "fade"
 }
 
@@ -219,7 +219,7 @@ const TabsContent = React.forwardRef<
 TabsContent.displayName = TabsPrimitive.Content.displayName
 
 /**
- * AnimatedTabs - hasSmoothSwitchAnimation's Tabs
+ * AnimatedTabs - Tabs with Smooth Transition Animation
  */
 interface AnimatedTabsProps {
  tabs: Array<{
@@ -296,7 +296,7 @@ function AnimatedTabs({
 }
 
 /**
- * VerticalTabs - VerticalLayout Tabs
+ * VerticalTabs - Vertical layout tabs
  */
 interface VerticalTabsProps {
  tabs: Array<{
@@ -376,7 +376,7 @@ function VerticalTabs({
 }
 
 /**
- * IconTabs - Iconasmain's Tabs
+ * IconTabs - Icon-Based Tabs
  */
 interface IconTabsProps {
  tabs: Array<{

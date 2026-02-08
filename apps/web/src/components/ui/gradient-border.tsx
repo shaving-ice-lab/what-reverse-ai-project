@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * GradientBorder - GradientEdgeComponent
+ * GradientBorder - Gradient Border Component
  * 
- * ProvidemultipletypeGradientEdgeEffect: 
- * - StaticGradient
- * - RotateGradient(Animation)
- * - HoverGlowEffect
+ * Provides multiple gradient border effects:
+ * - Static gradient
+ * - Rotating gradient (animated)
+ * - Hover glow effect
  */
 
 import { ReactNode } from "react";
@@ -25,7 +25,7 @@ interface GradientBorderProps {
  glowIntensity?: "sm" | "md" | "lg";
 }
 
-// PresetGradient
+// Preset Gradients
 export const gradients = {
  primary: "linear-gradient(135deg, hsl(var(--primary)) 0%, #2a6348 50%, hsl(var(--primary)/0.9) 100%)",
  rainbow: "linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7, #FF6B6B)",
@@ -66,7 +66,7 @@ export function GradientBorder({
  borderRadius,
  } as React.CSSProperties}
  >
- {/* GradientEdgeBackground */}
+ {/* Gradient Border Background */}
  <div
  className={cn(
  "absolute inset-0",
@@ -91,24 +91,24 @@ export function GradientBorder({
  />
  )}
  
- {/* ContentRegion */}
- <div
- className={cn(
- "relative bg-card",
- className
- )}
- style={{ borderRadius: `calc(${borderRadius} - ${borderWidth}px)` }}
- >
- {children}
- </div>
- </div>
+{/* Content Area */}
+     <div
+       className={cn(
+         "relative bg-card",
+         className
+       )}
+       style={{ borderRadius: `calc(${borderRadius} - ${borderWidth}px)` }}
+     >
+       {children}
+     </div>
+   </div>
  );
 }
 
 /**
- * AnimatedGradientBorder - AnimationGradientEdge
+ * AnimatedGradientBorder - Animated Gradient Border
  * 
- * hasFlowAnimationEffect'sGradientEdge
+ * Gradient border with flow animation effect
  */
 interface AnimatedGradientBorderProps {
  children: ReactNode;
@@ -143,7 +143,7 @@ export function AnimatedGradientBorder({
  borderRadius,
  } as React.CSSProperties}
  >
- {/* AnimationGradientBackground */}
+ {/* Animated Gradient Background */}
  <div
  className="absolute inset-0 animate-gradient-flow"
  style={{
@@ -154,11 +154,11 @@ export function AnimatedGradientBorder({
  }}
  />
  
- {/* ContentRegion */}
- <div
- className={cn("relative bg-card", className)}
- style={{ borderRadius: `calc(${borderRadius} - ${borderWidth}px)` }}
- >
+{/* Content Area */}
+     <div
+       className={cn("relative bg-card", className)}
+       style={{ borderRadius: `calc(${borderRadius} - ${borderWidth}px)` }}
+     >
  {children}
  </div>
  
@@ -183,9 +183,9 @@ export function AnimatedGradientBorder({
 }
 
 /**
- * GlowCard - GlowCard
+ * GlowCard - Card with Glow Effect
  * 
- * HovertimehasGlowEffect'sCard
+ * Card with glow effect on hover
  */
 interface GlowCardProps {
  children: ReactNode;
@@ -228,7 +228,7 @@ export function GlowCard({
  }}
  />
  
- {/* EdgeGlow */}
+ {/* Border Glow */}
  <div
  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
  style={{
@@ -247,9 +247,9 @@ export function GlowCard({
 }
 
 /**
- * SpotlightCard - SpotlightCard
+ * SpotlightCard - Card with Spotlight Effect
  * 
- * MouseFollow'sSpotlightEffect
+ * Spotlight effect that follows mouse
  */
 interface SpotlightCardProps {
  children: ReactNode;

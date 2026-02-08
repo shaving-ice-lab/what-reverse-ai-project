@@ -1,22 +1,22 @@
 /**
- * NodeConfigVerify Schema
- * Usage zod ProceedTypeSecurity'sFormVerify
+ * Node Config Validation Schema
+ * Uses zod for type-safe form validation
  */
 
 import { z } from "zod";
 
-// ===== BasicVerify Schema =====
+// ===== Basic Validation Schema =====
 
-// EmptyString
-const nonEmptyString = z.string().min(1, "thisFieldCannot be empty");
+// Non-empty string
+const nonEmptyString = z.string().min(1, "This field cannot be empty");
 
 const outputSchemaSchema = z.union([z.record(z.any()), z.string()]);
 
-// URL Verify
+// URL validation
 const urlSchema = z.string().refine(
  (val) => {
- if (!val) return true; // AllowEmptyvalue
- // SupportVariableSyntax {{var}}
+   if (!val) return true; // Allow empty value
+   // Support variable syntax {{var}}
  if (val.includes("{{") && val.includes("}}")) return true;
  try {
  new URL(val);
@@ -25,18 +25,18 @@ const urlSchema = z.string().refine(
  return false;
  }
  },
- { message: "Please enterValid's URL Address" }
+ { message: "Please enter a valid URL" }
 );
 
 // ===== LLM NodeConfig Schema =====
 
 export const llmConfigSchema = z.object({
- model: z.string().min(1, "Please selectModel"),
+ model: z.string().min(1, "Please select a model"),
  systemPrompt: z.string().optional(),
  userPrompt: z.string().optional(),
- temperature: z.number().min(0, "Minimumvalueas 0").max(2, "Maximumvalueas 2").default(0.7),
- maxTokens: z.number().int().min(1, "Minimumvalueas 1").max(128000, "Maximumvalueas 128000").default(2048),
- max_tokens: z.number().int().min(1, "Minimumvalueas 1").max(128000, "Maximumvalueas 128000").optional(),
+ temperature: z.number().min(0, "Minimum value is 0").max(2, "Maximum value is 2").default(0.7),
+ maxTokens: z.number().int().min(1, "Minimum value is 1").max(128000, "Maximum value is 128000").default(2048),
+ max_tokens: z.number().int().min(1, "Minimum value is 1").max(128000, "Maximum value is 128000").optional(),
  outputSchema: outputSchemaSchema.optional(),
  output_schema: outputSchemaSchema.optional(),
  topP: z.number().min(0).max(1).default(1).optional(),
@@ -96,12 +96,12 @@ const singleConditionSchema = z.object({
 
 const conditionGroupSchema = z.object({
  id: z.string(),
- conditions: z.array(singleConditionSchema).min(1, "fewneedneed1Condition"),
+ conditions: z.array(singleConditionSchema).min(1, "At least one condition is required"),
  logic: z.enum(["and", "or"]).default("and"),
 });
 
 export const conditionConfigSchema = z.object({
- conditions: z.array(conditionGroupSchema).min(1, "fewneedneed1Conditiongroup"),
+ conditions: z.array(conditionGroupSchema).min(1, "At least one condition group is required"),
  logic: z.enum(["and", "or"]).default("and"),
 });
 
@@ -126,7 +126,7 @@ export const loopConfigSchema = z.object({
  return true;
  },
  {
- message: "Please fill inneed'sLoopConfig",
+ message: "Please fill in the required loop configuration",
  path: ["mode"],
  }
 );
@@ -137,7 +137,7 @@ export type LoopConfig = z.infer<typeof loopConfigSchema>;
 
 export const codeConfigSchema = z.object({
  language: z.enum(["javascript", "typescript"]).default("javascript"),
- code: z.string().min(1, "Please enterCode"),
+ code: z.string().min(1, "Please enter code"),
  timeout: z.number().int().min(1000).max(300000).default(30000),
 });
 
@@ -146,7 +146,7 @@ export type CodeConfig = z.infer<typeof codeConfigSchema>;
 // ===== TemplateNodeConfig Schema =====
 
 export const templateConfigSchema = z.object({
- template: z.string().min(1, "Please enterTemplateContent"),
+ template: z.string().min(1, "Please enter template content"),
 });
 
 export type TemplateConfig = z.infer<typeof templateConfigSchema>;
@@ -155,8 +155,8 @@ export type TemplateConfig = z.infer<typeof templateConfigSchema>;
 
 const identifierSchema = z
  .string()
-.min(1, "FieldCannot be empty")
-.regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, "FieldcanContainschar, countcharanddownline, andnotcanwithcountcharhead");
+.min(1, "Field cannot be empty")
+.regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, "Field can only contain letters, numbers, and underscores, and cannot start with a number");
 
 const optionalIdentifierSchema = z
  .string()
@@ -164,7 +164,7 @@ const optionalIdentifierSchema = z
  .refine((val) => {
  if (val === undefined || val.trim() === "") return true;
  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(val);
- }, { message: "FieldcanContainschar, countcharanddownline, andnotcanwithcountcharhead" });
+ }, { message: "Field can only contain letters, numbers, and underscores, and cannot start with a number" });
 
 export const variableConfigSchema = z.object({
  variableName: identifierSchema,
@@ -208,7 +208,7 @@ export const inputConfigSchema = z.object({
 export type InputConfig = z.infer<typeof inputConfigSchema>;
 
 const submitActionSchema = z.union([
- z.string().min(1, "SubmitActionCannot be empty"),
+ z.string().min(1, "Submit action cannot be empty"),
  z.object({
  id: z.string().optional(),
  type: z.enum(["submit", "reset", "custom"]).optional(),
@@ -253,7 +253,7 @@ const dbBaseConfigSchema = z.object({
  table: z.string().optional(),
  where: z.string().optional(),
  values: z.any().optional(),
- limit: z.number().int().min(1, "Minimumvalueas 1").max(100000, "Maximumvalueas 100000").optional(),
+ limit: z.number().int().min(1, "Minimum value is 1").max(100000, "Maximum value is 100000").optional(),
  sql: z.string().optional(),
 });
 
@@ -279,16 +279,16 @@ const dbMigrateConfigSchema = dbBaseConfigSchema.extend({
  sql: nonEmptyString,
 });
 
-// ===== NodeBasic Information Schema =====
+// ===== Node Basic Info Schema =====
 
 export const nodeBasicSchema = z.object({
- label: nonEmptyString.max(50, "NamenotcanExceed 50 Character"),
- description: z.string().max(200, "DescriptionnotcanExceed 200 Character").optional(),
+ label: nonEmptyString.max(50, "Name cannot exceed 50 characters"),
+ description: z.string().max(200, "Description cannot exceed 200 characters").optional(),
 });
 
 export type NodeBasic = z.infer<typeof nodeBasicSchema>;
 
-// ===== VerifyResultType =====
+// ===== Validation Result Type =====
 
 export interface ValidationResult {
  success: boolean;
@@ -296,7 +296,7 @@ export interface ValidationResult {
  data?: unknown;
 }
 
-// ===== useVerifycount =====
+// ===== Validation Function =====
 
 export function validateConfig<T>(
  schema: z.ZodSchema<T>,
@@ -312,7 +312,7 @@ export function validateConfig<T>(
  };
  }
 
- // will Zod ErrorConvertasSimple'sErrorfor
+ // Convert Zod errors to a simple error map
  const errors: Record<string, string> = {};
  result.error.errors.forEach((err) => {
  const path = err.path.join(".");
@@ -325,7 +325,7 @@ export function validateConfig<T>(
  };
 }
 
-// ===== NodeTypeto Schema 'sMapping =====
+// ===== Node Type to Schema Mapping =====
 
 export const nodeConfigSchemas: Record<string, z.ZodSchema> = {
  llm: llmConfigSchema,
@@ -345,12 +345,12 @@ export const nodeConfigSchemas: Record<string, z.ZodSchema> = {
  db_migrate: dbMigrateConfigSchema,
 };
 
-// FetchNodeTypeforshould's Schema
+// Get the schema for a node type
 export function getNodeConfigSchema(nodeType: string): z.ZodSchema | null {
  return nodeConfigSchemas[nodeType] || null;
 }
 
-// VerifyNodeConfig
+// Validate node config
 export function validateNodeConfig(
  nodeType: string,
  config: unknown

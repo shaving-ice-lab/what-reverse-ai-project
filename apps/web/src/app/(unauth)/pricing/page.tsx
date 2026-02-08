@@ -18,77 +18,77 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// PricingPlan
+// Pricing Plan
 const plans = [
  {
- name: "Freeversion",
- description: "SuitablepersonUserandsmallitem",
+ name: "Free",
+ description: "For individual users and small projects",
  price: { monthly: 0, yearly: 0 },
  features: [
  { name: "5 Workflow", included: true },
- { name: "1,000 times/monthsExecute", included: true },
+ { name: "1,000 executions/month", included: true },
  { name: "Basic AI Model", included: true },
- { name: "CommunitySupport", included: true },
- { name: "7 daysExecuteHistory", included: true },
- { name: "TeamCollaboration", included: false },
+ { name: "Community Support", included: true },
+ { name: "7-day execution history", included: true },
+ { name: "Team Collaboration", included: false },
  { name: "Custom Domain", included: false },
- { name: "PrioritySupport", included: false },
+ { name: "Priority Support", included: false },
  ],
- cta: "FreeStart",
+ cta: "Get Started Free",
  href: "/register",
  popular: false,
  },
  {
- name: "Professionalversion",
- description: "SuitableProfessionalUserandGrowthTeam",
+ name: "Professional",
+ description: "For professional users and growing teams",
  price: { monthly: 99, yearly: 79 },
  features: [
- { name: "NonelimitWorkflow", included: true },
- { name: "50,000 times/monthsExecute", included: true },
+ { name: "Unlimited Workflows", included: true },
+ { name: "50,000 executions/month", included: true },
  { name: "Advanced AI Model", included: true },
- { name: "EmailSupport", included: true },
- { name: "30 daysExecuteHistory", included: true },
- { name: "TeamCollaboration(5person)", included: true },
+ { name: "Email Support", included: true },
+ { name: "30-day execution history", included: true },
+ { name: "Team Collaboration (5 members)", included: true },
  { name: "Custom Domain", included: true },
- { name: "PrioritySupport", included: false },
+ { name: "Priority Support", included: false },
  ],
- cta: "Startuse",
+ cta: "Start Free Trial",
  href: "/register?plan=pro",
  popular: true,
  },
  {
- name: "Teamversion",
- description: "SuitableTeamandEnterprise",
+ name: "Team",
+ description: "For teams and businesses",
  price: { monthly: 299, yearly: 249 },
  features: [
- { name: "NonelimitWorkflow", included: true },
- { name: "200,000 times/monthsExecute", included: true },
- { name: "allsection AI Model", included: true },
- { name: "PrioritySupport", included: true },
- { name: "1 yearsExecuteHistory", included: true },
- { name: "TeamCollaboration(20person)", included: true },
+ { name: "Unlimited Workflows", included: true },
+ { name: "200,000 executions/month", included: true },
+ { name: "All AI Models", included: true },
+ { name: "Priority Support", included: true },
+ { name: "1-year execution history", included: true },
+ { name: "Team Collaboration (20 members)", included: true },
  { name: "Custom Domain", included: true },
  { name: "SSO Sign In", included: true },
  ],
- cta: "Startuse",
+ cta: "Start Free Trial",
  href: "/register?plan=team",
  popular: false,
  },
  {
  name: "Enterprise",
- description: "SuitablelargeEnterpriseandCustomizeRequirements",
+ description: "For large enterprises with custom requirements",
  price: { monthly: null, yearly: null },
  features: [
- { name: "NonelimitWorkflow", included: true },
- { name: "NonelimitExecutetimescount", included: true },
- { name: "allsection AI Model", included: true },
- { name: "ExclusiveCustomerSuccessManager", included: true },
- { name: "NonelimitExecuteHistory", included: true },
- { name: "NonelimitTeamMember", included: true },
- { name: "PrivateDeploy", included: true },
+ { name: "Unlimited Workflows", included: true },
+ { name: "Unlimited Executions", included: true },
+ { name: "All AI Models", included: true },
+ { name: "Dedicated Customer Success Manager", included: true },
+ { name: "Unlimited Execution History", included: true },
+ { name: "Unlimited Team Members", included: true },
+ { name: "Private Deployment", included: true },
  { name: "SLA Assurance", included: true },
  ],
- cta: "ContactSales",
+ cta: "Contact Sales",
  href: "/contact?type=enterprise",
  popular: false,
  },
@@ -97,20 +97,20 @@ const plans = [
 // FAQ
 const faqs = [
  {
- question: "canwithFreeusePaidVersion??",
- answer: "is's, ProfessionalversionandTeamversionallProvide 14 daysFreeuse, NoneneedBinduse.",
+ question: "Can I try paid plans for free?",
+ answer: "Yes! Both the Professional and Team plans offer a 14-day free trial with no credit card required.",
  },
  {
- question: "ifwhatUpgradeorDowngradePlan?",
- answer: "youcanwithAnytimeatAccountSettingsUpgradeorDowngradePlan.UpgradeNowTake Effect, DowngradewillatCurrentBillingweeksEndafterTake Effect.",
+ question: "How do I upgrade or downgrade my plan?",
+ answer: "You can upgrade or downgrade your plan at any time in your Account Settings. Upgrades take effect immediately, while downgrades take effect at the end of the current billing cycle.",
  },
  {
- question: "SupportWhichPaymentmethod?",
- answer: "WeSupportuse, Payment, WeChatPayment, EnterpriseCustomerstillcanwithSelectfor.",
+ question: "What payment methods are supported?",
+ answer: "We support credit cards, Alipay, WeChat Pay, and bank transfers for enterprise customers.",
  },
  {
- question: "hasEducationorOrganizationDiscount??",
- answer: "is's, WeasEducationProvide 50% Discount, OrganizationcanEnjoy 30% Discount.PleaseContact UsFetchDetails.",
+ question: "Are there education or nonprofit discounts?",
+ answer: "Yes! We offer a 50% discount for educational institutions and a 30% discount for nonprofits. Please contact us for details.",
  },
 ];
 
@@ -129,15 +129,15 @@ export default function PricingPage() {
  <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
  <div className="lobe-badge mb-8">
  <Sparkles className="h-3.5 w-3.5" />
- <span>SimpleTransparent'sPricing</span>
+ <span>Simple, Transparent Pricing</span>
  </div>
 
  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- SelectSuitableyou'sPlan
+ Choose the Right Plan for You
  </h1>
 
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- fromFreeversionStart, AnytimeUpgrade.AllPaidVersionallProvide 14 daysFreeuse.
+ Start with the free plan and upgrade anytime. All paid plans include a 14-day free trial.
  </p>
 
  {/* Billing Toggle */}
@@ -151,7 +151,7 @@ export default function PricingPage() {
  : "text-foreground-lighter hover:text-foreground-light"
  )}
  >
- months
+ Monthly
  </button>
  <button
  onClick={() => setBillingCycle("yearly")}
@@ -162,8 +162,8 @@ export default function PricingPage() {
  : "text-foreground-lighter hover:text-foreground-light"
  )}
  >
- years
- <span className="ml-1.5 text-[11px] text-brand-500"> 20%</span>
+ Yearly
+ <span className="ml-1.5 text-[11px] text-brand-500">Save 20%</span>
  </button>
  </div>
  </div>
@@ -185,7 +185,7 @@ export default function PricingPage() {
  >
  {plan.popular && (
  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-medium">
- mostWelcome
+ Most Popular
  </div>
  )}
 
@@ -198,10 +198,10 @@ export default function PricingPage() {
  <span className="text-3xl font-bold text-foreground tracking-tight">
  ¥{billingCycle === "yearly" ? plan.price.yearly : plan.price.monthly}
  </span>
- <span className="text-foreground-lighter text-[13px]">/months</span>
+ <span className="text-foreground-lighter text-[13px]">/month</span>
  {billingCycle === "yearly" && plan.price.yearly > 0 && (
  <div className="text-[11px] text-brand-500 mt-1">
- yearsSave ¥{(plan.price.monthly - plan.price.yearly) * 12}
+ Save ¥{(plan.price.monthly - plan.price.yearly) * 12}/year
  </div>
  )}
  </>
@@ -288,14 +288,14 @@ export default function PricingPage() {
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
  <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- stillhasotherheIssue?
+ Still have questions?
  </h2>
  <p className="text-foreground-light mb-8">
- Contact Us'sSalesTeam, FetchCustomizePlanandEnterprise-gradeResolvePlan
+ Contact our sales team for custom plans and enterprise solutions
  </p>
  <Link href="/contact">
  <Button className="h-12 px-8 rounded-full text-[15px] border-border/50 bg-surface-200/50 text-foreground hover:bg-surface-300/50">
- ContactSales
+ Contact Sales
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

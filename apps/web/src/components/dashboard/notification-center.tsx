@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * NotificationscenterComponent
+ * Notification Center Component
  * 
- * SystemNotifications, ExecuteAlert, UpdateReminder
- * Usage WebSocket ReceiveReal-timeNotifications
+ * System notifications, execution alerts, update reminders
+ * Uses WebSocket to receive real-time notifications
  */
 
 import { useState, useMemo, useEffect } from "react";
@@ -42,13 +42,13 @@ interface Notification {
  actionLabel?: string;
 }
 
-// DefaultSystemNotifications(atNoReal-timeNotificationstimeDisplay)
+// Default system notifications (displayed when no real-time notifications exist)
 const defaultNotifications: Notification[] = [
  {
  id: "welcome",
  type: "info",
- title: "WelcomeUsage AgentFlow",
- message: "thisinwillDisplayWorkflowExecuteStatusandSystemNotifications",
+    title: "Welcome to AgentFlow",
+ message: "Workflow execution status and system notifications will appear here",
  time: new Date(),
  read: false,
  },
@@ -62,12 +62,12 @@ interface NotificationCenterProps {
 export function NotificationCenter({ className, compact = false }: NotificationCenterProps) {
  const router = useRouter();
  
- // TryUsage WebSocket Context(cancanDoes not exist)
+  // Try using WebSocket context (may not exist)
  let wsContext: ReturnType<typeof useWebSocketContext> | null = null;
  try {
  wsContext = useWebSocketContext();
  } catch (e) {
- // WebSocket ContextUnavailable, UsageDefaultData
+    // WebSocket context unavailable, using default data
  }
  
  const [localNotifications, setLocalNotifications] = useState<Notification[]>(defaultNotifications);
@@ -75,7 +75,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  const [showDropdown, setShowDropdown] = useState(false);
  const [isMuted, setIsMuted] = useState(false);
 
- // Convert WebSocket NotificationsasLocalNotificationsFormat
+  // Convert WebSocket notifications to local notification format
  const convertWSNotification = (n: WSNotification): Notification => {
  let type: NotificationType = "info";
  if (n.type === "error") type = "alert";
@@ -90,11 +90,11 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  time: n.timestamp,
  read: n.read,
  actionUrl: n.executionId ? `/executions/${n.executionId}` : undefined,
- actionLabel: n.executionId ? "ViewExecuteDetails": undefined,
+ actionLabel: n.executionId ? "View execution details" : undefined,
  };
  };
 
- // and WebSocket NotificationsandLocalNotifications
+  // Merge WebSocket notifications and local notifications
  const notifications = useMemo(() => {
  if (wsContext?.notifications && wsContext.notifications.length > 0) {
  return wsContext.notifications.map(convertWSNotification);
@@ -173,9 +173,9 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  const days = Math.floor(diff / 86400000);
 
  if (minutes < 1) return "Just now";
- if (minutes < 60) return `${minutes} minbefore`;
- if (hours < 24) return `${hours} hbefore`;
- return `${days} daysbefore`;
+ if (minutes < 60) return `${minutes} min ago`;
+ if (hours < 24) return `${hours} hours ago`;
+ return `${days} days ago`;
  };
 
  return (
@@ -197,7 +197,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  </div>
  <div>
  <div className="flex items-center gap-2">
- <h3 className="font-bold text-foreground">Notificationscenter</h3>
+              <h3 className="font-bold text-foreground">Notification Center</h3>
  {wsContext && (
  <span className={cn(
  "flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] ring-1",
@@ -210,7 +210,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  )}
  </div>
  <p className="text-xs text-foreground-light">
- {unreadCount > 0 ? `${unreadCount} not yetread`: "allsectionalreadyread"}
+            {unreadCount > 0 ? `${unreadCount} unread` : "All read"}
  </p>
  </div>
  </div>
@@ -228,7 +228,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  >
  <Filter className="w-3.5 h-3.5" />
  <span className="text-xs font-medium">
- {filter === "all" ? "allsection": getTypeLabel(filter as NotificationType)}
+            {filter === "all" ? "All" : getTypeLabel(filter as NotificationType)}
  </span>
  <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", showDropdown && "rotate-180")} />
  </button>
@@ -257,7 +257,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  <span className="scale-90">{getTypeIcon(type as NotificationType)}</span>
  )}
  {type === "all" && <span className="w-4 h-4 flex items-center justify-center text-xs">●</span>}
- <span className="font-medium">{type === "all" ? "allsection": getTypeLabel(type as NotificationType)}</span>
+                  <span className="font-medium">{type === "all" ? "All" : getTypeLabel(type as NotificationType)}</span>
  </button>
  ))}
  </div>
@@ -273,17 +273,17 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  ? "bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20" 
  : "text-foreground-light hover:text-foreground hover:bg-muted/50"
  )}
- title={isMuted ? "CancelMute": "MuteNotifications"}
+            title={isMuted ? "Unmute" : "Mute Notifications"}
  >
  {isMuted ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
  </button>
 
- {/* allsectionalreadyread - Enhanced */}
+ {/* Mark all as read - Enhanced */}
  {unreadCount > 0 && (
  <button
  onClick={markAllAsRead}
  className="p-2 rounded-xl text-foreground-light hover:text-primary hover:bg-primary/10 transition-all duration-200"
- title="allsectionMarkasalreadyread"
+ title="Mark all as read"
  >
  <CheckCheck className="w-4 h-4" />
  </button>
@@ -291,15 +291,15 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  </div>
  </div>
 
- {/* NotificationsList */}
+      {/* Notifications List */}
  <div className={cn("overflow-auto", compact ? "max-h-64" : "max-h-96")}>
  {filteredNotifications.length === 0 ? (
  <div className="py-12 text-center">
  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/50 flex items-center justify-center">
  <Bell className="w-8 h-8 text-foreground-light/30" />
  </div>
- <p className="text-sm text-foreground-light">NoneNotifications</p>
- <p className="text-xs text-foreground-light/60 mt-1">SystemMessagewillDisplayatthisin</p>
+            <p className="text-sm text-foreground-light">No Notifications</p>
+            <p className="text-xs text-foreground-light/60 mt-1">System messages will appear here</p>
  </div>
  ) : (
  filteredNotifications.map((notification, index) => (
@@ -349,7 +349,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  className="text-xs text-primary hover:underline font-medium"
  onClick={(e) => e.stopPropagation()}
  >
- {notification.actionLabel || "ViewDetails"}
+                  {notification.actionLabel || "View Details"}
  </a>
  )}
  </div>
@@ -362,7 +362,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  markAsRead(notification.id);
  }}
  className="p-1.5 rounded-lg hover:bg-surface-200 transition-colors text-foreground-light hover:text-primary"
- title="Markasalreadyread"
+ title="Mark as read"
  >
  <Check className="w-3.5 h-3.5" />
  </button>
@@ -393,7 +393,7 @@ export function NotificationCenter({ className, compact = false }: NotificationC
  {filteredNotifications.length} Notifications
  {unreadCount > 0 && (
  <span className="px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-medium">
- {unreadCount} not yetread
+ {unreadCount} unread
  </span>
  )}
  </span>

@@ -34,149 +34,149 @@ import { cn } from "@/lib/utils";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 
-// IntegrationCategory
+// Integration Categories
 const categories = [
- { id: "all", name: "allsection", icon: Box },
- { id: "communication", name: "Newsletter", icon: MessageSquare },
- { id: "development", name: "Development", icon: Code },
- { id: "productivity", name: "rate", icon: Zap },
- { id: "storage", name: "Storage", icon: Database },
- { id: "custom", name: "Custom", icon: Webhook },
+  { id: "all", name: "All", icon: Box },
+  { id: "communication", name: "Communication", icon: MessageSquare },
+  { id: "development", name: "Development", icon: Code },
+  { id: "productivity", name: "Productivity", icon: Zap },
+  { id: "storage", name: "Storage", icon: Database },
+  { id: "custom", name: "Custom", icon: Webhook },
 ];
 
-// IntegrationList
+// Integration List
 const integrations = [
  {
  id: "slack",
  name: "Slack",
- description: "SendMessage, CreateChannel, ProcessInteractiveMessage",
+    description: "Send messages, create channels, and handle interactive messages",
  category: "communication",
  icon: "🔔",
  color: "#4A154B",
  popular: true,
  docs: "/docs/integrations/slack",
- features: ["MessageNotifications", "Slash Command", "InteractiveApproval"],
+    features: ["Message Notifications", "Slash Command", "Interactive Approval"],
  },
  {
  id: "github",
  name: "GitHub",
- description: "AutomationCodeReview, Issue Manage, DeployFlow",
+    description: "Automate code reviews, manage issues, and streamline deployment",
  category: "development",
  icon: "🐙",
  color: "#24292e",
  popular: true,
  docs: "/docs/integrations/github",
- features: ["Webhook Trigger", "PR Manage", "Actions Integration"],
+    features: ["Webhook Trigger", "PR Management", "Actions Integration"],
  },
  {
  id: "webhook",
  name: "Webhook",
- description: "ReceiveandSend HTTP Request, ConnectoutsidesectionService",
+ description: "Send and receive HTTP requests to connect with external services",
  category: "custom",
  icon: "🔗",
  color: "#4e8fff",
  popular: true,
  docs: "/docs/integrations/webhook",
- features: ["CustomEndpoint", "RequestVerify", "ResponseMapping"],
+    features: ["Custom Endpoint", "Request Verification", "Response Mapping"],
  },
  {
  id: "notion",
  name: "Notion",
- description: "SyncDatabase, CreatePage, ManageContent",
+    description: "Sync databases, create pages, and manage content",
  category: "productivity",
  icon: "📝",
  color: "#ffffff",
  popular: false,
  docs: "/docs/integrations/notion",
- features: ["DatabaseSync", "PageCreate", "ContentUpdate"],
+    features: ["Database Sync", "Page Creation", "Content Updates"],
  },
  {
  id: "google-sheets",
  name: "Google Sheets",
- description: "ReadandenterElectronicTableData",
+    description: "Read and write spreadsheet data",
  category: "productivity",
  icon: "📊",
  color: "#0F9D58",
  popular: false,
  docs: "/docs/integrations/google-sheets",
- features: ["DataRead", "Batchenter", "Calculate"],
+    features: ["Data Reading", "Batch Writing", "Formulas"],
  },
  {
  id: "gmail",
  name: "Gmail",
- description: "SendEmail, ProcessInbox, AutoReply",
+    description: "Send emails, process inbox, and set up auto-replies",
  category: "communication",
  icon: "📧",
  color: "#EA4335",
  popular: false,
  docs: "/docs/integrations/gmail",
- features: ["SendEmail", "InboxTrigger", "AttachmentProcess"],
+    features: ["Send Email", "Inbox Trigger", "Attachment Processing"],
  },
  {
  id: "postgresql",
  name: "PostgreSQL",
- description: "Execute SQL Query, ManageDatabase",
+    description: "Execute SQL queries and manage databases",
  category: "storage",
  icon: "🐘",
  color: "#336791",
  popular: false,
  docs: "/docs/integrations/postgresql",
- features: ["SQL Query", "Support", "ConnectManage"],
+    features: ["SQL Query", "Transactions", "Connection Management"],
  },
  {
  id: "mongodb",
  name: "MongoDB",
- description: "DocumentDatabaseAction, AggregateQuery",
+    description: "Document database operations and aggregate queries",
  category: "storage",
  icon: "🍃",
  color: "#47A248",
  popular: false,
  docs: "/docs/integrations/mongodb",
- features: ["CRUD Action", "AggregatePipeline", "SearchManage"],
+    features: ["CRUD Operations", "Aggregation Pipeline", "Index Management"],
  },
  {
  id: "aws-s3",
  name: "AWS S3",
- description: "FileUpload, Download, ManageStorage",
+    description: "Upload, download, and manage file storage",
  category: "storage",
  icon: "☁️",
  color: "#FF9900",
  popular: false,
  docs: "/docs/integrations/aws-s3",
- features: ["FileUpload", "Bio URL", "weeks"],
+    features: ["File Upload", "Presigned URLs", "Lifecycle Policies"],
  },
  {
  id: "openai",
  name: "OpenAI",
- description: "GPT ModelCall, TextGenerate, EmbeddingVector",
+    description: "GPT model calls, text generation, and embedding vectors",
  category: "development",
  icon: "🤖",
  color: "#10A37F",
  popular: true,
  docs: "/docs/integrations/openai",
- features: ["Chat Done", "countCall", "VectorEmbedding"],
+    features: ["Chat Completion", "Function Calling", "Vector Embedding"],
  },
  {
  id: "stripe",
  name: "Stripe",
- description: "PaymentProcess, SubscriptionManage, InvoiceGenerate",
+    description: "Process payments, manage subscriptions, and generate invoices",
  category: "productivity",
  icon: "💳",
  color: "#635BFF",
  popular: false,
  docs: "/docs/integrations/stripe",
- features: ["PaymentProcess", "Webhook", "SubscriptionManage"],
+    features: ["Payment Processing", "Webhook", "Subscription Management"],
  },
  {
  id: "twilio",
  name: "Twilio",
- description: "SendSMS, Voice, WhatsApp Message",
+    description: "Send SMS, voice calls, and WhatsApp messages",
  category: "communication",
  icon: "📱",
  color: "#F22F46",
  popular: false,
  docs: "/docs/integrations/twilio",
- features: ["SMSSend", "Voice", "WhatsApp"],
+    features: ["SMS Sending", "Voice Calls", "WhatsApp"],
  },
 ];
 
@@ -184,7 +184,7 @@ export default function IntegrationsPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [selectedCategory, setSelectedCategory] = useState("all");
 
- // FilterIntegration
+ // Filter Integrations
  const filteredIntegrations = integrations.filter((integration) => {
  const matchesSearch =
  integration.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -208,24 +208,24 @@ export default function IntegrationsPage() {
  {/* Breadcrumb */}
  <nav className="flex items-center gap-2 text-[13px] text-foreground-lighter mb-8">
  <Link href="/docs" className="hover:text-foreground transition-colors">
- Document
+ Docs
  </Link>
  <ChevronRight className="w-3.5 h-3.5" />
- <span className="text-foreground">Integration</span>
+ <span className="text-foreground">Integrations</span>
  </nav>
 
  <div className="text-center max-w-3xl mx-auto">
  <div className="lobe-badge mb-8">
  <Plug className="h-3.5 w-3.5" />
- <span>Integrationcenter</span>
- </div>
+            <span>Integration Center</span>
+          </div>
 
- <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- Integrationcenter
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+            Integration Center
  </h1>
 
  <p className="text-lg text-foreground-light mb-10 leading-relaxed">
- Connectyou'sToolandService, Buildlarge'sAutomationWorkflow
+ Connect your tools and services to build powerful automation workflows
  </p>
 
  {/* Search */}
@@ -234,7 +234,7 @@ export default function IntegrationsPage() {
  <Input
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- placeholder="SearchIntegration..."
+ placeholder="Search integrations..."
  className="h-12 pl-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
  />
  </div>
@@ -243,15 +243,15 @@ export default function IntegrationsPage() {
  <div className="flex items-center justify-center gap-8 mt-10">
  <div className="text-center">
  <div className="text-2xl font-bold text-foreground">{integrations.length}+</div>
- <div className="text-[12px] text-foreground-lighter">IntegrationService</div>
- </div>
- <div className="text-center">
- <div className="text-2xl font-bold text-foreground">50k+</div>
- <div className="text-[12px] text-foreground-lighter">ActiveConnect</div>
- </div>
- <div className="text-center">
- <div className="text-2xl font-bold text-foreground">99.9%</div>
- <div className="text-[12px] text-foreground-lighter">Availablerate</div>
+              <div className="text-[12px] text-foreground-lighter">Integration Services</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">50k+</div>
+              <div className="text-[12px] text-foreground-lighter">Active Connections</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">99.9%</div>
+              <div className="text-[12px] text-foreground-lighter">Availability</div>
  </div>
  </div>
  </div>
@@ -263,7 +263,7 @@ export default function IntegrationsPage() {
  <section className="mb-16">
  <h2 className="text-[15px] font-semibold text-foreground mb-6 flex items-center gap-2">
  <Star className="w-4 h-4 text-yellow-500" />
- PopularIntegration
+            Popular Integrations
  </h2>
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {popularIntegrations.map((integration) => (
@@ -372,7 +372,7 @@ export default function IntegrationsPage() {
 
  {filteredIntegrations.length === 0 && (
  <div className="text-center py-16">
- <p className="text-foreground-lighter">NotoMatch'sIntegration</p>
+                <p className="text-foreground-lighter">No matching integrations found</p>
  </div>
  )}
  </section>
@@ -389,12 +389,12 @@ export default function IntegrationsPage() {
  <Webhook className="w-7 h-7 text-foreground-light" />
  </div>
  <div>
- <h3 className="text-[15px] font-semibold text-foreground mb-2">
- Notoneedneed'sIntegration?
- </h3>
- <p className="text-[13px] text-foreground-lighter max-w-lg leading-relaxed">
- UsageCustom Webhook orHTTP RequestNodeConnectwhatSupport API 'sService, 
- oruserTellWeyouneedneedWhatIntegration
+                  <h3 className="text-[15px] font-semibold text-foreground mb-2">
+                    Can't find the integration you need?
+                  </h3>
+                  <p className="text-[13px] text-foreground-lighter max-w-lg leading-relaxed">
+                    Use Custom Webhook or HTTP Request nodes to connect any API-supported service, 
+                    or let us know what integration you need
  </p>
  </div>
  </div>
@@ -402,13 +402,13 @@ export default function IntegrationsPage() {
  <Link href="/docs/integrations/custom">
  <Button className="rounded-full text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90">
  <Code className="w-4 h-4 mr-2" />
- CreateCustomIntegration
+                    Create Custom Integration
  </Button>
  </Link>
  <Link href="/community/feature-requests">
  <Button variant="outline" className="rounded-full text-[13px] border-border/50 hover:bg-surface-200/50">
  <MessageSquare className="w-4 h-4 mr-2" />
- RequestnewIntegration
+                    Request New Integration
  </Button>
  </Link>
  </div>

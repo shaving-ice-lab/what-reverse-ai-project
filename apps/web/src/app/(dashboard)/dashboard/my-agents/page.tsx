@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * I'sAgentPage
- * Supabase Settings Style: Left sideNavigation + Right sideContentLayout
- * Follow STYLE-TERMINAL-PIXEL.md MinimalTextStyleStandard
+ * My Agent Page
+ * Supabase Settings Style: Left side Navigation + Right side Content Layout
+ * Follow STYLE-TERMINAL-PIXEL.md Minimal Text Style Standard
  */
 
 import { useMemo, useState } from "react";
@@ -46,7 +46,7 @@ import {
 } from "@/components/dashboard/page-layout";
 import { LegacyEntryBanner } from "@/components/dashboard/legacy-entry-banner";
 
-// ===== TypeDefinition =====
+// ===== Type Definitions =====
 type AgentStatus = "active" | "paused" | "error" | "draft";
 
 type Agent = {
@@ -64,92 +64,92 @@ type Agent = {
  tags: string[];
 };
 
-// ===== MockData =====
+// ===== Mock Data =====
 const agents: Agent[] = [
  {
  id: "agent-1",
- name: "SupportSmartAssistant",
- description: "AutoReplyCustomerConsulting, ProcessFAQ, SmartpersonSupport",
+ name: "Smart Support Assistant",
+ description: "Automatically reply to customer inquiries, handle FAQs, provide smart support",
  status: "active",
  model: "GPT-4",
  type: "customer-service",
  createdAt: "2026-01-15",
  updatedAt: "2026-01-30",
- lastRun: "2 minbefore",
+ lastRun: "2 min ago",
  totalRuns: 15234,
  successRate: 98.5,
- tags: ["Support", "AutoReply", "Smart"],
+ tags: ["Support", "Auto Reply", "Smart"],
  },
  {
  id: "agent-2",
- name: "DataAnalyticsAssistant",
- description: "AutoAnalyticsSalesData, GenerateReport, SendeachdaySummary",
+ name: "Data Analytics Assistant",
+ description: "Automatically analyze sales data, generate reports, send daily summaries",
  status: "active",
  model: "GPT-4",
  type: "data-analysis",
  createdAt: "2026-01-10",
  updatedAt: "2026-01-29",
- lastRun: "1 hbefore",
+ lastRun: "1 hour ago",
  totalRuns: 892,
  successRate: 99.2,
- tags: ["DataAnalytics", "ReportGenerate", "ScheduledTask"],
+ tags: ["Data Analytics", "Report Generation", "Scheduled Tasks"],
  },
  {
  id: "agent-3",
  name: "CodeReviewBot",
- description: "AutoReview Pull Request, CheckCodeStandard, ProvideImproveSuggestion",
+ description: "Automatically review pull requests, check code standards, provide improvement suggestions",
  status: "paused",
  model: "Claude 3",
  type: "code-review",
  createdAt: "2026-01-08",
  updatedAt: "2026-01-24",
- lastRun: "3 daysbefore",
+ lastRun: "3 days ago",
  totalRuns: 456,
  successRate: 97.8,
- tags: ["GitHub", "CodeReview", "CI/CD"],
+ tags: ["GitHub", "Code Review", "CI/CD"],
  },
  {
  id: "agent-4",
- name: "ContentCreativeAssistant",
- description: "Based onThemeGenerateBlogArticle, Social MediaContentandMarketing Copy",
+ name: "Content Creative Assistant",
+ description: "Generate blog articles, social media content and marketing copy based on topics",
  status: "error",
  model: "GPT-4",
  type: "content-creation",
  createdAt: "2026-01-05",
  updatedAt: "2026-01-25",
- lastRun: "5 hbefore",
+ lastRun: "5 hours ago",
  totalRuns: 234,
  successRate: 92.3,
- tags: ["ContentGenerate", "Marketing", "Social Media"],
+ tags: ["Content Generation", "Marketing", "Social Media"],
  },
  {
  id: "agent-5",
- name: "willSummaryGenerate",
- description: "AutowillContent, Generatewillneedandrow",
+ name: "Meeting Summary Generator",
+ description: "Automatically summarize meeting content, generate action items and notes",
  status: "draft",
  model: "Whisper + GPT-4",
  type: "meeting",
  createdAt: "2026-01-20",
  updatedAt: "2026-01-28",
- lastRun: "not yetRun",
+ lastRun: "Not yet run",
  totalRuns: 0,
  successRate: 0,
- tags: ["will", "", "Summary"],
+ tags: ["Meeting", "Transcription", "Summary"],
  },
 ];
 
-// ===== ConstantConfig =====
+// ===== Constant Config =====
 const statusMeta = {
- active: { label: "Run", variant: "success", icon: CheckCircle, dot: "bg-brand-500" },
+ active: { label: "Running", variant: "success", icon: CheckCircle, dot: "bg-brand-500" },
  paused: { label: "Paused", variant: "warning", icon: Pause, dot: "bg-warning-400" },
  error: { label: "Exception", variant: "error", icon: AlertTriangle, dot: "bg-destructive-400" },
  draft: { label: "Draft", variant: "secondary", icon: Edit, dot: "bg-surface-400" },
 } as const;
 
 const sortOptions = [
- { id: "recent", label: "RecentUpdate" },
+ { id: "recent", label: "Recently Updated" },
  { id: "success", label: "Success Rate" },
- { id: "runs", label: "Executetimescount" },
+ { id: "runs", label: "Run Count" },
  { id: "name", label: "Name" },
 ] as const;
 
@@ -157,15 +157,15 @@ type SortOption = (typeof sortOptions)[number]["id"];
 
 const typeLabelMap: Record<string, string> = {
  "customer-service": "Support",
- "data-analysis": "DataAnalytics",
- "code-review": "CodeReview",
- "content-creation": "ContentCreative",
- meeting: "will",
+ "data-analysis": "Data Analytics",
+ "code-review": "Code Review",
+ "content-creation": "Content Creative",
+ meeting: "Meeting",
 };
 
-// ===== Toolcount =====
+// ===== Utility Functions =====
 const formatDate = (value: string) => value.replace(/-/g, ".");
-const getTypeLabel = (type: string) => typeLabelMap[type] ?? "use";
+ const getTypeLabel = (type: string) => typeLabelMap[type] ?? "General";
 
 const getPerformanceBarClass = (status: AgentStatus) => {
  if (status === "error") return "bg-destructive-400";
@@ -227,7 +227,7 @@ function StatusNavItem({ label, count, dotClass, active, onClick }: StatusNavIte
  );
 }
 
-// ===== mainPageComponent =====
+// ===== Main Page Component =====
 export default function MyAgentsPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [statusFilter, setStatusFilter] = useState<AgentStatus | "all">("all");
@@ -236,7 +236,7 @@ export default function MyAgentsPage() {
  const [sortBy, setSortBy] = useState<SortOption>("recent");
  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
 
- // ===== DataCalculate =====
+ // ===== Data Calculations =====
  const statusCounts = useMemo(() => {
  return agents.reduce(
  (acc, agent) => {
@@ -276,7 +276,7 @@ export default function MyAgentsPage() {
  }
  }, [filteredAgents, sortBy]);
 
- // ===== SelectLogic =====
+ // ===== Selection Logic =====
  const selectedSet = useMemo(() => new Set(selectedAgents), [selectedAgents]);
  const selectedVisibleCount = sortedAgents.filter((agent) =>
  selectedSet.has(agent.id)
@@ -308,19 +308,19 @@ export default function MyAgentsPage() {
 
  const hasFilters = searchQuery.trim() !== "" || statusFilter !== "all";
 
- // ===== SidebarRender =====
+ // ===== Sidebar Rendering =====
  const sidebar = (
  <div className="space-y-6">
- {/* StatusCategoryNavigation */}
+ {/* Status Category Navigation */}
  <SidebarNavGroup title="AGENTS">
  <StatusNavItem
- label="allsectionAgent"
+ label="All Agents"
  count={agents.length}
  active={statusFilter === "all"}
  onClick={() => setStatusFilter("all")}
  />
  <StatusNavItem
- label="Run"
+ label="Running"
  count={statusCounts.active}
  dotClass={statusMeta.active.dot}
  active={statusFilter === "active"}
@@ -349,8 +349,8 @@ export default function MyAgentsPage() {
  />
  </SidebarNavGroup>
 
- {/* QuickAction */}
- <SidebarNavGroup title="QuickAction">
+ {/* Quick Actions */}
+ <SidebarNavGroup title="Quick Actions">
  <Link href="/dashboard/my-agents/new" className="block">
  <Button
  variant="ghost"
@@ -358,7 +358,7 @@ export default function MyAgentsPage() {
  leftIcon={<Plus className="h-3.5 w-3.5" />}
  className="w-full justify-start h-8 text-[12px] font-medium text-foreground-light hover:text-foreground"
  >
- CreateAgent
+ Create Agent
  </Button>
  </Link>
  </SidebarNavGroup>
@@ -375,15 +375,15 @@ export default function MyAgentsPage() {
  <LegacyEntryBanner type="agent" />
  {/* PageHeader */}
  <PageHeader
- title="I'sAgent"
- description="ManageAllAutomationAgent, RunStatusandExecutePerformance"
+ title="My Agents"
+ description="Manage all automation agents, run status and execution performance"
  actions={
  <Button
  variant="outline"
  size="sm"
  leftIcon={<Settings className="h-4 w-4" />}
  >
- BatchManage
+ Batch Manage
  </Button>
  }
  />
@@ -393,7 +393,7 @@ export default function MyAgentsPage() {
  <Input
  value={searchQuery}
  onChange={(event) => setSearchQuery(event.target.value)}
- placeholder="SearchAgent, TagsorModel..."
+ placeholder="Search agents, tags or models..."
  leftIcon={<Search className="h-4 w-4" />}
  variant="search"
  inputSize="sm"
@@ -433,29 +433,29 @@ export default function MyAgentsPage() {
  </div>
  </div>
 
- {/* Resultcount */}
+ {/* Result Count */}
  <div className="flex items-center justify-between text-[11px] text-foreground-muted">
  <span>
- Display {sortedAgents.length} / {agents.length} Agent
+ Displaying {sortedAgents.length} / {agents.length} Agents
  </span>
  {statusFilter !== "all" && (
  <button
  onClick={() => setStatusFilter("all")}
  className="text-foreground-light hover:text-foreground transition-colors"
  >
- ClearFilter
+ Clear Filters
  </button>
  )}
  </div>
 
- {/* BatchAction */}
+ {/* Batch Actions */}
  {selectedVisibleCount > 0 && (
  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 rounded-md border border-border bg-surface-75/80 text-[12px]">
  <div className="flex items-center gap-2 text-foreground-light">
  <Badge variant="secondary" size="xs">
- alreadyselect {selectedVisibleCount} 
+ {selectedVisibleCount} selected
  </Badge>
- <span>canProceedBatchAction</span>
+ <span>Batch actions available</span>
  </div>
  <div className="flex items-center gap-2">
  <Button variant="secondary" size="xs" leftIcon={<Pause className="h-3.5 w-3.5" />}>
@@ -468,7 +468,7 @@ export default function MyAgentsPage() {
  Delete
  </Button>
  <Button variant="ghost" size="xs" onClick={() => setSelectedAgents([])}>
- ClearSelect
+ Clear Selection
  </Button>
  </div>
  </div>
@@ -497,22 +497,22 @@ export default function MyAgentsPage() {
  ) : (
  <EmptyState
  icon={<Bot className="h-5 w-5" />}
- title={hasFilters ? "NotoMatch'sAgent": "Not yetCreateAgent"}
+ title={hasFilters ? "No matching agents found": "No agents yet"}
  description={
  hasFilters
- ? "TryUsageotherheKeywordsorFilterCondition"
-: "Createyou's#1 AI Agent, StartAutomationJourney."
+ ? "Try using other keywords or filter conditions"
+: "Create your first AI agent to start your automation journey."
  }
  action={
  hasFilters
  ? {
- label: "ClearFilter",
+ label: "Clear filters",
  onClick: () => {
  setSearchQuery("");
  setStatusFilter("all");
  },
  }
-: { label: "CreateAgent", href: "/dashboard/my-agents/new" }
+: { label: "Create agent", href: "/dashboard/my-agents/new" }
  }
  />
  )}
@@ -551,12 +551,12 @@ function AgentListView({
  <Checkbox
  checked={allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false}
  onCheckedChange={toggleSelectAll}
- aria-label="SelectAllAgent"
+ aria-label="Select all agents"
  />
  </div>
  <span>Agent</span>
  <span>Status</span>
- <span>ExecutePerformance</span>
+ <span>Performance</span>
  <span className="text-right">Action</span>
  </div>
 
@@ -616,7 +616,7 @@ function AgentListView({
  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-foreground-muted">
  <span className="font-mono">ID {agent.id}</span>
  <span className="h-1 w-1 rounded-full bg-foreground-muted/70" />
- <span>Create {formatDate(agent.createdAt)}</span>
+ <span>Created {formatDate(agent.createdAt)}</span>
  </div>
  <BadgeGroup max={3} className="mt-1.5">
  {agent.tags.map((tag) => (
@@ -638,7 +638,7 @@ function AgentListView({
  {statusInfo.label}
  </Badge>
  <div className="text-[11px] text-foreground-muted">
- Update {formatDate(agent.updatedAt)}
+ Updated {formatDate(agent.updatedAt)}
  </div>
  </div>
 
@@ -776,13 +776,13 @@ function AgentGridView({ agents, activeMenu, setActiveMenu }: AgentGridViewProps
  <div className="rounded-md border border-border bg-surface-100/70 p-2">
  <Clock className="mb-0.5 h-3 w-3" />
  <div className="text-foreground font-medium">{agent.lastRun}</div>
- <div className="text-[10px] text-foreground-muted">ontimesRun</div>
+ <div className="text-[10px] text-foreground-muted">Last Run</div>
  </div>
  </div>
 
  {/* FooterAction */}
  <div className="mt-3 flex items-center justify-between text-[11px] text-foreground-muted">
- <span>Update {formatDate(agent.updatedAt)}</span>
+ <span>Updated {formatDate(agent.updatedAt)}</span>
  <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
  <AgentActionButton status={agent.status} />
  <Button variant="ghost" size="icon-sm" asChild>
@@ -862,7 +862,7 @@ function AgentMenu({ agentId, activeMenu, setActiveMenu }: AgentMenuProps) {
  </button>
  <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground transition-colors">
  <ExternalLink className="h-3.5 w-3.5" />
- ViewLogs
+ View Logs
  </button>
  <div className="mx-2 my-1 h-px bg-border-muted" />
  <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[12px] text-destructive hover:bg-destructive-200 transition-colors">

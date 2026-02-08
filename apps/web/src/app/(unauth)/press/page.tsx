@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * MediacenterPage - LobeHub StyleDarkDesign
+ * MediacenterPage - LobeHub Style Dark Design
  */
 
 import { useState } from "react";
@@ -27,101 +27,101 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// News
+// Press Releases
 const pressReleases = [
  {
  id: "1",
- title: "AgentFlow Done B Funding, value 5 100MUSD",
+ title: "AgentFlow completes Series B funding at $50M",
  date: "2026-01-15",
  category: "Funding",
  excerpt:
- "AgentFlow Done 5000 10000USD B Funding, Sequoia Capitalcurrent, willUsed forlargeTeamandallMarketplace.",
+ "AgentFlow raises $50M in Series B led by Sequoia Capital for team growth and marketplace expansion.",
  featured: true,
  },
  {
  id: "2",
- title: "AgentFlow Enterprise, Serviceall 500 Enterprise",
+ title: "AgentFlow Enterprise: serving 500+ enterprises",
  date: "2026-01-10",
  category: "Product",
  excerpt:
- "facelargeEnterpriseExclusiveResolvePlan, ProvidePrivateDeploy, SOC 2 AuthenticationandExclusiveTechnologySupport.",
+ "Enterprise plan with private deploy, SOC 2 compliance and dedicated support.",
  featured: true,
  },
  {
  id: "3",
- title: "AgentFlow UserBreakthrough 100 10000, monthsActive UsersGrowth 300%",
+ title: "AgentFlow hits 10M users; 300% monthly growth",
  date: "2025-12-20",
- category: "in",
- excerpt:
- "PlatformSign UpUserBreakthrough10010000large, monthsActive UserscountcompareGrowth 300%, downIndustrynew.",
+    category: "Milestone",
+    excerpt:
+    "Platform signups pass 10M with 300% monthly active user growth.",
  featured: false,
  },
  {
  id: "4",
- title: "AgentFlow andinCooperation",
+ title: "AgentFlow partnership program",
  date: "2025-12-05",
  category: "Cooperation",
  excerpt:
- "methodwillat AI BasicInfrastructure, ModelServiceetcDomainExpandDepthCooperation, EnterpriseSmart.",
+ "AI infrastructure and model partnerships for enterprise deployment.",
  featured: false,
  },
  {
  id: "5",
- title: "AgentFlow 2025 yearsmost AI Tool",
+ title: "AgentFlow named top AI tool of 2025",
  date: "2025-11-28",
- category: "",
- excerpt:
- "atall AI Toolselectand, Obtainyearsmost AI WorkflowTool.",
+    category: "Award",
+    excerpt:
+    "Selected among top AI tools; leading workflow automation platform.",
  featured: false,
  },
  {
  id: "6",
- title: "AgentFlow Open SourceCoreEngine, Obtain GitHub 10000",
+ title: "AgentFlow open-sources workflow engine; 10K GitHub stars",
  date: "2025-11-15",
  category: "Open Source",
  excerpt:
- "AgentFlow willWorkflowExecuteEngineOpen Source, onlineonly1weeksnowObtainExceed 10,000 GitHub Star.",
+ "Workflow execution engine open-sourced; exceeded 10,000 GitHub stars in one week.",
  featured: false,
  },
 ];
 
-// MediaResource
+// Media Resources
 const mediaAssets = [
  {
  title: "Logo Resource",
- description: "Contains SVG, PNG, PDF Format'smethod Logo",
+ description: "Logo assets in SVG, PNG and PDF",
  icon: Image,
  size: "4.2 MB",
  format: "ZIP",
  },
  {
- title: "BrandGuide",
- description: "Complete'sBrandUsageStandardandvisualStandard",
+ title: "Brand guide",
+ description: "Brand usage and visual standards",
  icon: FileText,
  size: "2.8 MB",
  format: "PDF",
  },
  {
- title: "ProductScreenshot",
- description: "ProductfaceScreenshotandDemo",
+ title: "Product screenshots",
+ description: "Product screenshots and demos",
  icon: Image,
  size: "18.5 MB",
  format: "ZIP",
  },
  {
  title: "Video",
- description: "ProductIntroductionVideoandFeaturesDemo",
+ description: "Product intro and feature demos",
  icon: Video,
  size: "156 MB",
  format: "MP4",
  },
 ];
 
-// Media
+// Media Coverage
 const mediaCoverage = [
  {
- source: "36",
- title: "AgentFlow: use AI re-newDefinitionWorkflowAutomation",
+    source: "36Kr",
+    title: "AgentFlow: redefining workflow automation with AI",
  date: "2026-01-18",
  logo: "36Kr",
  },
@@ -132,31 +132,31 @@ const mediaCoverage = [
  logo: "TC",
  },
  {
- source: "center",
- title: "DepthParse: AgentFlow ifwhatImplement AI Agent 'sScaleApp",
+    source: "Synced",
+    title: "How AgentFlow implements AI agent scale apps",
  date: "2026-01-12",
  logo: "Synced",
  },
  {
  source: "Huxiu",
- title: "10010000Userafter: AgentFlow 'sGrowthPassword",
+ title: "10M users: AgentFlow's growth story",
  date: "2025-12-22",
  logo: "Huxiu",
  },
 ];
 
-// CompanyStatistics
+// Company Statistics
 const companyStats = [
- { label: "Usercount", value: "10010000+", icon: Users },
- { label: "EnterpriseCustomer", value: "5000+", icon: Building2 },
- { label: "yearsGrowthrate", value: "300%", icon: TrendingUp },
- { label: "Industry", value: "15+", icon: Award },
+ { label: "Users", value: "10M+", icon: Users },
+ { label: "Enterprise customers", value: "5000+", icon: Building2 },
+ { label: "Yearly growth", value: "300%", icon: TrendingUp },
+ { label: "Industries", value: "15+", icon: Award },
 ];
 
 export default function PressPage() {
  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
- const categories = ["all", "Funding", "Product", "in", "Cooperation", "", "Open Source"];
+  const categories = ["all", "Funding", "Product", "Milestone", "Cooperation", "Award", "Open Source"];
 
  const filteredReleases = selectedCategory === "all"
  ? pressReleases
@@ -173,29 +173,29 @@ export default function PressPage() {
  <div className="max-w-6xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Newspaper className="h-4 w-4" />
- Mediacenter
+ Media center
  </div>
  <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-semibold text-foreground leading-tight tracking-tight mb-6">
  AgentFlow
  <br />
  <span className="text-brand">
- NewsandMedia
+ News and media
  </span>
  </h1>
  <p className="text-[15px] text-foreground-light max-w-2xl mx-auto mb-8">
- Fetchmostnew'sCompanyNews, ProductPublishandMediaResource
+ Latest company news, product updates and media resources
  </p>
  <div className="flex flex-col sm:flex-row gap-4 justify-center">
  <Link href="#press-releases">
  <Button className="h-12 px-8 rounded-full bg-foreground text-background font-semibold hover:bg-foreground/90">
- ViewNews
+ View news
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
  <Link href="#media-assets">
  <Button variant="outline" className="h-12 px-8 rounded-full border-border/30">
  <Download className="mr-2 w-4 h-4" />
- DownloadMediaResource
+ Download media resources
  </Button>
  </Link>
  </div>
@@ -257,7 +257,7 @@ export default function PressPage() {
  {release.excerpt}
  </p>
  <div className="mt-4 flex items-center text-brand text-[13px]">
- Readall
+                Read all
  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
  </div>
  </div>
@@ -284,7 +284,7 @@ export default function PressPage() {
  : "bg-surface-100/30 border border-border/30 text-foreground-light hover:text-foreground"
  )}
  >
- {cat === "all" ? "allsection": cat}
+            {cat === "all" ? "All" : cat}
  </button>
  ))}
  </div>
@@ -307,7 +307,7 @@ export default function PressPage() {
  {new Date(release.date).getDate()}
  </div>
  <div className="text-[11px] text-foreground-lighter">
- {new Date(release.date).toLocaleDateString("zh-CN", { month: "short" })}
+ {new Date(release.date).toLocaleDateString("en-US", { month: "short" })}
  </div>
  </div>
  </div>
@@ -371,10 +371,10 @@ export default function PressPage() {
  <section id="media-assets" className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="flex items-center justify-between mb-8">
- <h2 className="text-[20px] font-semibold text-foreground">MediaResource</h2>
+ <h2 className="text-[20px] font-semibold text-foreground">Media resources</h2>
  <Link href="/brand">
- <Button variant="outline" className="rounded-full border-border/30">
- ViewBrandGuide
+<Button variant="outline" className="rounded-full border-border/30">
+  View brand guide
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -415,10 +415,10 @@ export default function PressPage() {
  <div className="p-8 rounded-2xl bg-surface-100/30 border border-border/30 text-center">
  <Mail className="w-12 h-12 text-brand mx-auto mb-4" />
  <h2 className="text-[17px] font-semibold text-foreground mb-4">
- MediaContact
+            Media Contact
  </h2>
  <p className="text-[13px] text-foreground-light mb-6 max-w-lg mx-auto">
- ifresultyouisMediaWorkuser, needneedorFetchmoremultipleInfo, PleaseContact Us'sTeam
+ For media or more information, contact our team.
  </p>
  <a href="mailto:press@agentflow.ai">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">

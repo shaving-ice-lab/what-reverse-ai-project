@@ -5,22 +5,22 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export interface FlowingGridProps extends React.HTMLAttributes<HTMLDivElement> {
- /** GridCellSize */
- cellSize?: number;
- /** lineColor */
- lineColor?: string;
- /** 'sColor */
- dotColor?: string;
- /** GlowColor */
- glowColor?: string;
- /** isnoDisplay */
- showDots?: boolean;
- /** isnoDisplayPulseEffect */
- showPulse?: boolean;
- /** AnimationSpeed */
- speed?: "slow" | "normal" | "fast";
- /** Opacity */
- opacity?: number;
+  /** Grid cell size */
+  cellSize?: number;
+  /** Line color */
+  lineColor?: string;
+  /** Dot color */
+  dotColor?: string;
+  /** Glow color */
+  glowColor?: string;
+  /** Whether to display dots */
+  showDots?: boolean;
+  /** Whether to display pulse effect */
+  showPulse?: boolean;
+  /** Animation speed */
+  speed?: "slow" | "normal" | "fast";
+  /** Opacity */
+  opacity?: number;
 }
 
 export function FlowingGrid({

@@ -20,11 +20,11 @@ import {
  */
 function buildUrl(
  baseUrl: string,
- queryParams?: Record<string, string>,
- variables?: Record<string, unknown>
+  queryParams?: Record<string, string>,
+  variables?: Record<string, unknown>
 ): string {
- // Render URL 'sVariable
- let url = variables ? renderTemplate(baseUrl, variables) : baseUrl;
+  // Render URL variables
+  let url = variables ? renderTemplate(baseUrl, variables) : baseUrl;
  
  if (queryParams && Object.keys(queryParams).length > 0) {
  const params = new URLSearchParams();
@@ -42,29 +42,29 @@ function buildUrl(
 }
 
 /**
- * BuildRequesthead
+ * Build request headers
  */
 function buildHeaders(
- config: HTTPConfig,
- variables?: Record<string, unknown>
+  config: HTTPConfig,
+  variables?: Record<string, unknown>
 ): Record<string, string> {
- const headers: Record<string, string> = {};
- 
- // Basichead
- if (config.bodyType === "json") {
- headers["Content-Type"] = "application/json";
- } else if (config.bodyType === "form") {
- headers["Content-Type"] = "application/x-www-form-urlencoded";
- }
- 
- // Customhead
- if (config.headers) {
- for (const [key, value] of Object.entries(config.headers)) {
- headers[key] = variables ? renderTemplate(value, variables) : value;
- }
- }
- 
- // Authenticationhead
+  const headers: Record<string, string> = {};
+  
+  // Basic headers
+  if (config.bodyType === "json") {
+    headers["Content-Type"] = "application/json";
+  } else if (config.bodyType === "form") {
+    headers["Content-Type"] = "application/x-www-form-urlencoded";
+  }
+  
+  // Custom headers
+  if (config.headers) {
+    for (const [key, value] of Object.entries(config.headers)) {
+      headers[key] = variables ? renderTemplate(value, variables) : value;
+    }
+  }
+  
+  // Authentication headers
  if (config.authType && config.authType !== "none" && config.authConfig) {
  switch (config.authType) {
  case "basic": {
@@ -98,22 +98,22 @@ function buildHeaders(
 }
 
 /**
- * BuildRequest
+ * Build request body
  */
 function buildBody(
- config: HTTPConfig,
- variables?: Record<string, unknown>
+  config: HTTPConfig,
+  variables?: Record<string, unknown>
 ): BodyInit | undefined {
- if (config.method === "GET" || config.method === "HEAD" || !config.body) {
- return undefined;
- }
- 
- switch (config.bodyType) {
- case "json": {
- if (typeof config.body === "string") {
- // RenderTemplateVariable
- const rendered = variables ? renderTemplate(config.body, variables) : config.body;
- return rendered;
+  if (config.method === "GET" || config.method === "HEAD" || !config.body) {
+    return undefined;
+  }
+  
+  switch (config.bodyType) {
+    case "json": {
+      if (typeof config.body === "string") {
+        // Render template variables
+        const rendered = variables ? renderTemplate(config.body, variables) : config.body;
+        return rendered;
  }
  return JSON.stringify(config.body);
  }
@@ -140,25 +140,25 @@ function buildBody(
 }
 
 /**
- * ParseResponse
+ * Parse response
  */
 async function parseResponse(response: Response): Promise<unknown> {
- const contentType = response.headers.get("content-type") || "";
- 
- if (contentType.includes("application/json")) {
- try {
- return await response.json();
- } catch {
- return await response.text();
- }
- }
- 
- if (contentType.includes("text/")) {
- return await response.text();
- }
- 
- // TryParseas JSON, FailedthenBackText
- const text = await response.text();
+  const contentType = response.headers.get("content-type") || "";
+  
+  if (contentType.includes("application/json")) {
+    try {
+      return await response.json();
+    } catch {
+      return await response.text();
+    }
+  }
+  
+  if (contentType.includes("text/")) {
+    return await response.text();
+  }
+  
+  // Try parsing as JSON, fallback to text if failed
+  const text = await response.text();
  try {
  return JSON.parse(text);
  } catch {
@@ -172,27 +172,27 @@ async function parseResponse(response: Response): Promise<unknown> {
 export const httpExecutor: NodeExecutor<HTTPConfig> = {
  type: "http",
  
- async execute(context): Promise<NodeResult> {
- const { nodeConfig, variables, inputs, abortSignal } = context;
- const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- // andVariable
- const allVariables = { ...variables, ...inputs };
- 
- // BuildRequest
- const url = buildUrl(nodeConfig.url, nodeConfig.queryParams, allVariables);
- const headers = buildHeaders(nodeConfig, allVariables);
- const body = buildBody(nodeConfig, allVariables);
- 
- logs.push({
- level: "info",
- message: `Sending ${nodeConfig.method} request to ${url}`,
- timestamp: new Date().toISOString(),
- });
- 
- // Process API Key at query Parameter'sSituation
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, variables, inputs, abortSignal } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      // Merge variables
+      const allVariables = { ...variables, ...inputs };
+      
+      // Build request
+      const url = buildUrl(nodeConfig.url, nodeConfig.queryParams, allVariables);
+      const headers = buildHeaders(nodeConfig, allVariables);
+      const body = buildBody(nodeConfig, allVariables);
+      
+      logs.push({
+        level: "info",
+        message: `Sending ${nodeConfig.method} request to ${url}`,
+        timestamp: new Date().toISOString(),
+      });
+      
+      // Process API key in query parameters
  let finalUrl = url;
  if (
  nodeConfig.authType === "apiKey" &&
@@ -202,11 +202,11 @@ export const httpExecutor: NodeExecutor<HTTPConfig> = {
  ) {
  const separator = finalUrl.includes("?") ? "&" : "?";
  const value = renderTemplate(nodeConfig.authConfig.apiKeyValue, allVariables);
- finalUrl = `${finalUrl}${separator}${nodeConfig.authConfig.apiKeyName}=${encodeURIComponent(value)}`;
- }
- 
- // ExecuteRequest
- const timeout = nodeConfig.timeout ?? 30000;
+        finalUrl = `${finalUrl}${separator}${nodeConfig.authConfig.apiKeyName}=${encodeURIComponent(value)}`;
+      }
+      
+      // Execute request
+      const timeout = nodeConfig.timeout ?? 30000;
  const fetchOptions: RequestInit = {
  method: nodeConfig.method,
  headers,
@@ -220,11 +220,11 @@ export const httpExecutor: NodeExecutor<HTTPConfig> = {
  timeout,
  `HTTP request timed out after ${timeout}ms`
  );
- 
- const duration = Date.now() - startTime;
- 
- // CheckStatus
- if (nodeConfig.validateStatus !== false && !response.ok) {
+      
+      const duration = Date.now() - startTime;
+      
+      // Check status
+      if (nodeConfig.validateStatus !== false && !response.ok) {
  const errorBody = await response.text();
  
  logs.push({
@@ -242,19 +242,19 @@ export const httpExecutor: NodeExecutor<HTTPConfig> = {
  headers: Object.fromEntries(response.headers.entries()),
  error: errorBody,
  },
- error: createNodeError(
- "HTTP_ERROR",
- `HTTP ${response.status}: ${response.statusText}`,
- { status: response.status, body: errorBody },
- response.status >= 500 // 5xx ErrorcanRetry
- ),
+            error: createNodeError(
+              "HTTP_ERROR",
+              `HTTP ${response.status}: ${response.statusText}`,
+              { status: response.status, body: errorBody },
+              response.status >= 500 // 5xx errors can retry
+            ),
  logs,
  duration,
- };
- }
- 
- // ParseResponse
- const data = await parseResponse(response);
+        };
+      }
+      
+      // Parse response
+      const data = await parseResponse(response);
  const responseHeaders = Object.fromEntries(response.headers.entries());
  
  logs.push({
@@ -311,16 +311,16 @@ export const httpExecutor: NodeExecutor<HTTPConfig> = {
  validate(config) {
  const errors: string[] = [];
  
- if (!config.url) {
- errors.push("URL is required");
- } else if (!config.url.includes("{{")) {
- // hasatnotisVariabletimeonlyVerify URL Format
- try {
- new URL(config.url);
- } catch {
- errors.push("Invalid URL format");
- }
- }
+    if (!config.url) {
+      errors.push("URL is required");
+    } else if (!config.url.includes("{{")) {
+      // Only validate URL format if not a variable
+      try {
+        new URL(config.url);
+      } catch {
+        errors.push("Invalid URL format");
+      }
+    }
  
  if (!config.method) {
  errors.push("HTTP method is required");

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * App RunMonitorpage - Supabase Style
+ * App Run Monitor Page - Supabase Style
  * RunLogsList, MetricsOverview, StatusFilter
  */
 
@@ -72,7 +72,7 @@ import {
 
 // ExecuteStatusConfig
 const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
- pending: { label: "etcpending", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
+ pending: { label: "Pending", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
  running: { label: "Run", color: "text-brand-500", bgColor: "bg-brand-200", icon: Loader2 },
  completed: { label: "Completed", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
  failed: { label: "Failed", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
@@ -80,7 +80,7 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 };
 
 const timeRangeOptions = [
- { value: "all", label: "allsectionTime" },
+ { value: "all", label: "All Time" },
  { value: "24h", label: " 24 h" },
  { value: "7d", label: " 7 days" },
  { value: "30d", label: " 30 days" },
@@ -88,13 +88,13 @@ const timeRangeOptions = [
 ];
 
 const nodeTypeOptions = [
- { value: "all", label: "allsectionNodeType" },
- { value: "input", label: "InputNode" },
- { value: "llm", label: "ModelNode" },
- { value: "output", label: "OutputNode" },
+ { value: "all", label: "All Node Types" },
+ { value: "input", label: "Input Node" },
+ { value: "llm", label: "Model Node" },
+ { value: "output", label: "Output Node" },
  { value: "webhook", label: "Webhook" },
  { value: "storage", label: "Storage/Database" },
- { value: "workflow", label: "FlowNode" },
+ { value: "workflow", label: "Flow Node" },
 ];
 
 type QualityMetricStatus = "good" | "warn" | "risk";
@@ -116,8 +116,8 @@ const qualityStatusConfig: Record<
  { label: string; color: string; bgColor: string; icon: React.ElementType }
 > = {
  good: { label: "Meet Target", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- warn: { label: "", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
- risk: { label: "needoptimal", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
+ warn: { label: "Warning", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
+ risk: { label: "Needs Optimization", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
 };
 
 const clampScore = (value: number, min = 0, max = 100) => Math.min(Math.max(value, min), max);
@@ -140,8 +140,8 @@ const buildQualityMetrics = (metrics: AppMetrics | null, executions: AppExecutio
  const rows = [
  {
  id: "coherence",
- label: "Content1",
- description: "ContextandStructureComplete",
+   label: "Content Coherence",
+   description: "Context and Structure Completeness",
  value: score(-1),
  target: 90,
  unit: "",
@@ -149,8 +149,8 @@ const buildQualityMetrics = (metrics: AppMetrics | null, executions: AppExecutio
  },
  {
  id: "factual",
- label: "Fact1",
- description: "FactValidateanduseMatch",
+   label: "Factual Accuracy",
+   description: "Fact Validation and Usage Match",
  value: score(-3),
  target: 88,
  unit: "",
@@ -158,8 +158,8 @@ const buildQualityMetrics = (metrics: AppMetrics | null, executions: AppExecutio
  },
  {
  id: "readability",
- label: "canreadRating",
- description: "ClearandFormatStandard",
+   label: "Readability Rating",
+   description: "Clarity and Format Standards",
  value: score(2),
  target: 92,
  unit: "",
@@ -167,8 +167,8 @@ const buildQualityMetrics = (metrics: AppMetrics | null, executions: AppExecutio
  },
  {
  id: "safety",
- label: "SecurityCompliance",
- description: "SecurityRuleandFilterEffect",
+   label: "Security Compliance",
+   description: "Security Rules and Filter Effectiveness",
  value: score(1),
  target: 95,
  unit: "",
@@ -205,28 +205,28 @@ const regressionStatusConfig: Record<
  RegressionTestCase["status"],
  { label: string; color: string; bgColor: string; icon: React.ElementType }
 > = {
- pass: { label: "Via", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
+ pass: { label: "Passed", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
  fail: { label: "Failed", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
- needs_review: { label: "pending", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
- flaky: { label: "notStable", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
+ needs_review: { label: "Pending Review", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
+ flaky: { label: "Unstable", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
 };
 
 const reviewPriorityConfig = {
- high: { label: "Priority", color: "text-destructive", bgColor: "bg-destructive-200" },
- medium: { label: "Priority", color: "text-warning", bgColor: "bg-warning-200" },
- low: { label: "Priority", color: "text-foreground-muted", bgColor: "bg-surface-200" },
+ high: { label: "High", color: "text-destructive", bgColor: "bg-destructive-200" },
+ medium: { label: "Medium", color: "text-warning", bgColor: "bg-warning-200" },
+ low: { label: "Low", color: "text-foreground-muted", bgColor: "bg-surface-200" },
 } as const;
 
 const reviewStatusConfig = {
- active: { label: "Execute", color: "text-brand-500", bgColor: "bg-brand-200" },
+ active: { label: "Active", color: "text-brand-500", bgColor: "bg-brand-200" },
  paused: { label: "Paused", color: "text-foreground-muted", bgColor: "bg-surface-200" },
 } as const;
 
 const nodeStatusSamples = [
- { id: "input", label: "InputValidate", status: "completed", detail: "FieldValidateNormal" },
- { id: "llm", label: "ModelCall", status: "running", detail: "AverageResponse 2.4s" },
- { id: "storage", label: "Storageenter", status: "completed", detail: "enterSuccess Rate 99.1%" },
- { id: "webhook", label: "Callback/Webhook", status: "pending", detail: "etcpendingoutsidesectionConfirm" },
+ { id: "input", label: "Input Validation", status: "completed", detail: "Field Validation Normal" },
+ { id: "llm", label: "Model Call", status: "running", detail: "Average Response 2.4s" },
+ { id: "storage", label: "Storage Write", status: "completed", detail: "Write Success Rate 99.1%" },
+ { id: "webhook", label: "Callback/Webhook", status: "pending", detail: "Awaiting External Confirmation" },
 ];
 
 const summarizeRegressionCases = (cases: RegressionTestCase[]): RegressionSummary => {
@@ -261,7 +261,7 @@ function AppNav({ appId, activeTab }: { appId: string; activeTab: string }) {
  const navItems = [
  { id: "overview", label: "Overview", href: `/dashboard/app/${appId}` },
  { id: "builder", label: "Build", href: `/dashboard/app/${appId}/builder` },
- { id: "publish", label: "PublishSettings", href: `/dashboard/app/${appId}/publish` },
+ { id: "publish", label: "Publish Settings", href: `/dashboard/app/${appId}/publish` },
  { id: "versions", label: "Version History", href: `/dashboard/app/${appId}/versions` },
  { id: "monitoring", label: "Monitor", href: `/dashboard/app/${appId}/monitoring` },
  { id: "domains", label: "Domain", href: `/dashboard/app/${appId}/domains` },
@@ -362,7 +362,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  await loadData();
  } catch (error) {
  console.error("Failed to cancel execution:", error);
- setActionError("CancelExecuteFailed, Please try again laterRetry.");
+   setActionError("Failed to cancel execution. Please try again later.");
  } finally {
  setCancelingExecutionId(null);
  }
@@ -389,9 +389,9 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  const diff = now.getTime() - date.getTime();
  
  if (diff < 60000) return "Just now";
- if (diff < 3600000) return `${Math.floor(diff / 60000)} minbefore`;
- if (diff < 86400000) return `${Math.floor(diff / 3600000)} hbefore`;
- return date.toLocaleString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+ if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes ago`;
+   if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
+   return date.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
  };
 
  const parseTimestamp = (value?: string) => {
@@ -421,7 +421,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  status: index === nodeStatusSamples.length - 1 ? "failed" : "completed",
  detail:
  index === nodeStatusSamples.length - 1
- ? execution.error_message || "NodeExecuteFailed"
+       ? execution.error_message || "Node Execution Failed"
  : node.detail,
  }));
  }
@@ -435,15 +435,15 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  };
 
  const buildExecutionLogs = (execution: AppExecution) => {
- const logs = [
- `Execute ID: ${execution.id}`,
- `Triggermethod: ${resolveTriggerType(execution)}`,
- `StartTime: ${execution.started_at ? formatTime(execution.started_at): "not yetRecord"}`,
- `EndTime: ${execution.completed_at ? formatTime(execution.completed_at): "not yetRecord"}`,
- ];
- if (execution.error_message) {
- logs.push(`ErrorLogs: ${execution.error_message}`);
- }
+   const logs = [
+     `Execution ID: ${execution.id}`,
+     `Trigger Method: ${resolveTriggerType(execution)}`,
+     `Start Time: ${execution.started_at ? formatTime(execution.started_at): "Not Recorded"}`,
+     `End Time: ${execution.completed_at ? formatTime(execution.completed_at): "Not Recorded"}`,
+   ];
+   if (execution.error_message) {
+     logs.push(`Error Logs: ${execution.error_message}`);
+   }
  return logs;
  };
 
@@ -459,8 +459,8 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  const qualityOverview = buildQualityMetrics(metrics, executions);
  const qualityDescription = qualityOverview.summary.hasSamples
- ? `Recent ${qualityOverview.summary.days} days · ${qualityOverview.summary.sampleCount} timesExecutestylecurrent`
-: "NoneExecutestylecurrent, ShowcaseDefault";
+   ? `Recent ${qualityOverview.summary.days} days · ${qualityOverview.summary.sampleCount} executions sampled`
+: "No executions sampled yet. Showing defaults.";
  const regressionSummary = summarizeRegressionCases(regressionTestCases);
  const normalizedRegressionQuery = regressionQuery.trim().toLowerCase();
  const filteredRegressionCases = useMemo(() => {
@@ -553,10 +553,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <PageContainer>
  {/* PageHeader */}
  <PageHeader
- title="RunMonitor"
+           title="Run Monitor"
  eyebrow={app?.name}
  backHref="/dashboard/apps"
- backLabel="BackAppList"
+           backLabel="Back to App List"
  actions={
  <Button
  variant="outline"
@@ -572,13 +572,13 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  {/* MetricsOverview */}
  <SettingsSection
- title="RunMetrics"
- description="Recent 7 days'sExecuteStatistics"
+           title="Run Metrics"
+ description="Execution statistics for the last 7 days"
  compact
  >
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <MetricCard
- label="totalExecutetimescount"
+               label="Total Executions"
  value={metrics?.total_executions || 0}
  icon={<Zap className="w-4 h-4" />}
  />
@@ -589,12 +589,12 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  highlight={metrics?.success_rate !== undefined && metrics.success_rate < 0.9}
  />
  <MetricCard
- label="AverageResponse Time"
+               label="Average Response Time"
  value={formatDuration(metrics?.avg_duration_ms)}
  icon={<Timer className="w-4 h-4" />}
  />
  <MetricCard
- label="Errorrate"
+               label="Error Rate"
  value={`${(errorRate * 100).toFixed(1)}%`}
  icon={<AlertCircle className="w-4 h-4" />}
  highlight={errorRate > 0.1}
@@ -606,7 +606,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <div className="col-span-4">Metrics</div>
- <div className="col-span-3">Currentvalue</div>
+             <div className="col-span-3">Current Value</div>
  <div className="col-span-3">Target</div>
  <div className="col-span-2">Status</div>
  </div>
@@ -636,8 +636,8 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  {metric.unit}
  </div>
  <div className="text-[11px] text-foreground-muted">
- {qualityOverview.summary.hasSamples
- ? `stylecurrent ${qualityOverview.summary.sampleCount} times`
+                     {qualityOverview.summary.hasSamples
+                       ? `Sampled from ${qualityOverview.summary.sampleCount} executions`
 : "Default"}
  </div>
  </div>
@@ -662,7 +662,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  )}
  >
  <TrendIcon className="w-3 h-3 mr-0.5" />
- {metric.trend === "up" ? "on": "Decline"}
+                   {metric.trend === "up" ? "Rising": "Declining"}
  </span>
  </div>
  </div>
@@ -676,40 +676,40 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </span>
  <span className="flex items-center gap-1">
  <BarChart3 className="w-3 h-3" />
- RatingRange 0-100
+               Rating Range 0-100
  </span>
  <span className="flex items-center gap-1">
  <Bot className="w-3 h-3" />
- styleRatingandRuleValidate
+               Sample Rating and Rule Validation
  </span>
  </div>
  </SettingsSection>
 
  <SettingsSection
- title="RegressionTest"
- description={`canuseuseexample · Coverage ${regressionSummary.tagCoverage} Scenario`}
+           title="Regression Test"
+           description={`Test Cases · Covering ${regressionSummary.tagCoverage} Scenarios`}
  compact
  >
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <MetricCard
- label="useexampleTotal"
+               label="Total Test Cases"
  value={regressionSummary.total}
  icon={<ListChecks className="w-4 h-4" />}
  />
  <MetricCard
- label="Viarate"
+               label="Pass Rate"
  value={`${(regressionSummary.passRate * 100).toFixed(1)}%`}
  icon={<CheckCircle2 className="w-4 h-4" />}
  highlight={regressionSummary.passRate < 0.9}
  />
  <MetricCard
- label="Faileduseexample"
+               label="Failed Test Cases"
  value={regressionSummary.failed}
  icon={<XCircle className="w-4 h-4" />}
  highlight={regressionSummary.failed > 0}
  />
  <MetricCard
- label="RecentExecute"
+               label="Last Execution"
  value={regressionSummary.lastRunAt ? formatTime(regressionSummary.lastRunAt) : "-"}
  icon={<Calendar className="w-4 h-4" />}
  />
@@ -721,7 +721,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="relative">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchuseexampleTitleorTags..."
+                   placeholder="Search test case title or tags..."
  value={regressionQuery}
  onChange={(event) => setRegressionQuery(event.target.value)}
  className="pl-9 h-9 w-[220px] bg-surface-200 border-border text-foreground placeholder:text-foreground-muted focus:border-brand-400"
@@ -729,10 +729,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
  <Select value={regressionStatusFilter} onValueChange={setRegressionStatusFilter}>
  <SelectTrigger className="w-[140px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="StatusFilter" />
+ <SelectValue placeholder="Status filter" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Statuses</SelectItem>
  {Object.entries(regressionStatusConfig).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -742,14 +742,14 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </Select>
  </div>
  <div className="text-[12px] text-foreground-muted">
- {filteredRegressionCases.length} useexample
+                 {filteredRegressionCases.length} test cases
  </div>
  </div>
 
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
- <div className="col-span-4">useexample</div>
- <div className="col-span-3">Validate</div>
+                 <div className="col-span-4">Test Case</div>
+                 <div className="col-span-3">Validation</div>
  <div className="col-span-2">Tags</div>
  <div className="col-span-2">Result</div>
  <div className="col-span-1">Recent</div>
@@ -757,7 +757,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  {filteredRegressionCases.length === 0 ? (
  <div className="py-10 text-center text-[13px] text-foreground-muted">
- NoneMatch'sRegressionuseexample
+ No matching regression test cases
  </div>
  ) : (
  filteredRegressionCases.map((item) => {
@@ -836,29 +836,29 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1">
  <ListChecks className="w-3 h-3" />
- useexampleSupportuseandVersionManage
+               Test cases support versioning and management.
  </span>
  <span className="flex items-center gap-1">
  <BarChart3 className="w-3 h-3" />
- RatingBased onRuleValidateandstyleReview
+               Rating based on rule validation and sample review.
  </span>
  </div>
  </div>
  </SettingsSection>
 
  <SettingsSection
- title="personReviewstylePolicy"
- description={`canExecutePolicy · RecentUpdate ${formatTime(reviewSamplingStrategy.lastUpdated)}`}
+           title="Human Review Sampling Policy"
+           description={`Active Policies · Last Updated ${formatTime(reviewSamplingStrategy.lastUpdated)}`}
  compact
  >
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <MetricCard
- label="Basicstylerate"
+               label="Base Sample Rate"
  value={`${Math.round(reviewSamplingStrategy.baseRate * 100)}%`}
  icon={<Target className="w-4 h-4" />}
  />
  <MetricCard
- label="eachdaystyleonlimit"
+               label="Daily Sample Limit"
  value={`${reviewSamplingStrategy.dailyMin}-${reviewSamplingStrategy.dailyMax}`}
  icon={<Filter className="w-4 h-4" />}
  />
@@ -868,7 +868,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  icon={<Clock className="w-4 h-4" />}
  />
  <MetricCard
- label="ExecuteRule"
+               label="Active Rules"
  value={`${activeSamplingRules.length}/${reviewSamplingStrategy.rules.length}`}
  icon={<ClipboardCheck className="w-4 h-4" />}
  />
@@ -877,7 +877,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="mt-4 grid lg:grid-cols-[1.1fr_1fr] gap-4">
  <div className="rounded-md bg-surface-100 border border-border p-4">
  <div className="text-[11px] text-foreground-muted uppercase tracking-wider mb-3">
- styleTrigger
+                 Sample Triggers
  </div>
  <div className="space-y-3">
  {reviewSamplingStrategy.triggers.map((trigger) => (
@@ -896,7 +896,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  <div className="rounded-md bg-surface-100 border border-border p-4">
  <div className="text-[11px] text-foreground-muted uppercase tracking-wider mb-3">
- CoverageMatrix
+                 Coverage Matrix
  </div>
  <div className="space-y-3">
  {reviewSamplingStrategy.coverage.map((item) => (
@@ -923,10 +923,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="mt-4 rounded-md bg-surface-100 border border-border overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <div className="col-span-4">Scenario / Trigger</div>
- <div className="col-span-2">stylerate</div>
+             <div className="col-span-2">Sample Rate</div>
  <div className="col-span-3">Priority / Status</div>
  <div className="col-span-1">SLA</div>
- <div className="col-span-2">Reviewperson</div>
+             <div className="col-span-2">Reviewer</div>
  </div>
  {reviewSamplingStrategy.rules.map((rule) => {
  const priority = reviewPriorityConfig[rule.priority];
@@ -978,7 +978,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  <div className="mt-4 rounded-md bg-surface-75/60 border border-border p-4">
  <div className="text-[11px] text-foreground-muted uppercase tracking-wider mb-3">
- ReviewChecklist
+                 Review Checklist
  </div>
  <div className="grid md:grid-cols-2 gap-2">
  {reviewSamplingStrategy.checklist.map((item) => (
@@ -994,9 +994,9 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <Badge
  variant="secondary"
  className="text-[10px] bg-brand-200 text-brand-500"
- >
- select
- </Badge>
+                   >
+                     Required
+                   </Badge>
  )}
  </div>
  ))}
@@ -1010,23 +1010,23 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </span>
  <span className="flex items-center gap-1">
  <ShieldCheck className="w-3 h-3" />
- Upgradevalue: {Math.round(reviewSamplingStrategy.escalationThreshold * 100)}%
+               Escalation Threshold: {Math.round(reviewSamplingStrategy.escalationThreshold * 100)}%
  </span>
  <span className="flex items-center gap-1">
  <Target className="w-3 h-3" />
- : {Math.round(reviewSamplingStrategy.confidenceGate * 100)}%
+               Confidence Gate: {Math.round(reviewSamplingStrategy.confidenceGate * 100)}%
  </span>
  </div>
  </SettingsSection>
 
  <SettingsSection
- title="ExecuteLogs"
- description="RecentExecute'sLogsSummaryandErrorTip"
+           title="Execution Logs"
+           description="Recent execution log summary and error tips"
  compact
  >
  {recentExecutions.length === 0 ? (
  <div className="py-6 text-center text-[12px] text-foreground-muted">
- NoneExecuteLogs, canfirstTrigger1timesRunViewDetailedRecord.
+               No execution logs. Trigger a run first to view detailed records.
  </div>
  ) : (
  <div className="space-y-3">
@@ -1052,7 +1052,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </span>
  </div>
  <div className="mt-2 text-[11px] text-foreground-muted">
- {execution.error_message || "ExecuteNormal, NoneErrorLogs."}
+                   {execution.error_message || "Execution normal. No error logs."}
  </div>
  </div>
  <div className="text-[11px] text-foreground-light">
@@ -1066,8 +1066,8 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </SettingsSection>
 
  <SettingsSection
- title="NodeStatus"
- description="keyNodeHealthandRecent1timesStatus"
+           title="Node Status"
+           description="Key node health and latest execution status."
  compact
  >
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
@@ -1103,7 +1103,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
  </SettingsSection>
 
- {/* ExecuteList */}
+             {/* Execution List */}
  <div className="mt-6">
  {/* Toolbar */}
  <div className="flex items-center justify-between mb-4">
@@ -1111,7 +1111,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="relative">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchExecute ID orErrorInfo..."
+                   placeholder="Search execution ID or error info..."
  value={executionQuery}
  onChange={(event) => setExecutionQuery(event.target.value)}
  className="pl-9 h-9 w-[240px] bg-surface-200 border-border text-foreground placeholder:text-foreground-muted focus:border-brand-400"
@@ -1119,10 +1119,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
  <Select value={statusFilter} onValueChange={setStatusFilter}>
  <SelectTrigger className="w-[140px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="StatusFilter" />
+ <SelectValue placeholder="Status filter" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Statuses</SelectItem>
  {Object.entries(statusConfig).map(([key, config]) => (
  <SelectItem key={key} value={key}>
  {config.label}
@@ -1132,7 +1132,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </Select>
  <Select value={nodeTypeFilter} onValueChange={setNodeTypeFilter}>
  <SelectTrigger className="w-[150px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="NodeType" />
+ <SelectValue placeholder="Node type" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {nodeTypeOptions.map((option) => (
@@ -1144,7 +1144,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </Select>
  <Select value={timeRangeFilter} onValueChange={setTimeRangeFilter}>
  <SelectTrigger className="w-[150px] h-9 bg-surface-75 border-border">
- <SelectValue placeholder="TimeRange" />
+ <SelectValue placeholder="Time range" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {timeRangeOptions.map((option) => (
@@ -1157,7 +1157,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
 
  <div className="text-[12px] text-foreground-muted">
- Currentpage {filteredExecutions.length} · Total {total} 
+                 Current page {filteredExecutions.length} · Total {total} 
  </div>
  </div>
 
@@ -1171,18 +1171,18 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
  {/* head */}
  <div className="grid grid-cols-[1.6fr_1fr_1fr_2.2fr_1fr_1.4fr] gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
- <div>Execute ID</div>
- <div>Status</div>
- <div>Duration</div>
- <div>Error</div>
- <div>TriggerType</div>
+               <div>Execution ID</div>
+               <div>Status</div>
+               <div>Duration</div>
+               <div>Error</div>
+               <div>Trigger Type</div>
  <div>Time</div>
  </div>
 
- {/* ExecuteRecord */}
+               {/* Execution Records */}
  {filteredExecutions.length === 0 ? (
  <div className="py-12 text-center text-[13px] text-foreground-muted">
- NoneExecuteRecord
+                   No Execution Records
  </div>
  ) : (
  filteredExecutions.map((execution) => {
@@ -1199,7 +1199,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  )}
  onClick={() => setActiveExecutionId(execution.id)}
  >
- {/* Execute ID */}
+                     {/* Execution ID */}
  <div>
  <span className="text-[12px] font-mono text-foreground-light">
  {execution.id.slice(0, 8)}...
@@ -1229,7 +1229,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  {execution.error_message || "—"}
  </div>
 
- {/* TriggermethodandAction */}
+                     {/* Trigger Method and Actions */}
  <div className="flex items-center gap-2">
  <span className="text-[12px] text-foreground-muted">
  {resolveTriggerType(execution)}
@@ -1294,22 +1294,22 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  )}
 
  <SettingsSection
- title="ExecuteDetails"
- description="NodeStatus, LogsandInputOutputSnapshot"
+           title="Execution Details"
+           description="Node Status, Logs, and Input/Output Snapshots"
  compact
  >
  {!activeExecution ? (
  <div className="py-6 text-center text-[12px] text-foreground-muted">
- Please select1ExecuteRecordViewDetails.
+                 Please select an execution record to view details.
  </div>
  ) : (
  <div className="space-y-4">
  <div className="grid gap-3 md:grid-cols-4">
  <div className="rounded-md border border-border bg-surface-75 px-3 py-2">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- Execute ID
- </div>
- <div className="mt-1 text-[12px] text-foreground font-mono">
+                       Execution ID
+                       </div>
+                       <div className="mt-1 text-[12px] text-foreground font-mono">
  {activeExecution.id.slice(0, 12)}...
  </div>
  </div>
@@ -1335,10 +1335,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
  <div className="rounded-md border border-border bg-surface-75 px-3 py-2">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- TriggerType
- </div>
- <div className="mt-1 text-[12px] text-foreground">
- {resolveTriggerType(activeExecution)}
+                       Trigger Type
+                       </div>
+                       <div className="mt-1 text-[12px] text-foreground">
+                         {resolveTriggerType(activeExecution)}
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 px-3 py-2">
@@ -1354,10 +1354,10 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="grid gap-4 lg:grid-cols-2">
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[12px] font-medium text-foreground mb-2">
- NodeStatus
- </div>
- <div className="space-y-2">
- {activeNodeFlow.map((node) => {
+                     Node Status
+                     </div>
+                     <div className="space-y-2">
+                       {activeNodeFlow.map((node) => {
  const status = getStatusConfig(node.status);
  const StatusIcon = status.icon;
  return (
@@ -1381,9 +1381,9 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[12px] font-medium text-foreground mb-2">
- ExecuteLogs
- </div>
- <div className="space-y-2 text-[11px] text-foreground-muted">
+                     Execution Logs
+                     </div>
+                     <div className="space-y-2 text-[11px] text-foreground-muted">
  {buildExecutionLogs(activeExecution).map((line) => (
  <div key={line}>{line}</div>
  ))}
@@ -1397,7 +1397,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="grid gap-4 lg:grid-cols-2">
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[12px] font-medium text-foreground mb-2">
- InputSnapshot
+                     Input Snapshot
  </div>
  <pre className="rounded-md bg-surface-200/70 border border-border px-3 py-2 text-[11px] text-foreground-muted whitespace-pre-wrap font-mono">
  {JSON.stringify(activeExecution.inputs || {}, null, 2)}
@@ -1405,7 +1405,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[12px] font-medium text-foreground mb-2">
- OutputSnapshot
+                     Output Snapshot
  </div>
  <pre className="rounded-md bg-surface-200/70 border border-border px-3 py-2 text-[11px] text-foreground-muted whitespace-pre-wrap font-mono">
  {JSON.stringify(activeExecution.outputs || {}, null, 2)}

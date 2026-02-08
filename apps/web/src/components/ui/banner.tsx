@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * NotificationsBannerComponent
- * Used forDisplaySystemAnnouncement, Info, Warningetc
+ * Notification Banner Component
+ * Used to display system announcements, info, warnings, etc.
  */
 
 import { useState, ReactNode } from "react";
@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 // ============================================
-// BasicBanner
+// Basic Banner
 // ============================================
 
 interface BannerProps {
@@ -166,7 +166,7 @@ export function Banner({
 }
 
 // ============================================
-// TopallBanner
+// Top Banner
 // ============================================
 
 interface TopBannerProps {
@@ -240,7 +240,7 @@ export function TopBanner({
 }
 
 // ============================================
-// FeaturesIntroductionBanner
+// Feature Introduction Banner
 // ============================================
 
 interface FeatureBannerProps {
@@ -293,7 +293,7 @@ export function FeatureBanner({
  className
  )}
  >
- {/* BackgroundDecoration */}
+ {/* Background Decoration */}
  <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
@@ -373,7 +373,7 @@ export function FeatureBanner({
 }
 
 // ============================================
-// Cookie AgreeBanner
+// Cookie Consent Banner
 // ============================================
 
 interface CookieBannerProps {
@@ -396,8 +396,8 @@ export function CookieBanner({
  <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-4">
  <div className="flex-1 text-center md:text-left">
  <p className="text-sm text-foreground">
- WeUsage Cookie comeImproveyou'sBrowseExperience, ProvidePersonalizationContentandAnalyticsWebsite.
- ContinueUsagecurrentWebsitenowRepresentyouAgreeWeUsage Cookie.
+ We use cookies to improve your browsing experience, provide personalized content, and analyze website traffic.
+ By continuing to use this website, you agree to our use of cookies.
  </p>
  </div>
  <div className="flex items-center gap-2 shrink-0">
@@ -425,7 +425,7 @@ export function CookieBanner({
  setIsDismissed(true);
  }}
  >
- Acceptallsection
+ Accept All
  </Button>
  </div>
  </div>
@@ -434,7 +434,7 @@ export function CookieBanner({
 }
 
 // ============================================
-// MaintainBanner
+// Maintenance Banner
 // ============================================
 
 interface MaintenanceBannerProps {
@@ -452,10 +452,10 @@ export function MaintenanceBanner({
  <Banner
  variant="warning"
  icon={AlertTriangle}
- title="SystemMaintainNotifications"
+ title="System Maintenance Notice"
  description={
  message ||
- `Systemwillat ${scheduledTime || "nowwill"} ProceedMaintain${duration ? `, EstimatedContinuous ${duration}`: ""}.atthisbetween, PartialFeaturescancanNoneUsage.`
+ `The system will undergo maintenance at ${scheduledTime || "a scheduled time"}${duration ? `, estimated duration: ${duration}` : ""}. During this period, some features may be unavailable.`
  }
  dismissible={false}
  />
@@ -463,7 +463,7 @@ export function MaintenanceBanner({
 }
 
 // ============================================
-// UpgradeBanner
+// Upgrade Banner
 // ============================================
 
 interface UpgradeBannerProps {
@@ -484,11 +484,11 @@ export function UpgradeBanner({
  return (
  <FeatureBanner
  icon={Zap}
- title={`Upgradeto ${planName} Plan${discount ? ` - ${discount} Discount`: ""}`}
- description={`UnlockmoremultipleAdvancedFeatures, ImproveWorkrate${expiresIn ? `.DiscountCountdowntime: ${expiresIn}`: ""}`}
- features={["NonelimitWorkflow", "PrioritySupport", "AdvancedAnalytics", "TeamCollaboration"]}
+ title={`Upgrade to ${planName} Plan${discount ? ` - ${discount} Off` : ""}`}
+ description={`Unlock more advanced features and improve productivity${expiresIn ? `. Offer ends in: ${expiresIn}` : ""}`}
+ features={["Unlimited Workflows", "Priority Support", "Advanced Analytics", "Team Collaboration"]}
  action={{
- label: "NowUpgrade",
+ label: "Upgrade Now",
  href,
  onClick: onUpgrade,
  }}

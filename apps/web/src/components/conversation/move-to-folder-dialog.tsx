@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * MoveConversationtoFolderDialog
+ * Move Conversation to Folder Dialog
  */
 
 import { useState } from "react";
@@ -49,20 +49,20 @@ export function MoveToFolderDialog({
  await conversationApi.update(conversationIds[0], {
  folderId: selectedFolderId || undefined,
  });
- toast.success("ConversationalreadyMove");
+ toast.success("Conversation moved successfully");
  } else {
  // BatchMove
  await conversationApi.batchMove({
  ids: conversationIds,
  folderId: selectedFolderId || undefined,
  });
- toast.success(`alreadyMove ${conversationIds.length} Conversation`);
+ toast.success(`Moved ${conversationIds.length} conversations successfully`);
  }
  onSuccess();
  onOpenChange(false);
  } catch (error) {
  console.error("Move error:", error);
- toast.error("MoveFailed, PleaseRetry");
+ toast.error("Move failed, please try again");
  } finally {
  setIsLoading(false);
  }
@@ -76,13 +76,13 @@ export function MoveToFolderDialog({
  <DialogHeader>
  <DialogTitle className="flex items-center gap-2">
  <FolderOpen className="w-5 h-5" />
- {isMultiple ? `Move ${conversationIds.length} Conversation`: "MoveConversation"}
+ {isMultiple ? `Move ${conversationIds.length} Conversations` : "Move Conversation"}
  </DialogTitle>
  </DialogHeader>
 
  <div className="py-4">
  <p className="text-sm text-foreground-light mb-4">
- SelectTargetFolder: 
+ Select target folder:
  </p>
  
  <div className="space-y-1 max-h-[300px] overflow-y-auto">
@@ -100,7 +100,7 @@ export function MoveToFolderDialog({
  <Home className="w-5 h-5 text-foreground-light" />
  <div className="flex-1">
  <p className="font-medium">Directory</p>
- <p className="text-xs text-foreground-light">notenterwhatFolder</p>
+ <p className="text-xs text-foreground-light">Not in any folder</p>
  </div>
  </button>
 
@@ -127,7 +127,7 @@ export function MoveToFolderDialog({
  <p className="font-medium">{folder.name}</p>
  <p className="text-xs text-foreground-light flex items-center gap-1">
  <MessageSquare className="w-3 h-3" />
- {folder.conversationCount} Conversation
+              {folder.conversationCount} Conversations
  </p>
  </div>
  </button>
@@ -136,7 +136,7 @@ export function MoveToFolderDialog({
  {folders.length === 0 && (
  <div className="text-center py-6">
  <Folder className="w-10 h-10 mx-auto text-foreground-light/50 mb-2" />
- <p className="text-sm text-foreground-light">NoneFolder</p>
+ <p className="text-sm text-foreground-light">No Folders</p>
  </div>
  )}
  </div>
@@ -151,7 +151,7 @@ export function MoveToFolderDialog({
  Cancel
  </Button>
  <Button onClick={handleMove} disabled={isLoading}>
- {isLoading ? "Move...": "Move"}
+ {isLoading ? "Moving..." : "Move"}
  </Button>
  </DialogFooter>
  </DialogContent>

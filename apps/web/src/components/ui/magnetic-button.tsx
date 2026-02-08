@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * MagneticButton - MagneticButtonComponent
+ * MagneticButton - Magnetic Button Component
  * 
- * MouseHovertimewillMagneticEffect, ButtonwillFollowMouseMove
- * SupportCustomIntensity, ZoomEffectandElement
+ * On mouse hover, applies a magnetic effect where the button follows the cursor.
+ * Supports custom intensity, zoom effects, and wrapping any element.
  */
 
 import { useState, useRef, useCallback, ReactNode } from "react";
@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 interface MagneticButtonProps {
  children: ReactNode;
  className?: string;
- strength?: number; // MagneticIntensity, Default 0.3
- scale?: number; // Hovertime'sZoom, Default 1.05
+ strength?: number; // Magnetic intensity, default 0.3
+ scale?: number; // Scale on hover, default 1.05
  disabled?: boolean;
  onClick?: () => void;
 }
@@ -83,9 +83,9 @@ export function MagneticButton({
 }
 
 /**
- * MagneticWrapper - MagneticWrapper
+ * MagneticWrapper - Magnetic Wrapper
  * 
- * canwithwillwhatElementWrapperhasMagneticEffect'sElement
+ * Wraps any element with a magnetic hover effect
  */
 interface MagneticWrapperProps {
  children: ReactNode;

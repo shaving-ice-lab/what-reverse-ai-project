@@ -39,7 +39,7 @@ export const ParallelNode = memo(function ParallelNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -54,7 +54,7 @@ export const ParallelNode = memo(function ParallelNode({
  <GitBranch className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "androwExecute"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Parallel Execute"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Zap className="h-3 w-3" />
  {branchCount} Branch
@@ -65,14 +65,14 @@ export const ParallelNode = memo(function ParallelNode({
  {/* Content */}
  <div className="px-3 py-2.5 space-y-2 text-xs">
  <div className="flex items-center gap-2">
- <span className="text-foreground-muted">etcpending:</span>
+ <span className="text-foreground-muted">Pending:</span>
  <span className={cn(
  "px-1.5 py-0.5 rounded",
  waitAll 
  ? "bg-brand-200/60 text-brand-500" 
  : "bg-warning-200 text-warning"
  )}>
- {waitAll ? "etcpendingallsection": "1Done"}
+ {waitAll ? "Wait for All": "First Done"}
  </span>
  </div>
  {config.timeout && (
@@ -84,7 +84,7 @@ export const ParallelNode = memo(function ParallelNode({
  )}
  {config.failFast && (
  <span className="inline-flex px-1.5 py-0.5 rounded bg-warning-200 text-warning">
- QuickFailed
+ Quick Failed
  </span>
  )}
  </div>

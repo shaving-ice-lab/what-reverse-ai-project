@@ -3,7 +3,7 @@
  */
 
 /**
- * ParseVariablePath, FetchNestedfor'svalue
+ * Parse Variable Path, Get Nested Value
  * @example getValueByPath({ user: { name: 'John' } }, 'user.name') => 'John'
  */
 export function getValueByPath(obj: unknown, path: string): unknown {
@@ -37,7 +37,7 @@ export function getValueByPath(obj: unknown, path: string): unknown {
 }
 
 /**
- * SettingsNestedfor'svalue
+ * Set Nested Value
  */
 export function setValueByPath(
  obj: Record<string, unknown>,
@@ -59,7 +59,7 @@ export function setValueByPath(
 }
 
 /**
- * ParseTemplateString'sVariable
+ * Parse Template String's Variable
  * @example renderTemplate('Hello {{name}}!', { name: 'World' }) => 'Hello World!'
  */
 export function renderTemplate(
@@ -73,7 +73,7 @@ export function renderTemplate(
  const value = getValueByPath(variables, path);
  
  if (value === undefined || value === null) {
- return match; // RetainOriginalVariableMark
+      return match; // Retain Original Variable Mark
  }
  
  if (typeof value === "object") {
@@ -85,7 +85,7 @@ export function renderTemplate(
 }
 
 /**
- * DetectTemplate'sVariable
+ * Detect Template's Variable
  */
 export function extractTemplateVariables(template: string): string[] {
  const variables: string[] = [];
@@ -103,14 +103,14 @@ export function extractTemplateVariables(template: string): string[] {
 }
 
 /**
- * CreateLatency
+ * Create Latency
  */
 export function delay(ms: number): Promise<void> {
  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
- * Retry'sExecutecount
+ * Retry's Execute Count
  */
 export async function withRetry<T>(
  fn: () => Promise<T>,
@@ -140,7 +140,7 @@ export async function withRetry<T>(
 }
 
 /**
- * Timeout'sExecutecount
+ * Timeout's Execute Count
  */
 export async function withTimeout<T>(
  fn: () => Promise<T>,
@@ -168,7 +168,7 @@ export function createNodeError(
 }
 
 /**
- * FormatContinuousTime
+ * Format Continuous Time
  */
 export function formatDuration(ms: number): string {
  if (ms < 1000) return `${ms}ms`;
@@ -191,7 +191,7 @@ export function safeJSONParse<T = unknown>(
 }
 
 /**
- * Deep Copyfor
+ * Deep Copy For
  */
 export function deepClone<T>(obj: T): T {
  if (obj === null || typeof obj !== "object") {
@@ -213,7 +213,7 @@ export function deepClone<T>(obj: T): T {
 }
 
 /**
- * andVariableContext
+ * And Variable Context
  */
 export function mergeContext(
  ...contexts: Record<string, unknown>[]

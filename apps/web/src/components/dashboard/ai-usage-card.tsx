@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * AI UsageMonitorCard
+ * AI Usage Monitor Card
  * 
- * Token ConsumptionStatistics, byModelDistribution(GPT-4/Claude/LocalLLM), UsageTrendandWarning
- * Usage Stats API FetchRealData
+ * Token consumption statistics, model distribution (GPT-4/Claude/Local LLM), usage trends and warnings.
+ * Uses Stats API to fetch real data.
  */
 
 import { useState, useMemo, useEffect, useCallback } from "react";
@@ -36,7 +36,7 @@ interface UsageTrend {
  tokens: number;
 }
 
-// DefaultModelDistribution( API notBackModelLevelDatatimeUsage)
+// Default model distribution (used when API doesn't return model-level data)
 const defaultModelUsageData: ModelUsage[] = [
  { name: "GPT-4", tokens: 0, cost: 0, color: "#10B981", icon: "🟢" },
  { name: "GPT-3.5", tokens: 0, cost: 0, color: "#3B82F6", icon: "🔵" },
@@ -44,7 +44,7 @@ const defaultModelUsageData: ModelUsage[] = [
  { name: "Local LLM", tokens: 0, cost: 0, color: "#F59E0B", icon: "🟡" },
 ];
 
-// QuotaSettings
+// Quota Settings
 const MONTHLY_TOKEN_LIMIT = 2000000;
 const MONTHLY_BUDGET = 50;
 
@@ -59,7 +59,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  const [trendData, setTrendData] = useState<UsageTrend[]>([]);
  const [modelUsageData, setModelUsageData] = useState<ModelUsage[]>(defaultModelUsageData);
 
- // LoadStatisticsData
+  // Load statistics data
  const loadStats = useCallback(async () => {
  setIsLoading(true);
  try {
@@ -68,12 +68,12 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  statsApi.getExecutionTrends(7),
  ]);
  
- // FormatOverviewData
+    // Format overview data
  if (overviewResponse.data) {
  const formatted = formatOverviewStats(overviewResponse.data);
  setOverviewData(formatted);
  
- // Based ontotal Token UsageMockModelDistribution
+ // Mock model distribution based on total token usage
  const totalTokens = formatted.totalTokensUsed || 0;
  if (totalTokens > 0) {
  setModelUsageData([
@@ -85,23 +85,23 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  }
  }
  
- // FormatTrendData
+    // Format trend data
  if (trendsResponse.data) {
  const formattedTrends = formatDailyStats(trendsResponse.data);
- const weekdays = ["weeksday", "weeks1", "weeks2", "weeks3", "weeks4", "weeks5", "weeks6"];
+ const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
  setTrendData(formattedTrends.map((t) => ({
  date: weekdays[new Date(t.date).getDay()],
  tokens: t.tokensUsed || 0,
  })));
  }
  } catch (err) {
- console.error("LoadStatisticsDataFailed:", err);
+      console.error("Failed to load statistics data:", err);
  } finally {
  setIsLoading(false);
  }
  }, []);
 
- // InitialLoad
+  // Initial load
  useEffect(() => {
  loadStats();
  }, [loadStats]);
@@ -112,7 +112,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  const tokenUsagePercent = MONTHLY_TOKEN_LIMIT > 0 ? (totalTokens / MONTHLY_TOKEN_LIMIT) * 100 : 0;
  const budgetUsagePercent = MONTHLY_BUDGET > 0 ? (totalCost / MONTHLY_BUDGET) * 100 : 0;
  
- // Calculaterate(Usage API Back'sweeksDataforcompare)
+ // Calculate rate (compare weekly data from API)
  const runsThisWeek = overviewData?.runsThisWeek || 0;
  const avgTokensPerRun = runsThisWeek > 0 ? totalTokens / runsThisWeek : 0;
  const tokenChange = avgTokensPerRun > 0 ? ((avgTokensPerRun - 1000) / 1000) * 100 : 0;
@@ -128,13 +128,13 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  }, [modelUsageData, overviewData]);
 
  const usageTrendData = trendData.length > 0 ? trendData : [
- { date: "weeks1", tokens: 0 },
- { date: "weeks2", tokens: 0 },
- { date: "weeks3", tokens: 0 },
- { date: "weeks4", tokens: 0 },
- { date: "weeks5", tokens: 0 },
- { date: "weeks6", tokens: 0 },
- { date: "weeksday", tokens: 0 },
+ { date: "Mon", tokens: 0 },
+ { date: "Tue", tokens: 0 },
+ { date: "Wed", tokens: 0 },
+ { date: "Thu", tokens: 0 },
+ { date: "Fri", tokens: 0 },
+ { date: "Sat", tokens: 0 },
+ { date: "Sun", tokens: 0 },
  ];
 
  const maxTrendValue = Math.max(...usageTrendData.map((d) => d.tokens), 1);
@@ -148,8 +148,8 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  <Sparkles className="w-5 h-5 text-violet-500" />
  </div>
  <div>
- <h3 className="font-bold text-foreground">AI UsageMonitor</h3>
- <p className="text-xs text-muted-foreground">currentmonthsToken Consumption</p>
+<h3 className="font-bold text-foreground">AI Usage Monitor</h3>
+    <p className="text-xs text-muted-foreground">Current month&apos;s token consumption</p>
  </div>
  </div>
  
@@ -157,7 +157,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  {stats.isWarning && (
  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs">
  <AlertTriangle className="w-3 h-3" />
- UsageWarning
+ Warning
  </div>
  )}
  <button
@@ -196,7 +196,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  </p>
  <div className="mt-3">
  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
- <span>QuotaUsage</span>
+ <span>Quota Usage</span>
  <span className="font-mono">{stats.tokenUsagePercent.toFixed(0)}%</span>
  </div>
  <div className="h-2 bg-muted/50 rounded-full overflow-hidden ring-1 ring-border/30">
@@ -215,7 +215,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
 
  <div className="p-4 rounded-xl bg-gradient-to-br from-violet-500/5 to-transparent ring-1 ring-violet-500/10 hover:ring-violet-500/20 transition-all duration-300 group">
  <div className="flex items-center justify-between mb-2">
- <span className="text-xs font-medium text-muted-foreground">EstimateCost</span>
+ <span className="text-xs font-medium text-muted-foreground">Estimated Cost</span>
  <div className="p-1 rounded-md bg-muted/50 hover:bg-violet-500/10 cursor-help transition-colors">
  <Info className="w-3 h-3 text-muted-foreground" />
  </div>
@@ -225,7 +225,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  </p>
  <div className="mt-3">
  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
- <span>BudgetUsage</span>
+ <span>Budget Usage</span>
  <span className="font-mono">{stats.budgetUsagePercent.toFixed(0)}%</span>
  </div>
  <div className="h-2 bg-muted/50 rounded-full overflow-hidden ring-1 ring-border/30">
@@ -243,14 +243,14 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  </div>
  </div>
 
- {/* youTrend - Enhanced */}
+ {/* Usage Trend - Enhanced */}
  <div className="mb-5">
  <div className="flex items-center justify-between mb-3">
  <span className="text-xs font-medium text-muted-foreground flex items-center gap-2">
  <TrendingUp className="w-3 h-3" />
- currentweeksTrend
+ This Week&apos;s Trend
  </span>
- <span className="text-[10px] text-muted-foreground/60">ClickViewDetails</span>
+ <span className="text-[10px] text-muted-foreground/60">Click to View Details</span>
  </div>
  <div className="flex items-end gap-1.5 h-14 px-1">
  {usageTrendData.map((data, index) => {
@@ -270,10 +270,10 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  )}
  style={{ height: `${Math.max(height, 8)}%`, minHeight: "6px" }}
  >
- {/* HoverHighlight */}
- <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
- 
- {/* HoverTip */}
+{/* Hover Highlight */}
+    <div className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+    
+    {/* Hover Tooltip */}
  <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-popover/95 backdrop-blur-sm border border-border/50 rounded-lg px-2.5 py-1.5 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap z-10 shadow-lg scale-90 group-hover:scale-100">
  <span className="font-semibold text-foreground">{(data.tokens / 1000).toFixed(0)}K</span>
  <span className="text-muted-foreground ml-1">tokens</span>
@@ -341,7 +341,7 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  })}
  </div>
 
- {/* DetailedList */}
+ {/* Detailed List */}
  {showDetails && (
  <div className="mt-3 space-y-2 animate-in slide-in-from-top-2">
  {modelUsageData.map((model, index) => (
@@ -408,16 +408,16 @@ export function AIUsageCard({ className }: AIUsageCardProps) {
  )}
  </div>
 
- {/* WarningTip */}
+ {/* Warning Notice */}
  {stats.isWarning && (
  <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
  <div className="flex items-start gap-2">
  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
  <div>
- <p className="text-sm font-medium text-amber-500">UsageWarning</p>
- <p className="text-xs text-muted-foreground mt-1">
- currentmonthsToken Usagealready {stats.tokenUsagePercent.toFixed(0)}%, SuggestionReasonablePlanningUsageorUpgradePlan.
- </p>
+ <p className="text-sm font-medium text-amber-500">Usage Warning</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Current month's token usage already {stats.tokenUsagePercent.toFixed(0)}%, suggestion: reasonable planning usage or upgrade plan.
+        </p>
  </div>
  </div>
  </div>

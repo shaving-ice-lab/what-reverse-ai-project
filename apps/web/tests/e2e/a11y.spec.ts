@@ -15,7 +15,7 @@ test("public runtime page passes basic a11y checks", async ({ page }) => {
       return route.fulfill(
         respondOk({
           workspace: { name: "Demo Workspace", slug: "demo" },
-          app: { name: "daily reportAssistant", slug: "daily-report" },
+          app: { name: "Daily Report Assistant", slug: "daily-report" },
           schema: {
             ui_schema: {
               blocks: [
@@ -37,7 +37,7 @@ test("public runtime page passes basic a11y checks", async ({ page }) => {
     return route.fulfill(
       respondOk({
         workspace: { name: "Demo Workspace", slug: "demo" },
-        app: { name: "daily reportAssistant", slug: "daily-report" },
+        app: { name: "Daily Report Assistant", slug: "daily-report" },
         access_policy: { access_mode: "public_anonymous" },
         session_id: "sess_1",
       })

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * PlanningModule - canEdit + canvisual
- * with Workspace asuse's WBS EditandseeView
+ * Planning module – edit and view
+ * Workspace WBS: edit and see view
  */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -68,18 +68,18 @@ const statusColumns: Array<{
  accent: string;
  icon: React.ElementType;
 }> = [
- { key: "todo", label: "pending", accent: "text-foreground-light", icon: CircleDashed },
- { key: "in_progress", label: "Advance", accent: "text-sky-300", icon: Sparkles },
- { key: "blocked", label: "", accent: "text-amber-300", icon: ShieldAlert },
- { key: "done", label: "already", accent: "text-emerald-300", icon: CheckCircle2 },
+ { key: "todo", label: "Pending", accent: "text-foreground-light", icon: CircleDashed },
+ { key: "in_progress", label: "In Progress", accent: "text-sky-300", icon: Sparkles },
+ { key: "blocked", label: "Blocked", accent: "text-amber-300", icon: ShieldAlert },
+ { key: "done", label: "Done", accent: "text-emerald-300", icon: CheckCircle2 },
 ];
 
 const phasePalette: Record<string, { label: string; color: string; glow: string }> = {
- foundation: { label: "", color: "bg-[#2b6b5d]", glow: "shadow-[0_0_16px_rgba(43,107,93,0.6)]" },
+ foundation: { label: "Foundation", color: "bg-[#2b6b5d]", glow: "shadow-[0_0_16px_rgba(43,107,93,0.6)]" },
  core: { label: "Core", color: "bg-[#3b7aa0]", glow: "shadow-[0_0_16px_rgba(59,122,160,0.6)]" },
  release: { label: "Publish", color: "bg-[#80628a]", glow: "shadow-[0_0_16px_rgba(128,98,138,0.55)]" },
  access: { label: "Access", color: "bg-[#9b7d4a]", glow: "shadow-[0_0_16px_rgba(155,125,74,0.55)]" },
- other: { label: "otherhe", color: "bg-[#3a3a3a]", glow: "shadow-[0_0_12px_rgba(58,58,58,0.4)]" },
+ other: { label: "Other", color: "bg-[#3a3a3a]", glow: "shadow-[0_0_12px_rgba(58,58,58,0.4)]" },
 };
 
 function toDependencies(value: string): string[] {
@@ -289,7 +289,7 @@ export default function PlansPage() {
  }
  } catch (err) {
  console.error("Failed to load workspaces:", err);
- setError("WorkspaceLoadFailed, Please try again laterRetry.");
+ setError("Workspace load failed. Please try again later.");
  }
  };
  init();
@@ -314,7 +314,7 @@ export default function PlansPage() {
  }
  } catch (err) {
  console.error("Failed to load plan modules:", err);
- setError("PlanningModuleLoadFailed, PleaseCheckPermissionorafterRetry.");
+ setError("Planning module load failed. Please check permission or try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -464,7 +464,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to update dependencies:", err);
- setError("UpdateDependencyFailed, Please try again laterRetry.");
+ setError("Update dependency failed. Please try again later.");
  } finally {
  setDragSourceId(null);
  }
@@ -478,7 +478,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to remove dependency:", err);
- setError("RemoveDependencyFailed, Please try again laterRetry.");
+ setError("Remove dependency failed. Please try again later.");
  }
  };
 
@@ -512,19 +512,19 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to save module:", err);
- setError("SaveModuleFailed, PleaseCheckPermissionorafterRetry.");
+ setError("Save module failed. Please check permission or try again later.");
  }
  };
 
  const deleteModule = async (moduleId: string) => {
  if (!activeWorkspaceId) return;
- if (!confirm("ConfirmDeleteModuleandotherTask?thisActionNoneUndo.")) return;
+ if (!confirm("Confirm delete module and all its tasks? This action cannot be undone.")) return;
  try {
  await planApi.deleteModule(moduleId);
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to delete module:", err);
- setError("DeleteModuleFailed, Please try again laterRetry.");
+ setError("Delete module failed. Please try again later.");
  }
  };
 
@@ -594,19 +594,19 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to save task:", err);
- setError("SaveTaskFailed, Please try again laterRetry.");
+ setError("Save task failed. Please try again later.");
  }
  };
 
  const deleteTask = async (taskId: string) => {
  if (!activeWorkspaceId) return;
- if (!confirm("ConfirmDeleteTask?")) return;
+ if (!confirm("Confirm delete task?")) return;
  try {
  await planApi.deleteTask(taskId);
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to delete task:", err);
- setError("DeleteTaskFailed, Please try again laterRetry.");
+ setError("Delete task failed. Please try again later.");
  }
  };
 
@@ -617,7 +617,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to seed modules:", err);
- setError("InitialDefault WBS Failed, cancanalreadyInitialorNonePermission.");
+ setError("Failed to initialize default WBS. You may not have sufficient permissions.");
  }
  };
 
@@ -637,7 +637,7 @@ export default function PlansPage() {
  await loadVersions(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to create plan version:", err);
- setError("CreatePlanningVersionFailed, Please try again laterRetry.");
+ setError("Create planning version failed. Please try again later.");
  }
  };
 
@@ -648,13 +648,13 @@ export default function PlansPage() {
  setPreviewOpen(true);
  } catch (err) {
  console.error("Failed to load plan version:", err);
- setError("LoadVersionDetailsFailed, Please try again laterRetry.");
+ setError("Load version details failed. Please try again later.");
  }
  };
 
  const restoreVersion = async () => {
  if (!previewVersion || !activeWorkspaceId) return;
- if (!confirm("ConfirmRestoretothisVersion?CurrentPlanningwillbyReplace.")) return;
+ if (!confirm("Confirm restore to this version? Current planning will be replaced.")) return;
  try {
  await planApi.restoreVersion(previewVersion.id);
  setPreviewOpen(false);
@@ -662,7 +662,7 @@ export default function PlansPage() {
  await loadVersions(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to restore plan version:", err);
- setError("RestoreVersionFailed, Please try again laterRetry.");
+ setError("Restore version failed. Please try again later.");
  }
  };
 
@@ -670,8 +670,8 @@ export default function PlansPage() {
  if (isLoading) {
  return (
  <div className="rounded-xl border border-border bg-surface-100 p-6 text-[12px] text-foreground-light">
- LoadingPlanningData...
- </div>
+Loading planning data…
+</div>
  );
  }
 
@@ -679,12 +679,12 @@ export default function PlansPage() {
  return activeTasks.length === 0 ? (
  <ExceptionState
  variant="empty"
- title="Not yetTask"
- description="asCurrentModuleCreateTask, orImportDefault WBS."
- action={
- canManagePlan
- ? {
- label: "CreateTask",
+title="No tasks yet"
+description="Create a task in the current module, or import default WBS."
+action={
+canManagePlan
+? {
+label: "Create task",
  onClick: () => openCreateTask("todo"),
  icon: Plus,
  }
@@ -693,13 +693,13 @@ export default function PlansPage() {
  secondaryAction={
  canManagePlan
  ? {
- label: "ImportDefault WBS",
- onClick: seedDefaults,
- }
- : undefined
- }
- />
- ) : (
+label: "Import default WBS",
+onClick: seedDefaults,
+}
+: undefined
+}
+/>
+) : (
  <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
  {statusColumns.map((column) => {
  const ColumnIcon = column.icon;
@@ -734,7 +734,7 @@ export default function PlansPage() {
  <div className="space-y-3 flex-1">
  {tasks.length === 0 && (
  <div className="text-[11px] text-foreground-light border border-dashed border-border rounded-lg p-3">
- NoneTask, Clickrighton + Add.
+ No tasks. Click + to add.
  </div>
  )}
  {tasks.map((task) => {
@@ -841,8 +841,8 @@ export default function PlansPage() {
  {dependencyRows.length === 0 ? (
  <EmptyState
  icon={GitBranch}
- title="NoneDependency"
- description="firstasTaskConfigDependency."
+ title="No dependencies"
+ description="Add a task or configure a dependency first."
  size="sm"
  className="py-6"
  />
@@ -909,9 +909,9 @@ export default function PlansPage() {
  <div className="rounded-xl border border-border bg-surface-100/60 p-4">
  <div className="flex items-center gap-2 text-[12px] text-foreground mb-3">
  <GitBranch className="w-4 h-4 text-foreground-light" />
- Drag & DropDependency
+ Drag & Drop Dependencies
  <span className="text-[10px] text-foreground-light">
- TasktoTargetTaskon
+ Drag a task onto the target task
  </span>
  </div>
  <div className="space-y-2">
@@ -954,7 +954,7 @@ export default function PlansPage() {
  )}
  onClick={() => removeDependency(task, dep)}
  disabled={!canManagePlan}
- title={canManagePlan ? "ClickRemoveDependency": "NonePermissionEdit"}
+ title={canManagePlan ? "Click to remove dependency" : "No permission to edit"}
  >
  {dep}
  </button>
@@ -965,7 +965,7 @@ export default function PlansPage() {
  ))}
  {activeTasks.length === 0 && (
  <div className="text-[11px] text-foreground-light border border-dashed border-border rounded-lg p-3">
- NoneTaskcanDrag & Drop.
+ No tasks. You can drag and drop to reorder.
  </div>
  )}
  </div>
@@ -974,11 +974,11 @@ export default function PlansPage() {
  <div className="rounded-xl border border-border bg-surface-100/60 p-4 space-y-3">
  <div className="flex items-center gap-2 text-[12px] text-foreground">
  <AlertTriangle className="w-4 h-4 text-warning" />
- not yetParseDependency
+ Unresolved Dependencies
  </div>
  {dependencyGraph.unresolved.length === 0 ? (
  <div className="text-[11px] text-foreground-light border border-dashed border-border rounded-lg p-3">
- CurrentDependencyalreadyParse.
+ All dependencies are resolved.
  </div>
  ) : (
  <div className="space-y-2">
@@ -988,7 +988,7 @@ export default function PlansPage() {
  className="rounded-lg border border-border bg-background-200 px-3 py-2 text-[11px] text-foreground-light"
  >
  <div className="text-foreground">{item.task.title}</div>
- <div className="mt-1">not yetMatchDependency: {item.ref}</div>
+ <div className="mt-1">Unresolved dependency: {item.ref}</div>
  </div>
  ))}
  </div>
@@ -1004,7 +1004,7 @@ export default function PlansPage() {
  <div className="min-w-[720px] space-y-4">
  <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-foreground-light">
  <div className="flex items-center gap-2">
- <span>StartDate</span>
+ <span>Start Date</span>
  <Input
  type="date"
  value={ganttStartDate}
@@ -1013,16 +1013,16 @@ export default function PlansPage() {
  />
  </div>
  <div className="flex items-center gap-3">
- <span>CumulativeEstimate {ganttTotalDays} days</span>
- <span>EndDate: {ganttEndDate ? formatDate(ganttEndDate): "-"}</span>
+ <span>Total Estimate: {ganttTotalDays} days</span>
+ <span>End Date: {ganttEndDate ? formatDate(ganttEndDate) : "-"}</span>
  </div>
  </div>
  <div className="space-y-3">
  {ganttRows.length === 0 && (
  <EmptyState
  icon={CalendarRange}
- title="NoneTask"
- description="asEmpty."
+ title="No tasks"
+ description="No tasks in this view."
  size="sm"
  className="py-6"
  />
@@ -1066,11 +1066,11 @@ export default function PlansPage() {
  <div className="absolute inset-0 opacity-40 pointer-events-none bg-[linear-gradient(135deg,rgba(125,255,214,0.12),transparent_45%),linear-gradient(0deg,rgba(98,216,255,0.12),transparent_60%)]" />
  <div className="relative space-y-3">
  <div className="text-[11px] tracking-[0.3em] uppercase text-foreground-light">
- Workspace Signal
- </div>
- <Select value={activeWorkspaceId} onValueChange={setActiveWorkspaceId}>
- <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectWorkspace" />
+Workspace
+</div>
+<Select value={activeWorkspaceId} onValueChange={setActiveWorkspaceId}>
+<SelectTrigger className="h-9 bg-surface-75 border-border">
+<SelectValue placeholder="Select workspace" />
  </SelectTrigger>
  <SelectContent>
  {workspaces.map((workspace) => (
@@ -1081,7 +1081,7 @@ export default function PlansPage() {
  </SelectContent>
  </Select>
  <div className="text-[12px] text-foreground-light">
- CurrentModulecount: <span className="text-foreground">{modules.length}</span>
+ Current module count: <span className="text-foreground">{modules.length}</span>
  </div>
  </div>
  </div>
@@ -1089,8 +1089,8 @@ export default function PlansPage() {
  <div className="rounded-xl border border-border bg-surface-100/60 p-4">
  <div className="flex items-center justify-between mb-3">
  <div className="text-[11px] uppercase tracking-[0.2em] text-foreground-light">
- ModuleChecklist
- </div>
+Module checklist
+</div>
  <Badge variant="outline" className="text-[11px] border-border">
  WBS
  </Badge>
@@ -1099,26 +1099,26 @@ export default function PlansPage() {
  {modules.length === 0 && (
  <EmptyState
  icon={Layers}
- title="Not yetModule"
- description="firstImportDefault WBS orCreateModule."
+title="No modules yet"
+description="Import default WBS first or create a module."
  tone="info"
  size="sm"
  className="py-6"
  action={
  canManagePlan
  ? {
- label: "ImportDefault WBS",
- onClick: seedDefaults,
- icon: Wand2,
- }
+label: "Import default WBS",
+onClick: seedDefaults,
+icon: Wand2,
+}
  : undefined
  }
  secondaryAction={
  canManagePlan
  ? {
- label: "CreateModule",
- onClick: openCreateModule,
- }
+label: "Create module",
+onClick: openCreateModule,
+}
  : undefined
  }
  />
@@ -1138,7 +1138,7 @@ export default function PlansPage() {
  <div className="flex items-start justify-between gap-2">
  <div>
  <div className="text-[13px] text-foreground font-medium">{module.name}</div>
- <div className="text-[11px] text-foreground-light">Task {taskCount} </div>
+ <div className="text-[11px] text-foreground-light">{taskCount} tasks</div>
  </div>
  <div className="flex items-center gap-2">
  <button
@@ -1178,7 +1178,7 @@ export default function PlansPage() {
  <div className="rounded-xl border border-border bg-surface-100/60 p-4">
  <div className="flex items-center justify-between mb-3">
  <div className="text-[11px] uppercase tracking-[0.2em] text-foreground-light">
- VersionSnapshot
+ Version Snapshots
  </div>
  <Badge variant="outline" className="text-[11px] border-border">
  History
@@ -1188,8 +1188,8 @@ export default function PlansPage() {
  {versions.length === 0 && (
  <EmptyState
  icon={History}
- title="No Version Records"
- description="Click Version Snapshot on the right to generate."
+ title="No version records"
+ description="Click Version Snapshot on the right to create one."
  size="sm"
  className="py-6"
  />
@@ -1201,7 +1201,7 @@ export default function PlansPage() {
  >
  <div>
  <div className="text-[12px] text-foreground">
- {version.label || "not yetNamingSnapshot"}
+ {version.label || "Unnamed snapshot"}
  </div>
  <div className="text-[10px] text-foreground-light">
  {formatTimestamp(version.created_at)}
@@ -1225,9 +1225,9 @@ export default function PlansPage() {
  <PageContainer fullWidth className="min-h-[calc(100vh-48px)]">
  <div className="space-y-6">
  <PageHeader
- title="Planningversion"
- eyebrow="Plan / canvisual / canEdit"
- description="will WBS canOrchestrate'sExecuteCanvas: Module, TaskandPhase1Master."
+ title="Planning version"
+ eyebrow="Plan / View / Edit"
+ description="WBS orchestration canvas: modules, tasks and phases in one place."
  icon={<Layers className="w-4 h-4" />}
  actions={
  <div className="flex flex-wrap items-center gap-2">
@@ -1237,16 +1237,16 @@ export default function PlansPage() {
  </Button>
  <Button variant="ghost" size="sm" onClick={openCreateVersion} disabled={!canManagePlan}>
  <History className="w-4 h-4 mr-1" />
- VersionSnapshot
- </Button>
- <Button variant="ghost" size="sm" onClick={seedDefaults} disabled={!canManagePlan}>
- <Wand2 className="w-4 h-4 mr-1" />
- ImportDefault WBS
- </Button>
- <Button size="sm" onClick={openCreateModule} disabled={!canManagePlan}>
- <Plus className="w-4 h-4 mr-1" />
- CreateModule
- </Button>
+Version snapshot
+</Button>
+<Button variant="ghost" size="sm" onClick={seedDefaults} disabled={!canManagePlan}>
+<Wand2 className="w-4 h-4 mr-1" />
+Import default WBS
+</Button>
+<Button size="sm" onClick={openCreateModule} disabled={!canManagePlan}>
+<Plus className="w-4 h-4 mr-1" />
+Create module
+</Button>
  </div>
  }
  />
@@ -1262,10 +1262,10 @@ export default function PlansPage() {
  )}
  onClick={() => setActiveView("board")}
  >
- <Layers className="w-3.5 h-3.5" />
- see
- </button>
- <button
+<Layers className="w-3.5 h-3.5" />
+ Board
+</button>
+<button
  className={cn(
  "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] transition",
  activeView === "dependency"
@@ -1286,9 +1286,9 @@ export default function PlansPage() {
  )}
  onClick={() => setActiveView("gantt")}
  >
- <CalendarRange className="w-3.5 h-3.5" />
- 
- </button>
+<CalendarRange className="w-3.5 h-3.5" />
+ Gantt
+</button>
  </div>
 
  <div className="rounded-2xl border border-border bg-surface-100/70 p-5 relative overflow-hidden">
@@ -1300,23 +1300,23 @@ export default function PlansPage() {
  Signal Pulse
  </div>
  <div className="text-[20px] font-semibold text-foreground mt-2">
- {activeModule?.name || "PlanningView"}
+ {activeModule?.name || "Planning view"}
  </div>
  <div className="text-[12px] text-foreground-light mt-1">
- {activeModule?.description || "fromModulevisualforTask, PhaseandDependencyProceedOrchestrate."}
+ {activeModule?.description || "View tasks, phases and dependencies; orchestrate from this module."}
  </div>
  </div>
  <div className="grid grid-cols-2 gap-3">
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">totalTask</div>
+ <div className="text-[11px] text-foreground-light">Total tasks</div>
  <div className="text-[16px] text-foreground font-semibold">{stats.total}</div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">Donerate</div>
+ <div className="text-[11px] text-foreground-light">Done rate</div>
  <div className="text-[16px] text-foreground font-semibold">{stats.progress}%</div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">Estimatedayscount</div>
+ <div className="text-[11px] text-foreground-light">Estimated days</div>
  <div className="text-[16px] text-foreground font-semibold">{stats.estimate}</div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
@@ -1328,8 +1328,8 @@ export default function PlansPage() {
 
  <div className="mt-5">
  <div className="flex items-center justify-between text-[11px] text-foreground-light mb-2">
- <span>Phasecan</span>
- <span>totalEstimate {phaseTotal} days</span>
+ <span>Phase</span>
+ <span>Total estimate: {phaseTotal} days</span>
  </div>
  <div className="h-3 w-full rounded-full bg-surface-200 overflow-hidden flex">
  {Object.entries(phaseDistribution).map(([key, value]) => {
@@ -1341,7 +1341,7 @@ export default function PlansPage() {
  key={key}
  className={cn("h-full", palette.color)}
  style={{ width }}
- title={`${palette.label} ${value}days`}
+ title={`${palette.label} ${value} days`}
  />
  );
  })}
@@ -1359,7 +1359,7 @@ export default function PlansPage() {
  )}
  >
  <span className={cn("w-2 h-2 rounded-full", palette.color)} />
- {palette.label} · {value}days
+ {palette.label} · {value} days
  </span>
  );
  })}
@@ -1371,13 +1371,13 @@ export default function PlansPage() {
  {error && (
  <ExceptionState
  variant="error"
- title="PlanningModuleLoadFailed"
+ title="Planning module load failed"
  description={error}
  size="sm"
  action={
  activeWorkspaceId
  ? {
- label: "RetryLoad",
+ label: "Retry",
  onClick: () => loadModules(activeWorkspaceId),
  icon: RefreshCw,
  }
@@ -1390,36 +1390,36 @@ export default function PlansPage() {
  </div>
  </div>
 
- {/* ModuleEditModal */}
+ {/* Module Edit Modal */}
  <Dialog open={moduleDialogOpen} onOpenChange={setModuleDialogOpen}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle>{editingModule ? "EditModule": "CreateModule"}</DialogTitle>
- <DialogDescription>asPlanningModuleSettingsClear'scharandIdentifier.</DialogDescription>
- </DialogHeader>
- <div className="space-y-3">
- <div>
- <div className="text-[12px] text-foreground-light mb-1">ModuleName</div>
- <Input
- value={moduleForm.name}
- onChange={(event) => setModuleForm({ ...moduleForm, name: event.target.value })}
- placeholder="exampleif: Workspace / App / Runtime"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Key(Optional)</div>
- <Input
- value={moduleForm.key}
- onChange={(event) => setModuleForm({ ...moduleForm, key: event.target.value })}
- placeholder="exampleif: workspace"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Description(Optional)</div>
- <Textarea
+<DialogTitle>{editingModule ? "Edit module" : "Create module"}</DialogTitle>
+ <DialogDescription>Planning module settings. Name and identifier.</DialogDescription>
+</DialogHeader>
+<div className="space-y-3">
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Module name</div>
+<Input
+value={moduleForm.name}
+onChange={(event) => setModuleForm({ ...moduleForm, name: event.target.value })}
+placeholder="e.g. Workspace / App / Runtime"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Key (optional)</div>
+<Input
+value={moduleForm.key}
+onChange={(event) => setModuleForm({ ...moduleForm, key: event.target.value })}
+placeholder="e.g. workspace"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Description (optional)</div>
+<Textarea
  value={moduleForm.description}
  onChange={(event) => setModuleForm({ ...moduleForm, description: event.target.value })}
- placeholder="DescriptionModule'sRangeandDeliverTarget"
+ placeholder="Description, module scope and deliverable target"
  className="min-h-[80px]"
  />
  </div>
@@ -1433,161 +1433,161 @@ export default function PlansPage() {
  </DialogContent>
  </Dialog>
 
- {/* TaskEditModal */}
+ {/* Task Edit Modal */}
  <Dialog open={taskDialogOpen} onOpenChange={setTaskDialogOpen}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle>{editingTask ? "EditTask": "CreateTask"}</DialogTitle>
- <DialogDescription>willTaskascanTrack'sExecute.</DialogDescription>
- </DialogHeader>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
- <div className="md:col-span-2">
- <div className="text-[12px] text-foreground-light mb-1">TaskTitle</div>
- <Input
- value={taskForm.title}
- onChange={(event) => setTaskForm({ ...taskForm, title: event.target.value })}
- placeholder="exampleif: PublishFlowStatus"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">TaskCode(Optional)</div>
- <Input
- value={taskForm.code}
- onChange={(event) => setTaskForm({ ...taskForm, code: event.target.value })}
- placeholder="exampleif: app-models"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Phase</div>
- <Select
- value={taskForm.phase}
- onValueChange={(value) => setTaskForm({ ...taskForm, phase: value })}
- >
- <SelectTrigger>
- <SelectValue placeholder="SelectPhase" />
- </SelectTrigger>
- <SelectContent>
- <SelectItem value="foundation"></SelectItem>
- <SelectItem value="core">Core</SelectItem>
- <SelectItem value="release">Publish</SelectItem>
- <SelectItem value="access">Access</SelectItem>
- <SelectItem value="other">otherhe</SelectItem>
- </SelectContent>
- </Select>
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Status</div>
- <Select
- value={taskForm.status}
- onValueChange={(value) =>
- setTaskForm({ ...taskForm, status: value as StatusKey })
- }
- >
- <SelectTrigger>
- <SelectValue placeholder="SelectStatus" />
- </SelectTrigger>
- <SelectContent>
- <SelectItem value="todo">pending</SelectItem>
- <SelectItem value="in_progress">Advance</SelectItem>
- <SelectItem value="blocked"></SelectItem>
- <SelectItem value="done">already</SelectItem>
- </SelectContent>
- </Select>
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Owner</div>
- <Input
- value={taskForm.owner}
- onChange={(event) => setTaskForm({ ...taskForm, owner: event.target.value })}
- placeholder="owner / admin / frontend"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Estimatedayscount</div>
- <Input
- type="number"
- min={0}
- value={taskForm.estimate_days}
- onChange={(event) =>
- setTaskForm({ ...taskForm, estimate_days: Number(event.target.value) })
- }
- />
- </div>
- <div className="md:col-span-2">
- <div className="text-[12px] text-foreground-light mb-1">Deliver</div>
- <Textarea
- value={taskForm.deliverable}
- onChange={(event) =>
- setTaskForm({ ...taskForm, deliverable: event.target.value })
- }
- placeholder="OutputandcanDeliverResult"
- className="min-h-[70px]"
- />
- </div>
- <div className="md:col-span-2">
- <div className="text-[12px] text-foreground-light mb-1">AcceptanceStandard</div>
- <Textarea
- value={taskForm.acceptance}
- onChange={(event) =>
- setTaskForm({ ...taskForm, acceptance: event.target.value })
- }
- placeholder="AcceptancemethodandCondition"
- className="min-h-[70px]"
- />
- </div>
- <div className="md:col-span-2">
- <div className="text-[12px] text-foreground-light mb-1">Dependency(CommaSeparator)</div>
- <Input
- value={taskForm.dependencies}
- onChange={(event) =>
- setTaskForm({ ...taskForm, dependencies: event.target.value })
- }
- placeholder="exampleif: app-models, ws-api-contracts"
- />
+<DialogTitle>{editingTask ? "Edit task" : "Create task"}</DialogTitle>
+ <DialogDescription>Task can be tracked and executed.</DialogDescription>
+</DialogHeader>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div className="md:col-span-2">
+<div className="text-[12px] text-foreground-light mb-1">Task title</div>
+<Input
+value={taskForm.title}
+onChange={(event) => setTaskForm({ ...taskForm, title: event.target.value })}
+placeholder="e.g. Publish flow status"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Task code (optional)</div>
+<Input
+value={taskForm.code}
+onChange={(event) => setTaskForm({ ...taskForm, code: event.target.value })}
+placeholder="e.g. app-models"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Phase</div>
+<Select
+value={taskForm.phase}
+onValueChange={(value) => setTaskForm({ ...taskForm, phase: value })}
+>
+<SelectTrigger>
+<SelectValue placeholder="Select phase" />
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="foundation">Foundation</SelectItem>
+<SelectItem value="core">Core</SelectItem>
+<SelectItem value="release">Publish</SelectItem>
+<SelectItem value="access">Access</SelectItem>
+<SelectItem value="other">Other</SelectItem>
+</SelectContent>
+</Select>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Status</div>
+<Select
+value={taskForm.status}
+onValueChange={(value) =>
+setTaskForm({ ...taskForm, status: value as StatusKey })
+}
+>
+<SelectTrigger>
+<SelectValue placeholder="Select status" />
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="todo">Pending</SelectItem>
+<SelectItem value="in_progress">In progress</SelectItem>
+<SelectItem value="blocked">Blocked</SelectItem>
+<SelectItem value="done">Done</SelectItem>
+</SelectContent>
+</Select>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Owner</div>
+<Input
+value={taskForm.owner}
+onChange={(event) => setTaskForm({ ...taskForm, owner: event.target.value })}
+placeholder="owner / admin / frontend"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Estimated days</div>
+<Input
+type="number"
+min={0}
+value={taskForm.estimate_days}
+onChange={(event) =>
+setTaskForm({ ...taskForm, estimate_days: Number(event.target.value) })
+}
+/>
+</div>
+<div className="md:col-span-2">
+<div className="text-[12px] text-foreground-light mb-1">Deliverable</div>
+<Textarea
+value={taskForm.deliverable}
+onChange={(event) =>
+setTaskForm({ ...taskForm, deliverable: event.target.value })
+}
+placeholder="Output and deliverable result"
+className="min-h-[70px]"
+/>
+</div>
+<div className="md:col-span-2">
+<div className="text-[12px] text-foreground-light mb-1">Acceptance criteria</div>
+<Textarea
+value={taskForm.acceptance}
+onChange={(event) =>
+setTaskForm({ ...taskForm, acceptance: event.target.value })
+}
+placeholder="Acceptance method and conditions"
+className="min-h-[70px]"
+/>
+</div>
+<div className="md:col-span-2">
+<div className="text-[12px] text-foreground-light mb-1">Dependencies (comma-separated)</div>
+<Input
+value={taskForm.dependencies}
+onChange={(event) =>
+setTaskForm({ ...taskForm, dependencies: event.target.value })
+}
+placeholder="e.g. app-models, ws-api-contracts"
+/>
  </div>
  </div>
  <DialogFooter>
  <Button variant="ghost" onClick={() => setTaskDialogOpen(false)}>
  Cancel
  </Button>
- <Button onClick={submitTask}>{editingTask ? "Save": "Create"}</Button>
+ <Button onClick={submitTask}>{editingTask ? "Save" : "Create"}</Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>
 
- {/* VersionSnapshotModal */}
+ {/* Version Snapshot Modal */}
  <Dialog open={versionDialogOpen} onOpenChange={setVersionDialogOpen}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle>CreateVersionSnapshot</DialogTitle>
- <DialogDescription>FreezeCurrentPlanningStatus, atafterforcompareandTrack.</DialogDescription>
- </DialogHeader>
- <div className="space-y-3">
- <div>
- <div className="text-[12px] text-foreground-light mb-1">VersionName(Optional)</div>
- <Input
- value={versionForm.label}
- onChange={(event) => setVersionForm({ ...versionForm, label: event.target.value })}
- placeholder="exampleif: V1 Planningline"
- />
- </div>
- <div>
- <div className="text-[12px] text-foreground-light mb-1">Notes(Optional)</div>
- <Textarea
- value={versionForm.note}
- onChange={(event) => setVersionForm({ ...versionForm, note: event.target.value })}
- placeholder="RecordcurrenttimesSnapshotitem'sandChange"
- className="min-h-[80px]"
- />
- </div>
- </div>
- <DialogFooter>
- <Button variant="ghost" onClick={() => setVersionDialogOpen(false)}>
- Cancel
- </Button>
- <Button onClick={submitVersion} disabled={!canManagePlan}>
- CreateSnapshot
- </Button>
+<DialogTitle>Create version snapshot</DialogTitle>
+ <DialogDescription>Freeze current planning status for comparison and tracking.</DialogDescription>
+</DialogHeader>
+<div className="space-y-3">
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Version name (optional)</div>
+<Input
+value={versionForm.label}
+onChange={(event) => setVersionForm({ ...versionForm, label: event.target.value })}
+placeholder="e.g. V1 Planning line"
+/>
+</div>
+<div>
+<div className="text-[12px] text-foreground-light mb-1">Notes (optional)</div>
+<Textarea
+value={versionForm.note}
+onChange={(event) => setVersionForm({ ...versionForm, note: event.target.value })}
+placeholder="Record current time, snapshot items and changes"
+className="min-h-[80px]"
+/>
+</div>
+</div>
+<DialogFooter>
+<Button variant="ghost" onClick={() => setVersionDialogOpen(false)}>
+Cancel
+</Button>
+<Button onClick={submitVersion} disabled={!canManagePlan}>
+Create snapshot
+</Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>
@@ -1596,25 +1596,25 @@ export default function PlansPage() {
  <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle>VersionDetails</DialogTitle>
+<DialogTitle>Version details</DialogTitle>
  <DialogDescription>
- {previewVersion?.label || "not yetNamingSnapshot"} · {formatTimestamp(previewVersion?.created_at)}
+ {previewVersion?.label || "Unnamed snapshot"} · {formatTimestamp(previewVersion?.created_at)}
  </DialogDescription>
- </DialogHeader>
- {previewSummary ? (
- <div className="space-y-4">
- <div className="rounded-lg border border-border bg-surface-75 px-3 py-2 text-[11px] text-foreground-light">
- RestorewillAutoCreate"RestorebeforeBackup"Snapshot, withAnytimeRollback.
+</DialogHeader>
+{previewSummary ? (
+<div className="space-y-4">
+<div className="rounded-lg border border-border bg-surface-75 px-3 py-2 text-[11px] text-foreground-light">
+ Restore will auto-create a "restore before backup" snapshot, with rollback available anytime.
  </div>
- <div className="grid grid-cols-2 gap-3">
- <div className="rounded-lg border border-border bg-surface-75 px-3 py-2">
- <div className="text-[11px] text-foreground-light">Modulecount</div>
+<div className="grid grid-cols-2 gap-3">
+<div className="rounded-lg border border-border bg-surface-75 px-3 py-2">
+<div className="text-[11px] text-foreground-light">Modules</div>
  <div className="text-[16px] text-foreground font-semibold">
  {previewSummary.totalModules}
  </div>
  </div>
  <div className="rounded-lg border border-border bg-surface-75 px-3 py-2">
- <div className="text-[11px] text-foreground-light">Taskcount</div>
+ <div className="text-[11px] text-foreground-light">Tasks</div>
  <div className="text-[16px] text-foreground font-semibold">
  {previewSummary.totalTasks}
  </div>
@@ -1623,25 +1623,25 @@ export default function PlansPage() {
  {planDiff && (
  <div className="grid grid-cols-2 gap-3">
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">willAddModule</div>
+ <div className="text-[11px] text-foreground-light">Modules added</div>
  <div className="text-[14px] text-foreground font-semibold">
  {planDiff.modulesAdded.length}
  </div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">willRemoveModule</div>
+ <div className="text-[11px] text-foreground-light">Modules removed</div>
  <div className="text-[14px] text-foreground font-semibold">
  {planDiff.modulesRemoved.length}
  </div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">willAddTask</div>
+ <div className="text-[11px] text-foreground-light">Tasks added</div>
  <div className="text-[14px] text-foreground font-semibold">
  {planDiff.tasksAdded.length}
  </div>
  </div>
  <div className="rounded-lg border border-border bg-background-200 px-3 py-2">
- <div className="text-[11px] text-foreground-light">willRemoveTask</div>
+ <div className="text-[11px] text-foreground-light">Tasks removed</div>
  <div className="text-[14px] text-foreground font-semibold">
  {planDiff.tasksRemoved.length}
  </div>
@@ -1650,12 +1650,12 @@ export default function PlansPage() {
  )}
  {previewSummary.capturedAt && (
  <div className="text-[11px] text-foreground-light">
- CaptureTime: {formatTimestamp(previewSummary.capturedAt)}
+ Captured at: {formatTimestamp(previewSummary.capturedAt)}
  </div>
  )}
  {planDiff && planDiff.statusChanged.length > 0 && (
  <div className="rounded-lg border border-border bg-surface-75 px-3 py-2">
- <div className="text-[11px] text-foreground-light mb-2">StatusPreview</div>
+ <div className="text-[11px] text-foreground-light mb-2">Status Changes</div>
  <div className="space-y-1 text-[11px] text-foreground-light">
  {planDiff.statusChanged.slice(0, 5).map((item) => (
  <div key={item.title} className="flex items-center justify-between">
@@ -1667,7 +1667,7 @@ export default function PlansPage() {
  ))}
  {planDiff.statusChanged.length > 5 && (
  <div className="text-[10px] text-foreground-light">
- stillhas {planDiff.statusChanged.length - 5} not yetShowcase
+ and {planDiff.statusChanged.length - 5} more not shown
  </div>
  )}
  </div>
@@ -1680,29 +1680,29 @@ export default function PlansPage() {
  className="rounded-lg border border-border bg-surface-75 px-3 py-2"
  >
  <div className="text-[12px] text-foreground">
- {String(module.name || "not yetNamingModule")}
+ {String(module.name || "Unnamed module")}
  </div>
  <div className="text-[10px] text-foreground-light">
- Taskcount: {Array.isArray(module.tasks) ? module.tasks.length: 0}
+ Tasks: {Array.isArray(module.tasks) ? module.tasks.length : 0}
  </div>
  </div>
  ))}
  {previewSummary.modules.length > 6 && (
  <div className="text-[11px] text-foreground-light">
- stillhas {previewSummary.modules.length - 6} Modulenot yetShowcase.
+ and {previewSummary.modules.length - 6} more modules not shown.
  </div>
  )}
  </div>
  </div>
  ) : (
- <div className="text-[12px] text-foreground-light">NoneVersionInfo.</div>
+ <div className="text-[12px] text-foreground-light">No version info.</div>
  )}
  <DialogFooter>
  <Button variant="ghost" onClick={() => setPreviewOpen(false)}>
  Close
  </Button>
  <Button onClick={restoreVersion} disabled={!canManagePlan}>
- Restore/RollbackthisVersion
+ Restore this version
  </Button>
  </DialogFooter>
  </DialogContent>

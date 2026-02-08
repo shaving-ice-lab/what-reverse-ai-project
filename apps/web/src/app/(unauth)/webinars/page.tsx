@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Webinars Page - LobeHub StyleDesign
+ * Webinars Page - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -26,7 +26,7 @@ export default function WebinarsPage() {
  Webinars
  </h1>
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- WewillonlinePublicandlineonWorkshopwillContent.CurrentPagefirstProvideEntryandSubscriptionmethod.
+ We run public and on-demand workshops. This page lists upcoming sessions and how to subscribe.
  </p>
  </div>
  </section>
@@ -35,15 +35,15 @@ export default function WebinarsPage() {
  <main className="max-w-5xl mx-auto px-6 py-16 space-y-10">
  <div className="grid sm:grid-cols-2 gap-4">
  <div className="p-5 rounded-2xl bg-surface-100/30 border border-border/30">
- <h2 className="text-[15px] font-semibold text-foreground">Getting StartedPublic</h2>
+ <h2 className="text-[15px] font-semibold text-foreground">Getting started (public)</h2>
  <p className="text-[13px] text-foreground-light mt-1">
- Quick AgentFlow 'sCoreConcept, WorkflowDesignandPublish.
+ AgentFlow core concepts, workflow design and publishing.
  </p>
  </div>
  <div className="p-5 rounded-2xl bg-surface-100/30 border border-border/30">
  <h2 className="text-[15px] font-semibold text-foreground">Advanced</h2>
  <p className="text-[13px] text-foreground-light mt-1">
- API Integration, Webhook, canandProductionBest Practices.
+ API integration, webhooks and production best practices.
  </p>
  </div>
  </div>
@@ -51,13 +51,13 @@ export default function WebinarsPage() {
  <div className="flex flex-wrap items-center gap-3">
  <Link href="/newsletter">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- SubscriptionUpdate
+ Subscribe for updates
  </Button>
  </Link>
  <Link href="/docs/getting-started">
  <Button variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
  <BookOpen className="mr-2 w-4 h-4" />
- ViewDocument
+ View docs
  </Button>
  </Link>
  </div>

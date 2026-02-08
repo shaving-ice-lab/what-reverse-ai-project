@@ -5,87 +5,87 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Card CardComponent - Supabase Style: DarkTheme, surface Hierarchy
+ * Card Component - Supabase Style: Dark Theme, Surface Hierarchy
  */
 const cardVariants = cva(
  "rounded-lg text-foreground transition-colors duration-150 ease-in-out",
  {
  variants: {
  variant: {
- // DefaultCard - Supabase surface-100
- default: [
- "bg-surface-100 border border-border",
- ].join(""),
- // ImproveCard - Shadow
- elevated: [
- "bg-surface-100 border border-border",
- "shadow-md shadow-black/25",
- ].join(""),
- // OutlineCard - TransparentBackground
- outline: [
- "bg-transparent border border-border",
- ].join(""),
- // GhostCard - NoneEdge
- ghost: [
- "bg-transparent border-0",
- ].join(""),
- // MuteCard - Supabase surface-75
- muted: [
- "bg-surface-75 border border-border-muted",
- ].join(""),
- // GlassCard - GlassEffect
- glass: [
- "bg-surface-100/70 backdrop-blur-xl border border-border/50",
- ].join(""),
- // GlassCard - moreTransparent
- "glass-subtle": [
- "bg-surface-100/40 backdrop-blur-lg border border-border/30",
- ].join(""),
- // GradientEdgeCard - BrandGreen
- gradient: [
- "bg-surface-100 border-0 relative",
- "before:absolute before:inset-0 before:rounded-lg before:p-[1px]",
- "before:bg-gradient-to-br before:from-brand-500 before:via-brand-500/50 before:to-transparent",
- "before:-z-10",
- ].join(""),
- // EmphasizeCard - leftEdgeBrand
- accent: [
- "bg-surface-100 border-l-4 border-l-brand-500 border border-border rounded-l-none",
- ].join(""),
- // PanelCard - Supabase StylePanel
- panel: [
- "bg-surface-75 border border-border",
- ].join(""),
- // StatisticsCard - Supabase DashboardStatistics
- stats: [
- "bg-surface-100 border border-border",
- ].join(""),
- // BrandHighlightCard - GreenBackground
- brand: [
- "bg-brand-200 border border-brand-400/30",
- ].join(""),
- // WarningCard
- warning: [
- "bg-warning-200 border border-warning/30",
- ].join(""),
- // ErrorCard
- destructive: [
- "bg-destructive-200 border border-destructive/30",
- ].join(""),
+      // Default card - Supabase surface-100
+      default: [
+        "bg-surface-100 border border-border",
+      ].join(""),
+      // Elevated card with shadow
+      elevated: [
+        "bg-surface-100 border border-border",
+        "shadow-md shadow-black/25",
+      ].join(""),
+      // Outline card with transparent background
+      outline: [
+        "bg-transparent border border-border",
+      ].join(""),
+      // Ghost card with no border
+      ghost: [
+        "bg-transparent border-0",
+      ].join(""),
+      // Muted card - Supabase surface-75
+      muted: [
+        "bg-surface-75 border border-border-muted",
+      ].join(""),
+      // Glass card with glass effect
+      glass: [
+        "bg-surface-100/70 backdrop-blur-xl border border-border/50",
+      ].join(""),
+      // Glass card - more transparent
+      "glass-subtle": [
+        "bg-surface-100/40 backdrop-blur-lg border border-border/30",
+      ].join(""),
+      // Gradient border card - brand green
+      gradient: [
+        "bg-surface-100 border-0 relative",
+        "before:absolute before:inset-0 before:rounded-lg before:p-[1px]",
+        "before:bg-gradient-to-br before:from-brand-500 before:via-brand-500/50 before:to-transparent",
+        "before:-z-10",
+      ].join(""),
+      // Accent card with left brand border
+      accent: [
+        "bg-surface-100 border-l-4 border-l-brand-500 border border-border rounded-l-none",
+      ].join(""),
+      // Panel card - Supabase style panel
+      panel: [
+        "bg-surface-75 border border-border",
+      ].join(""),
+      // Statistics card - Supabase dashboard style
+      stats: [
+        "bg-surface-100 border border-border",
+      ].join(""),
+      // Brand highlight card with green background
+      brand: [
+        "bg-brand-200 border border-brand-400/30",
+      ].join(""),
+      // Warning card
+      warning: [
+        "bg-warning-200 border border-warning/30",
+      ].join(""),
+      // Destructive/error card
+      destructive: [
+        "bg-destructive-200 border border-destructive/30",
+      ].join(""),
  },
  hover: {
  none: "",
  border: "hover:border-border-strong",
  shadow: "hover:shadow-lg hover:shadow-black/30",
  lift: "hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5",
- muted: "hover:bg-surface-200",
- // InteractiveCard: Supabase GreenEdge
- glow: "hover:border-brand-500 hover:shadow-brand-500/10",
- "glow-border": "hover:border-brand-500/50 hover:shadow-sm",
- // Zoom
- scale: "hover:scale-[1.02]",
- // groupEffect
- interactive: "hover:border-border-strong hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5",
+      muted: "hover:bg-surface-200",
+      // Interactive card: Supabase green border
+      glow: "hover:border-brand-500 hover:shadow-brand-500/10",
+      "glow-border": "hover:border-brand-500/50 hover:shadow-sm",
+      // Scale/zoom effect
+      scale: "hover:scale-[1.02]",
+      // Combined interactive effect
+      interactive: "hover:border-border-strong hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5",
  },
  padding: {
  none: "",
@@ -106,14 +106,14 @@ const cardVariants = cva(
 )
 
 export interface CardProps
- extends React.HTMLAttributes<HTMLDivElement>,
- VariantProps<typeof cardVariants> {
- /** isnocanInteractive */
- interactive?: boolean
- /** enterAnimation */
- animation?: "none" | "fade" | "slide-up" | "scale"
- /** AnimationLatency (ms) */
- animationDelay?: number
+  extends React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof cardVariants> {
+  /** Whether interactive */
+  interactive?: boolean
+  /** Entry animation */
+  animation?: "none" | "fade" | "slide-up" | "scale"
+  /** Animation delay (ms) */
+  animationDelay?: number
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -156,10 +156,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 Card.displayName = "Card"
 
 interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoDisplayFooterEdge */
- bordered?: boolean
- /** Right sideAction */
- action?: React.ReactNode
+  /** Whether to display bottom border */
+  bordered?: boolean
+  /** Right side action element */
+  action?: React.ReactNode
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
@@ -186,8 +186,8 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
 CardHeader.displayName = "CardHeader"
 
 interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
- /** TitleSize */
- size?: "default" | "sm" | "lg"
+  /** Title size */
+  size?: "default" | "sm" | "lg"
 }
 
 const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
@@ -220,7 +220,7 @@ const CardDescription = React.forwardRef<
 CardDescription.displayName = "CardDescription"
 
 interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
- /** inEdgeSize */
+ /** Content padding */
  padding?: "default" | "sm" | "lg" | "none"
 }
 
@@ -242,10 +242,10 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
 CardContent.displayName = "CardContent"
 
 interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoDisplayTopEdge */
- bordered?: boolean
- /** formethod */
- align?: "start" | "center" | "end" | "between"
+  /** Whether to display top border */
+  bordered?: boolean
+  /** Alignment direction */
+  align?: "start" | "center" | "end" | "between"
 }
 
 const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
@@ -274,13 +274,13 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 CardFooter.displayName = "CardFooter"
 
 /**
- * SpotlightCard - hasMouseFollowLight Effect'sCard
+ * Spotlight Card - Card with Mouse-Following Light Effect
  */
 interface SpotlightCardProps extends CardProps {
- /** Light EffectColor */
- spotlightColor?: string
- /** Light EffectSize */
- spotlightSize?: number
+  /** Light effect color */
+  spotlightColor?: string
+  /** Light effect size */
+  spotlightSize?: number
 }
 
 const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
@@ -333,12 +333,12 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
 SpotlightCard.displayName = "SpotlightCard"
 
 /**
- * GlowCard - GlowEdgeCard
+ * GlowCard - Card with glowing edge effect
  */
 interface GlowCardProps extends CardProps {
- /** GlowColor */
+ /** Glow color */
  glowColor?: string
- /** isno1Glow */
+ /** Whether to show glow effect */
  alwaysGlow?: boolean
 }
 
@@ -352,7 +352,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
  }, ref) => {
  return (
  <div className="relative group">
- {/* GlowBackground */}
+ {/* Glow background */}
  <div
  className={cn(
  "absolute -inset-0.5 rounded-lg blur-sm transition-opacity duration-300",
@@ -374,7 +374,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
 GlowCard.displayName = "GlowCard"
 
 /**
- * FlipCard - FlipCard
+ * FlipCard - Card with flip animation
  */
 interface FlipCardProps {
  front: React.ReactNode
@@ -425,14 +425,14 @@ function FlipCard({
  transform: !flipOnHover && isFlipped ? "rotateY(180deg)" : flipOnHover ? undefined : "rotateY(0deg)",
  }}
  >
- {/* currentlyface */}
+ {/* Front face */}
  <div 
  className="absolute inset-0 backface-hidden"
  style={{ backfaceVisibility: "hidden" }}
  >
  {front}
  </div>
- {/* face */}
+ {/* Back face */}
  <div 
  className="absolute inset-0 backface-hidden rotate-y-180"
  style={{ 
@@ -448,18 +448,18 @@ function FlipCard({
 }
 
 /**
- * ExpandableCard - canExpandCard
+ * ExpandableCard - Expandable card component
  */
 interface ExpandableCardProps extends CardProps {
- /** Collapsetime'sContent */
+ /** Collapsed Content */
  collapsedContent: React.ReactNode
- /** Expandtime'soutsideContent */
+ /** Expandable content section */
  expandedContent: React.ReactNode
- /** isnoExpand */
+ /** Whether expanded */
  expanded?: boolean
- /** DefaultExpand */
+ /** Default expanded state */
  defaultExpanded?: boolean
- /** ExpandStatusChangeCallback */
+ /** Expand state change callback */
  onExpandedChange?: (expanded: boolean) => void
 }
 
@@ -501,7 +501,7 @@ function ExpandableCard({
 }
 
 /**
- * CardStack - CardStackEffect
+ * CardStack - Stacked card effect
  */
 interface CardStackProps {
  children: React.ReactNode[]

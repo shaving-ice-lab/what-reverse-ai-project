@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * canInsightsPanel
+ * Performance Insights Panel
  * 
- * AverageExecuteTimeTrend, mostNode Top 5, canoptimalSuggestion
- * Usage Stats API FetchRealData
+ * Average execution time trend, slowest nodes top 5, and optimization suggestions
+ * Uses Stats API to fetch real data
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -48,38 +48,38 @@ interface OptimizationTip {
  title: string;
  description: string;
  impact: "high" | "medium" | "low";
- type: "warning" | "info" | "success";
+  type: "warning" | "info" | "success";
 }
 
-// DefaultoptimalSuggestion
+// Default optimization suggestions
 const defaultOptimizationTips: OptimizationTip[] = [
- {
- id: "1",
- title: "ConsiderUsage GPT-3.5 AlternativePartial GPT-4 Call",
- description: "foratSimpleTask, GPT-3.5 canProvide 3x SpeedImprove, timeReduceCost",
- impact: "high",
- type: "warning",
- },
- {
- id: "2",
- title: "EnableDatabaseQueryCache",
- description: "re-QuerycanViaCachefew 60% 'sResponse Time",
- impact: "medium",
- type: "info",
- },
- {
- id: "3",
- title: "androwExecuteIndependentNode",
- description: "DetecttocanandrowExecute'sNode, optimalaftercanSaveExecuteTime",
- impact: "high",
- type: "info",
- },
+  {
+    id: "1",
+    title: "Consider using GPT-3.5 for some calls instead of GPT-4",
+    description: "For simple tasks, GPT-3.5 can provide 3x faster responses while reducing costs",
+    impact: "high",
+    type: "warning",
+  },
+  {
+    id: "2",
+    title: "Enable Database Query Cache",
+    description: "Re-query via cache reduces response time by ~60%",
+    impact: "medium",
+    type: "info",
+  },
+  {
+    id: "3",
+    title: "Parallel execution of independent nodes",
+    description: "Detect independent nodes and parallelize to save execution time",
+    impact: "high",
+    type: "info",
+  },
 ];
 
-// DefaultmostNode
+// Default slow nodes
 const defaultSlowNodes: SlowNode[] = [
  { id: "1", name: "LLM Call", type: "LLM", avgTime: 0, executions: 0, trend: "stable", icon: "🤖" },
- { id: "2", name: "DatabaseQuery", type: "SQL", avgTime: 0, executions: 0, trend: "stable", icon: "🗄️" },
+  { id: "2", name: "Database Query", type: "SQL", avgTime: 0, executions: 0, trend: "stable", icon: "🗄️" },
  { id: "3", name: "HTTP Request", type: "HTTP", avgTime: 0, executions: 0, trend: "stable", icon: "🌐" },
 ];
 
@@ -94,84 +94,84 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  const [performanceTrend, setPerformanceTrend] = useState<PerformanceTrend[]>([]);
  const [overviewData, setOverviewData] = useState<{ avgResponseTimeMs: number } | null>(null);
  const [slowNodes, setSlowNodes] = useState<SlowNode[]>(defaultSlowNodes);
- const [optimizationTips, setOptimizationTips] = useState<OptimizationTip[]>(defaultOptimizationTips);
+  const [optimizationTips, setOptimizationTips] = useState<OptimizationTip[]>(defaultOptimizationTips);
 
- // LoadStatisticsData
- const loadStats = useCallback(async () => {
- setIsLoading(true);
- try {
- const [overviewResponse, trendsResponse] = await Promise.all([
- statsApi.getOverview(),
- statsApi.getExecutionTrends(7),
- ]);
- 
- // FormatOverviewData
- if (overviewResponse.data) {
- const formatted = formatOverviewStats(overviewResponse.data);
- setOverviewData({ avgResponseTimeMs: formatted.avgResponseTimeMs });
- }
- 
- // FormatTrendData
- if (trendsResponse.data && trendsResponse.data.length > 0) {
- const formattedTrends = formatDailyStats(trendsResponse.data);
- const weekdays = ["weeksday", "weeks1", "weeks2", "weeks3", "weeks4", "weeks5", "weeks6"];
- 
- const trends: PerformanceTrend[] = formattedTrends.map((t) => {
- const avgTime = t.avgDurationMs || 0;
- return {
- date: weekdays[new Date(t.date).getDay()],
- avgTime,
- // Estimate P95 and P99(ActualShouldfromafterendpointFetch)
- p95Time: Math.floor(avgTime * 1.8),
- p99Time: Math.floor(avgTime * 2.5),
- };
- });
- 
- if (trends.some(t => t.avgTime > 0)) {
- setPerformanceTrend(trends);
- }
- 
- // Based onAverageExecuteTimeGenerateoptimalSuggestion
- const avgOverall = trends.reduce((sum, t) => sum + t.avgTime, 0) / trends.length;
- if (avgOverall > 3000) {
- setOptimizationTips([
- {
- id: "1",
- title: "ExecuteTime, Suggestionoptimal",
- description: `AverageExecuteTimeas ${(avgOverall / 1000).toFixed(1)}s, SuggestionCheckDurationNode`,
- impact: "high",
- type: "warning",
- },
- ...defaultOptimizationTips.slice(1),
- ]);
- }
- 
- // MockmostNodeData(ActualShouldfromafterendpointFetchNodeLevelStatistics)
- const totalExecutions = formattedTrends.reduce((sum, t) => sum + t.executions, 0);
- if (totalExecutions > 0) {
+  // Load statistics data
+  const loadStats = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [overviewResponse, trendsResponse] = await Promise.all([
+        statsApi.getOverview(),
+        statsApi.getExecutionTrends(7),
+      ]);
+      
+      // Format overview data
+      if (overviewResponse.data) {
+        const formatted = formatOverviewStats(overviewResponse.data);
+        setOverviewData({ avgResponseTimeMs: formatted.avgResponseTimeMs });
+      }
+      
+      // Format trend data
+      if (trendsResponse.data && trendsResponse.data.length > 0) {
+        const formattedTrends = formatDailyStats(trendsResponse.data);
+        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        
+        const trends: PerformanceTrend[] = formattedTrends.map((t) => {
+          const avgTime = t.avgDurationMs || 0;
+          return {
+            date: weekdays[new Date(t.date).getDay()],
+            avgTime,
+            // Estimate P95 and P99 (should fetch from backend API)
+            p95Time: Math.floor(avgTime * 1.8),
+            p99Time: Math.floor(avgTime * 2.5),
+          };
+        });
+        
+        if (trends.some(t => t.avgTime > 0)) {
+          setPerformanceTrend(trends);
+        }
+        
+        // Generate optimization suggestions based on average execution time
+        const avgOverall = trends.reduce((sum, t) => sum + t.avgTime, 0) / trends.length;
+        if (avgOverall > 3000) {
+          setOptimizationTips([
+            {
+              id: "1",
+              title: "High execution time, optimization recommended",
+              description: `Average execution time is ${(avgOverall / 1000).toFixed(1)}s. Suggestion: check slow nodes`,
+              impact: "high",
+              type: "warning",
+            },
+            ...defaultOptimizationTips.slice(1),
+          ]);
+        }
+        
+        // Mock slow node data (should fetch node-level statistics from backend)
+        const totalExecutions = formattedTrends.reduce((sum, t) => sum + t.executions, 0);
+        if (totalExecutions > 0) {
  setSlowNodes([
  { id: "1", name: "LLM Call", type: "LLM", avgTime: Math.floor(avgOverall * 0.6), executions: Math.floor(totalExecutions * 0.4), trend: "stable", icon: "🤖" },
- { id: "2", name: "DataProcess", type: "Transform", avgTime: Math.floor(avgOverall * 0.2), executions: Math.floor(totalExecutions * 0.3), trend: "down", icon: "⚙️" },
+ { id: "2", name: "Data Processing", type: "Transform", avgTime: Math.floor(avgOverall * 0.2), executions: Math.floor(totalExecutions * 0.3), trend: "down", icon: "⚙️" },
  { id: "3", name: "HTTP Request", type: "HTTP", avgTime: Math.floor(avgOverall * 0.15), executions: Math.floor(totalExecutions * 0.2), trend: "stable", icon: "🌐" },
- { id: "4", name: "ConditionDetermine", type: "Logic", avgTime: Math.floor(avgOverall * 0.03), executions: Math.floor(totalExecutions * 0.08), trend: "stable", icon: "🔀" },
- { id: "5", name: "TextProcess", type: "Text", avgTime: Math.floor(avgOverall * 0.02), executions: Math.floor(totalExecutions * 0.02), trend: "down", icon: "📝" },
+ { id: "4", name: "Condition", type: "Logic", avgTime: Math.floor(avgOverall * 0.03), executions: Math.floor(totalExecutions * 0.08), trend: "stable", icon: "🔀" },
+ { id: "5", name: "Text Processing", type: "Text", avgTime: Math.floor(avgOverall * 0.02), executions: Math.floor(totalExecutions * 0.02), trend: "down", icon: "📝" },
  ]);
- }
- }
- } catch (err) {
- console.error("LoadcanDataFailed:", err);
- } finally {
- setIsLoading(false);
- }
- }, []);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load performance data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
- // InitialLoad
- useEffect(() => {
- loadStats();
- }, [loadStats]);
+  // Initial load
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
- // CalculateStatisticsData
- const stats = useMemo(() => {
+  // Calculate statistics
+  const stats = useMemo(() => {
  if (performanceTrend.length === 0) {
  return {
  currentAvg: overviewData?.avgResponseTimeMs || 0,
@@ -226,19 +226,19 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  return "text-amber-500 bg-amber-500/10";
  case "low":
  return "text-blue-500 bg-blue-500/10";
- }
- };
+    }
+  };
 
- // DefaultDisplayData(NoRealDatatime)
- const displayTrend = performanceTrend.length > 0 ? performanceTrend : [
- { date: "weeks1", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeks2", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeks3", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeks4", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeks5", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeks6", avgTime: 0, p95Time: 0, p99Time: 0 },
- { date: "weeksday", avgTime: 0, p95Time: 0, p99Time: 0 },
- ];
+  // Default display data (when no real data)
+  const displayTrend = performanceTrend.length > 0 ? performanceTrend : [
+    { date: "Mon", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Tue", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Wed", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Thu", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Fri", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Sat", avgTime: 0, p95Time: 0, p99Time: 0 },
+    { date: "Sun", avgTime: 0, p95Time: 0, p99Time: 0 },
+  ];
 
  return (
  <Card className={cn("border border-border/60 bg-card/80 backdrop-blur-sm p-6 hover:border-blue-500/20 transition-colors duration-300", className)}>
@@ -249,8 +249,8 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  <Gauge className="w-5 h-5 text-blue-500" />
  </div>
  <div>
- <h3 className="font-bold text-foreground">canInsights</h3>
- <p className="text-xs text-muted-foreground">ExecuteTimeAnalytics</p>
+        <h3 className="font-bold text-foreground">Performance Insights</h3>
+ <p className="text-xs text-muted-foreground">Execution time analytics</p>
  </div>
  </div>
 
@@ -269,7 +269,7 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  </Button>
  </div>
 
- {/* mainneedMetrics - Enhanced */}
+        {/* Main Metrics - Enhanced */}
  <div className="flex items-center gap-6 mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-500/5 via-transparent to-transparent ring-1 ring-blue-500/10">
  <div className="flex-shrink-0">
  {isLoading ? (
@@ -278,7 +278,7 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  <p className="text-4xl font-bold text-foreground tracking-tight">{formatTime(stats.currentAvg)}</p>
  )}
  <div className="flex items-center gap-2 mt-1.5">
- <span className="text-sm text-muted-foreground">AverageExecuteTime</span>
+ <span className="text-sm text-muted-foreground">Average execution time</span>
  {stats.change !== 0 && (
  <div
  className={cn(
@@ -299,15 +299,15 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
 
  <div className="h-14 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
 
- <div className="flex gap-5">
- <div className="text-center p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group">
- {isLoading ? (
- <div className="h-7 w-16 bg-muted rounded-lg animate-pulse mb-1" />
- ) : (
- <p className="text-xl font-bold text-foreground group-hover:text-blue-500 transition-colors">{formatTime(stats.weekAvg)}</p>
- )}
- <p className="text-xs text-muted-foreground">weeksvalue</p>
- </div>
+            <div className="flex gap-5">
+              <div className="text-center p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group">
+                {isLoading ? (
+                  <div className="h-7 w-16 bg-muted rounded-lg animate-pulse mb-1" />
+                ) : (
+                  <p className="text-xl font-bold text-foreground group-hover:text-blue-500 transition-colors">{formatTime(stats.weekAvg)}</p>
+                )}
+                <p className="text-xs text-muted-foreground">Week average</p>
+              </div>
  <div className="text-center p-2 rounded-lg hover:bg-amber-500/10 transition-colors cursor-pointer group">
  {isLoading ? (
  <div className="h-7 w-16 bg-muted rounded-lg animate-pulse mb-1" />
@@ -333,33 +333,33 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
 
  {/* Trend - Enhanced */}
  <div className="mb-6">
- <div className="flex items-center justify-between mb-4">
- <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
- <Clock className="w-4 h-4" />
- ExecuteTimeTrend
- </span>
- <div className="flex items-center bg-muted/50 rounded-xl p-1 ring-1 ring-border/30">
- {(["avg", "p95", "p99"] as const).map((metric) => (
- <button
- key={metric}
- onClick={() => setActiveMetric(metric)}
- className={cn(
- "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
- activeMetric === metric
- ? cn(
- "shadow-sm",
- metric === "avg" && "bg-blue-500 text-white",
- metric === "p95" && "bg-amber-500 text-white",
- metric === "p99" && "bg-red-500 text-white"
- )
- : "text-muted-foreground hover:text-foreground hover:bg-muted"
- )}
- >
- {metric === "avg" ? "Average": metric.toUpperCase()}
- </button>
- ))}
- </div>
- </div>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Execution time trend
+          </span>
+          <div className="flex items-center bg-muted/50 rounded-xl p-1 ring-1 ring-border/30">
+            {(["avg", "p95", "p99"] as const).map((metric) => (
+              <button
+                key={metric}
+                onClick={() => setActiveMetric(metric)}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
+                  activeMetric === metric
+                    ? cn(
+                        "shadow-sm",
+                        metric === "avg" && "bg-blue-500 text-white",
+                        metric === "p95" && "bg-amber-500 text-white",
+                        metric === "p99" && "bg-red-500 text-white"
+                      )
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {metric === "avg" ? "Avg": metric.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
 
  <div className="flex items-end gap-2 h-28 px-1">
  {displayTrend.map((data, index) => {
@@ -378,11 +378,11 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  )}
  style={{ height: `${Math.max(height, 6)}px`, minHeight: "6px" }}
  >
- {/* HoverHighlight */}
+ {/* Hover Highlight */}
  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
  </div>
- {/* HoverTip */}
- {value > 0 && (
+{/* Hover Tooltip */}
+                {value > 0 && (
  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-popover/95 backdrop-blur-sm border border-border/50 rounded-lg px-2.5 py-1.5 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap z-10 shadow-lg scale-90 group-hover:scale-100">
  <span className="font-semibold text-foreground">{formatTime(value)}</span>
  </div>
@@ -392,7 +392,7 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  "text-[10px] transition-colors",
  isToday ? "text-blue-500 font-medium" : "text-muted-foreground group-hover:text-foreground"
  )}>
- {data.date.slice(1)}
+ {data.date}
  </span>
  </div>
  );
@@ -400,17 +400,17 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  </div>
  </div>
 
- {/* mostNode Top 5 - Enhanced */}
- <div className="mb-6">
- <div className="flex items-center justify-between mb-4">
- <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
- <div className="p-1 rounded-md bg-amber-500/10">
- <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
- </div>
- mostNode Top 5
- </h4>
- <span className="text-[10px] text-muted-foreground/60">ClickViewDetails</span>
- </div>
+      {/* Slowest nodes top 5 - Enhanced */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+            <div className="p-1 rounded-md bg-amber-500/10">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+            </div>
+            Slowest nodes top 5
+          </h4>
+          <span className="text-[10px] text-muted-foreground/60">Click to view details</span>
+        </div>
 
  <div className="space-y-2">
  {slowNodes.map((node, index) => (
@@ -436,57 +436,57 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2">
- <span className="text-sm font-semibold text-foreground truncate group-hover:text-blue-500 transition-colors">
- {node.name}
- </span>
- <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted/50 ring-1 ring-border/30">
- {node.type}
- </span>
- </div>
- <p className="text-xs text-muted-foreground mt-0.5">{node.executions.toLocaleString()} timesExecute</p>
- </div>
- <div className="text-right">
- <p className="text-sm font-bold text-foreground">{formatTime(node.avgTime)}</p>
- <div
- className={cn(
- "flex items-center justify-end gap-1 text-xs font-medium",
- node.trend === "up" && "text-red-500",
- node.trend === "down" && "text-primary",
- node.trend === "stable" && "text-muted-foreground"
- )}
- >
- {node.trend === "up" && <><TrendingUp className="w-3 h-3" /> on</>}
- {node.trend === "down" && <><TrendingDown className="w-3 h-3" /> Decline</>}
- {node.trend === "stable" && "Stable"}
- </div>
- </div>
+                  <span className="text-sm font-semibold text-foreground truncate group-hover:text-blue-500 transition-colors">
+                    {node.name}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted/50 ring-1 ring-border/30">
+                    {node.type}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{node.executions.toLocaleString()} executions</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-foreground">{formatTime(node.avgTime)}</p>
+                <div
+                  className={cn(
+                    "flex items-center justify-end gap-1 text-xs font-medium",
+                    node.trend === "up" && "text-red-500",
+                    node.trend === "down" && "text-primary",
+                    node.trend === "stable" && "text-muted-foreground"
+                  )}
+                >
+                  {node.trend === "up" && <><TrendingUp className="w-3 h-3" /> Up</>}
+                  {node.trend === "down" && <><TrendingDown className="w-3 h-3" /> Down</>}
+                  {node.trend === "stable" && "Stable"}
+                </div>
+              </div>
  </div>
  ))}
  </div>
  </div>
 
- {/* optimalSuggestion - Enhanced */}
- <div>
- <div className="flex items-center justify-between mb-4">
- <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
- <div className="p-1 rounded-md bg-primary/10">
- <Lightbulb className="w-3.5 h-3.5 text-primary" />
- </div>
- optimalSuggestion
- <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
- {optimizationTips.length}
- </span>
- </h4>
- <button
- onClick={() => setShowAllTips(!showAllTips)}
- className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-500/10 transition-colors"
- >
- {showAllTips ? "Collapse": "View all"}
- <ChevronRight
- className={cn("w-3 h-3 transition-transform duration-200", showAllTips && "rotate-90")}
- />
- </button>
- </div>
+      {/* Optimization suggestions - Enhanced */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+            <div className="p-1 rounded-md bg-primary/10">
+              <Lightbulb className="w-3.5 h-3.5 text-primary" />
+            </div>
+            Optimization suggestions
+            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+              {optimizationTips.length}
+            </span>
+          </h4>
+          <button
+            onClick={() => setShowAllTips(!showAllTips)}
+            className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-500/10 transition-colors"
+          >
+            {showAllTips ? "Hide": "View all"}
+            <ChevronRight
+              className={cn("w-3 h-3 transition-transform duration-200", showAllTips && "rotate-90")}
+            />
+          </button>
+        </div>
 
  <div className="space-y-2">
  {(showAllTips ? optimizationTips : optimizationTips.slice(0, 2)).map((tip, index) => (
@@ -524,13 +524,13 @@ export function PerformanceInsights({ className }: PerformanceInsightsProps) {
  "text-[10px] font-medium px-2 py-0.5 rounded-full ring-1",
  tip.impact === "high" && "text-red-500 bg-red-500/10 ring-red-500/20",
  tip.impact === "medium" && "text-amber-500 bg-amber-500/10 ring-amber-500/20",
- tip.impact === "low" && "text-blue-500 bg-blue-500/10 ring-blue-500/20"
- )}
- >
- {tip.impact === "high" && "Impact"}
- {tip.impact === "medium" && "Impact"}
- {tip.impact === "low" && "Impact"}
- </span>
+                    tip.impact === "low" && "text-blue-500 bg-blue-500/10 ring-blue-500/20"
+                  )}
+                >
+                  {tip.impact === "high" && "High impact"}
+                  {tip.impact === "medium" && "Med impact"}
+                  {tip.impact === "low" && "Low impact"}
+                </span>
  </div>
  <p className="text-xs text-muted-foreground leading-relaxed">{tip.description}</p>
  </div>

@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// TemplateTypeDefinition
+// Template type definition
 export interface TemplateData {
  id: string;
  name: string;
@@ -56,14 +56,14 @@ export interface TemplateData {
  createdAt: string;
 }
 
-// ExampleTemplateData
+// Example template data
 const sampleTemplates: TemplateData[] = [
  {
  id: "ai-customer-service",
- name: "SmartSupportAssistant",
- description: "Based on GPT-4 'smultipleConversationSupportSystem, SupportSentimentAnalyticsandAutoCategory",
- longDescription: "thisis1Complete'sSmartSupportResolvePlan, IntegrationmultipleConversationManage, SentimentAnalytics, Intent RecognitionandAutoTicketCategoryFeatures.Used forE-commerce, SaaS, FinanceetcmultipletypeBusinessScenario.SupportmultipleLanguage, canQuickforExistingSupportSystem.",
- author: "AgentFlow method",
+name: "Smart Support Assistant",
+  description: "GPT-4 powered multi-conversation support with sentiment analysis and auto-categorization",
+ longDescription: "A complete smart support solution: multi-conversation management, sentiment analysis, intent recognition and auto ticket categorization. For e-commerce, SaaS, finance and more. Multi-language support; quick to add to existing support systems.",
+  author: "AgentFlow Official",
  authorAvatar: "A",
  category: "AI App",
  tags: ["Support", "GPT-4", "Conversation", "NLP"],
@@ -74,27 +74,27 @@ const sampleTemplates: TemplateData[] = [
  nodes: 12,
  complexity: "intermediate",
  features: [
- "multipleConversationContextManage",
- "Real-timeSentimentAnalytics",
- "SmartIntent Recognition",
- "AutoTicketCreate",
- "multipleLanguageSupport",
- "ConversationHistoryRecord",
+ "Multi-conversation context",
+ "Real-time sentiment analytics",
+ "Smart intent recognition",
+ "Auto ticket creation",
+ "Multi-language support",
+ "Conversation history",
  ],
- requirements: ["GPT-4 API Key", "DatabaseConnect"],
+  requirements: ["GPT-4 API Key", "Database connection"],
  version: "2.1.0",
  updatedAt: "2026-01-25",
  createdAt: "2025-06-15",
  },
  {
  id: "data-pipeline",
- name: "DataProcessPipeline",
- description: "Enterprise-grade ETL DataPipeline, SupportmultipleDataSyncandConvert",
- longDescription: "canDataProcessPipeline, SupportfrommultipletypeData(MySQL, PostgreSQL, MongoDB, API)ExtractData, ProceedClean, ConvertandLoad.inDataCheckandErrorProcessMechanism.",
- author: "DataMaster",
+name: "Data Processing Pipeline",
+  description: "Enterprise ETL pipeline with multi-source sync and conversion",
+  longDescription: "Data pipeline supporting MySQL, PostgreSQL, MongoDB, API. Extract, clean, convert and load with validation and error handling.",
+  author: "Data Master",
  authorAvatar: "D",
- category: "DataProcess",
- tags: ["ETL", "DataSync", "Pipeline"],
+  category: "Data Processing",
+ tags: ["ETL", "Data Sync", "Pipeline"],
  stars: 856,
  downloads: 3421,
  views: 8765,
@@ -102,14 +102,14 @@ const sampleTemplates: TemplateData[] = [
  nodes: 18,
  complexity: "advanced",
  features: [
- "multipleDataSupport",
- "Sync",
- "DataCheck",
- "ErrorAutoRetry",
- "Real-timeMonitor",
- "ScheduleManage",
+    "Multi-data source support",
+    "Real-time sync",
+    "Data validation",
+    "Auto retry on error",
+ "Real-time monitor",
+ "Schedule management",
  ],
- requirements: ["DatabaseConnect", "API AccessPermission"],
+  requirements: ["Database connection", "API access permission"],
  version: "1.5.2",
  updatedAt: "2026-01-20",
  createdAt: "2025-09-01",
@@ -117,15 +117,15 @@ const sampleTemplates: TemplateData[] = [
 ];
 
 export interface TemplatePreviewModalProps {
- /** TemplateData */
+  /** Template data */
  template: TemplateData | null;
- /** isnoOpen */
+  /** Whether the modal is open */
  isOpen: boolean;
- /** CloseCallback */
+  /** Close callback */
  onClose: () => void;
- /** UsageTemplateCallback */
+  /** Use Template Callback */
  onUseTemplate?: (template: TemplateData) => void;
- /** FavoriteCallback */
+  /** Favorite callback */
  onFavorite?: (template: TemplateData) => void;
 }
 
@@ -140,7 +140,7 @@ export function TemplatePreviewModal({
  const [isFavorited, setIsFavorited] = useState(false);
  const [copied, setCopied] = useState(false);
 
- // BlockBackgroundScroll
+  // Block background scroll
  useEffect(() => {
  if (isOpen) {
  document.body.style.overflow = "hidden";
@@ -190,10 +190,10 @@ export function TemplatePreviewModal({
  const getComplexityLabel = (complexity: string) => {
  switch (complexity) {
  case "beginner":
- return "Getting Started";
- case "intermediate":
- return "";
- case "advanced":
+    return "Beginner";
+    case "intermediate":
+      return "Intermediate";
+    case "advanced":
  return "Advanced";
  default:
  return complexity;
@@ -276,7 +276,7 @@ export function TemplatePreviewModal({
 
  {/* Features */}
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">FeaturesFeature</h3>
+ <h3 className="text-sm font-medium text-foreground mb-3">Features</h3>
  <div className="grid sm:grid-cols-2 gap-2">
  {template.features.map((feature) => (
  <div
@@ -293,7 +293,7 @@ export function TemplatePreviewModal({
  {/* Requirements */}
  {template.requirements && template.requirements.length > 0 && (
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">Usageneed</h3>
+                <h3 className="text-sm font-medium text-foreground mb-3">Requirements</h3>
  <div className="flex flex-wrap gap-2">
  {template.requirements.map((req) => (
  <span
@@ -357,7 +357,7 @@ export function TemplatePreviewModal({
  <span className="text-foreground">{template.category}</span>
  </div>
  <div className="flex items-center justify-between text-sm">
- <span className="text-muted-foreground">Nodecount</span>
+                <span className="text-muted-foreground">Node Count</span>
  <span className="text-foreground">{template.nodes} </span>
  </div>
  <div className="flex items-center justify-between text-sm">
@@ -403,21 +403,21 @@ export function TemplatePreviewModal({
  <div className="aspect-video rounded-xl bg-background border border-border overflow-hidden flex items-center justify-center">
  <div className="text-center p-8">
  <Workflow className="w-16 h-16 text-primary/50 mx-auto mb-4" />
- <p className="text-muted-foreground mb-4">WorkflowPreview</p>
+ <p className="text-muted-foreground mb-4">Workflow preview</p>
  <Button
  variant="outline"
  className="rounded-xl"
  onClick={() => onUseTemplate?.(template)}
  >
  <Play className="w-4 h-4 mr-2" />
- atEditOpen
+              Open in Editor
  </Button>
  </div>
  </div>
 
  {/* Node List */}
  <div className="grid sm:grid-cols-3 gap-3">
- {["Trigger", "LLM Process", "ConditionBranch", "DataConvert", "API Call", "Output"].slice(0, template.nodes > 6 ? 6: template.nodes).map((node, i) => (
+ {["Trigger", "LLM Process", "Condition Branch", "Data Convert", "API Call", "Output"].slice(0, template.nodes > 6 ? 6: template.nodes).map((node, i) => (
  <div
  key={i}
  className="p-3 rounded-lg bg-card border border-border flex items-center gap-3"
@@ -523,7 +523,7 @@ export function TemplatePreviewModal({
  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
  onClick={() => onUseTemplate?.(template)}
  >
- {template.price === "free" ? "NowUsage": "PurchaseUsage"}
+ {template.price === "free" ? "Use now" : "Purchase to use"}
  <ArrowRight className="w-4 h-4 ml-2" />
  </Button>
  </div>
@@ -533,5 +533,5 @@ export function TemplatePreviewModal({
  );
 }
 
-// ExportExampleTemplateDataoutsidesectionUsage
+// Export example template data for external use
 export { sampleTemplates };

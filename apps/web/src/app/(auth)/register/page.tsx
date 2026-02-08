@@ -60,11 +60,11 @@ export default function RegisterPage() {
  clearError();
  
  if (!email) {
- setFormError("Please enterEmail Address");
+ setFormError("Please enter your email address");
  return;
  }
  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
- setFormError("Please enterValid'sEmail Address");
+ setFormError("Please enter a valid email address");
  return;
  }
  
@@ -84,45 +84,45 @@ export default function RegisterPage() {
  
  // UsernameVerify
  if (!username) {
- setFormError("Please enterUsername");
+ setFormError("Please enter a username");
  return;
  }
  if (username.length < 3 || username.length > 20) {
- setFormError("Usernameneedneed 3-20 Character");
+ setFormError("Username must be 3-20 characters");
  return;
  }
  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
- setFormError("UsernamecanContainschar, countcharanddownline");
+ setFormError("Username can only contain letters, numbers, and underscores");
  return;
  }
  
  // PasswordVerify
  if (!password) {
- setFormError("Please enterPassword");
+ setFormError("Please enter your password");
  return;
  }
  if (password.length < 8) {
- setFormError("Passwordfewneedneed 8 Character");
+ setFormError("Password must be at least 8 characters");
  return;
  }
  if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
- setFormError("PasswordneedneedContainsSizechar");
+ setFormError("Password must contain uppercase and lowercase letters");
  return;
  }
  if (!/\d/.test(password)) {
- setFormError("PasswordneedneedContainscountchar");
+ setFormError("Password must contain at least one number");
  return;
  }
  
  // Confirm PasswordVerify
  if (password !== confirmPassword) {
- setFormError("timesInput'sPasswordnot1");
+ setFormError("Passwords do not match");
  return;
  }
  
  // Terms of ServiceVerify
  if (!agreedToTerms) {
- setFormError("PleaseReadandAgreeTerms of ServiceandPrivacy Policy");
+ setFormError("Please read and agree to the Terms of Service and Privacy Policy");
  return;
  }
  
@@ -164,9 +164,9 @@ export default function RegisterPage() {
  <CheckCircle className="h-8 w-8 text-primary" />
  </div>
  </div>
- <h1 className="text-[24px] font-semibold text-foreground mb-2">Sign UpSuccess</h1>
+ <h1 className="text-[24px] font-semibold text-foreground mb-2">Sign Up Successful</h1>
  <p className="text-[15px] text-muted-foreground mb-8">
- VerifyEmailalreadySend
+ Verification email has been sent
  <br />
  <span className="text-foreground font-medium">{email}</span>
  </p>
@@ -175,14 +175,14 @@ export default function RegisterPage() {
  href="/login"
  className="flex items-center justify-center gap-2 w-full h-[52px] rounded-xl bg-primary text-primary-foreground font-medium text-[15px] hover:bg-primary/90 transition-all active:scale-[0.98]"
  >
- beforeSign In
+ Sign In
  <ArrowRight className="h-4 w-4" />
  </Link>
  <button
  type="button"
  className="w-full h-[52px] rounded-xl bg-muted border border-border text-muted-foreground font-medium text-[15px] hover:bg-muted/80 transition-all cursor-pointer active:scale-[0.98]"
  >
- re-newSendVerifyEmail
+ Resend Verification Email
  </button>
  </div>
  </div>
@@ -207,10 +207,10 @@ export default function RegisterPage() {
  {/* Title */}
  <div className="text-center mb-8">
  <h1 className="text-[28px] font-semibold text-foreground tracking-tight">
- {step === "social" ? "Sign InorSign Up": step === "email" ? "UsageEmailSign Up": "ImproveInfo"}
+ {step === "social" ? "Sign In or Sign Up": step === "email" ? "Sign Up with Email": "Complete Your Information"}
  </h1>
  <p className="mt-2 text-[15px] text-muted-foreground">
- {step === "social" ? "and AgentFlow 1StartCreative": step === "email" ? "Inputyou'sEmail Address": "Settingsyou'sAccountInfo"}
+ {step === "social" ? "Start creating with AgentFlow": step === "email" ? "Enter Your Email Address": "Set Up Your Account"}
  </p>
  </div>
  
@@ -233,7 +233,7 @@ export default function RegisterPage() {
  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
  </svg>
- Usage Google Sign In
+ Sign in with Google
  </button>
  
  {/* Microsoft Button */}
@@ -248,7 +248,7 @@ export default function RegisterPage() {
  <path fill="#7FBA00" d="M13 1h10v10H13z"/>
  <path fill="#FFB900" d="M13 13h10v10H13z"/>
  </svg>
- Usage Microsoft Sign In
+ Sign in with Microsoft
  </button>
  
  {/* Apple Button */}
@@ -259,14 +259,14 @@ export default function RegisterPage() {
  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
  </svg>
- Usage Apple Sign In
+ Sign in with Apple
  </button>
  </div>
  
  {/* Separatorline - ResponseTheme */}
  <div className="flex items-center gap-4 mb-6">
  <div className="flex-1 h-px bg-border" />
- <span className="text-[13px] text-muted-foreground">oruser</span>
+ <span className="text-[13px] text-muted-foreground">or</span>
  <div className="flex-1 h-px bg-border" />
  </div>
  
@@ -276,19 +276,19 @@ export default function RegisterPage() {
  onClick={() => setStep("email")}
  className="w-full h-[52px] rounded-xl bg-muted hover:bg-muted/80 border border-border text-foreground font-medium text-[15px] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.98]"
  >
- UsageEmailSign Up
+ Sign Up with Email
  <ArrowRight className="w-4 h-4" />
  </button>
  
  {/* Sign InLink */}
  <div className="mt-8 text-center">
  <p className="text-[14px] text-muted-foreground">
- alreadyhasAccount?{""}
+ Already have an account?{""}
  <Link
  href={`/login${redirectTo !== '/workflows' ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`}
  className="text-foreground hover:text-primary font-medium transition-colors duration-200"
  >
- NowSign In
+ Sign In Now
  </Link>
  </p>
  </div>
@@ -319,7 +319,7 @@ export default function RegisterPage() {
  <div className="space-y-4">
  <input
  type="email"
- placeholder="Please enteryou'sElectronicEmailAddress"
+ placeholder="Please enter your email address"
  value={email}
  onChange={(e) => setEmail(e.target.value)}
  autoComplete="email"
@@ -360,7 +360,7 @@ export default function RegisterPage() {
  </button>
  
  <div className="mb-6 p-4 rounded-xl bg-muted border border-border">
- <p className="text-[13px] text-muted-foreground">Sign UpEmail</p>
+ <p className="text-[13px] text-muted-foreground">Sign Up Email</p>
  <p className="text-[15px] text-foreground font-medium mt-1">{email}</p>
  </div>
  
@@ -391,7 +391,7 @@ export default function RegisterPage() {
  <div className="relative">
  <input
  type={showPassword ? "text" : "password"}
- placeholder="few 8 Character"
+ placeholder="At least 8 characters"
  value={password}
  onChange={(e) => setPassword(e.target.value)}
  autoComplete="new-password"
@@ -438,7 +438,7 @@ export default function RegisterPage() {
  <label className="block text-[13px] text-muted-foreground mb-2">Confirm Password</label>
  <input
  type={showPassword ? "text" : "password"}
- placeholder="againtimesInputPassword"
+ placeholder="Re-enter your password"
  value={confirmPassword}
  onChange={(e) => setConfirmPassword(e.target.value)}
  autoComplete="new-password"
@@ -456,7 +456,7 @@ export default function RegisterPage() {
  className="mt-1 h-4 w-4 rounded border-border bg-transparent text-primary focus:ring-2 focus:ring-primary/30 cursor-pointer"
  />
  <label htmlFor="terms" className="text-[13px] text-muted-foreground leading-relaxed cursor-pointer">
- IalreadyReadandAgree{""}
+ I have read and agree to the{""}
  <Link href="/terms" className="text-foreground/60 hover:text-foreground underline">
  Terms of Service
  </Link>{""}
@@ -486,7 +486,7 @@ export default function RegisterPage() {
  </>
  ) : (
  <>
- CreateAccount
+ Create Account
  <ArrowRight className="w-4 h-4" />
  </>
  )}

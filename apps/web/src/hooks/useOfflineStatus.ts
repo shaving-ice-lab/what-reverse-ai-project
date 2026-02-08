@@ -1,6 +1,6 @@
 /**
  * OfflineStatus Hook
- * @description NetworkStatusandManageOfflineQueue
+ * @description Network status detection and offline queue management
  */
 
 'use client';
@@ -20,7 +20,7 @@ import {
  * Hook BackType
  */
 export interface UseOfflineStatusReturn {
- /** isnoOnline */
+ /** Whether online */
  isOnline: boolean;
  /** NetworkStatus */
  status: NetworkStatus;
@@ -78,7 +78,7 @@ function getNetworkQuality(): NetworkQuality | undefined {
 }
 
 /**
- * DetermineNetworkisno
+ * Determine whether network is slow
  */
 function isSlowNetwork(quality?: NetworkQuality): boolean {
  if (!quality) return false;
@@ -187,7 +187,7 @@ export function useOfflineStatus(
  quality: newQuality,
  }));
 
- // ifresultfromNetworkRestoretoNormal, TriggerSync
+ // If network restored to normal, trigger sync
  if (
  autoSync &&
  onProcess &&
@@ -268,7 +268,7 @@ export function useOfflineStatus(
  queueRef.current.retryFailed();
  updateQueueState();
 
- // ifresultOnline, NowProcess
+ // If online, process now
  if (isOnline && onProcess) {
  queueRef.current.process(onProcess).then(updateQueueState);
  }

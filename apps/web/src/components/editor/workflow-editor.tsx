@@ -21,9 +21,9 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * WorkflowEditmainComponent - Manus Style
+ * Workflow Editor Main Component - Manus Style
  * 
- * LayoutStructure:
+ * Layout Structure:
  * ┌──────────────────────────────────────────────────────┐
  * │ Header/Toolbar (h-12) │
  * ├────────────┬─────────────────────────┬───────────────┤
@@ -35,10 +35,10 @@ import { cn } from "@/lib/utils";
  * │ Execution Panel (canCollapse, max-h-[300px]) │
  * └──────────────────────────────────────────────────────┘
  * 
- * : EditCanvasRegionAlwaysUsageDarkThemewithObtainmostvisualEffect
+ * Note: The editor canvas always uses a dark theme for the best visual effect.
  */
 
-// Manus StylePanelWidth
+// Manus Style Panel Width
 const PANEL_WIDTH = {
  left: 260,
  right: 320,
@@ -83,16 +83,16 @@ export function WorkflowEditor({
  const isMobile = useIsMobile();
  const isTablet = useIsTablet();
 
- // ResponsePanelWidth - Manus 
+ // Responsive Panel Width - Manus
  const leftPanelWidth = isTablet ? PANEL_WIDTH.leftTablet : PANEL_WIDTH.left;
  const rightPanelWidth = isTablet ? PANEL_WIDTH.rightTablet : PANEL_WIDTH.right;
  
- // PanelCollapseStatus
+ // Panel collapse state
  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(true);
  const [isExecutionPanelCollapsed, setIsExecutionPanelCollapsed] = useState(true);
  
- // Moveendpoint Sheet Status
+ // Mobile Sheet state
  const [isNodeSheetOpen, setIsNodeSheetOpen] = useState(false);
  const [isConfigSheetOpen, setIsConfigSheetOpen] = useState(false);
 
@@ -109,7 +109,7 @@ export function WorkflowEditor({
  markSaved,
  } = useWorkflowStore();
 
- // InitialWorkflowData
+ // Initialize workflow data
  useEffect(() => {
  if (initialData) {
  if (initialData.name) {
@@ -137,13 +137,13 @@ export function WorkflowEditor({
  }
  }, [workflowId, initialData, setWorkflow, setNodes, setEdges, markSaved]);
 
- // SaveWorkflow
+ // Save workflow
  const handleSave = useCallback(async () => {
  console.log("Saving workflow...", { nodes, edges });
  onSave?.();
  }, [nodes, edges, onSave]);
 
- // ShortcutkeyProcess
+ // Shortcut key handler
  useEffect(() => {
  const isInputElement = () => {
  const activeElement = document.activeElement;
@@ -210,24 +210,24 @@ export function WorkflowEditor({
  return () => window.removeEventListener("keydown", handleKeyDown);
  }, [selectedNodeIds, handleSave]);
 
- // RunWorkflow
+ // Run workflow
  const handleRun = useCallback(async () => {
  console.log("Running workflow...");
  setExecuting(true);
- setIsExecutionPanelCollapsed(false); // RuntimeExpandExecutePanel
+ setIsExecutionPanelCollapsed(false); // Expand execution panel at runtime
  onExecute?.();
  setTimeout(() => {
  setExecuting(false);
  }, 3000);
  }, [setExecuting, onExecute]);
 
- // StopExecute
+ // Stop execution
  const handleStop = useCallback(async () => {
  console.log("Stopping workflow...");
  setExecuting(false);
  }, [setExecuting]);
 
- // Based onselectStatusAutoDisplay/HideConfigPanel
+ // Auto show/hide config panel based on selection
  useEffect(() => {
  if (selectedNodeIds.length > 0) {
  if (isMobile) {
@@ -238,21 +238,21 @@ export function WorkflowEditor({
  }
  }, [selectedNodeIds, isRightPanelCollapsed, isMobile]);
 
- // EditAlwaysUsageDarkTheme'sstyle
+ // Editor always uses dark theme style
  const editorBg = "bg-background-studio";
  const panelBg = "bg-surface-100/95 backdrop-blur-sm";
  const borderColor = "border-border";
  const buttonBg = "bg-surface-200/80 backdrop-blur-sm";
  const buttonBorder = "border-border/70";
 
- // MoveendpointLayout
+ // Mobile layout
  if (isMobile) {
  return (
  <ReactFlowProvider>
  <div className={cn("flex flex-col h-full overflow-hidden", editorBg)}>
- {/* TopToolbar */}
+ {/* Top Toolbar */}
  <EditorToolbar
- workflowName={initialData?.name || "not yetNamingWorkflow"}
+ workflowName={initialData?.name || "Untitled Workflow"}
  workflowVersion={workflowVersion}
  onSave={handleSave}
  onRun={handleRun}
@@ -264,11 +264,11 @@ export function WorkflowEditor({
  executionStatus={executionStatus}
  />
 
- {/* CanvasRegion (all) */}
+ {/* Canvas Region */}
  <div className="flex-1 relative overflow-hidden">
  <EditorCanvas showEmptyState={showEmptyState} />
  
- {/* MoveendpointFloatingActionButton */}
+ {/* Mobile Floating Action Buttons */}
  <div className="absolute bottom-4 left-4 flex flex-col gap-2 z-10">
  <Sheet open={isNodeSheetOpen} onOpenChange={setIsNodeSheetOpen}>
  <SheetTrigger asChild>
@@ -330,13 +330,13 @@ export function WorkflowEditor({
  );
  }
 
- // faceendpointLayout - Manus Style
+ // Desktop layout - Manus Style
  return (
  <ReactFlowProvider>
  <div className={cn("flex flex-col h-full overflow-hidden", editorBg)}>
- {/* TopToolbar - h-12 */}
+ {/* Top Toolbar - h-12 */}
  <EditorToolbar
- workflowName={initialData?.name || "not yetNamingWorkflow"}
+ workflowName={initialData?.name || "Untitled Workflow"}
  workflowVersion={workflowVersion}
  onSave={handleSave}
  onRun={handleRun}
@@ -348,9 +348,9 @@ export function WorkflowEditor({
  executionStatus={executionStatus}
  />
 
- {/* mainRegion */}
+ {/* Main Region */}
  <div className="flex flex-1 overflow-hidden">
- {/* Left sideNodePanel - w-[260px] */}
+ {/* Left Side Node Panel - w-[260px] */}
  <aside
  className={cn(
  "shrink-0 overflow-hidden border-r",
@@ -362,13 +362,13 @@ export function WorkflowEditor({
  <NodePanel />
  </aside>
 
- {/* betweenCanvasRegion + FooterExecutePanel */}
+ {/* Canvas Region + Bottom Execution Panel */}
  <div className="flex flex-col flex-1 overflow-hidden">
- {/* CanvasRegion */}
+ {/* Canvas Region */}
  <div className="flex-1 relative overflow-hidden">
  <EditorCanvas showEmptyState={showEmptyState} />
  
- {/* PanelCollapseButton - Left side */}
+ {/* Panel Collapse Button - Left Side */}
  <button
  onClick={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
  className={cn(
@@ -389,7 +389,7 @@ export function WorkflowEditor({
  />
  </button>
 
- {/* PanelCollapseButton - Right side */}
+ {/* Panel Collapse Button - Right Side */}
  <button
  onClick={() => setIsRightPanelCollapsed(!isRightPanelCollapsed)}
  className={cn(
@@ -410,7 +410,7 @@ export function WorkflowEditor({
  />
  </button>
 
- {/* FooterExecutePanelCollapseButton */}
+ {/* Execution Panel Collapse Button */}
  <button
  onClick={() => setIsExecutionPanelCollapsed(!isExecutionPanelCollapsed)}
  className={cn(
@@ -431,7 +431,7 @@ export function WorkflowEditor({
  </button>
  </div>
 
- {/* FooterExecutePanel - canCollapse */}
+ {/* Bottom Execution Panel - Collapsible */}
  <div
  className={cn(
  "overflow-hidden border-t",
@@ -448,7 +448,7 @@ export function WorkflowEditor({
  </div>
  </div>
 
- {/* Right sideConfigPanel - w-[320px] */}
+ {/* Right Side Config Panel - w-[320px] */}
  <aside
  className={cn(
  "shrink-0 overflow-hidden border-l",

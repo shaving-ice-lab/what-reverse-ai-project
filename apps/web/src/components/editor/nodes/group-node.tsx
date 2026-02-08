@@ -4,11 +4,11 @@
  * GroupNodeComponent
  * 
  * Features: 
- * - willmultipleNodeOrganizationat1
- * - SupportCollapse/Expand
- * - SupportCustomColorTheme
- * - SupportGroupNaming
- * - SupportAdjustSize
+ * - Organize multiple nodes into a group
+ * - Support collapse/expand
+ * - Support custom color theme
+ * - Support group naming
+ * - Support resizing
  */
 
 import { memo, useState, useCallback, useRef, useEffect } from 'react';
@@ -207,9 +207,9 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  updateNode(id, { ...data, color: newColor });
  }, [id, data, updateNode]);
 
- // DeleteGroup
- const handleDelete = useCallback(() => {
- // firstwillNodefromGroup
+  // Delete group
+  const handleDelete = useCallback(() => {
+    // First remove nodes from the group
  const nodes = getNodes();
  const updatedNodes = nodes.map((node) => {
  if (node.parentId === id) {
@@ -217,7 +217,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  ...node,
  parentId: undefined,
  position: {
- // ConvertasforCoordinate(needneedFetchGroupNode)
+            // Convert to absolute coordinates (requires group node position)
  x: node.position.x + (nodes.find(n => n.id === id)?.position.x || 0),
  y: node.position.y + (nodes.find(n => n.id === id)?.position.y || 0),
  },
@@ -227,19 +227,19 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  });
  setNodes(updatedNodes);
  
- // afterDeleteGroupNode
+    // Then delete the group node
  removeNodes([id]);
  }, [id, getNodes, setNodes, removeNodes]);
 
- // CopyGroup(ContainsNode)
- const handleDuplicate = useCallback(() => {
- // TODO: ImplementCopyGroupFeatures
+  // Copy group (including nodes)
+  const handleDuplicate = useCallback(() => {
+    // TODO: Implement copy group feature
  console.log('Duplicate group:', id);
  }, [id]);
 
  return (
  <>
- {/* NodeAdjust - onlyatnot yetCollapsetimecanAdjustSize */}
+      {/* Node resizer - only resizable when not collapsed */}
  {!collapsed && (
  <NodeResizer
  minWidth={MIN_WIDTH}
@@ -326,7 +326,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  <span
  className={cn('text-sm font-medium truncate cursor-pointer', config.text)}
  onDoubleClick={() => setIsEditing(true)}
- title="Double ClickEditName"
+ title="Double-click to edit name"
  >
  {data.label}
  </span>
@@ -353,7 +353,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  className="text-foreground focus:bg-surface-200 focus:text-foreground"
  >
  <Pencil className="w-4 h-4 mr-2" />
- re-Naming
+            Rename
  </DropdownMenuItem>
  
  <DropdownMenuItem
@@ -363,12 +363,12 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  {collapsed ? (
  <>
  <ChevronDown className="w-4 h-4 mr-2" />
- ExpandGroup
+              Expand Group
  </>
  ) : (
  <>
  <ChevronRight className="w-4 h-4 mr-2" />
- CollapseGroup
+              Collapse Group
  </>
  )}
  </DropdownMenuItem>
@@ -377,7 +377,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  
  {/* ColorSelect */}
  <div className="px-2 py-1.5">
- <span className="text-xs text-foreground-muted mb-2 block">GroupColor</span>
+ <span className="text-xs text-foreground-muted mb-2 block">Group color</span>
  <div className="flex flex-wrap gap-1.5">
  {(Object.keys(colorConfig) as GroupColor[]).map((colorKey) => (
  <button
@@ -401,7 +401,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  className="text-foreground focus:bg-surface-200 focus:text-foreground"
  >
  <Copy className="w-4 h-4 mr-2" />
- CopyGroup
+            Copy Group
  </DropdownMenuItem>
  
  <DropdownMenuItem
@@ -409,16 +409,16 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
  className="text-destructive focus:bg-destructive-200 focus:text-destructive"
  >
  <Trash2 className="w-4 h-4 mr-2" />
- DeleteGroup
+            Delete Group
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  </div>
 
- {/* GroupContentRegion(onlyatExpandtimeDisplay) */}
+      {/* Group content area (only displayed when expanded) */}
  {!collapsed && (
  <div className="flex-1 p-2">
- {/* NodewillAutoRenderatthisRegionin */}
+          {/* Nodes will auto-render in this area */}
  {data.description && (
  <p className="text-xs text-foreground-muted px-1">{data.description}</p>
  )}

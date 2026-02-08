@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * PricingSettingsComponent
+ * Pricing Settings Component
  * 
- * SupportFree, Paid, Subscription3typePricing
+ * Supports Free, Paid, and Subscription pricing types
  */
 
 import { useState } from "react";
@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { PricingType } from "@/types/agent";
 
-// PricingOptionConfig
+// Pricing Option Config
 const pricingOptions: Array<{
  id: PricingType;
  label: string;
@@ -29,32 +29,32 @@ const pricingOptions: Array<{
  {
  id: "free",
  label: "Free",
- description: "AllUserFreeUsage, SuitablePromoteand",
+ description: "Free for all users, great for promotion and outreach",
  icon: Gift,
  badge: "Recommended",
  },
  {
  id: "paid",
- label: "timesPaid",
- description: "User1timesPaidafterPermanentUsage",
+label: "One-Time Purchase",
+    description: "Users pay once for permanent access",
  icon: CreditCard,
  },
  {
  id: "subscription",
  label: "Subscription",
- description: "UserbymonthsorbyyearsSubscriptionUsage",
+ description: "Users subscribe monthly or yearly for access",
  icon: Repeat,
  },
 ];
 
-// SubscriptionweeksOption
+// Subscription Period Options
 const subscriptionPeriods = [
- { id: "monthly", label: "bymonths", suffix: "/months" },
- { id: "yearly", label: "byyears", suffix: "/years", discount: "17%" },
+  { id: "monthly", label: "Monthly", suffix: "/month" },
+  { id: "yearly", label: "Yearly", suffix: "/year", discount: "17%" },
 ];
 
 interface PricingSettingsProps {
- // Currentvalue
+  // Current value
  pricingType: PricingType;
  price: number | null;
  
@@ -76,9 +76,9 @@ export function PricingSettings({
  const [subscriptionPeriod, setSubscriptionPeriod] = useState<"monthly" | "yearly">("monthly");
  const [priceInput, setPriceInput] = useState(price?.toString() || "");
 
- // ProcessPriceInput
- const handlePriceInputChange = (value: string) => {
- // Allowcountcharandsmallcount
+  // Process price input
+  const handlePriceInputChange = (value: string) => {
+    // Allow numbers and decimal points
  const cleanValue = value.replace(/[^0-9.]/g, "");
  setPriceInput(cleanValue);
  
@@ -90,7 +90,7 @@ export function PricingSettings({
  }
  };
 
- // ProcessPricingTypeChange
+  // Process pricing type change
  const handlePricingTypeChange = (type: PricingType) => {
  onPricingTypeChange(type);
  if (type === "free") {
@@ -99,20 +99,20 @@ export function PricingSettings({
  }
  };
 
- // PresetPriceOption
+  // Preset price options
  const presetPrices = pricingType === "subscription"
  ? subscriptionPeriod === "monthly"
  ? [9.9, 19.9, 29.9, 49.9]
  : [99, 199, 299, 499]
  : [9.9, 19.9, 49.9, 99];
 
- // PlatformDescription
+  // Platform fee
  const platformFee = 0.2; // 20%
  const estimatedEarnings = price ? price * (1 - platformFee) : 0;
 
  return (
  <div className={cn("space-y-6", className)}>
- {/* PricingSelect */}
+ {/* Pricing Select */}
  <div>
  <label className="block text-sm font-medium text-foreground mb-3">
  Pricing <span className="text-destructive">*</span>
@@ -135,7 +135,7 @@ export function PricingSettings({
  : "border-border bg-background hover:border-primary/30"
  )}
  >
- {/* selectIndicator */}
+ {/* Select Indicator */}
  <div className={cn(
  "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5",
  isSelected
@@ -183,12 +183,12 @@ export function PricingSettings({
  </div>
  </div>
 
- {/* SubscriptionweeksSelect */}
+ {/* Subscription Period Select */}
  {pricingType === "subscription" && (
  <div>
  <label className="block text-sm font-medium text-foreground mb-3">
- Subscriptionweeks
- </label>
+Subscription Period
+          </label>
  
  <div className="flex gap-3">
  {subscriptionPeriods.map((period) => (
@@ -220,15 +220,15 @@ export function PricingSettings({
  </div>
  )}
 
- {/* PriceInput */}
- {pricingType !== "free" && (
+      {/* Price Input */}
+      {pricingType !== "free" && (
  <div>
  <label className="block text-sm font-medium text-foreground mb-3">
- PriceSettings <span className="text-destructive">*</span>
+ Price <span className="text-destructive">*</span>
  </label>
 
- {/* PriceInput */}
- <div className="relative">
+          {/* Price Input Field */}
+          <div className="relative">
  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
  <span className="text-lg font-medium text-foreground-light"></span>
  </div>
@@ -252,7 +252,7 @@ export function PricingSettings({
  </div>
  </div>
 
- {/* PresetPrice */}
+ {/* Preset Prices */}
  <div className="flex flex-wrap gap-2 mt-3">
  {presetPrices.map((preset) => (
  <button
@@ -274,12 +274,12 @@ export function PricingSettings({
  ))}
  </div>
 
- {/* RevenueEstimate */}
+ {/* Revenue Estimate */}
  {price && price > 0 && (
  <div className="mt-4 p-4 rounded-xl bg-surface-200/50 border border-border">
  <div className="flex items-center gap-2 text-sm text-foreground-light mb-2">
  <Info className="w-4 h-4" />
- <span>RevenueEstimate</span>
+ <span>Revenue Estimate</span>
  </div>
  <div className="grid grid-cols-3 gap-4">
  <div>
@@ -289,13 +289,13 @@ export function PricingSettings({
  </div>
  </div>
  <div>
- <div className="text-xs text-foreground-light">PlatformCost (20%)</div>
+ <div className="text-xs text-foreground-light">Platform Fee (20%)</div>
  <div className="text-lg font-semibold text-orange-500">
  -{(price * platformFee).toFixed(2)}
  </div>
  </div>
  <div>
- <div className="text-xs text-foreground-light">you'sRevenue</div>
+ <div className="text-xs text-foreground-light">Your Revenue</div>
  <div className="text-lg font-semibold text-primary">
  {estimatedEarnings.toFixed(2)}
  </div>
@@ -306,7 +306,7 @@ export function PricingSettings({
  </div>
  )}
 
- {/* FreeTip */}
+ {/* Free Tier Tip */}
  {pricingType === "free" && (
  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
  <div className="flex items-start gap-3">
@@ -314,8 +314,8 @@ export function PricingSettings({
  <div>
  <div className="font-medium text-foreground">Free</div>
  <p className="text-sm text-foreground-light mt-1">
- Free Agent canwithObtainmoremultipleExposureandUsage, SuitableandCollectUserFeedback.
- youAnytimecanwithSwitchtoPaid.
+Free agents get more exposure and usage, making them great for collecting user feedback.
+                You can switch to paid pricing at any time.
  </p>
  </div>
  </div>

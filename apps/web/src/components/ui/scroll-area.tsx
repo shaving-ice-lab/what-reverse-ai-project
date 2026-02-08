@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * ScrollArea ScrollRegionComponent - Enhanced
+ * Scroll Area Component - Enhanced
  * 
  * Support: 
- * - GradientEdge
- * - AutoHideScroll
- * - ScrolltoTopButton
- * - ScrollShadow
+ * - Gradient edges
+ * - Auto-hide scrollbar
+ * - Scroll to top button
+ * - Scroll shadow
  */
 
 import * as React from "react"
@@ -16,18 +16,18 @@ import { ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ScrollAreaProps extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
- /** isnoDisplayGradientEdge */
- fadeEdges?: boolean
- /** GradientEdgemethod */
- fadeDirection?: "vertical" | "horizontal" | "both"
- /** isnoAutoHideScroll */
- autoHide?: boolean
- /** isnoDisplayScrolltoTopButton */
- showScrollToTop?: boolean
- /** ScrolltoTopvalue */
- scrollToTopThreshold?: number
- /** isnoDisplayScrollShadow */
- showShadow?: boolean
+  /** Whether to display gradient edges */
+  fadeEdges?: boolean
+  /** Gradient edge direction */
+  fadeDirection?: "vertical" | "horizontal" | "both"
+  /** Whether to auto-hide scrollbar */
+  autoHide?: boolean
+  /** Whether to display scroll to top button */
+  showScrollToTop?: boolean
+  /** Scroll to top threshold value */
+  scrollToTopThreshold?: number
+  /** Whether to display scroll shadow */
+  showShadow?: boolean
 }
 
 const ScrollArea = React.forwardRef<
@@ -44,40 +44,40 @@ const ScrollArea = React.forwardRef<
  showShadow = false,
  ...props 
 }, ref) => {
- const viewportRef = React.useRef<HTMLDivElement>(null)
- const [showTopButton, setShowTopButton] = React.useState(false)
- const [scrollState, setScrollState] = React.useState({ top: false, bottom: false })
+  const viewportRef = React.useRef<HTMLDivElement>(null)
+  const [showTopButton, setShowTopButton] = React.useState(false)
+  const [scrollState, setScrollState] = React.useState({ top: false, bottom: false })
 
- // ListenScroll
- React.useEffect(() => {
- const viewport = viewportRef.current
- if (!viewport) return
+  // Listen to scroll events
+  React.useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
 
- const handleScroll = () => {
- const { scrollTop, scrollHeight, clientHeight } = viewport
- 
- // ScrolltoTopButton
- if (showScrollToTop) {
- setShowTopButton(scrollTop > scrollToTopThreshold)
- }
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = viewport
+      
+      // Scroll to top button visibility
+      if (showScrollToTop) {
+        setShowTopButton(scrollTop > scrollToTopThreshold)
+      }
 
- // ScrollShadow
- if (showShadow) {
- setScrollState({
- top: scrollTop > 0,
- bottom: scrollTop < scrollHeight - clientHeight - 1,
- })
- }
- }
+      // Scroll shadow state
+      if (showShadow) {
+        setScrollState({
+          top: scrollTop > 0,
+          bottom: scrollTop < scrollHeight - clientHeight - 1,
+        })
+      }
+    }
 
- viewport.addEventListener("scroll", handleScroll)
- handleScroll() // InitialCheck
+    viewport.addEventListener("scroll", handleScroll)
+    handleScroll() // Initial check
 
- return () => viewport.removeEventListener("scroll", handleScroll)
- }, [showScrollToTop, scrollToTopThreshold, showShadow])
+    return () => viewport.removeEventListener("scroll", handleScroll)
+  }, [showScrollToTop, scrollToTopThreshold, showShadow])
 
- // ScrolltoTop
- const scrollToTop = () => {
+  // Scroll to top function
+  const scrollToTop = () => {
  viewportRef.current?.scrollTo({ top: 0, behavior: "smooth" })
  }
 

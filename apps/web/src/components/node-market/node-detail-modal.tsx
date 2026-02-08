@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * NodeDetailsModalComponent
+ * Node Detail Modal Component
  * 
- * ShowcaseNode'sCompleteInfo, ReviewsandAction
+ * Displays the node's complete info, reviews, and actions
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 import { customNodeApi } from "@/lib/api/custom-node";
 import type { CustomNodeDetail, CustomNodeCategory, CustomNodeReview } from "@/types/custom-node";
 
-// CategoryIconMapping
+// Category icon mapping
 const categoryIconMap: Record<CustomNodeCategory, typeof Cpu> = {
  ai: Cpu,
  data: Database,
@@ -54,21 +54,21 @@ const categoryIconMap: Record<CustomNodeCategory, typeof Cpu> = {
  other: Sparkles,
 };
 
-// CategoryNameMapping
+// Category name mapping
 const categoryNameMap: Record<CustomNodeCategory, string> = {
  ai: "AI/LLM",
- data: "DataProcess",
+ data: "Data Processing",
  integration: "Integration",
  utility: "Tool",
- logic: "LogicControl",
+ logic: "Logic Control",
  communication: "Communication",
  storage: "Storage",
- other: "otherhe",
+ other: "Other",
 };
 
-// Formatcountchar
+// Format number
 const formatNumber = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+ if (num >= 10000) return `${(num / 1000).toFixed(0)}K`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
@@ -92,17 +92,17 @@ export function NodeDetailModal({
  const [error, setError] = useState<string | null>(null);
  const [activeTab, setActiveTab] = useState<"overview" | "code" | "versions" | "reviews">("overview");
  
- // ActionStatus
+ // Action state
  const [isInstalling, setIsInstalling] = useState(false);
  const [isStarring, setIsStarring] = useState(false);
  const [isStarred, setIsStarred] = useState(false);
  const [isInstalled, setIsInstalled] = useState(false);
  const [copiedCode, setCopiedCode] = useState(false);
  
- // ExpandStatus
+ // Expand state
  const [showAllVersions, setShowAllVersions] = useState(false);
 
- // LoadNodeDetails
+ // Load node details
  const loadNode = useCallback(async () => {
  if (!nodeSlug) return;
  
@@ -115,14 +115,14 @@ export function NodeDetailModal({
  setIsStarred(response.data.userState?.isStarred || false);
  setIsInstalled(response.data.userState?.isInstalled || false);
  } catch (err) {
- console.error("LoadNodeDetailsFailed:", err);
- setError(err instanceof Error ? err.message: "LoadFailed");
+ console.error("Failed to load node details:", err);
+     setError(err instanceof Error ? err.message: "Failed to load");
  } finally {
  setIsLoading(false);
  }
  }, [nodeSlug]);
 
- // LoadReviews
+ // Load reviews
  const loadReviews = useCallback(async () => {
  if (!node) return;
  
@@ -130,11 +130,11 @@ export function NodeDetailModal({
  const response = await customNodeApi.getReviews(node.id, { pageSize: 5 });
  setReviews(response.data || []);
  } catch (err) {
- console.error("LoadReviewsFailed:", err);
+ console.error("Failed to load reviews:", err);
  }
  }, [node]);
 
- // InstallNode
+ // Install node
  const handleInstall = async () => {
  if (!node || isInstalling) return;
  
@@ -144,14 +144,14 @@ export function NodeDetailModal({
  setIsInstalled(true);
  onInstallSuccess?.();
  } catch (err) {
- console.error("InstallFailed:", err);
- alert(err instanceof Error ? err.message: "InstallFailed");
+ console.error("Failed to install:", err);
+     alert(err instanceof Error ? err.message: "Installation failed");
  } finally {
  setIsInstalling(false);
  }
  };
 
- // UninstallNode
+ // Uninstall node
  const handleUninstall = async () => {
  if (!node || isInstalling) return;
  
@@ -160,8 +160,8 @@ export function NodeDetailModal({
  await customNodeApi.uninstall(node.id);
  setIsInstalled(false);
  } catch (err) {
- console.error("UninstallFailed:", err);
- alert(err instanceof Error ? err.message: "UninstallFailed");
+ console.error("Failed to uninstall:", err);
+     alert(err instanceof Error ? err.message: "Uninstall failed");
  } finally {
  setIsInstalling(false);
  }
@@ -176,13 +176,13 @@ export function NodeDetailModal({
  const response = await customNodeApi.star(node.id);
  setIsStarred(response.data.isStarred);
  } catch (err) {
- console.error("FavoriteFailed:", err);
+ console.error("Failed to favorite:", err);
  } finally {
  setIsStarring(false);
  }
  };
 
- // CopyCode
+ // Copy code
  const handleCopyCode = () => {
  if (node?.exampleCode) {
  navigator.clipboard.writeText(node.exampleCode);
@@ -203,7 +203,7 @@ export function NodeDetailModal({
  }
  }, [node, loadReviews]);
 
- // CloseModaltimeResetStatus
+ // Reset state when modal closes
  useEffect(() => {
  if (!isOpen) {
  setActiveTab("overview");
@@ -214,19 +214,19 @@ export function NodeDetailModal({
  if (!isOpen) return null;
 
  const CategoryIcon = node ? categoryIconMap[node.category] : Sparkles;
- const categoryName = node ? categoryNameMap[node.category]: "otherhe";
+ const categoryName = node ? categoryNameMap[node.category]: "Other";
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center">
- {/* BackgroundMask */}
+ {/* Background Overlay */}
  <div
  className="absolute inset-0 bg-black/60 backdrop-blur-sm"
  onClick={onClose}
  />
 
- {/* ModalContent */}
+ {/* Modal Content */}
  <div className="relative w-full max-w-4xl max-h-[90vh] m-4 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col">
- {/* CloseButton */}
+ {/* Close Button */}
  <button
  onClick={onClose}
  className="absolute top-4 right-4 p-2 rounded-lg bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
@@ -234,14 +234,14 @@ export function NodeDetailModal({
  <X className="w-5 h-5" />
  </button>
 
- {/* LoadStatus */}
+ {/* Loading State */}
  {isLoading && (
  <div className="flex items-center justify-center py-32">
  <Loader2 className="w-8 h-8 animate-spin text-primary" />
  </div>
  )}
 
- {/* ErrorStatus */}
+ {/* Error State */}
  {error && !isLoading && (
  <div className="flex flex-col items-center justify-center py-32">
  <AlertCircle className="w-12 h-12 text-destructive mb-4" />
@@ -252,7 +252,7 @@ export function NodeDetailModal({
  </div>
  )}
 
- {/* NodeContent */}
+ {/* Node Content */}
  {node && !isLoading && !error && (
  <>
  {/* Header */}
@@ -269,7 +269,7 @@ export function NodeDetailModal({
  {node.author.isVerified && (
  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs">
  <CheckCircle2 className="w-3 h-3" />
- Authentication
+                   Verified
  </span>
  )}
  </div>
@@ -287,7 +287,7 @@ export function NodeDetailModal({
  </span>
  <span className="flex items-center gap-1">
  <Download className="w-4 h-4" />
- {formatNumber(node.installCount)} Install
+ {formatNumber(node.installCount)} installs
  </span>
  <span className="flex items-center gap-1">
  <User className="w-4 h-4" />
@@ -296,7 +296,7 @@ export function NodeDetailModal({
  </div>
  </div>
 
- {/* ActionButton */}
+ {/* Action Buttons */}
  <div className="flex items-center gap-2 shrink-0">
  <Button
  variant="outline"
@@ -350,7 +350,7 @@ export function NodeDetailModal({
  <div className="flex gap-1 px-6">
  {[
  { id: "overview" as const, label: "Overview" },
- { id: "code" as const, label: "ExampleCode" },
+ { id: "code" as const, label: "Example Code" },
  { id: "versions" as const, label: "Version History" },
  { id: "reviews" as const, label: `Reviews (${node.reviewCount})` },
  ].map((tab) => (
@@ -375,10 +375,10 @@ export function NodeDetailModal({
  {/* Overview */}
  {activeTab === "overview" && (
  <div className="space-y-6">
- {/* DetailedDescription */}
- {node.longDescription && (
- <div>
- <h3 className="text-sm font-medium text-foreground mb-3">DetailedIntroduction</h3>
+{/* Detailed Description */}
+                 {node.longDescription && (
+                   <div>
+                     <h3 className="text-sm font-medium text-foreground mb-3">Detailed Description</h3>
  <div className="p-4 rounded-xl bg-muted/50 border border-border">
  <p className="text-muted-foreground whitespace-pre-wrap">
  {node.longDescription}
@@ -387,10 +387,10 @@ export function NodeDetailModal({
  </div>
  )}
 
- {/* InputOutputPort */}
+ {/* Input/Output Ports */}
  <div className="grid md:grid-cols-2 gap-6">
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">InputPort</h3>
+ <h3 className="text-sm font-medium text-foreground mb-3">Input Ports</h3>
  <div className="space-y-2">
  {node.inputs.map((input, index) => (
  <div
@@ -414,13 +414,13 @@ export function NodeDetailModal({
  </div>
  ))}
  {node.inputs.length === 0 && (
- <p className="text-sm text-muted-foreground">NoneInputPort</p>
+ <p className="text-sm text-muted-foreground">No input ports</p>
  )}
  </div>
  </div>
  
  <div>
- <h3 className="text-sm font-medium text-foreground mb-3">OutputPort</h3>
+ <h3 className="text-sm font-medium text-foreground mb-3">Output Ports</h3>
  <div className="space-y-2">
  {node.outputs.map((output, index) => (
  <div
@@ -441,7 +441,7 @@ export function NodeDetailModal({
  </div>
  ))}
  {node.outputs.length === 0 && (
- <p className="text-sm text-muted-foreground">NoneOutputPort</p>
+ <p className="text-sm text-muted-foreground">No output ports</p>
  )}
  </div>
  </div>
@@ -494,7 +494,7 @@ export function NodeDetailModal({
  </div>
  )}
 
- {/* ExampleCode */}
+ {/* Example Code */}
  {activeTab === "code" && (
  <div>
  {node.exampleCode ? (
@@ -518,7 +518,7 @@ export function NodeDetailModal({
  ) : (
  <div className="text-center py-12 text-muted-foreground">
  <Code2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
- <p>NoneExampleCode</p>
+ <p>No example code available</p>
  </div>
  )}
  </div>
@@ -542,7 +542,7 @@ export function NodeDetailModal({
  <span className="font-semibold text-foreground">v{version.version}</span>
  {index === 0 && (
  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
- mostnew
+                   Latest
  </span>
  )}
  </div>
@@ -567,7 +567,7 @@ export function NodeDetailModal({
  ) : (
  <>
  <ChevronDown className="w-4 h-4" />
- View all ({node.versions.length} Version)
+ View all ({node.versions.length} versions)
  </>
  )}
  </button>
@@ -621,7 +621,7 @@ export function NodeDetailModal({
  ) : (
  <div className="text-center py-12 text-muted-foreground">
  <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
- <p>NoneReviews</p>
+ <p>No reviews yet</p>
  </div>
  )}
  </div>

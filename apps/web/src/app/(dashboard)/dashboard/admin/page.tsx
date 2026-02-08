@@ -53,13 +53,13 @@ const statusVariants: Record<string, { label: string; variant: "success" | "warn
  cold_storage: { label: "Storage", variant: "info" },
  draft: { label: "Draft", variant: "info" },
  published: { label: "Published", variant: "success" },
- deprecated: { label: "alreadyuse", variant: "warning" },
+  deprecated: { label: "Deprecated", variant: "warning" },
  archived: { label: "Archived", variant: "warning" },
  open: { label: "Pending", variant: "warning" },
  in_progress: { label: "Processing", variant: "info" },
- waiting_on_customer: { label: "etcpendingUser", variant: "warning" },
- resolved: { label: "alreadyResolve", variant: "success" },
- closed: { label: "alreadyClose", variant: "error" },
+  waiting_on_customer: { label: "Awaiting User", variant: "warning" },
+  resolved: { label: "Resolved", variant: "success" },
+  closed: { label: "Closed", variant: "error" },
 };
 
 type StatusHistoryItem = {
@@ -74,10 +74,10 @@ const ticketNextAction: Record<
  string,
  { label: string; nextStatus: string; variant: "default" | "secondary" | "outline" }
 > = {
- open: { label: "StartProcess", nextStatus: "in_progress", variant: "default" },
- in_progress: { label: "MarkResolve", nextStatus: "resolved", variant: "secondary" },
- resolved: { label: "CloseTicket", nextStatus: "closed", variant: "outline" },
- closed: { label: "re-newOpen", nextStatus: "open", variant: "default" },
+  open: { label: "Start Processing", nextStatus: "in_progress", variant: "default" },
+  in_progress: { label: "Mark Resolved", nextStatus: "resolved", variant: "secondary" },
+  resolved: { label: "Close Ticket", nextStatus: "closed", variant: "outline" },
+  closed: { label: "Reopen", nextStatus: "open", variant: "default" },
 };
 
 const formatDate = (value?: string) => {
@@ -281,9 +281,9 @@ export default function AdminConsolePage() {
  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-warning-200 text-warning">
  <AlertTriangle className="h-6 w-6" />
  </div>
- <h2 className="text-lg font-semibold text-foreground">needneedAdminPermission</h2>
- <p className="mt-2 text-sm text-foreground-muted">
- CurrentAccountnot yetbyAuthorizeAccessManageafter, PleaseContactSystemAdminPermission.
+          <h2 className="text-lg font-semibold text-foreground">Admin Permission Required</h2>
+          <p className="mt-2 text-sm text-foreground-muted">
+            This account is not authorized to access admin management. Please contact a system administrator.
  </p>
  </div>
  );
@@ -299,9 +299,9 @@ export default function AdminConsolePage() {
  </div>
  <div>
  <p className="text-xs uppercase tracking-[0.35em] text-foreground-muted">Command Desk</p>
- <h3 className="text-lg font-semibold text-foreground">OperationsandRisk Control</h3>
+ <h3 className="text-lg font-semibold text-foreground">Operations and risk control</h3>
  <p className="mt-1 text-sm text-foreground-muted">
- 1EntryManageUser, Workspace, AppandSupportTicket, AllActioncan.
+            Manage users, workspaces, apps and support tickets from a single dashboard.
  </p>
  </div>
  </div>
@@ -320,15 +320,15 @@ export default function AdminConsolePage() {
  return (
  <PageContainer className="space-y-6">
  <PageHeader
- title="Manageafter"
- eyebrow="InternalOperations"
+      title="Admin Console"
+        eyebrow="Internal Operations"
  icon={<Shield className="h-4 w-4" />}
- description="AdminPermissionValidate, Risk Control, Support's1Work."
+ description="Admin permission validation, risk control and support."
  actions={
  isAdmin ? (
  <Button variant="outline" size="sm" onClick={refreshActiveTab}>
  <RefreshCw className="mr-2 h-4 w-4" />
- RefreshData
+            Refresh Data
  </Button>
  ) : null
  }
@@ -339,7 +339,7 @@ export default function AdminConsolePage() {
  {isAdmin && (
  <SettingsSection
  title="Manage"
- description="byModuleProcessOperationsTask, SupportMinimumClosed Loop'sQuery, andTrack."
+ description="Process operations by module; supports minimal closed-loop query and tracking."
  >
  <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-5">
  <TabsList variant="segment" showIndicator fullWidth>
@@ -350,7 +350,7 @@ export default function AdminConsolePage() {
  Workspace
  </TabsTrigger>
  <TabsTrigger value="tickets" icon={<LifeBuoy className="h-4 w-4" />}>
- SupportTicket
+            Support Tickets
  </TabsTrigger>
  </TabsList>
 
@@ -360,7 +360,7 @@ export default function AdminConsolePage() {
  <Input
  value={userSearch}
  onChange={(event) => setUserSearch(event.target.value)}
- placeholder="SearchUserEmail/Username"
+ placeholder="Search user email or username"
  className="max-w-xs"
  />
  <select
@@ -368,7 +368,7 @@ export default function AdminConsolePage() {
  onChange={(event) => setUserStatus(event.target.value)}
  className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
  >
- <option value="">allsectionStatus</option>
+ <option value="">All Status</option>
  <option value="active">Normal</option>
  <option value="suspended">Pause</option>
  </select>
@@ -377,9 +377,9 @@ export default function AdminConsolePage() {
  onChange={(event) => setUserRole(event.target.value)}
  className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
  >
- <option value="">allsectionRole</option>
+ <option value="">All Roles</option>
  <option value="user">User</option>
- <option value="creator">Creativeuser</option>
+              <option value="creator">Creator</option>
  <option value="admin">Admin</option>
  </select>
  </div>
@@ -401,7 +401,7 @@ export default function AdminConsolePage() {
  {statusBadge(item.status)}
  <Badge variant="outline" size="sm" className="flex items-center gap-1">
  <Crown className="h-3 w-3" />
- {item.role === "admin" ? "Admin": item.role === "creator" ? "Creativeuser": "User"}
+              {item.role === "admin" ? "Admin": item.role === "creator" ? "Creator": "User"}
  </Badge>
  </div>
  <div className="flex flex-wrap gap-2">
@@ -413,8 +413,8 @@ export default function AdminConsolePage() {
  openActionDialog({
  type: "user",
  id: item.id,
- title: "PauseUser",
- description: "PauseafterwillNoneAccessProtectResource",
+                title: "Suspend User",
+ description: "Paused; no access to protected resource",
  nextStatus: "suspended",
  })
  }
@@ -430,8 +430,8 @@ export default function AdminConsolePage() {
  openActionDialog({
  type: "user",
  id: item.id,
- title: "RestoreUser",
- description: "RestoreaftercanagaintimesSign InandAccessSystem",
+                title: "Restore User",
+ description: "Try signing in again to access the system",
  nextStatus: "active",
  })
  }
@@ -451,7 +451,7 @@ export default function AdminConsolePage() {
  .catch((error) => console.error("Failed to update role", error))
  }
  >
- asAdmin
+                Set as Admin
  </Button>
  ) : (
  <Button
@@ -464,14 +464,14 @@ export default function AdminConsolePage() {
  .catch((error) => console.error("Failed to update role", error))
  }
  >
- CancelAdmin
+                Remove Admin
  </Button>
  )}
  </div>
  </div>
  ))}
  {users.length === 0 && !userLoading && (
- <p className="text-sm text-foreground-muted">NoneMatchUser.</p>
+ <p className="text-sm text-foreground-muted">No matching users.</p>
  )}
  </div>
  </div>
@@ -491,7 +491,7 @@ export default function AdminConsolePage() {
  onChange={(event) => setWorkspaceStatus(event.target.value)}
  className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
  >
- <option value="">allsectionStatus</option>
+ <option value="">All Status</option>
  <option value="active">Normal</option>
  <option value="suspended">Pause</option>
  <option value="deleted">Delete</option>
@@ -526,7 +526,7 @@ export default function AdminConsolePage() {
  type: "workspace",
  id: item.id,
  title: "Pause Workspace",
- description: "Pauseafter Workspace ResourcewillnotcanAccess",
+              description: "Workspace resources will not be accessible after suspension.",
  nextStatus: "suspended",
  })
  }
@@ -542,7 +542,7 @@ export default function AdminConsolePage() {
  type: "workspace",
  id: item.id,
  title: "Restore Workspace",
- description: "RestoreaftercanagaintimesAccess",
+              description: "Resources will be accessible again after restoration.",
  nextStatus: "active",
  })
  }
@@ -554,7 +554,7 @@ export default function AdminConsolePage() {
  </div>
  ))}
  {workspaces.length === 0 && !workspaceLoading && (
- <p className="text-sm text-foreground-muted">NoneMatch Workspace.</p>
+ <p className="text-sm text-foreground-muted">No matching workspace.</p>
  )}
  </div>
  </div>
@@ -566,7 +566,7 @@ export default function AdminConsolePage() {
  <Input
  value={ticketSearch}
  onChange={(event) => setTicketSearch(event.target.value)}
- placeholder="SearchTicketTheme/Number"
+ placeholder="Search ticket subject or number"
  className="max-w-xs"
  />
  <select
@@ -574,19 +574,19 @@ export default function AdminConsolePage() {
  onChange={(event) => setTicketStatus(event.target.value)}
  className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
  >
- <option value="">allsectionStatus</option>
+ <option value="">All Status</option>
  <option value="open">Pending</option>
  <option value="in_progress">Processing</option>
- <option value="waiting_on_customer">etcpendingUser</option>
- <option value="resolved">alreadyResolve</option>
- <option value="closed">alreadyClose</option>
+              <option value="waiting_on_customer">Awaiting User</option>
+              <option value="resolved">Resolved</option>
+              <option value="closed">Closed</option>
  </select>
  <select
  value={ticketPriority}
  onChange={(event) => setTicketPriority(event.target.value)}
  className="h-9 rounded-md border border-border bg-surface-100 px-3 text-sm"
  >
- <option value="">allsectionPriority</option>
+ <option value="">All Priorities</option>
  <option value="critical">Urgent</option>
  <option value="high"></option>
  <option value="normal"></option>
@@ -618,7 +618,7 @@ export default function AdminConsolePage() {
  <p className="text-xs text-foreground-muted">{ticket.requester_email}</p>
  {latest?.at && (
  <p className="mt-1 text-xs text-foreground-muted">
- RecentWorkflow: {latest.from || "Create"} → {historyLabel} ·{""}
+              Latest transition: {latest.from || "Created"} → {historyLabel} ·{""}
  {formatDate(latest.at)}
  </p>
  )}
@@ -641,13 +641,13 @@ export default function AdminConsolePage() {
  slaOverdue ? "bg-destructive-200 text-destructive" : "text-foreground-muted"
  )}
  >
- SLA {slaOverdue ? "alreadyTimeout": formatDate(ticket.sla_response_due_at)}
+              SLA {slaOverdue ? "Overdue": formatDate(ticket.sla_response_due_at)}
  </Badge>
  )}
  </div>
  <div className="flex flex-wrap gap-2">
  <Button asChild size="sm" variant="outline">
- <Link href={`/support-tickets/${ticket.id}`}>ViewDetails</Link>
+ <Link href={`/support-tickets/${ticket.id}`}>View details</Link>
  </Button>
  {action && (
  <Button
@@ -657,8 +657,8 @@ export default function AdminConsolePage() {
  openActionDialog({
  type: "ticket",
  id: ticket.id,
- title: "UpdateTicketStatus",
- description: `willStatusUpdateas"${statusVariants[action.nextStatus]?.label ?? action.nextStatus}"`,
+ title: "Update ticket status",
+ description: `Status will update to "${statusVariants[action.nextStatus]?.label ?? action.nextStatus}"`,
  nextStatus: action.nextStatus,
  })
  }
@@ -671,7 +671,7 @@ export default function AdminConsolePage() {
  );
  })}
  {tickets.length === 0 && !ticketLoading && (
- <p className="text-sm text-foreground-muted">NoneMatchTicket.</p>
+ <p className="text-sm text-foreground-muted">No matching tickets.</p>
  )}
  </div>
  </div>
@@ -684,9 +684,9 @@ export default function AdminConsolePage() {
  isOpen={Boolean(actionTarget)}
  onClose={() => setActionTarget(null)}
  onConfirm={confirmAction}
- title={actionTarget?.title ?? "ConfirmAction"}
+      title={actionTarget?.title ?? "Confirm Action"}
  description={actionTarget?.description}
- confirmText="ConfirmExecute"
+      confirmText="Confirm"
  cancelText="Cancel"
  variant={actionTarget?.nextStatus === "suspended" ? "danger" : "info"}
  icon={actionTarget?.nextStatus === "suspended" ? Ban : CheckCircle2}
@@ -694,12 +694,12 @@ export default function AdminConsolePage() {
  >
  <div className="space-y-2">
  <label className="text-xs text-foreground-muted">
- {actionTarget?.type === "ticket" ? "StatusDescription": "Reason"}
+          {actionTarget?.type === "ticket" ? "Status Note": "Reason"}
  </label>
  <textarea
  value={actionReason}
  onChange={(event) => setActionReason(event.target.value)}
- placeholder={actionTarget?.type === "ticket" ? "SupplementProcessDescription(Optional)": "Fill inReason(Optional)"}
+          placeholder={actionTarget?.type === "ticket" ? "Add a status note (optional)": "Provide a reason (optional)"}
  className={cn(
  "min-h-[80px] w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-sm text-foreground",
  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-500/30"

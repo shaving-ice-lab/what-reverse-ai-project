@@ -38,7 +38,7 @@ export const CodeNode = memo(function CodeNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"

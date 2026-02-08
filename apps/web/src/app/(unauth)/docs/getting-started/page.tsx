@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Getting StartedGuidePage - LobeHub Style
+ * Getting Started Guide Page - LobeHub Style
  */
 
 import Link from "next/link";
@@ -29,98 +29,98 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// LearnPath
+// Learning Paths
 const learningPaths = [
  {
  id: "beginner",
- title: "user",
- description: "fromStartLearn AgentFlow",
+    title: "Beginner",
+    description: "Learn AgentFlow from scratch",
  duration: "1-2 h",
  level: "Getting Started",
  steps: [
- { title: "currentConcept", href: "/docs/concepts" },
- { title: "Create#1Workflow", href: "/docs/quickstart" },
- { title: "UsageTemplateQuickon", href: "/templates" },
- { title: "LearnNodeConfig", href: "/docs/guide/nodes" },
+      { title: "Core Concepts", href: "/docs/concepts" },
+      { title: "Create Your First Workflow", href: "/docs/quickstart" },
+      { title: "Quick Start with Templates", href: "/templates" },
+      { title: "Learn Node Configuration", href: "/docs/guide/nodes" },
  ],
  },
  {
  id: "intermediate",
- title: "AdvancedUser",
- description: "enterLearnAdvancedFeatures",
+    title: "Intermediate User",
+    description: "Dive deeper into advanced features",
  duration: "3-5 h",
  level: "",
  steps: [
  { title: "AI Agent Integration", href: "/docs/guide/ai-agent" },
- { title: "ConditionBranchandLoop", href: "/docs/guide/conditional" },
- { title: "ErrorProcess", href: "/docs/guide/error-handling" },
- { title: "VariableandExpression", href: "/docs/guide/variables" },
+      { title: "Conditional Branches and Loops", href: "/docs/guide/conditional" },
+      { title: "Error Handling", href: "/docs/guide/error-handling" },
+      { title: "Variables and Expressions", href: "/docs/guide/variables" },
  ],
  },
  {
  id: "developer",
  title: "Developers",
- description: "API IntegrationandCustomDevelopment",
+    description: "API integration and custom development",
  duration: "5-8 h",
  level: "Advanced",
  steps: [
- { title: "API Document", href: "/docs/api" },
- { title: "SDK UsageGuide", href: "/docs/sdk" },
- { title: "CustomNodeDevelopment", href: "/docs/advanced/custom-nodes" },
+      { title: "API Documentation", href: "/docs/api" },
+      { title: "SDK Usage Guide", href: "/docs/sdk" },
+      { title: "Custom Node Development", href: "/docs/advanced/custom-nodes" },
  { title: "Webhook Integration", href: "/docs/integrations/webhook" },
  ],
  },
 ];
 
-// CoreConcept
+// Core Concepts
 const coreConcepts = [
  {
  icon: Zap,
  title: "Workflow (Workflow)",
- description: "multipleNodegroup'sAutomationFlow, canwithProcessData, CallService, ExecuteLogic",
+    description: "An automation flow composed of multiple nodes that can process data, call services, and execute logic",
  },
  {
  icon: Layers,
  title: "Node (Node)",
- description: "Workflow'scurrentgroup, eachNodeExecuteSpecific'sTask",
+    description: "The basic building blocks of a workflow — each node performs a specific task",
  },
  {
  icon: Play,
  title: "Trigger (Trigger)",
- description: "LaunchWorkflowExecute'sCondition, ifScheduled, Webhook, ManualTriggeretc",
+    description: "Conditions that start workflow execution, such as scheduled, webhook, or manual triggers",
  },
  {
  icon: Code,
  title: "Expression (Expression)",
- description: "Used foratNodebetweenPassDataandProceedDynamicCalculate'sSyntax(SupportTemplateandVariable)",
+    description: "Syntax for passing data between nodes and performing dynamic calculations (supports templates and variables)",
  },
 ];
 
-// RecommendedResource
+// Recommended Resources
 const resources = [
  {
  icon: Video,
- title: "VideoTutorial",
- description: "FollowVideo1Learn",
+    title: "Video Tutorials",
+    description: "Learn step by step with video guides",
  href: "/learn/courses",
  badge: "Recommended",
  },
  {
  icon: FileText,
- title: "UsageGuide",
- description: "Detailed'sFeaturesDescriptionDocument",
+    title: "User Guide",
+    description: "Detailed feature documentation",
  href: "/docs",
  },
  {
  icon: Users,
- title: "CommunityDiscussion",
- description: "andotherheUserExchangeExperience",
+    title: "Community Discussion",
+    description: "Exchange experiences with other users",
  href: "/community",
  },
  {
  icon: HelpCircle,
  title: "FAQ",
- description: "QuicktoAnswer",
+    description: "Quick answers to common questions",
  href: "/faq",
  },
 ];
@@ -138,38 +138,38 @@ export default function GettingStartedPage() {
  {/* Breadcrumb */}
  <nav className="flex items-center gap-2 text-[13px] text-foreground-lighter mb-8">
  <Link href="/docs" className="hover:text-foreground transition-colors">
- Document
+ Docs
  </Link>
  <ChevronRight className="w-3.5 h-3.5" />
- <span className="text-foreground">Getting StartedGuide</span>
+            <span className="text-foreground">Getting Started Guide</span>
  </nav>
 
  <div className="text-center max-w-3xl mx-auto">
  <div className="lobe-badge mb-8">
  <BookOpen className="h-3.5 w-3.5" />
- <span>Getting StartedGuide</span>
- </div>
+            <span>Getting Started Guide</span>
+          </div>
 
- <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- WelcomeUsage AgentFlow
- </h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+            Welcome to AgentFlow
+          </h1>
 
- <p className="text-lg text-foreground-light mb-10 leading-relaxed">
- NoneyouisuserstillisExperienceRich'sDevelopers, thisGuideallwillHelpyouQuickMaster AgentFlow
- andStartBuildlarge's AI Workflow
+          <p className="text-lg text-foreground-light mb-10 leading-relaxed">
+            Whether you're a beginner or an experienced developer, this guide will help you quickly master AgentFlow
+            and start building powerful AI workflows
  </p>
 
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/docs/quickstart">
  <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
  <Rocket className="mr-2 w-4 h-4" />
- 5 minQuickStart
+            5-Minute Quick Start
  </Button>
  </Link>
  <Link href="/learn/courses">
  <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
  <Video className="mr-2 w-4 h-4" />
- seeVideoTutorial
+            Watch Video Tutorials
  </Button>
  </Link>
  </div>
@@ -177,12 +177,12 @@ export default function GettingStartedPage() {
  </div>
  </section>
 
- {/* LearnPath */}
+ {/* Learning Paths */}
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>Selectyou'sLearnPath</h2>
- <p>Based onyou'sExperienceHorizontalSelectmostSuitable'sLearnPath</p>
+ <h2>Choose Your Learning Path</h2>
+ <p>Select the best learning path based on your experience level</p>
  </div>
 
  <div className="grid md:grid-cols-3 gap-4">
@@ -237,7 +237,7 @@ export default function GettingStartedPage() {
  variant="outline"
  className="w-full rounded-full text-[13px] border-border/50 hover:bg-surface-200/50"
  >
- StartLearn
+                  Start Learning
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -247,12 +247,12 @@ export default function GettingStartedPage() {
  </div>
  </section>
 
- {/* CoreConcept */}
+ {/* Core Concepts */}
  <section className="py-24 sm:py-32">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>CoreConcept</h2>
- <p> AgentFlow 'scurrentConcept, asafterLearndownBasic</p>
+              <h2>Core Concepts</h2>
+              <p>Understand AgentFlow's core concepts as a foundation for further learning</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -282,7 +282,7 @@ export default function GettingStartedPage() {
  <div className="text-center mt-10">
  <Link href="/docs/concepts">
  <Button variant="outline" className="rounded-full text-[13px] border-border/50 hover:bg-surface-200/50">
- moremultipleConcept
+                  View All Concepts
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -290,12 +290,12 @@ export default function GettingStartedPage() {
  </div>
  </section>
 
- {/* RecommendedResource */}
+ {/* Recommended Resources */}
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-6xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>RecommendedResource</h2>
- <p>moremultipleLearnMaterialsyouQuickGrowth</p>
+              <h2>Recommended Resources</h2>
+              <p>More learning materials to help you grow quickly</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -342,21 +342,21 @@ export default function GettingStartedPage() {
  <Rocket className="w-8 h-8 text-foreground-light" />
  </div>
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- PrepareStart??
+            Ready to Get Started?
  </h2>
  <p className="text-foreground-light mb-10 max-w-md mx-auto">
- NowCreateyou's#1 AI Workflow, ExperienceAutomation'slargepower
+ Create your first AI workflow now and experience the power of automation
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/register">
  <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
- FreeSign Up
+            Sign Up Free
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/docs/quickstart">
  <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
- ViewQuickStart
+            View Quick Start
  </Button>
  </Link>
  </div>

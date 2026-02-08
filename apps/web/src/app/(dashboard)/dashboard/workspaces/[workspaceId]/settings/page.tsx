@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Workspace Settingspage - Supabase Style
- * MemberManage, currentSettings, BillingInfo
+ * Workspace Settings Page - Supabase Style
+ * Member Management, General Settings, Billing Info
  */
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -115,7 +115,7 @@ const roles = [
  {
  id: "owner",
  name: "Owner",
- description: "completeallControlPermission, canwithManageTeamSettingsandBilling",
+    description: "Full control permissions — can manage team settings and billing",
  color: "text-warning",
  bgColor: "bg-warning-200",
  icon: Crown,
@@ -123,7 +123,7 @@ const roles = [
  {
  id: "admin",
  name: "Admin",
- description: "canwithManageMemberandlargePartialSettings",
+    description: "Can manage members and most settings",
  color: "text-brand-500",
  bgColor: "bg-brand-200",
  icon: Shield,
@@ -131,7 +131,7 @@ const roles = [
  {
  id: "member",
  name: "Member",
- description: "canwithCreateandEditApp",
+    description: "Can create and edit apps",
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
  icon: Edit3,
@@ -145,13 +145,13 @@ const archiveTypeOptions: Array<{
 }> = [
  {
  value: "execution_logs",
- label: "ExecuteLogs",
- description: "WorkflowExecuteRecordandNodeLogs",
+ label: "Execution Logs",
+ description: "Workflow execution records and node logs",
  },
  {
  value: "audit_logs",
  label: "Audit Log",
- description: "Actionperson, TargetandrowasRecord",
+ description: "Actor, target, and action records",
  },
 ];
 
@@ -161,7 +161,7 @@ const archiveStatusConfig: Record<
 > = {
  pending: { label: "Pending", color: "text-warning", bg: "bg-warning-200", icon: Clock },
  processing: { label: "Archive", color: "text-foreground-light", bg: "bg-surface-200", icon: Loader2 },
- completed: { label: "canReplay", color: "text-brand-500", bg: "bg-brand-200", icon: Check },
+ completed: { label: "Ready to Replay", color: "text-brand-500", bg: "bg-brand-200", icon: Check },
  failed: { label: "Failed", color: "text-destructive", bg: "bg-destructive-200", icon: AlertTriangle },
 };
 
@@ -208,10 +208,10 @@ const replayFieldMappings: Record<string, Array<{ label: string; field: string }
  { label: "Time", field: "created_at" },
  { label: "Execute ID", field: "execution_id" },
  { label: "Node ID", field: "node_id" },
- { label: "NodeType", field: "node_type" },
+ { label: "Node Type", field: "node_type" },
  { label: "Status", field: "status" },
  { label: "Duration", field: "duration_ms" },
- { label: "ErrorInfo", field: "error_message" },
+ { label: "Error Info", field: "error_message" },
  ],
  executions: [
  { label: "Time", field: "created_at" },
@@ -220,13 +220,13 @@ const replayFieldMappings: Record<string, Array<{ label: string; field: string }
  { label: "User ID", field: "user_id" },
  { label: "Status", field: "status" },
  { label: "Duration", field: "duration_ms" },
- { label: "ErrorInfo", field: "error_message" },
+ { label: "Error Info", field: "error_message" },
  ],
  audit_logs: [
  { label: "Time", field: "created_at" },
  { label: "Action", field: "action" },
- { label: "Actionperson", field: "actor_user_id" },
- { label: "TargetType", field: "target_type" },
+ { label: "Actor", field: "actor_user_id" },
+ { label: "Target Type", field: "target_type" },
  { label: "Target ID", field: "target_id" },
  ],
 };
@@ -235,19 +235,19 @@ const replayColumnTemplates: Record<string, ReplayColumnTemplate[]> = {
  node_logs: [
  {
  id: "default",
- label: "DefaultTemplate",
+ label: "Default Template",
  columns: ["created_at", "execution_id", "node_id", "node_type", "status", "duration_ms", "error_message"],
  source: "system",
  },
  {
  id: "core",
- label: "CoreTrack",
+ label: "Core Tracking",
  columns: ["created_at", "execution_id", "node_id", "status"],
  source: "system",
  },
  {
  id: "diagnostic",
- label: "DiagnoseTemplate",
+ label: "Diagnostic Template",
  columns: ["created_at", "execution_id", "node_id", "node_type", "status", "error_message"],
  source: "system",
  },
@@ -255,19 +255,19 @@ const replayColumnTemplates: Record<string, ReplayColumnTemplate[]> = {
  executions: [
  {
  id: "default",
- label: "DefaultTemplate",
+ label: "Default Template",
  columns: ["created_at", "execution_id", "workflow_id", "user_id", "status", "duration_ms", "error_message"],
  source: "system",
  },
  {
  id: "core",
- label: "CoreTrack",
+ label: "Core Tracking",
  columns: ["created_at", "execution_id", "status", "duration_ms"],
  source: "system",
  },
  {
  id: "ownership",
- label: "AttributionTemplate",
+ label: "Attribution Template",
  columns: ["created_at", "workflow_id", "user_id", "status", "duration_ms"],
  source: "system",
  },
@@ -275,19 +275,19 @@ const replayColumnTemplates: Record<string, ReplayColumnTemplate[]> = {
  audit_logs: [
  {
  id: "default",
- label: "DefaultTemplate",
+ label: "Default Template",
  columns: ["created_at", "action", "actor_user_id", "target_type", "target_id"],
  source: "system",
  },
  {
  id: "actions",
- label: "rowasView",
+ label: "Actions View",
  columns: ["created_at", "action", "actor_user_id"],
  source: "system",
  },
  {
  id: "targets",
- label: "TargetView",
+ label: "Targets View",
  columns: ["created_at", "target_type", "target_id", "action"],
  source: "system",
  },
@@ -297,11 +297,11 @@ const replayColumnTemplates: Record<string, ReplayColumnTemplate[]> = {
 // EdgeNavigation
 function SettingsNav({ workspaceId, activeTab }: { workspaceId: string; activeTab: string }) {
  const navItems = [
- { id: "general", label: "currentSettings", icon: <Settings className="w-4 h-4" /> },
- { id: "members", label: "MemberManage", icon: <Users className="w-4 h-4" /> },
- { id: "api-keys", label: "API Key", icon: <Key className="w-4 h-4" /> },
- { id: "billing", label: "UsageandBilling", icon: <CreditCard className="w-4 h-4" /> },
- { id: "archives", label: "ArchiveReplay", icon: <Archive className="w-4 h-4" /> },
+ { id: "general", label: "General Settings", icon: <Settings className="w-4 h-4" /> },
+ { id: "members", label: "Member Management", icon: <Users className="w-4 h-4" /> },
+ { id: "api-keys", label: "API Keys", icon: <Key className="w-4 h-4" /> },
+ { id: "billing", label: "Usage & Billing", icon: <CreditCard className="w-4 h-4" /> },
+ { id: "archives", label: "Archive & Replay", icon: <Archive className="w-4 h-4" /> },
  ];
 
  return (
@@ -529,7 +529,7 @@ export default function WorkspaceSettingsPage() {
  const q = await workspaceApi.getQuota(workspaceId);
  setQuota(q);
  } catch {
- // QuotaInterfacecancannot yetImplement
+ // Quota API may not be implemented yet
  }
 
  try {
@@ -537,7 +537,7 @@ export default function WorkspaceSettingsPage() {
  setBudget(settings);
  syncBudgetForm(settings);
  } catch {
- // BudgetInterfacecancannot yetImplementorNonePermission
+ // Budget API may not be implemented yet or insufficient permissions
  }
  } catch (error) {
  console.error("Failed to load workspace:", error);
@@ -615,7 +615,7 @@ export default function WorkspaceSettingsPage() {
  // Disable API Key
  const handleRevokeApiKey = async (keyId: string) => {
  try {
- await workspaceApi.revokeApiKey(workspaceId, keyId, "UsermainDisable");
+ await workspaceApi.revokeApiKey(workspaceId, keyId, "Manually disabled by user");
  loadApiKeys();
  } catch (error) {
  console.error("Failed to revoke API key:", error);
@@ -691,7 +691,7 @@ export default function WorkspaceSettingsPage() {
  setSelectedArchiveId(items[0].id);
  }
  } catch (error) {
- setArchiveError("LogsArchiveLoadFailed, Please try again laterRetry");
+ setArchiveError("Failed to load log archives. Please try again.");
  console.error("Failed to load log archives:", error);
  } finally {
  setIsArchiveLoading(false);
@@ -977,7 +977,7 @@ export default function WorkspaceSettingsPage() {
  setCloudSyncStatus("idle");
  } catch (error) {
  setCloudSyncStatus("error");
- setCloudSyncError("CloudConfigLoadFailed");
+ setCloudSyncError("Failed to load cloud config");
  console.error("Failed to load cloud replay config:", error);
  } finally {
  setCloudSyncReady(true);
@@ -1020,7 +1020,7 @@ export default function WorkspaceSettingsPage() {
  setSharedSyncStatus("idle");
  } catch (error) {
  setSharedSyncStatus("error");
- setSharedSyncError("TeamTemplateLoadFailed");
+ setSharedSyncError("Failed to load team templates");
  console.error("Failed to load shared templates:", error);
  }
  };
@@ -1073,13 +1073,13 @@ export default function WorkspaceSettingsPage() {
  key: sharedTemplatesKey,
  value: JSON.stringify(payload),
  value_type: "json",
- description: "LogsArchiveReplayShareTemplate",
+ description: "Log archive replay shared templates",
  });
  setSharedSyncStatus("idle");
  setSharedSyncedAt(new Date().toISOString());
  } catch (error) {
  setSharedSyncStatus("error");
- setSharedSyncError("TeamTemplateSyncFailed");
+ setSharedSyncError("Failed to sync team templates");
  console.error("Failed to save shared templates:", error);
  }
  };
@@ -1095,13 +1095,13 @@ export default function WorkspaceSettingsPage() {
  key: replayConfigKey,
  value: JSON.stringify(payload),
  value_type: "json",
- description: "LogsArchiveReplayConfigandTemplate",
+ description: "Log archive replay config and templates",
  });
  setCloudSyncStatus("idle");
  setLastSyncedAt(new Date().toISOString());
  } catch (error) {
  setCloudSyncStatus("error");
- setCloudSyncError("CloudSyncFailed");
+ setCloudSyncError("Cloud sync failed");
  console.error("Failed to sync cloud replay config:", error);
  }
  };
@@ -1131,7 +1131,7 @@ export default function WorkspaceSettingsPage() {
  });
  await loadArchives();
  } catch (error) {
- setArchiveError("CreateArchiveTaskFailed, PleaseCheckParameterorafterRetry");
+ setArchiveError("Failed to create archive task. Please check the parameters and try again.");
  console.error("Failed to request log archive:", error);
  } finally {
  setIsArchiveCreating(false);
@@ -1151,7 +1151,7 @@ export default function WorkspaceSettingsPage() {
  link.remove();
  window.URL.revokeObjectURL(url);
  } catch (error) {
- setArchiveError("DownloadArchiveFailed, Please try again laterRetry");
+ setArchiveError("Failed to download archive. Please try again.");
  console.error("Failed to download log archive:", error);
  }
  };
@@ -1169,7 +1169,7 @@ export default function WorkspaceSettingsPage() {
  setReplayNextOffset(null);
  }
  } catch (error) {
- setArchiveError("DeleteArchiveFailed, Please try again laterRetry");
+ setArchiveError("Failed to delete archive. Please try again.");
  console.error("Failed to delete log archive:", error);
  }
  };
@@ -1211,7 +1211,7 @@ export default function WorkspaceSettingsPage() {
  setReplayNextOffset(null);
  }
  } catch (error) {
- setReplayError("ArchiveReplayFailed, PleaseCheckFilterConditionorafterRetry");
+ setReplayError("Archive replay failed. Please check the filter conditions and try again.");
  console.error("Failed to replay log archive:", error);
  } finally {
  setIsReplayLoading(false);
@@ -1223,8 +1223,8 @@ export default function WorkspaceSettingsPage() {
  const replayDatasetOptions = isAuditArchive
  ? [{ value: "audit_logs", label: "Audit Log" }]
  : [
- { value: "node_logs", label: "NodeLogs" },
- { value: "executions", label: "ExecuteRecord" },
+ { value: "node_logs", label: "Node Logs" },
+ { value: "executions", label: "Execution Records" },
  ];
  const isAuditDataset = replayDataset === "audit_logs";
  const isExecutionDataset = replayDataset === "executions";
@@ -1343,11 +1343,11 @@ export default function WorkspaceSettingsPage() {
  { id: "action", header: "Action", accessor: "action", sortable: true, cell: (value) => renderText(String(value || "")) },
  {
  id: "actor_user_id",
- header: "Actionperson",
+ header: "Actor",
  accessor: "actor_user_id",
  cell: (value) => renderMono(String(value || "")),
  },
- { id: "target_type", header: "TargetType", accessor: "target_type", sortable: true, cell: (value) => renderText(String(value || "")) },
+ { id: "target_type", header: "Target Type", accessor: "target_type", sortable: true, cell: (value) => renderText(String(value || "")) },
  { id: "target_id", header: "Target ID", accessor: "target_id", cell: (value) => renderMono(String(value || "")) },
  ];
  }
@@ -1373,7 +1373,7 @@ export default function WorkspaceSettingsPage() {
  },
  {
  id: "error_message",
- header: "ErrorInfo",
+ header: "Error Info",
  accessor: "error_message",
  cell: (value) => renderText(String(value || "")),
  },
@@ -1389,7 +1389,7 @@ export default function WorkspaceSettingsPage() {
  },
  { id: "execution_id", header: "Execute ID", accessor: "execution_id", cell: (value) => renderMono(String(value || "")) },
  { id: "node_id", header: "Node ID", accessor: "node_id", sortable: true, cell: (value) => renderMono(String(value || "")) },
- { id: "node_type", header: "NodeType", accessor: "node_type", sortable: true, cell: (value) => renderText(String(value || "")) },
+ { id: "node_type", header: "Node Type", accessor: "node_type", sortable: true, cell: (value) => renderText(String(value || "")) },
  { id: "status", header: "Status", accessor: "status", sortable: true, cell: (value) => renderStatus(String(value || "")) },
  {
  id: "duration_ms",
@@ -1400,7 +1400,7 @@ export default function WorkspaceSettingsPage() {
  },
  {
  id: "error_message",
- header: "ErrorInfo",
+ header: "Error Info",
  accessor: "error_message",
  cell: (value) => renderText(String(value || "")),
  },
@@ -1511,7 +1511,7 @@ export default function WorkspaceSettingsPage() {
  const handleSaveCustomTemplate = () => {
  const name = newTemplateName.trim();
  if (!name) {
- setTemplateError("TemplateNameCannot be empty");
+ setTemplateError("Template name cannot be empty");
  return;
  }
  setTemplateError(null);
@@ -1576,7 +1576,7 @@ export default function WorkspaceSettingsPage() {
  if (!targetScope) return;
  const name = editingTemplateName.trim();
  if (!name) {
- setTemplateError("TemplateNameCannot be empty");
+ setTemplateError("Template name cannot be empty");
  return;
  }
  if (targetScope === "shared") {
@@ -1688,7 +1688,7 @@ export default function WorkspaceSettingsPage() {
  window.URL.revokeObjectURL(url);
  };
 
- // SavecurrentSettings
+ // Save current settings
  const handleSave = async () => {
  if (!workspace) return;
 
@@ -1767,7 +1767,7 @@ export default function WorkspaceSettingsPage() {
  return (
  <PageContainer>
  <div className="text-center py-16">
- <p className="text-foreground-muted">WorkspaceDoes not exist</p>
+ <p className="text-foreground-muted">Workspace does not exist</p>
  </div>
  </PageContainer>
  );
@@ -1783,27 +1783,27 @@ export default function WorkspaceSettingsPage() {
  {/* PageHeader */}
  <PageHeader
  title={workspace.name}
- eyebrow="WorkspaceSettings"
+ eyebrow="Workspace Settings"
  backHref="/dashboard/apps"
- backLabel="BackAppList"
+ backLabel="Back to Apps"
  />
 
- {/* currentSettings */}
+ {/* Current Settings */}
  {activeTab === "general" && (
  <div className="space-y-6">
  <SettingsSection
  title="Basic Info"
- description="Workspace'sNameandIdentifier"
+ description="Workspace name and identifier"
  footer={
  <Button onClick={handleSave} disabled={isSaving}>
  {isSaving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- SaveChange
+ Save Changes
  </Button>
  }
  >
  <FormRow
- label="WorkspaceName"
- description="Used forDisplay'sName"
+ label="Workspace Name"
+ description="Name used for display"
  >
  <Input
  value={editForm.name}
@@ -1814,7 +1814,7 @@ export default function WorkspaceSettingsPage() {
 
  <FormRow
  label="URL Identifier"
- description="Used forAccessAddress's1Identifier"
+ description="A unique identifier used in access URLs"
  >
  <div className="flex items-center gap-2 max-w-md">
  <span className="text-[12px] text-foreground-muted shrink-0">
@@ -1831,19 +1831,19 @@ export default function WorkspaceSettingsPage() {
 
  {/* DangerRegion */}
  <SettingsSection
- title="DangerAction"
- description="withdownActionnotcanUndo, PleaseCautionAction"
+ title="Danger Zone"
+ description="These actions are irreversible. Please proceed with caution."
  >
  <div className="flex items-center justify-between py-4">
  <div>
- <div className="text-[12px] font-medium text-foreground">DeleteWorkspace</div>
+ <div className="text-[12px] font-medium text-foreground">Delete Workspace</div>
  <div className="text-[12px] text-foreground-light mt-0.5">
- DeleteafterAllAppandDatawillNoneRestore
+ Once deleted, all apps and data cannot be restored
  </div>
  </div>
  <Button variant="destructive" size="sm">
  <Trash2 className="w-4 h-4 mr-1.5" />
- DeleteWorkspace
+ Delete Workspace
  </Button>
  </div>
  </SettingsSection>
@@ -1854,13 +1854,13 @@ export default function WorkspaceSettingsPage() {
  {activeTab === "members" && (
  <div className="space-y-6">
  <SettingsSection
- title="TeamMember"
- description="ManageWorkspace'sMemberandPermission"
+ title="Team Members"
+ description="Manage workspace members and permissions"
  >
  {/* Toolbar */}
  <div className="flex items-center justify-between mb-4">
  <div className="text-[12px] text-foreground-light">
- {members.length} Member
+ {members.length} {members.length === 1 ? "Member" : "Members"}
  </div>
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <Button size="sm" onClick={() => setShowInviteDialog(true)}>
@@ -1889,7 +1889,7 @@ export default function WorkspaceSettingsPage() {
  </Avatar>
  <div>
  <p className="text-[12px] font-medium text-foreground">
- {member.user?.username || "UnknownUser"}
+ {member.user?.username || "Unknown User"}
  </p>
  <p className="text-[11px] text-foreground-muted">
  {member.user?.email || ""}
@@ -1916,13 +1916,13 @@ export default function WorkspaceSettingsPage() {
  <DropdownMenuContent align="end" className="w-40 bg-surface-100 border-border">
  <DropdownMenuItem className="text-[12px]">
  <UserCog className="w-4 h-4 mr-2" />
- ChangeRole
+ Change Role
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border" />
  {member.role_name !== "owner" && (
  <DropdownMenuItem className="text-[12px] text-destructive">
  <Trash2 className="w-4 h-4 mr-2" />
- RemoveMember
+ Remove Member
  </DropdownMenuItem>
  )}
  </DropdownMenuContent>
@@ -1937,8 +1937,8 @@ export default function WorkspaceSettingsPage() {
 
  {/* RoleDescription */}
  <SettingsSection
- title="RolePermissionDescription"
- description="notRolehasnot'sActionPermission"
+ title="Role & Permission Overview"
+ description="Different roles have different action permissions"
  >
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
  {roles.map((role) => {
@@ -1968,14 +1968,14 @@ export default function WorkspaceSettingsPage() {
  {/* API Key ListTable */}
  <SettingsSection
  title="API Key"
- description="ManageUsed for AI ModelCallandWorkflowExecute'sKey"
+ description="Manage API keys used for AI model calls and workflow execution"
  actions={
  <Button
  size="sm"
  onClick={() => setShowCreateKeyDialog(true)}
  leftIcon={<Plus className="w-4 h-4" />}
  >
- AddKey
+ Add Key
  </Button>
  }
  >
@@ -1986,15 +1986,15 @@ export default function WorkspaceSettingsPage() {
  ) : apiKeys.length === 0 ? (
  <EmptyState
  icon={<Key className="w-8 h-8" />}
- title="None API Key"
- description="Add API KeywithEnable AI ModelCall"
+ title="No API Keys"
+ description="Add an API key to enable AI model calls"
  action={
  <Button
  size="sm"
  onClick={() => setShowCreateKeyDialog(true)}
  leftIcon={<Plus className="w-4 h-4" />}
  >
- AddKey
+ Add Key
  </Button>
  }
  />
@@ -2032,10 +2032,10 @@ export default function WorkspaceSettingsPage() {
  </div>
  <div className="flex items-center gap-4 mt-1 text-xs text-foreground-muted">
  <span className="font-mono">{key.key_preview || "••••••••"}</span>
- <span>Scopes: {key.scopes?.join(", ") || "allsection"}</span>
- <span>Createat {new Date(key.created_at).toLocaleDateString()}</span>
+ <span>Scopes: {key.scopes?.join(", ") || "All"}</span>
+ <span>Created {new Date(key.created_at).toLocaleDateString()}</span>
  {key.last_used_at && (
- <span>mostafterUsage {new Date(key.last_used_at).toLocaleDateString()}</span>
+ <span>Last used {new Date(key.last_used_at).toLocaleDateString()}</span>
  )}
  </div>
  </div>
@@ -2066,7 +2066,7 @@ export default function WorkspaceSettingsPage() {
  }}
  >
  <RefreshCw className="w-4 h-4 mr-2" />
- RotationKey
+ Rotate Key
  </DropdownMenuItem>
  <DropdownMenuSeparator />
  {key.is_active ? (
@@ -2097,8 +2097,8 @@ export default function WorkspaceSettingsPage() {
 
  {/* IntegrationConfigblock */}
  <SettingsSection
- title="IntegrationandConnect"
- description="Config Webhook, OAuth AuthorizeandThird-partyServiceConnect"
+ title="Integrations & Connections"
+ description="Configure webhooks, OAuth authorization, and third-party service connections"
  >
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
  {/* Webhook Card */}
@@ -2109,15 +2109,15 @@ export default function WorkspaceSettingsPage() {
  </div>
  <div>
  <h4 className="text-sm font-medium text-foreground">Webhook</h4>
- <p className="text-xs text-foreground-muted">EventPush Notifications</p>
+ <p className="text-xs text-foreground-muted">Event push notifications</p>
  </div>
  </div>
  <p className="text-xs text-foreground-muted mb-3">
- willWorkflowEventPushtooutsidesection URL, ImplementAutomationIntegration
+ Push workflow events to external URLs for automated integrations
  </p>
  <div className="flex items-center justify-between">
  <Badge variant="secondary" size="xs">
- {integrations.filter(i => i.type === "webhook").length} alreadyConfig
+ {integrations.filter(i => i.type === "webhook").length} configured
  </Badge>
  <Button
  variant="outline"
@@ -2137,11 +2137,11 @@ export default function WorkspaceSettingsPage() {
  </div>
  <div>
  <h4 className="text-sm font-medium text-foreground">OAuth Authorize</h4>
- <p className="text-xs text-foreground-muted">Third-partyAccountConnect</p>
+ <p className="text-xs text-foreground-muted">Third-party account connections</p>
  </div>
  </div>
  <p className="text-xs text-foreground-muted mb-3">
- AuthorizeAccess Google, GitHub, Slack etcService
+ Authorize access to Google, GitHub, Slack, and other services
  </p>
  <div className="flex items-center justify-between">
  <Badge variant="secondary" size="xs">
@@ -2160,16 +2160,16 @@ export default function WorkspaceSettingsPage() {
  <Link2 className="w-5 h-5 text-foreground-muted" />
  </div>
  <div>
- <h4 className="text-sm font-medium text-foreground">Third-partyConnect</h4>
- <p className="text-xs text-foreground-muted">DataandService</p>
+ <h4 className="text-sm font-medium text-foreground">Third-Party Connectors</h4>
+ <p className="text-xs text-foreground-muted">Data & service connections</p>
  </div>
  </div>
  <p className="text-xs text-foreground-muted mb-3">
- ConnectDatabase, API EndpointandoutsidesectionService
+ Connect databases, API endpoints, and external services
  </p>
  <div className="flex items-center justify-between">
  <Badge variant="secondary" size="xs">
- {integrations.filter(i => i.type === "connector").length} alreadyConfig
+ {integrations.filter(i => i.type === "connector").length} configured
  </Badge>
  <Button variant="outline" size="xs">
  Browse
@@ -2178,10 +2178,10 @@ export default function WorkspaceSettingsPage() {
  </div>
  </div>
 
- {/* alreadyConfig'sIntegrationList */}
+ {/* Configured Integrations List */}
  {integrations.length > 0 && (
  <div className="mt-6">
- <h4 className="text-sm font-medium text-foreground mb-3">alreadyConfig'sIntegration</h4>
+ <h4 className="text-sm font-medium text-foreground mb-3">Configured Integrations</h4>
  <div className="divide-y divide-border rounded-md border border-border">
  {integrations.map((integration) => {
  const statusConfig = {
@@ -2219,7 +2219,7 @@ export default function WorkspaceSettingsPage() {
  </span>
  {integration.last_sync_at && (
  <span className="text-xs text-foreground-muted">
- · mostafterSync {new Date(integration.last_sync_at).toLocaleString()}
+ · Last synced {new Date(integration.last_sync_at).toLocaleString()}
  </span>
  )}
  </div>
@@ -2247,47 +2247,47 @@ export default function WorkspaceSettingsPage() {
 
  {/* PermissionDescription */}
  <SettingsSection
- title="PermissionandSecurity"
- description="API KeyandIntegration'sSecurityBest Practices"
+ title="Permissions & Security"
+ description="Security best practices for API keys and integrations"
  >
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="p-4 rounded-md bg-surface-75">
  <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
  <Shield className="w-4 h-4 text-brand-500" />
- KeySecurity
+ Key Security
  </h4>
  <ul className="space-y-2 text-xs text-foreground-muted">
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
- AllKeyUsage AES-256 EncryptStorage
+ All keys are stored with AES-256 encryption
  </li>
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
- PeriodicRotationKeywithReduceRisk
+ Rotate keys periodically to reduce risk
  </li>
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
- UsageMinimumPermissionthenSettings Scopes
+ Use minimum permissions when setting scopes
  </li>
  </ul>
  </div>
  <div className="p-4 rounded-md bg-surface-75">
  <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
  <Activity className="w-4 h-4 text-warning" />
- MonitorSuggestion
+ Monitoring Tips
  </h4>
  <ul className="space-y-2 text-xs text-foreground-muted">
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-warning mt-1.5 shrink-0" />
- MonitorKeyUsagerateandExceptionCall
+ Monitor key usage rates and unusual API calls
  </li>
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-warning mt-1.5 shrink-0" />
- Settings Webhook FailedAlert
+ Set up webhook failure alerts
  </li>
  <li className="flex items-start gap-2">
  <span className="w-1.5 h-1.5 rounded-full bg-warning mt-1.5 shrink-0" />
- Audit LogRecordAllKeyAction
+ Audit logs record all key-related actions
  </li>
  </ul>
  </div>
@@ -2309,7 +2309,7 @@ export default function WorkspaceSettingsPage() {
  <DialogTitle>Add API Key</DialogTitle>
  <DialogDescription className="flex items-center gap-1.5 mt-0.5">
  <Shield className="w-3 h-3" />
- KeywillUsage AES-256 EncryptStorage
+ Keys are stored with AES-256 encryption
  </DialogDescription>
  </div>
  </div>
@@ -2332,11 +2332,11 @@ export default function WorkspaceSettingsPage() {
  </SelectContent>
  </Select>
  </FormRow>
- <FormRow label="KeyName">
+ <FormRow label="Key Name">
  <Input
  value={newKeyName}
  onChange={(e) => setNewKeyName(e.target.value)}
- placeholder="I's API Key"
+ placeholder="My API Key"
  />
  </FormRow>
  <FormRow label="API Key">
@@ -2363,7 +2363,7 @@ export default function WorkspaceSettingsPage() {
  </Button>
  </div>
  </FormRow>
- <FormRow label="PermissionRange">
+ <FormRow label="Permission Scopes">
  <div className="flex flex-wrap gap-2">
  {["read", "write", "execute", "admin"].map((scope) => (
  <Badge
@@ -2403,7 +2403,7 @@ export default function WorkspaceSettingsPage() {
  ) : (
  <>
  <Plus className="w-4 h-4 mr-2" />
- AddKey
+ Add Key
  </>
  )}
  </Button>
@@ -2417,11 +2417,11 @@ export default function WorkspaceSettingsPage() {
  <DialogHeader>
  <DialogTitle>Rotation API Key</DialogTitle>
  <DialogDescription>
- Inputnew'sKeyvalue, oldKeywillNowExpire
+ Enter the new key value. The old key will expire immediately.
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-4 py-4">
- <FormRow label="newKey">
+ <FormRow label="New key">
  <div className="relative">
  <Input
  type={showKeyValue ? "text" : "password"}
@@ -2488,7 +2488,7 @@ export default function WorkspaceSettingsPage() {
  <div>
  <DialogTitle>Config Webhook</DialogTitle>
  <DialogDescription>
- willWorkflowEventPushtoSpecify URL
+ Workflow events will be pushed to the specified URL
  </DialogDescription>
  </div>
  </div>
@@ -2498,7 +2498,7 @@ export default function WorkspaceSettingsPage() {
  <Input
  value={webhookName}
  onChange={(e) => setWebhookName(e.target.value)}
- placeholder="I's Webhook"
+ placeholder="My Webhook"
  />
  </FormRow>
  <FormRow label="URL">
@@ -2508,15 +2508,15 @@ export default function WorkspaceSettingsPage() {
  placeholder="https://example.com/webhook"
  />
  </FormRow>
- <FormRow label="BioKey(Optional)">
+ <FormRow label="Secret Key (Optional)">
  <Input
  type="password"
  value={webhookSecret}
  onChange={(e) => setWebhookSecret(e.target.value)}
- placeholder="Used forVerifyRequestBio"
+ placeholder="Used to verify request identity"
  />
  </FormRow>
- <FormRow label="SubscriptionEvent">
+ <FormRow label="Subscribed Events">
  <div className="flex flex-wrap gap-2">
  {[
  "execution.completed",
@@ -2575,8 +2575,8 @@ export default function WorkspaceSettingsPage() {
  <div className="space-y-6">
  {/* CurrentPlan */}
  <SettingsSection
- title="CurrentPlan"
- description="Workspace'sSubscriptionPlanandQuota"
+ title="Current Plan"
+ description="Workspace subscription plan and quota"
  >
  <div className="flex items-center justify-between p-4 rounded-md bg-surface-75">
  <div className="flex items-center gap-4">
@@ -2586,30 +2586,30 @@ export default function WorkspaceSettingsPage() {
  <div>
  <h3 className="text-[14px] font-semibold text-foreground">
  {workspace.plan === "free"
- ? "Freeversion"
+ ? "Free Plan"
  : workspace.plan === "pro"
- ? "Professionalversion"
+ ? "Professional Plan"
 : "Enterprise"}
  </h3>
  <p className="text-[12px] text-foreground-light">
  {workspace.plan === "free"
- ? "mostmultiple 3 App, BasicFeatures"
+ ? "Up to 3 apps, basic features"
  : workspace.plan === "pro"
- ? "mostmultiple 20 App, AdvancedFeatures"
-: "NonelimitApp, allsectionFeatures"}
+ ? "Up to 20 apps, advanced features"
+: "Unlimited apps, all features"}
  </p>
  </div>
  </div>
  <PermissionGate permissions={permissions} required={["billing_manage"]}>
- <Button>UpgradePlan</Button>
+ <Button>Upgrade Plan</Button>
  </PermissionGate>
  </div>
  </SettingsSection>
 
  {/* UsageStatistics */}
  <SettingsSection
- title="UsageStatistics"
- description="currentmonthsResourceUsageSituation"
+ title="Usage Statistics"
+ description="Current month's resource usage"
  >
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <UsageCard
@@ -2626,13 +2626,13 @@ export default function WorkspaceSettingsPage() {
  format="k"
  />
  <UsageCard
- label="AppCount"
+ label="App Count"
  used={quota?.apps.used || 0}
  limit={quota?.apps.limit || 3}
  icon={<Bot className="w-4 h-4" />}
  />
  <UsageCard
- label="StorageEmptybetween"
+ label="Storage Space"
  used={quota?.storage.used || 0}
  limit={quota?.storage.limit || 1024}
  icon={<Key className="w-4 h-4" />}
@@ -2643,28 +2643,28 @@ export default function WorkspaceSettingsPage() {
 
  {/* BudgetandReminder */}
  <SettingsSection
- title="BudgetandReminder"
- description="SettingsmonthsBudget, Remindervalueandonlimit"
+ title="Budget & Alerts"
+ description="Set monthly budget, alert thresholds, and spending limits"
  >
  <PermissionGate
  permissions={permissions}
  required={["billing_manage"]}
  fallback={
  <div className="text-[12px] text-foreground-light">
- youNoPermissionManageBudgetSettings.
+ You do not have permission to manage budget settings.
  </div>
  }
  >
  <div className="space-y-4">
  <FormRow
- label="monthsBudget"
- description="ExceedBudgetwillTriggerReminderandAlert"
+ label="Monthly Budget"
+ description="Exceeding the budget will trigger reminders and alerts"
  >
  <div className="flex items-center gap-3">
  <Input
  type="number"
  min={0}
- placeholder="exampleif 1000"
+ placeholder="e.g. 1000"
  value={budgetForm.monthlyBudget}
  onChange={(e) =>
  setBudgetForm({ ...budgetForm, monthlyBudget: e.target.value })
@@ -2678,8 +2678,8 @@ export default function WorkspaceSettingsPage() {
  </FormRow>
 
  <FormRow
- label="Remindervalue (%)"
- description="CommaSeparator, exampleif 50, 80, 100"
+ label="Alert Thresholds (%)"
+ description="Comma-separated, e.g. 50, 80, 100"
  >
  <Input
  placeholder="50, 80, 100"
@@ -2692,8 +2692,8 @@ export default function WorkspaceSettingsPage() {
  </FormRow>
 
  <FormRow
- label="onlimit"
- description="ExceedonlimittimecanExcessConsumption"
+ label="Spending Limit"
+ description="Prevent excess consumption when the limit is exceeded"
  >
  <div className="flex items-center gap-3">
  <Switch
@@ -2705,7 +2705,7 @@ export default function WorkspaceSettingsPage() {
  <Input
  type="number"
  min={0}
- placeholder="exampleif 1200"
+ placeholder="e.g. 1200"
  value={budgetForm.spendLimit}
  onChange={(e) =>
  setBudgetForm({ ...budgetForm, spendLimit: e.target.value })
@@ -2722,7 +2722,7 @@ export default function WorkspaceSettingsPage() {
 
  <div className="flex justify-end mt-4">
  <Button onClick={handleBudgetSave} disabled={isBudgetSaving}>
- {isBudgetSaving ? "Saving...": "SaveBudgetSettings"}
+ {isBudgetSaving ? "Saving..." : "Save Budget Settings"}
  </Button>
  </div>
  </PermissionGate>
@@ -2737,29 +2737,29 @@ export default function WorkspaceSettingsPage() {
  required={["workspace_admin"]}
  fallback={(
  <SettingsSection
- title="LogsArchive"
- description="RegiononlyAdmincanAccess"
+ title="Log Archives"
+ description="This section is only accessible to admins"
  >
  <div className="text-[12px] text-foreground-light">
- youNoPermissionViewLogsArchiveandReplayContent, PleaseContactWorkspaceAdmin.
+ You do not have permission to view log archives and replay content. Please contact a workspace admin.
  </div>
  </SettingsSection>
  )}
  >
  <div className="space-y-6">
  <SettingsSection
- title="LogsArchive"
- description="willExecute/Audit LogenterStorage, SupportafterReplayandDownload"
+ title="Log Archives"
+ description="Archive execution and audit logs for later replay and download"
  footer={(
  <Button onClick={handleArchiveRequest} disabled={isArchiveCreating}>
  {isArchiveCreating && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- CreateArchive
+ Create Archive
  </Button>
  )}
  >
  <FormRow
- label="ArchiveType"
- description="SelectneedneedArchive'sLogsDataType"
+ label="Archive Type"
+ description="Select the type of log data to archive"
  >
  <Select value={archiveType} onValueChange={(value) => setArchiveType(value as LogArchiveType)}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
@@ -2779,8 +2779,8 @@ export default function WorkspaceSettingsPage() {
  </FormRow>
 
  <FormRow
- label="ArchiveRange"
- description="Optional, EmptythenUsageSystemDefaultArchiveWindow"
+ label="Archive Range"
+ description="Optional. If empty, the system default archive window will be used"
  >
  <div className="space-y-2">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -2816,8 +2816,8 @@ export default function WorkspaceSettingsPage() {
  </SettingsSection>
 
  <SettingsSection
- title="ArchiveTaskList"
- description="mostnewArchiveTask, RangeandDownloadEntry"
+ title="Archive Task List"
+ description="Latest archive tasks, scopes, and download entries"
  >
  {isArchiveLoading ? (
  <div className="flex items-center justify-center py-8">
@@ -2826,8 +2826,8 @@ export default function WorkspaceSettingsPage() {
  ) : archives.length === 0 ? (
  <EmptyState
  icon={<Archive className="w-5 h-5" />}
- title="NoneArchiveTask"
- description="CreateArchiveTaskafter, thisinwillDisplayArchiveStatusandDownloadEntry."
+ title="No Archive Tasks"
+ description="After creating an archive task, its status and download link will appear here."
  />
  ) : (
  <div className="space-y-2">
@@ -2901,8 +2901,8 @@ export default function WorkspaceSettingsPage() {
  </SettingsSection>
 
  <SettingsSection
- title="ArchiveReplay"
- description="byConditionFilterArchiveinRecordandReplay"
+ title="Archive Replay"
+ description="Filter archive records and replay by condition"
  footer={(
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="outline" onClick={() => handleReplay(true)} disabled={isReplayLoading || !selectedArchiveId}>
@@ -2922,8 +2922,8 @@ export default function WorkspaceSettingsPage() {
  {!selectedArchive ? (
  <EmptyState
  icon={<Archive className="w-5 h-5" />}
- title="Please selectArchiveTask"
- description="fromonmethodListSelectArchiveTaskafternowcanReplay."
+ title="Please Select an Archive Task"
+ description="Select an archive task from the list above to start replaying."
  />
  ) : (
  <div className="space-y-4">
@@ -2942,7 +2942,7 @@ export default function WorkspaceSettingsPage() {
 
  <FormRow
  label="Dataset"
- description="SelectneedneedReplay'sArchiveDataset"
+ description="Select the archived dataset to replay"
  >
  <Select value={replayDataset} onValueChange={setReplayDataset}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
@@ -2960,7 +2960,7 @@ export default function WorkspaceSettingsPage() {
 
  <FormRow
  label="Template"
- description="Selectgroup, oratTableCustom"
+ description="Select a group or customize in the table"
  >
  <Select
  value={currentTemplateId}
@@ -2976,9 +2976,9 @@ export default function WorkspaceSettingsPage() {
  {getTemplatesForDataset(replayDataset).map((template) => (
  <SelectItem key={template.id} value={template.id}>
  {template.source === "shared"
- ? `Team · ${template.label}`
- : template.source === "personal"
- ? `person · ${template.label}`
+? `Team · ${template.label}`
+   : template.source === "personal"
+   ? `Personal · ${template.label}`
  : template.label}
  </SelectItem>
  ))}
@@ -3010,8 +3010,8 @@ export default function WorkspaceSettingsPage() {
  </div>
 
  <FormRow
- label="TimeFilter"
- description="Optional, smallReplay'sTimeRange"
+ label="Time Filter"
+ description="Optional: narrow down the replay time range"
  >
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  <Input
@@ -3031,8 +3031,8 @@ export default function WorkspaceSettingsPage() {
 
  {isExecutionDataset && (
  <FormRow
- label="ExecuteFilter"
- description="Optional, byExecute/Workflow/User/StatusFilter"
+ label="Execution Filter"
+ description="Optional, filter by Execution / Workflow / User / Status"
  >
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  <Input
@@ -3065,8 +3065,8 @@ export default function WorkspaceSettingsPage() {
 
  {isNodeDataset && (
  <FormRow
- label="NodeFilter"
- description="Optional, byExecute/Node/StatusFilter"
+ label="Node Filter"
+ description="Optional, filter by Execution / Node / Status"
  >
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  <Input
@@ -3099,8 +3099,8 @@ export default function WorkspaceSettingsPage() {
 
  {isAuditDataset && (
  <FormRow
- label="AuditFilter"
- description="Optional, by action/actor/target Filter"
+ label="Audit Filter"
+ description="Optional, filter by Action / Actor / Target"
  >
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  <Input
@@ -3132,8 +3132,8 @@ export default function WorkspaceSettingsPage() {
  )}
 
  <FormRow
- label="ReplayPagination"
- description="ControlReplayCountandOffset"
+ label="Replay Pagination"
+ description="Control replay count and offset"
  >
  <div className="grid grid-cols-2 gap-3">
  <Input
@@ -3160,12 +3160,12 @@ export default function WorkspaceSettingsPage() {
  <div className="space-y-3">
  <div className="flex flex-wrap items-center justify-between gap-2">
  <div className="flex flex-col gap-1">
- <div className="text-[12px] text-foreground-light">ReplayResult</div>
+ <div className="text-[12px] text-foreground-light">Sync result</div>
  <div className="text-[11px] text-foreground-muted">
- {cloudSyncStatus === "syncing" && "CloudSync..."}
- {cloudSyncStatus === "error" && (cloudSyncError || "CloudSyncFailed")}
- {cloudSyncStatus === "idle" && lastSyncedAt && `alreadySync ${formatDateTime(lastSyncedAt)}`}
- {cloudSyncStatus === "idle" && !lastSyncedAt && "not yetSyncCloud"}
+ {cloudSyncStatus === "syncing" && "Syncing to cloud..."}
+ {cloudSyncStatus === "error" && (cloudSyncError || "Cloud sync failed")}
+ {cloudSyncStatus === "idle" && lastSyncedAt && `Synced ${formatDateTime(lastSyncedAt)}`}
+ {cloudSyncStatus === "idle" && !lastSyncedAt && "Not synced to cloud yet"}
  </div>
  </div>
  <div className="flex flex-wrap items-center gap-2">
@@ -3191,7 +3191,7 @@ export default function WorkspaceSettingsPage() {
  checked={exportAllFields}
  onCheckedChange={toggleExportAllFields}
  >
- ExportallsectionField
+ Export all fields
  </DropdownMenuCheckboxItem>
  <DropdownMenuSeparator className="bg-border" />
  <DropdownMenuItem
@@ -3201,15 +3201,15 @@ export default function WorkspaceSettingsPage() {
  }}
  className="text-[12px]"
  >
- RestoreDefault
+ Restore Default
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  <Button variant="outline" size="sm" onClick={() => setShowSaveTemplateDialog(true)}>
- SaveTemplate
+ Save Template
  </Button>
  <Button variant="outline" size="sm" onClick={() => setShowManageTemplatesDialog(true)}>
- ManageTemplate
+ Manage Templates
  </Button>
  <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={replayRows.length === 0}>
  <Download className="w-4 h-4 mr-1.5" />
@@ -3220,7 +3220,7 @@ export default function WorkspaceSettingsPage() {
  size="sm"
  onClick={() => setReplayView("table")}
  >
- TableView
+ Table View
  </Button>
  <Button
  variant={replayView === "json" ? "default" : "outline"}
@@ -3238,7 +3238,7 @@ export default function WorkspaceSettingsPage() {
  ) : replayRecords.length === 0 ? (
  <EmptyState
  icon={<FileText className="w-5 h-5" />}
- title="NoneReplayResult"
+ title="No Replay Results"
  description="Please adjust filter conditions and click Query Replay."
  />
  ) : replayView === "table" ? (
@@ -3249,7 +3249,7 @@ export default function WorkspaceSettingsPage() {
  searchKeys={visibleReplayColumns.map((column) => column.id as keyofReplayRow)}
  paginated
  pageSize={10}
- emptyMessage="NoneReplayResult"
+ emptyMessage="No replay results"
  />
  ) : (
  replayRecords.map((record, idx) => (
@@ -3290,26 +3290,26 @@ export default function WorkspaceSettingsPage() {
  >
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">SaveCustomTemplate</DialogTitle>
+ <DialogTitle className="text-foreground">Save custom template</DialogTitle>
  <DialogDescription className="text-foreground-light">
- CurrentConfigwillSaveasTemplateandSynctoAccount
+ Current config will be saved as a template and synced to your account
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-3 py-2">
  <div>
  <label className="block text-[12px] font-medium text-foreground mb-2">
- TemplateName
+ Template Name
  </label>
  <Input
  value={newTemplateName}
  onChange={(e) => setNewTemplateName(e.target.value)}
- placeholder="exampleif: FaultTemplate"
+ placeholder="e.g. Default template"
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
  />
  </div>
  {templateError && <p className="text-[12px] text-destructive">{templateError}</p>}
  <div className="text-[11px] text-foreground-muted">
- TemplatewillSavetoCloud, DeviceMaintain1.
+ Template will be saved to the cloud and kept on this device.
  </div>
  </div>
  <DialogFooter>
@@ -3320,7 +3320,7 @@ export default function WorkspaceSettingsPage() {
  >
  Cancel
  </Button>
- <Button onClick={handleSaveCustomTemplate}>SaveTemplate</Button>
+ <Button onClick={handleSaveCustomTemplate}>Save template</Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>
@@ -3339,18 +3339,18 @@ export default function WorkspaceSettingsPage() {
  >
  <DialogContent className="sm:max-w-lg bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">TemplateManage</DialogTitle>
+ <DialogTitle className="text-foreground">Template management</DialogTitle>
  <DialogDescription className="text-foreground-light">
- ManageCurrentDataset'sperson/TeamTemplate
+ Manage current dataset personal/team templates
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-3 py-2">
- <div className="text-[12px] text-foreground-muted">personTemplate</div>
+ <div className="text-[12px] text-foreground-muted">Personal template</div>
  {customTemplatesForDataset.length === 0 ? (
  <EmptyState
  icon={<Archive className="w-5 h-5" />}
- title="NonepersonTemplate"
- description="SaveCurrentConfigwithCreatepersonTemplate."
+ title="No Personal Templates"
+ description="Save the current configuration to create a personal template."
  />
  ) : (
  customTemplatesForDataset.map((template) => (
@@ -3371,7 +3371,7 @@ export default function WorkspaceSettingsPage() {
  {template.label}
  </div>
  <div className="text-[11px] text-foreground-muted">
- count {template.columns.length}
+ {template.columns.length} columns
  </div>
  </>
  )}
@@ -3412,15 +3412,15 @@ export default function WorkspaceSettingsPage() {
  size="sm"
  onClick={() => handleStartRenameTemplate(template, "personal")}
  >
- re-Naming
+ Rename
  </Button>
  <Button
  variant="outline"
  size="sm"
  onClick={() => void handleShareTemplate(template)}
  >
- SharetoTeam
- </Button>
+Share to team
+</Button>
  <Button
  variant="ghost"
  size="sm"
@@ -3436,12 +3436,12 @@ export default function WorkspaceSettingsPage() {
  ))
  )}
 
- <div className="text-[12px] text-foreground-muted pt-2">TeamTemplate</div>
+ <div className="text-[12px] text-foreground-muted pt-2">Team template</div>
  {sharedTemplatesForDataset.length === 0 ? (
  <EmptyState
  icon={<Archive className="w-5 h-5" />}
- title="NoneTeamTemplate"
- description="canwillpersonTemplateSharetoTeam."
+ title="No Team Templates"
+ description="You can share a personal template with the team."
  />
  ) : (
  sharedTemplatesForDataset.map((template) => (
@@ -3462,7 +3462,7 @@ export default function WorkspaceSettingsPage() {
  {template.label}
  </div>
  <div className="text-[11px] text-foreground-muted">
- count {template.columns.length}
+ {template.columns.length} columns
  </div>
  </>
  )}
@@ -3503,7 +3503,7 @@ export default function WorkspaceSettingsPage() {
  size="sm"
  onClick={() => handleStartRenameTemplate(template, "shared")}
  >
- re-Naming
+ Rename
  </Button>
  <Button
  variant="ghost"
@@ -3521,10 +3521,10 @@ export default function WorkspaceSettingsPage() {
  )}
  {templateError && <p className="text-[12px] text-destructive">{templateError}</p>}
  {sharedSyncStatus === "error" && (
- <p className="text-[12px] text-destructive">{sharedSyncError || "TeamTemplateSyncFailed"}</p>
+ <p className="text-[12px] text-destructive">{sharedSyncError || "Failed to sync team templates"}</p>
  )}
  {sharedSyncStatus === "syncing" && (
- <p className="text-[12px] text-foreground-muted">TeamTemplateSync...</p>
+ <p className="text-[12px] text-foreground-muted">Syncing team templates…</p>
  )}
  </div>
  <DialogFooter>
@@ -3539,7 +3539,7 @@ export default function WorkspaceSettingsPage() {
  <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">InviteMember</DialogTitle>
+ <DialogTitle className="text-foreground">Invite member</DialogTitle>
  <DialogDescription className="text-foreground-light">
  SendInviteEmailtonewMember
  </DialogDescription>
@@ -3552,7 +3552,7 @@ export default function WorkspaceSettingsPage() {
  </label>
  <Input
  type="email"
- placeholder="InputEmail Address"
+ placeholder="Enter email address"
  value={inviteEmail}
  onChange={(e) => setInviteEmail(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * NotificationscenterPage
- * ViewandManageAllNotificationsMessage
+ * Notification Center Page
+ * View and manage all notification messages
  */
 
 import { useState, useMemo, useEffect, useCallback } from "react";
@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
-// NotificationsTypeConfig - Supabase Style
+// Notification Type Config - Supabase Style
 const notificationTypes: Record<
  NotificationType,
  {
@@ -97,7 +97,7 @@ const notificationTypes: Record<
  icon: AtSign,
  color: "text-foreground-light",
  bg: "bg-surface-200",
- label: "@and",
+ label: "Mention",
  badge: "secondary",
  },
  income: {
@@ -142,7 +142,7 @@ const toNotificationRow = (notification: ApiNotificationItem): NotificationRow =
  link: resolveNotificationLink(notification),
 });
 
-// FormatTime
+// Format Time
 function formatTime(dateString: string) {
  const date = new Date(dateString);
  const now = new Date();
@@ -152,11 +152,11 @@ function formatTime(dateString: string) {
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
  if (diffMins < 60) {
- return `${diffMins} minbefore`;
+ return `${diffMins} min ago`;
  } else if (diffHours < 24) {
- return `${diffHours} hbefore`;
+ return `${diffHours} hours ago`;
  } else if (diffDays < 7) {
- return `${diffDays} daysbefore`;
+ return `${diffDays} days ago`;
  } else {
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
  }
@@ -233,9 +233,9 @@ export default function NotificationsPage() {
  setPage(resolvedPage);
  setHasMore(resolvedPage * resolvedPageSize < resolvedTotal);
  } catch (error) {
- const message = error instanceof Error ? error.message: "FetchNotificationsFailed";
+ const message = error instanceof Error ? error.message : "Failed to fetch notifications";
  setErrorMessage(message);
- toast.error("FetchNotificationsFailed", message);
+ toast.error("Failed to fetch notifications", message);
  if (!append) {
  setNotifications([]);
  setTotal(0);
@@ -263,7 +263,7 @@ export default function NotificationsPage() {
  loadNotifications({ page: page + 1, append: true, mode: "more" });
  }, [hasMore, isLoadingMore, loadNotifications, page]);
 
- // FilterNotifications
+ // Filter Notifications
  const filteredNotifications = useMemo(() => {
  const normalizedQuery = searchQuery.trim().toLowerCase();
  return notifications.filter((n) => {
@@ -286,7 +286,7 @@ export default function NotificationsPage() {
  return data;
  }, [filteredNotifications, sortOrder]);
 
- // StatisticsData
+ // Statistics Data
  const resolvedTotal = Math.max(total, notifications.length);
  const stats = {
  total: resolvedTotal,
@@ -303,7 +303,7 @@ export default function NotificationsPage() {
  return counts;
  }, [notifications]);
 
- // Markalreadyread
+ // Mark as Read
  const markAsRead = async (id: string) => {
  const target = notifications.find((n) => n.id === id);
  if (!target || target.read) return;
@@ -314,12 +314,12 @@ export default function NotificationsPage() {
  prev.map((n) => (n.id === id ? { ...n, read: true } : n))
  );
  } catch (error) {
- const message = error instanceof Error ? error.message: "MarkalreadyreadFailed";
- toast.error("MarkalreadyreadFailed", message);
+ const message = error instanceof Error ? error.message: "Failed to mark as read";
+ toast.error("Failed to mark as read", message);
  }
  };
 
- // Markallsectionalreadyread
+ // Mark all as read
  const markAllAsRead = async () => {
  if (notifications.every((n) => n.read)) return;
 
@@ -328,19 +328,19 @@ export default function NotificationsPage() {
  setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
  setSelectedItems(new Set());
  } catch (error) {
- const message = error instanceof Error ? error.message: "MarkalreadyreadFailed";
- toast.error("MarkalreadyreadFailed", message);
+ const message = error instanceof Error ? error.message: "Failed to mark as read";
+ toast.error("Failed to mark as read", message);
  }
  };
 
- // SwitchFavorite
+ // Toggle Favorite
  const toggleStar = (id: string) => {
  setNotifications((prev) =>
  prev.map((n) => (n.id === id ? { ...n, starred: !n.starred } : n))
  );
  };
 
- // DeleteNotifications
+ // Delete Notification
  const deleteNotification = async (id: string) => {
  try {
  await notificationApi.delete(id);
@@ -352,12 +352,12 @@ export default function NotificationsPage() {
  });
  setTotal((prev) => Math.max(prev - 1, 0));
  } catch (error) {
- const message = error instanceof Error ? error.message: "DeleteNotificationsFailed";
- toast.error("DeleteNotificationsFailed", message);
+ const message = error instanceof Error ? error.message : "Failed to delete notifications";
+ toast.error("Failed to delete notifications", message);
  }
  };
 
- // SwitchSelect
+ // Toggle Select
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedItems);
  if (newSelected.has(id)) {
@@ -368,7 +368,7 @@ export default function NotificationsPage() {
  setSelectedItems(newSelected);
  };
 
- // BatchDelete
+ // Batch Delete
  const bulkDelete = async () => {
  const ids = Array.from(selectedItems);
  if (ids.length === 0) return;
@@ -384,11 +384,11 @@ export default function NotificationsPage() {
  setSelectedItems(new Set());
 
  if (failed.length > 0) {
- toast.error("PartialDeleteFailed", `has ${failed.length} not yetDelete`);
+ toast.error("Partial delete failed", `${failed.length} item(s) could not be deleted`);
  }
  };
 
- // BatchMarkalreadyread
+ // Batch Mark as Read
  const bulkMarkAsRead = async () => {
  const ids = Array.from(selectedItems);
  if (ids.length === 0) return;
@@ -400,8 +400,8 @@ export default function NotificationsPage() {
  );
  setSelectedItems(new Set());
  } catch (error) {
- const message = error instanceof Error ? error.message: "BatchMarkalreadyreadFailed";
- toast.error("BatchMarkalreadyreadFailed", message);
+const message = error instanceof Error ? error.message : "Failed to mark as read";
+  toast.error("Failed to mark as read", message);
  }
  };
 
@@ -436,7 +436,7 @@ export default function NotificationsPage() {
  }> = [
  {
  value: "all",
- label: "allsectionNotifications",
+ label: "All Notifications",
  icon: Bell,
  color: "text-foreground-light",
  bg: "bg-surface-200",
@@ -452,39 +452,39 @@ export default function NotificationsPage() {
  const trimmedQuery = searchQuery.trim();
  const displayQuery = trimmedQuery.length > 12 ? `${trimmedQuery.slice(0, 12)}...` : trimmedQuery;
  const hasActiveFilters = selectedType !== "all" || showUnreadOnly || trimmedQuery.length > 0;
- let emptyTitle = "NoneNotifications";
- let emptyDescription = "new'sNotificationswillDisplayatthisin";
- let emptyAction = hasActiveFilters ? { label: "ResetFilter", onClick: resetFilters }: undefined;
+ let emptyTitle = "No Notifications";
+ let emptyDescription = "New notifications will appear here";
+ let emptyAction = hasActiveFilters ? { label: "Reset filter", onClick: resetFilters } : undefined;
 
  if (isLoading) {
  emptyTitle = "Loading";
- emptyDescription = "currentlyatFetchNotifications";
+ emptyDescription = "Fetching notifications…";
  emptyAction = undefined;
  } else if (errorMessage) {
- emptyTitle = "LoadFailed";
+ emptyTitle = "Failed to Load";
  emptyDescription = errorMessage;
  emptyAction = { label: "Retry", onClick: refreshNotifications };
  } else if (trimmedQuery) {
- emptyTitle = "NoMatchResult";
- emptyDescription = "PleaseTrymoreKeywordsorClearFilter";
+emptyTitle = "No matching results";
+  emptyDescription = "Try different keywords or clear filters";
  } else if (showUnreadOnly) {
- emptyTitle = "Nonot yetreadNotifications";
- emptyDescription = "AllNotificationsallalreadyRead";
+ emptyTitle = "No Unread Notifications";
+ emptyDescription = "All notifications are read";
  } else if (selectedType !== "all") {
- emptyTitle = "TypeNoneNotifications";
- emptyDescription = "TrySwitchTypeorResetFilter";
+emptyTitle = "No notifications of this type";
+  emptyDescription = "Try another type or reset filters";
  }
 
  return (
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="Notificationscenter"
+ title="Notification Center"
  description={isLoading
- ? "currentlyatFetchNotifications..."
+ ? "Fetching notifications…"
  : stats.unread > 0
- ? `youhas ${stats.unread} not yetreadNotifications`
-: "AllNotificationsalreadyread"}
+ ? `You have ${stats.unread} unread notifications`
+: "All notifications have been read"}
  actions={(
  <div className="flex items-center gap-2">
  {stats.unread > 0 && (
@@ -494,7 +494,7 @@ export default function NotificationsPage() {
  onClick={markAllAsRead}
  leftIcon={<CheckCheck className="w-4 h-4" />}
  >
- allsectionMarkalreadyread
+ Mark all as read
  </Button>
  )}
  <Link href="/dashboard/settings/notifications">
@@ -507,9 +507,9 @@ export default function NotificationsPage() {
  >
  <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
  <Badge variant="secondary" size="sm" icon={<Bell className="w-3.5 h-3.5" />}>
- not yetread {stats.unread}
- </Badge>
- <Badge variant="warning" size="sm" icon={<Star className="w-3.5 h-3.5" />}>
+            Unread {stats.unread}
+          </Badge>
+          <Badge variant="warning" size="sm" icon={<Star className="w-3.5 h-3.5" />}>
  Favorite {stats.starred}
  </Badge>
  <Badge variant="outline" size="sm" icon={<CheckCircle2 className="w-3.5 h-3.5" />}>
@@ -521,7 +521,7 @@ export default function NotificationsPage() {
  <div className="page-grid grid-cols-1 md:grid-cols-3">
  <div className="page-panel p-4 md:p-5 space-y-3">
  <div className="flex items-center justify-between">
- <span className="page-caption">allsectionNotifications</span>
+ <span className="page-caption">All Notifications</span>
  <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center">
  <Bell className="w-4 h-4 text-foreground-light" />
  </div>
@@ -530,11 +530,11 @@ export default function NotificationsPage() {
  <span className="text-stat-large text-foreground tabular-nums">{stats.total}</span>
  <span className="text-xs text-foreground-muted pb-1"></span>
  </div>
- <p className="text-xs text-foreground-light">SystemCumulative'sNotificationstotal</p>
+ <p className="text-xs text-foreground-light">Total system notifications</p>
  </div>
  <div className="page-panel p-4 md:p-5 space-y-3">
  <div className="flex items-center justify-between">
- <span className="page-caption">not yetreadTodo</span>
+ <span className="page-caption">Unread</span>
  <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center">
  <CheckCheck className="w-4 h-4 text-brand-500" />
  </div>
@@ -543,11 +543,11 @@ export default function NotificationsPage() {
  <span className="text-stat-large text-foreground tabular-nums">{stats.unread}</span>
  <span className="text-xs text-foreground-muted pb-1"></span>
  </div>
- <p className="text-xs text-foreground-light">needneedProcess'sReminderandAlert</p>
+ <p className="text-xs text-foreground-light">Reminders and alerts to process</p>
  </div>
  <div className="page-panel p-4 md:p-5 space-y-3">
  <div className="flex items-center justify-between">
- <span className="page-caption">FavoriteFollow</span>
+ <span className="page-caption">Favorites & follows</span>
  <div className="w-8 h-8 rounded-md bg-warning-200 flex items-center justify-center">
  <Star className="w-4 h-4 text-warning" />
  </div>
@@ -556,7 +556,7 @@ export default function NotificationsPage() {
  <span className="text-stat-large text-foreground tabular-nums">{stats.starred}</span>
  <span className="text-xs text-foreground-muted pb-1"></span>
  </div>
- <p className="text-xs text-foreground-light">Markasre-'sNotifications</p>
+ <p className="text-xs text-foreground-light">Mark as read</p>
  </div>
  </div>
 
@@ -569,7 +569,7 @@ export default function NotificationsPage() {
  <Filter className="w-4 h-4 text-foreground-light" />
  Filter
  </p>
- <p className="page-panel-description">byTypeandalreadyreadStatusFilterNotifications</p>
+ <p className="page-panel-description">Filter notifications by type and read status</p>
  </div>
  <Button variant="ghost" size="sm" onClick={resetFilters}>
  Reset
@@ -621,23 +621,23 @@ export default function NotificationsPage() {
  size="sm"
  leftIcon={<Bell className="w-4 h-4" />}
  onClick={() => setShowUnreadOnly(false)}
- >
- allsection
- </Button>
- <Button
+            >
+            All
+            </Button>
+            <Button
  variant={showUnreadOnly ? "secondary" : "outline"}
  size="sm"
  leftIcon={<BellOff className="w-4 h-4" />}
  onClick={() => setShowUnreadOnly(true)}
- >
- onlynot yetread
- </Button>
- </div>
+            >
+            Unread Only
+            </Button>
+            </div>
  </div>
  <div className="py-4">
  <div className="rounded-md border border-border bg-surface-200/50 px-3 py-2">
  <div className="flex items-center justify-between text-xs text-foreground-muted">
- <span>CurrentFilter</span>
+ <span>Current filter</span>
  <span className="tabular-nums">
  {filteredNotifications.length}/{stats.total}
  </span>
@@ -649,9 +649,9 @@ export default function NotificationsPage() {
  </Badge>
  )}
  {showUnreadOnly && (
- <Badge variant="warning" size="xs">
- onlynot yetread
- </Badge>
+            <Badge variant="warning" size="xs">
+            Unread Only
+            </Badge>
  )}
  {trimmedQuery && (
  <Badge variant="outline" size="xs">
@@ -659,7 +659,7 @@ export default function NotificationsPage() {
  </Badge>
  )}
  {!showUnreadOnly && selectedType === "all" && !trimmedQuery && (
- <span className="text-xs text-foreground-light">allsectionNotifications</span>
+ <span className="text-xs text-foreground-light">All Notifications</span>
  )}
  </div>
  </div>
@@ -676,7 +676,7 @@ export default function NotificationsPage() {
  <Badge variant="primary" size="sm" className="tabular-nums">
  {selectedItems.size}
  </Badge>
- alreadySelect {selectedItems.size} 
+ Selected {selectedItems.size} items
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -685,7 +685,7 @@ export default function NotificationsPage() {
  onClick={bulkMarkAsRead}
  leftIcon={<Check className="w-4 h-4" />}
  >
- Markalreadyread
+ Mark as Read
  </Button>
  <Button
  variant="destructive"
@@ -707,14 +707,14 @@ export default function NotificationsPage() {
  <div className="page-panel-header space-y-3">
  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="page-panel-title">NotificationsList</p>
+ <p className="page-panel-title">Notifications list</p>
  <p className="page-panel-description"> {filteredNotifications.length} Notifications</p>
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Badge variant="secondary" size="sm">
- not yetread {stats.unread}
- </Badge>
- <Badge variant="warning" size="sm">
+              Unread {stats.unread}
+              </Badge>
+              <Badge variant="warning" size="sm">
  Favorite {stats.starred}
  </Badge>
  <ButtonGroup attached>
@@ -723,14 +723,14 @@ export default function NotificationsPage() {
  size="sm"
  onClick={() => setSortOrder("newest")}
  >
- mostnew
+ Newest
  </Button>
  <Button
  variant={sortOrder === "oldest" ? "secondary" : "outline"}
  size="sm"
  onClick={() => setSortOrder("oldest")}
  >
- most
+ Oldest
  </Button>
  </ButtonGroup>
  <Button
@@ -740,7 +740,7 @@ export default function NotificationsPage() {
  disabled={isRefreshing}
  leftIcon={<RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />}
  >
- {isRefreshing ? "Refresh": "Refresh"}
+ {isRefreshing ? "Refreshing...": "Refresh"}
  </Button>
  </div>
  </div>
@@ -750,7 +750,7 @@ export default function NotificationsPage() {
  onChange={(event) => setSearchQuery(event.target.value)}
  variant="search"
  inputSize="sm"
- placeholder="SearchNotificationsTitleorContent"
+ placeholder="Search notification title or content"
  leftIcon={<Search className="h-4 w-4" />}
  className="w-full md:max-w-sm"
  />
@@ -760,9 +760,9 @@ export default function NotificationsPage() {
  checked={allFilteredSelected ? true : someFilteredSelected ? "indeterminate" : false}
  onCheckedChange={toggleSelectAll}
  disabled={filteredNotifications.length === 0}
- aria-label="Select AllCurrentFilterResult"
+ aria-label="Select all filtered results"
  />
- Select AllCurrent
+ Select All
  </label>
  <Badge variant="outline" size="sm" className="tabular-nums">
  Display {filteredNotifications.length}
@@ -807,7 +807,7 @@ export default function NotificationsPage() {
  checked={isSelected}
  onCheckedChange={() => toggleSelect(notification.id)}
  className="mt-1"
- aria-label={`SelectNotifications: ${notification.title}`}
+ aria-label={`Select notification: ${notification.title}`}
  />
 
  <div
@@ -867,7 +867,7 @@ export default function NotificationsPage() {
  variant="ghost"
  size="icon-xs"
  onClick={() => markAsRead(notification.id)}
- aria-label="Markalreadyread"
+ aria-label="Mark as read"
  className="text-foreground-muted hover:text-foreground"
  >
  <Check className="w-4 h-4" />
@@ -878,7 +878,7 @@ export default function NotificationsPage() {
  <Button
  variant="ghost"
  size="icon-xs"
- aria-label="OpenNotificationsLink"
+ aria-label="Open notification link"
  className="text-foreground-muted hover:text-foreground"
  >
  <ExternalLink className="w-4 h-4" />
@@ -890,7 +890,7 @@ export default function NotificationsPage() {
  <Button
  variant="ghost"
  size="icon-xs"
- aria-label="moremultipleAction"
+ aria-label="More actions"
  className="text-foreground-muted hover:text-foreground"
  >
  <MoreHorizontal className="w-4 h-4" />
@@ -903,7 +903,7 @@ export default function NotificationsPage() {
  className="text-foreground-light hover:text-foreground hover:bg-surface-200"
  >
  <Check className="w-4 h-4 mr-2" />
- Markalreadyread
+ Mark as Read
  </DropdownMenuItem>
  )}
  <DropdownMenuItem

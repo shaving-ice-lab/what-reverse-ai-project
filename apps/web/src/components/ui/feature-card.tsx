@@ -124,7 +124,7 @@ export interface FeatureCardProps {
  color?: FeatureCardColor;
  /** ClickCallback */
  onClick?: () => void;
- /** outside's className */
+ /** External className */
  className?: string;
  /** Variant */
  variant?: "default" | "compact" | "large";

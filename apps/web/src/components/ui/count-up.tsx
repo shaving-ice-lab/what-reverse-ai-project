@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * CountUp - countcharScrollAnimationComponent
+ * CountUp - Number Scroll Animation Component
  * 
- * Used forShowcaseStatisticsData'sDynamiccountcharEffect
+ * Used for showcasing statistics data with dynamic counting effects
  */
 
 import { useEffect, useRef, useState } from "react";

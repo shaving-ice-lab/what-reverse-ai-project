@@ -1,12 +1,12 @@
 "use client"
 
 /**
- * Breadcrumb BreadcrumbNavigationComponent
+ * Breadcrumb Navigation Component
  * 
  * Support: 
- * - multipletypeDelimiterstyle
- * - canCollapseDisplay
- * - IconandDescription
+ * - Multiple delimiter styles
+ * - Collapsible display
+ * - Icon and description
  */
 
 import * as React from "react"
@@ -14,7 +14,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, ChevronDown, MoreHorizontal, Home, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// DelimiterType
+// Delimiter Type
 type SeparatorType = "chevron" | "slash" | "arrow" | "dot"
 
 const separatorIcons: Record<SeparatorType, React.ReactNode> = {
@@ -34,16 +34,17 @@ const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
 })
 
 /**
- * Breadcrumb - Breadcrumb
+ * Breadcrumb
  */
 interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
- /** DelimiterType */
- separator?: SeparatorType
- /** MaximumDisplaycount(ExceedCollapse) */
- maxItems?: number
- /** CollapsetimeDisplay'scount(tailDisplaymultiplefew) */
- itemsBeforeCollapse?: number
- itemsAfterCollapse?: number
+  /** Delimiter type */
+  separator?: SeparatorType
+  /** Maximum display count (exceeding items will be collapsed) */
+  maxItems?: number
+  /** Items to display before collapse */
+  itemsBeforeCollapse?: number
+  /** Items to display after collapse */
+  itemsAfterCollapse?: number
 }
 
 function Breadcrumb({
@@ -55,11 +56,11 @@ function Breadcrumb({
  children,
  ...props
 }: BreadcrumbProps) {
- const items = React.Children.toArray(children)
- const shouldCollapse = maxItems && items.length > maxItems
+  const items = React.Children.toArray(children)
+  const shouldCollapse = maxItems && items.length > maxItems
 
- // CollapseProcess
- const visibleItems = React.useMemo(() => {
+  // Collapse processing
+  const visibleItems = React.useMemo(() => {
  if (!shouldCollapse) return items
 
  const beforeItems = items.slice(0, itemsBeforeCollapse)
@@ -75,7 +76,7 @@ function Breadcrumb({
  return (
  <BreadcrumbContext.Provider value={{ separator }}>
  <nav
- aria-label="BreadcrumbNavigation"
+ aria-label="Breadcrumb"
  className={cn("flex items-center", className)}
  {...props}
  >
@@ -97,11 +98,11 @@ function Breadcrumb({
 }
 
 /**
- * BreadcrumbItem - Breadcrumb
+ * Breadcrumb Item
  */
 interface BreadcrumbItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
- /** isnoasCurrentPage */
- isCurrent?: boolean
+  /** Whether this is the current page */
+  isCurrent?: boolean
 }
 
 function BreadcrumbItem({
@@ -122,17 +123,17 @@ function BreadcrumbItem({
 }
 
 /**
- * BreadcrumbLink - BreadcrumbLink
+ * Breadcrumb Link
  */
 interface BreadcrumbLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
- /** isnoDisable */
- disabled?: boolean
- /** beforeIcon */
- icon?: React.ReactNode
- /** isnoasCurrentPage */
- isCurrent?: boolean
- /** asButtonUsage */
- asChild?: boolean
+  /** Whether disabled */
+  disabled?: boolean
+  /** Prefix icon */
+  icon?: React.ReactNode
+  /** Whether this is the current page */
+  isCurrent?: boolean
+  /** Use as child component */
+  asChild?: boolean
 }
 
 const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
@@ -190,7 +191,7 @@ function BreadcrumbPage({
 }
 
 /**
- * BreadcrumbEllipsis - Collapse'sBreadcrumb(downExpand)
+ * BreadcrumbEllipsis - Collapsed breadcrumb (expandable)
  */
 interface BreadcrumbEllipsisProps {
  items: React.ReactNode[]
@@ -208,7 +209,7 @@ function BreadcrumbEllipsis({ items }: BreadcrumbEllipsisProps) {
  "text-muted-foreground hover:text-foreground hover:bg-muted",
  "transition-colors"
  )}
- aria-label="Show morePath"
+ aria-label="Show more"
  >
  <MoreHorizontal className="w-4 h-4" />
  </button>
@@ -305,7 +306,7 @@ function SimpleBreadcrumb({
 }
 
 /**
- * BreadcrumbWithDropdown - Dropdown Menu'sBreadcrumb
+ * BreadcrumbWithDropdown - Breadcrumb with dropdown menu
  */
 interface BreadcrumbWithDropdownProps {
  label: string

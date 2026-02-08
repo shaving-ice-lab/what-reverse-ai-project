@@ -16,7 +16,7 @@ export interface FloatingCardItem {
 
 export interface FloatingCapabilityCardsProps extends React.HTMLAttributes<HTMLDivElement> {
  items: FloatingCardItem[];
- /** Layoutmethod */
+ /** Layout method */
  layout?: "horizontal" | "grid" | "orbital";
 }
 
@@ -43,7 +43,7 @@ export function FloatingCapabilityCards({
  const Icon = item.icon;
  const isHovered = hoveredId === item.id;
  
- // OrbitLayout'sCalculate
+ // Calculate orbit layout
  const orbitalStyle = layout === "orbital" ? {
  position: "absolute" as const,
  left: `${50 + 35 * Math.cos((index * 2 * Math.PI) / items.length)}%`,
@@ -63,7 +63,7 @@ export function FloatingCapabilityCards({
  onMouseEnter={() => setHoveredId(item.id)}
  onMouseLeave={() => setHoveredId(null)}
  >
- {/* mainCard */}
+ {/* Main Card */}
  <div
  className={cn(
  "relative p-5 rounded-2xl cursor-pointer",
@@ -118,7 +118,7 @@ export function FloatingCapabilityCards({
  {item.description}
  </p>
 
- {/* StatisticsData */}
+ {/* Statistics */}
  {item.stats && (
  <div 
  className={cn(
@@ -131,7 +131,7 @@ export function FloatingCapabilityCards({
  </div>
  )}
 
- {/* Floattime'sLight Point */}
+ {/* Floating light points */}
  {isHovered && (
  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary animate-ping" />
  )}
@@ -157,12 +157,12 @@ export function FloatingCapabilityCards({
  );
 }
 
-// 3D FloatCard()
+// 3D Floating Card
 export interface FloatingCard3DProps extends React.HTMLAttributes<HTMLDivElement> {
  children: React.ReactNode;
- /** 3D EffectIntensity */
+ /** 3D effect intensity */
  intensity?: number;
- /** isnoEnableGlow */
+ /** Whether to enable glow */
  glow?: boolean;
  glowColor?: string;
 }
@@ -225,7 +225,7 @@ export function FloatingCard3D({
  );
 }
 
-// Hero Region'scanpowerBadge
+// Hero Section Capability Badge
 export interface CapabilityBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
  icon: LucideIcon;
  label: string;

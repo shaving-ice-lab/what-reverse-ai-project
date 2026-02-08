@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * TimelineComponent
- * Used forShowcaseHistoryRecord, FlowStepetc
+ * Timeline Component
+ * Used for showcasing history records, flow steps, etc.
  */
 
 import { ReactNode } from "react";

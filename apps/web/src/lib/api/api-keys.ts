@@ -1,12 +1,12 @@
 /**
- * API KeyService
+ * API Key Service
  */
 
 import type { ApiKey, ApiKeyProvider, ApiKeyTestResult, CreateApiKeyRequest } from "@/types/api-key";
 import { request } from "./shared";
 
 /**
- * API KeyService(forafterendpoint /api/v1/users/me/api-keys)
+ * API Key Service (for backend endpoint /api/v1/users/me/api-keys)
  */
 interface ApiResponse<T> {
  code: string;
@@ -50,7 +50,7 @@ function splitKeyPreview(preview?: string | null) {
  };
  }
 
- // CurrentafterendpointDefaultis "***" + last4
+ // Current backend default is "***" + last 4 characters
  if (value.startsWith("***")) {
  return {
  keyPrefix: "***",
@@ -88,7 +88,7 @@ function toUiTestResult(result: BackendTestResult): ApiKeyTestResult {
  return {
  valid: Boolean(result?.valid),
  provider: result?.provider as ApiKeyProvider,
- message: result?.message || (result?.valid ? "KeyFormatValid": "KeyFormatInvalid"),
+ message: result?.message || (result?.valid ? "Key format is valid": "Key format is invalid"),
  };
 }
 
@@ -163,7 +163,7 @@ export const apiKeysApi = {
  },
 
  /**
- * TestSavedKey(ServiceendpointDecryptafterValidate)
+ * Test Saved Key (Service backend decrypts and validates)
  */
  async test(id: string): Promise<ApiKeyTestResult> {
  const response = await request<ApiResponse<BackendTestResult>>(

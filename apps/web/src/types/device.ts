@@ -1,31 +1,31 @@
 /**
- * Sign InDeviceRelatedTypeDefinition
+ * Login Device Related Type Definition
  */
 
 /**
- * Sign InDevice
+ * Login Device
  */
 export interface LoginDevice {
- /** Device/will ID */
+ /** Device/Session ID */
  id: string;
- /** DeviceType: desktop, mobile, tablet */
+ /** Device Type: desktop, mobile, tablet */
  type: "desktop" | "mobile" | "tablet";
- /** DeviceName */
+ /** Device Name */
  name: string;
- /** Browse */
+ /** Browser */
  browser: string;
- /** */
+ /** Location */
  location: string;
- /** IP Address (PartialHide) */
+ /** IP Address (Partially Hidden) */
  ip: string;
- /** isnoasCurrentDevice */
+ /** Whether this is the current device */
  is_current: boolean;
- /** mostafterActivityTime */
+ /** Last Activity Time */
  last_active: string;
 }
 
 /**
- * Format'sDeviceInfo(Used forbeforeendpointDisplay)
+ * Formatted Device Information (Used for Frontend Display)
  */
 export interface FormattedDevice extends LoginDevice {
  lastActiveFormatted: string;

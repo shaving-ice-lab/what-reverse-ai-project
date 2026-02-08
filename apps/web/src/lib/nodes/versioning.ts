@@ -103,7 +103,7 @@ export function checkNodeCompatibility(
  issues.push({
  type: "sdk",
  severity: "warning",
- message: "few SDK VersionContext, NoneVerifyCompatible",
+ message: "No SDK version context available, unable to verify compatibility",
  });
  }
 
@@ -112,14 +112,14 @@ export function checkNodeCompatibility(
  issues.push({
  type: "sdk",
  severity: "error",
- message: `Current SDK VersionatNodeneed(most ${node.minSdkVersion})`,
+ message: `Current SDK version is below the minimum required by this node (min ${node.minSdkVersion})`,
  });
  }
  if (node.maxSdkVersion && compareSemver(context.sdkVersion, node.maxSdkVersion) > 0) {
  issues.push({
  type: "sdk",
  severity: "error",
- message: `Current SDK VersionatNodeCompatibleonlimit(most ${node.maxSdkVersion})`,
+ message: `Current SDK version exceeds the maximum supported by this node (max ${node.maxSdkVersion})`,
  });
  }
  }
@@ -128,7 +128,7 @@ export function checkNodeCompatibility(
  issues.push({
  type: "app",
  severity: "warning",
- message: "fewAppVersionContext, NoneVerifyCompatible",
+ message: "No app version context available, unable to verify compatibility",
  });
  }
 
@@ -137,14 +137,14 @@ export function checkNodeCompatibility(
  issues.push({
  type: "app",
  severity: "error",
- message: `CurrentAppVersionatNodeneed(most ${node.minAppVersion})`,
+ message: `Current app version is below the minimum required by this node (min ${node.minAppVersion})`,
  });
  }
  if (node.maxAppVersion && compareSemver(context.appVersion, node.maxAppVersion) > 0) {
  issues.push({
  type: "app",
  severity: "error",
- message: `CurrentAppVersionatNodeCompatibleonlimit(most ${node.maxAppVersion})`,
+ message: `Current app version exceeds the maximum supported by this node (max ${node.maxAppVersion})`,
  });
  }
  }

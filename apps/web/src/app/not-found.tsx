@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 404 Page - Pagenot yetto * Manus Style: Minimal, largeWhitespace, optimal */
+ * 404 Page - Page Not Found * Manus Style: Minimal, large whitespace, optimal */
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -34,7 +34,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// QuickLink- Manus Style
+// Quick Links - Manus Style
 
 const quickLinks = [
 
@@ -128,10 +128,10 @@ export default function NotFound() {
 
  )}>
 
- Sorry, youAccess'sPageDoes not existoralreadybyMove.canBackHome, Retry, orContactSupportFetchHelp.
+ Sorry, the page you're looking for doesn't exist or has been moved. You can go back home, retry, or contact support for help.
  </p>
 
- {/* mainneedAction - Manus StyleButton */}
+ {/* Main Actions - Manus StyleButton */}
 
  <div className={cn(
  "flex flex-col sm:flex-row gap-3 justify-center mb-12",
@@ -148,7 +148,7 @@ export default function NotFound() {
 
  <Home className="mr-2 w-4 h-4" />
 
- BackHome
+ Back to Home
 
  </Button>
 
@@ -166,7 +166,7 @@ export default function NotFound() {
 
  <ArrowLeft className="mr-2 w-4 h-4" />
 
- Backon1page </Button>
+ Go Back </Button>
 
  <Button
  variant="outline"
@@ -174,12 +174,12 @@ export default function NotFound() {
  onClick={() => window.location.reload()}
  >
  <RefreshCw className="mr-2 w-4 h-4" />
- re-newLoad
+ Reload
  </Button>
 
  </div>
 
- {/* QuickLink- Manus Style */}
+ {/* Quick Links - Manus Style */}
 
  <div className={cn(
  "pt-8 border-t border-border",
@@ -190,7 +190,7 @@ export default function NotFound() {
 
  )}>
 
- <p className="text-sm text-muted-foreground mb-6">orAccesswithdownPage</p>
+ <p className="text-sm text-muted-foreground mb-6">Or visit the following pages</p>
 
  <div className="flex flex-wrap justify-center gap-2">
 
@@ -245,19 +245,19 @@ export default function NotFound() {
 
  <h3 className="font-semibold text-foreground mb-1 text-sm">
 
- needneedHelp?
+ Need Help?
 
  </h3>
 
  <p className="text-xs text-muted-foreground mb-3">
 
- ifresultyouasthisis1Error, We'sSupportTeamAnytimeasyouService </p>
+ If you believe this is an error, our support team is always here to help. </p>
 
  <Link href="/contact">
 
  <Button variant="outline" size="sm" className="rounded-full text-xs h-8 px-4 border-border hover:border-primary/30">
 
- ContactSupport
+ Contact Support
 
  </Button>
 

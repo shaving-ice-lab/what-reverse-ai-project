@@ -16,14 +16,14 @@ import { Button } from "@/components/ui/button";
  * WorkflowEditPage
  * Supabase Style: Minimal, Clear, Professional
  *
- * UsageLoadEditImplementCodeSplit, 
- * fewInitialLoadTime
+ * Uses lazy loading with code splitting
+ * to reduce initial load time.
  *
  * Features: 
- * - WorkflowDataLoad
- * - AutoSaveStatus
- * - CollaborationEditIndicator
- * - ExecuteStatusFeedback
+ * - Workflow data loading
+ * - Auto-save status
+ * - Collaboration edit indicator
+ * - Execution status feedback
  */
 
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
@@ -55,15 +55,15 @@ export default function EditorPage({
  const { id } = use(params);
  const router = useRouter();
  
- // DetermineisCreatestillisEdit
+ // Determine if creating or editing
  const isNew = id === "new";
 
- // EditStatus
+ // Editor State
  const [state, setState] = useState<EditorState>({
  isLoading: !isNew,
  error: null,
  workflowData: isNew ? {
- name: "not yetNamingWorkflow",
+ name: "Untitled Workflow",
  description: "",
  nodes: [],
  edges: [],
@@ -76,7 +76,7 @@ export default function EditorPage({
  executionStatus: "idle",
  });
 
- // ListenOnlineStatus
+ // Listen for online status changes
  useEffect(() => {
  const handleOnline = () => setState(s => ({ ...s, isOnline: true }));
  const handleOffline = () => setState(s => ({ ...s, isOnline: false }));
@@ -90,7 +90,7 @@ export default function EditorPage({
  };
  }, []);
 
- // LoadWorkflowData
+ // Load Workflow Data
  useEffect(() => {
  if (isNew) return;
 
@@ -118,7 +118,7 @@ export default function EditorPage({
  setState(s => ({
  ...s,
  isLoading: false,
- error: err instanceof Error ? err.message: "LoadWorkflowFailed",
+ error: err instanceof Error ? err.message : "Load failed",
  }));
  }
  };
@@ -126,7 +126,7 @@ export default function EditorPage({
  loadWorkflow();
  }, [id, isNew]);
 
- // SaveWorkflow
+ // Save workflow
  const handleSave = useCallback(async () => {
  if (!state.workflowData) return;
  
@@ -134,7 +134,7 @@ export default function EditorPage({
  
  try {
  if (isNew) {
- // CreatenewWorkflow
+ // Create new workflow
  const created = await workflowApi.create({
  name: state.workflowData.name,
  description: state.workflowData.description,
@@ -145,10 +145,10 @@ export default function EditorPage({
  variables: state.workflowData.variables,
  });
  
- // NavigatetoEditPage
+ // Navigate to edit page
  router.replace(`/editor/${created.id}`);
  } else {
- // UpdateExistingWorkflow
+ // Update existing workflow
  await workflowApi.update(id, {
  name: state.workflowData.name,
  description: state.workflowData.description,
@@ -170,11 +170,11 @@ export default function EditorPage({
  ...s,
  saveStatus: "error",
  }));
- console.error("SaveFailed:", err);
+ console.error("Save failed:", err);
  }
  }, [state.workflowData, isNew, id, router]);
 
- // ExecuteWorkflow
+ // Execute workflow
  const handleExecute = useCallback(async () => {
  if (isNew || !state.workflowData?.id) return;
  
@@ -184,26 +184,26 @@ export default function EditorPage({
  await workflowApi.execute(id, {});
  setState(s => ({ ...s, executionStatus: "completed" }));
  
- // 3safterResetStatus
+ // Reset status after 3s
  setTimeout(() => {
  setState(s => ({ ...s, executionStatus: "idle" }));
  }, 3000);
  } catch (err) {
  setState(s => ({ ...s, executionStatus: "failed" }));
- console.error("ExecuteFailed:", err);
+ console.error("Execution failed:", err);
  }
  }, [isNew, state.workflowData?.id, id]);
 
- // RetryLoad
+ // Retry load
  const handleRetry = () => {
  if (!isNew) {
  setState(s => ({ ...s, isLoading: true, error: null }));
- // Triggerre-newLoad
+ // Trigger reload
  window.location.reload();
  }
  };
 
- // LoadStatus - Supabase Style
+ // Load Status - Supabase Style
  if (state.isLoading) {
  return (
  <div className="h-full flex items-center justify-center bg-background-studio">
@@ -212,15 +212,15 @@ export default function EditorPage({
  <Loader2 className="h-5 w-5 animate-spin text-brand-500" />
  </div>
  <div>
- <h3 className="text-sm font-medium text-foreground">LoadingWorkflow</h3>
- <p className="text-xs text-foreground-muted mt-1">PrepareEditResource...</p>
+ <h3 className="text-sm font-medium text-foreground">Loading Workflow</h3>
+ <p className="text-xs text-foreground-muted mt-1">Preparing edit resources...</p>
  </div>
  </div>
  </div>
  );
  }
 
- // ErrorStatus - Supabase Style
+ // Error Status - Supabase Style
  if (state.error) {
  return (
  <div className="h-full flex items-center justify-center bg-background-studio">
@@ -229,7 +229,7 @@ export default function EditorPage({
  <AlertCircle className="h-5 w-5 text-foreground-light" />
  </div>
  <div className="text-center">
- <h3 className="text-sm font-medium text-foreground">LoadFailed</h3>
+ <h3 className="text-sm font-medium text-foreground">Load failed</h3>
  <p className="text-xs text-foreground-muted mt-1">{state.error}</p>
  </div>
  <div className="flex items-center gap-2">
@@ -247,13 +247,13 @@ export default function EditorPage({
  );
  }
 
- // PrepareInitialData
+ // Prepare Initial Data
  const initialData = state.workflowData ? {
  name: state.workflowData.name,
  nodes: state.workflowData.nodes,
  edges: state.workflowData.edges,
  } : {
- name: "not yetNamingWorkflow",
+ name: "Untitled Workflow",
  nodes: [],
  edges: [],
  };

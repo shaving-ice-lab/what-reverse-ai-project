@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PartnersPage - LobeHub StyleDesign
+ * PartnersPage - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -27,87 +27,87 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// PartnersType
+// Partner Types
 const partnerTypes = [
  {
  id: "reseller",
  title: "Partners",
- description: "Sales AgentFlow Product, EarnCommission",
+    description: "Sell AgentFlow products and earn commissions",
  icon: DollarSign,
- benefits: ["most 30% SalesCommission", "ExclusivePricingandDiscount", "SalesSupportandTraining", "JointMarketingResource"],
+    benefits: ["Up to 30% sales commission", "Exclusive pricing and discounts", "Sales support and training", "Joint marketing resources"],
  color: "#4e8fff",
  },
  {
  id: "integration",
- title: "TechnologyIntegrationPartner",
- description: "willyou'sProductand AgentFlow DepthIntegration",
+ title: "Technology Integration Partner",
+ description: "Deeply integrate your product with AgentFlow",
  icon: Code,
- benefits: ["Priority API Access", "ExclusiveTechnologySupport", "JointProductPublish", "IntegrationMarketplaceShowcase"],
+    benefits: ["Priority API access", "Exclusive technical support", "Joint product launches", "Integration marketplace showcase"],
  color: "#3B82F6",
  },
  {
  id: "consulting",
- title: "ConsultingServicePartner",
- description: "asCustomerProvide AgentFlow andDeliverService",
+    title: "Consulting Service Partner",
+    description: "Provide AgentFlow implementation and delivery services to customers",
  icon: Briefcase,
- benefits: ["AuthenticationTrainingPlan", "item", "TechnologyDocumentSupport", "CooperationCase StudiesShowcase"],
+    benefits: ["Certified training programs", "Project referrals", "Technical documentation support", "Co-branded case study showcases"],
  color: "#8B5CF6",
  },
  {
  id: "affiliate",
- title: "PromotePartner",
- description: "Promote AgentFlow, ObtainRecommendedRewards",
+    title: "Affiliate Partner",
+    description: "Promote AgentFlow and earn referral rewards",
  icon: Megaphone,
- benefits: ["20% RecommendedCommission", "ExclusivePromoteLink", "MarketingSupport", "Real-timeDataTrack"],
+    benefits: ["20% referral commission", "Exclusive promotional links", "Marketing support", "Real-time data tracking"],
  color: "#F59E0B",
  },
 ];
 
-// PartnersRights
+// Partner Benefits
 const partnerBenefits = [
- { icon: DollarSign, title: "Revenue", description: "powerCommissioncompareexampleandmultipletimesRewardsPlan" },
- { icon: BookOpen, title: "ProfessionalTraining", description: "Free'sProductTrainingandAuthenticationCourse" },
- { icon: HeadphonesIcon, title: "ExclusiveSupport", description: "ExclusiveCustomerManagerandTechnologySupportTeam" },
- { icon: Megaphone, title: "JointMarketing", description: "andMarketplaceActivityandBrandPromote" },
- { icon: Target, title: "Share", description: "optimalCustomerlineanditemwillShare" },
- { icon: TrendingUp, title: "Growth", description: "and AgentFlow 1QuickGrowth" },
+  { icon: DollarSign, title: "Revenue Sharing", description: "Competitive commission rates and multi-tier reward programs" },
+  { icon: BookOpen, title: "Professional Training", description: "Free product training and certification courses" },
+  { icon: HeadphonesIcon, title: "Dedicated Support", description: "Dedicated account manager and technical support team" },
+  { icon: Megaphone, title: "Joint Marketing", description: "Co-marketing campaigns and brand promotion" },
+  { icon: Target, title: "Lead Sharing", description: "Quality customer leads and project referrals" },
+  { icon: TrendingUp, title: "Growth", description: "Grow together with AgentFlow" },
 ];
 
-// ExistingPartnersShowcase
+// Existing Partners Showcase
 const featuredPartners = [
- { name: "in", type: "TechnologyCooperation", logo: "☁️" },
- { name: "Tencent Cloud", type: "TechnologyCooperation", logo: "🌐" },
- { name: "as", type: "TechnologyCooperation", logo: "📱" },
- { name: "AWS", type: "TechnologyCooperation", logo: "🔶" },
- { name: "Microsoft Azure", type: "TechnologyCooperation", logo: "💠" },
- { name: "Google Cloud", type: "TechnologyCooperation", logo: "🔵" },
+  { name: "Alibaba Cloud", type: "Technology Partner", logo: "☁️" },
+  { name: "Tencent Cloud", type: "Technology Partner", logo: "🌐" },
+  { name: "Huawei Cloud", type: "Technology Partner", logo: "📱" },
+  { name: "AWS", type: "Technology Partner", logo: "🔶" },
+  { name: "Microsoft Azure", type: "Technology Partner", logo: "💠" },
+  { name: "Google Cloud", type: "Technology Partner", logo: "🔵" },
 ];
 
-// SuccessCase StudiesData
+// Success Stats
 const successStats = [
- { value: "500+", label: "Partners" },
- { value: "$10M+", label: "PartnersEarnings" },
- { value: "98%", label: "CooperationSatisfaction" },
- { value: "50+", label: "and" },
+  { value: "500+", label: "Partners" },
+  { value: "$10M+", label: "Partner Earnings" },
+  { value: "98%", label: "Partner Satisfaction" },
+  { value: "50+", label: "Countries" },
 ];
 
 // FAQ
 const faqs = [
  {
- question: "ifwhatas AgentFlow Partners?",
- answer: "Fill incurrentPage'sPleaseForm, We'sPartnersTeamwillat 2 Business DayinandyouContact, DiscussionCooperation.",
+    question: "How do I become an AgentFlow partner?",
+    answer: "Fill out the application form on this page. Our partnerships team will contact you within 2 business days to discuss collaboration opportunities.",
  },
  {
- question: "PartnersneedneedPaid??",
- answer: "BasicPartnersPlanFree.WealsoProvideAdvancedPartnersPlan, ContainsmoremultipleRightsandSupport.",
+    question: "Is there a cost to become a partner?",
+    answer: "The basic partnership plan is free. We also offer advanced partnership plans with additional benefits and support.",
  },
  {
- question: "CommissionifwhatSettlement?",
- answer: "CommissionbymonthsSettlement, Supportrow, PayPal etcmultipletypemethod.mostAmountas $100.",
+    question: "How are commissions settled?",
+    answer: "Commissions are settled monthly via bank transfer, PayPal, and other payment methods. The minimum payout threshold is $100.",
  },
  {
- question: "needneedWhat?",
- answer: "notType'sPartnershasnot'sneed, 1needneedhasRelatedIndustryExperienceorTechnologycanpower.DetailsPleaseConsultingWe'sPartnersTeam.",
+    question: "What are the requirements?",
+    answer: "Different partnership types have different requirements, but generally you need relevant industry experience or technical capabilities. Please contact our partnerships team for details.",
  },
 ];
 
@@ -145,19 +145,19 @@ export default function PartnersPage() {
  <div className="w-20 h-20 rounded-full bg-[#4e8fff]/10 flex items-center justify-center mx-auto mb-6">
  <CheckCircle className="w-10 h-10 text-[#4e8fff]" />
  </div>
- <h1 className="text-2xl font-bold text-foreground mb-4">PleasealreadySubmit!</h1>
+              <h1 className="text-2xl font-bold text-foreground mb-4">Application Submitted!</h1>
  <p className="text-[13px] text-foreground-light mb-8">
- Thank youyou'sPlease!We'sPartnersTeamwillat 2 Business DayinandyouContact.
+ Thank you for your interest! Our partnerships team will contact you within 2 business days.
  </p>
  <div className="flex flex-col sm:flex-row gap-4 justify-center">
  <Link href="/">
  <Button variant="outline" className="rounded-full border-border/50 text-foreground-light">
- BackHome
+                Back to Home
  </Button>
  </Link>
  <Link href="/docs">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- ViewDocument
+                View Documentation
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -178,17 +178,17 @@ export default function PartnersPage() {
  <div className="max-w-6xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Handshake className="h-4 w-4" />
- PartnersPlan
+            Partner Program
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight mb-6">
- andAgentFlow
- <br />
- <span className="text-[#4e8fff]">not yetcome</span>
+            Partner with AgentFlow
+          <br />
+            <span className="text-[#4e8fff]">Shape the Future</span>
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-12">
- Join AgentFlow PartnersEcosystemSystem, AI Automation'sand, Createmorelarge'svalue
+            Join the AgentFlow partner ecosystem, seize the AI automation opportunity, and create greater value together
  </p>
 
  {/* Success Stats */}
@@ -207,9 +207,9 @@ export default function PartnersPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">SelectSuitableyou'sCooperationmethod</h2>
+ <h2 className="lobe-section-header mb-4">Choose the Right Partnership Model</h2>
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- WeProvidemultipletypePartnersType, SatisfynotBusinessRequirements
+            We offer multiple partnership types to meet diverse business needs
  </p>
  </div>
 
@@ -252,9 +252,9 @@ export default function PartnersPage() {
  <section className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">PartnersRights</h2>
- <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- as AgentFlow Partners, Enjoyallmethod'sSupportandResource
+          <h2 className="lobe-section-header mb-4">Partner Benefits</h2>
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
+            As an AgentFlow partner, enjoy comprehensive support and resources
  </p>
  </div>
 
@@ -286,9 +286,9 @@ export default function PartnersPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">PartnersShowcase</h2>
- <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- andIndustryfirstEnterpriseBuild AI AutomationEcosystem
+          <h2 className="lobe-section-header mb-4">Partner Showcase</h2>
+          <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
+            Building the AI automation ecosystem with industry-leading enterprises
  </p>
  </div>
 
@@ -319,14 +319,14 @@ export default function PartnersPage() {
  {/* Form */}
  <div className="lg:col-span-3">
  <div className="p-8 rounded-2xl bg-surface-100/30 border border-border/30">
- <h2 className="text-[15px] font-bold text-foreground mb-2">PleaseasPartners</h2>
- <p className="text-[13px] text-foreground-light mb-6">Fill inwithdownInfo, WewillandyouContact</p>
+              <h2 className="text-[15px] font-bold text-foreground mb-2">Apply to Become a Partner</h2>
+              <p className="text-[13px] text-foreground-light mb-6">Fill in the information below and we will contact you</p>
 
  <form onSubmit={handleSubmit} className="space-y-5">
  <div className="grid sm:grid-cols-2 gap-4">
  <div>
  <Label htmlFor="companyName" className="text-foreground text-[12px]">
- CompanyName <span className="text-red-500">*</span>
+                  Company Name <span className="text-red-500">*</span>
  </Label>
  <Input
  id="companyName"
@@ -335,12 +335,12 @@ export default function PartnersPage() {
  onChange={(e) => handleInputChange("companyName", e.target.value)}
  required
  className="mt-2 bg-background border-border/30 rounded-xl"
- placeholder="you'sCompanyName"
+ placeholder="Your company name"
  />
  </div>
  <div>
  <Label htmlFor="contactName" className="text-foreground text-[12px]">
- Contactperson <span className="text-red-500">*</span>
+                  Contact Person <span className="text-red-500">*</span>
  </Label>
  <Input
  id="contactName"
@@ -349,7 +349,7 @@ export default function PartnersPage() {
  onChange={(e) => handleInputChange("contactName", e.target.value)}
  required
  className="mt-2 bg-background border-border/30 rounded-xl"
- placeholder="you'sName"
+ placeholder="Your name"
  />
  </div>
  </div>
@@ -377,13 +377,13 @@ export default function PartnersPage() {
  value={formData.phone}
  onChange={(e) => handleInputChange("phone", e.target.value)}
  className="mt-2 bg-background border-border/30 rounded-xl"
- placeholder="ContactPhone"
+                placeholder="Contact phone"
  />
  </div>
  </div>
 
  <div>
- <Label htmlFor="website" className="text-foreground text-[12px]">CompanyWebsite</Label>
+              <Label htmlFor="website" className="text-foreground text-[12px]">Company Website</Label>
  <Input
  id="website"
  type="url"
@@ -396,7 +396,7 @@ export default function PartnersPage() {
 
  <div>
  <Label className="text-foreground text-[12px] mb-3 block">
- CooperationType <span className="text-red-500">*</span>
+                  Partnership Type <span className="text-red-500">*</span>
  </Label>
  <div className="grid grid-cols-2 gap-3">
  {partnerTypes.map((type) => (
@@ -418,7 +418,7 @@ export default function PartnersPage() {
  </div>
 
  <div>
- <Label htmlFor="message" className="text-foreground text-[12px]">SupplementDescription</Label>
+              <Label htmlFor="message" className="text-foreground text-[12px]">Additional Details</Label>
  <textarea
  id="message"
  value={formData.message}
@@ -430,7 +430,7 @@ export default function PartnersPage() {
  "focus:outline-none focus:ring-2 focus:ring-[#4e8fff]/20 focus:border-[#4e8fff]/50",
  "placeholder:text-foreground-lighter resize-none"
  )}
- placeholder="PleaseneedIntroductionyou'sCompanyandCooperation(Optional)"
+ placeholder="Please introduce your company and partnership interests (optional)"
  />
  </div>
 
@@ -442,11 +442,11 @@ export default function PartnersPage() {
  {isSubmitting ? (
  <>
  <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin mr-2" />
- Submit...
+                Submitting...
  </>
  ) : (
  <>
- SubmitPlease
+                  Submit Application
  <ArrowRight className="ml-2 w-4 h-4" />
  </>
  )}
@@ -471,8 +471,8 @@ export default function PartnersPage() {
  </div>
 
  <div className="mt-6 p-4 rounded-2xl bg-[#4e8fff]/10 border border-[#4e8fff]/20">
- <h4 className="font-medium text-foreground mb-2">needneedmoremultipleHelp?</h4>
- <p className="text-[13px] text-foreground-light mb-3">Contact Us'sPartnersTeam</p>
+            <h4 className="font-medium text-foreground mb-2">Need More Help?</h4>
+            <p className="text-[13px] text-foreground-light mb-3">Contact our partnerships team</p>
  <a
  href="mailto:partners@agentflow.ai"
  className="text-[13px] text-[#4e8fff] hover:underline"

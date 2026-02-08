@@ -1,7 +1,7 @@
 export const workspaceFixture = {
  id: "ws_123",
  owner_user_id: "user_1",
- name: "TestWorkspace",
+ name: "Test Workspace",
  slug: "demo",
  icon: "🏢",
  status: "active",
@@ -23,7 +23,7 @@ export const workspaceFixture = {
 export const workspaceAltFixture = {
  ...workspaceFixture,
  id: "ws_456",
- name: "AnalyticsWorkspace",
+ name: "Analytics Workspace",
  slug: "analytics",
  plan: "pro",
 } as const;

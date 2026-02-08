@@ -16,7 +16,7 @@ import {
  Clock,
 } from "lucide-react";
 
-// ActivityType
+// Activity Type
 const activityTypes = [
  { type: "workflow_run", icon: Play, color: "text-emerald-500", bg: "bg-emerald-500/10" },
  { type: "ai_request", icon: Bot, color: "text-violet-500", bg: "bg-violet-500/10" },
@@ -26,7 +26,7 @@ const activityTypes = [
  { type: "api_call", icon: Globe, color: "text-cyan-500", bg: "bg-cyan-500/10" },
 ];
 
-// MockUsername
+// Mock Usernames
 const mockUsers = [
  "", "Li Na", "Wang Qiang", "Liu Fang", "Chen Ming", "Yang Yang", "Zhao Min", "Huang Lei",
  "weeks", "Wu Liang", "Zheng Shuang", "Sun Tao", "User123", "DevTeam", "DataBot",
@@ -38,18 +38,18 @@ const mockLocations = [
  "Xi'an", "Tokyo", "new", "Silicon Valley", "London", "Sydney",
 ];
 
-// MockActivityDescription
+// Mock Activity Descriptions
 const mockActivities = [
- "Run"SmartSupport"Workflow",
- "Process 1,234 DataRecord",
- "Call GPT-4 GenerateContent",
- "Send 56 MarketingEmail",
- "Createnew'sAutomationFlow",
- "Sync Notion Database",
- "DoneDataCleanTask",
- "Trigger Webhook Event",
- "ExecuteScheduledTask",
- "ExportAnalyticsReport",
+ "Run \"Smart Support\" workflow",
+ "Process 1,234 data records",
+ "Call GPT-4 to generate content",
+ "Send 56 marketing emails",
+ "Create new automation flow",
+ "Sync Notion database",
+ "Data clean task done",
+ "Trigger webhook event",
+ "Scheduled task executed",
+ "Analytics report exported",
 ];
 
 export interface Activity {
@@ -74,13 +74,13 @@ function generateActivity(): Activity {
 }
 
 export interface LiveActivityFeedProps extends React.HTMLAttributes<HTMLDivElement> {
- /** MaximumDisplaycount */
- maxItems?: number;
- /** newActivityGeneratebetween(s) */
+  /** Maximum display count */
+  maxItems?: number;
+  /** New activity generation interval (ms) */
  interval?: number;
- /** isnoDisplay */
+ /** Whether to display location */
  showLocation?: boolean;
- /** isnoAutoGenerateActivity */
+ /** Whether to auto-generate activity */
  autoGenerate?: boolean;
  /** Compact */
  compact?: boolean;
@@ -99,16 +99,16 @@ export function LiveActivityFeed({
  const [isVisible, setIsVisible] = useState(false);
  const containerRef = useRef<HTMLDivElement>(null);
 
- // InitialActivity
+  // Initial Activities
  useEffect(() => {
  const initial = Array.from({ length: maxItems }, () => generateActivity());
  setActivities(initial);
  
- // LatencyDisplayAnimation
+    // Delay display animation
  setTimeout(() => setIsVisible(true), 100);
  }, [maxItems]);
 
- // AutoGeneratenewActivity
+  // Auto-generate new activities
  useEffect(() => {
  if (!autoGenerate) return;
 
@@ -130,10 +130,10 @@ export function LiveActivityFeed({
  const now = new Date();
  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
  
- if (diff < 5) return "Just now";
- if (diff < 60) return `${diff} sbefore`;
- if (diff < 3600) return `${Math.floor(diff / 60)} minbefore`;
- return `${Math.floor(diff / 3600)} hbefore`;
+    if (diff < 5) return "Just now";
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+ return `${Math.floor(diff / 3600)} hours ago`;
  };
 
  return (
@@ -151,10 +151,10 @@ export function LiveActivityFeed({
  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
  </div>
- <span className="text-sm font-medium text-primary">Real-timeActivity</span>
+        <span className="text-sm font-medium text-primary">Real-time Activity</span>
  </div>
 
- {/* ActivityList */}
+      {/* Activity List */}
  <div className="space-y-2">
  {activities.map((activity, index) => {
  const config = getActivityConfig(activity.type);
@@ -201,7 +201,7 @@ export function LiveActivityFeed({
  )}
  </div>
 
- {/* Time(Compact) */}
+      {/* Time (Compact) */}
  {compact && (
  <span className="text-xs text-muted-foreground shrink-0">
  {formatTime(activity.timestamp)}
@@ -212,27 +212,27 @@ export function LiveActivityFeed({
  })}
  </div>
 
- {/* Fade outMask */}
+    {/* Fade out mask */}
  <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none" />
  </div>
  );
 }
 
-// Real-timeRunStatisticsBadge
+// Real-time Run Statistics Badge
 export interface LiveStatsBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
- /** Initialvalue */
- initialValue?: number;
- /** Tags */
- label?: string;
- /** eachsRange */
- incrementRange?: [number, number];
- /** isnoDisplayPulseAnimation */
- showPulse?: boolean;
+  /** Initial value */
+  initialValue?: number;
+  /** Label */
+  label?: string;
+  /** Increment range per tick */
+  incrementRange?: [number, number];
+  /** Whether to show pulse animation */
+  showPulse?: boolean;
 }
 
 export function LiveStatsBadge({
- initialValue = 1234567,
- label = "WorkflowalreadyRun",
+  initialValue = 1234567,
+  label = "Workflows Executed",
  incrementRange = [1, 5],
  showPulse = true,
  className,
@@ -279,7 +279,7 @@ export function LiveStatsBadge({
  );
 }
 
-// allUserDistributionIndicator
+// Global Users Distribution Indicator
 export interface GlobalUsersIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
  activeUsers?: number;
 }
@@ -319,7 +319,7 @@ export function GlobalUsersIndicator({
  <p className="text-2xl font-bold text-foreground tabular-nums">
  {users.toLocaleString()}
  </p>
- <p className="text-xs text-muted-foreground">allOnlineUser</p>
+        <p className="text-xs text-muted-foreground">All Online Users</p>
  </div>
  </div>
  );

@@ -47,7 +47,7 @@ export const EndNode = memo(function EndNode({
  onMouseEnter={() => setIsHovered(true)}
  onMouseLeave={() => setIsHovered(false)}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  type="target"
  position={Position.Left}

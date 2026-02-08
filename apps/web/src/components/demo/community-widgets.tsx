@@ -25,53 +25,53 @@ import {
  Rocket,
 } from "lucide-react";
 
-// MockDiscussionData
+// Mock Discussion Data
 const mockDiscussions = [
  {
- id: 1", author: "",
+ id: 1, author: "Zhang Wei",
  avatar: "Z",
- title: "ifwhatoptimallargeScaleDataProcessWorkflow?",
- preview: "Ihas1needneedProcess 100 10000Data'sWorkflow, itembeforeRunTime, hasWhatoptimalSuggestion??",
- tags: ["canoptimal", "DataProcess"],
+ title: "How to optimize large-scale data processing workflows?",
+ preview: "I have a workflow that needs to process 100,000+ data entries. The runtime is too long. Any optimization suggestions?",
+ tags: ["Optimization", "Data Processing"],
  likes: 42,
  replies: 18,
- time: "10 minbefore",
+ time: "10 min ago",
  isHot: true,
  },
  {
  id: 2,
  author: "Emily Chen",
  avatar: "E",
- title: "Share: I's AI SupportWorkflowTemplate",
- preview: "1weeksTime'sSupportWorkflow, SupportmultipleConversation, SentimentAnalyticsandAutoCategory, Sharetolarge...",
- tags: ["TemplateShare", "AI App"],
+ title: "Sharing: My AI Support Workflow Template",
+ preview: "A week-long support workflow that supports multiple conversations, sentiment analysis, and auto-categorization. Sharing with everyone...",
+ tags: ["Template Sharing", "AI App"],
  likes: 89,
  replies: 34,
- time: "25 minbefore",
+ time: "25 min ago",
  isHot: true,
  },
  {
  id: 3,
  author: "Wang Lei",
  avatar: "W",
- title: "newAsk: Webhook TriggerConfig?",
- preview: "wantuse Webhook TriggerWorkflow, butis1nottoRequest, haspersoncanseeseeConfiginhasIssue??",
- tags: ["new", "Webhook"],
+ title: "Question: Webhook Trigger Configuration?",
+ preview: "I want to use Webhook to trigger my workflow, but keep getting request errors. Can anyone check if my config has issues?",
+ tags: ["Beginner", "Webhook"],
  likes: 12,
  replies: 8,
- time: "1 hbefore",
+ time: "1 hr ago",
  isHot: false,
  },
  {
  id: 4,
  author: "Li Na",
  avatar: "L",
- title: "Enterprise-gradeDeployBest PracticesShare",
- preview: "WeCompanyUsage AgentFlow alreadyyears, Share1atProductionEnvironmentSummary'sExperience...",
+ title: "Enterprise Deployment Best Practices",
+ preview: "Our company has been using AgentFlow for years. Sharing our production environment experience summary...",
  tags: ["Best Practices", "Enterprise"],
  likes: 156,
  replies: 67,
- time: "2 hbefore",
+ time: "2 hrs ago",
  isHot: true,
  },
  {
@@ -79,21 +79,21 @@ const mockDiscussions = [
  author: "Alex Liu",
  avatar: "A",
  title: "Feature Request: Support GraphQL Trigger",
- preview: "HopecanIncrease GraphQL Subscription asTriggerType, thisstylecanwithmoreandExistingSystemIntegration...",
- tags: ["FeaturesSuggestion"],
+ preview: "Hope to add GraphQL Subscription as a trigger type. This would enable better integration with existing systems...",
+ tags: ["Feature Request"],
  likes: 28,
  replies: 12,
- time: "3 hbefore",
+ time: "3 hrs ago",
  isHot: false,
  },
 ];
 
 export interface LiveDiscussionFeedProps extends React.HTMLAttributes<HTMLDivElement> {
- /** DisplayCount */
+ /** Number of items to display */
  limit?: number;
- /** isnoAutoRefresh */
+ /** Whether to auto-refresh */
  autoRefresh?: boolean;
- /** Refreshbetween(ms) */
+ /** Refresh interval (ms) */
  refreshInterval?: number;
 }
 
@@ -107,7 +107,7 @@ export function LiveDiscussionFeed({
  const [discussions, setDiscussions] = useState(mockDiscussions.slice(0, limit));
  const [newCount, setNewCount] = useState(0);
 
- // MockReal-timeUpdate
+ // Mock real-time updates
  useEffect(() => {
  if (!autoRefresh) return;
 
@@ -119,25 +119,25 @@ export function LiveDiscussionFeed({
  }, [autoRefresh, refreshInterval]);
 
  const handleRefresh = () => {
- // MockLoadnewContent
+ // Mock loading new content
  setDiscussions([...mockDiscussions].sort(() => Math.random() - 0.5).slice(0, limit));
  setNewCount(0);
  };
 
  return (
  <div className={cn("", className)} {...props}>
- {/* newMessageTip */}
+ {/* New Message Tip */}
  {newCount > 0 && (
  <button
  onClick={handleRefresh}
  className="w-full mb-4 py-2 px-4 rounded-xl bg-primary/10 border border-primary/20 text-sm text-primary hover:bg-primary/20 transition-all flex items-center justify-center gap-2"
  >
  <Zap className="w-4 h-4" />
- {newCount} newDiscussion, ClickRefresh
+ {newCount} new discussions, click to refresh
  </button>
  )}
 
- {/* DiscussionList */}
+ {/* Discussion List */}
  <div className="space-y-4">
  {discussions.map((discussion, index) => (
  <div
@@ -158,7 +158,7 @@ export function LiveDiscussionFeed({
  </div>
 
  <div className="flex-1 min-w-0">
- {/* TitleandTags */}
+ {/* Title and Tags */}
  <div className="flex items-start justify-between gap-2 mb-1">
  <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
  {discussion.isHot && (
@@ -173,7 +173,7 @@ export function LiveDiscussionFeed({
  {discussion.preview}
  </p>
 
- {/* FooterInfo */}
+ {/* Footer Info */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3 text-xs text-muted-foreground">
  <span className="flex items-center gap-1">
@@ -230,11 +230,11 @@ export function LiveDiscussionFeed({
  );
 }
 
-// LeaderboardData
+// Leaderboard Data
 const mockLeaderboard = [
- { rank: 1", name: "Li Ming", avatar: "L", score: 12580, change: 2, badge: "crown", workflows: 156, contributions: 89 },
+ { rank: 1, name: "Li Ming", avatar: "L", score: 12580, change: 2, badge: "crown", workflows: 156, contributions: 89 },
  { rank: 2, name: "Sarah Wang", avatar: "S", score: 11240, change: -1, badge: "medal", workflows: 134, contributions: 76 },
- { rank: 3, name: "", avatar: "Z", score: 10890, change: 1, badge: "trophy", workflows: 128, contributions: 71 },
+ { rank: 3, name: "Zhang Wei", avatar: "Z", score: 10890, change: 1, badge: "trophy", workflows: 128, contributions: 71 },
  { rank: 4, name: "Mike Chen", avatar: "M", score: 9650, change: 0, badge: "star", workflows: 112, contributions: 64 },
  { rank: 5, name: "Wang Fang", avatar: "W", score: 8920, change: 3, badge: "star", workflows: 98, contributions: 58 },
  { rank: 6, name: "David Liu", avatar: "D", score: 8450, change: -2, badge: "star", workflows: 89, contributions: 52 },
@@ -243,11 +243,11 @@ const mockLeaderboard = [
 ];
 
 export interface AnimatedLeaderboardProps extends React.HTMLAttributes<HTMLDivElement> {
- /** DisplayCount */
+ /** Number of items to display */
  limit?: number;
- /** isnoDisplayAnimation */
+ /** Whether to show animations */
  animated?: boolean;
- /** LeaderboardType */
+ /** Leaderboard type */
  type?: "contributors" | "workflows" | "overall";
 }
 
@@ -332,16 +332,16 @@ export function AnimatedLeaderboard({
  <div className="flex items-center gap-3 text-xs text-muted-foreground">
  <span className="flex items-center gap-1">
  <GitBranch className="w-3 h-3" />
- {user.workflows} Workflow
+              {user.workflows} Workflows
  </span>
  <span className="flex items-center gap-1">
  <Code2 className="w-3 h-3" />
- {user.contributions} Contribution
+              {user.contributions} Contributions
  </span>
  </div>
  </div>
 
- {/* countand */}
+ {/* Score and Change */}
  <div className="text-right">
  <div className="font-bold text-foreground">{user.score.toLocaleString()}</div>
  <div className={cn(

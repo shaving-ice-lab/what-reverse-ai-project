@@ -1,6 +1,6 @@
 /**
  * Local LLM TypeDefinition
- * @description Used forLocal LLM Integration'sTypeDefinition(Ollama/LM Studio etc)
+ * @description Type definitions for local LLM integration (Ollama/LM Studio, etc.)
  */
 
 // ============================================================================
@@ -64,7 +64,7 @@ export interface OllamaConfig {
  * Ollama Status
  */
 export interface OllamaStatus {
- /** isnoRun */
+ /** Whether it is running */
  running: boolean;
  /** Version Number */
  version?: string;
@@ -110,7 +110,7 @@ export interface ChatOptions {
  model?: string;
  /** MessageList */
  messages: ChatMessage[];
- /** isnoStreaming */
+ /** Whether streaming is enabled */
  stream?: boolean;
  /** Temperature(0-1) */
  temperature?: number;
@@ -130,13 +130,13 @@ export interface ChatOptions {
 export interface ChatResponse {
  /** ReplyContent */
  content: string;
- /** Usage'sModel */
+ /** Model used */
  model: string;
  /** token UsageStatistics */
  usage: TokenUsage;
  /** DoneReason */
  finishReason: 'stop' | 'length' | 'error';
- /** Complete'sOriginalMessage */
+ /** Complete original message */
  message?: ChatMessage;
 }
 
@@ -158,7 +158,7 @@ export interface TokenUsage {
 export interface StreamChunk {
  /** ContentFragment */
  content: string;
- /** isnoDone */
+ /** Whether it is done */
  done: boolean;
  /** ModelName */
  model?: string;
@@ -174,7 +174,7 @@ export interface StreamChunk {
 export interface EmbedOptions {
  /** ModelName */
  model?: string;
- /** needEmbedding'sText */
+ /** Text to be embedded */
  text: string;
 }
 
@@ -199,7 +199,7 @@ export interface LocalLLMProvider {
  /** ProvideuserType */
  readonly type: LLMProviderType;
 
- /** CheckServiceisnoAvailable */
+ /** Check if the service is available */
  isAvailable(): Promise<boolean>;
 
  /** ListAvailableModel */

@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Version HistoryComponent
+ * Version History Component
  * 
- * Showcase Agent 'sVersionUpdateHistory
+ * Displays the agent's version update history
  */
 
 import { formatDistanceToNow } from "date-fns";
@@ -22,16 +22,16 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { AgentVersion } from "@/types/agent";
 
-// ParseChangeLogs'sType
+// Parse changelog type
 const getChangeTypeIcon = (changelog: string) => {
  const lowerChangelog = changelog.toLowerCase();
- if (lowerChangelog.includes("newFeatures") || lowerChangelog.includes("Add") || lowerChangelog.includes("feature")) {
+ if (lowerChangelog.includes("new feature") || lowerChangelog.includes("add") || lowerChangelog.includes("feature")) {
  return { icon: Sparkles, color: "text-primary", bg: "bg-primary/10" };
  }
  if (lowerChangelog.includes("Fix") || lowerChangelog.includes("bug") || lowerChangelog.includes("fix")) {
  return { icon: Bug, color: "text-orange-500", bg: "bg-orange-500/10" };
  }
- if (lowerChangelog.includes("optimal") || lowerChangelog.includes("can") || lowerChangelog.includes("improve")) {
+ if (lowerChangelog.includes("optimize") || lowerChangelog.includes("improve") || lowerChangelog.includes("enhance")) {
  return { icon: Zap, color: "text-blue-500", bg: "bg-blue-500/10" };
  }
  return { icon: FileText, color: "text-foreground-light", bg: "bg-surface-200" };
@@ -58,7 +58,7 @@ export function VersionHistory({
  return (
  <div className={cn("rounded-xl bg-surface-200/50 border border-border p-6 text-center", className)}>
  <GitBranch className="w-10 h-10 text-foreground-light mx-auto mb-3" />
- <p className="text-foreground-light">NoneVersion History</p>
+ <p className="text-foreground-light">No version history</p>
  </div>
  );
  }
@@ -68,7 +68,7 @@ export function VersionHistory({
 
  return (
  <div className={cn("space-y-4", className)}>
- {/* Current VersionMark */}
+ {/* Current Version Label */}
  {currentVersion && (
  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20">
  <Tag className="w-4 h-4 text-primary" />
@@ -78,7 +78,7 @@ export function VersionHistory({
  </div>
  )}
 
- {/* VersionTimeline */}
+ {/* Version Timeline */}
  <div className="relative">
  {/* Timeline */}
  <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
@@ -91,7 +91,7 @@ export function VersionHistory({
 
  return (
  <div key={version.version} className="relative pl-10">
- {/* TimelineNode */}
+ {/* Timeline Node */}
  <div
  className={cn(
  "absolute left-2 top-1 w-5 h-5 rounded-full flex items-center justify-center",
@@ -106,7 +106,7 @@ export function VersionHistory({
  />
  </div>
 
- {/* VersionCard */}
+ {/* Version Card */}
  <div
  className={cn(
  "p-4 rounded-xl border transition-colors",
@@ -122,7 +122,7 @@ export function VersionHistory({
  </span>
  {isLatest && (
  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
- mostnew
+                    Latest
  </span>
  )}
  </div>
@@ -149,7 +149,7 @@ export function VersionHistory({
  </div>
  </div>
 
- {/* Expand/CollapseButton */}
+ {/* Expand/Collapse Button */}
  {hasMore && !showAll && (
  <button
  onClick={() => setIsExpanded(!isExpanded)}
@@ -163,7 +163,7 @@ export function VersionHistory({
  ) : (
  <>
  <ChevronDown className="w-4 h-4" />
- View all ({versions.length} Version)
+ View all ({versions.length} versions)
  </>
  )}
  </button>

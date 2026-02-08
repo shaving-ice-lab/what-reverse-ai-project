@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * WorkflowDetailsPage
+ * Workflow Details Page
  *
- * Supabase Style: Minimal, Professional, FeaturesRich
+ * Supabase Style: Minimal, Professional, Feature-Rich
  */
 
 import { useState } from "react";
@@ -35,20 +35,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-// MockWorkflowData
+// Mock Workflow Data
 
 const mockWorkflow = {
  id: "wf-001",
 
- name: "eachdayDataSync",
+ name: "Daily data sync",
 
- description: "eachdaysAutoSyncDatabaseDatatoDataRepository, andGenerateReportSendtoSpecifyEmail",
+ description: "Daily DB sync to data repo; generate and email reports",
 
  status: "active" as const,
 
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
 
- schedule: "eachdays 08:00",
+ schedule: "Daily at 08:00",
 
  createdAt: "2026-01-10",
 
@@ -58,7 +58,7 @@ const mockWorkflow = {
 
  nodes: 8,
 
- tags: ["DataSync", "Automation", "Report"],
+ tags: ["Data Sync", "Automation", "Report"],
 
  stats: {
  totalExecutions: 245,
@@ -74,7 +74,7 @@ const mockWorkflow = {
  },
 };
 
-// MockExecuteRecord
+// Mock Execution Records
 
 const mockExecutions = [
 
@@ -87,7 +87,7 @@ const mockExecutions = [
 
  duration: "2m 28s",
 
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
 
  },
 
@@ -100,7 +100,7 @@ const mockExecutions = [
 
  duration: "2m 45s",
 
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
 
  },
 
@@ -113,9 +113,9 @@ const mockExecutions = [
 
  duration: "1m 12s",
 
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
 
- error: "DatabaseConnectTimeout",
+ error: "Database connection timeout",
 
  },
 
@@ -128,7 +128,7 @@ const mockExecutions = [
 
  duration: "2m 31s",
 
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
 
  },
 
@@ -141,31 +141,31 @@ const mockExecutions = [
 
  duration: "2m 38s",
 
- trigger: "ManualTrigger",
+ trigger: "Manual Trigger",
 
  },
 
 ];
 
-// MockNodeConfig
+// Mock Node Config
 
 const mockNodes = [
 
- { id: 1, type: "trigger", name: "ScheduledTrigger", status: "active" },
+ { id: 1, type: "trigger", name: "Scheduled Trigger", status: "active" },
 
- { id: 2, type: "database", name: "ReadDatabase", status: "active" },
+ { id: 2, type: "database", name: "Read Database", status: "active" },
 
- { id: 3, type: "transform", name: "DataConvert", status: "active" },
+ { id: 3, type: "transform", name: "Data Convert", status: "active" },
 
- { id: 4, type: "filter", name: "FilterCondition", status: "active" },
+ { id: 4, type: "filter", name: "Filter Condition", status: "active" },
 
- { id: 5, type: "aggregate", name: "DataAggregate", status: "active" },
+ { id: 5, type: "aggregate", name: "Data Aggregate", status: "active" },
 
- { id: 6, type: "database", name: "enterDataRepository", status: "active" },
+ { id: 6, type: "database", name: "Data repository", status: "active" },
 
- { id: 7, type: "report", name: "GenerateReport", status: "active" },
+ { id: 7, type: "report", name: "Generate Report", status: "active" },
 
- { id: 8, type: "email", name: "SendEmail", status: "active" },
+ { id: 8, type: "email", name: "Send Email", status: "active" },
 
 ];
 
@@ -182,7 +182,7 @@ export default function WorkflowDetailPage() {
 
  const overviewStats = [
  {
- label: "totalExecutetimescount",
+ label: "Total execution count",
  value: workflow.stats.totalExecutions.toLocaleString(),
  icon: Activity,
  },
@@ -192,38 +192,38 @@ export default function WorkflowDetailPage() {
  icon: CheckCircle,
  },
  {
- label: "AverageDuration",
+ label: "Average Duration",
  value: workflow.stats.avgDuration,
  icon: Clock,
  },
  {
- label: "downtimesExecute",
+ label: "Next Execution",
  value: workflow.stats.nextRun,
  icon: Calendar,
  },
  ];
 
  const runtimeMeta = [
- { label: "Triggermethod", value: workflow.trigger },
- { label: "ExecutePlan", value: workflow.schedule },
- { label: "RecentRun", value: workflow.stats.lastRun },
- { label: "downtimesRun", value: workflow.stats.nextRun },
+ { label: "Trigger Method", value: workflow.trigger },
+ { label: "Execution Schedule", value: workflow.schedule },
+ { label: "Last Run", value: workflow.stats.lastRun },
+ { label: "Next Run", value: workflow.stats.nextRun },
  ];
 
  const baseMeta = [
  { label: "Version", value: `v${workflow.version}` },
- { label: "NodeCount", value: `${workflow.nodes} ` },
+ { label: "Node Count", value: `${workflow.nodes}` },
  { label: "Created At", value: workflow.createdAt },
  { label: "Updated At", value: workflow.updatedAt },
  ];
 
  const tabs = [
  { label: "Overview", value: "overview" },
- { label: "ExecuteRecord", value: "executions" },
+ { label: "Execution History", value: "executions" },
  { label: "Settings", value: "settings" },
  ];
 
- // CopyWorkflow ID
+  // Copy Workflow ID
 
  const copyId = () => {
  navigator.clipboard.writeText(workflow.id);
@@ -234,14 +234,14 @@ export default function WorkflowDetailPage() {
 
  };
 
- // SwitchRunStatus
+  // Toggle Running Status
 
  const toggleRunning = () => {
  setIsRunning(!isRunning);
 
  };
 
- // ManualExecute
+  // Manual Execute
 
  const executeWorkflow = async () => {
  setIsExecuting(true);
@@ -252,7 +252,7 @@ export default function WorkflowDetailPage() {
 
  };
 
- // StatusIcon
+  // Status Icon
 
  const StatusIcon = ({ status }: { status: string }) => {
  switch (status) {
@@ -343,7 +343,7 @@ export default function WorkflowDetailPage() {
  </button>
 
  <span className="hidden sm:inline">· v{workflow.version}</span>
- <span className="hidden sm:inline">· Update {workflow.updatedAt}</span>
+ <span className="hidden sm:inline">· Updated {workflow.updatedAt}</span>
 
  </div>
 
@@ -381,7 +381,7 @@ export default function WorkflowDetailPage() {
 
  <Play className="w-4 h-4 mr-2" />
 
- ManualExecute
+            Manual Execute
 
  </>
 
@@ -515,7 +515,7 @@ export default function WorkflowDetailPage() {
  </span>
 
  <span>
- Updateat: <span className="text-foreground">{workflow.updatedAt}</span>
+ Updated at: <span className="text-foreground">{workflow.updatedAt}</span>
  </span>
 
  </div>
@@ -529,8 +529,8 @@ export default function WorkflowDetailPage() {
  <div className="page-panel">
 
  <div className="page-panel-header">
- <div className="page-panel-title">WorkflowDescription</div>
- <div className="page-panel-description">SummaryandTags</div>
+<div className="page-panel-title">Workflow description</div>
+  <div className="page-panel-description">Summary and tags</div>
  </div>
 
  <div className="p-6">
@@ -583,7 +583,7 @@ export default function WorkflowDetailPage() {
  <div className="page-panel-header flex items-center justify-between">
 
  <div>
- <div className="page-panel-title">WorkflowNode</div>
+ <div className="page-panel-title">Workflow nodes</div>
  <div className="page-panel-description"> {mockNodes.length} Node</div>
  </div>
 
@@ -593,7 +593,7 @@ export default function WorkflowDetailPage() {
 
  <Edit className="w-4 h-4 mr-2" />
 
- EditWorkflow
+            Edit Workflow
 
  </Button>
 
@@ -643,8 +643,8 @@ export default function WorkflowDetailPage() {
  <div className="page-panel-header flex items-center justify-between">
 
  <div>
- <div className="page-panel-title">RecentExecute</div>
- <div className="page-panel-description">Recent 3 timesRunRecord</div>
+ <div className="page-panel-title">Recent runs</div>
+ <div className="page-panel-description">Last 3 execution records</div>
  </div>
 
  <Button variant="ghost" size="sm" onClick={() => setActiveTab("executions")} className="text-foreground-light">
@@ -745,8 +745,8 @@ export default function WorkflowDetailPage() {
  <div className="page-grid sm:grid-cols-2">
  <div className="page-panel">
  <div className="page-panel-header">
- <div className="page-panel-title">RunConfig</div>
- <div className="page-panel-description">TriggerandExecuteRhythm</div>
+ <div className="page-panel-title">Run config</div>
+ <div className="page-panel-description">Trigger and execution rhythm</div>
  </div>
  <div className="p-4 space-y-3 text-xs">
  {runtimeMeta.map((item) => (
@@ -761,7 +761,7 @@ export default function WorkflowDetailPage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <div className="page-panel-title">Basic Information</div>
- <div className="page-panel-description">VersionandScale</div>
+ <div className="page-panel-description">Version and scale</div>
  </div>
  <div className="p-4 space-y-3 text-xs">
  {baseMeta.map((item) => (
@@ -786,15 +786,15 @@ export default function WorkflowDetailPage() {
  <div className="page-panel-header flex items-center justify-between">
 
  <div>
- <div className="page-panel-title">ExecuteRecord</div>
- <div className="page-panel-description">AllHistoryRunRecord</div>
+              <div className="page-panel-title">Execution Records</div>
+ <div className="page-panel-description">All historical run records</div>
  </div>
 
  <div className="flex items-center gap-2">
 
  <select className="h-9 px-3 rounded-md bg-surface-100 border border-border text-xs text-foreground focus:border-brand-500 focus:outline-none">
 
- <option value="all">allsectionStatus</option>
+ <option value="all">All Status</option>
 
  <option value="success">Success</option>
 
@@ -822,11 +822,11 @@ export default function WorkflowDetailPage() {
 
  <th className="px-4 py-3 text-left text-table-header">Status</th>
 
- <th className="px-4 py-3 text-left text-table-header">StartTime</th>
+              <th className="px-4 py-3 text-left text-table-header">Start Time</th>
 
  <th className="px-4 py-3 text-left text-table-header">Duration</th>
 
- <th className="px-4 py-3 text-left text-table-header">Triggermethod</th>
+              <th className="px-4 py-3 text-left text-table-header">Trigger Method</th>
 
  <th className="px-4 py-3 text-right text-table-header">Action</th>
 
@@ -878,7 +878,7 @@ export default function WorkflowDetailPage() {
 
  <Button variant="ghost" size="sm" className="text-foreground-light">
 
- ViewLogs
+                View Logs
 
  <ExternalLink className="w-3 h-3 ml-1" />
 
@@ -909,7 +909,7 @@ export default function WorkflowDetailPage() {
 
  <div className="page-panel-header">
  <div className="page-panel-title">Basic Info</div>
- <div className="page-panel-description">UpdateWorkflowNameandDescription</div>
+ <div className="page-panel-description">Update workflow name and description</div>
  </div>
 
  <div className="p-6 space-y-4">
@@ -918,7 +918,7 @@ export default function WorkflowDetailPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- WorkflowName
+                Workflow Name
 
  </label>
 
@@ -953,8 +953,8 @@ export default function WorkflowDetailPage() {
  <div className="page-panel">
 
  <div className="page-panel-header">
- <div className="page-panel-title">TriggerConfig</div>
- <div className="page-panel-description">ConfigTriggerTypeandExecuteTime</div>
+              <div className="page-panel-title">Trigger Config</div>
+ <div className="page-panel-description">Configure trigger type and execution time</div>
  </div>
 
  <div className="p-6 page-grid sm:grid-cols-2">
@@ -963,17 +963,17 @@ export default function WorkflowDetailPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- TriggerType
+                Trigger Type
 
  </label>
 
  <select className="w-full h-9 px-4 rounded-md bg-surface-100 border border-border text-[13px] text-foreground focus:border-brand-500 focus:outline-none">
 
- <option value="schedule">ScheduledTrigger</option>
+ <option value="schedule">Scheduled Trigger</option>
 
  <option value="webhook">Webhook</option>
 
- <option value="manual">ManualTrigger</option>
+ <option value="manual">Manual Trigger</option>
 
  </select>
 
@@ -983,7 +983,7 @@ export default function WorkflowDetailPage() {
 
  <label className="block text-[13px] font-medium text-foreground mb-2">
 
- ExecuteTime
+                Execution Time
 
  </label>
 
@@ -999,7 +999,7 @@ export default function WorkflowDetailPage() {
 
  <div className="page-panel-header">
  <div className="page-panel-title">Advanced Settings</div>
- <div className="page-panel-description">FailedRetryandTimeoutPolicy</div>
+ <div className="page-panel-description">Failed retry and timeout policy</div>
  </div>
 
  <div className="p-6 space-y-4">
@@ -1008,9 +1008,9 @@ export default function WorkflowDetailPage() {
 
  <div>
 
- <div className="text-[13px] font-medium text-foreground">FailedRetry</div>
+              <div className="text-[13px] font-medium text-foreground">Failed Retry</div>
 
- <div className="text-xs text-foreground-muted">ExecuteFailedtimeAutoRetry</div>
+ <div className="text-xs text-foreground-muted">Auto-retry on execution failure</div>
 
  </div>
 
@@ -1026,9 +1026,9 @@ export default function WorkflowDetailPage() {
 
  <div>
 
- <div className="text-[13px] font-medium text-foreground">ExecuteTimeout</div>
+              <div className="text-[13px] font-medium text-foreground">Execution Timeout</div>
 
- <div className="text-xs text-foreground-muted">ExceedSpecifyTimeAuto</div>
+ <div className="text-xs text-foreground-muted">Auto-stop when specified time is exceeded</div>
 
  </div>
 
@@ -1046,9 +1046,9 @@ export default function WorkflowDetailPage() {
  <div className="page-panel border-destructive/30 bg-destructive-200/60">
 
  <div className="page-panel-header">
- <div className="text-sm font-semibold text-destructive">DangerAction</div>
+              <div className="text-sm font-semibold text-destructive">Danger Zone</div>
  <div className="text-xs text-foreground-light">
- DeleteWorkflowafterwillNoneRestore, AllExecuteRecordalsowillbyDelete.
+ Deleting the workflow cannot be undone. All execution records will also be deleted.
  </div>
  </div>
 
@@ -1057,7 +1057,7 @@ export default function WorkflowDetailPage() {
 
  <Trash2 className="w-4 h-4 mr-2" />
 
- DeleteWorkflow
+                Delete Workflow
 
  </Button>
  </div>
@@ -1068,7 +1068,7 @@ export default function WorkflowDetailPage() {
 
  <Button variant="outline" className="border border-border text-foreground-light hover:bg-surface-200">Cancel</Button>
 
- <Button className="bg-brand-500 hover:bg-brand-600 text-background">SaveChange</Button>
+              <Button className="bg-brand-500 hover:bg-brand-600 text-background">Save Changes</Button>
 
  </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Dashboard PageLayoutComponent - Supabase Style
- * 1'sPageHeader, ContentRegion, SidebarLayout
+ * Dashboard Page Layout Component - Supabase Style
+ * Includes page header, content region, and sidebar layout
  */
 
 import React from "react";
@@ -15,7 +15,7 @@ import Link from "next/link";
 interface PageContainerProps {
  children: React.ReactNode;
  className?: string;
- /** isnoall(NoneinEdge) */
+ /** Whether full width (No padding) */
  fullWidth?: boolean;
 }
 
@@ -37,22 +37,22 @@ export function PageContainer({ children, className, fullWidth = false }: PageCo
 
 // ===== PageHeader =====
 interface PageHeaderProps {
- /** PageTitle */
+ /** Page title */
  title: string;
- /** /Category */
+ /** Category / eyebrow text */
  eyebrow?: string;
- /** TitleIcon */
+ /** Title icon */
  icon?: React.ReactNode;
- /** PageDescription */
+ /** Page description */
  description?: string;
- /** BreadcrumborBackLink */
+ /** Breadcrumb or back link */
  backHref?: string;
  backLabel?: string;
- /** TitleBadge/Tags */
+ /** Title badge / tags */
  badge?: React.ReactNode;
- /** Right sideAction */
+ /** Right side actions */
  actions?: React.ReactNode;
- /** Element(Tabetc) */
+ /** Additional elements (tabs, etc.) */
  children?: React.ReactNode;
  className?: string;
 }
@@ -71,7 +71,7 @@ export function PageHeader({
 }: PageHeaderProps) {
  return (
  <div className={cn("mb-5 space-y-3", className)}>
- {/* BackLink */}
+ {/* Back Link */}
  {backHref && (
  <Link 
  href={backHref} 
@@ -82,7 +82,7 @@ export function PageHeader({
  </Link>
  )}
  
- {/* Titlerow */}
+ {/* Title Row */}
  <div className="page-header">
  <div className="min-w-0">
  <div className="flex items-start gap-3">
@@ -104,7 +104,7 @@ export function PageHeader({
  {actions && <div className="page-toolbar shrink-0">{actions}</div>}
  </div>
  
- {/* Content(Tabetc) */}
+ {/* Content (Tabs, etc.) */}
  {children && (
  <div className="mt-3">
  {children}
@@ -114,17 +114,17 @@ export function PageHeader({
  );
 }
 
-// ===== Settings/Formblock =====
+// ===== Settings / Form Block =====
 interface SettingsSectionProps {
- /** blockTitle */
+ /** Block title */
  title: string;
- /** blockDescription */
+ /** Block description */
  description?: string;
  /** Content */
  children: React.ReactNode;
- /** FooterAction */
+ /** Footer action */
  footer?: React.ReactNode;
- /** isnoCompact */
+ /** Whether compact */
  compact?: boolean;
  className?: string;
 }
@@ -168,7 +168,7 @@ export function SettingsSection({
  {children}
  </div>
  
- {/* FooterAction */}
+ {/* Footer Action */}
  {footer && (
  <div className={cn(
  "border-t border-border bg-surface-75 flex justify-end",
@@ -181,19 +181,19 @@ export function SettingsSection({
  );
 }
 
-// ===== Formrow(Supabase Style: leftTags+Description, rightWidget) =====
+// ===== Form Row (Supabase Style: left label + description, right widget) =====
 interface FormRowProps {
- /** Tags */
+ /** Label */
  label: string;
  /** Description */
  description?: string;
- /** Widget */
+ /** Form control */
  children: React.ReactNode;
- /** isnoRequired */
+ /** Whether required */
  required?: boolean;
- /** isnohasError */
+ /** Whether has error */
  error?: string;
- /** isnoHorizontalLayout(Defaultis) */
+ /** Whether horizontal layout (Default is vertical) */
  horizontal?: boolean;
  className?: string;
 }
@@ -213,7 +213,7 @@ export function FormRow({
  horizontal && "grid grid-cols-2 gap-8 items-start",
  className
  )}>
- {/* Left side: TagsandDescription */}
+ {/* Left side: Label and description */}
  <div>
  <label className="text-[12px] font-medium text-foreground">
  {label}
@@ -226,7 +226,7 @@ export function FormRow({
  )}
  </div>
  
- {/* Right side: Widget */}
+ {/* Right side: Form control */}
  <div className="space-y-1.5">
  {children}
  {error && (
@@ -237,7 +237,7 @@ export function FormRow({
  );
 }
 
-// ===== Toggle row(ToggleSettings) =====
+// ===== Toggle Row (Toggle Settings) =====
 interface ToggleRowProps {
  label: string;
  description?: string;
@@ -329,7 +329,7 @@ export function EmptyState({
  );
 }
 
-// ===== CategoryHeader(largeGraysmallTitle) =====
+// ===== Category Header (Large Gray Small Title) =====
 interface CategoryHeaderProps {
  children: React.ReactNode;
  className?: string;
@@ -346,7 +346,7 @@ export function CategoryHeader({ children, className }: CategoryHeaderProps) {
  );
 }
 
-// ===== StatisticsCard =====
+// ===== Statistics Card =====
 interface StatsCardProps {
  icon?: React.ReactNode;
  title: string;
@@ -400,7 +400,7 @@ export function StatsCard({
  );
 }
 
-// ===== Sidebar'sPageLayout =====
+// ===== Sidebar Page Layout =====
 interface PageWithSidebarProps {
  sidebar: React.ReactNode;
  children: React.ReactNode;
@@ -439,7 +439,7 @@ export function PageWithSidebar({
  </div>
  </div>
  
- {/* mainContent - Usage overflow-y-autoAllowScroll */}
+ {/* Main Content - Uses overflow-y-auto to allow scrolling */}
  <div className="flex-1 min-h-0 overflow-y-auto">
  <div className="px-6 py-5">
  {children}
@@ -449,7 +449,7 @@ export function PageWithSidebar({
  );
 }
 
-// ===== SidebarNavigation =====
+// ===== Sidebar Navigation =====
 interface SidebarNavItemProps {
  href: string;
  label: string;
@@ -493,7 +493,7 @@ export function SidebarNavItem({
  );
 }
 
-// ===== SidebarGroup =====
+// ===== Sidebar Group =====
 interface SidebarNavGroupProps {
  title?: string;
  children: React.ReactNode;

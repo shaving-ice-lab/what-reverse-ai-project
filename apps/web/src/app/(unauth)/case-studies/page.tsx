@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Case StudiesPage - LobeHub StyleDesign
+ * Case Studies Page - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -15,69 +15,69 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Case StudiesData
+// Case Studies Data
 const caseStudies = [
  {
  id: "1",
- company: "largeE-commercePlatform",
+ company: "Major E-Commerce Platform",
  industry: "E-commerce",
  logo: "🛒",
- title: "SmartSupportAutomationSystem",
- description: "ViaDeploy AI Driven'sSmartSupportSystem, willCustomerResponse Timefrom 30 minShortento 2 min, SupportrateImprove 300%.",
+ title: "Smart Customer Support Automation",
+ description: "By deploying an AI-driven smart support system, customer response time was reduced from 30 minutes to 2 minutes, improving support efficiency by 300%.",
  results: [
- { metric: "Response Time", value: "-93%", description: "from 30 minto 2 min" },
- { metric: "Supportrate", value: "+300%", description: "ProcesscanpowerImprove 3 " },
- { metric: "CustomerSatisfaction", value: "+45%", description: "NPS Improve" },
+ { metric: "Response Time", value: "-93%", description: "From 30 min to 2 min" },
+ { metric: "Support Efficiency", value: "+300%", description: "Processing capacity improved 3x" },
+ { metric: "Customer Satisfaction", value: "+45%", description: "NPS score improvement" },
  ],
- quote: "AgentFlow HelpWeChangeSupportOperations, atWe'ssmallTeamcanwithProcessPast 5 'sCustomerConsulting.",
- author: "Supporttotal",
+ quote: "AgentFlow transformed our support operations — our small team can now handle 5x the customer inquiries.",
+ author: "Head of Support",
  featured: true,
  },
  {
  id: "2",
- company: "Finance",
+ company: "Financial Institution",
  industry: "Finance",
  logo: "🏦",
- title: "AutomationRisk ControlFlow",
- description: "ImplementRiskMonitorandWarning'sallAutomation, Risk ControlResponseSpeedImprove 10 , largeReducepersonReviewCost.",
+ title: "Automated Risk Control Workflow",
+ description: "Achieved full automation of risk monitoring and alerts, improving risk response speed by 10x and significantly reducing manual review costs.",
  results: [
- { metric: "ResponseSpeed", value: "10x", description: "Real-timeRiskWarning" },
- { metric: "ReviewCost", value: "-60%", description: "fewpersonenter" },
- { metric: "Accuraterate", value: "99.5%", description: "AI AuxiliaryDecision" },
+ { metric: "Response Speed", value: "10x", description: "Real-time risk alerts" },
+ { metric: "Review Cost", value: "-60%", description: "Reduced manual effort" },
+ { metric: "Accuracy Rate", value: "99.5%", description: "AI-assisted decisions" },
  ],
- quote: "Automation'sRisk ControlFlowletWecanReal-timeResponseMarketplace, thisatFinanceIndustryisre-need's.",
- author: "Risk",
+ quote: "Automated risk control workflows allow us to respond to market changes in real time — essential in the financial industry.",
+ author: "Risk Director",
  featured: true,
  },
  {
  id: "3",
- company: "ManufacturingEnterprise",
+ company: "Manufacturing Enterprise",
  industry: "Manufacturing",
  logo: "🏭",
- title: "shouldAutomationManage",
- description: " ERP, MES and WMS System, ImplementshouldallFlowAutomation, InventoryweeksrateImprove 40%.",
+ title: "Supply Chain Automation Management",
+ description: "Integrated ERP, MES, and WMS systems to achieve full supply chain automation, improving inventory turnover by 40%.",
  results: [
- { metric: "shouldrate", value: "+150%", description: "endpointtoendpointAutomation" },
- { metric: "Inventoryweeks", value: "+40%", description: "SmartInventoryManage" },
- { metric: "OperationsCost", value: "-35%", description: "fewpersonAction" },
+ { metric: "Supply Chain Efficiency", value: "+150%", description: "End-to-end automation" },
+ { metric: "Inventory Turnover", value: "+40%", description: "Smart inventory management" },
+ { metric: "Operational Cost", value: "-35%", description: "Reduced manual operations" },
  ],
- quote: "AgentFlow HelpWeSystem'sData, currentlyImplementshould'scountchar.",
- author: "shouldtotal",
+ quote: "AgentFlow helped us connect all our systems' data, enabling true supply chain digitalization.",
+ author: "Supply Chain Director",
  featured: false,
  },
  {
  id: "4",
- company: " SaaS Company",
- industry: "",
+ company: "SaaS Company",
+ industry: "Technology",
  logo: "💻",
- title: "SaleslineAutomation",
- description: "AutomationSaleslineRatingandAllocate, SalesTeamrateImprove 200%, Conversion RateImprove 35%.",
+ title: "Sales Pipeline Automation",
+ description: "Automated sales pipeline scoring and lead allocation, improving sales team efficiency by 200% and conversion rate by 35%.",
  results: [
- { metric: "Salesrate", value: "+200%", description: "AutomationlineProcess" },
- { metric: "Conversion Rate", value: "+35%", description: "Customer" },
- { metric: "Response Time", value: "-80%", description: "QuickFollow up" },
+ { metric: "Sales Efficiency", value: "+200%", description: "Automated pipeline process" },
+ { metric: "Conversion Rate", value: "+35%", description: "Smarter lead targeting" },
+ { metric: "Response Time", value: "-80%", description: "Quick follow-up" },
  ],
- quote: "atWe'sSalesTeamcanwithFocusatvalueCustomer, andnotisTimeOnlineFilteron.",
+ quote: "Our sales team can now focus on high-value customers instead of spending time on lead filtering.",
  author: "Sales VP",
  featured: false,
  },
@@ -93,15 +93,15 @@ export default function CaseStudiesPage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Sparkles className="h-4 w-4" />
- RealCustomerCase Studies
+ Real Customer Case Studies
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- CustomerCase Studies
+ Customer Case Studies
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- IndustryfirstEnterpriseifwhatUsage AgentFlow ImplementBusinessAutomation, Improverate
+ See how industry-leading enterprises use AgentFlow to implement business automation and boost efficiency
  </p>
  </div>
  </section>
@@ -109,7 +109,7 @@ export default function CaseStudiesPage() {
  {/* Featured Cases */}
  <section className="py-12 px-6">
  <div className="max-w-5xl mx-auto">
- <h2 className="lobe-section-header mb-8">FeaturedCase Studies</h2>
+ <h2 className="lobe-section-header mb-8">Featured Case Studies</h2>
  <div className="grid md:grid-cols-2 gap-6">
  {caseStudies
  .filter((c) => c.featured)
@@ -165,7 +165,7 @@ export default function CaseStudiesPage() {
 
  <Link href={`/case-studies/${study.id}`}>
  <Button variant="outline" className="w-full rounded-full border-border/50 text-foreground-light">
- ViewDetails
+ View Details
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
@@ -178,7 +178,7 @@ export default function CaseStudiesPage() {
  {/* All Cases */}
  <section className="py-12 px-6 bg-gradient-section">
  <div className="max-w-5xl mx-auto">
- <h2 className="lobe-section-header mb-8">AllCase Studies</h2>
+ <h2 className="lobe-section-header mb-8">All Case Studies</h2>
  <div className="space-y-4">
  {caseStudies.map((study) => (
  <Link
@@ -234,21 +234,21 @@ export default function CaseStudiesPage() {
  <section className="py-16 px-6">
  <div className="max-w-4xl mx-auto text-center">
  <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">
- wantasdown1SuccessCase Studies?
+ Want to Be Our Next Success Story?
  </h2>
  <p className="text-[13px] text-foreground-light mb-6">
- Contact Us, AgentFlow ifwhatHelpyou'sBusinessImplementAutomation
+ Contact us to learn how AgentFlow can help your business implement automation
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/demo">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- AppointmentDemo
+ Schedule a Demo
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/contact">
  <Button size="lg" variant="outline" className="rounded-full border-border/50 text-foreground-light hover:text-foreground">
- ContactSales
+ Contact Sales
  </Button>
  </Link>
  </div>

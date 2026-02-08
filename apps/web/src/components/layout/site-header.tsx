@@ -50,45 +50,45 @@ const dropdownMenus = [
  {
  label: "Product",
  items: [
- { label: "FeaturesIntroduction", href: "/features", icon: Sparkles, desc: "ExploreCompleteFeaturesList" },
- { label: "useexample", href: "/use-cases", icon: Target, desc: "ViewIndustryAppScenario" },
- { label: "Template Gallery", href: "/templates", icon: BookOpen, desc: "BrowseWorkflowTemplate" },
- { label: "App Store", href: "/store", icon: ShoppingCart, desc: "DiscovermoremultipleIntegration" },
- { label: "Pricing", href: "/pricing", icon: CreditCard, desc: "ViewPlanandPrice" },
- { label: "Enterprise", href: "/enterprise", icon: Building2, desc: "Enterprise-gradeResolvePlan" },
+{ label: "Features", href: "/features", icon: Sparkles, desc: "Explore features" },
+  { label: "Use cases", href: "/use-cases", icon: Target, desc: "Industry scenarios" },
+ { label: "Template Gallery", href: "/templates", icon: BookOpen, desc: "Browse workflow templates" },
+ { label: "App Store", href: "/store", icon: ShoppingCart, desc: "Discover more integrations" },
+ { label: "Pricing", href: "/pricing", icon: CreditCard, desc: "View plans and pricing" },
+ { label: "Enterprise", href: "/enterprise", icon: Building2, desc: "Enterprise solutions" },
  ],
  },
  {
  label: "Resource",
  items: [
- { label: "Documentcenter", href: "/docs", icon: FileText, desc: "QuickGetting StartedGuide" },
+ { label: "Document Center", href: "/docs", icon: FileText, desc: "Quick getting started guide" },
  { label: "Developers", href: "/developers", icon: Code2, desc: "API and SDK" },
- { label: "Blog", href: "/blog", icon: Newspaper, desc: "What's NewandTutorial" },
- { label: "ActivityandLive", href: "/events", icon: Calendar, desc: "lineonlinedownActivity" },
- { label: "Case Studies", href: "/case-studies", icon: Award, desc: "CustomerSuccess" },
- { label: "LearnCourse", href: "/learn/courses", icon: BookOpen, desc: "SystemLearnTutorial" },
+ { label: "Blog", href: "/blog", icon: Newspaper, desc: "What's new and tutorials" },
+ { label: "Activity & Live", href: "/events", icon: Calendar, desc: "Live and online activity" },
+ { label: "Case Studies", href: "/case-studies", icon: Award, desc: "Customer success" },
+ { label: "Learn", href: "/learn/courses", icon: BookOpen, desc: "System learning tutorials" },
  ],
  },
  {
  label: "Community",
  items: [
- { label: "Community", href: "/community", icon: Users, desc: "JoinDevelopersCommunity" },
- { label: "Partners", href: "/partners", icon: Handshake, desc: "PartnersPlan" },
- { label: "Referral Program", href: "/referral-program", icon: Gift, desc: "RecommendedRewards" },
- { label: "SupportandTicket", href: "/support", icon: LifeBuoy, desc: "FetchTechnologySupport" },
- { label: "Help Center", href: "/help", icon: HelpCircle, desc: "FAQResolve" },
- { label: "Contact Us", href: "/contact", icon: Mail, desc: "ContactSalesTeam" },
+ { label: "Community", href: "/community", icon: Users, desc: "Join the developers community" },
+ { label: "Partners", href: "/partners", icon: Handshake, desc: "Partners plan" },
+ { label: "Referral Program", href: "/referral-program", icon: Gift, desc: "Recommended rewards" },
+ { label: "Support & tickets", href: "/support", icon: LifeBuoy, desc: "Get technical support" },
+ { label: "Help Center", href: "/help", icon: HelpCircle, desc: "FAQ and resolve" },
+ { label: "Contact Us", href: "/contact", icon: Mail, desc: "Contact the sales team" },
  ],
  },
 ];
 
-// ===== MoveendpointCompleteMenu =====
+// ===== Mobile Full Menu =====
 const mobileMenuSections = [
  {
  title: "Product",
  items: [
  { label: "Features", href: "/features" },
- { label: "useexample", href: "/use-cases" },
+ { label: "Use cases", href: "/use-cases" },
  { label: "Template Gallery", href: "/templates" },
  { label: "App Store", href: "/store" },
  { label: "Pricing", href: "/pricing" },
@@ -98,21 +98,21 @@ const mobileMenuSections = [
  {
  title: "Resource",
  items: [
- { label: "Documentcenter", href: "/docs" },
+ { label: "Document Center", href: "/docs" },
  { label: "Developers", href: "/developers" },
  { label: "Blog", href: "/blog" },
- { label: "ActivityandLive", href: "/events" },
+ { label: "Activity & Live", href: "/events" },
  { label: "Case Studies", href: "/case-studies" },
- { label: "LearnCourse", href: "/learn/courses" },
+ { label: "Learn courses", href: "/learn/courses" },
  ],
  },
  {
- title: "CommunityandSupport",
+ title: "Community & Support",
  items: [
  { label: "Community", href: "/community" },
  { label: "Partners", href: "/partners" },
  { label: "Referral Program", href: "/referral-program" },
- { label: "SupportandTicket", href: "/support" },
+ { label: "Support & tickets", href: "/support" },
  { label: "Help Center", href: "/help" },
  { label: "Contact Us", href: "/contact" },
  ],
@@ -317,7 +317,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
  "transition-all duration-200"
  )}
  >
- StartUsage
+ Get Started
  </Button>
  </Link>
 
@@ -381,7 +381,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
  "text-background font-medium"
  )}
  >
- StartUsage
+ Get Started
  </Button>
  </Link>
  </div>

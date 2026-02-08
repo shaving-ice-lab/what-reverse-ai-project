@@ -27,58 +27,58 @@ import { cn } from "@/lib/utils";
 const securityFeatures = [
  {
  icon: Lock,
- title: "DataEncrypt",
- description: "AllDataTransferUsage TLS 1.3 Encrypt, SensitiveDataUsage AES-256 EncryptStorage",
- items: ["TransferEncrypt", "StorageEncrypt", "KeyManage"],
+ title: "Data Encryption",
+ description: "All data transfers use TLS 1.3 encryption; sensitive data is stored with AES-256 encryption",
+ items: ["Encryption in Transit", "Encryption at Rest", "Key Management"],
  },
  {
  icon: Server,
- title: "BasicInfrastructureSecurity",
- description: "Enterprise-gradeBasicInfrastructure, multipleRegionDeploy, 99.99% AvailableAssurance",
- items: ["multipleRegionDeploy", "AutoFault", "DDoS Protection"],
+ title: "Infrastructure Security",
+ description: "Enterprise-grade infrastructure with multi-region deployment and 99.99% availability guarantee",
+ items: ["Multi-Region Deployment", "Automatic Failover", "DDoS Protection"],
  },
  {
  icon: Database,
- title: "DataProtect",
- description: "Improve'sDataBackupandRestoreMechanism, EnsureDataSecurity",
- items: ["AutoBackup", "Restore", "DataIsolate"],
+ title: "Data Protection",
+ description: "Advanced data backup and recovery mechanisms to ensure data safety",
+ items: ["Automatic Backup", "Disaster Recovery", "Data Isolation"],
  },
  {
  icon: Eye,
- title: "AccessControl",
- description: "'sPermissionManage, Support SSO andmultipleAuthentication",
- items: ["RolePermission", "SSO Integration", "MFA Authentication"],
+ title: "Access Control",
+ description: "Fine-grained permission management with SSO and multi-factor authentication support",
+ items: ["Role-Based Permissions", "SSO Integration", "MFA Authentication"],
  },
  {
  icon: FileCheck,
  title: "Audit Log",
- description: "Complete'sActionAudit Log, atComplianceReview",
- items: ["ActionLogs", "Sign InRecord", "ChangeTrack"],
+ description: "Comprehensive activity audit logs for compliance review",
+ items: ["Activity Logs", "Login Records", "Change Tracking"],
  },
  {
  icon: AlertTriangle,
- title: "Detect",
- description: "Real-timeMonitorandExceptionDetect, QuickResponseSecurityEvent",
- items: ["Real-timeMonitor", "ExceptionDetect", "SecurityAlert"],
+ title: "Threat Detection",
+ description: "Real-time monitoring and anomaly detection for rapid security incident response",
+ items: ["Real-time Monitoring", "Anomaly Detection", "Security Alerts"],
  },
 ];
 
-// ComplianceAuthentication
+// Compliance Certifications
 const certifications = [
- { name: "SOC 2 Type II", description: "Via SOC 2 Type II SecurityAudit", icon: "🛡️" },
- { name: "ISO 27001", description: "InfoSecurityManageAuthentication", icon: "📜" },
- { name: "GDPR", description: "DataProtect", icon: "🇪🇺" },
- { name: "etc3", description: "NetworkSecurityetcProtect", icon: "🇨🇳" },
+ { name: "SOC 2 Type II", description: "Passed SOC 2 Type II security audit", icon: "🛡️" },
+ { name: "ISO 27001", description: "Information security management certification", icon: "📜" },
+ { name: "GDPR", description: "European data protection compliance", icon: "🇪🇺" },
+ { name: "MLPS Level 3", description: "Network security compliance", icon: "🇨🇳" },
 ];
 
-// SecurityPractice
+// Security Practices
 const practices = [
- "PeriodicSecurityAuditandPenetrationTest",
- "SecurityDevelopmentweeks (SDL)",
- "VulnerabilityandResponsePlan",
- "EmployeeSecurityTraining",
- "shouldSecurityEvaluate",
- "DataAccessMinimumthen",
+ "Regular security audits and penetration testing",
+ "Security Development Lifecycle (SDL)",
+ "Vulnerability disclosure and response plan",
+ "Employee security awareness training",
+ "Vendor security assessments",
+ "Principle of least privilege for data access",
 ];
 
 export default function SecurityPage() {
@@ -93,29 +93,29 @@ export default function SecurityPage() {
  <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
  <div className="lobe-badge mb-8">
  <Shield className="h-3.5 w-3.5" />
- <span>Enterprise-gradeSecurity</span>
+ <span>Enterprise-Grade Security</span>
  </div>
 
  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- you'sDataSecurity
+ Your Data Security
  <br />
- <span className="gradient-text-brand">isWe'sneedTask</span>
+ <span className="gradient-text-brand">Is Our Top Priority</span>
  </h1>
 
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- WeuseIndustryfirst'sSecurityMeasureandComplianceStandard, Ensureyou'sDatatomostAdvanced'sProtect
+ We use industry-leading security measures and compliance standards to ensure your data receives the most advanced protection
  </p>
 
  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
  <Link href="/docs/security">
  <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">
- ViewSecurityDocument
+ View Security Documentation
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/contact?type=security">
  <Button size="lg" variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50 h-12 px-8">
- ContactSecurityTeam
+ Contact Security Team
  </Button>
  </Link>
  </div>
@@ -126,8 +126,8 @@ export default function SecurityPage() {
  <section className="py-16 px-6">
  <div className="max-w-5xl mx-auto">
  <div className="lobe-section-header">
- <h2>ComplianceAuthentication</h2>
- <p>Compliance certifications</p>
+ <h2>Compliance & Certifications</h2>
+ <p>Industry-standard security certifications</p>
  </div>
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {certifications.map((cert) => (
@@ -153,8 +153,8 @@ export default function SecurityPage() {
  <section className="py-20 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="lobe-section-header">
- <h2>Security</h2>
- <p>Security features</p>
+ <h2>Security Features</h2>
+ <p>Comprehensive protection for your data and workflows</p>
  </div>
  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
  {securityFeatures.map((feature) => (
@@ -194,8 +194,8 @@ export default function SecurityPage() {
  <section className="py-24 sm:py-32 px-6">
  <div className="max-w-4xl mx-auto">
  <div className="lobe-section-header">
- <h2>SecurityPractice</h2>
- <p>Security practices</p>
+ <h2>Security Practices</h2>
+ <p>How we keep your data safe</p>
  </div>
  <div className="grid sm:grid-cols-2 gap-4">
  {practices.map((practice) => (
@@ -219,14 +219,14 @@ export default function SecurityPage() {
  <Shield className="w-5 h-5 text-background" />
  </div>
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- DiscoverSecurityIssue?
+ Found a Security Issue?
  </h2>
  <p className="text-foreground-light mb-10">
- Were-visualSecurityResearchperson'sContribution, WelcomeResponsibilityReportSecurityVulnerability
+ We value the contributions of security researchers and welcome responsible disclosure of security vulnerabilities
  </p>
  <Link href="mailto:security@agentflow.ai">
  <Button size="lg" variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50 h-12 px-8">
- ReportSecurityIssue
+ Report a Security Issue
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

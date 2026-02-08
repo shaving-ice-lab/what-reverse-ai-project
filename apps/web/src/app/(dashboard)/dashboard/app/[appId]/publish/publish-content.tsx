@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * App PublishSettingspage - Supabase Style
- * AccessPolicy / AnonymousToggle / Rate LimitingandProtection
+ * App Publish Settings Page - Supabase Style
+ * Access Policy / Anonymous Toggle / Rate Limiting and Protection
  */
 
 import React, { useEffect, useState } from "react";
@@ -58,7 +58,7 @@ const statusConfig: Record<
 > = {
  draft: { label: "Draft", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
  published: { label: "Published", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- deprecated: { label: "alreadydownline", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
+  deprecated: { label: "Deprecated", color: "text-warning", bgColor: "bg-warning-200", icon: AlertCircle },
  archived: { label: "Archived", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Archive },
 };
 
@@ -66,35 +66,35 @@ const accessModeConfig: Record<
  string,
  { label: string; description: string; icon: React.ElementType }
 > = {
- private: { label: "PrivateAccess", description: "only workspace MembercanAccess", icon: Lock },
- public_auth: { label: "PublicAccess(needSign In)", description: "Sign InUsercanAccess", icon: Users },
- public_anonymous: { label: "PublicAccess(Anonymous)", description: "whatpersoncanAccess", icon: Globe },
+  private: { label: "Private Access", description: "Only workspace members can access", icon: Lock },
+  public_auth: { label: "Public Access (Sign-in Required)", description: "Signed-in users can access", icon: Users },
+  public_anonymous: { label: "Public Access (Anonymous)", description: "Anyone can access", icon: Globe },
 };
 
 const rateLimitLabels: Record<RateLimitKey, string> = {
- per_minute: "eachmin",
- per_hour: "eachh",
- per_day: "eachday",
+  per_minute: "Per Minute",
+  per_hour: "Per Hour",
+  per_day: "Per Day",
 };
 
 const domainStatusConfig: Record<
  string,
  { label: string; color: string; bgColor: string }
 > = {
- active: { label: "alreadyTake Effect", color: "text-brand-500", bgColor: "bg-brand-200" },
+  active: { label: "Active", color: "text-brand-500", bgColor: "bg-brand-200" },
  verified: { label: "Verified", color: "text-brand-500", bgColor: "bg-brand-200" },
  verifying: { label: "Verifying", color: "text-warning", bgColor: "bg-warning-200" },
- pending: { label: "pendingVerify", color: "text-foreground-muted", bgColor: "bg-surface-200" },
- failed: { label: "VerifyFailed", color: "text-destructive", bgColor: "bg-destructive/10" },
- blocked: { label: "alreadyBlock", color: "text-destructive", bgColor: "bg-destructive/10" },
+  pending: { label: "Pending Verification", color: "text-foreground-muted", bgColor: "bg-surface-200" },
+  failed: { label: "Verification Failed", color: "text-destructive", bgColor: "bg-destructive/10" },
+  blocked: { label: "Blocked", color: "text-destructive", bgColor: "bg-destructive/10" },
 };
 
-// EdgeNavigation
+// Sidebar Navigation
 function AppNav({ appId, activeTab }: { appId: string; activeTab: string }) {
  const navItems = [
  { id: "overview", label: "Overview", href: `/dashboard/app/${appId}` },
  { id: "builder", label: "Build", href: `/dashboard/app/${appId}/builder` },
- { id: "publish", label: "PublishSettings", href: `/dashboard/app/${appId}/publish` },
+  { id: "publish", label: "Publish Settings", href: `/dashboard/app/${appId}/publish` },
  { id: "versions", label: "Version History", href: `/dashboard/app/${appId}/versions` },
  { id: "monitoring", label: "Monitor", href: `/dashboard/app/${appId}/monitoring` },
  { id: "domains", label: "Domain", href: `/dashboard/app/${appId}/domains` },
@@ -177,8 +177,8 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  appApi.get(appId),
  appApi.getAccessPolicy(appId).catch(() => null),
  appApi.getDomains(appId).catch(() => {
- setDomainsError("DomainLoadFailed, Please try again laterRetry.");
- return [];
+        setDomainsError("Failed to load domains. Please try again later.");
+        return [];
  }),
  ]);
  setWorkspace(workspaceData);
@@ -187,7 +187,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  setDomains(domainsData);
  } catch (error) {
  console.error("Failed to load publish settings:", error);
- setLoadError("LoadFailed, Please try again laterRetry.");
+    setLoadError("Failed to load. Please try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -222,7 +222,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  setRequireCaptcha(Boolean(sourcePolicy.require_captcha));
  }, [accessPolicy, app?.access_policy]);
 
- // fromCurrent Version config_json.public_seo SEO
+  // Load SEO from current version config_json.public_seo
  useEffect(() => {
  const raw = (app?.current_version?.config_json as any)?.public_seo;
  if (!raw || typeof raw !== "object") return;
@@ -255,13 +255,13 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  const daysToExpiry = nextExpiry
  ? Math.ceil((nextExpiry.getTime() - Date.now()) / 86400000)
  : null;
- const expiryLabel = nextExpiry ? nextExpiry.toLocaleDateString("zh-CN"): "NonetoInfo";
- const expiryReminder =
- daysToExpiry === null
- ? "NoneRenewalReminder"
- : daysToExpiry <= 30
- ? `Distancetostillhas ${daysToExpiry} days, SuggestionbeforeRenewal`
-: `Distancetostillhas ${daysToExpiry} days`;
+  const expiryLabel = nextExpiry ? nextExpiry.toLocaleDateString("en-US"): "No info available";
+  const expiryReminder =
+    daysToExpiry === null
+    ? "No renewal reminder"
+    : daysToExpiry <= 30
+    ? `${daysToExpiry} days remaining — consider renewing soon`
+    : `${daysToExpiry} days remaining`;
 
  const resetSaveNotice = () => {
  if (saveMessage) setSaveMessage(null);
@@ -326,10 +326,10 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  require_captcha: requireCaptcha,
  });
  setAccessPolicy(updated);
- setSaveMessage("AccessPolicySaved.");
+      setSaveMessage("Access policy saved.");
  } catch (error) {
  console.error("Failed to update access policy:", error);
- setSaveError("SaveFailed, Please try again laterRetry.");
+      setSaveError("Failed to save. Please try again later.");
  } finally {
  setIsSaving(false);
  }
@@ -348,7 +348,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  setTimeout(() => setSeoSaved(false), 2000);
  } catch (error) {
  console.error("Failed to update public SEO:", error);
- setSeoSaveError("SEO SaveFailed, Please try again laterRetry.");
+      setSeoSaveError("Failed to save SEO settings. Please try again later.");
  } finally {
  setIsSavingSEO(false);
  }
@@ -356,17 +356,17 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
 
  const handlePublish = async () => {
  if (!app) return;
- if (!confirm("ConfirmPublishApp??")) return;
+    if (!confirm("Are you sure you want to publish this app?")) return;
  try {
  setIsPublishing(true);
  setPublishError(null);
  setPublishMessage(null);
  const updated = await appApi.publish(appId);
  setApp(updated);
- setPublishMessage("PublishRequestalreadySubmit.");
+      setPublishMessage("Publish request submitted.");
  } catch (error) {
  console.error("Failed to publish app:", error);
- setPublishError("PublishFailed, Please try again laterRetry.");
+      setPublishError("Failed to publish. Please try again later.");
  } finally {
  setIsPublishing(false);
  }
@@ -374,7 +374,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
 
  const handleSaveDraft = () => {
  setPublishError(null);
- setPublishMessage("DraftSaved, not yetforoutsidePublish.");
+    setPublishMessage("Draft saved. Not yet published externally.");
  };
 
  const handleCopyLink = async (value: string) => {
@@ -405,7 +405,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  return (
  <PageContainer>
  <div className="text-center py-16">
- <p className="text-foreground-muted">AppDoes not existorDeleted</p>
+          <p className="text-foreground-muted">App does not exist or has been deleted</p>
  </div>
  </PageContainer>
  );
@@ -419,11 +419,11 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  >
  <PageContainer>
  <PageHeader
- title="PublishSettings"
- eyebrow={app?.name}
- description="ConfigAccessPolicy, AnonymousAccessandRate LimitingRule, EnsurePublishSecuritycan."
- backHref={`/dashboard/app/${appId}`}
- backLabel="BackAppOverview"
+          title="Publish Settings"
+          eyebrow={app?.name}
+          description="Configure access policies, anonymous access, and rate limiting rules to ensure secure publishing."
+          backHref={`/dashboard/app/${appId}`}
+          backLabel="Back to App Overview"
  icon={<SlidersHorizontal className="w-4 h-4" />}
  actions={
  <div className="flex items-center gap-2">
@@ -433,14 +433,14 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </Button>
  <Button size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/builder`}>
- EnterBuild
+                Open Builder
  </Link>
  </Button>
  <PermissionGate permissions={permissions} required={["workspace_publish"]}>
  <Button size="sm" onClick={handlePublish} disabled={isPublishing}>
  {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- PublishApp
- </Button>
+              Publish App
+            </Button>
  </PermissionGate>
  </div>
  }
@@ -453,17 +453,17 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  )}
 
  <SettingsSection
- title="AccessPolicy"
- description="SettingsAccessRangeandAnonymous, canwithAccessApp"
+          title="Access Policy"
+ description="Configure access scope, anonymous access, and app permissions"
  footer={
  <div className="flex w-full flex-wrap items-center justify-between gap-3">
  <div className="text-[11px] text-foreground-muted">
- {!canPublish ? "CurrentRoleNonePublishPermission, onlycanViewSettings.": "SaveafterwillNowTake Effect."}
+              {!canPublish ? "Your current role does not have publish permissions. You can only view settings.": "Changes take effect immediately after saving."}
  </div>
  <PermissionGate permissions={permissions} required={["workspace_publish"]}>
  <Button onClick={handleSave} disabled={isSaving}>
  {isSaving && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- SaveSettings
+              Save Settings
  </Button>
  </PermissionGate>
  </div>
@@ -494,32 +494,32 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </div>
  </div>
 
- <FormRow label="Access" description="Private/needSign In/PublicAccess">
+        <FormRow label="Access" description="Private / Sign-in Required / Public Access">
  <Select
  value={accessMode}
  onValueChange={(value) => handleAccessModeChange(value as AppAccessPolicy["access_mode"])}
  disabled={!canPublish}
  >
  <SelectTrigger className="h-9 bg-surface-75 border-border" disabled={!canPublish}>
- <SelectValue placeholder="SelectAccess" />
+            <SelectValue placeholder="Select access mode" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  <SelectItem value="private">
  <span className="flex items-center gap-2">
  <Lock className="w-3.5 h-3.5" />
- PrivateAccess
- </span>
- </SelectItem>
- <SelectItem value="public_auth">
- <span className="flex items-center gap-2">
- <Users className="w-3.5 h-3.5" />
- PublicAccess(needSign In)
- </span>
- </SelectItem>
- <SelectItem value="public_anonymous">
- <span className="flex items-center gap-2">
- <Globe className="w-3.5 h-3.5" />
- PublicAccess(Anonymous)
+              Private Access
+              </span>
+            </SelectItem>
+            <SelectItem value="public_auth">
+              <span className="flex items-center gap-2">
+              <Users className="w-3.5 h-3.5" />
+              Public Access (Sign-in Required)
+              </span>
+            </SelectItem>
+            <SelectItem value="public_anonymous">
+              <span className="flex items-center gap-2">
+              <Globe className="w-3.5 h-3.5" />
+              Public Access (Anonymous)
  </span>
  </SelectItem>
  </SelectContent>
@@ -527,8 +527,8 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </FormRow>
 
  <ToggleRow
- label="AllowAnonymousAccess"
- description="EnableafterwillAllownot yetSign InUserDirectAccess"
+          label="Allow Anonymous Access"
+          description="When enabled, users who are not signed in can access directly"
  checked={isAnonymousAccess}
  onCheckedChange={handleAnonymousToggle}
  disabled={!canPublish || accessMode === "private"}
@@ -537,12 +537,12 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
 
  <div className="mt-6 space-y-6">
  <SettingsSection
- title="Rate LimitingandAccessProtection"
- description="LimitAccessrateandSource, ReduceuseRisk"
+          title="Rate Limiting and Access Protection"
+          description="Limit access rate and origins to reduce abuse risk"
  >
  <FormRow
  label="Rate Limit"
- description="EmptyRepresentnotLimit; SuggestionPublicAccesstimefewSettings1."
+            description="Leave empty for no limit. We recommend setting at least one limit for public access."
  >
  <div className="grid gap-3 sm:grid-cols-3">
  {(Object.keys(rateLimitLabels) as RateLimitKey[]).map((key) => (
@@ -550,7 +550,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  <Input
  type="number"
  min={1}
- placeholder="exampleif 60"
+                  placeholder="e.g. 60"
  value={rateLimits[key]}
  onChange={(event) => handleRateLimitChange(key, event.target.value)}
  disabled={!canPublish}
@@ -562,8 +562,8 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </FormRow>
 
  <FormRow
- label="AllowSource"
- description="LimitcanCall'sDomainSource, SupportCommaorrowSeparator."
+            label="Allowed Origins"
+ description="Restrict allowed domain origins for API calls. Supports comma or newline separators."
  >
  <Textarea
  placeholder="https://example.com, https://app.example.com"
@@ -577,8 +577,8 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </FormRow>
 
  <ToggleRow
- label="Verification CodeProtection"
- description="Enableafter, AnonymousAccesswillneedVerification Codewithfewuse."
+          label="CAPTCHA Protection"
+          description="When enabled, anonymous access requires a CAPTCHA verification to prevent abuse."
  checked={requireCaptcha}
  onCheckedChange={(checked) => {
  resetSaveNotice();
@@ -589,28 +589,28 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </SettingsSection>
 
  <SettingsSection
- title="SEO andShare"
- description="foroutsideAccesspage'sTitle, DescriptionandShareLink"
+          title="SEO and Sharing"
+ description="Title, description, and share link for the public access page"
  compact
  >
- <FormRow label="SEO Title" description="Used forSearchandShareShowcase">
+        <FormRow label="SEO Title" description="Used for search results and share previews">
  <Input
- placeholder="Please enterTitle"
+            placeholder="Enter a title"
  value={seoTitle}
  onChange={(event) => setSeoTitle(event.target.value)}
  disabled={!canPublish}
  />
  </FormRow>
- <FormRow label="SEO Description" description="needIntroductionAppvalue">
+        <FormRow label="SEO Description" description="A brief introduction of your app's value">
  <Textarea
- placeholder="Please enterDescription"
+            placeholder="Enter a description"
  value={seoDesc}
  onChange={(event) => setSeoDesc(event.target.value)}
  className="min-h-[80px]"
  disabled={!canPublish}
  />
  </FormRow>
- <FormRow label="ShareLink" description="foroutsidePublicAccessEntry">
+        <FormRow label="Share Link" description="Public access entry point for external users">
  <div className="flex items-center gap-2">
  <Input value={shareLink} readOnly />
  <Button
@@ -620,7 +620,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  disabled={!shareLink}
  >
  <Copy className="w-4 h-4 mr-1" />
- {linkCopied ? "alreadyCopy": "Copy"}
+              {linkCopied ? "Copied": "Copy"}
  </Button>
  </div>
  </FormRow>
@@ -644,8 +644,8 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </SettingsSection>
 
  <SettingsSection
- title="DomainBindSummary"
- description="ViewCurrentDomainBind, VerifyProgressandRenewalReminder"
+          title="Domain Binding Summary"
+          description="View current domain bindings, verification progress, and renewal reminders"
  compact
  >
  {domainsError && (
@@ -656,14 +656,14 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
 
  {!hasDomains ? (
  <div className="rounded-md border border-border bg-surface-75 p-4">
- <div className="text-[12px] text-foreground-light">UnboundCustom Domain.</div>
- <div className="mt-2 text-[11px] text-foreground-muted">
- BindDomainaftercanCustomAccessEntryandImproveBrandcan.
- </div>
+            <div className="text-[12px] text-foreground-light">No custom domain bound.</div>
+            <div className="mt-2 text-[11px] text-foreground-muted">
+              Binding a domain lets you customize the access entry and improve brand visibility.
+            </div>
  <div className="mt-3">
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/domains`}>
- goBindDomain
+                Bind Domain
  </Link>
  </Button>
  </div>
@@ -673,13 +673,13 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  <div className="grid gap-3 md:grid-cols-3">
  <div className="rounded-md border border-border bg-surface-75 p-3">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- CurrentDomain
+                  Current Domain
  </div>
  <div className="mt-2 text-[12px] text-foreground">{primaryDomain}</div>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-3">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- VerifyStatus
+                  Verification Status
  </div>
  <div className="mt-2">
  <Badge
@@ -692,7 +692,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-3">
  <div className="text-[10px] uppercase tracking-wider text-foreground-muted">
- RenewalReminder
+                  Renewal Reminder
  </div>
  <div className="mt-2 text-[12px] text-foreground">{expiryLabel}</div>
  <div className={cn("mt-1 text-[11px]", daysToExpiry !== null && daysToExpiry <= 30 ? "text-warning" : "text-foreground-muted")}>
@@ -703,17 +703,17 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  <div className="mt-3">
  <Button variant="outline" size="sm" asChild>
  <Link href={`/dashboard/app/${appId}/domains`}>
- ManageDomain
- </Link>
- </Button>
- </div>
- </>
- )}
- </SettingsSection>
+                Manage Domain
+              </Link>
+            </Button>
+          </div>
+          </>
+        )}
+        </SettingsSection>
 
- <SettingsSection
- title="PublishStatus"
- description="ViewCurrentPublishStatusandAccessEntry"
+        <SettingsSection
+          title="Publish Status"
+          description="View current publish status and access entry"
  compact
  >
  {(publishMessage || publishError) && (
@@ -750,7 +750,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
 
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[11px] text-foreground-muted uppercase tracking-wider">
- AccessEntry
+              Access Entry
  </div>
  <div className="mt-2">
  {runtimeEntryUrl ? (
@@ -758,11 +758,11 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  href={runtimeEntryUrl}
  className="inline-flex items-center gap-1 text-[12px] text-brand-500 hover:text-brand-600"
  >
- OpenRunpage
+              Open Runtime Page
  <ExternalLink className="w-3 h-3" />
  </Link>
  ) : (
- <span className="text-[12px] text-foreground-muted">PleasefirstConfig workspace/app slug</span>
+              <span className="text-[12px] text-foreground-muted">Please configure workspace/app slug first</span>
  )}
  </div>
  </div>
@@ -772,32 +772,32 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  <PermissionGate permissions={permissions} required={["workspace_publish"]}>
  <Button onClick={handlePublish} disabled={isPublishing}>
  {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- {app?.status === "published" ? "re-newPublish": "PublishApp"}
+              {app?.status === "published" ? "Republish": "Publish App"}
  </Button>
  </PermissionGate>
  <Button variant="outline" asChild>
  <Link href={`/dashboard/app/${appId}/domains`}>
- ManageDomain
- </Link>
- </Button>
- </div>
- </SettingsSection>
+                Manage Domain
+              </Link>
+            </Button>
+          </div>
+          </SettingsSection>
 
- <SettingsSection
- title="PublishAction"
- description="Publish, SaveDraftorCancelAction"
+        <SettingsSection
+          title="Publish Actions"
+          description="Publish, save draft, or cancel"
  compact
  >
  <div className="flex flex-wrap items-center gap-2">
  <PermissionGate permissions={permissions} required={["workspace_publish"]}>
  <Button onClick={handlePublish} disabled={isPublishing}>
  {isPublishing && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- {app?.status === "published" ? "re-newPublish": "Publish"}
+              {app?.status === "published" ? "Republish": "Publish"}
  </Button>
  </PermissionGate>
  <PermissionGate permissions={permissions} required={["workspace_edit"]}>
  <Button variant="outline" onClick={handleSaveDraft} disabled={!canEdit}>
- SaveDraft
+              Save Draft
  </Button>
  </PermissionGate>
  <Button variant="ghost" asChild>
@@ -805,7 +805,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  </Button>
  </div>
  <div className="mt-2 text-[11px] text-foreground-muted">
- SaveDraftnotwillforoutsidePublish, onlyRetainCurrentConfigandAccessPolicySettings.
+              Saving as draft will not publish externally. It only retains the current configuration and access policy settings.
  </div>
  </SettingsSection>
  </div>

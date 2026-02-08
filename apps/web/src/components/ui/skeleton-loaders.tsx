@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SkeletonLoadComponentCollection
- * Used forPageLoadStatus'sShowcase
+ * Skeleton Loader Component Collection
+ * Used for page loading state display
  */
 
 import { cn } from "@/lib/utils";
@@ -273,7 +273,7 @@ export function NavSkeleton({ items = 5, className }: NavSkeletonProps) {
 }
 
 // ============================================
-// PageSkeleton(group)
+// Page Skeleton (Composite)
 // ============================================
 
 interface PageSkeletonProps {
@@ -283,7 +283,7 @@ interface PageSkeletonProps {
 export function PageSkeleton({ className }: PageSkeletonProps) {
  return (
  <div className={cn("space-y-6 p-6", className)}>
- {/* PageTitle */}
+ {/* Page Title */}
  <div className="flex items-center justify-between">
  <div className="space-y-2">
  <Skeleton className="h-7 w-48" />
@@ -292,17 +292,17 @@ export function PageSkeleton({ className }: PageSkeletonProps) {
  <Skeleton className="h-10 w-32 rounded-md" />
  </div>
 
- {/* StatisticsCard */}
+ {/* Statistics Cards */}
  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
  {Array.from({ length: 4 }).map((_, i) => (
  <StatCardSkeleton key={i} />
  ))}
  </div>
 
- {/* mainContent */}
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
- <div className="lg:col-span-2">
- <TableSkeleton rows={5} columns={4} />
+     {/* Main Content */}
+     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+       <div className="lg:col-span-2">
+         <TableSkeleton rows={5} columns={4} />
  </div>
  <div className="space-y-4">
  <CardSkeleton />
@@ -324,7 +324,7 @@ interface DashboardSkeletonProps {
 export function DashboardSkeleton({ className }: DashboardSkeletonProps) {
  return (
  <div className={cn("space-y-6", className)}>
- {/* WelcomeRegion */}
+ {/* Welcome Section */}
  <div className="p-6 rounded-xl border border-border bg-card">
  <div className="flex items-center justify-between">
  <div className="space-y-2">
@@ -346,9 +346,9 @@ export function DashboardSkeleton({ className }: DashboardSkeletonProps) {
  ))}
  </div>
 
- {/* mainContent */}
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
- <div className="lg:col-span-2 space-y-4">
+     {/* Main Content */}
+     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+       <div className="lg:col-span-2 space-y-4">
  {Array.from({ length: 3 }).map((_, i) => (
  <ListItemSkeleton key={i} hasAvatar hasActions />
  ))}

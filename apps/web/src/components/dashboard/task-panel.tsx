@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * TodoTaskPanel
+ * Task Panel
  * 
- * TodaypendingExecuteTask, FailedneedProcess'sWorkflow, QuickActionEntry
- * fromAPILoadFailed'sExecuteRecordandpendingExecute'sWorkflow
+ * Today's pending tasks, failed workflows needing attention, and quick action entries
+ * Load failed execution records and pending workflows from API
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -56,30 +56,32 @@ export function TaskPanel({ className }: TaskPanelProps) {
  const [activeTab, setActiveTab] = useState<"all" | "failed" | "scheduled">("all");
  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
- // LoadFailed'sExecuteRecord
+ // Load failed execution records
  const loadTasks = useCallback(async () => {
- setIsLoading(true);
- try {
- // LoadFailed'sExecuteRecord
+   setIsLoading(true);
+   try {
+     // Load failed execution records
  const failedResponse = await executionApi.list({
  status: "failed",
  pageSize: 10,
  });
  
- // LoadpendingExecute(pending)'sExecuteRecord
+     // Load pending execution records
  const pendingResponse = await executionApi.list({
  status: "pending",
  pageSize: 5,
  });
  
- // Convertas Task Format
+     // Convert to task format
  const failedTasks: Task[] = (failedResponse.data || []).map((exec: ExecutionRecord) => ({
  id: exec.id,
  executionId: exec.id,
- workflowId: exec.workflowId", name: exec.workflowName || `Workflow ${exec.workflowId.slice(-6)}`", icon: exec.workflowIcon || "❌",
- status: "failed" as const,
- description: "ExecuteFailed",
- errorMessage: exec.errorMessage || "UnknownError",
+       workflowId: exec.workflowId,
+       name: exec.workflowName || `Workflow ${exec.workflowId.slice(-6)}`,
+       icon: exec.workflowIcon || "❌",
+       status: "failed" as const,
+       description: "Execution failed",
+       errorMessage: exec.errorMessage || "Unknown error",
  priority: "high" as const,
  }));
  
@@ -87,15 +89,16 @@ export function TaskPanel({ className }: TaskPanelProps) {
  id: exec.id,
  executionId: exec.id,
  workflowId: exec.workflowId,
- name: exec.workflowName || `Workflow ${exec.workflowId.slice(-6)}`", icon: exec.workflowIcon || "⏳",
- status: "pending" as const,
- description: "etcpendingExecute",
+       name: exec.workflowName || `Workflow ${exec.workflowId.slice(-6)}`,
+       icon: exec.workflowIcon || "⏳",
+       status: "pending" as const,
+       description: "Pending execution",
  priority: "medium" as const,
  }));
  
  setTasks([...failedTasks, ...pendingTasks]);
  } catch (err) {
- console.error("LoadTaskFailed:", err);
+     console.error("Failed to load tasks:", err);
  } finally {
  setIsLoading(false);
  }
@@ -136,10 +139,10 @@ export function TaskPanel({ className }: TaskPanelProps) {
  if (task?.executionId) {
  try {
  const response = await executionApi.retry(task.executionId);
- // Navigatetonew'sExecuteDetails
+ // Navigate to new execution details
  router.push(`/executions/${response.data.executionId}`);
  } catch (err) {
- console.error("RetryFailed:", err);
+       console.error("Failed to retry:", err);
  }
  }
  setActionMenuId(null);
@@ -160,8 +163,8 @@ export function TaskPanel({ className }: TaskPanelProps) {
  const hours = Math.floor(diff / 3600000);
  const minutes = Math.floor((diff % 3600000) / 60000);
 
- if (hours > 0) return `${hours}h ${minutes}m after`;
- return `${minutes}m after`;
+   if (hours > 0) return `in ${hours}h ${minutes}m`;
+   return `in ${minutes}m`;
  };
 
  const getPriorityColor = (priority?: Task["priority"]) => {
@@ -186,16 +189,16 @@ export function TaskPanel({ className }: TaskPanelProps) {
  <ListTodo className="w-5 h-5 text-orange-500" />
  </div>
  <div>
- <h3 className="font-bold text-foreground">TodoTask</h3>
+           <h3 className="font-bold text-foreground">Tasks</h3>
  <p className="text-xs text-muted-foreground">
  {failedCount > 0 && (
  <span className="text-red-500 font-medium">{failedCount} Failed</span>
  )}
  {failedCount > 0 && scheduledCount > 0 && ""}
  {scheduledCount > 0 && (
- <span>{scheduledCount} pendingExecute</span>
- )}
- {failedCount === 0 && scheduledCount === 0 && "NoneTask"}
+             <span>{scheduledCount} pending</span>
+           )}
+           {failedCount === 0 && scheduledCount === 0 && "No tasks"}
  </p>
  </div>
  </div>
@@ -229,7 +232,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
  )}
  >
- {tab === "all" && "allsection"}
+           {tab === "all" && "All"}
  {tab === "failed" && (
  <span className="flex items-center gap-1.5">
  <AlertCircle className="w-3.5 h-3.5" />
@@ -253,7 +256,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-orange-500/10 flex items-center justify-center">
  <Loader2 className="w-7 h-7 text-orange-500 animate-spin" />
  </div>
- <p className="text-sm font-medium text-muted-foreground">LoadTask...</p>
+           <p className="text-sm font-medium text-muted-foreground">Loading tasks...</p>
  </div>
  ) : filteredTasks.length === 0 ? (
  <div className="py-14 text-center">
@@ -261,10 +264,10 @@ export function TaskPanel({ className }: TaskPanelProps) {
  <CheckCircle2 className="w-8 h-8 text-primary" />
  </div>
  <p className="text-sm font-semibold text-foreground">
- {activeTab === "failed" ? "Great!": "TaskClear"}
- </p>
- <p className="text-xs text-muted-foreground mt-1">
- {activeTab === "failed" ? "NoFailed'sTask 🎉": "NoneTodoTask"}
+             {activeTab === "failed" ? "Great!" : "All clear"}
+           </p>
+           <p className="text-xs text-muted-foreground mt-1">
+             {activeTab === "failed" ? "No failed tasks 🎉" : "No pending tasks"}
  </p>
  </div>
  ) : (
@@ -283,7 +286,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  }}
  >
  <div className="flex items-start gap-3">
- {/* StatusIcon / DoneButton */}
+ {/* Status Icon / Done Button */}
  <button
  onClick={() => task.status === "pending" && handleCompleteTask(task.id)}
  className={cn(
@@ -305,7 +308,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  )}
  </button>
 
- {/* TaskInfo */}
+ {/* Task Info */}
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1.5">
  <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-base group-hover:scale-110 transition-transform">
@@ -331,7 +334,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  )}
  </div>
 
- {/* StatusInfo */}
+ {/* Status Info */}
  {task.status === "failed" && (
  <div className="flex items-center gap-2 text-xs mt-2">
  <span className="px-2 py-1 rounded-lg bg-red-500/10 text-red-500 ring-1 ring-red-500/20 truncate max-w-[200px]">
@@ -339,7 +342,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
  </span>
  {task.retryCount && (
  <span className="text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted/50">
- alreadyRetry {task.retryCount} times
+                   Retried {task.retryCount} times
  </span>
  )}
  </div>
@@ -353,8 +356,8 @@ export function TaskPanel({ className }: TaskPanelProps) {
  )}
  </div>
 
- {/* ActionButton */}
- <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200">
+{/* Action Buttons */}
+               <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200">
  {task.status === "failed" && (
  <button
  onClick={() => handleRetryTask(task.id)}
@@ -369,13 +372,13 @@ export function TaskPanel({ className }: TaskPanelProps) {
  <button
  onClick={() => handleRunTask(task.id)}
  className="p-2 rounded-xl hover:bg-primary/10 transition-all duration-200 text-muted-foreground hover:text-primary hover:scale-110"
- title="NowRun"
+                   title="Run Now"
  >
  <Play className="w-4 h-4" />
  </button>
  )}
 
- {/* moremultipleAction */}
+ {/* More Actions */}
  <div className="relative">
  <button
  onClick={() => setActionMenuId(actionMenuId === task.id ? null : task.id)}
@@ -411,18 +414,18 @@ export function TaskPanel({ className }: TaskPanelProps) {
  )}
  </div>
 
- {/* FooterQuickAction - Enhanced */}
+ {/* Footer Quick Actions - Enhanced */}
  <div className="p-4 border-t border-border/50 bg-gradient-to-r from-muted/30 via-transparent to-muted/30">
  <div className="flex items-center justify-between">
  <span className="text-xs text-muted-foreground flex items-center gap-2">
  <ListTodo className="w-3 h-3" />
- {tasks.length} Task
+           {tasks.length} tasks
  </span>
  <button
  onClick={() => router.push("/dashboard/executions?status=failed")}
  className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-orange-500/10 transition-colors group"
  >
- ViewAllExecuteRecord
+           View all execution records
  <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
  </button>
  </div>

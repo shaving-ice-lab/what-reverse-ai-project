@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Pagination PaginationComponent
+ * Pagination Component
  * 
  * Support: 
- * - multipletypestyleVariant
- * - Page NumberInputNavigate
- * - eachpageCountSelect
- * - Clean/Complete
+ * - Multiple style variants
+ * - Page number input navigation
+ * - Items per page selection
+ * - Clean/Complete modes
  */
 
 import * as React from "react"
@@ -22,25 +22,25 @@ import {
 import { cn } from "@/lib/utils"
 
 interface PaginationProps {
- /** CurrentPage Number(1-indexed) */
- page: number
- /** totalpagecount */
- totalPages: number
- /** Page NumberCallback */
- onPageChange: (page: number) => void
- /** Display'sPage NumberButtonCount */
- siblingCount?: number
- /** isnoDisplaytailpageButton */
- showFirstLast?: boolean
- /** isnoDisplayPage NumberInput */
- showInput?: boolean
- /** Variant */
- variant?: "default" | "outline" | "ghost" | "simple"
- /** Dimension */
- size?: "sm" | "default" | "lg"
- /** isnoDisable */
- disabled?: boolean
- className?: string
+  /** Current page number (1-indexed) */
+  page: number
+  /** Total page count */
+  totalPages: number
+  /** Page number change callback */
+  onPageChange: (page: number) => void
+  /** Display page number button count */
+  siblingCount?: number
+  /** Whether to display first/last page buttons */
+  showFirstLast?: boolean
+  /** Whether to display page number input */
+  showInput?: boolean
+  /** Variant */
+  variant?: "default" | "outline" | "ghost" | "simple"
+  /** Size */
+  size?: "sm" | "default" | "lg"
+  /** Whether to disable */
+  disabled?: boolean
+  className?: string
 }
 
 function Pagination({
@@ -55,15 +55,15 @@ function Pagination({
  disabled = false,
  className,
 }: PaginationProps) {
- const [inputValue, setInputValue] = React.useState(String(page))
+  const [inputValue, setInputValue] = React.useState(String(page))
 
- // SyncInputvalue
- React.useEffect(() => {
- setInputValue(String(page))
- }, [page])
+  // Sync input value
+  React.useEffect(() => {
+    setInputValue(String(page))
+  }, [page])
 
- // GeneratePage NumberRange
- const getPageRange = () => {
+  // Generate page number range
+  const getPageRange = () => {
  const totalNumbers = siblingCount * 2 + 3 // siblings + current + first + last
  const totalBlocks = totalNumbers + 2 // + 2 for dots
 
@@ -113,7 +113,7 @@ function Pagination({
  }
  }
 
- // Dimensionstyle
+ // Size styles
  const sizeStyles = {
  sm: "h-7 min-w-7 text-xs",
  default: "h-9 min-w-9 text-sm",
@@ -126,7 +126,7 @@ function Pagination({
  lg: "w-5 h-5",
  }
 
- // Buttonstyle
+ // Button styles
  const getButtonStyles = (isActive: boolean, isDisabled: boolean) => {
  const base = cn(
  "inline-flex items-center justify-center rounded-lg font-medium",
@@ -180,31 +180,31 @@ function Pagination({
  return (
  <nav
  className={cn("flex items-center gap-1", className)}
- aria-label="PaginationNavigation"
+ aria-label="Pagination"
  >
- {/* HomeButton */}
+ {/* First Page Button */}
  {showFirstLast && (
  <button
  onClick={() => onPageChange(1)}
  disabled={disabled || page === 1}
  className={getButtonStyles(false, disabled || page === 1)}
- aria-label="#1page"
+ aria-label="First page"
  >
  <ChevronsLeft className={iconSizes[size]} />
  </button>
  )}
 
- {/* on1pageButton */}
+ {/* Previous Page Button */}
  <button
  onClick={() => onPageChange(page - 1)}
  disabled={disabled || page === 1}
  className={getButtonStyles(false, disabled || page === 1)}
- aria-label="on1page"
+ aria-label="Previous page"
  >
  <ChevronLeft className={iconSizes[size]} />
  </button>
 
- {/* Page NumberButton */}
+ {/* Page Number Buttons */}
  {pages.map((pageNum, index) => {
  if (pageNum === "dots") {
  return (
@@ -227,7 +227,7 @@ function Pagination({
  onClick={() => onPageChange(pageNum as number)}
  disabled={disabled}
  className={getButtonStyles(page === pageNum, disabled)}
- aria-label={`# ${pageNum} page`}
+ aria-label={`Page ${pageNum}`}
  aria-current={page === pageNum ? "page" : undefined}
  >
  {pageNum}
@@ -235,29 +235,29 @@ function Pagination({
  )
  })}
 
- {/* down1pageButton */}
+ {/* Next Page Button */}
  <button
  onClick={() => onPageChange(page + 1)}
  disabled={disabled || page === totalPages}
  className={getButtonStyles(false, disabled || page === totalPages)}
- aria-label="down1page"
+ aria-label="Next page"
  >
  <ChevronRight className={iconSizes[size]} />
  </button>
 
- {/* pageButton */}
+ {/* Last Page Button */}
  {showFirstLast && (
  <button
  onClick={() => onPageChange(totalPages)}
  disabled={disabled || page === totalPages}
  className={getButtonStyles(false, disabled || page === totalPages)}
- aria-label="mostafter1page"
+ aria-label="Last page"
  >
  <ChevronsRight className={iconSizes[size]} />
  </button>
  )}
 
- {/* Page NumberInput */}
+ {/* Page Number Input */}
  {showInput && (
  <form onSubmit={handleInputSubmit} className="flex items-center gap-2 ml-2">
  <span className="text-sm text-foreground-light">Navigate</span>
@@ -281,7 +281,7 @@ function Pagination({
 }
 
 /**
- * PaginationInfo - PaginationInfo
+ * PaginationInfo - Pagination Information Display
  */
 interface PaginationInfoProps {
  page: number
@@ -308,7 +308,7 @@ function PaginationInfo({
 }
 
 /**
- * PageSizeSelect - eachpageCountSelect
+ * PageSizeSelect - Items Per Page Selector
  */
 interface PageSizeSelectProps {
  value: number
@@ -327,7 +327,7 @@ function PageSizeSelect({
 }: PageSizeSelectProps) {
  return (
  <div className={cn("flex items-center gap-2", className)}>
- <span className="text-sm text-foreground-light">eachpage</span>
+ <span className="text-sm text-foreground-light">per page</span>
  <select
  value={value}
  onChange={(e) => onChange(Number(e.target.value))}
@@ -351,21 +351,21 @@ function PageSizeSelect({
 }
 
 /**
- * FullPagination - CompletePaginationComponent
+ * Full Pagination - Complete Pagination Component
  */
 interface FullPaginationProps extends PaginationProps {
- /** eachpageCount */
- pageSize: number
- /** totalDatacount */
- total: number
- /** eachpageCountCallback */
- onPageSizeChange?: (size: number) => void
- /** eachpageCountOption */
- pageSizeOptions?: number[]
- /** isnoDisplayPaginationInfo */
- showInfo?: boolean
- /** isnoDisplayeachpageCountSelect */
- showSizeChanger?: boolean
+  /** Items per page */
+  pageSize: number
+  /** Total data count */
+  total: number
+  /** Page size change callback */
+  onPageSizeChange?: (size: number) => void
+  /** Page size options */
+  pageSizeOptions?: number[]
+  /** Whether to display pagination info */
+  showInfo?: boolean
+  /** Whether to display page size selector */
+  showSizeChanger?: boolean
 }
 
 function FullPagination({
@@ -383,13 +383,13 @@ function FullPagination({
  className,
  ...paginationProps
 }: FullPaginationProps) {
- return (
- <div className={cn(
- "flex flex-col sm:flex-row items-center justify-between gap-4",
- className
- )}>
- {/* Left sideInfo */}
- <div className="flex items-center gap-4">
+  return (
+    <div className={cn(
+      "flex flex-col sm:flex-row items-center justify-between gap-4",
+      className
+    )}>
+      {/* Left side info */}
+      <div className="flex items-center gap-4">
  {showInfo && (
  <PaginationInfo
  page={page}
@@ -407,7 +407,7 @@ function FullPagination({
  )}
  </div>
 
- {/* Right sidePagination */}
+ {/* Right Side Pagination */}
  <Pagination
  page={page}
  totalPages={totalPages}
@@ -421,7 +421,7 @@ function FullPagination({
 }
 
 /**
- * SimplePagination - CleanPagination
+ * SimplePagination - Simple Pagination
  */
 interface SimplePaginationProps {
  page: number
@@ -452,7 +452,7 @@ function SimplePagination({
  )}
  >
  <ChevronLeft className="w-4 h-4" />
- on1page
+ Previous
  </button>
 
  <span className="text-sm text-foreground-light">
@@ -470,7 +470,7 @@ function SimplePagination({
  "disabled:opacity-50 disabled:cursor-not-allowed"
  )}
  >
- down1page
+ Next
  <ChevronRight className="w-4 h-4" />
  </button>
  </div>

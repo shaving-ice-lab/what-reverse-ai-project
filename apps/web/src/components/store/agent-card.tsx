@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Agent CardComponent
+ * Agent Card Component
  * 
- * Used forShowcase Agent 'sInfoCard, SupportHoverEffectandInteractive
+ * Displays agent info card with hover effects and interactive elements
  */
 
 import Link from "next/link";
@@ -25,7 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Agent, AgentCategory } from "@/types/agent";
 
-// CategoryIconMapping
+// Category Icon Mapping
 const categoryIconMap: Record<AgentCategory, typeof MessageSquare> = {
  content: FileText,
  data: BarChart3,
@@ -39,9 +39,9 @@ const categoryIconMap: Record<AgentCategory, typeof MessageSquare> = {
  other: Sparkles,
 };
 
-// Formatcountchar
+// Format count
 const formatCount = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+  if (num >= 10000) return `${(num / 1000).toFixed(0)}K`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
@@ -184,7 +184,7 @@ export function AgentCard({
  }}
  onClick={handleClick}
  >
- {/* MouseFollowLight Effect */}
+ {/* Mouse Follow Light Effect */}
  <div
  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
  style={{
@@ -193,7 +193,7 @@ export function AgentCard({
  }}
  />
 
- {/* TopGradient */}
+ {/* Top Gradient */}
  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
  {/* Thumbnail Preview */}
@@ -213,11 +213,11 @@ export function AgentCard({
  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
  <span className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
  <Eye className="w-4 h-4" />
- QuickPreview
+ Quick Preview
  </span>
  </div>
 
- {/* PopularTags */}
+ {/* Popular Tags */}
  {agent.useCount > 1000 && (
  <div className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-orange-500 text-white text-xs font-semibold flex items-center gap-1 shadow-lg">
  <Zap className="w-3 h-3" />

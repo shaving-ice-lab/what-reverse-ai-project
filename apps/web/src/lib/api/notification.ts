@@ -135,7 +135,7 @@ export const notificationApi = {
  },
 
  /**
- * Fetchnot yetreadNotificationsCount
+ * Fetch unread notifications count
  */
  async getUnreadCount(): Promise<GetUnreadCountResponse> {
  const response = await request<ApiResponse<UnreadCount>>("/notifications/unread-count");

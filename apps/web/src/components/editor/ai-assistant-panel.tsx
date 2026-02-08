@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * AI AssistantPanelComponent
+ * AI Assistant Panel Component
  *
  * Features: 
- * - ConversationInput
- * - ConversationHistoryDisplay
- * - GeneratePreview
- * - Generate/re-newGenerateButton
+ * - Conversation Input
+ * - Conversation History Display
+ * - Generation Preview
+ * - Generate / Regenerate Button
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-// ========== TypeDefinition ==========
+// ========== Type Definitions ==========
 
 export interface ChatMessage {
  id: string;
@@ -74,29 +74,29 @@ export interface NodeSuggestion {
 }
 
 export interface AIAssistantPanelProps {
- /** GenerateWorkflowCallback */
+  /** Generate Workflow Callback */
  onGenerateWorkflow?: (workflowJSON: string) => void;
- /** AppWorkflowCallback */
+  /** Apply Workflow Callback */
  onApplyWorkflow?: (workflowJSON: string) => void;
- /** FetchNodeSuggestionCallback */
+  /** Get Node Suggestion Callback */
  onGetNodeSuggestion?: (nodeId: string) => Promise<NodeSuggestion[]>;
- /** isnoExpand */
+  /** Whether expanded */
  isExpanded?: boolean;
- /** ExpandStatusCallback */
+  /** Expanded State Callback */
  onExpandedChange?: (expanded: boolean) => void;
- /** CustomClass Name */
- className?: string;
+  /** Custom Class Name */
+  className?: string;
 }
 
-// ExampleTip
+// Example Prompts
 const EXAMPLE_PROMPTS = [
- "Create1ArticleSummaryWorkflow, InputArticleLink, OutputSummary",
- "do1SupportAutoReplyBot",
- "ICreate1DataAnalyticsFlow, from API FetchDataafteruse AI Analytics",
- "Create1EmailAutoCategoryandReply'sWorkflow",
+  "Create an article summary workflow: input an article link, output a summary",
+  "Build an auto-reply support bot",
+  "Create a data analytics flow that fetches data from an API and uses AI to analyze it",
+  "Create an email auto-categorization and reply workflow",
 ];
 
-// ========== MessageComponent ==========
+// ========== Message Component ==========
 
 interface MessageItemProps {
  message: ChatMessage;
@@ -115,10 +115,10 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  try {
  await navigator.clipboard.writeText(text);
  setCopiedTarget(target);
- toast.success("alreadyCopy");
- setTimeout(() => setCopiedTarget(null), 2000);
- } catch {
- toast.error("CopyFailed");
+      toast.success("Copied");
+      setTimeout(() => setCopiedTarget(null), 2000);
+    } catch {
+      toast.error("Copy failed");
  }
  };
 
@@ -154,21 +154,21 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
  <span className="text-sm font-medium text-foreground">
- {isUser ? "you": "AI Assistant"}
+            {isUser ? "You": "AI Assistant"}
  </span>
  <span className="text-xs text-foreground-muted">
- {message.timestamp.toLocaleTimeString("zh-CN", {
+ {message.timestamp.toLocaleTimeString("en-US", {
  hour: "2-digit",
  minute: "2-digit",
  })}
  </span>
  </div>
 
- {/* MessageContent */}
- {message.isLoading ? (
- <div className="flex items-center gap-2 text-foreground-muted">
- <Loader2 className="w-4 h-4 animate-spin" />
- <span className="text-sm">currentlyatThink...</span>
+          {/* Message Content */}
+          {message.isLoading ? (
+            <div className="flex items-center gap-2 text-foreground-muted">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Thinking...</span>
  </div>
  ) : message.error ? (
  <div className="flex items-center gap-2 text-destructive">
@@ -181,17 +181,17 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  </p>
  )}
 
- {/* Generate'sWorkflow */}
- {message.workflowJSON && (
- <div className="mt-3 rounded-lg border border-border overflow-hidden">
- <button
- onClick={() => setShowJSON(!showJSON)}
- className="w-full flex items-center justify-between p-3 bg-surface-100 hover:bg-surface-200 transition-colors"
- >
- <div className="flex items-center gap-2">
- <Wand2 className="w-4 h-4 text-brand-500" />
- <span className="text-sm font-medium text-foreground">
- Generate'sWorkflow
+          {/* Generated Workflow */}
+          {message.workflowJSON && (
+            <div className="mt-3 rounded-lg border border-border overflow-hidden">
+              <button
+                onClick={() => setShowJSON(!showJSON)}
+                className="w-full flex items-center justify-between p-3 bg-surface-100 hover:bg-surface-200 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Wand2 className="w-4 h-4 text-brand-500" />
+                  <span className="text-sm font-medium text-foreground">
+                    Generated Workflow
  </span>
  </div>
  {showJSON ? (
@@ -216,7 +216,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  onClick={() => onApplyWorkflow?.(message.workflowJSON!)}
  >
  <Wand2 className="w-3.5 h-3.5 mr-1.5" />
- ApptoCanvas
+                  Apply to Canvas
  </Button>
  <Button
  variant="outline"
@@ -235,7 +235,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  </div>
  )}
 
- {/* DataModelSuggestion */}
+          {/* Data Model Suggestion */}
  {message.dbSchema && (
  <div className="mt-3 rounded-lg border border-border overflow-hidden">
  <button
@@ -245,7 +245,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  <div className="flex items-center gap-2">
  <Database className="w-4 h-4 text-brand-500" />
  <span className="text-sm font-medium text-foreground">
- DataModelSuggestion
+                    Data Model Suggestion
  </span>
  </div>
  {showDBSchema ? (
@@ -300,7 +300,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  </div>
  )}
 
- {/* ActionButton */}
+          {/* Action Buttons */}
  {message.actions && message.actions.length > 0 && (
  <div className="mt-3 flex flex-wrap gap-2">
  {message.actions.map((action, index) => (
@@ -321,7 +321,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
  );
 }
 
-// ========== mainComponent ==========
+// ========== Main Component ==========
 
 export function AIAssistantPanel({
  onGenerateWorkflow,
@@ -336,11 +336,11 @@ export function AIAssistantPanel({
  id: "welcome",
  role: "assistant",
  content:
- "you!Iis AI Assistant, canwithyouQuickCreateWorkflow.\n\nyoucanwithTellIyouwantneedAutomationWhatTask, IwillyouGenerateWorkflow.",
- timestamp: new Date(),
- actions: [
- { type: "generate", label: "CreatenewWorkflow" },
- { type: "suggest", label: "ViewExample" },
+      "Hello! I'm your AI assistant and I can help you quickly create workflows.\n\nTell me what task you want to automate, and I'll generate a workflow for you.",
+      timestamp: new Date(),
+      actions: [
+        { type: "generate", label: "Create New Workflow" },
+        { type: "suggest", label: "View Examples" },
  ],
  },
  ]);
@@ -351,14 +351,14 @@ export function AIAssistantPanel({
  const scrollRef = useRef<HTMLDivElement>(null);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
- // ScrolltoFooter
+  // Scroll to bottom
  useEffect(() => {
  if (scrollRef.current) {
  scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
  }
  }, [messages]);
 
- // SendMessage
+  // Send Message
  const handleSend = useCallback(async () => {
  if (!input.trim() || isLoading) return;
 
@@ -399,19 +399,19 @@ export function AIAssistantPanel({
  });
 
  if (!response.ok) {
- throw new Error("RequestFailed");
+        throw new Error("Request failed");
  }
 
  const data = await response.json();
  const aiResponse = data.data?.response;
 
- // UpdateAssistantMessage
+      // Update Assistant Message
  setMessages((prev) =>
  prev.map((m) =>
  m.id === assistantMessage.id
  ? {
  ...m,
- content: aiResponse?.message || "IUnderstandyou'sRequirements, letIcomeProcess...",
+ content: aiResponse?.message || "I understand your requirements. Let me process that...",
  workflowJSON: aiResponse?.workflow_json,
  uiSchema: aiResponse?.ui_schema,
  dbSchema: aiResponse?.db_schema,
@@ -423,12 +423,12 @@ export function AIAssistantPanel({
  )
  );
 
- // ifresulthasGenerate'sWorkflow, TriggerCallback
+      // If a workflow was generated, trigger the callback
  if (aiResponse?.workflow_json) {
  onGenerateWorkflow?.(aiResponse.workflow_json);
  }
- } catch (error) {
- // MockResponse(DevelopmentEnvironment)
+    } catch (error) {
+      // Mock Response (Development Environment)
  const mockWorkflow = generateMockWorkflow(userMessage.content);
 
  setMessages((prev) =>
@@ -436,11 +436,11 @@ export function AIAssistantPanel({
  m.id === assistantMessage.id
  ? {
  ...m,
- content: `'s, Based onyou'sDescription"${userMessage.content}", ICreate1Workflow.\n\nthisWorkflowContainswithdownStep: \n1. StartNodeReceiveInput\n2. AI ProcessNodeAnalyticsContent\n3. TemplateNodeFormatOutput\n4. EndNodeBackResult`,
+ content: `Based on your description "${userMessage.content}", I've created a workflow.\n\nThis workflow contains the following steps:\n1. Start node receives input\n2. AI processing node analyzes content\n3. Template node formats output\n4. End node returns result`,
  workflowJSON: mockWorkflow,
- suggestions: [
- "canwithAddConditionNodecomeProcessnotSituation",
- "ConsiderAddErrorProcessLogic",
+              suggestions: [
+                    "You can add condition nodes to handle different scenarios",
+                    "Consider adding error handling logic",
  ],
  isLoading: false,
  }
@@ -454,7 +454,7 @@ export function AIAssistantPanel({
  }
  }, [input, isLoading, messages, onGenerateWorkflow]);
 
- // Processbykey
+  // Handle keypress
  const handleKeyDown = (e: React.KeyboardEvent) => {
  if (e.key === "Enter" && !e.shiftKey) {
  e.preventDefault();
@@ -462,7 +462,7 @@ export function AIAssistantPanel({
  }
  };
 
- // ProcessActionClick
+  // Handle Action Click
  const handleActionClick = (action: ChatAction) => {
  if (action.type === "suggest") {
  setShowExamples(true);
@@ -475,7 +475,7 @@ export function AIAssistantPanel({
  }
  };
 
- // UsageExample
+  // Use Example
  const handleUseExample = (example: string) => {
  setInput(example);
  setShowExamples(false);
@@ -516,7 +516,7 @@ export function AIAssistantPanel({
  </div>
  <div>
  <h3 className="text-sm font-medium text-foreground">AI Assistant</h3>
- <p className="text-[10px] text-foreground-muted">ConversationWorkflowGenerate</p>
+            <p className="text-[10px] text-foreground-muted">Conversational Workflow Generation</p>
  </div>
  </div>
  <div className="flex items-center gap-1">
@@ -538,7 +538,7 @@ export function AIAssistantPanel({
  </div>
  </div>
 
- {/* MessageList */}
+    {/* Message List */}
  <ScrollArea ref={scrollRef} className="flex-1">
  <div className="divide-y divide-border/50">
  {messages.map((message) => (
@@ -552,11 +552,11 @@ export function AIAssistantPanel({
  </div>
  </ScrollArea>
 
- {/* ExampleTip */}
- {showExamples && (
- <div className="shrink-0 p-4 border-t border-border bg-surface-200/60">
- <div className="flex items-center justify-between mb-3">
- <span className="text-xs text-foreground-muted">ExampleTip</span>
+    {/* Example Prompts */}
+    {showExamples && (
+      <div className="shrink-0 p-4 border-t border-border bg-surface-200/60">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs text-foreground-muted">Example Prompts</span>
  <Button
  variant="ghost"
  size="sm"
@@ -580,7 +580,7 @@ export function AIAssistantPanel({
  </div>
  )}
 
- {/* InputRegion */}
+    {/* Input Area */}
  <div className="shrink-0 p-4 border-t border-border">
  <div className="relative">
  <Textarea
@@ -588,7 +588,7 @@ export function AIAssistantPanel({
  value={input}
  onChange={(e) => setInput(e.target.value)}
  onKeyDown={handleKeyDown}
- placeholder="DescriptionyouwantneedCreate'sWorkflow..."
+          placeholder="Describe the workflow you want to create..."
  className="min-h-[80px] pr-12 resize-none bg-surface-200 border-border focus:border-brand-500 placeholder:text-foreground-muted"
  disabled={isLoading}
  />
@@ -623,14 +623,14 @@ export function AIAssistantPanel({
  </div>
  </div>
  <p className="mt-2 text-[10px] text-foreground-muted">
- byEnter Send, Shift + Enter row
+        Press Enter to send, Shift + Enter for new line
  </p>
  </div>
  </div>
  );
 }
 
-// GenerateMockWorkflow(DevelopmentEnvironment)
+// Generate Mock Workflow (Development Environment)
 function generateMockWorkflow(description: string): string {
  const workflow = {
  name: `AI Generate: ${description.slice(0, 20)}...`, description: description,
@@ -646,9 +646,9 @@ function generateMockWorkflow(description: string): string {
  type: "llm",
  position: { x: 350, y: 200 },
  data: {
- label: "AI Process",
- model: "gpt-4o-mini",
- systemPrompt: "youis1hasHelp'sAssistant.",
+          label: "AI Process",
+          model: "gpt-4o-mini",
+          systemPrompt: "You are a helpful assistant.",
  userPrompt: "{{input}}",
  temperature: 0.7,
  },
@@ -658,8 +658,8 @@ function generateMockWorkflow(description: string): string {
  type: "template",
  position: { x: 600, y: 200 },
  data: {
- label: "FormatOutput",
- template: "ProcessResult: \n\n{{llm-1.text}}",
+          label: "Format Output",
+ template: "Processing Result:\n\n{{llm-1.text}}",
  },
  },
  {

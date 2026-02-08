@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * CategoryandTagsSelectComponent
+ * Category and Tags Select Component
  * 
- * SupportCategoryselectandTagsmultipleselect
+ * Supports category selection and multi-tag selection
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -27,34 +27,34 @@ import {
 import { cn } from "@/lib/utils";
 import type { AgentCategory } from "@/types/agent";
 
-// CategoryConfig
+// Category Config
 const categories: Array<{
  id: AgentCategory;
  label: string;
  description: string;
  icon: typeof MessageSquare;
 }> = [
- { id: "content", label: "ContentCreative", description: "ArticleWriting, ContentGenerate", icon: FileText },
- { id: "data", label: "DataProcess", description: "DataAnalytics, Convert, Clean", icon: BarChart3 },
- { id: "customer", label: "CustomerService", description: "Support, FAQ, TicketProcess", icon: MessageSquare },
- { id: "productivity", label: "Officerate", description: "day, Task, Automation", icon: Users },
- { id: "developer", label: "DevelopmentTool", description: "CodeReview, DocumentGenerate", icon: Code2 },
- { id: "research", label: "ResearchAnalytics", description: "MarketplaceSurvey, DataAnalytics", icon: Globe },
- { id: "education", label: "EducationLearn", description: ", , ", icon: GraduationCap },
- { id: "finance", label: "FinanceFinance", description: "FinanceAnalytics, ReportProcess", icon: Wallet },
- { id: "marketing", label: "MarketplaceMarketing", description: "Marketing Copy, Social Media", icon: TrendingUp },
- { id: "other", label: "otherhe", description: "otherheType's Agent", icon: Sparkles },
+ { id: "content", label: "Content & creative", description: "Article writing, content generation", icon: FileText },
+ { id: "data", label: "Data process", description: "Data analytics, conversion, cleaning", icon: BarChart3 },
+ { id: "customer", label: "Customer service", description: "Support, FAQ, ticket processing", icon: MessageSquare },
+ { id: "productivity", label: "Productivity", description: "Daily tasks, automation", icon: Users },
+ { id: "developer", label: "Development Tools", description: "Code review, document generation", icon: Code2 },
+ { id: "research", label: "Research & Analytics", description: "Market research, data analytics", icon: Globe },
+ { id: "education", label: "Education & Learning", description: "Tutoring, courses, quizzes", icon: GraduationCap },
+ { id: "finance", label: "Finance", description: "Financial analytics, report processing", icon: Wallet },
+ { id: "marketing", label: "Marketing", description: "Marketing copy, social media", icon: TrendingUp },
+ { id: "other", label: "Other", description: "Other types of agents", icon: Sparkles },
 ];
 
-// RecommendedTags
+// Recommended Tags
 const suggestedTags = [
  "Automation", "AI", "GPT", "Writing", "Analytics",
- "rate", "Office", "Marketing", "Data", "Code",
+ "Productivity", "Office", "Marketing", "Data", "Code",
  "Support", "Translate", "Summary", "Generate", "Assistant",
 ];
 
 interface CategoryTagSelectorProps {
- // CurrentSelect
+ // Current Selection
  selectedCategory: AgentCategory | null;
  selectedTags: string[];
  
@@ -83,7 +83,7 @@ export function CategoryTagSelector({
  const dropdownRef = useRef<HTMLDivElement>(null);
  const tagInputRef = useRef<HTMLInputElement>(null);
 
- // ClickoutsidesectionCloseDropdown Menu
+ // Click outside to close dropdown menu
  useEffect(() => {
  const handleClickOutside = (e: MouseEvent) => {
  if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -94,14 +94,14 @@ export function CategoryTagSelector({
  return () => document.removeEventListener("mousedown", handleClickOutside);
  }, []);
 
- // FocusTagsInput
+ // Focus Tags Input
  useEffect(() => {
  if (showTagInput && tagInputRef.current) {
  tagInputRef.current.focus();
  }
  }, [showTagInput]);
 
- // AddTags
+ // Add Tag
  const handleAddTag = (tag: string) => {
  const trimmedTag = tag.trim();
  if (!trimmedTag) return;
@@ -112,12 +112,12 @@ export function CategoryTagSelector({
  setNewTag("");
  };
 
- // DeleteTags
+ // Remove Tag
  const handleRemoveTag = (tag: string) => {
  onTagsChange(selectedTags.filter((t) => t !== tag));
  };
 
- // ProcessTagsInputkeyEvent
+ // Process tag input key event
  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
  if (e.key === "Enter") {
  e.preventDefault();
@@ -133,7 +133,7 @@ export function CategoryTagSelector({
 
  return (
  <div className={cn("space-y-6", className)}>
- {/* CategorySelect */}
+ {/* Category Select */}
  <div>
  <label className="block text-sm font-medium text-foreground mb-2">
  Category <span className="text-destructive">*</span>
@@ -165,7 +165,7 @@ export function CategoryTagSelector({
  "font-medium",
  selectedCategory ? "text-foreground" : "text-muted-foreground"
  )}>
- {selectedCategoryData?.label || "SelectCategory"}
+ {selectedCategoryData?.label || "Select Category"}
  </div>
  {selectedCategoryData && (
  <div className="text-sm text-muted-foreground">
@@ -233,7 +233,7 @@ export function CategoryTagSelector({
  </div>
  </div>
 
- {/* TagsSelect */}
+ {/* Tags Select */}
  <div>
  <label className="block text-sm font-medium text-foreground mb-2">
  Tags
@@ -242,7 +242,7 @@ export function CategoryTagSelector({
  </span>
  </label>
 
- {/* alreadyselectTags */}
+ {/* Selected Tags */}
  <div className="flex flex-wrap gap-2 mb-3">
  {selectedTags.map((tag) => (
  <span
@@ -261,7 +261,7 @@ export function CategoryTagSelector({
  </span>
  ))}
  
- {/* AddTagsButton/Input */}
+ {/* Add Tag Button/Input */}
  {selectedTags.length < maxTags && (
  showTagInput ? (
  <div className="inline-flex items-center gap-1">
@@ -277,7 +277,7 @@ export function CategoryTagSelector({
  }
  setShowTagInput(false);
  }}
- placeholder="InputTags"
+ placeholder="Enter tags"
  className="w-24 px-2 py-1 text-sm rounded-lg border border-border bg-background focus:outline-none focus:border-primary"
  maxLength={20}
  />
@@ -289,15 +289,15 @@ export function CategoryTagSelector({
  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-dashed border-border text-muted-foreground text-sm hover:border-primary/50 hover:text-primary transition-colors"
  >
  <Plus className="w-3 h-3" />
- AddTags
+ Add Tag
  </button>
  )
  )}
  </div>
 
- {/* RecommendedTags */}
+ {/* Recommended Tags */}
  <div>
- <div className="text-xs text-muted-foreground mb-2">RecommendedTags</div>
+ <div className="text-xs text-muted-foreground mb-2">Recommended Tags</div>
  <div className="flex flex-wrap gap-1.5">
  {suggestedTags
  .filter((tag) => !selectedTags.includes(tag))

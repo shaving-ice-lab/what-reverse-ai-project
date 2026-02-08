@@ -4,8 +4,9 @@
  * Workbench - AppList
  */
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, useCallback, type CSSProperties } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { appApi, workspaceApi, type App, type Workspace } from "@/lib/api";
 import {
  demoDataPacks,
@@ -30,6 +31,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+ Dialog,
+ DialogContent,
+ DialogDescription,
+ DialogFooter,
+ DialogHeader,
+ DialogTitle,
+} from "@/components/ui/dialog";
 import { CodeBlock } from "@/components/ui/code-block";
 import { InteractiveArchitecture, type ArchitectureLayer } from "@/components/demo/interactive-architecture";
 import { cn } from "@/lib/utils";
@@ -48,6 +57,7 @@ import {
  Layers,
  Loader2,
  Monitor,
+ Plus,
  Search,
  ArrowRight,
  LayoutGrid,
@@ -58,7 +68,7 @@ import {
 const statusStyles: Record<string, { label: string; variant: "default" | "success" | "warning" | "error" }> = {
  draft: { label: "Draft", variant: "default" },
  published: { label: "Published", variant: "success" },
- deprecated: { label: "alreadydownline", variant: "warning" },
+  deprecated: { label: "Deprecated", variant: "warning" },
  archived: { label: "Archived", variant: "error" },
 };
 
@@ -70,7 +80,7 @@ const releaseWindowTypeStyles = {
 
 const releaseWindowStatusStyles = {
  open: { label: "Open", variant: "success" as const },
- restricted: { label: "limit", variant: "secondary" as const },
+ restricted: { label: "Restricted", variant: "secondary" as const },
 };
 
 const releaseImpactTone = {
@@ -81,16 +91,16 @@ const releaseImpactTone = {
 
 const appsSidebarLinks = [
  { id: "workbench-map", label: "Workbench Map", icon: LayoutGrid },
- { id: "sample-apps", label: "ExampleApp", icon: Sparkles },
+  { id: "sample-apps", label: "Example Apps", icon: Sparkles },
  { id: "demo-kit", label: "Demo Kit", icon: Database },
  { id: "demo-script", label: "Demo Script", icon: FileCode },
  { id: "release", label: "Release Policy", icon: Server },
  { id: "release-notes", label: "Release Notes", icon: FileCode },
- { id: "topology", label: "DeployTopology", icon: Monitor },
- { id: "container", label: "Standard", icon: Cpu },
- { id: "environment", label: "EnvironmentNaming", icon: Globe },
- { id: "deploy", label: "DeployTransactionline", icon: Layers },
- { id: "apps-list", label: "AppList", icon: LayoutGrid },
+  { id: "topology", label: "Deploy Topology", icon: Monitor },
+  { id: "container", label: "Container Standard", icon: Cpu },
+  { id: "environment", label: "Environment Naming", icon: Globe },
+  { id: "deploy", label: "Deploy Pipeline", icon: Layers },
+  { id: "apps-list", label: "App List", icon: LayoutGrid },
 ];
 
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
@@ -110,56 +120,56 @@ const deploymentTopologyLayers: ArchitectureLayer[] = [
  {
  id: "web",
  name: "Web",
- description: "ConsoleandPublicEntry",
+ description: "Console and public entry",
  icon: Monitor,
  color: "#3B82F6",
  components: [
  { name: "Dashboard", desc: "Workbench / Editor Console" },
- { name: "Public Site", desc: "andMarketingPage" },
+ { name: "Public Site", desc: "Marketing page" },
  ],
  },
  {
  id: "api",
  name: "API",
- description: "1andServiceEntry",
+ description: "Service entry",
  icon: Server,
  color: "#8B5CF6",
  components: [
- { name: "REST API", desc: "AppManageandRuntimeInterface" },
- { name: "WebSocket", desc: "ExecuteStatusReal-timePush" },
+{ name: "REST API", desc: "App management and runtime API" },
+   { name: "WebSocket", desc: "Real-time execution status" },
  ],
  },
  {
  id: "runtime",
  name: "Runtime",
- description: "ExecuteEngineandTaskSchedule",
+ description: "Execution engine and task schedule",
  icon: Cpu,
  color: "#10B981",
  components: [
- { name: "Workflow Engine", desc: "WorkflowOrchestrateExecute" },
- { name: "Scheduler", desc: "AsyncQueueandRetry" },
+{ name: "Workflow Engine", desc: "Workflow orchestration and execution" },
+   { name: "Scheduler", desc: "Async queue and retry" },
  ],
  },
  {
  id: "db-provisioner",
  name: "DB Provisioner",
- description: "DataResourceCreateandManage",
+ description: "Create and manage data resources",
  icon: Database,
  color: "#F59E0B",
  components: [
- { name: "Schema Provision", desc: "DatabaseInitialandMigration" },
- { name: "Backup/Restore", desc: "BackupandRollbackPolicy" },
+{ name: "Schema Provision", desc: "Database init and migration" },
+   { name: "Backup/Restore", desc: "Backup and rollback policy" },
  ],
  },
  {
  id: "domain-service",
  name: "Domain Service",
- description: "DomainVerifyandCertificateManage",
+ description: "Domain verification and certificate management",
  icon: Globe,
  color: "#EC4899",
  components: [
- { name: "DNS Verify", desc: "TXT/CNAME VerifyFlow" },
- { name: "SSL Issuance", desc: "CertificateIssueandRenewal" },
+ { name: "DNS Verify", desc: "TXT/CNAME Verification Flow" },
+ { name: "SSL Issuance", desc: "Certificate issue and renewal" },
  ],
  },
 ];
@@ -196,6 +206,7 @@ function formatDate(value?: string | null) {
 }
 
 export default function AppsPage() {
+ const router = useRouter();
  const [apps, setApps] = useState<App[]>([]);
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
@@ -208,6 +219,10 @@ export default function AppsPage() {
  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
 
+ const [showCreateAppDialog, setShowCreateAppDialog] = useState(false);
+ const [createAppForm, setCreateAppForm] = useState({ name: "", slug: "", description: "" });
+ const [isCreatingApp, setIsCreatingApp] = useState(false);
+
  useEffect(() => {
  let mounted = true;
  const load = async () => {
@@ -219,7 +234,7 @@ export default function AppsPage() {
  setApps(response.items || []);
  } catch (err) {
  if (!mounted) return;
- setError(err instanceof Error ? err.message: "LoadAppFailed");
+ setError(err instanceof Error ? err.message : "Failed to load app");
  } finally {
  if (mounted) setLoading(false);
  }
@@ -250,7 +265,7 @@ export default function AppsPage() {
  setActiveWorkspaceId(resolvedId);
  } catch (err) {
  if (!mounted) return;
- setWorkspaceError(err instanceof Error ? err.message: "LoadWorkspaceFailed");
+ setWorkspaceError(err instanceof Error ? err.message : "Failed to load workspace");
  } finally {
  if (mounted) setWorkspaceLoading(false);
  }
@@ -307,27 +322,27 @@ export default function AppsPage() {
  id: "workspace",
  step: "01",
  title: "Workspace Switch",
- description: "SelectWorkspaceandEnterforshouldAppList",
+ description: "Select a workspace to see its app list",
  href: "/dashboard/workspaces",
  icon: LayoutGrid,
  },
  {
  id: "apps",
  step: "02",
- title: "AppList",
+    title: "App List",
  description: activeWorkspace
- ? `${activeWorkspace.name} · ${workspaceApps.length} App`
-: "EnterWorkspaceAppList",
+ ? `${activeWorkspace.name} · ${workspaceApps.length} ${workspaceApps.length === 1 ? "App" : "Apps"}`
+: "Enter workspace app list",
  href: workspaceAppsHref,
  icon: Layers,
  },
  {
  id: "monitoring",
  step: "03",
- title: "RunMonitor",
+    title: "Run Monitor",
  description: primaryWorkspaceApp
- ? `Monitor ${primaryWorkspaceApp.name} 'sExecuteandMetrics`
-: "ViewRunLogsandMetrics",
+ ? `Monitor ${primaryWorkspaceApp.name} execution and metrics`
+: "View run logs and metrics",
  href: monitoringHref,
  icon: Monitor,
  },
@@ -339,6 +354,39 @@ export default function AppsPage() {
  localStorage.setItem(WORKSPACE_STORAGE_KEY, value);
  }
  };
+
+ const handleCreateAppNameChange = useCallback((name: string) => {
+ setCreateAppForm((prev) => ({
+ ...prev,
+ name,
+ slug: name
+ .toLowerCase()
+ .trim()
+ .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+ .replace(/^-+|-+$/g, ""),
+ }));
+ }, []);
+
+ const handleCreateApp = useCallback(async () => {
+ if (!activeWorkspaceId || !createAppForm.name || !createAppForm.slug) return;
+ try {
+ setIsCreatingApp(true);
+ const app = await appApi.create({
+ workspace_id: activeWorkspaceId,
+ name: createAppForm.name.trim(),
+ slug: createAppForm.slug.trim(),
+ description: createAppForm.description.trim() || undefined,
+ });
+ setShowCreateAppDialog(false);
+ setCreateAppForm({ name: "", slug: "", description: "" });
+ setApps((prev) => [...prev, app]);
+ router.push(`/dashboard/app/${app.id}/builder`);
+ } catch (err) {
+ console.error("Failed to create app:", err);
+ } finally {
+ setIsCreatingApp(false);
+ }
+ }, [activeWorkspaceId, createAppForm, router]);
 
  const statusCounts = useMemo(() => {
  const counts: Record<string, number> = {};
@@ -357,48 +405,48 @@ export default function AppsPage() {
  {workspaceLoading ? (
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
  <Loader2 className="h-3.5 w-3.5 animate-spin" />
- LoadWorkspace...
- </div>
- ) : workspaceError ? (
- <div className="text-[11px] text-foreground-muted">{workspaceError}</div>
- ) : (
- <>
- <Select value={activeWorkspaceId ?? ""} onValueChange={handleWorkspaceChange}>
- <SelectTrigger className="h-8 bg-surface-75 border-border">
- <SelectValue placeholder="SelectWorkspace" />
- </SelectTrigger>
- <SelectContent className="bg-surface-100 border-border">
- {workspaces.map((workspace) => (
- <SelectItem key={workspace.id} value={workspace.id}>
- {workspace.name}
- </SelectItem>
- ))}
- </SelectContent>
- </Select>
- {activeWorkspace ? (
- <div className="space-y-1">
- <div className="text-[12px] font-medium text-foreground">
- {activeWorkspace.name}
- </div>
- <div className="text-[10px] text-foreground-muted">
- /{activeWorkspace.slug} · {activeWorkspace.plan?.toUpperCase() ?? "PLAN"}
- </div>
- </div>
- ) : (
- <div className="text-[11px] text-foreground-muted">
- not yetSelectWorkspace.
+            Loading workspaces...
+          </div>
+        ) : workspaceError ? (
+          <div className="text-[11px] text-foreground-muted">{workspaceError}</div>
+        ) : (
+          <>
+            <Select value={activeWorkspaceId ?? ""} onValueChange={handleWorkspaceChange}>
+              <SelectTrigger className="h-8 bg-surface-75 border-border">
+                <SelectValue placeholder="Select workspace" />
+              </SelectTrigger>
+              <SelectContent className="bg-surface-100 border-border">
+                {workspaces.map((workspace) => (
+                  <SelectItem key={workspace.id} value={workspace.id}>
+                    {workspace.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {activeWorkspace ? (
+              <div className="space-y-1">
+                <div className="text-[12px] font-medium text-foreground">
+                  {activeWorkspace.name}
+                </div>
+                <div className="text-[10px] text-foreground-muted">
+                  /{activeWorkspace.slug} · {activeWorkspace.plan?.toUpperCase() ?? "PLAN"}
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] text-foreground-muted">
+                No workspace selected.
  </div>
  )}
  <div className="flex items-center justify-between text-[11px] text-foreground-muted">
- <span>CurrentApp</span>
+ <span>Current app</span>
  <span>{workspaceApps.length}</span>
  </div>
  </>
  )}
  <div className="flex items-center justify-between text-[11px] text-foreground-muted">
- <Link href="/dashboard/workspaces" className="hover:text-foreground">
- WorkspaceList
- </Link>
+            <Link href="/dashboard/workspaces" className="hover:text-foreground">
+              Workspace List
+            </Link>
  <Link href={workspaceAppsHref} className="text-brand-500 hover:text-brand-400">
  Enter Apps
  </Link>
@@ -407,14 +455,14 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-2">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
- AppSearch
+            App Search
  </div>
  <div className="relative">
  <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground-muted" />
  <Input
  value={query}
  onChange={(event) => setQuery(event.target.value)}
- placeholder="SearchAppName, Slug"
+ placeholder="Search app name or slug"
  className="pl-8 h-8 bg-surface-75 border-border"
  />
  </div>
@@ -439,7 +487,7 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-100/70 p-3 space-y-3">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
- StatusDistribution
+            Status Distribution
  </div>
  <div className="grid grid-cols-2 gap-2 text-[11px]">
  {Object.entries(statusStyles).map(([key, style]) => (
@@ -471,13 +519,13 @@ export default function AppsPage() {
  </div>
  ) : (
  <div className="text-[11px] text-foreground-muted">
- {activeWorkspaceId ? "NoneApp": "SelectWorkspaceafterView"}
+ {activeWorkspaceId ? "No apps" : "Select a workspace to view apps"}
  </div>
  )}
  <div className="flex items-center justify-between text-[11px] text-foreground-muted">
- <span>RunMonitorEntry</span>
+ <span>Run & monitor</span>
  <Link href={monitoringHref} className="text-brand-500 hover:text-brand-400">
- OpenMonitor
+              Open Monitor
  </Link>
  </div>
  </div>
@@ -491,14 +539,26 @@ export default function AppsPage() {
  title="Workbench"
  eyebrow="Apps"
  icon={<LayoutGrid className="h-4 w-4" />}
- description="1ViewandManageAppRuntime, EnterEditnowcanUpdateforshould'sWorkflowandConfig."
+ description="View and manage app runtime; enter edit mode to update workflow and config."
  actions={
+ <div className="flex items-center gap-2">
+ <Button
+ variant="default"
+ size="sm"
+ onClick={() => setShowCreateAppDialog(true)}
+ disabled={!activeWorkspaceId}
+ title={!activeWorkspaceId ? "Select a workspace first" : undefined}
+ >
+ <Plus className="h-4 w-4 mr-1.5" />
+ Create App
+ </Button>
  <Button variant="secondary" size="sm" asChild>
  <Link href="/dashboard/workflows/new">
- <Layers className="h-4 w-4" />
- CreateWorkflow
+ <Layers className="h-4 w-4 mr-1.5" />
+ Create Workflow
  </Link>
  </Button>
+ </div>
  }
  />
 
@@ -512,10 +572,10 @@ export default function AppsPage() {
  Workbench Map
  </div>
  <h2 className="mt-2 text-xl font-semibold text-(--workbench-ink) font-sans">
- WorkInfoArchitecture
+ Work info & architecture
  </h2>
  <p className="mt-2 text-sm text-(--workbench-muted)">
- Workspace ContextAppListandRunMonitor, EnsuremainneedPath1can.
+ Workspace context, app list and run monitor. One place to manage everything.
  </p>
  <div className="mt-5 grid gap-3 sm:grid-cols-3">
  {workbenchRoutes.map((route) => {
@@ -539,7 +599,7 @@ export default function AppsPage() {
  {route.description}
  </p>
  <div className="mt-3 inline-flex items-center gap-1 text-[11px] text-(--workbench-accent)">
- EnterPath
+                  Enter
  <ArrowRight className="h-3.5 w-3.5" />
  </div>
  </Link>
@@ -567,13 +627,13 @@ export default function AppsPage() {
  {workspaceLoading ? (
  <div className="mt-3 flex items-center gap-2 text-xs text-(--workbench-muted)">
  <Loader2 className="h-4 w-4 animate-spin" />
- LoadWorkspace...
- </div>
- ) : workspaceError ? (
- <div className="mt-3 text-xs text-(--workbench-muted)">
- {workspaceError}
- </div>
- ) : activeWorkspace ? (
+              Loading workspaces...
+            </div>
+          ) : workspaceError ? (
+            <div className="mt-3 text-xs text-(--workbench-muted)">
+              {workspaceError}
+            </div>
+          ) : activeWorkspace ? (
  <div className="mt-3 space-y-2">
  <div>
  <div className="text-base font-semibold text-(--workbench-ink) font-sans">
@@ -584,18 +644,18 @@ export default function AppsPage() {
  </div>
  </div>
  <div className="flex items-center justify-between text-[11px] text-(--workbench-muted)">
- <span>AppTotal {workspaceApps.length}</span>
+ <span>Total apps: {workspaceApps.length}</span>
  <Link
  href={workspaceAppsHref}
  className="text-(--workbench-accent) hover:text-(--workbench-ink)"
  >
- EnterAppList
+ Enter app list
  </Link>
  </div>
  </div>
  ) : (
  <div className="mt-3 text-xs text-(--workbench-muted)">
- not yetCreateWorkspace.
+              No workspace created yet.
  </div>
  )}
  <div className="mt-3">
@@ -603,7 +663,7 @@ export default function AppsPage() {
  href="/dashboard/workspaces"
  className="inline-flex items-center gap-1 text-[11px] text-(--workbench-ink) hover:text-(--workbench-accent)"
  >
- ViewWorkspaceList
+              View Workspace List
  <ArrowRight className="h-3.5 w-3.5" />
  </Link>
  </div>
@@ -611,7 +671,7 @@ export default function AppsPage() {
 
  <div className="rounded-xl border border-(--workbench-border) bg-(--workbench-panel) p-4">
  <div className="text-[10px] uppercase tracking-[0.35em] text-(--workbench-muted)">
- AppPreview
+              App Preview
  </div>
  {workspaceAppsPreview.length > 0 ? (
  <div className="mt-3 space-y-2">
@@ -632,16 +692,16 @@ export default function AppsPage() {
  </div>
  ) : (
  <div className="mt-3 text-xs text-(--workbench-muted)">
- {activeWorkspaceId ? "NoneApp, canfirstCreateWorkflow.": "SelectWorkspaceafterViewApp."}
+ {activeWorkspaceId ? "No apps; create a workflow first." : "Select a workspace to view apps."}
  </div>
  )}
  <div className="mt-3 flex items-center justify-between text-[11px] text-(--workbench-muted)">
- <span>RunMonitorEntry</span>
+ <span>Run & monitor</span>
  <Link
  href={monitoringHref}
  className="text-(--workbench-accent) hover:text-(--workbench-ink)"
  >
- OpenMonitor
+              Open Monitor
  </Link>
  </div>
  </div>
@@ -653,10 +713,10 @@ export default function AppsPage() {
  <section id="sample-apps" className="mt-6 rounded-md border border-border bg-surface-100 p-5">
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
- <div className="text-xs uppercase tracking-wider text-foreground-muted">ExampleApp</div>
- <h2 className="text-sm font-medium text-foreground">inExampleAppChecklist</h2>
+ <div className="text-xs uppercase tracking-wider text-foreground-muted">Example app</div>
+            <h2 className="text-sm font-medium text-foreground">Example App Checklist</h2>
  <p className="text-xs text-foreground-light">
- Coverage {sampleCategoryCount} Scenario, canDirectUsed forDemoor2times
+ Covers {sampleCategoryCount} scenarios; use directly for demo or trial
  </p>
  </div>
  <Badge variant="secondary" size="sm" className="bg-surface-200 text-foreground-light">
@@ -702,7 +762,7 @@ export default function AppsPage() {
  </div>
 
  <div className="mt-4 flex items-center justify-between text-[11px] text-foreground-muted">
- <span>Updateat {formatDate(app.updatedAt)}</span>
+ <span>Updated at {formatDate(app.updatedAt)}</span>
  <Button
  variant="ghost"
  size="sm"
@@ -710,7 +770,7 @@ export default function AppsPage() {
  asChild
  >
  <Link href={app.href}>
- ViewTemplate
+                  View Template
  <ArrowRight className="h-3.5 w-3.5" />
  </Link>
  </Button>
@@ -727,10 +787,10 @@ export default function AppsPage() {
  <div className="text-xs uppercase tracking-wider text-foreground-muted">Demo Kit</div>
  <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
  <Sparkles className="h-4 w-4 text-brand-500" />
- Demo DataandScaffold
+              Demo Data & Scaffold
  </h2>
  <p className="text-xs text-foreground-light">
- ProvidecanDirectDemo'sDataandScaffoldTemplate, QuickBuildDemoEnvironment
+ Provides demo data and scaffold templates to quickly build a demo environment
  </p>
  </div>
  <Badge variant="secondary" size="sm" className="bg-surface-200 text-foreground-light">
@@ -772,7 +832,7 @@ export default function AppsPage() {
  <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted">
  <span>{pack.records.toLocaleString()} Record</span>
  <span>{pack.fields} Field</span>
- <span>Updateat {formatDate(pack.updatedAt)}</span>
+ <span>Updated at {formatDate(pack.updatedAt)}</span>
  </div>
 
  <div className="mt-2 flex flex-wrap gap-2">
@@ -791,9 +851,9 @@ export default function AppsPage() {
  <div className="flex items-center justify-between">
  <div>
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted">
- ScaffoldTemplate
+                Scaffold Template
  </div>
- <div className="text-sm font-medium text-foreground">QuickDemoTemplate</div>
+ <div className="text-sm font-medium text-foreground">Quick demo template</div>
  </div>
  <FileCode className="h-4 w-4 text-foreground-muted" />
  </div>
@@ -824,7 +884,7 @@ export default function AppsPage() {
  {activeScaffold.description}
  </div>
  <div className="text-[11px] text-foreground-muted mt-1">
- Updateat {formatDate(activeScaffold.updatedAt)}
+ Updated at {formatDate(activeScaffold.updatedAt)}
  </div>
  </div>
  <CodeBlock
@@ -844,7 +904,7 @@ export default function AppsPage() {
  </div>
  </div>
  ) : (
- <div className="mt-4 text-xs text-foreground-muted">NoneAvailableScaffoldTemplate</div>
+ <div className="mt-4 text-xs text-foreground-muted">No scaffold templates available</div>
  )}
  </div>
  </div>
@@ -861,7 +921,7 @@ export default function AppsPage() {
  </div>
  <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground-muted">
  <Badge variant="secondary" size="xs">
- totaltime {demoFlowScript.totalDuration}
+              Total time: {demoFlowScript.totalDuration}
  </Badge>
  <Badge variant="secondary" size="xs">
  {demoFlowScript.steps.length} Step
@@ -870,7 +930,7 @@ export default function AppsPage() {
  </div>
 
  <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-foreground-muted">
- <span>usefor: </span>
+            <span>For: </span>
  {demoFlowScript.audience.map((role) => (
  <Badge key={role} variant="secondary" size="xs">
  {role}
@@ -964,7 +1024,7 @@ export default function AppsPage() {
  <div className="rounded-md border border-border bg-surface-75/80 overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-200/60 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <div className="col-span-3">Window</div>
- <div className="col-span-2">rate</div>
+            <div className="col-span-2">Cadence</div>
  <div className="col-span-2">Time</div>
  <div className="col-span-3">Range</div>
  <div className="col-span-2">Gate</div>
@@ -1011,7 +1071,7 @@ export default function AppsPage() {
  <div className="space-y-3">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- FreezeWindow
+              Freeze Window
  </div>
  <div className="space-y-3">
  {releaseCadencePlan.freezeWindows.map((window) => (
@@ -1029,10 +1089,10 @@ export default function AppsPage() {
  Hotfix Policy
  </div>
  <div className="space-y-2 text-[11px] text-foreground-muted">
- <div>TriggerWindow: {releaseCadencePlan.hotfixPolicy.window}</div>
- <div>Approval: {releaseCadencePlan.hotfixPolicy.approval}</div>
- <div>Rollback: {releaseCadencePlan.hotfixPolicy.rollback}</div>
- <div>: {releaseCadencePlan.hotfixPolicy.comms}</div>
+              <div>Trigger Window: {releaseCadencePlan.hotfixPolicy.window}</div>
+              <div>Approval: {releaseCadencePlan.hotfixPolicy.approval}</div>
+              <div>Rollback: {releaseCadencePlan.hotfixPolicy.rollback}</div>
+              <div>Comms: {releaseCadencePlan.hotfixPolicy.comms}</div>
  </div>
  </div>
  </div>
@@ -1041,7 +1101,7 @@ export default function AppsPage() {
  <div className="mt-4 grid gap-3 lg:grid-cols-2">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- PublishChannel
+              Publish Channel
  </div>
  <div className="space-y-3">
  {releaseCadencePlan.channels.map((channel) => (
@@ -1057,7 +1117,7 @@ export default function AppsPage() {
  />
  </div>
  <div className="text-[11px] text-foreground-muted mt-2">
- Assurancevalue: {channel.guardrail}
+                Guardrail: {channel.guardrail}
  </div>
  </div>
  ))}
@@ -1066,7 +1126,7 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- PublishCheckChecklist
+              Release Checklist
  </div>
  <div className="space-y-2">
  {releaseCadencePlan.checklist.map((item, index) => (
@@ -1087,7 +1147,7 @@ export default function AppsPage() {
  <div>
  <div className="text-xs uppercase tracking-wider text-foreground-muted">Release Notes</div>
  <h2 className="text-sm font-medium text-foreground">
- VersionChangeAnnouncementTemplate
+              Version Change Announcement Template
  </h2>
  <p className="text-xs text-foreground-light">
  {releaseNoteTemplate.title} · {releaseNoteTemplate.version}
@@ -1140,14 +1200,14 @@ export default function AppsPage() {
  <div className="space-y-3">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- ImpactEvaluate
+              Impact Assessment
  </div>
  <div className="space-y-2 text-[12px]">
  <div className={releaseImpactTone.downtime}>
- : {releaseNoteTemplate.impact.downtime}
+                Downtime: {releaseNoteTemplate.impact.downtime}
  </div>
  <div className={releaseImpactTone.affected}>
- ImpactRange: {releaseNoteTemplate.impact.affected}
+                Impact Range: {releaseNoteTemplate.impact.affected}
  </div>
  <div className={releaseImpactTone.migration}>
  Migration: {releaseNoteTemplate.impact.migration}
@@ -1157,14 +1217,14 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- RollbackPlan
+              Rollback Plan
  </div>
  <p className="text-[12px] text-foreground-light">{releaseNoteTemplate.rollback}</p>
  </div>
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- RelatedLink
+              Related Links
  </div>
  <div className="flex flex-wrap gap-2">
  {releaseNoteTemplate.links.map((link) => (
@@ -1204,7 +1264,7 @@ export default function AppsPage() {
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
  <div className="text-xs uppercase tracking-wider text-foreground-muted">Topology</div>
- <h2 className="text-sm font-medium text-foreground">DeployTopology</h2>
+ <h2 className="text-sm font-medium text-foreground">Deploy topology</h2>
  <p className="text-xs text-foreground-light">
  Coverage Web / API / Runtime / DB Provisioner / Domain Service
  </p>
@@ -1227,13 +1287,13 @@ export default function AppsPage() {
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
  <div className="text-xs uppercase tracking-wider text-foreground-muted">Container</div>
- <h2 className="text-sm font-medium text-foreground">andMirrorStandard</h2>
+ <h2 className="text-sm font-medium text-foreground">Container & Image Standard</h2>
  <p className="text-xs text-foreground-light">
  Registry: {containerizationSpec.registry}
  </p>
  </div>
  <Badge variant="secondary" size="xs">
- Updateat {formatDate(containerizationSpec.lastUpdated)}
+ Updated at {formatDate(containerizationSpec.lastUpdated)}
  </Badge>
  </div>
 
@@ -1241,9 +1301,9 @@ export default function AppsPage() {
  <div className="rounded-md border border-border bg-surface-75/80 overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-200/60 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <div className="col-span-2">Service</div>
- <div className="col-span-3">MirrorRepository</div>
+ <div className="col-span-3">Mirror repository</div>
  <div className="col-span-2">Runtime</div>
- <div className="col-span-3">TagsPolicy</div>
+ <div className="col-span-3">Tags policy</div>
  <div className="col-span-2">Rollback</div>
  </div>
  {containerizationSpec.images.map((image) => (
@@ -1276,7 +1336,7 @@ export default function AppsPage() {
  <div className="space-y-3">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- TagsStandard
+              Tag Standard
  </div>
  <CodeBlock
  code={`# Tag format\n${containerizationSpec.tagFormat}\n\n# Example\n${containerTagExample}`}
@@ -1292,19 +1352,19 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- BuildandCompliance
+              Build & Compliance
  </div>
  <div className="space-y-2 text-[12px] text-foreground-light">
- <div>RetainPolicy: {containerizationSpec.retention}</div>
- <div>ScanPolicy: {containerizationSpec.scanPolicy}</div>
- <div>BioPolicy: {containerizationSpec.signingPolicy}</div>
- <div>RollbackPolicy: {containerizationSpec.rollbackPolicy}</div>
+                <div>Retention Policy: {containerizationSpec.retention}</div>
+                <div>Scan Policy: {containerizationSpec.scanPolicy}</div>
+                <div>Signing Policy: {containerizationSpec.signingPolicy}</div>
+                <div>Rollback Policy: {containerizationSpec.rollbackPolicy}</div>
  </div>
  </div>
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- BuildTransactionline
+              Build Pipeline
  </div>
  <div className="space-y-2">
  {containerizationSpec.buildPipeline.map((step, index) => (
@@ -1329,7 +1389,7 @@ export default function AppsPage() {
  <p className="text-xs text-foreground-light">{environmentNamingSpec.description}</p>
  </div>
  <Badge variant="secondary" size="xs">
- Updateat {formatDate(environmentNamingSpec.lastUpdated)}
+ Updated at {formatDate(environmentNamingSpec.lastUpdated)}
  </Badge>
  </div>
 
@@ -1337,7 +1397,7 @@ export default function AppsPage() {
  <div className="rounded-md border border-border bg-surface-75/80 overflow-hidden">
  <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-border bg-surface-200/60 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
  <div className="col-span-2">Environment</div>
- <div className="col-span-3">NamingEmptybetween</div>
+ <div className="col-span-3">Naming (optional)</div>
  <div className="col-span-3">Domain</div>
  <div className="col-span-2">Retain</div>
  <div className="col-span-2">Access</div>
@@ -1372,7 +1432,7 @@ export default function AppsPage() {
  <div className="space-y-3">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- NamingStandardExample
+              Naming Standard Example
  </div>
  <CodeBlock
  code={environmentNamingExample}
@@ -1382,13 +1442,13 @@ export default function AppsPage() {
  defaultCollapsed
  />
  <div className="mt-3 text-[11px] text-foreground-muted">
- Configbefore: {environmentNamingSpec.environments.map((env) => env.configPrefix).join(" / ")}
+                Config prefix: {environmentNamingSpec.environments.map((env) => env.configPrefix).join(" / ")}
  </div>
  </div>
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- ResourceNamingRule
+              Resource Naming Rules
  </div>
  <div className="space-y-2 text-[12px] text-foreground-light">
  {environmentNamingSpec.resourceRules.map((rule) => (
@@ -1404,7 +1464,7 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- Isolatethen
+              Guardrails
  </div>
  <div className="space-y-2">
  {environmentNamingSpec.guardrails.map((rule, index) => (
@@ -1430,7 +1490,7 @@ export default function AppsPage() {
  </div>
  <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground-muted">
  <Badge variant="secondary" size="xs">
- Updateat {formatDate(deploymentPipelineStrategy.lastUpdated)}
+ Updated at {formatDate(deploymentPipelineStrategy.lastUpdated)}
  </Badge>
  {deploymentPipelineStrategy.toolchain.map((tool) => (
  <Badge key={tool} variant="outline" size="xs">
@@ -1452,7 +1512,7 @@ export default function AppsPage() {
  <div className="mt-4 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- TransactionlinePhase
+              Pipeline Phases
  </div>
  <div className="space-y-3">
  {deploymentPipelineStrategy.stages.map((stage, index) => (
@@ -1489,10 +1549,10 @@ export default function AppsPage() {
  <div className="space-y-3">
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- Grayscale
- </div>
- <div className="space-y-3">
- {deploymentPipelineStrategy.canary.trafficSteps.map((step) => (
+              Canary Deployment
+            </div>
+            <div className="space-y-3">
+              {deploymentPipelineStrategy.canary.trafficSteps.map((step) => (
  <div key={step.id} className="rounded-md border border-border/60 bg-surface-100/60 p-3">
  <div className="flex items-center justify-between text-[12px] text-foreground">
  <span className="font-medium">{step.label}</span>
@@ -1504,7 +1564,7 @@ export default function AppsPage() {
  style={{ width: `${Math.min(step.traffic, 100)}%` }}
  />
  </div>
- <div className="text-[11px] text-foreground-muted mt-2">Meet Target: {step.successCriteria}</div>
+ <div className="text-[11px] text-foreground-muted mt-2">Success Target: {step.successCriteria}</div>
  <div className="text-[10px] text-warning mt-1">Rollback: {step.rollback}</div>
  </div>
  ))}
@@ -1513,7 +1573,7 @@ export default function AppsPage() {
 
  <div className="rounded-md border border-border bg-surface-75/80 p-4">
  <div className="text-[11px] uppercase tracking-wider text-foreground-muted mb-3">
- GrayscaleMetricsandRollback
+              Canary Metrics & Rollback
  </div>
  <div className="space-y-3 text-[11px] text-foreground-muted">
  <div className="space-y-2">
@@ -1526,9 +1586,9 @@ export default function AppsPage() {
  </div>
  ))}
  </div>
- <div>ManualApproval: {deploymentPipelineStrategy.canary.manualApproval}</div>
+                <div>Manual Approval: {deploymentPipelineStrategy.canary.manualApproval}</div>
  <div>
- AutoRollbackTrigger: 
+                  Auto Rollback Trigger: 
  <div className="mt-2 space-y-1">
  {deploymentPipelineStrategy.canary.autoRollback.map((rule) => (
  <div key={rule} className="text-[11px] text-foreground-muted">
@@ -1538,7 +1598,7 @@ export default function AppsPage() {
  </div>
  </div>
  <div>
- FreezeRule: 
+                  Freeze Rules: 
  <div className="mt-2 space-y-1">
  {deploymentPipelineStrategy.canary.freezeRules.map((rule) => (
  <div key={rule} className="text-[11px] text-foreground-muted">
@@ -1557,34 +1617,50 @@ export default function AppsPage() {
  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
  <div>
  <div className="text-xs uppercase tracking-wider text-foreground-muted">Apps</div>
- <h2 className="text-sm font-medium text-foreground">AppList</h2>
+ <h2 className="text-sm font-medium text-foreground">App list</h2>
  <p className="text-xs text-foreground-light">
- {query ? `CurrentSearch: ${query}`: "by Workspace 1ManageApp"}
+            {query ? `Current search: ${query}` : "Manage apps by workspace"}
  </p>
  </div>
+ <div className="flex items-center gap-2">
+ <Button
+ variant="outline"
+ size="sm"
+ onClick={() => setShowCreateAppDialog(true)}
+ disabled={!activeWorkspaceId}
+ title={!activeWorkspaceId ? "Select a workspace first" : undefined}
+ >
+ <Plus className="h-3.5 w-3.5 mr-1.5" />
+ Create App
+ </Button>
  <Badge variant="secondary" size="xs" className="bg-surface-200 text-foreground-light">
  {filteredApps.length} / {apps.length}
  </Badge>
+ </div>
  </div>
 
  <div>
  {loading ? (
  <div className="flex items-center gap-2 text-sm text-foreground-muted">
  <Loader2 className="h-4 w-4 animate-spin" />
- LoadingAppList...
+              Loading app list...
  </div>
  ) : error ? (
  <EmptyState
  icon={<Layers className="h-5 w-5" />}
- title="LoadFailed"
+            title="Load failed"
  description={error}
  />
  ) : filteredApps.length === 0 ? (
  <EmptyState
  icon={<Layers className="h-5 w-5" />}
- title="NoneApp"
- description="firstfromWorkflowor AI Create1App, nowcanat Workbench 1Manage."
- action={{ label: "goCreateWorkflow", href: "/dashboard/workflows/new" }}
+            title="No apps"
+            description="Create an app from a workflow or AI first, then manage it here in the Workbench."
+ action={
+ activeWorkspaceId
+ ? { label: "Create App", onClick: () => setShowCreateAppDialog(true) }
+ : { label: "Create workflow", href: "/dashboard/workflows/new" }
+ }
  />
  ) : (
  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -1614,7 +1690,7 @@ export default function AppsPage() {
  </div>
  </div>
  <Button variant="ghost" size="icon" className="text-foreground-muted hover:text-foreground" asChild>
- <Link href={`/apps/editor/${app.id}`}>
+ <Link href={`/dashboard/app/${app.id}/builder`}>
  <ArrowRight className="h-4 w-4" />
  </Link>
  </Button>
@@ -1626,18 +1702,18 @@ export default function AppsPage() {
 
  <div className="mt-4 flex items-center justify-between text-xs text-foreground-muted">
  <span>
- Workspace: {app.workspace?.name || "not yetNamingEmptybetween"}
+ Workspace: {app.workspace?.name || "Unnamed workspace"}
  </span>
- <span>Updateat {formatDate(app.updatedAt)}</span>
+ <span>Updated at {formatDate(app.updatedAt)}</span>
  </div>
 
  <div className="mt-3 flex items-center justify-between text-xs text-foreground-muted">
  <span>Version: {app.current_version_id ? "Bound": "Unbound"}</span>
  <Link
- href={`/apps/editor/${app.id}`}
+ href={`/dashboard/app/${app.id}/builder`}
  className="inline-flex items-center gap-1 text-brand-500 hover:text-brand-400"
  >
- OpenEdit
+ Open Editor
  <ArrowRight className="h-3.5 w-3.5" />
  </Link>
  </div>
@@ -1648,6 +1724,79 @@ export default function AppsPage() {
  )}
  </div>
  </section>
+
+ <Dialog open={showCreateAppDialog} onOpenChange={setShowCreateAppDialog}>
+ <DialogContent className="sm:max-w-md bg-surface-100 border-border">
+ <DialogHeader>
+ <DialogTitle className="text-foreground">Create App</DialogTitle>
+ <DialogDescription className="text-foreground-light">
+ Create a new app in the current workspace
+ </DialogDescription>
+ </DialogHeader>
+ <div className="space-y-4 py-4">
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ App Name <span className="text-destructive">*</span>
+ </label>
+ <Input
+ placeholder="e.g. Daily Assistant"
+ value={createAppForm.name}
+ onChange={(e) => handleCreateAppNameChange(e.target.value)}
+ className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ />
+ </div>
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ URL Identifier <span className="text-destructive">*</span>
+ </label>
+ <div className="flex items-center gap-2">
+ {activeWorkspace && (
+ <span className="text-[12px] text-foreground-muted shrink-0">
+ /{activeWorkspace.slug}/
+ </span>
+ )}
+ <Input
+ placeholder="daily-assistant"
+ value={createAppForm.slug}
+ onChange={(e) =>
+ setCreateAppForm((prev) => ({ ...prev, slug: e.target.value }))
+ }
+ className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ />
+ </div>
+ </div>
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ Description (optional)
+ </label>
+ <Input
+ placeholder="Describe app features..."
+ value={createAppForm.description}
+ onChange={(e) =>
+ setCreateAppForm((prev) => ({ ...prev, description: e.target.value }))
+ }
+ className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ />
+ </div>
+ </div>
+ <DialogFooter>
+ <Button
+ variant="outline"
+ onClick={() => setShowCreateAppDialog(false)}
+ className="border-border"
+ >
+ Cancel
+ </Button>
+ <Button
+ onClick={handleCreateApp}
+ disabled={!createAppForm.name || !createAppForm.slug || isCreatingApp}
+ >
+ {isCreatingApp && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+ Create
+ </Button>
+ </DialogFooter>
+ </DialogContent>
+ </Dialog>
  </PageContainer>
  </PageWithSidebar>
  );

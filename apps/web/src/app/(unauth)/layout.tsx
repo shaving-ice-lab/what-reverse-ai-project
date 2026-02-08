@@ -10,16 +10,16 @@ export default function UnauthLayout({
 }) {
  const pathname = usePathname();
 
- // Runtime PageUsageIndependentLayout, notContainsNavigation
+ // Runtime pages use an independent layout without navigation
  if (pathname.startsWith("/runtime")) {
  return <>{children}</>;
  }
 
  return (
  <div className="min-h-screen bg-background text-foreground scroll-smooth relative">
- {/* LobeHub StyleallBackgroundDecoration */}
+ {/* LobeHub-style background decoration */}
  <div className="fixed inset-0 pointer-events-none -z-10" aria-hidden="true">
- {/* TopmainHalo - Mock LobeHub 'sPurple */}
+ {/* Top main halo - LobeHub-style purple glow */}
  <div
  className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3"
  style={{
@@ -28,7 +28,7 @@ export default function UnauthLayout({
  background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(45, 65, 180, 0.12) 0%, rgba(100, 50, 180, 0.04) 40%, transparent 70%)',
  }}
  />
- {/* Right sideAuxiliaryHalo */}
+ {/* Right side auxiliary halo */}
  <div
  className="absolute top-[20%] right-0"
  style={{
@@ -46,7 +46,7 @@ export default function UnauthLayout({
  background: 'radial-gradient(ellipse 80% 50% at 50% 100%, rgba(30, 50, 120, 0.05) 0%, transparent 60%)',
  }}
  />
- {/* 'sNoiseTexture - Increase */}
+ {/* Noise texture overlay */}
  <div
  className="absolute inset-0 opacity-[0.015]"
  style={{

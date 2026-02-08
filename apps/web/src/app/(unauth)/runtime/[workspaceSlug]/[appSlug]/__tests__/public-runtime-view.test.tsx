@@ -37,7 +37,7 @@ describe("PublicRuntimeView", () => {
  vi.clearAllMocks();
 
  mockGetEntry.mockResolvedValue({
- workspace: { id: "ws_123", name: "dayAssistant", slug: "demo" },
+ workspace: { id: "ws_123", name: "Daily Assistant", slug: "demo" },
  access_policy: { access_mode: "public_anonymous" },
  session_id: "sess_1",
  });
@@ -52,7 +52,7 @@ describe("PublicRuntimeView", () => {
  label: "Tip",
  input_key: "prompt",
  validation: { required: true },
- props: { placeholder: "Please enterRequirements" },
+ props: { placeholder: "Please enter your requirements" },
  },
  ],
  },
@@ -66,8 +66,8 @@ describe("PublicRuntimeView", () => {
  it("renders runtime input form and execute action", async () => {
  render(<PublicRuntimeView workspaceSlug="demo" appSlug="daily-report" />);
 
- expect(await screen.findByText("dayAssistant")).toBeInTheDocument();
+ expect(await screen.findByText("Daily Assistant")).toBeInTheDocument();
  expect(screen.getByText("Tip")).toBeInTheDocument();
- expect(screen.getByRole("button", { name: "NowExecute" })).toBeInTheDocument();
+ expect(screen.getByRole("button", { name: "Execute Now" })).toBeInTheDocument();
  });
 });

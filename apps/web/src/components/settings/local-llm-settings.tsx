@@ -1,5 +1,5 @@
 /**
- * Local LLM SettingsComponent - Enhanced
+ * Local LLM Settings Component - Enhanced
  */
 
 'use client';
@@ -75,7 +75,7 @@ function StatusIndicator({
  <Loader2 className="h-4 w-4 text-primary animate-spin" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">CheckConnecting...</p>
+ <p className="text-sm font-medium text-foreground">Checking connection...</p>
  <p className="text-xs text-muted-foreground">Connecting {providerName}</p>
  </div>
  </div>
@@ -92,8 +92,8 @@ function StatusIndicator({
  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-card animate-pulse" />
  </div>
  <div>
- <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{providerName} Run</p>
- <p className="text-xs text-muted-foreground">ConnectNormal, canwithUsageLocalModel</p>
+ <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{providerName} Running</p>
+ <p className="text-xs text-muted-foreground">Connected successfully. You can use local models.</p>
  </div>
  </div>
  );
@@ -108,8 +108,8 @@ function StatusIndicator({
  <XCircle className="h-4 w-4 text-destructive" />
  </div>
  <div>
- <p className="text-sm font-medium text-destructive">{providerName} not yetRun</p>
- <p className="text-xs text-muted-foreground">PleaseLaunch {providerName} Service</p>
+ <p className="text-sm font-medium text-destructive">{providerName} Not Running</p>
+ <p className="text-xs text-muted-foreground">Please start the {providerName} service</p>
  </div>
  </div>
  );
@@ -149,7 +149,7 @@ function ProviderSelector({
  : "border-border/50 bg-muted/20 hover:border-primary/30 hover:bg-muted/30"
  )}
  >
- {/* ActivateIndicatorline */}
+ {/* Active Indicator Line */}
  <div className={cn(
  "absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-300",
  isActive ? "bg-gradient-to-b from-primary to-primary/70 opacity-100" : "bg-muted opacity-0 group-hover:opacity-50"
@@ -175,7 +175,7 @@ function ProviderSelector({
  )}
  </div>
  <p className="text-xs text-muted-foreground mt-0.5">
- LocalRun, ProtectDataPrivacy
+ Run locally to protect data privacy
  </p>
  </div>
  </div>
@@ -183,7 +183,7 @@ function ProviderSelector({
  {isAvailable ? (
  <div className="flex items-center gap-1.5">
  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
- <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{modelsCount} Model</span>
+            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{modelsCount} Models</span>
  </div>
  ) : (
  <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">Offline</span>
@@ -297,13 +297,13 @@ function RecommendedModelItem({
  "border-b border-border/30 last:border-0",
  "hover:bg-muted/20 transition-all duration-200"
  )}>
- {/* StatusIndicatorline */}
+ {/* Status Indicator Line */}
  {isInstalled && (
  <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b from-emerald-400 to-emerald-500" />
  )}
  
  <div className="flex items-center gap-4 flex-1 min-w-0 pl-2">
- {/* ModelIcon */}
+ {/* Model Icon */}
  <div className={cn(
  "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
  "transition-all duration-300",
@@ -322,7 +322,7 @@ function RecommendedModelItem({
  <span className="text-sm font-semibold text-foreground">{model.name}</span>
  {isInstalled && (
  <span className="px-2 py-0.5 text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-500/20">
- alreadyInstall
+ Installed
  </span>
  )}
  </div>
@@ -392,7 +392,7 @@ function DownloadProgress({
  "shadow-lg shadow-primary/10",
  "animate-in slide-in-from-top-2 duration-300"
  )}>
- {/* BackgroundDecoration */}
+ {/* Background Decoration */}
  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
  
  <div className="relative">
@@ -409,7 +409,7 @@ function DownloadProgress({
  <span className="text-sm font-semibold text-foreground">
  Downloading {modelName}
  </span>
- <p className="text-xs text-muted-foreground">PleaseMaintainNetworkConnectStable</p>
+ <p className="text-xs text-muted-foreground">Please ensure your network connection is stable</p>
  </div>
  </div>
  <Button
@@ -427,7 +427,7 @@ function DownloadProgress({
  </Button>
  </div>
  
- {/* ProgressInfo */}
+ {/* Progress Info */}
  <div className="space-y-3">
  <div className="flex justify-between items-center">
  <div className="flex items-center gap-2">
@@ -462,10 +462,10 @@ function DownloadProgress({
  />
  </div>
  
- {/* Statuschar */}
+ {/* Status */}
  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
  <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
- {progress.status || "Prepare..."}
+ {progress.status || "Preparing..."}
  </p>
  </div>
  </div>
@@ -474,7 +474,7 @@ function DownloadProgress({
 }
 
 /**
- * Local LLM SettingsmainComponent
+ * Local LLM Settings Main Component
  */
 export function LocalLLMSettings() {
  const {
@@ -515,7 +515,7 @@ export function LocalLLMSettings() {
  setTestResult({
  modelName,
  result: '',
- error: err instanceof Error ? err.message: 'TestFailed',
+ error: err instanceof Error ? err.message : 'Test failed',
  });
  } finally {
  setTestingModel(null);
@@ -524,8 +524,8 @@ export function LocalLLMSettings() {
 
  const handleDeleteModel = async (modelName: string) => {
  const confirmed = await confirm({
- title: "DeleteModel",
- description: `OKneedDelete ${modelName} ??This action cannot be undone.`,
+ title: "Delete Model",
+ description: `Are you sure you want to delete ${modelName}? This action cannot be undone.`,
  confirmText: "Delete",
  cancelText: "Cancel",
  variant: "destructive",
@@ -545,7 +545,7 @@ export function LocalLLMSettings() {
  try {
  await pullModel(modelName);
  } catch {
- // Erroralreadyat hook Process
+ // Error is already handled in the hook
  }
  };
 
@@ -584,7 +584,7 @@ export function LocalLLMSettings() {
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <CheckCircle2 className="w-4 h-4 text-primary" />
- <h2 className="text-sm font-semibold text-foreground">ConnectStatus</h2>
+ <h2 className="text-sm font-semibold text-foreground">Connection Status</h2>
  </div>
  <Button
  variant="outline"
@@ -614,10 +614,10 @@ export function LocalLLMSettings() {
  </div>
  <div>
  <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
- {PROVIDER_NAMES[activeProvider]} not yetRun
+ {PROVIDER_NAMES[activeProvider]} Not Running
  </p>
  <p className="text-xs text-muted-foreground mt-1">
- PleaseEnsureServicealreadyLaunchandcurrentlyatRun
+ Please ensure the service is installed and currently running
  </p>
  <Button 
  variant="link" 
@@ -643,7 +643,7 @@ export function LocalLLMSettings() {
  <div className="space-y-3">
  <Label htmlFor="ollama-url" className="text-sm font-medium flex items-center gap-2">
  <Globe className="w-3.5 h-3.5" />
- ServiceAddress
+ Service Address
  </Label>
  <div className="flex gap-2">
  <Input
@@ -673,7 +673,7 @@ export function LocalLLMSettings() {
  )}
  </section>
 
- {/* ErrorTip - Enhanced */}
+ {/* Error Message - Enhanced */}
  {error && (
  <div className={cn(
  "flex items-center gap-3 p-4 rounded-xl",
@@ -696,13 +696,13 @@ export function LocalLLMSettings() {
  />
  )}
 
- {/* alreadyInstallModel - Enhanced */}
+ {/* Installed Models - Enhanced */}
  {status === 'available' && (
  <section className="space-y-4">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <HardDrive className="w-4 h-4 text-primary" />
- <h2 className="text-sm font-semibold text-foreground">alreadyInstallModel</h2>
+ <h2 className="text-sm font-semibold text-foreground">Installed Models</h2>
  <span className="px-2 py-0.5 text-[10px] font-bold bg-primary/10 text-primary rounded-full">
  {models.length}
  </span>
@@ -745,19 +745,19 @@ export function LocalLLMSettings() {
  )}>
  <HardDrive className="h-7 w-7 text-muted-foreground" />
  </div>
- <p className="text-sm font-medium text-foreground mb-1">NonealreadyInstallModel</p>
- <p className="text-xs text-muted-foreground">fromdownmethodRecommendedModelSelectInstall</p>
+ <p className="text-sm font-medium text-foreground mb-1">No installed models</p>
+ <p className="text-xs text-muted-foreground">Select and install from the recommended models below</p>
  </div>
  )}
  </section>
  )}
 
- {/* RecommendedModel - Enhanced */}
+ {/* Recommended Models - Enhanced */}
  {status === 'available' && (
  <section className="space-y-4">
  <div className="flex items-center gap-2">
  <Sparkles className="w-4 h-4 text-primary" />
- <h2 className="text-sm font-semibold text-foreground">RecommendedModel</h2>
+ <h2 className="text-sm font-semibold text-foreground">Recommended Models</h2>
  </div>
  <div className="space-y-1">
  {RECOMMENDED_MODELS.map((model, index) => {
@@ -790,7 +790,7 @@ export function LocalLLMSettings() {
  "border-border/50",
  "shadow-2xl"
  )}>
- {/* TopDecoration */}
+ {/* Top Decoration */}
  <div className={cn(
  "absolute top-0 left-0 right-0 h-1 rounded-t-lg",
  testResult?.error 
@@ -865,14 +865,14 @@ export function LocalLLMSettings() {
  </DialogContent>
  </Dialog>
 
- {/* currentlyatTestDialog - Enhanced */}
+ {/* Testing Dialog - Enhanced */}
  <Dialog open={!!testingModel} onOpenChange={() => {}}>
  <DialogContent className={cn(
  "sm:max-w-[400px]",
  "border-border/50",
  "shadow-2xl"
  )}>
- {/* TopDecoration */}
+ {/* Top Decoration */}
  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-violet-500 to-indigo-500 rounded-t-lg" />
  
  <DialogHeader className="pt-2">
@@ -885,9 +885,9 @@ export function LocalLLMSettings() {
  <Cpu className="w-6 h-6 text-primary" />
  </div>
  <div>
- <DialogTitle className="text-lg">currentlyatTest</DialogTitle>
+ <DialogTitle className="text-lg">Testing</DialogTitle>
  <DialogDescription className="mt-0.5">
- currentlyatandModelProceedConversation...
+ Communicating with the model...
  </DialogDescription>
  </div>
  </div>
@@ -901,7 +901,7 @@ export function LocalLLMSettings() {
  <div className="absolute -inset-4 border-2 border-primary/20 rounded-3xl animate-ping opacity-30" />
  </div>
  <p className="mt-6 text-sm text-muted-foreground">
- currentlyatTest <span className="font-semibold text-foreground">{testingModel}</span>
+ Testing <span className="font-semibold text-foreground">{testingModel}</span>
  </p>
  <p className="text-xs text-muted-foreground mt-1">Please wait...</p>
  </div>

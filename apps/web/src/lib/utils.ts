@@ -36,9 +36,9 @@ export function formatRelativeTime(date: Date | string): string {
  const days = Math.floor(hours / 24);
  
  if (seconds < 60) return "Just now";
- if (minutes < 60) return `${minutes} minbefore`;
- if (hours < 24) return `${hours} hbefore`;
- if (days < 7) return `${days} daysbefore`;
+ if (minutes < 60) return `${minutes} min ago`;
+ if (hours < 24) return `${hours} hours ago`;
+ if (days < 7) return `${days} days ago`;
  
  return formatDate(d);
 }

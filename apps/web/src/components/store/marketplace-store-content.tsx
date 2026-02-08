@@ -34,14 +34,14 @@ import { marketplaceApi, type MarketplaceApp } from "@/lib/api/marketplace";
 import { toast } from "sonner";
 
 const priceOptions = [
- { id: "all", label: "allsection" },
+ { id: "all", label: "All" },
  { id: "free", label: "Free" },
  { id: "paid", label: "Paid" },
 ] as const;
 
 const formatNumber = (value: number) => {
  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
- if (value >= 10000) return `${(value / 10000).toFixed(1)}W`;
+  if (value >= 10000) return `${(value / 1000).toFixed(0)}K`;
  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
  return String(value);
 };
@@ -86,7 +86,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  setApps(list);
  setTotal(response.meta?.total ?? list.length);
  } catch (err) {
- setError(err instanceof Error ? err.message: "LoadAppFailed");
+ setError(err instanceof Error ? err.message: "Failed to load apps");
  } finally {
  setIsLoading(false);
  }
@@ -114,10 +114,10 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
 
  const stats = useMemo(
  () => [
- { label: "onApp", value: formatNumber(total || apps.length), icon: Grid },
- { label: "PublicWorkspace", value: formatNumber(workspaceCount), icon: Users },
- { label: "CumulativeRating", value: formatNumber(totalRatings), icon: TrendingUp },
- { label: "AverageRating", value: formatRating(averageRating), icon: Star },
+{ label: "Apps", value: formatNumber(total || apps.length), icon: Grid },
+      { label: "Workspaces", value: formatNumber(workspaceCount), icon: Users },
+      { label: "Total Ratings", value: formatNumber(totalRatings), icon: TrendingUp },
+      { label: "Average Rating", value: formatRating(averageRating), icon: Star },
  ],
  [apps.length, averageRating, total, totalRatings, workspaceCount]
  );
@@ -157,13 +157,13 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  rating: ratingValue,
  comment: ratingComment.trim() || undefined,
  });
- toast.success("RatingalreadySubmit");
+ toast.success("Rating submitted successfully");
  setRatingTarget(null);
  setRatingComment("");
  setRatingValue(5);
  await loadApps();
  } catch (err) {
- toast.error(err instanceof Error ? err.message: "SubmitRatingFailed");
+ toast.error(err instanceof Error ? err.message: "Failed to submit rating");
  } finally {
  setIsSubmittingRating(false);
  }
@@ -193,7 +193,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  <DialogContent className="bg-card border-border">
  <DialogHeader>
  <DialogTitle className="text-foreground">
- as"{ratingTarget?.name ?? ""}"Rating
+ Rate "{ratingTarget?.name ?? ""}"
  </DialogTitle>
  </DialogHeader>
  <div className="space-y-4">
@@ -219,7 +219,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  <Textarea
  value={ratingComment}
  onChange={(e) => setRatingComment(e.target.value)}
- placeholder="downyou'sUsageExperience(Optional)"
+ placeholder="Share your experience (optional)"
  className="min-h-28 bg-background border-border"
  />
  </div>
@@ -242,7 +242,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  Submit
  </span>
  ) : (
- "SubmitRating"
+ "Submit Rating"
  )}
  </Button>
  </DialogFooter>
@@ -265,7 +265,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  )}
  >
  <Sparkles className="h-4 w-4" />
- Discoveroptimal AI App
+ Discover the Best AI Apps
  </div>
 
  <h1
@@ -275,7 +275,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}
  >
- AppMarketplace
+ App Marketplace
  </h1>
 
  <p
@@ -285,7 +285,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}
  >
- ExploreCommunityPublish'soptimalApp, Quickgroupyou'sAutomationWorkflowcanpowerStack
+ Explore the best community-published apps to quickly build your powerful automation workflow stack
  </p>
 
  {/* Search Box */}
@@ -299,7 +299,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  <div className="relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
  <Input
- placeholder="SearchApp..."
+ placeholder="Search apps..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-12 pr-4 h-12 rounded-full bg-card border-border"
@@ -308,7 +308,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  </div>
  </div>
 
- {/* StatisticsData */}
+ {/* Statistics */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
  {stats.map((stat) => (
  <div
@@ -331,7 +331,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  {/* Sidebar - Filter */}
  <aside className="lg:w-64 shrink-0">
  <div className={cn("sticky space-y-6", sidebarStickyTop)}>
- {/* PriceFilter */}
+ {/* Price Filter */}
  <div className="p-4 rounded-xl bg-card border border-border">
  <h3 className="font-semibold text-foreground mb-4">Price</h3>
  <div className="space-y-2">
@@ -353,19 +353,19 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  </div>
 
  <div className="p-4 rounded-xl bg-card border border-border">
- <h3 className="font-semibold text-foreground mb-2">onRule</h3>
- <p className="text-xs text-muted-foreground leading-relaxed">
- PublishedandSettingsasPublicAccess'sAppwillAutoEnterMarketplaceShowcase, RatingandFeedbackwillSyncImpactSortandExposure.
- </p>
+<h3 className="font-semibold text-foreground mb-2">Listing Rules</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Published apps set to public access will automatically appear in the marketplace. Ratings and feedback will affect sorting and visibility.
+              </p>
  </div>
 
  <div className="p-4 rounded-xl bg-card border border-border">
- <h3 className="font-semibold text-foreground mb-2">Complianceand</h3>
- <div className="space-y-2 text-xs text-muted-foreground leading-relaxed">
- <p>PublicAccessContentPublishuserCreateandResponsibility, PlatformonlyProvideTechnologyServiceandShowcaseChannel.</p>
- <p>AI GenerateContentcancanat, PleasepersonafterUsage.</p>
- <p className="text-[11px]">
- moremultiple: 
+<h3 className="font-semibold text-foreground mb-2">Compliance</h3>
+              <div className="space-y-2 text-xs text-muted-foreground leading-relaxed">
+                <p>Public content is created by and the responsibility of the publisher. The platform only provides the technology service and showcase channel.</p>
+                <p>AI-generated content may contain errors. Please verify before use.</p>
+                <p className="text-[11px]">
+                  Learn more: 
  <Link href="/terms" className="mx-1 text-primary hover:underline">
  Terms of Service
  </Link>
@@ -379,7 +379,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  </div>
  </aside>
 
- {/* AppList */}
+ {/* App List */}
  <main className="flex-1">
  {/* Sort */}
  <div className="flex items-center justify-between mb-6">
@@ -391,9 +391,9 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
  className="h-9 px-3 rounded-lg bg-card border border-border text-sm"
  >
- <option value="popular">mostPopular</option>
- <option value="rating">Ratingmost</option>
- <option value="newest">mostnew</option>
+<option value="popular">Most Popular</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="newest">Newest</option>
  </select>
  </div>
  </div>
@@ -438,7 +438,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  : "bg-amber-500/10 text-amber-500"
  )}
  >
- {app.access_mode === "public_anonymous" ? "Public": "needSign In"}
+ {app.access_mode === "public_anonymous" ? "Public": "Sign In Required"}
  </span>
  </div>
 
@@ -487,7 +487,7 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  size="sm"
  className="flex-1 rounded-lg"
  onClick={() => {
- toast.info("not yetOpen1keyInstall, Stay tuned");
+ toast.info("One-click install coming soon. Stay tuned!");
  }}
  >
  Install
@@ -508,10 +508,10 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  ) : (
  <div className="text-center py-16">
  <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
- <h3 className="text-lg font-semibold text-foreground mb-2">NotoApp</h3>
- <p className="text-muted-foreground mb-6">TryAdjustSearchConditionorFilter</p>
- <Button variant="outline" onClick={resetFilters}>
- ResetFilter
+<h3 className="text-lg font-semibold text-foreground mb-2">No Apps Found</h3>
+              <p className="text-muted-foreground mb-6">Try adjusting your search terms or filters</p>
+              <Button variant="outline" onClick={resetFilters}>
+                Reset Filters
  </Button>
  </div>
  )}
@@ -523,20 +523,20 @@ export function MarketplaceStoreContent({ variant }: { variant: MarketplaceStore
  {/* CTA Section */}
  <section className="py-16 px-6 bg-muted/20">
  <div className="max-w-4xl mx-auto text-center">
- <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">asAppCreativeuser</h2>
+ <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">For App Creators</h2>
  <p className="text-muted-foreground mb-6">
- Shareyou'sApp, ObtainCreativeuserRevenue, JoinWe'sDevelopersCommunity
+ Share your apps, earn revenue, and join our developer community
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/dashboard/creator">
  <Button size="lg" className="rounded-full">
- StartCreative
+ Start Creating
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/docs">
  <Button size="lg" variant="outline" className="rounded-full">
- ViewDocument
+ View Documentation
  </Button>
  </Link>
  </div>

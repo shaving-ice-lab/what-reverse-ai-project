@@ -35,7 +35,7 @@ export interface NotificationItem {
  createdAt: string;
 }
 
-// not yetreadcountStatistics
+// Unread count statistics
 export interface UnreadCount {
  total: number;
  byType: Record<NotificationType, number>;
@@ -94,7 +94,7 @@ export interface GetNotificationResponse {
  data: NotificationItem;
 }
 
-// not yetreadcountResponse
+// Unread count response
 export interface GetUnreadCountResponse {
  data: UnreadCount;
 }

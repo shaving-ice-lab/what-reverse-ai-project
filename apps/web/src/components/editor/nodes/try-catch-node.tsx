@@ -40,7 +40,7 @@ export const TryCatchNode = memo(function TryCatchNode({
  : "border-border hover:border-destructive/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -55,7 +55,7 @@ export const TryCatchNode = memo(function TryCatchNode({
  <ShieldAlert className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "ErrorProcess"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Error Handling"}</h3>
  <p className="text-xs text-foreground-muted">Try / Catch</p>
  </div>
  </div>
@@ -67,7 +67,7 @@ export const TryCatchNode = memo(function TryCatchNode({
  <RotateCcw className="h-3.5 w-3.5 text-foreground-muted shrink-0" />
  <span className="text-foreground-muted">Retry:</span>
  <span className="font-mono px-1.5 py-0.5 rounded bg-destructive-200 text-destructive font-medium">
- {retryCount}times
+ {retryCount} times
  </span>
  <span className="text-foreground-muted">Latency:</span>
  <span className="font-mono">{retryDelay}ms</span>
@@ -75,7 +75,7 @@ export const TryCatchNode = memo(function TryCatchNode({
  )}
  {config.errorVariable && (
  <div className="flex items-center gap-2">
- <span className="text-foreground-muted">ErrorVariable:</span>
+ <span className="text-foreground-muted">Error Variable:</span>
  <span className="font-mono px-1.5 py-0.5 rounded bg-surface-200">
  ${config.errorVariable}
  </span>
@@ -84,7 +84,7 @@ export const TryCatchNode = memo(function TryCatchNode({
  {config.continueOnError && (
  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-warning-200 text-warning">
  <AlertTriangle className="h-3 w-3" />
- ErrortimeContinueExecute
+ Continue on Error
  </span>
  )}
  </div>

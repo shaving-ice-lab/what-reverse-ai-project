@@ -1,30 +1,30 @@
 "use client";
 
 /**
- * SiteFooter - LobeHub Stylepage
- * Minimal, Modern, DarkTheme
+ * SiteFooter - LobeHub Style Page
+ * Minimal, Modern, Dark Theme
  */
 
 import Link from "next/link";
 import { Workflow } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Footer LinkGroup
+// Footer Link Groups
 const footerSections = [
  {
  title: "Product",
  links: [
  { label: "Features", href: "/features" },
- { label: "PricingPlan", href: "/pricing" },
+ { label: "Pricing Plan", href: "/pricing" },
  { label: "Enterprise", href: "/enterprise" },
  { label: "Template Gallery", href: "/templates" },
  { label: "Change Log", href: "/whats-new" },
  ],
  },
  {
- title: "Resource",
+ title: "Resources",
  links: [
- { label: "Documentcenter", href: "/docs" },
+ { label: "Document Center", href: "/docs" },
  { label: "Developers", href: "/developers" },
  { label: "Blog", href: "/blog" },
  { label: "Help Center", href: "/help" },
@@ -34,8 +34,8 @@ const footerSections = [
  {
  title: "Company",
  links: [
- { label: "AboutWe", href: "/about" },
- { label: "Mediacenter", href: "/press" },
+ { label: "About Us", href: "/about" },
+ { label: "Media Center", href: "/press" },
  { label: "Partners", href: "/partners" },
  { label: "Contact Us", href: "/contact" },
  ],
@@ -45,12 +45,12 @@ const footerSections = [
  links: [
  { label: "Terms of Service", href: "/terms" },
  { label: "Privacy Policy", href: "/privacy" },
- { label: "Securitycenter", href: "/security" },
+ { label: "Security Center", href: "/security" },
  ],
  },
 ];
 
-// Social MediaLink
+// Social Media Links
 const socialLinks = [
  {
  name: "GitHub",
@@ -81,7 +81,7 @@ const socialLinks = [
  },
 ];
 
-// Link(Used for minimal Variant)
+// Links (Used for minimal variant)
 const minimalLinks = [
  { label: "Document", href: "/docs" },
  { label: "Blog", href: "/blog" },
@@ -135,7 +135,7 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
  <span className="font-semibold text-foreground text-[15px]">AgentFlow</span>
  </Link>
  <p className="text-[13px] text-foreground-lighter leading-relaxed mb-6 max-w-xs">
- down1 AI WorkflowAutomationPlatform, leteachpersonallcanBuildSmartApp.
+ The next-generation AI Workflow Automation Platform. Let everyone build smart apps.
  </p>
  {/* Social Links */}
  <div className="flex items-center gap-2">

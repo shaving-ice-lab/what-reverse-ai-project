@@ -173,83 +173,83 @@ const saveHistoryToStorage = (workspaceId: string, entries: HistoryEntry[]) => {
 };
 
 const validateJsonFile = (file: File, label: string) => {
- if (!file) return `Please select${label} JSON File`;
- if (!file.name.toLowerCase().endsWith(".json")) return "onlySupport.json File";
- if (file.size === 0) return "FileasEmpty";
- if (file.size > MAX_IMPORT_BYTES) return `FileExceed ${MAX_IMPORT_MB}MB, PleaseSplitafteragainImport`;
- if (file.type && !file.type.toLowerCase().includes("json")) return "FileTypeMustas JSON";
- return null;
+  if (!file) return `Please select a ${label} JSON file`;
+  if (!file.name.toLowerCase().endsWith(".json")) return "Only .json files are supported.";
+  if (file.size === 0) return "File is empty.";
+  if (file.size > MAX_IMPORT_BYTES) return `File exceeds ${MAX_IMPORT_MB}MB. Please split and re-import.`;
+  if (file.type && !file.type.toLowerCase().includes("json")) return "File type must be JSON.";
+  return null;
 };
 
 const readJsonFile = async (file: File) => {
  const text = await file.text();
  const parsed = JSON.parse(text) as unknown;
  if (!isRecord(parsed)) {
- throw new Error("JSON Mustisfor");
+    throw new Error("JSON must be an object.");
  }
  return parsed;
 };
 
 const validateWorkflowPayload = (payload: Record<string, unknown>) => {
  const rawWorkflow = isRecord(payload.workflow) ? payload.workflow : payload;
- if (!isRecord(rawWorkflow)) return "WorkflowStructureInvalid";
- if (rawWorkflow.name !== undefined && typeof rawWorkflow.name !== "string") {
- return "workflow.name MustisString";
- }
- if (
- rawWorkflow.description !== undefined &&
- typeof rawWorkflow.description !== "string" &&
- rawWorkflow.description !== null
- ) {
- return "workflow.description MustisStringor null";
- }
- if (rawWorkflow.definition !== undefined && !isRecord(rawWorkflow.definition)) {
- return "workflow.definition Mustisfor";
- }
- if (
- rawWorkflow.variables !== undefined &&
- rawWorkflow.variables !== null &&
- !isRecord(rawWorkflow.variables)
- ) {
- return "workflow.variables Mustisfor";
- }
- if (rawWorkflow.trigger_type !== undefined && typeof rawWorkflow.trigger_type !== "string") {
- return "workflow.trigger_type MustisString";
- }
- if (
- rawWorkflow.trigger_config !== undefined &&
- rawWorkflow.trigger_config !== null &&
- !isRecord(rawWorkflow.trigger_config)
- ) {
- return "workflow.trigger_config Mustisfor";
- }
+  if (!isRecord(rawWorkflow)) return "Workflow structure is invalid.";
+  if (rawWorkflow.name !== undefined && typeof rawWorkflow.name !== "string") {
+    return "workflow.name must be a string.";
+  }
+  if (
+    rawWorkflow.description !== undefined &&
+    typeof rawWorkflow.description !== "string" &&
+    rawWorkflow.description !== null
+  ) {
+    return "workflow.description must be a string or null.";
+  }
+  if (rawWorkflow.definition !== undefined && !isRecord(rawWorkflow.definition)) {
+    return "workflow.definition must be an object.";
+  }
+  if (
+    rawWorkflow.variables !== undefined &&
+    rawWorkflow.variables !== null &&
+    !isRecord(rawWorkflow.variables)
+  ) {
+    return "workflow.variables must be an object.";
+  }
+  if (rawWorkflow.trigger_type !== undefined && typeof rawWorkflow.trigger_type !== "string") {
+    return "workflow.trigger_type must be a string.";
+  }
+  if (
+    rawWorkflow.trigger_config !== undefined &&
+    rawWorkflow.trigger_config !== null &&
+    !isRecord(rawWorkflow.trigger_config)
+  ) {
+    return "workflow.trigger_config must be an object.";
+  }
 
  const definition = isRecord(rawWorkflow.definition) ? rawWorkflow.definition : rawWorkflow;
  const nodes = (definition as { nodes?: unknown }).nodes ?? (rawWorkflow as { nodes?: unknown }).nodes;
  const edges = (definition as { edges?: unknown }).edges ?? (rawWorkflow as { edges?: unknown }).edges;
- if (nodes !== undefined && !Array.isArray(nodes)) return "nodes Mustiscountgroup";
- if (edges !== undefined && !Array.isArray(edges)) return "edges Mustiscountgroup";
- if (!Array.isArray(nodes) && !Array.isArray(edges)) return "not yetto nodes or edges";
+  if (nodes !== undefined && !Array.isArray(nodes)) return "nodes must be an array.";
+  if (edges !== undefined && !Array.isArray(edges)) return "edges must be an array.";
+  if (!Array.isArray(nodes) && !Array.isArray(edges)) return "Missing nodes or edges.";
 
- if (Array.isArray(nodes)) {
- for (const node of nodes) {
- if (!isRecord(node)) return "nodes Mustisfor";
- if (typeof node.id !== "string" || node.id.trim() === "") {
- return "nodes.id MustisEmptyString";
- }
- }
- }
- if (Array.isArray(edges)) {
- for (const edge of edges) {
- if (!isRecord(edge)) return "edges Mustisfor";
- if (typeof edge.source !== "string" || edge.source.trim() === "") {
- return "edges.source MustisEmptyString";
- }
- if (typeof edge.target !== "string" || edge.target.trim() === "") {
- return "edges.target MustisEmptyString";
- }
- }
- }
+  if (Array.isArray(nodes)) {
+    for (const node of nodes) {
+      if (!isRecord(node)) return "Each node must be an object.";
+      if (typeof node.id !== "string" || node.id.trim() === "") {
+        return "nodes.id must be a non-empty string.";
+      }
+    }
+  }
+  if (Array.isArray(edges)) {
+    for (const edge of edges) {
+      if (!isRecord(edge)) return "Each edge must be an object.";
+      if (typeof edge.source !== "string" || edge.source.trim() === "") {
+        return "edges.source must be a non-empty string.";
+      }
+      if (typeof edge.target !== "string" || edge.target.trim() === "") {
+        return "edges.target must be a non-empty string.";
+      }
+    }
+  }
  return null;
 };
 
@@ -259,31 +259,31 @@ const validateSchemaPayload = (payload: Record<string, unknown>) => {
  : isRecord(payload.version)
  ? payload.version
  : payload;
- if (!isRecord(version)) return "Schema StructureInvalid";
+  if (!isRecord(version)) return "Schema structure is invalid.";
 
- const uiSchema = (version.ui_schema ?? payload.ui_schema) ?? undefined;
- const dbSchema = (version.db_schema ?? payload.db_schema) ?? undefined;
- const configJson = (version.config_json ?? payload.config_json) ?? undefined;
- const workflowId = version.workflow_id ?? payload.workflow_id;
+  const uiSchema = (version.ui_schema ?? payload.ui_schema) ?? undefined;
+  const dbSchema = (version.db_schema ?? payload.db_schema) ?? undefined;
+  const configJson = (version.config_json ?? payload.config_json) ?? undefined;
+  const workflowId = version.workflow_id ?? payload.workflow_id;
 
- if (uiSchema === undefined && dbSchema === undefined && configJson === undefined) {
- return "not yetto ui_schema/db_schema/config_json";
- }
- if (uiSchema !== undefined && !isRecord(uiSchema)) return "ui_schema Mustisfor";
- if (dbSchema !== undefined && !isRecord(dbSchema)) return "db_schema Mustisfor";
- if (configJson !== undefined && !isRecord(configJson)) return "config_json Mustisfor";
- if (workflowId !== undefined && workflowId !== null && typeof workflowId !== "string") {
- return "workflow_id MustisString";
- }
- return null;
+  if (uiSchema === undefined && dbSchema === undefined && configJson === undefined) {
+    return "Missing ui_schema, db_schema, or config_json.";
+  }
+  if (uiSchema !== undefined && !isRecord(uiSchema)) return "ui_schema must be an object.";
+  if (dbSchema !== undefined && !isRecord(dbSchema)) return "db_schema must be an object.";
+  if (configJson !== undefined && !isRecord(configJson)) return "config_json must be an object.";
+  if (workflowId !== undefined && workflowId !== null && typeof workflowId !== "string") {
+    return "workflow_id must be a string.";
+  }
+  return null;
 };
 
 const auditActionLabels: Record<string, string> = {
- "workspace.export": "WorkspaceConfigExport",
- "workflow.import": "WorkflowImport",
+ "workspace.export": "Workspace Config Export",
+ "workflow.import": "Workflow Import",
  "workspace.schema.import": "Schema Import",
- "workspace.db.backup": "DatabaseBackup",
- "workspace.db.restore": "DatabaseRestore",
+ "workspace.db.backup": "Database Backup",
+ "workspace.db.restore": "Database Restore",
 };
 
 const readStringValue = (value: unknown) => (typeof value === "string" ? value : "");
@@ -576,19 +576,19 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "workspace_export",
  status: "success",
- label: "WorkspaceConfigExport",
+ label: "Workspace Config Export",
  detail: `${workspaceName} · ${filename}`,
  });
  if (activeWorkspaceId) {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "ExportFailed";
+ const message = error instanceof Error ? error.message: "Export Failed";
  setExportError(message);
  addHistoryEntry({
  action: "workspace_export",
  status: "failed",
- label: "WorkspaceConfigExport",
+ label: "Workspace Config Export",
  detail: message,
  });
  } finally {
@@ -598,7 +598,7 @@ export default function ExportPage() {
 
  const handleImportWorkflow = async () => {
  const file = workflowFileRef.current?.files?.[0];
- const fileError = file ? validateJsonFile(file, "Workflow"): "Please selectWorkflow JSON File";
+ const fileError = file ? validateJsonFile(file, "Workflow"): "Please select a Workflow JSON file";
  if (fileError) {
  setWorkflowImportError(fileError);
  await recordClientAudit("workflow.import", {
@@ -611,7 +611,7 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "workflow_import",
  status: "failed",
- label: "WorkflowImport",
+ label: "Workflow Import",
  detail: `${file.name} · ${fileError}`,
  });
  }
@@ -634,7 +634,7 @@ export default function ExportPage() {
  });
  const imported = response.data?.workflow;
  if (!imported?.id) {
- throw new Error("ImportSuccessbutnot yetBackWorkflow ID");
+ throw new Error("Import succeeded, but workflow ID was not returned");
  }
  setWorkflowImportResult({
  id: imported.id,
@@ -643,14 +643,14 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "workflow_import",
  status: "success",
- label: "WorkflowImport",
+ label: "Workflow Import",
  detail: `${file.name} · ${imported.name || workflow.name}`,
  });
  if (activeWorkspaceId) {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "ImportFailed";
+ const message = error instanceof Error ? error.message: "Import Failed";
  await recordClientAudit("workflow.import", {
  status: "failed",
  error: message,
@@ -661,7 +661,7 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "workflow_import",
  status: "failed",
- label: "WorkflowImport",
+ label: "Workflow Import",
  detail: `${file.name} · ${message}`,
  });
  } finally {
@@ -673,10 +673,10 @@ export default function ExportPage() {
  const handleImportSchema = async () => {
  const file = schemaFileRef.current?.files?.[0];
  if (!schemaWorkspaceId) {
- setSchemaImportError("Please selectTargetWorkspace");
+ setSchemaImportError("Please select a target workspace");
  await recordClientAudit("workspace.schema.import", {
  status: "failed",
- error: "not yetSelectTargetWorkspace",
+ error: "Target workspace not selected",
  validation_stage: "context",
  workspace_id: schemaWorkspaceId,
  source: "schema_import",
@@ -746,7 +746,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "ImportFailed";
+ const message = error instanceof Error ? error.message: "Import Failed";
  await recordClientAudit("workspace.schema.import", {
  status: "failed",
  error: message,
@@ -780,7 +780,7 @@ export default function ExportPage() {
  );
  const backup = response.data?.backup;
  if (!backup?.backup_id) {
- throw new Error("BackupCreated successfullybutnot yetBackBackup ID");
+ throw new Error("Backup created successfully, but backup ID was not returned");
  }
  setBackupResult({
  backupId: backup.backup_id,
@@ -791,19 +791,19 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "db_backup",
  status: "success",
- label: "DatabaseBackup",
+ label: "Database Backup",
  detail: `Backup ${backup.backup_id} · ${backup.tables} `,
  });
  if (activeWorkspaceId) {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "BackupFailed";
+ const message = error instanceof Error ? error.message: "Backup Failed";
  setBackupError(message);
  addHistoryEntry({
  action: "db_backup",
  status: "failed",
- label: "DatabaseBackup",
+ label: "Database Backup",
  detail: message,
  });
  } finally {
@@ -814,7 +814,7 @@ export default function ExportPage() {
  const handleRestore = async () => {
  if (!activeWorkspaceId) return;
  if (!restoreBackupId.trim()) {
- setRestoreError("Please enterBackup ID");
+ setRestoreError("Please enter a Backup ID");
  return;
  }
  setRestoreLoading(true);
@@ -830,7 +830,7 @@ export default function ExportPage() {
  );
  const restore = response.data?.restore;
  if (!restore?.backup_id) {
- throw new Error("RestoreSuccessbutnot yetBackRestoreResult");
+ throw new Error("Restore succeeded, but restore result was not returned");
  }
  setRestoreResult({
  backupId: restore.backup_id,
@@ -839,19 +839,19 @@ export default function ExportPage() {
  addHistoryEntry({
  action: "db_restore",
  status: "success",
- label: "DatabaseRestore",
+ label: "Database Restore",
  detail: `Backup ${restore.backup_id} · ${restore.restored_tables} `,
  });
  if (activeWorkspaceId) {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "RestoreFailed";
+ const message = error instanceof Error ? error.message: "Restore Failed";
  setRestoreError(message);
  addHistoryEntry({
  action: "db_restore",
  status: "failed",
- label: "DatabaseRestore",
+ label: "Database Restore",
  detail: message,
  });
  } finally {
@@ -862,13 +862,13 @@ export default function ExportPage() {
  const summaryItems = useMemo(
  () => [
  {
- label: "WorkspaceConfigExport",
- status: exportError ? "Failed": exportResult ? "Completed": "not yetExecute",
+ label: "Workspace Config Export",
+ status: exportError ? "Failed": exportResult ? "Completed": "Not yet executed",
  detail: exportResult?.filename,
  },
  {
- label: "WorkflowImport",
- status: workflowImportError ? "Failed": workflowImportResult ? "Completed": "not yetExecute",
+ label: "Workflow Import",
+ status: workflowImportError ? "Failed": workflowImportResult ? "Completed": "Not yet executed",
  detail: workflowImportResult?.name,
  },
  {
@@ -905,11 +905,11 @@ export default function ExportPage() {
  <PageContainer>
  <p className="page-caption">Data</p>
  <PageHeader
- title="DataImport/ExportandBackup"
- description="ExportWorkspaceConfig, ImportWorkflowand Schema, andManageWorkspaceBackup"
+ title="Data Import/Export and Backup"
+ description="Export workspace config, import workflows and schemas, and manage workspace backups"
  actions={(
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted">
- {activeWorkspaceId ? "BoundWorkspace": "not yetSelectWorkspace"}
+ {activeWorkspaceId ? "Bound Workspace": "No workspace selected"}
  </Badge>
  )}
  />
@@ -919,15 +919,15 @@ export default function ExportPage() {
  <div className="page-section space-y-6">
  <div className="page-panel">
  <div className="page-panel-header">
- <h2 className="page-panel-title">WorkspaceConfigExport</h2>
- <p className="page-panel-description mt-1">ExportWorkspaceCurrent Version's UI/DB Schema andConfig</p>
+ <h2 className="page-panel-title">Workspace Config Export</h2>
+ <p className="page-panel-description mt-1">Export workspace's current version UI/DB schema and config</p>
  </div>
  <div className="p-6 space-y-4">
  <div className="space-y-2">
- <label className="text-[12px] text-foreground-light">SelectWorkspace</label>
+ <label className="text-[12px] text-foreground-light">Select Workspace</label>
  <Select value={selectedWorkspaceId} onValueChange={setSelectedWorkspaceId}>
  <SelectTrigger className="bg-surface-100 border-border">
- <SelectValue placeholder={workspacesLoading ? "Loading...": "Please selectWorkspace"} />
+ <SelectValue placeholder={workspacesLoading ? "Loading...": "Please select a workspace"} />
  </SelectTrigger>
  <SelectContent>
  {workspaceOptions.map((app) => (
@@ -957,13 +957,13 @@ export default function ExportPage() {
  ) : (
  <>
  <Download className="w-4 h-4 mr-2" />
- DownloadConfig
+ Download Config
  </>
  )}
  </Button>
  {exportResult && (
  <Badge variant="secondary" className="bg-brand-200/60 text-brand-500">
- alreadyExport
+ Exported
  </Badge>
  )}
  </div>
@@ -986,12 +986,12 @@ export default function ExportPage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <h2 className="page-panel-title">Workflow / Schema Import</h2>
- <p className="page-panel-description mt-1">SupportImportWorkflow JSON andApp Schema File</p>
+ <p className="page-panel-description mt-1">Import Workflow JSON and App Schema files</p>
  </div>
  <div className="p-6 grid gap-4 lg:grid-cols-2">
  <div className="rounded-md border border-border bg-surface-75 p-4 space-y-3">
  <div className="flex items-center justify-between">
- <h3 className="text-[13px] font-medium text-foreground">WorkflowImport</h3>
+ <h3 className="text-[13px] font-medium text-foreground">Workflow Import</h3>
  {workflowImportResult && (
  <Badge variant="secondary" className="bg-brand-200/60 text-brand-500">
  Done
@@ -1018,7 +1018,7 @@ export default function ExportPage() {
  ) : (
  <>
  <Upload className="w-4 h-4 mr-2" />
- ImportWorkflow
+ Import Workflow
  </>
  )}
  </Button>
@@ -1030,7 +1030,7 @@ export default function ExportPage() {
  )}
  {workflowImportResult && (
  <div className="flex items-center justify-between text-[12px] text-foreground-muted">
- <span>alreadyImport: {workflowImportResult.name}</span>
+ <span>Imported: {workflowImportResult.name}</span>
  <Button
  size="xs"
  variant="outline"
@@ -1053,7 +1053,7 @@ export default function ExportPage() {
  </div>
  <Select value={schemaWorkspaceId} onValueChange={setSchemaWorkspaceId}>
  <SelectTrigger className="bg-surface-100 border-border">
- <SelectValue placeholder={workspacesLoading ? "Loading...": "SelectTargetWorkspace"} />
+ <SelectValue placeholder={workspacesLoading ? "Loading...": "Select Target Workspace"} />
  </SelectTrigger>
  <SelectContent>
  {workspaceOptions.map((app) => (
@@ -1098,7 +1098,7 @@ export default function ExportPage() {
  )}
  {schemaImportResult && (
  <div className="text-[12px] text-foreground-muted">
- alreadyCreateVersion {schemaImportResult.versionId?.slice(0, 8)}
+ Version created: {schemaImportResult.versionId?.slice(0, 8)}
  </div>
  )}
  </div>
@@ -1107,13 +1107,13 @@ export default function ExportPage() {
 
  <div className="page-panel">
  <div className="page-panel-header">
- <h2 className="page-panel-title">Workspace DataBackupandRestore</h2>
- <p className="page-panel-description mt-1">asWorkspaceDatabaseCreateBackuporExecuteRestore</p>
+ <h2 className="page-panel-title">Workspace Data Backup and Restore</h2>
+ <p className="page-panel-description mt-1">Create a backup of workspace data or perform a restore</p>
  </div>
  <div className="p-6 grid gap-4 lg:grid-cols-2">
  <div className="rounded-md border border-border bg-surface-75 p-4 space-y-3">
  <div className="flex items-center justify-between">
- <h3 className="text-[13px] font-medium text-foreground">CreateBackup</h3>
+ <h3 className="text-[13px] font-medium text-foreground">Create Backup</h3>
  {backupResult && (
  <Badge variant="secondary" className="bg-brand-200/60 text-brand-500">
  Done
@@ -1134,7 +1134,7 @@ export default function ExportPage() {
  ) : (
  <>
  <Database className="w-4 h-4 mr-2" />
- CreateDatabaseBackup
+ Create Database Backup
  </>
  )}
  </Button>
@@ -1153,7 +1153,7 @@ export default function ExportPage() {
 
  <div className="rounded-md border border-border bg-surface-75 p-4 space-y-3">
  <div className="flex items-center justify-between">
- <h3 className="text-[13px] font-medium text-foreground">fromBackupRestore</h3>
+ <h3 className="text-[13px] font-medium text-foreground">Restore from Backup</h3>
  {restoreResult && (
  <Badge variant="secondary" className="bg-brand-200/60 text-brand-500">
  Done
@@ -1181,13 +1181,13 @@ export default function ExportPage() {
  ) : (
  <>
  <Upload className="w-4 h-4 mr-2" />
- ExecuteRestore
+ Execute Restore
  </>
  )}
  </Button>
  <div className="flex items-start gap-2 text-[12px] text-foreground-muted">
  <AlertCircle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
- RestorewillCoverageCurrentDatabaseData, SuggestionfirstExecuteBackup.
+ Restoring will overwrite current database data. We suggest creating a backup first.
  </div>
  {restoreError && (
  <div className="flex items-center gap-2 text-xs text-destructive">
@@ -1197,7 +1197,7 @@ export default function ExportPage() {
  )}
  {restoreResult && (
  <div className="text-[12px] text-foreground-muted">
- alreadyRestore {restoreResult.restoredTables} 
+ Restored: {restoreResult.restoredTables} 
  </div>
  )}
  </div>
@@ -1208,8 +1208,8 @@ export default function ExportPage() {
  <div className="page-section space-y-6">
  <div className="page-panel sticky top-6">
  <div className="page-panel-header">
- <h2 className="page-panel-title">ActionSummary</h2>
- <p className="page-panel-description mt-1">Currentwill'sImport/ExportandBackupStatus</p>
+ <h2 className="page-panel-title">Action Summary</h2>
+ <p className="page-panel-description mt-1">Current import/export and backup status</p>
  </div>
  <div className="p-5 space-y-3">
  {summaryItems.map((item) => (
@@ -1242,7 +1242,7 @@ export default function ExportPage() {
  <div className="page-panel-header">
  <div className="flex items-start justify-between gap-3">
  <div>
- <h2 className="page-panel-title">Export/ImportHistory</h2>
+ <h2 className="page-panel-title">Export / Import History</h2>
  <p className="page-panel-description mt-1">Recent {MAX_HISTORY_ITEMS} Record</p>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted">
@@ -1254,7 +1254,7 @@ export default function ExportPage() {
  {historyLoading ? (
  <div className="text-[12px] text-foreground-muted">Loading...</div>
  ) : historyEntries.length === 0 ? (
- <div className="text-[12px] text-foreground-muted">NoneRecord</div>
+ <div className="text-[12px] text-foreground-muted">No Records</div>
  ) : (
  historyEntries.map((entry) => (
  <div key={entry.id} className="flex items-start justify-between gap-3">
@@ -1288,11 +1288,11 @@ export default function ExportPage() {
  <div className="p-4 flex items-start gap-3">
  <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
  <div>
- <h3 className="text-[13px] font-medium text-foreground mb-1">SecurityTip</h3>
+ <h3 className="text-[13px] font-medium text-foreground mb-1">Security Tips</h3>
  <ul className="text-[12px] text-foreground-light space-y-1">
- <li>• ExportFileasreadcurrent, SuggestionEncryptSave</li>
- <li>• Schema ImportwillCreatenewVersion, PleaseatTestEnvironmentVerify</li>
- <li>• DatabaseRestorewillCoverageExistingData, firstBackup</li>
+ <li>• Export files are readable. We suggest encrypting them before saving.</li>
+ <li>• Schema import will create a new version. Please verify in a test environment first.</li>
+ <li>• Database restore will overwrite existing data. Create a backup first.</li>
  </ul>
  </div>
  </div>

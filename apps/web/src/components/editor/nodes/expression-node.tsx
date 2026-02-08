@@ -41,7 +41,7 @@ export const ExpressionNode = memo(function ExpressionNode({
           : "border-border hover:border-brand-500/40"
       )}
     >
- {/* InputPort */}
+ {/* Input Port */}
       <Handle
         id="input"
         type="target"
@@ -57,7 +57,7 @@ export const ExpressionNode = memo(function ExpressionNode({
         </div>
         <div className="flex-1 min-w-0">
  <h3 className="font-medium text-sm truncate">{data.label || "Expression"}</h3>
- <p className="text-xs text-foreground-muted">CalculateExpression</p>
+ <p className="text-xs text-foreground-muted">Calculate Expression</p>
         </div>
       </div>
 

@@ -65,24 +65,24 @@ import {
 
 // mainNavigationMenu
 const mainNavItems = [
- { title: "itemOverview", href: "/dashboard", icon: Activity },
+ { title: "Overview", href: "/dashboard", icon: Activity },
  { title: "Workspace", href: "/dashboard/workspaces", icon: LayoutGrid },
  { title: "Planning", href: "/dashboard/plans", icon: ListTodo },
- { title: "TicketManage", href: "/dashboard/support-tickets", icon: LifeBuoy },
- { title: "SupportSettings", href: "/dashboard/support-settings", icon: Settings },
+ { title: "Ticket Management", href: "/dashboard/support-tickets", icon: LifeBuoy },
+ { title: "Support Settings", href: "/dashboard/support-settings", icon: Settings },
  { title: "Conversation", href: "/dashboard/conversations", icon: MessageSquare },
- { title: "Workflow(old)", href: "/dashboard/workflows", icon: Zap },
+ { title: "Workflow (legacy)", href: "/dashboard/workflows", icon: Zap },
  { title: "Workbench", href: "/dashboard/apps", icon: LayoutGrid },
- { title: "CreativeWorkshop", href: "/dashboard/creative", icon: Palette },
+ { title: "Creative Workshop", href: "/dashboard/creative", icon: Palette },
  { title: "Template Gallery", href: "/dashboard/template-gallery", icon: LayoutGrid },
  { title: "Store", href: "/dashboard/store", icon: Store },
 ];
 
 // personMenu
 const personalNavItems = [
- { title: "I's Agent(old)", href: "/dashboard/my-agents", icon: Bot },
- { title: "I'sFile", href: "/dashboard/files", icon: FolderOpen },
- { title: "DataAnalytics", href: "/dashboard/analytics", icon: BarChart3 },
+ { title: "My Agents (Legacy)", href: "/dashboard/my-agents", icon: Bot },
+ { title: "My Files", href: "/dashboard/files", icon: FolderOpen },
+ { title: "Data Analytics", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
 // allPage(PageControlLayoutandScroll)
@@ -134,11 +134,11 @@ const workspaceStatusConfig: Record<string, { label: string; color: string }> = 
 
 // MockConversationHistory
 const recentConversations = [
- { id: "1", title: "CreateAutomationEmailWorkflow", time: "2minbefore" },
- { id: "2", title: "Webhook TriggerConfig", time: "1hbefore" },
- { id: "3", title: "SalesDataAnalyticsReport", time: "Yesterday" },
- { id: "4", title: "GitHub Issue AutoCategory", time: "Yesterday" },
- { id: "5", title: "CustomerFeedbackSentimentAnalytics", time: "3daysbefore" },
+ { id: "1", title: "Create automation email workflow", time: "2 min ago" },
+ { id: "2", title: "Webhook trigger config", time: "1 hour ago" },
+ { id: "3", title: "Sales data analytics report", time: "Yesterday" },
+ { id: "4", title: "GitHub issue auto category", time: "Yesterday" },
+ { id: "5", title: "Customer feedback sentiment analytics", time: "3 days ago" },
 ];
 
 export default function DashboardLayout({
@@ -170,7 +170,7 @@ export default function DashboardLayout({
  ? [
  ...mainNavItems,
  {
- title: "Manageafter",
+ title: "Admin Panel",
  href: "/dashboard/admin",
  icon: Shield,
  },
@@ -195,7 +195,7 @@ export default function DashboardLayout({
  });
  }, []);
 
- // etcpendingCustomerendpointMountwithAvoid hydration Issue
+ // Wait for client-side mount to avoid hydration issues
  useEffect(() => {
  setMounted(true);
  }, []);
@@ -347,10 +347,10 @@ export default function DashboardLayout({
  setTheme(resolvedTheme === "dark" ? "light" : "dark");
  };
 
- // FetchCurrentisnoasDark Mode
+ // Check if currently in dark mode
  const isDark = mounted ? resolvedTheme === "dark" : true;
 
- // DeterminePathisnoActive
+ // Determine if the path is active
  const isActive = (href: string) => {
  return pathname.startsWith(href);
  };
@@ -369,7 +369,7 @@ export default function DashboardLayout({
  const handleWorkspaceSwitch = (workspaceId: string) => {
  if (workspaceId === activeWorkspaceId) return;
  if (typeof window !== "undefined" && activeWorkspaceId) {
- const confirmed = window.confirm("SwitchWorkspacewillLeaveCurrentContext, OKContinue?");
+ const confirmed = window.confirm("Switching workspace will leave the current context. Continue?");
  if (!confirmed) return;
  }
  setActiveWorkspaceId(workspaceId);
@@ -391,7 +391,7 @@ export default function DashboardLayout({
  const quotaSummaryItems = useMemo(() => {
  if (!workspaceQuota) return [];
  const buildItem = (label: string, used: number, limit: number, unit = "") => {
- if (limit <= 0) return { label, value: "notlimit" };
+ if (limit <= 0) return { label, value: "Unlimited" };
  return { label, value: `${used}/${limit}${unit}` };
  };
  return [
@@ -425,8 +425,8 @@ export default function DashboardLayout({
  const workspaceQuickLinks = activeWorkspace
  ? [
  { label: "Create App", href: "/dashboard/apps" },
- { label: "MemberManage", href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members` },
- { label: "UsageandBilling", href: "/dashboard/billing" },
+ { label: "Member Management", href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members` },
+ { label: "Usage and Billing", href: "/dashboard/billing" },
  { label: "Settings", href: `/dashboard/workspaces/${activeWorkspace.id}/settings` },
  ]
  : [];
@@ -525,8 +525,8 @@ export default function DashboardLayout({
  )}
  <span className="text-[12px] font-medium">
  {workspaceLoading
- ? "LoadWorkspace..."
-: activeWorkspace?.name || "SelectWorkspace"}
+ ? "Loading workspace..."
+: activeWorkspace?.name || "Select workspace"}
  </span>
  <span
  className={cn(
@@ -539,7 +539,7 @@ export default function DashboardLayout({
  ? "..."
  : activeWorkspace
  ? activePlan.label
-: "not yetSelect"}
+: "Not selected"}
  </span>
  <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
  </button>
@@ -549,7 +549,7 @@ export default function DashboardLayout({
  {activeWorkspace && (
  <div className="px-3 pb-2 space-y-2 text-[11px] text-foreground-light">
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">CurrentPlan</span>
+ <span className="text-foreground-muted">Current plan</span>
  <span
  className={cn(
  "px-1.5 py-0.5 text-[10px] font-semibold rounded",
@@ -561,9 +561,9 @@ export default function DashboardLayout({
  </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-muted">QuotaOverview</span>
+ <span className="text-foreground-muted">Quota overview</span>
  <span className="text-[10px] text-foreground-muted">
- {quotaLoading ? "Sync": `Usage ${quotaUsageLabel}`}
+ {quotaLoading ? "Syncing..." : `Usage ${quotaUsageLabel}`}
  </span>
  </div>
  {quotaSummaryItems.length > 0 ? (
@@ -580,11 +580,11 @@ export default function DashboardLayout({
  </div>
  ) : (
  <div className="text-[10px] text-foreground-muted">
- NoneQuotaData
+ No quota data
  </div>
  )}
  <Link href="/dashboard/billing" className="text-brand-500 hover:underline">
- ViewUsageDetails
+ View Usage Details
  </Link>
  <div className="grid grid-cols-2 gap-2 pt-1">
  {workspaceQuickLinks.map((link) => (
@@ -612,15 +612,15 @@ export default function DashboardLayout({
  <DropdownMenuItem asChild className="text-[12px]">
  <Link href="/dashboard/workspaces" className="flex items-center gap-2">
  <Plus className="w-3.5 h-3.5" />
- CreateWorkspace
- </Link>
- </DropdownMenuItem>
- ) : (
- workspaces.map((workspace) => {
+Create workspace
+</Link>
+</DropdownMenuItem>
+) : (
+workspaces.map((workspace) => {
  const plan = resolvePlanConfig(workspace.plan);
  const isActiveWorkspace = workspace.id === activeWorkspaceId;
  const status = workspaceStatusConfig[workspace.status] || {
- label: "limit",
+ label: "Limited",
  color: "text-foreground-muted",
  };
  const isDisabled = workspace.status !== "active";
@@ -664,19 +664,19 @@ export default function DashboardLayout({
  )}
  {hasRestrictedWorkspaces && (
  <div className="px-3 pb-2 text-[10px] text-foreground-muted">
- PartialWorkspacePausedorPermissionlimit, needAdminRestoreAccess.
+ Workspace paused or permission limited. An admin can restore access.
  </div>
  )}
  {recentWorkspaces.length > 0 && (
  <>
  <DropdownMenuSeparator className="bg-border" />
  <div className="px-3 py-2 text-[11px] text-foreground-muted">
- RecentAccess
+ Recent access
  </div>
  {recentWorkspaces.map((workspace) => {
  const plan = resolvePlanConfig(workspace.plan);
  const status = workspaceStatusConfig[workspace.status] || {
- label: "limit",
+ label: "Limited",
  color: "text-foreground-muted",
  };
  const isDisabled = workspace.status !== "active";
@@ -721,19 +721,19 @@ export default function DashboardLayout({
  <DropdownMenuSeparator className="bg-border" />
  <DropdownMenuItem asChild className="text-[12px]">
  <Link href="/dashboard/workspaces" className="flex items-center gap-2">
- <FolderOpen className="w-3.5 h-3.5" />
- WorkspaceList
- </Link>
- </DropdownMenuItem>
- {activeWorkspace && (
- <DropdownMenuItem asChild className="text-[12px]">
- <Link
- href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
- className="flex items-center gap-2"
- >
- <Settings className="w-3.5 h-3.5" />
- WorkspaceSettings
- </Link>
+<FolderOpen className="w-3.5 h-3.5" />
+ Workspace list
+</Link>
+</DropdownMenuItem>
+{activeWorkspace && (
+<DropdownMenuItem asChild className="text-[12px]">
+<Link
+href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+className="flex items-center gap-2"
+>
+<Settings className="w-3.5 h-3.5" />
+Workspace settings
+</Link>
  </DropdownMenuItem>
  )}
  </DropdownMenuContent>
@@ -744,10 +744,10 @@ export default function DashboardLayout({
  {/* Workspace Context */}
  {workspaceLoading ? (
  <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-muted">
- <Loader2 className="w-3.5 h-3.5 animate-spin" />
- enter
- </div>
- ) : activeWorkspace ? (
+<Loader2 className="w-3.5 h-3.5 animate-spin" />
+ Loading
+</div>
+) : activeWorkspace ? (
  <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light">
  <span className="text-foreground-muted">/{activeWorkspace.slug}</span>
  <span
@@ -770,11 +770,11 @@ export default function DashboardLayout({
  href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
  className="hover:text-foreground transition-colors"
  >
- MemberManage
- </Link>
- <Link href="/dashboard/billing" className="hover:text-foreground transition-colors">
- Usage
- </Link>
+Members
+</Link>
+<Link href="/dashboard/billing" className="hover:text-foreground transition-colors">
+Usage
+</Link>
  <Link
  href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
  className="hover:text-foreground transition-colors"
@@ -787,9 +787,9 @@ export default function DashboardLayout({
  href="/dashboard/workspaces"
  className="hidden md:inline-flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light hover:text-foreground transition-colors"
  >
- Create/SelectWorkspace
- </Link>
- )}
+Create or select workspace
+</Link>
+)}
 
  <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-full bg-warning/15 text-warning">
  PRODUCTION
@@ -895,7 +895,7 @@ export default function DashboardLayout({
  <DropdownMenuItem asChild>
  <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer">
  <CreditCard className="w-3.5 h-3.5" />
- SubscriptionPlan
+ Subscription Plan
  </Link>
  </DropdownMenuItem>
  </div>
@@ -938,19 +938,19 @@ export default function DashboardLayout({
  )}
  >
  {sidebarCollapsed && <Plus className="w-4 h-4" strokeWidth={2.5} />}
- {!sidebarCollapsed && <span>CreateConversation</span>}
+ {!sidebarCollapsed && <span>Create conversation</span>}
  </button>
  </Link>
  </TooltipTrigger>
  {sidebarCollapsed && (
  <TooltipContent side="right" sideOffset={8} className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground">
- <p className="text-xs">CreateConversation</p>
+ <p className="text-xs">Create conversation</p>
  </TooltipContent>
  )}
  </Tooltip>
  </div>
 
- {/* canScroll'sNavigationRegion */}
+ {/* Scrollable Navigation Region */}
  <div
  className={cn(
  "flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin",
@@ -1055,7 +1055,7 @@ export default function DashboardLayout({
  <ChevronDown
  className={cn("w-3 h-3 transition-transform", !showHistory && "-rotate-90")}
  />
- RecentConversation
+ Recent Conversations
  </button>
 
  {showHistory && (
@@ -1093,7 +1093,7 @@ export default function DashboardLayout({
  <div className="flex items-center justify-between mb-1.5">
  <div className="flex items-center gap-1.5">
  <Crown className="w-3.5 h-3.5 text-brand-500" />
- <span className="text-[11px] font-medium text-foreground-light">Freeversion</span>
+ <span className="text-[11px] font-medium text-foreground-light">Free Plan</span>
  </div>
  <Link href="/dashboard/billing" className="text-[10px] text-brand-500 hover:underline">
  Upgrade
@@ -1123,12 +1123,12 @@ export default function DashboardLayout({
  )}
  >
  {sidebarCollapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
- {!sidebarCollapsed && <span className="truncate text-[12px] font-medium">CollapseSidebar</span>}
+ {!sidebarCollapsed && <span className="truncate text-[12px] font-medium">Collapse sidebar</span>}
  </button>
  </TooltipTrigger>
  {sidebarCollapsed && (
  <TooltipContent side="right" className="bg-surface-100 border-border">
- <p className="text-xs">ExpandSidebar</p>
+ <p className="text-xs">Expand sidebar</p>
  </TooltipContent>
  )}
  </Tooltip>

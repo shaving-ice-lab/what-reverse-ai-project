@@ -1,6 +1,6 @@
 /**
  * Ollama LLM ProvideuserImplement
- * @description Used forand Ollama LocalServiceInteractive'sCustomerendpoint
+ * @description Used for interacting with Ollama local service custom endpoint
  */
 
 import type {
@@ -97,7 +97,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  /**
- * Check Ollama isnoAvailable
+ * Check if Ollama is Available
  */
  async isAvailable(): Promise<boolean> {
  try {
@@ -142,7 +142,7 @@ export class OllamaProvider implements LocalLLMProvider {
  const response = await this.fetchWithRetry(`${this.config.baseUrl}/api/tags`);
 
  if (!response.ok) {
- throw new LLMError('NoneFetchModelList', 'CONNECTION_ERROR');
+ throw new LLMError('Failed to fetch model list', 'CONNECTION_ERROR');
  }
 
  const data: OllamaTagsResponse = await response.json();
@@ -179,12 +179,12 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`DownloadModelFailed: ${errorText}`, 'CONNECTION_ERROR');
+ throw new LLMError(`Failed to download model: ${errorText}`, 'CONNECTION_ERROR');
  }
 
  const reader = response.body?.getReader();
  if (!reader) {
- throw new LLMError('NoneReadResponse', 'CONNECTION_ERROR');
+ throw new LLMError('Unable to read response', 'CONNECTION_ERROR');
  }
 
  const decoder = new TextDecoder();
@@ -205,7 +205,7 @@ export class OllamaProvider implements LocalLLMProvider {
  digest: progress.digest,
  });
  } catch {
- // IgnoreParseError
+ // Ignore parse error
  }
  }
  }
@@ -215,7 +215,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  /**
- * DeleteModel
+ * Delete Model
  */
  async deleteModel(modelName: string): Promise<void> {
  const response = await fetch(`${this.config.baseUrl}/api/delete`, {
@@ -226,7 +226,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`DeleteModelFailed: ${errorText}`, 'MODEL_NOT_FOUND');
+ throw new LLMError(`Failed to delete model: ${errorText}`, 'MODEL_NOT_FOUND');
  }
  }
 
@@ -263,7 +263,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`ChatRequestFailed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Chat request failed: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const data: OllamaChatResponse = await response.json();
@@ -284,7 +284,7 @@ export class OllamaProvider implements LocalLLMProvider {
  };
  } catch (error) {
  if (error instanceof Error && error.name === 'AbortError') {
- throw new LLMError('RequestCancelled', 'CANCELLED');
+ throw new LLMError('Request cancelled', 'CANCELLED');
  }
  throw error;
  } finally {
@@ -293,7 +293,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  /**
- * StreamingChat
+ * Streaming Chat
  */
  async *chatStream(options: ChatOptions): AsyncIterable<StreamChunk> {
  const requestId = crypto.randomUUID();
@@ -324,12 +324,12 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`ChatRequestFailed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Chat request failed: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const reader = response.body?.getReader();
  if (!reader) {
- throw new LLMError('NoneReadResponse', 'CONNECTION_ERROR');
+ throw new LLMError('Unable to read response', 'CONNECTION_ERROR');
  }
 
  const decoder = new TextDecoder();
@@ -349,7 +349,7 @@ export class OllamaProvider implements LocalLLMProvider {
  model: data.model,
  };
  } catch {
- // IgnoreParseError
+ // Ignore parse error
  }
  }
  }
@@ -358,7 +358,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
  } catch (error) {
  if (error instanceof Error && error.name === 'AbortError') {
- throw new LLMError('RequestCancelled', 'CANCELLED');
+ throw new LLMError('Request cancelled', 'CANCELLED');
  }
  throw error;
  } finally {
@@ -367,7 +367,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  /**
- * TextEmbedding
+ * Text Embedding
  */
  async embed(text: string, model: string = 'nomic-embed-text'): Promise<number[]> {
  const response = await fetch(`${this.config.baseUrl}/api/embeddings`, {
@@ -381,7 +381,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`EmbeddingRequestFailed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Embedding request failed: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const data: OllamaEmbedResponse = await response.json();
@@ -436,7 +436,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  throw new LLMError(
- `RequestFailed (Retry ${retries} times): ${lastError?.message}`,
+ `Request failed (retried ${retries} times): ${lastError?.message}`,
  'CONNECTION_ERROR'
  );
  }

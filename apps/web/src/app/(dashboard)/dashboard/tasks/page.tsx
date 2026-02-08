@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * TaskManagePage
- * ManageandTrackpersonTaskandTodo
+ * Task Management Page
+ * Manage and track personal tasks and todos
  */
 
 import { useState, useMemo } from "react";
@@ -90,24 +90,24 @@ const statusConfig = {
 
 // PriorityConfig
 const priorityConfig = {
- high: {
- label: "",
- color: "text-destructive",
- bgColor: "bg-destructive-200/60",
- borderColor: "border-destructive/30",
- },
- medium: {
- label: "",
- color: "text-warning",
- bgColor: "bg-warning-200/60",
- borderColor: "border-warning/30",
- },
- low: {
- label: "",
- color: "text-foreground-muted",
- bgColor: "bg-surface-200",
- borderColor: "border-border",
- },
+  high: {
+    label: "High",
+    color: "text-destructive",
+    bgColor: "bg-destructive-200/60",
+    borderColor: "border-destructive/30",
+  },
+  medium: {
+    label: "Medium",
+    color: "text-warning",
+    bgColor: "bg-warning-200/60",
+    borderColor: "border-warning/30",
+  },
+  low: {
+    label: "Low",
+    color: "text-foreground-muted",
+    bgColor: "bg-surface-200",
+    borderColor: "border-border",
+  },
 };
 
 type TaskStatus = keyof typeof statusConfig;
@@ -117,8 +117,8 @@ type TaskPriority = keyof typeof priorityConfig;
 const mockTasks = [
  {
  id: "task-1",
- title: "DoneWorkflowDocumentWrite",
- description: "WriteAutomationWorkflow'sUsageDocumentandBest PracticesGuide",
+ title: "Complete Workflow Documentation",
+ description: "Write usage documentation and best practices guide for automation workflows",
  status: "in_progress" as TaskStatus,
  priority: "high" as TaskPriority,
  tags: ["Document", "Workflow"],
@@ -130,8 +130,8 @@ const mockTasks = [
  },
  {
  id: "task-2",
- title: "Confignew's Agent Model",
- description: "asSupportAssistantConfignew's GPT-4 ModelandProceedTest",
+ title: "Configure New Agent Model",
+ description: "Configure a new GPT-4 model for the support assistant and run tests",
  status: "todo" as TaskStatus,
  priority: "high" as TaskPriority,
  tags: ["Agent", "Config"],
@@ -143,8 +143,8 @@ const mockTasks = [
  },
  {
  id: "task-3",
- title: "ReviewTeamSubmit'sTemplate",
- description: "ReviewandApproveTeamMemberSubmit's 5 newTemplate",
+ title: "Review Team-Submitted Templates",
+ description: "Review and approve 5 new templates submitted by team members",
  status: "todo" as TaskStatus,
  priority: "medium" as TaskPriority,
  tags: ["Review", "Template"],
@@ -156,11 +156,11 @@ const mockTasks = [
  },
  {
  id: "task-4",
- title: "optimalDataSyncFlow",
- description: "AnalyticsandoptimalExistingDataSyncWorkflow'scan",
+ title: "Optimize Data Sync Flow",
+ description: "Analyze and optimize the performance of existing data sync workflows",
  status: "in_progress" as TaskStatus,
  priority: "medium" as TaskPriority,
- tags: ["optimal", "Workflow"],
+ tags: ["Optimization", "Workflow"],
  dueDate: "2026-02-07",
  createdAt: "2026-01-30T11:00:00",
  updatedAt: "2026-02-02T16:00:00",
@@ -169,8 +169,8 @@ const mockTasks = [
  },
  {
  id: "task-5",
- title: "Update API IntegrationDocument",
- description: "UpdateThird-party API Integration'sTechnologyDocument",
+ title: "Update API Integration Docs",
+ description: "Update the technical documentation for third-party API integrations",
  status: "completed" as TaskStatus,
  priority: "low" as TaskPriority,
  tags: ["Document", "API"],
@@ -182,8 +182,8 @@ const mockTasks = [
  },
  {
  id: "task-6",
- title: "ProcessUserFeedback",
- description: "OrganizeandReplycurrentweeksto'sUserFeedback",
+ title: "Process User Feedback",
+ description: "Organize and reply to this week's user feedback",
  status: "paused" as TaskStatus,
  priority: "low" as TaskPriority,
  tags: ["Feedback", "User"],
@@ -195,8 +195,8 @@ const mockTasks = [
  },
  {
  id: "task-7",
- title: "SettingsMonitorAlert",
- description: "askeyWorkflowConfigExecuteFailedAlertNotifications",
+ title: "Set Up Monitor Alerts",
+ description: "Configure execution failure alert notifications for key workflows",
  status: "completed" as TaskStatus,
  priority: "high" as TaskPriority,
  tags: ["Monitor", "Alert"],
@@ -208,8 +208,8 @@ const mockTasks = [
  },
  {
  id: "task-8",
- title: "PrepareweeksData",
- description: "totalcurrentweeks'sWorkflowExecuteDataandkeyMetrics",
+ title: "Prepare Weekly Report Data",
+ description: "Summarize this week's workflow execution data and key metrics",
  status: "todo" as TaskStatus,
  priority: "medium" as TaskPriority,
  tags: ["Report", "Data"],
@@ -225,10 +225,10 @@ type SortKey = "dueDate" | "priority" | "status" | "createdAt" | "updatedAt";
 type ViewMode = "all" | "todo" | "in_progress" | "completed";
 
 const sortOptions: { value: SortKey; label: string }[] = [
- { value: "dueDate", label: "DeadlineDate" },
+ { value: "dueDate", label: "Due Date" },
  { value: "priority", label: "Priority" },
  { value: "status", label: "Status" },
- { value: "updatedAt", label: "RecentUpdate" },
+ { value: "updatedAt", label: "Recently Updated" },
  { value: "createdAt", label: "Created At" },
 ];
 
@@ -239,11 +239,11 @@ function formatDate(dateString: string) {
  const diffMs = date.getTime() - now.getTime();
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
- if (diffDays < -1) return `Expired ${Math.abs(diffDays)} days`;
- if (diffDays === -1) return "Yesterdayto";
- if (diffDays === 0) return "Todayto";
- if (diffDays === 1) return "Tomorrowto";
- if (diffDays < 7) return `${diffDays} daysafter`;
+ if (diffDays < -1) return `Overdue by ${Math.abs(diffDays)} days`;
+ if (diffDays === -1) return "Due yesterday";
+ if (diffDays === 0) return "Due today";
+ if (diffDays === 1) return "Due tomorrow";
+ if (diffDays < 7) return `In ${diffDays} days`;
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 }
 
@@ -257,14 +257,14 @@ function formatTimestamp(dateString: string) {
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
  if (diffMins < 1) return "Just now";
- if (diffMins < 60) return `${diffMins} minbefore`;
- if (diffHours < 24) return `${diffHours} hbefore`;
+ if (diffMins < 60) return `${diffMins} min ago`;
+ if (diffHours < 24) return `${diffHours}h ago`;
  if (diffDays === 1) return "Yesterday";
- if (diffDays < 7) return `${diffDays} daysbefore`;
+ if (diffDays < 7) return `${diffDays} days ago`;
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 }
 
-// CheckisnoExpired
+// Check if expired
 function isOverdue(dueDate: string, status: TaskStatus) {
  if (status === "completed") return false;
  const due = new Date(dueDate);
@@ -289,7 +289,7 @@ export default function TasksPage() {
  ? "in_progress"
  : "completed";
 
- // FilterandSort
+  // Filter and Sort
  const visibleTasks = useMemo(() => {
  const filtered = tasks.filter((task) => {
  const matchesSearch =
@@ -321,7 +321,7 @@ export default function TasksPage() {
  });
  }, [tasks, searchQuery, selectedStatus, selectedPriority, sortBy]);
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedItems);
  if (newSelected.has(id)) {
@@ -396,7 +396,7 @@ export default function TasksPage() {
 
  const statCards = [
  {
- label: "allsectionTask",
+ label: "All Tasks",
  value: stats.total,
  helper: `${stats.completed} Completed`,
  icon: ListTodo,
@@ -405,7 +405,7 @@ export default function TasksPage() {
  {
  label: "Todo",
  value: stats.todo,
- helper: "etcPending",
+ helper: "Pending",
  icon: Circle,
  iconClassName: "bg-surface-200 border-border text-foreground-light",
  },
@@ -417,9 +417,9 @@ export default function TasksPage() {
  iconClassName: "bg-warning-200/60 border-warning/30 text-warning",
  },
  {
- label: "ExpiredTask",
+ label: "Overdue Tasks",
  value: stats.overdue,
- helper: "needneedFollow",
+ helper: "Needs attention",
  icon: AlertCircle,
  iconClassName:
  stats.overdue > 0
@@ -429,7 +429,7 @@ export default function TasksPage() {
  ];
 
  const viewTabs = [
- { value: "all", label: "allsection", count: stats.total },
+ { value: "all", label: "All", count: stats.total },
  { value: "todo", label: "Todo", count: stats.todo },
  { value: "in_progress", label: "In Progress", count: stats.inProgress },
  { value: "completed", label: "Completed", count: stats.completed },
@@ -442,12 +442,12 @@ export default function TasksPage() {
  <div className="space-y-3">
  <p className="page-caption">Tasks</p>
  <PageHeader
- title="TaskManage"
- description="ManageandTrackyou'sTodo"
+ title="Task Management"
+ description="Manage and track your tasks"
  actions={
  <div className="flex items-center gap-2">
  <Button size="sm" leftIcon={<Plus className="w-4 h-4" />}>
- CreateTask
+ Create Task
  </Button>
  </div>
  }
@@ -455,11 +455,11 @@ export default function TasksPage() {
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <ListTodo className="w-3.5 h-3.5" />
- {stats.total} Task
+                    {stats.total} Tasks
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Flag className="w-3.5 h-3.5" />
- {stats.highPriority} Priority
+                    {stats.highPriority} High Priority
  </span>
  {stats.overdue > 0 && (
  <span className="inline-flex items-center gap-1.5 text-destructive">
@@ -510,7 +510,7 @@ export default function TasksPage() {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
  variant="dark"
- placeholder="SearchTask..."
+ placeholder="Search tasks..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
@@ -522,10 +522,10 @@ export default function TasksPage() {
  <SelectValue placeholder="Priority" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionPriority</SelectItem>
- <SelectItem value="high">Priority</SelectItem>
- <SelectItem value="medium">Priority</SelectItem>
- <SelectItem value="low">Priority</SelectItem>
+ <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
  </SelectContent>
  </Select>
 
@@ -571,7 +571,7 @@ export default function TasksPage() {
  </div>
  </section>
 
- {/* BatchAction */}
+ {/* Batch Actions */}
  {hasSelection && (
  <section className="page-panel border-brand-400/40 bg-brand-200/20">
  <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -579,7 +579,7 @@ export default function TasksPage() {
  <Badge variant="primary" size="sm">
  {selectedItems.size}
  </Badge>
- alreadySelect {selectedItems.size} Task
+ {selectedItems.size} tasks selected
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -588,7 +588,7 @@ export default function TasksPage() {
  onClick={bulkComplete}
  leftIcon={<CheckCircle2 className="w-4 h-4" />}
  >
- MarkDone
+ Mark Done
  </Button>
  <Button variant="destructive" size="sm" onClick={bulkDelete} leftIcon={<Trash2 className="w-4 h-4" />}>
  Delete
@@ -605,8 +605,8 @@ export default function TasksPage() {
  <section className="page-panel overflow-hidden">
  <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
  <div>
- <p className="page-panel-title">TaskList</p>
- <p className="page-panel-description"> {visibleTasks.length} Task</p>
+ <p className="page-panel-title">Task List</p>
+              <p className="page-panel-description"> {visibleTasks.length} Tasks</p>
  </div>
  <div className="flex items-center gap-2">
  <Button variant="ghost" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
@@ -624,7 +624,7 @@ export default function TasksPage() {
  <span className="text-left">Task</span>
  <span className="hidden md:block text-center">Status</span>
  <span className="hidden md:block text-center">Priority</span>
- <span className="hidden md:block text-center">DeadlineDate</span>
+ <span className="hidden md:block text-center">Due Date</span>
  <span className="text-right">Action</span>
  </div>
 
@@ -633,12 +633,12 @@ export default function TasksPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <ListTodo className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NoTask</h3>
+ <h3 className="text-base font-medium text-foreground mb-2">No Tasks</h3>
  <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
- {searchQuery ? "TryotherheSearchCondition": "CreatenewTaskStartManageyou'sWork"}
+ {searchQuery ? "Try different search criteria": "Create a new task to start managing your work"}
  </p>
  <Button size="sm" leftIcon={<Plus className="w-4 h-4" />}>
- CreateTask
+ Create Task
  </Button>
  </div>
  ) : (
@@ -697,7 +697,7 @@ export default function TasksPage() {
  href={`/dashboard/workflows/${task.workflowId}`}
  className="text-[11px] text-brand-500 hover:underline"
  >
- AssociateWorkflow
+ Linked Workflow
  </Link>
  )}
  </div>
@@ -754,7 +754,7 @@ export default function TasksPage() {
  onClick={() => updateTaskStatus(task.id, "completed")}
  >
  <CheckCircle2 className="w-4 h-4 mr-2" />
- MarkDone
+ Mark Done
  </DropdownMenuItem>
  )}
  {task.status === "todo" && (
@@ -763,7 +763,7 @@ export default function TasksPage() {
  onClick={() => updateTaskStatus(task.id, "in_progress")}
  >
  <Play className="w-4 h-4 mr-2" />
- StartProcess
+ Start
  </DropdownMenuItem>
  )}
  {task.status === "in_progress" && (

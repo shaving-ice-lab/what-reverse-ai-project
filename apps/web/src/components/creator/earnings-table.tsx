@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * EarningsDetailTableComponent - Enhanced
+ * Earnings Detail Table Component - Enhanced
  */
 
 import { useState } from "react";
@@ -52,7 +52,7 @@ interface EarningsTableProps {
  earnings: Earning[];
 }
 
-// EarningsTypeConfig
+// Earnings type config
 const earningTypeConfig = {
  sale: {
  label: "Sales",
@@ -80,10 +80,10 @@ const earningTypeConfig = {
  },
 };
 
-// StatusConfig
+// Status config
 const statusConfig = {
  pending: {
- label: "pendingConfirm",
+ label: "Pending Confirmation",
  icon: Clock,
  color: "text-warning",
  bgColor: "bg-warning-200",
@@ -92,7 +92,7 @@ const statusConfig = {
  animate: true,
  },
  confirmed: {
- label: "alreadyConfirm",
+ label: "Confirmed",
  icon: CheckCircle2,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
@@ -101,7 +101,7 @@ const statusConfig = {
  animate: false,
  },
  settled: {
- label: "alreadySettlement",
+ label: "Settled",
  icon: CheckCircle2,
  color: "text-brand-500",
  bgColor: "bg-brand-200/60",
@@ -110,7 +110,7 @@ const statusConfig = {
  animate: false,
  },
  refunded: {
- label: "alreadyRefund",
+ label: "Refunded",
  icon: XCircle,
  color: "text-destructive-400",
  bgColor: "bg-destructive-200",
@@ -138,8 +138,8 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
  <div className="h-16 w-16 rounded-2xl bg-surface-200 flex items-center justify-center mb-4">
  <Receipt className="h-8 w-8 opacity-50" />
  </div>
- <p className="text-sm font-medium mb-1">NoneEarningsRecord</p>
- <p className="text-xs text-foreground-muted">EarningsRecordwillatthisinDisplay</p>
+<p className="text-sm font-medium mb-1">No earnings records</p>
+  <p className="text-xs text-foreground-muted">Earnings records will appear here</p>
  </div>
  );
  }
@@ -156,8 +156,8 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
  Source
  </TableHead>
  <TableHead className="text-table-header text-right">
- totalAmount
- </TableHead>
+                Total Amount
+              </TableHead>
  <TableHead className="text-table-header text-right">
  Earnings
  </TableHead>
@@ -229,8 +229,8 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
  )}
  </TableCell>
  
- {/* totalAmount */}
- <TableCell className="py-4 text-right">
+            {/* Total Amount */}
+            <TableCell className="py-4 text-right">
  <span className="text-sm text-foreground-muted tabular-nums">
  {earning.gross_amount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
@@ -302,11 +302,11 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
  <DropdownMenuContent align="end" className="w-40">
  <DropdownMenuItem className="text-sm cursor-pointer">
  <Eye className="h-4 w-4 mr-2" />
- ViewDetails
+                View Details
  </DropdownMenuItem>
  <DropdownMenuItem className="text-sm cursor-pointer">
  <Copy className="h-4 w-4 mr-2" />
- CopyOrder
+                Copy Order
  </DropdownMenuItem>
  <DropdownMenuItem className="text-sm cursor-pointer">
  <ExternalLink className="h-4 w-4 mr-2" />
@@ -324,7 +324,7 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
  );
 }
 
-// FormatDate & Time
+// Format date and time
 function formatDateTime(dateStr: string): string {
  const date = new Date(dateStr);
  const now = new Date();
@@ -333,13 +333,13 @@ function formatDateTime(dateStr: string): string {
  const diffHours = Math.floor(diffMs / 3600000);
  const diffDays = Math.floor(diffMs / 86400000);
  
- // forTimeDisplay
- if (diffMins < 1) return "Just now";
- if (diffMins < 60) return `${diffMins} minbefore`;
- if (diffHours < 24) return `${diffHours} hbefore`;
- if (diffDays < 7) return `${diffDays} daysbefore`;
- 
- // forTimeDisplay
+  // Relative time display
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
+  
+  // Absolute time display
  return date.toLocaleString("zh-CN", {
  month: "short",
  day: "numeric",

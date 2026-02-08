@@ -1,9 +1,9 @@
 /**
- * StatisticsRelatedTypeDefinition
+ * Statistics Related Type Definitions
  */
 
 /**
- * OverviewStatistics
+ * Overview Statistics
  */
 export interface OverviewStats {
  total_workflows: number;
@@ -20,7 +20,7 @@ export interface OverviewStats {
 }
 
 /**
- * eachdayStatistics
+ * Daily Statistics
  */
 export interface DailyStats {
  date: string;
@@ -32,7 +32,7 @@ export interface DailyStats {
 }
 
 /**
- * ErrorStatistics
+ * Error Statistics
  */
 export interface ErrorStats {
  error_message: string;
@@ -41,7 +41,7 @@ export interface ErrorStats {
 }
 
 /**
- * WorkflowStatistics
+ * Workflow Statistics
  */
 export interface WorkflowStats {
  workflow_id: string;
@@ -57,7 +57,7 @@ export interface WorkflowStats {
 }
 
 /**
- * StatisticsOverviewResponse
+ * Statistics Overview Response
  */
 export interface OverviewStatsResponse {
  success: boolean;
@@ -65,7 +65,7 @@ export interface OverviewStatsResponse {
 }
 
 /**
- * ExecuteTrendResponse
+ * Execution Trend Response
  */
 export interface ExecutionTrendsResponse {
  success: boolean;
@@ -73,7 +73,7 @@ export interface ExecutionTrendsResponse {
 }
 
 /**
- * WorkflowStatisticsResponse
+ * Workflow Statistics Response
  */
 export interface WorkflowStatsResponse {
  success: boolean;

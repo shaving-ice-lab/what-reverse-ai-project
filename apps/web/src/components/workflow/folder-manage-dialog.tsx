@@ -16,13 +16,13 @@ import { folderApi, type Folder as FolderType } from "@/lib/api/folder";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// PresetColor
+ // Preset colors
 const PRESET_COLORS = [
  "hsl(var(--primary))", "#3B82F6", "#8B5CF6", "#EC4899", 
  "#F59E0B", "#EF4444", "#10B981", "#6B7280"
 ];
 
-// PresetIcon
+ // Preset icons
 const PRESET_ICONS = ["📁", "📂", "💼", "📊", "📈", "🔧", "⚡", "🎯", "💡", "🚀"];
 
 interface FolderManageDialogProps {
@@ -46,10 +46,10 @@ export function FolderManageDialog({
  const [isCreating, setIsCreating] = useState(false);
  const [isLoading, setIsLoading] = useState(false);
 
- // CreateFolder
+ // Create folder
  const handleCreate = async () => {
  if (!newFolderName.trim()) {
- toast.error("Please enterFolderName");
+ toast.error("Please enter a folder name");
  return;
  }
 
@@ -60,53 +60,53 @@ export function FolderManageDialog({
  icon: newFolderIcon,
  color: newFolderColor,
  });
- toast.success("FolderCreated successfully");
+ toast.success("Folder created successfully");
  setNewFolderName("");
  setIsCreating(false);
  onFoldersChange();
  } catch (error) {
- toast.error("CreateFailed, PleaseRetry");
+ toast.error("Creation failed. Please try again.");
  } finally {
  setIsLoading(false);
  }
  };
 
- // UpdateFolder
+ // Update folder
  const handleUpdate = async (id: string) => {
  if (!editName.trim()) return;
 
  setIsLoading(true);
  try {
  await folderApi.update(id, { name: editName.trim() });
- toast.success("FolderalreadyUpdate");
+ toast.success("Folder updated");
  setEditingId(null);
  onFoldersChange();
  } catch (error) {
- toast.error("UpdateFailed, PleaseRetry");
+ toast.error("Update failed. Please try again.");
  } finally {
  setIsLoading(false);
  }
  };
 
- // DeleteFolder
+ // Delete folder
  const handleDelete = async (id: string", name: string) => {
- if (!confirm(`OKneedDeleteFolder"${name}"??other'sWorkflowwillDirectory.`)) {
+ if (!confirm(`Are you sure you want to delete the folder "${name}"? Workflows inside it will be moved to the root directory.`)) {
  return;
  }
 
  setIsLoading(true);
  try {
  await folderApi.delete(id);
- toast.success("FolderDeleted");
+ toast.success("Folder deleted");
  onFoldersChange();
  } catch (error) {
- toast.error("DeleteFailed, PleaseRetry");
+ toast.error("Deletion failed. Please try again.");
  } finally {
  setIsLoading(false);
  }
  };
 
- // FilterSystemFolder
+ // Filter system folders
  const userFolders = folders.filter((f) => !f.is_system);
 
  return (
@@ -115,16 +115,16 @@ export function FolderManageDialog({
  <DialogHeader>
  <DialogTitle className="flex items-center gap-2">
  <Folder className="w-5 h-5" />
- ManageFolder
+ Manage Folders
  </DialogTitle>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
- {/* CreateFolder */}
+ {/* Create Folder */}
  {isCreating ? (
  <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
  <Input
- placeholder="FolderName"
+ placeholder="Folder name"
  value={newFolderName}
  onChange={(e) => setNewFolderName(e.target.value)}
  autoFocus
@@ -180,15 +180,15 @@ export function FolderManageDialog({
  onClick={() => setIsCreating(true)}
  >
  <FolderPlus className="w-4 h-4 mr-2" />
- CreateFolder
+ Create Folder
  </Button>
  )}
 
- {/* FolderList */}
+ {/* Folder List */}
  <div className="space-y-2">
  {userFolders.length === 0 ? (
  <p className="text-center text-muted-foreground py-8">
- NoneCustomFolder
+ No custom folders
  </p>
  ) : (
  userFolders.map((folder) => (
@@ -219,7 +219,7 @@ export function FolderManageDialog({
  )}
  
  <span className="text-xs text-muted-foreground">
- {folder.workflow_count} Workflow
+        {folder.workflow_count} Workflows
  </span>
 
  {editingId === folder.id ? (

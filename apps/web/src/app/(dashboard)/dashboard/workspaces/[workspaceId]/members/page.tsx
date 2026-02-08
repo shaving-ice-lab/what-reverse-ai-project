@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Workspace MemberandPermissionManagePage - Supabase Style
- * Task #149: MemberListTable, InviteandManageblock, RoleDescriptionblock
+ * Workspace Members and Permissions Page - Supabase Style
+ * Task #149: Member list table, invite and manage section, role description section
  */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -71,73 +71,73 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from "@/lib/permissions";
 import { PermissionGate } from "@/components/permissions/permission-gate";
 
-// ===== RoleConfig =====
+// ===== Role Config =====
 const roles = [
- {
- id: "owner",
- name: "Owner",
- description: "completeallControlPermission, IncludeBilling, SecurityPolicyandWorkspaceDelete",
- color: "text-warning",
- bgColor: "bg-warning-200",
- icon: Crown,
- permissions: [
- "ManageAllMemberandRole",
- "EditBillingandSubscription",
- "DeleteWorkspace",
- "ManageSecurityPolicy",
- ],
- },
- {
- id: "admin",
- name: "Admin",
- description: "canwithManageMember, AppandlargePartialSettings",
- color: "text-brand-500",
- bgColor: "bg-brand-200",
- icon: Shield,
- permissions: [
- "InviteandRemoveMember",
- "CreateandManageApp",
- "ViewAudit Log",
- "ManageIntegrationConfig",
- ],
- },
- {
- id: "member",
- name: "Member",
- description: "canwithCreateandEditApp, ExecuteWorkflow",
- color: "text-foreground-light",
- bgColor: "bg-surface-200",
- icon: Edit3,
- permissions: [
- "CreateandEditApp",
- "ExecuteWorkflow",
- "ViewExecuteLogs",
- "Manageperson API Key",
- ],
- },
- {
- id: "viewer",
- name: "Viewer",
- description: "readAccess, notcanEditorExecute",
- color: "text-foreground-muted",
- bgColor: "bg-surface-200",
- icon: Eye,
- permissions: [
- "ViewAppandWorkflow",
- "ViewExecuteRecord",
- "ViewMemberList",
- ],
- },
+  {
+    id: "owner",
+    name: "Owner",
+    description: "Full control permissions, including billing, security policies, and workspace deletion",
+    color: "text-warning",
+    bgColor: "bg-warning-200",
+    icon: Crown,
+    permissions: [
+      "Manage all members and roles",
+      "Edit billing and subscription",
+      "Delete workspace",
+      "Manage security policies",
+    ],
+  },
+  {
+    id: "admin",
+    name: "Admin",
+    description: "Can manage members, apps, and most settings",
+    color: "text-brand-500",
+    bgColor: "bg-brand-200",
+    icon: Shield,
+    permissions: [
+      "Invite and remove members",
+      "Create and manage apps",
+      "View audit logs",
+      "Manage integration config",
+    ],
+  },
+  {
+    id: "member",
+    name: "Member",
+    description: "Can create and edit apps, execute workflows",
+    color: "text-foreground-light",
+    bgColor: "bg-surface-200",
+    icon: Edit3,
+    permissions: [
+      "Create and edit apps",
+      "Execute workflows",
+      "View execution logs",
+      "Manage personal API keys",
+    ],
+  },
+  {
+    id: "viewer",
+    name: "Viewer",
+    description: "Read access only; cannot edit or execute",
+    color: "text-foreground-muted",
+    bgColor: "bg-surface-200",
+    icon: Eye,
+    permissions: [
+      "View apps and workflows",
+      "View execution records",
+      "View member list",
+    ],
+  },
 ];
 
-// ===== MemberStatusConfig =====
+// ===== Member Status Config =====
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
- active: { label: "Active", color: "text-brand-500", bg: "bg-brand-200" },
- pending: { label: "pendingAccept", color: "text-warning", bg: "bg-warning-200" },
- suspended: { label: "alreadyFreeze", color: "text-foreground-muted", bg: "bg-surface-200" },
+  active: { label: "Active", color: "text-brand-500", bg: "bg-brand-200" },
+  pending: { label: "Pending", color: "text-warning", bg: "bg-warning-200" },
+  suspended: { label: "Suspended", color: "text-foreground-muted", bg: "bg-surface-200" },
 };
 
-// ===== Mock Data(pendingConnectReal API) =====
+// ===== Mock Data (pending real API integration) =====
 const mockMembers: Array<WorkspaceMember & { lastActiveAt?: string }> = [
  {
  id: "m1",
@@ -162,7 +162,7 @@ const mockMembers: Array<WorkspaceMember & { lastActiveAt?: string }> = [
  joined_at: "2025-11-20T09:30:00Z",
  created_at: "2025-11-20T09:30:00Z",
  updated_at: "2026-02-01T14:00:00Z",
- lastActiveAt: "5 minbefore",
+ lastActiveAt: "5 min ago",
  user: { id: "u2", username: "Li Hua", email: "lihua@example.com", avatar: undefined },
  },
  {
@@ -175,7 +175,7 @@ const mockMembers: Array<WorkspaceMember & { lastActiveAt?: string }> = [
  joined_at: "2025-12-05T11:00:00Z",
  created_at: "2025-12-05T11:00:00Z",
  updated_at: "2026-01-30T16:00:00Z",
- lastActiveAt: "1 hbefore",
+ lastActiveAt: "1 hour ago",
  user: { id: "u3", username: "Wang Fang", email: "wangfang@example.com", avatar: undefined },
  },
  {
@@ -188,7 +188,7 @@ const mockMembers: Array<WorkspaceMember & { lastActiveAt?: string }> = [
  joined_at: "2026-01-10T10:00:00Z",
  created_at: "2026-01-10T10:00:00Z",
  updated_at: "2026-01-25T12:00:00Z",
- lastActiveAt: "3 daysbefore",
+ lastActiveAt: "3 days ago",
  user: { id: "u4", username: "Zhao Qiang", email: "zhaoqiang@example.com", avatar: undefined },
  },
 ];
@@ -210,7 +210,7 @@ const mockPendingInvites = [
  },
 ];
 
-// ===== mainComponent =====
+// ===== Main Component =====
 export default function WorkspaceMembersPage() {
  const params = useParams();
  const workspaceId = params.workspaceId as string;
@@ -227,27 +227,27 @@ export default function WorkspaceMembersPage() {
  const [roleFilter, setRoleFilter] = useState<string>("all");
  const [statusFilter, setStatusFilter] = useState<string>("all");
 
- // InviteDialog
+  // Invite Dialog
  const [showInviteDialog, setShowInviteDialog] = useState(false);
  const [inviteEmail, setInviteEmail] = useState("");
  const [inviteRole, setInviteRole] = useState("member");
  const [inviting, setInviting] = useState(false);
 
- // ChangeRoleDialog
+  // Change Role Dialog
  const [showRoleDialog, setShowRoleDialog] = useState(false);
  const [selectedMember, setSelectedMember] = useState<WorkspaceMember | null>(null);
  const [newRole, setNewRole] = useState("");
 
- // ===== LoadMemberData =====
+  // ===== Load Member Data =====
  useEffect(() => {
  async function fetchMembers() {
  if (!workspaceId) return;
  setLoading(true);
  try {
- // TODO: ConnectReal API
- // const data = await workspaceApi.getMembers(workspaceId);
- // setMembers(data);
- await new Promise((r) => setTimeout(r, 500)); // MockLatency
+      // TODO: Connect to real API
+      // const data = await workspaceApi.getMembers(workspaceId);
+      // setMembers(data);
+      await new Promise((r) => setTimeout(r, 500)); // Simulated latency
  } catch (err) {
  console.error("Failed to fetch members:", err);
  } finally {
@@ -257,7 +257,7 @@ export default function WorkspaceMembersPage() {
  fetchMembers();
  }, [workspaceId]);
 
- // ===== FilterMember =====
+  // ===== Filter Members =====
  const filteredMembers = useMemo(() => {
  return members.filter((m) => {
  const matchesSearch =
@@ -269,18 +269,18 @@ export default function WorkspaceMembersPage() {
  });
  }, [members, searchQuery, roleFilter, statusFilter]);
 
- // ===== FetchRoleConfig =====
+  // ===== Get Role Config =====
  const getRoleConfig = useCallback((roleId: string) => {
  return roles.find((r) => r.id === roleId) || roles[2];
  }, []);
 
- // ===== InviteMember =====
+  // ===== Invite Member =====
  const handleInvite = async () => {
  if (!inviteEmail.trim()) return;
  setInviting(true);
  try {
- // TODO: ConnectReal API
- // await workspaceApi.inviteMember(workspaceId, { email: inviteEmail, role: inviteRole });
+      // TODO: Connect to real API
+      // await workspaceApi.inviteMember(workspaceId, { email: inviteEmail, role: inviteRole });
  await new Promise((r) => setTimeout(r, 800));
  setPendingInvites((prev) => [
  ...prev,
@@ -301,12 +301,12 @@ export default function WorkspaceMembersPage() {
  }
  };
 
- // ===== ChangeRole =====
+  // ===== Change Role =====
  const handleChangeRole = async () => {
  if (!selectedMember || !newRole) return;
  try {
- // TODO: ConnectReal API
- // await workspaceApi.updateMemberRole(workspaceId, selectedMember.id, { role_id: newRole });
+      // TODO: Connect to real API
+      // await workspaceApi.updateMemberRole(workspaceId, selectedMember.id, { role_id: newRole });
  setMembers((prev) =>
  prev.map((m) =>
  m.id === selectedMember.id ? { ...m, role_id: newRole, role_name: newRole } : m
@@ -319,43 +319,43 @@ export default function WorkspaceMembersPage() {
  }
  };
 
- // ===== Freeze/ActivateMember =====
+  // ===== Suspend/Activate Member =====
  const handleToggleSuspend = async (member: WorkspaceMember) => {
  const newStatus = member.status === "suspended" ? "active" : "suspended";
  try {
- // TODO: ConnectReal API
- setMembers((prev) =>
- prev.map((m) => (m.id === member.id ? { ...m, status: newStatus } : m))
+      // TODO: Connect to real API
+      setMembers((prev) =>
+        prev.map((m) => (m.id === member.id ? { ...m, status: newStatus } : m))
  );
  } catch (err) {
  console.error("Failed to toggle suspend:", err);
  }
  };
 
- // ===== RemoveMember =====
- const handleRemoveMember = async (member: WorkspaceMember) => {
- if (!confirm(`OKneedRemoveMember ${member.user?.username || member.user?.email}?`)) return;
- try {
- // TODO: ConnectReal API
- // await workspaceApi.removeMember(workspaceId, member.id);
+  // ===== Remove Member =====
+  const handleRemoveMember = async (member: WorkspaceMember) => {
+    if (!confirm(`Are you sure you want to remove ${member.user?.username || member.user?.email}?`)) return;
+    try {
+      // TODO: Connect to real API
+      // await workspaceApi.removeMember(workspaceId, member.id);
  setMembers((prev) => prev.filter((m) => m.id !== member.id));
  } catch (err) {
  console.error("Failed to remove member:", err);
  }
  };
 
- // ===== UndoInvite =====
+  // ===== Cancel Invite =====
  const handleCancelInvite = (inviteId: string) => {
  setPendingInvites((prev) => prev.filter((i) => i.id !== inviteId));
  };
 
- // ===== re-Invite =====
- const handleResendInvite = async (inviteId: string) => {
- // TODO: ConnectReal API
- alert("Invitealreadyre-newSend");
- };
+  // ===== Resend Invite =====
+  const handleResendInvite = async (inviteId: string) => {
+    // TODO: Connect to real API
+    alert("Invitation has been resent");
+  };
 
- // ===== FormatDate =====
+  // ===== Format Date =====
  const formatDate = (dateStr?: string) => {
  if (!dateStr) return "-";
  return new Date(dateStr).toLocaleDateString("zh-CN", {
@@ -368,10 +368,10 @@ export default function WorkspaceMembersPage() {
  return (
  <PageContainer>
  <div className="space-y-6">
- {/* pagehead */}
+        {/* Page Header */}
  <PageHeader
- title="MemberandPermission"
- description="ManageWorkspaceMember, RoleandAccessPermission"
+title="Members and permissions"
+  description="Manage workspace members, roles and access permissions"
  actions={
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <Button
@@ -379,43 +379,43 @@ export default function WorkspaceMembersPage() {
  leftIcon={<UserPlus className="w-4 h-4" />}
  onClick={() => setShowInviteDialog(true)}
  >
- InviteMember
- </Button>
+              Invite Member
+            </Button>
  </PermissionGate>
  }
  >
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Users className="w-3.5 h-3.5" />
- Member {members.filter((m) => m.status !== "suspended").length}
- </span>
- <span className="inline-flex items-center gap-1.5">
- <Clock className="w-3.5 h-3.5" />
- pendingAccept {pendingInvites.length}
+              {members.filter((m) => m.status !== "suspended").length} Members
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              {pendingInvites.length} Pending
  </span>
  </div>
  </PageHeader>
 
- {/* RolePermissionDescriptionTip */}
- <div className="p-4 rounded-md bg-surface-100 border border-border">
- <div className="flex items-start gap-3">
- <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center shrink-0">
- <Shield className="w-4 h-4 text-foreground-light" />
- </div>
- <div className="space-y-1 text-[12px] text-foreground-light">
- <p><strong>InviteMember</strong>: ViaEmailInviteJoinWorkspace, Supportre-newSendandExpiredReminder.</p>
- <p><strong>RoleConfig</strong>: Owner/Admin/Member/Viewer forshouldnotPermissionRange.</p>
- <p><strong>PermissionDescription</strong>: MemberManage, BillingandSecurityPolicyneedAdminorOwnerPermission.</p>
- </div>
- </div>
- </div>
+        {/* Role Permission Description */}
+        <div className="p-4 rounded-md bg-surface-100 border border-border">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center shrink-0">
+              <Shield className="w-4 h-4 text-foreground-light" />
+            </div>
+            <div className="space-y-1 text-[12px] text-foreground-light">
+              <p><strong>Invite Members</strong>: Invite via email to join the workspace. Supports resending and expiration reminders.</p>
+              <p><strong>Role Configuration</strong>: Owner / Admin / Member / Viewer each have different permission scopes.</p>
+              <p><strong>Permission Details</strong>: Member management, billing, and security policies require Admin or Owner permissions.</p>
+            </div>
+          </div>
+        </div>
 
- {/* PendingInvite */}
+        {/* Pending Invitations */}
  {pendingInvites.length > 0 && (
  <div className="p-4 rounded-md bg-warning-200/50 border border-warning/20">
  <div className="flex items-center gap-2 mb-3">
  <Mail className="w-4 h-4 text-warning" />
- <span className="font-medium text-foreground">pendingAccept'sInvite</span>
+              <span className="font-medium text-foreground">Pending Invitations</span>
  <Badge variant="secondary" className="bg-warning-200 text-warning">
  {pendingInvites.length}
  </Badge>
@@ -437,7 +437,7 @@ export default function WorkspaceMembersPage() {
  <div>
  <p className="text-sm font-medium text-foreground">{invite.email}</p>
  <p className="text-xs text-foreground-muted">
- Sendat {invite.sentAt} · willat {invite.expiresAt} Expired
+                      Sent on {invite.sentAt} · Expires on {invite.expiresAt}
  </p>
  </div>
  </div>
@@ -453,7 +453,7 @@ export default function WorkspaceMembersPage() {
  onClick={() => handleResendInvite(invite.id)}
  >
  <RefreshCw className="w-4 h-4 mr-1" />
- re-
+                    Resend
  </Button>
  <Button
  variant="ghost"
@@ -472,7 +472,7 @@ export default function WorkspaceMembersPage() {
  </div>
  )}
 
- {/* MemberList */}
+        {/* Member List */}
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
  {/* Filter */}
  <div className="p-4 border-b border-border">
@@ -480,7 +480,7 @@ export default function WorkspaceMembersPage() {
  <div className="relative flex-1 min-w-[200px] max-w-sm">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchMemberNameorEmail..."
+ placeholder="Search member name or email..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-75 border-border focus:bg-surface-100 focus:border-brand-500"
@@ -492,7 +492,7 @@ export default function WorkspaceMembersPage() {
  <SelectValue placeholder="Role" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionRole</SelectItem>
+ <SelectItem value="all">All Roles</SelectItem>
  {roles.map((role) => (
  <SelectItem key={role.id} value={role.id}>
  {role.name}
@@ -505,15 +505,15 @@ export default function WorkspaceMembersPage() {
  <SelectValue placeholder="Status" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionStatus</SelectItem>
+ <SelectItem value="all">All Status</SelectItem>
  <SelectItem value="active">Active</SelectItem>
- <SelectItem value="suspended">alreadyFreeze</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
  </SelectContent>
  </Select>
  </div>
  </div>
 
- {/* MemberTable */}
+          {/* Member Table */}
  {loading ? (
  <div className="flex items-center justify-center py-12">
  <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
@@ -521,7 +521,7 @@ export default function WorkspaceMembersPage() {
  ) : filteredMembers.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
  <Users className="w-10 h-10 mb-3 opacity-50" />
- <p>NotoMatch'sMember</p>
+ <p>No matching members</p>
  </div>
  ) : (
  <div className="overflow-x-auto">
@@ -538,10 +538,10 @@ export default function WorkspaceMembersPage() {
  Status
  </th>
  <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
- JoinTime
+                    Joined
  </th>
  <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
- mostafterActive
+                    Last Active
  </th>
  <th className="text-right text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
  Action
@@ -571,7 +571,7 @@ export default function WorkspaceMembersPage() {
  </Avatar>
  <div>
  <p className="font-medium text-foreground">
- {member.user?.username || "UnknownUser"}
+                        {member.user?.username || "Unknown User"}
  </p>
  <p className="text-sm text-foreground-light">
  {member.user?.email}
@@ -599,12 +599,12 @@ export default function WorkspaceMembersPage() {
  </span>
  </td>
 
- {/* JoinTime */}
+                        {/* Joined */}
  <td className="px-4 py-4 text-sm text-foreground-light">
  {formatDate(member.joined_at)}
  </td>
 
- {/* mostafterActive */}
+                        {/* Last Active */}
  <td className="px-4 py-4 text-sm text-foreground-muted">
  {member.lastActiveAt || "-"}
  </td>
@@ -636,14 +636,14 @@ export default function WorkspaceMembersPage() {
  }}
  >
  <UserCog className="w-4 h-4 mr-2" />
- ChangeRole
+                          Change Role
  </DropdownMenuItem>
  )}
  </PermissionGate>
 
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Mail className="w-4 h-4 mr-2" />
- SendMessage
+                          Send Message
  </DropdownMenuItem>
 
  <PermissionGate permissions={permissions} required={["members_manage"]}>
@@ -657,12 +657,12 @@ export default function WorkspaceMembersPage() {
  {member.status === "suspended" ? (
  <>
  <Play className="w-4 h-4 mr-2" />
- ActivateMember
+                                Activate Member
  </>
  ) : (
  <>
  <Snowflake className="w-4 h-4 mr-2" />
- FreezeMember
+                                Suspend Member
  </>
  )}
  </DropdownMenuItem>
@@ -671,7 +671,7 @@ export default function WorkspaceMembersPage() {
  onClick={() => handleRemoveMember(member)}
  >
  <Trash2 className="w-4 h-4 mr-2" />
- RemoveMember
+                                Remove Member
  </DropdownMenuItem>
  </>
  )}
@@ -688,8 +688,8 @@ export default function WorkspaceMembersPage() {
  )}
  </div>
 
- {/* RolePermissionDescriptionblock */}
- <SettingsSection title="RolePermissionDescription" description="notRolehasnot'sPermissionRange">
+        {/* Role Permission Description */}
+ <SettingsSection title="Role permission description" description="Each role has a different permission scope">
  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
  {roles.map((role) => {
  const RoleIcon = role.icon;
@@ -728,13 +728,13 @@ export default function WorkspaceMembersPage() {
  </SettingsSection>
  </div>
 
- {/* InviteMemberDialog */}
- <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
- <DialogContent className="bg-surface-100 border-border max-w-md">
- <DialogHeader>
- <DialogTitle className="text-foreground">InvitenewMember</DialogTitle>
+      {/* Invite Member Dialog */}
+      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
+        <DialogContent className="bg-surface-100 border-border max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Invite New Member</DialogTitle>
  <DialogDescription className="text-foreground-muted">
- InputEmail AddressandSelectRole, Invite LinkwillSendtoSpecifyEmail.
+ Enter email address and select role; invite link will be sent to that email.
  </DialogDescription>
  </DialogHeader>
 
@@ -781,7 +781,7 @@ export default function WorkspaceMembersPage() {
  <div className="p-3 rounded-md bg-surface-75 text-sm text-foreground-light">
  <div className="flex items-start gap-2">
  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
- <p>Invite LinkValid 7 days, Expiredafterneedre-newSend.</p>
+              <p>Invite links are valid for 7 days. After expiration, you'll need to resend.</p>
  </div>
  </div>
  </div>
@@ -804,19 +804,19 @@ export default function WorkspaceMembersPage() {
  ) : (
  <Send className="w-4 h-4 mr-2" />
  )}
- SendInvite
+            Send Invite
  </Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>
 
- {/* ChangeRoleDialog */}
+      {/* Change Role Dialog */}
  <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
  <DialogContent className="bg-surface-100 border-border max-w-md">
  <DialogHeader>
- <DialogTitle className="text-foreground">ChangeMemberRole</DialogTitle>
+ <DialogTitle className="text-foreground">Change member role</DialogTitle>
  <DialogDescription className="text-foreground-muted">
- as {selectedMember?.user?.username || selectedMember?.user?.email} SelectnewRole.
+              Select a new role for {selectedMember?.user?.username || selectedMember?.user?.email}.
  </DialogDescription>
  </DialogHeader>
 
@@ -860,7 +860,7 @@ export default function WorkspaceMembersPage() {
  className="bg-brand-500 hover:bg-brand-600 text-background"
  >
  <Check className="w-4 h-4 mr-2" />
- ConfirmChange
+            Confirm Change
  </Button>
  </DialogFooter>
  </DialogContent>

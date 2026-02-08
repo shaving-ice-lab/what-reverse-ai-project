@@ -13,7 +13,7 @@ const user = {
 const workspace = {
   id: "ws_123",
   owner_user_id: "user_1",
-  name: "TestWorkspace",
+  name: "Test Workspace",
   slug: "demo",
   icon: "🏢",
   status: "active",
@@ -29,10 +29,10 @@ const draftApp = {
   id: "app_123",
   workspace_id: "ws_123",
   owner_user_id: "user_1",
-  name: "daily reportAssistant",
+  name: "Daily Report Assistant",
   slug: "daily-report",
   icon: "📄",
-  description: "Generatedaily report",
+  description: "Generate daily report",
   status: "draft",
   current_version_id: "ver_1",
   pricing_type: "free",
@@ -146,7 +146,7 @@ test("create app flow navigates to builder", async ({ page }) => {
 
   await page.goto("/dashboard/apps");
   await page.getByRole("button", { name: "Create App" }).click();
-  await page.getByPlaceholder("e.g.:daily reportAssistant").fill("daily reportAssistant");
+  await page.getByPlaceholder("e.g. Daily Assistant").fill("Daily Report Assistant");
   await page.getByRole("button", { name: "Create" }).click();
 
   await expect(page).toHaveURL(new RegExp(`/dashboard/app/app_456/builder`));
@@ -171,7 +171,7 @@ test("public runtime access renders execute action", async ({ page }) => {
       return route.fulfill(
         respondOk({
           workspace: { name: "Demo Workspace", slug: "demo" },
-          app: { name: "daily reportAssistant", slug: "daily-report" },
+          app: { name: "Daily Report Assistant", slug: "daily-report" },
           schema: {
             ui_schema: {
               blocks: [
@@ -193,7 +193,7 @@ test("public runtime access renders execute action", async ({ page }) => {
     return route.fulfill(
       respondOk({
         workspace: { name: "Demo Workspace", slug: "demo" },
-        app: { name: "daily reportAssistant", slug: "daily-report" },
+        app: { name: "Daily Report Assistant", slug: "daily-report" },
         access_policy: { access_mode: "public_anonymous" },
         session_id: "sess_1",
       })

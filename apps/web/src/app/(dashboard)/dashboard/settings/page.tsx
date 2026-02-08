@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PreferencesPage - Supabase Style(Support/Theme)
+ * Preferences Page - Supabase Style (Support/Theme)
  */
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -64,7 +64,7 @@ function ToggleRow({
  );
 }
 
-// SettingsCardComponent - Supabase Style
+// Settings Card Component - Supabase Style
 function SettingsSection({
  title,
  description,
@@ -85,7 +85,7 @@ function SettingsSection({
  </div>
  {/* Content */}
  <div className="p-6">{children}</div>
- {/* FooterAction */}
+ {/* Footer Action */}
  {footer && (
  <div className="px-6 py-4 border-t border-border bg-surface-200/60 flex justify-end">
  {footer}
@@ -95,27 +95,27 @@ function SettingsSection({
  );
 }
 
-// UsageStatisticsData
+// Usage Statistics Data
 const usageStats = [
  { label: "API Call", value: "12,580", limit: "100,000", percentage: 12.5 },
- { label: "StorageEmptybetween", value: "256 MB", limit: "1 GB", percentage: 25 },
- { label: "WorkflowExecute", value: "3,847", limit: "50,000", percentage: 7.7 },
- { label: "TeamMember", value: "3", limit: "5", percentage: 60 },
+ { label: "Storage Space", value: "256 MB", limit: "1 GB", percentage: 25 },
+ { label: "Workflow Executions", value: "3,847", limit: "50,000", percentage: 7.7 },
+ { label: "Team Members", value: "3", limit: "5", percentage: 60 },
 ];
 
-// Connect'sService
+// Connected services
 const connectedServices = [
- { id: "github", name: "GitHub", icon: Github, connected: true, lastSync: "2 hbefore" },
+ { id: "github", name: "GitHub", icon: Github, connected: true, lastSync: "2 hours ago" },
  { id: "slack", name: "Slack", icon: Slack, connected: true, lastSync: "Just now" },
  { id: "email", name: "Email (SMTP)", icon: Mail, connected: false, lastSync: null },
- { id: "database", name: "PostgreSQL", icon: Database, connected: true, lastSync: "5 minbefore" },
+ { id: "database", name: "PostgreSQL", icon: Database, connected: true, lastSync: "5 minutes ago" },
 ];
 
 export default function PreferencesPage() {
  const { theme, setTheme } = useTheme();
  const { user, setUser } = useAuthStore();
  
- // PreferencesStatus
+ // Preferences Status
  const [language, setLanguage] = useState("zh-CN");
  const [notifications, setNotifications] = useState({
  workflowComplete: true,
@@ -136,13 +136,13 @@ export default function PreferencesPage() {
  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
  const [hasChanges, setHasChanges] = useState(false);
 
- // LoadUserPreferences
+ // Load User Preferences
  const loadPreferences = useCallback(async () => {
  setIsLoadingData(true);
  try {
  const userData = await userApi.getCurrentUser();
  
- // UpdateLocalStatus
+ // Update Local Status
  if (userData.preferences) {
  const prefs = userData.preferences;
  
@@ -160,21 +160,21 @@ export default function PreferencesPage() {
  }
  }
  
- // Update store 'sUserData
+ // Update store's user data
  setUser(userData);
  } catch (err) {
- console.error("LoadPreferencesFailed:", err);
+ console.error("Load preferences failed:", err);
  } finally {
  setIsLoadingData(false);
  }
  }, [setTheme, setUser]);
 
- // InitialLoad
+ // Initial Load
  useEffect(() => {
  loadPreferences();
  }, [loadPreferences]);
 
- // TrackChange
+ // Track Changes
  useEffect(() => {
  setHasChanges(true);
  }, [language, notifications, performance]);
@@ -192,7 +192,7 @@ export default function PreferencesPage() {
  performance,
  };
  
- // SavetoService
+ // Save to Service
  const updatedUser = await userApi.updateProfile({ preferences });
  
  // Update store
@@ -202,19 +202,19 @@ export default function PreferencesPage() {
  setHasChanges(false);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message: "SaveFailed");
+ setError(err instanceof Error ? err.message: "Save failed");
  } finally {
  setIsLoading(false);
  }
  };
  
  const handleCancel = () => {
- // re-newLoadUserPreference
+ // Reload user preferences
  loadPreferences();
  setHasChanges(false);
  };
 
- // InitialLoadStatus
+ // Initial Load Status
  if (isLoadingData) {
  return (
  <PageContainer>
@@ -246,8 +246,8 @@ export default function PreferencesPage() {
  <div className="space-y-6">
  <PageHeader
  eyebrow="Settings"
- title="useSettings"
- description="Configoutside, NotificationsandcanOption"
+ title="User Settings"
+ description="Configure appearance, notifications, and performance options"
  actions={(
  <div className="flex items-center gap-3">
  <Button
@@ -269,7 +269,7 @@ export default function PreferencesPage() {
  Saving...
  </>
  ) : (
- "SaveChange"
+ "Save Changes"
  )}
  </Button>
  </div>
@@ -278,10 +278,10 @@ export default function PreferencesPage() {
 
  <div className="page-divider" />
 
- {/* outsideSettings */}
- <SettingsSection title="outside" description="CustomApp'svisualEffect">
+ {/* Appearance Settings */}
+ <SettingsSection title="Appearance" description="Customize your app's visual effects">
  <div className="space-y-5">
- {/* ThemeSelect */}
+ {/* Theme Select */}
  <div>
  <label className="text-sm font-medium text-foreground mb-3 block">
  Theme
@@ -317,7 +317,7 @@ export default function PreferencesPage() {
  </div>
  </div>
 
- {/* LanguageSelect */}
+ {/* Language Select */}
  <div>
  <label className="text-sm font-medium text-foreground mb-2 block">
  Language
@@ -330,7 +330,7 @@ export default function PreferencesPage() {
  <SelectItem value="zh-CN"></SelectItem>
  <SelectItem value="zh-TW"></SelectItem>
  <SelectItem value="en">English</SelectItem>
- <SelectItem value="ja">daycurrent</SelectItem>
+ <SelectItem value="ja">日本語</SelectItem>
  </SelectContent>
  </Select>
  </div>
@@ -338,34 +338,34 @@ export default function PreferencesPage() {
  </SettingsSection>
 
  {/* Notification Settings */}
- <SettingsSection title="Notifications" description="ManageyouHopeto'sNotificationsType">
+ <SettingsSection title="Notifications" description="Manage your notification preferences">
  <ToggleRow
- label="WorkflowDone"
- description="WorkflowRunDonetimeSendNotifications"
+ label="Workflow Complete"
+ description="Send notifications when workflow runs complete"
  checked={notifications.workflowComplete}
  onCheckedChange={(checked) =>
  setNotifications((prev) => ({ ...prev, workflowComplete: checked }))
  }
  />
  <ToggleRow
- label="WorkflowError"
- description="WorkflowRuntimeSendNotifications"
+ label="Workflow Error"
+ description="Send notifications when workflow errors occur"
  checked={notifications.workflowError}
  onCheckedChange={(checked) =>
  setNotifications((prev) => ({ ...prev, workflowError: checked }))
  }
  />
  <ToggleRow
- label="SystemUpdate"
- description="ReceiveSystemUpdateandnewFeaturesNotifications"
+ label="System Updates"
+ description="Receive system update and new feature notifications"
  checked={notifications.systemUpdates}
  onCheckedChange={(checked) =>
  setNotifications((prev) => ({ ...prev, systemUpdates: checked }))
  }
  />
  <ToggleRow
- label="eachweeksReport"
- description="eachweeksSendUsageSituationSummary"
+ label="Weekly Report"
+ description="Send weekly usage summary reports"
  checked={notifications.weeklyDigest}
  onCheckedChange={(checked) =>
  setNotifications((prev) => ({ ...prev, weeklyDigest: checked }))
@@ -373,19 +373,19 @@ export default function PreferencesPage() {
  />
  </SettingsSection>
 
- {/* canSettings */}
- <SettingsSection title="can" description="optimalAppcanandExperience">
+ {/* Performance Settings */}
+ <SettingsSection title="Performance" description="Optimize app performance and experience">
  <ToggleRow
- label="AutoSave"
- description="AutoSaveyou'sWorkflowChange"
+label="Auto-save"
+description="Auto-save your workflow changes"
  checked={performance.autoSave}
  onCheckedChange={(checked) =>
  setPerformance((prev) => ({ ...prev, autoSave: checked }))
  }
  />
  <ToggleRow
- label="faceAnimation"
- description="EnablefacepastAnimationEffect"
+ label="Interface Animation"
+ description="Enable interface transition animation effects"
  checked={performance.animations}
  onCheckedChange={(checked) =>
  setPerformance((prev) => ({ ...prev, animations: checked }))
@@ -393,7 +393,7 @@ export default function PreferencesPage() {
  />
  <ToggleRow
  label="Compact"
- description="UsagemoreCompact'sfaceLayout"
+ description="Use a more compact interface layout"
  checked={performance.compactMode}
  onCheckedChange={(checked) =>
  setPerformance((prev) => ({ ...prev, compactMode: checked }))
@@ -401,8 +401,8 @@ export default function PreferencesPage() {
  />
  </SettingsSection>
 
- {/* UsageStatistics */}
- <SettingsSection title="UsageStatistics" description="Viewyou'sAccountUsageSituation">
+ {/* Usage Statistics */}
+ <SettingsSection title="Usage Statistics" description="View your account usage">
  <div className="page-grid grid-cols-1 sm:grid-cols-2 gap-4">
  {usageStats.map((stat) => (
  <div key={stat.label} className="p-4 rounded-md bg-surface-100/60 border border-border">
@@ -422,7 +422,7 @@ export default function PreferencesPage() {
  />
  </div>
  <p className="text-xs text-foreground-muted mt-2">
- alreadyUsage {stat.percentage.toFixed(1)}%
+ Used {stat.percentage.toFixed(1)}%
  </p>
  </div>
  ))}
@@ -430,13 +430,13 @@ export default function PreferencesPage() {
  <div className="mt-4 flex items-center gap-2">
  <BarChart3 className="w-4 h-4 text-foreground-muted" />
  <span className="text-[13px] text-foreground-light">
- DataUpdateat {new Date().toLocaleString()}
+ Data updated at {new Date().toLocaleString()}
  </span>
  </div>
  </SettingsSection>
 
- {/* Connect'sService */}
- <SettingsSection title="Connect'sService" description="Manageyou'sThird-partyServiceIntegration">
+ {/* Connected services */}
+ <SettingsSection title="Connected Services" description="Manage your third-party service integrations">
  <div className="space-y-3">
  {connectedServices.map((service) => (
  <div 
@@ -457,7 +457,7 @@ export default function PreferencesPage() {
  <p className="text-sm font-medium text-foreground">{service.name}</p>
  <p className="text-xs text-foreground-muted">
  {service.connected 
- ? `mostafterSync: ${service.lastSync}` 
+ ? `Last synced: ${service.lastSync}` 
 : "Disconnected"}
  </p>
  </div>
@@ -471,7 +471,7 @@ export default function PreferencesPage() {
  </Button>
  <Button variant="ghost" size="sm" className="h-8 text-destructive hover:text-destructive">
  <X className="w-3.5 h-3.5 mr-1.5" />
- 
+ Disconnect
  </Button>
  </>
  ) : (
@@ -486,12 +486,12 @@ export default function PreferencesPage() {
  </div>
  <Button variant="outline" className="mt-4 border-border text-foreground-light hover:text-foreground">
  <Link2 className="w-4 h-4 mr-2" />
- Addnew'sIntegration
+ Add New Integration
  </Button>
  </SettingsSection>
 
- {/* DataExport */}
- <SettingsSection title="DataExport" description="Exportyou'sDataandConfig">
+ {/* Data Export */}
+ <SettingsSection title="Data Export" description="Export your data and configurations">
  <div className="page-grid grid-cols-1 sm:grid-cols-2 gap-4">
  <div className="p-4 rounded-md border border-border bg-surface-100/60 hover:border-brand-400 transition-colors cursor-pointer">
  <div className="flex items-center gap-3 mb-2">
@@ -499,7 +499,7 @@ export default function PreferencesPage() {
  <Download className="w-5 h-5 text-brand-500" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">ExportWorkflow</p>
+ <p className="text-sm font-medium text-foreground">Export Workflows</p>
  <p className="text-xs text-foreground-muted">JSON Format</p>
  </div>
  </div>
@@ -513,7 +513,7 @@ export default function PreferencesPage() {
  <Database className="w-5 h-5 text-foreground-light" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">ExportExecuteLogs</p>
+ <p className="text-sm font-medium text-foreground">Export Execution Logs</p>
  <p className="text-xs text-foreground-muted">CSV Format</p>
  </div>
  </div>
@@ -528,7 +528,7 @@ export default function PreferencesPage() {
  </div>
  <div>
  <p className="text-sm font-medium text-foreground">Export API Key</p>
- <p className="text-xs text-foreground-muted">EncryptBackup</p>
+ <p className="text-xs text-foreground-muted">Encrypted Backup</p>
  </div>
  </div>
  <Button variant="outline" size="sm" className="w-full mt-2 border-border text-foreground-light hover:bg-surface-200 hover:text-foreground">
@@ -541,7 +541,7 @@ export default function PreferencesPage() {
  <BarChart3 className="w-5 h-5 text-warning" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">ExportUsageReport</p>
+ <p className="text-sm font-medium text-foreground">Export Usage Report</p>
  <p className="text-xs text-foreground-muted">PDF Format</p>
  </div>
  </div>
@@ -552,17 +552,17 @@ export default function PreferencesPage() {
  </div>
  </SettingsSection>
 
- {/* DangerActionRegion */}
- <SettingsSection title="DangerAction" description="withdownActionnotcan, PleaseCautionAction">
+ {/* Danger Zone */}
+ <SettingsSection title="Danger Zone" description="The actions below are irreversible. Please proceed with caution.">
  <div className="space-y-4">
  <div className="p-4 rounded-md border border-warning/30 bg-warning-200">
  <div className="flex items-start justify-between">
  <div className="flex items-start gap-3">
  <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
  <div>
- <p className="text-sm font-medium text-foreground">ClearAllWorkflow</p>
+ <p className="text-sm font-medium text-foreground">Clear All Workflows</p>
  <p className="text-xs text-foreground-light mt-1">
- DeleteAllWorkflowandotherExecuteHistory, thisActionNoneUndo
+ Delete all workflows and execution history. This action cannot be undone.
  </p>
  </div>
  </div>
@@ -577,9 +577,9 @@ export default function PreferencesPage() {
  <div className="flex items-start gap-3">
  <Trash2 className="w-5 h-5 text-destructive mt-0.5" />
  <div>
- <p className="text-sm font-medium text-foreground">DeleteAccount</p>
+ <p className="text-sm font-medium text-foreground">Delete Account</p>
  <p className="text-xs text-foreground-light mt-1">
- PermanentDeleteyou'sAccountandAllData, thisActionNoneUndo
+ Permanently delete your account and all data. This action cannot be undone.
  </p>
  </div>
  </div>
@@ -589,14 +589,14 @@ export default function PreferencesPage() {
  className="text-destructive border-destructive/30 hover:bg-destructive-200/20"
  onClick={() => setShowDeleteConfirm(true)}
  >
- DeleteAccount
+ Delete Account
  </Button>
  </div>
  </div>
  </div>
  </SettingsSection>
 
- {/* DeleteConfirmModal */}
+ {/* Delete Confirm Modal */}
  {showDeleteConfirm && (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80">
  <div className="w-full max-w-md bg-surface-100 border border-border rounded-md p-6">
@@ -605,26 +605,26 @@ export default function PreferencesPage() {
  <AlertTriangle className="w-6 h-6 text-destructive" />
  </div>
  <div>
- <h3 className="font-semibold text-foreground">ConfirmDeleteAccount</h3>
- <p className="text-sm text-foreground-light">thisActionNoneUndo</p>
+ <h3 className="font-semibold text-foreground">Confirm Account Deletion</h3>
+ <p className="text-sm text-foreground-light">This action cannot be undone.</p>
  </div>
  </div>
  <p className="text-sm text-foreground-light mb-6">
- DeleteAccountafter, you'sAllWorkflow, ExecuteHistory, API KeyandotherheDatawillbyPermanentDelete, NoneRestore.
+ After deleting your account, all workflows, execution history, API keys, and other data will be permanently deleted and cannot be restored.
  </p>
  <div className="flex justify-end gap-3">
  <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} className="border-border text-foreground-light hover:bg-surface-200 hover:text-foreground">
  Cancel
  </Button>
  <Button className="bg-destructive hover:bg-destructive/90 text-background">
- ConfirmDelete
+ Confirm Delete
  </Button>
  </div>
  </div>
  </div>
  )}
 
- {/* TipInfo */}
+ {/* Status Messages */}
  {error && (
  <div className="flex items-center gap-2 p-4 rounded-md bg-destructive-200 border border-destructive/30 text-destructive text-sm">
  <AlertCircle className="h-4 w-4 shrink-0" />
@@ -634,7 +634,7 @@ export default function PreferencesPage() {
  {success && (
  <div className="flex items-center gap-2 p-4 rounded-md bg-brand-200 border border-brand-400 text-brand-500 text-sm">
  <CheckCircle2 className="h-4 w-4 shrink-0" />
- SettingsSaved
+ Settings saved successfully
  </div>
  )}
 

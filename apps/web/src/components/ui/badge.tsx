@@ -1,7 +1,7 @@
 /**
- * Badge BadgeComponent - Enhanced
+ * Badge Component - Enhanced
  * 
- * Supportmultipletypestyle, Dimension, AnimationandInteractiveEffect
+ * Supports multiple styles, sizes, animations, and interactive effects
  */
 
 import * as React from "react"
@@ -17,7 +17,7 @@ const badgeVariants = cva(
  {
  variants: {
  variant: {
- // Supabase default/primary: BrandGreen
+ // Supabase default/primary: Brand Green
  default: [
  "bg-surface-200",
  "border-border",
@@ -75,7 +75,7 @@ const badgeVariants = cva(
  "border-pink-500/30",
  "text-pink-400",
  ].join(""),
- // Supabase outline: Edgestyle
+     // Supabase outline style
  outline: [
  "bg-transparent",
  "border-border",
@@ -139,19 +139,19 @@ const badgeVariants = cva(
 export interface BadgeProps
  extends React.HTMLAttributes<HTMLDivElement>,
  VariantProps<typeof badgeVariants> {
- /** Left sideIcon */
+ /** Left side icon */
  icon?: React.ReactNode
- /** ClickCloseCallback */
+ /** Close click callback */
  onClose?: () => void
- /** isnocanInteractive */
+ /** Whether interactive */
  interactive?: boolean
- /** countchar(DisplayasBadgecountchar) */
+ /** Count (displayed as badge counter) */
  count?: number
- /** Maximumcountchar, ExceedDisplay {max}+ */
+ /** Maximum count, exceeding displays {max}+ */
  maxCount?: number
- /** isnoDisplayas */
+ /** Whether to display as dot */
  dot?: boolean
- /** 'sColor */
+ /** Dot color */
  dotColor?: string
 }
 
@@ -170,19 +170,19 @@ function Badge({
  children, 
  ...props 
 }: BadgeProps) {
- // ProcesscountcharDisplay
+ // Process count display
  const displayCount = count !== undefined 
  ? count > maxCount 
  ? `${maxCount}+` 
  : count.toString()
  : null
 
- // Ping AnimationEffect
+ // Ping animation effect
  const pingEffect = animation === "ping" && (
  <span className="absolute inset-0 rounded-full animate-ping opacity-75 bg-current" />
  )
 
- // Glow AnimationEffect
+ // Glow animation effect
  const glowClass = animation === "glow" && "shadow-[0_0_10px_currentColor]"
 
  return (
@@ -210,14 +210,14 @@ function Badge({
  <span className="shrink-0 -ml-0.5">{icon}</span>
  )}
  
- {/* Contentorcountchar */}
+ {/* Content or count */}
  {displayCount !== null ? (
  <span className="tabular-nums">{displayCount}</span>
  ) : (
  children
  )}
  
- {/* CloseButton */}
+ {/* Close Button */}
  {onClose && (
  <button
  type="button"
@@ -235,14 +235,14 @@ function Badge({
 }
 
 /**
- * BadgeGroup - Badgegroup
+ * BadgeGroup - Badge Group
  */
 interface BadgeGroupProps {
  children: React.ReactNode
  className?: string
- /** MaximumDisplayCount */
+ /** Maximum display count */
  max?: number
- /** isnocanCollapse */
+ /** Whether collapsible */
  collapsible?: boolean
 }
 
@@ -269,7 +269,7 @@ function BadgeGroup({
 }
 
 /**
- * StatusBadge - StatusBadge
+ * StatusBadge - Status Badge
  */
 interface StatusBadgeProps {
  status: "online" | "offline" | "busy" | "away" | "dnd"
@@ -281,9 +281,9 @@ interface StatusBadgeProps {
 const statusConfig = {
  online: { color: "hsl(var(--brand-500))", label: "Online", bgColor: "bg-brand-500/15" },
  offline: { color: "#6B7280", label: "Offline", bgColor: "bg-surface-200/50" },
- busy: { color: "#EF4444", label: "", bgColor: "bg-red-500/15" },
- away: { color: "#F59E0B", label: "Leave", bgColor: "bg-amber-500/15" },
- dnd: { color: "#EF4444", label: "Please", bgColor: "bg-red-500/15" },
+ busy: { color: "#EF4444", label: "Busy", bgColor: "bg-red-500/15" },
+ away: { color: "#F59E0B", label: "Away", bgColor: "bg-amber-500/15" },
+ dnd: { color: "#EF4444", label: "Do Not Disturb", bgColor: "bg-red-500/15" },
 }
 
 function StatusBadge({ 
@@ -318,7 +318,7 @@ function StatusBadge({
 }
 
 /**
- * NotificationBadge - NotificationsBadge(Used forElement)
+ * NotificationBadge - Notification Badge (wraps an element)
  */
 interface NotificationBadgeProps {
  children: React.ReactNode

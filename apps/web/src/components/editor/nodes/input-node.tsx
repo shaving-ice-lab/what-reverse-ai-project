@@ -24,7 +24,7 @@ const inputTypeIcons: Record<string, React.ReactNode> = {
 
 const inputTypeLabels: Record<string, string> = {
  text: "Text",
- number: "countchar",
+ number: "Number",
  boolean: "Toggle",
  select: "Select",
  textarea: "Text",
@@ -55,7 +55,7 @@ export const InputNode = memo(function InputNode({
 
  const inputType = config.inputType || "text";
  const inputName = config.name || "input";
- const inputLabel = config.label || "UserInput";
+ const inputLabel = config.label || "User Input";
 
  return (
  <div
@@ -72,7 +72,7 @@ export const InputNode = memo(function InputNode({
  <FormInput className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "UserInput"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "User Input"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  {inputTypeIcons[inputType]}
  {inputTypeLabels[inputType] || inputType}

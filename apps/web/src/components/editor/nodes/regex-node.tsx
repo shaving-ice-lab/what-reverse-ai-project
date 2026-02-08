@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * currentlythenExtractNode - Minimalist Style
+ * Currently Then Extract Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -33,9 +33,9 @@ export const RegexNode = memo(function RegexNode({
 
  const modeLabels: Record<string, string> = {
  first: "Match",
- all: "allsectionMatch",
- groups: "GroupExtract",
- test: "TestMatch",
+ all: "All Matches",
+    groups: "Group Extract",
+    test: "Test Match",
  };
 
  return (
@@ -47,7 +47,7 @@ export const RegexNode = memo(function RegexNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -62,7 +62,7 @@ export const RegexNode = memo(function RegexNode({
  <Regex className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "currentlythenExtract"}</h3>
+        <h3 className="font-medium text-sm truncate">{data.label || "Currently Then Extract"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Search className="h-3 w-3" />
  {modeLabels[extractMode]}
@@ -70,7 +70,7 @@ export const RegexNode = memo(function RegexNode({
  </div>
  </div>
 
- {/* currentlythenExpressionPreview */}
+        {/* Currently Then Expression Preview */}
  <div className="px-3 py-2.5 space-y-2 text-xs">
  {pattern ? (
  <div className="font-mono p-2 rounded-md bg-surface-200 overflow-hidden">
@@ -80,7 +80,7 @@ export const RegexNode = memo(function RegexNode({
  </div>
  ) : (
  <div className="text-foreground-muted p-2 rounded-md bg-surface-200 border border-dashed border-border">
- Please entercurrentlythenExpression...
+          Please enter currently then expression...
  </div>
  )}
  {config.groupNames && config.groupNames.length > 0 && (

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationHistoryPage
- * BrowseandManageAllHistoryConversationRecord
+ * Conversation History Page
+ * Browse and manage all historical conversation records
  */
 
 import { useState, useMemo } from "react";
@@ -50,7 +50,7 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// ConversationTypeConfig
+// Conversation Type Config
 const typeConfig = {
  chat: {
  label: "Conversation",
@@ -84,12 +84,12 @@ const typeConfig = {
  },
 } as const;
 
-// MockConversationHistoryData
+// Mock Conversation History Data
 const mockConversations = [
  {
  id: "conv-1",
- title: "About React canoptimal'sDiscussion",
- preview: "ifwhatUsage useMemo and useCallback optimalComponentRender...",
+    title: "Discussion About React Optimization",
+    preview: "How to use useMemo and useCallback to optimize component rendering...",
  type: "chat" as const,
  model: "GPT-4",
  messageCount: 24,
@@ -100,8 +100,8 @@ const mockConversations = [
  },
  {
  id: "conv-2",
- title: "ProductMarketing CopyGenerate",
- preview: "asnewProductPublishwillWrite1person'sMarketing Copy...",
+    title: "Product Marketing Copy Generation",
+    preview: "Write compelling marketing copy for a new product launch...",
  type: "creative" as const,
  model: "Claude 3",
  messageCount: 12,
@@ -112,8 +112,8 @@ const mockConversations = [
  },
  {
  id: "conv-3",
- title: "Python DataAnalyticscurrent",
- preview: "Write1AutomationDataCleanandAnalytics's Python current...",
+    title: "Python Data Analytics Script",
+    preview: "Write an automated data cleaning and analytics Python script...",
  type: "code" as const,
  model: "GPT-4",
  messageCount: 18,
@@ -124,8 +124,8 @@ const mockConversations = [
  },
  {
  id: "conv-4",
- title: "SupportAssistant Agent Conversation",
- preview: "TestnewConfig'sSupport Agent Response...",
+    title: "Support Assistant Agent Conversation",
+    preview: "Testing the newly configured support agent responses...",
  type: "agent" as const,
  model: "Custom Agent",
  messageCount: 35,
@@ -137,7 +137,7 @@ const mockConversations = [
  {
  id: "conv-5",
  title: "Website Banner Design",
- preview: "asE-commerceWebsiteHomeGenerate1group Banner...",
+    preview: "Generate a set of banners for an e-commerce website homepage...",
  type: "image" as const,
  model: "DALL-E 3",
  messageCount: 8,
@@ -148,8 +148,8 @@ const mockConversations = [
  },
  {
  id: "conv-6",
- title: "API DocumentWrite",
- preview: "as REST API InterfaceWriteDetailed'sTechnologyDocument...",
+    title: "API Documentation Writing",
+    preview: "Write detailed technical documentation for REST API endpoints...",
  type: "creative" as const,
  model: "Claude 3",
  messageCount: 15,
@@ -160,8 +160,8 @@ const mockConversations = [
  },
  {
  id: "conv-7",
- title: "Vue.js Componentre-",
- preview: "will Options API ComponentMigrationto Composition API...",
+    title: "Vue.js Component Refactoring",
+    preview: "Migrate Options API components to Composition API...",
  type: "code" as const,
  model: "GPT-4",
  messageCount: 28,
@@ -172,8 +172,8 @@ const mockConversations = [
  },
  {
  id: "conv-8",
- title: "UserSurveyDesign",
- preview: "Design1forProductExperience'sUserSurvey...",
+    title: "User Survey Design",
+    preview: "Design a user survey for product experience feedback...",
  type: "chat" as const,
  model: "GPT-4",
  messageCount: 10,
@@ -184,9 +184,9 @@ const mockConversations = [
  },
 ];
 
-// TimeRangeOption
+// Time Range Options
 const timeRanges = [
- { value: "all", label: "allsectionTime" },
+ { value: "all", label: "All Time" },
  { value: "today", label: "Today" },
  { value: "week", label: "Recent 7 days" },
  { value: "month", label: "Recent 30 days" },
@@ -197,13 +197,13 @@ type SortKey = "updated" | "created" | "messages" | "title";
 type ViewMode = "all" | "starred" | "archived";
 
 const sortOptions: { value: SortKey; label: string }[] = [
- { value: "updated", label: "RecentUpdate" },
+ { value: "updated", label: "Recently Updated" },
  { value: "created", label: "Created At" },
- { value: "messages", label: "MessageCount" },
+ { value: "messages", label: "Message Count" },
  { value: "title", label: "Title" },
 ];
 
-// FormatTime
+// Format Time
 function formatDate(dateString: string) {
  const date = new Date(dateString);
  const now = new Date();
@@ -215,7 +215,7 @@ function formatDate(dateString: string) {
  } else if (diffDays === 1) {
  return `Yesterday ${date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
  } else if (diffDays < 7) {
- return `${diffDays} daysbefore`;
+    return `${diffDays} days ago`;
  } else {
  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
  }
@@ -248,7 +248,7 @@ export default function HistoryPage() {
  setShowStarredOnly(false);
  };
 
- // FilterandSortConversation
+ // Filter and Sort Conversations
  const visibleConversations = useMemo(() => {
  const filtered = conversations.filter((conv) => {
  // SearchFilter
@@ -306,7 +306,7 @@ export default function HistoryPage() {
  return sorted;
  }, [conversations, searchQuery, selectedType, activeView, timeRange, sortBy]);
 
- // SwitchSelect
+ // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedItems);
  if (newSelected.has(id)) {
@@ -317,7 +317,7 @@ export default function HistoryPage() {
  setSelectedItems(newSelected);
  };
 
- // Select All/CancelSelect All
+ // Select All / Deselect All
  const toggleSelectAll = () => {
  if (visibleConversations.length === 0) {
  return;
@@ -329,7 +329,7 @@ export default function HistoryPage() {
  }
  };
 
- // SwitchFavorite
+ // Toggle Favorite
  const toggleStar = (id: string) => {
  setConversations((prev) =>
  prev.map((conv) =>
@@ -338,14 +338,14 @@ export default function HistoryPage() {
  );
  };
 
- // DeleteConversation
+ // Delete Conversation
  const deleteConversation = (id: string) => {
  setConversations((prev) => prev.filter((conv) => conv.id !== id));
  selectedItems.delete(id);
  setSelectedItems(new Set(selectedItems));
  };
 
- // ArchiveConversation
+ // Archive Conversation
  const archiveConversation = (id: string) => {
  setConversations((prev) =>
  prev.map((conv) =>
@@ -354,7 +354,7 @@ export default function HistoryPage() {
  );
  };
 
- // BatchAction
+ // Batch Actions
  const bulkDelete = () => {
  setConversations((prev) => prev.filter((conv) => !selectedItems.has(conv.id)));
  setSelectedItems(new Set());
@@ -378,7 +378,7 @@ export default function HistoryPage() {
  setShowStarredOnly(false);
  };
 
- // StatisticsData
+ // Statistics Data
  const stats = {
  total: conversations.length,
  active: conversations.filter((c) => !c.archived).length,
@@ -392,25 +392,25 @@ export default function HistoryPage() {
  }).length,
  };
 
- const sortLabel = sortOptions.find((option) => option.value === sortBy)?.label ?? "RecentUpdate";
+ const sortLabel = sortOptions.find((option) => option.value === sortBy)?.label ?? "Recently Updated";
 
  const statCards = [
  {
- label: "ActiveConversation",
- value: stats.active,
- helper: "not yetArchive",
+    label: "Active Conversations",
+    value: stats.active,
+    helper: "Not archived",
  icon: MessageSquare,
  iconClassName: "bg-brand-200/60 border-brand-400/40 text-brand-500",
  },
  {
- label: "FavoriteConversation",
- value: stats.starred,
- helper: "alreadyMark",
+    label: "Starred Conversations",
+    value: stats.starred,
+    helper: "Marked as favorite",
  icon: Star,
  iconClassName: "bg-warning-200/60 border-warning/30 text-warning",
  },
  {
- label: "TodayConversation",
+    label: "Today's Conversations",
  value: stats.today,
  helper: "Past 24 h",
  icon: Clock,
@@ -419,14 +419,14 @@ export default function HistoryPage() {
  {
  label: "Archived",
  value: stats.archived,
- helper: "HistoryRecord",
+    helper: "Historical records",
  icon: Archive,
  iconClassName: "bg-surface-200 border-border text-foreground-light",
  },
  ];
 
  const viewTabs = [
- { value: "all", label: "allsection", count: stats.total },
+ { value: "all", label: "All", count: stats.total },
  { value: "starred", label: "Favorite", count: stats.starred },
  { value: "archived", label: "Archive", count: stats.archived },
  ] as const;
@@ -449,8 +449,8 @@ export default function HistoryPage() {
  <div className="space-y-3">
  <p className="page-caption">Conversations</p>
  <PageHeader
- title="ConversationHistory"
- description="BrowseandManageyou'sAllConversationRecord"
+          title="Conversation History"
+          description="Browse and manage all your conversation history"
  actions={(
  <div className="flex items-center gap-2">
  <Button
@@ -462,8 +462,8 @@ export default function HistoryPage() {
  </Button>
  <Link href="/">
  <Button size="sm" leftIcon={<MessageSquare className="w-4 h-4" />}>
- CreateConversation
- </Button>
+                New Conversation
+              </Button>
  </Link>
  </div>
  )}
@@ -471,7 +471,7 @@ export default function HistoryPage() {
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5" />
- {latestUpdate ? `RecentUpdate ${formatDate(latestUpdate)}`: "NoneRecord"}
+            {latestUpdate ? `Last updated ${formatDate(latestUpdate)}`: "No records"}
  </span>
  <span className="inline-flex items-center gap-1.5">
  <Star className="w-3.5 h-3.5" />
@@ -522,7 +522,7 @@ export default function HistoryPage() {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
  variant="dark"
- placeholder="SearchConversationTitleorSummary..."
+              placeholder="Search conversation title or summary..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
@@ -531,10 +531,10 @@ export default function HistoryPage() {
 
  <Select value={selectedType} onValueChange={setSelectedType}>
  <SelectTrigger className="w-[150px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
- <SelectValue placeholder="ConversationType" />
+              <SelectValue placeholder="Conversation Type" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionType</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
  <SelectItem value="chat">Conversation</SelectItem>
  <SelectItem value="agent">Agent</SelectItem>
  <SelectItem value="creative">Creative</SelectItem>
@@ -545,7 +545,7 @@ export default function HistoryPage() {
 
  <Select value={timeRange} onValueChange={setTimeRange}>
  <SelectTrigger className="w-[150px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
- <SelectValue placeholder="TimeRange" />
+              <SelectValue placeholder="Time Range" />
  </SelectTrigger>
  <SelectContent>
  {timeRanges.map((range) => (
@@ -560,7 +560,7 @@ export default function HistoryPage() {
  <SelectTrigger className="w-[150px] h-9 bg-surface-200 border-border text-[12px] text-foreground">
  <div className="flex items-center gap-2">
  <ArrowUpDown className="w-4 h-4 text-foreground-muted" />
- <SelectValue placeholder="Sortmethod" />
+              <SelectValue placeholder="Sort by" />
  </div>
  </SelectTrigger>
  <SelectContent>
@@ -590,7 +590,7 @@ export default function HistoryPage() {
  </ButtonGroup>
 
  <Button variant="ghost" size="sm" onClick={resetFilters}>
- ResetFilter
+            Reset Filters
  </Button>
  </div>
 
@@ -620,18 +620,18 @@ export default function HistoryPage() {
  )}
  {activeView === "starred" && (
  <Badge variant="warning" size="xs">
- onlyFavorite
+                Starred Only
  </Badge>
  )}
  {activeView === "archived" && (
  <Badge variant="secondary" size="xs">
- onlyArchive
+                Archived Only
  </Badge>
  )}
  </div>
  </section>
 
- {/* BatchAction */}
+ {/* Batch Actions */}
  {hasSelection && (
  <section className="page-panel border-brand-400/40 bg-brand-200/20">
  <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -639,7 +639,7 @@ export default function HistoryPage() {
  <Badge variant="primary" size="sm">
  {selectedItems.size}
  </Badge>
- alreadySelect {selectedItems.size} Conversation
+            {selectedItems.size} conversations selected
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="outline" size="sm" onClick={bulkArchive}>
@@ -662,8 +662,8 @@ export default function HistoryPage() {
  <section className="page-panel overflow-hidden">
  <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
  <div>
- <p className="page-panel-title">ConversationList</p>
- <p className="page-panel-description"> {visibleConversations.length} Conversation</p>
+            <p className="page-panel-title">Conversation List</p>
+            <p className="page-panel-description">{visibleConversations.length} Conversations</p>
  </div>
  <div className="flex items-center gap-2">
  <Button variant="ghost" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />}>
@@ -693,14 +693,14 @@ export default function HistoryPage() {
  <div className="w-14 h-14 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <History className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NotoConversation</h3>
- <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
- {searchQuery ? "TryotherheSearchKeywords": "Startnew'sConversation"}
+              <h3 className="text-base font-medium text-foreground mb-2">No Conversations Found</h3>
+              <p className="text-[13px] text-foreground-light mb-4 max-w-sm">
+                {searchQuery ? "Try different search keywords": "Start a new conversation"}
  </p>
  <Link href="/">
  <Button size="sm" leftIcon={<MessageSquare className="w-4 h-4" />}>
- CreateConversation
- </Button>
+                New Conversation
+              </Button>
  </Link>
  </div>
  ) : (
@@ -755,7 +755,7 @@ export default function HistoryPage() {
  </Badge>
  <span className="inline-flex items-center gap-1">
  <MessageSquare className="w-3 h-3" />
- {conv.messageCount} Message
+ {conv.messageCount} messages
  </span>
  <span className="inline-flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -777,7 +777,7 @@ export default function HistoryPage() {
 
  <div className="hidden lg:flex justify-center">
  <span className="text-[13px] text-foreground-light tabular-nums">
- {conv.messageCount} 
+ {conv.messageCount}
  </span>
  </div>
 
@@ -817,12 +817,12 @@ export default function HistoryPage() {
  >
  <Link href={`/chat/${conv.id}`}>
  <Eye className="w-4 h-4 mr-2" />
- ViewConversation
+                  View Conversation
  </Link>
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <Copy className="w-4 h-4 mr-2" />
- CopyLink
+                  Copy Link
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
  <Share2 className="w-4 h-4 mr-2" />
@@ -838,7 +838,7 @@ export default function HistoryPage() {
  className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
  >
  <Archive className="w-4 h-4 mr-2" />
- {conv.archived ? "CancelArchive": "Archive"}
+              {conv.archived ? "Unarchive": "Archive"}
  </DropdownMenuItem>
  <DropdownMenuItem
  className="text-[13px] text-destructive-400 focus:text-destructive focus:bg-destructive-200"

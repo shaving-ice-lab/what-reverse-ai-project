@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ActivityLogsPage - Supabase Style
- * RecordandShowcaseUserActivityHistory
+ * Activity Logs Page - Supabase Style
+ * Record and showcase user activity history
  */
 
 import { useMemo, useState } from "react";
@@ -54,32 +54,32 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// ActivityTypeConfig
+// Activity Type Config
 const activityTypes = {
  workflow_created: {
  icon: Plus,
- label: "CreateWorkflow",
+    label: "Create Workflow",
  badgeVariant: "primary",
  iconColor: "text-brand-500",
  bgColor: "bg-brand-200/70",
  },
  workflow_executed: {
  icon: Play,
- label: "ExecuteWorkflow",
+    label: "Execute Workflow",
  badgeVariant: "primary",
  iconColor: "text-brand-500",
  bgColor: "bg-brand-200/70",
  },
  workflow_edited: {
  icon: Edit3,
- label: "EditWorkflow",
+    label: "Edit Workflow",
  badgeVariant: "warning",
  iconColor: "text-warning",
  bgColor: "bg-warning-200/70",
  },
  workflow_deleted: {
  icon: Trash2,
- label: "DeleteWorkflow",
+    label: "Delete Workflow",
  badgeVariant: "error",
  iconColor: "text-destructive",
  bgColor: "bg-destructive-200/70",
@@ -100,21 +100,21 @@ const activityTypes = {
  },
  conversation_started: {
  icon: MessageSquare,
- label: "StartConversation",
+    label: "Start Conversation",
  badgeVariant: "primary",
  iconColor: "text-brand-500",
  bgColor: "bg-brand-200/70",
  },
  file_uploaded: {
  icon: Upload,
- label: "UploadFile",
+    label: "Upload File",
  badgeVariant: "primary",
  iconColor: "text-brand-500",
  bgColor: "bg-brand-200/70",
  },
  file_deleted: {
  icon: Trash2,
- label: "DeleteFile",
+    label: "Delete File",
  badgeVariant: "error",
  iconColor: "text-destructive",
  bgColor: "bg-destructive-200/70",
@@ -128,7 +128,7 @@ const activityTypes = {
  },
  settings_updated: {
  icon: Settings,
- label: "UpdateSettings",
+    label: "Update Settings",
  badgeVariant: "secondary",
  iconColor: "text-foreground-muted",
  bgColor: "bg-surface-200",
@@ -183,10 +183,10 @@ const statusConfig = {
 
 const detailLabels: Record<string, string> = {
  duration: "Duration",
- records: "Recordcount",
+ records: "Record Count",
  model: "Model",
- messages: "Messagecount",
- nodes: "Nodecount",
+ messages: "Messages",
+ nodes: "Nodes",
  triggers: "Trigger",
  error: "Error",
  changes: "Change",
@@ -197,7 +197,7 @@ const detailLabels: Record<string, string> = {
  device: "Device",
  amount: "Amount",
  plan: "Plan",
- capabilities: "canpower",
+ capabilities: "Capabilities",
 };
 
 type ActivityStatus = keyof typeof statusConfig;
@@ -215,101 +215,101 @@ type ActivityItem = {
  details?: Record<string, string | number>;
 };
 
-// ActivityData
+// Activity Data
 const activities: ActivityItem[] = [
  {
  id: "1",
  type: "workflow_executed",
- title: "ExecuteWorkflow: CustomerFeedbackAutoProcess",
- description: "WorkflowExecuteSuccess, Process 15 Feedback",
+    title: "Execute Workflow: Customer Feedback Auto-Processing",
+    description: "Workflow executed successfully, processed 15 feedback items",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T10:30:00Z",
- timeAgo: "5 minbefore",
+    timeAgo: "5 min ago",
  status: "success",
  details: { duration: "12s", records: 15 },
  },
  {
  id: "2",
  type: "conversation_started",
- title: "StartnewConversation",
- description: "Usage GPT-4 ModelStartnewConversation",
+    title: "Started New Conversation",
+    description: "Started a new conversation using the GPT-4 model",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T10:15:00Z",
- timeAgo: "20 minbefore",
+    timeAgo: "20 min ago",
  status: "success",
  details: { model: "GPT-4", messages: 8 },
  },
  {
  id: "3",
  type: "workflow_created",
- title: "CreateWorkflow: EmailAutoCategory",
- description: "Createnew'sAutomationWorkflow",
+    title: "Create Workflow: Email Auto Categorization",
+    description: "Created a new automation workflow",
  user: { name: "Li Hua", avatar: null },
  timestamp: "2026-01-31T09:45:00Z",
- timeAgo: "50 minbefore",
+    timeAgo: "50 min ago",
  status: "success",
  details: { nodes: 6, triggers: 1 },
  },
  {
  id: "4",
  type: "workflow_executed",
- title: "ExecuteWorkflow: DataSync",
- description: "WorkflowExecuteFailed: API ConnectTimeout",
+    title: "Execute Workflow: Data Sync",
+    description: "Workflow execution failed: API connection timeout",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T09:30:00Z",
- timeAgo: "1 hbefore",
+    timeAgo: "1h ago",
  status: "error",
  details: { error: "Connection timeout" },
  },
  {
  id: "5",
  type: "agent_created",
- title: "Create Agent: WritingAssistant",
- description: "Createnew's AI Agent",
+    title: "Create Agent: Writing Assistant",
+    description: "Created a new AI agent",
  user: { name: "Wang Fang", avatar: null },
  timestamp: "2026-01-31T09:00:00Z",
- timeAgo: "1.5 hbefore",
+    timeAgo: "1.5h ago",
  status: "success",
  details: { model: "GPT-4", capabilities: 3 },
  },
  {
  id: "6",
  type: "file_uploaded",
- title: "UploadFile: ProductRequirementsDocument.pdf",
- description: "UploadnewFiletoKnowledge Base",
+    title: "Upload File: ProductRequirementsDocument.pdf",
+    description: "Uploaded a new file to the knowledge base",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T08:30:00Z",
- timeAgo: "2 hbefore",
- status: "success",
- details: { size: "2.4 MB", type: "PDF" },
+    timeAgo: "2h ago",
+    status: "success",
+    details: { size: "2.4 MB", type: "PDF" },
  },
  {
  id: "7",
  type: "api_key_created",
  title: "Create API Key",
- description: "as OpenAI ServiceCreatenew's API Key",
+    description: "Created a new API key for OpenAI service",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T08:00:00Z",
- timeAgo: "2.5 hbefore",
- status: "success",
- details: { provider: "OpenAI" },
+    timeAgo: "2.5h ago",
+    status: "success",
+    details: { provider: "OpenAI" },
  },
  {
  id: "8",
  type: "login",
- title: "Sign InSystem",
+    title: "System Sign In",
  description: "from Chrome/Windows Sign In",
  user: { name: "", avatar: null },
  timestamp: "2026-01-31T07:55:00Z",
- timeAgo: "2.5 hbefore",
- status: "success",
- details: { ip: "192.168.1.xxx", device: "Chrome/Windows" },
+    timeAgo: "2.5h ago",
+    status: "success",
+    details: { ip: "192.168.1.xxx", device: "Chrome/Windows" },
  },
  {
  id: "9",
  type: "workflow_edited",
- title: "EditWorkflow: CustomerFeedbackAutoProcess",
- description: "UpdateTriggerConditionandProcessLogic",
+    title: "Edit Workflow: Customer Feedback Auto-Processing",
+    description: "Updated trigger conditions and processing logic",
  user: { name: "Li Hua", avatar: null },
  timestamp: "2026-01-30T18:30:00Z",
  timeAgo: "Yesterday 18:30",
@@ -319,19 +319,19 @@ const activities: ActivityItem[] = [
  {
  id: "10",
  type: "payment",
- title: "SubscriptionRenew",
- description: "ProfessionalversionmonthsSubscriptionAutoRenewSuccess",
+    title: "Subscription Renewal",
+    description: "Professional plan monthly subscription auto-renewed successfully",
  user: { name: "", avatar: null },
  timestamp: "2026-01-30T00:00:00Z",
  timeAgo: "Yesterday 00:00",
  status: "success",
- details: { amount: "¥99", plan: "Professionalversion" },
+    details: { amount: "¥99", plan: "Professional" },
  },
 ];
 
-// FilterOption
+// Filter Options
 const filterOptions = [
- { id: "all", label: "allsectionActivity" },
+ { id: "all", label: "All Activities" },
  { id: "workflow", label: "Workflow" },
  { id: "agent", label: "Agent" },
  { id: "conversation", label: "Conversation" },
@@ -339,12 +339,12 @@ const filterOptions = [
  { id: "security", label: "Security" },
 ];
 
-// TimeRange
+// Time Range Options
 const timeRanges = [
  { id: "today", label: "Today" },
  { id: "7d", label: "Recent 7 days" },
  { id: "30d", label: "Recent 30 days" },
- { id: "all", label: "allsection" },
+ { id: "all", label: "All" },
 ];
 
 export default function ActivityPage() {
@@ -369,15 +369,15 @@ export default function ActivityPage() {
  }, [timeRange]);
 
  const filterLabel = useMemo(() => {
- return filterOptions.find((option) => option.id === filterType)?.label ?? "allsectionActivity";
+ return filterOptions.find((option) => option.id === filterType)?.label ?? "All Activities";
  }, [filterType]);
 
- // FetchActivityConfig
+ // Get Activity Config
  const getActivityConfig = (type: ActivityType) => {
  return activityTypes[type] || activityTypes.settings_updated;
  };
 
- // FilterActivity
+ // Filter Activities
  const filteredActivities = useMemo(() => {
  const query = searchQuery.trim().toLowerCase();
  const now = new Date();
@@ -423,7 +423,7 @@ export default function ActivityPage() {
  );
  }, [filteredActivities]);
 
- // byDateGroup
+ // Group by Date
  const groupedActivities = useMemo(() => {
  const groups = new Map<string, { label: string; items: ActivityItem[] }>();
 
@@ -480,14 +480,14 @@ export default function ActivityPage() {
  const errorRate = riskTotal ? 100 - warningRate : 0;
 
  const latestActivity = sortedActivities[0];
- const latestActivityLabel = latestActivity ? latestActivity.timeAgo: "NoneRecord";
+  const latestActivityLabel = latestActivity ? latestActivity.timeAgo: "No records";
 
  return (
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="ActivityLogs"
- description="TrackAccountinAllActionandSystemEvent, byTimeandTypeQuickFilter."
+          title="Activity Logs"
+          description="Track all account actions and system events. Quickly filter by time and type."
  actions={(
  <div className="flex items-center gap-2">
  <Button
@@ -524,7 +524,7 @@ export default function ActivityPage() {
  <div className="flex flex-wrap items-center gap-4 text-xs text-foreground-muted">
  <div className="flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5" />
- RecentUpdate: {latestActivityLabel}
+            Last update: {latestActivityLabel}
  </div>
  <div className="flex items-center gap-1.5">
  <User className="w-3.5 h-3.5" />
@@ -532,7 +532,7 @@ export default function ActivityPage() {
  </div>
  <div className="flex items-center gap-1.5">
  <Filter className="w-3.5 h-3.5" />
- CurrentFilter: {filterLabel}
+            Current filter: {filterLabel}
  </div>
  </div>
  </div>
@@ -542,11 +542,11 @@ export default function ActivityPage() {
 
  <div className="page-grid sm:grid-cols-2 xl:grid-cols-4">
  <div className="page-panel p-4">
- <p className="text-xs text-foreground-muted">Activitytotal</p>
+          <p className="text-xs text-foreground-muted">Total Activities</p>
  <p className="mt-2 text-stat-number text-foreground tabular-nums">
  {activityStats.total}
  </p>
- <p className="mt-2 text-xs text-foreground-muted">FilterRange: {timeRangeLabel}</p>
+          <p className="mt-2 text-xs text-foreground-muted">Filter range: {timeRangeLabel}</p>
  </div>
  <div className="page-panel p-4">
  <p className="text-xs text-foreground-muted">Success Rate</p>
@@ -559,7 +559,7 @@ export default function ActivityPage() {
  </div>
  </div>
  <div className="page-panel p-4">
- <p className="text-xs text-foreground-muted">RiskEvent</p>
+          <p className="text-xs text-foreground-muted">Risk Events</p>
  <p className="mt-2 text-stat-number text-foreground tabular-nums">
  {activityStats.warning + activityStats.error}
  </p>
@@ -574,7 +574,7 @@ export default function ActivityPage() {
  <div className="page-panel p-4">
  <p className="text-xs text-foreground-muted">Active Users</p>
  <p className="mt-2 text-stat-number text-foreground tabular-nums">{uniqueUsers}</p>
- <p className="mt-2 text-xs text-foreground-muted">currentweeksinandAction</p>
+          <p className="mt-2 text-xs text-foreground-muted">Participated this week</p>
  </div>
  </div>
 
@@ -584,10 +584,10 @@ export default function ActivityPage() {
  <div className="page-panel-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
  <p className="page-panel-title">Filter</p>
- <p className="page-panel-description">ViaKeywords, TypeandTimeRangeQuickRecord</p>
+            <p className="page-panel-description">Quickly find records by keywords, type, and time range</p>
  </div>
  <Button variant="ghost" size="sm" onClick={handleResetFilters}>
- ResetFilter
+            Reset Filters
  </Button>
  </div>
  <div className="p-6 space-y-4">
@@ -595,7 +595,7 @@ export default function ActivityPage() {
  <div className="flex-1 min-w-[240px]">
  <Input
  variant="search"
- placeholder="SearchActivity, Descriptionorkeychar..."
+              placeholder="Search activities, descriptions, or keywords..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="w-4 h-4" />}
@@ -628,20 +628,20 @@ export default function ActivityPage() {
  ))}
  </SelectContent>
  </Select>
- <Button variant="outline" size="sm" leftIcon={<Filter className="w-4 h-4" />}>
- AdvancedFilter
+            <Button variant="outline" size="sm" leftIcon={<Filter className="w-4 h-4" />}>
+              Advanced Filter
  </Button>
  </div>
  </div>
  </div>
  </div>
 
- {/* ActivityList */}
+ {/* Activity List */}
  <div className="page-panel">
  <div className="page-panel-header flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="page-panel-title">ActivityList</p>
- <p className="page-panel-description"> {filteredActivities.length} Record</p>
+            <p className="page-panel-title">Activity List</p>
+            <p className="page-panel-description">{filteredActivities.length} Records</p>
  </div>
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
  <Badge variant="success" size="xs">
@@ -661,9 +661,9 @@ export default function ActivityPage() {
  <div className="w-12 h-12 rounded-md bg-surface-200 border border-border flex items-center justify-center mb-4">
  <Activity className="w-5 h-5 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NotoActivityRecord</h3>
- <p className="text-[13px] text-foreground-light">
- {searchQuery ? "TryotherheSearchKeywordsorAdjustFilterCondition": "you'sActivitywillDisplayatthisin"}
+              <h3 className="text-base font-medium text-foreground mb-2">No Activity Records</h3>
+              <p className="text-[13px] text-foreground-light">
+                {searchQuery ? "Try different search keywords or adjust filter criteria": "Your activity will be displayed here"}
  </p>
  </div>
  ) : (
@@ -671,7 +671,7 @@ export default function ActivityPage() {
  <div className="hidden md:grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,140px)] gap-4 px-6 py-2 page-caption bg-surface-75 border-b border-border">
  <span>Event</span>
  <span>Status</span>
- <span>Actionperson</span>
+              <span>Actor</span>
  <span className="text-right">Time</span>
  </div>
  <div className="divide-y divide-border">
@@ -788,13 +788,13 @@ export default function ActivityPage() {
  className="bg-surface-100 border-border"
  >
  <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
- ViewDetails
+                  View Details
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
- Copyuse
+                  Copy
  </DropdownMenuItem>
  <DropdownMenuItem className="text-[13px] text-foreground-light hover:text-foreground hover:bg-surface-200">
- ExportRecord
+                  Export Record
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>

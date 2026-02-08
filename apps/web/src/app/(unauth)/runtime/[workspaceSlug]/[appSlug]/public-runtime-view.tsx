@@ -234,7 +234,7 @@ const formatExamplePreview = (
  .map(([key, value]) => `${labelMap[key] || key}: ${value || "—"}`)
  .join(" · ");
  if (entries.length <= 3) return preview;
- return `${preview} etc${entries.length}`;
+ return `${preview} and ${entries.length - 3} more`;
 };
 
 const formatOutputText = (value: unknown) => {
@@ -260,12 +260,12 @@ const formatTableCell = (value: unknown) => {
 };
 
 const formatRateLimit = (limit?: { per_minute?: number; per_hour?: number; per_day?: number }) => {
- if (!limit) return "not yetSettingsRate Limit";
+ if (!limit) return "No rate limit configured";
  const parts = [];
  if (limit.per_minute) parts.push(`${limit.per_minute}/min`);
  if (limit.per_hour) parts.push(`${limit.per_hour}/h`);
  if (limit.per_day) parts.push(`${limit.per_day}/days`);
- return parts.length ? parts.join(" · "): "not yetSettingsRate Limit";
+ return parts.length ? parts.join(" · ") : "No rate limit configured";
 };
 
 interface PublicRuntimeViewProps {
@@ -383,8 +383,8 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  if (Object.keys(values).length > 0) {
  examples.push({
  id: "default_example",
- title: "DefaultExample",
- description: "UsagePublicAccessDefaultvalueQuickFill.",
+ title: "Default Example",
+ description: "Use the default public access values for quick fill.",
  values,
  });
  }
@@ -429,9 +429,9 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
 
  const accessMode = entry?.access_policy?.access_mode || "private";
  const accessModeMap = {
- private: { label: "PrivateAccess", icon: Lock },
- public_auth: { label: "PublicAccess(needSign In)", icon: ShieldCheck },
- public_anonymous: { label: "PublicAccess(Anonymous)", icon: Globe },
+ private: { label: "Private Access", icon: Lock },
+ public_auth: { label: "Public Access (Login Required)", icon: ShieldCheck },
+ public_anonymous: { label: "Public Access (Anonymous)", icon: Globe },
  } as const;
  const accessMeta = accessModeMap[accessMode as keyof typeof accessModeMap] || accessModeMap.private;
 
@@ -493,13 +493,13 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  },
  {
  id: "access",
- title: "AnonymousLimit",
+ title: "Access Limits",
  description: `${accessModeLabel} · ${rateLimit} · ${captchaHint} · ${originHint}`,
  icon: Globe,
  },
  {
  id: "privacy",
- title: "PrivacyDescription",
+ title: "Privacy Notice",
  description: privacyHint,
  icon: Lock,
  },
@@ -544,7 +544,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  }
  } catch (err) {
  const runtimeError = err as RuntimeRequestError;
- setExecuteError(runtimeError.message || "ExecuteFailed");
+ setExecuteError(runtimeError.message || "Execution failed");
  } finally {
  setIsExecuting(false);
  }
@@ -565,18 +565,18 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <AlertTriangle className="h-5 w-5" />
  </div>
  <div>
- <h1 className="text-xl font-semibold text-foreground">AccessFailed</h1>
+ <h1 className="text-xl font-semibold text-foreground">Access Failed</h1>
  <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
  <div className="mt-4 flex flex-wrap gap-3">
  {code === "UNAUTHORIZED" && (
  <Button asChild>
  <Link href={`/login?redirect=${encodeURIComponent(runtimePath)}`}>
- Sign InafterContinue
+ Sign in to continue
  </Link>
  </Button>
  )}
  <Button variant="outline" asChild>
- <Link href="/">BackHome</Link>
+ <Link href="/">Back to Home</Link>
  </Button>
  </div>
  </div>
@@ -615,17 +615,17 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  </div>
  <div>
  <h1 className="text-2xl font-semibold text-foreground">
- {entry?.workspace?.name || "PublicApp"}
+ {entry?.workspace?.name || "Public App"}
  </h1>
  <p className="mt-2 text-sm text-muted-foreground">
- {entry?.workspace?.description || "thisAppalreadyforoutsidePublic, WelcomeExperience."}
+ {entry?.workspace?.description || "This app is publicly available. Feel free to try it out."}
  </p>
  </div>
  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
  <span>Workspace: {entry?.workspace?.name || workspaceSlug}</span>
- <span>AccessPolicy: {accessMeta.label}</span>
+ <span>Access Policy: {accessMeta.label}</span>
  <span>{formatRateLimit(entry?.access_policy?.rate_limit_json)}</span>
- {entry?.access_policy?.require_captcha && <span>needVerification Code</span>}
+ {entry?.access_policy?.require_captcha && <span>Captcha required</span>}
  </div>
  </div>
  </div>
@@ -633,13 +633,13 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="mt-6 rounded-2xl border border-border/60 bg-card/80 p-5">
  <div className="flex flex-wrap items-start justify-between gap-4">
  <div>
- <h2 className="text-sm font-semibold text-foreground">andTip</h2>
+ <h2 className="text-sm font-semibold text-foreground">Terms & Tips</h2>
  <p className="mt-1 text-xs text-muted-foreground">
- ExecutebeforeneedConfirmPublicAccessandDataUsageDescription.
+ Please confirm the public access and data usage terms before execution.
  </p>
  </div>
  <Badge variant="secondary">
- {termsAccepted ? "alreadyAgree": "not yetAgree"}
+ {termsAccepted ? "Accepted" : "Not Accepted"}
  </Badge>
  </div>
  <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -662,7 +662,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="mt-4">
  <Button variant="ghost" asChild className="gap-2 text-muted-foreground">
  <Link href="/terms">
- ViewDescription
+ View Terms
  </Link>
  </Button>
  </div>
@@ -672,21 +672,21 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="flex flex-col gap-6">
  <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg">
  <div className="flex items-center justify-between">
- <h2 className="text-lg font-semibold text-foreground">InputParameter</h2>
+ <h2 className="text-lg font-semibold text-foreground">Input Parameters</h2>
  {!termsAccepted && (
- <span className="text-xs text-warning">PleasefirstAgreeafterContinue</span>
+ <span className="text-xs text-warning">Please accept the terms first</span>
  )}
  </div>
  <div className="mt-5 space-y-4">
  {isLoading && (
  <div className="flex items-center gap-2 text-sm text-muted-foreground">
  <Loader2 className="h-4 w-4 animate-spin" />
- LoadPublicConfig...
+ Loading public configuration...
  </div>
  )}
  {!isLoading && fields.length === 0 && (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-sm text-muted-foreground">
- thisAppNonePublicInputConfig, canDirectExecute.
+ This app has no public input configuration. You can execute directly.
  </div>
  )}
  {!isLoading &&
@@ -745,13 +745,13 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="mt-6 rounded-xl border border-border/60 bg-background/60 p-4">
  <div className="flex flex-wrap items-center justify-between gap-2">
  <div>
- <h3 className="text-sm font-medium text-foreground">ExampleInput</h3>
+ <h3 className="text-sm font-medium text-foreground">Example Inputs</h3>
  <p className="mt-1 text-xs text-muted-foreground">
- SelectExampleQuickFillForm, againExecuteRun.
+ Select an example to quickly fill the form, then run.
  </p>
  </div>
  <Badge variant="outline" className="text-xs text-muted-foreground">
- ClickFill
+ Click to Fill
  </Badge>
  </div>
  <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -785,7 +785,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="mt-6 flex items-center gap-3">
  <Button onClick={handleExecute} disabled={disabled} className="gap-2">
  {isExecuting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
- {isExecuting ? "Execute": "NowExecute"}
+ {isExecuting ? "Executing..." : "Execute Now"}
  </Button>
  {executeError && (
  <span className="text-sm text-destructive">{executeError}</span>
@@ -796,8 +796,8 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg">
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
- <h2 className="text-lg font-semibold text-foreground">ResultShowcase</h2>
- <p className="mt-1 text-xs text-muted-foreground">SupportText / Table / Markdown View.</p>
+ <h2 className="text-lg font-semibold text-foreground">Results</h2>
+ <p className="mt-1 text-xs text-muted-foreground">Supports Text, Table, and Markdown views.</p>
  </div>
  <ButtonGroup attached>
  <Button
@@ -828,24 +828,24 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  {executeError ? (
  <div className="flex items-start gap-2 text-destructive">
  <AlertTriangle className="mt-0.5 h-4 w-4" />
- <div>ExecuteFailed: {executeError}</div>
+ <div>Execution failed: {executeError}</div>
  </div>
  ) : executeResult ? (
  <div className="space-y-2">
  <div className="flex items-center gap-2 text-foreground">
  <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
- ExecutealreadyLaunch
+ Execution started
  </div>
  <div className="grid gap-2 sm:grid-cols-2">
  <div>Execution ID: {executeResult.execution_id}</div>
  <div>Status: {executeResult.status}</div>
- {executeResult.started_at && <div>StartTime: {executeResult.started_at}</div>}
+ {executeResult.started_at && <div>Start Time: {executeResult.started_at}</div>}
  {executeResult.message && <div>{executeResult.message}</div>}
  </div>
  </div>
  ) : (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4">
- SubmitafterwillDisplayExecuteStatusandNumber.
+ Execution status and details will be displayed here after submission.
  </div>
  )}
  </div>
@@ -859,14 +859,14 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  </pre>
  ) : outputSchemaPreview ? (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-xs text-muted-foreground">
- <div className="text-foreground">OutputStructurePreview</div>
+ <div className="text-foreground">Output Structure Preview</div>
  <pre className="mt-2 max-h-[240px] overflow-auto whitespace-pre-wrap text-foreground/80">
  {outputSchemaPreview}
  </pre>
  </div>
  ) : (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-xs text-muted-foreground">
- SubmitafterwillShowcaseTextResult.
+ Text results will be displayed here after submission.
  </div>
  )}
  </>
@@ -906,7 +906,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  colSpan={outputColumns.length}
  className="px-3 py-3 text-center text-muted-foreground"
  >
- NoneTableData, ExecuteDoneafterAutoFill.
+ No table data. Data will appear after execution completes.
  </td>
  </tr>
  )}
@@ -915,7 +915,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  </div>
  ) : (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-xs text-muted-foreground">
- NoneTableStructure, SwitchtoTextor Markdown ViewViewOutput.
+ No table structure. Switch to Text or Markdown view to see output.
  </div>
  )}
  </>
@@ -929,7 +929,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  </div>
  ) : (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-xs text-muted-foreground">
- Markdown OutputwillatthisShowcase.
+ Markdown output will be displayed here.
  </div>
  )}
  </>
@@ -941,9 +941,9 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  {!isEmbed && (
  <div className="flex flex-col gap-6">
  <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg">
- <h2 className="text-lg font-semibold text-foreground">ShareLink</h2>
+ <h2 className="text-lg font-semibold text-foreground">Share Link</h2>
  <p className="mt-2 text-sm text-muted-foreground">
- willthisLinkSharetoGuest, AccessAuthorizePublicPolicyControl.
+ Share this link with others. Access is controlled by the public access policy.
  </p>
  <div className="mt-4 flex gap-2">
  <Input value={shareLink} readOnly className="bg-background/70" />
@@ -953,14 +953,14 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  className="shrink-0 gap-2"
  >
  <Copy className="h-4 w-4" />
- {linkCopied ? "alreadyCopy": "Copy"}
+ {linkCopied ? "Copied" : "Copy"}
  </Button>
  </div>
  <div className="mt-3">
  <Button variant="ghost" asChild className="gap-2 text-muted-foreground">
  <Link href={shareLink || "#"} target="_blank">
  <ExternalLink className="h-4 w-4" />
- atnewWindowOpen
+ Open in New Window
  </Link>
  </Button>
  </div>
@@ -969,7 +969,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg">
  <h2 className="text-lg font-semibold text-foreground">Embedding</h2>
  <p className="mt-2 text-sm text-muted-foreground">
- atoutsidesectionEmbeddingPublicApp.
+ Embed this public app in an external page.
  </p>
  <div className="mt-4 space-y-3">
  <Textarea value={embedCode} readOnly className="min-h-[120px] bg-background/70" />
@@ -979,7 +979,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  className="gap-2"
  >
  <Copy className="h-4 w-4" />
- {embedCopied ? "alreadyCopy": "CopyEmbeddingCode"}
+ {embedCopied ? "Copied" : "Copy Embed Code"}
  </Button>
  </div>
  </div>

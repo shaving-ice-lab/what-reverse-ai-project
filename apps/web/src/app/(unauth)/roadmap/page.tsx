@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ProductRoadmapPage - LobeHub StyleDesign
+ * Product Roadmap Page - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -17,42 +17,42 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// RoadmapData
+// Roadmap Data
 const roadmapItems = [
  {
  quarter: "Q1 2026",
  status: "completed",
  items: [
- { title: "AI Agent 2.0", description: "allnew's AI Engine, SupportmultipleModelCollaboration", done: true },
- { title: "canvisualEditUpgrade", description: "moreSmooth'sDrag & DropExperience", done: true },
- { title: "Enterprise-grade SSO", description: "Support SAML and OIDC Authentication", done: true },
+ { title: "AI Agent 2.0", description: "All-new AI engine with multi-model collaboration support", done: true },
+ { title: "Visual Editor Upgrade", description: "Smoother drag & drop experience", done: true },
+ { title: "Enterprise-Grade SSO", description: "Support for SAML and OIDC authentication", done: true },
  ],
  },
  {
  quarter: "Q2 2026",
  status: "in-progress",
  items: [
- { title: "MoveendpointApp", description: "iOS and Android NativeApp", done: false },
- { title: "AdvancedAnalyticsDashboard", description: "enter'sUsageDataAnalytics", done: false },
- { title: "moremultipleIntegration", description: "Add 50+ Third-partyServiceIntegration", done: false },
+ { title: "Mobile App", description: "Native iOS and Android apps", done: false },
+ { title: "Advanced Analytics Dashboard", description: "In-depth usage data analytics", done: false },
+ { title: "More Integrations", description: "Adding 50+ third-party service integrations", done: false },
  ],
  },
  {
  quarter: "Q3 2026",
  status: "planned",
  items: [
- { title: "AI WorkflowGenerate", description: "NaturalLanguageDescriptionAutoGenerateWorkflow", done: false },
- { title: "TeamCollaborationEnhanced", description: "Real-timeCollaborationEditandComment", done: false },
- { title: "TemplateMarketplace 2.0", description: "moreRich'sTemplateCategoryandSearch", done: false },
+ { title: "AI Workflow Generation", description: "Automatically generate workflows from natural language descriptions", done: false },
+ { title: "Enhanced Team Collaboration", description: "Real-time collaborative editing and commenting", done: false },
+ { title: "Template Marketplace 2.0", description: "Richer template categories and improved search", done: false },
  ],
  },
  {
  quarter: "Q4 2026",
  status: "exploring",
  items: [
- { title: "PrivateDeployEnhanced", description: "moreSimple'sDeployFlow", done: false },
- { title: "multipleLanguageSupport", description: "SupportmoremultipleLanguage'sface", done: false },
- { title: "AdvancedAutomation", description: "moreComplex'sConditionandLoopLogic", done: false },
+ { title: "Enhanced Private Deployment", description: "Simplified deployment process", done: false },
+ { title: "Multi-Language Support", description: "Support for more languages in the interface", done: false },
+ { title: "Advanced Automation", description: "More complex conditional and loop logic", done: false },
  ],
  },
 ];
@@ -60,8 +60,8 @@ const roadmapItems = [
 const statusConfig = {
  completed: { label: "Completed", color: "text-emerald-400", bg: "bg-emerald-400/10" },
  "in-progress": { label: "In Progress", color: "text-[#4e8fff]", bg: "bg-[#4e8fff]/10" },
- planned: { label: "Plan", color: "text-blue-400", bg: "bg-blue-400/10" },
- exploring: { label: "Explore", color: "text-purple-400", bg: "bg-purple-400/10" },
+ planned: { label: "Planned", color: "text-blue-400", bg: "bg-blue-400/10" },
+ exploring: { label: "Exploring", color: "text-purple-400", bg: "bg-purple-400/10" },
 };
 
 export default function RoadmapPage() {
@@ -74,15 +74,15 @@ export default function RoadmapPage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Rocket className="h-4 w-4" />
- ProductPlanning
+ Product Roadmap
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- ProductRoadmap
+ Product Roadmap
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- WecurrentlyatBuild'sFeatures, withandnot yetcome'sPlan.you'sFeedbackwillHelpWeOKPriority.
+ Features we're currently building, along with our future plans. Your feedback helps us prioritize.
  </p>
  </div>
  </section>
@@ -145,13 +145,13 @@ export default function RoadmapPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto text-center">
  <Lightbulb className="w-12 h-12 text-[#4e8fff] mx-auto mb-4" />
- <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">hasFeaturesSuggestion?</h2>
+ <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Have a Feature Suggestion?</h2>
  <p className="text-[13px] text-foreground-light mb-6">
- WeVeryre-visualyou'sFeedback, HelpWeBuildmore'sProduct
+ We truly value your feedback — help us build a better product
  </p>
  <Link href="/contact?type=feature-request">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- SubmitSuggestion
+ Submit a Suggestion
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

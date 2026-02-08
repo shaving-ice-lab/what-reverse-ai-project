@@ -1,25 +1,25 @@
 /**
- * canTestToolcount
- * @description ProvidecanandReport'sTool
+ * Performance Test Utilities
+ * @description Provide performance measurement and reporting tools
  */
 
 /**
- * canResult
+ * Performance Result
  */
 export interface PerformanceResult {
- /** TestName */
+ /** Test Name */
  name: string;
- /** Executetimescount */
+ /** Iteration Count */
  iterations: number;
- /** totalDuration (ms) */
+ /** Total Duration (ms) */
  totalTime: number;
- /** AverageDuration (ms) */
+ /** Average Duration (ms) */
  averageTime: number;
- /** MinimumDuration (ms) */
+ /** Minimum Duration (ms) */
  minTime: number;
- /** MaximumDuration (ms) */
+ /** Maximum Duration (ms) */
  maxTime: number;
- /** Standard (ms) */
+ /** Standard Deviation (ms) */
  stdDev: number;
  /** P50 (ms) */
  p50: number;
@@ -27,40 +27,40 @@ export interface PerformanceResult {
  p90: number;
  /** P99 (ms) */
  p99: number;
- /** Actioneachs */
+ /** Operations Per Second */
  opsPerSecond: number;
 }
 
 /**
- * inUsageSnapshot
+ * Memory Usage Snapshot
  */
 export interface MemorySnapshot {
- /** alreadyUsageHeapin (bytes) */
+ /** Used Heap Size (bytes) */
  usedJSHeapSize: number;
- /** HeapintotalSize (bytes) */
+ /** Total Heap Size (bytes) */
  totalJSHeapSize: number;
- /** HeapinLimit (bytes) */
+ /** Heap Size Limit (bytes) */
  jsHeapSizeLimit: number;
- /** Time */
+ /** Timestamp */
  timestamp: number;
 }
 
 /**
- * canvalueConfig
+ * Performance Threshold Configuration
  */
 export interface PerformanceThresholds {
- /** MaximumAverageDuration (ms) */
+ /** Maximum Average Duration (ms) */
  maxAverageTime?: number;
  /** Maximum P99 (ms) */
  maxP99?: number;
- /** MinimumActioneachs */
+ /** Minimum Operations Per Second */
  minOpsPerSecond?: number;
- /** MaximuminGrowth (bytes) */
+ /** Maximum Memory Growth (bytes) */
  maxMemoryGrowth?: number;
 }
 
 /**
- * Calculate100count
+ * Calculate Percentile
  */
 export function percentile(arr: number[], p: number): number {
  const sorted = [...arr].sort((a, b) => a - b);
@@ -69,7 +69,7 @@ export function percentile(arr: number[], p: number): number {
 }
 
 /**
- * CalculateStandard
+ * Calculate Standard Deviation
  */
 export function standardDeviation(arr: number[]): number {
  const n = arr.length;
@@ -83,7 +83,7 @@ export function standardDeviation(arr: number[]): number {
 }
 
 /**
- * ExecutecanTest
+ * Execute Performance Benchmark
  */
 export async function benchmark<T>(
  name: string,
@@ -101,7 +101,7 @@ export async function benchmark<T>(
  await fn();
  }
 
- // currentlyTest
+ // Run Benchmark
  for (let i = 0; i < iterations; i++) {
  const start = performance.now();
  await fn();
@@ -128,7 +128,7 @@ export async function benchmark<T>(
 }
 
 /**
- * FetchinSnapshot
+ * Get Memory Snapshot
  */
 export function getMemorySnapshot(): MemorySnapshot | null {
  if (typeof performance === 'undefined') return null;
@@ -146,7 +146,7 @@ export function getMemorySnapshot(): MemorySnapshot | null {
 }
 
 /**
- * inGrowth
+ * Measure Memory Growth
  */
 export async function measureMemoryGrowth<T>(
  fn: () => T | Promise<T>,
@@ -156,7 +156,7 @@ export async function measureMemoryGrowth<T>(
  endMemory: MemorySnapshot | null;
  growth: number;
 }> {
- // ForceGarbage(ifresultAvailable)
+ // Force garbage collection (if available)
  if (typeof global !== 'undefined' && (global as unknown as { gc?: () => void }).gc) {
  (global as unknown as { gc: () => void }).gc();
  }
@@ -177,7 +177,7 @@ export async function measureMemoryGrowth<T>(
 }
 
 /**
- * Verifycanisnovalue
+ * Verify if performance is acceptable
  */
 export function validatePerformance(
  result: PerformanceResult,
@@ -187,19 +187,19 @@ export function validatePerformance(
 
  if (thresholds.maxAverageTime && result.averageTime > thresholds.maxAverageTime) {
  failures.push(
- `AverageDuration ${result.averageTime.toFixed(2)}ms Exceedvalue ${thresholds.maxAverageTime}ms`
+ `Average duration ${result.averageTime.toFixed(2)}ms exceeds threshold ${thresholds.maxAverageTime}ms`
  );
  }
 
  if (thresholds.maxP99 && result.p99 > thresholds.maxP99) {
  failures.push(
- `P99 ${result.p99.toFixed(2)}ms Exceedvalue ${thresholds.maxP99}ms`
+ `P99 ${result.p99.toFixed(2)}ms exceeds threshold ${thresholds.maxP99}ms`
  );
  }
 
  if (thresholds.minOpsPerSecond && result.opsPerSecond < thresholds.minOpsPerSecond) {
  failures.push(
- `OPS ${result.opsPerSecond.toFixed(2)} atvalue ${thresholds.minOpsPerSecond}`
+ `OPS ${result.opsPerSecond.toFixed(2)} below minimum ${thresholds.minOpsPerSecond}`
  );
  }
 
@@ -210,18 +210,18 @@ export function validatePerformance(
 }
 
 /**
- * FormatcanReport
+ * Format Performance Report
  */
 export function formatPerformanceReport(result: PerformanceResult): string {
  return `
-canTestReport: ${result.name}
+Performance Test Report: ${result.name}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Executetimescount: ${result.iterations}
-totalDuration: ${result.totalTime.toFixed(2)}ms
-AverageDuration: ${result.averageTime.toFixed(2)}ms
-MinimumDuration: ${result.minTime.toFixed(2)}ms
-MaximumDuration: ${result.maxTime.toFixed(2)}ms
-Standard: ${result.stdDev.toFixed(2)}ms
+Iterations: ${result.iterations}
+Total Duration: ${result.totalTime.toFixed(2)}ms
+Average Duration: ${result.averageTime.toFixed(2)}ms
+Minimum Duration: ${result.minTime.toFixed(2)}ms
+Maximum Duration: ${result.maxTime.toFixed(2)}ms
+Standard Deviation: ${result.stdDev.toFixed(2)}ms
 P50: ${result.p50.toFixed(2)}ms
 P90: ${result.p90.toFixed(2)}ms
 P99: ${result.p99.toFixed(2)}ms
@@ -231,7 +231,7 @@ OPS: ${result.opsPerSecond.toFixed(2)}
 }
 
 /**
- * FormatBytesSize
+ * Format Bytes Size
  */
 export function formatBytes(bytes: number): string {
  if (bytes === 0) return '0 Bytes';
@@ -240,11 +240,11 @@ export function formatBytes(bytes: number): string {
  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
  const i = Math.floor(Math.log(bytes) / Math.log(k));
  
- return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + '' + sizes[i];
+ return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 /**
- * CreatecanTestSuite
+ * Create Performance Test Suite
  */
 export function createPerformanceSuite(name: string) {
  const results: PerformanceResult[] = [];
@@ -268,7 +268,7 @@ export function createPerformanceSuite(name: string) {
 
  printReport() {
  console.log(`\n${'='.repeat(50)}`);
- console.log(`canTestSuite: ${name}`);
+ console.log(`Performance Test Suite: ${name}`);
  console.log('='.repeat(50));
  
  for (const result of results) {

@@ -1,12 +1,12 @@
 /**
- * ActivityHistory API Service
+ * Activity History API Service
  */
 
 import type { UserActivity } from "@/types/activity";
 import { request } from "./shared";
 
 /**
- * ActivityListResponse
+ * Activity List Response
  */
 export interface ActivityListResponse {
   success: boolean;
@@ -23,9 +23,9 @@ export interface ActivityListResponse {
  */
 export const activityApi = {
   /**
- * FetchUserActivityHistory
- * @param params QueryParameter
- * @returns ActivityList
+ * Fetch User Activity History
+ * @param params Query Parameter
+ * @returns Activity List
    */
   async list(params?: {
     page?: number;
@@ -41,18 +41,18 @@ export const activityApi = {
 };
 
 /**
- * FormatActivityDisplayText
+ * Format Activity Display Text
  */
 export function formatActivityAction(action: string): string {
   const actionMap: Record<string, string> = {
- login: "Sign InSuccess",
+ login: "Signed In Successfully",
  logout: "Sign Out",
- create_workflow: "CreateWorkflow",
- update_workflow: "UpdateWorkflow",
- delete_workflow: "DeleteWorkflow",
- run_workflow: "RunWorkflow",
- update_profile: "UpdateProfile",
- change_password: "EditPassword",
+ create_workflow: "Create Workflow",
+ update_workflow: "Update Workflow",
+ delete_workflow: "Delete Workflow",
+ run_workflow: "Run Workflow",
+ update_profile: "Update Profile",
+ change_password: "Change Password",
  create_agent: "Publish Agent",
  update_agent: "Update Agent",
  create_api_key: "Create API Key",

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Quick ActionscenterPage - Supabase Style
- * useActionandShortcutEntry
+ * Quick Actions Center Page - Supabase Style
+ * Common Actions and Shortcut Entries
  */
 
 import { useState } from "react";
@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 const actionFilters = [
- { id: "all", label: "allsection" },
+ { id: "all", label: "All" },
  { id: "create", label: "Create" },
  { id: "generate", label: "Generate" },
  { id: "manage", label: "Manage" },
@@ -47,8 +47,8 @@ const actionFilters = [
 
 const featuredActions = [
  {
- title: "CreateConversation",
- description: "NowStart1new'sConversation",
+ title: "New Conversation",
+ description: "Start a new conversation",
  icon: MessageSquare,
  href: "/dashboard/conversations",
  badge: "Shortcut",
@@ -57,8 +57,8 @@ const featuredActions = [
  iconColor: "text-brand-500",
  },
  {
- title: "CreateWorkflow",
- description: "useTemplateQuickBuildAutomation",
+ title: "New Workflow",
+ description: "Use templates to build automation",
  icon: Zap,
  href: "/dashboard/workflows/new",
  badge: "Recommended",
@@ -67,8 +67,8 @@ const featuredActions = [
  iconColor: "text-brand-500",
  },
  {
- title: "GenerateContent",
- description: "Text, ImageandCodeGenerate",
+ title: "Generate Content",
+ description: "Text, image and code generation",
  icon: Sparkles,
  href: "/dashboard/creative/generate",
  badge: "AI",
@@ -77,11 +77,11 @@ const featuredActions = [
  iconColor: "text-foreground",
  },
  {
- title: "UploadFile",
- description: "OrganizeandKnowledge Base",
+ title: "Upload File",
+ description: "Organize your knowledge base",
  icon: Upload,
  href: "/dashboard/files",
- badge: "use",
+ badge: "Utility",
  badgeVariant: "secondary",
  iconBg: "bg-surface-200",
  iconColor: "text-foreground",
@@ -90,35 +90,35 @@ const featuredActions = [
 
 const quickStats = [
  {
- label: "TodayConversation",
+ label: "Today's Conversations",
  value: "12",
  icon: MessageSquare,
  trend: "+5",
- hint: "day",
+ hint: "today",
  trendVariant: "primary",
  },
  {
- label: "WorkflowExecute",
+ label: "Workflow Executions",
  value: "48",
  icon: Zap,
  trend: "+12",
- hint: "day",
+ hint: "today",
  trendVariant: "primary",
  },
  {
- label: "Agent Call",
+ label: "Agent Calls",
  value: "156",
  icon: Bot,
  trend: "+23",
- hint: "currentweeks",
+ hint: "this week",
  trendVariant: "primary",
  },
  {
- label: "FileUpload",
+ label: "Files Uploaded",
  value: "8",
  icon: Upload,
  trend: "+2",
- hint: "currentweeks",
+ hint: "this week",
  trendVariant: "secondary",
  },
 ];
@@ -127,14 +127,14 @@ const quickActionCategories = [
  {
  id: "create",
  title: "Create",
- description: "fromStartBuildnew'sWorkflowandContent",
+ description: "Start building a new workflow or content",
  icon: Plus,
  color: "text-brand-500",
  bgColor: "bg-brand-200/60",
  actions: [
  {
- title: "CreateConversation",
- description: "Startnew's AI Conversation",
+ title: "New Conversation",
+ description: "Start a new AI conversation",
  icon: MessageSquare,
  href: "/dashboard/conversations",
  shortcut: "⌘ N",
@@ -142,23 +142,23 @@ const quickActionCategories = [
  badgeVariant: "primary",
  },
  {
- title: "CreateWorkflow",
- description: "CreateAutomationWorkflow",
+ title: "New Workflow",
+ description: "Create automation workflow",
  icon: Zap,
  href: "/dashboard/workflows/new",
  shortcut: "⌘ W",
  },
  {
  title: "Create Agent",
- description: "CreateCustom AI Assistant",
+ description: "Create a custom AI assistant",
  icon: Bot,
  href: "/dashboard/my-agents/new",
  badge: "Beta",
  badgeVariant: "secondary",
  },
  {
- title: "CreateDocument",
- description: "CreateCreativeDocument",
+ title: "New Document",
+ description: "Create creative document",
  icon: FileText,
  href: "/dashboard/creative/documents",
  },
@@ -167,30 +167,30 @@ const quickActionCategories = [
  {
  id: "generate",
  title: "Generate",
- description: "Usage AI GenerateText, ImageandCode",
+ description: "Use AI to generate text, images and code",
  icon: Sparkles,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
  actions: [
  {
- title: "GenerateText",
- description: "AI TextGenerate",
+ title: "Generate Text",
+ description: "AI text generation",
  icon: FileText,
  href: "/dashboard/creative/generate?type=text",
  badge: "AI",
  badgeVariant: "primary",
  },
  {
- title: "GenerateImage",
- description: "AI ImageGenerate",
+ title: "Generate Image",
+ description: "AI image generation",
  icon: Palette,
  href: "/dashboard/creative/generate?type=image",
  badge: "AI",
  badgeVariant: "primary",
  },
  {
- title: "GenerateCode",
- description: "AI CodeGenerate",
+ title: "Generate Code",
+ description: "AI code generation",
  icon: Code,
  href: "/dashboard/creative/generate?type=code",
  badge: "AI",
@@ -201,28 +201,28 @@ const quickActionCategories = [
  {
  id: "manage",
  title: "Manage",
- description: "Manageyou'sandAutomation",
+ description: "Manage your resources and automations",
  icon: FolderOpen,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
  actions: [
  {
- title: "I'sWorkflow",
- description: "ManageAllWorkflow",
+ title: "My workflows",
+ description: "Manage all workflows",
  icon: Zap,
  href: "/dashboard/workflows",
  },
  {
- title: "I's Agent",
- description: "Manage AI Assistant",
+ title: "My Agents",
+ description: "Manage AI assistants",
  icon: Bot,
  href: "/dashboard/my-agents",
- badge: "use",
+ badge: "Utility",
  badgeVariant: "secondary",
  },
  {
- title: "File",
- description: "ManageUploadFile",
+ title: "Files",
+ description: "Manage uploaded files",
  icon: Upload,
  href: "/dashboard/files",
  badge: "Resource",
@@ -230,7 +230,7 @@ const quickActionCategories = [
  },
  {
  title: "Favorite",
- description: "Favorite'sContent",
+ description: "Favorite content",
  icon: Star,
  href: "/dashboard/favorites",
  },
@@ -239,14 +239,14 @@ const quickActionCategories = [
  {
  id: "settings",
  title: "Settings",
- description: "Account, SecurityandTeamConfig",
+ description: "Account, security and team settings",
  icon: Settings,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
  actions: [
  {
- title: "AccountSettings",
- description: "ManageAccountInfo",
+ title: "Account Settings",
+ description: "Manage account info",
  icon: Settings,
  href: "/dashboard/settings",
  shortcut: "⌘ ,",
@@ -261,13 +261,13 @@ const quickActionCategories = [
  },
  {
  title: "Notification Settings",
- description: "ConfigNotificationsPreference",
+ description: "Notification preferences",
  icon: Bell,
  href: "/dashboard/settings/notifications",
  },
  {
- title: "TeamManage",
- description: "ManageTeamMember",
+ title: "Team Management",
+ description: "Manage team members",
  icon: Users,
  href: "/dashboard/team",
  },
@@ -277,58 +277,58 @@ const quickActionCategories = [
 
 const recentActions = [
  {
- title: "CustomerFeedbackProcessWorkflow",
+ title: "Customer feedback workflow",
  type: "Workflow",
  icon: Zap,
  href: "/dashboard/workflows/1",
- time: "10 minbefore",
+ time: "10 min ago",
  },
  {
- title: "WritingAssistant Agent",
+ title: "Writing Assistant Agent",
  type: "Agent",
  icon: Bot,
  href: "/dashboard/my-agents/1",
- time: "30 minbefore",
+ time: "30 min ago",
  },
  {
- title: "SEO BlogTemplate",
+ title: "SEO Blog Template",
  type: "Template",
  icon: FileText,
  href: "/dashboard/creative/templates",
- time: "1 hbefore",
+ time: "1 hour ago",
  },
  {
- title: "ProductRequirementsDiscussion",
+ title: "Product requirements discussion",
  type: "Conversation",
  icon: MessageSquare,
  href: "/dashboard/chat/1",
- time: "2 hbefore",
+ time: "2 hours ago",
  },
 ];
 
 const keyboardShortcuts = [
- { keys: ["⌘", "K"], description: "OpenCommandPanel" },
- { keys: ["⌘", "N"], description: "CreateConversation" },
- { keys: ["⌘", "W"], description: "CreateWorkflow" },
- { keys: ["⌘", ","], description: "OpenSettings" },
- { keys: ["/"], description: "FocusSearch" },
- { keys: ["?"], description: "ShortcutkeyHelp" },
+ { keys: ["⌘", "K"], description: "Open command panel" },
+ { keys: ["⌘", "N"], description: "New conversation" },
+ { keys: ["⌘", "W"], description: "New workflow" },
+ { keys: ["⌘", ","], description: "Open settings" },
+ { keys: ["/"], description: "Focus search" },
+ { keys: ["?"], description: "Shortcut help" },
 ];
 
 const helpLinks = [
  {
  title: "Help Center",
- description: "ProductandFeaturesGuide",
+ description: "Product and features guide",
  href: "/help",
  },
  {
- title: "Learncenter",
- description: "Best PracticesandTemplate",
+ title: "Learning Center",
+ description: "Best practices and templates",
  href: "/dashboard/learn",
  },
  {
- title: "FeedbackSuggestion",
- description: "TellWeyou'swant",
+ title: "Feedback & Suggestions",
+ description: "Tell us what you need",
  href: "/dashboard/feedback",
  },
 ];
@@ -368,8 +368,8 @@ export default function QuickActionsPage() {
  <div className="max-w-6xl mx-auto px-6 py-6 space-y-5">
  <PageHeader
  eyebrow="Operations"
- title="Quick Actionscenter"
- description="QuickAccessuseFeatures, TemplateandSystem Settings"
+ title="Quick Actions Center"
+ description="Quick access to features, templates and system settings"
  icon={<Command className="w-4 h-4 text-brand-500" />}
  actions={(
  <div className="flex items-center gap-2 flex-wrap">
@@ -378,10 +378,10 @@ export default function QuickActionsPage() {
  size="sm"
  leftIcon={<Settings className="w-3.5 h-3.5" />}
  >
- CustomPanel
+ Customize Panel
  </Button>
  <Button size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>
- CreateAction
+ New Action
  </Button>
  </div>
  )}
@@ -391,7 +391,7 @@ export default function QuickActionsPage() {
  <Input
  variant="search"
  inputSize="lg"
- placeholder="SearchAction, FeaturesorPage..."
+ placeholder="Search actions, features or pages..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="w-4 h-4" />}
@@ -426,19 +426,19 @@ export default function QuickActionsPage() {
  </div>
 
  <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
- {/* ShortcutLaunch */}
+ {/* Shortcut Launch */}
  {filteredFeaturedActions.length > 0 && (
  <section className="page-panel">
  <div className="page-panel-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
  <div>
  <div className="flex items-center gap-2">
  <Zap className="w-4 h-4 text-brand-500" />
- <span className="page-panel-title">ShortcutLaunch</span>
+ <span className="page-panel-title">Shortcut launch</span>
  <Badge variant="secondary" size="sm">
  Recommended
  </Badge>
  </div>
- <p className="page-panel-description">Scenario'sQuickEntry</p>
+ <p className="page-panel-description">Quick entry by scenario</p>
  </div>
  <Button
  asChild
@@ -447,7 +447,7 @@ export default function QuickActionsPage() {
  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
  className="text-foreground-light hover:text-foreground"
  >
- <Link href="/dashboard/shortcuts">ManageShortcutmethod</Link>
+ <Link href="/dashboard/shortcuts">Manage shortcuts</Link>
  </Button>
  </div>
  <div className="p-4 page-grid sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3">
@@ -485,15 +485,15 @@ export default function QuickActionsPage() {
  </section>
  )}
 
- {/* TodayOverview */}
+ {/* Today's Overview */}
  <section className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div>
  <div className="flex items-center gap-2">
  <TrendingUp className="w-4 h-4 text-foreground-muted" />
- <span className="page-panel-title">TodayOverview</span>
+ <span className="page-panel-title">Today's overview</span>
  </div>
- <p className="page-panel-description">Past 24 h'sActivityTrend</p>
+ <p className="page-panel-description">Past 24h activity trend</p>
  </div>
  <Button
  asChild
@@ -502,7 +502,7 @@ export default function QuickActionsPage() {
  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
  className="text-foreground-light hover:text-foreground"
  >
- <Link href="/dashboard/analytics">ViewReport</Link>
+ <Link href="/dashboard/analytics">View report</Link>
  </Button>
  </div>
  <div className="grid grid-cols-2 md:grid-cols-4 divide-y divide-border md:divide-y-0 md:divide-x">
@@ -530,14 +530,14 @@ export default function QuickActionsPage() {
  </section>
 
  <div className="page-grid lg:grid-cols-[minmax(0,1fr)_320px] gap-8 lg:gap-8">
- {/* Left side - ActionCategory */}
+ {/* Left Side - Action Categories */}
  <div className="space-y-6">
  {filteredCategories.length === 0 ? (
  <div className="page-panel">
  <div className="p-6 text-center">
- <p className="text-sm text-foreground">not yettoMatch'sAction</p>
+ <p className="text-sm text-foreground">No matching actions</p>
  <p className="text-xs text-foreground-muted">
- TryAdjustKeywordsorFilterCondition
+ Try adjusting your keywords or filter criteria
  </p>
  </div>
  </div>
@@ -562,7 +562,7 @@ export default function QuickActionsPage() {
  </div>
  </div>
  <Badge variant="secondary" size="xs">
- {category.actions.length} 
+ {category.actions.length} actions
  </Badge>
  </div>
  <div className="p-4 space-y-2">
@@ -612,17 +612,17 @@ export default function QuickActionsPage() {
  )}
  </div>
 
- {/* Right side - RecentUsageandShortcutkey */}
+ {/* Right Side - Recent Usage and Keyboard Shortcuts */}
  <aside className="space-y-6">
- {/* RecentUsage */}
+ {/* Recent Usage */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between">
  <div className="flex items-center gap-2">
  <History className="w-4 h-4 text-foreground-muted" />
- <span className="page-panel-title">RecentUsage</span>
+ <span className="page-panel-title">Recent usage</span>
  </div>
  <Badge variant="secondary" size="xs">
- {recentActions.length} 
+ {recentActions.length} items
  </Badge>
  </div>
  <div className="p-4 space-y-2">
@@ -658,16 +658,16 @@ export default function QuickActionsPage() {
  href="/dashboard/activity"
  className="block text-[12px] text-brand-500 hover:underline text-center"
  >
- View allActivity
+ View all activity
  </Link>
  </div>
  </div>
 
- {/* keyBoard Shortcutskey */}
+ {/* Keyboard Shortcuts */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center gap-2">
  <Command className="w-4 h-4 text-foreground-muted" />
- <span className="page-panel-title">keyBoard Shortcutskey</span>
+ <span className="page-panel-title">Keyboard Shortcuts</span>
  </div>
  <div className="p-4 space-y-3">
  {keyboardShortcuts.map((shortcut, index) => (
@@ -693,19 +693,19 @@ export default function QuickActionsPage() {
  href="/dashboard/shortcuts"
  className="block text-[12px] text-brand-500 hover:underline text-center"
  >
- View allShortcutkey
+ View all shortcuts
  </Link>
  </div>
  </div>
 
- {/* SupportandFeedback */}
+ {/* Support and Feedback */}
  <div className="page-panel border-brand-400/30 bg-brand-200/10">
  <div className="page-panel-header bg-transparent border-border/60">
  <div className="flex items-center gap-2">
  <ExternalLink className="w-4 h-4 text-brand-500" />
- <span className="page-panel-title">SupportandFeedback</span>
+ <span className="page-panel-title">Support and feedback</span>
  </div>
- <p className="page-panel-description">FetchHelporShareyou'swant</p>
+ <p className="page-panel-description">Get help or share what you need</p>
  </div>
  <div className="p-4 space-y-3">
  {helpLinks.map((link) => (

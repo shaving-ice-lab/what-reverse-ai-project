@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * CreativeGeneratePage - Supabase Style
- * Left sideInput, Right sideResult, EmphasizePanelHierarchy
+ * Creative Generate Page - Supabase Style
+ * Left side: Input, Right side: Result, Emphasize Panel Hierarchy
  */
 
 import React, { useState, useRef, useEffect } from "react";
@@ -28,19 +28,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// AI ModelList
+// AI Model List
 const aiModels = [
  { id: "gpt-4", name: "GPT-4 Turbo", provider: "OpenAI" },
  { id: "claude-3", name: "Claude 3.5 Sonnet", provider: "Anthropic" },
- { id: "qwen", name: "Tongyi1000 2.5", provider: "in" },
+  { id: "qwen", name: "Qwen 2.5", provider: "Alibaba" },
 ];
 
-// TypeConfig - Supabase Style
+// Type Config - Supabase Style
 const typeConfig = {
- text: { icon: FileText, label: "TextGenerate", color: "text-foreground-light" },
- image: { icon: Image, label: "ImageGenerate", color: "text-foreground-light" },
- code: { icon: Code, label: "CodeGenerate", color: "text-brand-500" },
- chat: { icon: MessageSquare, label: "ConversationGenerate", color: "text-foreground-light" },
+  text: { icon: FileText, label: "Text Generation", color: "text-foreground-light" },
+  image: { icon: Image, label: "Image Generation", color: "text-foreground-light" },
+  code: { icon: Code, label: "Code Generation", color: "text-brand-500" },
+  chat: { icon: MessageSquare, label: "Chat Generation", color: "text-foreground-light" },
 };
 
 export default function GeneratePage() {
@@ -57,7 +57,7 @@ export default function GeneratePage() {
  const textareaRef = useRef<HTMLTextAreaElement>(null);
  const config = typeConfig[type] || typeConfig.text;
 
- // AutoAdjustInputHeight
+  // Auto-adjust input height
  useEffect(() => {
  if (textareaRef.current) {
  textareaRef.current.style.height = "auto";
@@ -71,22 +71,22 @@ export default function GeneratePage() {
  setIsGenerating(true);
  setResult("");
  
- // MockOutput
- const mockResponse = `withdownisasyouGenerate'sContent: 
+    // Mock output
+    const mockResponse = `Here is your generated content: 
 
-## CoreHighlight
+## Core Highlights
 
-1. **Clear**: ClearTargetAudienceandScenario
-2. **Structure**: firstafter, Readmore
-3. **rowGuide**: toNextSuggestion
+1. **Clarity**: Define your target audience and scenario clearly
+2. **Structure**: Use logical flow for better readability
+3. **Call to Action**: Guide users to the next step
 
-### rowSuggestion
+### Suggestions
 
-youcanwithattailAdd CTA, oruserSupplementmoremultipleData, makeContentmorepower.
+You can add a CTA at the end, or provide more data to make the content more compelling.
 
-ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
+If you need to fine-tune tone or length, tell me.`;
 
- // charOutputEffect
+    // Character-by-character output effect
  for (let i = 0; i <= mockResponse.length; i++) {
  await new Promise(resolve => setTimeout(resolve, 10));
  setResult(mockResponse.slice(0, i));
@@ -126,13 +126,13 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  <div>
  <p className="page-caption">Creative</p>
  <div className="text-sm font-medium text-foreground">{config.label}</div>
- <div className="text-xs text-foreground-muted">CreativeGenerate</div>
+ <div className="text-xs text-foreground-muted">Creative generate</div>
  </div>
  </div>
  </div>
 
  <div className="flex items-center gap-2 rounded-md border border-border bg-surface-100 p-1">
- {/* ModelSelect */}
+ {/* Model Select */}
  <div className="relative">
  <button
  onClick={() => setShowSettings(!showSettings)}
@@ -183,8 +183,8 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  <section className="flex flex-col border-b border-border lg:border-b-0 lg:border-r">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">InputTip</h2>
- <p className="page-panel-description">Descriptionyou'sRequirements, Support Markdown</p>
+              <h2 className="page-panel-title">Input Prompt</h2>
+ <p className="page-panel-description">Describe your requirements; Markdown is supported.</p>
  </div>
  <span className="text-xs text-foreground-muted">Ctrl / ⌘ + Enter</span>
  </div>
@@ -194,7 +194,7 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  value={prompt}
  onChange={(e) => setPrompt(e.target.value)}
  onKeyDown={handleKeyDown}
- placeholder="DescriptionyouwantGenerate'sContent..."
+ placeholder="Describe the content you want to generate..."
  className={cn(
  "w-full min-h-[240px] p-4 rounded-md",
  "bg-surface-100 border border-border text-foreground",
@@ -204,7 +204,7 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  )}
  />
  <p className="text-xs text-foreground-muted">
- ResultwillReal-timeDisplayatRight side, canCopyorSave.
+ Results are shown in real time on the right; you can copy or save.
  </p>
  </div>
 
@@ -221,8 +221,8 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  </>
  ) : (
  <>
- <Wand2 className="w-4 h-4 mr-2" />
- StartGenerate
+              <Wand2 className="w-4 h-4 mr-2" />
+              Start Generating
  </>
  )}
  </Button>
@@ -233,8 +233,8 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  <section className="flex flex-col">
  <div className="page-panel-header flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">GenerateResult</h2>
- <p className="page-panel-description">SupportCopy, Saveandre-newGenerate</p>
+<h2 className="page-panel-title">Generate result</h2>
+  <p className="page-panel-description">Copy, save or generate again</p>
  </div>
  {result && (
  <div className="flex items-center gap-2">
@@ -249,7 +249,7 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  ) : (
  <Copy className="w-4 h-4 mr-1" />
  )}
- {copied ? "alreadyCopy": "Copy"}
+ {copied ? "Copied" : "Copy"}
  </Button>
  <Button variant="ghost" size="sm" className="h-8">
  <Save className="w-4 h-4 mr-1" />
@@ -263,7 +263,7 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  className="h-8"
  >
  <RefreshCw className={cn("w-4 h-4 mr-1", isGenerating && "animate-spin")} />
- re-newGenerate
+                Regenerate
  </Button>
  </div>
  )}
@@ -314,10 +314,10 @@ ifneedFine-tuningToneorLength, PleaseContinueTellI.`;
  <Sparkles className="w-7 h-7 text-foreground-muted" />
  </div>
  <h3 className="text-lg font-semibold text-foreground mb-2">
- StartGenerateContent
- </h3>
- <p className="text-foreground-muted">
- InputRequirementsafter, AI willasyouGenerateStructureContent.
+                Start Generating Content
+              </h3>
+              <p className="text-foreground-muted">
+                After you enter your requirements, AI will generate structured content for you.
  </p>
  </div>
  </div>

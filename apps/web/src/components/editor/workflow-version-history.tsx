@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * WorkflowVersion HistoryComponent
+ * Workflow Version History Component
  *
  * Features: 
- * - AutoVersionCreate
- * - VersionListView
- * - Versionforcompare
- * - VersionRollback
+ * - Auto Version Creation
+ * - Version List View
+ * - Version Comparison
+ * - Version Rollback
  */
 
 import { useState, useCallback, useMemo, useEffect } from "react";
@@ -58,7 +58,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-// ========== TypeDefinition ==========
+// ========== Type Definitions ==========
 
 export interface WorkflowVersion {
  id: string;
@@ -86,25 +86,25 @@ export interface VersionChanges {
 export interface WorkflowVersionHistoryProps {
  /** Workflow ID */
  workflowId: string;
- /** VersionList */
+ /** Version List */
  versions: WorkflowVersion[];
  /** Current Version */
  currentVersionId?: string;
- /** CreateVersionCallback */
+ /** Create Version Callback */
  onCreateVersion?: (name?: string, description?: string) => Promise<void>;
- /** RestoreVersionCallback */
+ /** Restore Version Callback */
  onRestoreVersion?: (versionId: string) => Promise<void>;
- /** PreviewVersionCallback */
+ /** Preview Version Callback */
  onPreviewVersion?: (versionId: string) => void;
- /** DeleteVersionCallback */
+ /** Delete Version Callback */
  onDeleteVersion?: (versionId: string) => Promise<void>;
- /** AddTagsCallback */
+ /** Add Tag Callback */
  onTagVersion?: (versionId: string, tagName: string) => Promise<void>;
- /** FetchVersionforcompareCallback */
+ /** Version Comparison Callback */
  onCompareVersions?: (versionA: string, versionB: string) => Promise<VersionDiff>;
- /** isnoLoading */
+ /** Whether Loading */
  isLoading?: boolean;
- /** CustomClass Name */
+ /** Custom Class Name */
  className?: string;
 }
 
@@ -129,15 +129,15 @@ interface EdgeDiffItem {
  targetId: string;
 }
 
-// FormatTime
+// Format Time
 const formatTime = (date: Date): string => {
  const now = new Date();
  const diff = now.getTime() - date.getTime();
 
  if (diff < 60000) return "Just now";
- if (diff < 3600000) return `${Math.floor(diff / 60000)} minbefore`;
- if (diff < 86400000) return `${Math.floor(diff / 3600000)} hbefore`;
- if (diff < 604800000) return `${Math.floor(diff / 86400000)} daysbefore`;
+ if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
+ if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+ if (diff < 604800000) return `${Math.floor(diff / 86400000)} days ago`;
 
  return date.toLocaleDateString("zh-CN", {
  month: "short",
@@ -147,7 +147,7 @@ const formatTime = (date: Date): string => {
  });
 };
 
-// ========== VersionComponent ==========
+// ========== Version Item Component ==========
 
 interface VersionItemProps {
  version: WorkflowVersion;
@@ -189,7 +189,7 @@ function VersionItem({
  )}
  onClick={compareMode ? onCompareSelect : onSelect}
  >
- {/* forcompareMark */}
+ {/* Comparison Mark */}
  {compareMode && (isCompareA || isCompareB) && (
  <div
  className={cn(
@@ -203,7 +203,7 @@ function VersionItem({
 
  <div className="flex items-start justify-between gap-2">
  <div className="flex-1 min-w-0">
- {/* Version NumberandTags */}
+ {/* Version Number and Tags */}
  <div className="flex items-center gap-2">
  <span className="text-sm font-medium text-foreground">
  v{version.versionNumber}
@@ -240,7 +240,7 @@ function VersionItem({
  <p className="text-sm text-foreground mt-1 truncate">{version.name}</p>
  )}
 
- {/* TimeandChangeInfo */}
+ {/* Time and Change Info */}
  <div className="flex items-center gap-3 mt-1.5 text-xs text-foreground-muted">
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -268,7 +268,7 @@ function VersionItem({
  </div>
  </div>
 
- {/* ActionButton */}
+ {/* Action Button */}
  {!compareMode && (
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
@@ -313,7 +313,7 @@ function VersionItem({
  className="text-foreground focus:bg-surface-200"
  >
  <Tag className="w-4 h-4 mr-2" />
- AddTags
+ Add Tag
  </DropdownMenuItem>
  {!version.isCurrent && (
  <DropdownMenuItem
@@ -335,7 +335,7 @@ function VersionItem({
  );
 }
 
-// ========== VersionforcompareComponent ==========
+// ========== Version Comparison Component ==========
 
 interface VersionDiffViewProps {
  diff: VersionDiff | null;
@@ -355,7 +355,7 @@ function VersionDiffView({ diff, isLoading }: VersionDiffViewProps) {
  return (
  <div className="flex flex-col items-center justify-center py-8 text-foreground-muted">
  <GitCompare className="w-8 h-8 mb-2 opacity-50" />
- <p className="text-sm">SelectVersionProceedforcompare</p>
+ <p className="text-sm">Select versions to compare</p>
  </div>
  );
  }
@@ -371,20 +371,20 @@ function VersionDiffView({ diff, isLoading }: VersionDiffViewProps) {
  return (
  <div className="flex flex-col items-center justify-center py-8 text-foreground-muted">
  <Check className="w-8 h-8 mb-2 text-brand-500" />
- <p className="text-sm">VersioncompleteallSame</p>
+ <p className="text-sm">Versions are identical</p>
  </div>
  );
  }
 
  return (
  <div className="space-y-4">
- {/* AddNode */}
+ {/* Added Nodes */}
  {diff.nodesAdded.length > 0 && (
  <div>
  <div className="flex items-center gap-2 mb-2">
  <Plus className="w-4 h-4 text-brand-500" />
  <span className="text-sm font-medium text-brand-500">
- AddNode ({diff.nodesAdded.length})
+ Added Nodes ({diff.nodesAdded.length})
  </span>
  </div>
  <div className="space-y-1 pl-6">
@@ -401,13 +401,13 @@ function VersionDiffView({ diff, isLoading }: VersionDiffViewProps) {
  </div>
  )}
 
- {/* DeleteNode */}
+ {/* Removed Nodes */}
  {diff.nodesRemoved.length > 0 && (
  <div>
  <div className="flex items-center gap-2 mb-2">
  <Minus className="w-4 h-4 text-destructive" />
  <span className="text-sm font-medium text-destructive">
- DeleteNode ({diff.nodesRemoved.length})
+ Removed Nodes ({diff.nodesRemoved.length})
  </span>
  </div>
  <div className="space-y-1 pl-6">
@@ -424,13 +424,13 @@ function VersionDiffView({ diff, isLoading }: VersionDiffViewProps) {
  </div>
  )}
 
- {/* EditNode */}
+ {/* Modified Nodes */}
  {diff.nodesModified.length > 0 && (
  <div>
  <div className="flex items-center gap-2 mb-2">
  <GitBranch className="w-4 h-4 text-warning" />
  <span className="text-sm font-medium text-warning">
- EditNode ({diff.nodesModified.length})
+ Modified Nodes ({diff.nodesModified.length})
  </span>
  </div>
  <div className="space-y-1 pl-6">
@@ -456,7 +456,7 @@ function VersionDiffView({ diff, isLoading }: VersionDiffViewProps) {
  );
 }
 
-// ========== mainComponent ==========
+// ========== Main Component ==========
 
 export function WorkflowVersionHistory({
  workflowId,
@@ -484,38 +484,38 @@ export function WorkflowVersionHistory({
  const [newVersionName, setNewVersionName] = useState("");
  const [newTagName, setNewTagName] = useState("");
 
- // SortVersion(mostnewatbefore)
+  // Sort versions (newest first)
  const sortedVersions = useMemo(
  () => [...versions].sort((a, b) => b.versionNumber - a.versionNumber),
  [versions]
  );
 
- // ProcessforcompareSelect
+ // Handle comparison selection
  const handleCompareSelect = useCallback((versionId: string) => {
  if (!compareVersionA) {
  setCompareVersionA(versionId);
  } else if (!compareVersionB && versionId !== compareVersionA) {
  setCompareVersionB(versionId);
  } else {
- // re-newSelect
+ // Reset selection
  setCompareVersionA(versionId);
  setCompareVersionB(null);
  setDiff(null);
  }
  }, [compareVersionA, compareVersionB]);
 
- // Executeforcompare
+ // Execute comparison
  useEffect(() => {
  if (compareVersionA && compareVersionB && onCompareVersions) {
  setIsDiffLoading(true);
  onCompareVersions(compareVersionA, compareVersionB)
  .then(setDiff)
-.catch(() => toast.error("forcompareFailed"))
+.catch(() => toast.error("Comparison failed"))
  .finally(() => setIsDiffLoading(false));
  }
  }, [compareVersionA, compareVersionB, onCompareVersions]);
 
- // Exitforcompare
+ // Exit comparison mode
  const exitCompareMode = useCallback(() => {
  setCompareMode(false);
  setCompareVersionA(null);
@@ -523,44 +523,44 @@ export function WorkflowVersionHistory({
  setDiff(null);
  }, []);
 
- // CreateVersion
+ // Create Version
  const handleCreateVersion = useCallback(async () => {
  if (!onCreateVersion) return;
 
  try {
  await onCreateVersion(newVersionName || undefined);
- toast.success("VersionalreadyCreate");
+ toast.success("Version created");
  setShowCreateDialog(false);
  setNewVersionName("");
  } catch {
- toast.error("CreateFailed");
+ toast.error("Creation failed");
  }
  }, [newVersionName, onCreateVersion]);
 
- // RestoreVersion
+ // Restore Version
  const handleRestore = useCallback(async (versionId: string) => {
  if (!onRestoreVersion) return;
 
  try {
  await onRestoreVersion(versionId);
- toast.success("VersionalreadyRestore");
+ toast.success("Version restored");
  } catch {
- toast.error("RestoreFailed");
+ toast.error("Restore failed");
  }
  }, [onRestoreVersion]);
 
- // AddTags
+ // Add Tag
  const handleAddTag = useCallback(async () => {
  if (!onTagVersion || !tagVersionId || !newTagName.trim()) return;
 
  try {
  await onTagVersion(tagVersionId, newTagName.trim());
- toast.success("TagsalreadyAdd");
+ toast.success("Tag added");
  setShowTagDialog(false);
  setTagVersionId(null);
  setNewTagName("");
  } catch {
- toast.error("AddFailed");
+ toast.error("Failed to add tag");
  }
  }, [tagVersionId, newTagName, onTagVersion]);
 
@@ -586,7 +586,7 @@ export function WorkflowVersionHistory({
  onClick={exitCompareMode}
  >
  <X className="w-3.5 h-3.5 mr-1" />
- Exitforcompare
+ Exit Compare
  </Button>
  ) : (
  <TooltipProvider>
@@ -601,7 +601,7 @@ export function WorkflowVersionHistory({
  <GitCompare className="w-4 h-4 text-foreground-muted" />
  </Button>
  </TooltipTrigger>
- <TooltipContent>Versionforcompare</TooltipContent>
+ <TooltipContent>Compare Versions</TooltipContent>
  </Tooltip>
  </TooltipProvider>
  )}
@@ -612,26 +612,26 @@ export function WorkflowVersionHistory({
  onClick={() => setShowCreateDialog(true)}
  >
  <Save className="w-3.5 h-3.5 mr-1" />
- SaveVersion
+ Save Version
  </Button>
  </div>
  </div>
 
- {/* forcompareTip */}
+ {/* Comparison Tip */}
  {compareMode && (
  <div className="p-2 rounded-lg bg-brand-200/60 text-xs text-brand-500">
  {!compareVersionA
- ? "Select#1Version (A)"
+ ? "Select Version A"
  : !compareVersionB
- ? "Select#2Version (B)"
-: "forcompareResult"}
+ ? "Select Version B"
+: "Comparison Result"}
  </div>
  )}
  </div>
 
- {/* ContentRegion */}
+ {/* Content Area */}
  <div className="flex-1 overflow-hidden flex">
- {/* VersionList */}
+ {/* Version List */}
  <ScrollArea className={cn("flex-1", compareMode && compareVersionA && compareVersionB && "w-1/2")}>
  <div className="p-4 space-y-2">
  {sortedVersions.map((version) => (
@@ -657,20 +657,20 @@ export function WorkflowVersionHistory({
  {versions.length === 0 && (
  <div className="flex flex-col items-center justify-center py-12 text-foreground-muted">
  <History className="w-10 h-10 mb-3 opacity-50" />
- <p className="text-sm">NoneVersion History</p>
- <p className="text-xs mt-1">SaveVersionwithStartRecord</p>
+ <p className="text-sm">No Version History</p>
+ <p className="text-xs mt-1">Save a version to start recording</p>
  </div>
  )}
  </div>
  </ScrollArea>
 
- {/* forcompareResult */}
+ {/* Comparison Result */}
  {compareMode && compareVersionA && compareVersionB && (
  <div className="w-1/2 border-l border-border">
  <ScrollArea className="h-full">
  <div className="p-4">
  <h4 className="text-sm font-medium text-foreground mb-4">
- forcompareResult
+ Comparison Result
  </h4>
  <VersionDiffView diff={diff} isLoading={isDiffLoading} />
  </div>
@@ -679,18 +679,18 @@ export function WorkflowVersionHistory({
  )}
  </div>
 
- {/* CreateVersionDialog */}
+ {/* Create Version Dialog */}
  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">SaveVersion</DialogTitle>
+ <DialogTitle className="text-foreground">Save Version</DialogTitle>
  <DialogDescription className="text-foreground-muted">
- CreateCurrentWorkflow'sVersionSnapshot
+ Create a snapshot of the current workflow version
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-4">
  <Input
- placeholder="VersionName(Optional)"
+ placeholder="Version Name (Optional)"
  value={newVersionName}
  onChange={(e) => setNewVersionName(e.target.value)}
  className="bg-surface-100 border-border"
@@ -713,18 +713,18 @@ export function WorkflowVersionHistory({
  </DialogContent>
  </Dialog>
 
- {/* AddTagsDialog */}
+ {/* Add Tag Dialog */}
  <Dialog open={showTagDialog} onOpenChange={setShowTagDialog}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">AddTags</DialogTitle>
+ <DialogTitle className="text-foreground">Add Tag</DialogTitle>
  <DialogDescription className="text-foreground-muted">
- asthisVersionAdd1atIdentify'sTags
+ Add a tag to identify this version
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-4">
  <Input
- placeholder="TagsName, if v1.0, stable"
+ placeholder="Tag name, e.g. v1.0, stable"
  value={newTagName}
  onChange={(e) => setNewTagName(e.target.value)}
  className="bg-surface-100 border-border"

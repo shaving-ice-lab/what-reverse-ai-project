@@ -17,7 +17,7 @@ import { request } from "./shared";
  */
 export const customNodeApi = {
  /**
- * FetchNodeList
+ * Fetch node list
  */
  async list(params?: CustomNodeListParams): Promise<CustomNodeListResponse> {
  const searchParams = new URLSearchParams();
@@ -35,35 +35,35 @@ export const customNodeApi = {
  },
 
  /**
- * FetchPopularNode
+ * Fetch popular nodes
  */
  async getPopular(): Promise<CustomNodeListResponse> {
  return request<CustomNodeListResponse>("/nodes/popular");
  },
 
  /**
- * FetchmostnewNode
+ * Fetch the latest nodes
  */
  async getNewest(): Promise<CustomNodeListResponse> {
  return request<CustomNodeListResponse>("/nodes/newest");
  },
 
  /**
- * FetchNodeDetails
- */
+ * Fetch node details
+   */
  async getBySlug(slug: string): Promise<CustomNodeDetailResponse> {
  return request<CustomNodeDetailResponse>(`/nodes/${slug}`);
  },
 
  /**
- * FetchNodeDetails(Via ID)
+ * Fetch node details (by ID)
  */
  async getById(id: string): Promise<CustomNodeDetailResponse> {
  return request<CustomNodeDetailResponse>(`/nodes/id/${id}`);
  },
 
  /**
- * InstallNode
+ * Install node
  */
  async install(id: string): Promise<{ success: boolean; data: { version: string } }> {
  return request(`/nodes/${id}/install`, {
@@ -72,7 +72,7 @@ export const customNodeApi = {
  },
 
  /**
- * UninstallNode
+ * Uninstall node
  */
  async uninstall(id: string): Promise<{ success: boolean }> {
  return request(`/nodes/${id}/uninstall`, {
@@ -80,9 +80,9 @@ export const customNodeApi = {
  });
  },
 
- /**
- * UpdateNode
- */
+   /**
+   * Update node
+   */
  async update(id: string): Promise<{ success: boolean; data: { version: string } }> {
  return request(`/nodes/${id}/update`, {
  method: "POST",
@@ -90,7 +90,7 @@ export const customNodeApi = {
  },
 
  /**
- * Favorite/UnfavoriteNode
+ * Star/unstar node
  */
  async star(id: string): Promise<{ success: boolean; data: { isStarred: boolean } }> {
  return request(`/nodes/${id}/star`, {
@@ -99,7 +99,7 @@ export const customNodeApi = {
  },
 
  /**
- * FetchNodeReviewsList
+ * Fetch node reviews list
  */
  async getReviews(id: string, params?: { page?: number; pageSize?: number }): Promise<{
  success: boolean;
@@ -116,14 +116,14 @@ export const customNodeApi = {
  },
 
  /**
- * FetchalreadyInstall'sNode
+ * Fetch installed nodes
  */
  async getInstalled(): Promise<CustomNodeListResponse> {
  return request<CustomNodeListResponse>("/nodes/installed");
  },
 
  /**
- * FetchCategoryList
+ * Fetch category list
  */
  async getCategories(): Promise<{
  success: boolean;
@@ -138,7 +138,7 @@ export const customNodeApi = {
  },
 
  /**
- * FetchFeaturedNode
+ * Fetch featured nodes
  */
  async getFeatured(limit: number = 6): Promise<{
  success: boolean;
@@ -148,8 +148,8 @@ export const customNodeApi = {
  },
 
  /**
- * CreateNode
- */
+ * Create node
+   */
  async create(data: {
  name: string;
  slug?: string;
@@ -182,8 +182,8 @@ export const customNodeApi = {
  },
 
  /**
- * UpdateNode
- */
+ * Update node
+   */
  async updateNode(id: string, data: Partial<{
  displayName: string;
  description: string;
@@ -201,7 +201,7 @@ export const customNodeApi = {
  },
 
  /**
- * DeleteNode
+ * Delete node
  */
  async deleteNode(id: string): Promise<{ success: boolean }> {
  return request(`/nodes/${id}`, {
@@ -210,7 +210,7 @@ export const customNodeApi = {
  },
 
  /**
- * SaveDraft
+ * Save draft
  */
  async saveDraft(id: string, data: any): Promise<{ success: boolean; data: CustomNodeDetail }> {
  return request(`/nodes/${id}/draft`, {
@@ -220,8 +220,8 @@ export const customNodeApi = {
  },
 
  /**
- * SubmitReview
- */
+ * Submit for review
+   */
  async submit(id: string): Promise<{ success: boolean; data: CustomNodeDetail }> {
  return request(`/nodes/${id}/submit`, {
  method: "POST",
@@ -229,7 +229,7 @@ export const customNodeApi = {
  },
 
  /**
- * CreatenewVersion
+ * Create new version
  */
  async createVersion(nodeId: string, data: {
  version: string;
@@ -254,7 +254,7 @@ export const customNodeApi = {
  },
 
  /**
- * SubmitReviews
+ * Submit a review
  */
  async createReview(nodeId: string, data: {
  rating: number;
@@ -268,28 +268,28 @@ export const customNodeApi = {
  },
 
  /**
- * FetchUseralreadyInstall'sNode
+ * Fetch user's installed nodes
  */
  async getMyInstalled(): Promise<CustomNodeListResponse> {
  return request("/nodes/my/installed");
  },
 
  /**
- * FetchUserCreate'sNode
+ * Fetch user's created nodes
  */
  async getMyNodes(): Promise<CustomNodeListResponse> {
  return request("/nodes/my/created");
  },
 
  /**
- * FetchUserFavorite'sNode
+ * Fetch user's starred nodes
  */
  async getMyStarred(): Promise<CustomNodeListResponse> {
  return request("/nodes/my/starred");
  },
 };
 
-// NodeCategoryInterface
+// Node category interface
 export interface NodeCategory {
  id: string;
  name: string;

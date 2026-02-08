@@ -1,33 +1,33 @@
 /**
- * DataNodeExecute
- * VariableSettings, DataConvert, and, Filter
+ * Data Node Executors
+ * Variable settings, data transformation, merge, and filtering
  */
 
 import type {
- NodeContext,
- NodeResult,
- NodeExecutor,
- VariableConfig,
+  NodeContext,
+  NodeResult,
+  NodeExecutor,
+  VariableConfig,
 } from "../types";
 import {
- renderTemplate,
- getValueByPath,
- safeJSONParse,
- createNodeError,
+  renderTemplate,
+  getValueByPath,
+  safeJSONParse,
+  createNodeError,
 } from "../utils";
 
-// ==================== VariableSettingsNode ====================
+// ==================== Variable Setting Node ====================
 
 /**
- * ParseVariablevalue
+ * Parse variable value
  */
 function parseVariableValue(
- value: unknown,
- valueType: VariableConfig["valueType"],
- variables: Record<string, unknown>
+  value: unknown,
+  valueType: VariableConfig["valueType"],
+  variables: Record<string, unknown>
 ): unknown {
- // ifresultisString, firstRenderTemplate
- if (typeof value === "string") {
+  // If value is string, render template first
+  if (typeof value === "string") {
  value = renderTemplate(value, variables);
  }
  
@@ -61,38 +61,38 @@ function parseVariableValue(
  return {};
  }
  
- case "array": {
- if (Array.isArray(value)) return value;
- if (typeof value === "string") {
- const parsed = safeJSONParse(value, null);
- if (Array.isArray(parsed)) return parsed;
- // TrybyCommaSplit
- return value.split(",").map((s) => s.trim());
- }
- return [value];
- }
- 
- default:
- return value;
- }
+    case "array": {
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") {
+        const parsed = safeJSONParse(value, null);
+        if (Array.isArray(parsed)) return parsed;
+        // Try splitting by comma
+        return value.split(",").map((s) => s.trim());
+      }
+      return [value];
+    }
+    
+    default:
+      return value;
+  }
 }
 
 /**
- * VariableSettingsNodeExecute
+ * Variable setting node executor
  */
 export const variableExecutor: NodeExecutor<VariableConfig> = {
- type: "variable",
- 
- async execute(context): Promise<NodeResult> {
- const { nodeConfig, variables, inputs } = context;
- const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- const allVariables = { ...variables, ...inputs };
- 
- // ParseVariablevalue
- const parsedValue = parseVariableValue(
+  type: "variable",
+  
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, variables, inputs } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      const allVariables = { ...variables, ...inputs };
+      
+      // Parse variable value
+      const parsedValue = parseVariableValue(
  nodeConfig.value,
  nodeConfig.valueType,
  allVariables
@@ -152,46 +152,46 @@ export const variableExecutor: NodeExecutor<VariableConfig> = {
  valid: errors.length === 0,
  errors,
  };
- },
+  },
 };
 
-// ==================== DataConvertNode ====================
+// ==================== Data Transform Node ====================
 
 interface TransformConfig {
- transformType: "jsonPath" | "map" | "filter" | "reduce" | "expression";
- expression?: string;
- jsonPath?: string;
+  transformType: "jsonPath" | "map" | "filter" | "reduce" | "expression";
+  expression?: string;
+  jsonPath?: string;
 }
 
 export const transformExecutor: NodeExecutor<TransformConfig> = {
- type: "transform",
- 
- async execute(context): Promise<NodeResult> {
- const { nodeConfig, variables, inputs } = context;
- const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- const inputData = inputs.data ?? inputs.input ?? variables.input;
- let result: unknown;
- 
- switch (nodeConfig.transformType) {
- case "jsonPath": {
- if (!nodeConfig.jsonPath) {
- throw new Error("JSON Path is required");
- }
- result = getValueByPath(inputData as Record<string, unknown>, nodeConfig.jsonPath);
- break;
- }
- 
- case "expression": {
- // SimpleExpressionvalue
- if (!nodeConfig.expression) {
- throw new Error("Expression is required");
- }
- const expr = renderTemplate(nodeConfig.expression, { ...variables, ...inputs, data: inputData });
- // Note: ActualitemshouldUsageSecurity'sExpressionEngine
- result = expr;
+  type: "transform",
+  
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, variables, inputs } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      const inputData = inputs.data ?? inputs.input ?? variables.input;
+      let result: unknown;
+      
+      switch (nodeConfig.transformType) {
+        case "jsonPath": {
+          if (!nodeConfig.jsonPath) {
+            throw new Error("JSON Path is required");
+          }
+          result = getValueByPath(inputData as Record<string, unknown>, nodeConfig.jsonPath);
+          break;
+        }
+        
+        case "expression": {
+          // Simple expression evaluation
+          if (!nodeConfig.expression) {
+            throw new Error("Expression is required");
+          }
+          const expr = renderTemplate(nodeConfig.expression, { ...variables, ...inputs, data: inputData });
+          // Note: In production, use a secure expression engine
+          result = expr;
  break;
  }
  
@@ -232,26 +232,26 @@ export const transformExecutor: NodeExecutor<TransformConfig> = {
  }
  
  return { valid: errors.length === 0, errors };
- },
+  },
 };
 
-// ==================== DataandNode ====================
+// ==================== Data Merge Node ====================
 
 interface MergeConfig {
- mergeType: "object" | "array" | "concat";
+  mergeType: "object" | "array" | "concat";
 }
 
 export const mergeExecutor: NodeExecutor<MergeConfig> = {
- type: "merge",
- 
- async execute(context): Promise<NodeResult> {
- const { nodeConfig, inputs } = context;
- const startTime = Date.now();
- const logs: NodeResult["logs"] = [];
- 
- try {
- // FetchAllInput
- const inputValues = Object.values(inputs).filter((v) => v !== undefined);
+  type: "merge",
+  
+  async execute(context): Promise<NodeResult> {
+    const { nodeConfig, inputs } = context;
+    const startTime = Date.now();
+    const logs: NodeResult["logs"] = [];
+    
+    try {
+      // Get all inputs
+      const inputValues = Object.values(inputs).filter((v) => v !== undefined);
  let result: unknown;
  
  switch (nodeConfig.mergeType) {

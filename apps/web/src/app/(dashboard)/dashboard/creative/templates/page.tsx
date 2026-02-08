@@ -36,20 +36,20 @@ import { cn } from "@/lib/utils";
 
 // TemplateCategory
 const categories = [
- { id: "all", name: "allsectionTemplate", icon: Sparkles },
- { id: "blog", name: "BlogArticle", icon: FileText },
+ { id: "all", name: "All templates", icon: Sparkles },
+ { id: "blog", name: "Blog & Article", icon: FileText },
  { id: "social", name: "Social Media", icon: Hash },
  { id: "marketing", name: "Marketing Copy", icon: Megaphone },
- { id: "email", name: "EmailTemplate", icon: Mail },
- { id: "product", name: "ProductDescription", icon: MessageSquare },
+ { id: "email", name: "Email template", icon: Mail },
+ { id: "product", name: "Product description", icon: MessageSquare },
 ];
 
 // TemplateData
 const templates = [
  {
  id: "blog-seo",
- name: "SEO optimalBlogArticle",
- description: "Generate SEO optimal'sBlogArticle, ContainsKeywordsLayoutandDescription",
+ name: "SEO-optimized blog article",
+ description: "Generate SEO-optimized blog articles with keyword layout and description.",
  category: "blog",
  icon: FileText,
  uses: 15234,
@@ -61,7 +61,7 @@ const templates = [
  {
  id: "twitter-thread",
  name: "Twitter/X ",
- description: "willContentSplitaspersonenter's Twitter ",
+ description: "Split content into a Twitter/X thread for easy posting.",
  category: "social",
  icon: Hash,
  uses: 12500,
@@ -72,8 +72,8 @@ const templates = [
  },
  {
  id: "product-launch",
- name: "ProductPublishAnnouncement",
- description: "asnewProductPublishCreatepersonitem'sAnnouncementCopy",
+ name: "Product launch announcement",
+ description: "Create announcement copy for new product launches.",
  category: "marketing",
  icon: Megaphone,
  uses: 8900,
@@ -84,8 +84,8 @@ const templates = [
  },
  {
  id: "cold-email",
- name: "EmailMarketing",
- description: "GenerateConversion Rate'sEmail, ImproveReplyrate",
+ name: "Email marketing",
+ description: "Generate high-conversion emails and improve reply rates.",
  category: "email",
  icon: Mail,
  uses: 7800,
@@ -96,8 +96,8 @@ const templates = [
  },
  {
  id: "instagram-caption",
- name: "Instagram ImageDescription",
- description: "as Instagram Generateperson'sImageDescriptionandTags",
+ name: "Instagram image description",
+ description: "Generate Instagram image descriptions and hashtags.",
  category: "social",
  icon: ImageIcon,
  uses: 11200,
@@ -108,8 +108,8 @@ const templates = [
  },
  {
  id: "product-description",
- name: "E-commerceProductDescription",
- description: "asE-commerceProductGenerateProfessional, haspower'sDescription",
+ name: "E-commerce product description",
+ description: "Generate professional e-commerce product descriptions.",
  category: "product",
  icon: MessageSquare,
  uses: 9500,
@@ -120,8 +120,8 @@ const templates = [
  },
  {
  id: "newsletter",
- name: "Newsletter weeks",
- description: "CreateStructureClear, ContentRich's Newsletter",
+ name: "Newsletter weekly",
+ description: "Create clear, content-rich newsletters.",
  category: "email",
  icon: Mail,
  uses: 5600,
@@ -133,7 +133,7 @@ const templates = [
  {
  id: "linkedin-post",
  name: "LinkedIn Professional",
- description: "GenerateProfessional's LinkedIn , ImproveImpactpower",
+ description: "Generate professional LinkedIn content and improve impact",
  category: "social",
  icon: Hash,
  uses: 8100,
@@ -144,8 +144,8 @@ const templates = [
  },
  {
  id: "ad-copy",
- name: "AdvertisingCopy",
- description: "as Google Ads, Facebook Ads GenerateEfficientAdvertisingCopy",
+ name: "Advertising copy",
+ description: "Generate effective ad copy for Google Ads, Facebook Ads, etc.",
  category: "marketing",
  icon: Megaphone,
  uses: 7200,
@@ -156,8 +156,8 @@ const templates = [
  },
  {
  id: "how-to-guide",
- name: "ActionGuide",
- description: "CreateDetailed'sActionGuideandTutorial",
+ name: "Action guide",
+ description: "Create detailed action guides and tutorials.",
  category: "blog",
  icon: FileText,
  uses: 6800,
@@ -194,15 +194,15 @@ export default function CreativeTemplatesPage() {
  <p className="page-caption mb-3">Creative</p>
  <div className="flex items-center justify-between mb-6">
  <div>
- <h1 className="text-page-title text-foreground">CreativeTemplate</h1>
+ <h1 className="text-page-title text-foreground">Creative templates</h1>
  <p className="text-description">
- UsagePresetTemplateQuickGenerateContent
+ Use preset templates to quickly generate content.
  </p>
  </div>
  <Link href="/dashboard/creative/generate">
  <Button className="bg-brand-500 hover:bg-brand-600 text-background">
  <Plus className="mr-2 w-4 h-4" />
- CustomGenerate
+ Custom generate
  </Button>
  </Link>
  </div>
@@ -212,7 +212,7 @@ export default function CreativeTemplatesPage() {
  <div className="relative flex-1 max-w-md">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
  <Input
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-9 h-9 bg-surface-200 border-border"
@@ -278,9 +278,9 @@ export default function CreativeTemplatesPage() {
  <div className="mb-8">
  <div className="flex items-center gap-2 mb-4">
  <Star className="w-4 h-4 text-warning" />
- <h2 className="text-sm font-medium text-foreground">
- FeaturedTemplate
- </h2>
+<h2 className="text-sm font-medium text-foreground">
+ Featured templates
+</h2>
  </div>
  <div className="page-grid md:grid-cols-3">
  {featuredTemplates.map((template) => (
@@ -313,8 +313,8 @@ export default function CreativeTemplatesPage() {
  <div className="flex items-center gap-3 text-xs text-foreground-muted">
  <span className="flex items-center gap-1">
  <Users className="w-3 h-3" />
- {(template.uses / 1000).toFixed(1)}kUsage
- </span>
+{(template.uses / 1000).toFixed(1)}k uses
+</span>
  <span className="flex items-center gap-1">
  <Star className="w-3 h-3 text-warning" />
  {template.rating}
@@ -326,17 +326,17 @@ export default function CreativeTemplatesPage() {
  </div>
  )}
 
- {/* TemplateList */}
+        {/* Template List */}
  <div>
  <div className="flex items-center justify-between mb-4">
  <h2 className="text-sm font-medium text-foreground">
- {selectedCategory === "all"
- ? "allsectionTemplate"
+{selectedCategory === "all"
+ ? "All templates"
  : categories.find((c) => c.id === selectedCategory)?.name}
- </h2>
- <span className="text-xs text-foreground-muted">
- {filteredTemplates.length} Template
- </span>
+</h2>
+<span className="text-xs text-foreground-muted">
+{filteredTemplates.length} template{filteredTemplates.length !== 1 ? "s" : ""}
+</span>
  </div>
 
  {filteredTemplates.length > 0 ? (
@@ -442,10 +442,10 @@ export default function CreativeTemplatesPage() {
  <div className="text-center py-16">
  <Palette className="w-10 h-10 text-foreground-muted mx-auto mb-4" />
  <h3 className="text-sm font-medium text-foreground mb-2">
- NotoMatch'sTemplate
+ No matching templates
  </h3>
  <p className="text-[13px] text-foreground-muted mb-6">
- TryUsageotherheKeywordsorSelectotherheCategory
+ Try other keywords or select another category.
  </p>
  <Button
  variant="outline"
@@ -455,7 +455,7 @@ export default function CreativeTemplatesPage() {
  }}
  className="border-border text-foreground-light"
  >
- View allTemplate
+ View all templates
  </Button>
  </div>
  )}

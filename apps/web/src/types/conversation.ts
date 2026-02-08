@@ -120,7 +120,7 @@ export interface AddMessageRequest {
  tokenUsage?: number;
  promptTokens?: number;
  completionTokens?: number;
- parentId?: string; // Reply/use'sMessage ID
+ parentId?: string; // Reply/Thread Message ID
 }
 
 export interface ListMessagesParams {
@@ -209,7 +209,7 @@ export const AI_MODELS: AIModel[] = [
  id: "gpt-4",
  name: "GPT-4",
  provider: "OpenAI",
- description: "Bestlarge'sGPTModel, SuitableComplexTask",
+ description: "Best large GPT model, suitable for complex tasks",
  maxTokens: 8192,
  contextLength: 8192,
  },
@@ -217,7 +217,7 @@ export const AI_MODELS: AIModel[] = [
  id: "gpt-4-turbo",
  name: "GPT-4 Turbo",
  provider: "OpenAI",
- description: "moreQuick'sGPT-4Version",
+ description: "Faster GPT-4 version",
  maxTokens: 128000,
  contextLength: 128000,
  },
@@ -225,7 +225,7 @@ export const AI_MODELS: AIModel[] = [
  id: "gpt-3.5-turbo",
  name: "GPT-3.5 Turbo",
  provider: "OpenAI",
- description: "compareSelect",
+ description: "Compare and select",
  maxTokens: 16385,
  contextLength: 16385,
  },
@@ -233,7 +233,7 @@ export const AI_MODELS: AIModel[] = [
  id: "claude-3-opus",
  name: "Claude 3 Opus",
  provider: "Anthropic",
- description: "Anthropic BestModel",
+ description: "Anthropic best model",
  maxTokens: 200000,
  contextLength: 200000,
  },
@@ -241,7 +241,7 @@ export const AI_MODELS: AIModel[] = [
  id: "claude-3-sonnet",
  name: "Claude 3 Sonnet",
  provider: "Anthropic",
- description: "BalancecanandSpeed",
+ description: "Balance of capability and speed",
  maxTokens: 200000,
  contextLength: 200000,
  },
@@ -249,7 +249,7 @@ export const AI_MODELS: AIModel[] = [
  id: "claude-3-haiku",
  name: "Claude 3 Haiku",
  provider: "Anthropic",
- description: "QuickResponse",
+ description: "Quick response",
  maxTokens: 200000,
  contextLength: 200000,
  },
@@ -291,9 +291,9 @@ export function formatRelativeTime(dateString: string): string {
  const diffDay = Math.floor(diffHour / 24);
 
  if (diffSec < 60) return "Just now";
- if (diffMin < 60) return `${diffMin}minbefore`;
- if (diffHour < 24) return `${diffHour}hbefore`;
- if (diffDay < 7) return `${diffDay}daysbefore`;
+ if (diffMin < 60) return `${diffMin} min ago`;
+ if (diffHour < 24) return `${diffHour} hours ago`;
+ if (diffDay < 7) return `${diffDay} days ago`;
  
  return date.toLocaleDateString("zh-CN");
 }

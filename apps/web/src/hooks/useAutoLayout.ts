@@ -43,7 +43,7 @@ export function useAutoLayout(options: UseAutoLayoutOptions = {}) {
 
  const { direction, nodeWidth, nodeHeight, nodeSeparation, rankSeparation } = opts;
 
- // DetermineisHorizontalLayoutstillisVerticalLayout
+ // Determine if layout is horizontal or vertical
  const isHorizontal = direction === "LR" || direction === "RL";
 
  dagreGraph.setGraph({
@@ -54,7 +54,7 @@ export function useAutoLayout(options: UseAutoLayoutOptions = {}) {
  marginy: 50,
  });
 
- // AddNodeto dagre 
+ // Add nodes to dagre
  nodes.forEach((node) => {
  dagreGraph.setNode(node.id, {
  width: nodeWidth,
@@ -62,22 +62,22 @@ export function useAutoLayout(options: UseAutoLayoutOptions = {}) {
  });
  });
 
- // AddEdgeto dagre 
+ // Add edges to dagre
  edges.forEach((edge) => {
  dagreGraph.setEdge(edge.source, edge.target);
  });
 
- // ExecuteLayoutCalculate
+ // Execute layout calculation
  dagre.layout(dagreGraph);
 
- // FetchLayoutafter'sNode
+ // Get layouted nodes
  const layoutedNodes = nodes.map((node) => {
  const nodeWithPosition = dagreGraph.node(node.id);
 
  return {
  ...node,
  position: {
- // dagre Back'siscenter, needneedConvertaslefton
+ // dagre returns center position, need to convert to top left
  x: nodeWithPosition.x - nodeWidth / 2,
  y: nodeWithPosition.y - nodeHeight / 2,
  },
@@ -105,10 +105,10 @@ export function useAutoLayout(options: UseAutoLayoutOptions = {}) {
  mergedOptions
  );
 
- // Update store 'sNode
+ // Update store's nodes
  setNodes(layoutedNodes as typeof nodes);
 
- // LatencyExecute fitView withEnsureNodealreadyUpdate
+ // Delayed execute fitView to ensure nodes are updated
  setTimeout(() => {
  fitView({ padding: 0.1, duration: 300 });
  }, 50);

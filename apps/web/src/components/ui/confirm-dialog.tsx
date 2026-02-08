@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConfirmDialogComponent
- * Used forDangerAction, re-needDecision's2timesConfirm
+ * Confirm Dialog Component
+ * Used for dangerous actions that require double confirmation
  */
 
 import { ReactNode, useState } from "react";
@@ -92,7 +92,7 @@ export function ConfirmDialog({
 
  return (
  <>
- {/* BackgroundMask */}
+    {/* Background Overlay */}
  <div
  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
  onClick={onClose}
@@ -162,8 +162,8 @@ export function DeleteConfirmDialog({
  isOpen={isOpen}
  onClose={onClose}
  onConfirm={onConfirm}
- title={`Delete${itemType}`}
- description={`OKneedDelete"${itemName}"??thisActionNoneUndo.`}
+      title={`Delete ${itemType}`}
+ description={`Delete "${itemName}"? This action cannot be undone.`}
  confirmText="Delete"
  cancelText="Cancel"
  variant="danger"
@@ -174,7 +174,7 @@ export function DeleteConfirmDialog({
 }
 
 // ============================================
-// ExitConfirmDialog
+// Logout Confirm Dialog
 // ============================================
 
 interface LogoutConfirmDialogProps {
@@ -196,7 +196,7 @@ export function LogoutConfirmDialog({
  onClose={onClose}
  onConfirm={onConfirm}
  title="Sign Out"
- description="OKneedExitCurrentAccount??"
+ description="Are you sure you want to sign out of your account?"
  confirmText="Exit"
  cancelText="Cancel"
  variant="warning"
@@ -207,7 +207,7 @@ export function LogoutConfirmDialog({
 }
 
 // ============================================
-// InputConfirmDialog
+// Input Confirm Dialog
 // ============================================
 
 interface InputConfirmDialogProps {
@@ -229,7 +229,7 @@ export function InputConfirmDialog({
  onConfirm,
  title,
  description,
- placeholder = "Please enterConfirmchar",
+  placeholder = "Please enter confirmation text",
  confirmText = "Confirm",
  confirmValue,
  variant = "danger",
@@ -264,7 +264,7 @@ export function InputConfirmDialog({
  <div className="mt-4">
  {confirmValue && (
  <p className="text-sm text-muted-foreground mb-2">
- Please enter <code className="px-1.5 py-0.5 rounded bg-muted font-mono text-foreground">{confirmValue}</code> withConfirm
+            Please enter <code className="px-1.5 py-0.5 rounded bg-muted font-mono text-foreground">{confirmValue}</code> to confirm
  </p>
  )}
  <input
@@ -280,7 +280,7 @@ export function InputConfirmDialog({
 }
 
 // ============================================
-// Usage
+// Hook
 // ============================================
 
 interface UseConfirmDialogOptions {

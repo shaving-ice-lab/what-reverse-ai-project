@@ -47,7 +47,7 @@ export const VariableNode = memo(function VariableNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"

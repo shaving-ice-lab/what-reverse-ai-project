@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * ExecuteHistoryPanelComponent
+ * Execution History Panel Component
  * 
- * DisplayWorkflowExecuteHistoryRecord, SupportViewDetails, RetryandCancel
+ * Displays workflow execution history records. Supports viewing details, retry and cancel.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -31,25 +31,25 @@ import type { WorkflowExecution } from "@/types/workflow-api";
 import { cn } from "@/lib/utils";
 
 interface ExecutionHistoryPanelProps {
- workflowId?: string; // Optional, SpecifyWorkflowIDtimeDisplayWorkflow'sExecuteHistory
- limit?: number; // DisplayCountLimit
- showTitle?: boolean; // isnoDisplayTitle
- onViewDetail?: (execution: WorkflowExecution) => void; // ViewDetailsCallback
+  workflowId?: string; // Optional, specify workflow ID to display its execution history
+  limit?: number; // Display count limit
+  showTitle?: boolean; // Whether to display the title
+  onViewDetail?: (execution: WorkflowExecution) => void; // View details callback
 }
 
-// ExecuteStatusColorandIconMapping
+// Execution status color and icon mapping
 const statusConfig: Record<string, { color: string; bgColor: string; icon: typeof CheckCircle; label: string }> = {
  pending: {
  color: "text-orange-500",
  bgColor: "bg-orange-500/10",
  icon: Clock,
- label: "etcpending",
+    label: "Pending",
  },
  running: {
  color: "text-blue-500",
  bgColor: "bg-blue-500/10",
  icon: Loader2,
- label: "Execute",
+    label: "Running",
  },
  completed: {
  color: "text-primary",
@@ -71,7 +71,7 @@ const statusConfig: Record<string, { color: string; bgColor: string; icon: typeo
  },
 };
 
-// FormatContinuousTime
+// Format duration
 const formatDuration = (ms?: number): string => {
  if (!ms) return "-";
  if (ms < 1000) return `${ms}ms`;
@@ -92,7 +92,7 @@ export function ExecutionHistoryPanel({
  const [retryingId, setRetryingId] = useState<string | null>(null);
  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
- // LoadExecuteHistory
+  // Load execution history
  const loadExecutions = useCallback(async () => {
  if (!workflowId) {
  setIsLoading(false);
@@ -104,56 +104,56 @@ export function ExecutionHistoryPanel({
  setExecutions(response.data || []);
  setError(null);
  } catch (err) {
- console.error("LoadExecuteHistoryFailed:", err);
- setError(err instanceof Error ? err.message: "LoadFailed");
+      console.error("Failed to load execution history:", err);
+      setError(err instanceof Error ? err.message: "Failed to load");
  } finally {
  setIsLoading(false);
  setIsRefreshing(false);
  }
  }, [workflowId, limit]);
 
- // RefreshData
+  // Refresh data
  const handleRefresh = async () => {
  setIsRefreshing(true);
  await loadExecutions();
  };
 
- // RetryExecute
- const handleRetry = async (executionId: string) => {
- setRetryingId(executionId);
- try {
- await executionApi.retry(executionId);
- // re-newLoadList
- await loadExecutions();
- } catch (err) {
- console.error("RetryExecuteFailed:", err);
- alert(err instanceof Error ? err.message: "RetryFailed");
+  // Retry execution
+  const handleRetry = async (executionId: string) => {
+    setRetryingId(executionId);
+    try {
+      await executionApi.retry(executionId);
+      // Reload list
+      await loadExecutions();
+    } catch (err) {
+      console.error("Failed to retry execution:", err);
+      alert(err instanceof Error ? err.message: "Retry failed");
  } finally {
  setRetryingId(null);
  }
  };
 
- // CancelExecute
- const handleCancel = async (executionId: string) => {
- setCancellingId(executionId);
- try {
- await executionApi.cancel(executionId);
- // re-newLoadList
- await loadExecutions();
- } catch (err) {
- console.error("CancelExecuteFailed:", err);
- alert(err instanceof Error ? err.message: "CancelFailed");
+  // Cancel execution
+  const handleCancel = async (executionId: string) => {
+    setCancellingId(executionId);
+    try {
+      await executionApi.cancel(executionId);
+      // Reload list
+      await loadExecutions();
+    } catch (err) {
+      console.error("Failed to cancel execution:", err);
+      alert(err instanceof Error ? err.message: "Cancel failed");
  } finally {
  setCancellingId(null);
  }
  };
 
- // InitialLoad
+  // Initial load
  useEffect(() => {
  loadExecutions();
  }, [loadExecutions]);
 
- // AutoRefreshcurrentlyatExecute'sTask
+  // Auto-refresh currently executing tasks
  useEffect(() => {
  const hasRunning = executions.some(e => e.status === "running" || e.status === "pending");
  if (!hasRunning) return;
@@ -165,7 +165,7 @@ export function ExecutionHistoryPanel({
  return () => clearInterval(interval);
  }, [executions, loadExecutions]);
 
- // NoneWorkflowIDtimeDisplayTip - Enhanced
+  // No Workflow ID - Display Tip - Enhanced
  if (!workflowId) {
  return (
  <Card className="border border-border/60 bg-card/80 backdrop-blur-sm p-6">
@@ -173,9 +173,9 @@ export function ExecutionHistoryPanel({
  <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4 ring-1 ring-border/50">
  <Layers className="w-8 h-8 text-foreground-light/70" />
  </div>
- <h3 className="font-semibold text-foreground mb-2">Please selectWorkflow</h3>
- <p className="text-sm text-foreground-light max-w-xs">
- Select1WorkflowwithViewotherExecuteHistoryRecord
+            <h3 className="font-semibold text-foreground mb-2">Please select a workflow</h3>
+            <p className="text-sm text-foreground-light max-w-xs">
+              Select a workflow to view its execution history
  </p>
  </div>
  </Card>
@@ -192,9 +192,9 @@ export function ExecutionHistoryPanel({
  <Timer className="w-5 h-5 text-primary" />
  </div>
  <div>
- <h3 className="font-semibold text-foreground">ExecuteHistory</h3>
- <p className="text-xs text-foreground-light">
- {executions.length} Record
+                <h3 className="font-semibold text-foreground">Execution History</h3>
+                <p className="text-xs text-foreground-light">
+                  {executions.length} records
  </p>
  </div>
  </div>
@@ -214,7 +214,7 @@ export function ExecutionHistoryPanel({
  {/* Content */}
  <div className="divide-y divide-border/30">
  {isLoading ? (
- // LoadSkeleton - Enhanced
+          // Loading Skeleton - Enhanced
  Array.from({ length: 5 }).map((_, i) => (
  <div 
  key={i} 
@@ -233,12 +233,12 @@ export function ExecutionHistoryPanel({
  </div>
  ))
  ) : error ? (
- // ErrorStatus - Enhanced
+          // Error State - Enhanced
  <div className="flex flex-col items-center justify-center text-center p-10">
  <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 ring-1 ring-red-500/20">
  <AlertCircle className="w-8 h-8 text-red-500" />
  </div>
- <h3 className="font-semibold text-foreground mb-2">LoadFailed</h3>
+              <h3 className="font-semibold text-foreground mb-2">Failed to Load</h3>
  <p className="text-sm text-foreground-light mb-4 max-w-xs">{error}</p>
  <Button 
  variant="outline" 
@@ -256,13 +256,13 @@ export function ExecutionHistoryPanel({
  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 ring-1 ring-primary/20">
  <Zap className="w-8 h-8 text-primary" />
  </div>
- <h3 className="font-semibold text-foreground mb-2">NoneExecuteRecord</h3>
+ <h3 className="font-semibold text-foreground mb-2">No execution records</h3>
  <p className="text-sm text-foreground-light max-w-xs">
- RunWorkflowafter, ExecuteRecordwillDisplayatthisin
+              Execution records will appear here after running a workflow
  </p>
  </div>
  ) : (
- // ExecuteList - Enhanced
+          // Execution List - Enhanced
  executions.map((execution, index) => {
  const config = statusConfig[execution.status] || statusConfig.pending;
  const StatusIcon = config.icon;
@@ -284,7 +284,7 @@ export function ExecutionHistoryPanel({
  }}
  onClick={() => onViewDetail?.(execution)}
  >
- {/* StatusIcon */}
+              {/* Status Icon */}
  <div className={cn(
  "w-11 h-11 rounded-xl flex items-center justify-center ring-1 transition-transform duration-200 group-hover:scale-105",
  config.bgColor,
@@ -297,11 +297,11 @@ export function ExecutionHistoryPanel({
  <StatusIcon className={cn("w-5 h-5", config.color, execution.status === "running" && "animate-spin")} />
  </div>
 
- {/* ExecuteInfo */}
+              {/* Execution Info */}
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
  <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
- Execute #{execution.id.slice(-6)}
+                  Execution #{execution.id.slice(-6)}
  </span>
  <span className={cn(
  "px-2 py-0.5 rounded-full text-[10px] font-medium ring-1",
@@ -337,7 +337,7 @@ export function ExecutionHistoryPanel({
  )}
  </div>
 
- {/* ActionButton */}
+            {/* Action Buttons */}
  <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
  {canRetry && (
  <Button
@@ -395,7 +395,7 @@ export function ExecutionHistoryPanel({
  size="sm"
  className="w-full text-foreground-light hover:text-primary hover:bg-primary/10 group"
  >
- View moreRecord
+            View more records
  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
  </Button>
  </div>

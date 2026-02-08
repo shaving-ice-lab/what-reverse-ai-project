@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * TemplateMarketplacePage
- * Supabase Style: DarkHierarchy, version, BrandGreen
+ * Template Marketplace Page
+ * Supabase Style: Dark Hierarchy, Versioning, Brand Green
  * 
  * Features: 
- * - ShowcaseAllAvailableWorkflowTemplate
- * - CategoryFilterandSearch
- * - 1keyUsageTemplateCreateWorkflow
+ * - Showcase all available workflow templates
+ * - Category filter and search
+ * - One-click template usage to create workflows
  */
 
 import Link from "next/link";
@@ -47,7 +47,7 @@ import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
 
-// DifficultyConfig
+// Difficulty Config
 const difficultyConfig: Record<
  string,
  { label: string; variant: "success" | "warning" | "destructive"; className?: string }
@@ -57,21 +57,21 @@ const difficultyConfig: Record<
  variant: "success",
  className: "border-brand-400/40",
  },
- intermediate: {
- label: "Advanced",
- variant: "warning",
- className: "border-warning/40",
- },
- advanced: {
- label: "Advanced",
- variant: "destructive",
- className: "border-destructive/40",
- },
+  intermediate: {
+    label: "Intermediate",
+    variant: "warning",
+    className: "border-warning/40",
+  },
+  advanced: {
+    label: "Advanced",
+    variant: "destructive",
+    className: "border-destructive/40",
+  },
 };
 
-// Formatcountchar
+// Format count display
 const formatCount = (num: number): string => {
- if (num >= 10000) return `${(num / 10000).toFixed(1)}10000`;
+  if (num >= 10000) return `${(num / 1000).toFixed(0)}K`;
  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
  return num.toString();
 };
@@ -79,7 +79,7 @@ const formatCount = (num: number): string => {
 export default function TemplatesPage() {
  const router = useRouter();
 
- // DataStatus
+  // Data State
  const [templates, setTemplates] = useState<Template[]>([]);
  const [featuredTemplates, setFeaturedTemplates] = useState<Template[]>([]);
  const [categories, setCategories] = useState<TemplateCategory[]>([]);
@@ -87,13 +87,13 @@ export default function TemplatesPage() {
  const [page, setPage] = useState(1);
  const [hasMore, setHasMore] = useState(true);
 
- // LoadStatus
+  // Loading State
  const [isLoading, setIsLoading] = useState(true);
  const [isLoadingMore, setIsLoadingMore] = useState(false);
  const [isUsingTemplate, setIsUsingTemplate] = useState<string | null>(null);
  const [error, setError] = useState<string | null>(null);
 
- // FilterStatus
+  // Filter State
  const [activeCategory, setActiveCategory] = useState<string>("all");
  const [searchQuery, setSearchQuery] = useState("");
  const [difficulty, setDifficulty] = useState<string>("all");
@@ -112,33 +112,33 @@ export default function TemplatesPage() {
  return map;
  }, [categories]);
  const getCategoryLabel = (categoryId: string) =>
- categoryNameMap.get(categoryId) || "otherhe";
+ categoryNameMap.get(categoryId) || "Other";
  const officialCount = useMemo(
  () => templates.filter((template) => template.is_official).length,
  [templates]
  );
 
- // LoadCategoryList
+  // Load Category List
  const loadCategories = useCallback(async () => {
  try {
  const response = await templateApiNew.getCategories();
  setCategories(response.data.categories || []);
  } catch (err) {
- console.error("LoadCategoryFailed:", err);
+    console.error("Failed to load categories:", err);
  }
  }, []);
 
- // LoadFeaturedTemplate
+  // Load Featured Templates
  const loadFeaturedTemplates = useCallback(async () => {
  try {
  const response = await templateApiNew.getFeatured(6);
  setFeaturedTemplates(response.data.templates || []);
  } catch (err) {
- console.error("LoadFeaturedFailed:", err);
+    console.error("Failed to load featured templates:", err);
  }
  }, []);
 
- // LoadTemplateList
+  // Load Template List
  const loadTemplates = useCallback(
  async (resetPage = false, targetPage?: number) => {
  if (resetPage) {
@@ -178,7 +178,7 @@ export default function TemplatesPage() {
  setHasMore(newTemplates.length === PAGE_SIZE);
  }
  } catch (err) {
- setError(err instanceof Error ? err.message: "LoadFailed");
+      setError(err instanceof Error ? err.message: "Load failed");
  } finally {
  setIsLoading(false);
  setIsLoadingMore(false);
@@ -187,34 +187,34 @@ export default function TemplatesPage() {
  [activeCategory, searchQuery, difficulty, sortBy, page]
  );
 
- // InitialLoad
+  // Initial Load
  useEffect(() => {
  loadCategories();
  loadFeaturedTemplates();
  }, [loadCategories, loadFeaturedTemplates]);
 
- // Filtertimere-newLoad
+  // Reload when filter changes
  useEffect(() => {
  loadTemplates(true);
  // eslint-disable-next-line react-hooks/exhaustive-deps
  }, [activeCategory, searchQuery, difficulty, sortBy]);
 
- // UsageTemplate
+  // Use Template
  const handleUseTemplate = async (template: Template) => {
  setIsUsingTemplate(template.id);
  try {
  const response = await templateApiNew.use(template.id);
- toast.success("WorkflowCreated successfully", {
- description: `alreadyBased on"${template.name}"TemplateCreateWorkflow`,
- });
- // NavigatetoEdit
+    toast.success("Workflow created successfully", {
+      description: `Created workflow based on template "${template.name}"`,
+    });
+    // Navigate to editor
  const workflow = response.data.workflow as { id: string };
  if (workflow?.id) {
  router.push(`/editor/${workflow.id}`);
  }
  } catch (err) {
- toast.error("UsageTemplateFailed", {
- description: err instanceof Error ? err.message: "PleaseRetry",
+ toast.error("Template usage failed", {
+      description: err instanceof Error ? err.message: "Please retry",
  });
  } finally {
  setIsUsingTemplate(null);
@@ -241,7 +241,7 @@ export default function TemplatesPage() {
  <div className="space-y-5">
  <PageHeader
  title="Template Gallery"
- description="FeaturedWorkflowTemplate, QuickBuild AI Workflow"
+ description="Featured workflow templates to quickly build AI workflows"
  actions={
  <div className="flex items-center gap-2">
  {hasFilters && (
@@ -251,7 +251,7 @@ export default function TemplatesPage() {
  className="h-8 text-[12px] text-foreground-muted hover:text-foreground"
  onClick={handleClearFilters}
  >
- ClearFilter
+                Clear Filters
  </Button>
  )}
  <ButtonGroup
@@ -289,11 +289,11 @@ export default function TemplatesPage() {
  }
  />
 
- {/* CompactStatistics */}
+ {/* Compact Statistics */}
  <div className="flex items-center gap-6 py-3 px-4 bg-surface-75 rounded-md border border-border text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1.5">
  <Boxes className="w-3 h-3" />
- <span className="font-mono text-foreground">{total}</span> Template
+            <span className="font-mono text-foreground">{total}</span> templates
  </span>
  <span className="flex items-center gap-1.5">
  <Sparkles className="w-3 h-3 text-brand-500" />
@@ -301,18 +301,18 @@ export default function TemplatesPage() {
  </span>
  <span className="flex items-center gap-1.5">
  <CheckCircle2 className="w-3 h-3" />
- <span className="font-mono text-foreground">{officialCount}</span> method
+            <span className="font-mono text-foreground">{officialCount}</span> official
  </span>
  <span className="flex items-center gap-1.5">
  <TrendingUp className="w-3 h-3" />
- <span className="font-mono text-foreground">{formatCount(totalUsage)}</span> Usage
+            <span className="font-mono text-foreground">{formatCount(totalUsage)}</span> uses
  </span>
  </div>
 
 
- {/* FilterRegion */}
+ {/* Filter Region */}
  <div className="space-y-3">
- {/* CategoryTags */}
+ {/* Category Tags */}
  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
  <Button
  variant="ghost"
@@ -325,8 +325,8 @@ export default function TemplatesPage() {
  )}
  onClick={() => setActiveCategory("all")}
  >
- allsection
- </Button>
+            All
+            </Button>
  {categories.map((cat) => (
  <Button
  key={cat.id}
@@ -345,10 +345,10 @@ export default function TemplatesPage() {
  ))}
  </div>
 
- {/* SearchandFilter */}
+ {/* Search and Filter */}
  <div className="flex items-center gap-3">
  <Input
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="w-3.5 h-3.5" />}
@@ -360,10 +360,10 @@ export default function TemplatesPage() {
  <SelectValue placeholder="Difficulty" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="all">allsectionDifficulty</SelectItem>
+ <SelectItem value="all">All Difficulty</SelectItem>
  <SelectItem value="beginner">Getting Started</SelectItem>
- <SelectItem value="intermediate">Advanced</SelectItem>
- <SelectItem value="advanced">Advanced</SelectItem>
+                <SelectItem value="intermediate">Intermediate</SelectItem>
+                <SelectItem value="advanced">Advanced</SelectItem>
  </SelectContent>
  </Select>
 
@@ -372,8 +372,8 @@ export default function TemplatesPage() {
  <SelectValue placeholder="Sort" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
- <SelectItem value="popular">mostPopular</SelectItem>
- <SelectItem value="newest">mostnew</SelectItem>
+              <SelectItem value="popular">Most Popular</SelectItem>
+              <SelectItem value="newest">Newest</SelectItem>
  <SelectItem value="name">Name</SelectItem>
  </SelectContent>
  </Select>
@@ -381,12 +381,12 @@ export default function TemplatesPage() {
  <div className="flex-1" />
 
  <span className="text-[11px] text-foreground-muted">
- {templates.length} / {total} Template
+            {templates.length} / {total} templates
  </span>
  </div>
  </div>
 
- {/* TemplateList */}
+ {/* Template List */}
  <section className="page-panel">
  <div className="p-4">
  <div className="space-y-4">
@@ -426,9 +426,9 @@ export default function TemplatesPage() {
  <div className="w-12 h-12 mx-auto mb-3 rounded-md bg-surface-200 flex items-center justify-center">
  <Search className="w-5 h-5 text-foreground-muted" />
  </div>
- <p className="text-sm text-foreground-light mb-1">NotoMatch'sTemplate</p>
+ <p className="text-sm text-foreground-light mb-1">No matching templates</p>
  <p className="text-xs text-foreground-muted mb-3">
- TryotherheKeywordsorFilterCondition
+ Try other keywords or filter conditions
  </p>
  {hasFilters && (
  <Button
@@ -438,7 +438,7 @@ export default function TemplatesPage() {
  onClick={handleClearFilters}
  >
  <X className="w-3 h-3 mr-1" />
- ClearFilter
+                Clear Filters
  </Button>
  )}
  </div>
@@ -498,7 +498,7 @@ export default function TemplatesPage() {
  );
 }
 
-// TemplateCard(GridView)- CompactMinimalDesign
+// Template Card (Grid View) - Compact Minimal Design
 interface TemplateCardProps {
  template: Template;
  index: number;
@@ -531,7 +531,7 @@ function TemplateCard({ template, index, categoryLabel, onUse, isUsing }: Templa
  )}
  {template.is_official && (
  <Badge variant="primary" size="sm" className="text-[10px]">
- method
+ Official
  </Badge>
  )}
  </div>
@@ -543,11 +543,11 @@ function TemplateCard({ template, index, categoryLabel, onUse, isUsing }: Templa
  <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
  <span>{categoryLabel}</span>
  <span>·</span>
- <span>{template.node_count} Node</span>
- <span>·</span>
- <span>{formatCount(template.use_count)} Usage</span>
- </div>
- </CardContent>
+          <span>{template.node_count} nodes</span>
+          <span>·</span>
+          <span>{formatCount(template.use_count)} uses</span>
+        </div>
+      </CardContent>
 
  <CardFooter className="px-4 py-2.5 border-t border-border bg-surface-75" align="between">
  <Badge
@@ -565,16 +565,16 @@ function TemplateCard({ template, index, categoryLabel, onUse, isUsing }: Templa
  onUse(template);
  }}
  loading={isUsing}
- loadingText="Create..."
- >
- Usage
- </Button>
- </CardFooter>
+      loadingText="Creating..."
+        >
+          Use Template
+        </Button>
+      </CardFooter>
  </Card>
  );
 }
 
-// TemplateList(ListView)- CompactMinimalDesign
+// Template List (List View) - Compact Minimal Design
 interface TemplateListItemProps {
  template: Template;
  index: number;
@@ -603,7 +603,7 @@ function TemplateListItem({ template, index, categoryLabel, onUse, isUsing }: Te
  )}
  {template.is_official && (
  <Badge variant="primary" size="sm" className="text-[10px]">
- method
+ Official
  </Badge>
  )}
  <Badge variant={difficulty.variant} size="sm" className="text-[10px]">
@@ -617,18 +617,18 @@ function TemplateListItem({ template, index, categoryLabel, onUse, isUsing }: Te
 
  <div className="flex items-center gap-4 text-[11px] text-foreground-muted shrink-0">
  <span>{categoryLabel}</span>
- <span>{template.node_count} Node</span>
- <span>{formatCount(template.use_count)} Usage</span>
+      <span>{template.node_count} nodes</span>
+        <span>{formatCount(template.use_count)} uses</span>
  </div>
 
  <Button
  size="sm"
  className="h-7 shrink-0 bg-brand-500 hover:bg-brand-600 text-background text-[12px]"
- onClick={() => onUse(template)}
- loading={isUsing}
- loadingText="Create..."
- >
- Usage
+      onClick={() => onUse(template)}
+      loading={isUsing}
+      loadingText="Creating..."
+    >
+      Use Template
  </Button>
  </div>
  );

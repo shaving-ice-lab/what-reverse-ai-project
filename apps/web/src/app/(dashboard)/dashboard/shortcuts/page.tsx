@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ShortcutkeyGuidePage - Supabase Style
- * DisplayAllAvailable'skeyBoard Shortcutskey
+ * Shortcut Key Guide Page - Supabase Style
+ * Display all available keyboard shortcuts
  */
 
 import { cn } from "@/lib/utils";
@@ -29,86 +29,86 @@ import {
  Delete,
 } from "lucide-react";
 
-// ShortcutkeyCategory
+// Shortcut Key Categories
 const shortcutCategories = [
  {
- title: "allShortcutkey",
+ title: "All Shortcuts",
  icon: Command,
  shortcuts: [
- { keys: ["⌘", "K"], description: "OpenCommandPanel/Search", action: "search" },
- { keys: ["⌘", "N"], description: "CreateConversation", action: "new-chat" },
- { keys: ["⌘", "⇧", "N"], description: "CreateWorkflow", action: "new-workflow" },
- { keys: ["⌘", ","], description: "OpenSettings", action: "settings" },
- { keys: ["⌘", "/"], description: "DisplayShortcutkeyHelp", action: "shortcuts" },
- { keys: ["Esc"], description: "CloseModal/CancelAction", action: "escape" },
+ { keys: ["⌘", "K"], description: "Open command panel / search", action: "search" },
+ { keys: ["⌘", "N"], description: "Create conversation", action: "new-chat" },
+ { keys: ["⌘", "⇧", "N"], description: "Create workflow", action: "new-workflow" },
+ { keys: ["⌘", ","], description: "Open settings", action: "settings" },
+ { keys: ["⌘", "/"], description: "Display shortcut key help", action: "shortcuts" },
+ { keys: ["Esc"], description: "Close modal or cancel action", action: "escape" },
  ],
  },
  {
- title: "ConversationAction",
+ title: "Conversation Actions",
  icon: MessageSquare,
  shortcuts: [
- { keys: ["/"], description: "FocustoInput", action: "focus-input" },
- { keys: ["⌘", "↵"], description: "SendMessage", action: "send" },
- { keys: ["⇧", "↵"], description: "row(notSend)", action: "newline" },
- { keys: ["↑"], description: "Editon1Message", action: "edit-last" },
- { keys: ["⌘", "C"], description: "CopyselectContent/Message", action: "copy" },
- { keys: ["⌘", "⇧", "C"], description: "CopyCodeblock", action: "copy-code" },
+ { keys: ["/"], description: "Focus input", action: "focus-input" },
+ { keys: ["⌘", "↵"], description: "Send message", action: "send" },
+ { keys: ["⇧", "↵"], description: "New line (without sending)", action: "newline" },
+ { keys: ["↑"], description: "Edit last message", action: "edit-last" },
+ { keys: ["⌘", "C"], description: "Copy selected content/message", action: "copy" },
+ { keys: ["⌘", "⇧", "C"], description: "Copy code block", action: "copy-code" },
  ],
  },
  {
  title: "Navigation",
  icon: Navigation,
  shortcuts: [
- { keys: ["⌘", "1"], description: "SwitchtoConversationPage", action: "nav-chat" },
- { keys: ["⌘", "2"], description: "SwitchtoWorkflowPage", action: "nav-workflow" },
- { keys: ["⌘", "3"], description: "SwitchtoCreativeWorkshop", action: "nav-creative" },
- { keys: ["⌘", "4"], description: "SwitchtoTemplate Gallery", action: "nav-templates" },
- { keys: ["⌘", "["], description: "Backon1page", action: "back" },
- { keys: ["⌘", "]"], description: "beforetodown1page", action: "forward" },
+{ keys: ["⌘", "1"], description: "Switch to conversation page", action: "nav-chat" },
+   { keys: ["⌘", "2"], description: "Switch to workflow page", action: "nav-workflow" },
+   { keys: ["⌘", "3"], description: "Switch to creative workshop", action: "nav-creative" },
+ { keys: ["⌘", "4"], description: "Switch to template gallery", action: "nav-templates" },
+ { keys: ["⌘", "["], description: "Go back one page", action: "back" },
+ { keys: ["⌘", "]"], description: "Go forward one page", action: "forward" },
  ],
  },
  {
- title: "WorkflowEdit",
+ title: "Workflow Editor",
  icon: Zap,
  shortcuts: [
- { keys: ["⌘", "S"], description: "SaveWorkflow", action: "save" },
+ { keys: ["⌘", "S"], description: "Save workflow", action: "save" },
  { keys: ["⌘", "Z"], description: "Undo", action: "undo" },
  { keys: ["⌘", "⇧", "Z"], description: "Redo", action: "redo" },
- { keys: ["⌘", "D"], description: "CopyselectNode", action: "duplicate" },
- { keys: ["Delete"], description: "DeleteselectNode", action: "delete" },
- { keys: ["⌘", "A"], description: "Select AllNode", action: "select-all" },
- { keys: ["+"], description: "largeCanvas", action: "zoom-in" },
- { keys: ["-"], description: "smallCanvas", action: "zoom-out" },
- { keys: ["0"], description: "ResetZoom", action: "zoom-reset" },
+ { keys: ["⌘", "D"], description: "Duplicate selected node", action: "duplicate" },
+ { keys: ["Delete"], description: "Delete selected node", action: "delete" },
+ { keys: ["⌘", "A"], description: "Select all nodes", action: "select-all" },
+ { keys: ["+"], description: "Zoom in canvas", action: "zoom-in" },
+ { keys: ["-"], description: "Zoom out canvas", action: "zoom-out" },
+ { keys: ["0"], description: "Reset zoom", action: "zoom-reset" },
  ],
  },
  {
- title: "EditAction",
+ title: "Editing Actions",
  icon: Edit3,
  shortcuts: [
- { keys: ["⌘", "B"], description: "", action: "bold" },
- { keys: ["⌘", "I"], description: "", action: "italic" },
- { keys: ["⌘", "U"], description: "downline", action: "underline" },
- { keys: ["⌘", "⇧", "K"], description: "enterCodeblock", action: "code-block" },
- { keys: ["⌘", "⇧", "L"], description: "enterLink", action: "link" },
- { keys: ["Tab"], description: "IncreaseIndent", action: "indent" },
- { keys: ["⇧", "Tab"], description: "fewIndent", action: "outdent" },
+ { keys: ["⌘", "B"], description: "Bold", action: "bold" },
+ { keys: ["⌘", "I"], description: "Italic", action: "italic" },
+ { keys: ["⌘", "U"], description: "Underline", action: "underline" },
+ { keys: ["⌘", "⇧", "K"], description: "Insert code block", action: "code-block" },
+ { keys: ["⌘", "⇧", "L"], description: "Insert link", action: "link" },
+ { keys: ["Tab"], description: "Increase indent", action: "indent" },
+ { keys: ["⇧", "Tab"], description: "Decrease indent", action: "outdent" },
  ],
  },
  {
- title: "ViewandDisplay",
+ title: "View and Display",
  icon: Eye,
  shortcuts: [
- { keys: ["⌘", "\\"], description: "SwitchSidebar", action: "toggle-sidebar" },
- { keys: ["⌘", "⇧", "F"], description: "all", action: "fullscreen" },
- { keys: ["⌘", "⇧", "D"], description: "SwitchDark Mode", action: "dark-mode" },
- { keys: ["⌘", "+"], description: "largeface", action: "ui-zoom-in" },
- { keys: ["⌘", "-"], description: "smallface", action: "ui-zoom-out" },
+ { keys: ["⌘", "\\"], description: "Toggle sidebar", action: "toggle-sidebar" },
+ { keys: ["⌘", "⇧", "F"], description: "Full screen", action: "fullscreen" },
+ { keys: ["⌘", "⇧", "D"], description: "Toggle dark mode", action: "dark-mode" },
+ { keys: ["⌘", "+"], description: "Zoom in UI", action: "ui-zoom-in" },
+ { keys: ["⌘", "-"], description: "Zoom out UI", action: "ui-zoom-out" },
  ],
  },
 ];
 
-// ShortcutkeystyleComponent
+// Shortcut Key Style Component
 function KeyCap({ children, isSpecial = false }: { children: React.ReactNode; isSpecial?: boolean }) {
  return (
  <span
@@ -125,9 +125,9 @@ function KeyCap({ children, isSpecial = false }: { children: React.ReactNode; is
 
 export default function ShortcutsPage() {
  const [searchQuery, setSearchQuery] = useState("");
- const [isMac] = useState(true); // ActualshouldDetectUserSystem
+ const [isMac] = useState(true); // Should detect user system
 
- // FilterShortcutkey
+ // Filter Shortcuts
  const filteredCategories = shortcutCategories
  .map((category) => ({
  ...category,
@@ -143,8 +143,8 @@ export default function ShortcutsPage() {
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="ShortcutkeyGuide"
- description="UsagekeyBoard ShortcutskeyImproveWorkrate"
+ title="Shortcut key guide"
+ description="Use keyboard shortcuts to improve your workflow"
  >
  <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
@@ -159,14 +159,14 @@ export default function ShortcutsPage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <div>
- <p className="page-panel-title">SearchShortcutkey</p>
- <p className="page-panel-description">byNameorgroupkeyFilterShortcutkey</p>
+ <p className="page-panel-title">Search Shortcuts</p>
+ <p className="page-panel-description">Filter shortcuts by name or group</p>
  </div>
  </div>
  <div className="px-6 pb-6">
  <Input
  variant="search"
- placeholder="SearchShortcutkey..."
+ placeholder="Search shortcut keys..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  leftIcon={<Search className="w-4 h-4" />}
@@ -174,23 +174,23 @@ export default function ShortcutsPage() {
  />
  </div>
  </div>
- {/* SystemTip */}
+ {/* System Tip */}
  <div className="page-panel p-4">
  <p className="text-[13px] text-foreground-light">
  <span className="font-medium text-foreground">Tip: </span> 
- withdownShortcutkeyUsed for {isMac ? "macOS": "Windows/Linux"} System.
- {isMac ? " ⌘ Represent Command key, ⇧ Represent Shift key.": " Ctrl keyAlternative ⌘, otherhekeySame."}
+ The shortcuts below are for {isMac ? "macOS": "Windows/Linux"}.
+ {isMac ? " ⌘ = Command key, ⇧ = Shift key." : " Ctrl = alternative to ⌘; other keys are the same."}
  </p>
  </div>
 
- {/* ShortcutkeyList */}
+ {/* Shortcut Key List */}
  {filteredCategories.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-16">
  <div className="w-14 h-14 rounded-md bg-surface-200 flex items-center justify-center mb-4">
  <Keyboard className="w-6 h-6 text-foreground-muted" />
  </div>
- <h3 className="text-base font-medium text-foreground mb-2">NotoRelatedShortcutkey</h3>
- <p className="text-[13px] text-foreground-light">TryotherheKeywords</p>
+ <h3 className="text-base font-medium text-foreground mb-2">No related shortcut keys</h3>
+ <p className="text-[13px] text-foreground-light">Try other keywords</p>
  </div>
  ) : (
  <div className="space-y-6">
@@ -248,12 +248,12 @@ export default function ShortcutsPage() {
  </div>
  )}
 
- {/* CustomShortcutkeyTip */}
+ {/* Custom Shortcut Tip */}
  <div className="page-panel border-brand-400/30 bg-brand-200/20 text-center">
  <div className="p-5">
- <h3 className="text-sm font-medium text-foreground mb-2">CustomShortcutkey</h3>
+ <h3 className="text-sm font-medium text-foreground mb-2">Custom Shortcuts</h3>
  <p className="text-[13px] text-foreground-light mb-4">
- youcanwithatSettingsCustomShortcutkeywithshouldyou'sUsage
+ You can customize shortcut keys in Settings to match your usage.
  </p>
  <Button
  variant="outline"
@@ -261,7 +261,7 @@ export default function ShortcutsPage() {
  className="border-border-muted text-foreground-light hover:text-foreground hover:border-border"
  >
  <Settings className="w-4 h-4 mr-2" />
- OpenShortcutkeySettings
+ Open Shortcut Settings
  </Button>
  </div>
  </div>

@@ -37,11 +37,11 @@ export const DocumentAssemblerNode = memo(function DocumentAssemblerNode({
  inputCount?: number;
  };
 
- const title = config.title || "not yetNamingDocument";
+ const title = config.title || "Untitled Document";
  const inputCount = config.inputCount || 3;
  const normalizationLevel = config.normalizationLevel ?? 1;
 
- // FeaturesTags
+ // Feature Tags
  const features = [];
  if (config.generateTOC) features.push({ icon: List, label: "Directory" });
  if (config.generateSummary) features.push({ icon: AlignLeft, label: "Summary" });
@@ -56,7 +56,7 @@ export const DocumentAssemblerNode = memo(function DocumentAssemblerNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* multipleInputPort - Used forReceiveChapterContent */}
+ {/* Multiple Input Ports - Used for Receiving Chapter Content */}
  {Array.from({ length: inputCount }).map((_, i) => (
  <Handle
  key={`section-${i}`}
@@ -85,7 +85,7 @@ export const DocumentAssemblerNode = memo(function DocumentAssemblerNode({
 
  {/* DocumentTitlePreview */}
  <div className="px-3 py-2 border-b border-border/70">
- <div className="text-xs text-foreground-muted mb-1">DocumentTitle</div>
+ <div className="text-xs text-foreground-muted mb-1">Document Title</div>
  <div className="text-sm font-medium text-foreground truncate">
  {title}
  </div>
@@ -93,7 +93,7 @@ export const DocumentAssemblerNode = memo(function DocumentAssemblerNode({
 
  {/* FeaturesConfig */}
  <div className="px-3 py-2.5 space-y-2 text-xs">
- {/* FeaturesTags */}
+ {/* Feature Tags */}
  {features.length > 0 && (
  <div className="flex flex-wrap gap-1.5">
  {features.map(({ icon: Icon, label }) => (
@@ -110,7 +110,7 @@ export const DocumentAssemblerNode = memo(function DocumentAssemblerNode({
 
  {/* StandardLevel */}
  <div className="flex items-center gap-2">
- <span className="text-foreground-muted">FormatStandard:</span>
+ <span className="text-foreground-muted">Format Standard:</span>
  <div className="flex gap-0.5">
  {[1, 2, 3].map((level) => (
  <span

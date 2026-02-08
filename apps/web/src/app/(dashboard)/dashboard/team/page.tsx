@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * TeamManagePage - Supabase Style
- * ManageTeamMember, RoleandPermission
+ * Team Management Page - Supabase Style
+ * Manage team members, roles, and permissions
  */
 
 import { useState } from "react";
@@ -109,7 +109,7 @@ const roles = [
 
  name: "Owner",
 
- description: "completeallControlPermission, canwithManageTeamSettingsandBilling",
+ description: "Full control; can manage team settings and billing",
 
  color: "text-warning",
 
@@ -124,7 +124,7 @@ const roles = [
 
  name: "Admin",
 
- description: "canwithManageMemberandlargePartialSettings",
+ description: "Can manage members and most settings",
 
  color: "text-brand-500",
 
@@ -139,7 +139,7 @@ const roles = [
 
  name: "Editor",
 
- description: "canwithCreateandEditWorkflow, Agent",
+ description: "Can create and edit workflows and agents",
 
  color: "text-foreground-light",
 
@@ -154,7 +154,7 @@ const roles = [
 
  name: "Viewer",
 
- description: "canViewContent, notcanEdit",
+ description: "Can view content, cannot edit",
 
  color: "text-foreground-muted",
 
@@ -166,7 +166,7 @@ const roles = [
 
 ];
 
-// TeamMemberData
+// Team member data
 
 const teamMembers = [
 
@@ -206,7 +206,7 @@ const teamMembers = [
 
  joinedAt: "2025-11-20",
 
- lastActive: "5minbefore",
+ lastActive: "5 min ago",
 
  stats: { workflows: 8, agents: 3, conversations: 89 },
 
@@ -227,7 +227,7 @@ const teamMembers = [
 
  joinedAt: "2025-12-05",
 
- lastActive: "1hbefore",
+ lastActive: "1 hour ago",
 
  stats: { workflows: 5, agents: 2, conversations: 45 },
 
@@ -256,7 +256,7 @@ const teamMembers = [
 
 ];
 
-// PendingInvite
+// Pending invites
 
 const pendingInvites = [
 
@@ -275,7 +275,7 @@ const pendingInvites = [
 
 ];
 
-// TeamStatistics
+// Team statistics
 
 const teamStats = {
  members: 4,
@@ -308,7 +308,7 @@ export default function TeamPage() {
  const [frozenMembers, setFrozenMembers] = useState<Set<string>>(new Set());
  const [managementMessage, setManagementMessage] = useState<string | null>(null);
 
- // FilterMember
+ // Filter members
 
  const filteredMembers = members.filter((member) => {
  const matchesSearch =
@@ -326,14 +326,14 @@ export default function TeamPage() {
  const allSelected = filteredMembers.length > 0 && selectedMembers.size === filteredMembers.length;
  const someSelected = selectedMembers.size > 0 && !allSelected;
 
- // FetchRoleConfig
+ // Get role config
 
  const getRoleConfig = (roleId: string) => {
  return roles.find((r) => r.id === roleId) || roles[3];
 
  };
 
- // SwitchSelect
+ // Toggle selection
 
  const toggleSelect = (id: string, checked?: boolean | "indeterminate") => {
  const newSelected = new Set(selectedMembers);
@@ -360,10 +360,10 @@ export default function TeamPage() {
  const next = new Set(prev);
  if (next.has(memberId)) {
  next.delete(memberId);
- setManagementMessage("alreadyFreeze.");
- } else {
- next.add(memberId);
- setManagementMessage("MemberalreadyFreeze.");
+     setManagementMessage("Member unfrozen.");
+     } else {
+       next.add(memberId);
+       setManagementMessage("Member frozen.");
  }
  return next;
  });
@@ -377,27 +377,27 @@ export default function TeamPage() {
  selectedMembers.forEach((id) => next.add(id));
  return next;
  });
- setManagementMessage("alreadyFreezeselectMember.");
+ setManagementMessage("Member frozen.");
  setSelectedMembers(new Set());
  setTimeout(() => setManagementMessage(null), 2000);
  };
 
  const handleBulkRemove = () => {
  if (selectedMembers.size === 0) return;
- if (!confirm("ConfirmRemoveselectMember?")) return;
+ if (!confirm("Remove selected member?")) return;
  setMembers((prev) => prev.filter((member) => !selectedMembers.has(member.id)));
  setFrozenMembers((prev) => {
  const next = new Set(prev);
  selectedMembers.forEach((id) => next.delete(id));
  return next;
  });
- setManagementMessage("alreadyRemoveselectMember.");
+ setManagementMessage("Member removed.");
  setSelectedMembers(new Set());
  setTimeout(() => setManagementMessage(null), 2000);
  };
 
  const handleRemoveMember = (memberId: string) => {
- if (!confirm("ConfirmRemovethisMember?")) return;
+ if (!confirm("Remove this member?")) return;
  setMembers((prev) => prev.filter((member) => member.id !== memberId));
  setFrozenMembers((prev) => {
  const next = new Set(prev);
@@ -409,7 +409,7 @@ export default function TeamPage() {
  next.delete(memberId);
  return next;
  });
- setManagementMessage("MemberalreadyRemove.");
+   setManagementMessage("Member removed.");
  setTimeout(() => setManagementMessage(null), 2000);
  };
 
@@ -417,31 +417,31 @@ export default function TeamPage() {
  if (!value) return "-";
  const date = new Date(value);
  if (Number.isNaN(date.getTime())) return value;
- return date.toLocaleDateString("zh-CN");
+ return date.toLocaleDateString("en-US");
  };
 
  return (
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="TeamManage"
- description="ManageTeamMember, RoleandAccessPermission"
+title="Team management"
+  description="Manage team members, roles and access permissions"
  actions={(
  <div className="flex items-center gap-2">
  <PermissionGate permissions={permissions} required={["workspace_admin", "billing_manage"]}>
  <Button variant="outline" size="sm" leftIcon={<Settings className="w-4 h-4" />}>
- TeamSettings
+             Team Settings
  </Button>
  </PermissionGate>
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <Button size="sm" leftIcon={<UserPlus className="w-4 h-4" />} onClick={() => setShowInviteModal(true)}>
- InviteMember
- </Button>
- </PermissionGate>
- </div>
- )}
- >
- <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
+               Invite Member
+               </Button>
+             </PermissionGate>
+           </div>
+         )}
+       >
+         <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted">
  <span className="inline-flex items-center gap-1.5">
  <Users className="w-3.5 h-3.5" />
  Member {members.length}/{teamStats.maxMembers}
@@ -464,16 +464,16 @@ export default function TeamPage() {
  <Shield className="w-4 h-4 text-foreground-light" />
  </div>
  <div className="space-y-1 text-[12px] text-foreground-light">
- <p>InviteMember: ViaEmailInviteJoin Workspace, Supportre-newSendandExpiredReminder.</p>
- <p>RoleConfig: Owner/Admin/Editor/Viewer forshouldnotPermissionRange.</p>
- <p>PermissionDescription: MemberManage, BillingandSecurityPolicyneedAdminorOwnerPermission.</p>
+ <p>Invite members by email to join the workspace; resend and expiry reminders are supported.</p>
+               <p>Roles: Owner / Admin / Editor / Viewer — each with its own permission scope.</p>
+               <p>Permission Note: Member management, billing, and security policies require Admin or Owner permissions.</p>
  </div>
  </div>
  <div className="min-w-[260px] space-y-2">
- <div className="text-[11px] text-foreground-muted">InviteandManage</div>
+ <div className="text-[11px] text-foreground-muted">Invite and manage</div>
  <Select value={inviteRole} onValueChange={setInviteRole}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="DefaultInviteRole" />
+ <SelectValue placeholder="Default invite role" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {roles.filter((role) => role.id !== "owner").map((role) => (
@@ -487,14 +487,14 @@ export default function TeamPage() {
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <Button size="sm" onClick={() => setShowInviteModal(true)}>
  <UserPlus className="w-4 h-4 mr-1.5" />
- InviteMember
- </Button>
- </PermissionGate>
- <PermissionGate permissions={permissions} required={["members_manage"]}>
- <Button
- variant="outline"
- size="sm"
- onClick={handleBulkFreeze}
+               Invite Member
+               </Button>
+             </PermissionGate>
+             <PermissionGate permissions={permissions} required={["members_manage"]}>
+               <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={handleBulkFreeze}
  disabled={selectedMembers.size === 0}
  >
  Freeze
@@ -512,7 +512,7 @@ export default function TeamPage() {
  </PermissionGate>
  </div>
  <div className="text-[11px] text-foreground-muted">
- alreadySelect {selectedMembers.size} Member
+               {selectedMembers.size} member(s) selected
  </div>
  {managementMessage && (
  <div className="text-[11px] text-brand-500">{managementMessage}</div>
@@ -523,7 +523,7 @@ export default function TeamPage() {
 
  <div className="page-divider" />
 
- {/* TeamOverview */}
+ {/* Team overview */}
 
  <div className="page-grid grid-cols-2 lg:grid-cols-4">
 
@@ -547,7 +547,7 @@ export default function TeamPage() {
 
  <p className="text-stat-number text-foreground">{members.length}</p>
 
- <p className="text-xs text-foreground-muted">TeamMember</p>
+ <p className="text-xs text-foreground-muted">Team member</p>
 
  </div>
 
@@ -601,13 +601,13 @@ export default function TeamPage() {
 
  <p className="text-stat-number text-foreground">{(teamStats.apiCalls / 1000).toFixed(1)}K</p>
 
- <p className="text-xs text-foreground-muted">currentmonthsAPI Call</p>
+ <p className="text-xs text-foreground-muted">API calls this month</p>
 
  </div>
 
  </div>
 
- {/* PendingInvite */}
+ {/* Pending invitations */}
 
  {pendingInvites.length > 0 && (
  <div className="p-4 rounded-md bg-warning-200 border border-border-muted">
@@ -616,7 +616,7 @@ export default function TeamPage() {
 
  <Clock className="w-4 h-4 text-warning" />
 
- <span className="font-medium text-foreground">pendingAccept'sInvite</span>
+ <span className="font-medium text-foreground">Pending Invitations</span>
 
  <Badge variant="secondary" className="bg-warning-200 text-warning">
 
@@ -650,7 +650,7 @@ export default function TeamPage() {
 
  <p className="text-xs text-foreground-muted">
 
- Sendat {invite.sentAt} willat {invite.expiresAt} Expired
+                 Sent on {invite.sentAt} · Expires on {invite.expiresAt}
 
  </p>
 
@@ -670,7 +670,7 @@ export default function TeamPage() {
 
  <RefreshCw className="w-4 h-4 mr-1" />
 
- re-
+                 Resend
 
  </Button>
 
@@ -694,11 +694,11 @@ export default function TeamPage() {
 
  )}
 
- {/* MemberList */}
+ {/* Member list */}
 
  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
 
- {/* Filter */}
+ {/* Filters */}
 
  <div className="p-4 border-b border-border">
 
@@ -710,7 +710,7 @@ export default function TeamPage() {
 
  <Input
 
- placeholder="SearchMember..."
+ placeholder="Search members..."
 
  value={searchQuery}
 
@@ -726,13 +726,13 @@ export default function TeamPage() {
 
  <SelectTrigger className="w-[140px] h-10 bg-surface-75 border-border text-foreground-light">
 
- <SelectValue placeholder="RoleFilter" />
+ <SelectValue placeholder="Role filter" />
 
  </SelectTrigger>
 
  <SelectContent className="bg-surface-100 border-border">
 
- <SelectItem value="all">allsectionRole</SelectItem>
+ <SelectItem value="all">All Roles</SelectItem>
 
  {roles.map((role) => (
  <SelectItem key={role.id} value={role.id}>
@@ -751,7 +751,7 @@ export default function TeamPage() {
 
  </div>
 
- {/* MemberTable */}
+ {/* Member table */}
 
  <div className="overflow-x-auto">
 
@@ -765,7 +765,7 @@ export default function TeamPage() {
  <Checkbox
  checked={allSelected ? true : someSelected ? "indeterminate" : false}
  onCheckedChange={toggleSelectAll}
- aria-label="SelectAllMember"
+ aria-label="Select all members"
  />
  </th>
 
@@ -782,11 +782,11 @@ export default function TeamPage() {
  </th>
 
  <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
- JoinTime
+               Joined
  </th>
 
  <th className="text-left text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
- mostafterActive
+               Last Active
  </th>
 
  <th className="text-right text-xs font-medium text-foreground-muted uppercase tracking-wider px-4 py-3">
@@ -804,10 +804,10 @@ export default function TeamPage() {
  const RoleIcon = roleConfig.icon;
  const isFrozen = frozenMembers.has(member.id);
  const statusLabel = isFrozen
- ? "alreadyFreeze"
- : member.status === "active"
- ? "Active"
-: "pendingAccept";
+   ? "Frozen"
+                 : member.status === "active"
+                 ? "Active"
+: "Pending";
  const statusColor = isFrozen
  ? "text-warning"
  : member.status === "active"
@@ -825,7 +825,7 @@ export default function TeamPage() {
  <Checkbox
  checked={selectedMembers.has(member.id)}
  onCheckedChange={(checked) => toggleSelect(member.id, checked)}
- aria-label={`SelectMember ${member.name}`}
+ aria-label={`Select member ${member.name}`}
  />
  </td>
 
@@ -866,7 +866,7 @@ export default function TeamPage() {
 
  <td className="px-4 py-4">
  <span className="text-sm text-foreground-light">
- {member.lastActive || (member.status === "pending" ? "not yetJoin": "—")}
+ {member.lastActive || (member.status === "pending" ? "Not yet joined": "—")}
  </span>
  </td>
 
@@ -881,18 +881,18 @@ export default function TeamPage() {
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <UserCog className="w-4 h-4 mr-2" />
- ChangeRole
+                     Change Role
  </DropdownMenuItem>
  </PermissionGate>
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Key className="w-4 h-4 mr-2" />
- ManagePermission
+                     Manage Permissions
  </DropdownMenuItem>
  </PermissionGate>
  <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
  <Mail className="w-4 h-4 mr-2" />
- SendMessage
+                     Send Message
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border" />
  <PermissionGate permissions={permissions} required={["members_manage"]}>
@@ -906,7 +906,7 @@ export default function TeamPage() {
  ) : (
  <EyeOff className="w-4 h-4 mr-2" />
  )}
- {isFrozen ? "Freeze": "FreezeMember"}
+                   {isFrozen ? "Unfreeze": "Freeze Member"}
  </DropdownMenuItem>
  )}
  </PermissionGate>
@@ -917,7 +917,7 @@ export default function TeamPage() {
  onClick={() => handleRemoveMember(member.id)}
  >
  <Trash2 className="w-4 h-4 mr-2" />
- RemoveMember
+                     Remove Member
  </DropdownMenuItem>
  )}
  </PermissionGate>
@@ -936,11 +936,11 @@ export default function TeamPage() {
 
  </div>
 
- {/* RoleDescription */}
+ {/* Role descriptions */}
 
  <div className="p-6 rounded-md bg-surface-100 border border-border">
 
- <h3 className="font-semibold text-foreground mb-4">RolePermissionDescription</h3>
+ <h3 className="font-semibold text-foreground mb-4">Role permission description</h3>
 
  <div className="page-grid md:grid-cols-2 lg:grid-cols-4">
 
@@ -976,7 +976,7 @@ export default function TeamPage() {
 
  </div>
 
- {/* InviteMemberModal */}
+ {/* Invite member modal */}
 
  {showInviteModal && (
  <PermissionGate permissions={permissions} required={["members_manage"]}>
@@ -992,7 +992,7 @@ export default function TeamPage() {
 
  <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-md bg-surface-100 border border-border z-50">
 
- <h3 className="text-lg font-semibold text-foreground mb-4">InvitenewMember</h3>
+ <h3 className="text-lg font-semibold text-foreground mb-4">Invite new member</h3>
 
  <div className="space-y-4">
 
@@ -1008,7 +1008,7 @@ export default function TeamPage() {
 
  type="email"
 
- placeholder="InputEmail Address"
+ placeholder="Enter email address"
 
  value={inviteEmail}
 
@@ -1061,7 +1061,7 @@ export default function TeamPage() {
 
  <div className="p-3 rounded-md bg-surface-75 text-sm text-foreground-light">
 
- <p>Invite LinkwillSendtoSpecifyEmail, Valid 7 days.</p>
+ <p>Invite link will be sent to the specified email and is valid for 7 days.</p>
 
  </div>
 
@@ -1079,7 +1079,7 @@ export default function TeamPage() {
 
  <Send className="w-4 h-4 mr-2" />
 
- SendInvite
+               Send Invite
 
  </Button>
 

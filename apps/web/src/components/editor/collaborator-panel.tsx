@@ -34,7 +34,7 @@ interface CollaboratorPanelProps {
  maxDisplay?: number;
 }
 
-// GenerateUserColor(Based onUser ID)
+// Generate user color (based on user ID)
 const getUserColor = (userId: string) => {
  const colors = [
  "var(--color-brand-500)",
@@ -57,7 +57,7 @@ export function CollaboratorPanel({
  const { lastMessage, isConnected } = useWebSocketContext();
  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
 
- // ProcessCollaboratorMessage
+  // Process collaborator message
  const handleCollaboratorMessage = useCallback((message: unknown) => {
  const msg = message as {
  type: string;
@@ -133,18 +133,18 @@ export function CollaboratorPanel({
  }
  }, [workflowId]);
 
- // Listen WebSocket Message
+  // Listen for WebSocket messages
  useEffect(() => {
  if (lastMessage && lastMessage.type?.startsWith("collaborator.")) {
  handleCollaboratorMessage(lastMessage);
  }
  }, [lastMessage, handleCollaboratorMessage]);
 
- // Clean upOfflineCollaborator
- useEffect(() => {
- const cleanup = setInterval(() => {
- setCollaborators((prev) => prev.filter((c) => c.is_online));
- }, 60000); // eachminClean up1times
+  // Clean up offline collaborators
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      setCollaborators((prev) => prev.filter((c) => c.is_online));
+    }, 60000); // Clean up every minute
 
  return () => clearInterval(cleanup);
  }, []);
@@ -153,7 +153,7 @@ export function CollaboratorPanel({
  const displayCollaborators = onlineCollaborators.slice(0, maxDisplay);
  const remainingCount = Math.max(0, onlineCollaborators.length - maxDisplay);
 
- // ifresultNoOnlineCollaborator, notDisplay
+  // If no online collaborators, don't display
  if (onlineCollaborators.length === 0) {
  return (
  <div className="flex items-center gap-2 px-2 py-1 text-xs text-foreground-muted">
@@ -194,13 +194,13 @@ export function CollaboratorPanel({
  {collaborator.username[0].toUpperCase()}
  </AvatarFallback>
  </Avatar>
- {/* OnlineIndicator */}
+            {/* Online Indicator */}
  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-brand-500 border-2 border-background rounded-full" />
  </div>
  </TooltipTrigger>
  <TooltipContent>
  <p>{collaborator.username}</p>
- <p className="text-xs text-foreground-muted">currentlyatEdit</p>
+              <p className="text-xs text-foreground-muted">Currently editing</p>
  </TooltipContent>
  </Tooltip>
  ))}
@@ -215,7 +215,7 @@ export function CollaboratorPanel({
  </PopoverTrigger>
  <PopoverContent className="w-64 bg-surface-100 border-border">
  <div className="space-y-2">
- <h4 className="font-medium text-sm">OnlineCollaborator</h4>
+              <h4 className="font-medium text-sm">Online Collaborators</h4>
  <div className="space-y-2">
  {onlineCollaborators.map((collaborator) => (
  <div
@@ -243,7 +243,7 @@ export function CollaboratorPanel({
 
  <span className="text-xs text-foreground-muted ml-2">
  <Users className="w-3 h-3 inline mr-1" />
- {onlineCollaborators.length} personOnline
+        {onlineCollaborators.length} online
  </span>
  </div>
  );

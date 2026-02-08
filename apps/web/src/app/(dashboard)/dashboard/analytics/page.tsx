@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * UsageStatisticsAnalyticsPage - Supabase Dashboard Style
- * 2SidebarNavigation'sAnalyticsPage
+ * Usage Statistics Analytics Page - Supabase Dashboard Style
+ * Analytics page with dual sidebar navigation
  */
 
 import { useState } from "react";
@@ -44,38 +44,38 @@ import {
  Sparkline,
 } from "@/components/charts/simple-charts";
 
-// SidebarNavigationStructure
+// Sidebar Navigation Structure
 const navGroups = [
  {
  title: "OVERVIEW",
  items: [
  { id: "overview", label: "Overview", href: "#overview" },
- { id: "highlights", label: "UsageSnapshot", href: "#highlights" },
+      { id: "highlights", label: "Usage Snapshot", href: "#highlights" },
  ],
  },
  {
  title: "ANALYTICS",
  items: [
- { id: "trends", label: "UsageTrend", href: "#trends" },
- { id: "distribution", label: "ModelDistribution", href: "#distribution" },
- { id: "breakdown", label: "UsageDecompose", href: "#breakdown" },
+      { id: "trends", label: "Usage Trends", href: "#trends" },
+      { id: "distribution", label: "Model Distribution", href: "#distribution" },
+      { id: "breakdown", label: "Usage Breakdown", href: "#breakdown" },
  ],
  },
  {
  title: "DETAILS",
  items: [
- { id: "features", label: "FeaturesRanking", href: "#features" },
- { id: "daily", label: "eachdayStatistics", href: "#daily" },
- { id: "activities", label: "RecentActivity", href: "#activities" },
+      { id: "features", label: "Feature Ranking", href: "#features" },
+      { id: "daily", label: "Daily Statistics", href: "#daily" },
+      { id: "activities", label: "Recent Activity", href: "#activities" },
  ],
  },
  {
  title: "INSIGHTS",
- items: [{ id: "tips", label: "optimalSuggestion", href: "#tips" }],
+    items: [{ id: "tips", label: "Optimization Tips", href: "#tips" }],
  },
 ];
 
-// TimeRangeOption
+// Time Range Options
 const timeRanges = [
  { id: "7d", label: "Recent 7 days" },
  { id: "30d", label: "Recent 30 days" },
@@ -83,11 +83,11 @@ const timeRanges = [
  { id: "12m", label: "Recent 12 months" },
 ];
 
-// MockStatisticsData - version
+// Mock Statistics Data
 const overviewStats = [
  {
  id: "conversations",
- label: "ConversationTotal",
+    label: "Total Conversations",
  value: "2,847",
  change: 12.5,
  trend: "up" as const,
@@ -95,7 +95,7 @@ const overviewStats = [
  },
  {
  id: "workflows",
- label: "WorkflowRun",
+    label: "Workflow Runs",
  value: "1,256",
  change: 8.3,
  trend: "up" as const,
@@ -103,7 +103,7 @@ const overviewStats = [
  },
  {
  id: "agents",
- label: "Active Agent",
+ label: "Active Agents",
  value: "23",
  change: -2.1,
  trend: "down" as const,
@@ -119,76 +119,76 @@ const overviewStats = [
  },
 ];
 
-// UsageTrendData
+// Usage Trend Data
 const usageTrendData = [
- { label: "1months", value: 1200 },
- { label: "2months", value: 1450 },
- { label: "3months", value: 1380 },
- { label: "4months", value: 1650 },
- { label: "5months", value: 1820 },
- { label: "6months", value: 2100 },
- { label: "7months", value: 2350 },
+ { label: "Jan", value: 1200 },
+ { label: "Feb", value: 1450 },
+ { label: "Mar", value: 1380 },
+ { label: "Apr", value: 1650 },
+ { label: "May", value: 1820 },
+ { label: "Jun", value: 2100 },
+ { label: "Jul", value: 2350 },
 ];
 
-// Token UsageDistribution
+// Token Usage Distribution
 const tokenDistribution = [
  { label: "GPT-4", value: 45, color: "text-brand-500" },
  { label: "Claude 3", value: 30, color: "text-foreground-light" },
  { label: "GPT-3.5", value: 15, color: "text-foreground-muted" },
- { label: "otherhe", value: 10, color: "text-foreground-lighter" },
+ { label: "Other", value: 10, color: "text-foreground-lighter" },
 ];
 
-// FeaturesUsageRanking
+// Features Usage Ranking
 const featureUsage = [
- { name: "SmartConversation", usage: 2847, change: 12.5 },
- { name: "WorkflowAutomation", usage: 1256, change: 8.3 },
- { name: "DocumentAnalytics", usage: 892, change: 15.2 },
- { name: "CodeGenerate", usage: 654, change: -3.1 },
- { name: "DataProcess", usage: 423, change: 22.8 },
+ { name: "Smart Conversation", usage: 2847, change: 12.5 },
+ { name: "Workflow Automation", usage: 1256, change: 8.3 },
+ { name: "Document Analytics", usage: 892, change: 15.2 },
+ { name: "Code Generation", usage: 654, change: -3.1 },
+ { name: "Data Processing", usage: 423, change: 22.8 },
 ];
 
-// eachdayUsageData
+// Daily usage data
 const dailyUsage = [
- { day: "weeks1", conversations: 420, workflows: 180 },
- { day: "weeks2", conversations: 380, workflows: 165 },
- { day: "weeks3", conversations: 450, workflows: 210 },
- { day: "weeks4", conversations: 520, workflows: 245 },
- { day: "weeks5", conversations: 480, workflows: 220 },
- { day: "weeks6", conversations: 280, workflows: 120 },
- { day: "weeksday", conversations: 250, workflows: 95 },
+ { day: "Mon", conversations: 420, workflows: 180 },
+ { day: "Tue", conversations: 380, workflows: 165 },
+ { day: "Wed", conversations: 450, workflows: 210 },
+ { day: "Thu", conversations: 520, workflows: 245 },
+ { day: "Fri", conversations: 480, workflows: 220 },
+ { day: "Sat", conversations: 280, workflows: 120 },
+ { day: "Sun", conversations: 250, workflows: 95 },
 ];
 
-// RecentActivity
+// Recent Activity
 const recentActivities = [
- { type: "conversation", title: "ProductRequirementsDiscussion", time: "5minbefore", tokens: 1250 },
- { type: "workflow", title: "EmailAutoCategory", time: "12minbefore", tokens: 850 },
- { type: "agent", title: "WritingAssistantConversation", time: "25minbefore", tokens: 2100 },
- { type: "conversation", title: "TechnologyPlanReview", time: "1hbefore", tokens: 1800 },
- { type: "workflow", title: "DataSyncTask", time: "2hbefore", tokens: 450 },
+ { type: "conversation", title: "Product Requirements Discussion", time: "5 min ago", tokens: 1250 },
+ { type: "workflow", title: "Email Auto Categorization", time: "12 min ago", tokens: 850 },
+ { type: "agent", title: "Writing Assistant Conversation", time: "25 min ago", tokens: 2100 },
+ { type: "conversation", title: "Technical Plan Review", time: "1h ago", tokens: 1800 },
+ { type: "workflow", title: "Data Sync Task", time: "2h ago", tokens: 450 },
 ] as const;
 
 const optimizationTips = [
  {
- title: "Usage GPT-3.5 ProcessSimpleTask",
- description: "EstimatedcanSave 25% Token Consumption",
- impact: "Costoptimal",
+    title: "Use GPT-3.5 for Simple Tasks",
+    description: "Could save up to 25% on token consumption",
+    impact: "Cost Savings",
  },
  {
- title: "EnableWorkflowCache",
- description: "fewre-Calculate, Improve 40% Speed",
- impact: "canImprove",
+    title: "Enable Workflow Caching",
+    description: "Reduce recalculations and improve speed by 40%",
+    impact: "Performance",
  },
  {
- title: "optimalPromptLength",
- description: "StreamlinePromptcanSave 15% Cost",
- impact: "rateImprove",
+    title: "Optimize Prompt Length",
+    description: "Streamlined prompts can save 15% in costs",
+    impact: "Efficiency",
  },
 ];
 
 const usageHighlights = [
- { label: "currentmonthsCost", value: "¥1,284", change: 12.4 },
- { label: "Activedayscount", value: "19/30", change: 4.3 },
- { label: "AutomationSave", value: "¥312", change: -8.1 },
+ { label: "Monthly Cost", value: "¥1,284", change: 12.4 },
+ { label: "Active Days", value: "19/30", change: 4.3 },
+ { label: "Automation Savings", value: "¥312", change: -8.1 },
 ];
 
 const usageBudget = {
@@ -200,7 +200,7 @@ const breakdownTabs = [
  {
  id: "conversations",
  label: "Conversation",
- description: "ConversationRequestatnotScenario'sDistribution",
+    description: "Distribution of conversation requests across scenarios",
  bars: [
  { label: "Product", value: 520 },
  { label: "Writing", value: 420 },
@@ -211,19 +211,19 @@ const breakdownTabs = [
  segments: [
  { label: "will", value: 42 },
  { label: "will", value: 28 },
- { label: "AutoSummary", value: 18 },
+      { label: "Auto Summary", value: 18 },
  { label: "time", value: 12 },
  ],
  kpis: [
- { label: "AverageResponse", value: "2.4s", change: -6.4 },
+      { label: "Avg Response", value: "2.4s", change: -6.4 },
  { label: "Satisfaction", value: "92%", change: 1.8 },
- { label: "userate", value: "38%", change: 4.1 },
+      { label: "Usage Rate", value: "38%", change: 4.1 },
  ],
  },
  {
  id: "workflows",
  label: "Workflow",
- description: "AutomationTask'sTriggerandDoneSituation",
+    description: "Automation task trigger and completion status",
  bars: [
  { label: "Marketing", value: 320 },
  { label: "Data", value: 280 },
@@ -232,41 +232,41 @@ const breakdownTabs = [
  { label: "", value: 110 },
  ],
  segments: [
- { label: "SuccessExecute", value: 86 },
- { label: "etcpendingApproval", value: 9 },
- { label: "FailedRetry", value: 5 },
+      { label: "Successful", value: 86 },
+      { label: "Pending Approval", value: 9 },
+      { label: "Failed/Retry", value: 5 },
  ],
  kpis: [
- { label: "AverageDuration", value: "3.1m", change: -12.2 },
+      { label: "Avg Duration", value: "3.1m", change: -12.2 },
  { label: "Success Rate", value: "94%", change: 2.7 },
- { label: "Savetime", value: "18h", change: 6.9 },
+      { label: "Time Saved", value: "18h", change: 6.9 },
  ],
  },
  {
  id: "costs",
  label: "Cost",
- description: "Token UsageandCostDrivenSource",
+    description: "Token usage and cost drivers by source",
  bars: [
  { label: "GPT-4", value: 540 },
  { label: "Claude 3", value: 360 },
  { label: "GPT-3.5", value: 210 },
- { label: "otherhe", value: 120 },
+      { label: "Other", value: 120 },
  ],
  segments: [
- { label: "Costwill", value: 44 },
- { label: "BatchTask", value: 31 },
+      { label: "On-demand", value: 44 },
+      { label: "Batch Tasks", value: 31 },
  { label: "Cache", value: 17 },
- { label: "Worktime", value: 8 },
+      { label: "Work hours", value: 8 },
  ],
  kpis: [
- { label: "timesCost", value: "¥0.42", change: -4.8 },
- { label: "currentmonthsBudget", value: "64%", change: 8.3 },
- { label: "canSave", value: "¥128", change: -6.1 },
+      { label: "Cost per Request", value: "¥0.42", change: -4.8 },
+      { label: "Monthly Budget", value: "64%", change: 8.3 },
+      { label: "Potential Savings", value: "¥128", change: -6.1 },
  ],
  },
 ];
 
-// ActivityTypestyle
+// Activity Type Style
 const activityTypeLabels = {
  conversation: "Conversation",
  workflow: "Workflow",
@@ -317,7 +317,7 @@ export default function AnalyticsPage() {
  item.conversations > max.conversations ? item : max
  );
 
- // SidebarContent
+ // Sidebar Content
  const sidebar = (
  <nav className="space-y-1">
  {navGroups.map((group) => (
@@ -342,11 +342,11 @@ export default function AnalyticsPage() {
  sidebarWidth="narrow"
  >
  <div className="space-y-6 max-w-[960px]">
- {/* PageHeader */}
+ {/* Page Header */}
  <div className="space-y-1">
- <h1 className="text-xl font-medium text-foreground">UsageStatistics</h1>
- <p className="text-[13px] text-foreground-light">
- Trackyou'sUsageSituation, CostandWorkflowrate
+    <h1 className="text-xl font-medium text-foreground">Usage Statistics</h1>
+    <p className="text-[13px] text-foreground-light">
+          Track your usage, costs, and workflow performance
  </p>
  </div>
 
@@ -354,9 +354,9 @@ export default function AnalyticsPage() {
  <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
- <span>Real-timeMonitor</span>
- <span className="text-foreground-lighter">·</span>
- <span>Updateat 2 minbefore</span>
+          <span>Real-time monitoring</span>
+          <span className="text-foreground-lighter">·</span>
+          <span>Updated 2 min ago</span>
  </div>
  <div className="flex items-center gap-2">
  <DropdownMenu>
@@ -410,9 +410,9 @@ export default function AnalyticsPage() {
  </div>
  </div>
 
- {/* UsageSnapshot */}
+ {/* Usage Snapshot */}
  <section id="highlights" className="space-y-3">
- <CategoryHeader>UsageSnapshot</CategoryHeader>
+        <CategoryHeader>Usage Snapshot</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100 p-4">
  <div className="grid grid-cols-3 gap-0 divide-x divide-border">
  {usageHighlights.map((item) => (
@@ -442,7 +442,7 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* OverviewStatistics */}
+ {/* Overview Statistics */}
  <section id="overview" className="space-y-3">
  <CategoryHeader>Overview</CategoryHeader>
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -489,16 +489,16 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* UsageTrend */}
+ {/* Usage Trend */}
  <section id="trends" className="space-y-3">
  <div className="flex items-center justify-between">
- <CategoryHeader>UsageTrend</CategoryHeader>
+          <CategoryHeader>Usage Trends</CategoryHeader>
  <div className="flex items-center gap-3 text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1.5">
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
  Conversation
  </span>
- <span>Average {averageUsage.toLocaleString()} / months</span>
+            <span>Average {averageUsage.toLocaleString()} / month</span>
  </div>
  </div>
  <div className="rounded-md border border-border bg-surface-100 p-5">
@@ -512,9 +512,9 @@ export default function AnalyticsPage() {
  />
  <div className="mt-4 grid grid-cols-3 gap-3">
  <div className="rounded-md bg-surface-75 px-3 py-2">
- <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
- value
- </p>
+                <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
+                Peak
+                </p>
  <p className="text-sm font-medium text-foreground tabular-nums">
  {peakPoint.value.toLocaleString()} · {peakPoint.label}
  </p>
@@ -545,9 +545,9 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* ModelDistribution */}
+ {/* Model Distribution */}
  <section id="distribution" className="space-y-3">
- <CategoryHeader>ModelDistribution</CategoryHeader>
+        <CategoryHeader>Model Distribution</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100 p-5">
  <div className="grid lg:grid-cols-2 gap-6">
  <div className="flex justify-center">
@@ -580,7 +580,7 @@ export default function AnalyticsPage() {
  ))}
  <div className="pt-3 mt-3 border-t border-border">
  <div className="flex items-center justify-between text-[11px] text-foreground-muted mb-2">
- <span>currentmonthsBudget</span>
+                <span>Monthly Budget</span>
  <span className="tabular-nums">
  ¥{usageBudget.used} / ¥{usageBudget.limit}
  </span>
@@ -602,9 +602,9 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* UsageDecompose */}
+ {/* Usage Breakdown */}
  <section id="breakdown" className="space-y-3">
- <CategoryHeader>UsageDecompose</CategoryHeader>
+        <CategoryHeader>Usage Breakdown</CategoryHeader>
  <Tabs defaultValue="conversations" className="w-full">
  <div className="rounded-md border border-border bg-surface-100">
  <div className="px-5 pt-4 pb-0 border-b border-border">
@@ -700,11 +700,11 @@ export default function AnalyticsPage() {
  </Tabs>
  </section>
 
- {/* FeaturesRankingandeachdayStatistics */}
+ {/* Features ranking and daily statistics */}
  <div className="grid lg:grid-cols-2 gap-4">
- {/* FeaturesRanking */}
+ {/* Features ranking */}
  <section id="features" className="space-y-3">
- <CategoryHeader>FeaturesRanking</CategoryHeader>
+          <CategoryHeader>Feature Ranking</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100">
  <div className="px-4 py-2.5 border-b border-border flex items-center justify-between text-[11px] text-foreground-muted uppercase tracking-wide">
  <span>Features</span>
@@ -754,9 +754,9 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* eachdayStatistics */}
+ {/* Daily statistics */}
  <section id="daily" className="space-y-3">
- <CategoryHeader>eachdayStatistics</CategoryHeader>
+          <CategoryHeader>Daily Statistics</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100 p-5">
  <SimpleBarChart
  data={dailyUsage.map((item) => ({
@@ -770,7 +770,7 @@ export default function AnalyticsPage() {
  <div className="mt-4 grid grid-cols-3 gap-3">
  <div className="rounded-md bg-surface-75 px-3 py-2">
  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
- dayConversation
+                  Daily Conversations
  </p>
  <p className="text-sm font-medium text-foreground tabular-nums">
  {avgConversations}
@@ -778,7 +778,7 @@ export default function AnalyticsPage() {
  </div>
  <div className="rounded-md bg-surface-75 px-3 py-2">
  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
- dayWorkflow
+                  Daily Workflows
  </p>
  <p className="text-sm font-medium text-foreground tabular-nums">
  {avgWorkflows}
@@ -786,7 +786,7 @@ export default function AnalyticsPage() {
  </div>
  <div className="rounded-md bg-surface-75 px-3 py-2">
  <p className="text-[11px] text-foreground-muted uppercase tracking-wide">
- valueday
+                  Peak Day
  </p>
  <p className="text-sm font-medium text-foreground tabular-nums">
  {peakDay.day}
@@ -807,9 +807,9 @@ export default function AnalyticsPage() {
  </section>
  </div>
 
- {/* RecentActivity */}
+ {/* Recent Activity */}
  <section id="activities" className="space-y-3">
- <CategoryHeader>RecentActivity</CategoryHeader>
+        <CategoryHeader>Recent Activity</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100">
  <div className="px-4 py-2.5 border-b border-border flex items-center justify-between text-[11px] text-foreground-muted uppercase tracking-wide">
  <span>Activity</span>
@@ -842,9 +842,9 @@ export default function AnalyticsPage() {
  </div>
  </section>
 
- {/* optimalSuggestion */}
+ {/* Optimization Suggestions */}
  <section id="tips" className="space-y-3">
- <CategoryHeader>optimalSuggestion</CategoryHeader>
+        <CategoryHeader>Optimization Tips</CategoryHeader>
  <div className="rounded-md border border-border bg-surface-100 p-5">
  <div className="grid md:grid-cols-3 gap-4">
  {optimizationTips.map((tip) => (
@@ -865,13 +865,13 @@ export default function AnalyticsPage() {
  ))}
  </div>
  <div className="mt-4 flex items-center justify-between text-[12px] text-foreground-light pt-4 border-t border-border">
- <span>EstimatedcanSave 15% - 25% Cost</span>
+            <span>Estimated savings of 15% - 25% on costs</span>
  <Button
  variant="outline"
  size="sm"
  className="h-8 text-[12px] border-brand-500/50 text-brand-500 hover:bg-brand-500/10"
  >
- ViewDetailedSuggestion
+              View Detailed Suggestions
  </Button>
  </div>
  </div>

@@ -84,7 +84,7 @@ export function useFormValidation({
  }
  }, [validateOnBlur, validateField]);
 
- // FetchFieldError(DisplayalreadyTouchField'sError)
+ // Get field error (display error for already touched fields)
  const getFieldError = useCallback(
  (fieldPath: string): string | undefined => {
  if (!state.touchedFields.has(fieldPath)) return undefined;
@@ -125,12 +125,12 @@ export function useFormValidation({
  });
  }, []);
 
- // ConfigtimeAutoVerify(Debounce)
+ // Auto validate on config change (debounced)
  useEffect(() => {
  if (!validateOnChange) return;
 
  const timeoutId = setTimeout(() => {
- // VerifyalreadyTouch'sField
+ // Validate already touched fields
  if (state.touchedFields.size > 0) {
  validate();
  }

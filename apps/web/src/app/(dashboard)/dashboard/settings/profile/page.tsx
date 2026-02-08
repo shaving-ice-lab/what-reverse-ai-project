@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ProfilePage - Supabase Style(Support/Theme)
+ * Profile Page - Supabase Style (Support/Theme)
  */
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 import { ChangePasswordDialog } from "@/components/settings/change-password-dialog";
 import { PageContainer, PageHeader } from "@/components/dashboard/page-layout";
 
-// FormatforTime
+// Format Relative Time
 function formatRelativeTime(date: Date): string {
  const now = new Date();
  const diffMs = now.getTime() - date.getTime();
@@ -51,14 +51,14 @@ function formatRelativeTime(date: Date): string {
  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
  if (diffMins < 1) return "Just now";
- if (diffMins < 60) return `${diffMins} minbefore`;
- if (diffHours < 24) return `${diffHours} hbefore`;
- if (diffDays < 7) return `${diffDays} daysbefore`;
- if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeksbefore`;
+ if (diffMins < 60) return `${diffMins} min ago`;
+ if (diffHours < 24) return `${diffHours} hours ago`;
+ if (diffDays < 7) return `${diffDays} days ago`;
+ if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
  return date.toLocaleDateString("zh-CN");
 }
 
-// SettingsCardComponent - SupportTheme
+// Settings Card Component
 function SettingsSection({
  title,
  description,
@@ -81,7 +81,7 @@ function SettingsSection({
  );
 }
 
-// MockSign InDeviceData
+// Mock Signed-in Device Data
 const mockDevices = [
  {
  id: "1",
@@ -90,7 +90,7 @@ const mockDevices = [
  browser: "Chrome 120",
  location: "Beijing, ",
  ip: "192.168.1.***",
- lastActive: new Date(Date.now() - 1000 * 60 * 5), // 5minbefore
+ lastActive: new Date(Date.now() - 1000 * 60 * 5), // 5 min ago
  isCurrent: true,
  },
  {
@@ -100,7 +100,7 @@ const mockDevices = [
  browser: "Safari",
  location: "on, ",
  ip: "10.0.0.***",
- lastActive: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2hbefore
+ lastActive: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
  isCurrent: false,
  },
  {
@@ -110,18 +110,18 @@ const mockDevices = [
  browser: "Safari 17",
  location: "Shenzhen, ",
  ip: "172.16.0.***",
- lastActive: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2daysbefore
+ lastActive: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
  isCurrent: false,
  },
 ];
 
-// MockActivityHistory
+// Mock Activity History
 const mockActivities = [
- { id: "1", action: "Sign InSuccess", time: new Date(Date.now() - 1000 * 60 * 5), device: "Chrome / Windows" },
- { id: "2", action: "EditPassword", time: new Date(Date.now() - 1000 * 60 * 60 * 24), device: "Safari / macOS" },
- { id: "3", action: "UpdateProfile", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), device: "Chrome / Windows" },
- { id: "4", action: "CreateWorkflow", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), device: "Safari / iOS" },
- { id: "5", action: "Sign InSuccess", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), device: "Chrome / Windows" },
+ { id: "1", action: "Sign in success", time: new Date(Date.now() - 1000 * 60 * 5), device: "Chrome / Windows" },
+ { id: "2", action: "Edit password", time: new Date(Date.now() - 1000 * 60 * 60 * 24), device: "Safari / macOS" },
+ { id: "3", action: "Update profile", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), device: "Chrome / Windows" },
+ { id: "4", action: "Create workflow", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), device: "Safari / iOS" },
+ { id: "5", action: "Sign in success", time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), device: "Chrome / Windows" },
 ];
 
 export default function ProfilePage() {
@@ -132,13 +132,13 @@ export default function ProfilePage() {
  const [displayName, setDisplayName] = useState("");
  const [bio, setBio] = useState("");
  
- // ExtendInfo
+  // Extended Info
  const [company, setCompany] = useState("");
  const [jobTitle, setJobTitle] = useState("");
  const [website, setWebsite] = useState("");
  const [phone, setPhone] = useState("");
  
- // SocialAccount
+  // Social Accounts
  const [githubConnected, setGithubConnected] = useState(false);
  const [twitterConnected, setTwitterConnected] = useState(false);
  const [linkedinConnected, setLinkedinConnected] = useState(false);
@@ -157,32 +157,32 @@ export default function ProfilePage() {
  const [activities] = useState(mockActivities);
  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
 
- // LoadUserData
+  // Load User Data
  const loadUserData = useCallback(async () => {
  setIsLoadingData(true);
  try {
  const userData = await userApi.getCurrentUser();
  setUser(userData);
  
- // FillForm
+    // Fill Form
  setUsername(userData.username || "");
  setDisplayName(userData.displayName || "");
  setBio(userData.bio || "");
  
  setHasChanges(false);
  } catch (err) {
- console.error("LoadUserDataFailed:", err);
+ console.error("Load user data failed:", err);
  } finally {
  setIsLoadingData(false);
  }
  }, [setUser]);
 
- // InitialLoad
+  // Initial Load
  useEffect(() => {
  loadUserData();
  }, [loadUserData]);
 
- // from store SyncData
+  // Sync data from store
  useEffect(() => {
  if (user) {
  setUsername(user.username || "");
@@ -191,7 +191,7 @@ export default function ProfilePage() {
  }
  }, [user]);
 
- // TrackChange
+  // Track Changes
  useEffect(() => {
  setHasChanges(true);
  }, [username, displayName, bio, company, jobTitle, website, phone]);
@@ -213,7 +213,7 @@ export default function ProfilePage() {
  setHasChanges(false);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message: "UpdateFailed");
+ setError(err instanceof Error ? err.message : "Update failed.");
  } finally {
  setIsLoading(false);
  }
@@ -224,12 +224,12 @@ export default function ProfilePage() {
  if (!file) return;
 
  if (!file.type.startsWith("image/")) {
- setError("Please selectImageFile");
+ setError("Please select an image file.");
  return;
  }
 
  if (file.size > 2 * 1024 * 1024) {
- setError("ImageSizenotcanExceed 2MB");
+ setError("Image size cannot exceed 2 MB.");
  return;
  }
 
@@ -238,20 +238,20 @@ export default function ProfilePage() {
 
  try {
  const { url } = await userApi.uploadAvatar(file);
- // Update store 'sUserData
+ // Update store user data
  if (user) {
  setUser({ ...user, avatar: url });
  }
  setSuccess(true);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message: "UploadFailed");
+ setError(err instanceof Error ? err.message : "Upload failed.");
  } finally {
  setIsLoading(false);
  }
  };
 
- // LoadStatus
+  // Loading State
  if (isLoadingData) {
  return (
  <PageContainer>
@@ -292,13 +292,13 @@ export default function ProfilePage() {
  <PageHeader
  eyebrow="Settings"
  title="Profile"
- description="Manageyou'sAccountInfoandpersonSettings"
+ description="Manage your account information and personal settings"
  />
 
  <div className="page-section">
 
- {/* AvatarRegion */}
- <SettingsSection title="Avatar" description="Clickmoreyou'spersonAvatar">
+ {/* Avatar Section */}
+ <SettingsSection title="Avatar" description="Click to change your personal avatar">
  <div className="flex items-center gap-5">
  <div className="relative group">
  <Avatar className="h-16 w-16 border border-border">
@@ -330,7 +330,7 @@ export default function ProfilePage() {
  >
  <label className="cursor-pointer">
  <Camera className="h-3.5 w-3.5 mr-1.5" />
- moreAvatar
+ Change Avatar
  <input
  type="file"
  accept="image/*"
@@ -344,7 +344,7 @@ export default function ProfilePage() {
  </SettingsSection>
 
  {/* Basic Info */}
- <SettingsSection title="Basic Info" description="Updateyou'sAccountBasic Info">
+ <SettingsSection title="Basic Info" description="Update your account basic information">
  <form onSubmit={handleSubmit} className="space-y-5">
  <div className="page-grid grid-cols-1 md:grid-cols-2 gap-5">
  {/* Username */}
@@ -355,7 +355,7 @@ export default function ProfilePage() {
  <div className="relative">
  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
  <Input
- placeholder="InputUsername"
+ placeholder="Enter username"
  value={username}
  onChange={(e) => setUsername(e.target.value)}
  className="pl-10 h-9 bg-surface-200 border-border"
@@ -366,12 +366,12 @@ export default function ProfilePage() {
  {/* DisplayName */}
  <div>
  <label className="text-[13px] font-medium text-foreground mb-2 block">
- DisplayName
+              Display Name
  </label>
  <div className="relative">
  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
  <Input
- placeholder="youHopeDisplay'sName"
+ placeholder="Your preferred display name"
  value={displayName}
  onChange={(e) => setDisplayName(e.target.value)}
  className="pl-10 h-9 bg-surface-200 border-border"
@@ -403,7 +403,7 @@ export default function ProfilePage() {
  <div className="relative">
  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
  <Input
- placeholder="atCompanyorOrganization"
+ placeholder="Your company or organization"
  value={company}
  onChange={(e) => setCompany(e.target.value)}
  className="pl-10 h-9 bg-surface-200 border-border"
@@ -419,7 +419,7 @@ export default function ProfilePage() {
  <div className="relative">
  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
  <Input
- placeholder="you's"
+ placeholder="Your job title"
  value={jobTitle}
  onChange={(e) => setJobTitle(e.target.value)}
  className="pl-10 h-9 bg-surface-200 border-border"
@@ -430,7 +430,7 @@ export default function ProfilePage() {
  {/* Website */}
  <div>
  <label className="text-[13px] font-medium text-foreground mb-2 block">
- personWebsite
+ Personal Website
  </label>
  <div className="relative">
  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
@@ -460,24 +460,24 @@ export default function ProfilePage() {
  </div>
  </div>
 
- {/* personBio */}
- <div>
- <label className="text-[13px] font-medium text-foreground mb-2 block">
- personBio
+            {/* Personal Bio */}
+            <div>
+              <label className="text-[13px] font-medium text-foreground mb-2 block">
+                Personal Bio
  </label>
  <Textarea
- placeholder="Introduction1downSelf..."
+ placeholder="Introduce yourself..."
  value={bio}
  onChange={(e) => setBio(e.target.value)}
  rows={3}
  className="resize-none bg-surface-200 border-border"
  />
  <p className="text-xs text-foreground-muted mt-1.5">
- BiowillDisplayatyou'sPublicMaterialsPage
+ Bio will be displayed on your public profile page
  </p>
  </div>
 
- {/* TipInfo */}
+ {/* Status Messages */}
  {error && (
  <div className="flex items-center gap-2 p-3 rounded-md bg-destructive-200 border border-destructive/20 text-destructive text-[13px]">
  <AlertCircle className="h-4 w-4 shrink-0" />
@@ -487,11 +487,11 @@ export default function ProfilePage() {
  {success && (
  <div className="flex items-center gap-2 p-3 rounded-md bg-brand-200 border border-brand-400/30 text-brand-500 text-[13px]">
  <CheckCircle2 className="h-4 w-4 shrink-0" />
- ChangeSaved
+ Changes Saved
  </div>
  )}
 
- {/* SubmitButton */}
+ {/* Submit Button */}
  <Button
  type="submit"
  disabled={isLoading || !hasChanges}
@@ -505,15 +505,15 @@ export default function ProfilePage() {
  ) : (
  <>
  <Save className="h-4 w-4 mr-2" />
- SaveChange
+ Save Changes
  </>
  )}
  </Button>
  </form>
  </SettingsSection>
 
- {/* SocialAccountBind */}
- <SettingsSection title="SocialAccount" description="Associateyou'sSocial MediaAccount, atQuickSign In">
+ {/* Social Account Linking */}
+ <SettingsSection title="Social Accounts" description="Link your social media accounts for quick sign-in">
  <div className="space-y-3">
  {/* GitHub */}
  <div className="flex items-center justify-between p-4 rounded-md border border-border bg-surface-100/60">
@@ -524,7 +524,7 @@ export default function ProfilePage() {
  <div>
  <p className="text-[13px] font-medium text-foreground">GitHub</p>
  <p className="text-xs text-foreground-muted">
- {githubConnected ? "alreadyAssociate @username": "not yetAssociate"}
+ {githubConnected ? "Connected @username": "Not connected"}
  </p>
  </div>
  </div>
@@ -536,7 +536,7 @@ export default function ProfilePage() {
  githubConnected ? "border-border text-foreground-light" : "bg-surface-200 hover:bg-surface-300 text-foreground"
  )}
  >
- {githubConnected ? "CancelAssociate": "AssociateAccount"}
+ {githubConnected ? "Disconnect": "Connect Account"}
  </Button>
  </div>
 
@@ -549,7 +549,7 @@ export default function ProfilePage() {
  <div>
  <p className="text-[13px] font-medium text-foreground">X (Twitter)</p>
  <p className="text-xs text-foreground-muted">
- {twitterConnected ? "alreadyAssociate @username": "not yetAssociate"}
+ {twitterConnected ? "Connected @username": "Not connected"}
  </p>
  </div>
  </div>
@@ -559,7 +559,7 @@ export default function ProfilePage() {
  onClick={() => setTwitterConnected(!twitterConnected)}
  className="border-border text-foreground-light"
  >
- {twitterConnected ? "CancelAssociate": "AssociateAccount"}
+ {twitterConnected ? "Disconnect": "Connect Account"}
  </Button>
  </div>
 
@@ -572,7 +572,7 @@ export default function ProfilePage() {
  <div>
  <p className="text-[13px] font-medium text-foreground">LinkedIn</p>
  <p className="text-xs text-foreground-muted">
- {linkedinConnected ? "alreadyAssociate": "not yetAssociate"}
+ {linkedinConnected ? "Connected": "Not connected"}
  </p>
  </div>
  </div>
@@ -584,16 +584,16 @@ export default function ProfilePage() {
  linkedinConnected ? "border-border text-foreground-light" : "bg-brand-500 hover:bg-brand-600 text-background"
  )}
  >
- {linkedinConnected ? "CancelAssociate": "AssociateAccount"}
+ {linkedinConnected ? "Disconnect": "Connect Account"}
  </Button>
  </div>
  </div>
  </SettingsSection>
 
  {/* Security Settings */}
- <SettingsSection title="Security Settings" description="Protectyou'sAccountSecurity">
+ <SettingsSection title="Security Settings" description="Protect your account security">
  <div className="space-y-3">
- {/* Two-stepVerify */}
+ {/* Two-Factor Authentication */}
  <div className="flex items-center justify-between p-4 rounded-md border border-border bg-surface-100/60">
  <div className="flex items-center gap-3">
  <div className={cn(
@@ -605,11 +605,11 @@ export default function ProfilePage() {
  <Shield className="h-4 w-4" />
  </div>
  <div>
- <p className="text-[13px] font-medium text-foreground">Two-stepVerify (2FA)</p>
+ <p className="text-[13px] font-medium text-foreground">Two-Factor Authentication (2FA)</p>
  <p className="text-xs text-foreground-muted">
  {twoFactorEnabled 
- ? "Enabled - UsageVerifyApp" 
-: "asyou'sAccountAddoutside'sSecurityProtect"}
+ ? "Enabled - Using authenticator app" 
+: "Add an extra layer of security to your account"}
  </p>
  </div>
  </div>
@@ -626,25 +626,25 @@ export default function ProfilePage() {
  </div>
  </div>
 
- {/* EditPassword */}
- <div className="flex items-center justify-between p-4 rounded-md border border-border bg-surface-100/60">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center text-foreground-muted">
- <Key className="h-4 w-4" />
- </div>
+{/* Change Password */}
+            <div className="flex items-center justify-between p-4 rounded-md border border-border bg-surface-100/60">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center text-foreground-muted">
+                  <Key className="h-4 w-4" />
+                </div>
  <div>
  <p className="text-[13px] font-medium text-foreground">Password</p>
  <p className="text-xs text-foreground-muted">
- PeriodicmorePasswordwithProtectAccountSecurity
+ Change your password periodically to protect account security
  </p>
  </div>
  </div>
  <Button variant="outline" size="sm" onClick={() => setShowPasswordDialog(true)} className="border-border text-foreground-light">
- EditPassword
+              Change Password
  </Button>
  </div>
  
- {/* EditPasswordDialog */}
+ {/* Change Password Dialog */}
  <ChangePasswordDialog 
  open={showPasswordDialog} 
  onOpenChange={setShowPasswordDialog} 
@@ -652,8 +652,8 @@ export default function ProfilePage() {
  </div>
  </SettingsSection>
 
- {/* Sign InDevice */}
- <SettingsSection title="Sign InDevice" description="ManagealreadySign InthisAccount'sDevice">
+ {/* Signed-in Devices */}
+ <SettingsSection title="Signed-in Devices" description="Manage devices signed into this account">
  <div className="space-y-3">
  {devices.map((device) => (
  <div 
@@ -683,7 +683,7 @@ export default function ProfilePage() {
  <p className="text-[13px] font-medium text-foreground">{device.name}</p>
  {device.isCurrent && (
  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-brand-200 text-brand-500">
- CurrentDevice
+ Current Device
  </Badge>
  )}
  </div>
@@ -709,12 +709,12 @@ export default function ProfilePage() {
  ))}
  </div>
  <Button variant="outline" className="mt-4 w-full sm:w-auto border-border text-foreground-light">
- Sign OutAllotherheDevice
+ Sign Out All Other Devices
  </Button>
  </SettingsSection>
 
- {/* ActivityHistory */}
- <SettingsSection title="ActivityHistory" description="ViewyouAccount'sRecentActivityRecord">
+ {/* Activity History */}
+ <SettingsSection title="Activity History" description="View your account's recent activity">
  <div className="space-y-0 divide-y divide-border">
  {activities.map((activity) => (
  <div key={activity.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
@@ -732,12 +732,12 @@ export default function ProfilePage() {
  ))}
  </div>
  <Button variant="link" className="mt-2 p-0 h-auto text-[13px] text-brand-500">
- View allActivityRecord
+ View All Activity
  </Button>
  </SettingsSection>
 
- {/* AccountInfo */}
- <SettingsSection title="AccountInfo" description="Viewyou'sAccountDetailedInfo">
+ {/* Account Information */}
+ <SettingsSection title="Account Information" description="View your account details">
  <div className="space-y-0 divide-y divide-border">
  <div className="flex items-center justify-between py-4 first:pt-0">
  <div>
@@ -774,7 +774,7 @@ export default function ProfilePage() {
  </div>
  <div className="flex items-center justify-between py-4 last:pb-0">
  <div>
- <p className="text-[13px] text-foreground-light">EmailVerify</p>
+ <p className="text-[13px] text-foreground-light">Email Verification</p>
  <p
  className={cn(
  "text-[13px] mt-0.5 flex items-center gap-1.5",
@@ -801,29 +801,29 @@ export default function ProfilePage() {
  size="sm"
  className="h-8 border-border text-foreground-light"
  >
- re-newSend
+            Resend
  </Button>
  )}
  </div>
  </div>
  </SettingsSection>
 
- {/* DangerRegion */}
- <div className="page-panel bg-destructive-200/40 border-destructive/30">
- <div className="p-5">
- <h2 className="text-sm font-medium text-destructive mb-2">DangerRegion</h2>
- <p className="text-[13px] text-foreground-light mb-4">
- DeleteAccountafter, AllDatawillbyPermanentDeleteandNoneRestore.
+        {/* Danger Zone */}
+          <div className="page-panel bg-destructive-200/40 border-destructive/30">
+            <div className="p-5">
+              <h2 className="text-sm font-medium text-destructive mb-2">Danger Zone</h2>
+              <p className="text-[13px] text-foreground-light mb-4">
+                Once you delete your account, all data will be permanently deleted and cannot be restored.
  </p>
  <div className="flex flex-col sm:flex-row gap-3">
  <Button variant="outline" className="border-border text-foreground-light">
- ExportData
+              Export Data
  </Button>
  <Button
  variant="destructive"
  className="bg-transparent border border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
  >
- DeleteAccount
+              Delete Account
  </Button>
  </div>
  </div>

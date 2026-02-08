@@ -43,22 +43,22 @@ function resolveErrorState(error: unknown): WorkspaceGuardError {
  if (error.status === 403) {
  return {
  variant: "permission",
- title: "NoAccess Workspace 'sPermission",
- description: error.message || "PleaseContactAdminFetchAccessPermission.",
+      title: "No Access to Workspace",
+      description: error.message || "Please contact an admin to get access permission.",
  };
  }
- if (error.status === 404) {
- return {
- variant: "not_found",
- title: "Workspace Does not exist",
- description: "Current Workspace alreadybyRemoveorNoneAccess.",
- };
- }
+    if (error.status === 404) {
+      return {
+        variant: "not_found",
+        title: "Workspace Does Not Exist",
+        description: "This workspace has been removed or you don't have access.",
+      };
+    }
  }
  return {
  variant: "error",
- title: "Workspace LoadFailed",
- description: "Please try again laterRetryorCheckNetworkStatus.",
+      title: "Workspace Load Failed",
+      description: "Please try again later, or check your network connection.",
  };
 }
 
@@ -119,8 +119,8 @@ function WorkspaceGuardInner({
  if (!workspaceId) {
  setError({
  variant: "not_found",
- title: "Workspace Does not exist",
- description: "Current Workspace alreadybyRemoveorNoneAccess.",
+ title: "Workspace does not exist",
+ description: "This workspace was removed or you don't have access.",
  });
  setWorkspace(null);
  setIsLoading(false);
@@ -135,8 +135,8 @@ function WorkspaceGuardInner({
  if (data.status === "suspended") {
  setError({
  variant: "permission",
- title: "Workspace Paused",
- description: " Workspace PausedUsage, PleaseContactAdminRestore.",
+      title: "Workspace Paused",
+      description: "This workspace has been paused. Please contact an admin to restore it.",
  });
  setWorkspace(data);
  return;
@@ -144,8 +144,8 @@ function WorkspaceGuardInner({
  if (data.status === "deleted") {
  setError({
  variant: "not_found",
- title: "Workspace Deleted",
- description: " Workspace alreadybyRemoveorNoneAccess.",
+      title: "Workspace Deleted",
+      description: "This workspace has been removed or you don't have access.",
  });
  setWorkspace(null);
  return;
@@ -200,13 +200,13 @@ function WorkspaceGuardInner({
 
  if (error) {
  const action =
- error.variant === "error"
- ? { label: "re-newLoad", onClick: loadWorkspace }
-: { label: "BackWorkspace", href: "/dashboard/workspaces" };
- const secondaryAction =
- error.variant === "permission"
- ? { label: "BackDashboard", href: "/dashboard" }
- : undefined;
+    error.variant === "error"
+      ? { label: "Reload", onClick: loadWorkspace }
+      : { label: "Back to Workspace", href: "/dashboard/workspaces" };
+    const secondaryAction =
+      error.variant === "permission"
+        ? { label: "Back to Dashboard", href: "/dashboard" }
+        : undefined;
  return (
  <div className="h-full flex items-center justify-center px-6">
  <div className="w-full max-w-xl">

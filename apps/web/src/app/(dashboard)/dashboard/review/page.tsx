@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * ReviewQueuePage
+ * Review Queue Page
  * Supabase Style: Minimal, Clear, Professional
  *
  * Features: 
- * - DisplayPending ReviewitemList
- * - byStatus, Type, PriorityFilter
- * - SupportBatchReviewAction
- * - Real-timeStatisticsDataShowcase
+ * - Display pending review item list
+ * - Filter by status, type, and priority
+ * - Support batch review actions
+ * - Real-time statistics data showcase
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -68,20 +68,20 @@ import type {
 } from "@/types/review";
 import { cn } from "@/lib/utils";
 
-// StatusConfig
+// Status Config
 const statusConfig: Record<
  ReviewStatus,
  { label: string; icon: typeof CheckCircle; badge: "success" | "warning" | "destructive" | "secondary" }
 > = {
  pending: { label: "Pending Review", icon: Clock, badge: "warning" },
- in_review: { label: "Review", icon: Loader2, badge: "secondary" },
- approved: { label: "alreadyVia", icon: CheckCircle, badge: "success" },
- rejected: { label: "alreadyDeny", icon: XCircle, badge: "destructive" },
- revision: { label: "needEdit", icon: AlertTriangle, badge: "warning" },
+ in_review: { label: "In Review", icon: Loader2, badge: "secondary" },
+approved: { label: "Approved", icon: CheckCircle, badge: "success" },
+  rejected: { label: "Rejected", icon: XCircle, badge: "destructive" },
+ revision: { label: "Needs Edit", icon: AlertTriangle, badge: "warning" },
  cancelled: { label: "Cancelled", icon: X, badge: "secondary" },
 };
 
-// itemTypeConfig
+// Item Type Config
 const itemTypeConfig: Record<ReviewItemType, { label: string; icon: typeof Bot; color: string }> = {
  agent: { label: "Agent", icon: Bot, color: "text-foreground-light" },
  workflow: { label: "Workflow", icon: Layers, color: "text-brand-500" },
@@ -90,14 +90,14 @@ const itemTypeConfig: Record<ReviewItemType, { label: string; icon: typeof Bot; 
  content: { label: "Content", icon: MessageSquare, color: "text-foreground-light" },
 };
 
-// PriorityConfig
+// Priority Config
 const priorityConfig: Record<
  ReviewPriority,
  { label: string; icon: typeof Zap; badge: "secondary" | "warning" | "destructive" }
 > = {
- low: { label: "", icon: ArrowRight, badge: "secondary" },
+ low: { label: "Low", icon: ArrowRight, badge: "secondary" },
  normal: { label: "Normal", icon: ArrowRight, badge: "secondary" },
- high: { label: "", icon: ArrowUp, badge: "warning" },
+ high: { label: "High", icon: ArrowUp, badge: "warning" },
  urgent: { label: "Urgent", icon: Zap, badge: "destructive" },
 };
 
@@ -120,16 +120,16 @@ export default function ReviewQueuePage() {
  const [page, setPage] = useState(1);
  const [pageSize] = useState(20);
  
- // BatchSelect
+ // Batch Selection
  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
  const [isBatchMode, setIsBatchMode] = useState(false);
  
- // ActionStatus
+ // Action Status
  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
  const totalPages = Math.ceil(total / pageSize);
 
- // LoadReviewList
+ // Load Review List
  const loadReviews = useCallback(async () => {
  setIsLoading(true);
  setError(null);
@@ -145,7 +145,7 @@ export default function ReviewQueuePage() {
  
  let data = response.data || [];
  
- // CustomerendpointSearch
+ // Client-side search
  if (search) {
  data = data.filter(r => 
  r.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -157,36 +157,36 @@ export default function ReviewQueuePage() {
  setReviews(data);
  setTotal(response.meta?.total || data.length);
  } catch (err) {
- setError(err instanceof Error ? err.message: "LoadFailed");
+ setError(err instanceof Error ? err.message : "Load failed.");
  } finally {
  setIsLoading(false);
  }
  }, [statusFilter, itemTypeFilter, priorityFilter, page, pageSize, search]);
 
- // LoadStatisticsData
+  // Load Statistics Data
  const loadStats = useCallback(async () => {
  try {
  const response = await reviewApi.getStats();
  setStats(response.data);
  } catch (err) {
- console.error("LoadStatisticsDataFailed:", err);
+ console.error("Failed to load statistics:", err);
  }
  }, []);
 
- // InitialLoad
+  // Initial Load
  useEffect(() => {
  loadReviews();
  loadStats();
  }, [loadReviews, loadStats]);
 
- // BatchVia
- const handleBatchApprove = async () => {
- if (selectedIds.size === 0) return;
- 
- const confirmed = await confirm({
- title: "BatchViaReview",
- description: `OKneedViaselect's ${selectedIds.size} Reviewitem??`,
- confirmText: "ConfirmVia",
+  // Batch Approve
+  const handleBatchApprove = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const confirmed = await confirm({
+      title: "Batch approve",
+      description: `Approve ${selectedIds.size} selected review item(s)?`,
+      confirmText: "Confirm Approve",
  cancelText: "Cancel",
  });
  
@@ -202,20 +202,20 @@ export default function ReviewQueuePage() {
  loadReviews();
  loadStats();
  } catch (err) {
- console.error("BatchViaFailed:", err);
+ console.error("Batch approve failed:", err);
  } finally {
  setProcessingIds(new Set());
  }
  };
 
- // BatchDeny
- const handleBatchReject = async () => {
- if (selectedIds.size === 0) return;
- 
- const confirmed = await confirm({
- title: "BatchDenyReview",
- description: `OKneedDenyselect's ${selectedIds.size} Reviewitem??`,
- confirmText: "ConfirmDeny",
+  // Batch Reject
+  const handleBatchReject = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const confirmed = await confirm({
+      title: "Batch reject",
+      description: `Reject ${selectedIds.size} selected review item(s)?`,
+      confirmText: "Confirm Reject",
  cancelText: "Cancel",
  variant: "destructive",
  });
@@ -232,13 +232,13 @@ export default function ReviewQueuePage() {
  loadReviews();
  loadStats();
  } catch (err) {
- console.error("BatchDenyFailed:", err);
+ console.error("Batch reject failed:", err);
  } finally {
  setProcessingIds(new Set());
  }
  };
 
- // SwitchSelect
+  // Toggle Selection
  const toggleSelect = (id: string) => {
  const newSelected = new Set(selectedIds);
  if (newSelected.has(id)) {
@@ -249,7 +249,7 @@ export default function ReviewQueuePage() {
  setSelectedIds(newSelected);
  };
 
- // Select All/CancelSelect All
+  // Select All / Deselect All
  const toggleSelectAll = () => {
  if (selectedIds.size === reviews.length) {
  setSelectedIds(new Set());
@@ -280,21 +280,21 @@ export default function ReviewQueuePage() {
  },
  {
  key: "inReview",
- label: "Review",
+ label: "In Review",
  value: stats?.inReview || 0,
  icon: Loader2,
  valueClassName: "text-foreground",
  },
  {
  key: "approved",
- label: "alreadyVia",
+ label: "Approved",
  value: stats?.approved || 0,
  icon: CheckCircle,
  valueClassName: "text-brand-500",
  },
  {
  key: "rejected",
- label: "alreadyDeny",
+ label: "Rejected",
  value: stats?.rejected || 0,
  icon: XCircle,
  valueClassName: "text-foreground",
@@ -309,12 +309,12 @@ export default function ReviewQueuePage() {
  ];
 
  const statusTabs = [
- { label: "allsection", value: "all", count: stats?.total },
+ { label: "All", value: "all", count: stats?.total },
  { label: "Pending Review", value: "pending", count: stats?.pending },
- { label: "Review", value: "in_review", count: stats?.inReview },
- { label: "alreadyVia", value: "approved", count: stats?.approved },
- { label: "alreadyDeny", value: "rejected", count: stats?.rejected },
- { label: "needEdit", value: "revision", count: stats?.revision },
+ { label: "In Review", value: "in_review", count: stats?.inReview },
+ { label: "Approved", value: "approved", count: stats?.approved },
+ { label: "Rejected", value: "rejected", count: stats?.rejected },
+ { label: "Needs Edit", value: "revision", count: stats?.revision },
  ];
 
  return (
@@ -325,7 +325,7 @@ export default function ReviewQueuePage() {
  eyebrow="Moderation"
  icon={<Shield className="w-4 h-4" />}
  title="Review Queue"
- description="ManageandReviewpendingPublish's Agent, WorkflowandTemplate"
+ description="Manage and review pending agents, workflows and templates"
  badge={(
  <Badge variant="secondary" size="sm">
  {total} 
@@ -335,7 +335,7 @@ export default function ReviewQueuePage() {
  isBatchMode ? (
  <div className="flex flex-wrap items-center gap-2">
  <span className="text-[12px] text-foreground-light">
- alreadySelect {selectedIds.size} 
+ Selected {selectedIds.size} items
  </span>
  <Button
  variant="ghost"
@@ -355,7 +355,7 @@ export default function ReviewQueuePage() {
  className="gap-1.5"
  >
  <CheckCheck className="w-4 h-4" />
- BatchVia
+            Batch Approve
  </Button>
  <Button
  variant="destructive"
@@ -365,7 +365,7 @@ export default function ReviewQueuePage() {
  className="gap-1.5"
  >
  <XCircle className="w-4 h-4" />
- BatchDeny
+            Batch Reject
  </Button>
  </div>
  ) : (
@@ -377,7 +377,7 @@ export default function ReviewQueuePage() {
  className="gap-1.5"
  >
  <CheckCheck className="w-4 h-4" />
- BatchAction
+ Batch Actions
  </Button>
  <Button
  variant="outline"
@@ -429,7 +429,7 @@ export default function ReviewQueuePage() {
  >
  <Input
  type="text"
- placeholder="SearchTitle, IDorSubmituser..."
+ placeholder="Search title, ID or submitter..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}
  variant="search"
@@ -443,7 +443,7 @@ export default function ReviewQueuePage() {
  <SelectValue placeholder="Type" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionType</SelectItem>
+ <SelectItem value="all">All Types</SelectItem>
  <SelectItem value="agent">Agent</SelectItem>
  <SelectItem value="workflow">Workflow</SelectItem>
  <SelectItem value="template">Template</SelectItem>
@@ -455,11 +455,11 @@ export default function ReviewQueuePage() {
  <SelectValue placeholder="Priority" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionPriority</SelectItem>
+ <SelectItem value="all">All Priorities</SelectItem>
  <SelectItem value="urgent">Urgent</SelectItem>
- <SelectItem value="high"></SelectItem>
+ <SelectItem value="high">High</SelectItem>
  <SelectItem value="normal">Normal</SelectItem>
- <SelectItem value="low"></SelectItem>
+ <SelectItem value="low">Low</SelectItem>
  </SelectContent>
  </Select>
  </div>
@@ -469,7 +469,7 @@ export default function ReviewQueuePage() {
  {error && (
  <EmptyState
  icon={<AlertCircle className="w-5 h-5" />}
- title="LoadFailed"
+ title="Load failed"
  description={error}
  action={{ label: "Retry", onClick: loadReviews }}
  />
@@ -495,11 +495,11 @@ export default function ReviewQueuePage() {
  {!isLoading && !error && reviews.length === 0 && (
  <EmptyState
  icon={<Shield className="w-5 h-5" />}
- title={hasFilters ? "NotoMatch'sReviewitem": "NoneReviewitem"}
+ title={hasFilters ? "No matching review items" : "No review items"}
  description={
  hasFilters
- ? "TryAdjustFilterCondition"
-: "UserSubmit Agent orWorkflowPublishRequesttime, ReviewitemwillDisplayatthisin"
+ ? "Try adjusting filter"
+: "When you submit an agent or workflow for review, items will appear here"
  }
  />
  )}
@@ -513,7 +513,7 @@ export default function ReviewQueuePage() {
  onCheckedChange={toggleSelectAll}
  />
  <span className="text-[13px] text-foreground-light">
- {selectedIds.size === reviews.length ? "CancelSelect All": "Select AllCurrentpage"}
+        {selectedIds.size === reviews.length ? "Deselect All" : "Select All on This Page"}
  </span>
  </Card>
  )}
@@ -587,7 +587,7 @@ export default function ReviewQueuePage() {
  </span>
  <span className="flex items-center gap-1">
  <User className="w-3 h-3" />
- {review.submitter?.username || "UnknownUser"}
+                {review.submitter?.username || "Unknown User"}
  </span>
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -596,7 +596,7 @@ export default function ReviewQueuePage() {
  {review.revisionCount > 0 && (
  <span className="flex items-center gap-1 text-warning">
  <AlertTriangle className="w-3 h-3" />
- # {review.revisionCount + 1} timesSubmit
+                Submission #{review.revisionCount + 1}
  </span>
  )}
  </div>
@@ -629,7 +629,7 @@ export default function ReviewQueuePage() {
  {totalPages > 1 && (
  <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
  <p className="text-[13px] text-foreground-light">
- {total} Record, # {page} / {totalPages} page
+ {total} records, page {page} / {totalPages}
  </p>
  <div className="flex items-center gap-2">
  <Button
@@ -639,7 +639,7 @@ export default function ReviewQueuePage() {
  disabled={page <= 1}
  >
  <ChevronLeft className="w-4 h-4 mr-1" />
- on1page
+                Previous
  </Button>
  <Button
  variant="outline"
@@ -647,7 +647,7 @@ export default function ReviewQueuePage() {
  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
  disabled={page >= totalPages}
  >
- down1page
+                Next
  <ChevronRight className="w-4 h-4 ml-1" />
  </Button>
  </div>

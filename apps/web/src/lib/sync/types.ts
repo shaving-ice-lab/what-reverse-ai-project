@@ -1,6 +1,6 @@
 /**
- * DataSyncTypeDefinition
- * @description Local/CloudDataSyncRelatedType
+ * Data Sync Type Definition
+ * @description Local/Cloud Data Sync Related Types
  */
 
 // ============================================================================
@@ -8,34 +8,34 @@
 // ============================================================================
 
 /**
- * ConflictResolvePolicy
+ * Conflict Resolution Policy
  */
 export type ConflictResolutionStrategy = 'local' | 'cloud' | 'latest' | 'manual';
 
 /**
- * SyncConfig
+ * Sync Configuration
  */
 export interface SyncConfig {
- /** AutoSyncbetween (s) */
+ /** Auto Sync Interval (seconds) */
  interval: number;
- /** ConflictResolvePolicy */
+ /** Conflict Resolution Policy */
  conflictResolution: ConflictResolutionStrategy;
- /** Exclude'sDataType */
+ /** Excluded Data Types */
  excludePatterns: string[];
- /** SyncbeforeEncrypt */
+ /** Encrypt Before Sync */
  encryptBeforeSync: boolean;
- /** MaximumRetrytimescount */
+ /** Maximum Retry Count */
  maxRetries: number;
- /** BatchSize */
+ /** Batch Size */
  batchSize: number;
- /** isnoEnableAutoSync */
- autoSync: boolean;
- /** Cloud API Address */
- cloudApiUrl?: string;
+  /** Whether to enable auto sync */
+  autoSync: boolean;
+  /** Cloud API Address */
+  cloudApiUrl?: string;
 }
 
 /**
- * DefaultSyncConfig
+ * Default Sync Config
  */
 export const DEFAULT_SYNC_CONFIG: SyncConfig = {
  interval: 60000, // 1min
@@ -52,17 +52,17 @@ export const DEFAULT_SYNC_CONFIG: SyncConfig = {
 // ============================================================================
 
 /**
- * EntityType
+ * Entity Type
  */
 export type EntityType = 'workflow' | 'execution' | 'settings' | 'agent' | 'template';
 
 /**
- * ActionType
+ * Action Type
  */
 export type OperationType = 'create' | 'update' | 'delete';
 
 /**
- * SyncStatus
+ * Sync Status
  */
 export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict';
 
@@ -70,62 +70,62 @@ export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict
  * Change Log
  */
 export interface ChangeRecord<T = unknown> {
- /** Change ID */
- id: string;
- /** EntityType */
- entityType: EntityType;
- /** Entity ID */
- entityId: string;
- /** ActionType */
- operation: OperationType;
- /** ChangeData */
- data: T;
- /** Time */
- timestamp: Date;
- /** SyncStatus */
- syncStatus: SyncStatus;
- /** Version Number */
- version: number;
- /** Validateand */
- checksum?: string;
- /** Device ID */
- deviceId?: string;
+  /** Change ID */
+  id: string;
+  /** Entity Type */
+  entityType: EntityType;
+  /** Entity ID */
+  entityId: string;
+  /** Action Type */
+  operation: OperationType;
+  /** Change Data */
+  data: T;
+  /** Timestamp */
+  timestamp: Date;
+  /** Sync Status */
+  syncStatus: SyncStatus;
+  /** Version Number */
+  version: number;
+  /** Validation Checksum */
+  checksum?: string;
+  /** Device ID */
+  deviceId?: string;
 }
 
 // ============================================================================
-// ConflictProcess
+// Conflict Processing
 // ============================================================================
 
 /**
- * ConflictInfo
+ * Conflict Information
  */
 export interface Conflict<T = unknown> {
- /** LocalChange */
- local: ChangeRecord<T>;
- /** CloudChange */
- cloud: ChangeRecord<T>;
+  /** Local change */
+  local: ChangeRecord<T>;
+  /** Cloud change */
+  cloud: ChangeRecord<T>;
 }
 
 /**
- * alreadyResolve'sConflict
+ * Resolved Conflict
  */
 export interface ResolvedConflict<T = unknown> extends Conflict<T> {
- /** ResolvePlan */
- resolution: 'local' | 'cloud';
- /** ResolveTime */
- resolvedAt: Date;
+  /** Resolution strategy */
+  resolution: 'local' | 'cloud';
+  /** Resolution time */
+  resolvedAt: Date;
 }
 
 /**
- * ConflictDetectResult
+ * Conflict Detection Result
  */
 export interface ConflictDetectionResult<T = unknown> {
- /** ConflictList */
- conflicts: Conflict<T>[];
- /** onlyLocalhas'sChange */
- localOnly: ChangeRecord<T>[];
- /** onlyCloudhas'sChange */
- cloudOnly: ChangeRecord<T>[];
+  /** Conflict list */
+  conflicts: Conflict<T>[];
+  /** Changes only in local */
+  localOnly: ChangeRecord<T>[];
+  /** Changes only in cloud */
+  cloudOnly: ChangeRecord<T>[];
 }
 
 // ============================================================================
@@ -133,64 +133,64 @@ export interface ConflictDetectionResult<T = unknown> {
 // ============================================================================
 
 /**
- * SyncError
+ * Sync Error
  */
 export interface SyncError {
- /** Change ID List */
- changeIds: string[];
- /** ErrorInfo */
- error: string;
- /** ErrorCode */
- code?: string;
+  /** Change ID list */
+  changeIds: string[];
+  /** Error information */
+  error: string;
+  /** Error code */
+  code?: string;
 }
 
 /**
- * UploadResult
+ * Upload Result
  */
 export interface UploadResult {
- /** Success'sChange ID */
- successful: string[];
- /** Failed'sChange */
- failed: SyncError[];
+  /** Successful change IDs */
+  successful: string[];
+  /** Failed changes */
+  failed: SyncError[];
 }
 
 /**
- * DownloadResult
+ * Download Result
  */
 export interface DownloadResult {
- /** Success'sChange ID */
- successful: string[];
- /** Failed'sChange */
- failed: SyncError[];
+  /** Successful change IDs */
+  successful: string[];
+  /** Failed changes */
+  failed: SyncError[];
 }
 
 /**
- * SyncResultStatus
+ * Sync Result Status
  */
 export type SyncResultStatus = 'success' | 'partial' | 'failed' | 'skipped';
 
 /**
- * SyncResult
+ * Sync Result
  */
 export interface SyncResult {
- /** Status */
- status: SyncResultStatus;
- /** UploadCount */
- uploaded?: number;
- /** DownloadCount */
- downloaded?: number;
- /** ConflictCount */
- conflicts?: number;
- /** ErrorList */
- errors?: SyncError[];
- /** SkipReason */
- reason?: string;
- /** ErrorInfo */
- error?: string;
- /** SyncTime */
- syncedAt?: Date;
- /** Duration (ms) */
- duration?: number;
+  /** Status */
+  status: SyncResultStatus;
+  /** Upload count */
+  uploaded?: number;
+  /** Download count */
+  downloaded?: number;
+  /** Conflict count */
+  conflicts?: number;
+  /** Error list */
+  errors?: SyncError[];
+  /** Skip reason */
+  reason?: string;
+  /** Error information */
+  error?: string;
+  /** Sync time */
+  syncedAt?: Date;
+  /** Duration (ms) */
+  duration?: number;
 }
 
 // ============================================================================
@@ -198,25 +198,25 @@ export interface SyncResult {
 // ============================================================================
 
 /**
- * SyncEngineStatus
+ * Sync Engine Status
  */
 export interface SyncEngineState {
- /** isnoSyncing */
- isSyncing: boolean;
- /** isnoEnabled */
- isEnabled: boolean;
- /** isnoOnline */
- isOnline: boolean;
- /** pendingSyncCount */
- pendingCount: number;
- /** ConflictCount */
- conflictCount: number;
- /** ontimesSyncTime */
- lastSyncAt?: Date;
- /** ontimesSyncResult */
- lastSyncResult?: SyncResult;
- /** downtimesSyncTime */
- nextSyncAt?: Date;
+  /** Whether syncing */
+  isSyncing: boolean;
+  /** Whether enabled */
+  isEnabled: boolean;
+  /** Whether online */
+  isOnline: boolean;
+  /** Pending sync count */
+  pendingCount: number;
+  /** Conflict count */
+  conflictCount: number;
+  /** Last sync time */
+  lastSyncAt?: Date;
+  /** Last sync result */
+  lastSyncResult?: SyncResult;
+  /** Next sync time */
+  nextSyncAt?: Date;
 }
 
 // ============================================================================
@@ -224,40 +224,40 @@ export interface SyncEngineState {
 // ============================================================================
 
 /**
- * SyncEventType
+ * Sync Event Type
  */
 export type SyncEventType =
- | 'sync:start'
- | 'sync:progress'
- | 'sync:complete'
- | 'sync:error'
- | 'sync:conflict'
- | 'change:created'
- | 'change:synced'
- | 'change:failed';
+  | 'sync:start'
+  | 'sync:progress'
+  | 'sync:complete'
+  | 'sync:error'
+  | 'sync:conflict'
+  | 'change:created'
+  | 'change:synced'
+  | 'change:failed';
 
 /**
- * SyncEvent
+ * Sync Event
  */
 export interface SyncEvent<T = unknown> {
- type: SyncEventType;
- timestamp: Date;
+  type: SyncEventType;
+  timestamp: Date;
  data?: T;
 }
 
 // ============================================================================
-// Toolcount
+// Utility Functions
 // ============================================================================
 
 /**
- * GenerateChange ID
+ * Generate Change ID
  */
 export function generateChangeId(): string {
- return `change_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  return `change_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
- * GenerateDevice ID
+ * Generate Device ID
  */
 export function generateDeviceId(): string {
  const stored = typeof localStorage !== 'undefined' 
@@ -276,7 +276,7 @@ export function generateDeviceId(): string {
 }
 
 /**
- * CalculateDataValidateand
+ * Calculate Data Checksum
  */
 export async function calculateChecksum(data: unknown): Promise<string> {
  const text = JSON.stringify(data);
@@ -290,7 +290,7 @@ export async function calculateChecksum(data: unknown): Promise<string> {
 }
 
 /**
- * CompareTime, Backnew's
+ * Compare Timestamps, Return the Newer One
  */
 export function compareTimestamps(a: Date, b: Date): 'a' | 'b' | 'equal' {
  const timeA = new Date(a).getTime();
@@ -302,7 +302,7 @@ export function compareTimestamps(a: Date, b: Date): 'a' | 'b' | 'equal' {
 }
 
 /**
- * CheckChangeisnoShouldExclude
+ * Check if Change Should be Excluded
  */
 export function shouldExclude(entityType: string, excludePatterns: string[]): boolean {
  return excludePatterns.some(pattern => {

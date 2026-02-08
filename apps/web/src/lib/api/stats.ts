@@ -17,17 +17,17 @@ import { request } from "./shared";
  */
 export const statsApi = {
  /**
- * FetchStatisticsOverview
- * @returns StatisticsOverviewData
+ * Fetch statistics overview
+ * @returns Statistics overview data
  */
  async getOverview(): Promise<OverviewStatsResponse> {
  return request<OverviewStatsResponse>("/stats/overview");
  },
 
  /**
- * FetchExecuteTrend
- * @param days dayscount (Default7days, Maximum90days)
- * @returns eachdayStatisticscountgroup
+ * Fetch execution trends
+ * @param days Number of days (Default 7 days, Maximum 90 days)
+ * @returns Daily statistics data array
  */
  async getExecutionTrends(days: number = 7): Promise<ExecutionTrendsResponse> {
  const params = new URLSearchParams();
@@ -39,17 +39,17 @@ export const statsApi = {
  },
 
  /**
- * FetchWorkflowStatistics
+ * Fetch workflow statistics
  * @param workflowId Workflow ID
- * @returns WorkflowStatisticsData
+ * @returns Workflow statistics data
  */
  async getWorkflowStats(workflowId: string): Promise<WorkflowStatsResponse> {
  return request<WorkflowStatsResponse>(`/stats/workflows/${workflowId}`);
  },
 
  /**
- * FetchWorkflowAnalytics(byStatusandNodeTypeDistribution)
- * @returns WorkflowAnalyticsData
+ * Fetch workflow analytics (by status and node type distribution)
+ * @returns Workflow analytics data
  */
  async getWorkflowAnalytics(): Promise<WorkflowAnalyticsResponse> {
  return request<WorkflowAnalyticsResponse>("/stats/workflow-analytics");
@@ -78,7 +78,7 @@ export interface WorkflowAnalyticsResponse {
 }
 
 /**
- * Helper Functioncount: willafterendpoint's snake_case ConvertasbeforeendpointFriendly'sFormat
+ * Helper function: Convert backend snake_case to frontend-friendly format
  */
 export function formatOverviewStats(stats: OverviewStats) {
  return {

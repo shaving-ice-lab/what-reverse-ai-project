@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * VariableSelectComponent - Minimalist Style
+ * Variable Selector Component - Minimalist Style
  */
 
 import { useState, useMemo } from "react";
@@ -72,14 +72,14 @@ const systemVariables: Variable[] = [
  },
  {
  id: "sys_timestamp",
- name: "CurrentTime",
+ name: "Current Time",
  path: "system.timestamp",
  type: "number",
  source: "system",
  },
  {
  id: "sys_datetime",
- name: "CurrentDate & Time",
+ name: "Current Date & Time",
  path: "system.datetime",
  type: "string",
  source: "system",
@@ -200,7 +200,7 @@ export function VariableSelector({
  <div className="relative">
  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
  <Input
- placeholder="SearchVariable..."
+ placeholder="Search variables..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-8 h-8"
@@ -212,7 +212,7 @@ export function VariableSelector({
  {filteredVariables.nodeVars.length > 0 && (
  <div className="p-2">
  <div className="px-2 py-1 text-xs font-medium text-foreground-muted uppercase tracking-wider">
- NodeOutput
+ Node Output
  </div>
  <div className="space-y-0.5">
  {filteredVariables.nodeVars.map((variable) => (
@@ -245,7 +245,7 @@ export function VariableSelector({
  <div className="p-2 border-t border-border">
  <div className="px-2 py-1 text-xs font-medium text-foreground-muted uppercase tracking-wider flex items-center gap-1">
  <Clock className="h-3 w-3" />
- SystemVariable
+ System Variable
  </div>
  <div className="space-y-0.5">
  {filteredVariables.systemVars.map((variable) => (
@@ -275,15 +275,15 @@ export function VariableSelector({
  <div className="w-10 h-10 mx-auto mb-2 rounded-md bg-surface-200 flex items-center justify-center">
  <Braces className="h-5 w-5 opacity-50" />
  </div>
- <p className="text-sm">NotoVariable</p>
- <p className="text-xs mt-0.5">ConnectonNodewithFetchVariable</p>
+ <p className="text-sm">No variables</p>
+ <p className="text-xs mt-0.5">Connect to a node to fetch variables</p>
  </div>
  )}
  </ScrollArea>
 
  <div className="p-2 border-t border-border bg-surface-200">
  <p className="text-xs text-foreground-muted text-center">
- Usage <code className="font-mono bg-surface-200 px-1 py-0.5 rounded border border-border">{"{{Variable}}"}</code> use
+ Use <code className="font-mono bg-surface-200 px-1 py-0.5 rounded border border-border">{"{{Variable}}"}</code> syntax to reference variables
  </p>
  </div>
  </PopoverContent>

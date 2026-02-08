@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Add API KeyDialog - Enhanced
+ * Add API Key Dialog - Enhanced
  */
 
 import { useState } from "react";
@@ -61,7 +61,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  
  const providerConfig = PROVIDER_CONFIGS[provider];
  
- // VerifyKeyFormat
+ // Validate key format
  const validateKey = (): boolean => {
  if (!apiKey.trim()) {
  setError("Please enter API Key");
@@ -69,14 +69,14 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  }
  
  if (providerConfig.keyPattern && !providerConfig.keyPattern.test(apiKey)) {
- setError(`KeyInvalid format, PleaseCheckisnoasValid's ${providerConfig.name} Key`);
+ setError(`Invalid key format. Please check if this is a valid ${providerConfig.name} key.`);
  return false;
  }
  
  return true;
  };
  
- // TestKey
+ // Test key
  const handleTest = async () => {
  if (!validateKey()) return;
  
@@ -88,24 +88,24 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  const result = await apiKeysApi.testValue(provider, apiKey.trim());
  setTestResult({
  valid: result.valid,
- message: result.message || (result.valid ? "KeyFormatValid": "KeyFormatInvalid"),
+ message: result.message || (result.valid ? "Key is valid": "Key is invalid"),
  });
  } catch (err) {
  setTestResult({
  valid: false,
- message: err instanceof Error ? err.message: "TestFailed",
+ message: err instanceof Error ? err.message: "Test failed",
  });
  } finally {
  setIsTesting(false);
  }
  };
  
- // Submit
+ // Submit key
  const handleSubmit = async () => {
  if (!validateKey()) return;
  
  if (!name.trim()) {
- setError("Please enterKeyName");
+ setError("Please enter a key name");
  return;
  }
  
@@ -122,7 +122,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  setOpen(false);
  onSuccess?.();
  } catch (err) {
- setError(err instanceof Error ? err.message: "AddFailed");
+ setError(err instanceof Error ? err.message: "Failed to add key");
  } finally {
  setIsLoading(false);
  }
@@ -155,7 +155,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  )}
  >
  <Plus className="mr-1.5 h-4 w-4" />
- AddKey
+ Add Key
  </Button>
  )}
  </DialogTrigger>
@@ -164,7 +164,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  "border-border/50",
  "shadow-2xl"
  )}>
- {/* TopDecoration */}
+ {/* Top Decoration */}
  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-violet-500 to-indigo-500 rounded-t-lg" />
  
  <DialogHeader className="pt-2">
@@ -180,18 +180,18 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  <DialogTitle className="text-lg">Add API Key</DialogTitle>
  <DialogDescription className="flex items-center gap-1.5 mt-0.5">
  <Shield className="w-3 h-3" />
- KeywillUsage AES-256 EncryptStorage
+ Keys are encrypted with AES-256 for secure storage
  </DialogDescription>
  </div>
  </div>
  </DialogHeader>
  
  <div className="space-y-5 py-4">
- {/* ProviderSelect - Enhanced */}
+ {/* Provider Select - Enhanced */}
  <div className="space-y-3">
  <Label className="text-sm font-medium flex items-center gap-2">
  <Sparkles className="w-3.5 h-3.5 text-primary" />
- SelectProvider
+ Select Provider
  </Label>
  <Select value={provider} onValueChange={(v) => setProvider(v as ApiKeyProvider)}>
  <SelectTrigger className={cn(
@@ -220,14 +220,14 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  </Select>
  </div>
  
- {/* KeyName - Enhanced */}
+ {/* Key Name - Enhanced */}
  <div className="space-y-3">
  <Label htmlFor="keyName" className="text-sm font-medium">
- KeyName
+ Key Name
  </Label>
  <Input
  id="keyName"
- placeholder={`I's ${providerConfig.name} Key`}
+ placeholder={`My ${providerConfig.name} Key`}
  value={name}
  onChange={(e) => setName(e.target.value)}
  className={cn(
@@ -282,11 +282,11 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  </Button>
  </div>
  <p className="text-xs text-muted-foreground">
- KeywillSecurityStorage, onlyatExecuteWorkflowtimeDecryptUsage
+ Keys are stored securely and only decrypted when executing workflows
  </p>
  </div>
  
- {/* TestResult - Enhanced */}
+ {/* Test Result - Enhanced */}
  {testResult && (
  <div
  className={cn(
@@ -312,14 +312,14 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  "text-sm font-medium",
  testResult.valid ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
  )}>
- {testResult.valid ? "VerifyVia": "VerifyFailed"}
+ {testResult.valid ? "Verification passed": "Verification failed"}
  </p>
  <p className="text-xs text-muted-foreground">{testResult.message}</p>
  </div>
  </div>
  )}
  
- {/* ErrorTip - Enhanced */}
+ {/* Error Tip - Enhanced */}
  {error && (
  <div className={cn(
  "flex items-center gap-3 p-4 rounded-xl",
@@ -354,7 +354,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  ) : (
  <>
  <Zap className="mr-2 h-4 w-4" />
- TestConnect
+ Test Connection
  </>
  )}
  </Button>
@@ -373,12 +373,12 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  {isLoading ? (
  <>
  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
- Add...
+ Adding...
  </>
  ) : (
  <>
  <Plus className="mr-2 h-4 w-4" />
- AddKey
+ Add Key
  </>
  )}
  </Button>

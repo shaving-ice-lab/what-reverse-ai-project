@@ -23,11 +23,11 @@ interface TemplateGalleryProps {
  selectedId?: string;
 }
 
-// DifficultyTagsConfig
+// Difficulty tags config
 const difficultyConfig = {
- beginner: { label: "Getting Started", color: "bg-green-500" },
- intermediate: { label: "Advanced", color: "bg-yellow-500" },
- advanced: { label: "Advanced", color: "bg-red-500" },
+  beginner: { label: "Beginner", color: "bg-green-500" },
+  intermediate: { label: "Intermediate", color: "bg-yellow-500" },
+  advanced: { label: "Advanced", color: "bg-red-500" },
 };
 
 export function TemplateGallery({ 
@@ -43,7 +43,7 @@ export function TemplateGallery({
  const [category, setCategory] = useState<string>("all");
  const [difficulty, setDifficulty] = useState<string>("all");
 
- // LoadTemplateData
+  // Load template data
  useEffect(() => {
  const loadData = async () => {
  setLoading(true);
@@ -60,7 +60,7 @@ export function TemplateGallery({
  setCategories(categoriesRes.data.categories);
  setFeaturedTemplates(featuredRes.data.templates);
  } catch (error) {
- toast.error("LoadTemplateFailed");
+ toast.error("Failed to load template");
  } finally {
  setLoading(false);
  }
@@ -69,25 +69,25 @@ export function TemplateGallery({
  loadData();
  }, [search, category, difficulty]);
 
- // UsageTemplate
+  // Use Template
  const handleUseTemplate = async (template: Template) => {
  try {
  const response = await templateApiNew.use(template.id);
- toast.success("WorkflowCreated successfully");
+      toast.success("Workflow created successfully");
  onUseTemplate?.(response.data.workflow);
  } catch (error) {
- toast.error("UsageTemplateFailed");
+ toast.error("Failed to use template");
  }
  };
 
  return (
  <div className="space-y-6">
- {/* SearchandFilter */}
+      {/* Search and Filter */}
  <div className="flex gap-4">
  <div className="relative flex-1">
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-light" />
  <Input
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}
  className="pl-10"
@@ -95,10 +95,10 @@ export function TemplateGallery({
  </div>
  <Select value={category} onValueChange={setCategory}>
  <SelectTrigger className="w-[160px]">
- <SelectValue placeholder="SelectCategory" />
+ <SelectValue placeholder="Select category" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionCategory</SelectItem>
+ <SelectItem value="all">All Categories</SelectItem>
  {categories.map((cat) => (
  <SelectItem key={cat.id} value={cat.id}>
  {cat.icon} {cat.name}
@@ -111,20 +111,20 @@ export function TemplateGallery({
  <SelectValue placeholder="Difficulty" />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="all">allsectionDifficulty</SelectItem>
- <SelectItem value="beginner">Getting Started</SelectItem>
- <SelectItem value="intermediate">Advanced</SelectItem>
- <SelectItem value="advanced">Advanced</SelectItem>
+            <SelectItem value="all">All Difficulties</SelectItem>
+            <SelectItem value="beginner">Beginner</SelectItem>
+            <SelectItem value="intermediate">Intermediate</SelectItem>
+            <SelectItem value="advanced">Advanced</SelectItem>
  </SelectContent>
  </Select>
  </div>
 
- {/* FeaturedTemplate */}
+      {/* Featured Templates */}
  {category === "all" && !search && featuredTemplates.length > 0 && (
  <div className="space-y-3">
  <h3 className="text-lg font-semibold flex items-center gap-2">
  <Sparkles className="w-5 h-5 text-yellow-500" />
- FeaturedTemplate
+            Featured Templates
  </h3>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  {featuredTemplates.map((template) => (
@@ -140,10 +140,10 @@ export function TemplateGallery({
  </div>
  )}
 
- {/* allsectionTemplate */}
+ {/* All Templates */}
  <div className="space-y-3">
  <h3 className="text-lg font-semibold">
- {category === "all" ? "allsectionTemplate": categories.find((c) => c.id === category)?.name}
+ {category === "all" ? "All Templates": categories.find((c) => c.id === category)?.name}
  <span className="text-foreground-light text-sm font-normal ml-2">
  ({templates.length})
  </span>
@@ -157,7 +157,7 @@ export function TemplateGallery({
  </div>
  ) : templates.length === 0 ? (
  <div className="text-center py-12 text-foreground-light">
- not yettoMatch'sTemplate
+ No matching templates
  </div>
  ) : (
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -208,14 +208,14 @@ function TemplateCard({ template, selected, onClick, onUse }: TemplateCardProps)
 
  <div className="flex flex-wrap gap-1.5 mt-3">
  <Badge variant="outline" className="text-xs">
- {template.node_count} Node
+              {template.node_count} Nodes
  </Badge>
  <Badge variant="secondary" className={cn("text-xs", difficulty.color, "text-white")}>
  {difficulty.label}
  </Badge>
  {template.is_official && (
  <Badge variant="default" className="text-xs bg-blue-500">
- method
+              Official
  </Badge>
  )}
  </div>
@@ -225,7 +225,7 @@ function TemplateCard({ template, selected, onClick, onUse }: TemplateCardProps)
  <div className="flex items-center gap-3 text-xs text-foreground-light">
  <span className="flex items-center gap-1">
  <Users className="w-3 h-3" />
- {template.use_count} timesUsage
+                Used {template.use_count} times
  </span>
  <span className="flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -241,8 +241,8 @@ function TemplateCard({ template, selected, onClick, onUse }: TemplateCardProps)
  onUse();
  }}
  >
- Usage
- <ArrowRight className="w-3 h-3 ml-1" />
+            Use
+            <ArrowRight className="w-3 h-3 ml-1" />
  </Button>
  </CardFooter>
  </Card>

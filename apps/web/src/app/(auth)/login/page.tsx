@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Sign InPage - Manus Style
- * Feature: SupportLight/Dark Mode, Layout, SocialSign InPriority, MinimalDesign
+ * Sign In Page - Manus Style
+ * Features: Support Light/Dark Mode, Layout, Social Sign In Priority, Minimal Design
  */
 
 import { useState, useEffect } from "react";
@@ -43,11 +43,11 @@ export default function LoginPage() {
  clearError();
  
  if (!email) {
- setFormError("Please enterEmail Address");
+ setFormError("Please enter your email address");
  return;
  }
  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
- setFormError("Please enterValid'sEmail Address");
+ setFormError("Please enter a valid email address");
  return;
  }
  
@@ -66,7 +66,7 @@ export default function LoginPage() {
  clearError();
  
  if (!password) {
- setFormError("Please enterPassword");
+ setFormError("Please enter your password");
  return;
  }
  
@@ -90,7 +90,7 @@ export default function LoginPage() {
  "w-full max-w-[400px] mx-auto transition-all duration-500",
  mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}>
- {/* Logo - Manus StyleIcon */}
+ {/* Logo - Manus Style Icon */}
  <div className="flex justify-center mb-8">
  <Link href="/" className="group">
  <div className="w-16 h-16 flex items-center justify-center">
@@ -102,10 +102,10 @@ export default function LoginPage() {
  {/* Title */}
  <div className="text-center mb-8">
  <h1 className="text-[28px] font-semibold text-foreground tracking-tight">
- Sign InorSign Up
+ Sign In or Sign Up
  </h1>
  <p className="mt-2 text-[15px] text-muted-foreground">
- andAgentFlow 1StartCreative
+ Start creating with AgentFlow
  </p>
  </div>
  
@@ -114,7 +114,7 @@ export default function LoginPage() {
  "transition-all duration-300",
  mounted ? "opacity-100" : "opacity-0"
  )}>
- {/* SocialSign InButton - ResponseTheme */}
+ {/* Social Sign In Buttons - Responsive Theme */}
  <div className="space-y-3 mb-6">
  {/* Google Button */}
  <button
@@ -128,7 +128,7 @@ export default function LoginPage() {
  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
  </svg>
- Usage Google Sign In
+ Sign in with Google
  </button>
  
  {/* Microsoft Button */}
@@ -143,7 +143,7 @@ export default function LoginPage() {
  <path fill="#7FBA00" d="M13 1h10v10H13z"/>
  <path fill="#FFB900" d="M13 13h10v10H13z"/>
  </svg>
- Usage Microsoft Sign In
+ Sign in with Microsoft
  </button>
  
  {/* Apple Button */}
@@ -154,18 +154,18 @@ export default function LoginPage() {
  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
  </svg>
- Usage Apple Sign In
+ Sign in with Apple
  </button>
  </div>
  
- {/* Separatorline - ResponseTheme */}
+ {/* Separator Line - Responsive Theme */}
  <div className="flex items-center gap-4 mb-6">
  <div className="flex-1 h-px bg-border" />
- <span className="text-[13px] text-muted-foreground">oruser</span>
+ <span className="text-[13px] text-muted-foreground">or</span>
  <div className="flex-1 h-px bg-border" />
  </div>
  
- {/* EmailInput */}
+ {/* Email Input */}
  <form onSubmit={handleSubmit}>
  {(formError || error) && (
  <div className="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-[14px]">
@@ -176,7 +176,7 @@ export default function LoginPage() {
  <div className="space-y-4">
  <input
  type="email"
- placeholder="Please enteryou'sElectronicEmailAddress"
+ placeholder="Please enter your email address"
  value={email}
  onChange={(e) => setEmail(e.target.value)}
  autoComplete="email"
@@ -200,7 +200,7 @@ export default function LoginPage() {
  </form>
  </div>
  ) : (
- /* PasswordInputStep */
+ /* Password Input Step */
  <div className={cn(
  "transition-all duration-300",
  mounted ? "opacity-100" : "opacity-0"
@@ -216,7 +216,7 @@ export default function LoginPage() {
  </button>
  
  <div className="mb-6 p-4 rounded-xl bg-muted border border-border">
- <p className="text-[13px] text-muted-foreground">Sign InAccount</p>
+ <p className="text-[13px] text-muted-foreground">Sign in to account</p>
  <p className="text-[15px] text-foreground font-medium mt-1">{email}</p>
  </div>
  
@@ -230,7 +230,7 @@ export default function LoginPage() {
  <div className="relative">
  <input
  type={showPassword ? "text" : "password"}
- placeholder="InputPassword"
+ placeholder="Enter your password"
  value={password}
  onChange={(e) => setPassword(e.target.value)}
  autoComplete="current-password"
@@ -284,15 +284,15 @@ export default function LoginPage() {
  </div>
  )}
  
- {/* Sign UpLink */}
+ {/* Sign Up Link */}
  <div className="mt-8 text-center">
  <p className="text-[14px] text-muted-foreground">
- Not yetAccount?{""}
+ Don't have an account?{""}
  <Link
  href={`/register${redirectTo !== '/templates' ? `?redirect=${encodeURIComponent(redirectTo)}` : ""}`}
  className="text-foreground hover:text-primary font-medium transition-colors duration-200"
  >
- CreateAccount
+ Create Account
  </Link>
  </p>
  </div>

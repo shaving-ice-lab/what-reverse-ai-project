@@ -3,7 +3,7 @@ import { immer } from "zustand/middleware/immer";
 import type { Node, Edge } from "@xyflow/react";
 import { generateId } from "@/lib/utils";
 
-// ===== TypeDefinition =====
+// ===== Type Definitions =====
 
 export interface WorkflowNode extends Node {
  data: {
@@ -50,7 +50,7 @@ interface ClipboardData {
  edges: Edge[];
 }
 
-// GroupColorType
+// Group Color Type
 export type GroupColor = 
  | 'default'
  | 'violet'
@@ -61,7 +61,7 @@ export type GroupColor =
  | 'orange'
  | 'cyan';
 
-// GroupNodeData
+// Group Node Data
 export interface GroupNodeData {
  label: string;
  description?: string;
@@ -73,70 +73,70 @@ export interface GroupNodeData {
 }
 
 interface WorkflowState {
- // CurrentWorkflow
+ // Current Workflow
  workflow: Workflow | null;
  nodes: WorkflowNode[];
  edges: Edge[];
  
- // selectStatus
- selectedNodeIds: string[];
- selectedEdgeIds: string[];
- 
- // 
- clipboard: ClipboardData | null;
- 
- // HistoryRecord
- history: HistoryEntry[];
- historyIndex: number;
- maxHistory: number;
- 
- // Status
- isDirty: boolean;
- isExecuting: boolean;
- 
- // WorkflowAction
+  // Selection State
+  selectedNodeIds: string[];
+  selectedEdgeIds: string[];
+  
+  // Clipboard
+  clipboard: ClipboardData | null;
+  
+  // History Record
+  history: HistoryEntry[];
+  historyIndex: number;
+  maxHistory: number;
+  
+  // Status
+  isDirty: boolean;
+  isExecuting: boolean;
+  
+  // Workflow Actions
  setWorkflow: (workflow: Workflow) => void;
  clearWorkflow: () => void;
- updateWorkflowMeta: (data: Partial<Workflow>) => void;
- markSaved: () => void;
- 
- // NodeAction
- setNodes: (nodes: WorkflowNode[]) => void;
+  updateWorkflowMeta: (data: Partial<Workflow>) => void;
+  markSaved: () => void;
+  
+  // Node Actions
+  setNodes: (nodes: WorkflowNode[]) => void;
  addNode: (node: WorkflowNode) => void;
  addNodes: (nodes: WorkflowNode[]) => void;
  updateNode: (id: string, data: Partial<WorkflowNode["data"]>) => void;
- updateNodePosition: (id: string, position: { x: number; y: number }) => void;
- removeNodes: (ids: string[]) => void;
- 
- // ConnectionAction
- setEdges: (edges: Edge[]) => void;
+  updateNodePosition: (id: string, position: { x: number; y: number }) => void;
+  removeNodes: (ids: string[]) => void;
+  
+  // Connection Actions
+  setEdges: (edges: Edge[]) => void;
  addEdge: (edge: Edge) => void;
- addEdges: (edges: Edge[]) => void;
- removeEdges: (ids: string[]) => void;
- 
- // SelectAction
- selectNode: (id: string, multi?: boolean) => void;
+  addEdges: (edges: Edge[]) => void;
+  removeEdges: (ids: string[]) => void;
+  
+  // Select Actions
+  selectNode: (id: string, multi?: boolean) => void;
  selectEdge: (id: string, multi?: boolean) => void;
- selectAll: () => void;
- clearSelection: () => void;
- 
- // CopyPasteAction
- copySelectedNodes: () => void;
- pasteNodes: (offset?: { x: number; y: number }) => void;
- duplicateSelectedNodes: () => void;
- 
- // HistoryAction
- saveHistory: () => void;
+  selectAll: () => void;
+  clearSelection: () => void;
+  
+  // Copy Paste Actions
+  copySelectedNodes: () => void;
+  pasteNodes: (offset?: { x: number; y: number }) => void;
+  duplicateSelectedNodes: () => void;
+  
+  // History Actions
+  saveHistory: () => void;
  undo: () => void;
  redo: () => void;
- canUndo: () => boolean;
- canRedo: () => boolean;
- 
- // ExecuteStatus
- setExecuting: (isExecuting: boolean) => void;
- 
- // GroupAction
- createGroup: (nodeIds: string[], label?: string, color?: GroupColor) => string | null;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+  
+  // Execute Status
+  setExecuting: (isExecuting: boolean) => void;
+  
+  // Group Actions
+  createGroup: (nodeIds: string[], label?: string, color?: GroupColor) => string | null;
  ungroup: (groupId: string) => void;
  addNodesToGroup: (nodeIds: string[], groupId: string) => void;
  removeNodesFromGroup: (nodeIds: string[]) => void;
@@ -158,11 +158,11 @@ export const useWorkflowStore = create<WorkflowState>()(
  history: [],
  historyIndex: -1,
  maxHistory: 50,
- isDirty: false,
- isExecuting: false,
- 
- // WorkflowAction
- setWorkflow: (workflow) => {
+  isDirty: false,
+  isExecuting: false,
+  
+  // Workflow Actions
+  setWorkflow: (workflow) => {
  set((state) => {
  state.workflow = workflow;
  state.isDirty = false;
@@ -191,14 +191,14 @@ export const useWorkflowStore = create<WorkflowState>()(
  });
  },
 
- markSaved: () => {
- set((state) => {
- state.isDirty = false;
- });
- },
- 
- // NodeAction
- setNodes: (nodes) => {
+  markSaved: () => {
+    set((state) => {
+      state.isDirty = false;
+    });
+  },
+  
+  // Node Actions
+  setNodes: (nodes) => {
  set((state) => {
  state.nodes = nodes;
  state.isDirty = true;
@@ -243,47 +243,47 @@ export const useWorkflowStore = create<WorkflowState>()(
  },
  
  removeNodes: (ids) => {
- get().saveHistory();
- set((state) => {
- state.nodes = state.nodes.filter((n) => !ids.includes(n.id));
- // timeDeleteRelatedConnection
- state.edges = state.edges.filter(
- (e) => !ids.includes(e.source) && !ids.includes(e.target)
- );
- state.selectedNodeIds = state.selectedNodeIds.filter((id) => !ids.includes(id));
- state.isDirty = true;
- });
- },
- 
- // ConnectionAction
- setEdges: (edges) => {
+    get().saveHistory();
+    set((state) => {
+      state.nodes = state.nodes.filter((n) => !ids.includes(n.id));
+      // Also delete related connections
+      state.edges = state.edges.filter(
+        (e) => !ids.includes(e.source) && !ids.includes(e.target)
+      );
+      state.selectedNodeIds = state.selectedNodeIds.filter((id) => !ids.includes(id));
+      state.isDirty = true;
+    });
+  },
+  
+  // Connection Actions
+  setEdges: (edges) => {
  set((state) => {
  state.edges = edges;
  state.isDirty = true;
  });
  },
  
- addEdge: (edge) => {
- get().saveHistory();
- set((state) => {
- // CheckisnoAlready existsSameConnection
- const exists = state.edges.some(
- (e) =>
- e.source === edge.source &&
- e.target === edge.target &&
- e.sourceHandle === edge.sourceHandle &&
- e.targetHandle === edge.targetHandle
- );
- 
- if (!exists) {
- state.edges.push({
- ...edge,
- id: edge.id || generateId("edge"),
- });
- state.isDirty = true;
- }
- });
- },
+  addEdge: (edge) => {
+    get().saveHistory();
+    set((state) => {
+      // Check if same connection already exists
+      const exists = state.edges.some(
+        (e) =>
+          e.source === edge.source &&
+          e.target === edge.target &&
+          e.sourceHandle === edge.sourceHandle &&
+          e.targetHandle === edge.targetHandle
+      );
+      
+      if (!exists) {
+        state.edges.push({
+          ...edge,
+          id: edge.id || generateId("edge"),
+        });
+        state.isDirty = true;
+      }
+    });
+  },
  
  addEdges: (edges) => {
  get().saveHistory();
@@ -309,16 +309,16 @@ export const useWorkflowStore = create<WorkflowState>()(
  },
  
  removeEdges: (ids) => {
- get().saveHistory();
- set((state) => {
- state.edges = state.edges.filter((e) => !ids.includes(e.id));
- state.selectedEdgeIds = state.selectedEdgeIds.filter((id) => !ids.includes(id));
- state.isDirty = true;
- });
- },
- 
- // SelectAction
- selectNode: (id, multi = false) => {
+    get().saveHistory();
+    set((state) => {
+      state.edges = state.edges.filter((e) => !ids.includes(e.id));
+      state.selectedEdgeIds = state.selectedEdgeIds.filter((id) => !ids.includes(id));
+      state.isDirty = true;
+    });
+  },
+  
+  // Select Actions
+  selectNode: (id, multi = false) => {
  set((state) => {
  if (multi) {
  const index = state.selectedNodeIds.indexOf(id);
@@ -358,25 +358,25 @@ export const useWorkflowStore = create<WorkflowState>()(
  },
  
  clearSelection: () => {
- set((state) => {
- state.selectedNodeIds = [];
- state.selectedEdgeIds = [];
- });
- },
- 
- // CopyPasteAction
- copySelectedNodes: () => {
- const { nodes, edges, selectedNodeIds } = get();
- 
- if (selectedNodeIds.length === 0) return;
- 
- // Fetchselect'sNode
- const selectedNodes = nodes.filter((n) => selectedNodeIds.includes(n.id));
- 
- // FetchselectNodebetween'sConnection
- const selectedEdges = edges.filter(
- (e) => selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
- );
+    set((state) => {
+      state.selectedNodeIds = [];
+      state.selectedEdgeIds = [];
+    });
+  },
+  
+  // Copy Paste Actions
+  copySelectedNodes: () => {
+    const { nodes, edges, selectedNodeIds } = get();
+    
+    if (selectedNodeIds.length === 0) return;
+    
+    // Fetch selected nodes
+    const selectedNodes = nodes.filter((n) => selectedNodeIds.includes(n.id));
+    
+    // Fetch connections between selected nodes
+    const selectedEdges = edges.filter(
+      (e) => selectedNodeIds.includes(e.source) && selectedNodeIds.includes(e.target)
+    );
  
  set((state) => {
  state.clipboard = {
@@ -393,79 +393,79 @@ export const useWorkflowStore = create<WorkflowState>()(
  
  get().saveHistory();
  
- // Create ID Mapping (old ID -> new ID)
- const idMap: Record<string, string> = {};
+    // Create ID Mapping (old ID -> new ID)
+    const idMap: Record<string, string> = {};
+    
+    // Create new nodes
+    const newNodes: WorkflowNode[] = clipboard.nodes.map((node) => {
+      const newId = generateId("node");
+      idMap[node.id] = newId;
+      
+      return {
+        ...JSON.parse(JSON.stringify(node)),
+        id: newId,
+        position: {
+          x: node.position.x + offset.x,
+          y: node.position.y + offset.y,
+        },
+        selected: true,
+      };
+    });
+    
+    // Create new connections (update source and target to new IDs)
+    const newEdges: Edge[] = clipboard.edges.map((edge) => ({
+      ...JSON.parse(JSON.stringify(edge)),
+      id: generateId("edge"),
+      source: idMap[edge.source],
+      target: idMap[edge.target],
+    }));
+    
+    set((state) => {
+      // Clear previous selection status
+      state.nodes.forEach((n) => {
+        n.selected = false;
+      });
+      
+      // Add new nodes and connections
+      state.nodes.push(...newNodes);
+      state.edges.push(...newEdges);
+      
+      // Update selection status
+      state.selectedNodeIds = newNodes.map((n) => n.id);
+      state.selectedEdgeIds = [];
+      state.isDirty = true;
+    });
+  },
  
- // CreatenewNode
- const newNodes: WorkflowNode[] = clipboard.nodes.map((node) => {
- const newId = generateId("node");
- idMap[node.id] = newId;
- 
- return {
- ...JSON.parse(JSON.stringify(node)),
- id: newId,
- position: {
- x: node.position.x + offset.x,
- y: node.position.y + offset.y,
- },
- selected: true,
- };
- });
- 
- // CreatenewConnection (Update source and target asnew ID)
- const newEdges: Edge[] = clipboard.edges.map((edge) => ({
- ...JSON.parse(JSON.stringify(edge)),
- id: generateId("edge"),
- source: idMap[edge.source],
- target: idMap[edge.target],
- }));
- 
- set((state) => {
- // Cancelbefore'sselectStatus
- state.nodes.forEach((n) => {
- n.selected = false;
- });
- 
- // AddnewNodeandConnection
- state.nodes.push(...newNodes);
- state.edges.push(...newEdges);
- 
- // UpdateselectStatus
- state.selectedNodeIds = newNodes.map((n) => n.id);
- state.selectedEdgeIds = [];
- state.isDirty = true;
- });
- },
- 
- duplicateSelectedNodes: () => {
- get().copySelectedNodes();
- get().pasteNodes({ x: 50, y: 50 });
- },
- 
- // HistoryAction
- saveHistory: () => {
- set((state) => {
- const entry: HistoryEntry = {
- nodes: JSON.parse(JSON.stringify(state.nodes)),
- edges: JSON.parse(JSON.stringify(state.edges)),
- timestamp: Date.now(),
- };
- 
- // ifresultatHistorybetween, Deleteafterface'sRecord
- if (state.historyIndex < state.history.length - 1) {
- state.history = state.history.slice(0, state.historyIndex + 1);
- }
- 
- state.history.push(entry);
- 
- // LimitHistoryRecordCount
- if (state.history.length > state.maxHistory) {
- state.history = state.history.slice(-state.maxHistory);
- }
- 
- state.historyIndex = state.history.length - 1;
- });
- },
+  duplicateSelectedNodes: () => {
+    get().copySelectedNodes();
+    get().pasteNodes({ x: 50, y: 50 });
+  },
+  
+  // History Actions
+  saveHistory: () => {
+    set((state) => {
+      const entry: HistoryEntry = {
+        nodes: JSON.parse(JSON.stringify(state.nodes)),
+        edges: JSON.parse(JSON.stringify(state.edges)),
+        timestamp: Date.now(),
+      };
+      
+      // If in the middle of history, delete records after current position
+      if (state.historyIndex < state.history.length - 1) {
+        state.history = state.history.slice(0, state.historyIndex + 1);
+      }
+      
+      state.history.push(entry);
+      
+      // Limit history record count
+      if (state.history.length > state.maxHistory) {
+        state.history = state.history.slice(-state.maxHistory);
+      }
+      
+      state.historyIndex = state.history.length - 1;
+    });
+  },
  
  undo: () => {
  const { history, historyIndex } = get();
@@ -502,207 +502,207 @@ export const useWorkflowStore = create<WorkflowState>()(
  return historyIndex > 0;
  },
  
- canRedo: () => {
- const { history, historyIndex } = get();
- return historyIndex < history.length - 1;
- },
- 
- // ExecuteStatus
- setExecuting: (isExecuting) => {
- set((state) => {
- state.isExecuting = isExecuting;
- });
- },
- 
- // ===== GroupAction =====
- 
- // CreateGroup
- createGroup: (nodeIds, label = "newGroup", color = "default") => {
- if (nodeIds.length === 0) return null;
- 
- const { nodes, saveHistory } = get();
- saveHistory();
- 
- // Fetchselect'sNode
- const selectedNodes = nodes.filter((n) => nodeIds.includes(n.id));
- if (selectedNodes.length === 0) return null;
- 
- // CalculateGroup'sEdge
- let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
- selectedNodes.forEach((node) => {
- const nodeWidth = 280; // DefaultNodeWidth
- const nodeHeight = 120; // DefaultNodeHeight
- minX = Math.min(minX, node.position.x);
- minY = Math.min(minY, node.position.y);
- maxX = Math.max(maxX, node.position.x + nodeWidth);
- maxY = Math.max(maxY, node.position.y + nodeHeight);
- });
- 
- // AddEdge
- const padding = 40;
- const groupX = minX - padding;
- const groupY = minY - padding - 40; // outsideEmptybetweentoTitle
- const groupWidth = maxX - minX + padding * 2;
- const groupHeight = maxY - minY + padding * 2 + 40;
- 
- // CreateGroupNode
- const groupId = generateId("group");
- const groupNode: WorkflowNode = {
- id: groupId,
- type: "group",
- position: { x: groupX, y: groupY },
- style: { width: groupWidth, height: groupHeight },
- data: {
- label,
- description: "",
- collapsed: false,
- color,
- config: {},
- inputs: [],
- outputs: [],
- } as unknown as WorkflowNode["data"],
- };
- 
- set((state) => {
- // AddGroupNode(atAllNodebefore, thisstyleitwillRenderatdownface)
- state.nodes.unshift(groupNode);
- 
- // UpdateNode's parentId andfor
- state.nodes.forEach((node) => {
- if (nodeIds.includes(node.id)) {
- node.parentId = groupId;
- node.position = {
- x: node.position.x - groupX,
- y: node.position.y - groupY,
- };
- // EnsureNodeDisplayatGroupin
- node.extent = "parent";
- }
- });
- 
- state.isDirty = true;
- });
- 
- return groupId;
- },
- 
- // Group
- ungroup: (groupId) => {
- const { nodes, saveHistory } = get();
- saveHistory();
- 
- const groupNode = nodes.find((n) => n.id === groupId && n.type === "group");
- if (!groupNode) return;
- 
- set((state) => {
- // willNodeConvertforCoordinate
- state.nodes.forEach((node) => {
- if (node.parentId === groupId) {
- node.parentId = undefined;
- node.extent = undefined;
- node.position = {
- x: node.position.x + groupNode.position.x,
- y: node.position.y + groupNode.position.y,
- };
- }
- });
- 
- // RemoveGroupNode
- state.nodes = state.nodes.filter((n) => n.id !== groupId);
- state.isDirty = true;
- });
- },
- 
- // willNodeAddtoGroup
- addNodesToGroup: (nodeIds, groupId) => {
- const { nodes, saveHistory } = get();
- saveHistory();
- 
- const groupNode = nodes.find((n) => n.id === groupId && n.type === "group");
- if (!groupNode) return;
- 
- set((state) => {
- state.nodes.forEach((node) => {
- if (nodeIds.includes(node.id) && !node.parentId) {
- node.parentId = groupId;
- node.extent = "parent";
- // ConvertasforatGroup'sCoordinate
- node.position = {
- x: node.position.x - groupNode.position.x,
- y: node.position.y - groupNode.position.y,
- };
- }
- });
- state.isDirty = true;
- });
- },
- 
- // willNodefromGroup
- removeNodesFromGroup: (nodeIds) => {
- const { nodes, saveHistory } = get();
- saveHistory();
- 
- set((state) => {
- state.nodes.forEach((node) => {
- if (nodeIds.includes(node.id) && node.parentId) {
- const groupNode = state.nodes.find((n) => n.id === node.parentId);
- if (groupNode) {
- // ConvertforCoordinate
- node.position = {
- x: node.position.x + groupNode.position.x,
- y: node.position.y + groupNode.position.y,
- };
- }
- node.parentId = undefined;
- node.extent = undefined;
- }
- });
- state.isDirty = true;
- });
- },
- 
- // UpdateGroupstyle
- updateGroupStyle: (groupId, style) => {
- const { saveHistory } = get();
- saveHistory();
- 
- set((state) => {
- const groupNode = state.nodes.find((n) => n.id === groupId && n.type === "group");
- if (groupNode) {
- const data = groupNode.data as unknown as { label: string; color?: string; collapsed?: boolean };
- if (style.label !== undefined) data.label = style.label;
- if (style.color !== undefined) data.color = style.color;
- if (style.collapsed !== undefined) data.collapsed = style.collapsed;
- state.isDirty = true;
- }
- });
- },
- 
- // SwitchGroupCollapseStatus
- toggleGroupCollapse: (groupId) => {
- set((state) => {
- const groupNode = state.nodes.find((n) => n.id === groupId && n.type === "group");
- if (groupNode) {
- const data = groupNode.data as unknown as { collapsed?: boolean };
- const newCollapsed = !data.collapsed;
- data.collapsed = newCollapsed;
- 
- // Hide/DisplayNode
- state.nodes.forEach((node) => {
- if (node.parentId === groupId) {
- node.hidden = newCollapsed;
- }
- });
- 
- state.isDirty = true;
- }
- });
- },
- 
- // FetchGroup'sNode
- getGroupChildren: (groupId) => {
- const { nodes } = get();
- return nodes.filter((n) => n.parentId === groupId);
- },
+  canRedo: () => {
+    const { history, historyIndex } = get();
+    return historyIndex < history.length - 1;
+  },
+  
+  // Execute Status
+  setExecuting: (isExecuting) => {
+    set((state) => {
+      state.isExecuting = isExecuting;
+    });
+  },
+  
+  // ===== Group Actions =====
+  
+  // Create Group
+  createGroup: (nodeIds, label = "New Group", color = "default") => {
+    if (nodeIds.length === 0) return null;
+    
+    const { nodes, saveHistory } = get();
+    saveHistory();
+    
+    // Fetch selected nodes
+    const selectedNodes = nodes.filter((n) => nodeIds.includes(n.id));
+    if (selectedNodes.length === 0) return null;
+    
+    // Calculate group boundaries
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    selectedNodes.forEach((node) => {
+      const nodeWidth = 280; // Default node width
+      const nodeHeight = 120; // Default node height
+      minX = Math.min(minX, node.position.x);
+      minY = Math.min(minY, node.position.y);
+      maxX = Math.max(maxX, node.position.x + nodeWidth);
+      maxY = Math.max(maxY, node.position.y + nodeHeight);
+    });
+    
+    // Add padding
+    const padding = 40;
+    const groupX = minX - padding;
+    const groupY = minY - padding - 40; // Extra space for title
+    const groupWidth = maxX - minX + padding * 2;
+    const groupHeight = maxY - minY + padding * 2 + 40;
+    
+    // Create group node
+    const groupId = generateId("group");
+    const groupNode: WorkflowNode = {
+      id: groupId,
+      type: "group",
+      position: { x: groupX, y: groupY },
+      style: { width: groupWidth, height: groupHeight },
+      data: {
+        label,
+        description: "",
+        collapsed: false,
+        color,
+        config: {},
+        inputs: [],
+        outputs: [],
+      } as unknown as WorkflowNode["data"],
+    };
+    
+    set((state) => {
+      // Add group node (at the beginning of all nodes so it renders at the bottom)
+      state.nodes.unshift(groupNode);
+      
+      // Update node's parentId and relative position
+      state.nodes.forEach((node) => {
+        if (nodeIds.includes(node.id)) {
+          node.parentId = groupId;
+          node.position = {
+            x: node.position.x - groupX,
+            y: node.position.y - groupY,
+          };
+          // Ensure node is displayed within the group
+          node.extent = "parent";
+        }
+      });
+      
+      state.isDirty = true;
+    });
+    
+    return groupId;
+  },
+  
+  // Ungroup
+  ungroup: (groupId) => {
+    const { nodes, saveHistory } = get();
+    saveHistory();
+    
+    const groupNode = nodes.find((n) => n.id === groupId && n.type === "group");
+    if (!groupNode) return;
+    
+    set((state) => {
+      // Convert nodes to absolute coordinates
+      state.nodes.forEach((node) => {
+        if (node.parentId === groupId) {
+          node.parentId = undefined;
+          node.extent = undefined;
+          node.position = {
+            x: node.position.x + groupNode.position.x,
+            y: node.position.y + groupNode.position.y,
+          };
+        }
+      });
+      
+      // Remove group node
+      state.nodes = state.nodes.filter((n) => n.id !== groupId);
+      state.isDirty = true;
+    });
+  },
+  
+  // Add nodes to group
+  addNodesToGroup: (nodeIds, groupId) => {
+    const { nodes, saveHistory } = get();
+    saveHistory();
+    
+    const groupNode = nodes.find((n) => n.id === groupId && n.type === "group");
+    if (!groupNode) return;
+    
+    set((state) => {
+      state.nodes.forEach((node) => {
+        if (nodeIds.includes(node.id) && !node.parentId) {
+          node.parentId = groupId;
+          node.extent = "parent";
+          // Convert to relative coordinates within the group
+          node.position = {
+            x: node.position.x - groupNode.position.x,
+            y: node.position.y - groupNode.position.y,
+          };
+        }
+      });
+      state.isDirty = true;
+    });
+  },
+  
+  // Remove nodes from group
+  removeNodesFromGroup: (nodeIds) => {
+    const { nodes, saveHistory } = get();
+    saveHistory();
+    
+    set((state) => {
+      state.nodes.forEach((node) => {
+        if (nodeIds.includes(node.id) && node.parentId) {
+          const groupNode = state.nodes.find((n) => n.id === node.parentId);
+          if (groupNode) {
+            // Convert to absolute coordinates
+            node.position = {
+              x: node.position.x + groupNode.position.x,
+              y: node.position.y + groupNode.position.y,
+            };
+          }
+          node.parentId = undefined;
+          node.extent = undefined;
+        }
+      });
+      state.isDirty = true;
+    });
+  },
+  
+  // Update group style
+  updateGroupStyle: (groupId, style) => {
+    const { saveHistory } = get();
+    saveHistory();
+    
+    set((state) => {
+      const groupNode = state.nodes.find((n) => n.id === groupId && n.type === "group");
+      if (groupNode) {
+        const data = groupNode.data as unknown as { label: string; color?: string; collapsed?: boolean };
+        if (style.label !== undefined) data.label = style.label;
+        if (style.color !== undefined) data.color = style.color;
+        if (style.collapsed !== undefined) data.collapsed = style.collapsed;
+        state.isDirty = true;
+      }
+    });
+  },
+  
+  // Toggle group collapse status
+  toggleGroupCollapse: (groupId) => {
+    set((state) => {
+      const groupNode = state.nodes.find((n) => n.id === groupId && n.type === "group");
+      if (groupNode) {
+        const data = groupNode.data as unknown as { collapsed?: boolean };
+        const newCollapsed = !data.collapsed;
+        data.collapsed = newCollapsed;
+        
+        // Hide/display nodes
+        state.nodes.forEach((node) => {
+          if (node.parentId === groupId) {
+            node.hidden = newCollapsed;
+          }
+        });
+        
+        state.isDirty = true;
+      }
+    });
+  },
+  
+  // Fetch group's child nodes
+  getGroupChildren: (groupId) => {
+    const { nodes } = get();
+    return nodes.filter((n) => n.parentId === groupId);
+  },
  }))
 );

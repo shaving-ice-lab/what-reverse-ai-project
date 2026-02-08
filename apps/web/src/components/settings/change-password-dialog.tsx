@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * EditPasswordDialog - Enhanced
+ * Change Password Dialog - Enhanced
  */
 
 import { useState } from "react";
@@ -37,12 +37,12 @@ interface ChangePasswordDialogProps {
 }
 
 export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialogProps) {
- // FormStatus
+ // Form State
  const [currentPassword, setCurrentPassword] = useState("");
  const [newPassword, setNewPassword] = useState("");
  const [confirmPassword, setConfirmPassword] = useState("");
  
- // DisplayPassword
+ // Show/Hide Password
  const [showCurrent, setShowCurrent] = useState(false);
  const [showNew, setShowNew] = useState(false);
  const [showConfirm, setShowConfirm] = useState(false);
@@ -52,7 +52,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  const [error, setError] = useState<string | null>(null);
  const [success, setSuccess] = useState(false);
 
- // ResetForm
+ // Reset Form
  const resetForm = () => {
  setCurrentPassword("");
  setNewPassword("");
@@ -64,7 +64,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  setSuccess(false);
  };
 
- // CloseDialog
+ // Close Dialog
  const handleClose = (isOpen: boolean) => {
  if (!isOpen) {
  resetForm();
@@ -72,36 +72,36 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  onOpenChange(isOpen);
  };
 
- // VerifyPasswordIntensity
+ // Validate Password Strength
  const validatePassword = (password: string): string | null => {
  if (password.length < 8) {
- return "PasswordLengthfew 8 Character";
+ return "Password must be at least 8 characters";
  }
  if (!/[A-Z]/.test(password)) {
- return "PasswordneedneedContainslargechar";
+ return "Password must contain an uppercase letter";
  }
  if (!/[a-z]/.test(password)) {
- return "PasswordneedneedContainssmallchar";
+ return "Password must contain a lowercase letter";
  }
  if (!/[0-9]/.test(password)) {
- return "PasswordneedneedContainscountchar";
+ return "Password must contain a number";
  }
  return null;
  };
 
- // SubmitEdit
+ // Submit Changes
  const handleSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  setError(null);
  
  // Verify
  if (!currentPassword) {
- setError("Please enterCurrent Password");
+ setError("Please enter your current password");
  return;
  }
  
  if (!newPassword) {
- setError("Please enterNew Password");
+ setError("Please enter a new password");
  return;
  }
  
@@ -112,12 +112,12 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  }
  
  if (newPassword !== confirmPassword) {
- setError("timesInput'sPasswordnot1");
+ setError("Passwords do not match");
  return;
  }
  
  if (currentPassword === newPassword) {
- setError("New PasswordnotcanandCurrent PasswordSame");
+ setError("New password cannot be the same as your current password");
  return;
  }
  
@@ -131,18 +131,18 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  
  setSuccess(true);
  
- // 2safterClose
+ // Close after 2 seconds
  setTimeout(() => {
  handleClose(false);
  }, 2000);
  } catch (err) {
- setError(err instanceof Error ? err.message: "EditPasswordFailed");
+ setError(err instanceof Error ? err.message: "Failed to change password");
  } finally {
  setIsSubmitting(false);
  }
  };
 
- // PasswordIntensityIndicator
+ // Password Strength Indicator
  const getPasswordStrength = (password: string): { level: number; text: string; color: string } => {
  if (!password) return { level: 0, text: "", color: "" };
  
@@ -168,7 +168,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  "border-border/50",
  "shadow-2xl"
  )}>
- {/* TopDecoration */}
+ {/* Top Decoration */}
  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-primary to-teal-500 rounded-t-lg" />
  
  <DialogHeader className="pt-2">
@@ -181,10 +181,10 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  <Lock className="w-6 h-6 text-emerald-500" />
  </div>
  <div>
- <DialogTitle className="text-lg">EditPassword</DialogTitle>
+ <DialogTitle className="text-lg">Change Password</DialogTitle>
  <DialogDescription className="flex items-center gap-1.5 mt-0.5">
  <Shield className="w-3 h-3" />
- asyou'sAccountSecurity, PleasePeriodicmorePassword
+ For your account security, please change your password periodically
  </DialogDescription>
  </div>
  </div>
@@ -201,16 +201,16 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  )}>
  <ShieldCheck className="w-10 h-10 text-emerald-500" />
  </div>
- <h3 className="text-xl font-bold text-foreground mb-2">PasswordEditSuccess</h3>
- <p className="text-sm text-muted-foreground">you'sAccountSecurityetcalreadyImprove</p>
+ <h3 className="text-xl font-bold text-foreground mb-2">Password Changed Successfully</h3>
+ <p className="text-sm text-muted-foreground">Your account security has been improved</p>
  <div className="mt-4 flex items-center justify-center gap-2">
  <Sparkles className="w-4 h-4 text-emerald-500" />
- <span className="text-xs text-emerald-600 dark:text-emerald-400">currentlyatNavigate...</span>
+ <span className="text-xs text-emerald-600 dark:text-emerald-400">Redirecting...</span>
  </div>
  </div>
  ) : (
  <form onSubmit={handleSubmit} className="space-y-5 py-4">
- {/* ErrorTip */}
+ {/* Error Message */}
  {error && (
  <div className={cn(
  "flex items-center gap-3 p-4 rounded-xl",
@@ -233,7 +233,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  <Input
  id="currentPassword"
  type={showCurrent ? "text" : "password"}
- placeholder="InputCurrent Password"
+ placeholder="Enter current password"
  value={currentPassword}
  onChange={(e) => setCurrentPassword(e.target.value)}
  className={cn(
@@ -275,7 +275,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  <Input
  id="newPassword"
  type={showNew ? "text" : "password"}
- placeholder="InputNew Password"
+ placeholder="Enter new password"
  value={newPassword}
  onChange={(e) => setNewPassword(e.target.value)}
  className={cn(
@@ -297,7 +297,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  </button>
  </div>
  
- {/* PasswordIntensityIndicator - Enhanced */}
+ {/* Password Strength Indicator - Enhanced */}
  {newPassword && (
  <div className="space-y-2">
  <div className="flex gap-1.5">
@@ -324,14 +324,14 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  )}
  
  <p className="text-xs text-muted-foreground">
- Passwordneedneedfew 8 Character, ContainsSizecharandcountchar
+ Password must be at least 8 characters and contain uppercase, lowercase, and numeric characters
  </p>
  </div>
 
- {/* ConfirmNew Password */}
+ {/* Confirm New Password */}
  <div className="space-y-3">
  <Label htmlFor="confirmPassword" className="text-sm font-medium flex items-center gap-2">
- ConfirmNew Password
+ Confirm New Password
  {confirmPassword && confirmPassword === newPassword && (
  <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
  )}
@@ -340,7 +340,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  <Input
  id="confirmPassword"
  type={showConfirm ? "text" : "password"}
- placeholder="againtimesInputNew Password"
+ placeholder="Enter new password again"
  value={confirmPassword}
  onChange={(e) => setConfirmPassword(e.target.value)}
  className={cn(
@@ -365,7 +365,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  {confirmPassword && confirmPassword !== newPassword && (
  <p className="text-xs text-destructive flex items-center gap-1">
  <AlertCircle className="w-3 h-3" />
- timesInput'sPasswordnot1
+ Passwords do not match
  </p>
  )}
  </div>
@@ -398,12 +398,12 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
  {isSubmitting ? (
  <>
  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
- Edit...
+ Changing...
  </>
  ) : (
  <>
  <ShieldCheck className="w-4 h-4 mr-2" />
- ConfirmEdit
+ Confirm Change
  </>
  )}
  </Button>

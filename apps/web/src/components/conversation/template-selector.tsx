@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationTemplateSelectComponent
- * Used foratCreateConversationtimeSelectTemplate
+ * Conversation Template Select Component
+ * Used for selecting a template when creating a conversation
  */
 
 import { useState, useEffect } from "react";
@@ -77,13 +77,13 @@ export function TemplateSelector({
 
  const handleSelect = async (template: ConversationTemplate) => {
  try {
- // IncreaseUsagecount
+    // Increase usage count
  const usedTemplate = await conversationTemplateApi.use(template.id);
  onSelect(usedTemplate);
  onOpenChange(false);
  } catch (err) {
  console.error("Failed to use template:", err);
- // nowmakeFailedalsoSelectTemplate
+    // Even if tracking fails, still select the template
  onSelect(template);
  onOpenChange(false);
  }
@@ -95,10 +95,10 @@ export function TemplateSelector({
  <DialogHeader>
  <DialogTitle className="flex items-center gap-2">
  <FileText className="w-5 h-5" />
- SelectConversationTemplate
+        Select Conversation Template
  </DialogTitle>
  <DialogDescription>
- UsagePresetTemplateQuickStartConversation
+        Use a preset template to quickly start a conversation
  </DialogDescription>
  </DialogHeader>
 
@@ -108,12 +108,12 @@ export function TemplateSelector({
  <Input
  value={search}
  onChange={(e) => setSearch(e.target.value)}
- placeholder="SearchTemplate..."
+ placeholder="Search templates..."
  className="pl-9"
  />
  </div>
 
- {/* TemplateList */}
+        {/* Template List */}
  <ScrollArea className="flex-1 -mx-6 px-6">
  {loading ? (
  <div className="flex items-center justify-center py-12">
@@ -121,7 +121,7 @@ export function TemplateSelector({
  </div>
  ) : filteredTemplates.length === 0 ? (
  <div className="text-center py-12 text-foreground-light">
- {search ? "NotoMatch'sTemplate": "NoneTemplate"}
+ {search ? "No matching templates" : "No templates"}
  </div>
  ) : (
  <div className="space-y-2 py-2">
@@ -173,7 +173,7 @@ export function TemplateSelector({
  {template.usageCount > 0 && (
  <span className="flex items-center gap-1">
  <Star className="w-3 h-3" />
- {template.usageCount} timesUsage
+                Used {template.usageCount} times
  </span>
  )}
  </div>
@@ -185,7 +185,7 @@ export function TemplateSelector({
  )}
  </ScrollArea>
 
- {/* FooterButton */}
+        {/* Footer Button */}
  <div className="flex justify-end gap-2 pt-4 border-t border-border">
  <Button variant="outline" onClick={() => onOpenChange(false)}>
  Cancel
@@ -197,7 +197,7 @@ export function TemplateSelector({
  }}
  disabled={!selectedId}
  >
- UsageTemplate
+            Use Template
  </Button>
  </div>
  </DialogContent>

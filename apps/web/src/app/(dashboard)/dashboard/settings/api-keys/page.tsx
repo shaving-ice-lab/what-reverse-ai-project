@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * API KeyManagePage - Supabase Style(Support/Theme)
+ * API Key Management Page
  */
 
 import React, { useState, useEffect, useCallback } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import {
  Key,
  Trash2,
@@ -37,25 +37,25 @@ import {
 } from "@/types/api-key";
 import { cn } from "@/lib/utils";
 
-// StatusTextMapping
+// Status text mapping
 const statusLabels: Record<ApiKeyStatus, string> = {
  active: "Normal",
  expired: "Expired",
  revoked: "Revoked",
 };
 
-// DefaulteachdayUsageStatistics (Past7days)
+// Default daily usage statistics (Past 7 days)
 const defaultDailyUsage = [
- { day: "weeks1", calls: 0, tokens: 0, cost: 0 },
- { day: "weeks2", calls: 0, tokens: 0, cost: 0 },
- { day: "weeks3", calls: 0, tokens: 0, cost: 0 },
- { day: "weeks4", calls: 0, tokens: 0, cost: 0 },
- { day: "weeks5", calls: 0, tokens: 0, cost: 0 },
- { day: "weeks6", calls: 0, tokens: 0, cost: 0 },
- { day: "weeksday", calls: 0, tokens: 0, cost: 0 },
+ { day: "Mon", calls: 0, tokens: 0, cost: 0 },
+ { day: "Tue", calls: 0, tokens: 0, cost: 0 },
+ { day: "Wed", calls: 0, tokens: 0, cost: 0 },
+ { day: "Thu", calls: 0, tokens: 0, cost: 0 },
+ { day: "Fri", calls: 0, tokens: 0, cost: 0 },
+ { day: "Sat", calls: 0, tokens: 0, cost: 0 },
+ { day: "Sun", calls: 0, tokens: 0, cost: 0 },
 ];
 
-// SettingsCardComponent - SupportTheme
+// Settings card component
 function SettingsSection({
  title,
  description,
@@ -86,25 +86,25 @@ export default function ApiKeysPage() {
  const [dailyUsage] = useState(defaultDailyUsage);
  const { confirm, ConfirmDialog } = useConfirmDialog();
 
- // CalculateStatisticsData
+ // Calculate statistics data
  const stats = {
- totalCalls: apiKeys.reduce((sum, k) => sum + (k.usageCount || 0), 0),
- totalTokens: apiKeys.reduce((sum, k) => sum + (k.totalTokens || 0), 0),
- totalCost: apiKeys.reduce((sum, k) => sum + (k.totalCost || 0), 0),
- avgResponseTime: 1.2, // Defaultvalue
+   totalCalls: apiKeys.reduce((sum, k) => sum + (k.usageCount || 0), 0),
+   totalTokens: apiKeys.reduce((sum, k) => sum + (k.totalTokens || 0), 0),
+   totalCost: apiKeys.reduce((sum, k) => sum + (k.totalCost || 0), 0),
+   avgResponseTime: 1.2, // Default value
  };
 
- // LoadKeyList
+ // Load key list
  const loadApiKeys = useCallback(async () => {
- setIsLoading(true);
- setError(null);
- try {
- const keys = await apiKeysApi.list();
- setApiKeys(keys);
- } catch (err) {
- console.error("Failed to load API keys:", err);
- setError(err instanceof Error ? err.message: "LoadFailed");
- } finally {
+   setIsLoading(true);
+   setError(null);
+   try {
+     const keys = await apiKeysApi.list();
+     setApiKeys(keys);
+   } catch (err) {
+     console.error("Failed to load API keys:", err);
+     setError(err instanceof Error ? err.message: "Failed to load");
+   } finally {
  setIsLoading(false);
  }
  }, []);
@@ -113,7 +113,7 @@ export default function ApiKeysPage() {
  loadApiKeys();
  }, [loadApiKeys]);
 
- // TestKey
+ // Test key
  const handleTestKey = async (apiKey: ApiKey) => {
  setTestingId(apiKey.id);
  setTestResults((prev) => {
@@ -128,7 +128,7 @@ export default function ApiKeysPage() {
  ...prev,
  [apiKey.id]: {
  success: result.valid,
- message: result.message || (result.valid ? "KeyFormatValid": "KeyFormatInvalid"),
+ message: result.message || (result.valid ? "Key format valid" : "Key format invalid"),
  },
  }));
  } catch (err) {
@@ -136,7 +136,7 @@ export default function ApiKeysPage() {
  ...prev,
  [apiKey.id]: {
  success: false,
- message: err instanceof Error ? err.message: "TestFailed, Please try again laterRetry",
+ message: err instanceof Error ? err.message: "Test failed. Please try again later.",
  },
  }));
  } finally {
@@ -144,14 +144,14 @@ export default function ApiKeysPage() {
  }
  };
 
- // CalculateBar ChartMaximumHeight
+ // Calculate bar chart maximum height
  const maxCalls = Math.max(...dailyUsage.map((d) => d.calls), 1);
 
- // DeleteKey
+ // Delete key
  const handleDelete = async (id: string) => {
- const confirmed = await confirm({
- title: "DeleteKey",
- description: "Deleteafter, UsagethisKey'sWorkflowwillNoneExecute.thisActionNoneUndo.",
+   const confirmed = await confirm({
+     title: "Delete Key",
+     description: "After deletion, workflows using this key will not run. This cannot be undone.",
  confirmText: "Delete",
  cancelText: "Cancel",
  variant: "destructive",
@@ -162,13 +162,13 @@ export default function ApiKeysPage() {
  await apiKeysApi.delete(id);
  setApiKeys((prev) => prev.filter((k) => k.id !== id));
  } catch (err) {
- console.error("DeleteFailed:", err);
- setError(err instanceof Error ? err.message: "DeleteFailed");
+       console.error("Delete failed:", err);
+       setError(err instanceof Error ? err.message: "Delete failed");
  }
  }
  };
 
- // CopyKeybefore
+ // Copy key prefix
  const handleCopyPrefix = (key: ApiKey) => {
  navigator.clipboard.writeText(`${key.keyPrefix}...${key.keySuffix}`);
  setCopiedId(key.id);
@@ -184,7 +184,7 @@ export default function ApiKeysPage() {
  <PageHeader
  eyebrow="Settings"
  title="API Key"
- description="Manageyou's AI Service API AccessKey"
+ description="Manage your AI service API keys"
  className="mb-0"
  actions={(
  <Button
@@ -203,7 +203,7 @@ export default function ApiKeysPage() {
 
  <div className="page-divider" />
  
- {/* ErrorTip */}
+         {/* Error notice */}
  {error && (
  <div className="flex items-center gap-2 p-3 rounded-md bg-surface-200 border border-border text-foreground text-[13px] mb-6">
  <AlertCircle className="h-4 w-4 shrink-0" />
@@ -219,30 +219,30 @@ export default function ApiKeysPage() {
  </div>
  )}
 
- {/* SecurityTip */}
+         {/* Security notice */}
  <div className="flex items-start gap-3 p-4 rounded-md bg-surface-100 border border-border text-[13px]">
  <AlertCircle className="h-4 w-4 text-foreground-muted mt-0.5 shrink-0" />
  <div className="text-foreground-light">
- API KeyUsage AES-256 EncryptStorage, onlyatExecuteWorkflowtimeDecryptUsage.Pleaseyou'sKey.
+ API keys are stored with AES-256 encryption and decrypted only when running workflows. Keep your key safe.
  </div>
  </div>
 
  <SettingsSection
- title="CreateandPermissionDescription"
- description="byuseCreateKey, andasIntegrationSettingsMinimumPermissionRange"
+title="Create key and permissions"
+  description="Create a key and set minimum permission scope in integration settings"
  >
  <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-4">
  <div className="space-y-3 text-[12px] text-foreground-light">
- <p>1) CreateKey: asnotEnvironment(Development/Production)CreateKey.</p>
- <p>2) PermissionMinimum: onlyneedneed'sModelorWorkflowPermission.</p>
- <p>3) UsageDescription: atLLM/HTTP NodeuseKeyProceedCall.</p>
+             <p>1) Create Key: Create a key for each environment (Development / Production).</p>
+               <p>2) Minimum permission: only model or workflow permission is required.</p>
+               <p>3) Usage: Use the key in LLM / HTTP nodes to make API calls.</p>
  </div>
  <div className="rounded-md border border-border bg-surface-75 p-4">
  <div className="text-[11px] text-foreground-muted uppercase tracking-wider">
- RecommendedPermission
+                 Recommended Permissions
  </div>
  <div className="mt-2 flex flex-wrap gap-2">
- {["ModelCall", "Workflow Execute", "Webhook Trigger", "readStatistics"].map((item) => (
+ {["Model Call", "Workflow Execute", "Webhook Trigger", "Read Statistics"].map((item) => (
  <Badge key={item} variant="secondary" className="text-[10px]">
  {item}
  </Badge>
@@ -253,7 +253,7 @@ export default function ApiKeysPage() {
  trigger={
  <Button size="sm" className="w-full">
  <Plus className="h-4 w-4 mr-1.5" />
- CreatenewKey
+                   Create New Key
  </Button>
  }
  onSuccess={loadApiKeys}
@@ -263,7 +263,7 @@ export default function ApiKeysPage() {
  </div>
  </SettingsSection>
 
- {/* UsageStatisticsCard */}
+         {/* Usage statistics */}
  <div className="page-grid grid-cols-2 lg:grid-cols-4 gap-4">
  <div className="bg-surface-100 border border-border rounded-md p-4">
  <div className="flex items-center gap-2 mb-2">
@@ -272,7 +272,7 @@ export default function ApiKeysPage() {
  </div>
  </div>
  <p className="text-xl font-semibold text-foreground">{stats.totalCalls.toLocaleString()}</p>
- <p className="text-xs text-foreground-muted mt-1">currentweeksCalltimescount</p>
+ <p className="text-xs text-foreground-muted mt-1">Calls this week</p>
  </div>
  <div className="bg-surface-100 border border-border rounded-md p-4">
  <div className="flex items-center gap-2 mb-2">
@@ -290,7 +290,7 @@ export default function ApiKeysPage() {
  </div>
  </div>
  <p className="text-xl font-semibold text-foreground">${stats.totalCost.toFixed(2)}</p>
- <p className="text-xs text-foreground-muted mt-1">currentweeks</p>
+ <p className="text-xs text-foreground-muted mt-1">Cost this week</p>
  </div>
  <div className="bg-surface-100 border border-border rounded-md p-4">
  <div className="flex items-center gap-2 mb-2">
@@ -299,14 +299,14 @@ export default function ApiKeysPage() {
  </div>
  </div>
  <p className="text-xl font-semibold text-foreground">{stats.avgResponseTime}s</p>
- <p className="text-xs text-foreground-muted mt-1">AverageResponse Time</p>
+ <p className="text-xs text-foreground-muted mt-1">Average response time</p>
  </div>
  </div>
 
- {/* UsageTrendChart */}
- <SettingsSection
- title="UsageTrend"
- description="Past 7 days's API CallStatistics"
+         {/* Usage trend chart */}
+         <SettingsSection
+           title="Usage Trend"
+           description="API Call Statistics (Last 7 Days)"
  >
  <div className="flex items-end justify-between gap-2 h-32 mb-4">
  {dailyUsage.map((day, index) => {
@@ -318,7 +318,7 @@ export default function ApiKeysPage() {
  style={{ height: `${height}%`, minHeight: "8px" }}
  >
  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-100 border border-border rounded-md px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
- {day.calls} timesCall
+ {day.calls} calls
  </div>
  </div>
  </div>
@@ -334,23 +334,23 @@ export default function ApiKeysPage() {
  <div className="flex items-center gap-4">
  <div className="flex items-center gap-2">
  <div className="w-3 h-3 rounded-full bg-brand-500" />
- <span className="text-xs text-foreground-muted">API Calltimescount</span>
+ <span className="text-xs text-foreground-muted">API Call Count</span>
  </div>
  </div>
  <Button variant="ghost" size="sm" className="text-xs text-foreground-light">
  <BarChart3 className="h-3.5 w-3.5 mr-1.5" />
- ViewDetailedReport
+ View Detailed Report
  </Button>
  </div>
  </SettingsSection>
 
- {/* KeyList */}
- <SettingsSection
- title="alreadyAdd'sKey"
- description="ViewandManageyouAdd's API Key"
+         {/* Key list */}
+         <SettingsSection
+ title="Keys you've added"
+ description="View and manage API keys you've added"
  >
  {isLoading ? (
- // LoadSkeleton
+             // Loading skeleton
  <div className="space-y-3">
  {Array.from({ length: 3 }).map((_, i) => (
  <div
@@ -372,24 +372,24 @@ export default function ApiKeysPage() {
  <Key className="h-6 w-6 text-foreground-muted" />
  </div>
  <h3 className="text-sm font-medium text-foreground mb-1">
- None API Key
- </h3>
- <p className="text-[13px] text-foreground-light mb-6">
- Add API KeywithUsage LLM Node
+                   No API Keys
+                 </h3>
+                 <p className="text-[13px] text-foreground-light mb-6">
+                   Add an API key to use the LLM Node
  </p>
  <AddApiKeyDialog
  trigger={
  <Button className="bg-brand-500 hover:bg-brand-600 text-background">
  <Plus className="h-4 w-4 mr-1.5" />
- AddKey
+                     Add Key
  </Button>
  }
  onSuccess={loadApiKeys}
  />
  </div>
  ) : (
- // KeyList
- <div className="space-y-3">
+             // Key list
+             <div className="space-y-3">
  {apiKeys.map((apiKey) => {
  const provider = PROVIDER_CONFIGS[apiKey.provider];
  const testResult = testResults[apiKey.id];
@@ -430,13 +430,13 @@ export default function ApiKeysPage() {
  {apiKey.keyPrefix}...{apiKey.keySuffix}
  </code>
  {apiKey.usageCount !== undefined && (
- <span>{apiKey.usageCount.toLocaleString()} timesCall</span>
+ <span>{apiKey.usageCount.toLocaleString()} calls</span>
  )}
  {apiKey.lastUsedAt && (
  <span className="hidden sm:inline">
  {formatDistanceToNow(new Date(apiKey.lastUsedAt), {
  addSuffix: true,
- locale: zhCN,
+ locale: enUS,
  })}
  </span>
  )}
@@ -449,7 +449,7 @@ export default function ApiKeysPage() {
  ${apiKey.totalCost.toFixed(2)}
  </span>
  )}
- {/* TestButton */}
+                 {/* Test button */}
  <Button
  variant="ghost"
  size="sm"
@@ -492,7 +492,7 @@ export default function ApiKeysPage() {
  </div>
  </div>
  
- {/* TestResult */}
+                 {/* Test result */}
  {testResult && (
  <div className={cn(
  "px-4 py-2 border-t border-border text-xs flex items-center gap-2",
@@ -509,13 +509,13 @@ export default function ApiKeysPage() {
  </div>
  )}
 
- {/* UsageProgress Bar (onlyforActiveKeyDisplay) */}
+                 {/* Usage progress bar (active keys only) */}
  {apiKey.status === "active" && apiKey.totalTokens && (
  <div className="px-4 py-2 border-t border-border">
  <div className="flex items-center justify-between text-xs mb-1.5">
- <span className="text-foreground-muted">currentmonthsUsage</span>
+ <span className="text-foreground-muted">This month&apos;s usage</span>
  <span className="text-foreground font-medium">
- {((apiKey.totalTokens || 0) / 10000).toFixed(1)}10000 / 10010000 tokens
+ {((apiKey.totalTokens || 0) / 1000).toFixed(1)}K / 1,000K tokens
  </span>
  </div>
  <Progress 
@@ -528,7 +528,7 @@ export default function ApiKeysPage() {
  );
  })}
 
- {/* AddButton */}
+             {/* Add button */}
  <AddApiKeyDialog
  trigger={
  <button className="w-full mt-4 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-border rounded-md text-[13px] text-foreground-muted hover:border-brand-400 hover:text-foreground hover:bg-brand-200 transition-all duration-200 cursor-pointer">
@@ -542,10 +542,10 @@ export default function ApiKeysPage() {
  )}
  </SettingsSection>
 
- {/* Support'sProvider */}
- <SettingsSection
- title="Support'sProvider"
- description="WeSupportwithdown AI ServiceProvider"
+         {/* Supported providers */}
+         <SettingsSection
+           title="Supported Providers"
+           description="We support the following AI service providers"
  >
  <div className="page-grid grid-cols-2 sm:grid-cols-3 gap-3">
  {Object.values(PROVIDER_CONFIGS).map((provider) => (

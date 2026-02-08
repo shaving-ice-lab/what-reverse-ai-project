@@ -90,7 +90,7 @@ export interface UseTemplateResponse {
 
 export const templateApiNew = {
  /**
- * FetchTemplateList
+ * Fetch Template List
  */
  async list(params?: TemplateListParams): Promise<TemplateListResponse> {
  const searchParams = new URLSearchParams();
@@ -130,7 +130,7 @@ export const templateApiNew = {
  },
 
  /**
- * UsageTemplateCreateWorkflow
+ * Use Template Create Workflow
  */
  async use(id: string, data?: { name?: string; folder_id?: string }): Promise<UseTemplateResponse> {
  return request<UseTemplateResponse>(`/templates/${id}/use`, {

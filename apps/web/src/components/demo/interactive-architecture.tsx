@@ -31,83 +31,83 @@ export interface ArchitectureLayer {
  components: Array<{ name: string; desc: string }>;
 }
 
-// ArchitectureHierarchy
+// Architecture Layers
 const defaultArchitectureLayers: ArchitectureLayer[] = [
  {
  id: "client",
- name: "Customerendpoint",
- description: "multiplePlatformCustomerendpointAccess, Provide1'sUserExperience",
+    name: "Client Layer",
+    description: "Multi-platform client access with a unified experience",
  icon: Monitor,
  color: "#3B82F6",
  components: [
- { name: "Web App", desc: "React + Next.js Build'sModern Web face" },
- { name: "faceApp", desc: "Electron PlatformfaceCustomerendpoint" },
- { name: "MoveApp", desc: "React Native MoveendpointSupport" },
- { name: "CLI Tool", desc: "CommandrowTool, SuitableAutomationScenario" },
+ { name: "Web App", desc: "Modern Web Interface Built with React + Next.js" },
+      { name: "Desktop App", desc: "Cross-platform desktop client" },
+      { name: "Mobile App", desc: "React Native mobile client" },
+ { name: "CLI Tool", desc: "Command-line tool for automation" },
  ],
  },
  {
  id: "gateway",
- name: "API ",
- description: "1's API Entry, ResponsibleAuthentication, Rate LimitingandRoute",
+    name: "API Gateway",
+    description: "Unified API entry responsible for authentication, rate limiting and routing",
  icon: Globe,
  color: "#8B5CF6",
  components: [
- { name: "Load Balancing", desc: "SmartDistribute, SupportGrayscalePublish" },
- { name: "Authenticationcenter", desc: "OAuth 2.0 / JWT Verify" },
- { name: "Rate LimitingCircuit Break", desc: "ProtectafterendpointServicepast" },
- { name: "API VersionManage", desc: "Smooth's API VersionMigration" },
+    { name: "Load Balancing", desc: "Smart distribution and canary deployment" },
+      { name: "Authentication Center", desc: "OAuth 2.0 / JWT Verification" },
+      { name: "Rate Limiting & Circuit Breaker", desc: "Protect backend services from overload" },
+ { name: "API Version Management", desc: "Smooth API Version Migration" },
  ],
  },
  {
  id: "service",
- name: "Service",
- description: "CoreBusinessLogic, useServiceArchitecture",
+    name: "Service Layer",
+    description: "Core business logic and service architecture",
  icon: Cpu,
  color: "#10B981",
  components: [
- { name: "WorkflowEngine", desc: "canWorkflowExecuteandSchedule" },
- { name: "AI Service", desc: "multipleModelAdaptandSmartRoute" },
- { name: "DataProcess", desc: "ETL andReal-timeDataPipeline" },
- { name: "NotificationsService", desc: "multipleChannelMessagePush" },
+{ name: "Workflow Engine", desc: "Execute and schedule workflows" },
+  { name: "AI Service", desc: "Multi-model adaptation and smart routing" },
+  { name: "Data Processing", desc: "ETL and real-time pipeline" },
+  { name: "Notifications", desc: "Multi-channel message push" },
  ],
  },
  {
  id: "data",
- name: "Data",
- description: "AvailableDataStorage, SupportmultipletypeStorageEngine",
+    name: "Data Layer",
+    description: "Data storage with multiple engine support",
  icon: Database,
  color: "#F59E0B",
  components: [
- { name: "PostgreSQL", desc: "Data, ACID Support" },
- { name: "Redis", desc: "CacheandReal-timewillManage" },
- { name: "S3/OSS", desc: "forStorage, FileandMedia" },
- { name: "Elasticsearch", desc: "allSearchandLogsAnalytics" },
+    { name: "PostgreSQL", desc: "Relational data with ACID support" },
+      { name: "Redis", desc: "Cache and real-time session management" },
+      { name: "S3/OSS", desc: "Object storage for files and media" },
+ { name: "Elasticsearch", desc: "Full-text search and log analytics" },
  ],
  },
  {
  id: "infra",
- name: "BasicInfrastructure",
- description: "NativeBasicInfrastructure, SupportmultipleDeploy",
+    name: "Infrastructure",
+  description: "Infrastructure with multiple deployment options",
  icon: Cloud,
  color: "#EC4899",
  components: [
- { name: "Kubernetes", desc: "OrchestrateandAutoScale" },
- { name: "MonitorAlert", desc: "Prometheus + Grafana can" },
- { name: "LogsSystem", desc: "ELK Stack Logs" },
- { name: "CI/CD", desc: "GitOps ContinuousDeploy" },
+ { name: "Kubernetes", desc: "Orchestration and auto-scaling" },
+      { name: "Monitoring & Alerts", desc: "Prometheus + Grafana observability" },
+      { name: "Logging System", desc: "ELK Stack centralized logging" },
+      { name: "CI/CD", desc: "GitOps continuous deployment" },
  ],
  },
 ];
 
 export interface InteractiveArchitectureProps extends React.HTMLAttributes<HTMLDivElement> {
- /** DefaultExpand's */
+ /** Default expanded state */
  defaultExpanded?: string;
- /** isnoDisplayConnectAnimation */
+ /** Whether to display connection animation */
  showConnections?: boolean;
- /** Layoutmethod */
+  /** Layout mode */
  layout?: "vertical" | "horizontal";
- /** CustomArchitectureHierarchy */
+  /** Custom architecture layers */
  layers?: ArchitectureLayer[];
 }
 
@@ -138,7 +138,7 @@ export function InteractiveArchitecture({
  <div key={layer.id} className={cn(
  layout === "horizontal" && "flex-1"
  )}>
- {/* HierarchyCard */}
+          {/* Layer Card */}
  <div
  className={cn(
  "relative rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden",
@@ -148,13 +148,13 @@ export function InteractiveArchitecture({
  )}
  onClick={() => setActiveLayer(isActive ? null : layer.id)}
  >
- {/* TopGradient */}
+              {/* Top Gradient */}
  <div 
  className="absolute inset-x-0 top-0 h-1 opacity-80"
  style={{ backgroundColor: layer.color }}
  />
 
- {/* HierarchyHeader */}
+              {/* Layer Header */}
  <div className="p-4 flex items-center gap-4">
  <div
  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
@@ -174,7 +174,7 @@ export function InteractiveArchitecture({
  </div>
  </div>
 
- {/* Expand'sComponentList */}
+ {/* Expanded Component List */}
  {isActive && (
  <div className="px-4 pb-4 space-y-2 animate-in slide-in-from-top-2 duration-300">
  <div className="grid sm:grid-cols-2 gap-2">
@@ -206,7 +206,7 @@ export function InteractiveArchitecture({
  )}
  </div>
 
- {/* Connectline */}
+          {/* Connection line */}
  {showConnections && index < resolvedLayers.length - 1 && layout === "vertical" && (
  <div className="flex justify-center py-1">
  <div className="w-0.5 h-4 bg-gradient-to-b from-border to-transparent" />
@@ -217,7 +217,7 @@ export function InteractiveArchitecture({
  })}
  </div>
 
- {/* example */}
+    {/* Legend */}
  <div className="mt-8 flex flex-wrap justify-center gap-4">
  {resolvedLayers.map((layer) => (
  <div 
@@ -237,40 +237,40 @@ export function InteractiveArchitecture({
  );
 }
 
-// canforcompareComponent
+// Performance Comparison Component
 const performanceMetrics = [
- { 
- metric: "AverageResponse Time", 
- agentflow: 45, 
- traditional: 380, 
- unit: "ms",
- improvement: "8x more"
- },
- { 
- metric: "ConcurrencyProcesscanpower", 
- agentflow: 10000, 
- traditional: 500, 
- unit: "req/s",
- improvement: "20x more"
- },
- { 
- metric: "inuse", 
- agentflow: 256, 
- traditional: 1024, 
- unit: "MB",
- improvement: "75% morefew"
- },
- { 
- metric: "LaunchTime", 
- agentflow: 2, 
- traditional: 15, 
- unit: "s",
- improvement: "7x more"
- },
+  { 
+    metric: "Average Response Time", 
+    agentflow: 45, 
+    traditional: 380, 
+    unit: "ms",
+    improvement: "8x faster"
+  },
+  { 
+    metric: "Concurrency Processing Power", 
+    agentflow: 10000, 
+    traditional: 500, 
+    unit: "req/s",
+    improvement: "20x more"
+  },
+  { 
+    metric: "Memory Usage", 
+    agentflow: 256, 
+    traditional: 1024, 
+    unit: "MB",
+    improvement: "75% less"
+  },
+  { 
+    metric: "Startup Time", 
+    agentflow: 2, 
+    traditional: 15, 
+    unit: "s",
+    improvement: "7x faster"
+  },
 ];
 
 export interface PerformanceComparisonProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoEnableAnimation */
+ /** Whether to enable animation */
  animated?: boolean;
 }
 
@@ -293,8 +293,8 @@ export function PerformanceComparison({
  {performanceMetrics.map((item, index) => {
  const agentflowPercent = (item.agentflow / Math.max(item.agentflow, item.traditional)) * 100;
  const traditionalPercent = (item.traditional / Math.max(item.agentflow, item.traditional)) * 100;
- const isAgentflowBetter = item.agentflow < item.traditional || 
- (item.metric === "ConcurrencyProcesscanpower" && item.agentflow > item.traditional);
+    const isAgentflowBetter = item.agentflow < item.traditional || 
+        (item.metric === "Concurrency Processing Power" && item.agentflow > item.traditional);
 
  return (
  <div 
@@ -329,10 +329,10 @@ export function PerformanceComparison({
  </div>
  </div>
 
- {/* TraditionalPlan */}
+        {/* Traditional Solution */}
  <div className="space-y-1">
  <div className="flex items-center justify-between text-xs">
- <span className="text-muted-foreground">TraditionalPlan</span>
+          <span className="text-muted-foreground">Traditional Solution</span>
  <span className="text-muted-foreground">{item.traditional} {item.unit}</span>
  </div>
  <div className="h-3 bg-muted rounded-full overflow-hidden">

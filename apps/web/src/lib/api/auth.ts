@@ -18,7 +18,7 @@ import type {
 
 import { request, API_BASE_URL } from "./shared";
 
-// afterendpointResponseFormat(snake_case)
+// Backend response format (snake_case)
 interface BackendAuthResponse {
  success: boolean;
  data: {
@@ -46,7 +46,7 @@ interface BackendUserResponse {
  */
 export const authApi = {
  /**
- * UserSign In
+ * User sign in
  */
  async login(data: LoginRequest): Promise<LoginResponse> {
  const response = await request<BackendAuthResponse>("/auth/login", {
@@ -54,7 +54,7 @@ export const authApi = {
  body: JSON.stringify(data),
  });
  
- // ConvertafterendpointResponseFormatasbeforeendpointExpect'sFormat
+ // Convert backend response format to frontend-friendly format
  return {
  success: response.success,
  user: response.data.user,
@@ -67,7 +67,7 @@ export const authApi = {
  },
 
  /**
- * UserSign Up
+ * User sign up
  */
  async register(data: RegisterRequest): Promise<RegisterResponse> {
  const response = await request<BackendAuthResponse>("/auth/register", {
@@ -77,7 +77,7 @@ export const authApi = {
  
  return {
  success: response.success,
- message: "Sign UpSuccess",
+ message: "Registration successful",
  user: {
  id: response.data.user.id,
  email: response.data.user.email,
@@ -86,7 +86,7 @@ export const authApi = {
  },
 
  /**
- * RefreshToken
+ * Refresh token
  */
  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
  const response = await request<BackendRefreshResponse>("/auth/refresh", {
@@ -104,7 +104,7 @@ export const authApi = {
  },
 
  /**
- * Sign Out
+ * Sign out
  */
  async logout(): Promise<void> {
  return request<void>("/auth/logout", {
@@ -113,7 +113,7 @@ export const authApi = {
  },
 
  /**
- * Forgot Password
+ * Forgot password
  */
  async forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
  return request<{ message: string }>("/auth/forgot-password", {
@@ -123,7 +123,7 @@ export const authApi = {
  },
 
  /**
- * Reset Password
+ * Reset password
  */
  async resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
  return request<{ message: string }>("/auth/reset-password", {
@@ -133,7 +133,7 @@ export const authApi = {
  },
 
  /**
- * VerifyEmail
+ * Verify email
  */
  async verifyEmail(token: string): Promise<{ message: string }> {
  return request<{ message: string }>(`/auth/verify-email?token=${token}`, {
@@ -142,7 +142,7 @@ export const authApi = {
  },
 
  /**
- * re-VerifyEmail
+ * Resend verification email
  */
  async resendVerification(): Promise<{ message: string }> {
  return request<{ message: string }>("/auth/resend-verification", {
@@ -151,7 +151,7 @@ export const authApi = {
  },
 
  /**
- * OAuth Sign In
+ * OAuth sign in
  */
  getOAuthUrl(provider: OAuthProvider): string {
  return `${API_BASE_URL}/auth/oauth/${provider}`;
@@ -163,7 +163,7 @@ export const authApi = {
  */
 export const userApi = {
  /**
- * FetchCurrentUser
+ * Get current user
  */
  async getCurrentUser(): Promise<User> {
  const response = await request<BackendUserResponse>("/users/me");
@@ -171,7 +171,7 @@ export const userApi = {
  },
 
  /**
- * UpdateUserMaterials
+ * Update user profile
  */
  async updateProfile(data: UpdateProfileRequest): Promise<User> {
  return request<User>("/users/me", {
@@ -181,7 +181,7 @@ export const userApi = {
  },
 
  /**
- * EditPassword
+ * Change password
  */
  async changePassword(data: ChangePasswordRequest): Promise<{ message: string }> {
  return request<{ message: string }>("/users/me/password", {
@@ -191,7 +191,7 @@ export const userApi = {
  },
 
  /**
- * UploadAvatar
+ * Upload avatar
  */
  async uploadAvatar(file: File): Promise<{ url: string }> {
  const formData = new FormData();
@@ -214,7 +214,7 @@ export const userApi = {
  const data = await response.json();
  
  if (!response.ok) {
- throw new Error(data.error?.message || "UploadFailed");
+ throw new Error(data.error?.message || "Upload failed");
  }
  
  return data;

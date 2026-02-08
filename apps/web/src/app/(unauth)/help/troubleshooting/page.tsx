@@ -23,73 +23,73 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 const quickChecks = [
- "ConfirmCurrentAccountisnohasforshould Workspace Permission",
- "Check API Key orConnectCredentialsisnoExpired/byRevoke",
- "ViewExecuteLogsisnoatTimeoutorRate LimitingTip",
- "forTriggerand Webhook ConfigisnobyDisable",
+ "Confirm your account has workspace permission",
+ "Check that API key or credentials are not expired or revoked",
+ "Check execution logs for timeout or rate limiting",
+ "Confirm trigger and webhook config are not disabled",
 ];
 
 const troubleshootingSections = [
  {
  icon: Wrench,
- title: "WorkflowExecuteFailed",
- description: "NodeExecuteException, InputnotCompleteorInsufficient permissionsCause'sFailed",
+ title: "Workflow execution failed",
+ description: "Node execution failed: incomplete input or insufficient permissions",
  steps: [
- "atExecuteRecordViewFailedNodeandErrorInfo",
- "ConfirmInputParameterisnoMissingorInvalid format",
- "CheckTargetApp'sAccessPolicyandQuota",
- "needtimeReduceConcurrencyorEnableRetry",
+ "View the failed node and error in execution record",
+ "Confirm input parameters are not missing or invalid",
+ "Check the target app's access policy and quota",
+ "Reduce concurrency or enable retry if needed",
  ],
  },
  {
  icon: CloudOff,
- title: "Webhook NoTrigger",
- description: "Third-partyEventnot yetcanTriggerorCallbackFailed",
+ title: "Webhook not triggering",
+ description: "Third-party event could not trigger or callback failed",
  steps: [
- "Check Webhook URL isnocanAccess",
- "ConfirmCallbackBioKeyandEventType",
- "ViewLogsisnobyFirewallorRate LimitingIntercept",
- "TryuseTestEventre-newTrigger",
+ "Check that webhook URL is accessible",
+ "Confirm callback signature key and event type",
+ "Check logs for firewall or rate limit blocks",
+ "Try using a test event to trigger again",
  ],
  },
  {
  icon: Shield,
- title: "PermissionandSecurityBlock",
- description: "MemberRoleorSecurityPolicyCauseActionlimit",
+ title: "Permission and security block",
+ description: "Member role or security policy limits this action",
  steps: [
- "ConfirmMemberisnoas owner/admin Role",
- "Check Workspace 'sAccessPolicyandSecurity Settings",
- "Verify OAuth/SSO ConfigisnoExpire",
- "ifandSensitiveData, PleasePrepareAudit Log",
+ "Confirm member has owner or admin role",
+ "Check workspace access policy and security settings",
+ "Verify OAuth/SSO config is not expired",
+ "If handling sensitive data, prepare an audit log",
  ],
  },
  {
  icon: AlertTriangle,
- title: "RuntimeRate LimitingandFailed",
- description: "RequestpastorRuntimeExceptionCauseUnavailable",
+ title: "Runtime rate limiting and failures",
+ description: "Request or runtime exception caused unavailability",
  steps: [
- "ViewAccessStatisticsandRate LimitingEvent",
- "CheckisnotoPlanQuotavalue",
- " rate_limit orUpgradePlan",
- "needtimeSwitchuseModelor",
+ "View access statistics and rate limit events",
+ "Check if plan quota is exceeded",
+ "Wait for rate limit or upgrade plan",
+ "Try switching to another model if needed",
  ],
  },
 ];
 
 const nextActions = [
  {
- title: "FAQ FAQ",
- description: "IssueQuickResolve",
+ title: "FAQ",
+ description: "Issue resolved quickly",
  href: "/faq",
  },
  {
- title: "Help CenterDirectory",
- description: "byThemeBrowseCompleteDocument",
+ title: "Help center directory",
+ description: "Browse full docs by topic",
  href: "/help",
  },
  {
- title: "SubmitTicket",
- description: "FetchSupportTeamHelp",
+ title: "Submit ticket",
+ description: "Contact support for help",
  href: "/support",
  },
 ];
@@ -109,17 +109,17 @@ export default function TroubleshootingPage() {
  <span>Fault</span>
  </div>
 
- <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- FaultGuide
- </h1>
- <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- byStepQuickIssue, ShortenRestoreTime.
- </p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
+            Troubleshooting Guide
+            </h1>
+            <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
+            Step-by-step issue resolution to shorten restore time.
+            </p>
 
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchFaultkeychar..."
+ placeholder="Search error keywords..."
  className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
  />
  </div>
@@ -131,7 +131,7 @@ export default function TroubleshootingPage() {
  <div className="max-w-5xl mx-auto px-6">
  <div className="flex items-center gap-2 mb-6">
  <CheckCircle2 className="w-5 h-5 text-brand-500" />
- <h2 className="text-[15px] font-semibold text-foreground">QuickChecklist</h2>
+ <h2 className="text-[15px] font-semibold text-foreground">Quick checklist</h2>
  </div>
  <div className="grid sm:grid-cols-2 gap-4">
  {quickChecks.map((item) => (
@@ -156,8 +156,8 @@ export default function TroubleshootingPage() {
  <section className="py-24 sm:py-32 bg-gradient-section">
  <div className="max-w-5xl mx-auto px-6">
  <div className="lobe-section-header">
- <h2>CommonScenario</h2>
- <p>byScenarioQuickandResolveIssue</p>
+ <h2>Common scenarios</h2>
+            <p>Quickly diagnose and resolve issues by scenario</p>
  </div>
 
  <div className="grid lg:grid-cols-2 gap-4">
@@ -199,7 +199,7 @@ export default function TroubleshootingPage() {
  <div className="max-w-5xl mx-auto px-6">
  <div className="flex items-center gap-2 mb-6">
  <FileText className="w-5 h-5 text-brand-500" />
- <h2 className="text-[15px] font-semibold text-foreground">Nextrow</h2>
+            <h2 className="text-[15px] font-semibold text-foreground">Next Steps</h2>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -225,12 +225,12 @@ export default function TroubleshootingPage() {
  <div className="mt-10 flex flex-wrap gap-3">
  <Link href="/support">
  <Button className="h-10 px-6 rounded-full text-[13px] font-medium bg-foreground text-background hover:bg-foreground/90">
- SubmitTicket
+            Submit Ticket
  </Button>
  </Link>
  <Link href="/help">
  <Button variant="outline" className="h-10 px-6 rounded-full text-[13px] border-border/50 hover:bg-surface-200/50">
- BackHelp Center
+            Back to Help Center
  </Button>
  </Link>
  </div>

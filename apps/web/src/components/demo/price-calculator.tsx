@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// PriceConfig
+// Price Config
 const pricingConfig = {
  basePrice: {
  starter: 0,
@@ -45,10 +45,10 @@ const pricingConfig = {
  },
 };
 
-// PresetUsageScenario
+// Preset Usage Scenarios
 const usagePresets = [
  {
- name: "personDevelopers",
+ name: "Individual Developer",
  workflows: 5,
  executions: 1000,
  aiTokens: 100000,
@@ -56,7 +56,7 @@ const usagePresets = [
  icon: Zap,
  },
  {
- name: "smallTeam",
+ name: "Small Team",
  workflows: 20,
  executions: 10000,
  aiTokens: 500000,
@@ -72,7 +72,7 @@ const usagePresets = [
  icon: Database,
  },
  {
- name: "largeEnterprise",
+ name: "Large Enterprise",
  workflows: 200,
  executions: 1000000,
  aiTokens: 10000000,
@@ -82,11 +82,11 @@ const usagePresets = [
 ];
 
 export interface PriceCalculatorProps extends React.HTMLAttributes<HTMLDivElement> {
- /** DefaultPlan */
+ /** Default Plan */
  defaultPlan?: "starter" | "pro" | "enterprise";
- /** isnoDisplayPreset */
+ /** Whether to show presets */
  showPresets?: boolean;
- /** isnoDisplayDetailedDecompose */
+ /** Whether to show detailed breakdown */
  showBreakdown?: boolean;
 }
 
@@ -105,19 +105,19 @@ export function PriceCalculator({
  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
  const [animatedPrice, setAnimatedPrice] = useState(0);
 
- // CalculatePrice
+ // Calculate Price
  const calculatePrice = () => {
  const config = pricingConfig;
  const plan = selectedPlan;
  
  let total = config.basePrice[plan];
  
- // WorkflowCost(ExceedFreeQuotaafter)
+ // Workflow Cost (after exceeding free quota)
  const freeWorkflows = plan === "starter" ? 3 : plan === "pro" ? 20 : 100;
  const extraWorkflows = Math.max(0, workflows - freeWorkflows);
  total += extraWorkflows * config.perWorkflow[plan];
  
- // ExecuteCost(ExceedFreeQuotaafter)
+ // Execution Cost (after exceeding free quota)
  const freeExecutions = plan === "starter" ? 100 : plan === "pro" ? 10000 : 100000;
  const extraExecutions = Math.max(0, executions - freeExecutions);
  total += extraExecutions * config.perExecution[plan];
@@ -127,12 +127,12 @@ export function PriceCalculator({
  const extraTokens = Math.max(0, aiTokens - freeTokens);
  total += extraTokens * config.aiTokenRate[plan];
  
- // StorageCost
+    // Storage cost
  const freeStorage = plan === "starter" ? 1 : plan === "pro" ? 10 : 100;
  const extraStorage = Math.max(0, storage - freeStorage);
  total += extraStorage * config.storagePerGB[plan];
  
- // yearsDiscount
+ // Yearly Discount
  if (billingCycle === "yearly") {
  total *= 0.8; // 20% Discount
  }
@@ -142,7 +142,7 @@ export function PriceCalculator({
 
  const totalPrice = calculatePrice();
 
- // PriceAnimation
+ // Price Animation
  useEffect(() => {
  const duration = 500;
  const startTime = Date.now();
@@ -175,10 +175,10 @@ export function PriceCalculator({
 
  return (
  <div className={cn("", className)} {...props}>
- {/* PresetScenario */}
+ {/* Preset Scenarios */}
  {showPresets && (
  <div className="mb-8">
- <h4 className="text-sm font-medium text-foreground mb-4">SelectUsageScenario</h4>
+ <h4 className="text-sm font-medium text-foreground mb-4">Select Usage Scenario</h4>
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
  {usagePresets.map((preset) => (
  <button
@@ -206,11 +206,11 @@ export function PriceCalculator({
  )}
 
  <div className="grid lg:grid-cols-2 gap-8">
- {/* ParameterAdjust */}
+ {/* Parameter Adjustment */}
  <div className="space-y-6">
- {/* PlanSelect */}
+ {/* Plan Selection */}
  <div>
- <label className="text-sm font-medium text-foreground block mb-3">SelectPlan</label>
+ <label className="text-sm font-medium text-foreground block mb-3">Select Plan</label>
  <div className="grid grid-cols-3 gap-2">
  {(["starter", "pro", "enterprise"] as const).map((plan) => (
  <button
@@ -223,16 +223,16 @@ export function PriceCalculator({
  : "bg-muted text-muted-foreground hover:bg-muted/80"
  )}
  >
- {plan === "starter" ? "Freeversion": plan === "pro" ? "Professionalversion": "Enterprise"}
+ {plan === "starter" ? "Free": plan === "pro" ? "Professional": "Enterprise"}
  </button>
  ))}
  </div>
  </div>
 
- {/* WorkflowCount */}
+ {/* Workflow Count */}
  <div>
  <div className="flex items-center justify-between mb-2">
- <label className="text-sm font-medium text-foreground">WorkflowCount</label>
+ <label className="text-sm font-medium text-foreground">Workflow Count</label>
  <span className="text-sm text-primary font-medium">{workflows} </span>
  </div>
  <input
@@ -249,10 +249,10 @@ export function PriceCalculator({
  </div>
  </div>
 
- {/* monthsExecutetimescount */}
+ {/* Monthly Executions */}
  <div>
  <div className="flex items-center justify-between mb-2">
- <label className="text-sm font-medium text-foreground">monthsExecutetimescount</label>
+ <label className="text-sm font-medium text-foreground">Monthly Executions</label>
  <span className="text-sm text-primary font-medium">{executions.toLocaleString()} times</span>
  </div>
  <input
@@ -291,10 +291,10 @@ export function PriceCalculator({
  </div>
  </div>
 
- {/* StorageEmptybetween */}
+ {/* Storage Space */}
  <div>
  <div className="flex items-center justify-between mb-2">
- <label className="text-sm font-medium text-foreground">StorageEmptybetween</label>
+ <label className="text-sm font-medium text-foreground">Storage Space</label>
  <span className="text-sm text-primary font-medium">{storage} GB</span>
  </div>
  <input
@@ -312,9 +312,9 @@ export function PriceCalculator({
  </div>
  </div>
 
- {/* PriceDisplay */}
+ {/* Price Display */}
  <div className="bg-card border border-border rounded-2xl p-6">
- {/* Paymentweeks */}
+ {/* Billing Cycle */}
  <div className="flex items-center justify-center gap-2 mb-6">
  <button
  onClick={() => setBillingCycle("monthly")}
@@ -325,7 +325,7 @@ export function PriceCalculator({
  : "text-muted-foreground hover:text-foreground"
  )}
  >
- months
+ Monthly
  </button>
  <button
  onClick={() => setBillingCycle("yearly")}
@@ -336,7 +336,7 @@ export function PriceCalculator({
  : "text-muted-foreground hover:text-foreground"
  )}
  >
- years
+ Yearly
  <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[10px] bg-orange-500 text-white font-bold">
  -20%
  </span>
@@ -348,31 +348,31 @@ export function PriceCalculator({
  <div className="text-5xl font-bold text-foreground mb-2">
  <span className="text-2xl align-top">$</span>
  {animatedPrice.toFixed(2)}
- <span className="text-lg font-normal text-muted-foreground">/{billingCycle === "monthly" ? "months": "years"}</span>
+ <span className="text-lg font-normal text-muted-foreground">/{billingCycle === "monthly" ? "mo": "yr"}</span>
  </div>
  {billingCycle === "yearly" && (
  <p className="text-sm text-emerald-500">
  <Sparkles className="w-4 h-4 inline mr-1" />
- eachyearsSave ${(totalPrice / 0.8 - totalPrice).toFixed(2)}
+ Save ${(totalPrice / 0.8 - totalPrice).toFixed(2)} per year
  </p>
  )}
  </div>
 
- {/* CostDecompose */}
+ {/* Cost Breakdown */}
  {showBreakdown && (
  <div className="space-y-3 mb-6 py-4 border-y border-border">
  <div className="flex justify-between text-sm">
- <span className="text-muted-foreground">BasicPlan</span>
+ <span className="text-muted-foreground">Base Plan</span>
  <span className="text-foreground">${pricingConfig.basePrice[selectedPlan]}</span>
  </div>
  <div className="flex justify-between text-sm">
- <span className="text-muted-foreground">outsideWorkflow</span>
+ <span className="text-muted-foreground">Extra Workflows</span>
  <span className="text-foreground">
  ${(Math.max(0, workflows - (selectedPlan === "starter" ? 3 : selectedPlan === "pro" ? 20 : 100)) * pricingConfig.perWorkflow[selectedPlan]).toFixed(2)}
  </span>
  </div>
  <div className="flex justify-between text-sm">
- <span className="text-muted-foreground">ExecuteCost</span>
+ <span className="text-muted-foreground">Execution Cost</span>
  <span className="text-foreground">
  ~${(Math.max(0, executions - (selectedPlan === "starter" ? 100 : selectedPlan === "pro" ? 10000 : 100000)) * pricingConfig.perExecution[selectedPlan]).toFixed(2)}
  </span>
@@ -384,14 +384,14 @@ export function PriceCalculator({
  </span>
  </div>
  <div className="flex justify-between text-sm">
- <span className="text-muted-foreground">StorageEmptybetween</span>
+ <span className="text-muted-foreground">Storage Space</span>
  <span className="text-foreground">
  ~${(Math.max(0, storage - (selectedPlan === "starter" ? 1 : selectedPlan === "pro" ? 10 : 100)) * pricingConfig.storagePerGB[selectedPlan]).toFixed(2)}
  </span>
  </div>
  {billingCycle === "yearly" && (
  <div className="flex justify-between text-sm text-emerald-500">
- <span>yearsDiscount (-20%)</span>
+ <span>Yearly Discount (-20%)</span>
  <span>-${(totalPrice / 0.8 * 0.2).toFixed(2)}</span>
  </div>
  )}
@@ -400,14 +400,14 @@ export function PriceCalculator({
 
  {/* CTA */}
  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-12 text-base">
- {selectedPlan === "starter" ? "FreeStart": "NowSubscription"}
+ {selectedPlan === "starter" ? "Get Started Free": "Subscribe Now"}
  <ArrowRight className="w-4 h-4 ml-2" />
  </Button>
 
  <p className="text-xs text-center text-muted-foreground mt-3">
  {selectedPlan === "starter" 
- ? "Noneneeduse, nowStart"
-: "SupportAnytimeCancel, 14daysNoneReasonRefund"}
+ ? "No credit card required. Start now."
+: "Cancel anytime. 14-day money-back guarantee."}
  </p>
  </div>
  </div>

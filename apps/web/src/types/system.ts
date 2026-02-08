@@ -1,23 +1,23 @@
 /**
- * SystemRelatedTypeDefinition
+ * System Related Type Definition
  */
 
 /**
- * SystemHealthStatus
+ * System Health Status
  */
 export interface SystemHealth {
- /** ServiceName */
+ /** Service Name */
  name: string;
  /** Status: healthy, degraded, down */
  status: "healthy" | "degraded" | "down";
- /** Latency (s) */
+ /** Latency (ms) */
  latency_ms: number;
  /** Icon */
  icon?: string;
 }
 
 /**
- * SystemAnnouncement
+ * System Announcement
  */
 export interface Announcement {
  /** Announcement ID */
@@ -28,14 +28,14 @@ export interface Announcement {
  description: string;
  /** Type: feature, improvement, notice, warning */
  type: "feature" | "improvement" | "notice" | "warning";
- /** isnoalreadyread */
+ /** Whether already read */
  is_read?: boolean;
  /** Created At */
  created_at: string;
 }
 
 /**
- * Format'sSystemHealthStatus(Used forbeforeendpointDisplay)
+ * Formatted System Health Status (Used for Frontend Display)
  */
 export interface FormattedSystemHealth {
  name: string;

@@ -1,9 +1,9 @@
 /**
- * DesignSystemConstant
- * Used for1ManageDesignRelated'sConfig, EnsureApp'svisual1
+ * Design System Constants
+ * Used for managing design-related configurations, ensuring app's visual consistency
  */
 
-// ===== pastAnimation =====
+// ===== Transition & Animation =====
 export const TRANSITIONS = {
  fast: "150ms",
  base: "200ms",
@@ -28,57 +28,57 @@ export const BREAKPOINTS = {
 
 // ===== LayoutDimension =====
 export const LAYOUT = {
- // HeaderHeight
+ // Header Height
  headerHeight: 64,
  headerHeightMobile: 56,
  headerHeightSmall: 52,
- // SidebarWidth
+ // Sidebar Width
  sidebarWidth: 240,
  sidebarWidthTablet: 200,
  sidebarWidthCollapsed: 64,
- // PanelWidth
+ // Panel Width
  panelWidthSmall: 200,
  panelWidthMedium: 280,
  panelWidthLarge: 360,
  panelWidthSheet: 320,
- // MaximumWidth
+ // Maximum Width
  containerSm: 640,
  containerMd: 768,
  containerLg: 1024,
  containerXl: 1280,
  container2xl: 1536,
  contentMaxWidth: 1440,
- // TouchTargetMinimumDimension
+ // Touch Target Minimum Dimension
  touchTargetMin: 44,
- // inEdge
+ // Container Padding
  containerPaddingX: 24,
  containerPaddingXLg: 32,
- // Pagebetween
+ // Page Spacing
  pageHeaderPaddingY: 24,
  pageHeaderPaddingYLg: 32,
  pageContentPaddingY: 24,
  pageContentPaddingYLg: 32,
- // ToolbarHeight
+ // Toolbar Height
  toolbarHeight: 40,
- // blockbetween
+ // Section Spacing
  sectionGap: 64,
  sectionGapLg: 96,
- // Cardbetween
+ // Card Spacing
  cardGap: 20,
  cardGapLg: 24,
 } as const;
 
-// ===== AnimationConfig =====
+// ===== Animation Config =====
 export const ANIMATION = {
- // enterAnimationLatencycount
+ // Stagger Animation Delay
  staggerDelay: 50,
- // enterAnimationtime
+ // Entrance Animation Duration
  entranceDuration: 400,
- // QuickAnimation
+ // Quick Animation
  fast: 150,
- // BasicAnimation
+ // Basic Animation
  base: 200,
- // Animation
+ // Slow Animation
  slow: 300,
 } as const;
 
@@ -92,7 +92,7 @@ export const NODE_COLORS = {
  icon: "text-violet-600 dark:text-violet-400",
  accent: "#8b5cf6",
  },
- // IntegrationNode - Blue
+ // Integration Node - Blue
  integration: {
  bg: "bg-blue-50 dark:bg-blue-950/30",
  border: "border-blue-200 dark:border-blue-800",
@@ -275,10 +275,10 @@ export const Z_INDEX = {
  tooltip: 90,
 } as const;
 
-// ===== Helper Functioncount =====
+// ===== Helper Functions =====
 
 /**
- * FetchNode'sColorConfig
+ * Get Node Color Config
  */
 export function getNodeColors(nodeType: string) {
  const category = NODE_TYPE_CATEGORY[nodeType] || "flow";
@@ -286,49 +286,49 @@ export function getNodeColors(nodeType: string) {
 }
 
 /**
- * FetchPort'sColorConfig
+ * Get Port Color Config
  */
 export function getPortColors(portType: string) {
  return PORT_COLORS[portType as PortType] || PORT_COLORS.any;
 }
 
 /**
- * FetchStatus'sColorConfig
+ * Get Status Color Config
  */
 export function getStatusColors(status: string) {
  return STATUS_COLORS[status as StatusType] || STATUS_COLORS.pending;
 }
 
 /**
- * GenerateAnimationLatencystyle
+ * Generate Animation Delay Style
  */
 export function getAnimationDelay(index: number, baseDelay = 50) {
  return { animationDelay: `${index * baseDelay}ms` };
 }
 
 /**
- * CheckisnoasMoveendpoint
+ * Check if Mobile Breakpoint
  */
 export function isMobileBreakpoint(width: number) {
  return width < BREAKPOINTS.md;
 }
 
 /**
- * Checkisnoasendpoint
+ * Check if Tablet Breakpoint
  */
 export function isTabletBreakpoint(width: number) {
  return width >= BREAKPOINTS.md && width < BREAKPOINTS.lg;
 }
 
 /**
- * Checkisnoasfaceendpoint
+ * Check if Desktop Breakpoint
  */
 export function isDesktopBreakpoint(width: number) {
  return width >= BREAKPOINTS.lg;
 }
 
 /**
- * FetchCurrentBreakpointName
+ * Get Current Breakpoint Name
  */
 export function getCurrentBreakpoint(width: number): "sm" | "md" | "lg" | "xl" | "2xl" {
  if (width >= BREAKPOINTS["2xl"]) return "2xl";
@@ -339,7 +339,7 @@ export function getCurrentBreakpoint(width: number): "sm" | "md" | "lg" | "xl" |
 }
 
 /**
- * Based onBreakpointFetchLayoutDimension
+ * Get Layout Dimensions Based on Breakpoint
  */
 export function getResponsiveLayout(width: number) {
  const isMobile = isMobileBreakpoint(width);

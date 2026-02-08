@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Roadmap - ProductRoadmapTimelineComponent
+ * Roadmap - Product Roadmap Timeline Component
  * 
- * ShowcaseProductDevelopmentandnot yetcomePlan
+ * Displays product development progress and upcoming plans
  */
 
 import { useState } from "react";
@@ -43,60 +43,60 @@ const roadmapData: RoadmapItem[] = [
  id: "q1-2024",
  quarter: "Q1",
  year: "2024",
- title: "PlatformBasicPublish",
- description: "CoreWorkflowEngineandcanvisualEditcurrentlyonline",
+ title: "Platform Foundation Launch",
+ description: "Core workflow engine and visual editor are now live",
  status: "completed",
  icon: Rocket,
  features: [
- "canvisualWorkflowEdit",
- "20+ CoreNodeType",
- "Basic AI ModelIntegration",
- "Real-timeExecuteMonitor",
+ "Visual workflow editor",
+ "20+ core node types",
+ "Basic AI model integration",
+ "Real-time execution monitoring",
  ],
  },
  {
  id: "q2-2024",
  quarter: "Q2",
  year: "2024",
- title: "Enterprise-gradeFeatures",
- description: "enterTeamCollaborationandEnterpriseSecurity",
+ title: "Enterprise-Grade Features",
+ description: "Introducing team collaboration and enterprise security",
  status: "completed",
  icon: Shield,
  features: [
- "TeamWorkspace",
- "RBAC PermissionControl",
- "Audit Log",
- "SSO Sign In",
+ "Team workspaces",
+ "RBAC permission control",
+ "Audit logging",
+ "SSO sign-in",
  ],
  },
  {
  id: "q3-2024",
  quarter: "Q3",
  year: "2024",
- title: "AI canpowerEnhanced",
- description: "DepthIntegrationmultipletypelargeLanguageModel, SmartWorkflowoptimal",
+ title: "AI Capabilities Enhanced",
+ description: "Deep integration with multiple large language models and smart workflow optimization",
  status: "completed",
  icon: Brain,
  features: [
  "GPT-4, Claude, Gemini Integration",
- "AI Driven'sWorkflowSuggestion",
- "SmartErrorDiagnose",
- "NaturalLanguageCreateWorkflow",
+ "AI-Driven Workflow Suggestions",
+ "Smart error diagnostics",
+ "Natural language workflow creation",
  ],
  },
  {
  id: "q4-2024",
  quarter: "Q4",
  year: "2024",
- title: "allDeploy",
- description: "multipleRegionDeploySupport, moreLatencyExperience",
+ title: "Global Deployment",
+ description: "Multi-region deployment support for lower latency experiences",
  status: "in-progress",
  icon: Globe,
  features: [
- "Asia Pacific, Europe, Node",
- "SmartRouteSelect",
- "DataLocalStorage",
- "multipleLanguagefaceSupport",
+ "Asia Pacific, Europe, and US nodes",
+ "Smart route selection",
+ "Local data storage",
+ "Multi-language interface support",
  ],
  highlight: true,
  },
@@ -104,30 +104,30 @@ const roadmapData: RoadmapItem[] = [
  id: "q1-2025",
  quarter: "Q1",
  year: "2025",
- title: "EcosystemSystemExtend",
- description: "OpenPluginMarketplace, BuildDevelopersEcosystem",
+ title: "Ecosystem Expansion",
+ description: "Open plugin marketplace to build a developer ecosystem",
  status: "planned",
  icon: Boxes,
  features: [
- "Plugin/ExtendMarketplace",
- "Third-partyDevelopers SDK",
- "CustomNodeDevelopment",
- "TemplateCreativeuserPlan",
+ "Plugin / extension marketplace",
+ "Third-party developer SDK",
+ "Custom node development",
+ "Template creator program",
  ],
  },
  {
  id: "q2-2025",
  quarter: "Q2",
  year: "2025",
- title: "Agent Agent",
- description: "down1main AI Agent Workflow",
+ title: "Autonomous Agents",
+ description: "Next-generation autonomous AI agent workflows",
  status: "planned",
  icon: Sparkles,
  features: [
- "mainDecision Agent",
- "multiple Agent Collaboration",
- "MemorySystem",
- "Ioptimalcanpower",
+ "Autonomous decision agents",
+ "Multi-agent collaboration",
+ "Memory system",
+ "Self-optimizing capabilities",
  ],
  },
 ];
@@ -152,7 +152,7 @@ const statusConfig = {
  color: "text-muted-foreground",
  bgColor: "bg-muted-foreground",
  borderColor: "border-muted-foreground",
- label: "Plan",
+ label: "Planned",
  },
 };
 
@@ -161,7 +161,7 @@ export function Roadmap() {
 
  return (
  <div className="w-full">
- {/* example */}
+ {/* Legend */}
  <div className="flex items-center justify-center gap-6 mb-8">
  {Object.entries(statusConfig).map(([key, config]) => (
  <div key={key} className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export function Roadmap() {
 
  {/* Timeline */}
  <div className="relative">
- {/* Connectline */}
+ {/* Connector line */}
  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 hidden md:block" />
 
  <div className="space-y-4">
@@ -190,7 +190,7 @@ export function Roadmap() {
  !isLeft && "md:direction-rtl"
  )}
  >
- {/* TimeTags (MoveendpointDisplayatCardin) */}
+ {/* Time Tags (displayed on the side of the card on mobile) */}
  <div
  className={cn(
  "hidden md:flex items-center gap-2",
@@ -207,7 +207,7 @@ export function Roadmap() {
  </div>
  </div>
 
- {/* centerNode (faceendpoint) */}
+ {/* Center Node (desktop) */}
  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center">
  <div
  className={cn(
@@ -218,7 +218,7 @@ export function Roadmap() {
  />
  </div>
 
- {/* ContentCard */}
+ {/* Content Card */}
  <div
  className={cn(
  isLeft ? "md:col-start-2" : "md:col-start-1 md:direction-ltr"
@@ -234,7 +234,7 @@ export function Roadmap() {
  )}
  onClick={() => setExpandedItem(isExpanded ? null : item.id)}
  >
- {/* MoveendpointTimeTags */}
+ {/* Mobile Time Tags */}
  <div className="md:hidden flex items-center gap-2 mb-3">
  <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
  {item.quarter} {item.year}
@@ -275,7 +275,7 @@ export function Roadmap() {
  <h4 className="font-semibold text-foreground">{item.title}</h4>
  {item.highlight && (
  <span className="px-2 py-0.5 text-xs font-medium bg-yellow-400/20 text-yellow-400 rounded-full">
- CurrentPhase
+ Current Phase
  </span>
  )}
  </div>
@@ -283,22 +283,22 @@ export function Roadmap() {
  {item.description}
  </p>
 
- {/* ExpandButton */}
+ {/* Expand Button */}
  <button className="flex items-center gap-1 text-xs text-primary hover:underline">
  {isExpanded ? (
  <>
  <ChevronUp className="w-3 h-3" />
- CollapseDetails
+ Collapse Details
  </>
  ) : (
  <>
  <ChevronDown className="w-3 h-3" />
- ViewDetails
+ View Details
  </>
  )}
  </button>
 
- {/* ExpandContent */}
+ {/* Expanded Content */}
  <div
  className={cn(
  "overflow-hidden transition-all duration-300",
@@ -330,14 +330,14 @@ export function Roadmap() {
  {/* Footer CTA */}
  <div className="mt-12 text-center">
  <p className="text-muted-foreground mb-4">
- wantmoremultipleProductPlan?
+ Want to see more product plans?
  </p>
  <a
  href="/changelog"
  className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
  >
  <Sparkles className="w-4 h-4" />
- ViewCompleteChange Log
+ View Complete Changelog
  </a>
  </div>
  </div>

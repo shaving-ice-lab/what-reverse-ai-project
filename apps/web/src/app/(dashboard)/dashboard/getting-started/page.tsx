@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * QuickGetting Started / GuidePage - Supabase Style
- * newUserTask, Progress, ResourceandShortcutEntry
+ * Quick Getting Started / Guide Page - Supabase Style
+ * New User Tasks, Progress, Resources and Shortcut Entries
  */
 
 import Link from "next/link";
@@ -38,8 +38,8 @@ import {
 const onboardingSteps = [
  {
  id: "conversation",
- title: "Start#1timesConversation",
- description: "and AI Proceed1timesConversation, ExperienceSmartAssistant'sCorecanpower",
+ title: "Start Your First Conversation",
+ description: "Have your first conversation with AI and experience the assistant",
  icon: MessageSquare,
  href: "/dashboard/conversations",
  completed: true,
@@ -47,8 +47,8 @@ const onboardingSteps = [
  },
  {
  id: "workflow",
- title: "CreateWorkflow",
- description: "Createyou's#1AutomationWorkflow, ImproveWorkrate",
+ title: "Create a Workflow",
+ description: "Create your first automation workflow to improve productivity",
  icon: Zap,
  href: "/dashboard/workflows/new",
  completed: true,
@@ -57,7 +57,7 @@ const onboardingSteps = [
  {
  id: "agent",
  title: "Create AI Agent",
- description: "Customize1Exclusiveatyou's AI Assistant",
+ description: "Customize your own exclusive AI assistant",
  icon: Bot,
  href: "/dashboard/my-agents/new",
  completed: false,
@@ -65,8 +65,8 @@ const onboardingSteps = [
  },
  {
  id: "upload",
- title: "UploadFiletoKnowledge Base",
- description: "UploadDocument, let AI Based onyou'sDataProceedAnswer",
+ title: "Upload file to knowledge base",
+ description: "Upload documents and let AI answer based on your data",
  icon: Upload,
  href: "/dashboard/files",
  completed: false,
@@ -75,7 +75,7 @@ const onboardingSteps = [
  {
  id: "api-key",
  title: "Add API Key",
- description: "ConfigyouSelf's AI Model API Key",
+ description: "Configure your AI model API key",
  icon: Key,
  href: "/dashboard/settings/api-keys",
  completed: false,
@@ -83,8 +83,8 @@ const onboardingSteps = [
  },
  {
  id: "invite",
- title: "InviteTeamMember",
- description: "InviteColleague1Collaboration",
+ title: "Invite Team Members",
+ description: "Invite colleagues to collaborate together",
  icon: Users,
  href: "/dashboard/team",
  completed: false,
@@ -95,8 +95,8 @@ const onboardingSteps = [
 // Features
 const features = [
  {
- title: "AI SmartConversation",
- description: "multipleModelConnect, StableOutputResult",
+ title: "AI Smart Conversation",
+ description: "Connect multiple models for stable output results",
  icon: MessageSquare,
  color: "text-brand-500",
  bgColor: "bg-brand-200/60",
@@ -104,8 +104,8 @@ const features = [
  href: "/dashboard/conversations",
  },
  {
- title: "WorkflowAutomation",
- description: "canvisualOrchestrate, AutoExecuteComplexFlow",
+ title: "Workflow Automation",
+ description: "Visual orchestration with automatic execution of complex flows",
  icon: Zap,
  color: "text-warning",
  bgColor: "bg-warning-200/60",
@@ -114,7 +114,7 @@ const features = [
  },
  {
  title: "AI Agent",
- description: "BuildExclusive Agent, CoverageVerticalScenario",
+ description: "Build exclusive agents to cover vertical scenarios",
  icon: Bot,
  color: "text-brand-500",
  bgColor: "bg-brand-200/60",
@@ -123,7 +123,7 @@ const features = [
  },
  {
  title: "Knowledge Base",
- description: "anduse, QuickCallContent",
+ description: "Manage and use knowledge for quick content retrieval",
  icon: FileText,
  color: "text-brand-500",
  bgColor: "bg-brand-200/60",
@@ -135,32 +135,32 @@ const features = [
 // LearnResource
 const learningResources = [
  {
- title: "5 minQuickon",
- description: "MasterCoreFlowandusecanpower",
+ title: "5-Minute Quick Start",
+ description: "Master core workflows and unlock powerful features",
  icon: Play,
  duration: "5 min",
  type: "video",
  href: "/dashboard/learn",
  },
  {
- title: "WorkflowCreateGuide",
- description: "fromTemplateStartBuild#1Flow",
+ title: "Workflow Creation Guide",
+ description: "Start building your first flow from a template",
  icon: BookOpen,
  duration: "10 min",
  type: "tutorial",
  href: "/dashboard/workflows",
  },
  {
- title: "API IntegrationDocument",
- description: "ConfigKeyandDoneInterfaceCall",
+ title: "API Integration Docs",
+ description: "Configure keys and complete API integration",
  icon: FileText,
  duration: "15 min",
  type: "docs",
  href: "/dashboard/settings/api-keys",
  },
  {
- title: "Best PracticesCase Studies",
- description: "ExploreEfficient'sAutomation",
+ title: "Best Practices & Case Studies",
+ description: "Explore efficient automation",
  icon: Lightbulb,
  duration: "Read",
  type: "article",
@@ -225,7 +225,7 @@ export default function GettingStartedPage() {
  const milestones = [
  {
  id: "tasks",
- label: "CompletedTask",
+ label: "Completed Tasks",
  value: `${completedSteps}/${totalSteps}`,
  icon: Check,
  tone: "brand" as const,
@@ -239,14 +239,14 @@ export default function GettingStartedPage() {
  },
  {
  id: "remaining",
- label: "RemainingRewards",
+ label: "Remaining Rewards",
  value: `${remainingPoints} XP`,
  icon: Sparkles,
  tone: "brand" as const,
  },
  {
  id: "time",
- label: "Estimatedtime",
+ label: "Estimated Time",
  value: " 20 min",
  icon: Clock,
  tone: "neutral" as const,
@@ -256,29 +256,29 @@ export default function GettingStartedPage() {
  const quickLinks = [
  {
  id: "docs",
- title: "Learncenter",
- description: "QuickonandBest Practices",
+ title: "Learning Center",
+ description: "Quick start guides and best practices",
  icon: BookOpen,
  href: "/dashboard/learn",
  },
  {
  id: "api",
  title: "API Key",
- description: "ConfigModelandKey",
+ description: "Configure models and API keys",
  icon: Key,
  href: "/dashboard/settings/api-keys",
  },
  {
  id: "templates",
  title: "Template Gallery",
- description: "fromTemplateStartAutomation",
+ description: "Start automation from templates",
  icon: FileText,
  href: "/dashboard/template-gallery",
  },
  {
  id: "team",
- title: "TeamCollaboration",
- description: "InviteMember1Usage",
+ title: "Team Collaboration",
+ description: "Invite members to collaborate",
  icon: Users,
  href: "/dashboard/team",
  },
@@ -291,10 +291,10 @@ export default function GettingStartedPage() {
  <p className="page-caption">Getting Started</p>
  <h1 className="page-title flex items-center gap-2">
  <Rocket className="w-5 h-5 text-brand-500" />
- QuickGetting Started
+ Quick Start Guide
  </h1>
  <p className="page-description">
- DonekeyConfig, Unlock ReverseAI 'sCompleteAutomationcanpower
+ Complete key config to unlock ReverseAI automation
  </p>
  </div>
  <div className="page-toolbar">
@@ -306,7 +306,7 @@ export default function GettingStartedPage() {
  >
  <Link href="/dashboard/learn">
  <BookOpen className="w-4 h-4 mr-2" />
- ViewDocument
+ View Docs
  </Link>
  </Button>
  <Button
@@ -316,7 +316,7 @@ export default function GettingStartedPage() {
  >
  <Link href="/dashboard/conversations">
  <Play className="w-4 h-4 mr-2" />
- StartGuide
+ Start Guide
  </Link>
  </Button>
  </div>
@@ -361,9 +361,9 @@ export default function GettingStartedPage() {
  <Target className="w-4 h-4 text-brand-500" />
  </div>
  <div>
- <h2 className="page-panel-title">Getting StartedTask</h2>
+ <h2 className="page-panel-title">Getting Started Tasks</h2>
  <p className="page-panel-description">
- DonekeyStep, UnlockCompleteFeatures
+ Complete key steps to unlock all features
  </p>
  </div>
  </div>
@@ -379,7 +379,7 @@ export default function GettingStartedPage() {
  <div className="rounded-md border border-border-muted bg-surface-75/70 p-4">
  <div className="flex items-center justify-between">
  <span className="text-sm font-medium text-foreground">
- Getting StartedProgress
+ Getting Started Progress
  </span>
  <span className="text-xs text-foreground-muted">
  {Math.round(progressPercentage)}%
@@ -388,8 +388,8 @@ export default function GettingStartedPage() {
  <Progress value={progressPercentage} size="sm" className="mt-3" />
  <p className="text-xs text-foreground-light mt-3">
  {progressPercentage < 100
- ? `DoneAllStepcanObtain ${remainingPoints} XP Rewards`
-: "🎉 Congratulations!youCompletedAllGetting StartedTask!"}
+ ? `Complete all steps to earn ${remainingPoints} XP rewards`
+: "🎉 Congratulations! You've completed all getting started tasks!"}
  </p>
  </div>
 
@@ -481,8 +481,8 @@ export default function GettingStartedPage() {
  <Sparkles className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <h2 className="page-panel-title">NextSuggestion</h2>
- <p className="page-panel-description">ContinueDonekeyConfig</p>
+ <h2 className="page-panel-title">Next steps</h2>
+ <p className="page-panel-description">Continue with key configuration</p>
  </div>
  </div>
  <div className="p-6 space-y-4">
@@ -517,7 +517,7 @@ export default function GettingStartedPage() {
  size="sm"
  className="bg-brand-500 hover:bg-brand-600 text-background"
  >
- <Link href={nextStep.href}>ContinueTask</Link>
+ <Link href={nextStep.href}>Continue</Link>
  </Button>
  <Button
  asChild
@@ -525,16 +525,16 @@ export default function GettingStartedPage() {
  size="sm"
  className="border-border-muted text-foreground-light"
  >
- <Link href="/dashboard/learn">ViewLearnResource</Link>
+ <Link href="/dashboard/learn">View learning resources</Link>
  </Button>
  </div>
  </div>
  ) : (
  <div className="rounded-md border border-brand-400/40 bg-brand-200/30 p-4 text-sm text-foreground">
- 🎉 youCompletedallsectionGetting StartedTask, SuggestionBrowseTemplate GalleryorImproveAccountSettings.
+ 🎉 You've completed all getting started tasks! We suggest browsing the Template Gallery or updating your Account Settings.
  <div className="mt-3 flex items-center gap-2">
  <Button asChild size="sm" variant="outline-primary">
- <Link href="/dashboard/template-gallery">BrowseTemplate</Link>
+ <Link href="/dashboard/template-gallery">Browse Templates</Link>
  </Button>
  <Button
  asChild
@@ -542,14 +542,14 @@ export default function GettingStartedPage() {
  variant="outline"
  className="border-border-muted text-foreground-light"
  >
- <Link href="/dashboard/settings">AccountSettings</Link>
+ <Link href="/dashboard/settings">Account Settings</Link>
  </Button>
  </div>
  </div>
  )}
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
  <Clock className="w-4 h-4" />
- AverageDonetime 20 min
+ Average completion time ~20 min
  </div>
  </div>
  </div>
@@ -560,8 +560,8 @@ export default function GettingStartedPage() {
  <BookOpen className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <h2 className="page-panel-title">QuickEntry</h2>
- <p className="page-panel-description">useConfigandResource</p>
+ <h2 className="page-panel-title">Quick Links</h2>
+ <p className="page-panel-description">Configuration and resources</p>
  </div>
  </div>
  <div className="p-6 space-y-3">
@@ -602,9 +602,9 @@ export default function GettingStartedPage() {
  <Sparkles className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <h2 className="page-panel-title">ExploreFeatures</h2>
+ <h2 className="page-panel-title">Explore Features</h2>
  <p className="page-panel-description">
- fromCoreModuleStartBuildAutomation
+ Start building automation from core modules
  </p>
  </div>
  </div>
@@ -612,7 +612,7 @@ export default function GettingStartedPage() {
  variant="secondary"
  className="bg-surface-200 text-foreground-light"
  >
- {features.length} Module
+ {features.length} Modules
  </Badge>
  </div>
  <div className="p-6 grid md:grid-cols-2 gap-4">
@@ -648,7 +648,7 @@ export default function GettingStartedPage() {
  {feature.description}
  </p>
  <div className="flex items-center gap-1 mt-4 text-xs text-brand-500">
- NowExperience
+ Try Now
  <ArrowRight className="w-4 h-4" />
  </div>
  </Link>
@@ -664,9 +664,9 @@ export default function GettingStartedPage() {
  <BookOpen className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <h2 className="page-panel-title">LearnResource</h2>
+ <h2 className="page-panel-title">Learning Resources</h2>
  <p className="page-panel-description">
- faceScenario'sLearnPathandDocument
+ Scenario-based learning paths and docs
  </p>
  </div>
  </div>
@@ -674,7 +674,7 @@ export default function GettingStartedPage() {
  variant="secondary"
  className="bg-surface-200 text-foreground-light"
  >
- {learningResources.length} Resource
+ {learningResources.length} Resources
  </Badge>
  </div>
  <div className="p-6 grid md:grid-cols-2 gap-4">
@@ -729,33 +729,33 @@ export default function GettingStartedPage() {
  <Sparkles className="w-4 h-4 text-brand-500" />
  </div>
  <div>
- <h2 className="page-panel-title">Shortcutkey</h2>
+ <h2 className="page-panel-title">Keyboard Shortcuts</h2>
  <p className="page-panel-description">
- Improverate'suseAction
+ Boost your productivity with shortcuts
  </p>
  </div>
  </div>
  <div className="p-6 space-y-3 text-sm">
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">OpenCommandPanel</span>
+ <span className="text-foreground-light">Open command panel</span>
  <kbd className="px-2 py-1 rounded-md bg-surface-200 text-foreground-muted text-xs">
  ⌘ K
  </kbd>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">CreateConversation</span>
+ <span className="text-foreground-light">New conversation</span>
  <kbd className="px-2 py-1 rounded-md bg-surface-200 text-foreground-muted text-xs">
  ⌘ N
  </kbd>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">CreateWorkflow</span>
+ <span className="text-foreground-light">New workflow</span>
  <kbd className="px-2 py-1 rounded-md bg-surface-200 text-foreground-muted text-xs">
  ⌘ W
  </kbd>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">FocusInput</span>
+ <span className="text-foreground-light">Focus input</span>
  <kbd className="px-2 py-1 rounded-md bg-surface-200 text-foreground-muted text-xs">
  /
  </kbd>
@@ -770,10 +770,10 @@ export default function GettingStartedPage() {
  </div>
  <div>
  <h3 className="text-sm font-medium text-foreground mb-1">
- InviteFriends
+ Invite Friends
  </h3>
  <p className="text-xs text-foreground-light mb-4">
- InviteFriendsSign Up, methodObtain 1000 timesFree API Call
+ Invite friends to sign up and get 1,000 free API calls
  </p>
  <Button
  asChild
@@ -781,7 +781,7 @@ export default function GettingStartedPage() {
  className="bg-brand-500 hover:bg-brand-600 text-background"
  >
  <Link href="/dashboard/team">
- NowInvite
+ Invite Now
  <ExternalLink className="w-4 h-4 ml-1" />
  </Link>
  </Button>
@@ -793,10 +793,10 @@ export default function GettingStartedPage() {
  <div className="page-panel">
  <div className="p-6 text-center">
  <h3 className="text-sm font-medium text-foreground mb-2">
- needneedHelp?
+ Need Help?
  </h3>
  <p className="text-xs text-foreground-light mb-4">
- ifresultyouatUsagepasttoIssue, canwithAccessLearncenterorSubmitFeedback.
+ If you encounter any issues, visit the Learning Center or submit feedback.
  </p>
  <div className="flex items-center justify-center gap-3">
  <Button
@@ -807,7 +807,7 @@ export default function GettingStartedPage() {
  >
  <Link href="/dashboard/learn">
  <BookOpen className="w-4 h-4 mr-2" />
- Learncenter
+ Learning Center
  </Link>
  </Button>
  <Button
@@ -818,7 +818,7 @@ export default function GettingStartedPage() {
  >
  <Link href="/dashboard/feedback">
  <MessageSquare className="w-4 h-4 mr-2" />
- SubmitFeedback
+ Submit Feedback
  </Link>
  </Button>
  </div>

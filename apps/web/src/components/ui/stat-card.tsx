@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * StatCard - StatisticsCardComponent
+ * StatCard - Statistics Card Component
  * 
- * Used for Dashboard ShowcasekeyMetrics
- * Contains: Animationcount, TrendIndicator, youChart, IconAnimation
+ * Used for dashboard to showcase key metrics
+ * Contains: Animated counter, Trend indicator, Sparkline chart, Icon animation
  */
 
 import { ReactNode, useState, useRef, useEffect } from "react";
@@ -62,7 +62,7 @@ export function StatCard({
  const [isHovered, setIsHovered] = useState(false);
  const cardRef = useRef<HTMLDivElement>(null);
  
- // AutoCalculateTrend
+ // Auto-calculate trend
  const calculatedTrend = trend || (
  previousValue !== undefined
  ? value > previousValue ? "up" : value < previousValue ? "down" : "neutral"
@@ -75,7 +75,7 @@ export function StatCard({
  : undefined
  );
  
- // MouseTrack
+ // Mouse tracking
  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
  if (!cardRef.current) return;
  const rect = cardRef.current.getBoundingClientRect();
@@ -104,7 +104,7 @@ export function StatCard({
  className
  )}
  >
- {/* MouseFollowLight Effect */}
+ {/* Mouse-follow light effect */}
  <div 
  className={cn(
  "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none",
@@ -156,7 +156,7 @@ export function StatCard({
  )}
  </div>
  
- {/* TrendIndicator */}
+ {/* Trend indicator */}
  {calculatedTrend && calculatedTrendValue !== undefined && (
  <div className="flex items-center gap-2 mb-3">
  <span
@@ -189,14 +189,14 @@ export function StatCard({
  <p className="text-xs text-muted-foreground">{description}</p>
  )}
  
- {/* youSparkline Chart */}
+ {/* Sparkline Chart */}
  {sparklineData && sparklineData.length > 0 && (
  <div className="mt-4 h-8">
  <MiniSparkline data={sparklineData} color={iconColor} />
  </div>
  )}
  
- {/* ClickIndicator */}
+ {/* Click Indicator */}
  {onClick && (
  <div className={cn(
  "absolute bottom-3 right-3 opacity-0 group-hover:opacity-100",
@@ -210,7 +210,7 @@ export function StatCard({
 }
 
 /**
- * MiniSparkline - youLine Chart
+ * MiniSparkline - Mini Line Chart
  */
 interface MiniSparklineProps {
  data: number[];
@@ -232,7 +232,7 @@ function MiniSparkline({ data, color = "hsl(var(--primary))", className }: MiniS
  return `${x},${y}`;
  }).join("");
  
- // CreateSmoothline
+ // Create smooth line
  const pathD = data.length > 0
  ? `M ${points.split("").map((p, i) => {
  if (i === 0) return p;
@@ -259,7 +259,7 @@ function MiniSparkline({ data, color = "hsl(var(--primary))", className }: MiniS
  preserveAspectRatio="none"
  className={cn("w-full h-full", className)}
  >
- {/* GradientFill */}
+ {/* Gradient fill */}
  <defs>
  <linearGradient id={`sparkline-gradient-${color}`} x1="0" y1="0" x2="0" y2="1">
  <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -267,7 +267,7 @@ function MiniSparkline({ data, color = "hsl(var(--primary))", className }: MiniS
  </linearGradient>
  </defs>
  
- {/* FillRegion */}
+ {/* Fill region */}
  <path
  d={`${pathD} L 100,100 L 0,100 Z`}
  fill={`url(#sparkline-gradient-${color})`}
@@ -289,7 +289,7 @@ function MiniSparkline({ data, color = "hsl(var(--primary))", className }: MiniS
  }}
  />
  
- {/* mostafter1 */}
+ {/* Latest update */}
  {data.length > 0 && (
  <circle
  cx="100"
@@ -327,7 +327,7 @@ function MiniSparkline({ data, color = "hsl(var(--primary))", className }: MiniS
 }
 
 /**
- * StatCardSkeleton - StatisticsCardSkeleton
+ * StatCardSkeleton - Statistics card skeleton
  */
 function StatCardSkeleton({ className }: { className?: string }) {
  return (
@@ -349,7 +349,7 @@ function StatCardSkeleton({ className }: { className?: string }) {
 }
 
 /**
- * StatCardGrid - StatisticsCardGridLayout
+ * StatCardGrid - Statistics card grid layout
  */
 interface StatCardGridProps {
  children: ReactNode;
@@ -376,7 +376,7 @@ export function StatCardGrid({
 }
 
 /**
- * CompactStatCard - CompactStatisticsCard
+ * CompactStatCard - Compact statistics card
  */
 interface CompactStatCardProps {
  title: string;

@@ -1,12 +1,12 @@
 /**
- * CanvasStatusPersistent Hook
+ * Canvas State Persistence Hook
  * 
  * Features:
- * 1. AutoSaveCanvasStatusto localStorage
- * 2. PageLoadtimeRestoreCanvasStatus
- * 3. Supportvisual, ZoomLevel
- * 4. SupportNode/EdgeData
- * 5. DebounceSaveAvoidFrequententer
+ * 1. Auto-save canvas state to localStorage
+ * 2. Restore canvas state on page load
+ * 3. Support viewport and zoom level
+ * 4. Support node/edge data
+ * 5. Debounced save to avoid frequent writes
  */
 
 import { useCallback, useEffect, useRef } from "react";
@@ -25,38 +25,38 @@ interface CanvasState {
 interface CanvasPersistenceOptions {
  /** Workflow ID */
  workflowId: string;
- /** AutoSavebetween(s), Default 5000 */
+ /** Auto-save interval (ms), default 5000 */
  autoSaveInterval?: number;
- /** DebounceLatency(s), Default 1000 */
+ /** Debounce delay (ms), default 1000 */
  debounceDelay?: number;
- /** isnoEnableAutoSave, Default true */
+ /** Whether to enable auto-save, default true */
  enableAutoSave?: boolean;
- /** SaveCallback */
+ /** Save callback */
  onSave?: (state: CanvasState) => void;
- /** RestoreCallback */
+ /** Restore callback */
  onRestore?: (state: CanvasState) => void;
- /** ErrorCallback */
+ /** Error callback */
  onError?: (error: Error) => void;
 }
 
-// Storagekeybefore
+// Storage key prefix
 const STORAGE_PREFIX = "agentflow_canvas_";
-// Current Version
+// Current version
 const CURRENT_VERSION = "1.0";
-// MaximumSaveStatuscount
+// Maximum saved state count
 const MAX_HISTORY = 5;
 
-// FetchStoragekey
+// Get storage key
 function getStorageKey(workflowId: string): string {
  return `${STORAGE_PREFIX}${workflowId}`;
 }
 
-// FetchHistoryRecordkey
+// Get history record key
 function getHistoryKey(workflowId: string): string {
  return `${STORAGE_PREFIX}${workflowId}_history`;
 }
 
-// ===== main Hook =====
+// ===== Main Hook =====
 export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  const {
  workflowId,
@@ -75,7 +75,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  const autoSaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
  const lastSaveRef = useRef<number>(0);
 
- // SaveCanvasStatus
+ // Save canvas state
  const saveState = useCallback(() => {
  try {
  const state: CanvasState = {
@@ -86,7 +86,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  version: CURRENT_VERSION,
  };
 
- // Saveto localStorage
+     // Save to localStorage
  localStorage.setItem(getStorageKey(workflowId), JSON.stringify(state));
  lastSaveRef.current = state.timestamp;
 
@@ -102,7 +102,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId, getViewport, getNodes, getEdges, onSave, onError]);
 
- // DebounceSave
+ // Debounced save
  const debouncedSave = useCallback(() => {
  if (saveTimeoutRef.current) {
  clearTimeout(saveTimeoutRef.current);
@@ -113,7 +113,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }, debounceDelay);
  }, [saveState, debounceDelay]);
 
- // RestoreCanvasStatus
+ // Restore canvas state
  const restoreState = useCallback((): CanvasState | null => {
  try {
  const saved = localStorage.getItem(getStorageKey(workflowId));
@@ -121,17 +121,17 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
 
  const state: CanvasState = JSON.parse(saved);
 
- // VersionCheck
+     // Version check
  if (state.version !== CURRENT_VERSION) {
  console.warn("[CanvasPersistence] Version mismatch, migration may be needed");
  }
 
- // Restorevisual
+     // Restore viewport
  if (state.viewport) {
  setViewport(state.viewport, { duration: 0 });
  }
 
- // RestoreNodeandEdge
+     // Restore nodes and edges
  if (state.nodes && state.nodes.length > 0) {
  setNodes(state.nodes);
  }
@@ -148,7 +148,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId, setViewport, setNodes, setEdges, onRestore, onError]);
 
- // ClearSave'sStatus
+ // Clear saved state
  const clearState = useCallback(() => {
  try {
  localStorage.removeItem(getStorageKey(workflowId));
@@ -160,7 +160,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId, onError]);
 
- // FetchSave'sStatus(notRestore)
+ // Get saved state (without restoring)
  const getSavedState = useCallback((): CanvasState | null => {
  try {
  const saved = localStorage.getItem(getStorageKey(workflowId));
@@ -170,12 +170,12 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId]);
 
- // CheckisnohasSave'sStatus
+ // Check if there is a saved state
  const hasSavedState = useCallback((): boolean => {
  return !!localStorage.getItem(getStorageKey(workflowId));
  }, [workflowId]);
 
- // FetchHistoryRecord
+ // Get history records
  const getHistory = useCallback((): CanvasState[] => {
  try {
  const history = localStorage.getItem(getHistoryKey(workflowId));
@@ -185,7 +185,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId]);
 
- // fromHistoryRecordRestore
+ // Restore from history record
  const restoreFromHistory = useCallback(
  (index: number): boolean => {
  try {
@@ -213,7 +213,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  [getHistory, setViewport, setNodes, setEdges, onRestore, onError]
  );
 
- // onlySavevisual
+ // Save viewport only
  const saveViewportOnly = useCallback(() => {
  try {
  const saved = localStorage.getItem(getStorageKey(workflowId));
@@ -232,7 +232,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  }
  }, [workflowId, getViewport, onError]);
 
- // SettingsAutoSave
+ // Set up auto-save
  useEffect(() => {
  if (!enableAutoSave) return;
 
@@ -247,7 +247,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  };
  }, [enableAutoSave, autoSaveInterval, saveState]);
 
- // PageClosebeforeSave
+ // Save before page close
  useEffect(() => {
  const handleBeforeUnload = () => {
  saveState();
@@ -259,7 +259,7 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  };
  }, [saveState]);
 
- // Clean upScheduled
+ // Clean up timers
  useEffect(() => {
  return () => {
  if (saveTimeoutRef.current) {
@@ -285,9 +285,9 @@ export function useCanvasPersistence(options: CanvasPersistenceOptions) {
  };
 }
 
-// ===== Helper Functioncount =====
+// ===== Helper Functions =====
 
-// SavetoHistoryRecord
+// Save to history record
 function saveToHistory(workflowId: string, state: CanvasState): void {
  try {
  const historyKey = getHistoryKey(workflowId);
@@ -295,10 +295,10 @@ function saveToHistory(workflowId: string, state: CanvasState): void {
  localStorage.getItem(historyKey) || "[]"
  );
 
- // Addtohead
+ // Add to beginning
  history.unshift(state);
 
- // LimitHistoryRecordCount
+ // Limit history record count
  if (history.length > MAX_HISTORY) {
  history.pop();
  }
@@ -309,9 +309,9 @@ function saveToHistory(workflowId: string, state: CanvasState): void {
  }
 }
 
-// ===== Toolcount =====
+// ===== Utility Functions =====
 
-// FetchAllSave'sWorkflow ID
+// Fetch all saved workflow IDs
 export function getSavedWorkflowIds(): string[] {
  const ids: string[] = [];
  for (let i = 0; i < localStorage.length; i++) {
@@ -323,7 +323,7 @@ export function getSavedWorkflowIds(): string[] {
  return ids;
 }
 
-// ClearAllCanvasStatus
+// Clear all canvas states
 export function clearAllCanvasStates(): void {
  const keysToRemove: string[] = [];
  for (let i = 0; i < localStorage.length; i++) {
@@ -335,20 +335,20 @@ export function clearAllCanvasStates(): void {
  keysToRemove.forEach((key) => localStorage.removeItem(key));
 }
 
-// ExportCanvasStatus
+// Export canvas state
 export function exportCanvasState(workflowId: string): string | null {
  const state = localStorage.getItem(getStorageKey(workflowId));
  return state;
 }
 
-// ImportCanvasStatus
+// Import canvas state
 export function importCanvasState(
  workflowId: string,
  stateJson: string
 ): boolean {
  try {
  const state: CanvasState = JSON.parse(stateJson);
- // VerifyStructure
+   // Validate structure
  if (!state.version || !state.timestamp) {
  throw new Error("Invalid canvas state format");
  }
@@ -359,14 +359,14 @@ export function importCanvasState(
  }
 }
 
-// FetchCanvasStatus'sStorageSize(Bytes)
+// Get canvas state storage size (bytes)
 export function getCanvasStateSize(workflowId: string): number {
  const state = localStorage.getItem(getStorageKey(workflowId));
  const history = localStorage.getItem(getHistoryKey(workflowId));
  return (state?.length || 0) + (history?.length || 0);
 }
 
-// CompressCanvasStatus(Removenotneed'sData)
+// Compress canvas state (remove unnecessary data)
 export function compressCanvasState(state: CanvasState): CanvasState {
  return {
  ...state,
@@ -375,7 +375,7 @@ export function compressCanvasState(state: CanvasState): CanvasState {
  type: node.type,
  position: node.position,
  data: node.data,
- // RemovetimeStatus
+     // Remove runtime state
  selected: undefined,
  dragging: undefined,
  })) as Node[],
@@ -387,7 +387,7 @@ export function compressCanvasState(state: CanvasState): CanvasState {
  targetHandle: edge.targetHandle,
  type: edge.type,
  data: edge.data,
- // RemovetimeStatus
+     // Remove runtime state
  selected: undefined,
  })) as Edge[],
  };

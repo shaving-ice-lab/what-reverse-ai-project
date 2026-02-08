@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * Creativeusercenter - DashboardPage
+ * Creator Dashboard Page
  *
  * Supabase Style: Minimal, Clear, Professional
  *
- * Features: 
- * - EarningsOverview
- * - EarningsTrendChart
- * - WithdrawManage
- * - Agent Earningsrow
- * - RecentEarningsRecord
+ * Features:
+ * - Earnings Overview
+ * - Earnings Trend Chart
+ * - Withdrawal Management
+ * - Agent Earnings Ranking
+ * - Recent Earnings Records
  */
 
 import { useState, useEffect } from "react";
@@ -46,7 +46,7 @@ import { EarningsChart } from "@/components/creator/earnings-chart";
 import { EarningsTable } from "@/components/creator/earnings-table";
 import { WithdrawalDialog } from "@/components/creator/withdrawal-dialog";
 
-// MockData
+// Mock Data
 
 const mockDashboard = {
  account: {
@@ -75,7 +75,7 @@ const mockDashboard = {
  },
 
  current_tier: {
- tier_name: "GrowthCreativeuser",
+ tier_name: "Growth Creator",
 
  commission_rate: 0.75,
 
@@ -146,22 +146,22 @@ const mockDashboard = {
  ],
 };
 
-// EarningsTypeConfig
+// Earnings Type Config
 
 const earningTypeConfig = {
  sale: { label: "Sales", icon: Package, color: "text-brand-500", bgColor: "bg-brand-200/70" },
- subscription: { label: "Subscription", icon: RefreshCw, color: "text-foreground-light", bgColor: "bg-surface-200" },
- tip: { label: "", icon: Gift, color: "text-foreground-light", bgColor: "bg-surface-200" },
- referral: { label: "Recommended", icon: Users, color: "text-foreground-light", bgColor: "bg-surface-200" },
+ subscription: { label: "Subscriptions", icon: RefreshCw, color: "text-foreground-light", bgColor: "bg-surface-200" },
+ tip: { label: "Tips", icon: Gift, color: "text-foreground-light", bgColor: "bg-surface-200" },
+ referral: { label: "Referrals", icon: Users, color: "text-foreground-light", bgColor: "bg-surface-200" },
 };
 
-// StatusConfig
+// Status Config
 
 const statusConfig = {
- pending: { label: "pendingConfirm", icon: Clock, color: "text-warning", bgColor: "bg-warning-200" },
- confirmed: { label: "alreadyConfirm", icon: CheckCircle2, color: "text-foreground-light", bgColor: "bg-surface-200" },
- settled: { label: "alreadySettlement", icon: CheckCircle2, color: "text-brand-500", bgColor: "bg-brand-200/70" },
- refunded: { label: "alreadyRefund", icon: XCircle, color: "text-destructive", bgColor: "bg-destructive-200" },
+ pending: { label: "Pending", icon: Clock, color: "text-warning", bgColor: "bg-warning-200" },
+ confirmed: { label: "Confirmed", icon: CheckCircle2, color: "text-foreground-light", bgColor: "bg-surface-200" },
+ settled: { label: "Settled", icon: CheckCircle2, color: "text-brand-500", bgColor: "bg-brand-200/70" },
+ refunded: { label: "Refunded", icon: XCircle, color: "text-destructive", bgColor: "bg-destructive-200" },
 };
 
 export default function CreatorDashboardPage() {
@@ -171,7 +171,7 @@ export default function CreatorDashboardPage() {
 
  const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
 
- // MockLoadData
+ // Mock load data
 
  useEffect(() => {
  const timer = setTimeout(() => {
@@ -197,7 +197,7 @@ export default function CreatorDashboardPage() {
 
  const { account, current_tier, today_earnings, week_earnings, month_earnings } = dashboard;
 
- // CalculateDistancedown1etc'sProgress
+ // Calculate progress toward next tier
 
  const tierProgress = current_tier.max_revenue
  ? Math.max(
@@ -213,12 +213,12 @@ export default function CreatorDashboardPage() {
 
  const paymentMethodLabel =
  account.payment_method === "alipay"
- ? "Payment"
+ ? "Alipay"
  : account.payment_method === "wechat"
- ? "WeChatPayment"
+ ? "WeChat Pay"
  : account.payment_method === "bank"
- ? "row"
-: "not yetSettings";
+ ? "Bank Transfer"
+: "Not Configured";
 
  return (
  <PageContainer>
@@ -231,7 +231,7 @@ export default function CreatorDashboardPage() {
  </div>
  <PageHeader
  title="Creator Studio"
- description="Manageyou'sEarnings, ViewDataAnalytics, PleaseWithdraw"
+ description="Manage your earnings, view analytics, and withdraw"
  actions={(
  <div className="flex items-center gap-3">
  <Button
@@ -240,7 +240,7 @@ export default function CreatorDashboardPage() {
  className="border-border text-foreground-light"
  >
  <Download className="h-4 w-4 mr-2" />
- ExportReport
+ Export Report
  </Button>
  <Button
  size="sm"
@@ -249,27 +249,27 @@ export default function CreatorDashboardPage() {
  disabled={account.balance < 100}
  >
  <Wallet className="h-4 w-4 mr-2" />
- PleaseWithdraw
+ Withdraw
  </Button>
  </div>
  )}
  >
  <div className="flex flex-wrap items-center gap-2 text-xs text-foreground-muted">
  <Badge variant={account.is_verified ? "success" : "warning"} size="sm">
- {account.is_verified ? "alreadyAuthentication": "not yetAuthentication"}
+ {account.is_verified ? "Verified" : "Not Verified"}
  </Badge>
- <span>Paymentmethod: {paymentMethodLabel}</span>
- <span>CurrentSplit {(current_tier.commission_rate * 100).toFixed(0)}%</span>
+ <span>Payment method: {paymentMethodLabel}</span>
+ <span>Current commission: {(current_tier.commission_rate * 100).toFixed(0)}%</span>
  </div>
  </PageHeader>
 
  <div className="space-y-6">
 
- {/* AccountOverview */}
+ {/* Account Overview */}
 
  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
- {/* canWithdrawBalance */}
+ {/* Withdrawable balance */}
 
  <Card className="bg-brand-200/60 border-brand-500/30">
 
@@ -277,7 +277,7 @@ export default function CreatorDashboardPage() {
 
  <CardTitle className="text-[13px] font-medium text-foreground-light">
 
- canWithdrawBalance
+ Withdrawable balance
 
  </CardTitle>
 
@@ -293,13 +293,13 @@ export default function CreatorDashboardPage() {
 
  <div className="text-xl font-semibold text-foreground">
 
- {account.balance.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+ ${account.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
 
  </div>
 
  <p className="text-xs text-foreground-muted mt-1">
 
- pendingSettlement: {account.pending_balance.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+ Pending settlement: ${account.pending_balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
 
  </p>
 
@@ -307,7 +307,7 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* TodayEarnings */}
+ {/* Today's Earnings */}
 
  <Card className="bg-surface-100 border-border">
 
@@ -315,7 +315,7 @@ export default function CreatorDashboardPage() {
 
  <CardTitle className="text-[13px] font-medium text-foreground-light">
 
- TodayEarnings
+ Today&apos;s Earnings
 
  </CardTitle>
 
@@ -331,7 +331,7 @@ export default function CreatorDashboardPage() {
 
  <div className="text-xl font-semibold text-foreground">
 
- {today_earnings.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+ ${today_earnings.toLocaleString("en-US", { minimumFractionDigits: 2 })}
 
  </div>
 
@@ -339,7 +339,7 @@ export default function CreatorDashboardPage() {
 
  <ArrowUpRight className="h-3 w-3 mr-1" />
 
- day +12.5%
+ Daily +12.5%
 
  </p>
 
@@ -347,7 +347,7 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* currentweeksEarnings */}
+ {/* This Week's Earnings */}
 
  <Card className="bg-surface-100 border-border">
 
@@ -355,7 +355,7 @@ export default function CreatorDashboardPage() {
 
  <CardTitle className="text-[13px] font-medium text-foreground-light">
 
- currentweeksEarnings
+ This Week&apos;s Earnings
 
  </CardTitle>
 
@@ -371,7 +371,7 @@ export default function CreatorDashboardPage() {
 
  <div className="text-xl font-semibold text-foreground">
 
- {week_earnings.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+ ${week_earnings.toLocaleString("en-US", { minimumFractionDigits: 2 })}
 
  </div>
 
@@ -379,7 +379,7 @@ export default function CreatorDashboardPage() {
 
  <ArrowUpRight className="h-3 w-3 mr-1" />
 
- onweeks +8.3%
+ Weekly +8.3%
 
  </p>
 
@@ -387,7 +387,7 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* currentmonthsEarnings */}
+ {/* This Month's Earnings */}
 
  <Card className="bg-surface-100 border-border">
 
@@ -395,7 +395,7 @@ export default function CreatorDashboardPage() {
 
  <CardTitle className="text-[13px] font-medium text-foreground-light">
 
- currentmonthsEarnings
+ This Month&apos;s Earnings
 
  </CardTitle>
 
@@ -411,7 +411,7 @@ export default function CreatorDashboardPage() {
 
  <div className="text-xl font-semibold text-foreground">
 
- {month_earnings.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+ ${month_earnings.toLocaleString("en-US", { minimumFractionDigits: 2 })}
 
  </div>
 
@@ -419,7 +419,7 @@ export default function CreatorDashboardPage() {
 
  <ArrowUpRight className="h-3 w-3 mr-1" />
 
- onmonths +15.2%
+ Monthly +15.2%
 
  </p>
 
@@ -429,7 +429,7 @@ export default function CreatorDashboardPage() {
 
  </div>
 
- {/* SplitetcCard */}
+ {/* Commission Tier Card */}
 
  <Card className="bg-surface-100 border-border">
 
@@ -451,7 +451,7 @@ export default function CreatorDashboardPage() {
 
  <CardDescription className="text-[13px]">
 
- CurrentSplitcompareexample: {(current_tier.commission_rate * 100).toFixed(0)}%
+ Current commission rate: {(current_tier.commission_rate * 100).toFixed(0)}%
 
  </CardDescription>
 
@@ -469,7 +469,7 @@ export default function CreatorDashboardPage() {
 
  <TooltipContent side="left" className="max-w-xs">
 
- <p>monthsEarnings, Splitcompareexample.Continue!</p>
+ <p>Your commission rate is based on monthly earnings. Keep going!</p>
 
  </TooltipContent>
 
@@ -487,14 +487,14 @@ export default function CreatorDashboardPage() {
 
  <span className="text-foreground-light">
 
- currentmonthsEarnings: {account.monthly_revenue.toLocaleString()}
+ This month&apos;s earnings: ${account.monthly_revenue.toLocaleString()}
 
  </span>
 
  {current_tier.max_revenue && (
  <span className="text-foreground-light">
 
- down1etc: {current_tier.max_revenue.toLocaleString()}
+ Next tier: ${current_tier.max_revenue.toLocaleString()}
 
  </span>
 
@@ -508,9 +508,9 @@ export default function CreatorDashboardPage() {
 
  {current_tier.max_revenue 
 
- ? `stillneed ${(current_tier.max_revenue - account.monthly_revenue).toLocaleString()} nowcanUpgradetodown1etc`
+ ? `Still need $${(current_tier.max_revenue - account.monthly_revenue).toLocaleString()} to reach the next tier`
 
-: "youalreadytomostetc!"
+: "You've reached the highest tier!"
 
  }
 
@@ -522,19 +522,19 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* EarningsDistributionandTrend */}
+ {/* Earnings Distribution and Trend */}
 
  <div className="grid gap-6 lg:grid-cols-3">
 
- {/* EarningsTypeDistribution */}
+ {/* Earnings by Type */}
 
  <Card className="bg-surface-100 border-border">
 
  <CardHeader>
 
- <CardTitle className="text-sm font-medium">EarningsSource</CardTitle>
+ <CardTitle className="text-sm font-medium">Earnings by Source</CardTitle>
 
- <CardDescription className="text-[13px]">currentmonthsTypeEarningscompare</CardDescription>
+ <CardDescription className="text-[13px]">This month&apos;s earnings breakdown by type</CardDescription>
 
  </CardHeader>
 
@@ -596,15 +596,15 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* EarningsTrendChart */}
+ {/* Earnings Trend Chart */}
 
  <Card className="lg:col-span-2 bg-surface-100 border-border">
 
  <CardHeader>
 
- <CardTitle className="text-sm font-medium">EarningsTrend</CardTitle>
+ <CardTitle className="text-sm font-medium">Earnings Trend</CardTitle>
 
- <CardDescription className="text-[13px]"> 6 monthsEarnings</CardDescription>
+ <CardDescription className="text-[13px]">Last 6 months of earnings</CardDescription>
 
  </CardHeader>
 
@@ -618,7 +618,7 @@ export default function CreatorDashboardPage() {
 
  </div>
 
- {/* Top Agents andRecentEarnings */}
+ {/* Top Agents and Recent Earnings */}
 
  <div className="grid gap-6 lg:grid-cols-2">
 
@@ -628,9 +628,9 @@ export default function CreatorDashboardPage() {
 
  <CardHeader>
 
- <CardTitle className="text-sm font-medium">Popular Agent</CardTitle>
+ <CardTitle className="text-sm font-medium">Top Agents</CardTitle>
 
- <CardDescription className="text-[13px]">Earningsmost's Agent</CardDescription>
+ <CardDescription className="text-[13px]">Top earning agents</CardDescription>
 
  </CardHeader>
 
@@ -666,7 +666,7 @@ export default function CreatorDashboardPage() {
 
  <div className="text-xs text-foreground-muted">
 
- {agent.count} Transaction
+ {agent.count} transactions
 
  </div>
 
@@ -688,7 +688,7 @@ export default function CreatorDashboardPage() {
 
  <Link href="/dashboard/my-agents" className="text-[13px] text-brand-500 hover:underline flex items-center">
 
- ViewAll Agent
+ View All Agents
 
  <ChevronRight className="h-4 w-4 ml-1" />
 
@@ -698,15 +698,15 @@ export default function CreatorDashboardPage() {
 
  </Card>
 
- {/* RecentEarnings */}
+ {/* Recent Earnings */}
 
  <Card className="bg-surface-100 border-border">
 
  <CardHeader>
 
- <CardTitle className="text-sm font-medium">RecentEarnings</CardTitle>
+ <CardTitle className="text-sm font-medium">Recent Earnings</CardTitle>
 
- <CardDescription className="text-[13px]">mostnew'sEarningsRecord</CardDescription>
+ <CardDescription className="text-[13px]">Latest earnings records</CardDescription>
 
  </CardHeader>
 
@@ -738,7 +738,7 @@ export default function CreatorDashboardPage() {
 
  <div className="flex items-center gap-2 text-xs text-foreground-muted">
 
- <span>{new Date(earning.created_at).toLocaleString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+ <span>{new Date(earning.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
 
  <Badge variant="secondary" size="sm" className={cn("text-[11px]", statusCfg.bgColor, statusCfg.color)}>
 
@@ -768,7 +768,7 @@ export default function CreatorDashboardPage() {
 
  <Link href="/dashboard/creator/earnings" className="text-[13px] text-brand-500 hover:underline flex items-center">
 
- View allRecord
+ View All Records
 
  <ChevronRight className="h-4 w-4 ml-1" />
 
@@ -780,7 +780,7 @@ export default function CreatorDashboardPage() {
 
  </div>
 
- {/* EarningsDetailTable */}
+ {/* Earnings Detail Table */}
 
  <Card className="bg-surface-100 border-border">
 
@@ -790,9 +790,9 @@ export default function CreatorDashboardPage() {
 
  <div>
 
- <CardTitle className="text-sm font-medium">EarningsDetail</CardTitle>
+ <CardTitle className="text-sm font-medium">Earnings Detail</CardTitle>
 
- <CardDescription className="text-[13px]">ViewAllEarningsRecord</CardDescription>
+ <CardDescription className="text-[13px]">View all earnings records</CardDescription>
 
  </div>
 
@@ -800,13 +800,13 @@ export default function CreatorDashboardPage() {
 
  <TabsList variant="segment" size="sm" className="bg-surface-200 border border-border">
 
- <TabsTrigger value="all">allsection</TabsTrigger>
+ <TabsTrigger value="all">All</TabsTrigger>
 
  <TabsTrigger value="sale">Sales</TabsTrigger>
 
- <TabsTrigger value="subscription">Subscription</TabsTrigger>
+ <TabsTrigger value="subscription">Subscriptions</TabsTrigger>
 
- <TabsTrigger value="tip"></TabsTrigger>
+ <TabsTrigger value="tip">Tips</TabsTrigger>
 
  </TabsList>
 
@@ -826,7 +826,7 @@ export default function CreatorDashboardPage() {
 
  </div>
 
- {/* WithdrawDialog */}
+ {/* Withdrawal Dialog */}
 
  <WithdrawalDialog
 

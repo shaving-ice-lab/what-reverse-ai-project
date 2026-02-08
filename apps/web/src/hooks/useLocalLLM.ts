@@ -1,6 +1,6 @@
 /**
  * Local LLM Hook
- * @description ProvideLocal LLM StatusManageandAction's React Hook
+ * @description Provides a React Hook for local LLM status management and actions
  * @supports Ollama, LM Studio
  */
 
@@ -23,14 +23,14 @@ import {
 } from '@/lib/llm';
 
 /**
- * Detectisnoat Tauri Environment
+ * Detect if running in Tauri environment
  */
 function isTauri(): boolean {
  return typeof window !== 'undefined' && '__TAURI__' in window;
 }
 
 /**
- * Tauri CommandCall
+ * Tauri command invocation
  */
 async function invokeTauri<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
  if (!isTauri()) {
@@ -45,11 +45,11 @@ async function invokeTauri<T>(cmd: string, args?: Record<string, unknown>): Prom
  * Provider Status
  */
 interface ProviderStatus {
- /** isnoAvailable */
+ /** Whether available */
  available: boolean;
- /** ModelCount */
+ /** Model count */
  modelsCount: number;
- /** VersionInfo */
+ /** Version info */
  version?: string;
 }
 
@@ -57,19 +57,19 @@ interface ProviderStatus {
  * Hook Status
  */
 interface LocalLLMState {
- /** CurrentActive Provider */
+ /** Currently active provider */
  activeProvider: LLMProviderType;
  /** Status */
  status: 'checking' | 'available' | 'unavailable';
- /** alreadyInstallModelList */
+ /** Installed model list */
  models: LocalModelInfo[];
- /** CurrentDownloadProgress */
+ /** Current download progress */
  downloadProgress: PullProgress | null;
- /** Downloading'sModelName */
+ /** Name of the model being downloaded */
  downloadingModel: string | null;
- /** ErrorInfo */
+ /** Error info */
  error: string | null;
- /** isnoLoading */
+ /** Whether loading */
  isLoading: boolean;
  /** Provider Status */
  providerStatuses: Record<LLMProviderType, ProviderStatus>;
@@ -79,35 +79,35 @@ interface LocalLLMState {
  * Hook Action
  */
 interface LocalLLMActions {
- /** CheckStatus */
+ /** Check status */
  checkStatus: () => Promise<void>;
- /** RefreshModelList */
+ /** Refresh model list */
  refreshModels: () => Promise<void>;
- /** DownloadModel */
+ /** Download model */
  pullModel: (modelName: string) => Promise<void>;
- /** DeleteModel */
+ /** Delete model */
  deleteModel: (modelName: string) => Promise<void>;
  /** Chat */
  chat: (options: ChatOptions) => Promise<ChatResponse>;
- /** TestModel */
+ /** Test model */
  testModel: (modelName: string) => Promise<string>;
- /** UpdateConfig */
+ /** Update config */
  updateConfig: (config: Partial<OllamaConfig | LMStudioConfig>) => void;
- /** CancelDownload */
+ /** Cancel download */
  cancelDownload: () => void;
- /** Switch Provider */
+ /** Switch provider */
  switchProvider: (provider: LLMProviderType) => void;
- /** CheckSpecific Provider Status */
+ /** Check specific provider status */
  checkProviderStatus: (provider: LLMProviderType) => Promise<ProviderStatus>;
 }
 
 /**
- * Hook BackType
+ * Hook return type
  */
 export type UseLocalLLMReturn = LocalLLMState & LocalLLMActions;
 
 /**
- * Hook ConfigOption
+ * Hook config options
  */
 interface UseLocalLLMOptions {
  /** Default Provider */
@@ -116,7 +116,7 @@ interface UseLocalLLMOptions {
  ollamaUrl?: string;
  /** LM Studio URL */
  lmStudioUrl?: string;
- /** AutoCheckStatus */
+ /** Auto-check status */
  autoCheck?: boolean;
 }
 
@@ -142,7 +142,7 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  [lmStudioUrl]
  );
 
- // FetchCurrentActive Provider
+ // Get currently active provider
  const getActiveProvider = useCallback(
  (type: LLMProviderType) => {
  switch (type) {
@@ -172,21 +172,21 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  },
  });
 
- // DownloadCancelLogo
+ // Download cancel flag
  const [downloadCancelled, setDownloadCancelled] = useState(false);
 
- // CurrentActive Provider
+ // Currently active provider
  const provider = getActiveProvider(state.activeProvider);
 
  /**
- * Check Ollama Status
+ * Check provider status
  */
  const checkStatus = useCallback(async () => {
  setState((prev) => ({ ...prev, status: 'checking', error: null }));
 
  try {
  if (isTauri()) {
- // Usage Tauri Command
+      // Use Tauri command
  const status = await invokeTauri<{ running: boolean; models_count: number }>(
  'check_ollama_status'
  );
@@ -206,7 +206,7 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  }));
  }
  } else {
- // Usage Web API
+      // Use Web API
  const available = await provider.isAvailable();
  setState((prev) => ({
  ...prev,
@@ -222,13 +222,13 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  setState((prev) => ({
  ...prev,
  status: 'unavailable',
- error: error instanceof Error ? error.message: 'CheckStatusFailed',
+    error: error instanceof Error ? error.message: 'Failed to check status',
  }));
  }
  }, [provider]);
 
  /**
- * RefreshModelList
+ * Refresh model list
  */
  const refreshModels = useCallback(async () => {
  if (state.status !== 'available') return;
@@ -254,47 +254,47 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  setState((prev) => ({
  ...prev,
  isLoading: false,
- error: error instanceof Error ? error.message: 'FetchModelListFailed',
+    error: error instanceof Error ? error.message: 'Failed to fetch model list',
  }));
  }
  }, [state.status, provider]);
 
  /**
- * DownloadModel
+ * Download model
  */
  const pullModel = useCallback(
- async (modelName: string) => {
- if (state.status !== 'available') {
- throw new Error('Ollama not yetRun');
- }
+  async (modelName: string) => {
+   if (state.status !== 'available') {
+    throw new Error('Ollama is not running');
+   }
 
- setState((prev) => ({
- ...prev,
- downloadingModel: modelName,
- downloadProgress: { status: 'PrepareDownload...', completed: 0, total: 0 },
+   setState((prev) => ({
+    ...prev,
+    downloadingModel: modelName,
+    downloadProgress: { status: 'Preparing download...', completed: 0, total: 0 },
  error: null,
  }));
  setDownloadCancelled(false);
 
  try {
  if (isTauri()) {
- // Tauri EnvironmentUsageCommand
+      // Use Tauri command in Tauri environment
  await invokeTauri('pull_ollama_model', { modelName });
  } else {
- // Web EnvironmentUsageStreaming API
+      // Use streaming API in web environment
  await provider.pullModel(modelName, (progress) => {
  if (downloadCancelled) return;
  setState((prev) => ({ ...prev, downloadProgress: progress }));
  });
  }
 
- // DownloadDone, RefreshModelList
+    // Download complete, refresh model list
  await refreshModels();
  } catch (error) {
  if (!downloadCancelled) {
  setState((prev) => ({
  ...prev,
- error: error instanceof Error ? error.message: 'DownloadModelFailed',
+      error: error instanceof Error ? error.message: 'Failed to download model',
  }));
  }
  } finally {
@@ -309,13 +309,13 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  );
 
  /**
- * DeleteModel
+ * Delete model
  */
  const deleteModel = useCallback(
- async (modelName: string) => {
- if (state.status !== 'available') {
- throw new Error('Ollama not yetRun');
- }
+  async (modelName: string) => {
+   if (state.status !== 'available') {
+    throw new Error('Ollama is not running');
+   }
 
  setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -326,13 +326,13 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  await provider.deleteModel(modelName);
  }
 
- // RefreshModelList
- await refreshModels();
- } catch (error) {
- setState((prev) => ({
- ...prev,
- isLoading: false,
- error: error instanceof Error ? error.message: 'DeleteModelFailed',
+    // Refresh model list
+   await refreshModels();
+  } catch (error) {
+   setState((prev) => ({
+    ...prev,
+    isLoading: false,
+    error: error instanceof Error ? error.message: 'Failed to delete model',
  }));
  throw error;
  }
@@ -344,10 +344,10 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  * Chat
  */
  const chat = useCallback(
- async (options: ChatOptions): Promise<ChatResponse> => {
- if (state.status !== 'available') {
- throw new Error('Ollama not yetRun');
- }
+  async (options: ChatOptions): Promise<ChatResponse> => {
+   if (state.status !== 'available') {
+    throw new Error('Ollama is not running');
+   }
 
  if (isTauri()) {
  const response = await invokeTauri<{
@@ -386,18 +386,18 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  );
 
  /**
- * TestModel
+ * Test model
  */
  const testModel = useCallback(
- async (modelName: string): Promise<string> => {
- const response = await chat({
- model: modelName,
- messages: [
- {
- role: 'user',
- content: 'you, Pleaseuse1IntroductionSelf.',
- },
- ],
+  async (modelName: string): Promise<string> => {
+   const response = await chat({
+    model: modelName,
+    messages: [
+     {
+      role: 'user',
+      content: 'Hello, please introduce yourself briefly.',
+     },
+    ],
  maxTokens: 100,
  temperature: 0.7,
  });
@@ -408,7 +408,7 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  );
 
  /**
- * UpdateConfig
+ * Update config
  */
  const updateConfig = useCallback(
  (config: Partial<OllamaConfig>) => {
@@ -418,7 +418,7 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  );
 
  /**
- * CancelDownload
+ * Cancel download
  */
  const cancelDownload = useCallback(() => {
  setDownloadCancelled(true);
@@ -447,14 +447,14 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  error: null,
  }));
 
- // AutoChecknew Provider Status
+   // Auto-check new provider status
  setTimeout(() => checkStatus(), 0);
  },
  [state.activeProvider, checkStatus]
  );
 
  /**
- * CheckSpecific Provider Status
+ * Check specific provider status
  */
  const checkProviderStatus = useCallback(
  async (providerType: LLMProviderType): Promise<ProviderStatus> => {
@@ -503,11 +503,11 @@ export function useLocalLLM(options: UseLocalLLMOptions = {}): UseLocalLLMReturn
  [getActiveProvider]
  );
 
- // AutoCheckStatus
+ // Auto-check status
  useEffect(() => {
- if (autoCheck) {
- checkStatus();
- // timeCheckAll Provider Status
+  if (autoCheck) {
+   checkStatus();
+   // Also check all provider statuses
  checkProviderStatus('ollama');
  checkProviderStatus('lm-studio');
  }

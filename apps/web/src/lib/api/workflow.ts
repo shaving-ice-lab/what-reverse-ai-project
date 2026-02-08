@@ -25,7 +25,7 @@ import type {
 // API Basic URL from shared.ts Import
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
-// afterendpointBack'sWorkflowDataStructure(snake_case)
+// Workflow data structure returned by the API endpoint (snake_case)
 interface BackendWorkflow {
  id: string;
  user_id: string;
@@ -48,7 +48,7 @@ interface BackendWorkflow {
  folder_id?: string | null;
 }
 
-// ConvertafterendpointWorkflowDataasbeforeendpointFormat
+// Convert backend workflow data to frontend format
 function transformWorkflow(backend: BackendWorkflow): WorkflowMeta {
  return {
  id: backend.id,
@@ -79,7 +79,7 @@ import { request, getStoredTokens, API_BASE_URL } from "./shared";
  */
 export const workflowApi = {
  /**
- * FetchWorkflowList
+ * Fetch workflow list
  */
  async list(params?: ListWorkflowsRequest): Promise<ListWorkflowsResponse> {
  const searchParams = new URLSearchParams();
@@ -103,7 +103,7 @@ export const workflowApi = {
  meta: { total: number; page: number; page_size: number };
  }>(`/workflows${query ? `?${query}` : ""}`);
  
- // ConvertafterendpointDataasbeforeendpointFormat
+   // Convert backend data to frontend format
  return {
  success: response.success,
  data: (response.data || []).map(transformWorkflow),
@@ -117,7 +117,7 @@ export const workflowApi = {
  },
 
  /**
- * FetchWorkflowDetails
+ * Fetch workflow details
  */
  async get(id: string): Promise<GetWorkflowResponse> {
  const response = await request<{
@@ -141,7 +141,7 @@ export const workflowApi = {
  },
 
  /**
- * CreateWorkflow
+ * Create workflow
  */
  async create(data: CreateWorkflowRequest): Promise<CreateWorkflowResponse> {
  return request<CreateWorkflowResponse>("/workflows", {
@@ -151,7 +151,7 @@ export const workflowApi = {
  },
 
  /**
- * UpdateWorkflow
+ * Update workflow
  */
  async update(id: string, data: UpdateWorkflowRequest): Promise<GetWorkflowResponse> {
  return request<GetWorkflowResponse>(`/workflows/${id}`, {
@@ -161,7 +161,7 @@ export const workflowApi = {
  },
 
  /**
- * DeleteWorkflow
+ * Delete workflow
  */
  async delete(id: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/workflows/${id}`, {
@@ -170,7 +170,7 @@ export const workflowApi = {
  },
 
  /**
- * CopyWorkflow
+ * Duplicate workflow
  */
  async duplicate(id: string, data?: DuplicateWorkflowRequest): Promise<CreateWorkflowResponse> {
  return request<CreateWorkflowResponse>(`/workflows/${id}/duplicate`, {
@@ -180,14 +180,14 @@ export const workflowApi = {
  },
 
  /**
- * ExportWorkflow
+ * Export workflow
  */
  async export(id: string): Promise<ExportWorkflowResponse> {
  return request<ExportWorkflowResponse>(`/workflows/${id}/export`);
  },
 
  /**
- * ImportWorkflow
+ * Import workflow
  */
  async import(data: ImportWorkflowRequest): Promise<CreateWorkflowResponse> {
  return request<CreateWorkflowResponse>("/workflows/import", {
@@ -197,7 +197,7 @@ export const workflowApi = {
  },
 
  /**
- * PublishWorkflow
+ * Publish workflow
  */
  async publish(id: string): Promise<GetWorkflowResponse> {
  return request<GetWorkflowResponse>(`/workflows/${id}/publish`, {
@@ -206,7 +206,7 @@ export const workflowApi = {
  },
 
  /**
- * ArchiveWorkflow
+ * Archive workflow
  */
  async archive(id: string): Promise<GetWorkflowResponse> {
  return request<GetWorkflowResponse>(`/workflows/${id}/archive`, {
@@ -215,7 +215,7 @@ export const workflowApi = {
  },
 
  /**
- * ExecuteWorkflow
+ * Execute workflow
  */
  async execute(id: string, inputs?: Record<string, unknown>): Promise<{ executionId: string }> {
  return request<{ executionId: string }>(`/workflows/${id}/execute`, {
@@ -226,18 +226,18 @@ export const workflowApi = {
 };
 
 /**
- * WorkflowFolder API
+ * Workflow Folder API
  */
 export const folderApi = {
  /**
- * FetchFolderList
+ * Fetch folder list
  */
  async list(): Promise<ListFoldersResponse> {
  return request<ListFoldersResponse>("/workflows/folders");
  },
 
  /**
- * CreateFolder
+ * Create folder
  */
  async create(data: { name: string; parentId?: string; color?: string }): Promise<{ folder: WorkflowFolder }> {
  return request<{ folder: WorkflowFolder }>("/workflows/folders", {
@@ -247,7 +247,7 @@ export const folderApi = {
  },
 
  /**
- * UpdateFolder
+ * Update folder
  */
  async update(id: string, data: { name?: string; color?: string }): Promise<{ folder: WorkflowFolder }> {
  return request<{ folder: WorkflowFolder }>(`/workflows/folders/${id}`, {
@@ -257,7 +257,7 @@ export const folderApi = {
  },
 
  /**
- * DeleteFolder
+ * Delete folder
  */
  async delete(id: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/workflows/folders/${id}`, {
@@ -267,11 +267,11 @@ export const folderApi = {
 };
 
 /**
- * ExecuteRecord API
+ * Execution Record API
  */
 export const executionApi = {
  /**
- * FetchExecuteRecordList
+ * Fetch execution record list
  */
  async list(workflowId: string, params?: { page?: number; pageSize?: number }): Promise<ListExecutionsResponse> {
  const searchParams = new URLSearchParams();
@@ -284,14 +284,14 @@ export const executionApi = {
  },
 
  /**
- * FetchExecuteDetails
+ * Fetch execution details
  */
  async get(executionId: string): Promise<{ execution: WorkflowExecution }> {
  return request<{ execution: WorkflowExecution }>(`/executions/${executionId}`);
  },
 
  /**
- * CancelExecute
+ * Cancel execution
  */
  async cancel(executionId: string): Promise<{ success: boolean; message: string }> {
  return request<{ success: boolean; message: string }>(`/executions/${executionId}/cancel`, {
@@ -300,7 +300,7 @@ export const executionApi = {
  },
 
  /**
- * RetryExecute
+ * Retry execution
  */
  async retry(executionId: string): Promise<{ success: boolean; data: { execution: WorkflowExecution } }> {
  return request<{ success: boolean; data: { execution: WorkflowExecution } }>(`/executions/${executionId}/retry`, {
@@ -314,7 +314,7 @@ export const executionApi = {
  */
 export const templateApi = {
  /**
- * FetchTemplateList
+ * Fetch template list
  */
  async list(params?: { 
  category?: string;
@@ -337,14 +337,14 @@ export const templateApi = {
  },
 
  /**
- * FetchTemplateDetails
+ * Fetch template details
  */
  async get(id: string): Promise<{ template: WorkflowTemplate }> {
  return request<{ template: WorkflowTemplate }>(`/templates/${id}`);
  },
 
  /**
- * fromTemplateCreateWorkflow
+ * Create workflow from template
  */
  async useTemplate(id: string, data?: { name?: string; folderId?: string }): Promise<CreateWorkflowResponse> {
  return request<CreateWorkflowResponse>(`/templates/${id}/use`, {

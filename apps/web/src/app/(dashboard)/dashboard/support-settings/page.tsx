@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * SupportChannelandDispatchRuleConfig - Supabase Style
+ * Support Channel and Dispatch Rule Config - Supabase Style
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
  CheckCircle2,
  Bell,
@@ -33,35 +33,35 @@ import {
 } from "@/lib/api/support";
 
 const priorityOptions = [
- { id: "", label: "notlimit" },
+ { id: "", label: "No limit" },
  { id: "critical", label: "Urgent" },
- { id: "high", label: "" },
- { id: "normal", label: "" },
- { id: "low", label: "" },
+ { id: "high", label: "High" },
+ { id: "normal", label: "Normal" },
+ { id: "low", label: "Low" },
 ];
 
 const categoryOptions = [
- { id: "", label: "notlimit" },
- { id: "general", label: "1Consulting" },
- { id: "technical", label: "TechnologyIssue" },
- { id: "billing", label: "BillingandQuota" },
- { id: "account", label: "AccountandPermission" },
- { id: "security", label: "SecurityandCompliance" },
+ { id: "", label: "No limit" },
+ { id: "general", label: "General Inquiry" },
+ { id: "technical", label: "Technical Issue" },
+ { id: "billing", label: "Billing and Quota" },
+ { id: "account", label: "Account and Permission" },
+ { id: "security", label: "Security and Compliance" },
  { id: "bug", label: "Bug Report" },
- { id: "feature", label: "FeaturesSuggestion" },
+ { id: "feature", label: "Feature Suggestion" },
 ];
 
 const channelOptions = [
- { id: "", label: "notlimit" },
+ { id: "", label: "No limit" },
  { id: "web", label: "Web" },
  { id: "email", label: "Email" },
- { id: "chat", label: "OnlineSupport" },
+ { id: "chat", label: "Live Chat" },
  { id: "phone", label: "Phone" },
 ];
 
 const assigneeOptions = [
  { id: "team", label: "Team" },
- { id: "user", label: "person" },
+ { id: "user", label: "Person" },
  { id: "queue", label: "Queue" },
 ];
 
@@ -105,28 +105,28 @@ const emptyQueueForm = {
 };
 
 const templateChannelOptions = [
- { id: "system", label: "in" },
+ { id: "system", label: "In-app" },
  { id: "email", label: "Email" },
  { id: "sms", label: "SMS" },
 ];
 
 const templateLocaleOptions = [
- { id: "zh-CN", label: "" },
+ { id: "zh-CN", label: "Chinese" },
  { id: "en-US", label: "English" },
 ];
 
 const defaultZhTemplates: SupportNotificationTemplates = {
  ticket_created: {
- title: "newTicketalreadyDispatch",
- content: "Ticket {{reference}} alreadyCreateandDispatchtoyou: {{subject}}",
+ title: "New ticket assigned",
+ content: "Ticket {{reference}} has been created and assigned to you: {{subject}}",
  },
  status_updated: {
- title: "TicketStatusUpdate",
- content: "Ticket {{reference}} StatusUpdateas {{status}}.{{note}}",
+ title: "Ticket status updated",
+ content: "Ticket {{reference}} status updated to {{status}}. {{note}}",
  },
  comment_added: {
- title: "TicketAddComment",
- content: "Ticket {{reference}} hasnewComment: {{comment}}",
+ title: "New ticket comment",
+ content: "Ticket {{reference}} has a new comment: {{comment}}",
  },
 };
 
@@ -277,7 +277,7 @@ export default function SupportSettingsPage() {
  setTeamMembers(Object.fromEntries(teamMemberEntries));
  setQueueMembers(Object.fromEntries(queueMemberEntries));
  } catch (error) {
- setErrorMessage((error as Error).message || "LoadFailed");
+ setErrorMessage((error as Error).message || "Failed to load");
  } finally {
  setLoading(false);
  }
@@ -309,7 +309,7 @@ export default function SupportSettingsPage() {
 
  const submitChannel = async () => {
  if (!channelForm.key.trim() || !channelForm.name.trim()) {
- setErrorMessage("Please fill inChannel Key andName");
+ setErrorMessage("Please fill in Channel Key and Name");
  return;
  }
  setChannelSubmitting(true);
@@ -348,7 +348,7 @@ export default function SupportSettingsPage() {
  }
  resetChannelForm();
  } catch (error) {
- setErrorMessage((error as Error).message || "SaveChannelFailed");
+ setErrorMessage((error as Error).message || "Failed to save channel");
  } finally {
  setChannelSubmitting(false);
  }
@@ -381,13 +381,13 @@ export default function SupportSettingsPage() {
  prev.map((item) => (item.id === channel.id ? response.channel : item))
  );
  } catch (error) {
- setErrorMessage((error as Error).message || "UpdateChannelFailed");
+ setErrorMessage((error as Error).message || "Failed to update channel");
  }
  };
 
  const submitRule = async () => {
  if (!ruleForm.name.trim()) {
- setErrorMessage("Please fill inRuleName");
+ setErrorMessage("Please fill in Rule Name");
  return;
  }
  setRuleSubmitting(true);
@@ -424,7 +424,7 @@ export default function SupportSettingsPage() {
  }
  resetRuleForm();
  } catch (error) {
- setErrorMessage((error as Error).message || "SaveRuleFailed");
+ setErrorMessage((error as Error).message || "Failed to save rule");
  } finally {
  setRuleSubmitting(false);
  }
@@ -454,13 +454,13 @@ export default function SupportSettingsPage() {
  prev.map((item) => (item.id === rule.id ? response.rule : item))
  );
  } catch (error) {
- setErrorMessage((error as Error).message || "UpdateRuleFailed");
+ setErrorMessage((error as Error).message || "Failed to update rule");
  }
  };
 
  const submitTeam = async () => {
  if (!teamForm.name.trim()) {
- setErrorMessage("Please fill inTeamName");
+ setErrorMessage("Please fill in Team Name");
  return;
  }
  setTeamSubmitting(true);
@@ -485,7 +485,7 @@ export default function SupportSettingsPage() {
  }
  resetTeamForm();
  } catch (error) {
- setErrorMessage((error as Error).message || "SaveTeamFailed");
+ setErrorMessage((error as Error).message || "Failed to save team");
  } finally {
  setTeamSubmitting(false);
  }
@@ -509,14 +509,14 @@ export default function SupportSettingsPage() {
  prev.map((item) => (item.id === team.id ? response.team : item))
  );
  } catch (error) {
- setErrorMessage((error as Error).message || "UpdateTeamFailed");
+ setErrorMessage((error as Error).message || "Failed to update team");
  }
  };
 
  const addTeamMember = async (teamId: string) => {
  const draft = teamMemberDrafts[teamId];
  if (!draft?.userId) {
- setErrorMessage("Please fill inMemberUser ID");
+ setErrorMessage("Please fill in Member User ID");
  return;
  }
  try {
@@ -534,7 +534,7 @@ export default function SupportSettingsPage() {
  [teamId]: { userId: "", role: "", sortOrder: 0 },
  }));
  } catch (error) {
- setErrorMessage((error as Error).message || "AddMemberFailed");
+ setErrorMessage((error as Error).message || "Failed to add member");
  }
  };
 
@@ -546,13 +546,13 @@ export default function SupportSettingsPage() {
  [teamId]: (prev[teamId] || []).filter((member) => member.user_id !== userId),
  }));
  } catch (error) {
- setErrorMessage((error as Error).message || "RemoveMemberFailed");
+ setErrorMessage((error as Error).message || "Failed to remove member");
  }
  };
 
  const submitQueue = async () => {
  if (!queueForm.name.trim()) {
- setErrorMessage("Please fill inQueueName");
+ setErrorMessage("Please fill in Queue Name");
  return;
  }
  setQueueSubmitting(true);
@@ -577,7 +577,7 @@ export default function SupportSettingsPage() {
  }
  resetQueueForm();
  } catch (error) {
- setErrorMessage((error as Error).message || "SaveQueueFailed");
+ setErrorMessage((error as Error).message || "Failed to save queue");
  } finally {
  setQueueSubmitting(false);
  }
@@ -601,14 +601,14 @@ export default function SupportSettingsPage() {
  prev.map((item) => (item.id === queue.id ? response.queue : item))
  );
  } catch (error) {
- setErrorMessage((error as Error).message || "UpdateQueueFailed");
+ setErrorMessage((error as Error).message || "Failed to update queue");
  }
  };
 
  const addQueueMember = async (queueId: string) => {
  const draft = queueMemberDrafts[queueId];
  if (!draft?.userId) {
- setErrorMessage("Please fill inMemberUser ID");
+ setErrorMessage("Please fill in Member User ID");
  return;
  }
  try {
@@ -625,7 +625,7 @@ export default function SupportSettingsPage() {
  [queueId]: { userId: "", sortOrder: 0 },
  }));
  } catch (error) {
- setErrorMessage((error as Error).message || "AddMemberFailed");
+ setErrorMessage((error as Error).message || "Failed to add member");
  }
  };
 
@@ -637,7 +637,7 @@ export default function SupportSettingsPage() {
  [queueId]: (prev[queueId] || []).filter((member) => member.user_id !== userId),
  }));
  } catch (error) {
- setErrorMessage((error as Error).message || "RemoveMemberFailed");
+ setErrorMessage((error as Error).message || "Failed to remove member");
  }
  };
 
@@ -648,7 +648,7 @@ export default function SupportSettingsPage() {
  const response = await supportApi.adminUpdateNotificationTemplates(templateConfig);
  setTemplateConfig(mergeTemplateConfig(response.templates));
  } catch (error) {
- setErrorMessage((error as Error).message || "SaveNotificationsTemplateFailed");
+ setErrorMessage((error as Error).message || "Failed to save notification template");
  } finally {
  setTemplateSubmitting(false);
  }
@@ -660,7 +660,7 @@ export default function SupportSettingsPage() {
  );
 
  const updateTemplateField = (
- key: keyofSupportNotificationTemplates,
+ key: keyof SupportNotificationTemplates,
  field: "title" | "content",
  value: string
  ) => {
@@ -692,9 +692,9 @@ export default function SupportSettingsPage() {
  <p className="page-caption">Support</p>
  <h1 className="page-title flex items-center gap-2">
  <Settings className="w-5 h-5 text-brand-500" />
- SupportConfig
+ Support Settings
  </h1>
- <p className="page-description">ManageSupportChannelandTicketAutoDispatchPolicy</p>
+ <p className="page-description">Manage support channels and ticket auto-dispatch policy</p>
  </div>
  <div className="page-toolbar">
  <Button
@@ -721,11 +721,11 @@ export default function SupportSettingsPage() {
  <div className="page-panel-header">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">SupportChannel</h2>
- <p className="page-panel-description">ConfigforoutsideSupportEntryandContactmethod</p>
+ <h2 className="page-panel-title">Support Channels</h2>
+ <p className="page-panel-description">Configure external support entry and contact method</p>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted text-[11px]">
- {channels.length} Channel
+ {channels.length} Channels
  </Badge>
  </div>
  </div>
@@ -733,11 +733,11 @@ export default function SupportSettingsPage() {
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
  <LifeBuoy className="w-4 h-4 text-brand-500" />
- {editingChannelId ? "EditChannel": "AddChannel"}
+ {editingChannelId ? "Edit Channel" : "Add Channel"}
  </div>
  <div className="grid sm:grid-cols-2 gap-3">
  <Input
- placeholder="Key (exampleif email)"
+ placeholder="Key (e.g. email)"
  value={channelForm.key}
  onChange={(e) => setChannelForm((prev) => ({ ...prev, key: e.target.value }))}
  />
@@ -749,12 +749,12 @@ export default function SupportSettingsPage() {
  </div>
  <div className="grid sm:grid-cols-2 gap-3">
  <Input
- placeholder="Contactmethod"
+ placeholder="Contact method"
  value={channelForm.contact}
  onChange={(e) => setChannelForm((prev) => ({ ...prev, contact: e.target.value }))}
  />
  <Input
- placeholder="Sort(countchar)"
+ placeholder="Sort order"
  type="number"
  value={channelForm.sortOrder}
  onChange={(e) =>
@@ -763,7 +763,7 @@ export default function SupportSettingsPage() {
  />
  </div>
  <div>
- <label className="text-xs font-medium text-foreground">ChanneltimesResponse SLA(min)</label>
+ <label className="text-xs font-medium text-foreground">Channel Response SLA (minutes)</label>
  <div className="grid sm:grid-cols-4 gap-3 mt-2">
  <Input
  type="number"
@@ -823,11 +823,11 @@ export default function SupportSettingsPage() {
  />
  </div>
  <p className="text-xs text-foreground-muted mt-2">
- not yetFill inwillUsageDefault SLA.
+                      Leave empty to use the default SLA.
  </p>
  </div>
  <Input
- placeholder="Description(Optional)"
+ placeholder="Description (optional)"
  value={channelForm.description}
  onChange={(e) =>
  setChannelForm((prev) => ({ ...prev, description: e.target.value }))
@@ -841,7 +841,7 @@ export default function SupportSettingsPage() {
  setChannelForm((prev) => ({ ...prev, enabled: checked }))
  }
  />
- EnableChannel
+ Enable Channel
  </div>
  <div className="flex items-center gap-2">
  {editingChannelId && (
@@ -860,7 +860,7 @@ export default function SupportSettingsPage() {
  onClick={submitChannel}
  disabled={channelSubmitting}
  >
- {channelSubmitting ? "Saving...": "SaveChannel"}
+ {channelSubmitting ? "Saving..." : "Save Channel"}
  </Button>
  </div>
  </div>
@@ -868,7 +868,7 @@ export default function SupportSettingsPage() {
 
  {channels.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-10 text-center text-sm text-foreground-muted">
- NoneChannelConfig
+ No channel configured
  </div>
  ) : (
  <div className="space-y-3">
@@ -882,7 +882,7 @@ export default function SupportSettingsPage() {
  {channel.key}
  </Badge>
  </div>
- <p className="text-xs text-foreground-muted mt-1">{channel.contact || "not yetFill inContactmethod"}</p>
+ <p className="text-xs text-foreground-muted mt-1">{channel.contact || "No contact method specified"}</p>
  {channel.sla_overrides && (
  <p className="text-xs text-foreground-muted mt-1">
  SLA Coverage: {Object.keys(channel.sla_overrides).join(", ")}
@@ -915,11 +915,11 @@ export default function SupportSettingsPage() {
  <div className="page-panel-header">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">AutoDispatchRule</h2>
- <p className="page-panel-description">byPriority/ChannelAutoDispatchProcessTeam</p>
+ <h2 className="page-panel-title">Auto-dispatch rules</h2>
+ <p className="page-panel-description">Auto-dispatch tickets to teams by priority and channel</p>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted text-[11px]">
- {rules.length} Rule
+ {rules.length} Rules
  </Badge>
  </div>
  </div>
@@ -927,10 +927,10 @@ export default function SupportSettingsPage() {
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
  <SlidersHorizontal className="w-4 h-4 text-brand-500" />
- {editingRuleId ? "EditRule": "AddRule"}
+ {editingRuleId ? "Edit Rule" : "Add Rule"}
  </div>
  <Input
- placeholder="RuleName"
+ placeholder="Rule name"
  value={ruleForm.name}
  onChange={(e) => setRuleForm((prev) => ({ ...prev, name: e.target.value }))}
  />
@@ -971,7 +971,7 @@ export default function SupportSettingsPage() {
  ))}
  </select>
  <Input
- placeholder="Keywords(Optional)"
+ placeholder="Keywords (optional)"
  value={ruleForm.keyword}
  onChange={(e) => setRuleForm((prev) => ({ ...prev, keyword: e.target.value }))}
  />
@@ -994,7 +994,7 @@ export default function SupportSettingsPage() {
  onChange={(e) => setRuleForm((prev) => ({ ...prev, assigneeValue: e.target.value }))}
  className="h-9 rounded-md border border-border bg-surface-200 px-2 text-xs text-foreground"
  >
- <option value="">SelectTeam</option>
+ <option value="">Select Team</option>
  {teams.map((team) => (
  <option key={team.id} value={team.id}>
  {team.name}
@@ -1007,7 +1007,7 @@ export default function SupportSettingsPage() {
  onChange={(e) => setRuleForm((prev) => ({ ...prev, assigneeValue: e.target.value }))}
  className="h-9 rounded-md border border-border bg-surface-200 px-2 text-xs text-foreground"
  >
- <option value="">SelectQueue</option>
+ <option value="">Select Queue</option>
  {queues.map((queue) => (
  <option key={queue.id} value={queue.id}>
  {queue.name}
@@ -1038,7 +1038,7 @@ export default function SupportSettingsPage() {
  setRuleForm((prev) => ({ ...prev, enabled: checked }))
  }
  />
- EnableRule
+ Enable Rule
  </div>
  <div className="flex items-center gap-2">
  {editingRuleId && (
@@ -1057,7 +1057,7 @@ export default function SupportSettingsPage() {
  onClick={submitRule}
  disabled={ruleSubmitting}
  >
- {ruleSubmitting ? "Saving...": "SaveRule"}
+ {ruleSubmitting ? "Saving..." : "Save Rule"}
  </Button>
  </div>
  </div>
@@ -1065,7 +1065,7 @@ export default function SupportSettingsPage() {
 
  {rules.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-10 text-center text-sm text-foreground-muted">
- NoneDispatchRule
+ No dispatch rules
  </div>
  ) : (
  <div className="space-y-3">
@@ -1076,11 +1076,11 @@ export default function SupportSettingsPage() {
  <div className="flex items-center gap-2">
  <span className="text-sm font-medium text-foreground">{rule.name}</span>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted text-[11px]">
- {rule.assignee_type || "team"} · {rule.assignee_value || "not yetSettings"}
+ {rule.assignee_type || "team"} · {rule.assignee_value || "Not configured"}
  </Badge>
  </div>
  <p className="text-xs text-foreground-muted mt-1">
- {rule.priority || "notlimit"} / {rule.category || "notlimit"} / {rule.channel || "notlimit"} / {rule.keyword || "NoneKeywords"}
+ {rule.priority || "No limit"} / {rule.category || "No limit"} / {rule.channel || "No limit"} / {rule.keyword || "No keywords"}
  </p>
  </div>
  <div className="flex items-center gap-2">
@@ -1112,11 +1112,11 @@ export default function SupportSettingsPage() {
  <div className="page-panel-header">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">SupportTeam</h2>
- <p className="page-panel-description">ConfigTeamandMemberMapping</p>
+ <h2 className="page-panel-title">Support Teams</h2>
+ <p className="page-panel-description">Configure team and member mapping</p>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted text-[11px]">
- {teams.length} Team
+ {teams.length} Teams
  </Badge>
  </div>
  </div>
@@ -1124,16 +1124,16 @@ export default function SupportSettingsPage() {
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
  <Users className="w-4 h-4 text-brand-500" />
- {editingTeamId ? "EditTeam": "AddTeam"}
+ {editingTeamId ? "Edit Team" : "Add Team"}
  </div>
  <div className="grid sm:grid-cols-2 gap-3">
  <Input
- placeholder="TeamName"
+ placeholder="Team name"
  value={teamForm.name}
  onChange={(e) => setTeamForm((prev) => ({ ...prev, name: e.target.value }))}
  />
  <Input
- placeholder="Description(Optional)"
+ placeholder="Description (optional)"
  value={teamForm.description}
  onChange={(e) => setTeamForm((prev) => ({ ...prev, description: e.target.value }))}
  />
@@ -1144,7 +1144,7 @@ export default function SupportSettingsPage() {
  checked={teamForm.enabled}
  onCheckedChange={(checked) => setTeamForm((prev) => ({ ...prev, enabled: checked }))}
  />
- EnableTeam
+ Enable Team
  </div>
  <div className="flex items-center gap-2">
  {editingTeamId && (
@@ -1163,7 +1163,7 @@ export default function SupportSettingsPage() {
  onClick={submitTeam}
  disabled={teamSubmitting}
  >
- {teamSubmitting ? "Saving...": "SaveTeam"}
+ {teamSubmitting ? "Saving..." : "Save Team"}
  </Button>
  </div>
  </div>
@@ -1171,7 +1171,7 @@ export default function SupportSettingsPage() {
 
  {teams.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-10 text-center text-sm text-foreground-muted">
- NoneTeam
+ No teams
  </div>
  ) : (
  <div className="space-y-3">
@@ -1201,7 +1201,7 @@ export default function SupportSettingsPage() {
  </div>
  <div className="grid sm:grid-cols-3 gap-3">
  <Input
- placeholder="MemberUser ID"
+ placeholder="Member user ID"
  value={draft.userId}
  onChange={(e) =>
  setTeamMemberDrafts((prev) => ({
@@ -1211,7 +1211,7 @@ export default function SupportSettingsPage() {
  }
  />
  <Input
- placeholder="Role(Optional)"
+ placeholder="Role (optional)"
  value={draft.role}
  onChange={(e) =>
  setTeamMemberDrafts((prev) => ({
@@ -1268,11 +1268,11 @@ export default function SupportSettingsPage() {
  <div className="page-panel-header">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="page-panel-title">SupportQueue</h2>
- <p className="page-panel-description">willTicketDispatchtoQueueMember</p>
+ <h2 className="page-panel-title">Support Queues</h2>
+ <p className="page-panel-description">Tickets are dispatched to queue members.</p>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-muted text-[11px]">
- {queues.length} Queue
+ {queues.length} Queues
  </Badge>
  </div>
  </div>
@@ -1280,16 +1280,16 @@ export default function SupportSettingsPage() {
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
  <Inbox className="w-4 h-4 text-brand-500" />
- {editingQueueId ? "EditQueue": "AddQueue"}
+ {editingQueueId ? "Edit Queue" : "Add Queue"}
  </div>
  <div className="grid sm:grid-cols-2 gap-3">
  <Input
- placeholder="QueueName"
+ placeholder="Queue name"
  value={queueForm.name}
  onChange={(e) => setQueueForm((prev) => ({ ...prev, name: e.target.value }))}
  />
  <Input
- placeholder="Description(Optional)"
+ placeholder="Description (optional)"
  value={queueForm.description}
  onChange={(e) => setQueueForm((prev) => ({ ...prev, description: e.target.value }))}
  />
@@ -1300,7 +1300,7 @@ export default function SupportSettingsPage() {
  checked={queueForm.enabled}
  onCheckedChange={(checked) => setQueueForm((prev) => ({ ...prev, enabled: checked }))}
  />
- EnableQueue
+ Enable Queue
  </div>
  <div className="flex items-center gap-2">
  {editingQueueId && (
@@ -1319,7 +1319,7 @@ export default function SupportSettingsPage() {
  onClick={submitQueue}
  disabled={queueSubmitting}
  >
- {queueSubmitting ? "Saving...": "SaveQueue"}
+ {queueSubmitting ? "Saving..." : "Save Queue"}
  </Button>
  </div>
  </div>
@@ -1327,7 +1327,7 @@ export default function SupportSettingsPage() {
 
  {queues.length === 0 ? (
  <div className="rounded-md border border-border bg-surface-75/60 py-10 text-center text-sm text-foreground-muted">
- NoneQueue
+ No queues
  </div>
  ) : (
  <div className="space-y-3">
@@ -1357,7 +1357,7 @@ export default function SupportSettingsPage() {
  </div>
  <div className="grid sm:grid-cols-3 gap-3">
  <Input
- placeholder="MemberUser ID"
+ placeholder="Member user ID"
  value={draft.userId}
  onChange={(e) =>
  setQueueMemberDrafts((prev) => ({
@@ -1413,14 +1413,14 @@ export default function SupportSettingsPage() {
  <div className="page-panel-header">
  <div className="flex items-center gap-2">
  <Bell className="w-4 h-4 text-brand-500" />
- <h2 className="page-panel-title">NotificationsTemplate</h2>
+ <h2 className="page-panel-title">Notification Templates</h2>
  </div>
- <p className="page-panel-description">ConfigTicketNotificationsTitleandContentTemplate</p>
+ <p className="page-panel-description">Configure ticket notification title and content template</p>
  </div>
  <div className="p-5 space-y-4">
  <div className="grid lg:grid-cols-2 gap-4">
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-2">
- <div className="text-xs font-medium text-foreground">DefaultSendPolicy</div>
+ <div className="text-xs font-medium text-foreground">Default send policy</div>
  <div className="grid sm:grid-cols-2 gap-3">
  <select
  value={templateConfig.default_channel}
@@ -1450,11 +1450,11 @@ export default function SupportSettingsPage() {
  </select>
  </div>
  <p className="text-xs text-foreground-muted">
- not yetSpecifyChannelorLanguagetimeUsageDefaultConfig.
+ When no channel or language is specified, the default configuration is used.
  </p>
  </div>
  <div className="rounded-md border border-border bg-surface-75/60 p-4 space-y-2">
- <div className="text-xs font-medium text-foreground">EditTemplateRange</div>
+ <div className="text-xs font-medium text-foreground">Edit template scope</div>
  <div className="grid sm:grid-cols-2 gap-3">
  <select
  value={activeTemplateChannel}
@@ -1480,31 +1480,31 @@ export default function SupportSettingsPage() {
  </select>
  </div>
  <p className="text-xs text-foreground-muted">
- onlyUpdateCurrentChannelandLanguagedown'sTemplateContent.
+ Only update current channel and language template content.
  </p>
  </div>
  </div>
  <div className="text-xs text-foreground-muted">
- AvailableVariable: {"{{reference}}"}, {"{{subject}}"}, {"{{status}}"}, {"{{note}}"}, {"{{comment}}"}, {"{{assignee}}"}
+ Available variables: {"{{reference}}"}, {"{{subject}}"}, {"{{status}}"}, {"{{note}}"}, {"{{comment}}"}, {"{{assignee}}"}
  </div>
  <div className="grid lg:grid-cols-3 gap-4">
  {(
  [
- { key: "ticket_created", label: "TicketCreate" },
- { key: "status_updated", label: "StatusUpdate" },
- { key: "comment_added", label: "CommentAdd" },
+ { key: "ticket_created", label: "Ticket Created" },
+ { key: "status_updated", label: "Status Updated" },
+ { key: "comment_added", label: "Comment Added" },
  ] as const
  ).map((item) => (
  <div key={item.key} className="rounded-md border border-border bg-surface-75/60 p-4 space-y-3">
  <div className="text-sm font-medium text-foreground">{item.label}</div>
  <Input
- placeholder="TitleTemplate"
+ placeholder="Title template"
  value={activeTemplates[item.key].title}
  onChange={(e) => updateTemplateField(item.key, "title", e.target.value)}
  />
  <textarea
  rows={4}
- placeholder="ContentTemplate"
+ placeholder="Content template"
  value={activeTemplates[item.key].content}
  onChange={(e) => updateTemplateField(item.key, "content", e.target.value)}
  className="w-full rounded-md border border-border bg-surface-200 px-3 py-2 text-sm text-foreground resize-none"
@@ -1519,7 +1519,7 @@ export default function SupportSettingsPage() {
  onClick={submitTemplates}
  disabled={templateSubmitting}
  >
- {templateSubmitting ? "Saving...": "SaveTemplate"}
+ {templateSubmitting ? "Saving..." : "Save Template"}
  </Button>
  </div>
  </div>

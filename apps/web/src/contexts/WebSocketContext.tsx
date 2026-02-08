@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * WebSocket allContext
- * ProvideReal-timeExecuteStatusandNotifications
+ * WebSocket Context
+ * Provides real-time execution status and notifications
  */
 
 import React, { createContext, useContext, useEffect, useCallback, useState, useRef } from "react";
@@ -12,10 +12,10 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useExecutionStore } from "@/stores/useExecutionStore";
 import type { WSMessage, ConnectionState, ExecutionPayload, LogPayload, LatencyMetrics } from "@/hooks/useWebSocket";
 
-// Latencyvalue (500ms)
+// Latency threshold (500ms)
 const LATENCY_THRESHOLD_MS = 500;
 
-// NotificationsType
+// Notification Type
 export interface Notification {
  id: string;
  type: "success" | "error" | "info" | "warning";
@@ -41,7 +41,7 @@ interface WebSocketContextType {
  markAsRead: (notificationId: string) => void;
  markAllAsRead: () => void;
  clearNotifications: () => void;
- // LatencyMonitor
+  // Latency Monitor
  latencyMetrics: LatencyMetrics;
 }
 
@@ -76,7 +76,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  overThreshold: 0,
  });
  
- // LatencyStatisticsCumulativevalue
+  // Cumulative latency for statistics
  const totalLatencyRef = useRef(0);
  
  const maxReconnectAttempts = 5;
@@ -101,7 +101,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  overThreshold: latencyMs > LATENCY_THRESHOLD_MS ? prev.overThreshold + 1 : prev.overThreshold,
  };
  
- // ifresultLatencyExceedvalue, RecordWarning
+    // Log warning if latency exceeds threshold
  if (latencyMs > LATENCY_THRESHOLD_MS) {
  console.warn(`[WebSocket] Message latency exceeded ${LATENCY_THRESHOLD_MS}ms threshold: ${latencyMs}ms`);
  }
@@ -110,7 +110,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  });
  }, []);
 
- // AddNotifications
+  // Add notification
  const addNotification = useCallback((notification: Omit<Notification, "id" | "timestamp" | "read">) => {
  const newNotification: Notification = {
  ...notification,
@@ -119,7 +119,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  read: false,
  };
  
- setNotifications(prev => [newNotification,...prev].slice(0, 50)); // RetainRecent50
+    setNotifications(prev => [newNotification,...prev].slice(0, 50)); // Keep last 50
  }, []);
 
  // Process WebSocket Message
@@ -132,14 +132,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  // to Execution Store Process
  handleWSMessage(message);
  
- // GenerateNotifications
+    // Generate notifications
  switch (message.type) {
  case "execution.started": {
  const payload = message.payload as ExecutionPayload;
  addNotification({
  type: "info",
- title: "ExecuteStart",
- message: `WorkflowStartExecute`,
+        title: "Execution Started",
+        message: `Workflow execution has started`,
  executionId: payload.executionId,
  workflowId: payload.workflowId,
  });
@@ -150,8 +150,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  const payload = message.payload as ExecutionPayload;
  addNotification({
  type: "success",
- title: "ExecuteDone",
- message: `WorkflowExecuteSuccess, Duration ${payload.durationMs}ms`,
+        title: "Execution Completed",
+        message: `Workflow executed successfully, duration: ${payload.durationMs}ms`,
  executionId: payload.executionId,
  workflowId: payload.workflowId,
  });
@@ -162,8 +162,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  const payload = message.payload as ExecutionPayload;
  addNotification({
  type: "error",
- title: "ExecuteFailed",
- message: payload.error || "WorkflowExecuteFailed",
+        title: "Execution Failed",
+        message: payload.error || "Workflow execution failed",
  executionId: payload.executionId,
  workflowId: payload.workflowId,
  });
@@ -174,8 +174,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  const payload = message.payload as ExecutionPayload;
  addNotification({
  type: "warning",
- title: "ExecuteCancel",
- message: "WorkflowExecuteCancelled",
+        title: "Execution Cancelled",
+        message: "Workflow execution was cancelled",
  executionId: payload.executionId,
  workflowId: payload.workflowId,
  });
@@ -201,14 +201,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  }
 
  if (!tokens?.accessToken) {
- console.warn("[WebSocket] NoAvailable'sAccessToken, SkipConnect");
+      console.warn("[WebSocket] No access token available, skipping connection");
  return;
  }
 
- // CheckisnoEnableLocal(cancanNoafterendpointService)
+    // Check if local mode is enabled (backend service may not be required)
  const isLocalMode = isFeatureEnabled("local_mode");
  if (isLocalMode && process.env.NODE_ENV === "development") {
- console.info("[WebSocket] LocalEnabled, WebSocket ConnectisOptional's");
+      console.info("[WebSocket] Local mode enabled, WebSocket connection is optional");
  }
 
  try {
@@ -220,7 +220,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  const ws = new WebSocket(wsUrl);
 
  ws.onopen = () => {
- console.info("[WebSocket] ConnectSuccess");
+        console.info("[WebSocket] Connected successfully");
  setConnectionState("connected");
  reconnectAttemptsRef.current = 0;
  };
@@ -235,38 +235,38 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  };
 
  ws.onerror = () => {
- // WebSocket error EventnotContainsSpecificErrorInfo
- // ConnectFailedisasServicenot yetRun, thisatDevelopmentEnvironmentisCommon's
- if (process.env.NODE_ENV === "development") {
- console.warn("[WebSocket] ConnectFailed - PleaseEnsureafterendpointServicecurrentlyatRun (localhost:8080)");
- } else {
- console.error("[WebSocket] ConnectError");
- }
+        // WebSocket error events don't contain specific error info
+        // Connection failure is common in development when the backend is not running
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[WebSocket] Connection failed - Please ensure the backend service is running (localhost:8080)");
+        } else {
+          console.error("[WebSocket] Connection error");
+        }
  setConnectionState("error");
  };
 
  ws.onclose = (event) => {
- // NormalClose (1000) orCustomerendpointmainClose (1005) notneedneedre-
- const normalClose = event.code === 1000 || event.code === 1005;
- 
- if (normalClose) {
- console.info("[WebSocket] ConnectalreadyNormalClose");
- } else {
- console.warn(`[WebSocket] Connect (code: ${event.code})`);
- }
+        // Normal close (1000) or server-initiated close (1005) don't need reconnection
+        const normalClose = event.code === 1000 || event.code === 1005;
+        
+        if (normalClose) {
+          console.info("[WebSocket] Connection closed normally");
+        } else {
+          console.warn(`[WebSocket] Connection closed (code: ${event.code})`);
+        }
  setConnectionState("disconnected");
 
- // Autore- (NormalClosetime)
- if (!normalClose && reconnectAttemptsRef.current < maxReconnectAttempts) {
- const delay = reconnectInterval * Math.pow(1.5, reconnectAttemptsRef.current); // count
- reconnectTimeoutRef.current = setTimeout(() => {
- reconnectAttemptsRef.current++;
- console.info(`[WebSocket] re-... (# ${reconnectAttemptsRef.current} timesTry, Latency ${Math.round(delay / 1000)}s)`);
- connect();
- }, delay);
- } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
- console.warn("[WebSocket] alreadytoMaximumre-timescount, Stopre-");
- }
+        // Auto reconnect (except for normal close)
+        if (!normalClose && reconnectAttemptsRef.current < maxReconnectAttempts) {
+          const delay = reconnectInterval * Math.pow(1.5, reconnectAttemptsRef.current); // exponential backoff
+          reconnectTimeoutRef.current = setTimeout(() => {
+            reconnectAttemptsRef.current++;
+            console.info(`[WebSocket] Reconnecting... (attempt ${reconnectAttemptsRef.current}, delay ${Math.round(delay / 1000)}s)`);
+            connect();
+          }, delay);
+        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+          console.warn("[WebSocket] Maximum reconnection attempts reached, stopping");
+        }
  };
 
  wsRef.current = ws;
@@ -287,14 +287,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  setConnectionState("disconnected");
  }, []);
 
- // SendMessage
+  // Send message
  const sendMessage = useCallback((type: string, payload: unknown) => {
  if (wsRef.current?.readyState === WebSocket.OPEN) {
  wsRef.current.send(JSON.stringify({ type, payload }));
  }
  }, []);
 
- // SubscriptionExecute
+  // Subscribe to execution
  const subscribe = useCallback((executionId: string) => {
  sendMessage("subscribe", { executionId });
  }, [sendMessage]);
@@ -304,24 +304,24 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  sendMessage("unsubscribe", { executionId });
  }, [sendMessage]);
 
- // MarkNotificationsalreadyread
+  // Mark notification as read
  const markAsRead = useCallback((notificationId: string) => {
  setNotifications(prev => 
  prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
  );
  }, []);
 
- // Markallsectionalreadyread
+ // Mark all as read
  const markAllAsRead = useCallback(() => {
  setNotifications(prev => prev.map(n => ({ ...n, read: true })));
  }, []);
 
- // ClearNotifications
+  // Clear all notifications
  const clearNotifications = useCallback(() => {
  setNotifications([]);
  }, []);
 
- // AutoConnect
+  // Auto connect
  useEffect(() => {
  if (isAuthenticated && tokens?.accessToken) {
  connect();
@@ -334,7 +334,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  };
  }, [isAuthenticated, tokens?.accessToken, connect, disconnect]);
 
- // Calculatenot yetreadCount
+ // Calculate unread count
  const unreadCount = notifications.filter(n => !n.read).length;
 
  const value: WebSocketContextType = {

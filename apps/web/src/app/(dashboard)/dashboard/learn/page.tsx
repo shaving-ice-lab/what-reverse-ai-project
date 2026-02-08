@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * LearncenterPage
- * ProvideTutorial, Guide, VideoCourseetcLearnResource
+ * Learning Center Page
+ * Provides tutorials, guides, video courses and other learning resources
  */
 
 import { useState } from "react";
@@ -38,29 +38,29 @@ import {
  Flame,
 } from "lucide-react";
 
-// CourseCategory
+// Course Categories
 const categories = [
- { id: "all", label: "allsection", icon: BookOpen },
- { id: "getting-started", label: "Getting StartedGuide", icon: Sparkles },
+ { id: "all", label: "All", icon: BookOpen },
+ { id: "getting-started", label: "Getting Started", icon: Sparkles },
  { id: "workflows", label: "Workflow", icon: Zap },
  { id: "agents", label: "Agent Development", icon: Bot },
- { id: "advanced", label: "AdvancedTips", icon: Code },
- { id: "integration", label: "IntegrationTutorial", icon: Database },
+ { id: "advanced", label: "Advanced Tips", icon: Code },
+ { id: "integration", label: "Integration Tutorial", icon: Database },
 ];
 
-// DifficultyLevel
+// Difficulty Levels
 const levels = [
  { id: "beginner", label: "Getting Started", badgeVariant: "success" },
- { id: "intermediate", label: "", badgeVariant: "warning" },
+ { id: "intermediate", label: "Intermediate", badgeVariant: "warning" },
  { id: "advanced", label: "Advanced", badgeVariant: "destructive" },
 ] as const;
 
-// CourseData
+// Course Data
 const courses = [
  {
  id: "1",
- title: "QuickGetting Started: 5 minCreateyou's#1 AI Workflow",
- description: "LearnPlatformBasicAction, CreateandRunyou's#1AutomationWorkflow",
+    title: "Quick Start: Create Your First AI Workflow in 5 Minutes",
+    description: "Learn platform basics, create and run your first automation workflow",
  category: "getting-started",
  level: "beginner",
  type: "video",
@@ -74,8 +74,8 @@ const courses = [
  },
  {
  id: "2",
- title: "WorkflowNode: fromTriggertoAction",
- description: "entertypeNodeType, MasterWorkflowDesign'sCorecan",
+    title: "Workflow Nodes: From Triggers to Actions",
+    description: "Explore all node types and master the core of workflow design",
  category: "workflows",
  level: "beginner",
  type: "video",
@@ -88,8 +88,8 @@ const courses = [
  },
  {
  id: "3",
- title: "BuildSmartSupport Agent",
- description: "fromStartBuild1canProcessCustomerConsulting'sSmart Agent",
+    title: "Build a Smart Support Agent",
+    description: "Build a smart agent from scratch that can handle customer inquiries",
  category: "agents",
  level: "intermediate",
  type: "video",
@@ -102,8 +102,8 @@ const courses = [
  },
  {
  id: "4",
- title: "PromptBest Practices",
- description: "LearnifwhatWriteEfficient'sPrompt, Improve AI Output",
+    title: "Prompt Best Practices",
+    description: "Learn how to write effective prompts and improve AI output",
  category: "advanced",
  level: "intermediate",
  type: "article",
@@ -115,8 +115,8 @@ const courses = [
  },
  {
  id: "5",
- title: "WorkflowConditionBranchandErrorProcess",
- description: "MasterComplexWorkflow'sDesign, ProcesstypeEdgeSituation",
+    title: "Workflow Conditional Branching and Error Handling",
+    description: "Master complex workflow design and handle various edge cases",
  category: "workflows",
  level: "intermediate",
  type: "video",
@@ -128,8 +128,8 @@ const courses = [
  },
  {
  id: "6",
- title: "Integration Slack: BuildTeamCollaborationBot",
- description: "willWorkflowand Slack Integration, ImplementAutomationMessageNotifications",
+    title: "Slack Integration: Build a Team Collaboration Bot",
+    description: "Integrate workflows with Slack to automate message notifications",
  category: "integration",
  level: "intermediate",
  type: "video",
@@ -141,8 +141,8 @@ const courses = [
  },
  {
  id: "7",
- title: "Advanced Agent Development: multipleConversationandMemory",
- description: "enter Agent Development, ImplementComplex'sConversationManageandContextMemory",
+    title: "Advanced Agent Development: Multi-turn Conversations and Memory",
+    description: "Dive into agent development with complex conversation management and context memory",
  category: "agents",
  level: "advanced",
  type: "video",
@@ -154,8 +154,8 @@ const courses = [
  },
  {
  id: "8",
- title: "API Calland Webhook Config",
- description: "LearnifwhatVia API and Webhook ExtendPlatformFeatures",
+    title: "API Calls and Webhook Configuration",
+    description: "Learn how to extend platform features via APIs and webhooks",
  category: "integration",
  level: "advanced",
  type: "article",
@@ -172,12 +172,12 @@ const courseTypeMeta = {
  article: { label: "Article", icon: FileText },
 } as const;
 
-// LearnPath
+// Learning Paths
 const learningPaths = [
  {
  id: "workflow-master",
- title: "Workflowlarge",
- description: "fromGetting StartedtoExpert, asWorkflowDesignExpert",
+    title: "Workflow Mastery",
+    description: "From beginner to expert, become a workflow design master",
  courses: 8,
  duration: "4 h",
  progress: 35,
@@ -187,7 +187,7 @@ const learningPaths = [
  {
  id: "agent-developer",
  title: "Agent Developers",
- description: "Master Agent Development'sCorecan",
+    description: "Master the core skills of agent development",
  courses: 6,
  duration: "3 h",
  progress: 15,
@@ -196,8 +196,8 @@ const learningPaths = [
  },
  {
  id: "automation-pro",
- title: "AutomationExpert",
- description: "LearnAdvancedAutomationTipsandBest Practices",
+    title: "Automation Expert",
+    description: "Learn advanced automation techniques and best practices",
  courses: 10,
  duration: "5 h",
  progress: 0,
@@ -250,32 +250,32 @@ export default function LearnPage() {
  const totalHours = Math.round(totalMinutes / 60);
  const overviewStats = [
  {
- label: "CompletedCourse",
+      label: "Completed Courses",
  value: completedCourses,
- hint: ` ${courses.length} `,
+ hint: `of ${courses.length} total`,
  icon: Trophy,
  },
  {
- label: "Completedtime",
+      label: "Completed Lessons",
  value: `${completedLessons}/${totalLessons}`,
  hint: `${completionRate}% Done`,
  icon: CheckCircle2,
  },
  {
- label: "Learntime",
+      label: "Learning Time",
  value: `${completedHours}h`,
  hint: `Cumulative ${totalHours}h`,
  icon: Clock,
  },
  {
- label: "ContinuousLearn",
- value: "5 days",
- hint: "MaintainLearnRhythm",
+      label: "Learning Streak",
+      value: "5 days",
+      hint: "Keep your learning rhythm",
  icon: Flame,
  },
  ];
 
- // FilterCourse
+ // Filter Courses
  const filteredCourses = courses.filter((course) => {
  const matchesSearch =
  course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -298,8 +298,8 @@ export default function LearnPage() {
  <div className="relative space-y-8">
  <PageHeader
  eyebrow="Learning Hub"
- title="Learncenter"
- description="ExploreTutorial, TemplateandPracticalline, SystemImprove AI Workflowcanpower"
+          title="Learning Center"
+          description="Explore tutorials, templates, and hands-on courses to systematically improve your AI workflow skills"
  icon={<GraduationCap className="w-5 h-5" />}
  badge={(
  <Badge
@@ -308,7 +308,7 @@ export default function LearnPage() {
  icon={<Trophy className="w-3.5 h-3.5" />}
  className="bg-surface-200 text-foreground-light"
  >
- Completed {completedCourses} Course
+              Completed {completedCourses} Courses
  </Badge>
  )}
  actions={(
@@ -321,7 +321,7 @@ export default function LearnPage() {
  Filter
  </Button>
  <Button size="sm" leftIcon={<Sparkles className="w-3.5 h-3.5" />}>
- CreateLearnPlan
+                Create Learning Plan
  </Button>
  </div>
  )}
@@ -336,11 +336,11 @@ export default function LearnPage() {
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
  <div className="page-caption">Overview</div>
- <h2 className="text-sm font-medium text-foreground">LearnOverview</h2>
- <p className="page-subtle">MasterRhythm, ContinuousAdvanceyou'sLearnTarget</p>
+              <h2 className="text-sm font-medium text-foreground">Learning Overview</h2>
+              <p className="page-subtle">Keep your pace and continuously advance your learning goals</p>
  </div>
  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
- LearnRecord
+                Learning Record
  </Button>
  </div>
 
@@ -354,7 +354,7 @@ export default function LearnPage() {
  showValue
  />
  <div className="space-y-2">
- <div className="text-sm font-medium text-foreground">totalDone</div>
+                <div className="text-sm font-medium text-foreground">Overall Progress</div>
  <p className="text-xs text-foreground-light">
  Completed {completedLessons} / {totalLessons} · {completionRate}%
  </p>
@@ -364,14 +364,14 @@ export default function LearnPage() {
  size="sm"
  icon={<TrendingUp className="w-3.5 h-3.5" />}
  >
- currentweeks +8%
+                    This week +8%
  </Badge>
  <Badge
  variant="secondary"
  size="sm"
  icon={<Award className="w-3.5 h-3.5" />}
  >
- ContinuousLearn 5 days
+                    5-day learning streak
  </Badge>
  </div>
  </div>
@@ -407,9 +407,9 @@ export default function LearnPage() {
  <div className="page-caption">Continue</div>
  <div className="page-panel-title flex items-center gap-2">
  <Play className="w-4 h-4 text-brand-500" />
- ContinueLearn
- </div>
- <p className="page-panel-description">fromontimesProgressContinue, MaintainLearnRhythm</p>
+                Continue Learning
+              </div>
+              <p className="page-panel-description">Resume from where you left off and keep your learning rhythm</p>
  </div>
  <div className="flex items-center gap-2">
  <Badge
@@ -469,7 +469,7 @@ export default function LearnPage() {
  })
  ) : (
  <div className="rounded-md border border-dashed border-border p-4 text-sm text-foreground-light">
- youalreadyDoneAllCourse, Startnew'sLearnPath.
+              You've completed all courses. Start a new learning path!
  </div>
  )}
  </div>
@@ -482,9 +482,9 @@ export default function LearnPage() {
  <div className="page-caption">Paths</div>
  <div className="page-panel-title flex items-center gap-2">
  <Target className="w-4 h-4 text-brand-500" />
- LearnPath
- </div>
- <p className="page-panel-description">SystemLearnline, FocusPracticalcanpower</p>
+                Learning Paths
+              </div>
+              <p className="page-panel-description">Structured learning paths focused on practical skills</p>
  </div>
  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
  View all
@@ -530,7 +530,7 @@ export default function LearnPage() {
  </div>
  </div>
  <Badge variant="secondary" size="sm">
- {path.courses} 
+ {path.courses} courses
  </Badge>
  </div>
  <div className="flex items-center gap-3 text-xs text-foreground-muted">
@@ -540,17 +540,17 @@ export default function LearnPage() {
  </span>
  <span className="flex items-center gap-1">
  <BookOpen className="h-3.5 w-3.5" />
- {path.courses} Course
+ {path.courses} coursesCourses
  </span>
  </div>
  <div className="space-y-2">
  <Progress value={path.progress} size="sm" />
  <div className="flex items-center justify-between text-xs text-foreground-muted">
  <span>
- {path.progress > 0 ? `${path.progress}% Completed`: "not yetStart"}
+                {path.progress > 0 ? `${path.progress}% Completed`: "Not started"}
  </span>
  <span className="flex items-center gap-1 text-foreground-light group-hover:text-foreground">
- EnterPath
+                Enter Path
  <ArrowRight className="h-3.5 w-3.5" />
  </span>
  </div>
@@ -569,9 +569,9 @@ export default function LearnPage() {
  <div>
  <div className="page-panel-title flex items-center gap-2">
  <Sparkles className="w-4 h-4 text-warning" />
- RecommendedCourse
- </div>
- <p className="page-panel-description">Based onyou'sLearnProgressFeaturedContent</p>
+                Recommended Courses
+              </div>
+              <p className="page-panel-description">Featured content based on your learning progress</p>
  </div>
  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
  View more
@@ -636,11 +636,11 @@ export default function LearnPage() {
  <div className="flex items-center justify-between">
  <div>
  <div className="page-caption">Quick Wins</div>
- <h3 className="text-sm font-medium text-foreground">TodaycanDone</h3>
- <p className="text-xs text-foreground-light">use 30 minAdvanceLearnTarget</p>
+              <h3 className="text-sm font-medium text-foreground">Today's Quick Wins</h3>
+              <p className="text-xs text-foreground-light">Advance your learning goals in 30 minutes</p>
  </div>
  <Badge variant="success" size="sm">
- newFriendly
+                Beginner Friendly
  </Badge>
  </div>
  <div className="mt-5 space-y-3">
@@ -650,8 +650,8 @@ export default function LearnPage() {
  <Play className="h-4 w-4" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">5 minCreateWorkflow</p>
- <p className="text-xs text-foreground-light">QuickCoreFlowandTrigger</p>
+                  <p className="text-sm font-medium text-foreground">Create a Workflow in 5 Minutes</p>
+                  <p className="text-xs text-foreground-light">Learn core flows and triggers quickly</p>
  </div>
  </div>
  <div className="mt-3 flex items-center justify-between text-xs text-foreground-muted">
@@ -660,7 +660,7 @@ export default function LearnPage() {
  5 min
  </span>
  <span className="flex items-center gap-1 text-brand-500">
- StartLearn
+                  Start Learning
  <ArrowRight className="h-3.5 w-3.5" />
  </span>
  </div>
@@ -671,8 +671,8 @@ export default function LearnPage() {
  <BookOpen className="h-4 w-4" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">PromptChecklist</p>
- <p className="text-xs text-foreground-light">12 canuse'sPromptTemplate</p>
+                  <p className="text-sm font-medium text-foreground">Prompt Checklist</p>
+                  <p className="text-xs text-foreground-light">12 ready-to-use prompt templates</p>
  </div>
  </div>
  <div className="mt-3 flex items-center justify-between text-xs text-foreground-muted">
@@ -681,7 +681,7 @@ export default function LearnPage() {
  15 min
  </span>
  <span className="flex items-center gap-1 text-brand-500">
- OpenResource
+                  Open Resource
  <ArrowRight className="h-3.5 w-3.5" />
  </span>
  </div>
@@ -692,17 +692,17 @@ export default function LearnPage() {
  <Award className="h-4 w-4" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">Done# 1 in</p>
- <p className="text-xs text-foreground-light">UnlockGetting StartedBadgeandCertificate</p>
+                  <p className="text-sm font-medium text-foreground">Complete Challenge #1</p>
+                  <p className="text-xs text-foreground-light">Unlock the Getting Started badge and certificate</p>
  </div>
  </div>
  <div className="mt-3 flex items-center justify-between text-xs text-foreground-muted">
  <span className="flex items-center gap-1">
  <CheckCircle2 className="h-3.5 w-3.5" />
- 3/5 Step
+ 3/5 Steps
  </span>
  <span className="flex items-center gap-1 text-brand-500">
- ContinueDone
+                  Continue
  <ArrowRight className="h-3.5 w-3.5" />
  </span>
  </div>
@@ -717,9 +717,9 @@ export default function LearnPage() {
  <div className="page-caption">Catalog</div>
  <div className="page-panel-title flex items-center gap-2">
  <BookOpen className="w-4 h-4 text-brand-500" />
- CourseDirectory
- </div>
- <p className="page-panel-description">SearchandFilterCourse, Buildyou'sLearnline</p>
+                Course Catalog
+              </div>
+              <p className="page-panel-description">Search and filter courses to build your learning path</p>
  </div>
  <div className="flex items-center gap-2">
  <Badge
@@ -727,10 +727,10 @@ export default function LearnPage() {
  size="sm"
  className="bg-surface-200 text-foreground-light"
  >
- to {filteredCourses.length} 
- </Badge>
- <Button variant="ghost" size="sm" leftIcon={<Filter className="w-4 h-4" />}>
- AdvancedFilter
+              {filteredCourses.length} Courses
+              </Badge>
+              <Button variant="ghost" size="sm" leftIcon={<Filter className="w-4 h-4" />}>
+                Advanced Filter
  </Button>
  </div>
  </div>
@@ -738,7 +738,7 @@ export default function LearnPage() {
  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
  <div className="w-full lg:max-w-md">
  <Input
- placeholder="SearchCourse, Guide, Template..."
+                placeholder="Search courses, guides, templates..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  variant="search"
@@ -791,8 +791,8 @@ export default function LearnPage() {
  </div>
 
  <div className="flex items-center justify-between text-xs text-foreground-light">
- <span>to {filteredCourses.length} Course</span>
- <span>byPopularitySort</span>
+              <span>{filteredCourses.length} Courses</span>
+              <span>Sorted by popularity</span>
  </div>
 
  <div className="page-grid md:grid-cols-2 lg:grid-cols-3">
@@ -837,7 +837,7 @@ export default function LearnPage() {
  </Badge>
  )}
  <Badge variant="outline" size="xs">
- {course.lessons} 
+ {course.lessons} lessons
  </Badge>
  <Badge variant="outline" size="xs">
  {course.duration}

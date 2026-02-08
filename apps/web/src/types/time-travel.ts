@@ -1,223 +1,223 @@
 /**
- * TimerowDebug - TypeDefinition
+ * Time Travel Debug - Type Definitions
  * 
- * Providecanvisual'sExecuteHistoryBacktrackFeatures, letUsercanViewWorkflowExecute'seach1Status.
+ * Provides visual execution history backtracking features, allowing users to view each step of workflow execution status.
  */
 
 import type { ExecutionStatus } from "./execution";
 
-// ===== NodeExecuteStatus =====
+// ===== Node Execution Status =====
 
 /**
- * NodeExecuteStatusEnum
+ * Node execution status enum
  */
 export type NodeStatus = 
- | "pending" // etcpendingExecute
- | "running" // Execute
- | "completed" // ExecuteDone
- | "failed" // ExecuteFailed
- | "skipped" // alreadySkip
+ | "pending" // Pending execution
+ | "running" // Executing
+ | "completed" // Execution completed
+ | "failed" // Execution failed
+ | "skipped" // Skipped
  | "paused"; // Paused
 
 // ===== NodeSnapshot =====
 
 /**
- * NodeErrorInfo
+ * Node Error Info
  */
 export interface NodeError {
- /** Error */
+ /** Error code */
  code?: string;
- /** ErrorMessage */
+ /** Error message */
  message: string;
- /** ErrorStack */
+ /** Error stack */
  stack?: string;
- /** outsideDetails */
+ /** Additional details */
  details?: Record<string, unknown>;
 }
 
 /**
- * NodeData
- * RecordNodeExecute'soutsideInfo, if LLM Call's token Usageetc
+ * Node Metadata
+ * Records additional node execution info, such as token usage for LLM calls
  */
 export interface NodeMetadata {
- /** LLM Node: Token Usage */
+ /** LLM Node: Token usage */
  tokensUsed?: number;
- /** LLM Node: Usage'sModel */
+ /** LLM Node: Model used */
  model?: string;
- /** LLM Node: Tip Token */
+ /** LLM Node: Prompt tokens */
  promptTokens?: number;
- /** LLM Node: Done Token */
+ /** LLM Node: Completion tokens */
  completionTokens?: number;
- /** HTTP Node: ResponseStatus */
+ /** HTTP Node: Response status */
  httpStatusCode?: number;
  /** HTTP Node: Request URL */
  httpUrl?: string;
- /** HTTP Node: RequestMethod */
+ /** HTTP Node: Request method */
  httpMethod?: string;
- /** ConditionNode: Select'sBranch */
+ /** Condition Node: Selected branch */
  conditionBranch?: "true" | "false";
- /** LoopNode: Iterationtimescount */
+ /** Loop Node: Iteration count */
  loopIterations?: number;
- /** LoopNode: CurrentIterationIndex */
+ /** Loop Node: Current iteration index */
  currentIteration?: number;
- /** Retrytimescount */
+ /** Retry count */
  retryCount?: number;
- /** CustomData */
+ /** Custom data */
  [key: string]: unknown;
 }
 
 /**
- * NodeSnapshot
+ * Node Snapshot
  * 
- * RecordNodeatExecutepast1time'sCompleteStatusSnapshot, 
- * Used forTimerowDebugFeatures'sBacktrackandre-.
+ * Records the complete status snapshot of a node during execution,
+ * used for time travel debug features like backtracking and replay.
  */
 export interface NodeSnapshot {
  /** Node ID */
  nodeId: string;
- /** NodeName(DisplayName) */
+ /** Node name (display name) */
  nodeName: string;
- /** NodeType (if "llm", "http", "condition" etc) */
+ /** Node type (e.g. "llm", "http", "condition") */
  nodeType: string;
- /** NodeExecuteStatus */
+ /** Node execution status */
  status: NodeStatus;
  
- // ===== TimeInfo =====
+ // ===== Time Info =====
  
- /** StartExecuteTime (ISO 8601 Format) */
+ /** Execution start time (ISO 8601 format) */
  startedAt: string;
- /** DoneTime (ISO 8601 Format) */
+ /** Completion time (ISO 8601 format) */
  completedAt?: string;
- /** ExecuteDuration (s) */
+ /** Execution duration (ms) */
  durationMs: number;
  
- // ===== DataSnapshot =====
+ // ===== Data Snapshot =====
  
- /** NodeInputData */
+ /** Node input data */
  inputs: Record<string, unknown>;
- /** NodeOutputData */
+ /** Node output data */
  outputs: Record<string, unknown>;
- /** Parseafter'sConfig(VariableReplaceafter) */
+ /** Resolved config (after variable substitution) */
  resolvedConfig?: Record<string, unknown>;
  
- // ===== ErrorInfo =====
+ // ===== Error Info =====
  
- /** ErrorInfo(ifresultExecuteFailed) */
+ /** Error info (if execution failed) */
  error?: NodeError;
  
- // ===== Data =====
+ // ===== Metadata =====
  
- /** ExecuteData */
+ /** Execution metadata */
  metadata?: NodeMetadata;
  
- // ===== DebugInfo =====
+ // ===== Debug Info =====
  
- /** LogsRecord */
+ /** Log records */
  logs?: NodeLogEntry[];
- /** isnoisBreakpoint */
+ /** Whether this is a breakpoint */
  isBreakpoint?: boolean;
 }
 
 /**
- * NodeLogsitem
+ * Node Log Entry
  */
 export interface NodeLogEntry {
- /** LogsLevel */
+ /** Log level */
  level: "debug" | "info" | "warn" | "error";
- /** LogsMessage */
+ /** Log message */
  message: string;
- /** Time (ISO 8601 Format) */
+ /** Timestamp (ISO 8601 format) */
  timestamp: string;
- /** AdditionalData */
+ /** Additional data */
  data?: Record<string, unknown>;
 }
 
-// ===== ExecuteSnapshot =====
+// ===== Execution Snapshot =====
 
 /**
- * SnapshotData
+ * Snapshot Metadata
  */
 export interface SnapshotMetadata {
- /** SnapshotCreated At */
+ /** Snapshot created at */
  createdAt: string;
- /** SnapshotVersion */
+ /** Snapshot version */
  version: string;
- /** isnoCompressStorage */
+ /** Whether compressed storage is used */
  compressed?: boolean;
- /** CompressbeforeSize (bytes) */
+ /** Size before compression (bytes) */
  originalSize?: number;
- /** CompressafterSize (bytes) */
+ /** Size after compression (bytes) */
  compressedSize?: number;
- /** SnapshotSource (web | desktop) */
+ /** Snapshot source (web | desktop) */
  source: "web" | "desktop";
 }
 
 /**
- * ExecuteSummaryInfo
+ * Execution Summary Info
  */
 export interface ExecutionSummary {
- /** totalNodecount */
+ /** Total node count */
  totalNodes: number;
- /** CompletedNodecount */
+ /** Completed node count */
  completedNodes: number;
- /** FailedNodecount */
+ /** Failed node count */
  failedNodes: number;
- /** SkipNodecount */
+ /** Skipped node count */
  skippedNodes: number;
- /** total Token Usage */
+ /** Total token usage */
  totalTokensUsed?: number;
- /** EstimateCost (USD) */
+ /** Estimated cost (USD) */
  estimatedCost?: number;
 }
 
 /**
- * ExecuteSnapshot
+ * Execution Snapshot
  * 
- * CaptureWorkflowExecute'sCompleteStatusSnapshot, ContainsAllNode'sExecuteDetails, 
- * Used forTimerowDebugFeatures'sBacktrackandre-.
+ * Captures the complete status snapshot of a workflow execution, including all node execution details,
+ * used for time travel debug features like backtracking and replay.
  */
 export interface ExecutionSnapshot {
- /** Execute ID */
+ /** Execution ID */
  executionId: string;
  /** Workflow ID */
  workflowId: string;
- /** WorkflowName */
+ /** Workflow name */
  workflowName?: string;
- /** WorkflowVersion */
+ /** Workflow version */
  workflowVersion?: number;
- /** ExecuteStatus */
+ /** Execution status */
  status: ExecutionStatus;
  
- // ===== TimeInfo =====
+ // ===== Time Info =====
  
- /** StartTime (ISO 8601 Format) */
+ /** Start time (ISO 8601 format) */
  startedAt: string;
- /** DoneTime (ISO 8601 Format) */
+ /** Completion time (ISO 8601 format) */
  completedAt?: string;
- /** totalExecuteDuration (s) */
+ /** Total execution duration (ms) */
  durationMs?: number;
  
- // ===== NodeSnapshot =====
+ // ===== Node Snapshots =====
  
- /** AllNode'sSnapshot, byNode ID Index */
+ /** All node snapshots, indexed by node ID */
  nodeSnapshots: Record<string, NodeSnapshot>;
- /** NodeExecuteOrder */
+ /** Node execution order */
  executionOrder: string[];
- /** CurrentExecuteto'sNode ID */
+ /** Currently executing node ID */
  currentNodeId?: string;
  
- // ===== allVariable =====
+ // ===== Global Variables =====
  
- /** ExecuteInput */
+ /** Execution inputs */
  inputs: Record<string, unknown>;
- /** ExecuteOutput */
+ /** Execution outputs */
  outputs: Record<string, unknown>;
- /** allVariable */
+ /** Global variables */
  variables: Record<string, unknown>;
  
- // ===== ErrorInfo =====
+ // ===== Error Info =====
  
- /** ExecuteError(ifresultFailed) */
+ /** Execution error (if failed) */
  error?: {
  code?: string;
  message: string;
@@ -225,188 +225,188 @@ export interface ExecutionSnapshot {
  stack?: string;
  };
  
- // ===== SummaryandData =====
+ // ===== Summary and Metadata =====
  
- /** ExecuteSummary */
+ /** Execution summary */
  summary: ExecutionSummary;
- /** SnapshotData */
+ /** Snapshot metadata */
  metadata: SnapshotMetadata;
 }
 
-// ===== TimelineRelatedType =====
+// ===== Timeline Related Types =====
 
 /**
- * TimelineStep
- * Used foratTimeline UI DisplayExecuteStep
+ * Timeline Step
+ * Used to display execution steps in the Timeline UI
  */
 export interface TimelineStep {
- /** StepIndex */
+ /** Step index */
  index: number;
  /** Node ID */
  nodeId: string;
- /** NodeName */
+ /** Node name */
  nodeName: string;
- /** NodeType */
+ /** Node type */
  nodeType: string;
- /** NodeIcon */
+ /** Node icon */
  nodeIcon?: string;
- /** StepStatus */
+ /** Step status */
  status: NodeStatus;
- /** StartTime */
+ /** Start time */
  startedAt: string;
- /** DoneTime */
+ /** Completion time */
  completedAt?: string;
- /** Duration (s) */
+ /** Duration (ms) */
  durationMs: number;
- /** needDescription */
+ /** Description */
  description?: string;
- /** isnoisCurrentselectStep */
+ /** Whether this is the currently selected step */
  isSelected?: boolean;
- /** isnohasError */
+ /** Whether this step has an error */
  hasError?: boolean;
 }
 
 /**
- * TimelineViewData
+ * Timeline View Data
  */
 export interface TimelineView {
- /** Execute ID */
+ /** Execution ID */
  executionId: string;
- /** ExecuteStatus */
+ /** Execution status */
  status: ExecutionStatus;
- /** StartTime */
+ /** Start time */
  startedAt: string;
- /** DoneTime */
+ /** Completion time */
  completedAt?: string;
- /** totalDuration */
+ /** Total duration */
  durationMs?: number;
- /** TimelineStepList */
+ /** Timeline step list */
  steps: TimelineStep[];
- /** Currentselect'sStepIndex */
+ /** Currently selected step index */
  selectedStepIndex?: number;
 }
 
-// ===== DebugActionRelatedType =====
+// ===== Debug Action Related Types =====
 
 /**
- * re-NodeRequest
+ * Rerun Node Request
  */
 export interface RerunNodeRequest {
- /** Execute ID */
+ /** Execution ID */
  executionId: string;
- /** needre-'sNode ID */
+ /** Node ID to rerun */
  nodeId: string;
- /** new'sInput(Optional, notProvidethenUsageInput) */
+ /** New inputs (optional, uses original inputs if not provided) */
  newInputs?: Record<string, unknown>;
- /** isnoContinueExecuteafterNode */
+ /** Whether to continue executing subsequent nodes */
  continueExecution?: boolean;
 }
 
 /**
- * re-NodeResult
+ * Rerun Node Result
  */
 export interface RerunNodeResult {
- /** new'sExecute ID */
+ /** New execution ID */
  newExecutionId: string;
- /** NodeSnapshot */
+ /** Node snapshot */
  nodeSnapshot: NodeSnapshot;
- /** isnoSuccess */
+ /** Whether successful */
  success: boolean;
- /** ErrorMessage */
+ /** Error message */
  error?: string;
 }
 
 /**
- * BreakpointInfo
+ * Breakpoint Info
  */
 export interface Breakpoint {
  /** Breakpoint ID */
  id: string;
  /** Node ID */
  nodeId: string;
- /** isnoEnable */
+ /** Whether enabled */
  enabled: boolean;
- /** ConditionExpression(Optional) */
+ /** Condition expression (optional) */
  condition?: string;
- /** Created At */
+ /** Created at */
  createdAt: string;
 }
 
 /**
- * DebugwillStatus
+ * Debug Session Status
  */
 export interface DebugSession {
- /** will ID */
+ /** Session ID */
  sessionId: string;
- /** Associate'sExecute ID */
+ /** Associated execution ID */
  executionId: string;
- /** isnoPause */
+ /** Whether paused */
  isPaused: boolean;
- /** Pauseat'sNode ID */
+ /** Paused at node ID */
  pausedAtNodeId?: string;
- /** BreakpointList */
+ /** Breakpoint list */
  breakpoints: Breakpoint[];
- /** willStartTime */
+ /** Session start time */
  startedAt: string;
 }
 
-// ===== SnapshotStorageRelatedType =====
+// ===== Snapshot Storage Related Types =====
 
 /**
- * SnapshotStorageOption
+ * Snapshot Storage Options
  */
 export interface SnapshotStorageOptions {
- /** isnoCompress */
+ /** Whether to compress */
  compress?: boolean;
- /** CompressLevel (1-9) */
+ /** Compression level (1-9) */
  compressionLevel?: number;
- /** MaximumRetainCount */
+ /** Maximum snapshots to retain */
  maxSnapshots?: number;
- /** MaximumRetaindayscount */
+ /** Maximum retention days */
  maxAgeDays?: number;
- /** ExcludeSensitiveData */
+ /** Exclude sensitive data */
  excludeSensitiveData?: boolean;
- /** SensitiveFieldList */
+ /** Sensitive field list */
  sensitiveFields?: string[];
 }
 
 /**
- * SnapshotQueryParameter
+ * Snapshot Query Parameters
  */
 export interface SnapshotQueryParams {
  /** Workflow ID */
  workflowId?: string;
- /** ExecuteStatus */
+ /** Execution status */
  status?: ExecutionStatus;
- /** StartDate */
+ /** Start date */
  startDate?: string;
- /** EndDate */
+ /** End date */
  endDate?: string;
- /** Pagination - Page Number */
+ /** Pagination - page number */
  page?: number;
- /** Pagination - eachpageCount */
+ /** Pagination - items per page */
  pageSize?: number;
- /** SortField */
+ /** Sort field */
  sortBy?: "startedAt" | "durationMs" | "status";
- /** Sortmethod */
+ /** Sort order */
  sortOrder?: "asc" | "desc";
 }
 
 /**
- * SnapshotList(notCompleteNodeData)
+ * Snapshot List Item (without full node data)
  */
 export interface SnapshotListItem {
- /** Execute ID */
+ /** Execution ID */
  executionId: string;
  /** Workflow ID */
  workflowId: string;
- /** WorkflowName */
+ /** Workflow name */
  workflowName?: string;
- /** ExecuteStatus */
+ /** Execution status */
  status: ExecutionStatus;
- /** StartTime */
+ /** Start time */
  startedAt: string;
- /** DoneTime */
+ /** Completion time */
  completedAt?: string;
  /** Duration */
  durationMs?: number;
@@ -414,21 +414,21 @@ export interface SnapshotListItem {
  summary: ExecutionSummary;
 }
 
-// ===== ToolcountType =====
+// ===== Utility Types =====
 
 /**
- * fromExecuteResultCreateSnapshot'sOption
+ * Options for creating a snapshot from execution results
  */
 export interface CreateSnapshotOptions {
- /** ContainsLogs */
+ /** Include logs */
  includeLogs?: boolean;
- /** ContainsDebugInfo */
+ /** Include debug info */
  includeDebugInfo?: boolean;
- /** StorageOption */
+ /** Storage options */
  storage?: SnapshotStorageOptions;
 }
 
-// ===== ExportAggregateType =====
+// ===== Export Aggregate Types =====
 
 export type {
  NodeSnapshot as TimeTravelNodeSnapshot,

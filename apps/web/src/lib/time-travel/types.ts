@@ -65,7 +65,7 @@ export interface ISnapshotStore {
 }
 
 /**
- * StorageafterendpointType
+ * Storage Backend Type
  */
 export type StorageBackend = "indexeddb" | "localstorage" | "tauri" | "memory";
 
@@ -73,7 +73,7 @@ export type StorageBackend = "indexeddb" | "localstorage" | "tauri" | "memory";
  * SnapshotStorageConfig
  */
 export interface SnapshotStoreConfig {
- /** Storageafterendpoint */
+ /** Storage backend */
  backend: StorageBackend;
  /** DatabaseName (IndexedDB) */
  dbName?: string;

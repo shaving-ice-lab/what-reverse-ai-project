@@ -1,6 +1,6 @@
 /**
- * LogicNodeExecute
- * ConditionDetermine, Loopetc
+ * Logic Node Executors
+ * Condition evaluation, loops, etc.
  */
 
 import type {
@@ -15,30 +15,30 @@ import type {
 } from "../types";
 import { getValueByPath, renderTemplate, createNodeError } from "../utils";
 
-// ==================== ConditionDetermineNode ====================
+// ==================== Condition Node ====================
 
 /**
- * EvaluateCondition
+ * Evaluate a single condition
  */
 function evaluateCondition(
  condition: SingleCondition,
  variables: Record<string, unknown>
 ): boolean {
- // ParseleftActioncount
+ // Parse left operand
  let leftValue = condition.left;
  if (leftValue.startsWith("{{") && leftValue.endsWith("}}")) {
  const path = leftValue.slice(2, -2).trim();
  leftValue = getValueByPath(variables, path) as string;
  }
  
- // ParserightActioncount
+ // Parse right operand
  let rightValue = condition.right;
  if (rightValue?.startsWith("{{") && rightValue?.endsWith("}}")) {
  const path = rightValue.slice(2, -2).trim();
  rightValue = getValueByPath(variables, path) as string;
  }
  
- // TypeConvertAuxiliary
+ // Type conversion helpers
  const toNumber = (v: unknown): number => {
  const num = Number(v);
  return isNaN(num) ? 0 : num;
@@ -50,10 +50,10 @@ function evaluateCondition(
  return String(v);
  };
  
- // EvaluateAction
+ // Evaluate operator
  switch (condition.operator) {
- case "eq":
- return leftValue == rightValue; // LooseCompare
+   case "eq":
+     return leftValue == rightValue; // Loose comparison
  case "neq":
  return leftValue != rightValue;
  case "gt":
@@ -101,7 +101,7 @@ function evaluateCondition(
 }
 
 /**
- * EvaluateConditiongroup
+ * Evaluate a condition group
  */
 function evaluateConditionGroup(
  group: ConditionGroup,
@@ -119,7 +119,7 @@ function evaluateConditionGroup(
 }
 
 /**
- * EvaluateCompleteConditionConfig
+ * Evaluate complete condition config
  */
 function evaluateConditions(
  config: ConditionConfig,
@@ -137,7 +137,7 @@ function evaluateConditions(
 }
 
 /**
- * ConditionDetermineNodeExecute
+ * Condition node executor
  */
 export const conditionExecutor: NodeExecutor<ConditionConfig> = {
  type: "condition",
@@ -148,11 +148,11 @@ export const conditionExecutor: NodeExecutor<ConditionConfig> = {
  const logs: NodeResult["logs"] = [];
  
  try {
- // andVariable
+     // Merge variables
  const allVariables = { ...variables, ...inputs };
  
- // EvaluateCondition
- const result = evaluateConditions(nodeConfig, allVariables);
+     // Evaluate conditions
+     const result = evaluateConditions(nodeConfig, allVariables);
  
  logs.push({
  level: "info",
@@ -206,7 +206,7 @@ export const conditionExecutor: NodeExecutor<ConditionConfig> = {
 // ==================== LoopNode ====================
 
 /**
- * LoopNodeExecute
+ * Loop node executor
  */
 export const loopExecutor: NodeExecutor<LoopConfig> = {
  type: "loop",
@@ -224,7 +224,7 @@ export const loopExecutor: NodeExecutor<LoopConfig> = {
  
  switch (nodeConfig.mode) {
  case "forEach": {
- // FetchneedTraverse'scountgroup
+       // Get the array to iterate over
  let items: unknown[];
  if (nodeConfig.items) {
  const itemsPath = nodeConfig.items.replace(/^\{\{|\}\}$/g, "").trim();
@@ -276,8 +276,8 @@ export const loopExecutor: NodeExecutor<LoopConfig> = {
  timestamp: new Date().toISOString(),
  });
  
- // While needneedatExecuteEnginefaceProcess
- // thisinBackLoopConfig, ActualExecuteEngineProcess
+       // While loops need to be handled by the execution engine
+       // Here we return the loop config for the engine to process
  results.push({
  mode: "while",
  condition: nodeConfig.condition,
@@ -331,9 +331,9 @@ export const loopExecutor: NodeExecutor<LoopConfig> = {
  errors.push("Loop mode is required");
  }
  
- if (config.mode === "forEach" && !config.items) {
- // items canwithfromInputPortFetch, withthisinnotForceneed
- }
+   if (config.mode === "forEach" && !config.items) {
+     // items can be fetched from the input port, not strictly required here
+   }
  
  if (config.mode === "count" && (!config.count || config.count < 1)) {
  errors.push("Count must be at least 1 for count mode");

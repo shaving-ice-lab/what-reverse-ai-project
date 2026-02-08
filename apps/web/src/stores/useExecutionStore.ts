@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import type { ExecutionPayload, LogPayload, WSMessage } from '@/hooks/useWebSocket';
 
-// NodeExecuteStatus
+// Node Execution Status
 export type NodeExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
 
-// ExecuteStatus
+// Execution Status
 export type ExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
 
-// NodeExecuteRecord
+// Node Execution Record
 export interface NodeExecution {
  nodeId: string;
  nodeType: string;
@@ -20,7 +20,7 @@ export interface NodeExecution {
  durationMs?: number;
 }
 
-// ExecuteLogs
+// Execution Logs
 export interface ExecutionLog {
  id: string;
  executionId: string;
@@ -30,7 +30,7 @@ export interface ExecutionLog {
  timestamp: Date;
 }
 
-// ExecuteRecord
+// Execution Record
 export interface Execution {
  id: string;
  workflowId: string;
@@ -47,7 +47,7 @@ export interface Execution {
 }
 
 interface ExecutionStore {
- // CurrentExecute
+  // Current Execution
  currentExecutionId: string | null;
  executions: Record<string, Execution>;
  
@@ -56,20 +56,20 @@ interface ExecutionStore {
  updateExecution: (executionId: string, updates: Partial<Execution>) => void;
  completeExecution: (executionId: string, status: ExecutionStatus, error?: string) => void;
  
- // NodeStatus
+  // Node Status
  updateNodeStatus: (executionId: string, nodeId: string, update: Partial<NodeExecution>) => void;
  
  // Logs
  addLog: (executionId: string, log: Omit<ExecutionLog, 'id'>) => void;
  clearLogs: (executionId: string) => void;
  
- // SettingsCurrentExecute
+  // Set Current Execution
  setCurrentExecution: (executionId: string | null) => void;
  
  // Process WebSocket Message
  handleWSMessage: (message: WSMessage) => void;
  
- // FetchNodeStatus
+ // Get Node Status
  getNodeStatus: (nodeId: string) => NodeExecutionStatus | undefined;
  
  // Clean up
@@ -229,7 +229,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  state.addLog(data.executionId, {
  executionId: data.executionId,
  level: 'info',
- message: 'ExecuteStart',
+              message: 'Execution started',
  timestamp: new Date(),
  });
  }
@@ -243,7 +243,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  state.addLog(data.executionId, {
  executionId: data.executionId,
  level: 'info',
- message: `ExecuteDone, Duration ${data.durationMs}ms`,
+              message: `Execution completed, duration ${data.durationMs}ms`,
  timestamp: new Date(),
  });
  }
@@ -257,7 +257,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  state.addLog(data.executionId, {
  executionId: data.executionId,
  level: 'error',
- message: data.error || 'ExecuteFailed',
+              message: data.error || 'Execution failed',
  timestamp: new Date(),
  });
  }
@@ -271,7 +271,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  state.addLog(data.executionId, {
  executionId: data.executionId,
  level: 'warn',
- message: 'ExecuteCancelled',
+              message: 'Execution cancelled',
  timestamp: new Date(),
  });
  }
@@ -291,7 +291,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  executionId: data.executionId,
  nodeId: data.nodeId,
  level: 'info',
- message: `Node ${data.nodeId} StartExecute`,
+              message: `Node ${data.nodeId} started execution`,
  timestamp: new Date(),
  });
  }
@@ -308,7 +308,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  durationMs: data.durationMs,
  });
  
- // UpdateProgress
+            // Update progress
  const execution = state.executions[data.executionId];
  if (execution && data.progress !== undefined) {
  state.updateExecution(data.executionId, {
@@ -321,7 +321,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  executionId: data.executionId,
  nodeId: data.nodeId,
  level: 'info',
- message: `Node ${data.nodeId} ExecuteDone, Duration ${data.durationMs}ms`,
+              message: `Node ${data.nodeId} execution completed, duration ${data.durationMs}ms`,
  timestamp: new Date(),
  });
  }
@@ -341,7 +341,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  executionId: data.executionId,
  nodeId: data.nodeId,
  level: 'error',
- message: `Node ${data.nodeId} ExecuteFailed: ${data.error}`,
+              message: `Node ${data.nodeId} execution failed: ${data.error}`,
  timestamp: new Date(),
  });
  }

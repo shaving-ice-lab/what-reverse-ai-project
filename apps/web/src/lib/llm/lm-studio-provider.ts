@@ -1,6 +1,6 @@
 /**
- * LM Studio LLM ProvideuserImplement
- * @description LM Studio Usage OpenAI Compatible API
+ * LM Studio LLM Provider Implementation
+ * @description LM Studio uses OpenAI-compatible API
  */
 
 import type {
@@ -19,11 +19,11 @@ import { LLMError } from './types';
  * LM Studio Config
  */
 export interface LMStudioConfig {
- /** Basic URL(Default http://localhost:1234) */
+ /** Base URL (default: http://localhost:1234) */
  baseUrl: string;
- /** Request timeout(s) */
+ /** Request timeout (ms) */
  timeout: number;
- /** MaximumRetrytimescount */
+ /** Maximum retry count */
  maxRetries: number;
 }
 
@@ -31,18 +31,18 @@ export interface LMStudioConfig {
  * LM Studio Status
  */
 export interface LMStudioStatus {
- /** isnoRun */
+ /** Whether running */
  running: boolean;
- /** Version Number */
+ /** Version number */
  version?: string;
- /** CurrentLoad'sModel */
+ /** Currently loaded model */
  loadedModel?: string;
- /** alreadyInstallModelCount */
+ /** Installed model count */
  modelsCount: number;
 }
 
 /**
- * DefaultConfig
+ * Default Config
  */
 const DEFAULT_CONFIG: LMStudioConfig = {
  baseUrl: 'http://localhost:1234',
@@ -51,7 +51,7 @@ const DEFAULT_CONFIG: LMStudioConfig = {
 };
 
 /**
- * LM Studio Provider Implement
+ * LM Studio Provider Implementation
  */
 export class LMStudioProvider implements LocalLLMProvider {
  readonly type: LLMProviderType = 'lm-studio';
@@ -63,7 +63,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * Check LM Studio isnoAvailable
+ * Check if LM Studio is available
  */
  async isAvailable(): Promise<boolean> {
  try {
@@ -103,22 +103,22 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * ListAvailableModel
+ * List available models
  */
  async listModels(): Promise<LocalModelInfo[]> {
  const response = await this.fetchWithRetry('/v1/models');
 
  if (!response.ok) {
- throw new LLMError('FetchModelListFailed', 'CONNECTION_ERROR');
+   throw new LLMError('Failed to fetch model list', 'CONNECTION_ERROR');
  }
 
  const data = await response.json();
  const models = data.data || [];
 
  return models.map((model: { id: string; created?: number; owned_by?: string }) => ({
- name: model.id,
- model: model.id,
- size: 0, // LM Studio API notProvideSizeInfo
+   name: model.id,
+   model: model.id,
+   size: 0, // LM Studio API does not provide size info
  digest: '',
  modifiedAt: model.created 
  ? new Date(model.created * 1000).toISOString() 
@@ -130,26 +130,26 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * DownloadModel(LM Studio notSupportVia API Download)
+ * Download model (LM Studio does not support downloading via API)
  */
  async pullModel(
  _modelName: string,
  _onProgress?: (progress: PullProgress) => void
  ): Promise<void> {
- throw new LLMError(
- 'LM Studio notSupportVia API DownloadModel, Pleaseat LM Studio AppManualDownload',
- 'INVALID_REQUEST'
- );
+   throw new LLMError(
+   'LM Studio does not support downloading models via API. Please download manually in the LM Studio app.',
+   'INVALID_REQUEST'
+  );
  }
 
  /**
- * DeleteModel(LM Studio notSupportVia API Delete)
+ * Delete model (LM Studio does not support deleting via API)
  */
  async deleteModel(_modelName: string): Promise<void> {
- throw new LLMError(
- 'LM Studio notSupportVia API DeleteModel, Pleaseat LM Studio AppManualDelete',
- 'INVALID_REQUEST'
- );
+   throw new LLMError(
+   'LM Studio does not support deleting models via API. Please delete manually in the LM Studio app.',
+   'INVALID_REQUEST'
+  );
  }
 
  /**
@@ -177,7 +177,7 @@ export class LMStudioProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const error = await response.text();
- throw new LLMError(`ChatFailed: ${error}`, 'GENERATION_ERROR');
+   throw new LLMError(`Chat failed: ${error}`, 'GENERATION_ERROR');
  }
 
  const data = await response.json();
@@ -205,7 +205,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * StreamingChat
+ * Streaming chat
  */
  async *chatStream(options: ChatOptions): AsyncIterable<StreamChunk> {
  const requestId = crypto.randomUUID();
@@ -232,11 +232,11 @@ export class LMStudioProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const error = await response.text();
- throw new LLMError(`StreamingChatFailed: ${error}`, 'GENERATION_ERROR');
+   throw new LLMError(`Streaming chat failed: ${error}`, 'GENERATION_ERROR');
  }
 
  if (!response.body) {
- throw new LLMError('ResponseasEmpty', 'GENERATION_ERROR');
+   throw new LLMError('Response body is empty', 'GENERATION_ERROR');
  }
 
  const reader = response.body.getReader();
@@ -276,7 +276,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  yield { content: '', done: true, model: json.model };
  }
  } catch {
- // IgnoreParseError
+       // Ignore parse error
  }
  }
  }
@@ -287,7 +287,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * TextEmbedding
+ * Text embedding
  */
  async embed(text: string, model?: string): Promise<number[]> {
  const response = await this.fetchWithRetry('/v1/embeddings', {
@@ -300,7 +300,7 @@ export class LMStudioProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const error = await response.text();
- throw new LLMError(`EmbeddingFailed: ${error}`, 'GENERATION_ERROR');
+   throw new LLMError(`Embedding failed: ${error}`, 'GENERATION_ERROR');
  }
 
  const data = await response.json();
@@ -308,7 +308,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * CancelRequest
+ * Cancel request
  */
  cancel(requestId: string): void {
  const controller = this.abortControllers.get(requestId);
@@ -319,7 +319,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * CancelAllRequest
+ * Cancel all requests
  */
  cancelAll(): void {
  for (const controller of this.abortControllers.values()) {
@@ -329,21 +329,21 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
 
  /**
- * UpdateConfig
+ * Update config
  */
  updateConfig(config: Partial<LMStudioConfig>): void {
  this.config = { ...this.config, ...config };
  }
 
  /**
- * FetchCurrentConfig
+ * Get current config
  */
  getConfig(): LMStudioConfig {
  return { ...this.config };
  }
 
  /**
- * Retry's fetch
+ * Fetch with retry
  */
  private async fetchWithRetry(
  path: string,
@@ -375,7 +375,7 @@ export class LMStudioProvider implements LocalLLMProvider {
  throw new LLMError('Request timeout', 'TIMEOUT');
  }
 
- // etcpendingafterRetry
+      // Wait before retrying
  if (attempt < this.config.maxRetries - 1) {
  await new Promise((resolve) =>
  setTimeout(resolve, 1000 * (attempt + 1))
@@ -384,15 +384,15 @@ export class LMStudioProvider implements LocalLLMProvider {
  }
  }
 
- throw new LLMError(
- `Connect LM Studio Failed: ${lastError?.message}`,
- 'CONNECTION_ERROR'
- );
+   throw new LLMError(
+   `Failed to connect to LM Studio: ${lastError?.message}`,
+   'CONNECTION_ERROR'
+  );
  }
 }
 
 /**
- * Create LM Studio Provider Instance
+ * Create LM Studio provider instance
  */
 export function createLMStudioProvider(
  config?: Partial<LMStudioConfig>
@@ -401,12 +401,12 @@ export function createLMStudioProvider(
 }
 
 /**
- * Default LM Studio Provider Instance
+ * Default LM Studio provider instance
  */
 let defaultProvider: LMStudioProvider | null = null;
 
 /**
- * FetchDefault LM Studio Provider
+ * Get default LM Studio provider
  */
 export function getDefaultLMStudioProvider(): LMStudioProvider {
  if (!defaultProvider) {

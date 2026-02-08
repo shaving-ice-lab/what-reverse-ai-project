@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Security SettingsPage - Supabase Style
- * Password, Two-stepVerify, Sign InHistoryetc
+ * Security Settings Page - Supabase Style
+ * Password, Two-Factor Authentication, Sign-in History, etc.
  */
 
 import { useState } from "react";
@@ -34,7 +34,7 @@ import {
  Info,
 } from "lucide-react";
 
-// Sign InDevice
+// Signed-in Devices
 const loginDevices = [
  {
  id: "1",
@@ -51,7 +51,7 @@ const loginDevices = [
  browser: "Safari",
  location: "Beijing, ",
  ip: "123.45.67.***",
- lastActive: "1 hbefore",
+ lastActive: "1 hour ago",
  isCurrent: false,
  },
  {
@@ -60,12 +60,12 @@ const loginDevices = [
  browser: "Firefox 121",
  location: "on, ",
  ip: "98.76.54.***",
- lastActive: "3 daysbefore",
+ lastActive: "3 days ago",
  isCurrent: false,
  },
 ];
 
-// Sign InHistory
+// Sign-in History
 const loginHistory = [
  {
  id: "1",
@@ -111,15 +111,15 @@ export default function SecuritySettingsPage() {
  const [showSetup2FA, setShowSetup2FA] = useState(false);
  const [verificationCode, setVerificationCode] = useState("");
 
- // PasswordIntensityDetect
+  // Password Strength Detection
  const getPasswordStrength = (password: string) => {
- if (password.length === 0) return { level: 0, label: "", color: "" };
- if (password.length < 6) return { level: 1, label: "", color: "bg-destructive" };
- if (password.length < 10) return { level: 2, label: "", color: "bg-warning" };
- if (password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
- return { level: 3, label: "", color: "bg-brand-500" };
- }
- return { level: 2, label: "", color: "bg-warning" };
+    if (password.length === 0) return { level: 0, label: "", color: "" };
+    if (password.length < 6) return { level: 1, label: "Weak", color: "bg-destructive" };
+    if (password.length < 10) return { level: 2, label: "Medium", color: "bg-warning" };
+    if (password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+      return { level: 3, label: "Strong", color: "bg-brand-500" };
+    }
+    return { level: 2, label: "Medium", color: "bg-warning" };
  };
 
  const passwordStrength = getPasswordStrength(newPassword);
@@ -130,18 +130,18 @@ export default function SecuritySettingsPage() {
  <PageHeader
  eyebrow="Settings"
  title="Security Settings"
- description="ManagePassword, Two-stepVerifyandSign InDevice"
+ description="Manage password, two-step verification and signed-in devices"
  />
 
  <div className="page-section">
- {/* SecurityStatusOverview */}
+      {/* Security Status Overview */}
  <div className="page-panel bg-brand-200/40 border-brand-400/30">
  <div className="p-4 flex items-center gap-3">
  <CheckCircle2 className="w-5 h-5 text-brand-500" />
  <div>
- <h3 className="text-sm font-medium text-foreground">AccountSecurityStatus</h3>
+ <h3 className="text-sm font-medium text-foreground">Account security status</h3>
  <p className="text-[13px] text-foreground-light">
- you'sAccountEnabledcurrentSecurityProtect.SuggestionEnableTwo-stepVerifywithEnhancedSecurity.
+ Your account has basic security. We recommend enabling two-step verification for stronger security.
  </p>
  </div>
  </div>
@@ -149,7 +149,7 @@ export default function SecuritySettingsPage() {
  </div>
 
  <div className="page-section">
- {/* EditPassword */}
+        {/* Change Password */}
  <div className="page-panel">
  <div className="page-panel-header">
  <div className="flex items-center gap-3">
@@ -157,8 +157,8 @@ export default function SecuritySettingsPage() {
  <Key className="w-4 h-4 text-foreground-muted" />
  </div>
  <div>
- <h2 className="page-panel-title">EditPassword</h2>
- <p className="page-panel-description mt-1">PeriodicmorePasswordwithProtectAccountSecurity</p>
+                <h2 className="page-panel-title">Change Password</h2>
+ <p className="page-panel-description mt-1">Change password periodically to protect your account</p>
  </div>
  </div>
  </div>
@@ -173,7 +173,7 @@ export default function SecuritySettingsPage() {
  type={showCurrentPassword ? "text" : "password"}
  value={currentPassword}
  onChange={(e) => setCurrentPassword(e.target.value)}
- placeholder="InputCurrent Password"
+ placeholder="Enter current password"
  className="pr-10 h-9 bg-surface-200 border-border"
  />
  <button
@@ -195,7 +195,7 @@ export default function SecuritySettingsPage() {
  type={showNewPassword ? "text" : "password"}
  value={newPassword}
  onChange={(e) => setNewPassword(e.target.value)}
- placeholder="InputNew Password"
+ placeholder="Enter new password"
  className="pr-10 h-9 bg-surface-200 border-border"
  />
  <button
@@ -220,7 +220,7 @@ export default function SecuritySettingsPage() {
  </span>
  </div>
  <p className="text-xs text-foreground-muted mt-1">
- SuggestionUsage 10+ Character, ContainsSizecharandcountchar
+                We recommend using 10+ characters with uppercase and lowercase letters and numbers
  </p>
  </div>
  )}
@@ -228,17 +228,17 @@ export default function SecuritySettingsPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- ConfirmNew Password
+            Confirm New Password
  </label>
  <Input
  type="password"
  value={confirmPassword}
  onChange={(e) => setConfirmPassword(e.target.value)}
- placeholder="againtimesInputNew Password"
+ placeholder="Enter new password again"
  className="h-9 bg-surface-200 border-border"
  />
  {confirmPassword && newPassword !== confirmPassword && (
- <p className="text-xs text-destructive mt-1">timesInput'sPasswordnot1</p>
+ <p className="text-xs text-destructive mt-1">Passwords do not match</p>
  )}
  </div>
 
@@ -247,12 +247,12 @@ export default function SecuritySettingsPage() {
  disabled={!currentPassword || !newPassword || newPassword !== confirmPassword}
  >
  <Lock className="w-4 h-4 mr-2" />
- moreNew Password
+            Update Password
  </Button>
  </div>
  </div>
 
- {/* Two-stepVerify */}
+        {/* Two-Factor Authentication */}
  <div className="page-panel">
  <div className="page-panel-header">
  <div className="flex items-center justify-between">
@@ -261,15 +261,15 @@ export default function SecuritySettingsPage() {
  <Smartphone className="w-4 h-4 text-foreground-muted" />
  </div>
  <div>
- <h2 className="page-panel-title">Two-stepVerify (2FA)</h2>
- <p className="page-panel-description mt-1">UsageVerifyAppEnhancedAccountSecurity</p>
+                <h2 className="page-panel-title">Two-Factor Authentication (2FA)</h2>
+ <p className="page-panel-description mt-1">Use a verification app for enhanced account security</p>
  </div>
  </div>
  <Badge
  variant={is2FAEnabled ? "default" : "secondary"}
  className={is2FAEnabled ? "bg-brand-500 text-background" : "bg-surface-200 text-foreground-light"}
  >
- {is2FAEnabled ? "Enabled": "not yetEnable"}
+ {is2FAEnabled ? "Enabled": "Not Enabled"}
  </Badge>
  </div>
  </div>
@@ -281,10 +281,10 @@ export default function SecuritySettingsPage() {
  <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
  <div>
  <p className="text-[13px] text-foreground">
- Two-stepVerifycanwithasyou'sAccountProvideoutside'sSecurityProtect
+ Two-step verification adds an extra layer of security to your account
  </p>
  <p className="text-xs text-foreground-muted mt-1">
- nowmakePassword, alsoneedneedVerification CodeonlycanSign In
+ In addition to your password, you'll need a verification code to sign in
  </p>
  </div>
  </div>
@@ -294,18 +294,18 @@ export default function SecuritySettingsPage() {
  {!is2FAEnabled && !showSetup2FA && (
  <Button onClick={() => setShowSetup2FA(true)} className="bg-brand-500 hover:bg-brand-600 text-background">
  <Shield className="w-4 h-4 mr-2" />
- EnableTwo-stepVerify
+ Enable Two-Factor Authentication
  </Button>
  )}
 
  {showSetup2FA && (
  <div className="space-y-4">
  <div className="p-4 rounded-md bg-surface-100/60">
- <h3 className="text-[13px] font-medium text-foreground mb-2">SettingsStep</h3>
+ <h3 className="text-[13px] font-medium text-foreground mb-2">Settings step</h3>
  <ol className="list-decimal list-inside space-y-2 text-[13px] text-foreground-light">
- <li>DownloadVerifyApp(if Google Authenticator, Authy)</li>
- <li>Scandownmethod2R CodeorManualInputKey</li>
- <li>InputAppDisplay's 6 Verification Code</li>
+ <li>Download a verification app (e.g. Google Authenticator, Authy)</li>
+ <li>Scan the QR code below or manually enter the key</li>
+ <li>Enter the 6-digit code shown in the app</li>
  </ol>
  </div>
 
@@ -314,7 +314,7 @@ export default function SecuritySettingsPage() {
  <QrCode className="w-24 h-24 text-foreground" />
  </div>
  <div>
- <p className="text-[13px] text-foreground-light mb-2">orManualInputKey: </p>
+            <p className="text-[13px] text-foreground-light mb-2">Or manually enter the key:</p>
  <div className="flex items-center gap-2">
  <code className="px-3 py-2 bg-surface-200 rounded-md font-mono text-sm">
  ABCD-EFGH-IJKL-MNOP
@@ -328,7 +328,7 @@ export default function SecuritySettingsPage() {
 
  <div className="max-w-xs">
  <label className="block text-[13px] font-medium text-foreground mb-2">
- InputVerification Code
+              Enter Verification Code
  </label>
  <Input
  value={verificationCode}
@@ -348,7 +348,7 @@ export default function SecuritySettingsPage() {
  setShowSetup2FA(false);
  }}
  >
- VerifyandEnable
+                Verify and Enable
  </Button>
  <Button variant="outline" onClick={() => setShowSetup2FA(false)} className="border-border text-foreground-light">
  Cancel
@@ -361,31 +361,31 @@ export default function SecuritySettingsPage() {
  <div className="flex items-center gap-4">
  <Button variant="outline" className="border-border text-foreground-light">
  <RefreshCw className="w-4 h-4 mr-2" />
- re-newGenerateRestore
+              Regenerate Recovery Codes
  </Button>
  <Button variant="outline" className="text-destructive hover:text-destructive border-destructive/30">
- DisableTwo-stepVerify
+              Disable 2FA
  </Button>
  </div>
  )}
  </div>
  </div>
 
- {/* Sign InDevice */}
- <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center">
- <Monitor className="w-4 h-4 text-foreground-muted" />
- </div>
- <div>
- <h2 className="page-panel-title">Sign InDevice</h2>
- <p className="page-panel-description mt-1">ManagealreadySign In'sDeviceandwill</p>
+        {/* Signed-in Devices */}
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center">
+                    <Monitor className="w-4 h-4 text-foreground-muted" />
+                  </div>
+                  <div>
+                    <h2 className="page-panel-title">Signed-in Devices</h2>
+ <p className="page-panel-description mt-1">Manage devices that are signed in</p>
  </div>
  </div>
  <Button variant="outline" size="sm" className="text-destructive hover:text-destructive border-destructive/30">
- Sign OutAllDevice
+              Sign Out All Devices
  </Button>
  </div>
  </div>
@@ -410,7 +410,7 @@ export default function SecuritySettingsPage() {
  <div className="flex items-center gap-2">
  <h3 className="text-[13px] font-medium text-foreground">{device.device}</h3>
  {device.isCurrent && (
- <Badge className="bg-brand-500 text-background">CurrentDevice</Badge>
+ <Badge className="bg-brand-500 text-background">Current device</Badge>
  )}
  </div>
  <div className="flex items-center gap-4 mt-1 text-xs text-foreground-muted">
@@ -435,22 +435,22 @@ export default function SecuritySettingsPage() {
  </div>
  </div>
 
- {/* Sign InHistory */}
- <div className="page-panel">
- <div className="page-panel-header">
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center">
- <Clock className="w-4 h-4 text-foreground-muted" />
- </div>
- <div>
- <h2 className="page-panel-title">Sign InHistory</h2>
- <p className="page-panel-description mt-1">Recent'sSign InActivityRecord</p>
+        {/* Sign-in History */}
+          <div className="page-panel">
+            <div className="page-panel-header">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-md bg-surface-200 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-foreground-muted" />
+                  </div>
+                  <div>
+                    <h2 className="page-panel-title">Sign-in History</h2>
+ <p className="page-panel-description mt-1">Recent sign-in activity</p>
  </div>
  </div>
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Download className="w-4 h-4 mr-2" />
- ExportLogs
+              Export Logs
  </Button>
  </div>
  </div>
@@ -471,7 +471,7 @@ export default function SecuritySettingsPage() {
  <span className="text-[13px] text-foreground">{record.device}</span>
  {record.status === "blocked" && (
  <Badge variant="secondary" className="bg-destructive-200 text-destructive text-xs">
- alreadyBlock
+                  Blocked
  </Badge>
  )}
  </div>
@@ -492,7 +492,7 @@ export default function SecuritySettingsPage() {
  </div>
 
  <Button variant="outline" className="w-full mt-4 border-border text-foreground-light">
- View moreHistoryRecord
+            View More History
  </Button>
  </div>
  </div>

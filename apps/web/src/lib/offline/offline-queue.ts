@@ -1,6 +1,6 @@
 /**
- * OfflineQueueManage
- * @description ManageOfflineStatusdown'sActionQueue, SupportPersistentandAutoSync
+ * Offline Queue Management
+ * @description Manage Offline Status Action Queue, Support Persistent and Auto Sync
  */
 
 import type {
@@ -14,7 +14,7 @@ import type {
 import { generateOfflineId, sortOperations, isOperationExpired } from './types';
 
 /**
- * DefaultQueueConfig
+ * Default Queue Config
  */
 const DEFAULT_CONFIG: OfflineQueueConfig = {
  maxSize: 1000,
@@ -25,12 +25,12 @@ const DEFAULT_CONFIG: OfflineQueueConfig = {
 };
 
 /**
- * EventListenType
+ * Event Listener Type
  */
 type EventListener = (event: { type: OfflineEventType; data?: unknown }) => void;
 
 /**
- * OfflineQueueManage
+ * Offline Queue Management
  */
 export class OfflineQueue {
  private config: OfflineQueueConfig;
@@ -44,15 +44,15 @@ export class OfflineQueue {
  this.queue = [];
  this.listeners = new Map();
 
- // fromStorageRestoreQueue
- if (this.config.persistToStorage) {
- this.loadFromStorage();
- }
+    // Restore queue from storage
+    if (this.config.persistToStorage) {
+      this.loadFromStorage();
+    }
  }
 
- /**
- * AddActiontoQueue
- */
+  /**
+   * Add Action to Queue
+   */
  add<T>(
  type: OfflineOperationType,
  data: T,
@@ -62,16 +62,16 @@ export class OfflineQueue {
  metadata?: Record<string, unknown>;
  } = {}
  ): OfflineOperation<T> {
- // CheckQueueisnoalready
- if (this.queue.length >= this.config.maxSize) {
- // Removemostold'salreadyFailedAction
- const failedIndex = this.queue.findIndex((op) => op.status === 'failed');
- if (failedIndex !== -1) {
- this.queue.splice(failedIndex, 1);
- } else {
- throw new Error('OfflineQueuealready');
- }
- }
+    // Check if queue is already full
+    if (this.queue.length >= this.config.maxSize) {
+      // Remove the oldest already failed action
+      const failedIndex = this.queue.findIndex((op) => op.status === 'failed');
+      if (failedIndex !== -1) {
+        this.queue.splice(failedIndex, 1);
+      } else {
+        throw new Error('Offline queue is already full');
+      }
+    }
 
  const operation: OfflineOperation<T> = {
  id: generateOfflineId(),
@@ -93,9 +93,9 @@ export class OfflineQueue {
  return operation;
  }
 
- /**
- * RemoveAction
- */
+  /**
+   * Remove Action
+   */
  remove(id: string): boolean {
  const index = this.queue.findIndex((op) => op.id === id);
  if (index === -1) return false;
@@ -105,9 +105,9 @@ export class OfflineQueue {
  return true;
  }
 
- /**
- * CancelAction
- */
+  /**
+   * Cancel Action
+   */
  cancel(id: string): boolean {
  const operation = this.queue.find((op) => op.id === id);
  if (!operation || operation.status === 'processing') return false;
@@ -117,30 +117,30 @@ export class OfflineQueue {
  return true;
  }
 
- /**
- * FetchQueue'sAllAction
- */
+  /**
+   * Fetch All Actions in Queue
+   */
  getAll(): OfflineOperation[] {
  return [...this.queue];
  }
 
- /**
- * FetchPending'sAction
- */
+  /**
+   * Fetch Pending Actions
+   */
  getPending(): OfflineOperation[] {
  return this.queue.filter((op) => op.status === 'pending');
  }
 
- /**
- * FetchFailed'sAction
- */
+  /**
+   * Fetch Failed Actions
+   */
  getFailed(): OfflineOperation[] {
  return this.queue.filter((op) => op.status === 'failed');
  }
 
- /**
- * FetchQueueStatus
- */
+  /**
+   * Fetch Queue Status
+   */
  getState(): OfflineQueueState {
  return {
  length: this.queue.length,
@@ -151,9 +151,9 @@ export class OfflineQueue {
  };
  }
 
- /**
- * ProcessQueue
- */
+  /**
+   * Process Queue
+   */
  async process(
  handler: (operation: OfflineOperation) => Promise<void>
  ): Promise<void> {
@@ -177,22 +177,22 @@ export class OfflineQueue {
  }
  }
 
- /**
- * InternalProcessLogic
- */
+  /**
+   * Internal Process Logic
+   */
  private async processQueue(
  handler: (operation: OfflineOperation) => Promise<void>
  ): Promise<void> {
  const pendingOperations = this.getPending();
 
  for (const operation of pendingOperations) {
- // CheckisnoExpired
- if (isOperationExpired(operation)) {
- operation.status = 'failed';
- operation.error = 'ActionExpired';
- this.persist();
- continue;
- }
+      // Check if expired
+      if (isOperationExpired(operation)) {
+        operation.status = 'failed';
+        operation.error = 'Action expired';
+        this.persist();
+        continue;
+      }
 
  operation.status = 'processing';
  this.emit('queue:process', operation);
@@ -203,31 +203,31 @@ export class OfflineQueue {
  operation.status = 'completed';
  this.emit('queue:complete', operation);
  } catch (error) {
- operation.retryCount++;
- operation.error = error instanceof Error ? error.message: 'UnknownError';
+        operation.retryCount++;
+        operation.error = error instanceof Error ? error.message: 'Unknown error';
 
- if (operation.retryCount >= operation.maxRetries) {
- operation.status = 'failed';
- this.emit('queue:fail', operation);
- } else {
- operation.status = 'pending';
- // etcpendingRetrybetween
- await new Promise((resolve) =>
- setTimeout(resolve, this.config.retryInterval)
- );
- }
+        if (operation.retryCount >= operation.maxRetries) {
+          operation.status = 'failed';
+          this.emit('queue:fail', operation);
+        } else {
+          operation.status = 'pending';
+          // Wait before retrying
+          await new Promise((resolve) =>
+            setTimeout(resolve, this.config.retryInterval)
+          );
+        }
  }
 
  this.persist();
  }
 
- // Clean upCompleted'sAction
- this.cleanup();
- }
+    // Clean up completed actions
+    this.cleanup();
+  }
 
- /**
- * RetryFailed'sAction
- */
+  /**
+   * Retry Failed Actions
+   */
  retryFailed(): void {
  const failedOperations = this.getFailed();
  for (const operation of failedOperations) {
@@ -240,9 +240,9 @@ export class OfflineQueue {
  this.persist();
  }
 
- /**
- * Clean upCompletedandCancelled'sAction
- */
+  /**
+   * Clean up Completed and Cancelled Actions
+   */
  cleanup(): void {
  this.queue = this.queue.filter(
  (op) => op.status !== 'completed' && op.status !== 'cancelled'
@@ -250,17 +250,17 @@ export class OfflineQueue {
  this.persist();
  }
 
- /**
- * ClearQueue
- */
+  /**
+   * Clear Queue
+   */
  clear(): void {
  this.queue = [];
  this.persist();
  }
 
- /**
- * PersistenttoStorage
- */
+  /**
+   * Persist to Storage
+   */
  private persist(): void {
  if (!this.config.persistToStorage) return;
 
@@ -272,21 +272,21 @@ export class OfflineQueue {
  }
  }
 
- /**
- * fromStorageLoad
- */
+  /**
+   * Load from Storage
+   */
  private loadFromStorage(): void {
  try {
  const data = localStorage.getItem(this.config.storageKey);
  if (data) {
- const parsed = JSON.parse(data) as OfflineOperation[];
- // RestoreDatefor
- this.queue = parsed.map((op) => ({
- ...op,
- createdAt: new Date(op.createdAt),
- // willProcessing'sStatusResetasPending
- status: op.status === 'processing' ? 'pending' : op.status,
- }));
+        const parsed = JSON.parse(data) as OfflineOperation[];
+        // Restore date format
+        this.queue = parsed.map((op) => ({
+          ...op,
+          createdAt: new Date(op.createdAt),
+          // Reset processing status to pending
+          status: op.status === 'processing' ? 'pending' : op.status,
+        }));
  }
  } catch (error) {
  console.error('Failed to load offline queue:', error);
@@ -294,24 +294,24 @@ export class OfflineQueue {
  }
  }
 
- /**
- * SubscriptionEvent
- */
+  /**
+   * Subscribe to Event
+   */
  on(event: OfflineEventType, listener: EventListener): () => void {
  if (!this.listeners.has(event)) {
  this.listeners.set(event, new Set());
  }
- this.listeners.get(event)!.add(listener);
+    this.listeners.get(event)!.add(listener);
 
- // BackUnsubscribecount
- return () => {
- this.listeners.get(event)?.delete(listener);
- };
+    // Return unsubscribe function
+    return () => {
+      this.listeners.get(event)?.delete(listener);
+    };
  }
 
- /**
- * TriggerEvent
- */
+  /**
+   * Trigger Event
+   */
  private emit(type: OfflineEventType, data?: unknown): void {
  const eventListeners = this.listeners.get(type);
  if (eventListeners) {
@@ -327,7 +327,7 @@ export class OfflineQueue {
 }
 
 /**
- * CreateOfflineQueueInstance
+ * Create Offline Queue Instance
  */
 export function createOfflineQueue(
  config?: Partial<OfflineQueueConfig>
@@ -336,12 +336,12 @@ export function createOfflineQueue(
 }
 
 /**
- * DefaultOfflineQueueInstance
+ * Default Offline Queue Instance
  */
 let defaultQueue: OfflineQueue | null = null;
 
 /**
- * FetchDefaultOfflineQueue
+ * Fetch Default Offline Queue
  */
 export function getDefaultOfflineQueue(): OfflineQueue {
  if (!defaultQueue) {

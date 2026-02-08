@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Referral ProgramPage - LobeHub StyleDesign
+ * Referral Program Page - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -26,69 +26,69 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// RecommendedRewards
+// Referral Rewards
 const rewards = [
  {
  icon: Gift,
- title: "RecommendedSuccessRewards",
- description: "eachSuccessRecommended1PaidUser, youwillObtainUseryearsSubscriptionAmount's 20% asRewards",
+ title: "Successful Referral Reward",
+ description: "For each successfully referred paid user, you'll earn 20% of their annual subscription amount as a reward",
  highlight: "20% Commission",
  },
  {
  icon: Sparkles,
- title: "byRecommendeduserDiscount",
- description: "byRecommended'snewUserwillObtainmonthsSubscription 50% Discount",
+ title: "Referred User Discount",
+ description: "New users referred by you will receive a 50% discount on their first month",
  highlight: "50% Discount",
  },
  {
  icon: TrendingUp,
- title: "Rewards",
- description: "Recommendedmultiple, etc, UnlockmoremultipleExclusiveRights",
- highlight: "Noneonlimit",
+ title: "Tiered Rewards",
+ description: "The more you refer, the more exclusive benefits you unlock",
+ highlight: "No limit",
  },
 ];
 
-// Recommendedetc
+// Referral Tiers
 const tiers = [
  {
- name: "newRecommended",
- requirement: "1-5 person",
- benefits: ["20% Commission", "ExclusiveRecommendedLink"],
+ name: "New Referrer",
+ requirement: "1-5 referrals",
+ benefits: ["20% Commission", "Exclusive Referral Link"],
  },
  {
- name: "Recommended",
- requirement: "6-20 person",
- benefits: ["25% Commission", "PriorityCustomerSupport", "Exclusive Discord Channel"],
+ name: "Bronze Referrer",
+ requirement: "6-20 referrals",
+ benefits: ["25% Commission", "Priority Customer Support", "Exclusive Discord Channel"],
  },
  {
- name: "Recommended",
- requirement: "21-50 person",
- benefits: ["30% Commission", "ExclusiveCustomerManager", "beforeExperiencenewFeatures"],
+ name: "Silver Referrer",
+ requirement: "21-50 referrals",
+ benefits: ["30% Commission", "Dedicated Account Manager", "Early Access to New Features"],
  },
  {
- name: "Recommended",
- requirement: "50+ person",
- benefits: ["35% Commission", "yearsPartnerswillInvite", "JointMarketingwill"],
+ name: "Gold Referrer",
+ requirement: "50+ referrals",
+ benefits: ["35% Commission", "Annual Partner Event Invite", "Joint Marketing Opportunities"],
  },
 ];
 
 // FAQ
 const faqs = [
  {
- question: "ifwhatStartRecommended?",
- answer: "Sign UpAccountafter, atSettingsPageFetchyou'sExclusiveRecommendedLink.Shareto, heViayou'sLinkSign UpandSubscriptionPaidVersion, younowcanObtainRewards.",
+    question: "How do I get started with referrals?",
+    answer: "After signing up, get your exclusive referral link from the Settings page. Share it with others — when they sign up and subscribe to a paid plan through your link, you'll earn rewards.",
  },
  {
- question: "RewardsifwhatDistribute?",
- answer: "RewardswillatbyRecommendedUserDonetimesPaymentafter 30 daysinDistributetoyou'sAccountBalance.youcanwithSelectWithdraworUsed forSubscriptionCost.",
+    question: "How are rewards distributed?",
+    answer: "Rewards are distributed to your account balance 30 days after the referred user completes their first payment. You can choose to withdraw them or use them toward subscription costs.",
  },
  {
- question: "RecommendedLinkValidmultiple?",
- answer: "RecommendedLinkPermanentValid.byRecommendedUsertimesAccessafter 90 daysinSign UpandSubscription, allwillenteryou'sRecommended.",
+    question: "How long is the referral link valid?",
+    answer: "Referral links are permanently valid. If a referred user signs up and subscribes within 90 days of their first visit, it will count as your referral.",
  },
  {
- question: "canwithRecommendedtoCompanyorTeam??",
- answer: "canwith!NonepersonUserstillisEnterpriseTeam, needViayou'sRecommendedLinkSubscription, youallcanObtainshouldRewards.EnterpriseSubscription'sRewardsAmountmore.",
+    question: "Can I refer companies or teams?",
+    answer: "Yes! Whether they're individual users or enterprise teams, as long as they subscribe through your referral link, you'll earn the corresponding rewards. Enterprise subscriptions come with higher reward amounts.",
  },
 ];
 
@@ -115,13 +115,13 @@ export default function ReferralPage() {
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- InviteFriends, 
- <span className="text-[#4e8fff]">EarnRewards</span>
+ Invite Friends,{" "}
+ <span className="text-[#4e8fff]">Earn Rewards</span>
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-10">
- Share AgentFlow toyou'sandColleague, eachSuccessRecommended1PaidUser, 
- nowcanObtain'sCashRewards
+            Share AgentFlow with your friends and colleagues. For each successfully referred paid user, 
+            you'll earn cash rewards
  </p>
 
  {/* Referral Link */}
@@ -139,7 +139,7 @@ export default function ReferralPage() {
  {copied ? (
  <>
  <Check className="w-4 h-4 mr-2" />
- alreadyCopy
+ Copied
  </>
  ) : (
  <>
@@ -150,14 +150,14 @@ export default function ReferralPage() {
  </Button>
  </div>
  <p className="text-[12px] text-foreground-lighter mt-3">
- <Link href="/login" className="text-[#4e8fff] hover:underline">Sign In</Link>{""}
- Fetchyou'sExclusiveRecommendedLink
+            <Link href="/login" className="text-[#4e8fff] hover:underline">Sign in</Link>{" "}
+            to get your exclusive referral link
  </p>
  </div>
 
  {/* Share Buttons */}
  <div className="flex items-center justify-center gap-4 mt-8">
- <span className="text-[12px] text-foreground-lighter">Shareto: </span>
+ <span className="text-[12px] text-foreground-lighter">Share: </span>
  <div className="flex gap-2">
  <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-border/50">
  <Twitter className="h-4 w-4" />
@@ -177,8 +177,8 @@ export default function ReferralPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">RecommendedRewards</h2>
- <p className="text-[13px] text-foreground-light">Simple3, EasyEarnRewards</p>
+ <h2 className="lobe-section-header mb-4">Referral Rewards</h2>
+ <p className="text-[13px] text-foreground-light">3 simple steps to easily earn rewards</p>
  </div>
 
  <div className="grid md:grid-cols-3 gap-6">
@@ -208,8 +208,8 @@ export default function ReferralPage() {
  <section className="py-16 px-6">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">Recommendedetc</h2>
- <p className="text-[13px] text-foreground-light">Recommendedmultiple, Rewards</p>
+ <h2 className="lobe-section-header mb-4">Referral Tiers</h2>
+ <p className="text-[13px] text-foreground-light">The more you refer, the more you earn</p>
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -232,7 +232,7 @@ export default function ReferralPage() {
  )} />
  <h3 className="font-semibold text-foreground">{tier.name}</h3>
  </div>
- <p className="text-[13px] text-foreground-light mb-4">SuccessRecommended {tier.requirement}</p>
+ <p className="text-[13px] text-foreground-light mb-4">Successfully referred {tier.requirement}</p>
  <ul className="space-y-2">
  {tier.benefits.map((benefit) => (
  <li key={benefit} className="flex items-center gap-2 text-[12px]">
@@ -251,15 +251,15 @@ export default function ReferralPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="lobe-section-header mb-4">ifwhat</h2>
+ <h2 className="lobe-section-header mb-4">How It Works</h2>
  </div>
 
  <div className="space-y-6">
  {[
- { step: 1, title: "FetchRecommendedLink", description: "Sign InAccount, atSettingsPagetoyou'sExclusiveRecommendedLink" },
- { step: 2, title: "SharetoFriends", description: "ViaSocial Media, EmailorwhatmethodShareyou'sLink" },
- { step: 3, title: "FriendsSign UpSubscription", description: "FriendsViayou'sLinkSign UpandSubscriptionPaidversion" },
- { step: 4, title: "ObtainRewards", description: "RewardswillAutoenteryou'sAccount, canWithdraworSubscription" },
+            { step: 1, title: "Get Referral Link", description: "Sign in to your account and get your exclusive referral link from the Settings page" },
+            { step: 2, title: "Share with Friends", description: "Share your link via social media, email, or any other method" },
+            { step: 3, title: "Friends Sign Up & Subscribe", description: "Friends sign up and subscribe to a paid plan through your link" },
+            { step: 4, title: "Earn Rewards", description: "Rewards are automatically added to your account — withdraw or use for subscriptions" },
  ].map((item) => (
  <div
  key={item.step}
@@ -299,20 +299,20 @@ export default function ReferralPage() {
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto text-center">
  <Zap className="w-12 h-12 text-[#4e8fff] mx-auto mb-6" />
- <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">StartEarnRewards</h2>
+ <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Start Earning Rewards</h2>
  <p className="text-[13px] text-foreground-light mb-8 max-w-md mx-auto">
- NowSign Up, Fetchyou'sExclusiveRecommendedLink, StartInviteFriends
+            Sign up now, get your exclusive referral link, and start inviting friends
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/register">
  <Button className="h-12 px-8 rounded-full bg-foreground text-background hover:bg-foreground/90 font-medium">
- FreeSign Up
+ Sign Up Free
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>
  <Link href="/faq">
  <Button variant="outline" className="h-12 px-8 rounded-full border-border/50 text-foreground-light">
- moremultiple
+ Learn More
  </Button>
  </Link>
  </div>

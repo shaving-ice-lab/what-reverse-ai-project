@@ -6,7 +6,7 @@ import { AlertTriangle, RefreshCw, Home, Bug, XCircle } from "lucide-react";
 import { Button } from "./button";
 
 /**
- * ErrorEdgeComponent - Minimalist Style
+ * Error Boundary Component - Minimalist Style
  */
 
 interface ErrorBoundaryProps {
@@ -100,7 +100,7 @@ export function ErrorFallback({
 
  <h2 className="text-xl font-semibold mb-2 text-center"></h2>
  <p className="text-[var(--color-muted-foreground)] text-center mb-6 max-w-md text-sm">
- {error?.message || "Appto1Error, PleaseTryRefreshPageorBackHome"}
+ {error?.message || "Something went wrong. Try refreshing or go back home."}
  </p>
 
  <div className="flex items-center gap-2 mb-6">
@@ -113,7 +113,7 @@ export function ErrorFallback({
  {onGoHome && (
  <Button onClick={onGoHome} variant="outline">
  <Home className="mr-2 h-4 w-4" />
- BackHome
+ Back Home
  </Button>
  )}
  </div>
@@ -122,7 +122,7 @@ export function ErrorFallback({
  <details className="w-full max-w-2xl">
  <summary className="cursor-pointer text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] flex items-center gap-2">
  <Bug className="h-4 w-4" />
- ViewErrorDetails
+ View Error Details
  </summary>
  <div className="mt-3 p-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-muted)]">
  <div className="flex items-start gap-2 mb-3">
@@ -170,19 +170,19 @@ export function parseApiError(error: unknown): ApiError {
 
  return {
  code: "UNKNOWN_ERROR",
- message: "OccurUnknownError",
+ message: "An unknown error occurred",
  };
 }
 
 const errorMessages: Record<string, string> = {
- UNAUTHORIZED: "PleasefirstSign In",
- FORBIDDEN: "NoPermissionExecutethisAction",
- NOT_FOUND: "Request'sResourceDoes not exist",
- VALIDATION_ERROR: "InputDataVerifyFailed",
- RATE_LIMITED: "RequestpastatFrequent, Please try again later",
- SERVER_ERROR: "Server error, Please try again later",
- NETWORK_ERROR: "NetworkConnectFailed, PleaseCheckNetwork",
- TIMEOUT: "Request timeout, Please try again later",
+ UNAUTHORIZED: "Please sign in first",
+ FORBIDDEN: "You don't have permission for this action",
+ NOT_FOUND: "The requested resource does not exist",
+ VALIDATION_ERROR: "Input validation failed",
+ RATE_LIMITED: "Too many requests, please try again later",
+ SERVER_ERROR: "Server error, please try again later",
+ NETWORK_ERROR: "Network error. Check your connection.",
+ TIMEOUT: "Request timed out, please try again later",
 };
 
 export function getErrorMessage(error: unknown): string {
@@ -193,6 +193,6 @@ export function getErrorMessage(error: unknown): string {
 export function createApiError(code: string, message?: string): ApiError {
  return {
  code,
- message: message || errorMessages[code] || "OccurError",
+ message: message || errorMessages[code] || "An error occurred",
  };
 }

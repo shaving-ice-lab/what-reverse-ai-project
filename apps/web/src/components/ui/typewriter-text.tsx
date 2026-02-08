@@ -5,25 +5,25 @@ import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 export interface TypewriterTextProps extends React.HTMLAttributes<HTMLSpanElement> {
- /** needDisplay'sTextcountgroup, willLoopDisplay */
+ /** Array of texts to display, will loop through them */
  texts: string[];
- /** charSpeed(s/Character) */
+ /** Typing speed (ms per character) */
  typingSpeed?: number;
- /** DeleteSpeed(s/Character) */
+ /** Deleting speed (ms per character) */
  deletingSpeed?: number;
- /** TextDisplayDoneafter'setcpendingTime */
+ /** Pause duration after text display completes */
  pauseDuration?: number;
- /** isnoLoopPlay */
+ /** Whether to loop playback */
  loop?: boolean;
- /** style */
+ /** Cursor style */
  cursorStyle?: "bar" | "underscore" | "block" | "none";
- /** Color */
+ /** Cursor color */
  cursorColor?: string;
- /** isnoatDoneafterMaintainDisplay */
+ /** Whether to keep cursor displayed after completion */
  keepCursor?: boolean;
- /** charDone'sCallback */
+ /** Callback when typing completes */
  onComplete?: () => void;
- /** eachtimesTextSwitch'sCallback */
+ /** Callback when text switches */
  onTextChange?: (index: number) => void;
 }
 
@@ -137,7 +137,7 @@ export function TypewriterText({
  );
 }
 
-// Simple'stimescharEffect
+// Simple typewriter character effect
 export interface TypeOnceProps extends React.HTMLAttributes<HTMLSpanElement> {
  text: string;
  speed?: number;
@@ -186,21 +186,21 @@ export function TypeOnce({
  );
 }
 
-// Highlight'scharEffect
+// Highlighted typewriter effect
 export interface TypewriterHighlightProps extends React.HTMLAttributes<HTMLSpanElement> {
- /** beforeText(Fixednot) */
+ /** Prefix text (fixed, not typed) */
  prefix?: string;
- /** needcharDisplay'sHighlightTextcountgroup */
+ /** Array of text segments to highlight during typing */
  highlights: string[];
- /** afterText(Fixednot) */
+ /** Suffix text (fixed, not typed) */
  suffix?: string;
- /** HighlightText'sstyle */
+ /** Highlight text style */
  highlightClassName?: string;
- /** charSpeed */
+ /** Typing speed */
  typingSpeed?: number;
- /** DeleteSpeed */
+ /** Deleting speed */
  deletingSpeed?: number;
- /** PauseTime */
+ /** Pause duration */
  pauseDuration?: number;
 }
 

@@ -74,7 +74,7 @@ export const WebhookNode = memo(function WebhookNode({
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="font-medium text-sm truncate">{data.label || "Webhook"}</h3>
- <p className="text-xs text-foreground-muted">ReceiveoutsidesectionRequest</p>
+ <p className="text-xs text-foreground-muted">Receive External Requests</p>
  </div>
  <span className={cn("px-1.5 py-0.5 rounded text-xs font-mono font-medium", methodColors[method])}>
  {method}
@@ -112,7 +112,7 @@ export const WebhookNode = memo(function WebhookNode({
  {requireSignature && (
  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brand-200 text-brand-500">
  <Shield className="h-3 w-3" />
- BioVerify
+ Signature Verify
  </span>
  )}
  <span className={cn(
@@ -121,7 +121,7 @@ export const WebhookNode = memo(function WebhookNode({
  ? "bg-warning-200 text-warning"
  : "bg-surface-200 text-foreground-muted"
  )}>
- {responseMode === "wait" ? "etcpendingExecute": "NowResponse"}
+ {responseMode === "wait" ? "Wait for Execution" : "Immediate Response"}
  </span>
  {config.ipWhitelist && config.ipWhitelist.length > 0 && (
  <span className="inline-flex px-1.5 py-0.5 rounded bg-surface-200 text-foreground-light">

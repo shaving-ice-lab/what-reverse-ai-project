@@ -67,7 +67,7 @@ export interface ExecutionSummary {
 }
 
 /**
- * eachdayStatistics
+ * Daily Statistics
  */
 export interface DailyStats {
  date: string;
@@ -102,7 +102,7 @@ export interface Recommendation {
 }
 
 /**
- * UseretcInfo
+ * User Level Information
  */
 export interface UserLevel {
  level: number;
@@ -143,7 +143,7 @@ export interface TokenUsage {
 }
 
 /**
- * eachday Token Usage
+ * Daily Token Usage
  */
 export interface DailyTokenUsage {
  date: string;
@@ -196,7 +196,7 @@ export interface Announcement {
 }
 
 /**
- * eachdayTaskInfo
+ * Daily Task Information
  */
 export interface DailyTaskInfo {
  checked_in: boolean;
@@ -209,7 +209,7 @@ export interface DailyTaskInfo {
 }
 
 /**
- * eachdayTask
+ * Daily Task
  */
 export interface DailyTask {
  id: string;
@@ -225,7 +225,7 @@ export interface DailyTask {
 }
 
 /**
- * toResult
+ * Check-in Result
  */
 export interface CheckInResult {
  success: boolean;
@@ -250,7 +250,7 @@ export interface FavoriteItem {
 }
 
 /**
- * ShortcutRun
+ * Quick Run Item
  */
 export interface QuickRunItem {
  id: string;
@@ -264,7 +264,7 @@ export interface QuickRunItem {
 }
 
 /**
- * canInsights
+ * Performance Insights
  */
 export interface PerformanceInsights {
  overall_score: number;
@@ -344,7 +344,7 @@ export interface AffectedWorkflow {
 }
 
 /**
- * API UsageStatistics
+ * API Usage Statistics
  */
 export interface APIUsageStats {
  total_calls: number;
@@ -423,7 +423,7 @@ export interface ScheduledTask {
 }
 
 /**
- * Notificationscenter
+ * Notification Center
  */
 export interface NotificationCenter {
  unread_count: number;
@@ -483,7 +483,7 @@ export interface LeaderboardUser {
 }
 
 /**
- * Target
+ * Goal
  */
 export interface Goal {
  id: string;
@@ -531,7 +531,7 @@ export interface SystemMetrics {
 }
 
 /**
- * RunQueue
+ * Running Queue
  */
 export interface RunningQueue {
  total_running: number;
@@ -556,7 +556,7 @@ export interface QueueTask {
 }
 
 /**
- * Dashboard CompleteData
+ * Dashboard Complete Data
  */
 export interface DashboardData {
  quick_stats: QuickStats;
@@ -736,7 +736,7 @@ export interface RunningQueueResponse {
  */
 export const dashboardApi = {
  /**
- * Fetch Dashboard allsectionData
+ * Fetch all Dashboard data
  * @returns Dashboard Data
  */
  async getDashboardData(): Promise<DashboardResponse> {
@@ -744,18 +744,18 @@ export const dashboardApi = {
  },
 
  /**
- * FetchShortcutStatistics
- * @returns ShortcutStatisticsData
- */
+  * Fetch Quick Statistics
+  * @returns Quick Statistics Data
+  */
  async getQuickStats(): Promise<QuickStatsResponse> {
  return request<QuickStatsResponse>("/dashboard/stats");
  },
 
  /**
- * FetchRecentWorkflow
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns WorkflowList
- */
+  * Fetch Recent Workflows
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Workflow List
+  */
  async getRecentWorkflows(limit: number = 5): Promise<WorkflowsResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -766,10 +766,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchRecentActivity
- * @param limit BackCountLimit (Default10, Maximum50)
- * @returns ActivityList
- */
+  * Fetch Recent Activities
+  * @param limit Return count limit (Default: 10, Maximum: 50)
+  * @returns Activity List
+  */
  async getRecentActivities(limit: number = 10): Promise<ActivitiesResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -780,10 +780,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchRecentExecuteRecord
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns ExecuteRecordList
- */
+  * Fetch Recent Execution Records
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Execution Record List
+  */
  async getRecentExecutions(limit: number = 5): Promise<ExecutionsResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -794,9 +794,9 @@ export const dashboardApi = {
  },
 
  /**
- * FetchUseretcInfo
- * @returns UseretcandAchievement
- */
+  * Fetch User Level Information
+  * @returns User Level and Achievements
+  */
  async getUserLevel(): Promise<UserLevelResponse> {
  return request<UserLevelResponse>("/dashboard/level");
  },
@@ -810,10 +810,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchPopularTemplate
- * @param limit BackCountLimit (Default4, Maximum10)
- * @returns TemplateList
- */
+  * Fetch Popular Templates
+  * @param limit Return count limit (Default: 4, Maximum: 10)
+  * @returns Template List
+  */
  async getFeaturedTemplates(limit: number = 4): Promise<TemplatesResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -824,18 +824,18 @@ export const dashboardApi = {
  },
 
  /**
- * FetchLearnResource
- * @returns LearnResourceList
- */
+  * Fetch Learning Resources
+  * @returns Learning Resource List
+  */
  async getLearningResources(): Promise<LearningResourcesResponse> {
  return request<LearningResourcesResponse>("/dashboard/learning");
  },
 
  /**
- * FetchSystemAnnouncement
- * @param limit BackCountLimit (Default3, Maximum10)
- * @returns AnnouncementList
- */
+  * Fetch System Announcements
+  * @param limit Return count limit (Default: 3, Maximum: 10)
+  * @returns Announcement List
+  */
  async getAnnouncements(limit: number = 3): Promise<AnnouncementsResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -846,17 +846,17 @@ export const dashboardApi = {
  },
 
  /**
- * FetcheachdayTask
- * @returns eachdayTaskInfo
- */
+  * Fetch Daily Tasks
+  * @returns Daily Task Information
+  */
  async getDailyTasks(): Promise<DailyTasksResponse> {
  return request<DailyTasksResponse>("/dashboard/daily-tasks");
  },
 
  /**
- * eachdayto
- * @returns toResult
- */
+  * Daily Check-in
+  * @returns Check-in Result
+  */
  async checkIn(): Promise<CheckInResponse> {
  return request<CheckInResponse>("/dashboard/check-in", {
  method: "POST",
@@ -864,10 +864,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchFavorite
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns FavoriteList
- */
+  * Fetch Favorites
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Favorite List
+  */
  async getFavorites(limit: number = 5): Promise<FavoritesResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -878,10 +878,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchShortcutRunHistory
- * @param limit BackCountLimit (Default4, Maximum10)
- * @returns ShortcutRunList
- */
+  * Fetch Quick Run History
+  * @param limit Return count limit (Default: 4, Maximum: 10)
+  * @returns Quick Run List
+  */
  async getQuickRuns(limit: number = 4): Promise<QuickRunsResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -892,18 +892,18 @@ export const dashboardApi = {
  },
 
  /**
- * FetchcanInsights
- * @returns canInsightsData
- */
+  * Fetch Performance Insights
+  * @returns Performance Insights Data
+  */
  async getPerformanceInsights(): Promise<PerformanceInsightsResponse> {
  return request<PerformanceInsightsResponse>("/dashboard/performance");
  },
 
  /**
- * FetchErrorMonitor
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns ErrorMonitorData
- */
+  * Fetch Error Monitor
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Error Monitor Data
+  */
  async getErrorMonitor(limit: number = 5): Promise<ErrorMonitorResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -922,10 +922,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchQuickNote
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns NoteList
- */
+  * Fetch Quick Notes
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Note List
+  */
  async getQuickNotes(limit: number = 5): Promise<QuickNotesResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -936,10 +936,10 @@ export const dashboardApi = {
  },
 
  /**
- * CreateQuickNote
- * @param content NoteContent
- * @returns Create'sNote
- */
+  * Create Quick Note
+  * @param content Note Content
+  * @returns Created Note
+  */
  async createQuickNote(content: string): Promise<QuickNoteResponse> {
  return request<QuickNoteResponse>("/dashboard/notes", {
  method: "POST",
@@ -948,9 +948,9 @@ export const dashboardApi = {
  },
 
  /**
- * DeleteQuickNote
- * @param noteId Note ID
- */
+  * Delete Quick Note
+  * @param noteId Note ID
+  */
  async deleteQuickNote(noteId: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/dashboard/notes/${noteId}`, {
  method: "DELETE",
@@ -958,18 +958,18 @@ export const dashboardApi = {
  },
 
  /**
- * FetchIntegrationStatus
- * @returns IntegrationStatusData
- */
+  * Fetch Integration Status
+  * @returns Integration Status Data
+  */
  async getIntegrationStatus(): Promise<IntegrationStatusResponse> {
  return request<IntegrationStatusResponse>("/dashboard/integrations");
  },
 
  /**
- * FetchPlanTask
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns PlanTaskList
- */
+  * Fetch Scheduled Tasks
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Scheduled Task List
+  */
  async getScheduledTasks(limit: number = 5): Promise<ScheduledTasksResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -980,10 +980,10 @@ export const dashboardApi = {
  },
 
  /**
- * FetchNotifications
- * @param limit BackCountLimit (Default5, Maximum20)
- * @returns NotificationsList
- */
+  * Fetch Notifications
+  * @param limit Return count limit (Default: 5, Maximum: 20)
+  * @returns Notifications List
+  */
  async getNotifications(limit: number = 5): Promise<NotificationsResponse> {
  const params = new URLSearchParams();
  if (limit > 0) {
@@ -994,9 +994,9 @@ export const dashboardApi = {
  },
 
  /**
- * MarkNotificationsalreadyread
- * @param notificationId Notifications ID
- */
+  * Mark Notification as Read
+  * @param notificationId Notification ID
+  */
  async markNotificationRead(notificationId: string): Promise<{ success: boolean }> {
  return request<{ success: boolean }>(`/dashboard/notifications/${notificationId}/read`, {
  method: "POST",
@@ -1012,28 +1012,28 @@ export const dashboardApi = {
  },
 
  /**
- * FetchLeaderboard
- * @returns LeaderboardData
- */
+  * Fetch Leaderboard
+  * @returns Leaderboard Data
+  */
  async getLeaderboard(): Promise<LeaderboardResponse> {
  return request<LeaderboardResponse>("/dashboard/leaderboard");
  },
 
  /**
- * FetchTargetTrack
- * @returns TargetList
- */
+  * Fetch Goal Tracking
+  * @returns Goal List
+  */
  async getGoals(): Promise<GoalsResponse> {
  return request<GoalsResponse>("/dashboard/goals");
  },
 
  /**
- * CreateTarget
- * @param title TargetTitle
- * @param targetValue Targetvalue
- * @param goalType TargetType
- * @returns Create'sTarget
- */
+  * Create Goal
+  * @param title Goal Title
+  * @param targetValue Target Value
+  * @param goalType Goal Type
+  * @returns Created Goal
+  */
  async createGoal(title: string, targetValue: number, goalType: string): Promise<GoalResponse> {
  return request<GoalResponse>("/dashboard/goals", {
  method: "POST",
@@ -1042,24 +1042,24 @@ export const dashboardApi = {
  },
 
  /**
- * FetchSystemHealthStatus
- * @returns SystemHealthStatus
- */
+  * Fetch System Health Status
+  * @returns System Health Status
+  */
  async getSystemHealth(): Promise<SystemHealthResponse> {
  return request<SystemHealthResponse>("/dashboard/system-health");
  },
 
  /**
- * FetchRunQueue
- * @returns RunQueueData
- */
+  * Fetch Running Queue
+  * @returns Running Queue Data
+  */
  async getRunningQueue(): Promise<RunningQueueResponse> {
  return request<RunningQueueResponse>("/dashboard/running-queue");
  },
 };
 
 /**
- * FormatShortcutStatisticsasbeforeendpointFriendlyFormat
+ * Format Quick Statistics as Frontend-Friendly Format
  */
 export function formatQuickStats(stats: QuickStats) {
  return {
@@ -1080,7 +1080,7 @@ export function formatQuickStats(stats: QuickStats) {
 }
 
 /**
- * FormatWorkflowSummaryasbeforeendpointFriendlyFormat
+ * Format Workflow Summary as Frontend-Friendly Format
  */
 export function formatWorkflowSummary(workflow: WorkflowSummary) {
  return {
@@ -1097,7 +1097,7 @@ export function formatWorkflowSummary(workflow: WorkflowSummary) {
 }
 
 /**
- * FormatActivitySummaryasbeforeendpointFriendlyFormat
+ * Format Activity Summary as Frontend-Friendly Format
  */
 export function formatActivitySummary(activity: ActivitySummary) {
  return {
@@ -1112,7 +1112,7 @@ export function formatActivitySummary(activity: ActivitySummary) {
 }
 
 /**
- * FormatExecuteSummaryasbeforeendpointFriendlyFormat
+ * Format Execution Summary as Frontend-Friendly Format
  */
 export function formatExecutionSummary(execution: ExecutionSummary) {
  return {
@@ -1129,7 +1129,7 @@ export function formatExecutionSummary(execution: ExecutionSummary) {
 }
 
 /**
- * FetchActivityIcon
+ * Get Activity Icon
  */
 export function getActivityIcon(action: string): string {
  const iconMap: Record<string, string> = {
@@ -1150,7 +1150,7 @@ export function getActivityIcon(action: string): string {
 }
 
 /**
- * FetchExecuteStatusColor
+ * Get Execution Status Color
  */
 export function getExecutionStatusColor(status: string): string {
  const colorMap: Record<string, string> = {
@@ -1164,7 +1164,7 @@ export function getExecutionStatusColor(status: string): string {
 }
 
 /**
- * FetchExecuteStatusBackground
+ * Get Execution Status Background
  */
 export function getExecutionStatusBgColor(status: string): string {
  const colorMap: Record<string, string> = {
@@ -1178,14 +1178,14 @@ export function getExecutionStatusBgColor(status: string): string {
 }
 
 /**
- * FetchExecuteStatusText
+ * Get Execution Status Text
  */
 export function getExecutionStatusText(status: string): string {
  const textMap: Record<string, string> = {
  running: "Run",
  completed: "Completed",
  failed: "Failed",
- pending: "pendingExecute",
+ pending: "Pending",
  cancelled: "Cancelled",
  };
  return textMap[status] || status;

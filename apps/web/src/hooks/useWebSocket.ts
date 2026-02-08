@@ -24,7 +24,7 @@ export interface WSMessage<T = unknown> {
  type: MessageType;
  payload: T;
  timestamp: string;
- sentAt?: number; // ServiceendpointSendTime(s), Used forLatencyCalculate
+ sentAt?: number; // Server-side send timestamp, used for latency calculation
 }
 
 // LatencyMonitorMetrics
@@ -33,7 +33,7 @@ export interface LatencyMetrics {
  avgLatencyMs: number;
  maxLatencyMs: number;
  lastLatencyMs: number;
- overThreshold: number; // Exceed500ms'sMessagecount
+ overThreshold: number; // Message count exceeding 500ms
 }
 
 // Latencyvalue (500ms)

@@ -2,7 +2,7 @@
 
 /**
  * DataTableComponent
- * SupportSort, Filter, Pagination, SelectetcFeatures
+ * Supports sort, filter, pagination, selection, and other features
  */
 
 import { useState, useMemo, ReactNode } from "react";
@@ -34,13 +34,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // ============================================
-// TypeDefinition
+// Type Definitions
 // ============================================
 
 export interface Column<T> {
  id: string;
  header: string | ReactNode;
- accessor: keyofT | ((row: T) => ReactNode);
+ accessor: keyof T | ((row: T) => ReactNode);
  sortable?: boolean;
  width?: string;
  align?: "left" | "center" | "right";
@@ -178,7 +178,7 @@ export function Pagination({
  </span>
  {onPageSizeChange && (
  <div className="flex items-center gap-2">
- <span>eachpage</span>
+ <span>per page</span>
  <select
  value={pageSize}
  onChange={(e) => onPageSizeChange(Number(e.target.value))}
@@ -277,7 +277,7 @@ interface DataTableProps<T extends { id: string | number }> {
  onSelectionChange?: (ids: Set<string | number>) => void;
  searchable?: boolean;
  searchPlaceholder?: string;
- searchKeys?: (keyofT)[];
+ searchKeys?: (keyof T)[];
  paginated?: boolean;
  pageSize?: number;
  emptyMessage?: string;
@@ -311,7 +311,7 @@ export function DataTable<T extends { id: string | number }>({
  const [currentPage, setCurrentPage] = useState(1);
  const [pageSize, setPageSize] = useState(initialPageSize);
 
- // SearchFilter
+ // Search filter
  const filteredData = useMemo(() => {
  if (!searchQuery || !searchKeys?.length) return data;
 
@@ -361,7 +361,7 @@ export function DataTable<T extends { id: string | number }>({
 
  const totalPages = Math.ceil(sortedData.length / pageSize);
 
- // SortSwitch
+ // Sort toggle
  const handleSort = (columnId: string) => {
  setSort((prev) => {
  if (prev.column !== columnId) {
@@ -374,7 +374,7 @@ export function DataTable<T extends { id: string | number }>({
  });
  };
 
- // SelectProcess
+ // Selection handling
  const handleSelectAll = () => {
  if (!onSelectionChange) return;
  const allIds = new Set(paginatedData.map((row) => row.id));

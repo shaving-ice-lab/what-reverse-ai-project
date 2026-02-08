@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// NodeTypeConfig
+// Node type config
 const nodeTypes = {
  trigger: { 
  color: "#10B981", 
@@ -57,18 +57,18 @@ const nodeTypes = {
  },
 };
 
-// PresetScenario
+// Preset scenarios
 const scenarios = [
  {
  id: "customer-service",
- name: "SmartSupport",
+ name: "Smart Support",
  icon: Bot,
  nodes: [
- { id: 1, type: "trigger", label: "MessageReceive", icon: Webhook, x: 50, y: 140 },
- { id: 2, type: "llm", label: "GPT-4 Understand", icon: Bot, x: 200, y: 100 },
- { id: 3, type: "condition", label: "Determine", icon: GitBranch, x: 350, y: 140 },
- { id: 4, type: "action", label: "AutoReply", icon: Send, x: 500, y: 80 },
- { id: 5, type: "data", label: "RecordLogs", icon: Database, x: 500, y: 200 },
+ { id: 1, type: "trigger", label: "Message Received", icon: Webhook, x: 50, y: 140 },
+    { id: 2, type: "llm", label: "GPT-4 Analysis", icon: Bot, x: 200, y: 100 },
+    { id: 3, type: "condition", label: "Route", icon: GitBranch, x: 350, y: 140 },
+ { id: 4, type: "action", label: "Auto Reply", icon: Send, x: 500, y: 80 },
+ { id: 5, type: "data", label: "Record Logs", icon: Database, x: 500, y: 200 },
  ],
  connections: [
  { from: 1, to: 2 },
@@ -79,14 +79,14 @@ const scenarios = [
  },
  {
  id: "data-pipeline",
- name: "DataProcess",
+    name: "Data Processing",
  icon: Database,
  nodes: [
- { id: 1, type: "trigger", label: "ScheduledTrigger", icon: Clock, x: 50, y: 140 },
- { id: 2, type: "data", label: "ReadData", icon: Database, x: 180, y: 140 },
- { id: 3, type: "llm", label: "DataClean", icon: Sparkles, x: 310, y: 140 },
- { id: 4, type: "action", label: "FormatConvert", icon: FileText, x: 440, y: 140 },
- { id: 5, type: "data", label: "StorageResult", icon: Database, x: 570, y: 140 },
+ { id: 1, type: "trigger", label: "Scheduled Trigger", icon: Clock, x: 50, y: 140 },
+ { id: 2, type: "data", label: "Read Data", icon: Database, x: 180, y: 140 },
+    { id: 3, type: "llm", label: "Data Cleaning", icon: Sparkles, x: 310, y: 140 },
+    { id: 4, type: "action", label: "Format Conversion", icon: FileText, x: 440, y: 140 },
+ { id: 5, type: "data", label: "Store Results", icon: Database, x: 570, y: 140 },
  ],
  connections: [
  { from: 1, to: 2 },
@@ -97,14 +97,14 @@ const scenarios = [
  },
  {
  id: "marketing-auto",
- name: "MarketingAutomation",
+ name: "Marketing Automation",
  icon: Mail,
  nodes: [
- { id: 1, type: "trigger", label: "newUserSign Up", icon: Zap, x: 50, y: 140 },
- { id: 2, type: "llm", label: "PersonalizationContent", icon: Bot, x: 200, y: 100 },
- { id: 3, type: "condition", label: "User", icon: GitBranch, x: 350, y: 140 },
- { id: 4, type: "action", label: "SendEmail", icon: Mail, x: 500, y: 80 },
- { id: 5, type: "action", label: "Push Notifications", icon: Send, x: 500, y: 200 },
+ { id: 1, type: "trigger", label: "New User Sign Up", icon: Zap, x: 50, y: 140 },
+    { id: 2, type: "llm", label: "Personalized Content", icon: Bot, x: 200, y: 100 },
+    { id: 3, type: "condition", label: "User Segment", icon: GitBranch, x: 350, y: 140 },
+ { id: 4, type: "action", label: "Send Email", icon: Mail, x: 500, y: 80 },
+    { id: 5, type: "action", label: "Push Notification", icon: Send, x: 500, y: 200 },
  ],
  connections: [
  { from: 1, to: 2 },
@@ -116,16 +116,16 @@ const scenarios = [
 ];
 
 export interface WorkflowCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
- /** isnoAutoPlayDemo */
- autoPlay?: boolean;
- /** DemoSpeed(s) */
- speed?: number;
- /** InitialScenario */
- initialScenario?: string;
- /** isnoDisplayControl */
- showControls?: boolean;
- /** isnoDisplayScenarioSwitch */
- showScenarioSwitcher?: boolean;
+  /** Whether to auto-play the demo */
+  autoPlay?: boolean;
+  /** Demo speed in milliseconds */
+  speed?: number;
+  /** Initial scenario */
+  initialScenario?: string;
+  /** Whether to display controls */
+  showControls?: boolean;
+  /** Whether to display scenario switcher */
+  showScenarioSwitcher?: boolean;
 }
 
 export function WorkflowCanvas({
@@ -146,7 +146,7 @@ export function WorkflowCanvas({
 
  const currentScenario = scenarios.find((s) => s.id === activeScenario) || scenarios[0];
 
- // AutoExecuteAnimation
+  // Auto-execute animation
  useEffect(() => {
  if (!isPlaying) return;
 
@@ -169,7 +169,7 @@ export function WorkflowCanvas({
  return () => clearInterval(timer);
  }, [isPlaying, activeNodeIndex, currentScenario.nodes, speed]);
 
- // SwitchScenariotimeResetStatus
+  // Reset status when switching scenarios
  useEffect(() => {
  setActiveNodeIndex(-1);
  setExecutedNodes([]);
@@ -187,18 +187,18 @@ export function WorkflowCanvas({
  return "idle";
  };
 
- // GenerateConnectionPath
+  // Generate connection path
  const getConnectionPath = (from: number, to: number) => {
  const fromNode = currentScenario.nodes.find((n) => n.id === from);
  const toNode = currentScenario.nodes.find((n) => n.id === to);
  if (!fromNode || !toNode) return "";
 
- const startX = fromNode.x + 80; // NoderightEdge
- const startY = fromNode.y + 25; // Nodecenter
+    const startX = fromNode.x + 80; // Node right edge
+    const startY = fromNode.y + 25; // Node center
  const endX = toNode.x;
  const endY = toNode.y + 25;
 
- // Usageline
+    // Bezier curve
  const midX = (startX + endX) / 2;
  return `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
  };
@@ -224,11 +224,11 @@ export function WorkflowCanvas({
  <div className="w-3 h-3 rounded-full bg-green-500/80" />
  </div>
  <span className="text-sm text-muted-foreground ml-2">
- {currentScenario.name}Workflow.flow
+            {currentScenario.name} Workflow.flow
  </span>
  </div>
  
- {/* ScenarioSwitch */}
+      {/* Scenario switcher */}
  {showScenarioSwitcher && (
  <div className="flex items-center gap-1">
  {scenarios.map((scenario) => (
@@ -275,7 +275,7 @@ export function WorkflowCanvas({
  <stop offset="100%" stopColor="hsl(var(--muted-foreground))" stopOpacity="0.1" />
  </linearGradient>
  
- {/* FlowParticle */}
+          {/* Flow particle */}
  <circle id="particle" r="3" fill="hsl(var(--primary))">
  <animate
  attributeName="opacity"
@@ -293,7 +293,7 @@ export function WorkflowCanvas({
  
  return (
  <g key={`${conn.from}-${conn.to}`}>
- {/* Basicline */}
+              {/* Base line */}
  <path
  d={path}
  stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
@@ -303,7 +303,7 @@ export function WorkflowCanvas({
  className="transition-all duration-500"
  />
  
- {/* FlowAnimation */}
+              {/* Flow animation */}
  {isActive && (
  <circle r="4" fill="hsl(var(--primary))" opacity="0.8">
  <animateMotion
@@ -367,7 +367,7 @@ export function WorkflowCanvas({
  </span>
  </div>
 
- {/* StatusIndicator */}
+          {/* Status indicator */}
  {status === "running" && (
  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary">
  <div className="absolute inset-0 rounded-full bg-primary animate-ping" />
@@ -382,18 +382,18 @@ export function WorkflowCanvas({
  );
  })}
 
- {/* ExecuteStatusBadge */}
+          {/* Execution status badge */}
  <div className="absolute bottom-4 right-4 flex items-center gap-2">
  {isPlaying && activeNodeIndex >= 0 && (
  <div className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2">
  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
- Execute... {activeNodeIndex + 1}/{currentScenario.nodes.length}
+            Executing... {activeNodeIndex + 1}/{currentScenario.nodes.length}
  </div>
  )}
  {!isPlaying && executedNodes.length === currentScenario.nodes.length && (
  <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-medium flex items-center gap-2">
  <CheckCircle className="w-3.5 h-3.5" />
- ExecuteDone
+ Execution Done
  </div>
  )}
  </div>

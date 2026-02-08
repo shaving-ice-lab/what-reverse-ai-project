@@ -48,9 +48,9 @@ import { KeyboardShortcutsDialog, useKeyboardShortcutsDialog } from "./keyboard-
 import { cn } from "@/lib/utils";
 
 /**
- * EditTopToolbar - Manus Style
+ * Editor Top Toolbar - Manus Style
  * 
- * EditToolbarAlwaysUsageDarkThemewithMaintain1'svisualExperience
+ * The editor toolbar always uses a dark theme to maintain a consistent visual experience
  */
 
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
@@ -69,7 +69,7 @@ interface EditorToolbarProps {
  executionStatus?: "idle" | "running" | "completed" | "failed";
 }
 
-// EdituseDarkstyle
+// Editor dark style
 const editorStyles = {
  bg: "bg-surface-100/95 backdrop-blur-sm",
  border: "border-border/70",
@@ -81,7 +81,7 @@ const editorStyles = {
 };
 
 export function EditorToolbar({
- workflowName = "not yetNamingWorkflow",
+ workflowName = "Untitled Workflow",
  workflowVersion,
  onSave,
  onRun,
@@ -112,18 +112,18 @@ export function EditorToolbar({
  saved: { label: "Saved", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
  saving: { label: "Saving", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
  unsaved: { label: "Unsaved", dot: "var(--color-warning)", textClass: "text-warning" },
- error: { label: "SaveFailed", dot: "var(--color-destructive)", textClass: "text-destructive" },
+ error: { label: "Save Failed", dot: "var(--color-destructive)", textClass: "text-destructive" },
  } as const;
  const saveMeta = saveStatusConfig[saveStatus];
 
- // DeleteselectNode
+ // Delete selected node
  const handleDelete = useCallback(() => {
  if (selectedNodeIds.length > 0) {
  removeNodes(selectedNodeIds);
  }
  }, [selectedNodeIds, removeNodes]);
 
- // ExportWorkflow
+ // Export workflow
  const handleExport = useCallback(() => {
  const data = {
  version: "1.0",
@@ -144,7 +144,7 @@ export function EditorToolbar({
  URL.revokeObjectURL(url);
  }, [nodes, edges, workflowName]);
 
- // optimal'sToolButton
+ // Optimized tool button component
  const ToolButton = ({
  icon: Icon,
  label,
@@ -170,19 +170,19 @@ export function EditorToolbar({
  "h-8 w-8 flex items-center justify-center rounded-md",
  "transition-all duration-150",
  "disabled:opacity-30 disabled:pointer-events-none",
- // Defaultstyle
+ // Default style
  variant === "default" && [
  "text-foreground-muted",
  "hover:text-foreground hover:bg-surface-200",
  "active:scale-95"
  ],
- // mainneedstyle
+ // Primary style
  variant === "primary" && [
  "text-brand-500",
  "hover:text-brand-500 hover:bg-brand-200/40",
  "active:scale-95"
  ],
- // Dangerstyle
+ // Danger style
  variant === "danger" && [
  "text-destructive-400",
  "hover:text-destructive hover:bg-destructive-200/60",
@@ -286,7 +286,7 @@ export function EditorToolbar({
  className="border-border/70 bg-surface-200/70 text-foreground-muted"
  >
  <Users className="h-3 w-3" />
- {collaborators.length} personOnline
+ {collaborators.length} online
  </Badge>
  )}
 
@@ -312,7 +312,7 @@ export function EditorToolbar({
  </div>
  </div>
 
- {/* between: ToolButton */}
+ {/* Center: Tool Buttons */}
  <div className="flex items-center gap-0.5">
  {/* Undo/Redo */}
  <ToolButton
@@ -332,22 +332,22 @@ export function EditorToolbar({
 
  <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
 
- {/* ZoomControl */}
+ {/* Zoom Controls */}
  <ToolButton
  icon={ZoomOut}
- label="small"
+ label="Zoom Out"
  shortcut="⌘-"
  onClick={() => zoomOut()}
  />
  <ToolButton
  icon={ZoomIn}
- label="large"
+ label="Zoom In"
  shortcut="⌘+"
  onClick={() => zoomIn()}
  />
  <ToolButton
  icon={Maximize}
- label="shouldCanvas"
+ label="Fit to Canvas"
  shortcut="⌘0"
  onClick={() => fitView({ padding: 0.1, duration: 300 })}
  />
@@ -369,7 +369,7 @@ export function EditorToolbar({
  <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
  <DropdownMenuItem onClick={applyHorizontalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <ArrowRight className="h-4 w-4 mr-2" />
- HorizontalLayout (left→right)
+ Horizontal Layout (Left → Right)
  </DropdownMenuItem>
  <DropdownMenuItem onClick={applyVerticalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <ArrowDown className="h-4 w-4 mr-2" />
@@ -381,7 +381,7 @@ export function EditorToolbar({
  {/* Delete */}
  <ToolButton
  icon={Trash2}
- label="Deleteselect"
+ label="Delete Selected"
  shortcut="Del"
  onClick={handleDelete}
  disabled={selectedNodeIds.length === 0}
@@ -390,7 +390,7 @@ export function EditorToolbar({
 
  <div className={cn("w-px h-5 mx-2", editorStyles.divider)} />
 
- {/* moremultipleAction */}
+ {/* More Actions */}
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <button className={cn(
@@ -405,33 +405,33 @@ export function EditorToolbar({
  <DropdownMenuContent align="center" className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
  <DropdownMenuItem onClick={handleExport} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <Download className="h-4 w-4 mr-2" />
- ExportWorkflow
+ Export Workflow
  </DropdownMenuItem>
  <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <Upload className="h-4 w-4 mr-2" />
- ImportWorkflow
+ Import Workflow
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border/70" />
  <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <Copy className="h-4 w-4 mr-2" />
- CopyWorkflow
+ Copy Workflow
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border/70" />
  <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <Settings className="h-4 w-4 mr-2" />
- WorkflowSettings
+ Workflow Settings
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border/70" />
  <DropdownMenuItem onClick={shortcutsDialog.open} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <Keyboard className="h-4 w-4 mr-2" />
- ShortcutkeyHelp
+ Keyboard Shortcuts
  <span className="ml-auto text-xs text-foreground-muted">?</span>
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>
  </div>
 
- {/* Right side: ActionButton */}
+ {/* Right side: Action Buttons */}
  <div className="flex items-center gap-2">
  <Button
  variant="ghost"
@@ -479,7 +479,7 @@ export function EditorToolbar({
  )}
  </div>
 
- {/* ShortcutkeyHelpDialog */}
+ {/* Keyboard Shortcuts Dialog */}
  <KeyboardShortcutsDialog
  open={shortcutsDialog.isOpen}
  onOpenChange={shortcutsDialog.setIsOpen}

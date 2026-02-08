@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * DataConvertNode - Minimalist Style
+ * Data Convert Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -17,21 +17,21 @@ export interface TransformNodeProps extends NodeProps {
 
 const transformTypeLabels: Record<string, string> = {
  jsonParse: "JSON Parse",
- jsonStringify: "JSON Sequence",
- toArray: "ascountgroup",
- toObject: "asfor",
- toString: "asString",
- toNumber: "ascountchar",
- toBoolean: "as",
- flatten: "Flat",
- pick: "selectField",
- omit: "ExcludeField",
- map: "MappingConvert",
+ jsonStringify: "JSON Stringify",
+ toArray: "To Array",
+ toObject: "To Object",
+ toString: "To String",
+ toNumber: "To Number",
+ toBoolean: "To Boolean",
+ flatten: "Flatten",
+ pick: "Pick Fields",
+ omit: "Omit Fields",
+ map: "Map Transform",
  filter: "Filter",
  sort: "Sort",
- reverse: "Invert",
- unique: "gore-",
- groupBy: "Group",
+ reverse: "Reverse",
+ unique: "Remove Duplicates",
+ groupBy: "Group By",
 };
 
 export const TransformNode = memo(function TransformNode({
@@ -59,7 +59,7 @@ export const TransformNode = memo(function TransformNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -74,7 +74,7 @@ export const TransformNode = memo(function TransformNode({
  <Shuffle className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "DataConvert"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Data Convert"}</h3>
  <p className="text-xs text-foreground-muted">
  {transformTypeLabels[transformType] || transformType}
  </p>

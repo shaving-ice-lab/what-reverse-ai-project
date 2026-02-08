@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * SearchResultShowcaseComponent
- * Used forallSearchFeatures'sResultShowcase
+ * Search Result Display Component
+ * Used for displaying all search feature results
  */
 
 import { useState } from "react";
@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// SearchResultType
+// Search result type
 export type SearchResultType = 
  | "workflow"
  | "agent"
@@ -40,7 +40,7 @@ export type SearchResultType =
  | "setting"
  | "action";
 
-// SearchResultConfig
+// Search result config
 const resultTypeConfig: Record<SearchResultType, {
  icon: typeof Zap;
  label: string;
@@ -57,7 +57,7 @@ const resultTypeConfig: Record<SearchResultType, {
 };
 
 // ============================================
-// SearchResult
+// Search result
 // ============================================
 
 export interface SearchResult {
@@ -124,7 +124,7 @@ export function SearchResultItem({
 }
 
 // ============================================
-// SearchResultGroup
+// Search result group
 // ============================================
 
 interface SearchResultGroupProps {
@@ -174,7 +174,7 @@ export function SearchResultGroup({
 }
 
 // ============================================
-// SearchSuggestion
+// Search suggestion
 // ============================================
 
 interface SearchSuggestion {
@@ -208,15 +208,15 @@ export function SearchSuggestions({
  const getSuggestionLabel = (type: SearchSuggestion["type"]) => {
  switch (type) {
  case "recent":
- return "RecentSearch";
+ return "Recent Searches";
  case "trending":
- return "PopularSearch";
+ return "Popular Searches";
  case "suggested":
- return "RecommendedSearch";
+ return "Recommended";
  }
  };
 
- // byTypeGroup
+ // Group by type
  const groupedSuggestions = suggestions.reduce((acc, suggestion) => {
  if (!acc[suggestion.type]) {
  acc[suggestion.type] = [];
@@ -258,7 +258,7 @@ export function SearchSuggestions({
 }
 
 // ============================================
-// EmptySearchStatus
+// Empty Search State
 // ============================================
 
 interface EmptySearchStateProps {
@@ -273,19 +273,19 @@ export function EmptySearchState({ query, className }: EmptySearchStateProps) {
  <Search className="w-8 h-8 text-muted-foreground" />
  </div>
  <h3 className="text-lg font-medium text-foreground mb-2">
- {query ? `Noto "${query}" 'sResult`: "StartSearch"}
+ {query ? `No results for "${query}"` : "Start searching"}
  </h3>
  <p className="text-sm text-muted-foreground text-center max-w-sm">
  {query
- ? "TryUsagenot'sKeywordsorCheckSpell"
-: "SearchWorkflow, Agent, Conversation, DocumentetcContent"}
+ ? "Try different keywords or check spelling"
+: "Search workflows, agents, conversations, documents and more"}
  </p>
  </div>
  );
 }
 
 // ============================================
-// SearchLoadStatus
+// Search Loading State
 // ============================================
 
 interface SearchLoadingStateProps {
@@ -296,13 +296,13 @@ export function SearchLoadingState({ className }: SearchLoadingStateProps) {
  return (
  <div className={cn("flex flex-col items-center justify-center py-12", className)}>
  <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
- <p className="text-sm text-muted-foreground">currentlyatSearch...</p>
+ <p className="text-sm text-muted-foreground">Searching...</p>
  </div>
  );
 }
 
 // ============================================
-// SearchFilter
+// Search Filters
 // ============================================
 
 interface SearchFiltersProps {
@@ -342,7 +342,7 @@ export function SearchFilters({
  )}
  >
  <Icon className="w-4 h-4" />
- {type === "all" ? "allsection": config?.label}
+ {type === "all" ? "All": config?.label}
  </button>
  );
  })}
@@ -351,7 +351,7 @@ export function SearchFilters({
 }
 
 // ============================================
-// Quick ActionsResult
+// Quick Actions
 // ============================================
 
 interface QuickAction {

@@ -1,16 +1,14 @@
 /**
- * AI CreativeAssistantTemplate JSON Schema
- * 
- * Used forVerifyTemplateConfigData'sCompleteandcurrently
- * canand Zod, Ajv etcVerifyUsage
+ * AI Creative Assistant template JSON schema.
+ * Used to verify template config data completeness; can be used with Zod, Ajv, etc.
  */
 
 import { z } from "zod";
 
-// ===== BasicEnum Schema =====
+// ===== Basic Enum Schema =====
 
 /**
- * TemplateCategory Schema
+ * Template Category Schema
  */
 export const CreativeTemplateCategorySchema = z.enum([
  "business",
@@ -20,7 +18,7 @@ export const CreativeTemplateCategorySchema = z.enum([
 ]);
 
 /**
- * InputFieldType Schema
+ * Input Field Type Schema
  */
 export const InputFieldTypeSchema = z.enum([
  "text",
@@ -33,19 +31,19 @@ export const InputFieldTypeSchema = z.enum([
  "date",
 ]);
 
-// ===== InputField Schema =====
+// ===== Input Field Schema =====
 
 /**
- * downOption Schema
+ * Dropdown Option Schema
  */
 export const SelectOptionSchema = z.object({
- value: z.string().min(1, "OptionvalueCannot be empty"),
- label: z.string().min(1, "OptionTagsCannot be empty"),
+ value: z.string().min(1, "Option value cannot be empty"),
+ label: z.string().min(1, "Option label cannot be empty"),
  description: z.string().optional(),
 });
 
 /**
- * InputVerifyRule Schema
+ * Input Validation Rule Schema
  */
 export const InputValidationSchema = z.object({
  required: z.boolean().optional(),
@@ -62,7 +60,7 @@ export const InputValidationSchema = z.object({
  }
  return true;
  },
- { message: "minLength Mustsmallatetcat maxLength" }
+ { message: "minLength must be less than or equal to maxLength" }
 ).refine(
  (data) => {
  if (data.min !== undefined && data.max !== undefined) {
@@ -70,29 +68,29 @@ export const InputValidationSchema = z.object({
  }
  return true;
  },
- { message: "min Mustsmallatetcat max" }
+ { message: "min must be less than or equal to max" }
 );
 
 /**
- * ConditionDisplayRule Schema
+ * Conditional Display Rule Schema
  */
 export const ShowWhenSchema = z.object({
- field: z.string().min(1, "DependencyField ID Cannot be empty"),
+ field: z.string().min(1, "Dependency field ID cannot be empty"),
  operator: z.enum(["eq", "neq", "contains", "notEmpty"]),
  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
 });
 
 /**
- * InputField Schema
+ * Input Field Schema
  */
 export const InputFieldSchema = z.object({
  id: z.string()
-.min(1, "Field ID Cannot be empty")
-.regex(/^[a-z_][a-z0-9_]*$/, "Field ID Mustissmallchar, countcharanddownline, andwithcharordownlinehead"),
- label: z.string().min(1, "FieldTagsCannot be empty").max(100, "FieldTagsnotcanExceed 100 Character"),
+.min(1, "Field ID cannot be empty")
+.regex(/^[a-z_][a-z0-9_]*$/, "Field ID must contain only lowercase letters, numbers, and underscores, and start with a letter or underscore"),
+ label: z.string().min(1, "Field label cannot be empty").max(100, "Field label cannot exceed 100 characters"),
  type: InputFieldTypeSchema,
- placeholder: z.string().max(500, "PlaceholdernotcanExceed 500 Character").optional(),
- helpText: z.string().max(500, "HelpTextnotcanExceed 500 Character").optional(),
+ placeholder: z.string().max(500, "Placeholder cannot exceed 500 characters").optional(),
+ helpText: z.string().max(500, "Help text cannot exceed 500 characters").optional(),
  defaultValue: z.union([
  z.string(),
  z.number(),
@@ -102,83 +100,83 @@ export const InputFieldSchema = z.object({
  options: z.array(SelectOptionSchema).optional(),
  validation: InputValidationSchema.optional(),
  aiSuggest: z.boolean().optional(),
- aiSuggestPrompt: z.string().max(2000, "AI SuggestionPromptnotcanExceed 2000 Character").optional(),
+ aiSuggestPrompt: z.string().max(2000, "AI suggestion prompt cannot exceed 2000 characters").optional(),
  showWhen: ShowWhenSchema.optional(),
 }).refine(
  (data) => {
- // select and multiselect TypeMusthas options
+ // select and multiselect types must have options
  if (data.type === "select" || data.type === "multiselect") {
  return data.options && data.options.length >= 1;
  }
  return true;
  },
- { message: "select and multiselect TypeMustfewhas1Option" }
+ { message: "select and multiselect types must have at least 1 option" }
 ).refine(
  (data) => {
- // aiSuggest as true timeSuggestionhas aiSuggestPrompt
+ // When aiSuggest is true, it's recommended to have aiSuggestPrompt
  if (data.aiSuggest && !data.aiSuggestPrompt) {
- return true; // isWarning, notForce
+ return true; // Warning only, not enforced
  }
  return true;
  },
- { message: "Enable AI SuggestiontimeSuggestionProvide aiSuggestPrompt" }
+ { message: "When AI suggestion is enabled, it is recommended to provide aiSuggestPrompt" }
 );
 
-// ===== OutputChapter Schema =====
+// ===== Output Section Schema =====
 
 /**
- * OutputChapter Schema
+ * Output Section Schema
  */
 export const OutputSectionSchema = z.object({
  id: z.string()
-.min(1, "Chapter ID Cannot be empty")
-.regex(/^[a-z_][a-z0-9_-]*$/, "Chapter ID Mustissmallchar, countchar, downlineandCharacter"),
- title: z.string().min(1, "ChapterTitleCannot be empty").max(100, "ChapterTitlenotcanExceed 100 Character"),
- description: z.string().max(500, "ChapterDescriptionnotcanExceed 500 Character"),
- promptTemplate: z.string().min(10, "PromptTemplatenotcanfewat 10 Character"),
+.min(1, "Section ID cannot be empty")
+.regex(/^[a-z_][a-z0-9_-]*$/, "Section ID must contain only lowercase letters, numbers, underscores, and hyphens"),
+ title: z.string().min(1, "Section title cannot be empty").max(100, "Section title cannot exceed 100 characters"),
+ description: z.string().max(500, "Section description cannot exceed 500 characters"),
+ promptTemplate: z.string().min(10, "Prompt template must be at least 10 characters"),
  icon: z.string().max(50).optional(),
- estimatedTime: z.number().min(1).max(600).optional(), // mostmultiple 10 min
+ estimatedTime: z.number().min(1).max(600).optional(), // Max 10 minutes
  dependsOn: z.array(z.string()).optional(),
  regeneratable: z.boolean().optional().default(true),
  outputFormat: z.enum(["markdown", "json", "table", "list"]).optional().default("markdown"),
 });
 
-// ===== TemplateExample Schema =====
+// ===== Template Example Schema =====
 
 /**
- * TemplateExample Schema
+ * Template Example Schema
  */
 export const TemplateExampleSchema = z.object({
  input: z.record(z.string(), z.unknown()),
- output: z.string().min(100, "ExampleOutputfewneedneed 100 Character"),
+ output: z.string().min(100, "Example output must be at least 100 characters"),
  title: z.string().max(100).optional(),
  description: z.string().max(500).optional(),
 });
 
-// ===== TemplatemainStructure Schema =====
+// ===== Template Main Structure Schema =====
 
 /**
- * CreativeTemplate Schema
+ * Creative Template Schema
  */
 export const CreativeTemplateSchema = z.object({
  id: z.string()
-.min(1, "Template ID Cannot be empty")
-.regex(/^[a-z][a-z0-9-]*$/, "Template ID Mustissmallchar, countcharandCharacter, andwithcharhead"),
- name: z.string().min(2, "TemplateNamefew 2 Character").max(50, "TemplateNamenotcanExceed 50 Character"),
- description: z.string().min(10, "TemplateDescriptionfew 10 Character").max(500, "TemplateDescriptionnotcanExceed 500 Character"),
- icon: z.string().min(1, "IconCannot be empty").max(50, "IconNamenotcanExceed 50 Character"),
+.min(1, "Template ID cannot be empty")
+.regex(/^[a-z][a-z0-9-]*$/, "Template ID must contain only lowercase letters, numbers, and hyphens, and start with a letter"),
+ name: z.string().min(2, "Template name must be at least 2 characters").max(50, "Template name cannot exceed 50 characters"),
+ description: z.string().min(10, "Template description must be at least 10 characters").max(500, "Template description cannot exceed 500 characters"),
+ icon: z.string().min(1, "Icon cannot be empty").max(50, "Icon name cannot exceed 50 characters"),
  category: CreativeTemplateCategorySchema,
  inputs: z.object({
- required: z.array(InputFieldSchema).min(1, "fewneedneed1RequiredField"),
+ required: z.array(InputFieldSchema).min(1, "At least 1 required field is needed"),
  optional: z.array(InputFieldSchema).default([]),
  }),
- outputSections: z.array(OutputSectionSchema).min(1, "fewneedneed1OutputChapter"),
- workflowId: z.string().min(1, "Workflow ID Cannot be empty"),
+ outputSections: z.array(OutputSectionSchema).min(1, "At least 1 output section is needed"),
+ workflowId: z.string().min(1, "Workflow ID cannot be empty"),
  example: TemplateExampleSchema.optional(),
  usageCount: z.number().min(0).default(0),
  rating: z.number().min(0).max(5).default(0),
  reviewCount: z.number().min(0).default(0),
- tags: z.array(z.string().max(20)).max(10, "TagsnotcanExceed 10 ").default([]),
+ tags: z.array(z.string().max(20)).max(10, "Tags cannot exceed 10").default([]),
  estimatedTime: z.number().min(10).max(1800).optional(), // 10s - 30min
  isOfficial: z.boolean().optional().default(false),
  creatorId: z.string().optional(),
@@ -188,7 +186,7 @@ export const CreativeTemplateSchema = z.object({
  updatedAt: z.string().datetime().optional(),
 }).refine(
  (data) => {
- // VerifyOutputChapter's dependsOn useisnoValid
+ // Verify that output section dependsOn references are valid
  const sectionIds = new Set(data.outputSections.map((s) => s.id));
  for (const section of data.outputSections) {
  if (section.dependsOn) {
@@ -201,10 +199,10 @@ export const CreativeTemplateSchema = z.object({
  }
  return true;
  },
- { message: "Chapter's dependsOn useDoes not exist'sChapter ID" }
+ { message: "Section dependsOn references a non-existent section ID" }
 ).refine(
  (data) => {
- // VerifyExampleInputisnoContainsAllRequiredField
+ // Verify that the example input contains all required fields
  if (data.example) {
  const requiredIds = data.inputs.required.map((f) => f.id);
  const inputKeys = Object.keys(data.example.input);
@@ -212,13 +210,13 @@ export const CreativeTemplateSchema = z.object({
  }
  return true;
  },
- { message: "TemplateExampleMustContainsAllRequiredField'sInput" }
+ { message: "Template example must contain input for all required fields" }
 );
 
-// ===== CreateTemplateRequest Schema =====
+// ===== Create Template Request Schema =====
 
 /**
- * Create/UpdateTemplateRequest Schema (notContainsAutoGenerate'sField)
+ * Create/Update Template Request Schema (excludes auto-generated fields)
  */
 export const CreateTemplateRequestSchema = CreativeTemplateSchema.omit({
  usageCount: true,
@@ -228,7 +226,7 @@ export const CreateTemplateRequestSchema = CreativeTemplateSchema.omit({
  updatedAt: true,
 });
 
-// ===== TypeInfer =====
+// ===== Type Inference =====
 
 export type CreativeTemplateCategoryType = z.infer<typeof CreativeTemplateCategorySchema>;
 export type InputFieldTypeType = z.infer<typeof InputFieldTypeSchema>;
@@ -241,10 +239,10 @@ export type TemplateExampleType = z.infer<typeof TemplateExampleSchema>;
 export type CreativeTemplateType = z.infer<typeof CreativeTemplateSchema>;
 export type CreateTemplateRequestType = z.infer<typeof CreateTemplateRequestSchema>;
 
-// ===== VerifyHelper Functioncount =====
+// ===== Validation Helper Functions =====
 
 /**
- * VerifyTemplateConfig
+ * Validate template configuration
  */
 export function validateTemplate(data: unknown): {
  success: boolean;
@@ -259,7 +257,7 @@ export function validateTemplate(data: unknown): {
 }
 
 /**
- * VerifyInputField
+ * Validate input field
  */
 export function validateInputField(data: unknown): {
  success: boolean;
@@ -274,7 +272,7 @@ export function validateInputField(data: unknown): {
 }
 
 /**
- * VerifyOutputChapter
+ * Validate output section
  */
 export function validateOutputSection(data: unknown): {
  success: boolean;
@@ -289,7 +287,7 @@ export function validateOutputSection(data: unknown): {
 }
 
 /**
- * FormatVerifyErrorasUserFriendly'sMessage
+ * Format validation errors as user-friendly messages
  */
 export function formatValidationErrors(errors: z.ZodError): string[] {
  return errors.errors.map((err) => {

@@ -24,43 +24,43 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// DemoType
+// Demo Types
 const demoTypes = [
  {
  id: "product",
- name: "ProductDemo",
- description: " AgentFlow 'sCoreFeatures",
+    name: "Product Demo",
+    description: "Explore AgentFlow's core features",
  duration: "30 min",
  },
  {
  id: "technical",
- name: "TechnologyDemo",
- description: "enterDiscuss API, IntegrationandTechnologyArchitecture",
+    name: "Technical Demo",
+    description: "Deep dive into API, integrations, and technical architecture",
  duration: "45 min",
  },
  {
  id: "enterprise",
- name: "EnterprisePlan",
- description: "Enterprise-gradeFeaturesandCustomizePlan",
+    name: "Enterprise Plan",
+    description: "Enterprise-grade features and custom solutions",
  duration: "60 min",
  },
 ];
 
-// CompanyScale
+// Company Sizes
 const companySizes = [
- "1-10 person",
- "11-50 person",
- "51-200 person",
- "201-500 person",
- "500+ person",
+  "1-10 employees",
+  "11-50 employees",
+  "51-200 employees",
+  "201-500 employees",
+  "500+ employees",
 ];
 
-// Highlight
+// Highlights
 const highlights = [
- "FreeDemo, NonewhatHideCost",
- "ProfessionalProductConsultant1for1",
- "SupportTencentwillor Zoom",
- "DemoafterProvideDetailedMaterials",
+  "Free demo with no hidden costs",
+  "1-on-1 with a professional product consultant",
+  "Available via video call or Zoom",
+  "Detailed materials provided after demo",
 ];
 
 export default function DemoPage() {
@@ -97,15 +97,15 @@ export default function DemoPage() {
  <div className="max-w-4xl mx-auto text-center relative z-10 px-6">
  <div className="lobe-badge mb-8">
  <Play className="h-3.5 w-3.5" />
- <span>FreeProductDemo</span>
+            <span>Free Product Demo</span>
  </div>
 
  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
- AppointmentDemo
- </h1>
+            Book a Demo
+          </h1>
 
  <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
- letWe'sProductExpertasyouShowcase AgentFlow ifwhatHelpyou'sTeamImproverate
+            Let our product experts show you how AgentFlow can help your team boost productivity
  </p>
  </div>
  </section>
@@ -120,25 +120,25 @@ export default function DemoPage() {
  <div className="p-8 rounded-2xl bg-brand-500/5 border border-brand-500/20 text-center">
  <CheckCircle className="w-16 h-16 text-brand-500 mx-auto mb-4" />
  <h2 className="text-2xl font-bold text-foreground mb-2">
- AppointmentSuccess!
+              Booking Confirmed!
  </h2>
  <p className="text-foreground-lighter mb-6 text-[13px]">
- We'sTeamwillat 1 Business DayinandyouContact, ConfirmDemoTime.
+              Our team will contact you within 1 business day to confirm your demo time.
  </p>
  <Link href="/">
- <Button variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50">BackHome</Button>
+ <Button variant="outline" className="rounded-full border-border/50 hover:bg-surface-200/50">Back to Home</Button>
  </Link>
  </div>
  ) : (
  <form onSubmit={handleSubmit} className="space-y-6">
  <h2 className="text-xl font-semibold text-foreground mb-4">
- Fill inInfo
+            Fill In Your Details
  </h2>
 
  {/* Demo Type */}
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-3">
- DemoType
+              Demo Type
  </label>
  <div className="grid sm:grid-cols-3 gap-3">
  {demoTypes.map((type) => (
@@ -179,13 +179,13 @@ export default function DemoPage() {
  required
  value={formData.name}
  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- placeholder="you'sName"
+ placeholder="Your name"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- WorkEmail *
+              Work Email *
  </label>
  <Input
  type="email"
@@ -212,13 +212,13 @@ export default function DemoPage() {
  </div>
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- CompanyName *
+              Company Name *
  </label>
  <Input
  required
  value={formData.company}
  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
- placeholder="you'sCompany"
+ placeholder="Your company"
  className="bg-surface-200/50 border-border/30"
  />
  </div>
@@ -226,7 +226,7 @@ export default function DemoPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- CompanyScale
+              Company Size
  </label>
  <select
  value={formData.companySize}
@@ -242,12 +242,12 @@ export default function DemoPage() {
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- youwantWhat?
+              What are you looking for?
  </label>
  <textarea
  value={formData.message}
  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
- placeholder="PleaseSimpleDescriptionyou'sRequirementsorIssue(select)"
+ placeholder="Briefly describe your requirements or questions (optional)"
  rows={3}
  className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30 text-foreground text-[13px] resize-none"
  />
@@ -262,12 +262,12 @@ export default function DemoPage() {
  {isSubmitting ? (
  <>
  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
- Submit...
+              Submitting...
  </>
  ) : (
  <>
  <Calendar className="w-4 h-4 mr-2" />
- AppointmentDemo
+              Book Demo
  </>
  )}
  </Button>
@@ -280,7 +280,7 @@ export default function DemoPage() {
  {/* Highlights */}
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <h3 className="text-[14px] font-semibold text-foreground mb-4">
- DemoContains
+              What's Included
  </h3>
  <ul className="space-y-3">
  {highlights.map((item) => (
@@ -295,16 +295,16 @@ export default function DemoPage() {
  {/* Stats */}
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <h3 className="text-[14px] font-semibold text-foreground mb-4">
- CustomerReviews
+              Customer Feedback
  </h3>
  <div className="space-y-4">
  <div>
  <div className="text-2xl font-bold text-foreground">98%</div>
- <div className="text-[12px] text-foreground-lighter">CustomerSatisfaction</div>
- </div>
- <div>
- <div className="text-2xl font-bold text-foreground">500+</div>
- <div className="text-[12px] text-foreground-lighter">EnterpriseCustomer</div>
+              <div className="text-[12px] text-foreground-lighter">Customer Satisfaction</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-foreground">500+</div>
+              <div className="text-[12px] text-foreground-lighter">Enterprise Customers</div>
  </div>
  </div>
  </div>
@@ -312,7 +312,7 @@ export default function DemoPage() {
  {/* Quick Contact */}
  <div className="p-6 rounded-2xl bg-surface-100/30 border border-border/30">
  <h3 className="text-[14px] font-semibold text-foreground mb-4">
- QuickContact
+              Quick Contact
  </h3>
  <div className="space-y-3 text-[13px]">
  <a

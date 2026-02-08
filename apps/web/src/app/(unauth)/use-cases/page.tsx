@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Use Cases Page - LobeHub StyleDesign
+ * Use Cases Page - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -13,23 +13,23 @@ import { SiteFooter } from "@/components/layout/site-footer";
 const useCases = [
  {
  icon: MessageSquare,
- title: "SmartSupport",
- description: "7x24 AutoReply, Knowledge BaseSearch, Smartperson.",
+ title: "Smart support",
+ description: "24/7 auto-reply, knowledge base search, smart routing.",
  },
  {
  icon: FileText,
- title: "ContentGenerateandPublish",
- description: "BatchGenerateCopy, SEO optimal, ReviewandPublishFlowAutomation.",
+ title: "Content Generation and Publishing",
+ description: "Batch copy generation, SEO optimization, review and publish automation.",
  },
  {
  icon: RefreshCw,
- title: "DataSync",
- description: "SystembetweenDatafor, Sync, ExceptionAlertandRetry.",
+ title: "Data sync",
+ description: "Sync between systems; exception alerts and retry.",
  },
  {
  icon: BarChart3,
- title: "OperationsAutomation",
- description: "lineDistribute, Email/IM Notifications, seetotalandweeksReport.",
+ title: "Operations automation",
+ description: "Task distribution, email/IM notifications, weekly reports.",
  },
 ];
 
@@ -46,10 +46,10 @@ export default function UseCasesPage() {
  Solutions
  </div>
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- UsageScenario
+ Use cases
  </h1>
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">
- WecurrentlyatOrganizemoreComplete'sIndustryBest PracticesandTemplateExample.CurrentPagefirstProvide1canBrowse'sScenarioOverview.
+ Industry best practices and template examples. Browse scenario overviews below.
  </p>
  </div>
  </section>
@@ -73,7 +73,7 @@ export default function UseCasesPage() {
  <div className="flex flex-wrap items-center gap-3 mt-10">
  <Link href="/templates">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- BrowseTemplate
+ Browse templates
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>

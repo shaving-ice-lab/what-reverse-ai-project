@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TextSplit/andNode - Minimalist Style
+ * Text Split / Join Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -16,11 +16,11 @@ export interface TextSplitNodeProps extends NodeProps {
 }
 
 const modeLabels: Record<string, string> = {
- split: "SplitText",
- join: "andText",
- splitLines: "byrowSplit",
- splitParagraphs: "byParagraphSplit",
- chunk: "block",
+ split: "Split Text",
+ join: "Join Text",
+ splitLines: "Split by Lines",
+ splitParagraphs: "Split by Paragraphs",
+ chunk: "Chunk",
 };
 
 export const TextSplitNode = memo(function TextSplitNode({
@@ -50,7 +50,7 @@ export const TextSplitNode = memo(function TextSplitNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -66,7 +66,7 @@ export const TextSplitNode = memo(function TextSplitNode({
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="font-medium text-sm truncate">
- {data.label || (isSplit ? "TextSplit": "Textand")}
+ {data.label || (isSplit ? "Text Split" : "Text Join")}
  </h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Scissors className="h-3 w-3" />
@@ -103,7 +103,7 @@ export const TextSplitNode = memo(function TextSplitNode({
  </div>
  {config.chunkOverlap !== undefined && (
  <div className="flex items-center gap-2">
- <span className="text-foreground-muted">re-:</span>
+ <span className="text-foreground-muted">Overlap:</span>
  <span className="font-mono">{config.chunkOverlap}</span>
  </div>
  )}
@@ -111,7 +111,7 @@ export const TextSplitNode = memo(function TextSplitNode({
  )}
  {config.trim && (
  <span className="inline-flex px-1.5 py-0.5 rounded bg-surface-200 text-foreground-muted">
- goEmpty
+ Remove Empty
  </span>
  )}
  </div>
@@ -120,10 +120,10 @@ export const TextSplitNode = memo(function TextSplitNode({
  <div className="flex justify-between px-3 py-2 border-t border-border text-xs text-foreground-muted bg-surface-200">
  <span className="flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-foreground-muted" />
- {isSplit ? "Text": "countgroup"}
+ {isSplit ? "Text" : "Array"}
  </span>
  <span className="flex items-center gap-1">
- {isSplit ? "countgroup": "Text"}
+ {isSplit ? "Array" : "Text"}
  <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
  </span>
  </div>

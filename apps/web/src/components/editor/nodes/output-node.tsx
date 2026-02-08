@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * OutputShowcaseNode - Minimalist Style
+ * Output Showcase Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -48,7 +48,7 @@ export const OutputNode = memo(function OutputNode({
  };
 
  const outputType = config.outputType || "text";
- const title = config.title || "OutputResult";
+ const title = config.title || "Output result";
 
  return (
  <div
@@ -59,7 +59,7 @@ export const OutputNode = memo(function OutputNode({
  : "border-border hover:border-brand-500/40"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"
@@ -74,10 +74,10 @@ export const OutputNode = memo(function OutputNode({
  <FileOutput className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-medium text-sm truncate">{data.label || "OutputShowcase"}</h3>
+ <h3 className="font-medium text-sm truncate">{data.label || "Output"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Monitor className="h-3 w-3" />
- ResultShowcase
+ Result Preview
  </p>
  </div>
  </div>
@@ -109,11 +109,11 @@ export const OutputNode = memo(function OutputNode({
  </div>
  </div>
 
- {/* PreviewRegion */}
+ {/* Preview Region */}
  <div className="mx-3 mb-2.5 p-2.5 rounded-md border border-dashed border-border bg-surface-200">
  <div className="text-xs text-foreground-muted text-center flex items-center justify-center gap-1.5">
  <Monitor className="h-3.5 w-3.5 opacity-50" />
- ResultwillatthisinDisplay
+ Results will be displayed here
  </div>
  </div>
 

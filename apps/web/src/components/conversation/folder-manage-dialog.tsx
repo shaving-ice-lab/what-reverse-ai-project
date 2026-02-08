@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * ConversationFolderManageDialog
- * SupportCreate, Edit, DeleteConversationFolder
+ * Conversation Folder Management Dialog
+ * Supports creating, editing, and deleting conversation folders
  */
 
 import { useState } from "react";
@@ -22,7 +22,7 @@ import type { ConversationFolder } from "@/types/conversation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// PresetColor
+// Preset colors
 const PRESET_COLORS = [
  "#3B82F6", // blue
  "#8B5CF6", // purple
@@ -34,7 +34,7 @@ const PRESET_COLORS = [
  "#6B7280", // gray
 ];
 
-// PresetIcon
+// Preset icons
 const PRESET_ICONS = ["📁", "📂", "💬", "💡", "🎯", "⚡", "🔧", "📊", "🚀", "💼"];
 
 interface FolderManageDialogProps {
@@ -58,10 +58,10 @@ export function ConversationFolderManageDialog({
  const [isCreating, setIsCreating] = useState(false);
  const [isLoading, setIsLoading] = useState(false);
 
- // CreateFolder
- const handleCreate = async () => {
+  // Create folder
+  const handleCreate = async () => {
  if (!newFolderName.trim()) {
- toast.error("Please enterFolderName");
+ toast.error("Please enter a folder name");
  return;
  }
 
@@ -72,7 +72,7 @@ export function ConversationFolderManageDialog({
  icon: newFolderIcon,
  color: newFolderColor,
  });
- toast.success("FolderCreated successfully");
+ toast.success("Folder created successfully");
  setNewFolderName("");
  setNewFolderIcon("📁");
  setNewFolderColor("#3B82F6");
@@ -80,44 +80,44 @@ export function ConversationFolderManageDialog({
  onFoldersChange();
  } catch (error) {
  console.error("Create folder error:", error);
- toast.error("CreateFailed, PleaseRetry");
+ toast.error("Creation failed, please try again");
  } finally {
  setIsLoading(false);
  }
  };
 
- // UpdateFolder
+  // Update folder
  const handleUpdate = async (id: string) => {
  if (!editName.trim()) return;
 
  setIsLoading(true);
  try {
  await conversationFolderApi.update(id, { name: editName.trim() });
- toast.success("FolderalreadyUpdate");
+ toast.success("Folder updated");
  setEditingId(null);
  onFoldersChange();
  } catch (error) {
  console.error("Update folder error:", error);
- toast.error("UpdateFailed, PleaseRetry");
+ toast.error("Update failed, please try again");
  } finally {
  setIsLoading(false);
  }
  };
 
- // DeleteFolder
+  // Delete folder
  const handleDelete = async (id: string, name: string) => {
- if (!confirm(`OKneedDeleteFolder"${name}"??other'sConversationwillDirectory.`)) {
+ if (!confirm(`Are you sure you want to delete the folder "${name}"? Conversations in this folder will be moved out.`)) {
  return;
  }
 
  setIsLoading(true);
  try {
  await conversationFolderApi.delete(id);
- toast.success("FolderDeleted");
+ toast.success("Folder deleted");
  onFoldersChange();
  } catch (error) {
  console.error("Delete folder error:", error);
- toast.error("DeleteFailed, PleaseRetry");
+ toast.error("Deletion failed, please try again");
  } finally {
  setIsLoading(false);
  }
@@ -129,16 +129,16 @@ export function ConversationFolderManageDialog({
  <DialogHeader>
  <DialogTitle className="flex items-center gap-2">
  <Folder className="w-5 h-5" />
- ManageConversationFolder
+ Manage Conversation Folders
  </DialogTitle>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
- {/* CreateFolder */}
+        {/* Create folder */}
  {isCreating ? (
  <div className="space-y-3 p-3 border rounded-lg bg-surface-200/30">
  <Input
- placeholder="FolderName"
+ placeholder="Folder name"
  value={newFolderName}
  onChange={(e) => setNewFolderName(e.target.value)}
  autoFocus
@@ -198,7 +198,7 @@ export function ConversationFolderManageDialog({
  onClick={handleCreate} 
  disabled={isLoading || !newFolderName.trim()}
  >
- {isLoading ? "Create...": "Create"}
+ {isLoading ? "Creating...": "Create"}
  </Button>
  </div>
  </div>
@@ -209,17 +209,17 @@ export function ConversationFolderManageDialog({
  onClick={() => setIsCreating(true)}
  >
  <FolderPlus className="w-4 h-4 mr-2" />
- CreateFolder
+ New Folder
  </Button>
  )}
 
- {/* FolderList */}
+        {/* Folder list */}
  <div className="space-y-2 max-h-[300px] overflow-y-auto">
  {folders.length === 0 ? (
  <div className="text-center py-8">
  <Folder className="w-12 h-12 mx-auto text-foreground-light/50 mb-2" />
- <p className="text-foreground-light">NoneFolder</p>
- <p className="text-xs text-foreground-light">CreateFoldercomeOrganizeyou'sConversation</p>
+ <p className="text-foreground-light">No Folders</p>
+ <p className="text-xs text-foreground-light">Create a folder to organize your conversations</p>
  </div>
  ) : (
  folders.map((folder) => (

@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * NotificationCenter NotificationscenterComponent
+ * NotificationCenter - Notification center component
  * 
- * Support: 
- * - NotificationsList
- * - CategoryFilter
- * - alreadyread/not yetreadStatus
- * - Real-timeUpdate
+ * Supports: 
+ * - Notifications list
+ * - Category filter
+ * - Read/unread status
+ * - Real-time updates
  */
 
 import * as React from "react"
@@ -33,10 +33,10 @@ import {
 
 import { cn } from "@/lib/utils"
 
-// NotificationsType
+// Notification types
 type NotificationType = "info" | "success" | "warning" | "error" | "message" | "social" | "system"
 
-// Notifications
+// Notification item
 interface NotificationItem {
  id: string
  type: NotificationType
@@ -53,9 +53,9 @@ interface NotificationItem {
  link?: string
 }
 
-// TypeConfig
+// Type config
 const typeConfig: Record<NotificationType, { icon: LucideIcon; color: string }> = {
- info: { icon: Info", color: "text-blue-500" },
+ info: { icon: Info, color: "text-blue-500" },
  success: { icon: CheckCircle2, color: "text-primary" },
  warning: { icon: AlertTriangle, color: "text-amber-500" },
  error: { icon: AlertCircle, color: "text-red-500" },
@@ -65,21 +65,21 @@ const typeConfig: Record<NotificationType, { icon: LucideIcon; color: string }> 
 }
 
 interface NotificationCenterProps {
- /** NotificationsList */
+ /** Notifications list */
  notifications: NotificationItem[]
- /** Markalreadyread */
+ /** Mark as read */
  onMarkRead?: (id: string) => void
- /** Markallsectionalreadyread */
+ /** Mark all as read */
  onMarkAllRead?: () => void
- /** DeleteNotifications */
+ /** Delete notification */
  onDelete?: (id: string) => void
- /** Clearallsection */
+ /** Clear all */
  onClearAll?: () => void
- /** NotificationsClick */
+ /** Notification click handler */
  onNotificationClick?: (notification: NotificationItem) => void
- /** MaximumDisplayCount */
+ /** Maximum display count */
  maxItems?: number
- /** Empty StateText */
+ /** Empty state text */
  emptyText?: string
  className?: string
 }
@@ -92,7 +92,7 @@ function NotificationCenter({
  onClearAll,
  onNotificationClick,
  maxItems = 50,
- emptyText = "NoneNotifications",
+ emptyText = "No Notifications",
  className,
 }: NotificationCenterProps) {
  const [filter, setFilter] = React.useState<"all" | "unread">("all")
@@ -119,7 +119,7 @@ function NotificationCenter({
  <button
  onClick={onMarkAllRead}
  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
- title="allsectionasalreadyread"
+ title="Mark all as read"
  >
  <CheckCheck className="w-4 h-4" />
  </button>
@@ -128,7 +128,7 @@ function NotificationCenter({
  <button
  onClick={onClearAll}
  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
- title="Clearallsection"
+ title="Clear all"
  >
  <Trash2 className="w-4 h-4" />
  </button>
@@ -147,7 +147,7 @@ function NotificationCenter({
  : "text-muted-foreground hover:text-foreground hover:bg-muted"
  )}
  >
- allsection
+            All
  </button>
  <button
  onClick={() => setFilter("unread")}
@@ -158,11 +158,11 @@ function NotificationCenter({
  : "text-muted-foreground hover:text-foreground hover:bg-muted"
  )}
  >
- not yetread {unreadCount > 0 && `(${unreadCount})`}
+ Unread {unreadCount > 0 && `(${unreadCount})`}
  </button>
  </div>
 
- {/* NotificationsList */}
+ {/* Notifications list */}
  <div className="flex-1 overflow-y-auto">
  {filteredNotifications.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -190,7 +190,7 @@ function NotificationCenter({
 }
 
 /**
- * NotificationListItem - NotificationsList
+ * NotificationListItem - Notification list item
  */
 interface NotificationListItemProps {
  notification: NotificationItem
@@ -224,7 +224,7 @@ function NotificationListItem({
  )}
  onClick={handleClick}
  >
- {/* not yetreadIndicator */}
+ {/* Unread Indicator */}
  {!notification.read && (
  <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
  )}
@@ -265,7 +265,7 @@ function NotificationListItem({
  {formatTime(notification.time)}
  </p>
 
- {/* ActionButton */}
+ {/* Action button */}
  {notification.action && (
  <button
  onClick={(e) => {
@@ -279,7 +279,7 @@ function NotificationListItem({
  )}
  </div>
 
- {/* DeleteButton */}
+ {/* Delete button */}
  {onDelete && (
  <button
  onClick={(e) => {
@@ -297,7 +297,7 @@ function NotificationListItem({
 }
 
 /**
- * NotificationBell - NotificationsButton
+ * NotificationBell - Notification bell button
  */
 interface NotificationBellProps {
  count?: number
@@ -341,7 +341,7 @@ function NotificationBell({
 }
 
 /**
- * NotificationPopover - NotificationsPopup
+ * NotificationPopover - Notification popover
  */
 interface NotificationPopoverProps extends NotificationCenterProps {
  trigger?: React.ReactNode
@@ -387,7 +387,7 @@ function NotificationPopover({
 }
 
 /**
- * NotificationToast - Notifications Toast(Used forReal-timePush)
+ * NotificationToast - Notification toast (for real-time push)
  */
 interface NotificationToastProps {
  notification: NotificationItem
@@ -443,7 +443,7 @@ function NotificationToast({
  )}
  </div>
 
- {/* CloseButton */}
+ {/* Close button */}
  <button
  onClick={(e) => {
  e.stopPropagation()
@@ -457,7 +457,7 @@ function NotificationToast({
  )
 }
 
-// Helper Functioncount: FormatTime
+// Helper function: Format time
 function formatTime(time: Date | string): string {
  const date = typeof time === "string" ? new Date(time) : time
  const now = new Date()
@@ -468,11 +468,11 @@ function formatTime(time: Date | string): string {
  const days = Math.floor(diff / 86400000)
 
  if (minutes < 1) return "Just now"
- if (minutes < 60) return `${minutes} minbefore`
- if (hours < 24) return `${hours} hbefore`
- if (days < 7) return `${days} daysbefore`
+ if (minutes < 60) return `${minutes} min ago`
+ if (hours < 24) return `${hours} hours ago`
+ if (days < 7) return `${days} days ago`
 
- return date.toLocaleDateString("zh-CN", {
+ return date.toLocaleDateString("en-US", {
  month: "short",
  day: "numeric",
  })

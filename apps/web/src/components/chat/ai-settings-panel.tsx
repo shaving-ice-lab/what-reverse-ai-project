@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * AI ParameterSettingsPanelComponent
- * Used forConfig AI ResponseParameter
+ * AI Parameter Settings Panel Component
+ * Used for configuring AI response parameters
  */
 
 import { useState, useEffect } from "react";
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { AIParameters } from "@/types/conversation";
 
-// DefaultParametervalue
+// Default parameter values
 const DEFAULT_PARAMS: Required<AIParameters> = {
  temperature: 1.0,
  maxTokens: 4096,
@@ -43,14 +43,14 @@ const DEFAULT_PARAMS: Required<AIParameters> = {
  presencePenalty: 0.0,
 };
 
-// ParameterDescription
+// Parameter descriptions
 const PARAM_DESCRIPTIONS = {
- temperature: "ControlOutput'sRandom.'svaluemakeOutputmoreRandom, 'svaluemakeOutputmoreandOK.",
- maxTokens: "LimitGenerate'sMaximum token Count.",
- topP: "SamplingParameter.ControlConsider's token ratevalue.",
- topK: "Top-K Sampling.LimiteachtimesConsiderratemost's K token.0 RepresentDisable.",
- frequencyPenalty: "ratePenalty.Reducere-'sAppearrate.currentlyvaluefewre-, valueIncreasere-.",
- presencePenalty: "atPenalty.Modelnew.currentlyvalueIncreasemultiplestyle, valuefewmultiplestyle.",
+ temperature: "Controls output randomness. Higher value makes output more random, lower value makes output more deterministic.",
+ maxTokens: "Limits the maximum number of tokens to generate.",
+ topP: "Sampling parameter. Controls the proportion of tokens to consider. Lower value is more focused.",
+ topK: "Top-K Sampling. Limits each time to consider at most K tokens. 0 means disabled.",
+ frequencyPenalty: "Frequency penalty. Reduces repeated appearances. Higher value decreases repetition, lower value increases repetition.",
+ presencePenalty: "Presence penalty. Encourages model to introduce new topics. Higher value increases diversity, lower value decreases diversity.",
 };
 
 interface AISettingsPanelProps {
@@ -76,7 +76,7 @@ export function AISettingsPanel({
  setLocalParams({ ...DEFAULT_PARAMS, ...params });
  }, [params]);
 
- const handleChange = (key: keyofAIParameters, value: number) => {
+  const handleChange = (key: keyof AIParameters, value: number) => {
  const newParams = { ...localParams, [key]: value };
  setLocalParams(newParams);
  onChange(newParams);
@@ -202,7 +202,7 @@ export function AISettingsPanel({
  <Tooltip>
  <TooltipTrigger asChild>
  <Label className="flex items-center gap-2 cursor-help text-[12px] text-foreground">
- ratePenalty
+                Frequency Penalty
  </Label>
  </TooltipTrigger>
  <TooltipContent side="right" className="max-w-[250px] bg-surface-100 border-border text-foreground">
@@ -229,7 +229,7 @@ export function AISettingsPanel({
  <Tooltip>
  <TooltipTrigger asChild>
  <Label className="flex items-center gap-2 cursor-help text-[12px] text-foreground">
- atPenalty
+                Presence Penalty
  </Label>
  </TooltipTrigger>
  <TooltipContent side="right" className="max-w-[250px] bg-surface-100 border-border text-foreground">
@@ -251,7 +251,7 @@ export function AISettingsPanel({
  </div>
  </TooltipProvider>
 
- {/* ResetButton */}
+    {/* Reset button */}
  <Button
  variant="outline"
  size="sm"
@@ -259,7 +259,7 @@ export function AISettingsPanel({
  className="w-full text-foreground-light hover:text-foreground"
  >
  <RotateCcw className="w-4 h-4 mr-2" />
- RestoreDefaultvalue
+ Restore Default Values
  </Button>
  </div>
  );
@@ -278,7 +278,7 @@ export function AISettingsPanel({
  >
  <span className="flex items-center gap-2 text-sm font-medium">
  <Settings className="w-4 h-4" />
- AI ParameterSettings
+            AI Parameter Settings
  </span>
  {isOpen ? (
  <ChevronUp className="w-4 h-4" />
@@ -296,12 +296,12 @@ export function AISettingsPanel({
  <div className={cn("space-y-4", className)}>
  <div className="flex items-center gap-2 text-sm font-medium">
  <Settings className="w-4 h-4" />
- AI ParameterSettings
+            AI Parameter Settings
  </div>
  {content}
  </div>
  );
 }
 
-// ExportDefaultParameter
+// Export default parameters
 export { DEFAULT_PARAMS as DEFAULT_AI_PARAMS };

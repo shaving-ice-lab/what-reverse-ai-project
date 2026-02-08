@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * DomainManagepage - Supabase Style
- * DomainBind, VerifyStatus, SSL CertificateManage
+ * Domain Management Page - Supabase Style
+ * Domain Binding, Verification Status, SSL Certificate Management
  */
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -68,20 +68,20 @@ import { PermissionGate } from "@/components/permissions/permission-gate";
 
 // DomainStatusConfig
 const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
- pending: { label: "pendingConfig", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
+  pending: { label: "Pending Configuration", color: "text-foreground-muted", bgColor: "bg-surface-200", icon: Clock },
  verifying: { label: "Verifying", color: "text-warning", bgColor: "bg-warning-200", icon: Loader2 },
  verified: { label: "Verified", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- active: { label: "alreadyTake Effect", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
- failed: { label: "VerifyFailed", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
- blocked: { label: "already", color: "text-destructive", bgColor: "bg-destructive-200", icon: Lock },
+  active: { label: "Active", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
+  failed: { label: "Verification Failed", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
+  blocked: { label: "Blocked", color: "text-destructive", bgColor: "bg-destructive-200", icon: Lock },
 };
 
 // SSL StatusConfig
 const sslStatusConfig: Record<string, { label: string; color: string }> = {
- pending: { label: "pendingIssue", color: "text-foreground-muted" },
- issuing: { label: "Issue", color: "text-warning" },
- issued: { label: "alreadyIssue", color: "text-brand-500" },
- failed: { label: "IssueFailed", color: "text-destructive" },
+  pending: { label: "Pending Issuance", color: "text-foreground-muted" },
+  issuing: { label: "Issuing", color: "text-warning" },
+  issued: { label: "Issued", color: "text-brand-500" },
+  failed: { label: "Issuance Failed", color: "text-destructive" },
  expired: { label: "Expired", color: "text-destructive" },
 };
 
@@ -90,7 +90,7 @@ function AppNav({ appId, activeTab }: { appId: string; activeTab: string }) {
  const navItems = [
  { id: "overview", label: "Overview", href: `/dashboard/app/${appId}` },
  { id: "builder", label: "Build", href: `/dashboard/app/${appId}/builder` },
- { id: "publish", label: "PublishSettings", href: `/dashboard/app/${appId}/publish` },
+    { id: "publish", label: "Publish Settings", href: `/dashboard/app/${appId}/publish` },
  { id: "versions", label: "Version History", href: `/dashboard/app/${appId}/versions` },
  { id: "monitoring", label: "Monitor", href: `/dashboard/app/${appId}/monitoring` },
  { id: "domains", label: "Domain", href: `/dashboard/app/${appId}/domains` },
@@ -245,7 +245,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
 
  // DeleteDomain
  const handleDelete = async (domainId: string) => {
- if (!confirm("OKneedDeletethisDomainBind??")) return;
+    if (!confirm("Are you sure you want to delete this domain binding?")) return;
 
  try {
  await appApi.deleteDomain(appId, domainId);
@@ -264,7 +264,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  const handleSetPrimaryDomain = (domainId: string) => {
  setPrimaryDomainId(domainId);
  setDomainActionError(null);
- setDomainActionMessage("alreadyasPrimary Domain.");
+    setDomainActionMessage("Set as primary domain.");
  setTimeout(() => setDomainActionMessage(null), 2000);
  };
 
@@ -349,16 +349,16 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  <PageContainer>
  {/* PageHeader */}
  <PageHeader
- title="DomainManage"
+                title="Domain Management"
  eyebrow={app?.name}
  backHref="/dashboard/apps"
- backLabel="BackAppList"
+                backLabel="Back to App List"
  actions={
  <PermissionAction
  permissions={permissions}
  required={["workspace_publish"]}
- label="BindDomain"
- icon={Plus}
+                    label="Bind Domain"
+                    icon={Plus}
  size="sm"
  onClick={() => setShowBindDialog(true)}
  />
@@ -367,21 +367,21 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
 
  {expiringDomains.length > 0 && (
  <div className="mb-4 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-[12px] text-warning">
- Domainnowwillto: 
+                Domains expiring soon: 
  <span className="ml-1">
  {expiringDomains
  .slice(0, 2)
-.map((item) => `${item.domain.domain} · ${item.daysRemaining}days`)
+.map((item) => `${item.domain.domain} · ${item.daysRemaining} days`)
  .join(", ")}
  </span>
- {expiringDomains.length > 2 && <span> etc {expiringDomains.length} </span>}
+ {expiringDomains.length > 2 && <span> and {expiringDomains.length - 2} more</span>}
  </div>
  )}
 
  {/* DefaultDomain */}
  <SettingsSection
- title="DefaultDomain"
- description="SystemAllocate'sAccessAddress, NoneneedConfignowcanUsage"
+                title="Default Domain"
+                description="System-allocated access address. No configuration needed."
  compact
  >
  <div className="flex items-center justify-between p-3 rounded-md bg-surface-75">
@@ -394,7 +394,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  {workspace?.slug}.agentflow.app/{app?.slug}
  </p>
  <p className="text-[11px] text-foreground-muted">
- HTTPS AutoEnable
+                    HTTPS Auto-Enabled
  </p>
  </div>
  </div>
@@ -425,8 +425,8 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </SettingsSection>
 
  <SettingsSection
- title="BindandVerify"
- description="Config DNS RecordandDoneVerify, EnsureDomainAvailable"
+                title="Bind and Verify"
+                description="Configure DNS records and complete verification to ensure domain availability."
  compact
  >
  {(domainActionMessage || domainActionError) && (
@@ -445,21 +445,21 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  {domains.length === 0 ? (
  <EmptyState
  icon={<Globe className="w-6 h-6" />}
- title="Not yetBindDomain"
- description="firstBindDomain, againBased on DNS ConfigDescriptionDoneVerify."
+                    title="No Domain Bound"
+                    description="Bind a domain first, then verify based on the DNS configuration instructions."
  action={{
- label: "BindDomain",
- onClick: () => setShowBindDialog(true),
- }}
- />
- ) : (
- <div className="space-y-4">
- <div className="flex flex-wrap items-end justify-between gap-3">
- <div className="min-w-[220px]">
- <div className="text-[11px] text-foreground-muted mb-2">VerifyDomain</div>
+                      label: "Bind Domain",
+                      onClick: () => setShowBindDialog(true),
+                    }}
+                  />
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap items-end justify-between gap-3">
+                      <div className="min-w-[220px]">
+                        <div className="text-[11px] text-foreground-muted mb-2">Verify Domain</div>
  <Select value={verificationTargetId} onValueChange={setVerificationTargetId}>
  <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="SelectDomain" />
+                        <SelectValue placeholder="Select Domain" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100 border-border">
  {sortedDomains.map((domain) => (
@@ -472,7 +472,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="outline" size="sm" onClick={() => setShowBindDialog(true)}>
- BindnewDomain
+                        Bind New Domain
  </Button>
  <Button
  variant="outline"
@@ -489,8 +489,8 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  >
  {isVerifying && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
  {verificationTarget?.status === "verified" || verificationTarget?.status === "active"
- ? "re-newVerify"
-: "NowVerify"}
+                        ? "Re-verify"
+: "Verify Now"}
  </Button>
  </div>
  </div>
@@ -536,7 +536,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </div>
  </div>
  <div className="mt-3 text-[11px] text-foreground-muted">
- DNS RecordTake Effectcancanneedneedmintoh, PleaseatDoneConfigafteragainClickVerify.
+                    DNS records can take minutes to hours to take effect. Please click Verify after completing configuration.
  </div>
  </div>
  )}
@@ -548,26 +548,26 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  <div className="mt-6">
  <SettingsSection
  title="Custom Domain"
- description="BindyouSelf'sDomain, ProvidemoreProfessional'sAccessExperience"
+                  description="Bind your own domain for a more professional access experience."
  compact
  >
  {domains.length === 0 ? (
  <EmptyState
  icon={<Globe className="w-6 h-6" />}
- title="NoneCustom Domain"
- description="BindyouSelf'sDomain, letAppmoreProfessional"
+                    title="No Custom Domain"
+                    description="Bind your own domain to make your app more professional."
  action={{
- label: "BindDomain",
- onClick: () => setShowBindDialog(true),
- }}
- />
- ) : (
- <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
- <div className="grid grid-cols-[2fr_1fr_1.3fr_1fr_1.6fr] gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
- <div>Domain</div>
- <div>Status</div>
- <div>Verify</div>
- <div>Certificateto</div>
+                      label: "Bind Domain",
+                      onClick: () => setShowBindDialog(true),
+                    }}
+                  />
+                ) : (
+                  <div className="rounded-md bg-surface-100 border border-border overflow-hidden">
+                    <div className="grid grid-cols-[2fr_1fr_1.3fr_1fr_1.6fr] gap-4 px-4 py-3 border-b border-border bg-surface-75 text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
+                      <div>Domain</div>
+                      <div>Status</div>
+                      <div>Verify</div>
+                      <div>Certificate Expiry</div>
  <div className="text-right">Action</div>
  </div>
  {sortedDomains.map((domain) => {
@@ -581,8 +581,8 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  : domain.status === "verifying"
  ? "Verifying"
  : domain.status === "failed"
- ? "VerifyFailed"
-: "pendingVerify";
+                        ? "Verification Failed"
+: "Pending Verification";
 
  return (
  <div
@@ -602,7 +602,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  )}
  </div>
  <div className="text-[10px] text-foreground-muted">
- Bindat {formatDate(domain.created_at)}
+                            Bound at {formatDate(domain.created_at)}
  </div>
  </div>
  <div className="flex items-center gap-2">
@@ -632,7 +632,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  size="sm"
  onClick={() => openVerifyDialog(domain)}
  >
- ViewConfig
+                            View Configuration
  </Button>
  )}
  {domain.status === "verified" && (
@@ -643,24 +643,24 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  disabled={isVerifying}
  >
  <RefreshCw className={cn("w-4 h-4 mr-1.5", isVerifying && "animate-spin")} />
- re-newVerify
- </Button>
- )}
- <DropdownMenu>
- <DropdownMenuTrigger asChild>
- <Button variant="ghost" size="icon" className="h-8 w-8">
- <MoreHorizontal className="w-4 h-4" />
- </Button>
- </DropdownMenuTrigger>
- <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
- <DropdownMenuItem
- onClick={() => handleSetPrimaryDomain(domain.id)}
- disabled={isPrimary}
- >
- asPrimary Domain
+                            Re-verify
+                          </Button>
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
+                            <DropdownMenuItem
+                              onClick={() => handleSetPrimaryDomain(domain.id)}
+                              disabled={isPrimary}
+                            >
+                              Set as Primary Domain
  </DropdownMenuItem>
- <DropdownMenuItem onClick={() => handleOpenCertificate(domain)}>
- ViewCertificate
+                          <DropdownMenuItem onClick={() => handleOpenCertificate(domain)}>
+                            View Certificate
  </DropdownMenuItem>
  <DropdownMenuSeparator className="bg-border" />
  <PermissionGate permissions={permissions} required={["workspace_publish"]}>
@@ -683,13 +683,13 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </div>
  </PageContainer>
 
- {/* BindDomainDialog */}
+        {/* Bind Domain Dialog */}
  <Dialog open={showBindDialog} onOpenChange={setShowBindDialog}>
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">BindDomain</DialogTitle>
- <DialogDescription className="text-foreground-light">
- InputyouneedBind'sDomain, BindafterneedneedConfig DNS RecordProceedVerify
+              <DialogTitle className="text-foreground">Bind Domain</DialogTitle>
+              <DialogDescription className="text-foreground-light">
+                Enter the domain you want to bind. After binding, you'll need to configure DNS records for verification.
  </DialogDescription>
  </DialogHeader>
 
@@ -699,20 +699,20 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  Domain <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="exampleif: app.example.com"
+                    placeholder="e.g., app.example.com"
  value={bindDomain}
  onChange={(e) => setBindDomain(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
  />
  <p className="text-[11px] text-foreground-muted mt-1.5">
- SuggestionUsageSubdomain, if app.example.com
+                    We recommend using a subdomain, e.g., app.example.com
  </p>
  </div>
 
  <div className="p-3 rounded-md bg-surface-75 text-[12px] text-foreground-light">
  <p className="flex items-center gap-2">
  <Info className="w-4 h-4 text-foreground-muted shrink-0" />
- Bindafter, youneedneedatDomain's DNS SettingsAddshouldRecord
+                    After binding, you need to add the required records in your domain's DNS settings.
  </p>
  </div>
  </div>
@@ -733,32 +733,32 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </DialogContent>
  </Dialog>
 
- {/* DNS ConfigDescriptionDialog */}
+        {/* DNS Configuration Instructions Dialog */}
  <Dialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
  <DialogContent className="sm:max-w-lg bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">DNS ConfigDescription</DialogTitle>
+              <DialogTitle className="text-foreground">DNS Configuration Instructions</DialogTitle>
  <DialogDescription className="text-foreground-light">
- Pleaseatyou'sDomain DNS SettingsAddwithdownRecord
+ Please add the following record in your domain DNS settings
  </DialogDescription>
  </DialogHeader>
 
  <div className="space-y-4 py-4">
- {/* TXT RecordVerify */}
+            {/* TXT Record Verification */}
  <div className="p-4 rounded-md bg-surface-75 border border-border">
  <h4 className="text-[12px] font-medium text-foreground mb-3">
- method1: TXT RecordVerify
+                    Method 1: TXT Record Verification
  </h4>
  <div className="space-y-2">
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">RecordType</span>
- <span className="text-[12px] font-mono text-foreground">TXT</span>
+                      <span className="text-[11px] text-foreground-muted">Record Type</span>
+                      <span className="text-[12px] font-mono text-foreground">TXT</span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">mainRecord</span>
- <div className="flex items-center gap-2">
- <span className="text-[12px] font-mono text-foreground">
- {txtName || `${defaultTxtPrefix}.${selectedDomain?.domain ?? ""}`}
+                      <span className="text-[11px] text-foreground-muted">Host Record</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-mono text-foreground">
+                          {txtName || `${defaultTxtPrefix}.${selectedDomain?.domain ?? ""}`}
  </span>
  <Button
  variant="ghost"
@@ -771,10 +771,10 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </div>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">Recordvalue</span>
- <div className="flex items-center gap-2">
- <span className="text-[12px] font-mono text-foreground truncate max-w-[200px]">
- {txtValue || "loading..."}
+                      <span className="text-[11px] text-foreground-muted">Record Value</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-mono text-foreground truncate max-w-[200px]">
+                          {txtValue || "loading..."}
  </span>
  <Button
  variant="ghost"
@@ -792,24 +792,24 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  {/* CNAME Record */}
  <div className="p-4 rounded-md bg-surface-75 border border-border">
  <h4 className="text-[12px] font-medium text-foreground mb-3">
- method2: CNAME Record
+                    Method 2: CNAME Record
  </h4>
  <div className="space-y-2">
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">RecordType</span>
- <span className="text-[12px] font-mono text-foreground">CNAME</span>
+                      <span className="text-[11px] text-foreground-muted">Record Type</span>
+                      <span className="text-[12px] font-mono text-foreground">CNAME</span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">mainRecord</span>
- <span className="text-[12px] font-mono text-foreground">
- {selectedDomain?.domain?.split(".")[0] || "app"}
+                      <span className="text-[11px] text-foreground-muted">Host Record</span>
+                      <span className="text-[12px] font-mono text-foreground">
+                        {selectedDomain?.domain?.split(".")[0] || "app"}
  </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-[11px] text-foreground-muted">Recordvalue</span>
- <div className="flex items-center gap-2">
- <span className="text-[12px] font-mono text-foreground">
- {cnameTarget}
+                      <span className="text-[11px] text-foreground-muted">Record Value</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-mono text-foreground">
+                          {cnameTarget}
  </span>
  <Button
  variant="ghost"
@@ -827,38 +827,38 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  <div className="p-3 rounded-md bg-warning-200 text-[12px] text-warning">
  <p className="flex items-center gap-2">
  <AlertCircle className="w-4 h-4 shrink-0" />
- DNS RecordTake Effectcancanneedneedmintoh, Pleasecenteretcpending
+                DNS records can take minutes to hours to take effect. Please wait patiently.
  </p>
  </div>
  </div>
 
  <DialogFooter>
  <Button variant="outline" onClick={() => setShowVerifyDialog(false)}>
- afterVerify
+                Verify Later
  </Button>
  <Button
  onClick={() => selectedDomain && handleVerify(selectedDomain.id)}
  disabled={isVerifying}
  >
  {isVerifying && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
- NowVerify
+                Verify Now
  </Button>
  </DialogFooter>
  </DialogContent>
  </Dialog>
 
- {/* CertificateDetailsDialog */}
+        {/* Certificate Details Dialog */}
  <Dialog open={showCertDialog} onOpenChange={setShowCertDialog}>
  <DialogContent className="sm:max-w-md bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">CertificateDetails</DialogTitle>
- <DialogDescription className="text-foreground-light">
- View SSL CertificateStatusandValid
+              <DialogTitle className="text-foreground">Certificate Details</DialogTitle>
+              <DialogDescription className="text-foreground-light">
+                View SSL certificate status and validity.
  </DialogDescription>
  </DialogHeader>
  <div className="space-y-3 py-2">
  {!certDomain ? (
- <div className="text-[12px] text-foreground-muted">NoneCertificateInfo.</div>
+                  <div className="text-[12px] text-foreground-muted">No certificate information.</div>
  ) : (
  <>
  <div className="flex items-center justify-between text-[12px]">
@@ -866,7 +866,7 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  <span className="text-foreground">{certDomain.domain}</span>
  </div>
  <div className="flex items-center justify-between text-[12px]">
- <span className="text-foreground-muted">CertificateStatus</span>
+                    <span className="text-foreground-muted">Certificate Status</span>
  <span className="text-foreground">
  {certDomain.ssl_status
  ? sslStatusConfig[certDomain.ssl_status]?.label || certDomain.ssl_status
@@ -874,11 +874,11 @@ export function DomainsPageContent({ workspaceId, appId }: DomainsPageProps) {
  </span>
  </div>
  <div className="flex items-center justify-between text-[12px]">
- <span className="text-foreground-muted">IssueTime</span>
+                    <span className="text-foreground-muted">Issue Time</span>
  <span className="text-foreground">{formatDate(certDomain.ssl_issued_at)}</span>
  </div>
  <div className="flex items-center justify-between text-[12px]">
- <span className="text-foreground-muted">toTime</span>
+                    <span className="text-foreground-muted">Expiry Time</span>
  <span className="text-foreground">{formatDate(certDomain.ssl_expires_at)}</span>
  </div>
  </>

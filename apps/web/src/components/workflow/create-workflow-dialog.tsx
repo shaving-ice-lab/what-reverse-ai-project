@@ -3,11 +3,11 @@
 /**
  * CreateWorkflowDialog - Enhanced UI/UX
  * 
- * : 
- * - Smooth'sAnimationEffect
- * - TemplatePreview
- * - SmartFormVerify
- * - keyBoard Shortcutskey
+ * Features: 
+ * - Smooth animation effects
+ * - Template preview
+ * - Smart form validation
+ * - Keyboard shortcuts
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -54,12 +54,12 @@ interface CreateWorkflowDialogProps {
  onSuccess?: (workflowId: string) => void;
 }
 
-// PresetTemplate - EnhancedConfig
+// Preset templates - enhanced config
 const templates = [
  {
  id: "blank",
- name: "EmptyWorkflow",
- description: "fromStart, completeallCustom",
+ name: "Empty workflow",
+ description: "Start from scratch, fully customizable",
  icon: Plus,
  color: "#6366f1",
  gradient: "from-indigo-500/20 to-purple-500/20",
@@ -69,7 +69,7 @@ const templates = [
  {
  id: "llm-chat",
  name: "AI Conversation",
- description: "Simple's LLM ConversationFlow",
+ description: "Simple LLM conversation flow",
  icon: MessageSquare,
  color: "#8b5cf6",
  gradient: "from-violet-500/20 to-purple-500/20",
@@ -78,8 +78,8 @@ const templates = [
  },
  {
  id: "api-processor",
- name: "API DataProcess",
- description: "Call API andProcessBackData",
+    name: "API Data Processing",
+ description: "Call API and process response data",
  icon: Database,
  color: "#f97316",
  gradient: "from-orange-500/20 to-amber-500/20",
@@ -88,8 +88,8 @@ const templates = [
  },
  {
  id: "auto-workflow",
- name: "AutomationWorkflow",
- description: "ConditionDetermineandLoopProcess",
+    name: "Automation Workflow",
+ description: "Conditions, branching and loop processing",
  icon: GitBranch,
  color: "#22c55e",
  gradient: "from-emerald-500/20 to-green-500/20",
@@ -98,8 +98,8 @@ const templates = [
  },
  {
  id: "code-generator",
- name: "CodeGenerate",
- description: "Usage AI GenerateCode",
+    name: "Code Generation",
+ description: "Use AI to generate code",
  icon: Code2,
  color: "#ec4899",
  gradient: "from-pink-500/20 to-rose-500/20",
@@ -109,7 +109,7 @@ const templates = [
  {
  id: "ai-assistant",
  name: "AI Assistant",
- description: "multipleConversationSmartAssistant",
+ description: "Multi-conversation smart assistant",
  icon: Brain,
  color: "#06b6d4",
  gradient: "from-cyan-500/20 to-teal-500/20",
@@ -134,7 +134,7 @@ export function CreateWorkflowDialog({
  const [isSuccess, setIsSuccess] = useState(false);
  const nameInputRef = useRef<HTMLInputElement>(null);
  
- // AutoFocustoNameInput
+  // Auto-focus name input
  useEffect(() => {
  if (open && nameInputRef.current) {
  setTimeout(() => nameInputRef.current?.focus(), 100);
@@ -143,7 +143,7 @@ export function CreateWorkflowDialog({
  
  const handleCreate = async () => {
  if (!name.trim()) {
- setError("Please enterWorkflowName");
+ setError("Please enter workflow name.");
  nameInputRef.current?.focus();
  return;
  }
@@ -161,7 +161,7 @@ export function CreateWorkflowDialog({
  
  setIsSuccess(true);
  
- // LatencyDisplaySuccessStatus
+      // Delay to display success state
  setTimeout(() => {
  setOpen(false);
  
@@ -172,7 +172,7 @@ export function CreateWorkflowDialog({
  }
  }, 500);
  } catch (err) {
- setError(err instanceof Error ? err.message: "CreateFailed");
+ setError(err instanceof Error ? err.message : "Create failed.");
  } finally {
  setIsLoading(false);
  }
@@ -181,7 +181,7 @@ export function CreateWorkflowDialog({
  const handleOpenChange = (isOpen: boolean) => {
  setOpen(isOpen);
  if (!isOpen) {
- // LatencyResetStatus, AvoidCloseAnimationtimeContentBlink
+      // Delay reset to avoid content flash during close animation
  setTimeout(() => {
  setName("");
  setDescription("");
@@ -193,14 +193,14 @@ export function CreateWorkflowDialog({
  }
  };
 
- // keyBoard Shortcutskey
+  // Keyboard shortcuts
  const handleKeyDown = (e: React.KeyboardEvent) => {
  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
  handleCreate();
  }
  };
  
- // FetchselectTemplate'sDetails
+  // Get selected template details
  const selectedTemplateDetails = templates.find(t => t.id === selectedTemplate);
  
  return (
@@ -226,7 +226,7 @@ export function CreateWorkflowDialog({
  className="sm:max-w-[580px] overflow-hidden"
  onKeyDown={handleKeyDown}
  >
- {/* SuccessStatusOverlay */}
+        {/* Success State Overlay */}
  {isSuccess && (
  <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm animate-fadeIn">
  <div className="flex flex-col items-center gap-4 text-center">
@@ -235,7 +235,7 @@ export function CreateWorkflowDialog({
  </div>
  <div>
  <h3 className="text-lg font-semibold text-foreground">Created successfully!</h3>
- <p className="text-sm text-muted-foreground mt-1">currentlyatNavigatetoEdit...</p>
+              <p className="text-sm text-muted-foreground mt-1">Navigating to editor...</p>
  </div>
  </div>
  </div>
@@ -247,9 +247,9 @@ export function CreateWorkflowDialog({
  <Wand2 className="w-5 h-5 text-primary" />
  </div>
  <div>
- <DialogTitle className="text-xl">CreateWorkflow</DialogTitle>
+ <DialogTitle className="text-xl">Create Workflow</DialogTitle>
  <DialogDescription className="mt-0.5">
- Create1new's AI WorkflowcomeAutomationyou'sTask
+ Create a new AI workflow to automate your tasks
  </DialogDescription>
  </div>
  </div>
@@ -262,28 +262,28 @@ export function CreateWorkflowDialog({
  className="flex-1 h-9 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
  >
  <Plus className="w-4 h-4 mr-2" />
- EmptyCreate
+              From Scratch
  </TabsTrigger>
  <TabsTrigger 
  value="template" 
  className="flex-1 h-9 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
  >
  <Layers className="w-4 h-4 mr-2" />
- fromTemplate
+              From Template
  </TabsTrigger>
  </TabsList>
  
  <TabsContent value="blank" className="space-y-4 mt-5 animate-fadeIn">
- {/* EmptyCreateTip */}
+            {/* From Scratch Tip */}
  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
  <div className="flex items-start gap-3">
  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
  <Sparkles className="w-5 h-5 text-primary" />
  </div>
  <div>
- <p className="text-sm font-medium text-foreground">fromEmptyStart</p>
+ <p className="text-sm font-medium text-foreground">Start from Scratch</p>
  <p className="text-xs text-muted-foreground mt-1">
- Create1EmptyWorkflow, atEditDrag & DropNodecomeBuildyou'sAutomationFlow
+ Create an empty workflow and drag & drop nodes in the editor to build your automation flow
  </p>
  </div>
  </div>
@@ -291,12 +291,12 @@ export function CreateWorkflowDialog({
  
  <div className="space-y-2">
  <Label htmlFor="name" className="text-sm font-medium">
- WorkflowName <span className="text-destructive">*</span>
- </Label>
- <Input
- ref={nameInputRef}
- id="name"
- placeholder="exampleif: CustomerDataAnalyticsFlow"
+Workflow name <span className="text-destructive">*</span>
+</Label>
+<Input
+ref={nameInputRef}
+id="name"
+placeholder="e.g. Customer data analytics flow"
  value={name}
  onChange={(e) => {
  setName(e.target.value);
@@ -316,7 +316,7 @@ export function CreateWorkflowDialog({
  </Label>
  <Textarea
  id="description"
- placeholder="SimpleDescriptionthisWorkflow'suse..."
+ placeholder="Brief description of this workflow's use..."
  value={description}
  onChange={(e) => setDescription(e.target.value)}
  rows={3}
@@ -326,7 +326,7 @@ export function CreateWorkflowDialog({
  </TabsContent>
  
  <TabsContent value="template" className="space-y-4 mt-5 animate-fadeIn">
- {/* TemplateSelectGrid */}
+            {/* Template Selection Grid */}
  <div className="grid grid-cols-2 gap-3">
  {templates.map((template, index) => {
  const Icon = template.icon;
@@ -353,13 +353,13 @@ export function CreateWorkflowDialog({
  animationDelay: `${index * 50}ms`,
  }}
  >
- {/* BackgroundGradient */}
+                  {/* Background Gradient */}
  <div className={cn(
  "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
  template.gradient
  )} />
  
- {/* PopularTags */}
+                  {/* Popular Tag */}
  {template.popular && (
  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
  Popular
@@ -388,12 +388,12 @@ export function CreateWorkflowDialog({
  {template.nodeCount > 0 && (
  <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground/70">
  <Layers className="w-3 h-3" />
- {template.nodeCount} PresetNode
- </div>
+{template.nodeCount} preset nodes
+</div>
  )}
  </div>
  
- {/* selectIndicator */}
+                  {/* Selection Indicator */}
  {isSelected && (
  <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
  <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />
@@ -404,15 +404,15 @@ export function CreateWorkflowDialog({
  })}
  </div>
  
- {/* NameInput */}
+            {/* Name Input */}
  <div className="space-y-2 pt-2">
  <Label htmlFor="template-name" className="text-sm font-medium">
- WorkflowName <span className="text-destructive">*</span>
- </Label>
- <Input
- ref={tab === "template" ? nameInputRef : undefined}
- id="template-name"
- placeholder="InputWorkflowName"
+Workflow name <span className="text-destructive">*</span>
+</Label>
+<Input
+ref={tab === "template" ? nameInputRef : undefined}
+id="template-name"
+placeholder="Enter workflow name"
  value={name}
  onChange={(e) => {
  setName(e.target.value);
@@ -427,7 +427,7 @@ export function CreateWorkflowDialog({
  </TabsContent>
  </Tabs>
  
- {/* ErrorTip */}
+        {/* Error Message */}
  {error && (
  <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm animate-shake">
  <AlertCircle className="h-4 w-4 shrink-0" />
@@ -439,7 +439,7 @@ export function CreateWorkflowDialog({
  <div className="hidden sm:flex items-center text-xs text-muted-foreground mr-auto">
  <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[10px] mr-1">⌘</kbd>
  <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[10px] mr-1.5">Enter</kbd>
- QuickCreate
+              Quick create
  </div>
  <Button 
  variant="ghost" 
@@ -468,14 +468,14 @@ export function CreateWorkflowDialog({
  </>
  ) : (
  <>
- CreateWorkflow
+              Create Workflow
  <ArrowRight className="ml-2 h-4 w-4" />
  </>
  )}
  </Button>
  </DialogFooter>
  
- {/* Animationstyle */}
+        {/* Animation styles */}
  <style jsx global>{`
  @keyframes shake {
  0%, 100% { transform: translateX(0); }

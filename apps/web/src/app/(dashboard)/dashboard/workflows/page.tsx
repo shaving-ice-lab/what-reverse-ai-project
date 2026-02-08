@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * WorkflowListPage
- * Supabase Settings Style: EdgeNavigation + Right sideContentPanelLayout
- * Reference STYLE-TERMINAL-PIXEL.md MinimalTextstyleStandard
+ * Workflow List Page
+ * Supabase Settings Style: Edge Navigation + Right Side Content Panel Layout
+ * Reference STYLE-TERMINAL-PIXEL.md Minimal Text Style Standard
  */
 
 import { useState } from "react";
@@ -57,43 +57,43 @@ type SortBy = "updated" | "name" | "runs" | "success";
 const workflows = [
  {
  id: "wf-1",
- name: "CustomerFeedbackAutoProcess",
- description: "AutoCollectandAnalyticsCustomerFeedback, GenerateReportandNotificationsRelatedTeam",
+ name: "Customer Feedback Auto-Processing",
+ description: "Automatically collect and analyze customer feedback, generate reports and notify related teams",
  status: "active" as WorkflowStatus,
  trigger: "Webhook",
  createdAt: "2026-01-15",
- updatedAt: "2 hbefore",
- lastRun: "5 minbefore",
+ updatedAt: "2 hours ago",
+ lastRun: "5 min ago",
  totalRuns: 1256,
  successRate: 98.5,
- folder: "CustomerService",
+ folder: "Customer Service",
  starred: true,
- tags: ["Automation", "CustomerService", "Report"],
+ tags: ["Automation", "Customer Service", "Report"],
  },
  {
  id: "wf-2",
- name: "eachdaySalesDatatotal",
- description: "eachdaysAutototalSalesData, GeneratecanvisualReportConcurrencyEmail",
+ name: "Daily Sales Data Summary",
+ description: "Automatically summarize daily sales data, generate visual reports and send emails",
  status: "active" as WorkflowStatus,
- trigger: "ScheduledTrigger (eachdays 09:00)",
+ trigger: "Scheduled (daily 09:00)",
  createdAt: "2026-01-10",
- updatedAt: "1 daysbefore",
+ updatedAt: "1 day ago",
  lastRun: "Today 09:00",
  totalRuns: 45,
  successRate: 100,
- folder: "DataAnalytics",
+ folder: "Data Analytics",
  starred: true,
  tags: ["Data", "Report", "Scheduled"],
  },
  {
  id: "wf-3",
- name: "GitHub Issue AutoCategory",
- description: "Usage AI AutoAnalyticsnew Issue andAddTagsandAllocateOwner",
+ name: "GitHub Issue Auto-Category",
+ description: "Use AI to automatically analyze new issues, add tags and assign owners",
  status: "active" as WorkflowStatus,
  trigger: "GitHub Webhook",
  createdAt: "2026-01-08",
- updatedAt: "3 hbefore",
- lastRun: "1 hbefore",
+ updatedAt: "3 hours ago",
+ lastRun: "1 hour ago",
  totalRuns: 234,
  successRate: 95.7,
  folder: "Development",
@@ -102,28 +102,28 @@ const workflows = [
  },
  {
  id: "wf-4",
- name: "newEmployeeenterFlow",
- description: "AutomationnewEmployeeenterFlow, IncludeAccountCreate, PermissionAllocateandNotifications",
+ name: "New Employee Onboarding Flow",
+ description: "Automate new employee onboarding, including account creation, permission assignment and notifications",
  status: "paused" as WorkflowStatus,
- trigger: "ManualTrigger",
+ trigger: "Manual Trigger",
  createdAt: "2026-01-05",
- updatedAt: "1 weeksbefore",
- lastRun: "2 weeksbefore",
+ updatedAt: "1 week ago",
+ lastRun: "2 weeks ago",
  totalRuns: 23,
  successRate: 100,
- folder: "personpowerResource",
+ folder: "Human Resources",
  starred: false,
- tags: ["HR", "enter", "Automation"],
+ tags: ["HR", "Onboarding", "Automation"],
  },
  {
  id: "wf-5",
- name: "Social MediaContentPublish",
- description: "ScheduledPublishSocial MediaContenttomultiplePlatform",
+ name: "Social Media Content Publishing",
+ description: "Schedule and publish social media content to multiple platforms",
  status: "error" as WorkflowStatus,
- trigger: "ScheduledTrigger",
+ trigger: "Scheduled Trigger",
  createdAt: "2026-01-03",
- updatedAt: "6 hbefore",
- lastRun: "6 hbefore",
+ updatedAt: "6 hours ago",
+ lastRun: "6 hours ago",
  totalRuns: 89,
  successRate: 87.6,
  folder: "Marketing",
@@ -132,13 +132,13 @@ const workflows = [
  },
  {
  id: "wf-6",
- name: "OrderProcessAutomation",
- description: "newOrderAutoVerify, ProcessConcurrencyConfirmEmail",
+ name: "Order Processing Automation",
+ description: "Automatically verify new orders, process and send confirmation emails",
  status: "draft" as WorkflowStatus,
  trigger: "Webhook",
  createdAt: "2026-01-20",
  updatedAt: "Just now",
- lastRun: "not yetRun",
+ lastRun: "Not yet run",
  totalRuns: 0,
  successRate: 0,
  folder: "E-commerce",
@@ -149,11 +149,11 @@ const workflows = [
 
 // FolderList
 const folders = [
- { name: "allsection", count: workflows.length },
- { name: "CustomerService", count: 1 },
- { name: "DataAnalytics", count: 1 },
+ { name: "All", count: workflows.length },
+ { name: "Customer Service", count: 1 },
+ { name: "Data Analytics", count: 1 },
  { name: "Development", count: 1 },
- { name: "personpowerResource", count: 1 },
+ { name: "Human Resources", count: 1 },
  { name: "Marketing", count: 1 },
  { name: "E-commerce", count: 1 },
 ];
@@ -161,9 +161,9 @@ const folders = [
 // FetchStatusInfo
 const getStatusInfo = (status: WorkflowStatus) => {
  switch (status) {
- case "active":
- return {
- label: "Run",
+    case "active":
+      return {
+        label: "Running",
  color: "text-brand-500",
  bg: "bg-brand-200/70",
  border: "border-brand-400/40",
@@ -199,13 +199,13 @@ const getStatusInfo = (status: WorkflowStatus) => {
 const getRelativeMinutes = (value: string) => {
  if (!value) return Number.MAX_SAFE_INTEGER;
  if (value.includes("Just now")) return 0;
- const minuteMatch = value.match(/(\d+)\s*min?before/);
+  const minuteMatch = value.match(/(\d+)\s*min(?:utes?)?\s*ago/);
  if (minuteMatch) return Number.parseInt(minuteMatch[1], 10);
- const hourMatch = value.match(/(\d+)\s*hbefore/);
+ const hourMatch = value.match(/(\d+)\s*hours ago/);
  if (hourMatch) return Number.parseInt(hourMatch[1], 10) * 60;
- const dayMatch = value.match(/(\d+)\s*daysbefore/);
+ const dayMatch = value.match(/(\d+)\s*days ago/);
  if (dayMatch) return Number.parseInt(dayMatch[1], 10) * 24 * 60;
- const weekMatch = value.match(/(\d+)\s*weeksbefore/);
+ const weekMatch = value.match(/(\d+)\s*weeks ago/);
  if (weekMatch) return Number.parseInt(weekMatch[1], 10) * 7 * 24 * 60;
  return Number.MAX_SAFE_INTEGER;
 };
@@ -243,7 +243,7 @@ function WorkflowSidebar({
  : "text-foreground-light hover:bg-surface-100/60 hover:text-foreground"
  )}
  >
- <span>allsectionWorkflow</span>
+ <span>All Workflows</span>
  <span className="text-[11px] text-foreground-muted">{stats.total}</span>
  </button>
  <button
@@ -256,10 +256,10 @@ function WorkflowSidebar({
  )}
  >
  <span className="flex items-center gap-2">
- <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
- Run
- </span>
- <span className="text-[11px] text-foreground-muted">{stats.active}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+            Running
+          </span>
+          <span className="text-[11px] text-foreground-muted">{stats.active}</span>
  </button>
  <button
  onClick={() => setStatusFilter("paused")}
@@ -308,7 +308,7 @@ function WorkflowSidebar({
  </button>
  </SidebarNavGroup>
 
- {/* Separatorline */}
+        {/* Separator Line */}
  <div className="h-px bg-border my-3" />
 
  {/* FolderFilter */}
@@ -333,7 +333,7 @@ function WorkflowSidebar({
  {/* CreateFolder */}
  <button className="w-full flex items-center gap-2 h-8 px-2 rounded-md text-[12px] text-foreground-muted hover:text-foreground hover:bg-surface-100/60 transition-colors mt-2">
  <Plus className="w-3.5 h-3.5" />
- CreateFolder
+ Create Folder
  </button>
  </div>
  );
@@ -342,7 +342,7 @@ function WorkflowSidebar({
 export default function WorkflowsPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [statusFilter, setStatusFilter] = useState<WorkflowStatus | "all">("all");
- const [selectedFolder, setSelectedFolder] = useState("allsection");
+ const [selectedFolder, setSelectedFolder] = useState("All");
  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
  const [sortBy, setSortBy] = useState<SortBy>("updated");
 
@@ -352,7 +352,7 @@ export default function WorkflowsPage() {
  wf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
  wf.description.toLowerCase().includes(searchQuery.toLowerCase());
  const matchesStatus = statusFilter === "all" || wf.status === statusFilter;
- const matchesFolder = selectedFolder === "allsection" || wf.folder === selectedFolder;
+ const matchesFolder = selectedFolder === "All" || wf.folder === selectedFolder;
  return matchesSearch && matchesStatus && matchesFolder;
  });
 
@@ -374,9 +374,9 @@ export default function WorkflowsPage() {
  };
 
  const sortOptions: Array<{ value: SortBy; label: string }> = [
- { value: "updated", label: "RecentUpdate" },
+ { value: "updated", label: "Recently Updated" },
  { value: "name", label: "Name" },
- { value: "runs", label: "Runtimescount" },
+ { value: "runs", label: "Run Count" },
  { value: "success", label: "Success Rate" },
  ];
 
@@ -420,9 +420,9 @@ export default function WorkflowsPage() {
  {/* PageHeader */}
  <div className="flex items-start justify-between">
  <div>
- <h1 className="text-[18px] font-semibold text-foreground">WorkflowManage</h1>
+ <h1 className="text-[18px] font-semibold text-foreground">Workflow Management</h1>
  <p className="text-[12px] text-foreground-light mt-1">
- ManageandMonitorAllAutomationWorkflow
+ Manage and monitor all automation workflows
  </p>
  </div>
  <div className="flex items-center gap-2">
@@ -432,7 +432,7 @@ export default function WorkflowsPage() {
  <Button size="sm" asChild>
  <Link href="/dashboard/workflows/new">
  <Plus className="h-3.5 w-3.5" />
- CreateWorkflow
+ Create Workflow
  </Link>
  </Button>
  </div>
@@ -442,37 +442,37 @@ export default function WorkflowsPage() {
  <div className="page-panel">
  <div className="page-panel-header">
  <h2 className="page-panel-title">Overview</h2>
- <p className="page-panel-description">keyMetricsandRecentUpdate</p>
+ <p className="page-panel-description">Key metrics and recent updates</p>
  </div>
  <div className="p-4">
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
- <p className="text-[11px] text-foreground-muted mb-1">totalWorkflow</p>
+ <p className="text-[11px] text-foreground-muted mb-1">Total Workflows</p>
  <p className="text-lg font-semibold text-foreground">{stats.total}</p>
- <p className="text-[11px] text-foreground-muted">{stats.starred} alreadyFavorite</p>
+ <p className="text-[11px] text-foreground-muted">{stats.starred} favorited</p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
- <p className="text-[11px] text-foreground-muted mb-1">Run</p>
+              <p className="text-[11px] text-foreground-muted mb-1">Running</p>
  <p className="text-lg font-semibold text-foreground">{stats.active}</p>
  <p className="text-[11px] text-foreground-muted">{stats.paused} Paused</p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
- <p className="text-[11px] text-foreground-muted mb-1">Executetimescount</p>
+ <p className="text-[11px] text-foreground-muted mb-1">Total Runs</p>
  <p className="text-lg font-semibold text-foreground">{stats.totalRuns.toLocaleString()}</p>
- <p className="text-[11px] text-foreground-muted">CumulativeRun</p>
+ <p className="text-[11px] text-foreground-muted">Cumulative runs</p>
  </div>
  <div className="p-3 rounded-md border border-border bg-surface-75/60">
- <p className="text-[11px] text-foreground-muted mb-1">AverageSuccess Rate</p>
+ <p className="text-[11px] text-foreground-muted mb-1">Avg Success Rate</p>
  <p className="text-lg font-semibold text-brand-500">{stats.avgSuccessRate.toFixed(1)}%</p>
- <p className="text-[11px] text-foreground-muted">{stats.error} Exception</p>
+ <p className="text-[11px] text-foreground-muted">{stats.error} Exceptions</p>
  </div>
  </div>
 
- {/* RecentUpdate */}
+ {/* Recent Update */}
  {mostRecentWorkflow && (
  <div className="pt-4 border-t border-border">
  <div className="flex items-center justify-between mb-3">
- <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">RecentUpdate</span>
+ <span className="text-[11px] font-medium text-foreground-muted uppercase tracking-wide">Recent Update</span>
  <span className="text-[11px] text-foreground-muted">{mostRecentWorkflow.updatedAt}</span>
  </div>
  <div className="flex items-center justify-between">
@@ -526,7 +526,7 @@ export default function WorkflowsPage() {
  <p className="page-panel-description">
  {sortedWorkflows.length} Workflow
  {statusFilter !== "all" && ` · ${getStatusInfo(statusFilter).label}`}
- {selectedFolder !== "allsection" && ` · ${selectedFolder}`}
+ {selectedFolder !== "All" && ` · ${selectedFolder}`}
  </p>
  </div>
  <div className="flex items-center gap-2">
@@ -567,7 +567,7 @@ export default function WorkflowsPage() {
  {/* Toolbar */}
  <div className="px-4 py-3 border-b border-border flex items-center gap-3">
  <Input
- placeholder="SearchWorkflow..."
+ placeholder="Search workflows..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  variant="search"
@@ -611,12 +611,12 @@ export default function WorkflowsPage() {
  {/* ListView */}
  {sortedWorkflows.length > 0 && viewMode === "list" && (
  <div>
- {/* head */}
+            {/* Header */}
  <div className="hidden lg:grid grid-cols-[1fr_100px_100px_80px_80px] gap-4 px-4 py-2 border-b border-border text-[11px] font-medium text-foreground-muted uppercase tracking-wide">
  <span>Workflow</span>
- <span>Triggermethod</span>
- <span>RecentRun</span>
- <span>Runtimescount</span>
+ <span>Trigger</span>
+ <span>Last Run</span>
+ <span>Run Count</span>
  <span className="text-right">Action</span>
  </div>
  {/* List */}
@@ -661,17 +661,17 @@ export default function WorkflowsPage() {
  </div>
  </div>
 
- {/* Triggermethod */}
+              {/* Trigger Method */}
  <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
  {workflow.trigger.includes("Scheduled") ? "Scheduled": workflow.trigger}
  </div>
 
- {/* RecentRun */}
+              {/* Recent Run */}
  <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
  {workflow.lastRun}
  </div>
 
- {/* Runtimescount */}
+              {/* Run Count */}
  <div className="hidden lg:flex items-center text-[11px] text-foreground-light">
  {workflow.totalRuns}
  </div>
@@ -684,7 +684,7 @@ export default function WorkflowsPage() {
  className="text-foreground-muted hover:text-foreground h-7 w-7"
  asChild
  >
- <Link href={`/editor/${workflow.id}`} aria-label="EditWorkflow">
+ <Link href={`/editor/${workflow.id}`} aria-label="Edit workflow">
  <Edit className="w-3.5 h-3.5" />
  </Link>
  </Button>
@@ -694,7 +694,7 @@ export default function WorkflowsPage() {
  variant="ghost"
  size="icon-sm"
  className="text-foreground-muted hover:text-foreground h-7 w-7"
- aria-label="moremultipleAction"
+ aria-label="More actions"
  >
  <MoreVertical className="w-3.5 h-3.5" />
  </Button>
@@ -731,11 +731,11 @@ export default function WorkflowsPage() {
  </DropdownMenu>
  </div>
 
- {/* MoveendpointInfo */}
+ {/* Mobile Info */}
  <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted lg:hidden">
  <span>{workflow.trigger.includes("Scheduled") ? "Scheduled": workflow.trigger}</span>
  <span>{workflow.lastRun}</span>
- <span>{workflow.totalRuns} timesRun</span>
+ <span>{workflow.totalRuns} runs</span>
  </div>
  </div>
  );
@@ -780,7 +780,7 @@ export default function WorkflowsPage() {
  {workflow.description}
  </p>
  <div className="flex items-center justify-between text-[10px] text-foreground-muted">
- <span>{workflow.totalRuns} timesRun</span>
+ <span>{workflow.totalRuns} runs</span>
  <span>{workflow.updatedAt}</span>
  </div>
  </Link>
@@ -797,13 +797,13 @@ export default function WorkflowsPage() {
  </div>
  <h3 className="text-[13px] font-medium text-foreground mb-1">
  {searchQuery || statusFilter !== "all"
- ? "NotoMatch'sWorkflow"
-: "Not yetCreateWorkflow"}
+ ? "No matching workflows found"
+: "No workflows yet"}
  </h3>
  <p className="text-[11px] text-foreground-light mb-4 max-w-xs mx-auto">
  {searchQuery || statusFilter !== "all"
- ? "TryUsageotherheKeywordsorFilterCondition"
-: "Createyou's#1Workflow, StartAutomationJourney"}
+ ? "Try using other keywords or filter conditions"
+: "Create your first workflow to start your automation journey"}
  </p>
  {searchQuery || statusFilter !== "all" ? (
  <Button
@@ -812,16 +812,16 @@ export default function WorkflowsPage() {
  onClick={() => {
  setSearchQuery("");
  setStatusFilter("all");
- setSelectedFolder("allsection");
+ setSelectedFolder("All");
  }}
  >
- ClearFilter
+ Clear Filters
  </Button>
  ) : (
  <Button size="sm" asChild>
  <Link href="/dashboard/workflows/new">
  <Plus className="mr-1.5 w-3.5 h-3.5" />
- CreateWorkflow
+ Create Workflow
  </Link>
  </Button>
  )}

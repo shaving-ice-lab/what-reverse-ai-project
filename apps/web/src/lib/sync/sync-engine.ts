@@ -1,6 +1,6 @@
 /**
- * DataSyncEngine
- * @description ManageLocalandCloudData'sSync
+ * Data Sync Engine
+ * @description Manages synchronization between local and cloud data
  */
 
 import type {
@@ -28,12 +28,12 @@ import {
 } from './types';
 
 /**
- * EventListenType
+ * Event listener type
  */
 type EventListener = (event: { type: SyncEventType; data?: unknown }) => void;
 
 /**
- * LocalStorageInterface
+ * Local storage interface
  */
 export interface LocalStorage {
  getChanges(): Promise<ChangeRecord[]>;
@@ -47,7 +47,7 @@ export interface LocalStorage {
 }
 
 /**
- * Cloud API Interface
+ * Cloud API interface
  */
 export interface CloudApi {
  getChangesSince(since: Date | null): Promise<ChangeRecord[]>;
@@ -56,7 +56,7 @@ export interface CloudApi {
 }
 
 /**
- * SyncEngine
+ * Sync Engine
  */
 export class SyncEngine {
  private config: SyncConfig;
@@ -81,7 +81,7 @@ export class SyncEngine {
  }
 
  /**
- * FetchCurrentStatus
+ * Get current state
  */
  async getState(): Promise<SyncEngineState> {
  const pendingChanges = await this.localStorage.getPendingChanges();
@@ -102,7 +102,7 @@ export class SyncEngine {
  }
 
  /**
- * LaunchAutoSync
+ * Start auto sync
  */
  startAutoSync(): void {
  if (this.syncInterval) return;
@@ -112,12 +112,12 @@ export class SyncEngine {
  this.sync().catch(console.error);
  }, this.config.interval);
 
- // NowExecute1timesSync
+ // Execute sync immediately
  this.sync().catch(console.error);
  }
 
  /**
- * StopAutoSync
+ * Stop auto sync
  */
  stopAutoSync(): void {
  if (this.syncInterval) {
@@ -128,7 +128,7 @@ export class SyncEngine {
  }
 
  /**
- * RecordChange
+ * Record a change
  */
  async recordChange<T>(
  entityType: EntityType,
@@ -136,7 +136,7 @@ export class SyncEngine {
  operation: OperationType,
  data: T
  ): Promise<ChangeRecord<T>> {
- // CheckisnoShouldExclude
+ // Check if entity type should be excluded
  if (shouldExclude(entityType, this.config.excludePatterns)) {
  throw new Error(`Entity type '${entityType}' is excluded from sync`);
  }
@@ -163,14 +163,14 @@ export class SyncEngine {
  }
 
  /**
- * ExecuteSync
+ * Execute sync
  */
  async sync(): Promise<SyncResult> {
  if (this.isSyncing) {
  return { status: 'skipped', reason: 'Sync already in progress' };
  }
 
- // CheckisnoOnline
+ // Check if online
  const isOnline = await this.cloudApi.isOnline();
  if (!isOnline) {
  return { status: 'skipped', reason: 'Offline' };
@@ -181,23 +181,23 @@ export class SyncEngine {
  this.emit('sync:start');
 
  try {
- // 1. FetchLocalpendingSync'sChange
+ // 1. Get local pending changes
  const localChanges = await this.localStorage.getPendingChanges();
 
- // 2. FetchCloud'sChange
+ // 2. Get cloud changes
  const lastSyncTime = await this.localStorage.getLastSyncTime();
  const cloudChanges = await this.cloudApi.getChangesSince(lastSyncTime);
 
- // 3. DetectConflict
+ // 3. Detect conflicts
  const { conflicts, localOnly, cloudOnly } = this.detectConflicts(
  localChanges,
  cloudChanges
  );
 
- // 4. ResolveConflict
+ // 4. Resolve conflicts
  const resolvedConflicts = await this.resolveConflicts(conflicts);
 
- // 5. UploadLocalChange
+ // 5. Upload local changes
  const changesToUpload = [
  ...localOnly,
  ...resolvedConflicts
@@ -206,7 +206,7 @@ export class SyncEngine {
  ];
  const uploadResults = await this.uploadChanges(changesToUpload);
 
- // 6. DownloadCloudChange
+ // 6. Download cloud changes
  const changesToDownload = [
  ...cloudOnly,
  ...resolvedConflicts
@@ -215,10 +215,10 @@ export class SyncEngine {
  ];
  const downloadResults = await this.downloadChanges(changesToDownload);
 
- // 7. UpdateSyncTime
+ // 7. Update sync time
  await this.localStorage.setLastSyncTime(new Date());
 
- // 8. MarkalreadySync'sChange
+ // 8. Mark synced changes
  for (const id of uploadResults.successful) {
  await this.localStorage.updateChangeStatus(id, 'synced');
  this.emit('change:synced', { id });
@@ -254,7 +254,7 @@ export class SyncEngine {
  }
 
  /**
- * DetectConflict
+ * Detect conflicts
  */
  private detectConflicts(
  localChanges: ChangeRecord[],
@@ -268,13 +268,13 @@ export class SyncEngine {
  cloudChanges.map((c) => [`${c.entityType}:${c.entityId}`, c])
  );
 
- // CheckLocalChange
+ // Check local changes
  for (const local of localChanges) {
  const key = `${local.entityType}:${local.entityId}`;
  const cloud = cloudMap.get(key);
 
  if (cloud) {
- // 1EntityatendpointallhasChange -> Conflict
+ // Same entity changed on both sides -> conflict
  conflicts.push({ local, cloud });
  cloudMap.delete(key);
  } else {
@@ -282,10 +282,10 @@ export class SyncEngine {
  }
  }
 
- // Remaining'sCloudChange
+ // Remaining cloud changes
  cloudOnly.push(...cloudMap.values());
 
- // RecordConflicttoQueue
+ // Record conflicts to queue
  this.conflictQueue = conflicts;
 
  if (conflicts.length > 0) {
@@ -296,7 +296,7 @@ export class SyncEngine {
  }
 
  /**
- * ResolveConflict
+ * Resolve conflicts
  */
  private async resolveConflicts(conflicts: Conflict[]): Promise<ResolvedConflict[]> {
  const resolved: ResolvedConflict[] = [];
@@ -319,8 +319,8 @@ export class SyncEngine {
  resolution = comparison === 'a' ? 'local' : 'cloud';
  break;
  case 'manual':
- // ManualResolvetime, DefaultRetainLocal
- // ActualImplementneedneed UI Interactive
+ // For manual resolution, default to keeping local
+ // Actual implementation requires UI interaction
  resolution = 'local';
  break;
  default:
@@ -338,7 +338,7 @@ export class SyncEngine {
  }
 
  /**
- * UploadChange
+ * Upload changes
  */
  private async uploadChanges(changes: ChangeRecord[]): Promise<UploadResult> {
  if (changes.length === 0) {
@@ -348,12 +348,12 @@ export class SyncEngine {
  const successful: string[] = [];
  const failed: SyncError[] = [];
 
- // Upload
+ // Upload in batches
  for (let i = 0; i < changes.length; i += this.config.batchSize) {
  const batch = changes.slice(i, i + this.config.batchSize);
 
  try {
- // UpdateStatusasSync
+ // Update status to syncing
  for (const change of batch) {
  await this.localStorage.updateChangeStatus(change.id, 'syncing');
  }
@@ -362,7 +362,7 @@ export class SyncEngine {
  successful.push(...result.successful);
  failed.push(...result.failed);
 
- // MarkFailed'sChange
+ // Mark failed changes
  for (const error of result.failed) {
  for (const id of error.changeIds) {
  await this.localStorage.updateChangeStatus(id, 'failed');
@@ -375,13 +375,13 @@ export class SyncEngine {
  error: error instanceof Error ? error.message : 'Upload failed',
  });
 
- // ResetStatusaspendingSync
+ // Reset status to pending
  for (const change of batch) {
  await this.localStorage.updateChangeStatus(change.id, 'pending');
  }
  }
 
- // SendProgressEvent
+ // Emit progress event
  this.emit('sync:progress', {
  uploaded: successful.length,
  total: changes.length,
@@ -392,7 +392,7 @@ export class SyncEngine {
  }
 
  /**
- * DownloadChange
+ * Download changes
  */
  private async downloadChanges(changes: ChangeRecord[]): Promise<DownloadResult> {
  if (changes.length === 0) {
@@ -418,14 +418,14 @@ export class SyncEngine {
  }
 
  /**
- * FetchConflictQueue
+ * Get conflict queue
  */
  getConflicts(): Conflict[] {
  return [...this.conflictQueue];
  }
 
  /**
- * ManualResolveConflict
+ * Manually resolve a conflict
  */
  async resolveConflictManually(
  conflictIndex: number,
@@ -437,25 +437,25 @@ export class SyncEngine {
  const chosen = resolution === 'local' ? conflict.local : conflict.cloud;
  await this.localStorage.applyChange(chosen);
 
- // fromQueueRemove
+ // Remove from queue
  this.conflictQueue.splice(conflictIndex, 1);
  }
 
  /**
- * UpdateConfig
+ * Update configuration
  */
  updateConfig(config: Partial<SyncConfig>): void {
  const wasAutoSync = this.config.autoSync;
  this.config = { ...this.config, ...config };
 
- // ifresultAutoSyncStatusChange
+ // If auto sync status changed
  if (wasAutoSync && !this.config.autoSync) {
  this.stopAutoSync();
  } else if (!wasAutoSync && this.config.autoSync) {
  this.startAutoSync();
  }
 
- // ifresultbetweenChange, re-AutoSync
+ // If interval changed, restart auto sync
  if (this.syncInterval && config.interval) {
  this.stopAutoSync();
  this.startAutoSync();
@@ -463,14 +463,14 @@ export class SyncEngine {
  }
 
  /**
- * FetchConfig
+ * Get configuration
  */
  getConfig(): SyncConfig {
  return { ...this.config };
  }
 
  /**
- * SubscriptionEvent
+ * Subscribe to events
  */
  on(event: SyncEventType, listener: EventListener): () => void {
  if (!this.listeners.has(event)) {
@@ -484,7 +484,7 @@ export class SyncEngine {
  }
 
  /**
- * TriggerEvent
+ * Emit event
  */
  private emit(type: SyncEventType, data?: unknown): void {
  const eventListeners = this.listeners.get(type);
@@ -500,7 +500,7 @@ export class SyncEngine {
  }
 
  /**
- * DestroyEngine
+ * Destroy engine
  */
  destroy(): void {
  this.stopAutoSync();
@@ -509,7 +509,7 @@ export class SyncEngine {
 }
 
 /**
- * CreateSyncEngine
+ * Create sync engine
  */
 export function createSyncEngine(
  localStorage: LocalStorage,

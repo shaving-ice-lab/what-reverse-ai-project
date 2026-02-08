@@ -3,7 +3,7 @@
 /**
  * QuickTaskPanel - Manus Style
 
- * DisplayTodoTask, In ProgressTaskandQuickAction
+ * Displays todo tasks, in-progress tasks, and quick actions
  */
 
 import { useState } from "react";
@@ -64,7 +64,7 @@ import {
  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-// TaskPriority
+// Task priority
 
 type Priority = "high" | "medium" | "low";
 
@@ -92,16 +92,16 @@ interface Task {
  starred?: boolean;
 }
 
-// MockTaskData
+// Mock task data
 
 const mockTasks: Task[] = [
 
  {
  id: "1",
 
- title: "DoneCustomerFeedbackWorkflowConfig",
+   title: "Complete customer feedback workflow configuration",
 
- description: "Config AI NodeandEmail Notifications",
+   description: "Configure AI node and email notifications",
 
  type: "workflow",
 
@@ -118,9 +118,9 @@ const mockTasks: Task[] = [
  {
  id: "2",
 
- title: "TestEmailAssistant Agent",
+   title: "Test email assistant agent",
 
- description: "VerifyAutoReplyFeatures",
+   description: "Verify auto-reply features",
 
  type: "agent",
 
@@ -135,7 +135,7 @@ const mockTasks: Task[] = [
  {
  id: "3",
 
- title: "AnalyticsonweeksSalesData",
+   title: "Analyze this week's sales data",
 
  type: "conversation",
 
@@ -158,7 +158,7 @@ const mockTasks: Task[] = [
 
  priority: "low",
 
- dueDate: "currentweeks",
+   dueDate: "This week",
 
  },
 
@@ -179,7 +179,7 @@ const mockTasks: Task[] = [
 
 ];
 
-// FetchTaskTypeInfo
+// Get task type info
 
 const getTaskTypeInfo = (type: TaskType) => {
  switch (type) {
@@ -202,7 +202,7 @@ const getTaskTypeInfo = (type: TaskType) => {
  }
 };
 
-// FetchPriorityInfo
+// Get priority info
 
 const getPriorityInfo = (priority: Priority) => {
  switch (priority) {
@@ -232,7 +232,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  const [filter, setFilter] = useState<"all" | "todo" | "in_progress">("all");
 
- // FilterTask
+ // Filter tasks
 
  const filteredTasks = tasks.filter((task) => {
  if (filter === "all") return task.status !== "completed";
@@ -241,7 +241,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  });
 
- // UpdateTaskStatus
+ // Update task status
 
  const toggleTaskStatus = (id: string) => {
  setTasks((prev) =>
@@ -264,14 +264,14 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  };
 
- // DeleteTask
+ // Delete task
 
  const deleteTask = (id: string) => {
  setTasks((prev) => prev.filter((task) => task.id !== id));
 
  };
 
- // SwitchFavorite
+ // Toggle favorite
 
  const toggleStar = (id: string) => {
  setTasks((prev) =>
@@ -286,7 +286,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  };
 
- // StatisticsData
+ // Statistics
 
  const stats = {
  todo: tasks.filter((t) => t.status === "todo").length,
@@ -298,7 +298,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
  };
 
  if (compact) {
- // Compact - Used forSidebarorsmallCard
+ // Compact - Used for sidebar or small card
 
  return (
  <div className={cn("rounded-xl bg-card border border-border overflow-hidden", className)}>
@@ -309,7 +309,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <Target className="w-4 h-4 text-primary" />
 
- TodoTask
+ Tasks
 
  </h3>
 
@@ -415,7 +415,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <div>
 
- <h3 className="text-lg font-semibold text-foreground">Taskcenter</h3>
+       <h3 className="text-lg font-semibold text-foreground">Task Center</h3>
 
  <p className="text-xs text-muted-foreground">
 
@@ -431,7 +431,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <Plus className="w-4 h-4" />
 
- newTask
+ New Task
 
  </Button>
 
@@ -458,7 +458,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  >
 
- allsection
+ All
 
  </button>
 
@@ -523,9 +523,9 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  </div>
 
- <p className="text-sm text-muted-foreground">Great!NoPending'sTask</p>
+ <p className="text-sm text-muted-foreground">Great! No pending tasks</p>
 
- <p className="text-xs text-muted-foreground/70 mt-1">ClickonmethodButtonAddnewTask</p>
+       <p className="text-xs text-muted-foreground/70 mt-1">Click the button above to add a new task</p>
 
  </div>
 
@@ -546,7 +546,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <div className="flex items-start gap-3">
 
- {/* StatusButton */}
+ {/* Status Button */}
 
  <button
 
@@ -598,11 +598,11 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  )}
 
- {/* TagsandInfo */}
+ {/* Tags and Info */}
 
  <div className="flex items-center gap-2 flex-wrap">
 
- {/* TypeTags */}
+ {/* Type Tags */}
 
  <span className={cn(
  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
@@ -635,7 +635,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  )}
 
- {/* DeadlineDate */}
+ {/* Due Date */}
 
  {task.dueDate && (
  <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
@@ -675,7 +675,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  </div>
 
- {/* ActionMenu */}
+ {/* Action Menu */}
 
  <DropdownMenu>
 
@@ -735,7 +735,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <CheckCircle2 className="w-4 h-4" />
 
- MarkDone
+ Mark as Done
 
  </DropdownMenuItem>
 
@@ -773,7 +773,7 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  </div>
 
- {/* FooterShortcutEntry */}
+ {/* Footer Shortcut */}
 
  <div className="flex items-center justify-between p-3 border-t border-border bg-muted/30">
 
@@ -781,13 +781,13 @@ export function QuickTasksPanel({ className, compact = false }: QuickTasksPanelP
 
  <Sparkles className="w-4 h-4 text-primary" />
 
- <span className="text-xs text-muted-foreground">AI canwithyouPlanningandTrackTask</span>
+ <span className="text-xs text-muted-foreground">AI can help you plan and track tasks</span>
 
  </div>
 
  <button className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
 
- moremultiple
+ More
 
  <ArrowRight className="w-3 h-3" />
 

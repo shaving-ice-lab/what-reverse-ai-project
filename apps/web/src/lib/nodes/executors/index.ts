@@ -19,7 +19,7 @@ import { inputExecutor, outputExecutor } from "./io";
 import type { NodeExecutor } from "../types";
 
 /**
- * AllAvailable'sNodeExecute
+ * All Available Node Executors
  */
 export const nodeExecutors: Record<string, NodeExecutor> = {
  // AI Node
@@ -64,7 +64,7 @@ export const nodeExecutors: Record<string, NodeExecutor> = {
 };
 
 /**
- * FetchNodeExecute
+ * Get Node Executor
  */
 export function getNodeExecutor(nodeType: string): NodeExecutor | null {
  return nodeExecutors[nodeType] || null;

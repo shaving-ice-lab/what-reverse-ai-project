@@ -1,10 +1,10 @@
 /**
- * ConcurrencySecurityTool
+ * Concurrency Safety Utilities
  * 
- * ResolvebeforeendpointStatusandConcurrencyIssue
+ * Resolve frontend state and concurrency issues
  */
 
-// ===== =====
+// ===== Mutex =====
 export class Mutex {
  private locked = false;
  private queue: Array<() => void> = [];
@@ -39,7 +39,7 @@ export class Mutex {
  }
 }
 
-// ===== read =====
+// ===== Read-Write Mutex =====
 export class RWMutex {
  private readers = 0;
  private writer = false;
@@ -79,13 +79,13 @@ export class RWMutex {
 
  releaseWrite(): void {
  this.writer = false;
- // PriorityProcessetcpending'sreadRequest
+ // Prioritize processing pending read requests
  while (this.readQueue.length > 0 && this.writeQueue.length === 0) {
  this.readers++;
  const next = this.readQueue.shift();
  next?.();
  }
- // ifresultNoreadRequest, ProcessRequest
+ // If there are no read requests, process write requests
  if (this.readers === 0 && this.writeQueue.length > 0) {
  this.writer = true;
  const next = this.writeQueue.shift();
@@ -112,7 +112,7 @@ export class RWMutex {
  }
 }
 
-// ===== DebounceRequest =====
+// ===== Debounced Request =====
 interface DebouncedRequest<T> {
  promise: Promise<T>;
  cancel: () => void;
@@ -155,20 +155,20 @@ export function createDebouncedRequest<T>(
  };
 }
 
-// ===== RequestSequence =====
+// ===== Request Serializer =====
 export class RequestSerializer {
  private pendingRequests = new Map<string, Promise<unknown>>();
  private mutex = new Mutex();
 
  async execute<T>(key: string, request: () => Promise<T>): Promise<T> {
  return this.mutex.withLock(async () => {
- // CheckisnohasSame'sRequestcurrentlyatProceed
+ // Check if there's an identical request currently in progress
  const pending = this.pendingRequests.get(key);
  if (pending) {
  return pending as Promise<T>;
  }
 
- // CreatenewRequest
+ // Create new request
  const promise = request().finally(() => {
  this.pendingRequests.delete(key);
  });
@@ -187,7 +187,7 @@ export class RequestSerializer {
  }
 }
 
-// ===== VersionStatus =====
+// ===== Versioned State =====
 export class VersionedState<T> {
  private value: T;
  private version = 0;
@@ -202,7 +202,7 @@ export class VersionedState<T> {
 
  set(newValue: T, expectedVersion?: number): boolean {
  if (expectedVersion !== undefined && expectedVersion !== this.version) {
- return false; // VersionnotMatch, UpdateFailed
+ return false; // Version mismatch, update failed
  }
  this.value = newValue;
  this.version++;
@@ -223,7 +223,7 @@ export class VersionedState<T> {
  }
 }
 
-// ===== AtomicAction =====
+// ===== Atomic Counter =====
 export class AtomicCounter {
  private value: number;
 
@@ -261,7 +261,7 @@ export class AtomicCounter {
  }
 }
 
-// ===== CancelToken =====
+// ===== Cancellation Token =====
 export class CancellationToken {
  private cancelled = false;
  private callbacks: Array<() => void> = [];
@@ -298,7 +298,7 @@ export class CancellationToken {
  }
 }
 
-// ===== Cancel's Promise =====
+// ===== Cancellable Promise =====
 export function cancellablePromise<T>(
  promise: Promise<T>,
  token: CancellationToken
@@ -324,7 +324,7 @@ export function cancellablePromise<T>(
  });
 }
 
-// ===== Process =====
+// ===== Batch Processor =====
 export class BatchProcessor<T, R> {
  private queue: Array<{ item: T; resolve: (r: R) => void; reject: (e: Error) => void }> = [];
  private timer: NodeJS.Timeout | null = null;
@@ -373,7 +373,7 @@ export class BatchProcessor<T, R> {
  }
 }
 
-// ===== Signal =====
+// ===== Semaphore =====
 export class Semaphore {
  private permits: number;
  private queue: Array<() => void> = [];

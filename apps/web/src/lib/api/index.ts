@@ -2,7 +2,7 @@
  * API ServiceExport
  */
 
-// Export API Customerendpoint
+// Export API client
 export { api, ApiError, type ApiResponse, type RequestConfig } from "../api";
 
 // ExportModule API

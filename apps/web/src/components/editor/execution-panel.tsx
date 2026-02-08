@@ -28,8 +28,8 @@ import {
 } from 'lucide-react';
 
 /**
- * ExecutePanel - Manus Style
- * FootercanCollapsePanel, ContainsOutput, Logs, Variable3Tab
+ * Execution Panel - Manus Style
+ * Collapsible footer panel containing Output, Logs, and Variables tabs
  */
 
 type TabType = 'output' | 'logs' | 'variables';
@@ -76,7 +76,7 @@ export function ExecutionPanel({
 
  const currentExecution = currentExecutionId ? executions[currentExecutionId] : null;
 
- // ExecuteWorkflow
+  // Execute workflow
  const handleExecute = useCallback(async () => {
  if (isExecuting || workflowId === 'new') return;
  
@@ -85,25 +85,25 @@ export function ExecutionPanel({
  const response = await workflowApi.execute(workflowId, {});
  const executionId = response.executionId;
  
- // Usage store StartTrackExecute
+    // Use store to start tracking execution
  startExecution(executionId, workflowId, 0);
  setCurrentExecution(executionId);
  
- // SubscriptionExecuteUpdate
+    // Subscribe to execution updates
  if (isConnected) {
  subscribe(executionId);
  }
  
- // CallComponentCallback
+    // Call component callback
  onExecute?.();
  } catch (err) {
- console.error('ExecuteWorkflowFailed:', err);
+ console.error('Execute workflow failed:', err);
  } finally {
  setIsExecuting(false);
  }
  }, [workflowId, isExecuting, isConnected, startExecution, setCurrentExecution, subscribe, onExecute]);
 
- // CancelExecute
+  // Cancel execution
  const handleCancel = useCallback(async () => {
  if (!currentExecutionId || isCancelling) return;
  
@@ -119,13 +119,13 @@ export function ExecutionPanel({
  
  onCancel?.();
  } catch (err) {
- console.error('CancelExecuteFailed:', err);
+ console.error('Failed to cancel execution:', err);
  } finally {
  setIsCancelling(false);
  }
  }, [currentExecutionId, isCancelling, isConnected, completeExecution, unsubscribe, onCancel]);
 
- // NavigatetoExecuteDetails
+  // Navigate to execution details
  const handleViewDetail = () => {
  if (currentExecutionId) {
  router.push(`/executions/${currentExecutionId}`);
@@ -183,7 +183,7 @@ export function ExecutionPanel({
 
  const isRunning = currentExecution?.status === 'running';
 
- // Tab ButtonComponent - Icon
+  // Tab Button Component with Icon
  const TabButton = ({ tab, label, icon: Icon, count }: { tab: TabType; label: string; icon: React.ElementType; count?: number }) => (
  <button
  onClick={() => setActiveTab(tab)}
@@ -219,15 +219,15 @@ export function ExecutionPanel({
 
  return (
  <div className={cn('bg-transparent h-full flex flex-col', className)}>
- {/* Header - optimal'sTags */}
+ {/* Header - Optimized Tabs */}
  <div className="h-11 px-4 flex items-center justify-between border-b border-border bg-surface-75/80">
  <div className="flex gap-1">
  <TabButton tab="output" label="Output" icon={Terminal} count={outputCount} />
  <TabButton tab="logs" label="Logs" icon={Zap} count={logCount} />
- <TabButton tab="variables" label="Variable" icon={Variable} count={variableCount} />
+ <TabButton tab="variables" label="Variables" icon={Variable} count={variableCount} />
  </div>
  <div className="flex items-center gap-2">
- {/* ConnectStatus */}
+          {/* Connection Status */}
  <div className={cn(
  "flex items-center gap-1 px-2 py-0.5 rounded text-xs",
  isConnected ? "text-brand-500" : "text-foreground-muted"
@@ -245,13 +245,13 @@ export function ExecutionPanel({
  {currentExecution.durationMs 
  ? `${(currentExecution.durationMs / 1000).toFixed(2)}s`
  : currentExecution.status === 'running' 
- ? 'Run...'
+              ? 'Running...'
  : ''
  }
  </div>
  )}
  
- {/* ViewDetailsButton */}
+          {/* View Details Button */}
  {currentExecution && (
  <Button
  size="sm"
@@ -264,7 +264,7 @@ export function ExecutionPanel({
  </Button>
  )}
  
- {/* Clear/CancelButton */}
+          {/* Clear/Cancel Button */}
  {currentExecution && isRunning && (
  <Button
  size="sm"
@@ -293,7 +293,7 @@ export function ExecutionPanel({
  </Button>
  )}
  
- {/* ExecuteButton */}
+          {/* Execute Button */}
  <Button
  size="sm"
  onClick={handleExecute}
@@ -305,12 +305,12 @@ export function ExecutionPanel({
  ) : (
  <Play className="h-3 w-3 mr-1" />
  )}
- {isExecuting || isRunning ? 'Run': 'Run'}
+            {isExecuting || isRunning ? 'Running': 'Run'}
  </Button>
  </div>
  </div>
 
- {/* ContentRegion */}
+      {/* Content Region */}
  <div className="overflow-y-auto" style={{ height: panelHeight }}>
  {activeTab === 'output' && (
  <div className="p-4 font-mono text-xs text-foreground leading-normal">
@@ -332,8 +332,8 @@ export function ExecutionPanel({
  <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
  <Terminal className="h-5 w-5 text-foreground-muted/50" />
  </div>
- <p className="text-sm font-medium text-foreground-muted">RunWorkflowViewOutput</p>
- <p className="text-xs text-foreground-muted/70 mt-1">OutputContentwillDisplayatthisin</p>
+ <p className="text-sm font-medium text-foreground-muted">Run workflow to view output</p>
+ <p className="text-xs text-foreground-muted/70 mt-1">Output content will be displayed here.</p>
  </div>
  )}
  <div ref={logEndRef} />
@@ -346,8 +346,8 @@ export function ExecutionPanel({
  <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
  <Zap className="h-5 w-5 text-foreground-muted/50" />
  </div>
- <p className="text-sm font-medium text-foreground-muted">NoneLogs</p>
- <p className="text-xs text-foreground-muted/70 mt-1">RuntimeLogswillDisplayatthisin</p>
+ <p className="text-sm font-medium text-foreground-muted">No Logs</p>
+ <p className="text-xs text-foreground-muted/70 mt-1">Runtime logs will be displayed here.</p>
  </div>
  ) : (
  <VirtualScrollArea
@@ -402,7 +402,7 @@ export function ExecutionPanel({
  className="rounded-lg border border-border/70 overflow-hidden animate-fade-in"
  style={{ animationDelay: `${idx * 50}ms` }}
  >
- {/* NodeHeader */}
+                  {/* Node Header */}
  <div className="flex items-center justify-between px-3 py-2 bg-surface-100/80">
  <span className="text-foreground font-medium truncate">{nodeId}</span>
  <span className={cn(
@@ -418,13 +418,13 @@ export function ExecutionPanel({
  {nodeData.status}
  </span>
  </div>
- {/* NodeOutput */}
+                  {/* Node Output */}
  {nodeData.outputs && (
  <pre className="p-3 overflow-x-auto text-foreground bg-surface-200 text-[11px] leading-normal font-normal">
  {JSON.stringify(nodeData.outputs, null, 2)}
  </pre>
  )}
- {/* ErrorInfo */}
+                  {/* Error Info */}
  {nodeData.error && (
  <div className="p-3 bg-destructive-200 text-destructive border-t border-destructive/30">
  {nodeData.error}
@@ -438,8 +438,8 @@ export function ExecutionPanel({
  <div className="w-12 h-12 rounded-xl bg-surface-100 flex items-center justify-center mb-3">
  <Variable className="h-5 w-5 text-foreground-muted/50" />
  </div>
- <p className="text-sm font-medium text-foreground-muted">NoneVariableData</p>
- <p className="text-xs text-foreground-muted/70 mt-1">NodeExecuteDatawillDisplayatthisin</p>
+ <p className="text-sm font-medium text-foreground-muted">No variable data</p>
+ <p className="text-xs text-foreground-muted/70 mt-1">Node execution data will be displayed here.</p>
  </div>
  )}
  </div>

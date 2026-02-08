@@ -23,7 +23,7 @@ function createTestQueryClient() {
  });
 }
 
-// ContainsAll Provider 'sWrapper
+// Wrapper containing all providers
 interface AllProvidersProps {
  children: ReactNode;
 }

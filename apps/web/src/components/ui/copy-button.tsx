@@ -1,12 +1,12 @@
 "use client"
 
 /**
- * CopyButton CopyButtonComponent
+ * Copy Button Component
  * 
  * Support: 
- * - CopyText/value
- * - Success/FailedStatusFeedback
- * - multipletypestyleVariant
+ * - Copy text/value
+ * - Success/failure status feedback
+ * - Multiple style variants
  */
 
 import * as React from "react"
@@ -60,18 +60,18 @@ const copyButtonVariants = cva(
 type CopyState = "idle" | "copying" | "copied" | "error"
 
 export interface CopyButtonProps
- extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children">,
- VariantProps<typeof copyButtonVariants> {
- /** needCopy'svalue */
- value: string
- /** Copied successfullyafter'sDisplayTime(s) */
- timeout?: number
- /** DisplaycharTags */
- showLabel?: boolean
- /** Copied successfullyCallback */
- onCopySuccess?: () => void
- /** CopyFailedCallback */
- onCopyError?: (error: Error) => void
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children">,
+  VariantProps<typeof copyButtonVariants> {
+  /** Value to copy */
+  value: string
+  /** Display time after successful copy (ms) */
+  timeout?: number
+  /** Whether to display text label */
+  showLabel?: boolean
+  /** Callback on successful copy */
+  onCopySuccess?: () => void
+  /** Callback on copy failure */
+  onCopyError?: (error: Error) => void
 }
 
 function CopyButton({
@@ -128,9 +128,9 @@ function CopyButton({
  case "copying":
  return "Copy..."
  case "copied":
- return "alreadyCopy"
+    return "Copied"
  case "error":
- return "CopyFailed"
+    return "Copy Failed"
  default:
  return "Copy"
  }
@@ -156,7 +156,7 @@ function CopyButton({
 }
 
 /**
- * CopyField - CopyButton'sField
+ * CopyField - Field with Copy Button
  */
 interface CopyFieldProps {
  value: string
@@ -181,7 +181,7 @@ function CopyField({ value, label, className }: CopyFieldProps) {
 }
 
 /**
- * CopyLink - CopyLinkComponent
+ * CopyLink - Copy Link Component
  */
 interface CopyLinkProps {
  url: string
@@ -192,7 +192,7 @@ interface CopyLinkProps {
 
 function CopyLink({ 
  url, 
- label = "CopyLink", 
+  label = "Copy Link", 
  showFullUrl = false,
  className,
 }: CopyLinkProps) {
@@ -246,7 +246,7 @@ function CopyLink({
 }
 
 /**
- * CopyCode - CopyCodeblock
+ * CopyCode - Copy Code Block
  */
 interface CopyCodeProps {
  code: string
@@ -262,14 +262,14 @@ function CopyCode({ code, language, className }: CopyCodeProps) {
  <code className="text-sm font-mono text-foreground">{code}</code>
  </pre>
 
- {/* LanguageTags */}
+    {/* Language Tag */}
  {language && (
  <span className="absolute top-2 left-3 text-xs text-muted-foreground">
  {language}
  </span>
  )}
 
- {/* CopyButton */}
+    {/* Copy Button */}
  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
  <CopyButton value={code} variant="default" size="xs" />
  </div>
@@ -278,7 +278,7 @@ function CopyCode({ code, language, className }: CopyCodeProps) {
 }
 
 /**
- * CopyInput - canCopy'sInput
+ * CopyInput - Copyable Input Field
  */
 interface CopyInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "value"> {
  value: string

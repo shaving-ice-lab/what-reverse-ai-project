@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * StoreSearch BarComponent
+ * Store Search Bar Component
  * 
- * ProvideSearch, FilterandSortFeatures
+ * Provides search, filter, and sort features
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -22,15 +22,15 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const sortOptions = [
- { id: "popular", label: "mostWelcome", icon: TrendingUp },
- { id: "newest", label: "mostnewPublish", icon: Clock },
- { id: "rating", label: "Ratingmost", icon: Star },
- { id: "price_asc", label: "Pricefromto", icon: SortDesc },
- { id: "price_desc", label: "Pricefromto", icon: SortDesc },
+ { id: "popular", label: "Most Popular", icon: TrendingUp },
+ { id: "newest", label: "Newest", icon: Clock },
+ { id: "rating", label: "Highest Rated", icon: Star },
+ { id: "price_asc", label: "Price: Low to High", icon: SortDesc },
+ { id: "price_desc", label: "Price: High to Low", icon: SortDesc },
 ];
 
 const pricingOptions = [
- { id: "all", label: "allsection" },
+ { id: "all", label: "All" },
  { id: "free", label: "Free" },
  { id: "paid", label: "Paid" },
 ];
@@ -65,7 +65,7 @@ export function StoreSearchBar({
  const sortMenuRef = useRef<HTMLDivElement>(null);
  const filterMenuRef = useRef<HTMLDivElement>(null);
 
- // ClickoutsidesectionCloseMenu
+ // Click outside to close menu
  useEffect(() => {
  const handleClickOutside = (event: MouseEvent) => {
  if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
@@ -85,9 +85,9 @@ export function StoreSearchBar({
 
  return (
  <div className={cn("space-y-4", className)}>
- {/* Search BarandAction */}
+ {/* Search Bar and Actions */}
  <div className="flex flex-col sm:flex-row gap-3">
- {/* SearchInput */}
+ {/* Search Input */}
  <div className="relative flex-1">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-light" />
  <input
@@ -112,9 +112,9 @@ export function StoreSearchBar({
  )}
  </div>
 
- {/* ActionButton */}
+ {/* Action Buttons */}
  <div className="flex items-center gap-2">
- {/* Sortdown */}
+ {/* Sort Dropdown */}
  <div className="relative" ref={sortMenuRef}>
  <button
  onClick={() => {
@@ -167,7 +167,7 @@ export function StoreSearchBar({
  )}
  </div>
 
- {/* Filterdown */}
+ {/* Filter Dropdown */}
  {showFilters && onPricingChange && (
  <div className="relative" ref={filterMenuRef}>
  <button
@@ -202,7 +202,7 @@ export function StoreSearchBar({
  {showFilterMenu && (
  <div className="absolute right-0 top-full mt-2 w-40 bg-card border border-border rounded-xl shadow-lg z-20 py-1 animate-scale-in">
  <div className="px-3 py-2 text-xs font-medium text-foreground-light">
- PriceType
+                Price Type
  </div>
  {pricingOptions.map((option) => (
  <button
@@ -228,7 +228,7 @@ export function StoreSearchBar({
  </div>
  </div>
 
- {/* StatisticsandActiveFilterTags */}
+ {/* Statistics and Active Filter Tags */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  {totalCount !== undefined && (
@@ -276,7 +276,7 @@ export function StoreSearchBar({
  className="text-xs text-foreground-light hover:text-foreground"
  >
  <X className="w-3 h-3 mr-1" />
- ClearFilter
+            Clear Filters
  </Button>
  )}
  </div>

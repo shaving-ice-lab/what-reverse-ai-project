@@ -51,10 +51,10 @@ import {
 function DashboardNav({ activeSection }: { activeSection: string }) {
  const navItems = [
  { id: "overview", label: "Overview", href: "#overview" },
- { id: "status", label: "itemStatus", href: "#status" },
+ { id: "status", label: "Status", href: "#status" },
  { id: "actions", label: "Quick Actions", href: "#actions" },
- { id: "recent", label: "RecentDynamic", href: "#recent" },
- { id: "usage", label: "ResourceUsage", href: "#usage" },
+ { id: "recent", label: "Recent Activity", href: "#recent" },
+ { id: "usage", label: "Resource Usage", href: "#usage" },
  ];
 
  return (
@@ -124,11 +124,11 @@ export default function DashboardPage() {
  // Fetch
  const getGreeting = () => {
  const hour = new Date().getHours();
- if (hour < 6) return "";
- if (hour < 12) return "on";
- if (hour < 14) return "";
- if (hour < 18) return "down";
- return "on";
+ if (hour < 6) return "Good evening";
+ if (hour < 12) return "Good morning";
+ if (hour < 14) return "Good afternoon";
+ if (hour < 18) return "Good afternoon";
+ return "Good evening";
  };
 
  const stats = dashboardData?.quick_stats;
@@ -144,13 +144,13 @@ export default function DashboardPage() {
  {/* PageHeader */}
  <PageHeader
  title={`${getGreeting()}, ${user?.displayName || user?.username || "User"}`}
- description="itemOverviewandWorkflowStatus"
+ description="Overview of your workflows and status"
  actions={
  <div className="flex items-center gap-2">
  <Button size="sm" asChild>
  <Link href="/dashboard/workflows/new">
  <Plus className="w-3.5 h-3.5" />
- CreateWorkflow
+ Create Workflow
  </Link>
  </Button>
  </div>
@@ -160,33 +160,33 @@ export default function DashboardPage() {
  {/* keyMetrics */}
  <section id="overview" className="scroll-mt-6">
  <SettingsSection
- title="keyMetrics"
- description="WorkflowandExecuteOverviewData"
+ title="Key Metrics"
+ description="Overview of workflow and execution data"
  >
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <MetricItem
- label="WorkflowTotal"
+ label="Total Workflows"
  value={formattedStats?.totalWorkflows ?? 0}
  subtext={`${formattedStats?.activeWorkflows ?? 0} Active`}
  trend={formattedStats?.workflowsGrowth}
  isLoading={isLoading}
  />
  <MetricItem
- label="TodayExecute"
+ label="Today's Executions"
  value={formattedStats?.runsToday ?? 0}
- subtext={`currentweeks ${formattedStats?.runsThisWeek ?? 0} times`}
+ subtext={`This week: ${formattedStats?.runsThisWeek ?? 0} runs`}
  trend={formattedStats?.executionsGrowth}
  isLoading={isLoading}
  />
  <MetricItem
  label="Success Rate"
  value={`${(formattedStats?.successRate ?? 0).toFixed(1)}%`}
- subtext={`${formattedStats?.totalExecutions ?? 0} timesExecute`}
+ subtext={`${formattedStats?.totalExecutions ?? 0} total executions`}
  trend={formattedStats?.successRateChange}
  isLoading={isLoading}
  />
  <MetricItem
- label="AverageResponse"
+ label="Avg Response"
  value={`${formattedStats?.avgResponseTimeMs ?? 0}ms`}
  subtext="Response Time"
  isLoading={isLoading}
@@ -198,22 +198,22 @@ export default function DashboardPage() {
  {/* itemStatus */}
  <section id="status" className="scroll-mt-6 mt-6">
  <SettingsSection
- title="itemStatus"
- description="SystemRunStatusandResourceMonitor"
+ title="Status"
+ description="System run status and resource monitoring"
  >
  <div className="space-y-4">
  {/* SystemStatus */}
  <StatusRow
- label="SystemStatus"
- description="AllServiceRunNormal"
+ label="System Status"
+ description="All services running normally"
  status={dashboardData?.system_health?.overall_status || "healthy"}
  isLoading={isLoading}
  />
  
  {/* RunQueue */}
  <StatusRow
- label="RunQueue"
- description={`${dashboardData?.running_queue?.total_running ?? 0} TaskRun, ${dashboardData?.running_queue?.total_pending ?? 0} etcpending`}
+ label="Run Queue"
+ description={`${dashboardData?.running_queue?.total_running ?? 0} tasks running, ${dashboardData?.running_queue?.total_pending ?? 0} pending`}
  status={dashboardData?.running_queue?.queue_health || "healthy"}
  isLoading={isLoading}
  />
@@ -229,7 +229,7 @@ export default function DashboardPage() {
  />
  <SystemMetric
  icon={Database}
- label="in"
+ label="Memory"
  value={`${dashboardData.system_health.metrics.memory_usage.toFixed(1)}%`}
  />
  <SystemMetric
@@ -248,28 +248,28 @@ export default function DashboardPage() {
  <section id="actions" className="scroll-mt-6 mt-6">
  <SettingsSection
  title="Quick Actions"
- description="useFeaturesEntry"
+ description="Frequently used feature shortcuts"
  >
  <div className="space-y-1">
  <ActionRow
  href="/dashboard/workflows/new"
- label="CreateWorkflow"
- description="BuildAutomationTaskFlow"
+ label="Create Workflow"
+ description="Build an automated task flow"
  />
  <ActionRow
  href="/dashboard/template-gallery"
  label="Template Gallery"
- description="fromPresetTemplateQuickStart"
+ description="Quick start from preset templates"
  />
  <ActionRow
  href="/dashboard/creative/generate"
- label="GenerateContent"
- description="AI AuxiliaryCopyCreative"
+ label="Generate Content"
+ description="AI-assisted copywriting and creative content"
  />
  <ActionRow
  href="/dashboard/my-agents"
- label="I's Agent"
- description="ManagePublished's Agent"
+ label="My Agents"
+ description="Manage your published agents"
  />
  </div>
  </SettingsSection>
@@ -280,8 +280,8 @@ export default function DashboardPage() {
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  {/* RecentWorkflow */}
  <SettingsSection
- title="RecentWorkflow"
- description="RecentCreateorEdit'sWorkflow"
+ title="Recent Workflows"
+ description="Recently created or edited workflows"
  compact
  >
  {isLoading ? (
@@ -294,8 +294,8 @@ export default function DashboardPage() {
  </div>
  ) : (
  <EmptyMessage
- text="NoneWorkflow"
- action={{ label: "CreateWorkflow", href: "/dashboard/workflows/new" }}
+ text="No workflows yet"
+ action={{ label: "Create Workflow", href: "/dashboard/workflows/new" }}
  />
  )}
  {dashboardData?.recent_workflows && dashboardData.recent_workflows.length > 0 && (
@@ -304,7 +304,7 @@ export default function DashboardPage() {
  href="/dashboard/workflows"
  className="text-[12px] text-foreground-light hover:text-foreground transition-colors flex items-center gap-1"
  >
- View allWorkflow
+ View all workflows
  <ChevronRight className="w-3 h-3" />
  </Link>
  </div>
@@ -313,8 +313,8 @@ export default function DashboardPage() {
 
  {/* RecentExecute */}
  <SettingsSection
- title="RecentExecute"
- description="Recent'sWorkflowExecuteRecord"
+ title="Recent Executions"
+ description="Recent workflow execution records"
  compact
  >
  {isLoading ? (
@@ -326,7 +326,7 @@ export default function DashboardPage() {
  ))}
  </div>
  ) : (
- <EmptyMessage text="NoneExecuteRecord" />
+ <EmptyMessage text="No execution records yet" />
  )}
  {dashboardData?.recent_executions && dashboardData.recent_executions.length > 0 && (
  <div className="pt-3 border-t border-border mt-3">
@@ -334,7 +334,7 @@ export default function DashboardPage() {
  href="/dashboard/executions"
  className="text-[12px] text-foreground-light hover:text-foreground transition-colors flex items-center gap-1"
  >
- View allExecuteRecord
+ View all execution records
  <ChevronRight className="w-3 h-3" />
  </Link>
  </div>
@@ -346,8 +346,8 @@ export default function DashboardPage() {
  {/* ResourceUsage */}
  <section id="usage" className="scroll-mt-6 mt-6">
  <SettingsSection
- title="ResourceUsage"
- description="Token and API CallStatistics"
+ title="Resource Usage"
+ description="Token and API call statistics"
  >
  <div className="space-y-4">
  {/* Token Usage */}
@@ -365,19 +365,19 @@ export default function DashboardPage() {
  <div className="pt-4 border-t border-border">
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <UsageMetric
- label="TodayCall"
+ label="Today's Calls"
  value={dashboardData.api_usage_stats.calls_today}
  />
  <UsageMetric
- label="currentweeksCall"
+ label="This Week's Calls"
  value={dashboardData.api_usage_stats.calls_this_week}
  />
  <UsageMetric
- label="AverageLatency"
+ label="Avg Latency"
  value={`${dashboardData.api_usage_stats.avg_latency_ms}ms`}
  />
  <UsageMetric
- label="QuotaUsage"
+ label="Quota Usage"
  value={`${dashboardData.api_usage_stats.usage_percent.toFixed(1)}%`}
  highlight={dashboardData.api_usage_stats.usage_percent > 80}
  />
@@ -456,8 +456,8 @@ function StatusRow({ label, description, status, isLoading }: StatusRowProps) {
  healthy: { color: "bg-brand-500", text: "Normal" },
  degraded: { color: "bg-warning", text: "Exception" },
  down: { color: "bg-destructive", text: "Fault" },
- busy: { color: "bg-warning", text: "" },
- overloaded: { color: "bg-destructive", text: "past" },
+ busy: { color: "bg-warning", text: "Busy" },
+ overloaded: { color: "bg-destructive", text: "Overloaded" },
  };
  const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.healthy;
 
@@ -545,7 +545,7 @@ function WorkflowRow({ workflow }: { workflow: WorkflowSummary }) {
  <div className="flex-1 min-w-0">
  <div className="text-[12px] font-medium text-foreground truncate">{workflow.name}</div>
  <div className="text-[11px] text-foreground-muted">
- {workflow.run_count} timesRun
+ {workflow.run_count} runs
  {workflow.success_rate > 0 && ` · ${workflow.success_rate.toFixed(0)}% Success`}
  </div>
  </div>
@@ -614,7 +614,7 @@ function UsageBar({ label, used, limit, unit = "" }: UsageBarProps) {
  />
  </div>
  <div className="text-[10px] text-foreground-muted mt-1">
- {percent.toFixed(1)}% alreadyUsage
+ {percent.toFixed(1)}% used
  </div>
  </div>
  );

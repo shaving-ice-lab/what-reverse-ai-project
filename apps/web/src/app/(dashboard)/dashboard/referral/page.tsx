@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * InviteFriendsPage - Supabase Style
- * RecommendedRewardsSystem
+ * Invite Friends Page - Supabase Style
+ * Referral Rewards System
  */
 
 import { useState } from "react";
@@ -37,14 +37,14 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// RewardsRule
+// Rewards Rules
 
 const rewardRules = [
 
  {
- title: "InviteSign Up",
+ title: "Invite and sign up",
 
- description: "FriendsViayou'sLinkSign Up",
+ description: "Friends sign up via your link",
 
  yourReward: "500 Credits",
 
@@ -55,22 +55,22 @@ const rewardRules = [
  },
 
  {
- title: "FriendsUpgrade",
+ title: "Friends upgrade",
 
- description: "FriendsUpgradeasPaidUser",
+ description: "Friends upgrade as paid user",
 
  yourReward: "¥50 Cash",
 
- friendReward: "months 8 ",
+ friendReward: "8 Months Free",
 
  icon: Star,
 
  },
 
  {
- title: "ContinuousRewards",
+ title: "Continuous rewards",
 
- description: "FriendseachmonthsRenew",
+ description: "Friends renew each month",
 
  yourReward: "10% Split",
 
@@ -82,7 +82,7 @@ const rewardRules = [
 
 ];
 
-// InviteStatistics
+// Invite Statistics
 
 const referralStats = {
  totalInvited: 12,
@@ -100,28 +100,28 @@ const referralStats = {
 
 const statCards = [
  {
- label: "alreadyInvite",
+ label: "Invited",
  value: referralStats.totalInvited,
- helper: `${referralStats.registered} alreadySign Up`,
+ helper: `${referralStats.registered} signed up`,
  icon: Users,
  },
  {
- label: "alreadyUpgrade",
+ label: "Upgraded",
  value: referralStats.upgraded,
- helper: "PaidUser",
+ helper: "Paid user",
  icon: Star,
  },
  {
- label: "CumulativeRevenue",
+ label: "Cumulative revenue",
  value: `¥${referralStats.totalEarnings.toFixed(0)}`,
- helper: `+¥${referralStats.pendingEarnings.toFixed(0)} pendingDistribute`,
+ helper: `+¥${referralStats.pendingEarnings.toFixed(0)} pending distribution`,
  icon: DollarSign,
  highlight: true,
  },
  {
- label: "CreditsBalance",
+ label: "Credits balance",
  value: referralStats.currentPoints.toLocaleString(),
- helper: "canRedeem API Call",
+ helper: "Redeemable for API calls",
  icon: Sparkles,
  highlight: true,
  },
@@ -135,18 +135,18 @@ const shareChannels = [
 
 const redeemOptions = [
  {
- title: "1000 times API Call",
+ title: "1,000 API Calls",
  cost: "2000 Credits",
  icon: Zap,
  },
  {
- title: "Pro Plan 1 months",
+ title: "Pro Plan 1 Month",
  cost: "10000 Credits",
  icon: Crown,
  },
 ];
 
-// InviteRecord
+// Invite Records
 
 const referralHistory = [
 
@@ -221,7 +221,7 @@ const referralHistory = [
 
  registeredAt: "2026-01-30",
 
- reward: "pendingDistribute",
+ reward: "Pending",
 
  },
 
@@ -243,21 +243,21 @@ const leaderboard = [
 
 ];
 
-// FetchStatusConfig
+// Get Status Config
 
 const getStatusConfig = (status: string) => {
  switch (status) {
  case "upgraded":
 
- return { label: "alreadyUpgrade", variant: "success" as const };
+ return { label: "Upgraded", variant: "success" as const };
 
  case "registered":
 
- return { label: "alreadySign Up", variant: "secondary" as const };
+ return { label: "Signed Up", variant: "secondary" as const };
 
  case "pending":
 
- return { label: "pendingConfirm", variant: "outline" as const };
+ return { label: "Pending", variant: "outline" as const };
 
  default:
 
@@ -277,7 +277,7 @@ export default function ReferralPage() {
 
  const referralLink = `https://reverseai.com/r/${referralCode}`;
 
- // CopyLink
+ // Copy Link
 
  const handleCopy = () => {
  navigator.clipboard.writeText(referralLink);
@@ -288,7 +288,7 @@ export default function ReferralPage() {
 
  };
 
- // SendInvite
+ // Send Invite
 
  const handleSendInvite = async () => {
  if (!inviteEmail) return;
@@ -303,7 +303,7 @@ export default function ReferralPage() {
 
  };
 
- // CalculateProgress
+ // Calculate Progress
 
  const milestoneTarget = 10;
 
@@ -318,8 +318,8 @@ export default function ReferralPage() {
  <div className="page-section space-y-8">
  <PageHeader
  eyebrow="Referral"
- title="InviteFriends, ShareRewards"
- description="InviteFriendsJoin ReverseAI, methodcanObtainCredits, CashRewardsandmore'sCallQuota."
+ title="Invite Friends, Share Rewards"
+ description="Invite friends to join ReverseAI and earn credits, cash rewards and more call quota."
  icon={<Gift className="w-4 h-4" />}
  className="mb-0"
  actions={(
@@ -329,11 +329,11 @@ export default function ReferralPage() {
  size="sm"
  className="gap-1.5 border-border text-foreground-light hover:text-foreground"
  >
- ViewRule
+ View Rules
  <ExternalLink className="w-4 h-4" />
  </Button>
  <Button variant="ghost" size="sm" className="text-foreground-muted">
- InviteRecord
+ Invite Records
  <ArrowRight className="w-4 h-4" />
  </Button>
  </div>
@@ -343,8 +343,8 @@ export default function ReferralPage() {
  <div className="page-panel p-5">
  <div className="flex items-start justify-between gap-4">
  <div>
- <p className="text-sm font-medium text-foreground">ExclusiveInvite Link</p>
- <p className="text-xs text-foreground-muted mt-1">InviteFriendsSign Upafter, SystemAutoRecordRewards</p>
+ <p className="text-sm font-medium text-foreground">Exclusive Invite Link</p>
+ <p className="text-xs text-foreground-muted mt-1">After friends sign up, the system will record rewards automatically</p>
  </div>
  <Badge variant="outline" size="sm" className="font-mono text-[11px]">
  {referralCode}
@@ -363,7 +363,7 @@ export default function ReferralPage() {
  <div className="flex gap-2">
  <Button size="lg" onClick={handleCopy} className="sm:min-w-[120px]">
  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
- {copied ? "alreadyCopy": "Copy"}
+ {copied ? "Copied": "Copy"}
  </Button>
  <Button variant="outline" size="icon-lg" className="border-border">
  <QrCode className="w-4 h-4" />
@@ -372,7 +372,7 @@ export default function ReferralPage() {
  </div>
 
  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
- <span className="text-xs text-foreground-muted">Shareto</span>
+ <span className="text-xs text-foreground-muted">Share to</span>
  {shareChannels.map((channel) => {
  const Icon = channel.icon;
  return (
@@ -414,9 +414,9 @@ export default function ReferralPage() {
 
  <div className="space-y-4">
  <div className="flex flex-wrap items-center justify-between gap-2">
- <h2 className="text-sm font-medium text-foreground">RewardsRule</h2>
+ <h2 className="text-sm font-medium text-foreground">Reward Rules</h2>
  <Button variant="ghost" size="sm" className="text-foreground-muted">
- CompleteRule
+ Full Rules
  <ExternalLink className="w-4 h-4" />
  </Button>
  </div>
@@ -446,11 +446,11 @@ export default function ReferralPage() {
 
  <div className="mt-4 space-y-2 text-[13px]">
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">youObtain</span>
+ <span className="text-foreground-light">You Get</span>
  <span className="font-medium text-brand-500">{rule.yourReward}</span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-foreground-light">FriendsObtain</span>
+ <span className="text-foreground-light">Friends Get</span>
  <span className="font-medium text-foreground">{rule.friendReward}</span>
  </div>
  </div>
@@ -464,13 +464,13 @@ export default function ReferralPage() {
  <div className="space-y-6">
  <Tabs defaultValue="history">
  <div className="flex flex-wrap items-center justify-between gap-2">
- <h2 className="text-sm font-medium text-foreground">InviteRecord</h2>
+ <h2 className="text-sm font-medium text-foreground">Invite Records</h2>
  <TabsList variant="underline" showIndicator className="border-border">
  <TabsTrigger value="history" variant="underline">
- HistoryRecord
+ History
  </TabsTrigger>
  <TabsTrigger value="invite" variant="underline">
- EmailInvite
+ Email Invite
  </TabsTrigger>
  </TabsList>
  </div>
@@ -488,7 +488,7 @@ export default function ReferralPage() {
  <tr>
  <th className="px-4 py-3 text-table-header">Friends</th>
  <th className="px-4 py-3 text-table-header">Status</th>
- <th className="px-4 py-3 text-table-header">Sign UpTime</th>
+ <th className="px-4 py-3 text-table-header">Sign Up Date</th>
  <th className="px-4 py-3 text-table-header text-right">Rewards</th>
  </tr>
  </thead>
@@ -539,9 +539,9 @@ export default function ReferralPage() {
  <Mail className="w-4 h-4 text-foreground-light" />
  </div>
  <div>
- <h3 className="text-sm font-medium text-foreground">ViaEmailInviteFriends</h3>
+ <h3 className="text-sm font-medium text-foreground">Invite friends via email</h3>
  <p className="text-xs text-foreground-muted">
- SupportBatchInvite, SystemwillaseachFriendsGenerateTrackLink
+ Supports batch invites. The system will generate a tracking link for each friend.
  </p>
  </div>
  </div>
@@ -559,15 +559,15 @@ export default function ReferralPage() {
  onClick={handleSendInvite}
  disabled={!inviteEmail}
  loading={sending}
- loadingText="Send..."
+ loadingText="Sending..."
  size="lg"
  className="sm:min-w-[140px]"
  >
- SendInvite
+ Send Invite
  </Button>
  </div>
  <p className="text-xs text-foreground-muted">
- multipleEmailPleaseuseCommaSeparator, mostmultipleSupport 20 Address
+ For multiple emails, use commas to separate. Up to 20 addresses supported.
  </p>
  </div>
  </TabsContent>
@@ -582,8 +582,8 @@ export default function ReferralPage() {
  <Target className="w-4 h-4 text-brand-500" />
  </div>
  <div>
- <h3 className="text-sm font-medium text-foreground">down1in</h3>
- <p className="text-xs text-foreground-muted">eachInvite 10 FriendsUnlockRewards</p>
+ <h3 className="text-sm font-medium text-foreground">Next Milestone</h3>
+ <p className="text-xs text-foreground-muted">Invite 10 friends to unlock rewards</p>
  </div>
  </div>
  <Badge variant="primary" size="sm">
@@ -591,7 +591,7 @@ export default function ReferralPage() {
  </Badge>
  </div>
  <p className="mt-4 text-[13px] text-foreground-light">
- againInvite <span className="text-foreground font-medium">{invitesToNextReward}</span> personnowcanObtainoutsideRewards
+ Invite <span className="text-foreground font-medium">{invitesToNextReward}</span> more people to unlock the next reward
  </p>
  <div className="mt-4 space-y-2">
  <Progress value={progressToNextReward} size="sm" variant="default" />
@@ -606,7 +606,7 @@ export default function ReferralPage() {
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
  <Trophy className="w-4 h-4 text-foreground-light" />
- <h3 className="text-sm font-medium text-foreground">currentmonthsLeaderboard</h3>
+ <h3 className="text-sm font-medium text-foreground">This Month's Leaderboard</h3>
  </div>
  <Button variant="ghost" size="xs" className="text-foreground-muted">
  View all
@@ -643,7 +643,7 @@ export default function ReferralPage() {
  </Badge>
  )}
  </div>
- <p className="text-xs text-foreground-muted">{user.invites} personInvite</p>
+ <p className="text-xs text-foreground-muted">{user.invites} invites</p>
  </div>
  <span className="text-sm font-medium text-foreground">{user.reward}</span>
  </div>
@@ -654,10 +654,10 @@ export default function ReferralPage() {
  <div className="page-panel p-5">
  <div className="flex items-center gap-2">
  <Sparkles className="w-4 h-4 text-brand-500" />
- <h3 className="text-sm font-medium text-foreground">CreditsRedeem</h3>
+ <h3 className="text-sm font-medium text-foreground">Redeem Credits</h3>
  </div>
  <p className="text-xs text-foreground-muted mt-1">
- UsageCreditsRedeemCallQuotaorAdvancedPlan
+ Use credits to redeem API call quota or advanced plans
  </p>
  <div className="mt-4 space-y-2">
  {redeemOptions.map((option) => {
@@ -682,7 +682,7 @@ export default function ReferralPage() {
  })}
  </div>
  <Button variant="outline" className="w-full mt-4">
- View allRedeemOption
+ View All Redeem Options
  <ArrowRight className="w-4 h-4" />
  </Button>
  </div>

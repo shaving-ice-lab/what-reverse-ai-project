@@ -1,14 +1,14 @@
 /**
- * Tauri faceApp API Encapsulate
+ * Tauri Desktop App API Wrapper
  * 
- * Provide1's API Interface, AutoDetectRunEnvironment
- * at Web downtoStandard Web API
+ * Provides a unified API interface with automatic runtime environment detection.
+ * Falls back to standard Web APIs when running in browser.
  */
 
-// ===== EnvironmentDetect =====
+// ===== Environment Detection =====
 
 /**
- * Detectisnoat Tauri faceAppRun
+ * Detect whether running in a Tauri desktop app
  */
 export function isTauri(): boolean {
  if (typeof window === 'undefined') return false;
@@ -16,7 +16,7 @@ export function isTauri(): boolean {
 }
 
 /**
- * FetchCurrentPlatform
+ * Get the current platform
  */
 export type Platform = 'windows' | 'macos' | 'linux' | 'web';
 
@@ -55,11 +55,11 @@ export interface FileDialogOptions {
 }
 
 /**
- * OpenFileSelectDialog
+ * Open file selection dialog
  */
 export async function openFileDialog(options?: FileDialogOptions): Promise<string[] | null> {
  if (!isTauri()) {
- // Web fallback: Usage input[type=file]
+ // Web fallback: Use input[type=file]
  return new Promise((resolve) => {
  const input = document.createElement('input');
  input.type = 'file';
@@ -95,12 +95,12 @@ export async function openFileDialog(options?: FileDialogOptions): Promise<strin
 }
 
 /**
- * OpenFileSaveDialog
+ * Open File Save Dialog
  */
 export async function saveFileDialog(options?: FileDialogOptions): Promise<string | null> {
  if (!isTauri()) {
- // Web fallback: BackUserInput'sFile
- const fileName = prompt('Please enterFile', options?.defaultPath || 'untitled');
+ // Web fallback: Prompt user for file name
+ const fileName = prompt('Please enter a file name', options?.defaultPath || 'untitled');
  return fileName;
  }
  
@@ -117,7 +117,7 @@ export async function saveFileDialog(options?: FileDialogOptions): Promise<strin
 }
 
 /**
- * ReadFileContent
+ * Read file content
  */
 export async function readFile(path: string): Promise<string | null> {
  if (!isTauri()) {
@@ -135,11 +135,11 @@ export async function readFile(path: string): Promise<string | null> {
 }
 
 /**
- * enterFileContent
+ * Write file content
  */
 export async function writeFile(path: string, contents: string): Promise<boolean> {
  if (!isTauri()) {
- // Web fallback: DownloadFile
+ // Web fallback: Download file
  const blob = new Blob([contents], { type: 'text/plain' });
  const url = URL.createObjectURL(blob);
  const a = document.createElement('a');
@@ -169,11 +169,11 @@ export interface NotificationOptions {
 }
 
 /**
- * SendSystemNotifications
+ * Send system notification
  */
 export async function sendNotification(options: NotificationOptions): Promise<boolean> {
  if (!isTauri()) {
- // Web fallback: Usage Web Notifications API
+ // Web fallback: Use Web Notifications API
  if (!('Notification' in window)) return false;
  
  const permission = await Notification.requestPermission();
@@ -202,7 +202,7 @@ export async function sendNotification(options: NotificationOptions): Promise<bo
 // ===== Shell API =====
 
 /**
- * atDefaultBrowseOpen URL
+ * Open URL in default browser
  */
 export async function openInBrowser(url: string): Promise<boolean> {
  if (!isTauri()) {
@@ -230,15 +230,15 @@ export interface HttpRequestOptions {
 }
 
 /**
- * Send HTTP Request (past CORS)
+ * Send HTTP request (bypasses CORS in Tauri)
  */
 export async function httpRequest<T = unknown>(
  url: string,
  options?: HttpRequestOptions
 ): Promise<T | null> {
  if (!isTauri()) {
- // Web fallback: Usage fetch
- try {
+    // Web fallback: Use fetch
+    try {
  const response = await fetch(url, {
  method: options?.method || 'GET',
  headers: options?.headers,
@@ -269,7 +269,7 @@ export async function httpRequest<T = unknown>(
 // ===== Storage API =====
 
 /**
- * LocalStorage (Usage Tauri Store or localStorage)
+ * Local storage (uses Tauri Store or localStorage)
  */
 export const storage = {
  async get<T = unknown>(key: string): Promise<T | null> {
@@ -325,7 +325,7 @@ export const storage = {
 // ===== Tauri Commands =====
 
 /**
- * Call Tauri afterendpointCommand
+ * Call Tauri backend command
  */
 export async function invokeCommand<T = unknown>(
  command: string,
@@ -345,20 +345,20 @@ export async function invokeCommand<T = unknown>(
  }
 }
 
-// ===== EventSystem =====
+// ===== Event System =====
 
 type EventCallback<T> = (payload: T) => void;
 
 /**
- * Listen Tauri Event
+ * Listen to Tauri event
  */
 export async function listenEvent<T = unknown>(
  event: string,
  callback: EventCallback<T>
 ): Promise<() => void> {
  if (!isTauri()) {
- // Web fallback: Usage CustomEvent
- const handler = (e: Event) => {
+    // Web fallback: Use CustomEvent
+    const handler = (e: Event) => {
  callback((e as CustomEvent).detail as T);
  };
  window.addEventListener(event, handler);
@@ -377,15 +377,15 @@ export async function listenEvent<T = unknown>(
 }
 
 /**
- * Send Tauri Event
+ * Emit Tauri event
  */
 export async function emitEvent<T = unknown>(
  event: string,
  payload?: T
 ): Promise<boolean> {
  if (!isTauri()) {
- // Web fallback: Usage CustomEvent
- window.dispatchEvent(new CustomEvent(event, { detail: payload }));
+    // Web fallback: Use CustomEvent
+    window.dispatchEvent(new CustomEvent(event, { detail: payload }));
  return true;
  }
  
@@ -398,6 +398,6 @@ export async function emitEvent<T = unknown>(
  }
 }
 
-// ===== ExportType =====
+// ===== Export Types =====
 
 export type { FileDialogOptions, NotificationOptions, HttpRequestOptions };

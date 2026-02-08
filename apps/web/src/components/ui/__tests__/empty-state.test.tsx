@@ -1,5 +1,5 @@
 /**
- * EmptyState ComponentTest
+ * Empty State Component Test
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -13,17 +13,17 @@ import {
 } from "../empty-state";
 
 describe("EmptyState", () => {
- it("ShouldcurrentlyRenderTitle", () => {
- render(<EmptyState title="NoData" />);
- expect(screen.getByText("NoData")).toBeInTheDocument();
+ it("Should render title correctly", () => {
+ render(<EmptyState title="No Data" />);
+ expect(screen.getByText("No Data")).toBeInTheDocument();
  });
 
- it("ShouldRenderDescriptionText", () => {
- render(<EmptyState title="Title" description="thisisDescription" />);
- expect(screen.getByText("thisisDescription")).toBeInTheDocument();
+ it("Should render description text", () => {
+ render(<EmptyState title="Title" description="This is a description" />);
+ expect(screen.getByText("This is a description")).toBeInTheDocument();
  });
 
- it("ShouldRenderActionButton", () => {
+ it("Should render action button", () => {
  const handleClick = vi.fn();
  render(
  <EmptyState
@@ -39,26 +39,26 @@ describe("EmptyState", () => {
  expect(handleClick).toHaveBeenCalledTimes(1);
  });
 
- it("ShouldRendertimesneedActionButton", () => {
+ it("Should render multiple action buttons", () => {
  const handlePrimary = vi.fn();
  const handleSecondary = vi.fn();
  render(
  <EmptyState
  title="Empty State"
- action={{ label: "mainneed", onClick: handlePrimary }}
- secondaryAction={{ label: "timesneed", onClick: handleSecondary }}
+ action={{ label: "Primary", onClick: handlePrimary }}
+ secondaryAction={{ label: "Secondary", onClick: handleSecondary }}
  />
  );
 
- expect(screen.getByRole("button", { name: /mainneed/ })).toBeInTheDocument();
- expect(screen.getByRole("button", { name: "timesneed" })).toBeInTheDocument();
+ expect(screen.getByRole("button", { name: /Primary/ })).toBeInTheDocument();
+ expect(screen.getByRole("button", { name: "Secondary" })).toBeInTheDocument();
  });
 
- it("ShouldAppnot'sDimension", () => {
+ it("Should apply correct dimensions", () => {
  const { rerender } = render(
  <EmptyState title="Test" size="sm" />
  );
- // EmptyState outside div has size forshould's padding class
+ // EmptyState container should have padding class based on size
  expect(screen.getByText("Test").closest("div[class*='py-']")).toBeTruthy();
 
  // sm -> py-8, md -> py-12, lg -> py-16
@@ -75,66 +75,66 @@ describe("EmptyState", () => {
 });
 
 describe("SearchEmpty", () => {
- it("ShouldDisplaySearch", () => {
- render(<SearchEmpty query="TestKeywords" />);
- expect(screen.getByText(/Noto.*TestKeywords/)).toBeInTheDocument();
+ it("Should display search query", () => {
+ render(<SearchEmpty query="Test Keywords" />);
+ expect(screen.getByText(/Test Keywords/)).toBeInTheDocument();
  });
 
- it("ShouldDisplayClearButton", () => {
+ it("Should display clear button", () => {
  const handleClear = vi.fn();
  render(<SearchEmpty query="Test" onClear={handleClear} />);
 
- const button = screen.getByRole("button", { name: /ClearSearch/ });
+ const button = screen.getByRole("button", { name: /Clear Search/ });
  fireEvent.click(button);
  expect(handleClear).toHaveBeenCalledTimes(1);
  });
 });
 
 describe("WorkflowEmpty", () => {
- it("ShouldcurrentlyRender", () => {
+ it("Should render correctly", () => {
  render(<WorkflowEmpty />);
- expect(screen.getByText("Not yetWorkflow")).toBeInTheDocument();
+ expect(screen.getByText("No Workflows Yet")).toBeInTheDocument();
  });
 
- it("ShouldDisplayCreateButton", () => {
+ it("Should display create button", () => {
  const handleCreate = vi.fn();
  render(<WorkflowEmpty onCreateClick={handleCreate} />);
 
- const button = screen.getByRole("button", { name: /CreateWorkflow/ });
+ const button = screen.getByRole("button", { name: /Create Workflow/ });
  fireEvent.click(button);
  expect(handleCreate).toHaveBeenCalledTimes(1);
  });
 });
 
 describe("ApiKeyEmpty", () => {
- it("ShouldcurrentlyRender", () => {
+ it("Should render correctly", () => {
  render(<ApiKeyEmpty />);
- expect(screen.getByText("Not yet API Key")).toBeInTheDocument();
+ expect(screen.getByText("No API Keys Yet")).toBeInTheDocument();
  });
 
- it("ShouldDisplayAddButton", () => {
+ it("Should display add button", () => {
  const handleAdd = vi.fn();
  render(<ApiKeyEmpty onAddClick={handleAdd} />);
 
- const button = screen.getByRole("button", { name: /AddKey/ });
+ const button = screen.getByRole("button", { name: /Add Key/ });
  fireEvent.click(button);
  expect(handleAdd).toHaveBeenCalledTimes(1);
  });
 });
 
 describe("ErrorEmpty", () => {
- it("ShouldDisplayDefaultErrorMessage", () => {
+ it("Should display default error message", () => {
  render(<ErrorEmpty />);
- expect(screen.getByText("LoadFailed")).toBeInTheDocument();
+ expect(screen.getByText("Loading Failed")).toBeInTheDocument();
  });
 
- it("ShouldDisplayCustomErrorMessage", () => {
- render(<ErrorEmpty title="CustomError" description="DetailedDescription" />);
- expect(screen.getByText("CustomError")).toBeInTheDocument();
- expect(screen.getByText("DetailedDescription")).toBeInTheDocument();
+ it("Should display custom error message", () => {
+ render(<ErrorEmpty title="Custom Error" description="Detailed Description" />);
+ expect(screen.getByText("Custom Error")).toBeInTheDocument();
+ expect(screen.getByText("Detailed Description")).toBeInTheDocument();
  });
 
- it("ShouldDisplayRetryButton", () => {
+ it("Should display retry button", () => {
  const handleRetry = vi.fn();
  render(<ErrorEmpty onRetry={handleRetry} />);
 

@@ -28,85 +28,85 @@ import { cn } from "@/lib/utils";
 
 // FAQ Category
 const categories = [
- { id: "all", name: "allsection", icon: HelpCircle },
- { id: "getting-started", name: "Getting StartedUsage", icon: Zap },
- { id: "billing", name: "BillingandSubscription", icon: CreditCard },
- { id: "security", name: "SecurityandPrivacy", icon: Shield },
- { id: "technical", name: "TechnologyIssue", icon: Settings },
- { id: "troubleshooting", name: "Fault", icon: AlertTriangle },
+ { id: "all", name: "All", icon: HelpCircle },
+ { id: "getting-started", name: "Getting Started", icon: Zap },
+ { id: "billing", name: "Billing & Subscription", icon: CreditCard },
+ { id: "security", name: "Security & Privacy", icon: Shield },
+ { id: "technical", name: "Technical Issues", icon: Settings },
+ { id: "troubleshooting", name: "Troubleshooting", icon: AlertTriangle },
 ];
 
 // FAQ Data
 const faqs = [
  {
  category: "getting-started",
- question: "Whatis AgentFlow?",
- answer: "AgentFlow is1 AI Driven'sWorkflowAutomationPlatform, HelpUserViacanvisualEditandSmart AI Agent QuickBuild, DeployandManageAutomationWorkflow.NoneneedProgramming, nowcanImplementComplex'sBusinessAutomation.",
+ question: "What is AgentFlow?",
+ answer: "AgentFlow is an AI-driven workflow automation platform that helps users quickly build, deploy, and manage automated workflows through a visual editor and smart AI agents. No programming required — you can implement complex business automation right away.",
  },
  {
  category: "getting-started",
- question: "ifwhatStartUsage AgentFlow?",
- answer: "StartUsageVerySimple: 1. Sign UpFreeAccount; 2. atTemplateMarketplaceSelect1Template, orfromStartCreateWorkflow; 3. UsagecanvisualEditConfigWorkflowNode; 4. SettingsTriggerConditionandActivateWorkflow.WestillProvideDetailed'sDocumentandVideoTutorialHelpyouQuickon.",
+ question: "How do I start using AgentFlow?",
+ answer: "Getting started is easy: 1. Sign up for a free account; 2. Choose a template from the Template Marketplace or create a workflow from scratch; 3. Use the visual editor to configure workflow nodes; 4. Set trigger conditions and activate your workflow. We also provide detailed documentation and video tutorials to help you get started quickly.",
  },
  {
  category: "getting-started",
- question: "needneedProgramming??",
- answer: "notneedneed.AgentFlow Providecanvisual'sDrag & DropEdit, NoneneedWritewhatCodenowcanCreateComplex'sWorkflow., ifresultyouhasProgrammingBackground, canwithUsageWe's API and SDK ProceedmoreAdvanced'sCustomize.",
+ question: "Do I need programming skills?",
+ answer: "Not at all. AgentFlow provides a visual drag & drop editor so you can create complex workflows without writing any code. However, if you have programming experience, you can use our API and SDK for more advanced customization.",
  },
  {
  category: "billing",
- question: "canwithFreeuse??",
- answer: "is's!ProfessionalversionandTeamversionallProvide 14 daysFreeuse, NoneneedBinduse.usebetweenyoucanwithExperienceAllPaidFeatures.useEndafter, youcanwithSelectSubscriptionPaidVersionorDowngradetoFreeversion.",
+ question: "Can I try it for free?",
+ answer: "Yes! Both the Professional and Team plans offer a 14-day free trial with no credit card required. During the trial you can experience all paid features. After the trial ends, you can choose to subscribe to a paid plan or downgrade to the free version.",
  },
  {
  category: "billing",
- question: "SupportWhichPaymentmethod?",
- answer: "WeSupportmultipletypePaymentmethod: use(Visa, MasterCard, American Express), Payment, WeChatPayment, Enterprisefor(EnterpriseCustomer).AllPaymentViaSecurity'sThird-partyPaymentPlatformProcess.",
+ question: "What payment methods do you support?",
+ answer: "We support multiple payment methods: credit cards (Visa, MasterCard, American Express), Alipay, WeChat Pay, and bank transfers (for enterprise customers). All payments are processed through secure third-party payment platforms.",
  },
  {
  category: "billing",
- question: "ifwhatUnsubscribe?",
- answer: "youcanwithAnytimeUnsubscribe, NoneneedPaymentwhatCancelCost.Cancelafter, you'sPaidFeatureswillatCurrentBillingweeksEndafterStop, AccountwillAutoDowngradetoFreeVersion.you'sDatawillbyRetain, ifneedDeletePleaseContact Us.",
+ question: "How do I cancel my subscription?",
+ answer: "You can cancel your subscription at any time with no cancellation fees. After cancellation, your paid features will remain active until the end of the current billing cycle, and your account will automatically downgrade to the free plan. Your data will be retained — if you need it deleted, please contact us.",
  },
  {
  category: "security",
- question: "DataSecurityifwhatAssurance?",
- answer: "DataSecurityisWe'sneedTask.WemultipleSecurityMeasure: AllDataTransferUsage TLS Encrypt, SensitiveDataUsage AES-256 EncryptStorage, SOC 2 Type II Authentication, GDPR Compliance, PeriodicSecurityAuditandPenetrationTest, Strict'sInternalAccessControl.",
+ question: "How is data security ensured?",
+ answer: "Data security is our top priority. We implement multiple security measures: all data transfers use TLS encryption, sensitive data is stored with AES-256 encryption, SOC 2 Type II certification, GDPR compliance, regular security audits and penetration testing, and strict internal access controls.",
  },
  {
  category: "security",
- question: "DataStorageatin?",
- answer: "We'sDatacenteratin, UsageinandTencent Cloud'sBasicInfrastructure.forathasSpecialComplianceneed'sEnterpriseCustomer, WeProvidePrivateDeployOption, DatacanwithStorageatyouSelf'sServiceon.",
+ question: "Where is data stored?",
+ answer: "Our data centers are located in China, using Alibaba Cloud and Tencent Cloud infrastructure. For enterprise customers with special compliance requirements, we offer private deployment options where data can be stored on your own servers.",
  },
  {
  category: "technical",
- question: "SupportWhichIntegration?",
- answer: "WeSupport 100+ mainService'sIntegration, Include: Newsletter(Slack, Feishu, DingTalk, WeChat), itemManage(Notion, Asana, Jira, Linear), DevelopmentTool(GitHub, GitLab, Vercel), Database(MySQL, PostgreSQL, MongoDB), AI Service(OpenAI, Anthropic, Tongyi1000).stillSupportCustom Webhook and API Integration.",
+ question: "What integrations are supported?",
+ answer: "We support 100+ integrations with major services, including: Messaging (Slack, Feishu, DingTalk, WeChat), Project Management (Notion, Asana, Jira, Linear), Development Tools (GitHub, GitLab, Vercel), Databases (MySQL, PostgreSQL, MongoDB), AI Services (OpenAI, Anthropic, Qwen). We also support custom Webhook and API integrations.",
  },
  {
  category: "technical",
- question: "has API Limit??",
- answer: "is's, notVersionhasnot's API Limit: Freeversion 100 times/min, Professionalversion 500 times/min, Teamversion 2000 times/min, EnterpriseCustomLimit.ifresultyouneedneedmore'sLimit, PleaseContact Us'sSalesTeam.",
+ question: "Are there API rate limits?",
+ answer: "Yes, each plan has different API rate limits: Free plan — 100 requests/min, Professional — 500 requests/min, Team — 2,000 requests/min, Enterprise — custom limits. If you need higher limits, please contact our sales team.",
  },
  {
  category: "troubleshooting",
- question: "WorkflowExecuteFailedifwhatQuick?",
- answer: "SuggestionfirstViewExecuteRecord'sFailedNodeandErrorInfo, ConfirmInputParameterisnoMissingorInvalid format, againCheckTargetApp'sAccessPolicyandQuota.needtimeReduceConcurrencyorEnableRetrywithShortenRestoreTime.",
+ question: "What should I do when a workflow execution fails?",
+ answer: "We recommend first checking the execution log for the failed node and error details, confirming that input parameters are not missing or in an invalid format, and then checking the target app's access policies and quotas. If needed, try reducing concurrency or enabling retry to shorten recovery time.",
  },
  {
  category: "troubleshooting",
- question: "Webhook nottoEventCallback?",
- answer: "Please confirm Webhook URL canAccessandnot yetbyFirewallIntercept, forBioKeyandEventTypeisnoMatch, againUsageTestEventTrigger.alsocanatLogsViewCallbackFailedReason.",
+ question: "Why isn't my Webhook receiving event callbacks?",
+ answer: "Please confirm your Webhook URL is accessible and not blocked by a firewall, verify that the signing key and event type are correctly configured, and try using a test event to trigger it. You can also check the logs for callback failure reasons.",
  },
  {
  category: "troubleshooting",
- question: "RuntimeTipRate LimitingorTimeoutifwhatProcess?",
- answer: "PriorityCheckAccessrateisnoExceedCurrentPlanQuota, needtimeAdjust rate_limit PolicyorUpgradePlan.timecanfewConcurrencyorEnableRetrycomeTimeout.",
+ question: "How do I handle rate limiting or timeout errors?",
+ answer: "First check whether your request rate exceeds your current plan's quota. If needed, adjust your rate limit policy or upgrade your plan. You can also reduce concurrency or enable automatic retry to handle timeout issues.",
  },
  {
  category: "troubleshooting",
- question: "ifwhatSubmitTicketandTrackResponse SLA?",
- answer: "EnterSupportcenterSubmitTicket, SystemwillAutoTierandtoResponse SLA.youcanwithatTicketViewEstimatedResponse TimeandCurrentStatus.",
+ question: "How do I submit a ticket and track the response SLA?",
+ answer: "Go to the Support Center to submit a ticket. The system will automatically assign a priority tier and corresponding response SLA. You can view the estimated response time and current status directly in your ticket.",
  },
 ];
 
@@ -142,14 +142,14 @@ export default function FAQPage() {
  FAQ
  </h1>
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- Quicktoyouneedneed'sAnswer
+ Quickly find the answers you need
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchIssue..."
+ placeholder="Search questions..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-12 h-12 rounded-full bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter"
@@ -188,10 +188,10 @@ export default function FAQPage() {
  <div className="text-center py-16">
  <HelpCircle className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
  <h3 className="text-[15px] font-medium text-foreground mb-2">
- NotoRelatedIssue
+ No matching questions found
  </h3>
  <p className="text-[13px] text-foreground-lighter">
- TryUsageotherheKeywordsSearch
+ Try searching with different keywords
  </p>
  </div>
  ) : (
@@ -241,21 +241,21 @@ export default function FAQPage() {
  <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
  <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-4">
- stillhasotherheIssue?
+ Still have questions?
  </h2>
  <p className="text-foreground-light mb-8">
- Contact Us'sSupportTeamFetchHelp
+ Contact our support team for help
  </p>
  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
  <Link href="/contact">
  <Button className="h-12 px-8 rounded-full text-[15px] font-medium bg-foreground text-background hover:bg-foreground/90">
  <MessageSquare className="w-4 h-4 mr-2" />
- ContactSupport
+ Contact Support
  </Button>
  </Link>
  <Link href="/docs">
  <Button variant="outline" className="h-12 px-8 rounded-full text-[15px] border-border/50 hover:bg-surface-200/50">
- ViewDocument
+ View Documentation
  </Button>
  </Link>
  </div>

@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * FilterSidebarComponent
+ * Filter Sidebar Component
  * 
- * ProvideCategory, Price, RatingetcmultipleFilterFeatures
+ * Provides Category, Price, Rating, and other filter features
  */
 
 import { useState } from "react";
@@ -28,56 +28,56 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { AgentCategory, PricingType } from "@/types/agent";
 
-// CategoryConfig
+// Category Config
 const categoryOptions: Array<{
  id: AgentCategory;
  label: string;
  icon: typeof MessageSquare;
 }> = [
- { id: "content", label: "ContentCreative", icon: FileText },
- { id: "data", label: "DataProcess", icon: BarChart3 },
- { id: "customer", label: "CustomerService", icon: MessageSquare },
- { id: "productivity", label: "Officerate", icon: Users },
- { id: "developer", label: "DevelopmentTool", icon: Code2 },
- { id: "research", label: "ResearchAnalytics", icon: Globe },
- { id: "education", label: "EducationLearn", icon: GraduationCap },
- { id: "finance", label: "FinanceFinance", icon: Wallet },
- { id: "marketing", label: "MarketplaceMarketing", icon: TrendingUp },
- { id: "other", label: "otherhe", icon: Sparkles },
+ { id: "content", label: "Content & creative", icon: FileText },
+ { id: "data", label: "Data process", icon: BarChart3 },
+ { id: "customer", label: "Customer service", icon: MessageSquare },
+ { id: "productivity", label: "Office & Productivity", icon: Users },
+ { id: "developer", label: "Development tools", icon: Code2 },
+ { id: "research", label: "Research & analytics", icon: Globe },
+ { id: "education", label: "Education & Learning", icon: GraduationCap },
+ { id: "finance", label: "Finance", icon: Wallet },
+ { id: "marketing", label: "Marketplace & marketing", icon: TrendingUp },
+ { id: "other", label: "Other", icon: Sparkles },
 ];
 
-// PriceOption
+// Price Options
 const pricingOptions: Array<{
  id: PricingType | "all";
  label: string;
 }> = [
- { id: "all", label: "allsection" },
+ { id: "all", label: "All" },
  { id: "free", label: "Free" },
  { id: "paid", label: "Paid" },
  { id: "subscription", label: "Subscription" },
 ];
 
-// RatingOption
+// Rating Options
 const ratingOptions = [
- { id: 4.5", label: "4.5 andwithon" },
- { id: 4.0, label: "4.0 andwithon" },
- { id: 3.5, label: "3.5 andwithon" },
- { id: 3.0, label: "3.0 andwithon" },
+  { id: 4.5, label: "4.5 and above" },
+  { id: 4.0, label: "4.0 and above" },
+  { id: 3.5, label: "3.5 and above" },
+  { id: 3.0, label: "3.0 and above" },
 ];
 
 interface FilterSidebarProps {
- // CurrentFiltervalue
+ // Current Filter Values
  selectedCategories?: AgentCategory[];
  selectedPricing?: PricingType | "all";
  selectedMinRating?: number;
  
- // Callbackcount
+ // Callbacks
  onCategoryChange?: (categories: AgentCategory[]) => void;
  onPricingChange?: (pricing: PricingType | "all") => void;
  onMinRatingChange?: (rating: number | undefined) => void;
  onClearAll?: () => void;
  
- // DisplayStatistics
+ // Display Statistics
  categoryCounts?: Record<AgentCategory, number>;
  
  // style
@@ -97,7 +97,7 @@ export function FilterSidebar({
  className,
  collapsible = true,
 }: FilterSidebarProps) {
- // CollapseStatus
+ // Collapse Status
  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
  category: true,
  pricing: true,
@@ -112,7 +112,7 @@ export function FilterSidebar({
  }));
  };
 
- // SwitchCategorySelect
+ // Toggle Category Selection
  const toggleCategory = (categoryId: AgentCategory) => {
  if (!onCategoryChange) return;
  
@@ -124,7 +124,7 @@ export function FilterSidebar({
  }
  };
 
- // CalculateActiveFilterCount
+ // Calculate Active Filter Count
  const activeFilterCount =
  selectedCategories.length +
  (selectedPricing !== "all" ? 1 : 0) +
@@ -159,7 +159,7 @@ export function FilterSidebar({
  </div>
 
  <div className="space-y-6">
- {/* CategoryFilter */}
+ {/* Category Filter */}
  <div className="border-b border-border pb-6">
  <button
  onClick={() => toggleSection("category")}
@@ -213,7 +213,7 @@ export function FilterSidebar({
  )}
  </div>
 
- {/* PriceFilter */}
+ {/* Price Filter */}
  <div className="border-b border-border pb-6">
  <button
  onClick={() => toggleSection("pricing")}
@@ -265,13 +265,13 @@ export function FilterSidebar({
  )}
  </div>
 
- {/* RatingFilter */}
+ {/* Rating Filter */}
  <div>
  <button
  onClick={() => toggleSection("rating")}
  className="flex items-center justify-between w-full text-left mb-3"
  >
- <span className="text-sm font-medium text-foreground">mostRating</span>
+ <span className="text-sm font-medium text-foreground">Highest Rated</span>
  {collapsible && (
  expandedSections.rating ? (
  <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -304,7 +304,7 @@ export function FilterSidebar({
  <div className="w-2 h-2 rounded-full bg-primary" />
  )}
  </div>
- <span className="flex-1 text-left">notlimit</span>
+ <span className="flex-1 text-left">No limit</span>
  </button>
 
  {ratingOptions.map((option) => {

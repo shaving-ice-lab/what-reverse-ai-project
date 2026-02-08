@@ -2,7 +2,7 @@
 
 /**
  * Edit Agent Page
- * Supabase Style: Minimal, Professional, FormRich
+ * Supabase Style: Minimal, Professional, Form Rich
  */
 
 import { useState, useEffect } from "react";
@@ -36,12 +36,12 @@ import { cn } from "@/lib/utils";
 // Mock Agent Data
 const mockAgent = {
  id: "1",
- name: "SupportAssistant",
- description: "SmartSupportBot, canProcessFAQandProvide24/7Support",
+ name: "Support Assistant",
+ description: "Smart support bot that can handle FAQs and provide 24/7 support",
  model: "gpt-4",
  capabilities: ["chat", "analyze"],
- systemPrompt: "youis1Professional'sSupportAssistant, HelpUserResolveIssue.PleaseMaintainFriendly, Professional's, ifresulttoNoneResolve'sIssue, PleaseGuideUserContactpersonSupport.",
- welcomeMessage: "you!IisSmartSupportAssistant, hasWhatcanwithHelpyou's?",
+ systemPrompt: "You are a professional support assistant. Help users resolve issues. Please maintain a friendly, professional tone. If an issue cannot be resolved, please guide the user to contact human support.",
+ welcomeMessage: "Hello! I'm a smart support assistant. How can I help you?",
  temperature: 0.7,
  maxTokens: 2048,
  avatar: null,
@@ -50,20 +50,20 @@ const mockAgent = {
  updatedAt: "2026-01-28",
 };
 
-// AI ModelOption
+// AI Model Options
 const aiModels = [
  { id: "gpt-4", name: "GPT-4", provider: "OpenAI" },
  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI" },
  { id: "claude-3", name: "Claude 3", provider: "Anthropic" },
- { id: "qwen", name: "Tongyi1000", provider: "in" },
+ { id: "qwen", name: "Qwen", provider: "Alibaba" },
 ];
 
-// canpowerOption
+// Capability Options
 const capabilities = [
- { id: "chat", name: "Conversation", icon: MessageSquare, description: "NaturalLanguageConversation" },
- { id: "code", name: "Code", icon: Code, description: "CodeGenerateandAnalytics" },
- { id: "analyze", name: "Analytics", icon: Zap, description: "DataAnalytics" },
- { id: "search", name: "Search", icon: Eye, description: "NetworkSearch" },
+ { id: "chat", name: "Conversation", icon: MessageSquare, description: "Natural language conversation" },
+ { id: "code", name: "Code", icon: Code, description: "Code generation and analysis" },
+ { id: "analyze", name: "Analytics", icon: Zap, description: "Data analytics" },
+ { id: "search", name: "Search", icon: Eye, description: "Web search" },
 ];
 
 export default function EditAgentPage() {
@@ -73,7 +73,7 @@ export default function EditAgentPage() {
  const [hasChanges, setHasChanges] = useState(false);
  const [activeTab, setActiveTab] = useState<"basic" | "model" | "advanced">("basic");
 
- // FormStatus
+ // Form State
  const [formData, setFormData] = useState({
  name: mockAgent.name, description: mockAgent.description,
  model: mockAgent.model,
@@ -85,13 +85,13 @@ export default function EditAgentPage() {
  avatar: mockAgent.avatar,
  });
 
- // UpdateForm
+ // Update Form
  const updateForm = (field: string, value: any) => {
  setFormData((prev) => ({ ...prev, [field]: value }));
  setHasChanges(true);
  };
 
- // Switchcanpower
+ // Toggle Capability
  const toggleCapability = (id: string) => {
  setFormData((prev) => ({
  ...prev,
@@ -102,7 +102,7 @@ export default function EditAgentPage() {
  setHasChanges(true);
  };
 
- // SaveChange
+ // Save Changes
  const handleSave = async () => {
  setIsSaving(true);
  await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -112,7 +112,7 @@ export default function EditAgentPage() {
 
  // Delete Agent
  const handleDelete = () => {
- if (confirm("OKneedDeletethis Agent ??This action cannot be undone.")) {
+ if (confirm("Are you sure you want to delete this agent? This action cannot be undone.")) {
  router.push("/dashboard/my-agents");
  }
  };
@@ -147,7 +147,7 @@ export default function EditAgentPage() {
  {hasChanges && (
  <span className="text-xs text-foreground-light flex items-center gap-1">
  <AlertCircle className="w-3 h-3" />
- hasUnsaved'sChange
+ Unsaved changes
  </span>
  )}
  <Button
@@ -173,7 +173,7 @@ export default function EditAgentPage() {
  ) : (
  <>
  <Save className="w-4 h-4 mr-2" />
- SaveChange
+ Save Changes
  </>
  )}
  </Button>
@@ -187,7 +187,7 @@ export default function EditAgentPage() {
  <div className="flex gap-6">
  {[
  { id: "basic" as const, label: "Basic Info", icon: Bot },
- { id: "model" as const, label: "ModelConfig", icon: Settings },
+ { id: "model" as const, label: "Model Config", icon: Settings },
  { id: "advanced" as const, label: "Advanced Settings", icon: Shield },
  ].map((tab) => (
  <button
@@ -237,10 +237,10 @@ export default function EditAgentPage() {
  <div className="space-y-2">
  <Button variant="outline" size="sm" className="border-border text-foreground-light">
  <Upload className="w-4 h-4 mr-2" />
- UploadImage
+ Upload Image
  </Button>
  <p className="text-xs text-foreground-muted">
- Support JPG, PNG Format, SuggestionDimension 512x512
+ Supports JPG, PNG format. Recommended size: 512x512
  </p>
  </div>
  </div>
@@ -254,7 +254,7 @@ export default function EditAgentPage() {
  <Input
  value={formData.name}
  onChange={(e) => updateForm("name", e.target.value)}
- placeholder="toyou's Agent char"
+ placeholder="Your agent's name"
  className="h-9 bg-surface-200 border-border"
  />
  </div>
@@ -267,7 +267,7 @@ export default function EditAgentPage() {
  <textarea
  value={formData.description}
  onChange={(e) => updateForm("description", e.target.value)}
- placeholder="Descriptionthis Agent 'sFeaturesanduse..."
+ placeholder="Describe this agent's features and use cases..."
  rows={3}
  className="w-full px-4 py-3 rounded-md bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none text-[13px]"
  />
@@ -276,7 +276,7 @@ export default function EditAgentPage() {
  {/* Capabilities */}
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-3">
- canpowerConfig
+ Capabilities
  </label>
  <div className="page-grid sm:grid-cols-2">
  {capabilities.map((cap) => (
@@ -318,7 +318,7 @@ export default function EditAgentPage() {
 
  {/* Prompts */}
  <div className="p-5 rounded-md bg-surface-100 border border-border">
- <h3 className="text-sm font-medium text-foreground mb-6">PromptConfig</h3>
+ <h3 className="text-sm font-medium text-foreground mb-6">Prompt Configuration</h3>
  
  <div className="space-y-6">
  <div>
@@ -328,23 +328,23 @@ export default function EditAgentPage() {
  <textarea
  value={formData.systemPrompt}
  onChange={(e) => updateForm("systemPrompt", e.target.value)}
- placeholder="Definition Agent 'sRole, rowasandReplyStyle..."
+ placeholder="Define the agent's role, behavior and reply style..."
  rows={6}
  className="w-full px-4 py-3 rounded-md bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none font-mono text-[13px]"
  />
  <p className="text-xs text-foreground-muted mt-2">
- System PromptwillImpact Agent 'srowasandReplyStyle
+ The system prompt will affect the agent's behavior and reply style
  </p>
  </div>
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- WelcomeMessage
+ Welcome Message
  </label>
  <Input
  value={formData.welcomeMessage}
  onChange={(e) => updateForm("welcomeMessage", e.target.value)}
- placeholder="Agent StartConversationtime'sWelcomeMessage..."
+ placeholder="The agent's welcome message when starting a conversation..."
  className="h-9 bg-surface-200 border-border"
  />
  </div>
@@ -390,12 +390,12 @@ export default function EditAgentPage() {
  </div>
 
  <div className="p-5 rounded-md bg-surface-100 border border-border">
- <h3 className="text-sm font-medium text-foreground mb-6">ParameterSettings</h3>
+ <h3 className="text-sm font-medium text-foreground mb-6">Parameter Settings</h3>
  
  <div className="space-y-6">
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Temperature (Temperature)
+ Temperature
  <span className="ml-2 text-brand-500 font-normal">
  {formData.temperature}
  </span>
@@ -414,13 +414,13 @@ export default function EditAgentPage() {
  <span>Creative (2)</span>
  </div>
  <p className="text-xs text-foreground-muted mt-2">
- 'sTemperaturewillmoreOK'sReply, 'sTemperaturewillmoremultiplestyle'sReply
+ Lower temperature produces more deterministic replies. Higher temperature produces more creative replies.
  </p>
  </div>
 
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- Maximum Token count
+ Maximum Tokens
  </label>
  <Input
  type="number"
@@ -431,7 +431,7 @@ export default function EditAgentPage() {
  className="h-9 bg-surface-200 border-border"
  />
  <p className="text-xs text-foreground-muted mt-2">
- LimiteachtimesReply'sMaximumLength(256 - 8192)
+ Limit the maximum length of each reply (256 - 8192)
  </p>
  </div>
  </div>
@@ -443,7 +443,7 @@ export default function EditAgentPage() {
  {activeTab === "advanced" && (
  <div className="space-y-8">
  <div className="p-5 rounded-md bg-surface-100 border border-border">
- <h3 className="text-sm font-medium text-foreground mb-6">StatusManage</h3>
+ <h3 className="text-sm font-medium text-foreground mb-6">Status Management</h3>
  
  <div className="space-y-4">
  <div className="flex items-center justify-between p-4 rounded-md bg-surface-75">
@@ -455,7 +455,7 @@ export default function EditAgentPage() {
  <div>
  <div className="text-[13px] font-medium text-foreground">Agent Status</div>
  <div className="text-xs text-foreground-muted">
- {mockAgent.status === "active" ? "Run": "Paused"}
+ {mockAgent.status === "active" ? "Running": "Paused"}
  </div>
  </div>
  </div>
@@ -500,9 +500,9 @@ export default function EditAgentPage() {
 
  <div className="p-4 rounded-md bg-surface-75">
  <p className="text-xs text-foreground-muted">
- Usage Agent ID Via API Callthis Agent.
+ Use the Agent ID to call this agent via the API.
  <Link href="/docs/api" className="text-brand-500 hover:underline ml-1">
- View API Document
+ View API Docs
  </Link>
  </p>
  </div>
@@ -510,9 +510,9 @@ export default function EditAgentPage() {
  </div>
 
  <div className="p-5 rounded-md bg-surface-200 border border-border-strong">
- <h3 className="text-sm font-semibold text-foreground mb-4">DangerAction</h3>
+ <h3 className="text-sm font-semibold text-foreground mb-4">Danger Zone</h3>
  <p className="text-xs text-foreground-light mb-4">
- Delete Agent afterwillNoneRestore, AllConversationHistoryalsowillbyDelete.
+ Deleting this agent cannot be undone. All conversation history will also be deleted.
  </p>
  <Button
  variant="outline"

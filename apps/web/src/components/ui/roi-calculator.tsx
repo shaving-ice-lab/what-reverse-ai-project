@@ -1,11 +1,9 @@
 "use client";
 
 /**
- * ROICalculator - InvestmentrateCalculateComponent
-
- * 
-
- * HelpUserEstimateUsage AgentFlow after'sCostSave
+ * ROI Calculator - Return on Investment Calculator Component
+ *
+ * Helps users estimate AgentFlow usage and cost savings
  */
 
 import { useState, useMemo } from "react";
@@ -55,9 +53,9 @@ export function ROICalculator() {
  const results = useMemo(() => {
  const weeklyHours = inputs.employees * inputs.hoursPerWeek;
 
- const weeklyLaborcost = weeklyHours * inputs.hourlyRate;
+ const weeklyLaborCost = weeklyHours * inputs.hourlyRate;
 
- const yearlyLaborCost = weeklyLaborcost * 52;
+ const yearlyLaborCost = weeklyLaborCost * 52;
 
  const automatedHours = weeklyHours * (inputs.automationRate / 100);
 
@@ -92,7 +90,7 @@ export function ROICalculator() {
 
  }, [inputs]);
 
- const handleInputChange = (key: keyofCalculatorInputs, value: number) => {
+ const handleInputChange = (key: keyof CalculatorInputs, value: number) => {
  setInputs(prev => ({ ...prev, [key]: value }));
 
  };
@@ -123,9 +121,9 @@ export function ROICalculator() {
 
  <div>
 
- <h3 className="font-semibold text-foreground">ROI Calculate</h3>
+      <h3 className="font-semibold text-foreground">ROI Calculator</h3>
 
- <p className="text-sm text-muted-foreground">EstimateUsage AgentFlow after'sInvestment</p>
+ <p className="text-sm text-muted-foreground">Estimate AgentFlow usage and investment</p>
 
  </div>
 
@@ -145,7 +143,7 @@ export function ROICalculator() {
 
  <Info className="w-4 h-4 text-muted-foreground" />
 
- Inputyou'sData
+ Enter Your Data
 
  </h4>
 
@@ -159,11 +157,11 @@ export function ROICalculator() {
 
  <Users className="w-4 h-4" />
 
- Teampersoncount
+              Team size
 
  </span>
 
- <span className="font-semibold text-foreground">{inputs.employees} person</span>
+            <span className="font-semibold text-foreground">{inputs.employees} people</span>
 
  </label>
 
@@ -203,7 +201,7 @@ export function ROICalculator() {
 
  <Clock className="w-4 h-4" />
 
- eachpersoneachweeksre-WorkTime
+              Time saved per person per week
 
  </span>
 
@@ -247,7 +245,7 @@ export function ROICalculator() {
 
  <DollarSign className="w-4 h-4" />
 
- AveragetimeCost
+              Average hourly cost
 
  </span>
 
@@ -293,7 +291,7 @@ export function ROICalculator() {
 
  <Sparkles className="w-4 h-4" />
 
- EstimatedcanAutomationcompareexample
+              Estimated automation rate
 
  </span>
 
@@ -358,7 +356,7 @@ export function ROICalculator() {
 
  <TrendingUp className="w-4 h-4 text-primary" />
 
- EstimateRevenue
+            Estimated Savings
 
  </h4>
 
@@ -373,7 +371,7 @@ export function ROICalculator() {
 
  )}>
 
- <p className="text-sm text-muted-foreground mb-2">yearsInvestmentrate</p>
+            <p className="text-sm text-muted-foreground mb-2">Annual ROI</p>
 
  <p className="text-5xl font-bold text-primary">
 
@@ -383,7 +381,7 @@ export function ROICalculator() {
 
  <p className="text-xs text-muted-foreground mt-2">
 
- Save {results.netSavings.toLocaleString()} / years
+            Save ${results.netSavings.toLocaleString()} / year
 
  </p>
 
@@ -395,7 +393,7 @@ export function ROICalculator() {
 
  <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
- <p className="text-xs text-muted-foreground mb-1">eachyearsSavetime</p>
+            <p className="text-xs text-muted-foreground mb-1">Time saved per year</p>
 
  <p className="text-xl font-bold text-foreground">
 
@@ -409,43 +407,43 @@ export function ROICalculator() {
 
  <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
- <p className="text-xs text-muted-foreground mb-1">SavepersonCost</p>
+            <p className="text-xs text-muted-foreground mb-1">Labor cost savings</p>
 
  <p className="text-xl font-bold text-foreground">
 
- {(results.savedCostPerYear / 10000).toFixed(1)}
+ ${results.savedCostPerYear.toLocaleString()}
 
  </p>
 
- <p className="text-xs text-muted-foreground">10000/years</p>
+ <p className="text-xs text-muted-foreground">per year</p>
 
  </div>
 
  <div className="p-4 rounded-xl bg-muted/50 border border-border">
 
- <p className="text-xs text-muted-foreground mb-1">AgentFlow years</p>
+ <p className="text-xs text-muted-foreground mb-1">AgentFlow cost</p>
 
  <p className="text-xl font-bold text-foreground">
 
- {(results.agentflowCost / 10000).toFixed(1)}
+ ${results.agentflowCost.toLocaleString()}
 
  </p>
 
- <p className="text-xs text-muted-foreground">10000/years</p>
+ <p className="text-xs text-muted-foreground">per year</p>
 
  </div>
 
  <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
 
- <p className="text-xs text-muted-foreground mb-1">Revenue</p>
+ <p className="text-xs text-muted-foreground mb-1">Net savings</p>
 
  <p className="text-xl font-bold text-primary">
 
- {(results.netSavings / 10000).toFixed(1)}
+ ${results.netSavings.toLocaleString()}
 
  </p>
 
- <p className="text-xs text-muted-foreground">10000/years</p>
+ <p className="text-xs text-muted-foreground">per year</p>
 
  </div>
 
@@ -453,7 +451,7 @@ export function ROICalculator() {
 
  <p className="text-xs text-muted-foreground text-center pt-2">
 
- * withonDataonlyReference, ActualRevenueatSpecificUsageScenario
+            * Data is for reference only. Actual savings depend on your specific use case.
 
  </p>
 

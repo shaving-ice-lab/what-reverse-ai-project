@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ShowcasePage - LobeHub StyleDesign
+ * Showcase Page - LobeHub Style Design
  */
 
 import { useState } from "react";
@@ -19,13 +19,13 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// ShowcaseWork
+// Showcase Works
 const showcaseItems = [
  {
  id: "1",
- title: "SmartSupportAutomationSystem",
- description: "7x24 hAutoReplyCustomerIssue, SupportmultipleChannelConnect, ProcessrateImprove 300%",
- author: "E-commerceCompany",
+    title: "Smart Customer Support Automation",
+    description: "24/7 automated customer response with multi-channel support, improving processing efficiency by 300%",
+    author: "E-commerce Company",
  category: "Support",
  views: 12500,
  stars: 456,
@@ -34,9 +34,9 @@ const showcaseItems = [
  },
  {
  id: "2",
- title: "GitHub PR AutomationReview",
- description: "AutoReview Pull Request, CheckCodeandStandard, fewpersonReviewTime",
- author: "DevOps small",
+    title: "GitHub PR Automated Review",
+    description: "Automatically review pull requests, check code quality and standards, reducing manual review time",
+    author: "DevOps Team",
  category: "Development",
  views: 8900,
  stars: 342,
@@ -45,9 +45,9 @@ const showcaseItems = [
  },
  {
  id: "3",
- title: "Social MediaContentManage",
- description: "AutoPublishContenttomultipleSocial MediaPlatform, SupportScheduledPublishandDataAnalytics",
- author: "ContentCreativeusersmall",
+    title: "Social Media Content Management",
+    description: "Automatically publish content across multiple social media platforms with scheduled posting and data analytics",
+    author: "Content Creator Team",
  category: "Marketing",
  views: 7600,
  stars: 289,
@@ -56,9 +56,9 @@ const showcaseItems = [
  },
  {
  id: "4",
- title: "FinanceReportAutomation",
- description: "AutototalFinanceData, GenerateStandardReport, and ERP SystemNonefor",
- author: "FinanceCompany",
+    title: "Financial Report Automation",
+    description: "Automatically aggregate financial data, generate standardized reports, and integrate seamlessly with ERP systems",
+    author: "Finance Company",
  category: "Finance",
  views: 6700,
  stars: 234,
@@ -67,9 +67,9 @@ const showcaseItems = [
  },
  {
  id: "5",
- title: "Bug SmartBot",
- description: "AutoCategoryandAllocate Bug toshould'sDevelopmentperson, ImproveIssueResolverate",
- author: "TechnologyTeam",
+    title: "Smart Bug Triage Bot",
+    description: "Automatically categorize and assign bugs to the right developers, improving issue resolution efficiency",
+    author: "Technology Team",
  category: "Development",
  views: 5400,
  stars: 198,
@@ -78,9 +78,9 @@ const showcaseItems = [
  },
  {
  id: "6",
- title: "SaleslineAutoRating",
- description: "AutoEvaluateSalesline, PriorityFollow upvalueCustomer, ImproveConversion Rate",
- author: "SalesTeam",
+    title: "Sales Lead Auto-Scoring",
+    description: "Automatically evaluate sales leads, prioritize high-value customers, and improve conversion rates",
+    author: "Sales Team",
  category: "Sales",
  views: 4800,
  stars: 176,
@@ -90,18 +90,18 @@ const showcaseItems = [
 ];
 
 // Category
-const categories = ["allsection", "Support", "Development", "Marketing", "Finance", "Sales"];
+const categories = ["All", "Support", "Development", "Marketing", "Finance", "Sales"];
 
 export default function ShowcasePage() {
  const [searchQuery, setSearchQuery] = useState("");
- const [activeCategory, setActiveCategory] = useState("allsection");
+  const [activeCategory, setActiveCategory] = useState("All");
 
  const filteredItems = showcaseItems.filter((item) => {
  const matchesSearch =
  item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
  item.description.toLowerCase().includes(searchQuery.toLowerCase());
  const matchesCategory =
- activeCategory === "allsection" || item.category === activeCategory;
+    activeCategory === "All" || item.category === activeCategory;
  return matchesSearch && matchesCategory;
  });
 
@@ -114,22 +114,22 @@ export default function ShowcasePage() {
  <div className="max-w-4xl mx-auto text-center">
  <div className="lobe-badge mb-8">
  <Sparkles className="h-4 w-4" />
- CommunityFeatured
+            Community Showcase
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- WorkflowShowcase
+            Workflow Showcase
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto mb-8">
- ExploreCommunityMemberCreate'soptimalWorkflow, FetchInspirationandBest Practices
+            Explore outstanding workflows created by community members for inspiration and best practices
  </p>
 
  {/* Search */}
  <div className="max-w-xl mx-auto relative">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-lighter" />
  <Input
- placeholder="SearchWorkflow..."
+ placeholder="Search workflows..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="pl-12 h-12 rounded-full bg-surface-100/30 border-border/30"
@@ -218,8 +218,8 @@ export default function ShowcasePage() {
  {filteredItems.length === 0 && (
  <div className="text-center py-16">
  <Sparkles className="w-12 h-12 text-foreground-lighter mx-auto mb-4" />
- <h3 className="text-[15px] font-medium text-foreground mb-2">NotoMatch'sWorkflow</h3>
- <p className="text-[13px] text-foreground-light">TryAdjustFilterConditionorSearchKeywords</p>
+            <h3 className="text-[15px] font-medium text-foreground mb-2">No matching workflows found</h3>
+            <p className="text-[13px] text-foreground-light">Try adjusting your filter or search keywords</p>
  </div>
  )}
  </div>
@@ -228,11 +228,11 @@ export default function ShowcasePage() {
  {/* CTA */}
  <section className="py-16 px-6 bg-gradient-section">
  <div className="max-w-4xl mx-auto text-center">
- <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Shareyou'sWorkflow</h2>
- <p className="text-[13px] text-foreground-light mb-6">willyou'sCreativeSharetoCommunity, HelpmoremultiplepersonImproverate</p>
+          <h2 className="text-[15px] sm:text-2xl font-bold text-foreground mb-4">Share Your Workflow</h2>
+ <p className="text-[13px] text-foreground-light mb-6">Share your creations with the community and help more people improve their productivity</p>
  <Link href="/dashboard/workflows/new">
  <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- SubmitWork
+            Submit Your Work
  <ArrowRight className="ml-2 h-4 w-4" />
  </Button>
  </Link>

@@ -90,7 +90,7 @@ export interface BillingInvoiceDetail extends BillingInvoiceSummary {
  }>;
 }
 
-// WorkspaceUsageStatistics
+// Workspace Usage Statistics
 export interface WorkspaceUsageStat {
  id: string;
  workspace_id: string;
@@ -106,9 +106,9 @@ export interface WorkspaceUsageStat {
  };
  cost_amount: number;
  currency: string;
- // TrendRelated
- trend_percent?: number; // comparePercentage, currentlyasGrowth, asDecline
- trend_direction?: "up" | "down" | "flat";
+  // Trend Related
+  trend_percent?: number; // compare percentage, currently as growth or decline
+  trend_direction?: "up" | "down" | "flat";
 }
 
 export const billingApi = {
@@ -222,9 +222,9 @@ export const billingApi = {
  return response.blob();
  },
 
- /**
- * Fetch Workspace UsageStatistics
- */
+  /**
+   * Fetch Workspace Usage Statistics
+   */
  async getWorkspaceUsageStats(
  workspaceId: string,
  params?: { period_start?: string; period_end?: string }
@@ -254,9 +254,9 @@ export const billingApi = {
  }>
  >(`/billing/workspaces/${workspaceId}/usage${query ? `?${query}` : ""}`);
  const stats = response.data?.stats || [];
- // CalculateTrend(: thisinafterendpointalreadyBackorbeforeendpointMock)
- return stats.map((stat, index, arr) => {
- // SimpleMockTrendCalculate
+    // Calculate Trend (this is already implemented in the backend or frontend mock)
+    return stats.map((stat, index, arr) => {
+      // Simple Mock Trend Calculate
  const prevStat = arr[index + 1];
  let trendPercent = 0;
  let trendDirection: "up" | "down" | "flat" = "flat";
@@ -267,7 +267,7 @@ export const billingApi = {
  return {
  id: stat.id,
  workspace_id: stat.workspace_id,
- workspace_name: stat.workspace?.name || "UnknownWorkspace",
+ workspace_name: stat.workspace?.name || "Unknown Workspace",
  workspace_icon: stat.workspace?.icon,
  period_start: stat.period_start,
  period_end: stat.period_end,

@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 type LegacyEntryType = "workflow" | "agent";
 
 const legacyEntryCopy: Record<LegacyEntryType, { label: string; description: string }> = {
- workflow: {
- label: "WorkflowEntry",
- description: "currentlyatMigrationto App Workbench, SuggestionfromnewEntryContinueCreateandManage.",
- },
- agent: {
- label: "Agent Entry",
- description: "currentlyat1to App Workbench, SuggestionfromnewEntryContinueCreateandManage.",
- },
+  workflow: {
+    label: "Workflow Entry",
+    description: "This is being migrated to App Workbench. We recommend using the new entry to continue creating and managing.",
+  },
+  agent: {
+    label: "Agent Entry",
+    description: "This is being migrated to App Workbench. We recommend using the new entry to continue creating and managing.",
+  },
 };
 
 interface LegacyEntryBannerProps {
@@ -29,7 +29,7 @@ interface LegacyEntryBannerProps {
 export function LegacyEntryBanner({
  type,
  actionHref = "/dashboard/apps",
- actionLabel = "before Workbench",
+  actionLabel = "Go to Workbench",
  className,
 }: LegacyEntryBannerProps) {
  const copy = legacyEntryCopy[type];
@@ -44,7 +44,7 @@ export function LegacyEntryBanner({
  >
  <div className="space-y-1">
  <AlertTitle className="text-[11px] uppercase tracking-[0.14em] text-warning">
- oldEntryTip
+        Legacy Entry Notice
  </AlertTitle>
  <AlertDescription className="text-[12px] text-foreground-light">
  <span className="text-foreground font-medium">{copy.label}</span>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * WithdrawDialogComponent
+ * Withdrawal Dialog Component
  */
 
 import { useState } from "react";
@@ -36,11 +36,11 @@ interface WithdrawalDialogProps {
  isVerified: boolean;
 }
 
-// MinimumWithdrawAmount
+// Minimum withdrawal amount
 const MIN_WITHDRAWAL_AMOUNT = 100;
-// WithdrawRenewrate
+// Withdrawal fee rate
 const WITHDRAWAL_FEE_RATE = 0.01;
-// MinimumRenew
+// Minimum fee
 const MIN_WITHDRAWAL_FEE = 1;
 
 export function WithdrawalDialog({
@@ -60,7 +60,7 @@ export function WithdrawalDialog({
  const actualAmount = numericAmount - fee;
 
  const handleAmountChange = (value: string) => {
- // Allowcountcharandsmallcount
+ // Allow digits and decimals
  if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
  setAmount(value);
  setError(null);
@@ -75,11 +75,11 @@ export function WithdrawalDialog({
 
  const validateAmount = () => {
  if (numericAmount < MIN_WITHDRAWAL_AMOUNT) {
- setError(`mostWithdrawAmountas ${MIN_WITHDRAWAL_AMOUNT}`);
+ setError(`Minimum withdrawal amount is ${MIN_WITHDRAWAL_AMOUNT}`);
  return false;
  }
  if (numericAmount > balance) {
- setError("WithdrawAmountnotcanExceedAvailableBalance");
+ setError("Withdrawal amount cannot exceed available balance");
  return false;
  }
  return true;
@@ -93,7 +93,7 @@ export function WithdrawalDialog({
 
  const handleSubmit = async () => {
  setIsSubmitting(true);
- // MockSubmit
+ // Mock submit
  await new Promise((resolve) => setTimeout(resolve, 1500));
  setIsSubmitting(false);
  setStep("success");
@@ -106,23 +106,23 @@ export function WithdrawalDialog({
  onOpenChange(false);
  };
 
- // CheckisnocanwithWithdraw
+ // Check if withdrawal is possible
  if (!isVerified || !paymentMethod) {
  return (
  <Dialog open={open} onOpenChange={onOpenChange}>
  <DialogContent className="sm:max-w-[425px] bg-surface-100 border-border text-foreground">
  <DialogHeader>
- <DialogTitle className="text-foreground">SettingsPaymentInfo</DialogTitle>
+ <DialogTitle className="text-foreground">Set Up Payment Info</DialogTitle>
  <DialogDescription className="text-foreground-light">
- WithdrawbeforePleasefirstSettingsPaymentAccountInfo
+ Please set up your payment account information before withdrawing
  </DialogDescription>
  </DialogHeader>
  <div className="py-6">
  <Alert className="border-warning/30 bg-warning-200">
  <AlertCircle className="h-4 w-4 text-warning" />
- <AlertTitle className="text-warning">needneedSettingsPaymentInfo</AlertTitle>
+ <AlertTitle className="text-warning">Payment info required</AlertTitle>
  <AlertDescription className="text-foreground-light">
- PleasefirstbeforeSettingsPageAddyou'sPaymentAccountInfo(Payment/WeChat/row).
+ Please add your payment account information (PayPal / bank transfer) in the Settings page first.
  </AlertDescription>
  </Alert>
  </div>
@@ -138,10 +138,10 @@ export function WithdrawalDialog({
  className="bg-brand-500 hover:bg-brand-600 text-background"
  onClick={() => {
  onOpenChange(false);
- // TODO: NavigatetoSettingsPage
+ // TODO: Navigate to Settings page
  }}
  >
- goSettings
+ Go to Settings
  </Button>
  </DialogFooter>
  </DialogContent>
@@ -155,15 +155,15 @@ export function WithdrawalDialog({
  {step === "amount" && (
  <>
  <DialogHeader>
- <DialogTitle className="text-foreground">PleaseWithdraw</DialogTitle>
+ <DialogTitle className="text-foreground">Request Withdrawal</DialogTitle>
  <DialogDescription className="text-foreground-light">
- AvailableBalance: {balance.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
+            Available Balance: {balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
  </DialogDescription>
  </DialogHeader>
  <div className="py-4 space-y-6">
- {/* AmountInput */}
+ {/* Amount Input */}
  <div className="space-y-3">
- <Label className="text-foreground-light">WithdrawAmount</Label>
+ <Label className="text-foreground-light">Withdrawal Amount</Label>
  <div className="relative">
  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl font-semibold text-foreground-muted">
  
@@ -187,7 +187,7 @@ export function WithdrawalDialog({
  )}
  </div>
 
- {/* ShortcutSelect */}
+ {/* Quick Select */}
  <div className="flex gap-2">
  {[0.25, 0.5, 0.75, 1].map((percentage) => (
  <Button
@@ -197,29 +197,29 @@ export function WithdrawalDialog({
  onClick={() => handleQuickSelect(percentage)}
  className="flex-1 border-border text-foreground-muted hover:border-brand-500 hover:text-brand-500"
  >
- {percentage === 1 ? "allsection": `${percentage * 100}%`}
+ {percentage === 1 ? "All": `${percentage * 100}%`}
  </Button>
  ))}
  </div>
 
- {/* CostPreview */}
+ {/* Fee Preview */}
  {numericAmount > 0 && (
  <div className="rounded-lg border border-border p-4 space-y-2">
  <div className="flex justify-between text-sm">
- <span className="text-foreground-light">WithdrawAmount</span>
+ <span className="text-foreground-light">Withdrawal Amount</span>
  <span className="text-foreground">
  {numericAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
  </div>
  <div className="flex justify-between text-sm">
- <span className="text-foreground-light">Renew (1%)</span>
+ <span className="text-foreground-light">Fee (1%)</span>
  <span className="text-foreground">
  -{fee.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
  </div>
  <div className="border-t border-border pt-2 mt-2">
  <div className="flex justify-between text-sm font-semibold">
- <span className="text-foreground-light">Actualto</span>
+ <span className="text-foreground-light">You&apos;ll receive</span>
  <span className="text-brand-500">
  {actualAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
@@ -251,13 +251,13 @@ export function WithdrawalDialog({
  {step === "confirm" && (
  <>
  <DialogHeader>
- <DialogTitle className="text-foreground">ConfirmWithdrawInfo</DialogTitle>
+ <DialogTitle className="text-foreground">Confirm Withdrawal</DialogTitle>
  <DialogDescription className="text-foreground-light">
- Please confirmwithdownWithdrawInfo
+ Please confirm the withdrawal details below
  </DialogDescription>
  </DialogHeader>
  <div className="py-4 space-y-4">
- {/* PaymentAccount */}
+ {/* Payment Account */}
  <div className="rounded-lg border border-border p-4">
  <div className="flex items-center gap-3 mb-3">
  <div className="h-10 w-10 rounded-full bg-surface-200 flex items-center justify-center">
@@ -265,7 +265,7 @@ export function WithdrawalDialog({
  </div>
  <div>
  <div className="font-medium text-foreground">
- {paymentMethod === "alipay" ? "Payment": paymentMethod === "wechat" ? "WeChatPayment": "row"}
+ {paymentMethod === "alipay" ? "Alipay": paymentMethod === "wechat" ? "WeChat Pay": "Bank Transfer"}
  </div>
  <div className="text-sm text-foreground-light">
  {paymentMethod === "alipay" ? "****@example.com" : "**** **** 1234"}
@@ -274,23 +274,23 @@ export function WithdrawalDialog({
  </div>
  </div>
 
- {/* AmountConfirm */}
+ {/* Amount Confirmation */}
  <div className="rounded-lg border border-border p-4 space-y-3">
  <div className="flex justify-between">
- <span className="text-foreground-light">WithdrawAmount</span>
+ <span className="text-foreground-light">Withdrawal Amount</span>
  <span className="font-medium text-foreground">
  {numericAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
  </div>
  <div className="flex justify-between">
- <span className="text-foreground-light">Renew</span>
+ <span className="text-foreground-light">Fee</span>
  <span className="text-foreground">
  {fee.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
  </div>
  <div className="border-t border-border pt-3">
  <div className="flex justify-between">
- <span className="font-medium text-foreground-light">Actualto</span>
+ <span className="font-medium text-foreground-light">You&apos;ll receive</span>
  <span className="text-xl font-bold text-brand-500">
  {actualAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
@@ -302,7 +302,7 @@ export function WithdrawalDialog({
  <Alert className="border-border">
  <AlertCircle className="h-4 w-4 text-foreground-muted" />
  <AlertDescription className="text-foreground-light">
- WithdrawPleasewillat 1-3 Business DayinProcessDone
+ Withdrawals are typically processed within 1-3 business days.
  </AlertDescription>
  </Alert>
  </div>
@@ -322,12 +322,12 @@ export function WithdrawalDialog({
  {isSubmitting ? (
  <>
  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
- Submit...
+              Submitting...
  </>
  ) : (
  <>
  <Wallet className="h-4 w-4 mr-2" />
- ConfirmWithdraw
+ Confirm Withdrawal
  </>
  )}
  </Button>
@@ -343,21 +343,21 @@ export function WithdrawalDialog({
  </div>
  
  <h3 className="text-xl font-bold text-foreground mb-2">
- WithdrawPleasealreadySubmit!
+ Withdrawal Request Submitted!
  </h3>
  <p className="text-foreground-light mb-6">
- Estimated 1-3 Business Dayinto, PleaseNote
+ Estimated arrival within 1-3 business days. Please check your account.
  </p>
  
  <div className="rounded-lg border border-border bg-surface-200 p-4 w-full">
  <div className="flex justify-between mb-3">
- <span className="text-foreground-light">WithdrawAmount</span>
+ <span className="text-foreground-light">Withdrawal Amount</span>
  <span className="font-semibold text-foreground">
  {numericAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>
  </div>
  <div className="flex justify-between pt-3 border-t border-border">
- <span className="text-foreground-light">Actualto</span>
+ <span className="text-foreground-light">You&apos;ll receive</span>
  <span className="text-xl font-bold text-brand-500">
  {actualAmount.toLocaleString("zh-CN", { minimumFractionDigits: 2 })}
  </span>

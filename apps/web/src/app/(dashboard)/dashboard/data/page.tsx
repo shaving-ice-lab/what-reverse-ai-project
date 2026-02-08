@@ -2,7 +2,7 @@
 
 /**
  * DataManagePage
- * Import, ExportandManageUserData
+ * Import, Export and Manage User Data
  */
 
 import { useState } from "react";
@@ -47,7 +47,7 @@ import {
 import { EmptyState, PageHeader, TabNav } from "@/components/dashboard/supabase-ui";
 import { PageContainer } from "@/components/dashboard/page-layout";
 
-// DataTypeConfig
+// Data Type Config
 const dataTypes = {
  workflows: {
  label: "Workflow",
@@ -66,7 +66,7 @@ const dataTypes = {
  size: "1.8 MB",
  },
  conversations: {
- label: "ConversationRecord",
+    label: "Conversation Records",
  icon: MessageSquare,
  color: "text-brand-500",
  bg: "bg-brand-200",
@@ -82,7 +82,7 @@ const dataTypes = {
  size: "0.2 MB",
  },
  files: {
- label: "UploadFile",
+    label: "Uploaded Files",
  icon: FolderOpen,
  color: "text-brand-500",
  bg: "bg-brand-200",
@@ -91,15 +91,15 @@ const dataTypes = {
  },
 };
 
-// ExportFormat
+// Export Format
 const exportFormats = [
- { id: "json", label: "JSON", icon: FileJson, description: "useDataFormat" },
- { id: "csv", label: "CSV", icon: Table, description: "TableData" },
- { id: "markdown", label: "Markdown", icon: FileText, description: "DocumentFormat" },
- { id: "zip", label: "ZIP Compress", icon: Archive, description: "CompleteBackup" },
+ { id: "json", label: "JSON", icon: FileJson, description: "Standard data format" },
+ { id: "csv", label: "CSV", icon: Table, description: "Table data" },
+ { id: "markdown", label: "Markdown", icon: FileText, description: "Document format" },
+ { id: "zip", label: "ZIP Compressed", icon: Archive, description: "Complete backup" },
 ];
 
-// ExportHistory
+// Export History
 const exportHistory = [
  {
  id: "1",
@@ -136,12 +136,12 @@ const exportHistory = [
  format: "zip",
  size: "145.2 MB",
  status: "failed",
- error: "StorageEmptybetweennot",
+    error: "Insufficient storage space",
  createdAt: "2026-01-29T09:15:00Z",
  },
 ];
 
-// StatusConfig
+// Status Config
 const statusConfig = {
  completed: {
  label: "Completed",
@@ -199,12 +199,12 @@ export default function DataPage() {
  setTimeout(() => setIsExporting(false), 2000);
  };
 
- // CalculatetotalSize
+ // Calculate total size
  const totalSize = Object.entries(dataTypes)
  .filter(([key]) => selectedTypes.includes(key))
  .reduce((sum, [, config]) => sum + parseFloat(config.size), 0);
 
- // StorageUsageSituation
+ // Storage usage
  const storageUsed = 148.5;
  const storageTotal = 500;
  const storagePercent = (storageUsed / storageTotal) * 100;
@@ -220,7 +220,7 @@ export default function DataPage() {
  );
 
  const historyTabs = [
- { label: "allsection", value: "all", count: exportHistory.length },
+ { label: "All", value: "all", count: exportHistory.length },
  { label: "Completed", value: "completed", count: historyCounts.completed },
  { label: "Processing", value: "processing", count: historyCounts.processing },
  { label: "Failed", value: "failed", count: historyCounts.failed },
@@ -235,8 +235,8 @@ export default function DataPage() {
  <PageContainer>
  <div className="space-y-6">
  <PageHeader
- title="DataManage"
- description="Import, ExportandManageyou'sAllData"
+    title="Data Management"
+    description="Import, export, and manage all your data"
  badge={{ text: "Data", variant: "default" }}
  actions={
  <>
@@ -254,11 +254,11 @@ export default function DataPage() {
  className="border-border-muted text-foreground-light"
  >
  <Upload className="w-4 h-4 mr-2" />
- ImportData
+            Import Data
  </Button>
  <Button size="sm" className="bg-brand-500 hover:bg-brand-600 text-background">
  <Download className="w-4 h-4 mr-2" />
- CreateExport
+            Create Export
  </Button>
  </>
  }
@@ -266,7 +266,7 @@ export default function DataPage() {
 
  <div className="page-divider" />
 
- {/* StorageUsageSituation */}
+ {/* Storage Usage */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-4">
  <div className="flex items-center gap-3">
@@ -274,9 +274,9 @@ export default function DataPage() {
  <HardDrive className="w-4 h-4 text-brand-500" />
  </div>
  <div>
- <h2 className="page-panel-title">StorageUsageSituation</h2>
- <p className="page-panel-description">
- alreadyUsage {storageUsed} MB / {storageTotal} MB
+          <h2 className="page-panel-title">Storage Usage</h2>
+              <p className="page-panel-description">
+                {storageUsed} MB / {storageTotal} MB used
  </p>
  </div>
  </div>
@@ -291,7 +291,7 @@ export default function DataPage() {
  : "bg-brand-200 text-brand-500"
  )}
  >
- {storagePercent.toFixed(1)}% alreadyuse
+              {storagePercent.toFixed(1)}% used
  </Badge>
  </div>
  <div className="p-6 space-y-4">
@@ -314,25 +314,25 @@ export default function DataPage() {
  </div>
 
  <div className="page-grid lg:grid-cols-[1.1fr_0.9fr]">
- {/* ExportData */}
+ {/* Export Data */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-4">
  <div className="flex items-center gap-2">
  <Download className="w-4 h-4 text-brand-500" />
  <div>
- <h2 className="page-panel-title">ExportData</h2>
- <p className="page-panel-description">SelectneedneedExport'sDataandFormat</p>
+              <h2 className="page-panel-title">Export Data</h2>
+              <p className="page-panel-description">Select the data and format you want to export</p>
  </div>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-light">
- alreadyselect {selectedTypes.length} 
+              {selectedTypes.length} selected
  </Badge>
  </div>
 
  <div className="p-6 space-y-6">
- {/* SelectDataType */}
+ {/* Select Data Type */}
  <div className="space-y-2">
- <p className="text-xs text-foreground-muted">SelectneedExport'sData</p>
+              <p className="text-xs text-foreground-muted">Select data to export</p>
  {Object.entries(dataTypes).map(([key, config]) => {
  const Icon = config.icon;
  const isSelected = selectedTypes.includes(key);
@@ -365,9 +365,9 @@ export default function DataPage() {
  })}
  </div>
 
- {/* SelectFormat */}
+ {/* Select Format */}
  <div className="space-y-3">
- <p className="text-xs text-foreground-muted">SelectExportFormat</p>
+              <p className="text-xs text-foreground-muted">Select export format</p>
  <div className="page-grid sm:grid-cols-2 gap-2">
  {exportFormats.map((format) => {
  const Icon = format.icon;
@@ -396,10 +396,10 @@ export default function DataPage() {
  </div>
  </div>
 
- {/* ExportButton */}
+ {/* Export Button */}
  <div className="flex items-center justify-between pt-4 border-t border-border">
  <p className="text-[13px] text-foreground-light">
- EstimatedSize: <span className="font-medium text-foreground">{totalSize.toFixed(1)} MB</span>
+              Estimated size: <span className="font-medium text-foreground">{totalSize.toFixed(1)} MB</span>
  </p>
  <Button
  onClick={handleExport}
@@ -414,7 +414,7 @@ export default function DataPage() {
  ) : (
  <>
  <Download className="w-4 h-4 mr-2" />
- StartExport
+                Start Export
  </>
  )}
  </Button>
@@ -422,23 +422,23 @@ export default function DataPage() {
  </div>
  </div>
 
- {/* ImportData */}
+ {/* Import Data */}
  <div className="page-panel">
  <div className="page-panel-header flex items-center justify-between gap-4">
  <div className="flex items-center gap-2">
  <Upload className="w-4 h-4 text-brand-500" />
  <div>
- <h2 className="page-panel-title">ImportData</h2>
- <p className="page-panel-description">Support JSON, CSV, ZIP</p>
+ <h2 className="page-panel-title">Import Data</h2>
+              <p className="page-panel-description">Supports JSON, CSV, ZIP</p>
  </div>
  </div>
  <Badge variant="secondary" className="bg-surface-200 text-foreground-light">
- SecurityValidate
+              Security Validated
  </Badge>
  </div>
 
  <div className="p-6 space-y-6">
- {/* UploadRegion */}
+ {/* Upload Region */}
  <div
  className={cn(
  "border border-dashed rounded-md p-6 text-center transition-colors cursor-pointer bg-surface-75/60",
@@ -467,7 +467,7 @@ export default function DataPage() {
  <>
  <Upload className="w-10 h-10 text-foreground-muted mx-auto mb-4" />
  <p className="text-sm font-medium text-foreground mb-1">
- Drag & DropFiletothis, orClickUpload
+              Drag & drop files here, or click to upload
  </p>
  <p className="text-[13px] text-foreground-light">
  Support JSON, CSV, ZIP Format
@@ -476,19 +476,19 @@ export default function DataPage() {
  )}
  </div>
 
- {/* ImportOption */}
+ {/* Import Options */}
  <div className="space-y-2">
  <label className="flex items-center gap-2 rounded-md border border-border bg-surface-75/60 px-3 py-2 text-[13px] text-foreground">
  <Checkbox id="merge" />
- andExistingData(notCoverage)
+              Merge with existing data (no overwrite)
  </label>
  <label className="flex items-center gap-2 rounded-md border border-border bg-surface-75/60 px-3 py-2 text-[13px] text-foreground">
  <Checkbox id="validate" defaultChecked />
- ImportbeforeVerifyData
+              Validate data before import
  </label>
  </div>
 
- {/* ImportButton */}
+ {/* Import Button */}
  <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
  {importFile && (
  <Button
@@ -501,32 +501,32 @@ export default function DataPage() {
  )}
  <Button disabled={!importFile} className="bg-brand-500 hover:bg-brand-600 text-background">
  <Upload className="w-4 h-4 mr-2" />
- StartImport
+              Start Import
  </Button>
  </div>
 
- {/* WarningTip */}
+ {/* Warning Tip */}
  <div className="flex items-start gap-2 p-3 rounded-md border border-warning/30 bg-warning-200/60">
  <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
  <p className="text-xs text-foreground-light">
- ImportwillEditExistingConfig.SuggestionatImportbeforefirstExportCurrentDataasBackup.
+              Import may modify existing settings. We recommend exporting your current data as a backup before importing.
  </p>
  </div>
  </div>
  </div>
  </div>
 
- {/* ExportHistory */}
+ {/* Export History */}
  <div className="page-panel">
  <div className="page-panel-header space-y-4">
  <div className="flex items-center justify-between gap-4">
  <div>
- <h2 className="page-panel-title">ExportHistory</h2>
- <p className="page-panel-description">Recent 7 daysin'sExportRecord</p>
+              <h2 className="page-panel-title">Export History</h2>
+              <p className="page-panel-description">Export records from the last 7 days</p>
  </div>
  <div className="page-toolbar">
  <Input
- placeholder="SearchExportRecord"
+                placeholder="Search export records"
  inputSize="sm"
  variant="search"
  className="w-[200px]"
@@ -536,7 +536,7 @@ export default function DataPage() {
  <SelectTrigger className="h-8 w-[130px] text-[12px]">
  <div className="flex items-center gap-2">
  <Calendar className="h-3.5 w-3.5 text-foreground-muted" />
- <SelectValue placeholder="TimeRange" />
+ <SelectValue placeholder="Time range" />
  </div>
  </SelectTrigger>
  <SelectContent>
@@ -551,7 +551,7 @@ export default function DataPage() {
  className="border-border-muted text-foreground-light"
  >
  <Trash2 className="w-4 h-4 mr-2" />
- Clean upExpired
+              Clean Up Expired
  </Button>
  </div>
  </div>
@@ -568,9 +568,9 @@ export default function DataPage() {
  {filteredHistory.length === 0 ? (
  <EmptyState
  icon={Archive}
- title="NoneExportRecord"
- description="CurrentFilterConditiondownNoExportRecord"
- action={{ label: "CreateExport", onClick: handleExport, icon: Download }}
+              title="No Export Records"
+              description="No export records found for the current filter"
+ action={{ label: "Create export", onClick: handleExport, icon: Download }}
  />
  ) : (
  <div className="overflow-hidden rounded-md border border-border bg-surface-75/50">
@@ -579,7 +579,7 @@ export default function DataPage() {
  const status = statusConfig[item.status as keyof typeof statusConfig];
  const StatusIcon = status.icon;
  const typeConfig = dataTypes[item.type as keyof typeof dataTypes] || {
- label: "CompleteBackup",
+                  label: "Complete Backup",
  icon: Archive,
  color: "text-brand-500",
  bg: "bg-brand-200",
@@ -620,7 +620,7 @@ export default function DataPage() {
  <p className="text-[13px] text-foreground-light flex items-center gap-2">
  <Calendar className="h-3.5 w-3.5 text-foreground-muted" />
  {formatDate(item.createdAt)}
- {item.expiresAt && ` · Expiredat ${formatDate(item.expiresAt)}`}
+                  {item.expiresAt && ` · Expires at ${formatDate(item.expiresAt)}`}
  {item.error && <span className="text-destructive ml-2">{item.error}</span>}
  </p>
  </div>
@@ -666,23 +666,23 @@ export default function DataPage() {
  </div>
  </div>
 
- {/* DataSecurityTip */}
+ {/* Data Security Tip */}
  <div className="page-panel border-brand-400/30 bg-brand-200/40">
  <div className="p-6 flex items-start gap-4">
  <div className="p-2 rounded-md bg-brand-500">
  <Shield className="w-5 h-5 text-background" />
  </div>
  <div className="flex-1">
- <h3 className="text-sm font-medium text-foreground mb-1">DataSecurity</h3>
- <p className="text-[13px] text-foreground-light mb-4">
- AllExport'sDataallpastEncryptProcess.ExportFilewillat 7 daysafterAutoDelete, PleaseandtimeDownload.
+            <h3 className="text-sm font-medium text-foreground mb-1">Data Security</h3>
+            <p className="text-[13px] text-foreground-light mb-4">
+              All exported data is encrypted. Export files are automatically deleted after 7 days. Please download them promptly.
  </p>
  <div className="flex flex-wrap items-center gap-3">
  <Button variant="outline" size="sm" className="border-border-muted text-foreground-light">
- DataSecurityPolicy
+              Data Security Policy
  </Button>
  <Button variant="outline" size="sm" className="border-border-muted text-foreground-light">
- ManageDataRetainSettings
+              Manage Data Retention Settings
  </Button>
  </div>
  </div>

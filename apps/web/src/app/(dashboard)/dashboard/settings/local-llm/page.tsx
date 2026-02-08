@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Local LLM SettingsPage - Supabase Style
+ * Local LLM Settings Page - Supabase Style
  */
 
 import React, { useState } from "react";
@@ -52,7 +52,7 @@ const PROVIDER_LINKS: Record<LLMProviderType, string> = {
  "llama-cpp": "https://github.com/ggerganov/llama.cpp",
 };
 
-// SettingsCardComponent
+// Settings Card Component
 function SettingsSection({
  title,
  description,
@@ -78,7 +78,7 @@ function SettingsSection({
  );
 }
 
-// StatusIndicator
+// Status Indicator
 function StatusIndicator({
  status,
  provider = "ollama",
@@ -100,20 +100,20 @@ function StatusIndicator({
  return (
  <div className="flex items-center gap-2 text-[13px] text-brand-500">
  <CheckCircle2 className="h-4 w-4" />
- <span>{providerName} Run</span>
+      <span>{providerName} Running</span>
  </div>
  );
  case "unavailable":
  return (
  <div className="flex items-center gap-2 text-[13px] text-foreground-muted">
  <XCircle className="h-4 w-4" />
- <span>{providerName} not yetRun</span>
+      <span>{providerName} Not Running</span>
  </div>
  );
  }
 }
 
-// Provider Select
+// Provider Selector
 function ProviderSelector({
  provider,
  name,
@@ -151,7 +151,7 @@ function ProviderSelector({
  </div>
  <div className="flex items-center gap-2">
  {isAvailable ? (
- <span className="text-xs text-brand-500">{modelsCount} Model</span>
+      <span className="text-xs text-brand-500">{modelsCount} Models</span>
  ) : (
  <span className="text-xs text-foreground-muted">Offline</span>
  )}
@@ -160,7 +160,7 @@ function ProviderSelector({
  );
 }
 
-// ModelList
+// Model List Item
 function ModelItem({
  model,
  onTest,
@@ -217,7 +217,7 @@ function ModelItem({
  );
 }
 
-// RecommendedModelList
+// Recommended Model List Item
 function RecommendedModelItem({
  model,
  isInstalled,
@@ -236,7 +236,7 @@ function RecommendedModelItem({
  <span className="text-[13px] font-medium text-foreground">{model.name}</span>
  {isInstalled && (
  <Badge className="text-xs bg-brand-200 text-brand-500 border-brand-400">
- alreadyInstall
+          Installed
  </Badge>
  )}
  </div>
@@ -274,7 +274,7 @@ function RecommendedModelItem({
  );
 }
 
-// DownloadProgress
+// Download Progress
 function DownloadProgress({
  modelName,
  progress,
@@ -295,7 +295,7 @@ function DownloadProgress({
  <div className="flex items-center gap-2">
  <Download className="h-4 w-4 text-brand-500" />
  <span className="text-[13px] font-medium text-foreground">
- Download {modelName}
+          Downloading {modelName}
  </span>
  </div>
  <Button
@@ -366,7 +366,7 @@ export default function LocalLLMPage() {
  setTestResult({
  modelName,
  result: "",
- error: err instanceof Error ? err.message: "TestFailed",
+ error: err instanceof Error ? err.message : "Test failed.",
  });
  } finally {
  setTestingModel(null);
@@ -375,8 +375,8 @@ export default function LocalLLMPage() {
 
  const handleDeleteModel = async (modelName: string) => {
  const confirmed = await confirm({
- title: "DeleteModel",
- description: `OKneedDelete ${modelName} ??This action cannot be undone.`,
+ title: "Delete model",
+ description: `Delete ${modelName}? This action cannot be undone.`,
  confirmText: "Delete",
  cancelText: "Cancel",
  variant: "destructive",
@@ -396,7 +396,7 @@ export default function LocalLLMPage() {
  try {
  await pullModel(modelName);
  } catch {
- // Erroralreadyat hook Process
+      // Error already handled in hook
  }
  };
 
@@ -408,15 +408,15 @@ export default function LocalLLMPage() {
  <PageHeader
  eyebrow="Settings"
  title="Local LLM"
- description="ManageandConfigLocalRun's AI largeLanguageModel"
+ description="Manage and configure locally running AI large language models"
  />
 
  <div className="page-divider" />
 
- {/* LLM EngineSelect */}
+      {/* LLM Engine Selection */}
  <SettingsSection
  title="LLM Engine"
- description="SelectyouneedUsage'sLocal LLM RunEngine"
+ description="Select the local LLM runtime engine you want to use"
  >
  <div className="space-y-2">
  <ProviderSelector
@@ -438,10 +438,10 @@ export default function LocalLLMPage() {
  </div>
  </SettingsSection>
 
- {/* ConnectStatus */}
+      {/* Connection Status */}
  <SettingsSection
- title="ConnectStatus"
- description="CheckLocal LLM Engine'sRunStatus"
+ title="Connection status"
+ description="Check the running status of the local LLM engine"
  action={
  <Button
  variant="ghost"
@@ -469,10 +469,10 @@ export default function LocalLLMPage() {
  <AlertCircle className="h-4 w-4 text-foreground-light mt-0.5 shrink-0" />
  <div>
  <p className="text-foreground font-medium">
- {PROVIDER_NAMES[activeProvider]} not yetRun
- </p>
- <p className="text-foreground-light mt-1">
- PleaseEnsureyoualreadyInstallandLaunch {PROVIDER_NAMES[activeProvider]}
+{PROVIDER_NAMES[activeProvider]} is not running
+</p>
+<p className="text-foreground-light mt-1">
+Please ensure you have installed and launched {PROVIDER_NAMES[activeProvider]}
  </p>
  <Button
  variant="link"
@@ -496,9 +496,9 @@ export default function LocalLLMPage() {
  {/* URL Config */}
  {activeProvider === "ollama" && status === "available" && (
  <div className="mt-4 space-y-2">
- <label className="text-[13px] font-medium text-foreground block">
- ServiceAddress
- </label>
+<label className="text-[13px] font-medium text-foreground block">
+ Service address
+</label>
  <div className="flex gap-2">
  <Input
  value={ollamaUrl}
@@ -519,7 +519,7 @@ export default function LocalLLMPage() {
  )}
  </SettingsSection>
 
- {/* ErrorTip */}
+      {/* Error Notice */}
  {error && (
  <div className="flex items-center gap-2 p-3 rounded-md bg-surface-200 border border-border text-foreground text-[13px]">
  <AlertCircle className="h-4 w-4 shrink-0 text-foreground-light" />
@@ -527,7 +527,7 @@ export default function LocalLLMPage() {
  </div>
  )}
 
- {/* DownloadProgress */}
+      {/* Download Progress */}
  {downloadingModel && downloadProgress && (
  <DownloadProgress
  modelName={downloadingModel}
@@ -536,11 +536,11 @@ export default function LocalLLMPage() {
  />
  )}
 
- {/* alreadyInstallModel */}
+      {/* Installed Models */}
  {status === "available" && (
  <SettingsSection
- title={`alreadyInstallModel (${models.length})`}
- description="ManageyouLocalalreadyDownload'sModel"
+ title={`Installed models (${models.length})`}
+ description="Manage models you've downloaded locally"
  action={
  <Button
  variant="ghost"
@@ -574,20 +574,20 @@ export default function LocalLLMPage() {
  ) : (
  <div className="text-center py-12">
  <HardDrive className="h-10 w-10 mx-auto mb-3 text-foreground-muted" />
- <p className="text-[13px] text-foreground-light">NonealreadyInstallModel</p>
- <p className="text-xs text-foreground-muted mt-1">
- fromdownmethodRecommendedModelSelectDownload
- </p>
+<p className="text-[13px] text-foreground-light">No installed models</p>
+<p className="text-xs text-foreground-muted mt-1">
+ Download from the recommended models below
+</p>
  </div>
  )}
  </SettingsSection>
  )}
 
- {/* RecommendedModel */}
+      {/* Recommended Models */}
  {status === "available" && (
  <SettingsSection
- title="RecommendedModel"
- description="PopularOpen SourceModel, ClickDownloadnowcanUsage"
+ title="Recommended models"
+ description="Popular open-source models. Click to download and use."
  >
  <div>
  {RECOMMENDED_MODELS.map((model) => {
@@ -608,7 +608,7 @@ export default function LocalLLMPage() {
  </SettingsSection>
  )}
 
- {/* TestResultDialog */}
+      {/* Test Result Dialog */}
  <Dialog open={!!testResult} onOpenChange={() => setTestResult(null)}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
@@ -643,13 +643,13 @@ export default function LocalLLMPage() {
  </DialogContent>
  </Dialog>
 
- {/* currentlyatTestDialog */}
+      {/* Testing Dialog */}
  <Dialog open={!!testingModel} onOpenChange={() => {}}>
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
- <DialogTitle className="text-foreground">currentlyatTest</DialogTitle>
- <DialogDescription className="text-foreground-light">
- currentlyatand {testingModel} ProceedConversationTest...
+            <DialogTitle className="text-foreground">Testing</DialogTitle>
+            <DialogDescription className="text-foreground-light">
+              Testing conversation with {testingModel}...
  </DialogDescription>
  </DialogHeader>
  <div className="flex items-center justify-center py-8">

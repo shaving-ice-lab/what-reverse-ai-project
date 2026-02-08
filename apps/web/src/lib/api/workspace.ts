@@ -1,11 +1,11 @@
 /**
  * Workspace API Service
- * WorkspaceManageRelatedInterface
+ * Workspace management related interfaces
  */
 
 import { request, API_BASE_URL } from "./shared";
 
-// ===== TypeDefinition =====
+// ===== Type Definitions =====
 
 export interface Workspace {
  id: string;
@@ -22,28 +22,28 @@ export interface Workspace {
  updated_at: string;
  deleted_at?: string;
  
- // App RelatedField(Workspace atthenis App)
+ // App related fields (workspace is the app)
  app_status: "draft" | "published" | "deprecated" | "archived";
  current_version_id?: string;
  pricing_type?: "free" | "paid" | "subscription";
  price?: number;
  published_at?: string;
  
- // AccessPolicyField( AppAccessPolicy)
+ // Access policy fields (app access policy)
  access_mode: "private" | "public_auth" | "public_anonymous";
  data_classification?: string;
  rate_limit_json?: Record<string, unknown>;
  allowed_origins?: string[];
  require_captcha?: boolean;
  
- // AssociateData
+ // Associated data
  current_version?: WorkspaceVersion;
 }
 
-// asCompatibleRetain App Typeas Workspace 'sAlias
+// Retain App type as alias for Workspace for compatibility
 export type App = Workspace;
 
-// Workspace Version( AppVersion)
+// Workspace version (app version)
 export interface WorkspaceVersion {
  id: string;
  workspace_id: string;
@@ -57,10 +57,10 @@ export interface WorkspaceVersion {
  created_at: string;
 }
 
-// asCompatibleRetain AppVersion Type
+// Retain AppVersion type for compatibility
 export type AppVersion = WorkspaceVersion;
 
-// Workspace Domain( AppDomain)
+// Workspace domain (app domain)
 export interface WorkspaceDomain {
  id: string;
  workspace_id: string;
@@ -80,17 +80,17 @@ export interface WorkspaceDomain {
  updated_at: string;
 }
 
-// asCompatibleRetain AppDomain Type
+// Retain AppDomain type for compatibility
 export type AppDomain = WorkspaceDomain;
 
-// DomainVerifyInfo
+// Domain verification info
 export interface DomainVerificationInfo {
  txt_name: string;
  txt_value: string;
  cname_target: string;
 }
 
-// Workspace DomainBindResult
+// Workspace domain binding result
 export interface WorkspaceDomainBindingResult {
  domain: WorkspaceDomain;
  verification?: DomainVerificationInfo;
@@ -98,7 +98,7 @@ export interface WorkspaceDomainBindingResult {
  method?: string;
 }
 
-// Workspace ExecuteRecord
+// Workspace execution record
 export interface WorkspaceExecution {
  id: string;
  workspace_id: string;
@@ -114,7 +114,7 @@ export interface WorkspaceExecution {
  created_at: string;
 }
 
-// Workspace Metrics
+// Workspace metrics
 export interface WorkspaceMetrics {
  total_executions: number;
  success_count: number;
@@ -136,7 +136,7 @@ export interface WorkspaceMember {
  joined_at?: string;
  created_at: string;
  updated_at: string;
- // UserInfo(join Back)
+ // User info (joined from backend)
  user?: {
  id: string;
  username: string;
@@ -240,7 +240,7 @@ export interface UpdateMemberRoleRequest {
  role_id: string;
 }
 
-// ===== Workspace API Key Type =====
+// ===== Workspace API Key Types =====
 
 export interface WorkspaceApiKey {
  id: string;
@@ -272,7 +272,7 @@ export interface RotateWorkspaceApiKeyRequest {
  scopes?: string[];
 }
 
-// ===== Workspace IntegrationType =====
+// ===== Workspace Integration Types =====
 
 export type IntegrationStatus = "connected" | "disconnected" | "error" | "pending";
 export type IntegrationType = "webhook" | "oauth" | "connector";
@@ -312,7 +312,7 @@ export interface ConnectorConfig {
  credentials_preview?: string;
 }
 
-// ===== API ResponseType =====
+// ===== API Response Types =====
 
 interface ApiResponse<T> {
  code: string;
@@ -327,7 +327,7 @@ interface ListResponse<T> {
  page_size: number;
 }
 
-// ===== afterendpointResponseType(Used forforalreadyImplement's user/webhook API)=====
+// ===== Backend Response Types (for already implemented user/webhook APIs) =====
 
 type BackendUserApiKey = {
  id: string;
@@ -403,7 +403,7 @@ function toWebhookIntegration(workspaceId: string, endpoint: BackendWebhookEndpo
 
 export const workspaceApi = {
  /**
- * FetchUser'sWorkspaceList
+ * Get user's workspace list
  */
  async list(): Promise<Workspace[]> {
  const response = await request<ApiResponse<ListResponse<Workspace> | { workspaces?: Workspace[] } | Workspace[]>>(
@@ -417,7 +417,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchWorkspaceDetails
+ * Get workspace details
  */
  async get(id: string): Promise<Workspace> {
  const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
@@ -428,7 +428,7 @@ export const workspaceApi = {
  },
 
  /**
- * Via slug FetchWorkspace
+ * Get workspace by slug
  */
  async getBySlug(slug: string): Promise<Workspace> {
  const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
@@ -439,7 +439,7 @@ export const workspaceApi = {
  },
 
  /**
- * CreateWorkspace
+ * Create workspace
  */
  async create(data: CreateWorkspaceRequest): Promise<Workspace> {
  const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>("/workspaces", {
@@ -451,7 +451,7 @@ export const workspaceApi = {
  },
 
  /**
- * UpdateWorkspace
+ * Update workspace
  */
  async update(id: string, data: UpdateWorkspaceRequest): Promise<Workspace> {
  const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
@@ -466,7 +466,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchWorkspaceMemberList
+ * Get workspace member list
  */
  async getMembers(workspaceId: string): Promise<WorkspaceMember[]> {
  const response = await request<ApiResponse<ListResponse<WorkspaceMember> | { members?: WorkspaceMember[] } | WorkspaceMember[]>>(
@@ -480,7 +480,7 @@ export const workspaceApi = {
  },
 
  /**
- * InviteMember
+ * Invite member
  */
  async inviteMember(
  workspaceId: string,
@@ -498,7 +498,7 @@ export const workspaceApi = {
  },
 
  /**
- * UpdateMemberRole
+ * Update member role
  */
  async updateMemberRole(
  workspaceId: string,
@@ -517,7 +517,7 @@ export const workspaceApi = {
  },
 
  /**
- * RemoveMember
+ * Remove member
  */
  async removeMember(workspaceId: string, memberId: string): Promise<void> {
  await request<ApiResponse<null>>(
@@ -529,7 +529,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchWorkspaceRoleList
+ * Get workspace role list
  */
  async getRoles(workspaceId: string): Promise<WorkspaceRole[]> {
  const response = await request<ApiResponse<ListResponse<WorkspaceRole>>>(
@@ -539,7 +539,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchWorkspaceQuotaUsageSituation
+ * Get workspace quota usage
  */
  async getQuota(workspaceId: string): Promise<WorkspaceQuota> {
  const response = await request<ApiResponse<WorkspaceQuota>>(
@@ -549,7 +549,7 @@ export const workspaceApi = {
  },
 
  /**
- * CreateLogsArchiveTask
+ * Create log archive task
  */
  async requestLogArchive(
  workspaceId: string,
@@ -566,7 +566,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchLogsArchiveTaskList
+ * Get log archive task list
  */
  async listLogArchives(
  workspaceId: string,
@@ -584,7 +584,7 @@ export const workspaceApi = {
  },
 
  /**
- * FetchLogsArchiveTaskDetails
+ * Get log archive task details
  */
  async getLogArchive(workspaceId: string, archiveId: string): Promise<LogArchiveJob> {
  const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
@@ -594,7 +594,7 @@ export const workspaceApi = {
  },
 
  /**
- * DownloadLogsArchive
+ * Download log archive
  */
  async downloadLogArchive(workspaceId: string, archiveId: string): Promise<Blob> {
  const { getStoredTokens } = await import("./shared");
@@ -616,7 +616,7 @@ export const workspaceApi = {
  },
 
  /**
- * ArchiveReplay
+ * Replay archive
  */
  async replayLogArchive(
  workspaceId: string,
@@ -647,7 +647,7 @@ export const workspaceApi = {
  },
 
  /**
- * DeleteLogsArchive
+ * Delete log archive
  */
  async deleteLogArchive(workspaceId: string, archiveId: string): Promise<void> {
  await request<ApiResponse<null>>(
@@ -656,13 +656,13 @@ export const workspaceApi = {
  );
  },
 
- // ===== Workspace API Key Method =====
+ // ===== Workspace API Key Methods =====
 
  /**
- * FetchWorkspace API KeyList
+ * Get workspace API key list
  */
  async listApiKeys(workspaceId: string): Promise<WorkspaceApiKey[]> {
- // afterendpointalreadyImplement'sisUserLevel API Key: GET /users/me/api-keys
+ // Backend currently implements user-level API keys: GET /users/me/api-keys
  const response = await request<ApiResponse<BackendUserApiKey[] | { items?: BackendUserApiKey[] }>>(
  `/users/me/api-keys`
  );
@@ -676,13 +676,13 @@ export const workspaceApi = {
  },
 
  /**
- * CreateWorkspace API Key
+ * Create workspace API key
  */
  async createApiKey(
  workspaceId: string,
  data: CreateWorkspaceApiKeyRequest
  ): Promise<WorkspaceApiKey> {
- // forafterendpoint: POST /users/me/api-keys
+ // Maps to backend: POST /users/me/api-keys
  const response = await request<ApiResponse<BackendUserApiKey | { api_key?: BackendUserApiKey }>>(
  `/users/me/api-keys`,
  {
@@ -701,7 +701,7 @@ export const workspaceApi = {
  },
 
  /**
- * RotationWorkspace API Key
+ * Rotate workspace API key
  */
  async rotateApiKey(
  workspaceId: string,
@@ -725,7 +725,7 @@ export const workspaceApi = {
  },
 
  /**
- * DisableWorkspace API Key
+ * Revoke workspace API key
  */
  async revokeApiKey(
  workspaceId: string,
@@ -745,19 +745,19 @@ export const workspaceApi = {
  },
 
  /**
- * DeleteWorkspace API Key
+ * Delete workspace API key
  */
  async deleteApiKey(_workspaceId: string, keyId: string): Promise<void> {
  await request<ApiResponse<{ message?: string }>>(`/users/me/api-keys/${keyId}`, { method: "DELETE" });
  },
 
- // ===== Workspace IntegrationMethod =====
+ // ===== Workspace Integration Methods =====
 
  /**
- * FetchWorkspaceIntegrationList
+ * Get workspace integration list
  */
  async listIntegrations(workspaceId: string): Promise<WorkspaceIntegration[]> {
- // PhaseafterendpointalreadyImplement'sis Webhook(DefaultWorkspace): GET /webhooks
+ // Currently backend implements webhooks (default workspace): GET /webhooks
  const response = await request<ApiResponse<BackendWebhookEndpoint[] | { webhooks?: BackendWebhookEndpoint[] }>>(
  `/webhooks`
  );
@@ -771,7 +771,7 @@ export const workspaceApi = {
  },
 
  /**
- * Create Webhook Integration
+ * Create webhook integration
  */
  async createWebhook(
  workspaceId: string,
@@ -800,14 +800,14 @@ export const workspaceApi = {
  },
 
  /**
- * UpdateIntegrationStatus
+ * Update integration
  */
  async updateIntegration(
  workspaceId: string,
  integrationId: string,
  data: Partial<WorkspaceIntegration>
  ): Promise<WorkspaceIntegration> {
- // itembeforeonlyfor webhook: PATCH /webhooks/:id
+ // Currently only supports webhook: PATCH /webhooks/:id
  const config: any = (data?.config_json as any) || {};
  const body: Record<string, unknown> = {};
  if (typeof data?.name === "string") body.name = data.name;
@@ -840,14 +840,14 @@ export const workspaceApi = {
  },
 
  /**
- * DeleteIntegration
+ * Delete integration
  */
  async deleteIntegration(_workspaceId: string, integrationId: string): Promise<void> {
  await request<ApiResponse<{ message?: string }>>(`/webhooks/${integrationId}`, { method: "DELETE" });
  },
 };
 
-// ===== App AccessPolicyType(CompatibleoldCode) =====
+// ===== App Access Policy Types (backward compatible) =====
 
 export interface AppAccessPolicy {
  access_mode: Workspace["access_mode"];
@@ -857,10 +857,10 @@ export interface AppAccessPolicy {
  require_captcha?: boolean;
 }
 
-// asCompatibleRetain WorkspaceAccessPolicy Alias
+// Retain WorkspaceAccessPolicy alias for compatibility
 export type WorkspaceAccessPolicy = AppAccessPolicy;
 
-// VersionforcompareResult
+// Version comparison result
 export interface AppVersionDiff {
  from_version: string;
  to_version: string;
@@ -868,18 +868,18 @@ export interface AppVersionDiff {
  summary?: string;
 }
 
-// App Metrics(CompatibleAlias)
+// App metrics (compatible alias)
 export type AppMetrics = WorkspaceMetrics;
 
-// App ExecuteRecord(CompatibleAlias)
+// App execution record (compatible alias)
 export type AppExecution = WorkspaceExecution;
 
-// ===== appApi Compatible =====
-// Workspace = App, appApi MethodMappingto workspaceApi orDirectCall workspace Endpoint
+// ===== appApi Compatibility Layer =====
+// Workspace = App, appApi methods map to workspaceApi or directly call workspace endpoints
 
 export const appApi = {
  /**
- * FetchAppList(now Workspace List, Optionalby workspace_id Filter)
+ * Get app list (now workspace list, optionally filtered by workspace_id)
  */
  async list(params?: {
  workspace_id?: string;
@@ -906,14 +906,14 @@ export const appApi = {
  },
 
  /**
- * FetchApp(Workspace)Details
+ * Get app (workspace) details
  */
  async get(id: string): Promise<Workspace> {
  return workspaceApi.get(id);
  },
 
  /**
- * CreateApp(nowCreate Workspace)
+ * Create app (now creates workspace)
  */
  async create(data: {
  name: string;
@@ -930,7 +930,7 @@ export const appApi = {
  },
 
  /**
- * PublishApp(Workspace)
+ * Publish app (workspace)
  */
  async publish(id: string): Promise<Workspace> {
  const response = await request<ApiResponse<any>>(
@@ -942,7 +942,7 @@ export const appApi = {
  },
 
  /**
- * downlineApp
+ * Deprecate app
  */
  async deprecate(id: string): Promise<Workspace> {
  const response = await request<ApiResponse<any>>(
@@ -954,7 +954,7 @@ export const appApi = {
  },
 
  /**
- * ArchiveApp
+ * Archive app
  */
  async archive(id: string): Promise<Workspace> {
  const response = await request<ApiResponse<any>>(
@@ -966,7 +966,7 @@ export const appApi = {
  },
 
  /**
- * RollbackVersion
+ * Rollback version
  */
  async rollback(id: string, versionId: string): Promise<Workspace> {
  const response = await request<ApiResponse<any>>(
@@ -978,7 +978,7 @@ export const appApi = {
  },
 
  /**
- * FetchVersionList
+ * Get version list
  */
  async getVersions(
  id: string,
@@ -1003,7 +1003,7 @@ export const appApi = {
  },
 
  /**
- * Versionforcompare
+ * Compare versions
  */
  async compareVersions(
  id: string,
@@ -1017,7 +1017,7 @@ export const appApi = {
  },
 
  /**
- * FetchAccessPolicy
+ * Get access policy
  */
  async getAccessPolicy(id: string): Promise<AppAccessPolicy> {
  const response = await request<ApiResponse<any>>(
@@ -1028,7 +1028,7 @@ export const appApi = {
  },
 
  /**
- * UpdateAccessPolicy
+ * Update access policy
  */
  async updateAccessPolicy(
  id: string,
@@ -1043,7 +1043,7 @@ export const appApi = {
  },
 
  /**
- * FetchDomainList
+ * Get domain list
  */
  async getDomains(id: string): Promise<WorkspaceDomain[]> {
  const response = await request<ApiResponse<any>>(
@@ -1060,7 +1060,7 @@ export const appApi = {
  },
 
  /**
- * BindDomain
+ * Bind domain
  */
  async bindDomain(
  id: string,
@@ -1074,7 +1074,7 @@ export const appApi = {
  },
 
  /**
- * VerifyDomain
+ * Verify domain
  */
  async verifyDomain(
  id: string,
@@ -1089,7 +1089,7 @@ export const appApi = {
  },
 
  /**
- * DeleteDomain
+ * Delete domain
  */
  async deleteDomain(id: string, domainId: string): Promise<void> {
  await request<ApiResponse<null>>(
@@ -1099,7 +1099,7 @@ export const appApi = {
  },
 
  /**
- * Update UI Schema
+ * Update UI schema
  */
  async updateUISchema(
  id: string,
@@ -1114,7 +1114,7 @@ export const appApi = {
  },
 
  /**
- * FetchExecuteList
+ * Get execution list
  */
  async getExecutions(
  id: string,
@@ -1138,7 +1138,7 @@ export const appApi = {
  },
 
  /**
- * FetchMetrics
+ * Get metrics
  */
  async getMetrics(id: string, params?: { days?: number }): Promise<WorkspaceMetrics> {
  const search = new URLSearchParams();
@@ -1151,7 +1151,7 @@ export const appApi = {
  },
 
  /**
- * CancelExecute
+ * Cancel execution
  */
  async cancelExecution(executionId: string): Promise<void> {
  await request<ApiResponse<null>>(
@@ -1161,7 +1161,7 @@ export const appApi = {
  },
 
  /**
- * UpdatePublicpage SEO Info
+ * Update public page SEO info
  */
  async updatePublicSEO(
  id: string,

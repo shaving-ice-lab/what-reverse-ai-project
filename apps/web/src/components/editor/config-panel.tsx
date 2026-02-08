@@ -61,7 +61,7 @@ const nodeIcons: Record<string, React.ReactNode> = {
  output: <FileOutput className="h-4 w-4" />,
 };
 
-// NodeTypeColorConfig
+// Node Type Color Config
 const nodeTypeColors: Record<string, { bg: string; icon: string; border: string }> = {
  llm: { bg: "bg-brand-200/60", icon: "text-brand-500", border: "border-brand-400/40" },
  http: { bg: "bg-surface-200/80", icon: "text-foreground-muted", border: "border-border/70" },
@@ -81,7 +81,7 @@ const nodeTypeColors: Record<string, { bg: string; icon: string; border: string 
  end: { bg: "bg-destructive-200/80", icon: "text-destructive", border: "border-destructive/30" },
 };
 
-// canCollapseConfigRegionComponent
+// Collapsible Config Section Component
 function ConfigSection({
  title,
  icon,
@@ -123,7 +123,7 @@ function ConfigSection({
  );
 }
 
-// 1'sFormInputstyle
+// Unified form input style
 const inputStyles = "bg-surface-200/80 border-border/70 text-foreground placeholder:text-foreground-muted focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 transition-colors";
 const labelStyles = "text-sm font-medium text-foreground mb-1.5 block";
 
@@ -187,7 +187,7 @@ function LLMNodeConfig({
  onValueChange={(value) => updateConfig("model", value)}
  >
  <SelectTrigger className={inputStyles}>
- <SelectValue placeholder="SelectModel" />
+ <SelectValue placeholder="Select model" />
  </SelectTrigger>
  <SelectContent className="bg-surface-100/95 border-border/70 shadow-lg shadow-black/20">
  <SelectItem value="gpt-4" className="text-foreground focus:bg-surface-200 focus:text-foreground">GPT-4</SelectItem>
@@ -195,7 +195,7 @@ function LLMNodeConfig({
  <SelectItem value="gpt-3.5-turbo" className="text-foreground focus:bg-surface-200 focus:text-foreground">GPT-3.5 Turbo</SelectItem>
  <SelectItem value="claude-3-opus" className="text-foreground focus:bg-surface-200 focus:text-foreground">Claude 3 Opus</SelectItem>
  <SelectItem value="claude-3-sonnet" className="text-foreground focus:bg-surface-200 focus:text-foreground">Claude 3 Sonnet</SelectItem>
- <SelectItem value="local" className="text-foreground focus:bg-surface-200 focus:text-foreground">LocalModel</SelectItem>
+ <SelectItem value="local" className="text-foreground focus:bg-surface-200 focus:text-foreground">Local model</SelectItem>
  </SelectContent>
  </Select>
  </div>
@@ -205,7 +205,7 @@ function LLMNodeConfig({
  <Textarea
  value={config.systemPrompt || ""}
  onChange={(e) => updateConfig("systemPrompt", e.target.value)}
- placeholder="Settings AI Roleandrowas..."
+ placeholder="Set the AI's role and behavior..."
  rows={3}
  className={cn(inputStyles, "resize-none")}
  />
@@ -223,12 +223,12 @@ function LLMNodeConfig({
  ref={userPromptRef}
  value={config.userPrompt || ""}
  onChange={(e) => updateConfig("userPrompt", e.target.value)}
- placeholder="InputPrompt, Support {{variable}} Variable"
+ placeholder="Input prompt, supports {{variable}} syntax"
  rows={4}
  className={cn(inputStyles, "resize-none")}
  />
  <p className="text-[11px] text-foreground-muted">
- Usage {"{{Variable}}"} enteronVariable
+ Use {"{{variable}}"} syntax to insert variables
  </p>
  </div>
 
@@ -327,7 +327,7 @@ function HTTPNodeConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label>RequestMethod</Label>
+ <Label>Request method</Label>
  <Select
  value={config.method || "GET"}
  onValueChange={(value) => updateConfig("method", value)}
@@ -418,12 +418,12 @@ function CodeNodeConfig({
  className="font-mono text-sm"
  />
  <p className="text-xs text-foreground-muted">
- countReceive inputs for, BackvalueasNodeOutput
+ Function receives inputs parameter, returns value as node output
  </p>
  </div>
 
  <div className="space-y-2">
- <Label>TimeoutTime (s)</Label>
+ <Label>Timeout (seconds)</Label>
  <Input
  type="number"
  min={1000}
@@ -457,7 +457,7 @@ function TemplateNodeConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label>TemplateContent</Label>
+ <Label>Template content</Label>
  <Textarea
  value={config.template || ""}
  onChange={(e) => updateConfig("template", e.target.value)}
@@ -465,7 +465,7 @@ function TemplateNodeConfig({
  rows={8}
  />
  <p className="text-xs text-foreground-muted">
- Usage {"{{Variable}}"} enterVariable
+ Use {"{{variable}}"} syntax to insert variables
  </p>
  </div>
  </div>
@@ -505,7 +505,7 @@ function VariableNodeConfig({
  </div>
 
  <div className="space-y-2">
- <Label>DataType</Label>
+ <Label>Data type</Label>
  <Select
  value={config.valueType || "string"}
  onValueChange={(value) => updateConfig("valueType", value)}
@@ -524,7 +524,7 @@ function VariableNodeConfig({
  </div>
 
  <div className="space-y-2">
- <Label>Defaultvalue</Label>
+ <Label>Default value</Label>
  <Textarea
  value={
  typeof config.value === "object"
@@ -607,21 +607,21 @@ function InputNodeConfig({
  className="font-mono"
  />
  <p className="text-xs text-foreground-muted">
- Used forInputMapping, SuggestionUsagechar/countchar/downline
+ Used for input mapping. Suggestion: use string/number/boolean
  </p>
  </div>
 
  <div className="space-y-2">
- <Label>DisplayName</Label>
+ <Label>Display name</Label>
  <Input
  value={config.label || ""}
  onChange={(e) => updateConfig("label", e.target.value)}
- placeholder="UserInput"
+ placeholder="User input"
  />
  </div>
 
  <div className="space-y-2">
- <Label>InputType</Label>
+ <Label>Input type</Label>
  <Select
  value={inputType}
  onValueChange={(value) => updateConfig("inputType", value)}
@@ -631,28 +631,28 @@ function InputNodeConfig({
  </SelectTrigger>
  <SelectContent>
  <SelectItem value="text">Text</SelectItem>
- <SelectItem value="textarea">Text</SelectItem>
- <SelectItem value="number">countchar</SelectItem>
+ <SelectItem value="textarea">Textarea</SelectItem>
+ <SelectItem value="number">Number</SelectItem>
  <SelectItem value="boolean">Toggle</SelectItem>
  <SelectItem value="select">Select</SelectItem>
  <SelectItem value="password">Password</SelectItem>
  <SelectItem value="email">Email</SelectItem>
- <SelectItem value="url">Link</SelectItem>
+ <SelectItem value="url">URL</SelectItem>
  </SelectContent>
  </Select>
  </div>
 
  <div className="space-y-2">
- <Label>Tip</Label>
+ <Label>Placeholder</Label>
  <Input
  value={config.placeholder || ""}
  onChange={(e) => updateConfig("placeholder", e.target.value)}
- placeholder="Please enter..."
+ placeholder="Enter placeholder text..."
  />
  </div>
 
  <div className="space-y-2">
- <Label>Defaultvalue</Label>
+ <Label>Default value</Label>
  <Input
  value={config.defaultValue === undefined ? "" : String(config.defaultValue)}
  onChange={(e) => updateConfig("defaultValue", e.target.value)}
@@ -692,27 +692,27 @@ function InputNodeConfig({
  )}
 
  <div className="space-y-2">
- <Label>ValidateRule</Label>
+ <Label>Validation rule</Label>
  <div className="grid grid-cols-2 gap-2">
  <Input
  type="number"
  value={config.validation?.min ?? ""}
  onChange={(e) => updateValidation("min", e.target.value === "" ? undefined : Number(e.target.value))}
- placeholder="Minimumvalue"
+ placeholder="Minimum value"
  className={inputStyles}
  />
  <Input
  type="number"
  value={config.validation?.max ?? ""}
  onChange={(e) => updateValidation("max", e.target.value === "" ? undefined : Number(e.target.value))}
- placeholder="Maximumvalue"
+ placeholder="Maximum value"
  className={inputStyles}
  />
  </div>
  <Input
  value={config.validation?.pattern || ""}
  onChange={(e) => updateValidation("pattern", e.target.value)}
- placeholder="currentlythenExpression"
+ placeholder="Regex pattern"
  className={inputStyles}
  />
  </div>
@@ -744,7 +744,7 @@ function OutputNodeConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label>ShowcaseType</Label>
+ <Label>Display type</Label>
  <Select
  value={config.outputType || "text"}
  onValueChange={(value) => updateConfig("outputType", value)}
@@ -769,23 +769,23 @@ function OutputNodeConfig({
  <Input
  value={config.title || ""}
  onChange={(e) => updateConfig("title", e.target.value)}
- placeholder="OutputResult"
+ placeholder="Output result"
  />
  </div>
 
  <div className="space-y-2">
- <Label>MaximumLength</Label>
+ <Label>Maximum length</Label>
  <Input
  type="number"
  min={0}
  value={config.maxLength ?? ""}
  onChange={(e) => updateConfig("maxLength", e.target.value === "" ? undefined : Number(e.target.value))}
- placeholder="0 RepresentnotLimit"
+ placeholder="0 means no limit"
  />
  </div>
 
  <div className="flex items-center justify-between">
- <label className="text-xs text-foreground-muted">DisplayTime</label>
+ <label className="text-xs text-foreground-muted">Display time</label>
  <Switch
  checked={Boolean(config.showTimestamp)}
  onCheckedChange={(checked) => updateConfig("showTimestamp", checked)}
@@ -839,9 +839,9 @@ function ConditionNodeConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label>ConditionConfig</Label>
+ <Label>Condition config</Label>
  <p className="text-xs text-foreground-muted">
- ConfigDetermineCondition, SatisfyConditiontimeExecute True Branch, nothenExecute False Branch
+ Configure conditions. When satisfied, the True branch executes; otherwise, the False branch executes.
  </p>
  </div>
  <ConditionBuilder
@@ -888,9 +888,9 @@ function LoopNodeConfig({
  <SelectValue />
  </SelectTrigger>
  <SelectContent>
- <SelectItem value="forEach">Traversecountgroup (For Each)</SelectItem>
- <SelectItem value="while">ConditionLoop (While)</SelectItem>
- <SelectItem value="count">Fixedtimescount</SelectItem>
+ <SelectItem value="forEach">Traverse array (For Each)</SelectItem>
+ <SelectItem value="while">Condition loop (While)</SelectItem>
+ <SelectItem value="count">Fixed times loop</SelectItem>
  </SelectContent>
  </Select>
  </div>
@@ -898,7 +898,7 @@ function LoopNodeConfig({
  {config.mode === "forEach" && (
  <div className="space-y-2">
  <div className="flex items-center justify-between">
- <Label>Traversecountgroup</Label>
+ <Label>Traverse array</Label>
  <VariableSelector
  currentNodeId={node.id}
  onSelect={(v) => updateConfig("items", v.path)}
@@ -907,31 +907,31 @@ function LoopNodeConfig({
  <Input
  value={config.items || ""}
  onChange={(e) => updateConfig("items", e.target.value)}
- placeholder="{{countgroupVariable}}"
+ placeholder="{{arrayVariable}}"
  />
  <p className="text-xs text-foreground-muted">
- InputneedTraverse'scountgroupVariable
+ Input must be an array variable
  </p>
  </div>
  )}
 
  {config.mode === "while" && (
  <div className="space-y-2">
- <Label>LoopCondition</Label>
+ <Label>Loop condition</Label>
  <Input
  value={config.condition || ""}
  onChange={(e) => updateConfig("condition", e.target.value)}
  placeholder="{{Variable}} == true"
  />
  <p className="text-xs text-foreground-muted">
- ConditionastimeContinueLoop
+ The loop continues while this condition is true
  </p>
  </div>
  )}
 
  {config.mode === "count" && (
  <div className="space-y-2">
- <Label>Looptimescount</Label>
+ <Label>Loop Count</Label>
  <Input
  type="number"
  min={1}
@@ -945,7 +945,7 @@ function LoopNodeConfig({
  <Separator />
 
  <div className="space-y-2">
- <Label>MaximumIterationtimescount</Label>
+ <Label>Max iterations</Label>
  <Input
  type="number"
  min={1}
@@ -954,7 +954,7 @@ function LoopNodeConfig({
  onChange={(e) => updateConfig("maxIterations", parseInt(e.target.value))}
  />
  <p className="text-xs text-foreground-muted">
- PreventNonelimitLoop'sSecurityLimit
+ Prevent infinite loops (security limit)
  </p>
  </div>
  </div>
@@ -1002,7 +1002,7 @@ function DatabaseNodeConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-1.5">
- <label className={labelStyles}>ActionType</label>
+ <label className={labelStyles}>Action type</label>
  <div className="text-xs text-foreground-muted">
  {operation.toUpperCase()}
  </div>
@@ -1077,7 +1077,7 @@ function DatabaseNodeConfig({
  );
 }
 
-// useBasicConfig
+// Basic Config
 function BasicConfig({
  node,
  onUpdate,
@@ -1088,11 +1088,11 @@ function BasicConfig({
  return (
  <div className="space-y-4">
  <div className="space-y-2">
- <Label>NodeName</Label>
+ <Label>Node name</Label>
  <Input
  value={node.data.label || ""}
  onChange={(e) => onUpdate({ label: e.target.value })}
- placeholder="NodeName"
+ placeholder="Node name"
  />
  </div>
 
@@ -1101,7 +1101,7 @@ function BasicConfig({
  <Textarea
  value={node.data.description || ""}
  onChange={(e) => onUpdate({ description: e.target.value })}
- placeholder="NodeDescription(Optional)"
+ placeholder="Node description (optional)"
  rows={2}
  />
  </div>
@@ -1109,7 +1109,7 @@ function BasicConfig({
  );
 }
 
-// Based onNodeTypeRenderConfig
+// Render Config Based on Node Type
 function NodeConfigByType({
  node,
  onUpdate,
@@ -1145,7 +1145,7 @@ function NodeConfigByType({
  default:
  return (
  <div className="py-4 text-center text-foreground-muted text-sm">
- NodeNonecanConfig
+ This node has no configurable options
  </div>
  );
  }
@@ -1170,15 +1170,15 @@ export function ConfigPanel() {
  <aside className="w-full h-full bg-transparent flex flex-col">
  {/* Header */}
  <div className="h-12 px-4 flex items-center border-b border-border bg-surface-75/80">
- <span className="text-sm font-medium text-foreground">NodeConfig</span>
+ <span className="text-sm font-medium text-foreground">Node config</span>
  </div>
  <div className="flex-1 flex items-center justify-center p-6">
  <div className="text-center max-w-[200px]">
  <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-linear-to-br from-surface-100 to-surface-200 border border-border flex items-center justify-center">
  <Settings className="h-6 w-6 text-foreground-muted" />
  </div>
- <p className="text-sm font-medium text-foreground mb-1">SelectNode</p>
- <p className="text-xs text-foreground-muted leading-relaxed">ClickCanvas'sNodeViewandEditConfig</p>
+ <p className="text-sm font-medium text-foreground mb-1">Select node</p>
+ <p className="text-xs text-foreground-muted leading-relaxed">Click a node on the canvas to view and edit its config.</p>
  </div>
  </div>
  </aside>
@@ -1190,7 +1190,7 @@ export function ConfigPanel() {
 
  return (
  <aside className="w-full h-full bg-transparent flex flex-col">
- {/* Header - DisplayNodeTypeandName */}
+ {/* Header - Display Node Type and Name */}
  <div className="px-4 py-3 border-b border-border bg-surface-75/80">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
@@ -1202,7 +1202,7 @@ export function ConfigPanel() {
  </div>
  <div className="min-w-0">
  <h3 className="text-sm font-medium text-foreground truncate">
- {selectedNode.data.label || "not yetNamingNode"}
+ {selectedNode.data.label || "Unnamed Node"}
  </h3>
  <p className="text-[11px] text-foreground-muted capitalize">{selectedNode.type}</p>
  </div>
@@ -1218,13 +1218,13 @@ export function ConfigPanel() {
  </div>
  </div>
 
- {/* ConfigContent */}
+{/* Config Content */}
  <ScrollArea className="flex-1">
- {/* currentSettings */}
- <ConfigSection title="currentSettings" icon={<Info className="w-3.5 h-3.5" />}>
+  {/* General Settings */}
+ <ConfigSection title="Current settings" icon={<Info className="w-3.5 h-3.5" />}>
  <div className="space-y-4">
  <div>
- <label className={labelStyles}>NodeName</label>
+ <label className={labelStyles}>Node Name</label>
  <Input 
  value={selectedNode.data.label || ""} 
  onChange={(e) => handleUpdate({ label: e.target.value })}
@@ -1236,7 +1236,7 @@ export function ConfigPanel() {
  <Textarea
  value={selectedNode.data.description || ""}
  onChange={(e) => handleUpdate({ description: e.target.value })}
- placeholder="NodeDescription(Optional)"
+ placeholder="Node description (optional)"
  rows={2}
  className={cn(inputStyles, "resize-none")}
  />
@@ -1244,16 +1244,16 @@ export function ConfigPanel() {
  </div>
  </ConfigSection>
 
- {/* NodeExclusiveConfig */}
+ {/* Node-Specific Config */}
  <ConfigSection 
- title="NodeConfig" 
+ title="Node config" 
  icon={<Zap className="w-3.5 h-3.5" />}
  >
  <NodeConfigByType node={selectedNode} onUpdate={handleUpdate} />
  </ConfigSection>
  </ScrollArea>
 
- {/* FooterInfo - moreCompact */}
+ {/* Footer Info */}
  <div className="px-4 py-2.5 border-t border-border bg-surface-75/80">
  <div className="flex items-center justify-between text-[10px] text-foreground-muted">
  <span>ID</span>

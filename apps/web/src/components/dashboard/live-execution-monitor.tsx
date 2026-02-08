@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * Real-timeExecuteMonitorPanel
+ * Live Execution Monitor Panel
  * 
- * CurrentExecute'sWorkflowList, ExecuteProgress BarandNodeStatus, Real-timeLogs
- * Usage WebSocket ProceedReal-timeUpdate
+ * Currently executing workflow list, execution progress bar and node status, real-time logs.
+ * Uses WebSocket for real-time updates.
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -57,7 +57,7 @@ interface LogEntry {
 
 interface LiveExecutionMonitorProps {
  className?: string;
- workflowId?: string; // Optional, SpecifyMonitorSpecificWorkflow
+  workflowId?: string; // Optional, monitor a specific workflow
 }
 
 export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMonitorProps) {
@@ -68,7 +68,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  const logEndRef = useRef<HTMLDivElement>(null);
  const [isLoading, setIsLoading] = useState(true);
 
- // LoadRun'sExecuteRecord
+  // Load running execution records
  const loadRunningExecutions = useCallback(async () => {
  try {
  const response = await executionApi.list({
@@ -77,7 +77,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  pageSize: 10,
  });
  
- // Convertas ExecutingWorkflow Format
+    // Convert to ExecutingWorkflow format
  const runningWorkflows: ExecutingWorkflow[] = (response.data || []).map((exec: ExecutionRecord) => ({
  id: exec.id,
  executionId: exec.id,
@@ -94,35 +94,35 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(),
  level: "info" as const,
- message: "currentlyatExecute...",
+          message: "Currently executing...",
  }],
  }));
  
  setWorkflows(runningWorkflows);
  } catch (err) {
- console.error("LoadExecuteRecordFailed:", err);
+      console.error("Failed to load execution records:", err);
  } finally {
  setIsLoading(false);
  }
  }, [workflowId]);
 
- // InitialLoad
+  // Initial load
  useEffect(() => {
  loadRunningExecutions();
  }, [loadRunningExecutions]);
 
- // WebSocket Connect
+  // WebSocket connection
  const handleMessage = useCallback((message: WSMessage) => {
  const { type, payload, timestamp } = message;
 
  switch (type) {
  case "execution.started": {
  const execPayload = payload as ExecutionPayload;
- // CheckisnoneedneedFilterWorkflow
+        // Check if we need to filter by workflow
  if (workflowId && execPayload.workflowId !== workflowId) return;
  
  setWorkflows((prev) => {
- // CheckisnoAlready exists
+            // Check if already exists
  if (prev.find((w) => w.executionId === execPayload.executionId)) return prev;
  
  return [
@@ -144,7 +144,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(timestamp),
  level: "info",
- message: "ExecutealreadyStart",
+                message: "Execution started",
  },
  ],
  },
@@ -167,7 +167,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(timestamp),
  level: "info" as const,
- message: `Node ${nodePayload.nodeType || nodePayload.nodeId} StartExecute`,
+                  message: `Node ${nodePayload.nodeType || nodePayload.nodeId} started executing`,
  node: nodePayload.nodeType || nodePayload.nodeId,
  },
  ],
@@ -286,14 +286,14 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(timestamp),
  level: "success" as const,
- message: `ExecuteDone (totalDuration: ${execPayload.durationMs}ms)`,
+                message: `Execution completed (total duration: ${execPayload.durationMs}ms)`,
  },
  ],
  }
  : wf
  )
  );
- // 3safterAutoRemoveCompleted'sExecute
+      // Auto-remove completed execution after 5s
  setTimeout(() => {
  setWorkflows((prev) => prev.filter((wf) => wf.executionId !== execPayload.executionId));
  }, 5000);
@@ -314,7 +314,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(timestamp),
  level: "error" as const,
- message: `ExecuteFailed: ${execPayload.error}`,
+                message: `Execution failed: ${execPayload.error}`,
  },
  ],
  }
@@ -344,24 +344,24 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  autoConnect: true,
  });
 
- // CancelExecute
- const handleCancel = async (executionId: string) => {
- try {
- await executionApi.cancel(executionId);
- setWorkflows((prev) => prev.filter((wf) => wf.executionId !== executionId));
- } catch (err) {
- console.error("CancelExecuteFailed:", err);
+  // Cancel execution
+  const handleCancel = async (executionId: string) => {
+    try {
+      await executionApi.cancel(executionId);
+      setWorkflows((prev) => prev.filter((wf) => wf.executionId !== executionId));
+    } catch (err) {
+      console.error("Failed to cancel execution:", err);
  }
  };
 
- // AutoScrolltomostnewLogs
+  // Auto-scroll to latest logs
  useEffect(() => {
  if (isAutoScroll && logEndRef.current) {
  logEndRef.current.scrollIntoView({ behavior: "smooth" });
  }
  }, [workflows, isAutoScroll]);
 
- // NavigatetoExecuteDetails
+  // Navigate to execution details
  const handleViewDetail = (executionId: string) => {
  router.push(`/executions/${executionId}`);
  };
@@ -408,13 +408,13 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  const getStatusText = (status: ExecutingWorkflow["status"]) => {
  switch (status) {
  case "pending":
- return "etcpending";
- case "running":
- return "Run";
- case "paused":
- return "Paused";
- case "completing":
- return "nowwillDone";
+      return "Pending";
+    case "running":
+      return "Running";
+    case "paused":
+      return "Paused";
+    case "completing":
+      return "Completing";
  case "completed":
  return "Completed";
  case "failed":
@@ -444,7 +444,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  </div>
  <div>
  <h3 className="font-bold text-foreground flex items-center gap-2">
- Real-timeExecuteMonitor
+                Live Execution Monitor
  {runningCount > 0 && (
  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -453,12 +453,12 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  )}
  </h3>
  <p className="text-xs text-muted-foreground">
- {runningCount > 0 ? `${runningCount} WorkflowcurrentlyatExecute`: "NoneExecute'sTask"}
+ {runningCount > 0 ? `${runningCount} workflow(s) running` : "No running tasks"}
  </p>
  </div>
  </div>
  <div className="flex items-center gap-2">
- {/* ConnectStatusIndicator - Enhanced */}
+        {/* Connection Status Indicator - Enhanced */}
  <div className={cn(
  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-300",
  isConnected 
@@ -487,29 +487,29 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  </div>
  </div>
 
- {/* ExecuteList - Enhanced */}
+      {/* Execution List - Enhanced */}
  <div className="max-h-[400px] overflow-auto">
  {isLoading ? (
  <div className="p-10 flex flex-col items-center justify-center">
  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4 ring-1 ring-amber-500/20">
  <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
  </div>
- <p className="text-sm font-medium text-muted-foreground">LoadExecuteRecord...</p>
+ <p className="text-sm font-medium text-muted-foreground">Loading execution records...</p>
  </div>
  ) : workflows.length === 0 ? (
  <div className="p-10 text-center">
  <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4 ring-1 ring-border/50">
  <Zap className="w-8 h-8 text-muted-foreground/70" />
  </div>
- <p className="text-sm font-semibold text-foreground">NoneExecute'sTask</p>
+ <p className="text-sm font-semibold text-foreground">No running tasks</p>
  <p className="text-xs text-muted-foreground mt-1.5">
  {isConnected ? (
  <span className="flex items-center justify-center gap-1.5">
  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
- WebSocket Connected, etcpendingExecuteEvent...
+                    WebSocket connected, waiting for execution events...
  </span>
  ) : (
- "PleaseCheck WebSocket Connect"
+                "Please check WebSocket connection"
  )}
  </p>
  </div>
@@ -523,7 +523,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  animation: 'fadeInUp 300ms ease-out both'
  }}
  >
- {/* WorkflowInfo */}
+            {/* Workflow Info */}
  <button
  onClick={() => setExpandedId(expandedId === workflow.executionId ? null : workflow.executionId)}
  className="w-full p-4 flex items-center gap-4 hover:bg-amber-500/5 transition-all duration-200 group"
@@ -618,7 +618,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  </div>
  </button>
 
- {/* Expand'sLogsRegion - Enhanced */}
+            {/* Expanded Logs - Enhanced */}
  {expandedId === workflow.executionId && (
  <div className="border-t border-border/50 bg-gradient-to-b from-muted/30 to-muted/10">
  <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30">
@@ -626,7 +626,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  <div className="p-1 rounded-md bg-muted/50">
  <Terminal className="w-3 h-3" />
  </div>
- ExecuteLogs
+                  Execution Logs
  <span className="text-[10px] text-muted-foreground/60 px-1.5 py-0.5 rounded-full bg-muted/50">
  {workflow.logs.length} 
  </span>
@@ -640,7 +640,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  : "text-muted-foreground hover:bg-muted/50"
  )}
  >
- {isAutoScroll ? "⏬ AutoScroll": "⏸ ManualScroll"}
+                  {isAutoScroll ? "⏬ Auto-scroll": "⏸ Manual"}
  </button>
  </div>
  <div className="max-h-48 overflow-auto p-3 font-mono text-xs space-y-1.5 bg-card/50">

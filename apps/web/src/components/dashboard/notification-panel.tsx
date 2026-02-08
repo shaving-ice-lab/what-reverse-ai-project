@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * NotificationsPanelComponent - Manus Style
- * DisplaySystemNotifications, TaskUpdate, MessageReminderetc
+ * Notifications Panel Component - Manus Style
+ * Display System Notifications, Task Updates, Message Reminders, etc.
  */
 
 import { useState } from "react";
@@ -33,31 +33,31 @@ import {
  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// NotificationsType
+// Notification Type
 type NotificationType = "workflow" | "message" | "alert" | "info" | "reward" | "system";
 
 interface Notification {
- id: string;
- type: NotificationType;
- title: string;
- description: string;
- time: string;
- read: boolean;
- actionUrl?: string;
- actionLabel?: string;
+  id: string;
+  type: NotificationType;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
 }
 
-// MockNotificationsData
+// Mock Notifications Data
 const mockNotifications: Notification[] = [
  {
  id: "1",
  type: "workflow",
- title: "WorkflowExecuteDone",
+ title: "Workflow Execution Complete",
  description: "Customer Feedback Auto Process executed successfully, processed 24 feedback items",
- time: "2 minbefore",
+ time: "2 min ago",
  read: false,
  actionUrl: "/dashboard/workflows/wf-1",
- actionLabel: "ViewDetails",
+ actionLabel: "View Details",
  },
  {
  id: "2",
@@ -107,7 +107,7 @@ const mockNotifications: Notification[] = [
  },
 ];
 
-// FetchNotificationsIcon
+// Get notification icon
 const getNotificationIcon = (type: NotificationType) => {
  switch (type) {
  case "workflow":
@@ -141,24 +141,24 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  ? notifications.filter((n) => !n.read)
  : notifications;
 
- // Markasalreadyread
+ // Mark as read
  const markAsRead = (id: string) => {
  setNotifications((prev) =>
  prev.map((n) => (n.id === id ? { ...n, read: true } : n))
  );
  };
 
- // Markallsectionalreadyread
+ // Mark all as read
  const markAllAsRead = () => {
  setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
  };
 
- // DeleteNotifications
+ // Delete notification
  const deleteNotification = (id: string) => {
  setNotifications((prev) => prev.filter((n) => n.id !== id));
  };
 
- // ClearAllNotifications
+ // Clear all notifications
  const clearAll = () => {
  setNotifications([]);
  };
@@ -167,13 +167,13 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
 
  return (
  <>
- {/* BackgroundMask */}
+ {/* Background Mask */}
  <div
  className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
  onClick={onClose}
  />
 
- {/* NotificationsPanel */}
+ {/* Notifications Panel */}
  <div className="fixed right-4 top-16 w-[400px] max-h-[calc(100vh-100px)] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 flex flex-col overflow-hidden animate-in slide-in-from-right-4 fade-in duration-200">
  {/* Header */}
  <div className="flex items-center justify-between p-4 border-b border-border">
@@ -181,7 +181,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
  {unreadCount > 0 && (
  <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary/20 text-primary">
- {unreadCount} not yetread
+ {unreadCount} unread
  </span>
  )}
  </div>
@@ -191,8 +191,8 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  onClick={markAllAsRead}
  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
  >
- allsectionalreadyread
- </button>
+Mark all as read
+            </button>
  )}
  <button
  onClick={onClose}
@@ -203,7 +203,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  </div>
  </div>
 
- {/* FilterTags */}
+ {/* Filter Tabs */}
  <div className="flex items-center gap-2 p-3 border-b border-border">
  <button
  onClick={() => setFilter("all")}
@@ -214,30 +214,30 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
  )}
  >
- allsection
- </button>
- <button
- onClick={() => setFilter("unread")}
- className={cn(
- "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
- filter === "unread"
- ? "bg-muted text-foreground"
- : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
- )}
- >
- not yetread
+            All
+          </button>
+          <button
+            onClick={() => setFilter("unread")}
+            className={cn(
+              "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
+              filter === "unread"
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            )}
+          >
+            Unread
  </button>
  </div>
 
- {/* NotificationsList */}
+ {/* Notifications List */}
  <div className="flex-1 overflow-y-auto">
  {filteredNotifications.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 text-center">
  <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
  <Bell className="w-6 h-6 text-muted-foreground/50" />
  </div>
- <p className="text-sm text-muted-foreground">NoneNotifications</p>
- <p className="text-xs text-muted-foreground/60 mt-1">new'sNotificationswillDisplayatthisin</p>
+ <p className="text-sm text-muted-foreground">No notifications</p>
+ <p className="text-xs text-muted-foreground/60 mt-1">New notifications will appear here</p>
  </div>
  ) : (
  <div className="divide-y divide-border">
@@ -278,7 +278,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  </p>
  </div>
 
- {/* ActionMenu */}
+ {/* Action Menu */}
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <button
@@ -301,7 +301,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  }}
  >
  <Check className="w-4 h-4" />
- Markalreadyread
+ Mark as read
  </DropdownMenuItem>
  )}
  <DropdownMenuItem
@@ -318,7 +318,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  </DropdownMenu>
  </div>
 
- {/* TimeandAction */}
+ {/* Time and Action */}
  <div className="flex items-center justify-between mt-2">
  <span className="text-[11px] text-muted-foreground/60 flex items-center gap-1">
  <Clock className="w-3 h-3" />
@@ -351,7 +351,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  onClick={clearAll}
  className="text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
  >
- Clearallsection
+ Clear all
  </button>
  <a
  href="/dashboard/settings/notifications"
@@ -367,7 +367,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
  );
 }
 
-// NotificationsButtonComponent
+// Notification Bell Button Component
 interface NotificationBellProps {
  onClick: () => void;
  unreadCount?: number;

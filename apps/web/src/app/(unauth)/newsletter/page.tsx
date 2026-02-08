@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Newsletter SubscriptionPage - LobeHub StyleDarkDesign
+ * Newsletter Subscription Page - LobeHub Style Dark Design
  */
 
 import { useState } from "react";
@@ -26,33 +26,33 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// SubscriptionContentType
+// Subscription Content Types
 const contentTypes = [
  {
  id: "all",
- title: "allsectionUpdate",
- description: "ReceiveAllType'sUpdate",
+ title: "All Updates",
+ description: "Receive all types of updates",
  icon: Bell,
  default: true,
  },
  {
  id: "product",
- title: "ProductUpdate",
- description: "newFeaturesPublishandImprove",
+ title: "Product Updates",
+ description: "New feature releases and improvements",
  icon: Sparkles,
  default: true,
  },
  {
  id: "blog",
- title: "BlogArticle",
- description: "TechnologyShareandBest Practices",
+ title: "Blog Articles",
+ description: "Technical insights and best practices",
  icon: BookOpen,
  default: true,
  },
  {
  id: "tips",
- title: "UsageTips",
- description: "Improverate'ssmallTips",
+ title: "Usage Tips",
+ description: "Quick tips to boost your productivity",
  icon: Zap,
  default: false,
  },
@@ -62,60 +62,60 @@ const contentTypes = [
 const highlights = [
  {
  icon: Calendar,
- title: "eachweeksFeatured",
- description: "eachweeks5Send, notwillyou'sWorkRhythm",
+    title: "Weekly Highlights",
+    description: "Sent every Friday, without disrupting your work rhythm",
  },
  {
  icon: Star,
- title: "Content",
- description: "SubscriptionuserExclusive'sDepthArticleandResource",
+ title: "Exclusive Content",
+ description: "In-depth articles and resources exclusive to subscribers",
  },
  {
  icon: Gift,
- title: "ExclusiveDiscount",
- description: "SubscriptionusercanObtainProductDiscountandEarlyExperience",
+ title: "Exclusive Discounts",
+ description: "Subscribers get product discounts and early access",
  },
  {
  icon: Users,
- title: "Community",
- description: "CommunityBest PracticesandCase StudiesShare",
+ title: "Community Highlights",
+ description: "Community best practices and case study highlights",
  },
 ];
 
-// pastArticleExample
+// Past Issues
 const pastIssues = [
  {
- title: "AI Agent 2.0 DepthParse",
+ title: "AI Agent 2.0 Deep Dive",
  date: "2026-01-25",
  readTime: "5 min",
- category: "ProductUpdate",
+ category: "Product Update",
  },
  {
- title: "2026 yearsWorkflowAutomationTrend",
+ title: "2026 Workflow Automation Trends",
  date: "2026-01-18",
  readTime: "8 min",
- category: "IndustryInsights",
+ category: "Industry Insights",
  },
  {
- title: "5 letyourate'sWorkflowTemplate",
+ title: "5 Workflow Templates to Boost Your Productivity",
  date: "2026-01-11",
  readTime: "6 min",
- category: "UsageTips",
+ category: "Usage Tips",
  },
  {
- title: "ifwhatuse AgentFlow BuildSmartSupport",
+ title: "How to Build Smart Customer Support with AgentFlow",
  date: "2026-01-04",
  readTime: "10 min",
- category: "PracticalTutorial",
+ category: "Practical Tutorial",
  },
 ];
 
-// SubscriptionuserData
+// Subscriber Stats
 const stats = [
- { value: "50,000+", label: "Subscriptionuser" },
- { value: "48%", label: "AverageOpenrate" },
- { value: "200+", label: "inArticle" },
- { value: "4.9/5", label: "readuserRating" },
+ { value: "50,000+", label: "Subscribers" },
+ { value: "48%", label: "Average Open Rate" },
+ { value: "200+", label: "Articles Published" },
+ { value: "4.9/5", label: "Reader Rating" },
 ];
 
 export default function NewsletterPage() {
@@ -165,23 +165,23 @@ export default function NewsletterPage() {
  <CheckCircle className="w-10 h-10 text-brand" />
  </div>
  <h1 className="text-[20px] font-semibold text-foreground mb-4">
- SubscriptionSuccess!
+ Subscription Successful!
  </h1>
  <p className="text-[13px] text-foreground-light mb-4">
- Thank youyou'sSubscription!Wealready <span className="text-foreground font-medium">{email}</span> Send1ConfirmEmail.
+              Thank you for subscribing! We've already sent a confirmation email to <span className="text-foreground font-medium">{email}</span>.
  </p>
  <p className="text-[12px] text-foreground-lighter mb-8">
- PleaseCheckyou'sEmail(IncludeGarbageEmailFolder), ClickConfirmLinkDoneSubscription.
+              Please check your email (including your spam folder) and click the confirmation link to complete your subscription.
  </p>
  <div className="flex flex-col sm:flex-row gap-4 justify-center">
  <Link href="/">
  <Button variant="outline" className="rounded-full border-border/30">
- BackHome
+ Back to Home
  </Button>
  </Link>
  <Link href="/blog">
  <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
- BrowseBlog
+ Browse Blog
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -205,13 +205,13 @@ export default function NewsletterPage() {
  Newsletter
  </div>
  <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-semibold text-foreground leading-tight tracking-tight mb-6">
- Maintain
+ Stay Up to Date on{" "}
  <span className="text-brand">
- {""}What's New
+ What&apos;s New
  </span>
  </h1>
  <p className="text-[15px] text-foreground-light max-w-2xl mx-auto mb-8">
- SubscriptionWe's Newsletter, FetchProductUpdate, TechnologyArticle, UsageTipsandIndustryInsights
+ Subscribe to our newsletter for product updates, technical articles, usage tips, and industry insights
  </p>
 
  {/* Stats */}
@@ -255,7 +255,7 @@ export default function NewsletterPage() {
  <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
  ) : (
  <>
- Subscription
+ Subscribe
  <ArrowRight className="ml-2 w-4 h-4" />
  </>
  )}
@@ -266,7 +266,7 @@ export default function NewsletterPage() {
  {/* Content Type Selection */}
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-3">
- SubscriptionContent(canmultipleselect)
+ Subscription Content (select multiple)
  </label>
  <div className="grid sm:grid-cols-2 gap-3">
  {contentTypes.map((type) => (
@@ -311,11 +311,11 @@ export default function NewsletterPage() {
 
  {/* Privacy Note */}
  <p className="text-[11px] text-foreground-lighter text-center">
- SubscriptionnowRepresentyouAgreeWe's{""}
+ By subscribing, you agree to our{" "}
  <Link href="/privacy" className="text-brand hover:underline">
  Privacy Policy
  </Link>
- .youcanwithAnytimeUnsubscribe.
+ . You can unsubscribe at any time.
  </p>
  </form>
  </div>
@@ -327,10 +327,10 @@ export default function NewsletterPage() {
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-12">
  <h2 className="text-[20px] font-semibold text-foreground mb-4">
- SubscriptionuserExclusive
+ Exclusive for Subscribers
  </h2>
  <p className="text-[13px] text-foreground-light">
- asSubscriptionuser, EnjoymoremultipleExclusiveContentand
+ As a subscriber, enjoy exclusive content and more
  </p>
  </div>
  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -360,10 +360,10 @@ export default function NewsletterPage() {
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-12">
  <h2 className="text-[20px] font-semibold text-foreground mb-4">
- Featured
+ Past Issues
  </h2>
  <p className="text-[13px] text-foreground-light">
- seeseeWeRecentPublish's1Content
+ Check out some of our recently published content
  </p>
  </div>
 
@@ -403,7 +403,7 @@ export default function NewsletterPage() {
  <div className="text-center mt-8">
  <Link href="/blog">
  <Button variant="outline" className="rounded-full border-border/30">
- View moreArticle
+ View More Articles
  <ArrowRight className="ml-2 w-4 h-4" />
  </Button>
  </Link>
@@ -419,10 +419,10 @@ export default function NewsletterPage() {
  <div className="relative z-10">
  <Mail className="w-12 h-12 text-brand/60 mx-auto mb-4" />
  <h2 className="text-[22px] sm:text-[26px] font-semibold text-foreground mb-4">
- pastwhatUpdate
+ Never Miss an Update
  </h2>
  <p className="text-[13px] text-foreground-light mb-8 max-w-lg mx-auto">
- Join 50,000+ Subscriptionuser, eachweeksFetchmostnew'sProductanduseTips
+ Join 50,000+ subscribers and get the latest product updates and tips every week
  </p>
  <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
  <Input
@@ -431,7 +431,7 @@ export default function NewsletterPage() {
  className="h-12 bg-surface-100/50 border-border/30 text-foreground placeholder:text-foreground-lighter rounded-full"
  />
  <Button className="h-12 px-6 rounded-full bg-foreground text-background font-medium hover:bg-foreground/90 shrink-0">
- NowSubscription
+ Subscribe Now
  </Button>
  </div>
  </div>

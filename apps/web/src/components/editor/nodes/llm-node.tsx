@@ -35,7 +35,7 @@ export const LLMNode = memo(function LLMNode({
  selected && "border-brand-500 shadow-[0_0_0_2px_rgba(62,207,142,0.28)]"
  )}
  >
- {/* InputPort */}
+ {/* Input Port */}
  <Handle
  id="input"
  type="target"

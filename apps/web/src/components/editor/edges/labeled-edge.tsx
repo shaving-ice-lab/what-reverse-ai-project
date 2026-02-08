@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * Tags'sCustomEdge - optimalversion
+ * Custom Edge with Label - Optimized Version
  * 
- * :
- * - GradientConnectline
- * - SmoothAnimationEffect
- * - FloatHighlight
- * - selectStatusGlow
+ * Features:
+ * - Gradient Connection Line
+ * - Smooth Animation Effects
+ * - Hover Highlight
+ * - Selection Glow
  */
 
 import { memo, useState } from "react";
@@ -31,7 +31,7 @@ interface LabeledEdgeData {
 
 export type LabeledEdgeType = Edge<LabeledEdgeData, "labeled">;
 
-// Edge'sBasicstyle
+// Edge Basic Styles
 const edgeColors = {
  default: "var(--color-border)",
  hover: "var(--color-border-strong)",
@@ -73,7 +73,7 @@ export const LabeledEdge = memo(function LabeledEdge({
  onMouseEnter={() => setIsHovered(true)}
  onMouseLeave={() => setIsHovered(false)}
  >
- {/* Transparent'sPathUsed formoreEasy'sInteractive */}
+ {/* Transparent Path for Easier Interaction */}
  <path
  d={edgePath}
  fill="none"
@@ -82,7 +82,7 @@ export const LabeledEdge = memo(function LabeledEdge({
  style={{ cursor: "pointer" }}
  />
  
- {/* select/Floattime'sGlowEffect */}
+ {/* Selected/hover glow effect */}
  {(selected || isHovered) && (
  <path
  d={edgePath}
@@ -94,7 +94,7 @@ export const LabeledEdge = memo(function LabeledEdge({
  />
  )}
  
- {/* mainEdgeline */}
+ {/* Main Edge Line */}
  <BaseEdge
  path={edgePath}
  markerEnd={markerEnd}
@@ -106,7 +106,7 @@ export const LabeledEdge = memo(function LabeledEdge({
  }}
  />
  
- {/* AnimationFlowEffect - selecttimeDisplay */}
+ {/* Animation Flow Effect - Shown When Selected */}
  {selected && (
  <path
  d={edgePath}
@@ -360,7 +360,7 @@ export const ConditionalEdge = memo(function ConditionalEdge({
  onMouseEnter={() => setIsHovered(true)}
  onMouseLeave={() => setIsHovered(false)}
  >
- {/* TransparentInteractive */}
+ {/* Transparent interactive area */}
  <path
  d={edgePath}
  fill="none"
@@ -369,7 +369,7 @@ export const ConditionalEdge = memo(function ConditionalEdge({
  style={{ cursor: "pointer" }}
  />
  
- {/* GlowEffect */}
+ {/* Glow effect */}
  {(selected || isHovered) && (
  <path
  d={edgePath}
@@ -381,7 +381,7 @@ export const ConditionalEdge = memo(function ConditionalEdge({
  />
  )}
  
- {/* mainEdgeline */}
+ {/* Main Edge Line */}
  <BaseEdge
  path={edgePath}
  markerEnd={markerEnd}

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * AI WritingAssistantPanel
- * Used forCreativeContentGenerate, ProvideSmartWritingSuggestionandEnhancedFeatures
+ * AI Writing Assistant Panel
+ * Provides creative content generation, smart writing suggestions, and enhanced features
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -54,16 +54,16 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 
-// WritingStyle
+// Writing Styles
 const writingStyles = [
- { id: "professional", label: "Professionalcurrently", icon: FileText },
- { id: "casual", label: "Easy", icon: MessageSquare },
+ { id: "professional", label: "Professional", icon: FileText },
+ { id: "casual", label: "Casual", icon: MessageSquare },
  { id: "creative", label: "Creative", icon: Sparkles },
- { id: "persuasive", label: "power", icon: Target },
- { id: "informative", label: "InfoRich", icon: Lightbulb },
+ { id: "persuasive", label: "Persuasive", icon: Target },
+ { id: "informative", label: "Informative", icon: Lightbulb },
 ];
 
-// ContentType
+// Content Types
 const contentTypes = [
  { id: "article", label: "Article", icon: FileText },
  { id: "marketing", label: "Marketing Copy", icon: TrendingUp },
@@ -74,21 +74,21 @@ const contentTypes = [
 
 // Quick Actions
 const quickActions = [
- { id: "expand", label: "ExtendContent", icon: ArrowRight, description: "letContentmoreDetailedRich" },
- { id: "summarize", label: "StreamlineSummary", icon: List, description: "Coreneed" },
- { id: "rewrite", label: "optimal", icon: RefreshCw, description: "1typemethod" },
- { id: "translate", label: "TranslateConvert", icon: Languages, description: "TranslateotherheLanguage" },
- { id: "tone", label: "AdjustTone", icon: Type, description: "ChangeWritingStyle" },
- { id: "grammar", label: "SyntaxCheck", icon: Check, description: "currentlySyntaxError" },
+ { id: "expand", label: "Expand Content", icon: ArrowRight, description: "Make content more detailed and rich" },
+ { id: "summarize", label: "Summarize", icon: List, description: "Extract core points" },
+ { id: "rewrite", label: "Rewrite", icon: RefreshCw, description: "Rephrase in a different style" },
+ { id: "translate", label: "Translate", icon: Languages, description: "Translate to another language" },
+ { id: "tone", label: "Adjust Tone", icon: Type, description: "Change the writing style" },
+ { id: "grammar", label: "Grammar Check", icon: Check, description: "Fix grammar errors" },
 ];
 
-// AI Suggestion
+// AI Suggestions
 const aiSuggestions = [
- "Add1personenter'shead",
- "JoinDataorCase StudiescomeSupport",
- "Usagemore's",
- "Adduse",
- "optimalParagraphpast",
+ "Add a compelling introduction",
+ "Include data or case studies for support",
+ "Use more vivid language",
+ "Add a call to action",
+ "Improve paragraph transitions",
 ];
 
 interface AIWritingPanelProps {
@@ -114,14 +114,14 @@ export function AIWritingPanel({
  const [copied, setCopied] = useState(false);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
- // CopyContent
+ // Copy content
  const handleCopy = () => {
  navigator.clipboard.writeText(content);
  setCopied(true);
  setTimeout(() => setCopied(false), 2000);
  };
 
- // ExecuteQuick Actions
+ // Execute quick action
  const handleQuickAction = async (actionId: string) => {
  if (!content.trim()) return;
  
@@ -134,13 +134,13 @@ export function AIWritingPanel({
  
  switch (actionId) {
  case "expand":
- newContent = `${content}\n\nthisoutside, value1'sis, this1stillcanwithfromwithdownmethodfaceProceedenterDiscuss: \n\n1. first, fromfacecomesee...\n2. othertimes, PracticeCase StudiesAnalytics...\n3. mostafter, not yetcomeDevelopmentTrend...`;
+ newContent = `${content}\n\nFurthermore, it is worth noting that this topic can be explored from the following perspectives:\n\n1. First, from a theoretical standpoint...\n2. Additionally, practical case studies suggest...\n3. Finally, looking at future development trends...`;
  break;
  case "summarize":
- newContent = `Coreneed: \n• ${content.slice(0, 100)}...\n• mainneed: ContentalreadyStreamline\n• key: PleaseView`;
+ newContent = `Key points:\n• ${content.slice(0, 100)}...\n• Main takeaway: Content has been summarized\n• Highlights: See above`;
  break;
  case "rewrite":
- newContent = `pastoptimal'sVersion: \n\n${content.replace(/./g, '!').replace(/, /g, ', ')}`;
+ newContent = `Improved version:\n\n${content.replace(/./g, '!').replace(/, /g, ', ')}`;
  break;
  default:
  break;
@@ -150,23 +150,23 @@ export function AIWritingPanel({
  setIsGenerating(false);
  };
 
- // GenerateContent
+ // Generate content
  const handleGenerate = async () => {
  if (!prompt.trim()) return;
  
  setIsGenerating(true);
  
- // MockGenerate
+ // Mock generation
  await new Promise((resolve) => setTimeout(resolve, 2000));
  
- const generatedContent = `Based onyou'sneed"${prompt}", withdownisGenerate's${contentTypes.find(t => t.id === selectedType)?.label}Content: \n\n${selectedStyle === 'professional' ? ''sreaduser, \n\n': '!\n\n'}thisis1 AI Generate'sExampleContent.atActualUsage, thisinwillBased onyou'sSpecificRequirementsGenerateshould'sContent.\n\n${selectedStyle === 'professional' ? 'WeHopewithonContentcanSatisfyyou'sRequirements.': 'HopeforyouhasHelp!'}`;
+ const generatedContent = `Based on your request "${prompt}", here is the generated ${contentTypes.find(t => t.id === selectedType)?.label} content:\n\n${selectedStyle === 'professional' ? 'Dear reader,\n\n' : 'Hi there!\n\n'}This is an AI-generated example. In actual use, the content will be generated based on your specific requirements.\n\n${selectedStyle === 'professional' ? 'We hope this content meets your needs.' : 'Hope this helps!'}`;
  
  onContentChange(generatedContent);
  setPrompt("");
  setIsGenerating(false);
  };
 
- // AppSuggestion
+ // Apply suggestion
  const handleApplySuggestion = (suggestion: string) => {
  setPrompt(suggestion);
  };
@@ -175,7 +175,7 @@ export function AIWritingPanel({
  <div className={cn("flex flex-col h-full", className)}>
  {/* Toolbar */}
  <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50">
- {/* ContentType */}
+ {/* Content Type */}
  <Select value={selectedType} onValueChange={setSelectedType}>
  <SelectTrigger className="w-[120px] h-9">
  <SelectValue />
@@ -192,7 +192,7 @@ export function AIWritingPanel({
  </SelectContent>
  </Select>
 
- {/* WritingStyle */}
+ {/* Writing Style */}
  <Select value={selectedStyle} onValueChange={setSelectedStyle}>
  <SelectTrigger className="w-[120px] h-9">
  <SelectValue />
@@ -246,7 +246,7 @@ export function AIWritingPanel({
  {copied ? (
  <>
  <Check className="w-4 h-4 mr-2" />
- alreadyCopy
+ Copied
  </>
  ) : (
  <>
@@ -257,18 +257,18 @@ export function AIWritingPanel({
  </Button>
  </div>
 
- {/* ContentEdit */}
+ {/* Content Editor */}
  <div className="flex-1 p-4 overflow-auto">
  <Textarea
  ref={textareaRef}
  value={content}
  onChange={(e) => onContentChange(e.target.value)}
- placeholder="atthisinInputorGenerateContent..."
+ placeholder="Enter or generate content here..."
  className="min-h-[300px] resize-none border-none focus-visible:ring-0 text-base leading-relaxed"
  />
  </div>
 
- {/* AI GeneratePanel */}
+ {/* AI Generation Panel */}
  <div className="border-t border-border bg-card/50 p-4 space-y-4">
  {/* AI Suggestion */}
  {showSuggestions && (
@@ -299,13 +299,13 @@ export function AIWritingPanel({
  </div>
  )}
 
- {/* GenerateInput */}
+ {/* Generation Input */}
  <div className="flex items-end gap-3">
  <div className="flex-1">
  <Textarea
  value={prompt}
  onChange={(e) => setPrompt(e.target.value)}
- placeholder="DescriptionyouwantneedGenerate'sContent..."
+ placeholder="Describe the content you want to generate..."
  className="min-h-[80px] resize-none"
  />
  </div>
@@ -328,9 +328,9 @@ export function AIWritingPanel({
  </Button>
  </div>
 
- {/* ShortcutTip */}
+ {/* Shortcut Tip */}
  <div className="flex items-center justify-between text-xs text-foreground-light">
- <span>Tip: Usage Cmd+Enter QuickGenerate</span>
+ <span>Tip: Use Cmd+Enter to quickly generate</span>
  <span>Token Usage: 0 / 4,000</span>
  </div>
  </div>
@@ -338,7 +338,7 @@ export function AIWritingPanel({
  );
 }
 
-// WritingSuggestionCard
+// Writing Suggestion Card
 interface WritingSuggestionCardProps {
  title: string;
  description: string;

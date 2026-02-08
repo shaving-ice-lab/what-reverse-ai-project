@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Prompt PreviewComponent - Minimalist Style
+ * Prompt Preview Component - Minimalist Style
  */
 
 import { useMemo, useState } from "react";
@@ -25,7 +25,7 @@ interface PromptPreviewProps {
 }
 
 const mockVariables: Record<string, unknown> = {
- input: "thisisUserInput'sContentExample",
+ input: "This is user input content example",
  name: "3",
  age: 25,
  items: ["result", "", ""],
@@ -150,7 +150,7 @@ export function PromptPreview({
  size="icon"
  className="h-6 w-6"
  onClick={() => setUseRealVariables(!useRealVariables)}
- title={useRealVariables ? "UsageMockData": "UsageRealData"}
+ title={useRealVariables ? "Use Mock Data": "Use Real Data"}
  >
  <RefreshCw className={cn("h-3.5 w-3.5", useRealVariables && "text-brand-500")} />
  </Button>
@@ -181,7 +181,7 @@ export function PromptPreview({
  </pre>
  ) : (
  <p className="text-sm text-foreground-muted italic text-center py-3">
- InputTemplateContentViewPreview...
+ Enter template content to view preview...
  </p>
  )}
  </div>
@@ -193,7 +193,7 @@ export function PromptPreview({
  <div className="px-3 py-2 text-xs space-y-1.5 bg-surface-200">
  {usedVariables.length > 0 && (
  <div className="flex flex-wrap items-center gap-1">
- <span className="text-foreground-muted">UsageVariable:</span>
+ <span className="text-foreground-muted">Used Variables:</span>
  {usedVariables.map((v) => (
  <Badge key={v} variant="secondary" className="text-xs font-mono">
  {v}
@@ -203,7 +203,7 @@ export function PromptPreview({
  )}
  {missingVariables.length > 0 && (
  <div className="flex flex-wrap items-center gap-1">
- <span className="text-destructive">MissingVariable:</span>
+ <span className="text-destructive">Missing Variables:</span>
  {missingVariables.map((v) => (
  <Badge key={v} variant="destructive" className="text-xs font-mono">
  {v}

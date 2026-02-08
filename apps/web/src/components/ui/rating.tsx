@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * RatingandReviewsComponent
- * SupportStar RatingRating, Like, FeedbacketcFeatures
+ * Rating and Feedback Component
+ * Supports star ratings, likes, feedback, and more
  */
 
 import { useState } from "react";
@@ -23,7 +23,7 @@ import { Button } from "./button";
 import { Textarea } from "./textarea";
 
 // ============================================
-// Star RatingRating
+// Star Rating
 // ============================================
 
 interface StarRatingProps {
@@ -103,7 +103,7 @@ export function StarRating({
 }
 
 // ============================================
-// Like/for
+// Like / Dislike
 // ============================================
 
 interface ThumbsRatingProps {
@@ -164,7 +164,7 @@ export function ThumbsRating({
 }
 
 // ============================================
-// centerFavorite
+// Favorite
 // ============================================
 
 interface HeartButtonProps {
@@ -243,8 +243,8 @@ export function EmojiRating({
 }: EmojiRatingProps) {
  const options = [
  { id: "positive", icon: Smile, label: "Satisfied", color: "text-emerald-500", bg: "bg-emerald-500/10" },
- { id: "neutral", icon: Meh, label: "1", color: "text-amber-500", bg: "bg-amber-500/10" },
- { id: "negative", icon: Frown, label: "notSatisfied", color: "text-red-500", bg: "bg-red-500/10" },
+    { id: "neutral", icon: Meh, label: "Neutral", color: "text-amber-500", bg: "bg-amber-500/10" },
+    { id: "negative", icon: Frown, label: "Unsatisfied", color: "text-red-500", bg: "bg-red-500/10" },
  ] as const;
 
  return (
@@ -277,7 +277,7 @@ export function EmojiRating({
 }
 
 // ============================================
-// RatingShowcase
+// Rating Display
 // ============================================
 
 interface RatingDisplayProps {
@@ -297,7 +297,7 @@ export function RatingDisplay({
 
  return (
  <div className={cn("flex items-start gap-6", className)}>
- {/* totalRating */}
+ {/* Overall Rating */}
  <div className="text-center">
  <div className="text-4xl font-bold text-foreground">{rating.toFixed(1)}</div>
  <StarRating value={rating} readonly size="sm" />
@@ -308,7 +308,7 @@ export function RatingDisplay({
  )}
  </div>
 
- {/* RatingDistribution */}
+ {/* Rating Distribution */}
  {breakdown && (
  <div className="flex-1 space-y-2">
  {breakdown.sort((a, b) => b.stars - a.stars).map((item) => {
@@ -336,7 +336,7 @@ export function RatingDisplay({
 }
 
 // ============================================
-// FeedbackForm
+// Feedback Form
 // ============================================
 
 interface FeedbackFormProps {
@@ -348,8 +348,8 @@ interface FeedbackFormProps {
 
 export function FeedbackForm({
  onSubmit,
- title = "you'sFeedback",
- placeholder = "PleaseTellWeyou'swant...",
+  title = "Your Feedback",
+  placeholder = "Please tell us what you think...",
  className,
 }: FeedbackFormProps) {
  const [rating, setRating] = useState(0);
@@ -374,8 +374,8 @@ export function FeedbackForm({
  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
  <ThumbsUp className="w-6 h-6 text-emerald-500" />
  </div>
- <h3 className="font-semibold text-foreground mb-1">Thank youyou'sFeedback!</h3>
- <p className="text-sm text-muted-foreground">you'sFeedbackforWeVeryre-need</p>
+        <h3 className="font-semibold text-foreground mb-1">Thank You for Your Feedback!</h3>
+        <p className="text-sm text-muted-foreground">Your feedback is very important to us</p>
  </div>
  );
  }
@@ -411,7 +411,7 @@ export function FeedbackForm({
  ) : (
  <>
  <Send className="w-4 h-4 mr-2" />
- SubmitFeedback
+            Submit Feedback
  </>
  )}
  </Button>
@@ -420,7 +420,7 @@ export function FeedbackForm({
 }
 
 // ============================================
-// QuickReviews
+// Quick Feedback
 // ============================================
 
 interface QuickFeedbackProps {
@@ -430,7 +430,7 @@ interface QuickFeedbackProps {
 }
 
 export function QuickFeedback({
- question = "thisAnswerforyouhasHelp??",
+  question = "Was this answer helpful?",
  onFeedback,
  className,
 }: QuickFeedbackProps) {
@@ -444,7 +444,7 @@ export function QuickFeedback({
  if (submitted !== null) {
  return (
  <div className={cn("text-sm text-muted-foreground", className)}>
- Thank youyou'sFeedback!
+        Thank you for your feedback!
  </div>
  );
  }
