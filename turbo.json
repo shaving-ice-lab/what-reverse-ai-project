@@ -21,26 +21,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
     },
-    "build:admin": {
-      "dependsOn": ["^build"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*",
-        "src/**",
-        "public/**",
-        "next.config.*",
-        "tailwind.config.*",
-        "postcss.config.*",
-        "tsconfig.json"
-      ],
-      "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
-    },
     "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "dev:admin": {
       "cache": false,
       "persistent": true
     },
@@ -49,22 +30,11 @@
       "inputs": ["$TURBO_DEFAULT$", "eslint.config.*", ".eslintrc.*"],
       "outputs": []
     },
-    "lint:admin": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*"],
-      "outputs": []
-    },
     "test": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "src/**", "vitest.config.*"],
       "outputs": ["coverage/**"],
       "env": ["NODE_ENV"]
-    },
-    "test:admin": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "src/**", "tests/**", "vitest.config.*", "playwright.config.*"],
-      "outputs": ["coverage/**", "playwright-report/**"],
-      "env": ["NODE_ENV", "CI"]
     },
     "test:e2e": {
       "dependsOn": ["build"],

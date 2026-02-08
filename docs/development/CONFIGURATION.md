@@ -73,8 +73,3 @@
 - `AGENTFLOW_API_TOKEN`: API 访问令牌
 - `AGENTFLOW_TOKEN`: 访问令牌（兜底）
 
-## 5. 桌面端（Desktop）签名环境变量
-
-桌面端代码签名使用变量较多，完整清单见：
-- `apps/desktop/docs/CODE_SIGNING.md`
-
