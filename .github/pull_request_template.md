@@ -14,7 +14,6 @@
 
 - [ ] Backend
 - [ ] Web
-- [ ] Desktop
 - [ ] SDK
 - [ ] Docs only
 

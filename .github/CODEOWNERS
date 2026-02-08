@@ -13,7 +13,6 @@
 # Product areas
 /apps/server/ @shaving-ice-lab/backend
 /apps/web/ @shaving-ice-lab/frontend
-/apps/desktop/ @shaving-ice-lab/desktop
 /packages/sdk/ @shaving-ice-lab/sdk
 
 # Critical modules (merge-gate applies)
