@@ -80,7 +80,7 @@ export function TaskPanel({ className }: TaskPanelProps) {
        name: exec.workflowName || `Workflow ${exec.workflowId.slice(-6)}`,
        icon: exec.workflowIcon || "❌",
        status: "failed" as const,
-       description: "Execution failed",
+       description: "Failed to execute",
        errorMessage: exec.errorMessage || "Unknown error",
  priority: "high" as const,
  }));

@@ -18,7 +18,7 @@ const footerSections = [
  { label: "Pricing Plan", href: "/pricing" },
  { label: "Enterprise", href: "/enterprise" },
  { label: "Template Gallery", href: "/templates" },
- { label: "Change Log", href: "/whats-new" },
+ { label: "Changelog", href: "/whats-new" },
  ],
  },
  {

@@ -100,7 +100,7 @@ export function ImageUploader({
 
  onChange([...images, ...newImages]);
  } catch (err) {
- setError(err instanceof Error ? err.message : "Upload failed");
+ setError(err instanceof Error ? err.message : "Failed to upload");
  } finally {
  setIsUploading(false);
  }
@@ -237,7 +237,7 @@ export function ImageUploader({
  <>
  <Upload className="w-8 h-8 text-muted-foreground mb-2" />
  <span className="text-sm text-muted-foreground">
- Click or drag & drop to upload
+ Click or drag and drop to upload
  </span>
  <span className="text-xs text-muted-foreground/60 mt-1">
  Maximum {maxSizeMB}MB

@@ -49,7 +49,7 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
  });
  }, [data]);
 
- // CalculateAveragevalueUsed forReferenceline
+ // Calculate average value used for reference line
  const averageGross = useMemo(() => {
  return data.reduce((sum, item) => sum + item.gross, 0) / data.length;
  }, [data]);
@@ -245,10 +245,10 @@ function CustomTooltip({ active, payload, label }: any) {
  ))}
  </div>
  
- {/* Transactioncount */}
+ {/* Transaction Count */}
  {data?.count && (
  <div className="mt-3 pt-2 border-t border-border flex items-center justify-between">
- <span className="text-xs text-foreground-muted">Transactioncount</span>
+ <span className="text-xs text-foreground-muted">Transaction Count</span>
  <span className="text-xs font-medium text-foreground-muted">
  {data.count} 
  </span>
@@ -258,16 +258,16 @@ function CustomTooltip({ active, payload, label }: any) {
  );
 }
 
-// FormatmonthsDisplay(Brief)
+// Format month display (brief)
 function formatMonth(month: string): string {
  const [year, m] = month.split("-");
  const monthNum = parseInt(m, 10);
- return `${monthNum}months`;
+ return `${monthNum} ${monthNum === 1 ? 'month' : 'months'}`;
 }
 
-// FormatmonthsDisplay(Complete)
+// Format month display (full)
 function formatFullMonth(month: string): string {
  const [year, m] = month.split("-");
  const monthNum = parseInt(m, 10);
- return `${year}years${monthNum}months`;
+ return `${year} ${parseInt(year, 10) === 1 ? 'year' : 'years'}, ${monthNum} ${monthNum === 1 ? 'month' : 'months'}`;
 }

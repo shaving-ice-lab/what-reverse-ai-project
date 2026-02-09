@@ -57,7 +57,7 @@ function resolveErrorState(error: unknown): WorkspaceGuardError {
  }
  return {
  variant: "error",
-      title: "Workspace Load Failed",
+      title: "Failed to Load Workspace",
       description: "Please try again later, or check your network connection.",
  };
 }

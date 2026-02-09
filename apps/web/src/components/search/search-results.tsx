@@ -278,7 +278,7 @@ export function EmptySearchState({ query, className }: EmptySearchStateProps) {
  <p className="text-sm text-muted-foreground text-center max-w-sm">
  {query
  ? "Try different keywords or check spelling"
-: "Search workflows, agents, conversations, documents and more"}
+: "Search workflows, agents, conversations, documents, and more"}
  </p>
  </div>
  );

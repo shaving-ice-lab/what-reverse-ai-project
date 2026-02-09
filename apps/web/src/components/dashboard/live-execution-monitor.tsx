@@ -94,7 +94,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  id: `log-${Date.now()}`,
  timestamp: new Date(),
  level: "info" as const,
-          message: "Currently executing...",
+          message: "Executing...",
  }],
  }));
  
@@ -453,7 +453,7 @@ export function LiveExecutionMonitor({ className, workflowId }: LiveExecutionMon
  )}
  </h3>
  <p className="text-xs text-muted-foreground">
- {runningCount > 0 ? `${runningCount} workflow(s) running` : "No running tasks"}
+ {runningCount > 0 ? `${runningCount} ${runningCount === 1 ? 'workflow' : 'workflows'} running` : "No running tasks"}
  </p>
  </div>
  </div>

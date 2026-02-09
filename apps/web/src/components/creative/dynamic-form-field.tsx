@@ -116,7 +116,7 @@ export function checkShowCondition(
 ): boolean {
  if (!field.showWhen) return true;
 
- const { field: dependField, operator", value: expectedValue } = field.showWhen;
+ const { field: dependField, operator, value: expectedValue } = field.showWhen;
  const actualValue = allValues[dependField];
 
  switch (operator) {

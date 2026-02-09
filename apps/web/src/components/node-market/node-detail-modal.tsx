@@ -116,7 +116,7 @@ export function NodeDetailModal({
  setIsInstalled(response.data.userState?.isInstalled || false);
  } catch (err) {
  console.error("Failed to load node details:", err);
-     setError(err instanceof Error ? err.message: "Failed to load");
+     setError(err instanceof Error ? err.message: "Failed to load details");
  } finally {
  setIsLoading(false);
  }
@@ -145,7 +145,7 @@ export function NodeDetailModal({
  onInstallSuccess?.();
  } catch (err) {
  console.error("Failed to install:", err);
-     alert(err instanceof Error ? err.message: "Installation failed");
+     alert(err instanceof Error ? err.message: "Failed to install node");
  } finally {
  setIsInstalling(false);
  }
@@ -161,7 +161,7 @@ export function NodeDetailModal({
  setIsInstalled(false);
  } catch (err) {
  console.error("Failed to uninstall:", err);
-     alert(err instanceof Error ? err.message: "Uninstall failed");
+     alert(err instanceof Error ? err.message: "Failed to uninstall node");
  } finally {
  setIsInstalling(false);
  }

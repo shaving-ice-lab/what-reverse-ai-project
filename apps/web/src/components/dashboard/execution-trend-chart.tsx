@@ -76,7 +76,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  setData(chartData);
  } catch (err) {
  console.error("Failed to load execution trend:", err);
- setError(err instanceof Error ? err.message : "Load failed");
+ setError(err instanceof Error ? err.message : "Failed to load trend data");
  // Use empty data as fallback
  setData([]);
  } finally {
@@ -268,7 +268,7 @@ export function ExecutionTrendChart({ className }: ExecutionTrendChartProps) {
  <div className="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mb-3 ring-1 ring-red-500/20">
  <TrendingDown className="w-7 h-7 text-red-500" />
  </div>
- <p className="text-sm font-medium text-foreground mb-1">Load Failed</p>
+ <p className="text-sm font-medium text-foreground mb-1">Failed to Load Chart</p>
  <p className="text-xs text-muted-foreground mb-3">{error}</p>
  <button 
  onClick={loadData}

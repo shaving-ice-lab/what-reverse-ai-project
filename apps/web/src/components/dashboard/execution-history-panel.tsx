@@ -3,7 +3,7 @@
 /**
  * Execution History Panel Component
  * 
- * Displays workflow execution history records. Supports viewing details, retry and cancel.
+ * Displays workflow execution history records. Supports viewing details, retry, and cancel.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -105,7 +105,7 @@ export function ExecutionHistoryPanel({
  setError(null);
  } catch (err) {
       console.error("Failed to load execution history:", err);
-      setError(err instanceof Error ? err.message: "Failed to load");
+      setError(err instanceof Error ? err.message: "Failed to load execution history");
  } finally {
  setIsLoading(false);
  setIsRefreshing(false);
@@ -127,7 +127,7 @@ export function ExecutionHistoryPanel({
       await loadExecutions();
     } catch (err) {
       console.error("Failed to retry execution:", err);
-      alert(err instanceof Error ? err.message: "Retry failed");
+      alert(err instanceof Error ? err.message: "Failed to retry execution");
  } finally {
  setRetryingId(null);
  }
@@ -142,7 +142,7 @@ export function ExecutionHistoryPanel({
       await loadExecutions();
     } catch (err) {
       console.error("Failed to cancel execution:", err);
-      alert(err instanceof Error ? err.message: "Cancel failed");
+      alert(err instanceof Error ? err.message: "Failed to cancel execution");
  } finally {
  setCancellingId(null);
  }
@@ -238,7 +238,7 @@ export function ExecutionHistoryPanel({
  <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 ring-1 ring-red-500/20">
  <AlertCircle className="w-8 h-8 text-red-500" />
  </div>
-              <h3 className="font-semibold text-foreground mb-2">Failed to Load</h3>
+              <h3 className="font-semibold text-foreground mb-2">Failed to Load Data</h3>
  <p className="text-sm text-foreground-light mb-4 max-w-xs">{error}</p>
  <Button 
  variant="outline" 
