@@ -39,7 +39,7 @@ function handleGlobalError(error: unknown) {
  toast.error(getErrorMessage(error));
 }
 
-// Settingsall Toast(Used forComponentEnvironment)
+// Settings all toast (used for component environment)
 function GlobalToastSetter() {
  const { addToast } = useToast();
  

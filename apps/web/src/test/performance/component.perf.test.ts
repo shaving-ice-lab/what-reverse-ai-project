@@ -54,11 +54,11 @@ function simulateWorkflowUpdate(nodes: ReturnType<typeof generateMockNodes>) {
  }));
 }
 
-describe('ComponentRendercanTest', () => {
- const suite = createPerformanceSuite('UI Componentcan');
+describe('Component render can test', () => {
+ const suite = createPerformanceSuite('UI Component');
 
- describe('NodeDataProcesscan', () => {
- it('Generate 100 Nodeshouldat 10ms inDone', async () => {
+ describe('Node data process can', () => {
+ it('Generate 100 nodes should complete at 10ms', async () => {
  const result = await benchmark(
  'Generate 100 Node',
  () => generateMockNodes(100),
@@ -69,7 +69,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(10);
  });
 
- it('Generate 500 Nodeshouldat 50ms inDone', async () => {
+ it('Generate 500 nodes should complete at 50ms', async () => {
  const result = await benchmark(
  'Generate 500 Node',
  () => generateMockNodes(500),
@@ -80,7 +80,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(50);
  });
 
- it('Generate 1000 Nodeshouldat 100ms inDone', async () => {
+ it('Generate 1000 nodes should complete at 100ms', async () => {
  const result = await benchmark(
  'Generate 1000 Node',
  () => generateMockNodes(1000),
@@ -92,8 +92,8 @@ describe('ComponentRendercanTest', () => {
  });
  });
 
- describe('EdgeDataProcesscan', () => {
- it('Generate 100 Edgeshouldat 5ms inDone', async () => {
+ describe('Edge data process can', () => {
+ it('Generate 100 edges should complete at 5ms', async () => {
  const result = await benchmark(
  'Generate 100 Edge',
  () => generateMockEdges(101),
@@ -104,7 +104,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(5);
  });
 
- it('Generate 500 Edgeshouldat 20ms inDone', async () => {
+ it('Generate 500 edges should complete at 20ms', async () => {
  const result = await benchmark(
  'Generate 500 Edge',
  () => generateMockEdges(501),
@@ -116,11 +116,11 @@ describe('ComponentRendercanTest', () => {
  });
  });
 
- describe('StatusUpdatecan', () => {
+ describe('Status update can', () => {
  const nodes100 = generateMockNodes(100);
  const nodes500 = generateMockNodes(500);
 
- it('Update 100 NodeStatusshouldat 5ms inDone', async () => {
+ it('Update 100 node status should complete at 5ms', async () => {
  const result = await benchmark(
  'Update 100 NodeStatus',
  () => simulateWorkflowUpdate(nodes100),
@@ -131,7 +131,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(5);
  });
 
- it('Update 500 NodeStatusshouldat 20ms inDone', async () => {
+ it('Update 500 node status should complete at 20ms', async () => {
  const result = await benchmark(
  'Update 500 NodeStatus',
  () => simulateWorkflowUpdate(nodes500),
@@ -143,7 +143,7 @@ describe('ComponentRendercanTest', () => {
  });
  });
 
- describe('JSON Sequencecan', () => {
+ describe('JSON sequence can', () => {
  const workflow = {
  id: 'test-workflow',
  name: 'Performance Test Workflow',
@@ -156,39 +156,39 @@ describe('ComponentRendercanTest', () => {
  },
  };
 
- it('Sequence 100 NodeWorkflowshouldat 5ms inDone', async () => {
+ it('Sequence 100 node workflow should complete at 5ms', async () => {
  const result = await benchmark(
- 'SequenceWorkflow',
+ 'Sequence workflow',
  () => JSON.stringify(workflow),
  { iterations: 100 }
  );
 
- console.log(`SequenceWorkflow: ${result.averageTime.toFixed(2)}ms`);
+ console.log(`Sequence workflow: ${result.averageTime.toFixed(2)}ms`);
  expect(result.averageTime).toBeLessThan(5);
  });
 
- it('Sequence 100 NodeWorkflowshouldat 5ms inDone', async () => {
+ it('Parse 100 node workflow should complete at 5ms', async () => {
  const jsonStr = JSON.stringify(workflow);
 
  const result = await benchmark(
- 'SequenceWorkflow',
+ 'Sequence workflow',
  () => JSON.parse(jsonStr),
  { iterations: 100 }
  );
 
- console.log(`SequenceWorkflow: ${result.averageTime.toFixed(2)}ms`);
+ console.log(`Sequence workflow: ${result.averageTime.toFixed(2)}ms`);
  expect(result.averageTime).toBeLessThan(5);
  });
  });
 
- describe('countgroupActioncan', () => {
+ describe('Array operations can', () => {
  const largeArray = Array.from({ length: 10000 }, (_, i) => ({
  id: i,
  value: Math.random(),
  name: `Item ${i}`,
  }));
 
- it('filter 10000 shouldat 5ms inDone', async () => {
+ it('Filter 10000 items should complete at 5ms', async () => {
  const result = await benchmark(
  'filter 10000 ',
  () => largeArray.filter(item => item.value > 0.5),
@@ -199,7 +199,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(5);
  });
 
- it('map 10000 shouldat 10ms inDone', async () => {
+ it('Map 10000 items should complete at 10ms', async () => {
  const result = await benchmark(
  'map 10000 ',
  () => largeArray.map(item => ({ ...item, doubled: item.value * 2 })),
@@ -210,7 +210,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(10);
  });
 
- it('reduce 10000 shouldat 2ms inDone', async () => {
+ it('Reduce 10000 items should complete at 2ms', async () => {
  const result = await benchmark(
  'reduce 10000 ',
  () => largeArray.reduce((sum, item) => sum + item.value, 0),
@@ -221,7 +221,7 @@ describe('ComponentRendercanTest', () => {
  expect(result.averageTime).toBeLessThan(2);
  });
 
- it('find 10000 shouldat 1ms inDone', async () => {
+ it('Find in 10000 items should complete at 1ms', async () => {
  const result = await benchmark(
  'find 10000 ',
  () => largeArray.find(item => item.id === 9999),
@@ -233,7 +233,7 @@ describe('ComponentRendercanTest', () => {
  });
  });
 
- describe('forActioncan', () => {
+ describe('Deep copy operations can', () => {
  const createDeepObject = () => ({
  level1: {
  level2: {
@@ -249,20 +249,20 @@ describe('ComponentRendercanTest', () => {
  },
  });
 
- it('Deep Copyforshouldat 2ms inDone', async () => {
+ it('Deep copy should complete at 2ms', async () => {
  const obj = createDeepObject();
 
  const result = await benchmark(
- 'Deep Copyfor',
+ 'Deep copy',
  () => JSON.parse(JSON.stringify(obj)),
  { iterations: 100 }
  );
 
- console.log(`Deep Copyfor: ${result.averageTime.toFixed(2)}ms`);
+ console.log(`Deep copy: ${result.averageTime.toFixed(2)}ms`);
  expect(result.averageTime).toBeLessThan(2);
  });
 
- it('structuredClone shouldat 2ms inDone', async () => {
+ it('Structured clone should complete at 2ms', async () => {
  const obj = createDeepObject();
 
  const result = await benchmark(
@@ -277,8 +277,8 @@ describe('ComponentRendercanTest', () => {
  });
 });
 
-describe('inUsageTest', () => {
- it('CreatelargeNodenotshouldCausein', async () => {
+describe('Memory usage test', () => {
+ it('Creating large nodes should not cause memory issues', async () => {
  const { growth } = await measureMemoryGrowth(
  () => {
  const nodes = generateMockNodes(100);

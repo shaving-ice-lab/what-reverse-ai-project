@@ -22,8 +22,8 @@ export interface ApiKey {
  id: string;
  name: string;
  provider: ApiKeyProvider;
- keyPrefix: string; // Display prefix, e.g. sk-xxxx
- keySuffix: string; // Display suffix, e.g. xxxx
+ keyPrefix: string; // Display prefix, e.g., sk-xxxx
+ keySuffix: string; // Display suffix, e.g., xxxx
  status: ApiKeyStatus;
  lastUsedAt?: string;
  expiresAt?: string;
