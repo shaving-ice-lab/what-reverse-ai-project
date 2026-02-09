@@ -501,7 +501,7 @@ export default function MyAgentsPage() {
  description={
  hasFilters
  ? "Try using other keywords or filter conditions"
-: "Create your first AI agent to start your automation journey."
+: "Create your first AI agent to start automating your tasks."
  }
  action={
  hasFilters

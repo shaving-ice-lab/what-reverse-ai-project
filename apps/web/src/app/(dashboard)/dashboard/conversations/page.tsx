@@ -667,7 +667,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
     toast.success("Conversation archived");
     } catch (err) {
       console.error("Failed to archive:", err);
-      toast.error("Archive failed");
+      toast.error("Failed to archive");
  } finally {
  setOperationLoading(null);
  }
@@ -684,7 +684,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
     toast.success("Conversation deleted");
     } catch (err) {
       console.error("Failed to delete:", err);
-      toast.error("Delete failed");
+      toast.error("Failed to delete");
  } finally {
  setOperationLoading(null);
  }
@@ -699,7 +699,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  toast.success("Conversation copied");
  } catch (err) {
  console.error("Failed to duplicate:", err);
-    toast.error("Copy failed");
+    toast.error("Failed to copy");
  } finally {
  setOperationLoading(null);
  }
@@ -728,7 +728,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
       toast.success("Renamed successfully");
     } catch (err) {
       console.error("Failed to rename:", err);
-      toast.error("Rename failed");
+      toast.error("Failed to rename");
  } finally {
  setOperationLoading(null);
  }
@@ -765,7 +765,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
       toast.success("Export successful");
     } catch (err) {
       console.error("Failed to export:", err);
-      toast.error("Export failed");
+      toast.error("Failed to export");
  }
  };
 
@@ -800,7 +800,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
  toast.success(starred ? "Added to favorites" : "Removed from favorites");
  } catch (err) {
  console.error("Failed to batch star:", err);
- toast.error("Operation failed");
+      toast.error("Failed to perform operation");
  }
  };
 
@@ -821,14 +821,14 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
       toast.success("Archived selected conversations");
     } catch (err) {
       console.error("Failed to batch archive:", err);
-      toast.error("Archive failed");
+      toast.error("Failed to archive");
  }
  };
 
   // Batch Delete
  const handleBatchDelete = async () => {
  if (selectedConversations.size === 0) return;
- if (!confirm(`Delete ${selectedConversations.size} selected conversation(s)? This cannot be undone.`)) return;
+ if (!confirm(`Delete ${selectedConversations.size} selected ${selectedConversations.size === 1 ? 'conversation' : 'conversations'}? This cannot be undone.`)) return;
  
  try {
  await conversationApi.batchDelete({
@@ -842,7 +842,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
       toast.success("Deleted selected conversations");
     } catch (err) {
       console.error("Failed to batch delete:", err);
-      toast.error("Delete failed");
+      toast.error("Failed to delete");
  }
  };
 
@@ -1242,7 +1242,7 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
     // Error State
  <EmptyState
  icon={<X className="w-6 h-6 text-destructive" />}
-          title="Load Failed"
+          title="Failed to Load Conversations"
           description={error}
           action={{
             label: "Reload",
@@ -1522,7 +1522,7 @@ export default function ConversationsPage() {
 
  return (
  <div className="min-h-[60vh] flex items-center justify-center text-sm text-foreground-muted">
-      Navigating to app conversations...
+      Redirecting to conversations...
  </div>
  );
 }

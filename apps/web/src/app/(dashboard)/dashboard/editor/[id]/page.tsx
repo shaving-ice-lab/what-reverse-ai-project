@@ -118,7 +118,7 @@ export default function EditorPage({
  setState(s => ({
  ...s,
  isLoading: false,
- error: err instanceof Error ? err.message : "Load failed",
+ error: err instanceof Error ? err.message : "Failed to load",
  }));
  }
  };
@@ -229,7 +229,7 @@ export default function EditorPage({
  <AlertCircle className="h-5 w-5 text-foreground-light" />
  </div>
  <div className="text-center">
- <h3 className="text-sm font-medium text-foreground">Load failed</h3>
+ <h3 className="text-sm font-medium text-foreground">Failed to Load Editor</h3>
  <p className="text-xs text-foreground-muted mt-1">{state.error}</p>
  </div>
  <div className="flex items-center gap-2">

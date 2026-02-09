@@ -81,10 +81,10 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 
 const timeRangeOptions = [
  { value: "all", label: "All Time" },
- { value: "24h", label: " 24 h" },
- { value: "7d", label: " 7 days" },
- { value: "30d", label: " 30 days" },
- { value: "90d", label: " 90 days" },
+ { value: "24h", label: "24 hours" },
+ { value: "7d", label: "7 days" },
+ { value: "30d", label: "30 days" },
+ { value: "90d", label: "90 days" },
 ];
 
 const nodeTypeOptions = [
@@ -421,7 +421,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  status: index === nodeStatusSamples.length - 1 ? "failed" : "completed",
  detail:
  index === nodeStatusSamples.length - 1
-       ? execution.error_message || "Node Execution Failed"
+       ? execution.error_message || "Failed to Execute Node"
  : node.detail,
  }));
  }
@@ -459,7 +459,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
 
  const qualityOverview = buildQualityMetrics(metrics, executions);
  const qualityDescription = qualityOverview.summary.hasSamples
-   ? `Recent ${qualityOverview.summary.days} days · ${qualityOverview.summary.sampleCount} executions sampled`
+   ? `Last ${qualityOverview.summary.days} days · ${qualityOverview.summary.sampleCount} executions sampled`
 : "No executions sampled yet. Showing defaults.";
  const regressionSummary = summarizeRegressionCases(regressionTestCases);
  const normalizedRegressionQuery = regressionQuery.trim().toLowerCase();
@@ -672,7 +672,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-foreground-muted">
  <span className="flex items-center gap-1">
  <Calendar className="w-3 h-3" />
- {qualityOverview.summary.hasSamples ? `Recent ${qualityOverview.summary.days} days`: "Default"}
+ {qualityOverview.summary.hasSamples ? `Last ${qualityOverview.summary.days} days`: "Default"}
  </span>
  <span className="flex items-center gap-1">
  <BarChart3 className="w-3 h-3" />
@@ -1268,7 +1268,7 @@ export function MonitoringPageContent({ workspaceId, appId }: MonitoringPageProp
  {totalPages > 1 && (
  <div className="flex items-center justify-between mt-4">
  <div className="text-[12px] text-foreground-muted">
- # {page} / {totalPages} page
+ Page {page} of {totalPages}
  </div>
  <div className="flex items-center gap-2">
  <Button

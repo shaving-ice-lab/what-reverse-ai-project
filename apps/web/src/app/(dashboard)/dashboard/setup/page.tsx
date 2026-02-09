@@ -79,7 +79,7 @@ export default function DashboardSetupPage() {
  }
  } catch (err) {
  console.error("Failed to load setup context:", err);
-      if (mounted) setError("Failed to load initial info. Please try again later.");
+      if (mounted) setError("Failed to load setup information. Please try again later.");
  } finally {
  if (mounted) setIsLoading(false);
  }
@@ -165,7 +165,7 @@ export default function DashboardSetupPage() {
  }
  } catch (err) {
  console.error("Failed to finish setup:", err);
-      setError(err instanceof Error ? err.message: "Setup failed. Please try again later.");
+      setError(err instanceof Error ? err.message: "Failed to set up. Please try again later.");
  } finally {
  setIsSubmitting(false);
  }
@@ -241,7 +241,7 @@ export default function DashboardSetupPage() {
  onChange={(e) => {
  setWorkspaceName(e.target.value);
  }}
-          placeholder="e.g. My Team"
+          placeholder="e.g., My Team"
  />
  </FormRow>
         <FormRow label="Workspace Slug" required description="Used for links and identifiers (auto-generated)">
@@ -251,7 +251,7 @@ export default function DashboardSetupPage() {
  setWorkspaceSlugTouched(true);
  setWorkspaceSlug(e.target.value);
  }}
-          placeholder="e.g. my-team"
+          placeholder="e.g., my-team"
  />
  </FormRow>
  </div>
@@ -272,7 +272,7 @@ export default function DashboardSetupPage() {
  setAppSlug(slugify(e.target.value));
  }
  }}
-          placeholder="e.g. Support Automation"
+          placeholder="e.g., Support Automation"
  disabled={hasApps}
  />
  </FormRow>
@@ -283,7 +283,7 @@ export default function DashboardSetupPage() {
  setAppSlugTouched(true);
  setAppSlug(e.target.value);
  }}
-          placeholder="e.g. support-bot"
+          placeholder="e.g., support-bot"
  disabled={hasApps}
  />
  </FormRow>
@@ -291,7 +291,7 @@ export default function DashboardSetupPage() {
  <Input
  value={appDescription}
  onChange={(e) => setAppDescription(e.target.value)}
-          placeholder="e.g. Auto-reply FAQ"
+          placeholder="e.g., Auto-reply FAQ"
  disabled={hasApps}
  />
  </FormRow>

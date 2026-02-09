@@ -425,7 +425,7 @@ export default function TeamPage() {
  <div className="space-y-6">
  <PageHeader
 title="Team management"
-  description="Manage team members, roles and access permissions"
+  description="Manage team members, roles, and access permissions"
  actions={(
  <div className="flex items-center gap-2">
  <PermissionGate permissions={permissions} required={["workspace_admin", "billing_manage"]}>
@@ -512,7 +512,7 @@ title="Team management"
  </PermissionGate>
  </div>
  <div className="text-[11px] text-foreground-muted">
-               {selectedMembers.size} member(s) selected
+               {selectedMembers.size} {selectedMembers.size === 1 ? 'member' : 'members'} selected
  </div>
  {managementMessage && (
  <div className="text-[11px] text-brand-500">{managementMessage}</div>

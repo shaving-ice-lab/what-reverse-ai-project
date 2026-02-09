@@ -42,7 +42,7 @@ const creativeTypes = [
  {
  id: "text",
  title: "Creative Hub",
- description: "Articles, copy, emails, reports and more",
+ description: "Articles, copy, emails, reports, and more",
  icon: FileText,
  href: "/dashboard/creative/generate?type=text",
  },

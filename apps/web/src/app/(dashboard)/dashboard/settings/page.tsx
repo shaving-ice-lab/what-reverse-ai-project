@@ -202,7 +202,7 @@ export default function PreferencesPage() {
  setHasChanges(false);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message: "Save failed");
+ setError(err instanceof Error ? err.message: "Failed to save settings");
  } finally {
  setIsLoading(false);
  }

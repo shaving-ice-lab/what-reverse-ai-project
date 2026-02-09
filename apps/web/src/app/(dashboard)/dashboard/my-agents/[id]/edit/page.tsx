@@ -40,7 +40,7 @@ const mockAgent = {
  description: "Smart support bot that can handle FAQs and provide 24/7 support",
  model: "gpt-4",
  capabilities: ["chat", "analyze"],
- systemPrompt: "You are a professional support assistant. Help users resolve issues. Please maintain a friendly, professional tone. If an issue cannot be resolved, please guide the user to contact human support.",
+ systemPrompt: "You are a professional support assistant. Help users resolve issues. Maintain a friendly, professional tone. If an issue cannot be resolved, guide the user to contact human support.",
  welcomeMessage: "Hello! I'm a smart support assistant. How can I help you?",
  temperature: 0.7,
  maxTokens: 2048,
@@ -328,7 +328,7 @@ export default function EditAgentPage() {
  <textarea
  value={formData.systemPrompt}
  onChange={(e) => updateForm("systemPrompt", e.target.value)}
- placeholder="Define the agent's role, behavior and reply style..."
+ placeholder="Define the agent's role, behavior, and reply style..."
  rows={6}
  className="w-full px-4 py-3 rounded-md bg-surface-200 border border-border text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none font-mono text-[13px]"
  />

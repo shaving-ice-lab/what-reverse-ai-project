@@ -289,7 +289,7 @@ export default function PlansPage() {
  }
  } catch (err) {
  console.error("Failed to load workspaces:", err);
- setError("Workspace load failed. Please try again later.");
+      setError("Failed to load workspace. Please try again later.");
  }
  };
  init();
@@ -314,7 +314,7 @@ export default function PlansPage() {
  }
  } catch (err) {
  console.error("Failed to load plan modules:", err);
- setError("Planning module load failed. Please check permission or try again later.");
+      setError("Failed to load planning module. Please check permissions or try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -464,7 +464,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to update dependencies:", err);
- setError("Update dependency failed. Please try again later.");
+      setError("Failed to update dependency. Please try again later.");
  } finally {
  setDragSourceId(null);
  }
@@ -478,7 +478,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to remove dependency:", err);
- setError("Remove dependency failed. Please try again later.");
+      setError("Failed to remove dependency. Please try again later.");
  }
  };
 
@@ -512,7 +512,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to save module:", err);
- setError("Save module failed. Please check permission or try again later.");
+      setError("Failed to save module. Please check permissions or try again later.");
  }
  };
 
@@ -524,7 +524,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to delete module:", err);
- setError("Delete module failed. Please try again later.");
+      setError("Failed to delete module. Please try again later.");
  }
  };
 
@@ -594,7 +594,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to save task:", err);
- setError("Save task failed. Please try again later.");
+      setError("Failed to save task. Please try again later.");
  }
  };
 
@@ -606,7 +606,7 @@ export default function PlansPage() {
  await loadModules(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to delete task:", err);
- setError("Delete task failed. Please try again later.");
+      setError("Failed to delete task. Please try again later.");
  }
  };
 
@@ -637,7 +637,7 @@ export default function PlansPage() {
  await loadVersions(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to create plan version:", err);
- setError("Create planning version failed. Please try again later.");
+      setError("Failed to create planning version. Please try again later.");
  }
  };
 
@@ -648,7 +648,7 @@ export default function PlansPage() {
  setPreviewOpen(true);
  } catch (err) {
  console.error("Failed to load plan version:", err);
- setError("Load version details failed. Please try again later.");
+      setError("Failed to load version details. Please try again later.");
  }
  };
 
@@ -662,7 +662,7 @@ export default function PlansPage() {
  await loadVersions(activeWorkspaceId);
  } catch (err) {
  console.error("Failed to restore plan version:", err);
- setError("Restore version failed. Please try again later.");
+      setError("Failed to restore version. Please try again later.");
  }
  };
 
@@ -680,7 +680,7 @@ Loading planning data…
  <ExceptionState
  variant="empty"
 title="No tasks yet"
-description="Create a task in the current module, or import default WBS."
+            description="Create a task in the current module, or import the default WBS."
 action={
 canManagePlan
 ? {
@@ -1019,13 +1019,13 @@ onClick: seedDefaults,
  </div>
  <div className="space-y-3">
  {ganttRows.length === 0 && (
- <EmptyState
- icon={CalendarRange}
- title="No tasks"
- description="No tasks in this view."
- size="sm"
- className="py-6"
- />
+          <EmptyState
+            icon={CalendarRange}
+            title="No tasks"
+            description="No tasks available in this view."
+            size="sm"
+            className="py-6"
+          />
  )}
  {ganttRows.map((row) => {
  const left = ganttTotalDays === 0 ? 0 : (row.start / ganttTotalDays) * 100;
@@ -1097,13 +1097,13 @@ Module checklist
  </div>
  <div className="space-y-2">
  {modules.length === 0 && (
- <EmptyState
- icon={Layers}
-title="No modules yet"
-description="Import default WBS first or create a module."
- tone="info"
- size="sm"
- className="py-6"
+          <EmptyState
+            icon={Layers}
+            title="No modules yet"
+            description="Import the default WBS or create a new module."
+            tone="info"
+            size="sm"
+            className="py-6"
  action={
  canManagePlan
  ? {
@@ -1186,13 +1186,13 @@ onClick: openCreateModule,
  </div>
  <div className="space-y-2">
  {versions.length === 0 && (
- <EmptyState
- icon={History}
- title="No version records"
- description="Click Version Snapshot on the right to create one."
- size="sm"
- className="py-6"
- />
+          <EmptyState
+            icon={History}
+            title="No version records"
+            description="Click 'Version Snapshot' on the right to create one."
+            size="sm"
+            className="py-6"
+          />
  )}
  {versions.map((version) => (
  <div
@@ -1227,7 +1227,7 @@ onClick: openCreateModule,
  <PageHeader
  title="Planning version"
  eyebrow="Plan / View / Edit"
- description="WBS orchestration canvas: modules, tasks and phases in one place."
+          description="Orchestrate your WBS: manage modules, tasks, and phases in one place."
  icon={<Layers className="w-4 h-4" />}
  actions={
  <div className="flex flex-wrap items-center gap-2">
@@ -1303,7 +1303,7 @@ Create module
  {activeModule?.name || "Planning view"}
  </div>
  <div className="text-[12px] text-foreground-light mt-1">
- {activeModule?.description || "View tasks, phases and dependencies; orchestrate from this module."}
+ {activeModule?.description || "View tasks, phases, and dependencies; orchestrate from this module."}
  </div>
  </div>
  <div className="grid grid-cols-2 gap-3">
@@ -1368,23 +1368,23 @@ Create module
  </div>
  </div>
 
- {error && (
- <ExceptionState
- variant="error"
- title="Planning module load failed"
- description={error}
- size="sm"
- action={
- activeWorkspaceId
- ? {
- label: "Retry",
- onClick: () => loadModules(activeWorkspaceId),
- icon: RefreshCw,
- }
- : undefined
- }
- />
- )}
+        {error && (
+          <ExceptionState
+            variant="error"
+            title="Failed to load planning module"
+            description={error}
+            size="sm"
+            action={
+              activeWorkspaceId
+                ? {
+                    label: "Retry",
+                    onClick: () => loadModules(activeWorkspaceId),
+                    icon: RefreshCw,
+                  }
+                : undefined
+            }
+          />
+        )}
 
  {renderViewContent()}
  </div>
@@ -1403,7 +1403,7 @@ Create module
 <Input
 value={moduleForm.name}
 onChange={(event) => setModuleForm({ ...moduleForm, name: event.target.value })}
-placeholder="e.g. Workspace / App / Runtime"
+placeholder="e.g., Workspace / App / Runtime"
 />
 </div>
 <div>
@@ -1411,7 +1411,7 @@ placeholder="e.g. Workspace / App / Runtime"
 <Input
 value={moduleForm.key}
 onChange={(event) => setModuleForm({ ...moduleForm, key: event.target.value })}
-placeholder="e.g. workspace"
+placeholder="e.g., workspace"
 />
 </div>
 <div>
@@ -1446,7 +1446,7 @@ placeholder="e.g. workspace"
 <Input
 value={taskForm.title}
 onChange={(event) => setTaskForm({ ...taskForm, title: event.target.value })}
-placeholder="e.g. Publish flow status"
+placeholder="e.g., Publish flow status"
 />
 </div>
 <div>
@@ -1454,7 +1454,7 @@ placeholder="e.g. Publish flow status"
 <Input
 value={taskForm.code}
 onChange={(event) => setTaskForm({ ...taskForm, code: event.target.value })}
-placeholder="e.g. app-models"
+placeholder="e.g., app-models"
 />
 </div>
 <div>
@@ -1542,7 +1542,7 @@ value={taskForm.dependencies}
 onChange={(event) =>
 setTaskForm({ ...taskForm, dependencies: event.target.value })
 }
-placeholder="e.g. app-models, ws-api-contracts"
+placeholder="e.g., app-models, ws-api-contracts"
 />
  </div>
  </div>
@@ -1568,7 +1568,7 @@ placeholder="e.g. app-models, ws-api-contracts"
 <Input
 value={versionForm.label}
 onChange={(event) => setVersionForm({ ...versionForm, label: event.target.value })}
-placeholder="e.g. V1 Planning line"
+placeholder="e.g., V1 Planning line"
 />
 </div>
 <div>
@@ -1604,7 +1604,7 @@ Create snapshot
 {previewSummary ? (
 <div className="space-y-4">
 <div className="rounded-lg border border-border bg-surface-75 px-3 py-2 text-[11px] text-foreground-light">
- Restore will auto-create a "restore before backup" snapshot, with rollback available anytime.
+ Restore will auto-create a "restore before backup" snapshot, with rollback available at any time.
  </div>
 <div className="grid grid-cols-2 gap-3">
 <div className="rounded-lg border border-border bg-surface-75 px-3 py-2">

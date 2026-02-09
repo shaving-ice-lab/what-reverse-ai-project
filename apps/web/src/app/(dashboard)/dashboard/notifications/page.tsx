@@ -384,7 +384,7 @@ export default function NotificationsPage() {
  setSelectedItems(new Set());
 
  if (failed.length > 0) {
- toast.error("Partial delete failed", `${failed.length} item(s) could not be deleted`);
+      toast.error("Failed to partially delete", `${failed.length} ${failed.length === 1 ? 'item' : 'items'} could not be deleted`);
  }
  };
 
@@ -461,7 +461,7 @@ const message = error instanceof Error ? error.message : "Failed to mark as read
  emptyDescription = "Fetching notifications…";
  emptyAction = undefined;
  } else if (errorMessage) {
- emptyTitle = "Failed to Load";
+ emptyTitle = "Failed to Load Notifications";
  emptyDescription = errorMessage;
  emptyAction = { label: "Retry", onClick: refreshNotifications };
  } else if (trimmedQuery) {

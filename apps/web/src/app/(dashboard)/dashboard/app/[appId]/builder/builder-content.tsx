@@ -317,7 +317,7 @@ label: "Public Access (Requires Sign-in)",
  saved: { label: "Saved", color: "text-brand-500" },
  saving: { label: "Saving", color: "text-warning" },
  unsaved: { label: "Unsaved", color: "text-warning" },
- error: { label: "Save Failed", color: "text-destructive" },
+        error: { label: "Failed to Save", color: "text-destructive" },
  };
  const saveStatusMeta = saveStatusMap[saveStatus];
  const lastSavedLabel = lastSavedAt
@@ -642,7 +642,7 @@ label: "Public Access (Requires Sign-in)",
  }
 
  if (!workflowId) {
- throw new Error("Workflow creation failed. Please try again.");
+      throw new Error("Failed to create workflow. Please try again.");
  }
 
  const uiSchema = payload.ui_schema;
@@ -711,7 +711,7 @@ label: "Public Access (Requires Sign-in)",
  setChatMessages((prev) => [...prev, { role: "assistant", content: assistantContent }]);
  } catch (error) {
  console.error("Failed to generate workflow:", error);
- const message = error instanceof Error ? error.message: "AI generation failed. Please try again.";
+        const message = error instanceof Error ? error.message: "Failed to generate with AI. Please try again.";
  setChatMessages((prev) => [
  ...prev,
  { role: "assistant", content: `Generation failed: ${message}` },
@@ -751,7 +751,7 @@ label: "Public Access (Requires Sign-in)",
  }
 
  if (!workflowId) {
- throw new Error("Workflow save failed. Please try again.");
+        throw new Error("Failed to save workflow. Please try again.");
  }
 
  let updatedVersion: AppVersion | null = null;
@@ -819,7 +819,7 @@ label: "Public Access (Requires Sign-in)",
  setPublishDialogOpen(false);
  } catch (error) {
  console.error("Failed to publish:", error);
- setPublishWarning("Publish failed. Please try again.");
+      setPublishWarning("Failed to publish. Please try again.");
  } finally {
  setIsPublishing(false);
  }
@@ -881,7 +881,7 @@ label: "Public Access (Requires Sign-in)",
  } catch (error) {
  console.error("Preview run failed:", error);
  setPreviewRunStatus("error");
- setPreviewRunError("Run failed. Please try again.");
+      setPreviewRunError("Failed to run. Please try again.");
  }
  };
 
@@ -991,7 +991,7 @@ label: "Public Access (Requires Sign-in)",
  await loadVersions();
  } catch (error) {
  console.error("Failed to save UI schema:", error);
- setUiSchemaError("Save failed. Please check the field configuration and try again.");
+      setUiSchemaError("Save failed. Please check the field configuration and try again.");
  } finally {
  setUiSchemaSaving(false);
  }
@@ -1003,11 +1003,11 @@ label: "Public Access (Requires Sign-in)",
 
  const handleCompareVersions = async () => {
  if (!compareFrom || !compareTo) {
- setCompareError("Please select versions to compare");
+ setCompareError("Please select versions to compare.");
  return;
  }
  if (compareFrom === compareTo) {
- setCompareError("Please select different versions to compare");
+ setCompareError("Please select different versions to compare.");
  return;
  }
  try {
@@ -1017,7 +1017,7 @@ label: "Public Access (Requires Sign-in)",
  setVersionDiff(diff);
  } catch (error) {
  console.error("Failed to compare versions:", error);
- setCompareError("Comparison failed. Please try again.");
+      setCompareError("Comparison failed. Please try again.");
  } finally {
  setCompareLoading(false);
  }
@@ -1102,7 +1102,7 @@ label: "Public Access (Requires Sign-in)",
 
  <div className="flex-1" />
 
- {/* ActionButton */}
+ {/* Action button */}
  <div className="flex items-center gap-2">
  <Tooltip>
  <TooltipTrigger asChild>
@@ -1613,7 +1613,7 @@ title: "Describe Your App",
  <div className="mt-3 grid gap-2">
  <Input
  className="h-8"
- placeholder="Field name, e.g. Title"
+ placeholder="Field name, e.g., Title"
  value={field.label}
  onChange={(event) =>
  handleUpdateUISchemaField(index, { label: event.target.value })
@@ -1621,7 +1621,7 @@ title: "Describe Your App",
  />
  <Input
  className="h-8"
- placeholder="Input key, e.g. title"
+ placeholder="Input key, e.g., title"
  value={field.inputKey}
  onChange={(event) =>
  handleUpdateUISchemaField(index, { inputKey: event.target.value })
@@ -1787,7 +1787,7 @@ title: "Describe Your App",
  <div>
  <p className="text-[13px] font-medium text-foreground">Live Preview</p>
  <p className="text-[11px] text-foreground-muted">
- UI Schema changes sync to the preview form in real time. Saved changes will be used for public access.
+ UI Schema changes are synced to the preview form in real time. Saved changes will be applied to public access.
  </p>
  </div>
 
@@ -1795,7 +1795,7 @@ title: "Describe Your App",
  <EmptyState
  icon={Eye}
  title="No Previewable Fields"
- description="Add fields in the UI Config tab first, then preview here."
+ description="Add fields in the UI Config tab first, then preview them here."
  action={{ label: "Go to Config", onClick: handleFocusSchema }}
  className="py-10"
  />
@@ -1861,7 +1861,7 @@ title: "Describe Your App",
  Input Mapping & Preview Data
  </div>
  <div className="text-[11px] text-foreground-muted mb-2">
- Saving the UI schema will generate the latest workflow input mapping.
+ Saving the UI schema will update the workflow input mapping.
  </div>
  {(() => {
  const mapping = app?.current_version?.config_json?.input_mapping as

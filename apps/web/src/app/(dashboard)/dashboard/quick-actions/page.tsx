@@ -68,7 +68,7 @@ const featuredActions = [
  },
  {
  title: "Generate Content",
- description: "Text, image and code generation",
+ description: "Text, image, and code generation",
  icon: Sparkles,
  href: "/dashboard/creative/generate",
  badge: "AI",
@@ -167,7 +167,7 @@ const quickActionCategories = [
  {
  id: "generate",
  title: "Generate",
- description: "Use AI to generate text, images and code",
+ description: "Use AI to generate text, images, and code",
  icon: Sparkles,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
@@ -239,7 +239,7 @@ const quickActionCategories = [
  {
  id: "settings",
  title: "Settings",
- description: "Account, security and team settings",
+ description: "Account, security, and team settings",
  icon: Settings,
  color: "text-foreground-light",
  bgColor: "bg-surface-200",
@@ -369,7 +369,7 @@ export default function QuickActionsPage() {
  <PageHeader
  eyebrow="Operations"
  title="Quick Actions Center"
- description="Quick access to features, templates and system settings"
+ description="Quick access to features, templates, and system settings"
  icon={<Command className="w-4 h-4 text-brand-500" />}
  actions={(
  <div className="flex items-center gap-2 flex-wrap">

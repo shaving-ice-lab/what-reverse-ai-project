@@ -52,7 +52,7 @@ const notificationCategories = [
  },
  {
  id: "workflow_failed",
- title: "Workflow failed",
+    title: "Workflow Failed",
  description: "Notify when a workflow fails",
  email: true,
  push: true,

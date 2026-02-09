@@ -69,7 +69,7 @@ const documents = [
  id: "doc-3",
  title: "Q1 marketing activity plan",
  type: "marketing",
- excerpt: "Q1 marketing plan: targets, policy, budget and execution...",
+ excerpt: "Q1 marketing plan: targets, policy, budget, and execution...",
  wordCount: 3200,
  createdAt: "2026-01-25",
  updatedAt: "3 days ago",

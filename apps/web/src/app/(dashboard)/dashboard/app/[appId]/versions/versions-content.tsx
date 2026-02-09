@@ -2,7 +2,7 @@
 
 /**
  * App Version History Page - Supabase Style
- * Version List / Comparison / Rollback / Change Log
+ * Version List / Comparison / Rollback / Changelog
  */
 
 import React, { useEffect, useState } from "react";
@@ -53,10 +53,10 @@ const versionStatusConfig: Record<
 
 const timeRangeOptions = [
  { value: "all", label: "All Time" },
- { value: "7d", label: " 7 days" },
- { value: "30d", label: " 30 days" },
- { value: "90d", label: " 90 days" },
- { value: "180d", label: " 180 days" },
+ { value: "7d", label: "7 days" },
+ { value: "30d", label: "30 days" },
+ { value: "90d", label: "90 days" },
+ { value: "180d", label: "180 days" },
 ];
 
 const sortOptions = [
@@ -160,14 +160,14 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  setVersionDiff(diff);
  } catch (error) {
  console.error("Failed to compare versions:", error);
- setCompareError("Version comparison failed. Please try again later.");
+      setCompareError("Failed to compare versions. Please try again later.");
  } finally {
  setIsComparing(false);
  }
  };
 
  const handleRollback = async (versionId: string) => {
- if (!confirm("Confirm rollback to this version? This will overwrite the current live version.")) return;
+ if (!confirm("Are you sure you want to rollback to this version? This will overwrite the current live version.")) return;
  try {
  setRollbackId(versionId);
  const updated = await appApi.rollback(appId, versionId);
@@ -181,7 +181,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
  };
 
  const handleRestore = async (versionId: string) => {
- if (!confirm("Confirm restore to this version? This will overwrite the current live version.")) return;
+ if (!confirm("Are you sure you want to restore to this version? This will overwrite the current live version.")) return;
  try {
  setRollbackId(versionId);
  const updated = await appApi.rollback(appId, versionId);
@@ -382,7 +382,7 @@ export function VersionsPageContent({ workspaceId, appId }: VersionsPageProps) {
 
  <SettingsSection
 title="Version List"
-            description="View change logs, filter versions, and perform rollback/restore."
+            description="View changelogs, filter versions, and perform rollback/restore."
  compact
  >
  <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -488,7 +488,7 @@ title="Version List"
  {formatDate(version.created_at)}
  </div>
  <div className="flex items-center text-foreground-muted line-clamp-2">
- {version.changelog || "No change log description."}
+ {version.changelog || "No changelog description."}
  </div>
  <div className="flex items-center justify-end gap-2">
  <Button
@@ -593,7 +593,7 @@ title="Version Details"
  Version Notes
  </div>
  <div className="mt-1 text-[12px] text-foreground">
- {activeVersion.changelog || "No change log description."}
+ {activeVersion.changelog || "No changelog description."}
  </div>
  </div>
  </div>

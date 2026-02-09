@@ -1101,7 +1101,7 @@ export default function WorkspaceSettingsPage() {
  setLastSyncedAt(new Date().toISOString());
  } catch (error) {
  setCloudSyncStatus("error");
- setCloudSyncError("Cloud sync failed");
+      setCloudSyncError("Failed to sync cloud configuration");
  console.error("Failed to sync cloud replay config:", error);
  }
  };
@@ -1211,7 +1211,7 @@ export default function WorkspaceSettingsPage() {
  setReplayNextOffset(null);
  }
  } catch (error) {
- setReplayError("Archive replay failed. Please check the filter conditions and try again.");
+      setReplayError("Failed to replay archive. Please check the filter conditions and try again.");
  console.error("Failed to replay log archive:", error);
  } finally {
  setIsReplayLoading(false);
@@ -2664,7 +2664,7 @@ export default function WorkspaceSettingsPage() {
  <Input
  type="number"
  min={0}
- placeholder="e.g. 1000"
+ placeholder="e.g., 1000"
  value={budgetForm.monthlyBudget}
  onChange={(e) =>
  setBudgetForm({ ...budgetForm, monthlyBudget: e.target.value })
@@ -2679,7 +2679,7 @@ export default function WorkspaceSettingsPage() {
 
  <FormRow
  label="Alert Thresholds (%)"
- description="Comma-separated, e.g. 50, 80, 100"
+ description="Comma-separated, e.g., 50, 80, 100"
  >
  <Input
  placeholder="50, 80, 100"
@@ -2705,7 +2705,7 @@ export default function WorkspaceSettingsPage() {
  <Input
  type="number"
  min={0}
- placeholder="e.g. 1200"
+ placeholder="e.g., 1200"
  value={budgetForm.spendLimit}
  onChange={(e) =>
  setBudgetForm({ ...budgetForm, spendLimit: e.target.value })
@@ -2922,7 +2922,7 @@ export default function WorkspaceSettingsPage() {
  {!selectedArchive ? (
  <EmptyState
  icon={<Archive className="w-5 h-5" />}
- title="Please Select an Archive Task"
+ title="Please select an archive task"
  description="Select an archive task from the list above to start replaying."
  />
  ) : (
@@ -3163,7 +3163,7 @@ export default function WorkspaceSettingsPage() {
  <div className="text-[12px] text-foreground-light">Sync result</div>
  <div className="text-[11px] text-foreground-muted">
  {cloudSyncStatus === "syncing" && "Syncing to cloud..."}
- {cloudSyncStatus === "error" && (cloudSyncError || "Cloud sync failed")}
+            {cloudSyncStatus === "error" && (cloudSyncError || "Failed to sync cloud configuration")}
  {cloudSyncStatus === "idle" && lastSyncedAt && `Synced ${formatDateTime(lastSyncedAt)}`}
  {cloudSyncStatus === "idle" && !lastSyncedAt && "Not synced to cloud yet"}
  </div>
@@ -3303,7 +3303,7 @@ export default function WorkspaceSettingsPage() {
  <Input
  value={newTemplateName}
  onChange={(e) => setNewTemplateName(e.target.value)}
- placeholder="e.g. Default template"
+ placeholder="e.g., Default template"
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
  />
  </div>

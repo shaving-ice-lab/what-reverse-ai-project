@@ -157,7 +157,7 @@ export default function ReviewQueuePage() {
  setReviews(data);
  setTotal(response.meta?.total || data.length);
  } catch (err) {
- setError(err instanceof Error ? err.message : "Load failed.");
+ setError(err instanceof Error ? err.message : "Failed to load reviews.");
  } finally {
  setIsLoading(false);
  }
@@ -185,7 +185,7 @@ export default function ReviewQueuePage() {
     
     const confirmed = await confirm({
       title: "Batch approve",
-      description: `Approve ${selectedIds.size} selected review item(s)?`,
+      description: `Approve ${selectedIds.size} selected review ${selectedIds.size === 1 ? 'item' : 'items'}?`,
       confirmText: "Confirm Approve",
  cancelText: "Cancel",
  });
@@ -214,7 +214,7 @@ export default function ReviewQueuePage() {
     
     const confirmed = await confirm({
       title: "Batch reject",
-      description: `Reject ${selectedIds.size} selected review item(s)?`,
+      description: `Reject ${selectedIds.size} selected review ${selectedIds.size === 1 ? 'item' : 'items'}?`,
       confirmText: "Confirm Reject",
  cancelText: "Cancel",
  variant: "destructive",
@@ -325,7 +325,7 @@ export default function ReviewQueuePage() {
  eyebrow="Moderation"
  icon={<Shield className="w-4 h-4" />}
  title="Review Queue"
- description="Manage and review pending agents, workflows and templates"
+ description="Manage and review pending agents, workflows, and templates"
  badge={(
  <Badge variant="secondary" size="sm">
  {total} 
@@ -469,7 +469,7 @@ export default function ReviewQueuePage() {
  {error && (
  <EmptyState
  icon={<AlertCircle className="w-5 h-5" />}
- title="Load failed"
+ title="Failed to Load Reviews"
  description={error}
  action={{ label: "Retry", onClick: loadReviews }}
  />

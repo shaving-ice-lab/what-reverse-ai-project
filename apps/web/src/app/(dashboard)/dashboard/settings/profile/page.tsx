@@ -213,7 +213,7 @@ export default function ProfilePage() {
  setHasChanges(false);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message : "Update failed.");
+ setError(err instanceof Error ? err.message : "Failed to update.");
  } finally {
  setIsLoading(false);
  }
@@ -245,7 +245,7 @@ export default function ProfilePage() {
  setSuccess(true);
  setTimeout(() => setSuccess(false), 3000);
  } catch (err) {
- setError(err instanceof Error ? err.message : "Upload failed.");
+ setError(err instanceof Error ? err.message : "Failed to upload.");
  } finally {
  setIsLoading(false);
  }

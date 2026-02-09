@@ -277,7 +277,7 @@ export default function SupportSettingsPage() {
  setTeamMembers(Object.fromEntries(teamMemberEntries));
  setQueueMembers(Object.fromEntries(queueMemberEntries));
  } catch (error) {
- setErrorMessage((error as Error).message || "Failed to load");
+ setErrorMessage((error as Error).message || "Failed to load support settings");
  } finally {
  setLoading(false);
  }
@@ -737,7 +737,7 @@ export default function SupportSettingsPage() {
  </div>
  <div className="grid sm:grid-cols-2 gap-3">
  <Input
- placeholder="Key (e.g. email)"
+ placeholder="Key (e.g., email)"
  value={channelForm.key}
  onChange={(e) => setChannelForm((prev) => ({ ...prev, key: e.target.value }))}
  />

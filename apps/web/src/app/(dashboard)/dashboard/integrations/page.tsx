@@ -321,7 +321,7 @@ export default function IntegrationsPage() {
  <PageHeader
  eyebrow="Integrations"
  title="Extend your database"
- description="Manage connections, permissions and automation triggers for your team and community."
+ description="Manage connections, permissions, and automation triggers for your team and community."
  actions={(
  <div className="page-toolbar">
  <Button

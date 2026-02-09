@@ -72,7 +72,7 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
  verifying: { label: "Verifying", color: "text-warning", bgColor: "bg-warning-200", icon: Loader2 },
  verified: { label: "Verified", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
   active: { label: "Active", color: "text-brand-500", bgColor: "bg-brand-200", icon: CheckCircle2 },
-  failed: { label: "Verification Failed", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
+  failed: { label: "Failed to Verify", color: "text-destructive", bgColor: "bg-destructive-200", icon: XCircle },
   blocked: { label: "Blocked", color: "text-destructive", bgColor: "bg-destructive-200", icon: Lock },
 };
 
@@ -81,7 +81,7 @@ const sslStatusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: "Pending Issuance", color: "text-foreground-muted" },
   issuing: { label: "Issuing", color: "text-warning" },
   issued: { label: "Issued", color: "text-brand-500" },
-  failed: { label: "Issuance Failed", color: "text-destructive" },
+  failed: { label: "Failed to Issue", color: "text-destructive" },
  expired: { label: "Expired", color: "text-destructive" },
 };
 

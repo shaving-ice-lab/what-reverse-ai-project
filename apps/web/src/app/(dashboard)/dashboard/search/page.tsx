@@ -57,7 +57,7 @@ const mockResults = {
  id: "wf-1",
  type: "workflow",
  title: "Customer Feedback Auto-Processing",
- description: "Automatically collect, categorize and reply to customer feedback",
+ description: "Automatically collect, categorize, and reply to customer feedback",
  status: "active",
  lastRun: "2h ago",
  runs: 1256,
@@ -244,7 +244,7 @@ export default function SearchPage() {
  <div className="page-caption">Search</div>
  <PageHeader
  title="Global Search"
- description="Search across workflows, agents, conversations and files"
+ description="Search across workflows, agents, conversations, and files"
  >
  <div className="space-y-3">
  <form onSubmit={handleSearch}>

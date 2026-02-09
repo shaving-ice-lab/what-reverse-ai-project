@@ -228,7 +228,7 @@ export default function ReviewDetailPage() {
  }
 
  } catch (err) {
-    setError(err instanceof Error ? err.message: "Failed to load");
+    setError(err instanceof Error ? err.message: "Failed to load review details");
 
  } finally {
  setIsLoading(false);

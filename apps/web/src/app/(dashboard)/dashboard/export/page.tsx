@@ -583,7 +583,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "Export Failed";
+ const message = error instanceof Error ? error.message: "Failed to export";
  setExportError(message);
  addHistoryEntry({
  action: "workspace_export",
@@ -634,7 +634,7 @@ export default function ExportPage() {
  });
  const imported = response.data?.workflow;
  if (!imported?.id) {
- throw new Error("Import succeeded, but workflow ID was not returned");
+ throw new Error("Failed to import: workflow ID was not returned");
  }
  setWorkflowImportResult({
  id: imported.id,
@@ -650,7 +650,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "Import Failed";
+ const message = error instanceof Error ? error.message: "Failed to import";
  await recordClientAudit("workflow.import", {
  status: "failed",
  error: message,
@@ -683,7 +683,7 @@ export default function ExportPage() {
  });
  return;
  }
- const fileError = file ? validateJsonFile(file, "Schema"): "Please select Schema JSON File";
+ const fileError = file ? validateJsonFile(file, "Schema"): "Please select a Schema JSON file";
  if (fileError) {
  setSchemaImportError(fileError);
  await recordClientAudit("workspace.schema.import", {
@@ -746,7 +746,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "Import Failed";
+ const message = error instanceof Error ? error.message: "Failed to import";
  await recordClientAudit("workspace.schema.import", {
  status: "failed",
  error: message,
@@ -780,7 +780,7 @@ export default function ExportPage() {
  );
  const backup = response.data?.backup;
  if (!backup?.backup_id) {
- throw new Error("Backup created successfully, but backup ID was not returned");
+ throw new Error("Failed to create backup: backup ID was not returned");
  }
  setBackupResult({
  backupId: backup.backup_id,
@@ -798,7 +798,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "Backup Failed";
+    const message = error instanceof Error ? error.message: "Failed to create backup";
  setBackupError(message);
  addHistoryEntry({
  action: "db_backup",
@@ -830,7 +830,7 @@ export default function ExportPage() {
  );
  const restore = response.data?.restore;
  if (!restore?.backup_id) {
- throw new Error("Restore succeeded, but restore result was not returned");
+ throw new Error("Failed to restore: restore result was not returned");
  }
  setRestoreResult({
  backupId: restore.backup_id,
@@ -846,7 +846,7 @@ export default function ExportPage() {
  await fetchAuditHistory(activeWorkspaceId);
  }
  } catch (error) {
- const message = error instanceof Error ? error.message: "Restore Failed";
+ const message = error instanceof Error ? error.message: "Failed to restore";
  setRestoreError(message);
  addHistoryEntry({
  action: "db_restore",

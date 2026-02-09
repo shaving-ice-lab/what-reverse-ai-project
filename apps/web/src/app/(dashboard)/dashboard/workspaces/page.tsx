@@ -459,7 +459,7 @@ export default function WorkspacesPage() {
  <section id="create" className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
  <SettingsSection
  title="Create Workspace"
- description="Fill in name, region and plan info. You can switch immediately after creating."
+ description="Fill in name, region, and plan info. You can switch immediately after creating."
  compact
  >
  <div className="space-y-4">
@@ -468,7 +468,7 @@ export default function WorkspacesPage() {
  Workspace Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="e.g. My Team"
+ placeholder="e.g., My Team"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
@@ -493,7 +493,7 @@ export default function WorkspacesPage() {
  />
  </div>
  <p className="text-[11px] text-foreground-muted mt-1.5">
- Can contain lowercase letters, numbers and hyphens
+ Can contain lowercase letters, numbers, and hyphens
  </p>
  </div>
 
@@ -717,7 +717,7 @@ export default function WorkspacesPage() {
  Workspace Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="e.g. My Team"
+ placeholder="e.g., My Team"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"
@@ -742,7 +742,7 @@ export default function WorkspacesPage() {
  />
  </div>
  <p className="text-[11px] text-foreground-muted mt-1.5">
- Can contain lowercase letters, numbers and hyphens
+ Can contain lowercase letters, numbers, and hyphens
  </p>
  </div>
 

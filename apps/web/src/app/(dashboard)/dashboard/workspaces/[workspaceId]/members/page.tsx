@@ -371,7 +371,7 @@ export default function WorkspaceMembersPage() {
         {/* Page Header */}
  <PageHeader
 title="Members and permissions"
-  description="Manage workspace members, roles and access permissions"
+  description="Manage workspace members, roles, and access permissions"
  actions={
  <PermissionGate permissions={permissions} required={["members_manage"]}>
  <Button

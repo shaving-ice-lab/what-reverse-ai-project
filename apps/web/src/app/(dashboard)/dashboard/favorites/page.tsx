@@ -2,7 +2,7 @@
 
 /**
  * Favorite Page
- * Manages user's favorite workflows, agents, templates and other content
+ * Manages user's favorite workflows, agents, templates, and other content
  */
 
 import { useState, useMemo } from "react";
@@ -167,7 +167,7 @@ name: "User sign-up notifications flow",
  {
  id: "fav-7",
  name: "Item resource folder",
- description: "Related images, documents and config files",
+ description: "Related images, documents, and config files",
  type: "folder" as FavoriteType,
  href: "/dashboard/files/folder-1",
  createdAt: "2026-01-08T10:00:00",
@@ -329,7 +329,7 @@ export default function FavoritesPage() {
  <p className="page-caption">Favorites</p>
  <PageHeader
  title="Favorite"
- description="Manage your favorite workflows, agents, templates and documents"
+ description="Manage your favorite workflows, agents, templates, and documents"
  actions={
  <div className="flex items-center gap-2">
  <ButtonGroup attached>
@@ -463,7 +463,7 @@ export default function FavoritesPage() {
  <Badge variant="primary" size="sm">
  {selectedItems.size}
  </Badge>
- Selected {selectedItems.size} favorite(s)
+ Selected {selectedItems.size} {selectedItems.size === 1 ? 'favorite' : 'favorites'}
  </div>
  <div className="flex flex-wrap items-center gap-2">
  <Button variant="destructive" size="sm" onClick={bulkRemove} leftIcon={<StarOff className="w-4 h-4" />}>

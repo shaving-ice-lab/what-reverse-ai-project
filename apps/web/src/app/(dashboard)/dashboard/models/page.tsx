@@ -2,7 +2,7 @@
 
 /**
  * AI Model Management Page
- * View, compare and configure available AI models
+ * View, compare, and configure available AI models
  */
 
 import { useState } from "react";
@@ -300,7 +300,7 @@ export default function ModelsPage() {
  <PageHeader
  eyebrow="Models"
  title="AI Model"
- description="Browse, compare and configure available AI models"
+ description="Browse, compare, and configure available AI models"
  actions={(
  <div className="flex flex-wrap items-center gap-2">
  <Button
@@ -407,7 +407,7 @@ export default function ModelsPage() {
  <div className="page-panel-header flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="page-panel-title">Filter and sort</p>
-            <p className="page-panel-description">Filter by capability, provider and price.</p>
+            <p className="page-panel-description">Filter by capability, provider, and price.</p>
           </div>
  {isFiltering && (
  <Button
@@ -665,7 +665,7 @@ title="No matching models"
                 <div className="page-panel-header">
                   <div>
                     <p className="page-panel-title">Model comparison</p>
-                    <p className="page-panel-description">Selected {selectedModels.length} model(s)</p>
+                    <p className="page-panel-description">Selected {selectedModels.length} {selectedModels.length === 1 ? 'model' : 'models'}</p>
                   </div>
                 </div>
  <div className="px-6 pb-6 overflow-x-auto">
@@ -805,7 +805,7 @@ title="No matching models"
               <div className="page-panel-header">
                 <div>
                   <p className="page-panel-title">Recommended strategy</p>
-                  <p className="page-panel-description">Select models based on quality, speed and popularity.</p>
+                  <p className="page-panel-description">Select models based on quality, speed, and popularity.</p>
                 </div>
               </div>
               <div className="p-6 space-y-4">

@@ -133,7 +133,7 @@ const workflows = [
  {
  id: "wf-6",
  name: "Order Processing Automation",
- description: "Automatically verify new orders, process and send confirmation emails",
+ description: "Automatically verify new orders, process, and send confirmation emails",
  status: "draft" as WorkflowStatus,
  trigger: "Webhook",
  createdAt: "2026-01-20",
@@ -803,7 +803,7 @@ export default function WorkflowsPage() {
  <p className="text-[11px] text-foreground-light mb-4 max-w-xs mx-auto">
  {searchQuery || statusFilter !== "all"
  ? "Try using other keywords or filter conditions"
-: "Create your first workflow to start your automation journey"}
+: "Create your first workflow to start automating your tasks"}
  </p>
  {searchQuery || statusFilter !== "all" ? (
  <Button

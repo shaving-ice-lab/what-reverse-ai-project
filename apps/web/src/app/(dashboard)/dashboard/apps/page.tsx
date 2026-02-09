@@ -1648,7 +1648,7 @@ export default function AppsPage() {
  ) : error ? (
  <EmptyState
  icon={<Layers className="h-5 w-5" />}
-            title="Load failed"
+            title="Failed to Load Apps"
  description={error}
  />
  ) : filteredApps.length === 0 ? (
@@ -1739,7 +1739,7 @@ export default function AppsPage() {
  App Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="e.g. Daily Assistant"
+ placeholder="e.g., Daily Assistant"
  value={createAppForm.name}
  onChange={(e) => handleCreateAppNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"

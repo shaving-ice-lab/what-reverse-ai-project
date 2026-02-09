@@ -123,7 +123,7 @@ export default function SupportTicketDetailPage() {
  })
  .catch((error) => {
  if (!active) return;
- setErrorMessage((error as Error).message || "Load Failed");
+ setErrorMessage((error as Error).message || "Failed to load ticket details");
  })
  .finally(() => {
  if (active) setIsLoading(false);
@@ -224,7 +224,7 @@ export default function SupportTicketDetailPage() {
  });
  setTicket(response.ticket);
  } catch (error) {
- setErrorMessage((error as Error).message || "Update Failed");
+ setErrorMessage((error as Error).message || "Failed to Update");
  } finally {
  setIsUpdating(false);
  }
@@ -241,7 +241,7 @@ export default function SupportTicketDetailPage() {
  setComments((prev) => [...prev, response.comment]);
  setCommentDraft("");
  } catch (error) {
- setErrorMessage((error as Error).message || "Comment Submit Failed");
+ setErrorMessage((error as Error).message || "Failed to submit comment");
  } finally {
  setCommentSubmitting(false);
  }

@@ -133,7 +133,7 @@ export default function SupportTicketsPage() {
  setTickets(response.items ?? []);
  setTotal(response.total ?? 0);
  } catch (error) {
- setErrorMessage((error as Error).message || "Load Failed");
+ setErrorMessage((error as Error).message || "Failed to load support tickets");
  } finally {
  setIsLoading(false);
  }
@@ -292,7 +292,7 @@ export default function SupportTicketsPage() {
  );
  cancelEdit();
  } catch (error) {
- setErrorMessage((error as Error).message || "Update Failed");
+ setErrorMessage((error as Error).message || "Failed to Update");
  } finally {
  setIsUpdating(false);
  }

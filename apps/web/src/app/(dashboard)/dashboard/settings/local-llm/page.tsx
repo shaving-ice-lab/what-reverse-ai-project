@@ -366,7 +366,7 @@ export default function LocalLLMPage() {
  setTestResult({
  modelName,
  result: "",
- error: err instanceof Error ? err.message : "Test failed.",
+        error: err instanceof Error ? err.message : "Failed to test.",
  });
  } finally {
  setTestingModel(null);
@@ -613,7 +613,7 @@ Please ensure you have installed and launched {PROVIDER_NAMES[activeProvider]}
  <DialogContent className="bg-surface-100 border-border">
  <DialogHeader>
  <DialogTitle className="text-foreground">
- {testResult?.error ? "Test Failed" : "Test Successful"}
+ {testResult?.error ? "Failed to Test" : "Test Successful"}
  </DialogTitle>
  <DialogDescription className="text-foreground-light">
  Model: {testResult?.modelName}

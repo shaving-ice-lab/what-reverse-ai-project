@@ -392,7 +392,7 @@ export default function NewWorkflowPage() {
  <Input
  value={workflowName}
  onChange={(e) => setWorkflowName(e.target.value)}
- placeholder="e.g. Customer Feedback Auto-Processing"
+ placeholder="e.g., Customer Feedback Auto-Processing"
  inputSize="sm"
  className="bg-surface-200 border-border"
  />

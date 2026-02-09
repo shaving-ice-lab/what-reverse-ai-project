@@ -303,7 +303,7 @@ export default function SecuritySettingsPage() {
  <div className="p-4 rounded-md bg-surface-100/60">
  <h3 className="text-[13px] font-medium text-foreground mb-2">Settings step</h3>
  <ol className="list-decimal list-inside space-y-2 text-[13px] text-foreground-light">
- <li>Download a verification app (e.g. Google Authenticator, Authy)</li>
+ <li>Download a verification app (e.g., Google Authenticator, Authy)</li>
  <li>Scan the QR code below or manually enter the key</li>
  <li>Enter the 6-digit code shown in the app</li>
  </ol>

@@ -106,7 +106,7 @@ export default function AppEditorPage({
  setState((s) => ({
  ...s,
  isLoading: false,
- error: err instanceof Error ? err.message: "Load App Failed",
+    error: err instanceof Error ? err.message: "Failed to Load App",
  }));
  }
  };

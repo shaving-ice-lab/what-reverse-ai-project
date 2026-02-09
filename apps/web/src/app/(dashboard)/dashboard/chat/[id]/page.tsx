@@ -922,7 +922,7 @@ export default function ChatPage() {
  router.replace(`/dashboard/app/${wsId}/conversations/${conversationId}`);
  return;
  }
- setRedirectError("Conversation is not linked to a workspace. Unable to navigate.");
+ setRedirectError("Conversation is not linked to a workspace. Failed to navigate.");
  } catch (error) {
  if (cancelled) return;
  console.error("Failed to resolve app for conversation:", error);

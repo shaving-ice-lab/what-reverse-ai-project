@@ -60,7 +60,7 @@ const courses = [
  {
  id: "1",
     title: "Quick Start: Create Your First AI Workflow in 5 Minutes",
-    description: "Learn platform basics, create and run your first automation workflow",
+    description: "Learn platform basics, create, and run your first automation workflow",
  category: "getting-started",
  level: "beginner",
  type: "video",

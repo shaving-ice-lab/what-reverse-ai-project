@@ -178,7 +178,7 @@ export default function TemplatesPage() {
  setHasMore(newTemplates.length === PAGE_SIZE);
  }
  } catch (err) {
-      setError(err instanceof Error ? err.message: "Load failed");
+      setError(err instanceof Error ? err.message: "Failed to load templates");
  } finally {
  setIsLoading(false);
  setIsLoadingMore(false);
@@ -213,9 +213,9 @@ export default function TemplatesPage() {
  router.push(`/editor/${workflow.id}`);
  }
  } catch (err) {
- toast.error("Template usage failed", {
-      description: err instanceof Error ? err.message: "Please retry",
- });
+      toast.error("Failed to use template", {
+        description: err instanceof Error ? err.message: "Please try again",
+      });
  } finally {
  setIsUsingTemplate(null);
  }

@@ -2,7 +2,7 @@
 
 /**
  * API Key Management Page
- * Create, Manage and Monitor API Keys
+ * Create, Manage, and Monitor API Keys
  */
 
 import { useMemo, useState } from "react";
@@ -829,8 +829,8 @@ Key name
  <Input
  placeholder={
  isPublishable
- ? "e.g. Web publishable key"
-: "e.g. Production environment key"
+ ? "e.g., Web publishable key"
+: "e.g., Production environment key"
  }
  value={newKeyName}
  onChange={(e) => setNewKeyName(e.target.value)}

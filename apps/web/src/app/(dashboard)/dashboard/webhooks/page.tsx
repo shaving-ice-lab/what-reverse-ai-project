@@ -428,7 +428,7 @@ export default function WebhooksPage() {
  <label className="block text-[13px] font-medium text-foreground mb-2">
  Name
  </label>
- <Input placeholder="e.g. Workflow done notifications" className="h-9 bg-surface-200 border-border" />
+ <Input placeholder="e.g., Workflow done notifications" className="h-9 bg-surface-200 border-border" />
  </div>
 
  <div>

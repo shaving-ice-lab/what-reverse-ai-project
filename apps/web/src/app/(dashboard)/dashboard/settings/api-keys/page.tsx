@@ -103,7 +103,7 @@ export default function ApiKeysPage() {
      setApiKeys(keys);
    } catch (err) {
      console.error("Failed to load API keys:", err);
-     setError(err instanceof Error ? err.message: "Failed to load");
+     setError(err instanceof Error ? err.message: "Failed to load API keys");
    } finally {
  setIsLoading(false);
  }
@@ -136,7 +136,7 @@ export default function ApiKeysPage() {
  ...prev,
  [apiKey.id]: {
  success: false,
- message: err instanceof Error ? err.message: "Test failed. Please try again later.",
+        message: err instanceof Error ? err.message: "Failed to test API key. Please try again later.",
  },
  }));
  } finally {
@@ -163,7 +163,7 @@ export default function ApiKeysPage() {
  setApiKeys((prev) => prev.filter((k) => k.id !== id));
  } catch (err) {
        console.error("Delete failed:", err);
-       setError(err instanceof Error ? err.message: "Delete failed");
+       setError(err instanceof Error ? err.message: "Failed to delete API key");
  }
  }
  };

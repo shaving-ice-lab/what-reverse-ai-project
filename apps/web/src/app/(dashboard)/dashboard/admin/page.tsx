@@ -301,7 +301,7 @@ export default function AdminConsolePage() {
  <p className="text-xs uppercase tracking-[0.35em] text-foreground-muted">Command Desk</p>
  <h3 className="text-lg font-semibold text-foreground">Operations and risk control</h3>
  <p className="mt-1 text-sm text-foreground-muted">
-            Manage users, workspaces, apps and support tickets from a single dashboard.
+            Manage users, workspaces, apps, and support tickets from a single dashboard.
  </p>
  </div>
  </div>

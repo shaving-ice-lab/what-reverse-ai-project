@@ -153,7 +153,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  setLatestExecutionAt(executionsData.items[0]?.created_at || null);
  } catch (error) {
  console.error("Failed to load app overview:", error);
- setLoadError("Load failed. Please try again later.");
+ setLoadError("Failed to load app overview. Please try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -323,7 +323,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  {status.label}
  </Badge>
  }
- description={app?.published_at ? `Published at ${formatDateTime(app.published_at)}` : "Unpublished"}
+ description={app?.published_at ? `Published on ${formatDateTime(app.published_at)}` : "Unpublished"}
  icon={<StatusIcon className="w-3.5 h-3.5" />}
  />
  <SummaryCard
@@ -341,7 +341,7 @@ export function AppOverviewPageContent({ workspaceId, appId }: AppOverviewPagePr
  <SummaryCard
  label="Recent Run"
  value={lastRunLabel}
- description={latestExecutionAt ? "From latest execution": "No execution records"}
+ description={latestExecutionAt ? "From the latest execution": "No execution records"}
  icon={<Clock className="w-3.5 h-3.5" />}
  />
  <SummaryCard
@@ -459,7 +459,7 @@ label="Anonymous Access"
 
  <SettingsSection
 title="Version and Changes"
-            description="Current version, change log, and rollback entry."
+            description="Current version, changelog, and rollback entry."
  compact
  >
  <div className="grid md:grid-cols-3 gap-3">
@@ -474,7 +474,7 @@ title="Version and Changes"
  />
  </div>
  <div className="mt-3 rounded-md border border-border bg-surface-75 px-4 py-3 text-[11px] text-foreground-muted">
- {app?.current_version?.changelog || "No version change description. We recommend adding a change log when publishing."}
+ {app?.current_version?.changelog || "No version change description. We recommend adding a changelog when publishing."}
  </div>
  <div className="mt-3 flex flex-wrap gap-2">
  <Button variant="outline" size="sm" asChild>

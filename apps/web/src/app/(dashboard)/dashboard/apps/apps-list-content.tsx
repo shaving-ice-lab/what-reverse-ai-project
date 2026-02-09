@@ -381,7 +381,7 @@ export default function AppsPage() {
  await loadData();
  } catch (error) {
  console.error("Failed to bulk publish:", error);
- setBulkActionError("Batch publish failed. Please try again later.");
+      setBulkActionError("Failed to batch publish apps. Please try again later.");
  } finally {
  setIsBulkPublishing(false);
  }
@@ -389,7 +389,7 @@ export default function AppsPage() {
 
  const handleBulkArchive = async (appsToArchive: App[]) => {
  if (appsToArchive.length === 0) return;
- const confirmed = window.confirm("Archive selected app(s)?");
+ const confirmed = window.confirm("Archive selected apps?");
  if (!confirmed) return;
  try {
  setIsBulkArchiving(true);
@@ -401,7 +401,7 @@ export default function AppsPage() {
  await loadData();
  } catch (error) {
  console.error("Failed to bulk archive:", error);
- setBulkActionError("Batch archive failed. Please try again later.");
+      setBulkActionError("Failed to batch archive apps. Please try again later.");
  } finally {
  setIsBulkArchiving(false);
  }
@@ -458,7 +458,7 @@ export default function AppsPage() {
  <PageHeader
  title="App management"
  eyebrow={workspace?.name}
- description="Manage workspace apps, publish and monitor run status"
+ description="Manage workspace apps, publish, and monitor run status"
  actions={
  <div className="flex items-center gap-2">
  <Button variant="outline" size="sm" asChild>
@@ -573,7 +573,7 @@ export default function AppsPage() {
  {selectedAppIds.size > 0 && (
  <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface-100 px-4 py-3">
  <div className="text-[12px] text-foreground-light">
- {selectedAppIds.size} app(s) selected
+ {selectedAppIds.size} {selectedAppIds.size === 1 ? 'app' : 'apps'} selected
  {publishableApps.length > 0 && (
  <span className="text-foreground-muted">
  , {publishableApps.length} can be published
@@ -890,7 +890,7 @@ export default function AppsPage() {
  App Name <span className="text-destructive">*</span>
  </label>
  <Input
- placeholder="e.g. Daily Assistant"
+ placeholder="e.g., Daily Assistant"
  value={createForm.name}
  onChange={(e) => handleNameChange(e.target.value)}
  className="h-9 bg-surface-75 border-border focus:border-brand-500"

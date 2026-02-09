@@ -85,7 +85,7 @@ const domainStatusConfig: Record<
  verified: { label: "Verified", color: "text-brand-500", bgColor: "bg-brand-200" },
  verifying: { label: "Verifying", color: "text-warning", bgColor: "bg-warning-200" },
   pending: { label: "Pending Verification", color: "text-foreground-muted", bgColor: "bg-surface-200" },
-  failed: { label: "Verification Failed", color: "text-destructive", bgColor: "bg-destructive/10" },
+  failed: { label: "Failed to Verify", color: "text-destructive", bgColor: "bg-destructive/10" },
   blocked: { label: "Blocked", color: "text-destructive", bgColor: "bg-destructive/10" },
 };
 
@@ -187,7 +187,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  setDomains(domainsData);
  } catch (error) {
  console.error("Failed to load publish settings:", error);
-    setLoadError("Failed to load. Please try again later.");
+    setLoadError("Failed to load publish settings. Please try again later.");
  } finally {
  setIsLoading(false);
  }
@@ -550,7 +550,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  <Input
  type="number"
  min={1}
-                  placeholder="e.g. 60"
+                  placeholder="e.g., 60"
  value={rateLimits[key]}
  onChange={(event) => handleRateLimitChange(key, event.target.value)}
  disabled={!canPublish}
@@ -635,7 +635,7 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  Save SEO
  </Button>
  {seoSaved && (
- <span className="text-[11px] text-brand-500">Saved SEO Config</span>
+ <span className="text-[11px] text-brand-500">SEO settings saved</span>
  )}
  {seoSaveError && (
  <span className="text-[11px] text-destructive">{seoSaveError}</span>
@@ -740,11 +740,11 @@ export function PublishSettingsPageContent({ workspaceId, appId }: PublishSettin
  {statusMeta.label}
  </Badge>
  <div className="text-[11px] text-foreground-muted">
- {app?.published_at ? `Published at ${new Date(app.published_at).toLocaleString("en-US")}` : "Unpublished"}
+ {app?.published_at ? `Published on ${new Date(app.published_at).toLocaleString("en-US")}` : "Unpublished"}
  </div>
  </div>
  <div className="mt-3 text-[12px] text-foreground-light">
- After publishing, the app can be accessed via the public entry URL. It is recommended to configure the access policy before publishing.
+ After publishing, the app can be accessed via the public entry URL. We recommend configuring the access policy before publishing.
  </div>
  </div>
 
