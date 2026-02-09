@@ -64,7 +64,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  // Validate key format
  const validateKey = (): boolean => {
  if (!apiKey.trim()) {
- setError("Please enter API Key");
+ setError("Please enter an API key");
  return false;
  }
  
@@ -93,7 +93,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  } catch (err) {
  setTestResult({
  valid: false,
- message: err instanceof Error ? err.message: "Test failed",
+        message: err instanceof Error ? err.message: "Failed to test API key",
  });
  } finally {
  setIsTesting(false);
@@ -122,7 +122,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
  setOpen(false);
  onSuccess?.();
  } catch (err) {
- setError(err instanceof Error ? err.message: "Failed to add key");
+ setError(err instanceof Error ? err.message: "Failed to add API key");
  } finally {
  setIsLoading(false);
  }

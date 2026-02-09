@@ -65,7 +65,7 @@ export function FolderManageDialog({
  setIsCreating(false);
  onFoldersChange();
  } catch (error) {
- toast.error("Creation failed. Please try again.");
+      toast.error("Failed to create. Please try again.");
  } finally {
  setIsLoading(false);
  }
@@ -82,7 +82,7 @@ export function FolderManageDialog({
  setEditingId(null);
  onFoldersChange();
  } catch (error) {
- toast.error("Update failed. Please try again.");
+      toast.error("Failed to update. Please try again.");
  } finally {
  setIsLoading(false);
  }
@@ -100,7 +100,7 @@ export function FolderManageDialog({
  toast.success("Folder deleted");
  onFoldersChange();
  } catch (error) {
- toast.error("Deletion failed. Please try again.");
+      toast.error("Failed to delete. Please try again.");
  } finally {
  setIsLoading(false);
  }

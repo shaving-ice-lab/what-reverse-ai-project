@@ -515,7 +515,7 @@ export function LocalLLMSettings() {
  setTestResult({
  modelName,
  result: '',
- error: err instanceof Error ? err.message : 'Test failed',
+        error: err instanceof Error ? err.message : 'Failed to test',
  });
  } finally {
  setTestingModel(null);
@@ -816,7 +816,7 @@ export function LocalLLMSettings() {
  "text-lg",
  testResult?.error ? "text-destructive" : "text-emerald-600 dark:text-emerald-400"
  )}>
- {testResult?.error ? 'Test Failed' : 'Test Successful'}
+ {testResult?.error ? 'Failed to Test' : 'Test Successful'}
  </DialogTitle>
  <DialogDescription className="flex items-center gap-1.5 mt-0.5">
  <Cpu className="w-3 h-3" />

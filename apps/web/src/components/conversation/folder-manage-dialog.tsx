@@ -80,7 +80,7 @@ export function ConversationFolderManageDialog({
  onFoldersChange();
  } catch (error) {
  console.error("Create folder error:", error);
- toast.error("Creation failed, please try again");
+      toast.error("Failed to create. Please try again.");
  } finally {
  setIsLoading(false);
  }
@@ -98,7 +98,7 @@ export function ConversationFolderManageDialog({
  onFoldersChange();
  } catch (error) {
  console.error("Update folder error:", error);
- toast.error("Update failed, please try again");
+      toast.error("Failed to update. Please try again.");
  } finally {
  setIsLoading(false);
  }
@@ -117,7 +117,7 @@ export function ConversationFolderManageDialog({
  onFoldersChange();
  } catch (error) {
  console.error("Delete folder error:", error);
- toast.error("Deletion failed, please try again");
+      toast.error("Failed to delete. Please try again.");
  } finally {
  setIsLoading(false);
  }

@@ -209,7 +209,7 @@ export function PublishAgentDialog({
  onSuccess?.(response.data.id);
  }, 1500);
  } catch (err) {
- setError(err instanceof Error ? err.message: "Publish failed. Please try again later.");
+      setError(err instanceof Error ? err.message: "Failed to publish. Please try again later.");
  } finally {
  setIsSubmitting(false);
  }

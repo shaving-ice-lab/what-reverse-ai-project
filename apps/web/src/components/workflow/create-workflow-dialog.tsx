@@ -89,7 +89,7 @@ const templates = [
  {
  id: "auto-workflow",
     name: "Automation Workflow",
- description: "Conditions, branching and loop processing",
+ description: "Conditions, branching, and loop processing",
  icon: GitBranch,
  color: "#22c55e",
  gradient: "from-emerald-500/20 to-green-500/20",
@@ -143,7 +143,7 @@ export function CreateWorkflowDialog({
  
  const handleCreate = async () => {
  if (!name.trim()) {
- setError("Please enter workflow name.");
+ setError("Please enter a workflow name.");
  nameInputRef.current?.focus();
  return;
  }
@@ -172,7 +172,7 @@ export function CreateWorkflowDialog({
  }
  }, 500);
  } catch (err) {
- setError(err instanceof Error ? err.message : "Create failed.");
+      setError(err instanceof Error ? err.message : "Failed to create workflow.");
  } finally {
  setIsLoading(false);
  }
@@ -234,8 +234,8 @@ export function CreateWorkflowDialog({
  <CheckCircle2 className="w-8 h-8 text-primary" />
  </div>
  <div>
- <h3 className="text-lg font-semibold text-foreground">Created successfully!</h3>
-              <p className="text-sm text-muted-foreground mt-1">Navigating to editor...</p>
+ <h3 className="text-lg font-semibold text-foreground">Workflow created successfully!</h3>
+              <p className="text-sm text-muted-foreground mt-1">Opening the editor...</p>
  </div>
  </div>
  </div>
@@ -283,7 +283,7 @@ export function CreateWorkflowDialog({
  <div>
  <p className="text-sm font-medium text-foreground">Start from Scratch</p>
  <p className="text-xs text-muted-foreground mt-1">
- Create an empty workflow and drag & drop nodes in the editor to build your automation flow
+ Create an empty workflow and drag and drop nodes in the editor to build your automation flow
  </p>
  </div>
  </div>
@@ -296,7 +296,7 @@ Workflow name <span className="text-destructive">*</span>
 <Input
 ref={nameInputRef}
 id="name"
-placeholder="e.g. Customer data analytics flow"
+placeholder="e.g., Customer data analytics flow"
  value={name}
  onChange={(e) => {
  setName(e.target.value);
@@ -314,14 +314,14 @@ placeholder="e.g. Customer data analytics flow"
  Description
  <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
  </Label>
- <Textarea
- id="description"
- placeholder="Brief description of this workflow's use..."
- value={description}
- onChange={(e) => setDescription(e.target.value)}
- rows={3}
- className="resize-none rounded-xl"
- />
+        <Textarea
+          id="description"
+          placeholder="Brief description of what this workflow does..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className="resize-none rounded-xl"
+        />
  </div>
  </TabsContent>
  
@@ -388,7 +388,7 @@ placeholder="e.g. Customer data analytics flow"
  {template.nodeCount > 0 && (
  <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground/70">
  <Layers className="w-3 h-3" />
-{template.nodeCount} preset nodes
+{template.nodeCount} pre-configured nodes
 </div>
  )}
  </div>

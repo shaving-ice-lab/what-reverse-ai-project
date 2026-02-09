@@ -101,12 +101,12 @@ export function ImportDialog({
  setParsedData(importData);
  setTitle(importData.title);
  } catch {
- setError("File parse failed. Please ensure the file is valid JSON.");
+ setError("Failed to parse file. Please ensure the file is valid JSON.");
  }
  };
 
  reader.onerror = () => {
- setError("File read failed");
+ setError("Failed to read file");
  };
 
  reader.readAsText(selectedFile);
@@ -136,7 +136,7 @@ export function ImportDialog({
  onSuccess?.();
  }
  } catch (err) {
-    setError("Import failed, please retry");
+    setError("Failed to import. Please try again.");
  console.error("Import failed:", err);
  } finally {
  setImporting(false);
@@ -202,10 +202,10 @@ export function ImportDialog({
  ) : (
  <div>
  <p className="text-sm text-muted-foreground">
-                Click or drag & drop a file here
+                Click or drag and drop a file here
  </p>
  <p className="text-xs text-muted-foreground">
- Support JSON Format
+ Supports JSON format
  </p>
  </div>
  )}

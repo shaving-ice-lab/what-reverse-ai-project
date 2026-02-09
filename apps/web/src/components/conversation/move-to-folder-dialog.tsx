@@ -62,7 +62,7 @@ export function MoveToFolderDialog({
  onOpenChange(false);
  } catch (error) {
  console.error("Move error:", error);
- toast.error("Move failed, please try again");
+      toast.error("Failed to move. Please try again.");
  } finally {
  setIsLoading(false);
  }
