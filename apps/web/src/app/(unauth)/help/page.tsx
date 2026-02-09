@@ -311,7 +311,7 @@ export default function HelpPage() {
  { title: "API Documentation", href: "/docs/api", icon: "📚" },
  { title: "Video Tutorials", href: "/docs/tutorials", icon: "🎬" },
  { title: "FAQ", href: "/faq", icon: "❓" },
- { title: "Change Log", href: "/whats-new", icon: "📝" },
+ { title: "Changelog", href: "/whats-new", icon: "📝" },
  ].map((link) => (
  <Link
  key={link.title}

@@ -35,7 +35,7 @@ const testimonials = [
  rating: 5,
  },
  {
-    quote: "With AgentFlow ERP, MES and WMS integration, our throughput improved 150%.",
+    quote: "With AgentFlow's ERP, MES, and WMS integration, our throughput improved 150%.",
     author: "James W.",
     role: "Operations Director",
  company: "Manufacturing enterprise",

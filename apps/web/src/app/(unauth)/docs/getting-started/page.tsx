@@ -76,22 +76,22 @@ const learningPaths = [
 const coreConcepts = [
  {
  icon: Zap,
- title: "Workflow (Workflow)",
+ title: "Workflow",
     description: "An automation flow composed of multiple nodes that can process data, call services, and execute logic",
  },
  {
  icon: Layers,
- title: "Node (Node)",
+ title: "Node",
     description: "The basic building blocks of a workflow — each node performs a specific task",
  },
  {
  icon: Play,
- title: "Trigger (Trigger)",
+ title: "Trigger",
     description: "Conditions that start workflow execution, such as scheduled, webhook, or manual triggers",
  },
  {
  icon: Code,
- title: "Expression (Expression)",
+ title: "Expression",
     description: "Syntax for passing data between nodes and performing dynamic calculations (supports templates and variables)",
  },
 ];

@@ -35,7 +35,7 @@ const demoTypes = [
  {
  id: "technical",
     name: "Technical Demo",
-    description: "Deep dive into API, integrations, and technical architecture",
+    description: "Deep dive into APIs, integrations, and technical architecture",
  duration: "45 min",
  },
  {

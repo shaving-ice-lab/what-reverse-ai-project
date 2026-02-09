@@ -43,7 +43,7 @@ const supportQuickLinks = [
  },
  {
  icon: Wrench,
- title: "Fault Guide",
+ title: "Troubleshooting Guide",
  description: "Step-by-step troubleshooting",
  href: "/help/troubleshooting",
  },
@@ -280,7 +280,7 @@ export default function SupportPage() {
  setCaptchaRequired(true);
  }
  } else {
- setSubmitError("Submit failed. Please try again later.");
+      setSubmitError("Failed to submit. Please try again later.");
  }
  } finally {
  setIsSubmitting(false);
@@ -300,7 +300,7 @@ export default function SupportPage() {
 <span>Customer Success and Support Center</span>
 </div>
 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
-Let issues move to closed loop
+Resolve issues from start to finish
 </h1>
  <p className="text-lg text-foreground-light max-w-2xl mx-auto leading-relaxed">
  From ticket submission to follow-up, we provide every user with a clear, trackable support path.
@@ -379,7 +379,7 @@ Let issues move to closed loop
  <div>
 <h2 className="text-xl font-semibold text-foreground">Submit Ticket</h2>
 <p className="text-[13px] text-foreground-lighter mt-1">
-Fill in key info; the system will auto-tier and calculate response SLA.
+Fill in key information; the system will automatically assign priority and calculate response SLA.
 </p>
 </div>
 <div className="hidden sm:flex items-center gap-2 text-[12px] text-foreground-lighter">
@@ -440,7 +440,7 @@ Contact person name
  </div>
  <div>
  <label className="block text-[13px] font-medium text-foreground mb-2">
- ContactEmail *
+ Contact Email *
  </label>
  <Input
  required
@@ -507,7 +507,7 @@ Workspace ID (optional)
 <Input
 value={formData.workspaceId}
 onChange={(e) => setFormData({ ...formData, workspaceId: e.target.value })}
-placeholder="e.g. if linking to a specific workspace"
+placeholder="e.g., if linking to a specific workspace"
 className="bg-surface-200/50 border-border/30"
 />
  </div>
@@ -566,7 +566,7 @@ className="w-full px-3 py-2 rounded-lg bg-surface-200/50 border border-border/30
  <div className="flex items-center justify-between">
  <div className="text-[11px] text-foreground-muted flex items-center gap-2">
  <Shield className="w-4 h-4" />
-We will process sensitive info securely.
+We will process sensitive information securely.
 </div>
 <Button type="submit" disabled={isSubmitting} className="rounded-full bg-foreground hover:bg-foreground/90 text-background">
 {isSubmitting ? (

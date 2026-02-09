@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Change Log Page - LobeHub Style Design
+ * Changelog Page - LobeHub Style Design
  */
 
 import Link from "next/link";
@@ -15,7 +15,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
-// Change Log
+// Changelog
 const releases = [
  {
  version: "2.1.0",
@@ -88,7 +88,7 @@ export default function WhatsNewPage() {
  </div>
 
  <h1 className="text-[15px] sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-6">
- Change Log
+ Changelog
  </h1>
 
  <p className="text-[13px] text-foreground-light max-w-2xl mx-auto">

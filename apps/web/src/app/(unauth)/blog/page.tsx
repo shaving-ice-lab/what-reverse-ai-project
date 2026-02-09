@@ -124,7 +124,7 @@ const blogSeries = [
  {
  id: "enterprise-guide",
  title: "Enterprise Deployment Guide",
- description: "Security, compliance and enterprise best practices",
+ description: "Security, compliance, and enterprise best practices",
  articles: 6,
  totalReadTime: "60 min",
  level: "Advanced",
@@ -167,7 +167,7 @@ const upcomingWebinars = [
  },
  {
  id: "webinar-2",
- title: "Practical: build a smart support system in 30 min",
+ title: "Practical: Build a Smart Support System in 30 Minutes",
  date: "2026-02-12",
  time: "15:00 CST",
  speaker: "Li Wei",
@@ -472,8 +472,8 @@ const blogPosts = [
  },
  {
  id: "multimodal-ai-workflows",
- title: "Multimodal AI workflow: image, voice and text in one",
- excerpt: "Integrate visual, voice and natural language in one workflow for smarter automation.",
+ title: "Multimodal AI Workflow: Image, Voice, and Text in One",
+ excerpt: "Integrate visual, voice, and natural language in one workflow for smarter automation.",
  category: "tech",
  author: "Wang Hao",
  authorRole: "AI Researcher",
@@ -489,7 +489,7 @@ const blogPosts = [
  },
  {
  id: "enterprise-automation-trends",
- title: "2026 enterprise automation trend: AI-driven workflows",
+ title: "2026 Enterprise Automation Trends: AI-Driven Workflows",
  excerpt: "Explore the latest 2026 trends: AI reshaping enterprise workflows and operations.",
  category: "industry",
  author: "Chen Xiao",
@@ -541,7 +541,7 @@ const blogPosts = [
  {
  id: "error-handling-patterns",
  title: "Workflow error handling: keep automation reliable",
- excerpt: "Error handling policies: retry, fallback and alerts so your automation runs stably.",
+ excerpt: "Error handling policies: retry, fallback, and alerts so your automation runs stably.",
  category: "tech",
  author: "Li Wei",
  authorRole: "Tech Lead",
@@ -713,7 +713,7 @@ export default function BlogPage() {
  "transition-all duration-700 delay-200",
  isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
  )}>
- Explore the latest AI workflow automation trends, product updates and case studies
+ Explore the latest AI workflow automation trends, product updates, and case studies
  </p>
 
  {/* Search */}
@@ -1021,7 +1021,7 @@ export default function BlogPage() {
  No related articles
  </h3>
  <p className="text-foreground-light text-[13px] mb-8">
- Try adjusting search keywords or select another category
+ Try adjusting your search keywords or selecting another category
  </p>
  <Button
  variant="outline"
@@ -1125,7 +1125,7 @@ export default function BlogPage() {
  { href: "/docs", icon: BookOpen, label: "Documentation Center" },
  { href: "/templates", icon: Rocket, label: "Template Gallery" },
  { href: "/community", icon: MessageSquare, label: "Community Discussion" },
- { href: "/changelog", icon: Sparkles, label: "Change Log" },
+ { href: "/changelog", icon: Sparkles, label: "Changelog" },
  ].map((item) => (
  <Link 
  key={item.href}

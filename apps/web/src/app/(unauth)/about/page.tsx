@@ -40,7 +40,7 @@ const milestones = [
 const values = [
  { icon: Target, title: "Mission Driven", description: "We empower everyone to easily use AI automation and unleash their creative potential." },
  { icon: Heart, title: "User First", description: "User success is our greatest achievement. We always put users first." },
- { icon: Sparkles, title: "Relentless Innovation", description: "Constantly exceeding user expectations in product, technology, and service." },
+ { icon: Sparkles, title: "Relentless Innovation", description: "We constantly exceed user expectations in product, technology, and service." },
  { icon: Globe, title: "Open Collaboration", description: "Open source, growing with the community to build better products together." },
 ];
 

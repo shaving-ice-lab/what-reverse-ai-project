@@ -44,7 +44,7 @@ const coreFeatures = [
  {
  icon: GitBranch,
  title: "Visual Workflow Editor",
- description: "Intuitive drag & drop editor that lets you build complex automation flows without writing any code.",
+ description: "Intuitive drag-and-drop editor that lets you build complex automation flows without writing any code.",
  highlights: ["Drag & Drop", "Real-time Preview", "Version Control"],
  },
  {

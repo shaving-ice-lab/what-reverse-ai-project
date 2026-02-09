@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * FaultGuide - LobeHub Style
+ * Troubleshooting Guide - LobeHub Style
  */
 
 import Link from "next/link";
@@ -23,8 +23,8 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { cn } from "@/lib/utils";
 
 const quickChecks = [
- "Confirm your account has workspace permission",
- "Check that API key or credentials are not expired or revoked",
+ "Confirm that your account has workspace permission",
+ "Check that your API key or credentials are not expired or revoked",
  "Check execution logs for timeout or rate limiting",
  "Confirm trigger and webhook config are not disabled",
 ];
@@ -32,8 +32,8 @@ const quickChecks = [
 const troubleshootingSections = [
  {
  icon: Wrench,
- title: "Workflow execution failed",
- description: "Node execution failed: incomplete input or insufficient permissions",
+    title: "Failed to Execute Workflow",
+    description: "Failed to execute node: incomplete input or insufficient permissions",
  steps: [
  "View the failed node and error in execution record",
  "Confirm input parameters are not missing or invalid",
@@ -44,7 +44,7 @@ const troubleshootingSections = [
  {
  icon: CloudOff,
  title: "Webhook not triggering",
- description: "Third-party event could not trigger or callback failed",
+    description: "Third-party events could not trigger or failed to call back",
  steps: [
  "Check that webhook URL is accessible",
  "Confirm callback signature key and event type",
@@ -106,14 +106,14 @@ export default function TroubleshootingPage() {
  <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
  <div className="lobe-badge mb-8">
  <Wrench className="h-3.5 w-3.5" />
- <span>Fault</span>
+ <span>Troubleshooting</span>
  </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-[1.1]">
             Troubleshooting Guide
             </h1>
             <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
-            Step-by-step issue resolution to shorten restore time.
+            Step-by-step issue resolution to shorten recovery time.
             </p>
 
  <div className="max-w-xl mx-auto relative">

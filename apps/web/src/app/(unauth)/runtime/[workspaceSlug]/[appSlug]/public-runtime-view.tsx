@@ -430,7 +430,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  const accessMode = entry?.access_policy?.access_mode || "private";
  const accessModeMap = {
  private: { label: "Private Access", icon: Lock },
- public_auth: { label: "Public Access (Login Required)", icon: ShieldCheck },
+ public_auth: { label: "Public Access (Sign-in Required)", icon: ShieldCheck },
  public_anonymous: { label: "Public Access (Anonymous)", icon: Globe },
  } as const;
  const accessMeta = accessModeMap[accessMode as keyof typeof accessModeMap] || accessModeMap.private;
@@ -477,12 +477,12 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  const policy = entry?.access_policy;
  const accessModeLabel = accessMeta.label;
  const rateLimit = formatRateLimit(policy?.rate_limit_json);
- const captchaHint = policy?.require_captcha ? "Captcha verification required" : "No captcha required";
+ const captchaHint = policy?.require_captcha ? "CAPTCHA verification required" : "CAPTCHA not required";
  const originHint =
  policy?.allowed_origins && policy.allowed_origins.length > 0
  ? `Allowed origins: ${policy.allowed_origins.join(", ")}`
- : "No origin restrictions";
- const privacyHint = policy?.data_classification ? `Data classification: ${policy.data_classification}. Please avoid submitting sensitive information.`
+ : "No origin restrictions configured";
+ const privacyHint = policy?.data_classification ? `Data classification: ${policy.data_classification}. Please do not submit sensitive information.`
  : "Please do not submit sensitive information. Input may be used for auditing and risk control.";
  return [
  {
@@ -544,7 +544,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  }
  } catch (err) {
  const runtimeError = err as RuntimeRequestError;
- setExecuteError(runtimeError.message || "Execution failed");
+        setExecuteError(runtimeError.message || "Failed to execute");
  } finally {
  setIsExecuting(false);
  }
@@ -625,7 +625,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  <span>Workspace: {entry?.workspace?.name || workspaceSlug}</span>
  <span>Access Policy: {accessMeta.label}</span>
  <span>{formatRateLimit(entry?.access_policy?.rate_limit_json)}</span>
- {entry?.access_policy?.require_captcha && <span>Captcha required</span>}
+ {entry?.access_policy?.require_captcha && <span>CAPTCHA required</span>}
  </div>
  </div>
  </div>
@@ -686,7 +686,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  )}
  {!isLoading && fields.length === 0 && (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-sm text-muted-foreground">
- This app has no public input configuration. You can execute directly.
+ This app has no public input configuration. You can execute it directly.
  </div>
  )}
  {!isLoading &&
@@ -828,7 +828,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  {executeError ? (
  <div className="flex items-start gap-2 text-destructive">
  <AlertTriangle className="mt-0.5 h-4 w-4" />
- <div>Execution failed: {executeError}</div>
+        <div>Failed to execute: {executeError}</div>
  </div>
  ) : executeResult ? (
  <div className="space-y-2">
@@ -915,7 +915,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
  </div>
  ) : (
  <div className="rounded-xl border border-dashed border-border/80 bg-background/60 p-4 text-xs text-muted-foreground">
- No table structure. Switch to Text or Markdown view to see output.
+ No table structure. Switch to the Text or Markdown view to see the output.
  </div>
  )}
  </>

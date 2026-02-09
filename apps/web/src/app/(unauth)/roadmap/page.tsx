@@ -24,7 +24,7 @@ const roadmapItems = [
  status: "completed",
  items: [
  { title: "AI Agent 2.0", description: "All-new AI engine with multi-model collaboration support", done: true },
- { title: "Visual Editor Upgrade", description: "Smoother drag & drop experience", done: true },
+ { title: "Visual Editor Upgrade", description: "Smoother drag-and-drop experience", done: true },
  { title: "Enterprise-Grade SSO", description: "Support for SAML and OIDC authentication", done: true },
  ],
  },

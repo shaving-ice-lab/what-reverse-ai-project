@@ -98,8 +98,8 @@ const features = [
  },
  {
  icon: Globe,
- title: "All APIs Open",
- description: "Workflows, runs and analytics via open API",
+ title: "All APIs Are Open",
+ description: "Workflows, runs, and analytics via open API",
  },
 ];
 
@@ -133,7 +133,7 @@ export default function DevelopersPage() {
  </h1>
 
  <p className="text-lg text-foreground-light max-w-2xl mx-auto mb-10 leading-relaxed">
- Large API, rich SDK, improved docs. Get started with AgentFlow integration quickly.
+ Large API, rich SDK, and improved docs. Get started with AgentFlow integration quickly.
  </p>
 
  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -347,7 +347,7 @@ export default function DevelopersPage() {
  Join the Developer Community
  </h2>
  <p className="text-foreground-light mb-10">
- Exchange with other developers and get technical support
+ Exchange ideas with other developers and get technical support
  </p>
  <Link href="/community">
  <Button size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-12 px-8">

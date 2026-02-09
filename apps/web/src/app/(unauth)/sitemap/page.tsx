@@ -49,7 +49,7 @@ const sitemapSections = [
  { name: "Documentation", href: "/docs" },
  { name: "API Documentation", href: "/docs/api" },
  { name: "SDK Download", href: "/docs/sdk" },
- { name: "Change Log", href: "/changelog" },
+ { name: "Changelog", href: "/changelog" },
  { name: "Roadmap", href: "/roadmap" },
  ],
  },

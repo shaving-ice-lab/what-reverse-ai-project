@@ -51,7 +51,7 @@ const faqs = [
  {
  category: "getting-started",
  question: "Do I need programming skills?",
- answer: "Not at all. AgentFlow provides a visual drag & drop editor so you can create complex workflows without writing any code. However, if you have programming experience, you can use our API and SDK for more advanced customization.",
+ answer: "Not at all. AgentFlow provides a visual drag-and-drop editor so you can create complex workflows without writing any code. However, if you have programming experience, you can use our API and SDK for more advanced customization.",
  },
  {
  category: "billing",

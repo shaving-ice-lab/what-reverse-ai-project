@@ -25,7 +25,7 @@ const plans = [
  description: "For individual users and small projects",
  price: { monthly: 0, yearly: 0 },
  features: [
- { name: "5 Workflow", included: true },
+ { name: "5 Workflows", included: true },
  { name: "1,000 executions/month", included: true },
  { name: "Basic AI Model", included: true },
  { name: "Community Support", included: true },

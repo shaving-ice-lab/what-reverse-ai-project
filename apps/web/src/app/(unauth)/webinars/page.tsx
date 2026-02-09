@@ -43,7 +43,7 @@ export default function WebinarsPage() {
  <div className="p-5 rounded-2xl bg-surface-100/30 border border-border/30">
  <h2 className="text-[15px] font-semibold text-foreground">Advanced</h2>
  <p className="text-[13px] text-foreground-light mt-1">
- API integration, webhooks and production best practices.
+ API integration, webhooks, and production best practices.
  </p>
  </div>
  </div>

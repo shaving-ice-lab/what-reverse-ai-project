@@ -37,7 +37,7 @@ const platforms = [
  {
  icon: Github,
  name: "GitHub",
- description: "Participate in open source development",
+ description: "Participate in open-source development",
  href: "https://github.com/agentflow",
  cta: "View Code",
  },

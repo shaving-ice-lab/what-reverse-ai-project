@@ -19,7 +19,7 @@ const useCases = [
  {
  icon: FileText,
  title: "Content Generation and Publishing",
- description: "Batch copy generation, SEO optimization, review and publish automation.",
+ description: "Batch copy generation, SEO optimization, review, and publish automation.",
  },
  {
  icon: RefreshCw,

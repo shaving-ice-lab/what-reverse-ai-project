@@ -53,12 +53,12 @@ const contactMethods = [
 const offices = [
  {
  city: "Beijing",
- address: " xxx ",
+ address: "Zhongguancun, Haidian District",
  type: "headquarters",
  },
  {
  city: "Shanghai",
- address: "new xxx ",
+ address: "Pudong New Area",
  type: "branch",
  },
 ];
