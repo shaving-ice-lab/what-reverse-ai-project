@@ -1,71 +1,71 @@
 /**
- * SystemIntegration Hook
+ * System Integration Hook
  * 
- * ProvideSystem, Launch, ResourceMonitoretcFeatures
+ * Provides system info, launch, and resource monitor features
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 
-// ===== TypeDefinition =====
+// ===== Type Definitions =====
 
 export interface SystemInfo {
- /** ActionSystem */
+ /** Operating System */
  os: string;
  /** Architecture */
  arch: string;
- /** main */
+ /** Hostname */
  hostname: string;
- /** CPU Corecount */
+ /** CPU Core Count */
  cpuCount: number;
- /** totalin (Bytes) */
+ /** Total Memory (Bytes) */
  memoryTotal: number;
 }
 
 export interface SystemResources {
- /** CPU Usagerate (0-100) */
+ /** CPU Usage Rate (0-100) */
  cpuUsage: number;
- /** inUsage (Bytes) */
+ /** Memory Used (Bytes) */
  memoryUsed: number;
- /** totalin (Bytes) */
+ /** Total Memory (Bytes) */
  memoryTotal: number;
- /** inUsagerate (0-100) */
+ /** Memory Usage Rate (0-100) */
  memoryUsage: number;
- /** StorageUsage (Bytes) */
+ /** Storage Used (Bytes) */
  storageUsed: number;
- /** Storagetotal (Bytes) */
+ /** Storage Total (Bytes) */
  storageTotal: number;
- /** StorageUsagerate (0-100) */
+ /** Storage Usage Rate (0-100) */
  storageUsage: number;
- /** AppDataDirectorySize (Bytes) */
+ /** App Data Directory Size (Bytes) */
  appDataSize: number;
- /** Time */
+ /** Timestamp */
  timestamp: string;
 }
 
 export interface StorageDetails {
- /** WorkflowDataSize */
+ /** Workflow Data Size */
  workflowsSize: number;
- /** ExecuteRecordSize */
+ /** Execution Record Size */
  executionsSize: number;
- /** SnapshotDataSize */
+ /** Snapshot Data Size */
  snapshotsSize: number;
- /** CacheSize */
+ /** Cache Size */
  cacheSize: number;
- /** LogsSize */
+ /** Logs Size */
  logsSize: number;
- /** otherheDataSize */
+ /** Other Data Size */
  otherSize: number;
- /** totalSize */
+ /** Total Size */
  totalSize: number;
 }
 
 export interface LogFileInfo {
- /** File */
+ /** File Name */
  name: string;
- /** FilePath */
+ /** File Path */
  path: string;
- /** FileSize (Bytes) */
+ /** File Size (Bytes) */
  size: number;
  /** Created At */
  createdAt?: string;
@@ -74,19 +74,19 @@ export interface LogFileInfo {
 }
 
 export interface LogStats {
- /** LogsFileList */
+ /** Log Files List */
  files: LogFileInfo[];
- /** totalSize (Bytes) */
+ /** Total Size (Bytes) */
  totalSize: number;
- /** FileCount */
+ /** File Count */
  fileCount: number;
 }
 
 export interface AutoLaunchStatus {
- /** isnoEnabled */
- enabled: boolean;
- /** isnoSupport */
- supported: boolean;
+  /** Whether the feature is enabled */
+  enabled: boolean;
+  /** Whether the feature is supported */
+  supported: boolean;
 }
 
 // ===== Hook =====

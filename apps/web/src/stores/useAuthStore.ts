@@ -107,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
  } catch (error) {
  set({
  isLoading: false,
- error: error instanceof Error ? error.message : "Sign in failed",
+      error: error instanceof Error ? error.message : "Failed to sign in",
  });
  throw error;
  }
@@ -123,7 +123,7 @@ export const useAuthStore = create<AuthState>()(
  } catch (error) {
  set({
  isLoading: false,
- error: error instanceof Error ? error.message : "Sign up failed",
+      error: error instanceof Error ? error.message : "Failed to sign up",
  });
  throw error;
  }

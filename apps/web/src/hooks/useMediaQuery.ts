@@ -4,20 +4,20 @@ import { useState, useEffect } from "react";
 
 /**
  * MediaQuery Hook
- * Used forResponseDesign
+ * Used for responsive design
  */
 
 export function useMediaQuery(query: string): boolean {
- const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(false);
 
- useEffect(() => {
- const mediaQuery = window.matchMedia(query);
- 
- // Initialvalue
- setMatches(mediaQuery.matches);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    
+    // Initial value
+    setMatches(mediaQuery.matches);
 
- // Listen
- const handler = (event: MediaQueryListEvent) => {
+    // Listen to changes
+    const handler = (event: MediaQueryListEvent) => {
  setMatches(event.matches);
  };
 
@@ -31,7 +31,7 @@ export function useMediaQuery(query: string): boolean {
  return matches;
 }
 
-// PresetBreakpoint
+// Preset breakpoint
 export const breakpoints = {
  sm: "(min-width: 640px)",
  md: "(min-width: 768px)",
@@ -52,19 +52,19 @@ export function useIsTablet(): boolean {
 }
 
 export function useIsDesktop(): boolean {
- return useMediaQuery(breakpoints.lg);
+  return useMediaQuery(breakpoints.lg);
 }
 
-// methodDetect
+// Method detection
 export function useIsPortrait(): boolean {
  return useMediaQuery("(orientation: portrait)");
 }
 
 export function useIsLandscape(): boolean {
- return useMediaQuery("(orientation: landscape)");
+  return useMediaQuery("(orientation: landscape)");
 }
 
-// TouchDeviceDetect
+// Touch device detection
 export function useIsTouchDevice(): boolean {
  return useMediaQuery("(hover: none) and (pointer: coarse)");
 }

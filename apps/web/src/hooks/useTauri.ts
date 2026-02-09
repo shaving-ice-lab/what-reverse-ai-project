@@ -1,19 +1,19 @@
 /**
- * Tauri EnvironmentDetect Hook
+ * Tauri Environment Detection Hook
  * 
- * atComponentDetectisnoRunat Tauri faceApp
+ * Detect whether running at Tauri app at component level
  */
 
 import { useState, useEffect } from 'react';
 import { isTauri, getPlatform, type Platform } from '@/lib/tauri';
 
 export interface TauriEnvironment {
- /** isnoat Tauri faceAppRun */
- isTauri: boolean;
- /** CurrentPlatform */
- platform: Platform;
- /** isnoLoading */
- isLoading: boolean;
+  /** Whether running at Tauri app */
+  isTauri: boolean;
+  /** Current platform */
+  platform: Platform;
+  /** Whether loading */
+  isLoading: boolean;
 }
 
 /**

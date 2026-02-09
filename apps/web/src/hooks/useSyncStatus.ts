@@ -401,7 +401,7 @@ export function useSyncStatus(
  error: error instanceof Error ? error.message : 'Unknown error',
  };
  setLastSyncResult(syncResult);
- onError?.(error instanceof Error ? error : new Error('Sync failed'));
+ onError?.(error instanceof Error ? error : new Error('Failed to sync'));
  return syncResult;
 
  } finally {

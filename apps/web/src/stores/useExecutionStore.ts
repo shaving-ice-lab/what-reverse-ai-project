@@ -257,7 +257,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  state.addLog(data.executionId, {
  executionId: data.executionId,
  level: 'error',
-              message: data.error || 'Execution failed',
+              message: data.error || 'Failed to execute',
  timestamp: new Date(),
  });
  }
@@ -341,7 +341,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
  executionId: data.executionId,
  nodeId: data.nodeId,
  level: 'error',
-              message: `Node ${data.nodeId} execution failed: ${data.error}`,
+              message: `Failed to execute node ${data.nodeId}: ${data.error}`,
  timestamp: new Date(),
  });
  }

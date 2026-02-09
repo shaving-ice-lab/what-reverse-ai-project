@@ -162,8 +162,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
  const payload = message.payload as ExecutionPayload;
  addNotification({
  type: "error",
-        title: "Execution Failed",
-        message: payload.error || "Workflow execution failed",
+        title: "Failed to Execute",
+        message: payload.error || "Failed to execute workflow",
  executionId: payload.executionId,
  workflowId: payload.workflowId,
  });
