@@ -225,7 +225,7 @@ export async function exportDocument(id: string, format: ExportFormat): Promise<
  );
  
  if (!response.ok) {
- throw new Error("Export failed");
+      throw new Error("Failed to export");
  }
  
  return response.blob();

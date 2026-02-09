@@ -610,7 +610,7 @@ export const workspaceApi = {
  }
  );
  if (!response.ok) {
- throw new Error(`Archive download failed: ${response.statusText}`);
+ throw new Error(`Failed to download archive: ${response.statusText}`);
  }
  return response.blob();
  },

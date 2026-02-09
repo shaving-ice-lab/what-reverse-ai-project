@@ -217,7 +217,7 @@ export const billingApi = {
  }
  );
  if (!response.ok) {
- throw new Error(`Invoice download failed: ${response.statusText}`);
+ throw new Error(`Failed to download invoice: ${response.statusText}`);
  }
  return response.blob();
  },

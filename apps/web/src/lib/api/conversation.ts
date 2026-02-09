@@ -430,7 +430,7 @@ export const conversationApi = {
  );
 
  if (!response.ok) {
- throw new Error(`Export failed: ${response.statusText}`);
+ throw new Error(`Failed to export: ${response.statusText}`);
  }
 
  return response.blob();

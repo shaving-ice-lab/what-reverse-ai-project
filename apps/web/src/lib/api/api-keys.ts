@@ -41,7 +41,7 @@ function splitKeyPreview(preview?: string | null) {
  const value = (preview ?? "").trim();
  if (!value) return { keyPrefix: "***", keySuffix: "" };
 
- // Compatiblecancan's "sk-abc...wxyz" 
+ // Compatible with "sk-abc...wxyz" format 
  if (value.includes("...")) {
  const [prefix, suffix] = value.split("...");
  return {
