@@ -1,7 +1,7 @@
 /**
- * Skeleton SkeletonComponent - Enhanced
+ * Skeleton Component - Enhanced
  * 
- * SupportmultipletypeAnimationEffectandPresetLayout
+ * Support multiple type animation effects and preset layouts
  */
 
 import { cn } from "@/lib/utils"

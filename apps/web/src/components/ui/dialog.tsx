@@ -1,13 +1,13 @@
 "use client"
 
 /**
- * Dialog DialogComponent - Enhanced
+ * Dialog Component - Enhanced
  * 
  * Support: 
- * - multipletypeAnimationEffect
- * - multipletypeDimension
+ * - Multiple type animation effects
+ * - Multiple type dimensions
  * - Variant
- * - IconandStatus
+ * - Icon and status
  */
 
 import * as React from "react"

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Wizard/StepComponent
- * Used forGuideUserDonemultipleStepFlow
+ * Wizard/Step Component
+ * Used for guiding users through multiple step flows
  */
 
 import { useState, ReactNode, createContext, useContext } from "react";

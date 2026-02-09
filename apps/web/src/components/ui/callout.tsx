@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * Callout TooltipComponent
+ * Callout Component
  * 
- * Used forDisplayre-needInfo, Tip, Warningetc
+ * Used for displaying Info, Tip, Warning, etc.
  */
 
 import * as React from "react"
@@ -103,16 +103,16 @@ const variantIcons: Record<string, LucideIcon> = {
 export interface CalloutProps
  extends React.HTMLAttributes<HTMLDivElement>,
  VariantProps<typeof calloutVariants> {
- /** Title */
- title?: string
- /** CustomIcon */
- icon?: React.ReactNode
- /** isnoDisplayIcon */
- showIcon?: boolean
- /** isnocanClose */
- closable?: boolean
- /** CloseCallback */
- onClose?: () => void
+  /** Title */
+  title?: string
+  /** Custom icon */
+  icon?: React.ReactNode
+  /** Whether to display icon */
+  showIcon?: boolean
+  /** Whether the callout can be closed */
+  closable?: boolean
+  /** Close callback */
+  onClose?: () => void
 }
 
 function Callout({
@@ -176,7 +176,7 @@ function Callout({
 }
 
 /**
- * CalloutTitle - TooltipTitle
+ * CalloutTitle
  */
 function CalloutTitle({
  className,
@@ -194,7 +194,7 @@ function CalloutTitle({
 }
 
 /**
- * CalloutDescription - TooltipDescription
+ * CalloutDescription
  */
 function CalloutDescription({
  className,
@@ -212,7 +212,7 @@ function CalloutDescription({
 }
 
 /**
- * InlineCallout - inTip
+ * InlineCallout - Inline Tip
  */
 interface InlineCalloutProps {
  variant?: CalloutProps["variant"]
@@ -248,11 +248,11 @@ function InlineCallout({
 }
 
 /**
- * BannerCallout - BannerTip
+ * BannerCallout - Banner Callout
  */
 interface BannerCalloutProps extends Omit<CalloutProps, "size"> {
- /** ActionButton */
- action?: React.ReactNode
+  /** Action button */
+  action?: React.ReactNode
 }
 
 function BannerCallout({
@@ -326,7 +326,7 @@ function BannerCallout({
 }
 
 /**
- * FeatureCallout - FeaturesTip
+ * FeatureCallout - Feature Callout
  */
 interface FeatureCalloutProps {
  title: string

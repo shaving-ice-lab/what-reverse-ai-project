@@ -2,7 +2,7 @@
 
 /**
  * FileUploadComponent
- * Supports drag & drop upload, multiple files, preview, and other features
+ * Supports drag-and-drop upload, multiple files, preview, and other features
  */
 
 import { useState, useRef, useCallback, ReactNode } from "react";
@@ -371,7 +371,7 @@ export function FileUploader({
  onChange((prev) =>
  prev.map((f) =>
  f.id === uploadFile.id
- ? {...f, status: "error" as const, error: "Upload Failed" }
+ ? {...f, status: "error" as const, error: "Failed to Upload" }
  : f
  )
  );

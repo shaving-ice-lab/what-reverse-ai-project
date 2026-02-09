@@ -4,10 +4,10 @@
  * Accordion Component - Enhanced
  * 
  * Support: 
- * - multipletypestyleVariant
- * - SmoothAnimation
- * - IconCustom
- * - NestedSupport
+ * - Multiple type style variants
+ * - Smooth animation
+ * - Icon custom
+ * - Nested support
  */
 
 import * as React from "react"

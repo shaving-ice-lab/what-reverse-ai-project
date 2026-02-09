@@ -7,13 +7,13 @@
 
  * Support: 
 
- * - StepperButton
+ * - Stepper button
 
- * - Minimum/MaximumvalueLimit
+ * - Minimum/Maximum value limit
 
- * - FormatDisplay
+ * - Format display
 
- * - PrecisionControl
+ * - Precision control
  */
 
 import * as React from "react"
@@ -41,45 +41,45 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 
  max?: number
 
- /** Steppervalue */
+ /** Stepper value */
 
  step?: number
 
- /** smallcountPrecision */
+ /** Decimal precision */
 
  precision?: number
 
  /** Dimension */
 
- size?: "sm" | "default" | "lg"
+  size?: "sm" | "default" | "lg"
 
- /** isnoDisplayStepper */
+  /** Whether to display stepper */
 
- showStepper?: boolean
+  showStepper?: boolean
 
- /** Stepper */
+ /** Stepper position */
 
  stepperPosition?: "right" | "sides"
 
- /** before */
+ /** Prefix */
 
  prefix?: React.ReactNode
 
- /** after */
+ /** Suffix */
 
  suffix?: React.ReactNode
 
- /** FormatDisplay */
+ /** Format display */
 
  formatter?: (value: number | undefined) => string
 
- /** ParseInput */
+  /** Parse input */
 
- parser?: (value: string) => number | undefined
+  parser?: (value: string) => number | undefined
 
- /** isnoAllowEmptyvalue */
+  /** Whether to allow empty value */
 
- allowEmpty?: boolean
+  allowEmpty?: boolean
 
  /** ErrorStatus */
 
@@ -152,7 +152,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
  }, [formatter, precision])
 
- // ParseInput
+ // Parse input
 
  const parseValue = React.useCallback((str: string): number | undefined => {
  if (!str || str === "-") return undefined
@@ -358,9 +358,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
  </button>
 
- )}
+  )}
 
- {/* before */}
+ {/* Prefix */}
 
  {prefix && (
  <span className="pl-3 text-foreground-light shrink-0">{prefix}</span>
@@ -406,9 +406,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
  {...props}
 
- />
+  />
 
- {/* after */}
+ {/* Suffix */}
 
  {suffix && (
  <span className="pr-3 text-foreground-light shrink-0">{suffix}</span>
@@ -604,9 +604,9 @@ function PercentInput({
  */
 
 interface QuantityInputProps extends Omit<NumberInputProps, "precision" | "step"> {
- /** isnoCompact */
+  /** Whether to use compact mode */
 
- compact?: boolean
+  compact?: boolean
 }
 
 function QuantityInput({

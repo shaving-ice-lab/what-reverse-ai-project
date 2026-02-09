@@ -1,9 +1,9 @@
 "use client"
 
 /**
- * Tooltip TooltipComponent - Enhanced
+ * Tooltip Component - Enhanced
  * 
- * Supportmultipletypestyle, ColorThemeandContent
+ * Support multiple type styles, color themes and content
  */
 
 import * as React from "react"

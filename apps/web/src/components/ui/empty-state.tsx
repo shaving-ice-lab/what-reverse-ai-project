@@ -253,7 +253,7 @@ const exceptionPresets: Record<
  badge: "EMPTY",
  },
  error: {
-    title: "Loading Failed",
+    title: "Failed to Load",
     description: "An error occurred. Please try again later.",
  icon: AlertTriangle,
  tone: "error",
@@ -410,7 +410,7 @@ export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptySt
  <EmptyState
  icon={Zap}
       title="No Workflows Yet"
-      description="Create your first workflow to start your automation journey"
+      description="Create your first workflow to start automating your tasks"
  action={
  onCreateClick
  ? {
@@ -437,7 +437,7 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
  <EmptyState
  icon={MessageSquare}
       title="Start a New Conversation"
-      description="Chat with the AI assistant to get help and inspiration"
+      description="Chat with the AI assistant for help and inspiration"
  action={{
         label: "New Conversation",
  href: "/dashboard/conversations",
@@ -458,7 +458,7 @@ export function AgentEmptyState({ className }: AgentEmptyStateProps) {
  <EmptyState
  icon={Bot}
       title="No Agents Yet"
-      description="Create your first AI agent to help you process tasks"
+      description="Create your first AI agent to help automate your tasks"
  action={{
  label: "Create Agent",
  href: "/dashboard/my-agents/new",
@@ -502,7 +502,7 @@ interface ErrorEmptyStateProps {
 }
 
 export function ErrorEmptyState({
-  title = "Loading Failed",
+  title = "Failed to Load",
   description = "An error occurred. Please try again.",
  onRetry,
  className,
@@ -563,7 +563,7 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
  <EmptyState
  icon={FileText}
       title="No Documents Yet"
-      description="Create your first document to start creating content"
+      description="Create your first document to start generating content"
  action={
  onCreate
  ? {

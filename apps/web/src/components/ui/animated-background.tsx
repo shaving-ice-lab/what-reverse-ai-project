@@ -5,22 +5,22 @@ import { cn } from "@/lib/utils";
 
 export interface AnimatedBackgroundProps
  extends React.HTMLAttributes<HTMLDivElement> {
- /** BackgroundVariant */
- variant?: "mesh" | "gradient" | "dots" | "grid" | "aurora" | "waves" | "particles" | "glow-lines" | "cyber-grid";
- /** isnoEnableAnimation */
- animated?: boolean;
- /** AnimationSpeed */
- speed?: "slow" | "normal" | "fast";
- /** Opacity */
- opacity?: number;
- /** isnoFixedBackground */
- fixed?: boolean;
- /** mainHue */
- primaryColor?: string;
- /** timesHue */
- secondaryColor?: string;
- /** isnoDisplayNoiseTexture */
- showNoise?: boolean;
+  /** Background variant */
+  variant?: "mesh" | "gradient" | "dots" | "grid" | "aurora" | "waves" | "particles" | "glow-lines" | "cyber-grid";
+  /** Whether to enable animation */
+  animated?: boolean;
+  /** Animation speed */
+  speed?: "slow" | "normal" | "fast";
+  /** Opacity */
+  opacity?: number;
+  /** Whether to use fixed background */
+  fixed?: boolean;
+  /** Main hue */
+  primaryColor?: string;
+  /** Secondary hue */
+  secondaryColor?: string;
+  /** Whether to display noise texture */
+  showNoise?: boolean;
 }
 
 const AnimatedBackground = React.forwardRef<

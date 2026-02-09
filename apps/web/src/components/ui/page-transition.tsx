@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * PageTransition - PagepastAnimationComponent
+ * PageTransition - Page Transition Animation Component
  * 
- * ProvidemultipletypePageSwitchEffect: 
- * - enterFade out
+ * Provide multiple type page switch effects: 
+ * - Enter fade out
  * - Slide
  * - Zoom
  * - Blur

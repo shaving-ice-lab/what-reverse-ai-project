@@ -301,7 +301,7 @@ export const editorOnboardingSteps: OnboardingStep[] = [
  {
  id: "node-panel",
  title: "Node Panel",
- description: "Select a node type from the left panel and drag & drop it onto the canvas to add a node",
+ description: "Select a node type from the left panel and drag and drop it onto the canvas to add a node",
  target: "[data-testid='node-panel']",
  position: "right",
  icon: <Layers className="h-5 w-5" />,

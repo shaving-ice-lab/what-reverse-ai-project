@@ -130,7 +130,7 @@ function CopyButton({
  case "copied":
     return "Copied"
  case "error":
-    return "Copy Failed"
+    return "Failed to Copy"
  default:
  return "Copy"
  }

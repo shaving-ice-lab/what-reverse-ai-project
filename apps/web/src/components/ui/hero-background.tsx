@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * HeroBackground - Hero RegionEnhancedBackgroundComponent
+ * HeroBackground - Hero Region Enhanced Background Component
  * 
- * ProvidemultipletypevisualEffect: 
- * - DynamicGrid
- * - ParticleEffect
- * - GradientHalo
- * - visualEffect
+ * Provide multiple type visual effects: 
+ * - Dynamic grid
+ * - Particle effect
+ * - Gradient halo
+ * - Visual effect
  */
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -326,9 +326,9 @@ export function NoiseTexture({
 }
 
 /**
- * HeroBackground - groupBackground
+ * HeroBackground - Group Background
  * 
- * willmultipletypeEffectgroupat1
+ * Will group multiple type effects at once
  */
 interface HeroBackgroundProps {
  className?: string;

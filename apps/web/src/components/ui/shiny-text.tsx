@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * ShinyText - charComponent
+ * ShinyText - Character Component
  * 
- * Providemultipletypechar: 
- * - pastEffect
- * - Gradientchar
- * - charEffect
+ * Provide multiple type characters: 
+ * - Past effect
+ * - Gradient character
+ * - Character effect
  */
 
 import { ReactNode } from "react";
@@ -22,7 +22,7 @@ interface ShinyTextProps {
 }
 
 /**
- * ShinyText - pastchar
+ * ShinyText - Past character
  */
 export function ShinyText({
  children,
@@ -82,7 +82,7 @@ export function ShinyText({
 }
 
 /**
- * GradientText - Gradientchar
+ * GradientText - Gradient character
  */
 interface GradientTextProps {
  children: ReactNode;
@@ -150,7 +150,7 @@ export function GradientText({
 }
 
 /**
- * GlitchText - FaultcharEffect
+ * GlitchText - Fault character effect
  */
 interface GlitchTextProps {
  children: string;
@@ -239,7 +239,7 @@ export function GlitchText({
 }
 
 /**
- * BlurText - Blurenterchar
+ * BlurText - Blur enter character
  */
 interface BlurTextProps {
  children: string;
@@ -296,9 +296,9 @@ export function BlurText({
 }
 
 /**
- * HighlightText - Highlightchar
+ * HighlightText - Highlight character
  * 
- * BackgroundHighlightAnimationEffect
+ * Background highlight animation effect
  */
 interface HighlightTextProps {
  children: ReactNode;

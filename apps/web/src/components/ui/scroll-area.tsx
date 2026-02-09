@@ -192,7 +192,7 @@ const ScrollBar = React.forwardRef<
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
 /**
- * VirtualScrollArea - VirtualScrollRegion(Used forlargeList)
+ * VirtualScrollArea - Virtual scroll region (used for large lists)
  */
 interface VirtualScrollAreaProps {
  /** itemTotal */

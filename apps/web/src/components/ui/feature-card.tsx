@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * FeatureCard - Manus StyleFeaturesCardComponent
+ * FeatureCard - Feature Card Component
  * 
- * Used forHome, TemplateStoreetcPageShowcaseFeatures/Template
+ * Used for home, template store, etc. pages to showcase features/templates
  */
 
 import Link from "next/link";
@@ -112,13 +112,13 @@ export interface FeatureCardProps {
  title: string;
  /** Description */
  description: string;
- /** IconComponent */
- icon?: LucideIcon;
- /** CustomIconElement */
- iconElement?: React.ReactNode;
- /** PreviewImage */
+  /** Icon component */
+  icon?: LucideIcon;
+  /** Custom icon element */
+  iconElement?: React.ReactNode;
+ /** Preview image */
  image?: string;
- /** LinkAddress */
+ /** Link address */
  href?: string;
  /** ColorTheme */
  color?: FeatureCardColor;
@@ -128,10 +128,10 @@ export interface FeatureCardProps {
  className?: string;
  /** Variant */
  variant?: "default" | "compact" | "large";
- /** Tags */
- tags?: string[];
- /** isnoDisplayhead */
- showArrow?: boolean;
+  /** Tags */
+  tags?: string[];
+  /** Whether to display arrow */
+  showArrow?: boolean;
 }
 
 export function FeatureCard({
@@ -158,9 +158,9 @@ export function FeatureCard({
  "hover:shadow-lg hover:-translate-y-0.5",
  variant === "compact" ? "p-4" : variant === "large" ? "p-6" : "p-5",
  className
- )}
+  )}
  >
- {/* PreviewImage */}
+ {/* Preview image */}
  {image && variant === "large" && (
  <div className="relative w-full h-40 mb-4 rounded-lg overflow-hidden bg-muted">
  <Image

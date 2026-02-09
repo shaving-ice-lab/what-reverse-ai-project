@@ -68,7 +68,7 @@ const afterData: ComparisonItem = {
  icon: Workflow,
  accent: "border-primary/50",
  points: [
- { text: "Visual drag & drop workflow builder", positive: true },
+ { text: "Visual drag-and-drop workflow builder", positive: true },
     { text: "Built-in retry, timeout, and error handling", positive: true },
     { text: "Real-time monitoring and debug tools", positive: true },
     { text: "Deploy in minutes, iterate quickly", positive: true },

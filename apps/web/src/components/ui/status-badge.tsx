@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * StatusBadgeComponent
- * Used forDisplaytypeStatusIndicator
+ * StatusBadge Component
+ * Used for displaying status indicators
  */
 
 import { ReactNode } from "react";
@@ -429,7 +429,7 @@ export function LevelBadge({
 }
 
 // ============================================
-// SecurityetcBadge
+// Security Badge
 // ============================================
 
 type SecurityLevel = "high" | "medium" | "low" | "none";
@@ -498,7 +498,7 @@ export function SecurityBadge({
 }
 
 // ============================================
-// can/Badge
+// Energy Badge
 // ============================================
 
 interface EnergyBadgeProps {

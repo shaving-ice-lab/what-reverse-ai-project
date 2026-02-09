@@ -111,7 +111,7 @@ const STATE_CONFIG: Record<SyncState, {
     icon: CloudOff,
     color: "text-red-400",
     bgColor: "bg-red-500/10",
-    label: "Sync failed",
+    label: "Failed to sync",
  },
  offline: {
  icon: WifiOff,
@@ -194,9 +194,9 @@ export function SyncIndicator({
  await onSync();
       toast.success("Sync completed");
     } catch (error) {
-      toast.error("Sync failed", {
+      toast.error("Failed to sync", {
         description: error instanceof Error ? error.message: "Please try again",
- });
+      });
  } finally {
  setIsSyncing(false);
  }

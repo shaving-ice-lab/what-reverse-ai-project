@@ -98,7 +98,7 @@ export function ErrorFallback({
  <AlertTriangle className="h-8 w-8 text-[var(--color-destructive)]" />
  </div>
 
- <h2 className="text-xl font-semibold mb-2 text-center"></h2>
+ <h2 className="text-xl font-semibold mb-2 text-center">Something Went Wrong</h2>
  <p className="text-[var(--color-muted-foreground)] text-center mb-6 max-w-md text-sm">
  {error?.message || "Something went wrong. Try refreshing or go back home."}
  </p>
@@ -178,7 +178,7 @@ const errorMessages: Record<string, string> = {
  UNAUTHORIZED: "Please sign in first",
  FORBIDDEN: "You don't have permission for this action",
  NOT_FOUND: "The requested resource does not exist",
- VALIDATION_ERROR: "Input validation failed",
+  VALIDATION_ERROR: "Failed to validate input",
  RATE_LIMITED: "Too many requests, please try again later",
  SERVER_ERROR: "Server error, please try again later",
  NETWORK_ERROR: "Network error. Check your connection.",

@@ -13,14 +13,14 @@ import {
 } from "lucide-react";
 
 /**
- * Toast NotificationsComponent - Enhanced
+ * Toast Notifications Component - Enhanced
  * 
  * Support: 
- * - multipletype
+ * - Multiple types
  * - Progress Bar
- * - CustomIcon
- * - ActionButton
- * - StackAnimation
+ * - Custom icon
+ * - Action button
+ * - Stack animation
  */
 
 export type ToastType = "success" | "error" | "warning" | "info" | "loading" | "default";
@@ -391,9 +391,9 @@ function ToastItem({ toast, onDismiss, index, position }: ToastItemProps) {
  <p className="text-sm font-semibold text-foreground">{toast.title}</p>
  {toast.description && (
  <p className="text-sm text-foreground-light mt-1 leading-relaxed">{toast.description}</p>
- )}
- 
- {/* ActionButton */}
+  )}
+  
+ {/* Action button */}
  {(toast.action || toast.secondaryAction) && (
  <div className="flex items-center gap-2 mt-3">
  {toast.action && (

@@ -77,14 +77,14 @@ export * from "./pagination"
 export * from "./data-table"
 export * from "./notification-center"
 
-// NotificationsandBannerComponent
+// Notifications and banner components
 export * from "./banner"
 
-// PricingandSkeletonComponent
+// Pricing and skeleton components
 export * from "./pricing-cards"
 export * from "./skeleton-loaders"
 export * from "./tag-input"
 
-// StatusandWizardComponent
+// Status and wizard components
 export * from "./status-badge"
 export * from "./wizard"

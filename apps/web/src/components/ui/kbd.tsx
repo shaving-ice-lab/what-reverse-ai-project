@@ -151,7 +151,7 @@ function formatKey(key: string): string {
 }
 
 /**
- * ShortcutHint - ShortcutkeyTip(Used forButton/Menu)
+ * ShortcutHint - Shortcut key tip (used for buttons/menus)
  */
 interface ShortcutHintProps {
  keys: string[]
