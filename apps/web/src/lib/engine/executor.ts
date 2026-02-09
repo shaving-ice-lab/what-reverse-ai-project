@@ -199,7 +199,7 @@ export class WorkflowExecutor {
  const failedNode = this.state.nodeStates[this.state.failedNodeIds[0]];
  const error = {
  code: "NODE_EXECUTION_FAILED",
- message: failedNode?.error?.message || "Node execution failed",
+    message: failedNode?.error?.message || "Failed to execute node",
  nodeId: this.state.failedNodeIds[0],
  };
  this.updateState({ status: "failed", error });
@@ -416,7 +416,7 @@ export class WorkflowExecutor {
  });
  this.config.onNodeError(nodeId, result.error);
 
- throw new Error(result.error?.message || "Node execution failed");
+    throw new Error(result.error?.message || "Failed to execute node");
  }
  }
 

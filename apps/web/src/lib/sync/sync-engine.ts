@@ -372,7 +372,7 @@ export class SyncEngine {
  } catch (error) {
  failed.push({
  changeIds: batch.map((c) => c.id),
- error: error instanceof Error ? error.message : 'Upload failed',
+ error: error instanceof Error ? error.message : 'Failed to upload',
  });
 
  // Reset status to pending
@@ -409,7 +409,7 @@ export class SyncEngine {
  } catch (error) {
  failed.push({
  changeIds: [change.id],
- error: error instanceof Error ? error.message : 'Download failed',
+ error: error instanceof Error ? error.message : 'Failed to download',
  });
  }
  }

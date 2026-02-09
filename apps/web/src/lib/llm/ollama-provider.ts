@@ -184,7 +184,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  const reader = response.body?.getReader();
  if (!reader) {
- throw new LLMError('Unable to read response', 'CONNECTION_ERROR');
+ throw new LLMError('Failed to read response', 'CONNECTION_ERROR');
  }
 
  const decoder = new TextDecoder();
@@ -263,7 +263,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`Chat request failed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Failed to process chat request: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const data: OllamaChatResponse = await response.json();
@@ -324,12 +324,12 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`Chat request failed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Failed to process chat request: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const reader = response.body?.getReader();
  if (!reader) {
- throw new LLMError('Unable to read response', 'CONNECTION_ERROR');
+ throw new LLMError('Failed to read response', 'CONNECTION_ERROR');
  }
 
  const decoder = new TextDecoder();
@@ -381,7 +381,7 @@ export class OllamaProvider implements LocalLLMProvider {
 
  if (!response.ok) {
  const errorText = await response.text();
- throw new LLMError(`Embedding request failed: ${errorText}`, 'GENERATION_ERROR');
+ throw new LLMError(`Failed to process embedding request: ${errorText}`, 'GENERATION_ERROR');
  }
 
  const data: OllamaEmbedResponse = await response.json();
@@ -436,7 +436,7 @@ export class OllamaProvider implements LocalLLMProvider {
  }
 
  throw new LLMError(
- `Request failed (retried ${retries} times): ${lastError?.message}`,
+ `Failed to process request (retried ${retries} times): ${lastError?.message}`,
  'CONNECTION_ERROR'
  );
  }

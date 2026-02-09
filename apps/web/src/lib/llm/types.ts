@@ -96,10 +96,10 @@ export interface PullProgress {
 export interface ChatMessage {
  /** Role */
  role: 'system' | 'user' | 'assistant';
- /** Content */
- content: string;
- /** Image(Optional, Used formultipleModal) */
- images?: string[];
+  /** Content */
+  content: string;
+  /** Image (optional, used for multiple modals) */
+  images?: string[];
 }
 
 /**
@@ -328,7 +328,7 @@ export type LLMErrorCode =
 // ============================================================================
 
 /**
- * FormatBytescount
+ * Format Bytes Count
  */
 export function formatBytes(bytes: number): string {
  if (bytes === 0) return '0 B';

@@ -137,7 +137,7 @@ export type LoopConfig = z.infer<typeof loopConfigSchema>;
 
 export const codeConfigSchema = z.object({
  language: z.enum(["javascript", "typescript"]).default("javascript"),
- code: z.string().min(1, "Please enter code"),
+ code: z.string().min(1, "Please enter the code"),
  timeout: z.number().int().min(1000).max(300000).default(30000),
 });
 
@@ -217,8 +217,8 @@ const submitActionSchema = z.union([
 ]);
 
 export const uiTriggerConfigSchema = z.object({
- formId: z.string().min(1, "Form ID Cannot be empty").optional(),
- form_id: z.string().min(1, "Form ID Cannot be empty").optional(),
+ formId: z.string().min(1, "Form ID cannot be empty").optional(),
+ form_id: z.string().min(1, "Form ID cannot be empty").optional(),
  submitAction: submitActionSchema.optional(),
  submit_action: submitActionSchema.optional(),
  validation: z.record(z.any()).optional(),

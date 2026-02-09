@@ -60,7 +60,7 @@ export function generateId(prefix = ""): string {
 }
 
 /**
- * Deep Copyfor
+ * Deep copy
  */
 export function deepClone<T>(obj: T): T {
  return JSON.parse(JSON.stringify(obj));

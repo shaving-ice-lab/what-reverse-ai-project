@@ -79,10 +79,10 @@ export interface SnapshotStoreConfig {
  dbName?: string;
  /** Name */
  storeName?: string;
- /** DefaultStorageOption */
- defaultOptions?: SnapshotStorageOptions;
- /** isnoEnableDebugLogs */
- debug?: boolean;
+  /** Default storage option */
+  defaultOptions?: SnapshotStorageOptions;
+  /** Whether to enable debug logs */
+  debug?: boolean;
 }
 
 /**

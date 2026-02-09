@@ -38,7 +38,7 @@ export interface LogEntry {
  data?: unknown;
 }
 
-// UsageInfo (mainneedUsed for LLM Node)
+// Usage info (mainly used for LLM Node)
 export interface UsageInfo {
  promptTokens?: number;
  completionTokens?: number;

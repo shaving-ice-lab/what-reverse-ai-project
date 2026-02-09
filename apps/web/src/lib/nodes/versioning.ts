@@ -103,7 +103,7 @@ export function checkNodeCompatibility(
  issues.push({
  type: "sdk",
  severity: "warning",
- message: "No SDK version context available, unable to verify compatibility",
+ message: "No SDK version context available. Failed to verify compatibility",
  });
  }
 
@@ -128,7 +128,7 @@ export function checkNodeCompatibility(
  issues.push({
  type: "app",
  severity: "warning",
- message: "No app version context available, unable to verify compatibility",
+ message: "No app version context available. Failed to verify compatibility",
  });
  }
 

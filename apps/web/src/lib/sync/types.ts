@@ -48,7 +48,7 @@ export const DEFAULT_SYNC_CONFIG: SyncConfig = {
 };
 
 // ============================================================================
-// Change Log
+// Changelog
 // ============================================================================
 
 /**
@@ -67,7 +67,7 @@ export type OperationType = 'create' | 'update' | 'delete';
 export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict';
 
 /**
- * Change Log
+ * Changelog
  */
 export interface ChangeRecord<T = unknown> {
   /** Change ID */

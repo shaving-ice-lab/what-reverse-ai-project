@@ -553,7 +553,7 @@ export const faqItems: FAQItem[] = [
  {
  id: "faq-3",
     question: "How do I configure an API key?",
- answer: "Go to Settings → API Keys page, click Add Key, select the service provider (e.g. OpenAI, Claude), enter your API key, and save to start using it.",
+ answer: "Go to Settings → API Keys page, click Add Key, select the service provider (e.g., OpenAI, Claude), enter your API key, and save to start using it.",
  category: "Config",
  helpful: 156,
  },

@@ -1,6 +1,6 @@
 /**
  * Text Node Executors
- * Template rendering, regex extraction, split and join
+ * Template rendering, regex extraction, split, and join
  */
 
 import type {
