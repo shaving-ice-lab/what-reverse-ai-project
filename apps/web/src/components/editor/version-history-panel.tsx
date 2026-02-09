@@ -71,7 +71,7 @@ export function VersionHistoryPanel({
  onRestore?.(version);
  setOpen(false);
  } catch (error) {
- toast.error("Restore failed, please try again");
+      toast.error("Failed to restore. Please try again.");
  }
  };
 
@@ -115,7 +115,7 @@ export function VersionHistoryPanel({
  `Version comparison complete: ${diff.summary.nodes_change_count} node changes, ${diff.summary.edges_change_count} connection changes`
  );
  } catch (error) {
- toast.error("Version comparison failed.");
+      toast.error("Failed to compare versions.");
  }
  };
 

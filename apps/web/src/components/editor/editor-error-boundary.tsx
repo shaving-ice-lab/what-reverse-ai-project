@@ -101,7 +101,7 @@ export class EditorErrorBoundary extends Component<
  });
  this.props.onRecovery?.();
  } else {
- alert("Multiple recovery attempts failed. Please refresh the page. Your data has been auto-saved.");
+ alert("Failed to recover after multiple attempts. Please refresh the page. Your data has been auto-saved.");
  }
  };
 
@@ -124,11 +124,11 @@ export class EditorErrorBoundary extends Component<
  document.body.removeChild(a);
  URL.revokeObjectURL(url);
  } else {
- alert("Unable to restore data.");
+      alert("Failed to restore data.");
  }
  } catch (e) {
  console.error("[EditorErrorBoundary] Export failed:", e);
- alert("Export failed.");
+      alert("Failed to export.");
  }
  };
 
@@ -229,7 +229,7 @@ export class EditorErrorBoundary extends Component<
 export function safeNodeOperation<T>(
  operation: () => T,
  fallback: T,
- errorMessage = "Node operation failed"
+  errorMessage = "Failed to perform node operation"
 ): T {
  try {
  return operation();
@@ -242,7 +242,7 @@ export function safeNodeOperation<T>(
 export async function safeAsyncOperation<T>(
  operation: () => Promise<T>,
  fallback: T,
- errorMessage = "Async operation failed"
+  errorMessage = "Failed to perform async operation"
 ): Promise<T> {
  try {
  return await operation();

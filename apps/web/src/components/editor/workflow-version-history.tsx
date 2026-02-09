@@ -510,7 +510,7 @@ export function WorkflowVersionHistory({
  setIsDiffLoading(true);
  onCompareVersions(compareVersionA, compareVersionB)
  .then(setDiff)
-.catch(() => toast.error("Comparison failed"))
+.catch(() => toast.error("Failed to compare versions"))
  .finally(() => setIsDiffLoading(false));
  }
  }, [compareVersionA, compareVersionB, onCompareVersions]);
@@ -533,7 +533,7 @@ export function WorkflowVersionHistory({
  setShowCreateDialog(false);
  setNewVersionName("");
  } catch {
- toast.error("Creation failed");
+      toast.error("Failed to create version");
  }
  }, [newVersionName, onCreateVersion]);
 
@@ -545,7 +545,7 @@ export function WorkflowVersionHistory({
  await onRestoreVersion(versionId);
  toast.success("Version restored");
  } catch {
- toast.error("Restore failed");
+      toast.error("Failed to restore version");
  }
  }, [onRestoreVersion]);
 
@@ -560,7 +560,7 @@ export function WorkflowVersionHistory({
  setTagVersionId(null);
  setNewTagName("");
  } catch {
- toast.error("Failed to add tag");
+ toast.error("Failed to add version tag");
  }
  }, [tagVersionId, newTagName, onTagVersion]);
 
@@ -724,7 +724,7 @@ export function WorkflowVersionHistory({
  </DialogHeader>
  <div className="space-y-4">
  <Input
- placeholder="Tag name, e.g. v1.0, stable"
+ placeholder="Tag name, e.g., v1.0, stable"
  value={newTagName}
  onChange={(e) => setNewTagName(e.target.value)}
  className="bg-surface-100 border-border"

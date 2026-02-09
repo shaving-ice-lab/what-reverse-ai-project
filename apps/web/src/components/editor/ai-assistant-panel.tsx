@@ -118,7 +118,7 @@ function MessageItem({ message, onApplyWorkflow, onActionClick }: MessageItemPro
       toast.success("Copied");
       setTimeout(() => setCopiedTarget(null), 2000);
     } catch {
-      toast.error("Copy failed");
+      toast.error("Failed to copy");
  }
  };
 
@@ -399,7 +399,7 @@ export function AIAssistantPanel({
  });
 
  if (!response.ok) {
-        throw new Error("Request failed");
+        throw new Error("Failed to request");
  }
 
  const data = await response.json();

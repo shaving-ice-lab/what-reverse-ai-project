@@ -1170,7 +1170,7 @@ export function ConfigPanel() {
  <aside className="w-full h-full bg-transparent flex flex-col">
  {/* Header */}
  <div className="h-12 px-4 flex items-center border-b border-border bg-surface-75/80">
- <span className="text-sm font-medium text-foreground">Node config</span>
+                <span className="text-sm font-medium text-foreground">Node Configuration</span>
  </div>
  <div className="flex-1 flex items-center justify-center p-6">
  <div className="text-center max-w-[200px]">
@@ -1221,7 +1221,7 @@ export function ConfigPanel() {
 {/* Config Content */}
  <ScrollArea className="flex-1">
   {/* General Settings */}
- <ConfigSection title="Current settings" icon={<Info className="w-3.5 h-3.5" />}>
+        <ConfigSection title="General Settings" icon={<Info className="w-3.5 h-3.5" />}>
  <div className="space-y-4">
  <div>
  <label className={labelStyles}>Node Name</label>
@@ -1244,11 +1244,11 @@ export function ConfigPanel() {
  </div>
  </ConfigSection>
 
- {/* Node-Specific Config */}
- <ConfigSection 
- title="Node config" 
- icon={<Zap className="w-3.5 h-3.5" />}
- >
+        {/* Node-Specific Config */}
+        <ConfigSection 
+          title="Node Configuration" 
+          icon={<Zap className="w-3.5 h-3.5" />}
+        >
  <NodeConfigByType node={selectedNode} onUpdate={handleUpdate} />
  </ConfigSection>
  </ScrollArea>

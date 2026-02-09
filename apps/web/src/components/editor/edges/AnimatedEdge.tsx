@@ -28,12 +28,12 @@ export interface AnimatedEdgeData {
  status?: EdgeStatus;
  /** DataType */
  dataType?: DataType;
- /** Tags */
- label?: string;
- /** isnoDisplayAnimation */
- animated?: boolean;
- /** CustomColor */
- color?: string;
+  /** Tags */
+  label?: string;
+  /** Whether to display animation */
+  animated?: boolean;
+  /** Custom color */
+  color?: string;
 }
 
 // DataTypeColorMapping
@@ -93,10 +93,10 @@ function AnimatedEdge({
  if (status === "running" || status === "completed" || status === "error") {
  return STATUS_COLORS[status];
  }
- return DATA_TYPE_COLORS[dataType];
+  return DATA_TYPE_COLORS[dataType];
  }, [color, status, dataType]);
 
- // isnoDisplayAnimation
+ // Whether to display animation
  const showAnimation = animated || status === "running";
 
  // Animation ID
@@ -134,7 +134,7 @@ function AnimatedEdge({
  )}
  </defs>
 
- {/* Backgroundline(more, Used forClickRegion) */}
+ {/* Background line (more, used for click region) */}
  <path
  d={edgePath}
  fill="none"

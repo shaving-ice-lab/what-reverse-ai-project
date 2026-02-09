@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Currently Then Extract Node - Minimalist Style
+ * Regex Extract Node - Minimalist Style
  */
 
 import { memo } from "react";
@@ -62,7 +62,7 @@ export const RegexNode = memo(function RegexNode({
  <Regex className="h-4 w-4" />
  </div>
  <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm truncate">{data.label || "Currently Then Extract"}</h3>
+        <h3 className="font-medium text-sm truncate">{data.label || "Regex Extract"}</h3>
  <p className="text-xs text-foreground-muted flex items-center gap-1">
  <Search className="h-3 w-3" />
  {modeLabels[extractMode]}
@@ -70,7 +70,7 @@ export const RegexNode = memo(function RegexNode({
  </div>
  </div>
 
-        {/* Currently Then Expression Preview */}
+        {/* Regex Expression Preview */}
  <div className="px-3 py-2.5 space-y-2 text-xs">
  {pattern ? (
  <div className="font-mono p-2 rounded-md bg-surface-200 overflow-hidden">
@@ -80,7 +80,7 @@ export const RegexNode = memo(function RegexNode({
  </div>
  ) : (
  <div className="text-foreground-muted p-2 rounded-md bg-surface-200 border border-dashed border-border">
-          Please enter currently then expression...
+          Please enter a regular expression...
  </div>
  )}
  {config.groupNames && config.groupNames.length > 0 && (

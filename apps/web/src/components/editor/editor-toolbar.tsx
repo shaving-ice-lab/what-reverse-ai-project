@@ -112,7 +112,7 @@ export function EditorToolbar({
  saved: { label: "Saved", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
  saving: { label: "Saving", dot: "var(--color-brand-500)", textClass: "text-foreground-light" },
  unsaved: { label: "Unsaved", dot: "var(--color-warning)", textClass: "text-warning" },
- error: { label: "Save Failed", dot: "var(--color-destructive)", textClass: "text-destructive" },
+ error: { label: "Failed to Save", dot: "var(--color-destructive)", textClass: "text-destructive" },
  } as const;
  const saveMeta = saveStatusConfig[saveStatus];
 
@@ -373,7 +373,7 @@ export function EditorToolbar({
  </DropdownMenuItem>
  <DropdownMenuItem onClick={applyVerticalLayout} className="text-foreground hover:text-foreground hover:bg-surface-200/70">
  <ArrowDown className="h-4 w-4 mr-2" />
- VerticalLayout (on→down)
+ Vertical Layout (Top → Down)
  </DropdownMenuItem>
  </DropdownMenuContent>
  </DropdownMenu>

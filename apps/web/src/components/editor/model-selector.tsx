@@ -342,9 +342,9 @@ export function ModelSelector({
  newMap.delete(modelName);
  return newMap;
  });
- toast.error("Download failed", {
- description: error instanceof Error ? error.message: "Please try again",
- });
+        toast.error("Failed to download", {
+          description: error instanceof Error ? error.message: "Please try again",
+        });
  }
  },
  [isTauri, loadLocalModels]
@@ -369,9 +369,9 @@ export function ModelSelector({
  // Refresh model list
  loadLocalModels();
  } catch (error) {
- toast.error("Delete failed", {
- description: error instanceof Error ? error.message: "Please try again",
- });
+        toast.error("Failed to delete", {
+          description: error instanceof Error ? error.message: "Please try again",
+        });
  } finally {
  setDeletingModels((prev) => {
  const newSet = new Set(prev);

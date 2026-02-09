@@ -225,7 +225,7 @@ function JsonViewer({
       toast.success("Copied to clipboard");
  setTimeout(() => setCopied(false), 2000);
  } catch {
-      toast.error("Copy failed");
+      toast.error("Failed to copy");
  }
  };
 
@@ -566,7 +566,7 @@ export function NodeDetailsPanel({
           {snapshot.resolvedConfig && (
             <JsonViewer
               data={snapshot.resolvedConfig}
-              title="Resolved config"
+              title="Resolved Configuration"
  defaultOpen={false}
  />
  )}

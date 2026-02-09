@@ -566,7 +566,7 @@ export function NodeDetailsPanel({
  {snapshot.resolvedConfig && (
  <JsonViewer
  data={snapshot.resolvedConfig}
- title="Resolved config"
+              title="Resolved Configuration"
  defaultOpen={false}
  />
  )}
