@@ -40,6 +40,7 @@ import {
  PlugZap,
  ListTodo,
  Loader2,
+ Shield,
 } from "lucide-react";
 import { RequireAuth } from "@/components/auth/auth-guard";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -47,7 +48,6 @@ import { useCommandPalette } from "@/components/dashboard/use-command-palette";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { appApi } from "@/lib/api/workspace";
 import { workspaceApi, type Workspace, type WorkspaceQuota } from "@/lib/api/workspace";
 import {
  DropdownMenu,
@@ -276,24 +276,8 @@ export default function DashboardLayout({
  }
 
  const isDefaultName = activeWorkspace.name?.trim() === "Default Workspace";
- const checkApps = async () => {
- try {
- const apps = await appApi.list({
- workspace_id: activeWorkspace.id,
- page: 1,
- pageSize: 1,
- });
- const hasApps = (apps.items?.length ?? 0) > 0;
- setNeedsSetup(isDefaultName || !hasApps);
- } catch (error) {
- console.error("Failed to check onboarding status:", error);
- setNeedsSetup(true);
- } finally {
+ setNeedsSetup(isDefaultName);
  setSetupChecked(true);
- }
- };
-
- checkApps();
  }, [
  activeWorkspaceId,
  mounted,
@@ -305,6 +289,13 @@ export default function DashboardLayout({
  useEffect(() => {
  if (!needsSetup) return;
  if (pathname?.startsWith("/dashboard/setup")) return;
+ // Re-check localStorage in case setup was just completed
+ const justCompleted = typeof window !== "undefined" && localStorage.getItem("agentflow-setup-completed") === "true";
+ if (justCompleted) {
+  setNeedsSetup(false);
+  setSetupChecked(true);
+  return;
+ }
  router.replace("/dashboard/setup");
  }, [needsSetup, pathname, router]);
 
@@ -358,6 +349,8 @@ export default function DashboardLayout({
  const isFullBleed = fullBleedRoutes.some((route) => {
  return pathname === route || pathname.startsWith(`${route}/`);
  });
+
+ const isSetupPage = pathname === "/dashboard/setup" || pathname.startsWith("/dashboard/setup/");
 
  const activeWorkspace = workspaces.find((ws) => ws.id === activeWorkspaceId) || null;
 
@@ -921,7 +914,7 @@ Create or select workspace
  data-collapsed={sidebarCollapsed}
  className={cn(
  "flex flex-col transition-all duration-300 ease-out relative shrink-0 bg-background-studio border-r border-border overflow-hidden",
- sidebarCollapsed ? "w-[52px]" : "w-[188px]"
+ isSetupPage ? "w-0 border-r-0 hidden" : sidebarCollapsed ? "w-[52px]" : "w-[188px]"
  )}
  >
  <div className="relative z-10 flex h-full flex-col">
@@ -1144,7 +1137,7 @@ Create or select workspace
  data-layout={isFullBleed ? "full" : "standard"}
  >
  <div className="dashboard-content">
- <div className="dashboard-page">{children}</div>
+ <div className="dashboard-page">{(!setupChecked && !isSetupPage) ? (<div className="flex items-center justify-center h-full"><div className="w-6 h-6 border-2 border-foreground-muted border-t-transparent rounded-full animate-spin" /></div>) : children}</div>
  </div>
  </div>
  </main>
