@@ -132,12 +132,15 @@ func (h *WorkspaceHandler) Create(c echo.Context) error {
 		Region: req.Region,
 	})
 	if err != nil {
-		switch err {
-		case service.ErrWorkspaceInvalidName, service.ErrWorkspaceInvalidSlug, service.ErrWorkspaceInvalidIcon, service.ErrWorkspaceInvalidPlan:
+		switch {
+		case errors.Is(err, service.ErrWorkspaceInvalidName),
+			errors.Is(err, service.ErrWorkspaceInvalidSlug),
+			errors.Is(err, service.ErrWorkspaceInvalidIcon),
+			errors.Is(err, service.ErrWorkspaceInvalidPlan):
 			return errorResponse(c, http.StatusBadRequest, "INVALID_INPUT", "工作空间参数无效")
-		case service.ErrWorkspaceSlugExists:
+		case errors.Is(err, service.ErrWorkspaceSlugExists):
 			return errorResponse(c, http.StatusConflict, "SLUG_EXISTS", "工作空间 Slug 已存在")
-		case service.ErrWorkspaceUserNotFound:
+		case errors.Is(err, service.ErrWorkspaceUserNotFound):
 			return errorResponse(c, http.StatusNotFound, "USER_NOT_FOUND", "用户不存在")
 		default:
 			return errorResponse(c, http.StatusInternalServerError, "CREATE_FAILED", "创建工作空间失败")

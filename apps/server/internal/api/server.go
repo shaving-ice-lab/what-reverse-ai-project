@@ -191,6 +191,7 @@ func (s *Server) setupRoutes() {
 	// 初始化服务层
 	eventRecorder := service.NewEventRecorderService(runtimeEventRepo, s.log, nil, s.config.Security.PIISanitizationEnabled)
 	workspaceService := service.NewWorkspaceService(
+		s.db,
 		workspaceRepo,
 		workspaceSlugAliasRepo,
 		userRepo,
@@ -413,7 +414,7 @@ func (s *Server) setupRoutes() {
 	supportRoutingService := service.NewSupportRoutingService(supportTeamRepo, supportTeamMemberRepo, supportQueueRepo, supportQueueMemberRepo)
 	supportNotificationTemplateService := service.NewSupportNotificationTemplateService(supportNotificationTemplateRepo)
 	supportSettingsService := service.NewSupportSettingsService(supportChannelRepo, supportAssignmentRuleRepo)
-	supportTicketCommentService := service.NewSupportTicketCommentService(
+	_ = service.NewSupportTicketCommentService(
 		supportTicketCommentRepo,
 		supportTicketRepo,
 		notificationService,
@@ -665,6 +666,8 @@ func (s *Server) setupRoutes() {
 		ops.GET("/queues/dead", opsHandler.ListDeadTasks)
 		ops.POST("/queues/dead/:taskId/retry", opsHandler.RetryDeadTask)
 		ops.DELETE("/queues/dead/:taskId", opsHandler.DeleteDeadTask)
+		ops.GET("/support/sops", opsSupportHandler.ListSOPs)
+		ops.GET("/support/sops/:key", opsSupportHandler.GetSOP)
 	}
 
 	// 公开分享访问路由 (无需认证)

@@ -170,7 +170,7 @@ func (r *workspaceRepository) ListByUserID(ctx context.Context, userID uuid.UUID
 	var workspaces []entity.Workspace
 	if err := r.db.WithContext(ctx).
 		Table("what_reverse_workspaces").
-		Joins("LEFT JOIN what_reverse_workspace_members ON what_reverse_workspace_members.workspace_id = what_reverse_workspaces.id AND what_reverse_workspace_members.user_id = ?", userID).
+		Joins("LEFT JOIN what_reverse_workspace_members ON what_reverse_workspace_members.workspace_id = what_reverse_workspaces.id AND what_reverse_workspace_members.user_id = ? AND what_reverse_workspace_members.status = 'active'", userID).
 		Where("what_reverse_workspaces.deleted_at IS NULL").
 		Where("what_reverse_workspaces.owner_user_id = ? OR what_reverse_workspace_members.user_id = ?", userID, userID).
 		Group("what_reverse_workspaces.id").

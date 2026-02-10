@@ -71,6 +71,7 @@ func main() {
 	idempotencyRepo := repository.NewIdempotencyKeyRepository(db)
 	eventRecorder := service.NewEventRecorderService(runtimeEventRepo, log, nil, cfg.Security.PIISanitizationEnabled)
 	workspaceService := service.NewWorkspaceService(
+		db,
 		workspaceRepo,
 		workspaceSlugAliasRepo,
 		userRepo,

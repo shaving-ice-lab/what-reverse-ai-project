@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -52,6 +53,7 @@ type WorkspaceService interface {
 }
 
 type workspaceService struct {
+	db            *gorm.DB
 	workspaceRepo repository.WorkspaceRepository
 	slugAliasRepo repository.WorkspaceSlugAliasRepository
 	userRepo      repository.UserRepository
@@ -64,6 +66,7 @@ type workspaceService struct {
 
 // NewWorkspaceService 创建工作空间服务实例
 func NewWorkspaceService(
+	db *gorm.DB,
 	workspaceRepo repository.WorkspaceRepository,
 	slugAliasRepo repository.WorkspaceSlugAliasRepository,
 	userRepo repository.UserRepository,
@@ -74,6 +77,7 @@ func NewWorkspaceService(
 	retentionCfg config.RetentionConfig,
 ) WorkspaceService {
 	return &workspaceService{
+		db:            db,
 		workspaceRepo: workspaceRepo,
 		slugAliasRepo: slugAliasRepo,
 		userRepo:      userRepo,
@@ -132,18 +136,28 @@ func (s *workspaceService) EnsureDefaultWorkspace(ctx context.Context, user *ent
 		Settings:    entity.JSON{},
 	}
 
-	if err := s.workspaceRepo.Create(ctx, workspace); err != nil {
-		return nil, err
-	}
+	txErr := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		txWorkspaceRepo := repository.NewWorkspaceRepository(tx)
+		txRoleRepo := repository.NewWorkspaceRoleRepository(tx)
+		txMemberRepo := repository.NewWorkspaceMemberRepository(tx)
 
-	roles, err := s.ensureDefaultRoles(ctx, workspace.ID)
-	if err != nil {
-		return nil, err
-	}
-	if ownerRole, ok := roles["owner"]; ok {
-		if err := s.ensureOwnerMembership(ctx, workspace.ID, user.ID, ownerRole.ID); err != nil {
-			return nil, err
+		if err := txWorkspaceRepo.Create(ctx, workspace); err != nil {
+			return err
 		}
+
+		roles, err := s.ensureDefaultRolesWithRepo(ctx, workspace.ID, txRoleRepo)
+		if err != nil {
+			return err
+		}
+		if ownerRole, ok := roles["owner"]; ok {
+			if err := s.ensureOwnerMembershipWithRepo(ctx, workspace.ID, user.ID, ownerRole.ID, txMemberRepo); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if txErr != nil {
+		return nil, txErr
 	}
 
 	s.recordWorkspaceCreated(ctx, workspace, user.ID, "default")
@@ -174,7 +188,7 @@ func (s *workspaceService) Create(ctx context.Context, ownerID uuid.UUID, req Cr
 	}
 
 	name := strings.TrimSpace(req.Name)
-	if name == "" {
+	if name == "" || len(name) > 100 {
 		return nil, ErrWorkspaceInvalidName
 	}
 
@@ -237,18 +251,28 @@ func (s *workspaceService) Create(ctx context.Context, ownerID uuid.UUID, req Cr
 		workspace.Region = &region
 	}
 
-	if err := s.workspaceRepo.Create(ctx, workspace); err != nil {
-		return nil, err
-	}
+	txErr := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		txWorkspaceRepo := repository.NewWorkspaceRepository(tx)
+		txRoleRepo := repository.NewWorkspaceRoleRepository(tx)
+		txMemberRepo := repository.NewWorkspaceMemberRepository(tx)
 
-	roles, err := s.ensureDefaultRoles(ctx, workspace.ID)
-	if err != nil {
-		return nil, err
-	}
-	if ownerRole, ok := roles["owner"]; ok {
-		if err := s.ensureOwnerMembership(ctx, workspace.ID, ownerID, ownerRole.ID); err != nil {
-			return nil, err
+		if err := txWorkspaceRepo.Create(ctx, workspace); err != nil {
+			return err
 		}
+
+		roles, err := s.ensureDefaultRolesWithRepo(ctx, workspace.ID, txRoleRepo)
+		if err != nil {
+			return err
+		}
+		if ownerRole, ok := roles["owner"]; ok {
+			if err := s.ensureOwnerMembershipWithRepo(ctx, workspace.ID, ownerID, ownerRole.ID, txMemberRepo); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if txErr != nil {
+		return nil, txErr
 	}
 
 	s.recordWorkspaceCreated(ctx, workspace, ownerID, "manual")
@@ -270,7 +294,9 @@ func (s *workspaceService) recordWorkspaceCreated(ctx context.Context, workspace
 		WithMessage("workspace created").
 		Build()
 	event.Metadata = metadata
-	_ = s.eventRecorder.Record(ctx, event)
+	if err := s.eventRecorder.Record(ctx, event); err != nil {
+		fmt.Fprintf(os.Stderr, "[WARN] failed to record workspace.created event for workspace %s: %v\n", workspace.ID, err)
+	}
 }
 
 func (s *workspaceService) ListByOwner(ctx context.Context, ownerID uuid.UUID) ([]entity.Workspace, error) {
@@ -561,6 +587,10 @@ type defaultWorkspaceRole struct {
 }
 
 func (s *workspaceService) ensureDefaultRoles(ctx context.Context, workspaceID uuid.UUID) (map[string]*entity.WorkspaceRole, error) {
+	return s.ensureDefaultRolesWithRepo(ctx, workspaceID, s.roleRepo)
+}
+
+func (s *workspaceService) ensureDefaultRolesWithRepo(ctx context.Context, workspaceID uuid.UUID, roleRepo repository.WorkspaceRoleRepository) (map[string]*entity.WorkspaceRole, error) {
 	defaults := []defaultWorkspaceRole{
 		{
 			name:        "owner",
@@ -578,7 +608,7 @@ func (s *workspaceService) ensureDefaultRoles(ctx context.Context, workspaceID u
 
 	roles := make(map[string]*entity.WorkspaceRole, len(defaults))
 	for _, def := range defaults {
-		role, err := s.roleRepo.GetByWorkspaceAndName(ctx, workspaceID, def.name)
+		role, err := roleRepo.GetByWorkspaceAndName(ctx, workspaceID, def.name)
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				return nil, err
@@ -589,14 +619,14 @@ func (s *workspaceService) ensureDefaultRoles(ctx context.Context, workspaceID u
 				Permissions: def.permissions,
 				IsSystem:    true,
 			}
-			if err := s.roleRepo.Create(ctx, role); err != nil {
+			if err := roleRepo.Create(ctx, role); err != nil {
 				return nil, err
 			}
 		} else {
 			merged, changed := mergePermissions(role.Permissions, def.permissions)
 			if changed {
 				role.Permissions = merged
-				if err := s.roleRepo.Update(ctx, role); err != nil {
+				if err := roleRepo.Update(ctx, role); err != nil {
 					return nil, err
 				}
 			}
@@ -608,7 +638,11 @@ func (s *workspaceService) ensureDefaultRoles(ctx context.Context, workspaceID u
 }
 
 func (s *workspaceService) ensureOwnerMembership(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, ownerRoleID uuid.UUID) error {
-	existing, err := s.memberRepo.GetByWorkspaceAndUser(ctx, workspaceID, ownerID)
+	return s.ensureOwnerMembershipWithRepo(ctx, workspaceID, ownerID, ownerRoleID, s.memberRepo)
+}
+
+func (s *workspaceService) ensureOwnerMembershipWithRepo(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, ownerRoleID uuid.UUID, memberRepo repository.WorkspaceMemberRepository) error {
+	existing, err := memberRepo.GetByWorkspaceAndUser(ctx, workspaceID, ownerID)
 	if err == nil && existing != nil {
 		return nil
 	}
@@ -624,12 +658,12 @@ func (s *workspaceService) ensureOwnerMembership(ctx context.Context, workspaceI
 		Status:      "active",
 		JoinedAt:    &now,
 	}
-	return s.memberRepo.Create(ctx, member)
+	return memberRepo.Create(ctx, member)
 }
 
 func (s *workspaceService) ensureUniqueSlug(ctx context.Context, baseSlug string) (string, error) {
 	slug := baseSlug
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		exists, err := s.workspaceRepo.ExistsBySlug(ctx, slug)
 		if err != nil {
 			return "", err
@@ -639,7 +673,7 @@ func (s *workspaceService) ensureUniqueSlug(ctx context.Context, baseSlug string
 		}
 		slug = fmt.Sprintf("%s-%s", baseSlug, uuid.New().String()[:8])
 	}
-	return "", errors.New("unable to generate unique workspace slug")
+	return "", ErrWorkspaceSlugExists
 }
 
 func (s *workspaceService) GetWorkspaceAccess(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) (*WorkspaceAccess, error) {
