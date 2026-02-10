@@ -139,13 +139,13 @@ export const useAuthStore = create<AuthState>()(
           // Even if API call fails, still clear local state
         }
 
-        // Clear state (reset isInitialized so it can be re-initialized next time)
+        // Clear state but keep isInitialized true so AuthGuard can redirect
         set({
           user: null,
           tokens: null,
           isAuthenticated: false,
           isLoading: false,
-          isInitialized: false,
+          isInitialized: true,
         })
         // Zustand persist will automatically save tokens: null to localStorage
       },
