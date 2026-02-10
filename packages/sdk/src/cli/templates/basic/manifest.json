@@ -12,9 +12,5 @@
     "icon": "puzzle",
     "minSdkVersion": "0.1.0"
   },
-  "keywords": [
-    "agentflow",
-    "node",
-    "custom"
-  ]
+  "keywords": ["agentflow", "node", "custom"]
 }

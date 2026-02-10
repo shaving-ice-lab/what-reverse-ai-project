@@ -13,7 +13,7 @@ import type {
   SerializedNodeDefinition,
   SerializedInputField,
   SerializedOutputField,
-} from "./types";
+} from './types'
 
 /**
  * 定义自定义节点
@@ -52,12 +52,10 @@ import type {
  */
 export function defineNode<
   TInputs extends Record<string, InputFieldConfig>,
-  TOutputs extends Record<string, OutputFieldConfig>
->(
-  config: NodeDefinitionConfig<TInputs, TOutputs>
-): NodeDefinition<TInputs, TOutputs> {
+  TOutputs extends Record<string, OutputFieldConfig>,
+>(config: NodeDefinitionConfig<TInputs, TOutputs>): NodeDefinition<TInputs, TOutputs> {
   // 验证配置
-  validateNodeConfig(config);
+  validateNodeConfig(config)
 
   // 创建节点定义实例
   const definition: NodeDefinition<TInputs, TOutputs> = {
@@ -65,27 +63,27 @@ export function defineNode<
 
     // 验证输入
     validateInputs(inputs: unknown): ValidationResult {
-      return validateInputs(config.inputs, inputs);
+      return validateInputs(config.inputs, inputs)
     },
 
     // 获取默认配置
     getDefaultConfig(): Record<string, unknown> {
-      const defaults: Record<string, unknown> = {};
+      const defaults: Record<string, unknown> = {}
       for (const [key, field] of Object.entries(config.inputs)) {
         if (field.defaultValue !== undefined) {
-          defaults[key] = field.defaultValue;
+          defaults[key] = field.defaultValue
         }
       }
-      return defaults;
+      return defaults
     },
 
     // 序列化节点定义
     serialize(): SerializedNodeDefinition {
-      return serializeDefinition(config);
+      return serializeDefinition(config)
     },
-  };
+  }
 
-  return definition;
+  return definition
 }
 
 /**
@@ -93,37 +91,37 @@ export function defineNode<
  */
 function validateNodeConfig<
   TInputs extends Record<string, InputFieldConfig>,
-  TOutputs extends Record<string, OutputFieldConfig>
+  TOutputs extends Record<string, OutputFieldConfig>,
 >(config: NodeDefinitionConfig<TInputs, TOutputs>): void {
   // 验证必填字段
   if (!config.id) {
-    throw new Error("Node id is required");
+    throw new Error('Node id is required')
   }
   if (!/^[a-z0-9-]+$/.test(config.id)) {
-    throw new Error("Node id must be lowercase alphanumeric with hyphens");
+    throw new Error('Node id must be lowercase alphanumeric with hyphens')
   }
   if (!config.name) {
-    throw new Error("Node name is required");
+    throw new Error('Node name is required')
   }
   if (!config.description) {
-    throw new Error("Node description is required");
+    throw new Error('Node description is required')
   }
   if (!config.category) {
-    throw new Error("Node category is required");
+    throw new Error('Node category is required')
   }
   if (!config.icon) {
-    throw new Error("Node icon is required");
+    throw new Error('Node icon is required')
   }
   if (!config.version) {
-    throw new Error("Node version is required");
+    throw new Error('Node version is required')
   }
-  if (!config.execute || typeof config.execute !== "function") {
-    throw new Error("Node execute function is required");
+  if (!config.execute || typeof config.execute !== 'function') {
+    throw new Error('Node execute function is required')
   }
 
   // 验证版本格式
   if (!/^\d+\.\d+\.\d+$/.test(config.version)) {
-    throw new Error("Node version must be in semver format (e.g., 1.0.0)");
+    throw new Error('Node version must be in semver format (e.g., 1.0.0)')
   }
 }
 
@@ -134,54 +132,54 @@ function validateInputs(
   inputDefs: Record<string, InputFieldConfig>,
   inputs: unknown
 ): ValidationResult {
-  const errors: ValidationError[] = [];
+  const errors: ValidationError[] = []
 
-  if (typeof inputs !== "object" || inputs === null) {
+  if (typeof inputs !== 'object' || inputs === null) {
     return {
       valid: false,
       errors: [
         {
-          field: "_root",
-          message: "Inputs must be an object",
-          code: "INVALID_TYPE",
+          field: '_root',
+          message: 'Inputs must be an object',
+          code: 'INVALID_TYPE',
         },
       ],
-    };
+    }
   }
 
-  const inputValues = inputs as Record<string, unknown>;
+  const inputValues = inputs as Record<string, unknown>
 
   for (const [fieldName, fieldConfig] of Object.entries(inputDefs)) {
-    const value = inputValues[fieldName];
+    const value = inputValues[fieldName]
 
     // 检查必填
     if (fieldConfig.required && (value === undefined || value === null)) {
       errors.push({
         field: fieldName,
         message: `${fieldConfig.label} is required`,
-        code: "REQUIRED",
-      });
-      continue;
+        code: 'REQUIRED',
+      })
+      continue
     }
 
     // 如果值为空且非必填，跳过验证
     if (value === undefined || value === null) {
-      continue;
+      continue
     }
 
     // 类型检查
-    const typeError = validateType(fieldName, fieldConfig, value);
+    const typeError = validateType(fieldName, fieldConfig, value)
     if (typeError) {
-      errors.push(typeError);
-      continue;
+      errors.push(typeError)
+      continue
     }
 
     // 自定义验证规则
     if (fieldConfig.validation) {
       for (const rule of fieldConfig.validation) {
-        const ruleError = validateRule(fieldName, rule, value);
+        const ruleError = validateRule(fieldName, rule, value)
         if (ruleError) {
-          errors.push(ruleError);
+          errors.push(ruleError)
         }
       }
     }
@@ -190,7 +188,7 @@ function validateInputs(
   return {
     valid: errors.length === 0,
     errors,
-  };
+  }
 }
 
 /**
@@ -201,57 +199,57 @@ function validateType(
   config: InputFieldConfig,
   value: unknown
 ): ValidationError | null {
-  const { type, label } = config;
+  const { type, label } = config
 
   switch (type) {
-    case "string":
-      if (typeof value !== "string") {
+    case 'string':
+      if (typeof value !== 'string') {
         return {
           field: fieldName,
           message: `${label} must be a string`,
-          code: "INVALID_TYPE",
-        };
+          code: 'INVALID_TYPE',
+        }
       }
-      break;
-    case "number":
-      if (typeof value !== "number" || isNaN(value)) {
+      break
+    case 'number':
+      if (typeof value !== 'number' || isNaN(value)) {
         return {
           field: fieldName,
           message: `${label} must be a number`,
-          code: "INVALID_TYPE",
-        };
+          code: 'INVALID_TYPE',
+        }
       }
-      break;
-    case "boolean":
-      if (typeof value !== "boolean") {
+      break
+    case 'boolean':
+      if (typeof value !== 'boolean') {
         return {
           field: fieldName,
           message: `${label} must be a boolean`,
-          code: "INVALID_TYPE",
-        };
+          code: 'INVALID_TYPE',
+        }
       }
-      break;
-    case "object":
-      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      break
+    case 'object':
+      if (typeof value !== 'object' || value === null || Array.isArray(value)) {
         return {
           field: fieldName,
           message: `${label} must be an object`,
-          code: "INVALID_TYPE",
-        };
+          code: 'INVALID_TYPE',
+        }
       }
-      break;
-    case "array":
+      break
+    case 'array':
       if (!Array.isArray(value)) {
         return {
           field: fieldName,
           message: `${label} must be an array`,
-          code: "INVALID_TYPE",
-        };
+          code: 'INVALID_TYPE',
+        }
       }
-      break;
+      break
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -263,39 +261,39 @@ function validateRule(
   value: unknown
 ): ValidationError | null {
   switch (rule.type) {
-    case "min":
-      if (typeof value === "number" && value < (rule.value as number)) {
-        return { field: fieldName, message: rule.message, code: "MIN" };
+    case 'min':
+      if (typeof value === 'number' && value < (rule.value as number)) {
+        return { field: fieldName, message: rule.message, code: 'MIN' }
       }
-      break;
-    case "max":
-      if (typeof value === "number" && value > (rule.value as number)) {
-        return { field: fieldName, message: rule.message, code: "MAX" };
+      break
+    case 'max':
+      if (typeof value === 'number' && value > (rule.value as number)) {
+        return { field: fieldName, message: rule.message, code: 'MAX' }
       }
-      break;
-    case "minLength":
-      if (typeof value === "string" && value.length < (rule.value as number)) {
-        return { field: fieldName, message: rule.message, code: "MIN_LENGTH" };
+      break
+    case 'minLength':
+      if (typeof value === 'string' && value.length < (rule.value as number)) {
+        return { field: fieldName, message: rule.message, code: 'MIN_LENGTH' }
       }
-      break;
-    case "maxLength":
-      if (typeof value === "string" && value.length > (rule.value as number)) {
-        return { field: fieldName, message: rule.message, code: "MAX_LENGTH" };
+      break
+    case 'maxLength':
+      if (typeof value === 'string' && value.length > (rule.value as number)) {
+        return { field: fieldName, message: rule.message, code: 'MAX_LENGTH' }
       }
-      break;
-    case "pattern":
-      if (typeof value === "string" && !new RegExp(rule.value as string).test(value)) {
-        return { field: fieldName, message: rule.message, code: "PATTERN" };
+      break
+    case 'pattern':
+      if (typeof value === 'string' && !new RegExp(rule.value as string).test(value)) {
+        return { field: fieldName, message: rule.message, code: 'PATTERN' }
       }
-      break;
-    case "custom":
+      break
+    case 'custom':
       if (rule.validator && !rule.validator(value)) {
-        return { field: fieldName, message: rule.message, code: "CUSTOM" };
+        return { field: fieldName, message: rule.message, code: 'CUSTOM' }
       }
-      break;
+      break
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -303,9 +301,9 @@ function validateRule(
  */
 function serializeDefinition<
   TInputs extends Record<string, InputFieldConfig>,
-  TOutputs extends Record<string, OutputFieldConfig>
+  TOutputs extends Record<string, OutputFieldConfig>,
 >(config: NodeDefinitionConfig<TInputs, TOutputs>): SerializedNodeDefinition {
-  const inputs: Record<string, SerializedInputField> = {};
+  const inputs: Record<string, SerializedInputField> = {}
   for (const [key, field] of Object.entries(config.inputs)) {
     inputs[key] = {
       type: field.type,
@@ -313,17 +311,17 @@ function serializeDefinition<
       description: field.description,
       required: field.required,
       defaultValue: field.defaultValue,
-    };
+    }
   }
 
-  const outputs: Record<string, SerializedOutputField> = {};
+  const outputs: Record<string, SerializedOutputField> = {}
   for (const [key, field] of Object.entries(config.outputs)) {
     outputs[key] = {
       type: field.type,
       label: field.label,
       description: field.description,
       optional: field.optional,
-    };
+    }
   }
 
   return {
@@ -335,5 +333,5 @@ function serializeDefinition<
     version: config.version,
     inputs,
     outputs,
-  };
+  }
 }

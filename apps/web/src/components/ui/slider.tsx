@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
 /**
  * Slider SliderComponent - Minimalist Style
  */
 
-import * as React from "react";
-import * as SliderPrimitive from "@radix-ui/react-slider";
-import { cn } from "@/lib/utils";
+import * as React from 'react'
+import * as SliderPrimitive from '@radix-ui/react-slider'
+import { cn } from '@/lib/utils'
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -14,10 +14,7 @@ const Slider = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}
-    className={cn(
-      "relative flex w-full touch-none select-none items-center",
-      className
-    )}
+    className={cn('relative flex w-full touch-none select-none items-center', className)}
     {...props}
   >
     <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-surface-200">
@@ -25,7 +22,7 @@ const Slider = React.forwardRef<
     </SliderPrimitive.Track>
     <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border border-border bg-surface-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/20 disabled:pointer-events-none disabled:opacity-50 hover:border-brand-500" />
   </SliderPrimitive.Root>
-));
-Slider.displayName = SliderPrimitive.Root.displayName;
+))
+Slider.displayName = SliderPrimitive.Root.displayName
 
-export { Slider };
+export { Slider }

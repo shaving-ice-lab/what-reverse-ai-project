@@ -10,42 +10,42 @@
 /**
  * Conflict Resolution Policy
  */
-export type ConflictResolutionStrategy = 'local' | 'cloud' | 'latest' | 'manual';
+export type ConflictResolutionStrategy = 'local' | 'cloud' | 'latest' | 'manual'
 
 /**
  * Sync Configuration
  */
 export interface SyncConfig {
- /** Auto Sync Interval (seconds) */
- interval: number;
- /** Conflict Resolution Policy */
- conflictResolution: ConflictResolutionStrategy;
- /** Excluded Data Types */
- excludePatterns: string[];
- /** Encrypt Before Sync */
- encryptBeforeSync: boolean;
- /** Maximum Retry Count */
- maxRetries: number;
- /** Batch Size */
- batchSize: number;
+  /** Auto Sync Interval (seconds) */
+  interval: number
+  /** Conflict Resolution Policy */
+  conflictResolution: ConflictResolutionStrategy
+  /** Excluded Data Types */
+  excludePatterns: string[]
+  /** Encrypt Before Sync */
+  encryptBeforeSync: boolean
+  /** Maximum Retry Count */
+  maxRetries: number
+  /** Batch Size */
+  batchSize: number
   /** Whether to enable auto sync */
-  autoSync: boolean;
+  autoSync: boolean
   /** Cloud API Address */
-  cloudApiUrl?: string;
+  cloudApiUrl?: string
 }
 
 /**
  * Default Sync Config
  */
 export const DEFAULT_SYNC_CONFIG: SyncConfig = {
- interval: 60000, // 1min
- conflictResolution: 'latest',
- excludePatterns: ['api_keys', 'secrets', 'tokens'],
- encryptBeforeSync: true,
- maxRetries: 3,
- batchSize: 50,
- autoSync: true,
-};
+  interval: 60000, // 1min
+  conflictResolution: 'latest',
+  excludePatterns: ['api_keys', 'secrets', 'tokens'],
+  encryptBeforeSync: true,
+  maxRetries: 3,
+  batchSize: 50,
+  autoSync: true,
+}
 
 // ============================================================================
 // Changelog
@@ -54,42 +54,42 @@ export const DEFAULT_SYNC_CONFIG: SyncConfig = {
 /**
  * Entity Type
  */
-export type EntityType = 'workflow' | 'execution' | 'settings' | 'agent' | 'template';
+export type EntityType = 'workflow' | 'execution' | 'settings' | 'agent' | 'template'
 
 /**
  * Action Type
  */
-export type OperationType = 'create' | 'update' | 'delete';
+export type OperationType = 'create' | 'update' | 'delete'
 
 /**
  * Sync Status
  */
-export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict';
+export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'conflict'
 
 /**
  * Changelog
  */
 export interface ChangeRecord<T = unknown> {
   /** Change ID */
-  id: string;
+  id: string
   /** Entity Type */
-  entityType: EntityType;
+  entityType: EntityType
   /** Entity ID */
-  entityId: string;
+  entityId: string
   /** Action Type */
-  operation: OperationType;
+  operation: OperationType
   /** Change Data */
-  data: T;
+  data: T
   /** Timestamp */
-  timestamp: Date;
+  timestamp: Date
   /** Sync Status */
-  syncStatus: SyncStatus;
+  syncStatus: SyncStatus
   /** Version Number */
-  version: number;
+  version: number
   /** Validation Checksum */
-  checksum?: string;
+  checksum?: string
   /** Device ID */
-  deviceId?: string;
+  deviceId?: string
 }
 
 // ============================================================================
@@ -101,9 +101,9 @@ export interface ChangeRecord<T = unknown> {
  */
 export interface Conflict<T = unknown> {
   /** Local change */
-  local: ChangeRecord<T>;
+  local: ChangeRecord<T>
   /** Cloud change */
-  cloud: ChangeRecord<T>;
+  cloud: ChangeRecord<T>
 }
 
 /**
@@ -111,9 +111,9 @@ export interface Conflict<T = unknown> {
  */
 export interface ResolvedConflict<T = unknown> extends Conflict<T> {
   /** Resolution strategy */
-  resolution: 'local' | 'cloud';
+  resolution: 'local' | 'cloud'
   /** Resolution time */
-  resolvedAt: Date;
+  resolvedAt: Date
 }
 
 /**
@@ -121,11 +121,11 @@ export interface ResolvedConflict<T = unknown> extends Conflict<T> {
  */
 export interface ConflictDetectionResult<T = unknown> {
   /** Conflict list */
-  conflicts: Conflict<T>[];
+  conflicts: Conflict<T>[]
   /** Changes only in local */
-  localOnly: ChangeRecord<T>[];
+  localOnly: ChangeRecord<T>[]
   /** Changes only in cloud */
-  cloudOnly: ChangeRecord<T>[];
+  cloudOnly: ChangeRecord<T>[]
 }
 
 // ============================================================================
@@ -137,11 +137,11 @@ export interface ConflictDetectionResult<T = unknown> {
  */
 export interface SyncError {
   /** Change ID list */
-  changeIds: string[];
+  changeIds: string[]
   /** Error information */
-  error: string;
+  error: string
   /** Error code */
-  code?: string;
+  code?: string
 }
 
 /**
@@ -149,9 +149,9 @@ export interface SyncError {
  */
 export interface UploadResult {
   /** Successful change IDs */
-  successful: string[];
+  successful: string[]
   /** Failed changes */
-  failed: SyncError[];
+  failed: SyncError[]
 }
 
 /**
@@ -159,38 +159,38 @@ export interface UploadResult {
  */
 export interface DownloadResult {
   /** Successful change IDs */
-  successful: string[];
+  successful: string[]
   /** Failed changes */
-  failed: SyncError[];
+  failed: SyncError[]
 }
 
 /**
  * Sync Result Status
  */
-export type SyncResultStatus = 'success' | 'partial' | 'failed' | 'skipped';
+export type SyncResultStatus = 'success' | 'partial' | 'failed' | 'skipped'
 
 /**
  * Sync Result
  */
 export interface SyncResult {
   /** Status */
-  status: SyncResultStatus;
+  status: SyncResultStatus
   /** Upload count */
-  uploaded?: number;
+  uploaded?: number
   /** Download count */
-  downloaded?: number;
+  downloaded?: number
   /** Conflict count */
-  conflicts?: number;
+  conflicts?: number
   /** Error list */
-  errors?: SyncError[];
+  errors?: SyncError[]
   /** Skip reason */
-  reason?: string;
+  reason?: string
   /** Error information */
-  error?: string;
+  error?: string
   /** Sync time */
-  syncedAt?: Date;
+  syncedAt?: Date
   /** Duration (ms) */
-  duration?: number;
+  duration?: number
 }
 
 // ============================================================================
@@ -202,21 +202,21 @@ export interface SyncResult {
  */
 export interface SyncEngineState {
   /** Whether syncing */
-  isSyncing: boolean;
+  isSyncing: boolean
   /** Whether enabled */
-  isEnabled: boolean;
+  isEnabled: boolean
   /** Whether online */
-  isOnline: boolean;
+  isOnline: boolean
   /** Pending sync count */
-  pendingCount: number;
+  pendingCount: number
   /** Conflict count */
-  conflictCount: number;
+  conflictCount: number
   /** Last sync time */
-  lastSyncAt?: Date;
+  lastSyncAt?: Date
   /** Last sync result */
-  lastSyncResult?: SyncResult;
+  lastSyncResult?: SyncResult
   /** Next sync time */
-  nextSyncAt?: Date;
+  nextSyncAt?: Date
 }
 
 // ============================================================================
@@ -234,15 +234,15 @@ export type SyncEventType =
   | 'sync:conflict'
   | 'change:created'
   | 'change:synced'
-  | 'change:failed';
+  | 'change:failed'
 
 /**
  * Sync Event
  */
 export interface SyncEvent<T = unknown> {
-  type: SyncEventType;
-  timestamp: Date;
- data?: T;
+  type: SyncEventType
+  timestamp: Date
+  data?: T
 }
 
 // ============================================================================
@@ -253,63 +253,62 @@ export interface SyncEvent<T = unknown> {
  * Generate Change ID
  */
 export function generateChangeId(): string {
-  return `change_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  return `change_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 }
 
 /**
  * Generate Device ID
  */
 export function generateDeviceId(): string {
- const stored = typeof localStorage !== 'undefined' 
- ? localStorage.getItem('agentflow_device_id') 
- : null;
- 
- if (stored) return stored;
- 
- const deviceId = `device_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
- 
- if (typeof localStorage !== 'undefined') {
- localStorage.setItem('agentflow_device_id', deviceId);
- }
- 
- return deviceId;
+  const stored =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('agentflow_device_id') : null
+
+  if (stored) return stored
+
+  const deviceId = `device_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('agentflow_device_id', deviceId)
+  }
+
+  return deviceId
 }
 
 /**
  * Calculate Data Checksum
  */
 export async function calculateChecksum(data: unknown): Promise<string> {
- const text = JSON.stringify(data);
- const encoder = new TextEncoder();
- const dataBuffer = encoder.encode(text);
- 
- const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
- const hashArray = Array.from(new Uint8Array(hashBuffer));
- 
- return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const text = JSON.stringify(data)
+  const encoder = new TextEncoder()
+  const dataBuffer = encoder.encode(text)
+
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /**
  * Compare Timestamps, Return the Newer One
  */
 export function compareTimestamps(a: Date, b: Date): 'a' | 'b' | 'equal' {
- const timeA = new Date(a).getTime();
- const timeB = new Date(b).getTime();
- 
- if (timeA > timeB) return 'a';
- if (timeB > timeA) return 'b';
- return 'equal';
+  const timeA = new Date(a).getTime()
+  const timeB = new Date(b).getTime()
+
+  if (timeA > timeB) return 'a'
+  if (timeB > timeA) return 'b'
+  return 'equal'
 }
 
 /**
  * Check if Change Should be Excluded
  */
 export function shouldExclude(entityType: string, excludePatterns: string[]): boolean {
- return excludePatterns.some(pattern => {
- if (pattern.includes('*')) {
- const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
- return regex.test(entityType);
- }
- return entityType === pattern;
- });
+  return excludePatterns.some((pattern) => {
+    if (pattern.includes('*')) {
+      const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$')
+      return regex.test(entityType)
+    }
+    return entityType === pattern
+  })
 }

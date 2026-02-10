@@ -9,18 +9,8 @@
   "agentflow": {
     "type": "plugin",
     "minSdkVersion": "0.1.0",
-    "permissions": [
-      "http:request",
-      "storage:read",
-      "storage:write"
-    ],
-    "nodes": [
-      "plugin-node-1",
-      "plugin-node-2"
-    ]
+    "permissions": ["http:request", "storage:read", "storage:write"],
+    "nodes": ["plugin-node-1", "plugin-node-2"]
   },
-  "keywords": [
-    "agentflow",
-    "plugin"
-  ]
+  "keywords": ["agentflow", "plugin"]
 }

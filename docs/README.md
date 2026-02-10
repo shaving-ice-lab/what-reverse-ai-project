@@ -85,8 +85,8 @@ docs/
 
 ## 文档规范（简版）
 
-- **唯一计划入口**：所有平台落地任务仅在 `development/DEV-PLAN-WORKSPACE-APP-PLATFORM.md` 追加与追踪  
-- **命名**：优先使用大写 + 连字符（如 `SYSTEM-ARCHITECTURE.md`）  
+- **唯一计划入口**：所有平台落地任务仅在 `development/DEV-PLAN-WORKSPACE-APP-PLATFORM.md` 追加与追踪
+- **命名**：优先使用大写 + 连字符（如 `SYSTEM-ARCHITECTURE.md`）
 - **结构**：标题与元信息 / 目录（长文档必须） / 正文 / 变更记录
 
 ---

@@ -22,96 +22,115 @@
 > **Phase 3.1 进度**: 本地部署 - 7/7 完成 (100%) ✅
 >
 > **最新更新 (v3.26)**:
+>
 > - ✅ LM Studio 集成 (lm-studio-provider.ts - OpenAI 兼容 API)
 > - ✅ 多 Provider 支持 (useLocalLLM.ts - 切换/状态检测)
 > - ✅ UI Provider 选择 (LocalLLMSettings.tsx - 卡片式选择)
 >
 > **更新 (v3.25)**:
+>
 > - ✅ 性能测试框架 (utils.ts - 基准测试/内存测量/报告生成)
 > - ✅ 前端组件性能测试 (component.perf.test.ts - 渲染/序列化/内存)
 > - ✅ 执行引擎性能测试 (engine.perf.test.ts - DAG/拓扑排序/并发)
 > - ✅ 性能测试配置 (vitest.perf.config.ts - 独立配置)
 >
 > **更新 (v3.24)**:
+>
 > - ✅ E2E 测试用例 (Playwright - 认证/工作流/执行流程测试)
 > - ✅ 测试工具函数 (test-helpers.ts - 认证/工作流/等待/断言辅助)
 > - ✅ 测试脚本配置 (e2e/e2e:ui/e2e:headed/e2e:debug)
 >
 > **更新 (v3.23)**:
+>
 > - ✅ 本地/云端数据同步 (types.ts/sync-engine.ts - 冲突检测/增量同步)
 > - ✅ 端到端加密 (encryption.ts - AES-GCM/PBKDF2 密钥派生)
 > - ✅ 同步状态 Hook (useSyncStatus.ts - 自动同步/手动同步)
 > - ✅ 同步状态 UI (SyncIndicator/SyncBadge - 状态显示/操作)
 >
 > **更新 (v3.22)**:
+>
 > - ✅ 离线模式支持 (types.ts/offline-queue.ts - 离线队列管理)
 > - ✅ 离线状态 Hook (useOfflineStatus.ts - 网络检测/自动同步)
 > - ✅ 离线提示 UI (OfflineIndicator/OfflineBanner/OnlineStatusBadge)
 >
 > **更新 (v3.21)**:
+>
 > - ✅ Ollama 本地模型集成 (types.ts/ollama-provider.ts/useLocalLLM.ts)
 > - ✅ 模型管理 UI (LocalLLMSettings.tsx - 状态检测/模型列表/下载/删除/测试)
 > - ✅ 设置页面集成本地 LLM 设置
 >
 > **更新 (v3.20)**:
+>
 > - ✅ Tauri 桌面应用框架 (Rust + Tauri 2.0 完整架构)
 > - ✅ SQLite 本地数据库 (迁移系统/工作流CRUD/执行记录)
 >
 > **更新 (v3.19)**:
+>
 > - ✅ 实现插件签名验证 (signature.ts - 签名生成/验证/证书链/校验和)
 >
 > **更新 (v3.18)**:
+>
 > - ✅ 实现插件市场基础 (marketplace.ts - 搜索/下载/发布/缓存)
 > - ✅ 实现插件版本管理 (version.ts - 语义化版本/兼容性检查)
 > - ✅ 编写开发者文档 (PLUGIN_DEV_GUIDE.md - 完整开发指南)
 >
 > **更新 (v3.17)**:
+>
 > - ✅ 实现插件权限控制 (permissions.ts - 权限管理/策略/审计)
 > - ✅ 实现插件安装/卸载 (installer.ts - 安装器/更新检查)
 > - ✅ 编写示例插件 (examples/ - Hello World/HTTP Tools)
 >
 > **更新 (v3.16)**:
+>
 > - ✅ 设计插件 Manifest 规范 (types.ts - 完整类型定义)
 > - ✅ 实现插件加载机制 (loader.ts - 加载器/注册表)
 > - ✅ 实现插件沙箱环境 (sandbox.ts - 权限/资源限制)
 >
 > **更新 (v3.15)**:
+>
 > - ✅ 实现 CLI 工具 (init/build/test/validate 命令)
 > - ✅ 发布 npm 包配置 (package.json/CHANGELOG/.npmignore)
 >
 > **更新 (v3.14)**:
+>
 > - ✅ 实现节点验证机制 (validation.ts - 完整验证系统)
 > - ✅ 实现节点测试框架 (testing.ts - Mock/断言/套件)
 > - ✅ 编写 SDK 使用文档 (README.md - 完整 API 文档)
 > - ✅ 提供示例节点 (examples/ - 3个完整示例)
 >
 > **更新 (v3.13)**:
+>
 > - ✅ 设计 SDK API 接口 (types.ts - 完整类型系统)
 > - ✅ 实现节点定义规范 (defineNode.ts - 核心 API)
 > - ✅ 实现输入/输出类型系统 (builders.ts - 链式构建器)
 >
 > **更新 (v3.12)**:
+>
 > - ✅ 设置前端测试框架 (Vitest + React Testing Library)
 > - ✅ 编写核心组件单元测试 (Button/Loading/EmptyState)
 > - ✅ 编写 Lib 模块测试 (cache/concurrency)
 > - ✅ 编写后端执行引擎测试 (DAG/Executor/Context)
 >
 > **更新 (v3.11)**:
+>
 > - ✅ 实现画布状态持久化 (useCanvasPersistence/自动保存/历史记录)
 > - ✅ 实现数据库查询优化 (QueryCache/BatchQuery/QueryBuilder)
 > - ✅ 实现数据库索引管理 (IndexDefinition/CreateAllIndexes/TableStats)
 >
 > **更新 (v3.10)**:
+>
 > - ✅ 实现编辑器错误边界 (EditorErrorBoundary/自动保存/数据恢复)
 > - ✅ 实现执行引擎异常处理 (ExecutionError/RetryConfig/SafeExecute/Checkpoint)
 > - ✅ 实现并发安全工具 (Mutex/RWMutex/Semaphore/CancellationToken)
 >
 > **更新 (v3.9)**:
+>
 > - ✅ 实现快捷键帮助对话框 (KeyboardShortcutsDialog)
 > - ✅ 实现新用户引导教程组件 (OnboardingProvider/OnboardingOverlay)
 > - ✅ 实现前端缓存策略 (queryKeys/localCache/dedupeRequest)
 >
 > **更新 (v3.8)**:
+>
 > - ✅ 实现加载状态组件 (Spinner/PageLoader/Skeleton/FullscreenLoader)
 > - ✅ 实现 Toast 通知系统 (success/error/warning/info)
 > - ✅ 实现错误边界组件 (ErrorBoundary/ErrorFallback/ApiError)
@@ -119,12 +138,14 @@
 > - ✅ 实现前端代码分割 (LazyWorkflowEditor)
 >
 > **更新 (v3.7)**:
+>
 > - ✅ 实现延迟节点 (DelayNode + DelayExecutor)
 > - ✅ 实现 Webhook 触发节点 (WebhookNode + WebhookExecutor)
 > - ✅ 注册所有新执行器到引擎
 > - ✅ Phase 1.3 基础节点集完成!
 >
 > **更新 (v3.6)**:
+>
 > - ✅ 实现文本分割/合并节点 (TextSplitNode + TextSplitExecutor)
 > - ✅ 实现数据合并节点 (MergeNode + MergeExecutor)
 > - ✅ 实现数据筛选节点 (FilterNode + FilterExecutor)
@@ -132,6 +153,7 @@
 > - ✅ 注册所有新执行器到引擎
 >
 > **更新 (v3.5)**:
+>
 > - ✅ 实现表达式计算节点 (ExpressionNode + ExpressionExecutor)
 > - ✅ 实现错误处理节点 Try/Catch (TryCatchNode + TryCatchExecutor)
 > - ✅ 实现数据转换节点 (TransformNode + TransformExecutor)
@@ -139,6 +161,7 @@
 > - ✅ 注册所有新执行器到引擎
 >
 > **更新 (v3.4)**:
+>
 > - ✅ 实现执行取消功能 (后端 Handler + 前端 API)
 > - ✅ 实现 JavaScript 代码节点 (前端组件 + 后端执行器)
 > - ✅ 实现用户输入节点 (InputNode 组件 + InputExecutor)
@@ -146,6 +169,7 @@
 > - ✅ 更新节点类型注册映射
 >
 > **更新 (v3.3)**:
+>
 > - ✅ 实现前端 WebSocket Hook (连接管理/自动重连/消息处理)
 > - ✅ 实现执行状态 Store (useExecutionStore)
 > - ✅ 实现执行控制台面板 (ExecutionPanel)
@@ -153,6 +177,7 @@
 > - ✅ 更新组件和 Hook 导出
 >
 > **更新 (v3.2)**:
+>
 > - ✅ 实现 WebSocket 服务 (Hub/Client/Handler) - 支持实时推送执行状态
 > - ✅ 实现后端工作流执行引擎 (DAG/Scheduler/Executors)
 > - ✅ 集成 Asynq 任务队列 (异步执行/定时任务/Webhook触发)
@@ -160,6 +185,7 @@
 > - ✅ 创建节点执行器 (Start/End/LLM/HTTP/Condition/Loop/Template/Variable)
 >
 > **更新 (v3.1)**:
+>
 > - ✅ 创建 API 密钥类型定义 (Provider/Status/Config)
 > - ✅ 创建 API 密钥服务层 (apiKeysApi)
 > - ✅ 创建添加密钥对话框 (提供商选择/密钥测试)
@@ -168,6 +194,7 @@
 > - ✅ 创建个人资料页面 (头像/基本信息/危险区域)
 >
 > **更新 (v3.0)**:
+>
 > - ✅ 创建工作流 API 类型定义 (WorkflowMeta/Workflow/Execution)
 > - ✅ 创建工作流 API 服务层 (workflowApi/folderApi/executionApi)
 > - ✅ 创建工作流卡片组件 (统计/标签/状态)
@@ -176,6 +203,7 @@
 > - ✅ 创建 Dashboard 布局 (响应式导航)
 >
 > **更新 (v2.9)**:
+>
 > - ✅ 创建认证类型定义 (User/AuthTokens/登录注册接口)
 > - ✅ 创建认证 API 服务层 (authApi/userApi)
 > - ✅ 创建认证状态管理 (useAuthStore)
@@ -184,6 +212,7 @@
 > - ✅ 创建路由保护组件 (AuthGuard)
 >
 > **更新 (v2.8)**:
+>
 > - ✅ 设计前端执行引擎架构 (WorkflowExecutor)
 > - ✅ 实现 DAG 依赖分析 (拓扑排序/循环检测)
 > - ✅ 实现工作流执行器 (并发控制/状态管理)
@@ -191,6 +220,7 @@
 > - ✅ 创建 useExecution Hook (React 集成)
 >
 > **更新 (v2.7)**:
+>
 > - ✅ 实现 LLM 调用节点执行器 (支持 OpenAI/Anthropic/本地模型)
 > - ✅ 实现 HTTP 请求节点执行器 (支持认证/重试/超时)
 > - ✅ 实现条件判断节点执行器 (多条件组/AND/OR)
@@ -200,18 +230,21 @@
 > - ✅ 创建节点执行器架构 (types/utils/executors)
 >
 > **更新 (v2.6)**:
+>
 > - ✅ 实现连线动画效果 (数据流动/执行中/脉冲动画)
 > - ✅ 实现响应式适配 (移动端 Sheet 布局)
 > - ✅ 实现配置实时预览 (Prompt 预览/HTTP cURL 预览)
 > - ✅ 完成可视化编辑器全部功能!
 >
 > **更新 (v2.5)**:
+>
 > - ✅ 实现连线类型检查 (防止自连接/循环连接/类型不兼容)
 > - ✅ 实现表单校验 (基于 zod schema)
 > - ✅ 实现深色/浅色主题切换 (基于 next-themes)
 > - ✅ 实现连线标签 (条件边/标签边)
 >
 > **更新 (v2.4)**:
+>
 > - ✅ 实现节点复制粘贴功能 (Ctrl+C/V/D)
 > - ✅ 实现自动布局算法 (基于 dagre)
 > - ✅ 实现变量选择器组件
@@ -219,6 +252,7 @@
 > - ✅ 实现循环节点配置面板
 >
 > **更新 (v2.3)**:
+>
 > - ✅ 完成编辑器整体布局实现 (WorkflowEditor)
 > - ✅ 完成 React Flow 画布集成 (EditorCanvas)
 > - ✅ 完成节点面板实现 (NodePanel) - 支持分类、搜索、拖拽
@@ -233,6 +267,7 @@
 ## 目录
 
 ### 第一部分：项目基础
+
 1. [项目概述](#1-项目概述)
 2. [技术栈详情](#2-技术栈详情)
 3. [项目结构](#3-项目结构)
@@ -241,30 +276,35 @@
 6. [TodoList 任务清单](#6-todolist-任务清单)
 
 ### 第二部分：核心功能实现
+
 7. [数据库设计](#7-数据库设计)
 8. [API 接口设计](#8-api-接口设计)
 9. [前端组件设计](#9-前端组件设计)
 10. [后端服务设计](#10-后端服务设计)
 
 ### 第三部分：代码级自定义系统
+
 11. [自定义节点 SDK](#11-自定义节点-sdk)
 12. [Prompt 模板引擎](#12-prompt-模板引擎)
 13. [沙箱执行环境](#13-沙箱执行环境)
 14. [插件系统架构](#14-插件系统架构)
 
 ### 第四部分：Agent 协作网络
+
 15. [Agent 商店系统](#15-agent-商店系统)
 16. [Agent 组合器](#16-agent-组合器)
 17. [Agent 进化系统](#17-agent-进化系统)
 18. [创作者经济系统](#18-创作者经济系统)
 
 ### 第五部分：本地优先架构
+
 19. [本地/云端双模式架构](#19-本地云端双模式架构)
 20. [本地 LLM 集成](#20-本地-llm-集成)
 21. [数据同步机制](#21-数据同步机制)
 22. [离线支持方案](#22-离线支持方案)
 
 ### 第六部分：运维与部署
+
 23. [测试策略](#23-测试策略)
 24. [部署方案](#24-部署方案)
 25. [监控与运维](#25-监控与运维)
@@ -284,12 +324,12 @@ AgentFlow 是一个本地优先、代码级自定义、社区驱动的 AI Agent 
 
 ### 1.2 核心价值
 
-| 价值点 | 描述 |
-|--------|------|
-| 本地优先 | 支持完全本地运行，数据不出本机 |
-| 代码级自定义 | 用户可编写自定义节点和插件 |
-| 社区生态 | Agent商店 + 分享机制 + 创作者经济 |
-| 极致体验 | 5分钟上手，美观现代的界面 |
+| 价值点       | 描述                              |
+| ------------ | --------------------------------- |
+| 本地优先     | 支持完全本地运行，数据不出本机    |
+| 代码级自定义 | 用户可编写自定义节点和插件        |
+| 社区生态     | Agent商店 + 分享机制 + 创作者经济 |
+| 极致体验     | 5分钟上手，美观现代的界面         |
 
 ---
 
@@ -318,7 +358,7 @@ UI框架:
 
 代码编辑:
   - Monaco Editor (代码节点)
-  
+
 工程化:
   - ESLint + Prettier
   - Vitest (单元测试)
@@ -632,7 +672,7 @@ NEXT_PUBLIC_ENABLE_LOCAL_MODE=true
 ```yaml
 server:
   port: 8080
-  mode: development  # development | production
+  mode: development # development | production
 
 database:
   host: localhost
@@ -645,13 +685,13 @@ database:
 redis:
   host: localhost
   port: 6379
-  password: ""
+  password: ''
   db: 0
 
 jwt:
   secret: your-jwt-secret-key
   access_token_expire: 15m
-  refresh_token_expire: 168h  # 7 days
+  refresh_token_expire: 168h # 7 days
 
 ai:
   openai_api_key: ${OPENAI_API_KEY}
@@ -667,47 +707,47 @@ ai:
 
 **目标**: 可用的工作流编辑器和执行引擎
 
-| 周次 | 里程碑 | 交付物 |
-|------|--------|--------|
-| W1-2 | 项目启动 | 技术选型、开发环境、CI/CD |
-| W3-4 | 编辑器基础 | 画布、节点拖拽、连线 |
-| W5-6 | 基础节点 | LLM、HTTP、条件、循环节点 |
-| W7-8 | 执行引擎 | 任务调度、状态管理 |
-| W9-10 | 用户系统 | 注册登录、工作流管理 |
-| W11-12 | 打磨优化 | Bug修复、性能优化、内测发布 |
+| 周次   | 里程碑     | 交付物                      |
+| ------ | ---------- | --------------------------- |
+| W1-2   | 项目启动   | 技术选型、开发环境、CI/CD   |
+| W3-4   | 编辑器基础 | 画布、节点拖拽、连线        |
+| W5-6   | 基础节点   | LLM、HTTP、条件、循环节点   |
+| W7-8   | 执行引擎   | 任务调度、状态管理          |
+| W9-10  | 用户系统   | 注册登录、工作流管理        |
+| W11-12 | 打磨优化   | Bug修复、性能优化、内测发布 |
 
 ### 5.2 Phase 2: 自定义能力 (Q2 2026)
 
 **目标**: 开放自定义能力，吸引开发者
 
-| 周次 | 里程碑 | 交付物 |
-|------|--------|--------|
-| W1-3 | 节点SDK | SDK设计、开发者文档 |
-| W4-6 | 插件系统 | 加载器、沙箱、基础市场 |
-| W7-8 | 本地模式 | 桌面应用、本地LLM集成 |
-| W9-10 | 调试工具 | 断点、日志、性能分析 |
-| W11-12 | 公测发布 | 公测、反馈收集、迭代 |
+| 周次   | 里程碑   | 交付物                 |
+| ------ | -------- | ---------------------- |
+| W1-3   | 节点SDK  | SDK设计、开发者文档    |
+| W4-6   | 插件系统 | 加载器、沙箱、基础市场 |
+| W7-8   | 本地模式 | 桌面应用、本地LLM集成  |
+| W9-10  | 调试工具 | 断点、日志、性能分析   |
+| W11-12 | 公测发布 | 公测、反馈收集、迭代   |
 
 ### 5.3 Phase 3: 社区生态 (Q3 2026)
 
 **目标**: 建立社区飞轮，实现有机增长
 
-| 周次 | 里程碑 | 交付物 |
-|------|--------|--------|
-| W1-3 | Agent商店 | 发布流程、审核系统 |
-| W4-6 | 分享机制 | 链接分享、嵌入预览、Fork |
-| W7-9 | 创作者经济 | 支付系统、分成结算 |
-| W10-12 | 正式发布 | 全量上线、运营活动 |
+| 周次   | 里程碑     | 交付物                   |
+| ------ | ---------- | ------------------------ |
+| W1-3   | Agent商店  | 发布流程、审核系统       |
+| W4-6   | 分享机制   | 链接分享、嵌入预览、Fork |
+| W7-9   | 创作者经济 | 支付系统、分成结算       |
+| W10-12 | 正式发布   | 全量上线、运营活动       |
 
 ### 5.4 Phase 4: 规模化 (Q4 2026)
 
 **目标**: 商业化变现，企业市场拓展
 
-| 周次 | 里程碑 | 交付物 |
-|------|--------|--------|
-| W1-4 | 企业版 | 私有部署、SSO、审计 |
-| W5-8 | 团队协作 | 多人协作、权限管理 |
-| W9-12 | 高级功能 | 分析、监控、优化 |
+| 周次  | 里程碑   | 交付物              |
+| ----- | -------- | ------------------- |
+| W1-4  | 企业版   | 私有部署、SSO、审计 |
+| W5-8  | 团队协作 | 多人协作、权限管理  |
+| W9-12 | 高级功能 | 分析、监控、优化    |
 
 ---
 
@@ -727,18 +767,18 @@ ai:
 
 ##### 前端初始化
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| FE-001 | 创建 Next.js 16 项目 (App Router) | 🔴 P0 | ✅ | - | 2h |
-| FE-002 | 配置 TypeScript 和路径别名 | 🔴 P0 | ✅ | FE-001 | 1h |
-| FE-003 | 安装配置 Tailwind CSS 4.x | 🔴 P0 | ✅ | FE-001 | 1h |
-| FE-004 | 安装配置 shadcn/ui 组件库 | 🟠 P1 | ✅ | FE-003 | 2h |
-| FE-005 | 配置 ESLint + Prettier | 🟠 P1 | ✅ | FE-002 | 1h |
-| FE-006 | 安装配置 Zustand 状态管理 | 🟠 P1 | ✅ | FE-001 | 2h |
-| FE-007 | 安装配置 TanStack Query | 🟠 P1 | ✅ | FE-001 | 2h |
-| FE-008 | 创建基础目录结构 | 🔴 P0 | ✅ | FE-001 | 1h |
-| FE-009 | 配置环境变量 | 🟠 P1 | ✅ | FE-001 | 1h |
-| FE-010 | 编写 API 客户端封装 | 🟠 P1 | ✅ | FE-007 | 4h |
+| ID     | 任务                              | 优先级 | 状态 | 依赖   | 估时 |
+| ------ | --------------------------------- | ------ | ---- | ------ | ---- |
+| FE-001 | 创建 Next.js 16 项目 (App Router) | 🔴 P0  | ✅   | -      | 2h   |
+| FE-002 | 配置 TypeScript 和路径别名        | 🔴 P0  | ✅   | FE-001 | 1h   |
+| FE-003 | 安装配置 Tailwind CSS 4.x         | 🔴 P0  | ✅   | FE-001 | 1h   |
+| FE-004 | 安装配置 shadcn/ui 组件库         | 🟠 P1  | ✅   | FE-003 | 2h   |
+| FE-005 | 配置 ESLint + Prettier            | 🟠 P1  | ✅   | FE-002 | 1h   |
+| FE-006 | 安装配置 Zustand 状态管理         | 🟠 P1  | ✅   | FE-001 | 2h   |
+| FE-007 | 安装配置 TanStack Query           | 🟠 P1  | ✅   | FE-001 | 2h   |
+| FE-008 | 创建基础目录结构                  | 🔴 P0  | ✅   | FE-001 | 1h   |
+| FE-009 | 配置环境变量                      | 🟠 P1  | ✅   | FE-001 | 1h   |
+| FE-010 | 编写 API 客户端封装               | 🟠 P1  | ✅   | FE-007 | 4h   |
 
 **详细任务说明：**
 
@@ -759,6 +799,7 @@ ai:
     - ✓ `@components/*` 指向组件目录
     - ✓ 严格类型检查 `strict: true`
   - **配置文件**: `tsconfig.json`
+
   ```json
   {
     "compilerOptions": {
@@ -858,15 +899,16 @@ ai:
     - ✓ `.env.example` 示例文件
     - ✓ 类型安全的环境变量访问
   - **环境变量**:
+
     ```env
     # API
     NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
     NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
-    
+
     # Auth
     NEXT_PUBLIC_GITHUB_CLIENT_ID=
     NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-    
+
     # Feature Flags
     NEXT_PUBLIC_ENABLE_LOCAL_MODE=true
     ```
@@ -888,18 +930,18 @@ ai:
 
 ##### 后端初始化
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| BE-001 | 创建 Go 项目结构 | 🔴 P0 | ✅ | - | 2h |
-| BE-002 | 配置 Echo 框架 | 🔴 P0 | ✅ | BE-001 | 2h |
-| BE-003 | 配置 GORM 和数据库连接 | 🔴 P0 | ✅ | BE-001 | 3h |
-| BE-004 | 配置 Redis 客户端 | 🟠 P1 | ✅ | BE-001 | 2h |
-| BE-005 | 配置 JWT 认证 | 🔴 P0 | ✅ | BE-002 | 3h |
-| BE-006 | 配置日志系统 (Zap) | 🟠 P1 | ✅ | BE-001 | 2h |
-| BE-007 | 配置 Swagger 文档 | 🟡 P2 | ✅ | BE-002 | 2h |
-| BE-008 | 创建基础目录结构 | 🔴 P0 | ✅ | BE-001 | 1h |
-| BE-009 | 编写配置管理 (Viper) | 🟠 P1 | ✅ | BE-001 | 2h |
-| BE-010 | 创建数据库迁移工具 | 🟠 P1 | ✅ | BE-003 | 3h |
+| ID     | 任务                   | 优先级 | 状态 | 依赖   | 估时 |
+| ------ | ---------------------- | ------ | ---- | ------ | ---- |
+| BE-001 | 创建 Go 项目结构       | 🔴 P0  | ✅   | -      | 2h   |
+| BE-002 | 配置 Echo 框架         | 🔴 P0  | ✅   | BE-001 | 2h   |
+| BE-003 | 配置 GORM 和数据库连接 | 🔴 P0  | ✅   | BE-001 | 3h   |
+| BE-004 | 配置 Redis 客户端      | 🟠 P1  | ✅   | BE-001 | 2h   |
+| BE-005 | 配置 JWT 认证          | 🔴 P0  | ✅   | BE-002 | 3h   |
+| BE-006 | 配置日志系统 (Zap)     | 🟠 P1  | ✅   | BE-001 | 2h   |
+| BE-007 | 配置 Swagger 文档      | 🟡 P2  | ✅   | BE-002 | 2h   |
+| BE-008 | 创建基础目录结构       | 🔴 P0  | ✅   | BE-001 | 1h   |
+| BE-009 | 编写配置管理 (Viper)   | 🟠 P1  | ✅   | BE-001 | 2h   |
+| BE-010 | 创建数据库迁移工具     | 🟠 P1  | ✅   | BE-003 | 3h   |
 
 **详细任务说明：**
 
@@ -1006,27 +1048,28 @@ ai:
     - ✓ 环境变量覆盖
     - ✓ 配置热加载 (开发环境)
   - **配置文件**: `config/config.yaml`
+
     ```yaml
     server:
-      host: "0.0.0.0"
+      host: '0.0.0.0'
       port: 8080
-      mode: "development"  # development/production
-    
+      mode: 'development' # development/production
+
     database:
-      host: "localhost"
+      host: 'localhost'
       port: 5432
-      name: "agentflow"
-      user: "postgres"
-      password: ""
-      sslmode: "disable"
-    
+      name: 'agentflow'
+      user: 'postgres'
+      password: ''
+      sslmode: 'disable'
+
     redis:
-      host: "localhost"
+      host: 'localhost'
       port: 6379
       db: 0
-    
+
     jwt:
-      secret: "your-secret-key"
+      secret: 'your-secret-key'
       access_expire: 15m
       refresh_expire: 168h
     ```
@@ -1047,12 +1090,12 @@ ai:
 
 ##### 基础设施
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| INFRA-001 | 配置 Docker Compose | 🔴 P0 | ✅ | - | 2h |
-| INFRA-002 | 配置 GitHub Actions CI/CD | 🟠 P1 | ✅ | - | 4h |
-| INFRA-003 | 编写项目 README | 🟡 P2 | ✅ | - | 2h |
-| INFRA-004 | 配置代码提交规范 | 🟡 P2 | ✅ | - | 1h |
+| ID        | 任务                      | 优先级 | 状态 | 依赖 | 估时 |
+| --------- | ------------------------- | ------ | ---- | ---- | ---- |
+| INFRA-001 | 配置 Docker Compose       | 🔴 P0  | ✅   | -    | 2h   |
+| INFRA-002 | 配置 GitHub Actions CI/CD | 🟠 P1  | ✅   | -    | 4h   |
+| INFRA-003 | 编写项目 README           | 🟡 P2  | ✅   | -    | 2h   |
+| INFRA-004 | 配置代码提交规范          | 🟡 P2  | ✅   | -    | 1h   |
 
 **详细任务说明：**
 
@@ -1063,6 +1106,7 @@ ai:
     - ✓ 数据持久化配置
     - ✓ 网络配置
   - **docker-compose.yml**:
+
     ```yaml
     version: '3.8'
     services:
@@ -1073,27 +1117,27 @@ ai:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
-          - "5432:5432"
+          - '5432:5432'
         volumes:
           - postgres_data:/var/lib/postgresql/data
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          test: ['CMD-SHELL', 'pg_isready -U postgres']
           interval: 10s
           timeout: 5s
           retries: 5
-    
+
       redis:
         image: redis:7-alpine
         ports:
-          - "6379:6379"
+          - '6379:6379'
         volumes:
           - redis_data:/data
         healthcheck:
-          test: ["CMD", "redis-cli", "ping"]
+          test: ['CMD', 'redis-cli', 'ping']
           interval: 10s
           timeout: 5s
           retries: 5
-    
+
     volumes:
       postgres_data:
       redis_data:
@@ -1130,15 +1174,15 @@ ai:
 
 ##### 画布基础
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| CANVAS-001 | 集成 React Flow 库 | 🔴 P0 | ✅ | FE-001 | 4h |
-| CANVAS-002 | 实现无限画布 | 🔴 P0 | ✅ | CANVAS-001 | 4h |
-| CANVAS-003 | 实现画布背景网格 | 🟡 P2 | ✅ | CANVAS-001 | 2h |
-| CANVAS-004 | 实现小地图组件 | 🟡 P2 | ✅ | CANVAS-001 | 3h |
-| CANVAS-005 | 实现快捷键系统 | 🟠 P1 | ✅ | CANVAS-001 | 4h |
-| CANVAS-006 | 实现撤销/重做功能 | 🟠 P1 | ✅ | CANVAS-001 | 6h |
-| CANVAS-007 | 实现画布状态持久化 | 🟠 P1 | ✅ | CANVAS-001 | 4h |
+| ID         | 任务               | 优先级 | 状态 | 依赖       | 估时 |
+| ---------- | ------------------ | ------ | ---- | ---------- | ---- |
+| CANVAS-001 | 集成 React Flow 库 | 🔴 P0  | ✅   | FE-001     | 4h   |
+| CANVAS-002 | 实现无限画布       | 🔴 P0  | ✅   | CANVAS-001 | 4h   |
+| CANVAS-003 | 实现画布背景网格   | 🟡 P2  | ✅   | CANVAS-001 | 2h   |
+| CANVAS-004 | 实现小地图组件     | 🟡 P2  | ✅   | CANVAS-001 | 3h   |
+| CANVAS-005 | 实现快捷键系统     | 🟠 P1  | ✅   | CANVAS-001 | 4h   |
+| CANVAS-006 | 实现撤销/重做功能  | 🟠 P1  | ✅   | CANVAS-001 | 6h   |
+| CANVAS-007 | 实现画布状态持久化 | 🟠 P1  | ✅   | CANVAS-001 | 4h   |
 
 **详细任务说明：**
 
@@ -1205,15 +1249,15 @@ ai:
 
 ##### 节点系统
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| NODE-001 | 设计节点数据结构 | 🔴 P0 | ✅ | - | 4h |
-| NODE-002 | 实现节点面板 | 🔴 P0 | ✅ | CANVAS-001 | 6h |
-| NODE-003 | 实现节点拖拽到画布 | 🔴 P0 | ✅ | NODE-002 | 4h |
-| NODE-004 | 实现节点选中/多选 | 🟠 P1 | ✅ | CANVAS-001 | 3h |
-| NODE-005 | 实现节点删除 | 🟠 P1 | ✅ | NODE-004 | 2h |
-| NODE-006 | 实现节点复制粘贴 | 🟠 P1 | ✅ | NODE-004 | 4h |
-| NODE-007 | 实现节点分组功能 | 🟡 P2 | ⬜ | NODE-004 | 6h |
+| ID       | 任务               | 优先级 | 状态 | 依赖       | 估时 |
+| -------- | ------------------ | ------ | ---- | ---------- | ---- |
+| NODE-001 | 设计节点数据结构   | 🔴 P0  | ✅   | -          | 4h   |
+| NODE-002 | 实现节点面板       | 🔴 P0  | ✅   | CANVAS-001 | 6h   |
+| NODE-003 | 实现节点拖拽到画布 | 🔴 P0  | ✅   | NODE-002   | 4h   |
+| NODE-004 | 实现节点选中/多选  | 🟠 P1  | ✅   | CANVAS-001 | 3h   |
+| NODE-005 | 实现节点删除       | 🟠 P1  | ✅   | NODE-004   | 2h   |
+| NODE-006 | 实现节点复制粘贴   | 🟠 P1  | ✅   | NODE-004   | 4h   |
+| NODE-007 | 实现节点分组功能   | 🟡 P2  | ⬜   | NODE-004   | 6h   |
 
 **详细任务说明：**
 
@@ -1223,41 +1267,50 @@ ai:
     - ✓ 支持所有节点类型
     - ✓ 可扩展性设计
   - **数据结构**:
+
     ```typescript
     interface WorkflowNode {
-      id: string;
-      type: NodeType;
-      position: { x: number; y: number };
+      id: string
+      type: NodeType
+      position: { x: number; y: number }
       data: {
-        label: string;
-        icon?: string;
-        description?: string;
-        config: NodeConfig;      // 节点特定配置
-        inputs: PortDefinition[];
-        outputs: PortDefinition[];
-      };
-      selected?: boolean;
-      dragging?: boolean;
-      parentId?: string;        // 分组父节点
+        label: string
+        icon?: string
+        description?: string
+        config: NodeConfig // 节点特定配置
+        inputs: PortDefinition[]
+        outputs: PortDefinition[]
+      }
+      selected?: boolean
+      dragging?: boolean
+      parentId?: string // 分组父节点
     }
-    
+
     interface PortDefinition {
-      id: string;
-      name: string;
-      type: DataType;
-      required?: boolean;
-      multiple?: boolean;       // 允许多条连线
-      defaultValue?: unknown;
+      id: string
+      name: string
+      type: DataType
+      required?: boolean
+      multiple?: boolean // 允许多条连线
+      defaultValue?: unknown
     }
-    
-    type NodeType = 
-      | 'llm' | 'http' | 'webhook'
-      | 'condition' | 'loop' | 'parallel'
-      | 'code' | 'template' | 'variable'
-      | 'start' | 'end' | 'input' | 'output';
-    
-    type DataType = 
-      | 'string' | 'number' | 'boolean' | 'object' | 'array' | 'any';
+
+    type NodeType =
+      | 'llm'
+      | 'http'
+      | 'webhook'
+      | 'condition'
+      | 'loop'
+      | 'parallel'
+      | 'code'
+      | 'template'
+      | 'variable'
+      | 'start'
+      | 'end'
+      | 'input'
+      | 'output'
+
+    type DataType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'any'
     ```
 
 - [x] **NODE-002: 实现节点面板** 🔴 P0 ✅
@@ -1293,14 +1346,14 @@ ai:
 
 ##### 连线系统
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| EDGE-001 | 实现节点端口 | 🔴 P0 | ✅ | NODE-001 | 4h |
-| EDGE-002 | 实现连线拖拽创建 | 🔴 P0 | ✅ | EDGE-001 | 4h |
-| EDGE-003 | 实现连线类型检查 | 🟠 P1 | ✅ | EDGE-002 | 4h |
-| EDGE-004 | 实现连线动画效果 | 🟢 P3 | ✅ | EDGE-002 | 3h |
-| EDGE-005 | 实现连线标签 | 🟡 P2 | ✅ | EDGE-002 | 2h |
-| EDGE-006 | 实现连线删除 | 🟠 P1 | ✅ | EDGE-002 | 2h |
+| ID       | 任务             | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ---------------- | ------ | ---- | -------- | ---- |
+| EDGE-001 | 实现节点端口     | 🔴 P0  | ✅   | NODE-001 | 4h   |
+| EDGE-002 | 实现连线拖拽创建 | 🔴 P0  | ✅   | EDGE-001 | 4h   |
+| EDGE-003 | 实现连线类型检查 | 🟠 P1  | ✅   | EDGE-002 | 4h   |
+| EDGE-004 | 实现连线动画效果 | 🟢 P3  | ✅   | EDGE-002 | 3h   |
+| EDGE-005 | 实现连线标签     | 🟡 P2  | ✅   | EDGE-002 | 2h   |
+| EDGE-006 | 实现连线删除     | 🟠 P1  | ✅   | EDGE-002 | 2h   |
 
 **详细任务说明：**
 
@@ -1335,13 +1388,13 @@ ai:
 
 ##### 配置面板
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| PANEL-001 | 实现右侧配置面板 | 🔴 P0 | ✅ | NODE-004 | 4h |
-| PANEL-002 | 实现节点配置表单 | 🔴 P0 | ✅ | PANEL-001 | 8h |
-| PANEL-003 | 实现表单校验 | 🟠 P1 | ✅ | PANEL-002 | 4h |
-| PANEL-004 | 实现配置实时预览 | 🟡 P2 | ✅ | PANEL-002 | 4h |
-| PANEL-005 | 实现变量选择器 | 🟠 P1 | ✅ | PANEL-002 | 6h |
+| ID        | 任务             | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | ---------------- | ------ | ---- | --------- | ---- |
+| PANEL-001 | 实现右侧配置面板 | 🔴 P0  | ✅   | NODE-004  | 4h   |
+| PANEL-002 | 实现节点配置表单 | 🔴 P0  | ✅   | PANEL-001 | 8h   |
+| PANEL-003 | 实现表单校验     | 🟠 P1  | ✅   | PANEL-002 | 4h   |
+| PANEL-004 | 实现配置实时预览 | 🟡 P2  | ✅   | PANEL-002 | 4h   |
+| PANEL-005 | 实现变量选择器   | 🟠 P1  | ✅   | PANEL-002 | 6h   |
 
 **详细任务说明：**
 
@@ -1363,13 +1416,13 @@ ai:
 
 ##### 布局与样式
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| LAYOUT-001 | 设计编辑器整体布局 | 🔴 P0 | ✅ | - | 4h |
-| LAYOUT-002 | 实现顶部工具栏 | 🟠 P1 | ✅ | LAYOUT-001 | 4h |
-| LAYOUT-003 | 实现自动布局算法 | 🟡 P2 | ✅ | CANVAS-001 | 6h |
-| LAYOUT-004 | 实现深色/浅色主题 | 🟠 P1 | ✅ | LAYOUT-001 | 4h |
-| LAYOUT-005 | 响应式适配 | 🟡 P2 | ✅ | LAYOUT-001 | 4h |
+| ID         | 任务               | 优先级 | 状态 | 依赖       | 估时 |
+| ---------- | ------------------ | ------ | ---- | ---------- | ---- |
+| LAYOUT-001 | 设计编辑器整体布局 | 🔴 P0  | ✅   | -          | 4h   |
+| LAYOUT-002 | 实现顶部工具栏     | 🟠 P1  | ✅   | LAYOUT-001 | 4h   |
+| LAYOUT-003 | 实现自动布局算法   | 🟡 P2  | ✅   | CANVAS-001 | 6h   |
+| LAYOUT-004 | 实现深色/浅色主题  | 🟠 P1  | ✅   | LAYOUT-001 | 4h   |
+| LAYOUT-005 | 响应式适配         | 🟡 P2  | ✅   | LAYOUT-001 | 4h   |
 
 **详细任务说明：**
 
@@ -1408,11 +1461,11 @@ ai:
 
 ##### AI 节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| AI-001 | LLM 调用节点 (Chat) | 🔴 P0 | ✅ | NODE-001, PANEL-002 | 12h |
-| AI-002 | LLM 调用节点 (Completion) | 🟡 P2 | ⬜ | AI-001 | 4h |
-| AI-003 | 文本嵌入节点 (Embedding) | 🟡 P2 | ⬜ | NODE-001 | 6h |
+| ID     | 任务                      | 优先级 | 状态 | 依赖                | 估时 |
+| ------ | ------------------------- | ------ | ---- | ------------------- | ---- |
+| AI-001 | LLM 调用节点 (Chat)       | 🔴 P0  | ✅   | NODE-001, PANEL-002 | 12h  |
+| AI-002 | LLM 调用节点 (Completion) | 🟡 P2  | ⬜   | AI-001              | 4h   |
+| AI-003 | 文本嵌入节点 (Embedding)  | 🟡 P2  | ⬜   | NODE-001            | 6h   |
 
 **详细任务说明：**
 
@@ -1470,10 +1523,10 @@ ai:
 
 ##### 集成节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| INT-001 | HTTP 请求节点 | 🔴 P0 | ✅ | NODE-001 | 8h |
-| INT-002 | Webhook 触发节点 | 🟠 P1 | ✅ | NODE-001, BE-002 | 8h |
+| ID      | 任务             | 优先级 | 状态 | 依赖             | 估时 |
+| ------- | ---------------- | ------ | ---- | ---------------- | ---- |
+| INT-001 | HTTP 请求节点    | 🔴 P0  | ✅   | NODE-001         | 8h   |
+| INT-002 | Webhook 触发节点 | 🟠 P1  | ✅   | NODE-001, BE-002 | 8h   |
 
 **详细任务说明：**
 
@@ -1509,13 +1562,13 @@ ai:
 
 ##### 逻辑节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| LOGIC-001 | 条件判断节点 (If/Else) | 🔴 P0 | ✅ | NODE-001 | 8h |
-| LOGIC-002 | 循环节点 (Loop) | 🔴 P0 | ✅ | NODE-001 | 10h |
-| LOGIC-003 | 并行执行节点 (Parallel) | 🟠 P1 | ✅ | NODE-001 | 6h |
-| LOGIC-004 | 等待节点 (Delay) | 🟡 P2 | ✅ | NODE-001 | 2h |
-| LOGIC-005 | 错误处理节点 (Try/Catch) | 🟠 P1 | ✅ | NODE-001 | 6h |
+| ID        | 任务                     | 优先级 | 状态 | 依赖     | 估时 |
+| --------- | ------------------------ | ------ | ---- | -------- | ---- |
+| LOGIC-001 | 条件判断节点 (If/Else)   | 🔴 P0  | ✅   | NODE-001 | 8h   |
+| LOGIC-002 | 循环节点 (Loop)          | 🔴 P0  | ✅   | NODE-001 | 10h  |
+| LOGIC-003 | 并行执行节点 (Parallel)  | 🟠 P1  | ✅   | NODE-001 | 6h   |
+| LOGIC-004 | 等待节点 (Delay)         | 🟡 P2  | ✅   | NODE-001 | 2h   |
+| LOGIC-005 | 错误处理节点 (Try/Catch) | 🟠 P1  | ✅   | NODE-001 | 6h   |
 
 **详细任务说明：**
 
@@ -1527,13 +1580,14 @@ ai:
     - ✓ 两个输出分支: true, false
     - ✓ 条件表达式模式 (高级)
   - **条件配置界面**:
+
     ```
     条件组 1 (AND):
     ├── {{user.age}} [>=] [18]
     └── {{user.verified}} [==] [true]
-    
+
     OR
-    
+
     条件组 2:
     └── {{user.role}} [==] ["admin"]
     ```
@@ -1571,31 +1625,31 @@ ai:
 
 ##### 数据节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| DATA-001 | 变量设置节点 | 🔴 P0 | ✅ | NODE-001 | 4h |
-| DATA-002 | 数据转换节点 | 🟠 P1 | ✅ | NODE-001 | 6h |
-| DATA-003 | 数据合并节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
-| DATA-004 | 数据筛选节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
+| ID       | 任务         | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ------------ | ------ | ---- | -------- | ---- |
+| DATA-001 | 变量设置节点 | 🔴 P0  | ✅   | NODE-001 | 4h   |
+| DATA-002 | 数据转换节点 | 🟠 P1  | ✅   | NODE-001 | 6h   |
+| DATA-003 | 数据合并节点 | 🟠 P1  | ✅   | NODE-001 | 4h   |
+| DATA-004 | 数据筛选节点 | 🟠 P1  | ✅   | NODE-001 | 4h   |
 
 ---
 
 ##### 文本节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| TEXT-001 | 文本模板节点 | 🔴 P0 | ✅ | NODE-001 | 6h |
-| TEXT-002 | 正则提取节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
-| TEXT-003 | 文本分割/合并节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
+| ID       | 任务              | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ----------------- | ------ | ---- | -------- | ---- |
+| TEXT-001 | 文本模板节点      | 🔴 P0  | ✅   | NODE-001 | 6h   |
+| TEXT-002 | 正则提取节点      | 🟠 P1  | ✅   | NODE-001 | 4h   |
+| TEXT-003 | 文本分割/合并节点 | 🟠 P1  | ✅   | NODE-001 | 4h   |
 
 ---
 
 ##### 代码节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| CODE-001 | JavaScript 代码节点 | 🟠 P1 | ✅ | NODE-001 | 8h |
-| CODE-002 | 表达式计算节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
+| ID       | 任务                | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ------------------- | ------ | ---- | -------- | ---- |
+| CODE-001 | JavaScript 代码节点 | 🟠 P1  | ✅   | NODE-001 | 8h   |
+| CODE-002 | 表达式计算节点      | 🟠 P1  | ✅   | NODE-001 | 4h   |
 
 **详细任务说明：**
 
@@ -1608,21 +1662,23 @@ ai:
     - ✓ 执行超时限制 (默认 30s)
     - ✓ 内存限制 (默认 128MB)
   - **代码模板**:
+
     ```javascript
     // inputs 包含所有输入变量
     // 返回值作为节点输出
-    
+
     async function main(inputs) {
-      const { data } = inputs;
-      
+      const { data } = inputs
+
       // 你的代码
-      const result = data.map(item => item * 2);
-      
+      const result = data.map((item) => item * 2)
+
       return {
-        output: result
-      };
+        output: result,
+      }
     }
     ```
+
   - **可用 API**:
     - `console.log/warn/error` - 日志
     - `JSON.parse/stringify` - JSON 处理
@@ -1632,12 +1688,12 @@ ai:
 
 ##### 流程节点
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| FLOW-001 | 开始节点 | 🔴 P0 | ✅ | NODE-001 | 2h |
-| FLOW-002 | 结束节点 | 🔴 P0 | ✅ | NODE-001 | 2h |
-| FLOW-003 | 用户输入节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
-| FLOW-004 | 输出展示节点 | 🟠 P1 | ✅ | NODE-001 | 4h |
+| ID       | 任务         | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ------------ | ------ | ---- | -------- | ---- |
+| FLOW-001 | 开始节点     | 🔴 P0  | ✅   | NODE-001 | 2h   |
+| FLOW-002 | 结束节点     | 🔴 P0  | ✅   | NODE-001 | 2h   |
+| FLOW-003 | 用户输入节点 | 🟠 P1  | ✅   | NODE-001 | 4h   |
+| FLOW-004 | 输出展示节点 | 🟠 P1  | ✅   | NODE-001 | 4h   |
 
 ---
 
@@ -1645,21 +1701,21 @@ ai:
 
 ##### 后端执行引擎
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| EXE-001 | 设计执行引擎架构 | 🔴 P0 | ✅ | - | 8h |
-| EXE-002 | 实现工作流解析器 | 🔴 P0 | ✅ | EXE-001 | 6h |
-| EXE-003 | 实现 DAG 依赖分析 | 🔴 P0 | ✅ | EXE-002 | 6h |
-| EXE-004 | 实现节点执行器接口 | 🔴 P0 | ✅ | EXE-001 | 4h |
-| EXE-005 | 实现 LLM 节点执行器 | 🔴 P0 | ✅ | EXE-004 | 8h |
-| EXE-006 | 实现 HTTP 节点执行器 | 🔴 P0 | ✅ | EXE-004 | 4h |
-| EXE-007 | 实现条件节点执行器 | 🔴 P0 | ✅ | EXE-004 | 4h |
-| EXE-008 | 实现循环节点执行器 | 🔴 P0 | ✅ | EXE-004 | 6h |
-| EXE-009 | 实现代码节点执行器 (沙箱) | 🟠 P1 | ⬜ | EXE-004 | 8h |
-| EXE-010 | 实现执行状态管理 | 🔴 P0 | ✅ | EXE-001 | 6h |
-| EXE-011 | 实现执行日志记录 | 🟠 P1 | ✅ | EXE-001 | 4h |
-| EXE-012 | 实现错误处理和重试 | 🟠 P1 | ✅ | EXE-001 | 6h |
-| EXE-013 | 实现执行超时机制 | 🟠 P1 | ✅ | EXE-001 | 4h |
+| ID      | 任务                      | 优先级 | 状态 | 依赖    | 估时 |
+| ------- | ------------------------- | ------ | ---- | ------- | ---- |
+| EXE-001 | 设计执行引擎架构          | 🔴 P0  | ✅   | -       | 8h   |
+| EXE-002 | 实现工作流解析器          | 🔴 P0  | ✅   | EXE-001 | 6h   |
+| EXE-003 | 实现 DAG 依赖分析         | 🔴 P0  | ✅   | EXE-002 | 6h   |
+| EXE-004 | 实现节点执行器接口        | 🔴 P0  | ✅   | EXE-001 | 4h   |
+| EXE-005 | 实现 LLM 节点执行器       | 🔴 P0  | ✅   | EXE-004 | 8h   |
+| EXE-006 | 实现 HTTP 节点执行器      | 🔴 P0  | ✅   | EXE-004 | 4h   |
+| EXE-007 | 实现条件节点执行器        | 🔴 P0  | ✅   | EXE-004 | 4h   |
+| EXE-008 | 实现循环节点执行器        | 🔴 P0  | ✅   | EXE-004 | 6h   |
+| EXE-009 | 实现代码节点执行器 (沙箱) | 🟠 P1  | ⬜   | EXE-004 | 8h   |
+| EXE-010 | 实现执行状态管理          | 🔴 P0  | ✅   | EXE-001 | 6h   |
+| EXE-011 | 实现执行日志记录          | 🟠 P1  | ✅   | EXE-001 | 4h   |
+| EXE-012 | 实现错误处理和重试        | 🟠 P1  | ✅   | EXE-001 | 6h   |
+| EXE-013 | 实现执行超时机制          | 🟠 P1  | ✅   | EXE-001 | 4h   |
 
 **详细任务说明：**
 
@@ -1700,13 +1756,14 @@ ai:
     └─────────────────────────────────────────────────────┘
     ```
   - **核心接口**:
+
     ```go
     type ExecutionEngine interface {
         Execute(ctx context.Context, workflow *Workflow, inputs map[string]interface{}) (*ExecutionResult, error)
         Cancel(executionID string) error
         GetStatus(executionID string) (*ExecutionStatus, error)
     }
-    
+
     type NodeExecutor interface {
         Execute(ctx context.Context, node *Node, inputs map[string]interface{}) (map[string]interface{}, error)
         GetType() string
@@ -1717,24 +1774,24 @@ ai:
 
 ##### 任务调度
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| SCHED-001 | 集成 Asynq 任务队列 | 🔴 P0 | ✅ | BE-004 | 6h |
-| SCHED-002 | 实现即时执行 | 🔴 P0 | ✅ | SCHED-001 | 4h |
-| SCHED-003 | 实现定时执行 (Cron) | 🟠 P1 | ✅ | SCHED-001 | 6h |
-| SCHED-004 | 实现 Webhook 触发执行 | 🟠 P1 | ✅ | SCHED-001 | 4h |
-| SCHED-005 | 实现执行取消功能 | 🟠 P1 | ✅ | SCHED-001 | 4h |
+| ID        | 任务                  | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | --------------------- | ------ | ---- | --------- | ---- |
+| SCHED-001 | 集成 Asynq 任务队列   | 🔴 P0  | ✅   | BE-004    | 6h   |
+| SCHED-002 | 实现即时执行          | 🔴 P0  | ✅   | SCHED-001 | 4h   |
+| SCHED-003 | 实现定时执行 (Cron)   | 🟠 P1  | ✅   | SCHED-001 | 6h   |
+| SCHED-004 | 实现 Webhook 触发执行 | 🟠 P1  | ✅   | SCHED-001 | 4h   |
+| SCHED-005 | 实现执行取消功能      | 🟠 P1  | ✅   | SCHED-001 | 4h   |
 
 ---
 
 ##### 实时通信
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| WS-001 | 实现 WebSocket 服务 | 🔴 P0 | ✅ | BE-002 | 6h |
-| WS-002 | 实现执行状态推送 | 🔴 P0 | ✅ | WS-001 | 4h |
-| WS-003 | 实现节点执行进度推送 | 🟠 P1 | ✅ | WS-001 | 4h |
-| WS-004 | 实现执行日志实时推送 | 🟠 P1 | ✅ | WS-001 | 4h |
+| ID     | 任务                 | 优先级 | 状态 | 依赖   | 估时 |
+| ------ | -------------------- | ------ | ---- | ------ | ---- |
+| WS-001 | 实现 WebSocket 服务  | 🔴 P0  | ✅   | BE-002 | 6h   |
+| WS-002 | 实现执行状态推送     | 🔴 P0  | ✅   | WS-001 | 4h   |
+| WS-003 | 实现节点执行进度推送 | 🟠 P1  | ✅   | WS-001 | 4h   |
+| WS-004 | 实现执行日志实时推送 | 🟠 P1  | ✅   | WS-001 | 4h   |
 
 **详细任务说明：**
 
@@ -1745,7 +1802,7 @@ ai:
     - ✓ 认证 (Token 验证)
     - ✓ 房间/频道机制 (按执行 ID)
     - ✓ 消息格式规范
-  - **实现文件**: 
+  - **实现文件**:
     - `internal/pkg/websocket/hub.go` - 连接管理中心
     - `internal/pkg/websocket/client.go` - 客户端处理
     - `internal/api/handler/websocket.go` - HTTP 升级处理器
@@ -1773,12 +1830,12 @@ ai:
 
 ##### 前端执行展示
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| EXEC-UI-001 | 实现执行状态可视化 | 🔴 P0 | ✅ | WS-001 | 6h |
-| EXEC-UI-002 | 实现节点执行高亮 | 🟠 P1 | ✅ | EXEC-UI-001 | 4h |
-| EXEC-UI-003 | 实现执行日志面板 | 🟠 P1 | ✅ | WS-004 | 6h |
-| EXEC-UI-004 | 实现执行结果查看 | 🟠 P1 | ✅ | EXEC-UI-001 | 4h |
+| ID          | 任务               | 优先级 | 状态 | 依赖        | 估时 |
+| ----------- | ------------------ | ------ | ---- | ----------- | ---- |
+| EXEC-UI-001 | 实现执行状态可视化 | 🔴 P0  | ✅   | WS-001      | 6h   |
+| EXEC-UI-002 | 实现节点执行高亮   | 🟠 P1  | ✅   | EXEC-UI-001 | 4h   |
+| EXEC-UI-003 | 实现执行日志面板   | 🟠 P1  | ✅   | WS-004      | 6h   |
+| EXEC-UI-004 | 实现执行结果查看   | 🟠 P1  | ✅   | EXEC-UI-001 | 4h   |
 
 ---
 
@@ -1786,16 +1843,16 @@ ai:
 
 ##### 认证系统
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| AUTH-001 | 实现邮箱注册 | 🔴 P0 | ✅ | BE-003, BE-005 | 6h |
-| AUTH-002 | 实现邮箱验证 | 🔴 P0 | ⬜ | AUTH-001 | 4h |
-| AUTH-003 | 实现密码登录 | 🔴 P0 | ✅ | AUTH-001 | 4h |
-| AUTH-004 | 实现 JWT Token 签发 | 🔴 P0 | ✅ | BE-005 | 4h |
-| AUTH-005 | 实现 Token 刷新 | 🔴 P0 | ✅ | AUTH-004 | 4h |
-| AUTH-006 | 实现登出功能 | 🟠 P1 | ✅ | AUTH-004 | 2h |
-| AUTH-007 | 实现 GitHub OAuth 登录 | 🟡 P2 | ⬜ | AUTH-004 | 6h |
-| AUTH-008 | 实现 Google OAuth 登录 | 🟡 P2 | ⬜ | AUTH-004 | 6h |
+| ID       | 任务                   | 优先级 | 状态 | 依赖           | 估时 |
+| -------- | ---------------------- | ------ | ---- | -------------- | ---- |
+| AUTH-001 | 实现邮箱注册           | 🔴 P0  | ✅   | BE-003, BE-005 | 6h   |
+| AUTH-002 | 实现邮箱验证           | 🔴 P0  | ⬜   | AUTH-001       | 4h   |
+| AUTH-003 | 实现密码登录           | 🔴 P0  | ✅   | AUTH-001       | 4h   |
+| AUTH-004 | 实现 JWT Token 签发    | 🔴 P0  | ✅   | BE-005         | 4h   |
+| AUTH-005 | 实现 Token 刷新        | 🔴 P0  | ✅   | AUTH-004       | 4h   |
+| AUTH-006 | 实现登出功能           | 🟠 P1  | ✅   | AUTH-004       | 2h   |
+| AUTH-007 | 实现 GitHub OAuth 登录 | 🟡 P2  | ⬜   | AUTH-004       | 6h   |
+| AUTH-008 | 实现 Google OAuth 登录 | 🟡 P2  | ⬜   | AUTH-004       | 6h   |
 
 **详细任务说明：**
 
@@ -1818,40 +1875,40 @@ ai:
 
 ##### 用户管理
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| USER-001 | 用户表设计和迁移 | 🔴 P0 | ✅ | BE-010 | 4h |
-| USER-002 | 用户注册 API | 🔴 P0 | ✅ | USER-001, AUTH-001 | 4h |
-| USER-003 | 用户登录 API | 🔴 P0 | ✅ | USER-001, AUTH-003 | 4h |
-| USER-004 | 获取当前用户 API | 🔴 P0 | ✅ | USER-001, AUTH-004 | 2h |
-| USER-005 | 更新用户资料 API | 🟠 P1 | ✅ | USER-004 | 4h |
-| USER-006 | 修改密码 API | 🟠 P1 | ✅ | USER-004 | 4h |
-| USER-007 | 上传头像功能 | 🟡 P2 | ⬜ | USER-004 | 4h |
+| ID       | 任务             | 优先级 | 状态 | 依赖               | 估时 |
+| -------- | ---------------- | ------ | ---- | ------------------ | ---- |
+| USER-001 | 用户表设计和迁移 | 🔴 P0  | ✅   | BE-010             | 4h   |
+| USER-002 | 用户注册 API     | 🔴 P0  | ✅   | USER-001, AUTH-001 | 4h   |
+| USER-003 | 用户登录 API     | 🔴 P0  | ✅   | USER-001, AUTH-003 | 4h   |
+| USER-004 | 获取当前用户 API | 🔴 P0  | ✅   | USER-001, AUTH-004 | 2h   |
+| USER-005 | 更新用户资料 API | 🟠 P1  | ✅   | USER-004           | 4h   |
+| USER-006 | 修改密码 API     | 🟠 P1  | ✅   | USER-004           | 4h   |
+| USER-007 | 上传头像功能     | 🟡 P2  | ⬜   | USER-004           | 4h   |
 
 ---
 
 ##### 工作流管理
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| WF-001 | 工作流表设计和迁移 | 🔴 P0 | ✅ | USER-001 | 4h |
-| WF-002 | 创建工作流 API | 🔴 P0 | ✅ | WF-001 | 4h |
-| WF-003 | 获取工作流列表 API | 🔴 P0 | ✅ | WF-001 | 4h |
-| WF-004 | 获取工作流详情 API | 🔴 P0 | ✅ | WF-001 | 2h |
-| WF-005 | 更新工作流 API | 🔴 P0 | ✅ | WF-001 | 4h |
-| WF-006 | 删除工作流 API | 🔴 P0 | ✅ | WF-001 | 2h |
-| WF-007 | 工作流文件夹管理 | 🟡 P2 | ⬜ | WF-001 | 6h |
+| ID     | 任务               | 优先级 | 状态 | 依赖     | 估时 |
+| ------ | ------------------ | ------ | ---- | -------- | ---- |
+| WF-001 | 工作流表设计和迁移 | 🔴 P0  | ✅   | USER-001 | 4h   |
+| WF-002 | 创建工作流 API     | 🔴 P0  | ✅   | WF-001   | 4h   |
+| WF-003 | 获取工作流列表 API | 🔴 P0  | ✅   | WF-001   | 4h   |
+| WF-004 | 获取工作流详情 API | 🔴 P0  | ✅   | WF-001   | 2h   |
+| WF-005 | 更新工作流 API     | 🔴 P0  | ✅   | WF-001   | 4h   |
+| WF-006 | 删除工作流 API     | 🔴 P0  | ✅   | WF-001   | 2h   |
+| WF-007 | 工作流文件夹管理   | 🟡 P2  | ⬜   | WF-001   | 6h   |
 
 ---
 
 ##### API 密钥管理
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| KEY-001 | API 密钥加密存储 | 🔴 P0 | ✅ | USER-001 | 4h |
-| KEY-002 | 添加 API 密钥 | 🔴 P0 | ✅ | KEY-001 | 4h |
-| KEY-003 | 删除 API 密钥 | 🟠 P1 | ✅ | KEY-001 | 2h |
-| KEY-004 | 密钥脱敏展示 | 🟠 P1 | ✅ | KEY-002 | 2h |
+| ID      | 任务             | 优先级 | 状态 | 依赖     | 估时 |
+| ------- | ---------------- | ------ | ---- | -------- | ---- |
+| KEY-001 | API 密钥加密存储 | 🔴 P0  | ✅   | USER-001 | 4h   |
+| KEY-002 | 添加 API 密钥    | 🔴 P0  | ✅   | KEY-001  | 4h   |
+| KEY-003 | 删除 API 密钥    | 🟠 P1  | ✅   | KEY-001  | 2h   |
+| KEY-004 | 密钥脱敏展示     | 🟠 P1  | ✅   | KEY-002  | 2h   |
 
 **详细任务说明：**
 
@@ -1869,14 +1926,14 @@ ai:
 
 ##### 前端页面
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| PAGE-001 | 登录页面 | 🔴 P0 | ✅ | AUTH-003 | 4h |
-| PAGE-002 | 注册页面 | 🔴 P0 | ✅ | AUTH-001 | 4h |
-| PAGE-003 | 忘记密码页面 | 🟡 P2 | ⬜ | AUTH-002 | 4h |
-| PAGE-004 | 个人中心页面 | 🟠 P1 | ✅ | USER-004 | 6h |
-| PAGE-005 | 工作流列表页面 | 🔴 P0 | ✅ | WF-003 | 6h |
-| PAGE-006 | 设置页面 | 🟠 P1 | ✅ | USER-004, KEY-002 | 6h |
+| ID       | 任务           | 优先级 | 状态 | 依赖              | 估时 |
+| -------- | -------------- | ------ | ---- | ----------------- | ---- |
+| PAGE-001 | 登录页面       | 🔴 P0  | ✅   | AUTH-003          | 4h   |
+| PAGE-002 | 注册页面       | 🔴 P0  | ✅   | AUTH-001          | 4h   |
+| PAGE-003 | 忘记密码页面   | 🟡 P2  | ⬜   | AUTH-002          | 4h   |
+| PAGE-004 | 个人中心页面   | 🟠 P1  | ✅   | USER-004          | 6h   |
+| PAGE-005 | 工作流列表页面 | 🔴 P0  | ✅   | WF-003            | 6h   |
+| PAGE-006 | 设置页面       | 🟠 P1  | ✅   | USER-004, KEY-002 | 6h   |
 
 ---
 
@@ -1884,13 +1941,13 @@ ai:
 
 ##### 性能优化
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| PERF-001 | 前端代码分割 | 🟠 P1 | ✅ | - | 4h |
-| PERF-002 | 图片资源优化 | 🟡 P2 | ✅ | - | 4h |
-| PERF-003 | API 响应缓存 | 🟠 P1 | ✅ | BE-004 | 4h |
-| PERF-004 | 数据库查询优化 | 🟠 P1 | ✅ | - | 6h |
-| PERF-005 | 添加数据库索引 | 🟠 P1 | ✅ | - | 4h |
+| ID       | 任务           | 优先级 | 状态 | 依赖   | 估时 |
+| -------- | -------------- | ------ | ---- | ------ | ---- |
+| PERF-001 | 前端代码分割   | 🟠 P1  | ✅   | -      | 4h   |
+| PERF-002 | 图片资源优化   | 🟡 P2  | ✅   | -      | 4h   |
+| PERF-003 | API 响应缓存   | 🟠 P1  | ✅   | BE-004 | 4h   |
+| PERF-004 | 数据库查询优化 | 🟠 P1  | ✅   | -      | 6h   |
+| PERF-005 | 添加数据库索引 | 🟠 P1  | ✅   | -      | 4h   |
 
 **详细任务说明：**
 
@@ -1909,27 +1966,27 @@ ai:
 
 ##### 用户体验
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| UX-001 | 加载状态优化 | 🟠 P1 | ✅ | - | 4h |
-| UX-002 | 错误提示优化 | 🟠 P1 | ✅ | - | 4h |
-| UX-003 | 空状态设计 | 🟡 P2 | ✅ | - | 4h |
-| UX-004 | 引导教程 | 🟡 P2 | ✅ | - | 8h |
-| UX-005 | 快捷键帮助 | 🟡 P2 | ✅ | CANVAS-005 | 4h |
+| ID     | 任务         | 优先级 | 状态 | 依赖       | 估时 |
+| ------ | ------------ | ------ | ---- | ---------- | ---- |
+| UX-001 | 加载状态优化 | 🟠 P1  | ✅   | -          | 4h   |
+| UX-002 | 错误提示优化 | 🟠 P1  | ✅   | -          | 4h   |
+| UX-003 | 空状态设计   | 🟡 P2  | ✅   | -          | 4h   |
+| UX-004 | 引导教程     | 🟡 P2  | ✅   | -          | 8h   |
+| UX-005 | 快捷键帮助   | 🟡 P2  | ✅   | CANVAS-005 | 4h   |
 
 ---
 
 ##### Bug 修复 & 测试
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| FIX-001 | 编辑器稳定性问题 | 🔴 P0 | ✅ | - | 8h |
-| FIX-002 | 执行引擎异常处理 | 🔴 P0 | ✅ | - | 8h |
-| FIX-003 | 并发问题修复 | 🟠 P1 | ✅ | - | 6h |
-| TEST-001 | 核心组件单元测试 | 🟠 P1 | ✅ | - | 16h |
-| TEST-002 | API 接口测试 | 🟠 P1 | ✅ | - | 12h |
-| TEST-003 | E2E 测试用例 | 🟡 P2 | ✅ | - | 16h |
-| TEST-004 | 性能测试 | 🟡 P2 | ✅ | - | 8h |
+| ID       | 任务             | 优先级 | 状态 | 依赖 | 估时 |
+| -------- | ---------------- | ------ | ---- | ---- | ---- |
+| FIX-001  | 编辑器稳定性问题 | 🔴 P0  | ✅   | -    | 8h   |
+| FIX-002  | 执行引擎异常处理 | 🔴 P0  | ✅   | -    | 8h   |
+| FIX-003  | 并发问题修复     | 🟠 P1  | ✅   | -    | 6h   |
+| TEST-001 | 核心组件单元测试 | 🟠 P1  | ✅   | -    | 16h  |
+| TEST-002 | API 接口测试     | 🟠 P1  | ✅   | -    | 12h  |
+| TEST-003 | E2E 测试用例     | 🟡 P2  | ✅   | -    | 16h  |
+| TEST-004 | 性能测试         | 🟡 P2  | ✅   | -    | 8h   |
 
 **详细任务说明：**
 
@@ -1949,17 +2006,17 @@ ai:
 
 #### 6.2.1 节点 SDK (W1-3)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| SDK-001 | 设计 SDK API 接口 | 🔴 P0 | ✅ | Phase 1 | 8h |
-| SDK-002 | 实现节点定义规范 | 🔴 P0 | ✅ | SDK-001 | 8h |
-| SDK-003 | 实现输入/输出类型系统 | 🔴 P0 | ✅ | SDK-002 | 8h |
-| SDK-004 | 实现节点验证机制 | 🟠 P1 | ✅ | SDK-003 | 6h |
-| SDK-005 | 实现节点测试框架 | 🟠 P1 | ✅ | SDK-002 | 8h |
-| SDK-006 | 编写 SDK 使用文档 | 🟠 P1 | ✅ | SDK-002 | 8h |
-| SDK-007 | 提供示例节点 | 🟠 P1 | ✅ | SDK-002 | 8h |
-| SDK-008 | 实现 CLI 工具 | 🟠 P1 | ✅ | SDK-002 | 12h |
-| SDK-009 | 发布 npm 包 (@agentflow/sdk) | 🔴 P0 | ✅ | SDK-001~008 | 4h |
+| ID      | 任务                         | 优先级 | 状态 | 依赖        | 估时 |
+| ------- | ---------------------------- | ------ | ---- | ----------- | ---- |
+| SDK-001 | 设计 SDK API 接口            | 🔴 P0  | ✅   | Phase 1     | 8h   |
+| SDK-002 | 实现节点定义规范             | 🔴 P0  | ✅   | SDK-001     | 8h   |
+| SDK-003 | 实现输入/输出类型系统        | 🔴 P0  | ✅   | SDK-002     | 8h   |
+| SDK-004 | 实现节点验证机制             | 🟠 P1  | ✅   | SDK-003     | 6h   |
+| SDK-005 | 实现节点测试框架             | 🟠 P1  | ✅   | SDK-002     | 8h   |
+| SDK-006 | 编写 SDK 使用文档            | 🟠 P1  | ✅   | SDK-002     | 8h   |
+| SDK-007 | 提供示例节点                 | 🟠 P1  | ✅   | SDK-002     | 8h   |
+| SDK-008 | 实现 CLI 工具                | 🟠 P1  | ✅   | SDK-002     | 12h  |
+| SDK-009 | 发布 npm 包 (@agentflow/sdk) | 🔴 P0  | ✅   | SDK-001~008 | 4h   |
 
 **详细任务说明：**
 
@@ -1969,36 +2026,37 @@ ai:
     - ✓ API 简洁易用
     - ✓ 可扩展性良好
   - **核心 API**:
+
     ```typescript
     // 创建节点定义
-    import { defineNode, input, output } from '@agentflow/sdk';
-    
+    import { defineNode, input, output } from '@agentflow/sdk'
+
     export default defineNode({
       id: 'my-custom-node',
       name: '自定义节点',
       description: '这是一个自定义节点',
       icon: 'puzzle',
       category: 'custom',
-      
+
       inputs: {
         text: input.string('输入文本').required(),
         count: input.number('数量').default(10),
         options: input.object('选项').optional(),
       },
-      
+
       outputs: {
         result: output.string('处理结果'),
         error: output.object('错误信息').optional(),
       },
-      
+
       async execute(ctx) {
-        const { text, count } = ctx.inputs;
+        const { text, count } = ctx.inputs
         // 处理逻辑
         return {
           result: text.repeat(count),
-        };
+        }
       },
-    });
+    })
     ```
 
 - [x] **SDK-008: 实现 CLI 工具** 🟠 P1
@@ -2024,32 +2082,32 @@ ai:
 
 #### 6.2.2 插件系统 (W4-6)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| PLUGIN-001 | 设计插件 Manifest 规范 | 🔴 P0 | ✅ | SDK-009 | 6h |
-| PLUGIN-002 | 实现插件加载机制 | 🔴 P0 | ✅ | PLUGIN-001 | 12h |
-| PLUGIN-003 | 实现插件沙箱环境 | 🔴 P0 | ✅ | PLUGIN-002 | 16h |
-| PLUGIN-004 | 实现插件权限控制 | 🟠 P1 | ✅ | PLUGIN-002 | 8h |
-| PLUGIN-005 | 实现插件市场基础 | 🟠 P1 | ✅ | PLUGIN-001 | 12h |
-| PLUGIN-006 | 实现插件安装/卸载 | 🟠 P1 | ✅ | PLUGIN-002 | 8h |
-| PLUGIN-007 | 实现插件版本管理 | 🟠 P1 | ✅ | PLUGIN-006 | 8h |
-| PLUGIN-008 | 实现插件签名验证 | 🟡 P2 | ✅ | PLUGIN-002 | 8h |
-| PLUGIN-009 | 编写示例插件 | 🟠 P1 | ✅ | PLUGIN-002 | 8h |
-| PLUGIN-010 | 编写开发者文档 | 🟠 P1 | ✅ | PLUGIN-001 | 8h |
+| ID         | 任务                   | 优先级 | 状态 | 依赖       | 估时 |
+| ---------- | ---------------------- | ------ | ---- | ---------- | ---- |
+| PLUGIN-001 | 设计插件 Manifest 规范 | 🔴 P0  | ✅   | SDK-009    | 6h   |
+| PLUGIN-002 | 实现插件加载机制       | 🔴 P0  | ✅   | PLUGIN-001 | 12h  |
+| PLUGIN-003 | 实现插件沙箱环境       | 🔴 P0  | ✅   | PLUGIN-002 | 16h  |
+| PLUGIN-004 | 实现插件权限控制       | 🟠 P1  | ✅   | PLUGIN-002 | 8h   |
+| PLUGIN-005 | 实现插件市场基础       | 🟠 P1  | ✅   | PLUGIN-001 | 12h  |
+| PLUGIN-006 | 实现插件安装/卸载      | 🟠 P1  | ✅   | PLUGIN-002 | 8h   |
+| PLUGIN-007 | 实现插件版本管理       | 🟠 P1  | ✅   | PLUGIN-006 | 8h   |
+| PLUGIN-008 | 实现插件签名验证       | 🟡 P2  | ✅   | PLUGIN-002 | 8h   |
+| PLUGIN-009 | 编写示例插件           | 🟠 P1  | ✅   | PLUGIN-002 | 8h   |
+| PLUGIN-010 | 编写开发者文档         | 🟠 P1  | ✅   | PLUGIN-001 | 8h   |
 
 ---
 
 #### 6.2.3 本地模式 (W7-8)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| LOCAL-001 | Tauri 桌面应用框架 | 🔴 P0 | ✅ | Phase 1 | 16h |
-| LOCAL-002 | SQLite 本地数据库 | 🔴 P0 | ✅ | LOCAL-001 | 12h |
-| LOCAL-003 | Ollama 本地模型集成 | 🟠 P1 | ✅ | LOCAL-001 | 16h |
-| LOCAL-004 | LM Studio 集成 | 🟡 P2 | ✅ | LOCAL-003 | 8h |
-| LOCAL-005 | 本地/云端数据同步 | 🟠 P1 | ✅ | LOCAL-002 | 24h |
-| LOCAL-006 | 模型管理 UI | 🟠 P1 | ✅ | LOCAL-003 | 12h |
-| LOCAL-007 | 离线模式支持 | 🟠 P1 | ✅ | LOCAL-002 | 16h |
+| ID        | 任务                | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | ------------------- | ------ | ---- | --------- | ---- |
+| LOCAL-001 | Tauri 桌面应用框架  | 🔴 P0  | ✅   | Phase 1   | 16h  |
+| LOCAL-002 | SQLite 本地数据库   | 🔴 P0  | ✅   | LOCAL-001 | 12h  |
+| LOCAL-003 | Ollama 本地模型集成 | 🟠 P1  | ✅   | LOCAL-001 | 16h  |
+| LOCAL-004 | LM Studio 集成      | 🟡 P2  | ✅   | LOCAL-003 | 8h   |
+| LOCAL-005 | 本地/云端数据同步   | 🟠 P1  | ✅   | LOCAL-002 | 24h  |
+| LOCAL-006 | 模型管理 UI         | 🟠 P1  | ✅   | LOCAL-003 | 12h  |
+| LOCAL-007 | 离线模式支持        | 🟠 P1  | ✅   | LOCAL-002 | 16h  |
 
 **详细任务说明：**
 
@@ -2068,14 +2126,14 @@ ai:
 
 #### 6.2.4 调试工具 (W9-10)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| DEBUG-001 | 节点断点功能 | 🟠 P1 | ⬜ | EXE-001 | 12h |
-| DEBUG-002 | 变量监视器 | 🟠 P1 | ⬜ | DEBUG-001 | 8h |
-| DEBUG-003 | 执行步进功能 | 🟠 P1 | ⬜ | DEBUG-001 | 12h |
-| DEBUG-004 | 性能分析面板 | 🟡 P2 | ⬜ | DEBUG-001 | 12h |
-| DEBUG-005 | 执行时间线可视化 | 🟡 P2 | ⬜ | DEBUG-001 | 8h |
-| DEBUG-006 | 输入/输出检查器 | 🟠 P1 | ⬜ | DEBUG-001 | 8h |
+| ID        | 任务             | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | ---------------- | ------ | ---- | --------- | ---- |
+| DEBUG-001 | 节点断点功能     | 🟠 P1  | ⬜   | EXE-001   | 12h  |
+| DEBUG-002 | 变量监视器       | 🟠 P1  | ⬜   | DEBUG-001 | 8h   |
+| DEBUG-003 | 执行步进功能     | 🟠 P1  | ⬜   | DEBUG-001 | 12h  |
+| DEBUG-004 | 性能分析面板     | 🟡 P2  | ⬜   | DEBUG-001 | 12h  |
+| DEBUG-005 | 执行时间线可视化 | 🟡 P2  | ⬜   | DEBUG-001 | 8h   |
+| DEBUG-006 | 输入/输出检查器  | 🟠 P1  | ⬜   | DEBUG-001 | 8h   |
 
 ---
 
@@ -2083,48 +2141,48 @@ ai:
 
 #### 6.3.1 Agent 商店 (W1-3)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| STORE-001 | 设计商店首页 UI | 🔴 P0 | ⬜ | Phase 1 | 12h |
-| STORE-002 | 实现 Agent 列表与搜索 | 🔴 P0 | ⬜ | STORE-001 | 12h |
-| STORE-003 | 实现 Agent 详情页 | 🔴 P0 | ⬜ | STORE-001 | 12h |
-| STORE-004 | 实现评分评价系统 | 🟠 P1 | ⬜ | STORE-003 | 8h |
-| STORE-005 | 实现收藏功能 | 🟠 P1 | ⬜ | STORE-003 | 4h |
-| STORE-006 | 实现试用功能 | 🟠 P1 | ⬜ | STORE-003 | 8h |
-| STORE-007 | 实现 Fork 功能 | 🟠 P1 | ⬜ | STORE-003 | 8h |
-| STORE-008 | 实现分类管理 | 🟠 P1 | ⬜ | STORE-002 | 6h |
-| STORE-009 | Agent 发布流程 | 🔴 P0 | ⬜ | STORE-001 | 12h |
-| STORE-010 | 审核系统 | 🟠 P1 | ⬜ | STORE-009 | 12h |
+| ID        | 任务                  | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | --------------------- | ------ | ---- | --------- | ---- |
+| STORE-001 | 设计商店首页 UI       | 🔴 P0  | ⬜   | Phase 1   | 12h  |
+| STORE-002 | 实现 Agent 列表与搜索 | 🔴 P0  | ⬜   | STORE-001 | 12h  |
+| STORE-003 | 实现 Agent 详情页     | 🔴 P0  | ⬜   | STORE-001 | 12h  |
+| STORE-004 | 实现评分评价系统      | 🟠 P1  | ⬜   | STORE-003 | 8h   |
+| STORE-005 | 实现收藏功能          | 🟠 P1  | ⬜   | STORE-003 | 4h   |
+| STORE-006 | 实现试用功能          | 🟠 P1  | ⬜   | STORE-003 | 8h   |
+| STORE-007 | 实现 Fork 功能        | 🟠 P1  | ⬜   | STORE-003 | 8h   |
+| STORE-008 | 实现分类管理          | 🟠 P1  | ⬜   | STORE-002 | 6h   |
+| STORE-009 | Agent 发布流程        | 🔴 P0  | ⬜   | STORE-001 | 12h  |
+| STORE-010 | 审核系统              | 🟠 P1  | ⬜   | STORE-009 | 12h  |
 
 ---
 
 #### 6.3.2 分享机制 (W4-6)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| SHARE-001 | 链接分享 | 🔴 P0 | ⬜ | STORE-009 | 8h |
-| SHARE-002 | 嵌入代码生成 | 🟠 P1 | ⬜ | SHARE-001 | 6h |
-| SHARE-003 | 版本历史 | 🟠 P1 | ⬜ | STORE-009 | 12h |
-| SHARE-004 | 协作权限 | 🟠 P1 | ⬜ | SHARE-001 | 12h |
-| SHARE-005 | 私有/公开切换 | 🟠 P1 | ⬜ | SHARE-001 | 4h |
-| SHARE-006 | 分享统计 | 🟡 P2 | ⬜ | SHARE-001 | 8h |
+| ID        | 任务          | 优先级 | 状态 | 依赖      | 估时 |
+| --------- | ------------- | ------ | ---- | --------- | ---- |
+| SHARE-001 | 链接分享      | 🔴 P0  | ⬜   | STORE-009 | 8h   |
+| SHARE-002 | 嵌入代码生成  | 🟠 P1  | ⬜   | SHARE-001 | 6h   |
+| SHARE-003 | 版本历史      | 🟠 P1  | ⬜   | STORE-009 | 12h  |
+| SHARE-004 | 协作权限      | 🟠 P1  | ⬜   | SHARE-001 | 12h  |
+| SHARE-005 | 私有/公开切换 | 🟠 P1  | ⬜   | SHARE-001 | 4h   |
+| SHARE-006 | 分享统计      | 🟡 P2  | ⬜   | SHARE-001 | 8h   |
 
 ---
 
 #### 6.3.3 创作者经济 (W7-9)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| ECON-001 | 实现创作者账户系统 | 🔴 P0 | ⬜ | Phase 1 | 12h |
-| ECON-002 | 集成支付宝支付 | 🟠 P1 | ⬜ | ECON-001 | 16h |
-| ECON-003 | 集成微信支付 | 🟠 P1 | ⬜ | ECON-001 | 16h |
-| ECON-004 | 实现订单管理 | 🔴 P0 | ⬜ | ECON-002/003 | 12h |
-| ECON-005 | 实现收入分成计算 | 🔴 P0 | ⬜ | ECON-004 | 8h |
-| ECON-006 | 实现提现功能 | 🟠 P1 | ⬜ | ECON-005 | 12h |
-| ECON-007 | 实现创作者等级系统 | 🟡 P2 | ⬜ | ECON-001 | 8h |
-| ECON-008 | 实现创作者数据分析 | 🟠 P1 | ⬜ | ECON-001 | 12h |
-| ECON-009 | 实现激励机制 | 🟡 P2 | ⬜ | ECON-007 | 8h |
-| ECON-010 | 实现税务合规 | 🟠 P1 | ⬜ | ECON-006 | 12h |
+| ID       | 任务               | 优先级 | 状态 | 依赖         | 估时 |
+| -------- | ------------------ | ------ | ---- | ------------ | ---- |
+| ECON-001 | 实现创作者账户系统 | 🔴 P0  | ⬜   | Phase 1      | 12h  |
+| ECON-002 | 集成支付宝支付     | 🟠 P1  | ⬜   | ECON-001     | 16h  |
+| ECON-003 | 集成微信支付       | 🟠 P1  | ⬜   | ECON-001     | 16h  |
+| ECON-004 | 实现订单管理       | 🔴 P0  | ⬜   | ECON-002/003 | 12h  |
+| ECON-005 | 实现收入分成计算   | 🔴 P0  | ⬜   | ECON-004     | 8h   |
+| ECON-006 | 实现提现功能       | 🟠 P1  | ⬜   | ECON-005     | 12h  |
+| ECON-007 | 实现创作者等级系统 | 🟡 P2  | ⬜   | ECON-001     | 8h   |
+| ECON-008 | 实现创作者数据分析 | 🟠 P1  | ⬜   | ECON-001     | 12h  |
+| ECON-009 | 实现激励机制       | 🟡 P2  | ⬜   | ECON-007     | 8h   |
+| ECON-010 | 实现税务合规       | 🟠 P1  | ⬜   | ECON-006     | 12h  |
 
 ---
 
@@ -2132,71 +2190,71 @@ ai:
 
 #### 6.4.1 企业版 (W1-4)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| ENT-001 | 私有化部署方案 | 🔴 P0 | ⬜ | Phase 1~3 | 40h |
-| ENT-002 | Docker/K8s 部署模板 | 🔴 P0 | ⬜ | ENT-001 | 24h |
-| ENT-003 | SSO 集成 (SAML/OIDC) | 🟠 P1 | ⬜ | ENT-001 | 24h |
-| ENT-004 | LDAP/AD 集成 | 🟠 P1 | ⬜ | ENT-003 | 16h |
-| ENT-005 | 审计日志系统 | 🟠 P1 | ⬜ | ENT-001 | 16h |
-| ENT-006 | 高级权限管理 (RBAC) | 🟠 P1 | ⬜ | ENT-001 | 20h |
-| ENT-007 | SLA 保障与监控 | 🟡 P2 | ⬜ | ENT-001 | 16h |
-| ENT-008 | 企业管理后台 | 🟠 P1 | ⬜ | ENT-001 | 24h |
+| ID      | 任务                 | 优先级 | 状态 | 依赖      | 估时 |
+| ------- | -------------------- | ------ | ---- | --------- | ---- |
+| ENT-001 | 私有化部署方案       | 🔴 P0  | ⬜   | Phase 1~3 | 40h  |
+| ENT-002 | Docker/K8s 部署模板  | 🔴 P0  | ⬜   | ENT-001   | 24h  |
+| ENT-003 | SSO 集成 (SAML/OIDC) | 🟠 P1  | ⬜   | ENT-001   | 24h  |
+| ENT-004 | LDAP/AD 集成         | 🟠 P1  | ⬜   | ENT-003   | 16h  |
+| ENT-005 | 审计日志系统         | 🟠 P1  | ⬜   | ENT-001   | 16h  |
+| ENT-006 | 高级权限管理 (RBAC)  | 🟠 P1  | ⬜   | ENT-001   | 20h  |
+| ENT-007 | SLA 保障与监控       | 🟡 P2  | ⬜   | ENT-001   | 16h  |
+| ENT-008 | 企业管理后台         | 🟠 P1  | ⬜   | ENT-001   | 24h  |
 
 ---
 
 #### 6.4.2 团队协作 (W5-8)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| TEAM-001 | 团队/组织管理 | 🔴 P0 | ⬜ | Phase 1 | 16h |
-| TEAM-002 | 成员邀请与角色管理 | 🔴 P0 | ⬜ | TEAM-001 | 12h |
-| TEAM-003 | 实时协作编辑 (OT/CRDT) | 🟠 P1 | ⬜ | TEAM-001 | 40h |
-| TEAM-004 | 资源共享与权限 | 🟠 P1 | ⬜ | TEAM-001 | 12h |
-| TEAM-005 | 评论与标注功能 | 🟡 P2 | ⬜ | TEAM-001 | 12h |
-| TEAM-006 | 活动流与通知 | 🟡 P2 | ⬜ | TEAM-001 | 8h |
-| TEAM-007 | 团队工作空间 | 🟠 P1 | ⬜ | TEAM-001 | 12h |
+| ID       | 任务                   | 优先级 | 状态 | 依赖     | 估时 |
+| -------- | ---------------------- | ------ | ---- | -------- | ---- |
+| TEAM-001 | 团队/组织管理          | 🔴 P0  | ⬜   | Phase 1  | 16h  |
+| TEAM-002 | 成员邀请与角色管理     | 🔴 P0  | ⬜   | TEAM-001 | 12h  |
+| TEAM-003 | 实时协作编辑 (OT/CRDT) | 🟠 P1  | ⬜   | TEAM-001 | 40h  |
+| TEAM-004 | 资源共享与权限         | 🟠 P1  | ⬜   | TEAM-001 | 12h  |
+| TEAM-005 | 评论与标注功能         | 🟡 P2  | ⬜   | TEAM-001 | 12h  |
+| TEAM-006 | 活动流与通知           | 🟡 P2  | ⬜   | TEAM-001 | 8h   |
+| TEAM-007 | 团队工作空间           | 🟠 P1  | ⬜   | TEAM-001 | 12h  |
 
 ---
 
 #### 6.4.3 高级功能 (W9-12)
 
-| ID | 任务 | 优先级 | 状态 | 依赖 | 估时 |
-|---|---|---|---|---|---|
-| ADV-001 | 使用分析仪表盘 | 🟠 P1 | ⬜ | Phase 1 | 24h |
-| ADV-002 | 性能监控系统 | 🟠 P1 | ⬜ | Phase 1 | 20h |
-| ADV-003 | 自动优化建议 | 🟡 P2 | ⬜ | ADV-001 | 24h |
-| ADV-004 | AI 辅助搭建 | 🟡 P2 | ⬜ | Phase 1 | 32h |
-| ADV-005 | 工作流模板库 | 🟠 P1 | ⬜ | Phase 1 | 16h |
-| ADV-006 | 批量操作支持 | 🟡 P2 | ⬜ | Phase 1 | 12h |
-| ADV-007 | 导入/导出功能 | 🟠 P1 | ⬜ | Phase 1 | 12h |
-| ADV-008 | API 速率限制与配额 | 🟠 P1 | ⬜ | Phase 1 | 12h |
+| ID      | 任务               | 优先级 | 状态 | 依赖    | 估时 |
+| ------- | ------------------ | ------ | ---- | ------- | ---- |
+| ADV-001 | 使用分析仪表盘     | 🟠 P1  | ⬜   | Phase 1 | 24h  |
+| ADV-002 | 性能监控系统       | 🟠 P1  | ⬜   | Phase 1 | 20h  |
+| ADV-003 | 自动优化建议       | 🟡 P2  | ⬜   | ADV-001 | 24h  |
+| ADV-004 | AI 辅助搭建        | 🟡 P2  | ⬜   | Phase 1 | 32h  |
+| ADV-005 | 工作流模板库       | 🟠 P1  | ⬜   | Phase 1 | 16h  |
+| ADV-006 | 批量操作支持       | 🟡 P2  | ⬜   | Phase 1 | 12h  |
+| ADV-007 | 导入/导出功能      | 🟠 P1  | ⬜   | Phase 1 | 12h  |
+| ADV-008 | API 速率限制与配额 | 🟠 P1  | ⬜   | Phase 1 | 12h  |
 
 ---
 
 ### 6.5 任务统计概览
 
-| Phase | 任务数 | P0 | P1 | P2 | P3 | 预估工时 |
-|---|---|---|---|---|---|---|
-| Phase 1: 核心 MVP | 120+ | 45 | 50 | 20 | 5 | ~800h |
-| Phase 2: 自定义能力 | 35+ | 10 | 18 | 7 | 0 | ~300h |
-| Phase 3: 社区生态 | 30+ | 8 | 16 | 6 | 0 | ~280h |
-| Phase 4: 规模化 | 25+ | 5 | 14 | 6 | 0 | ~350h |
-| **总计** | **210+** | **68** | **98** | **39** | **5** | **~1730h** |
+| Phase               | 任务数   | P0     | P1     | P2     | P3    | 预估工时   |
+| ------------------- | -------- | ------ | ------ | ------ | ----- | ---------- |
+| Phase 1: 核心 MVP   | 120+     | 45     | 50     | 20     | 5     | ~800h      |
+| Phase 2: 自定义能力 | 35+      | 10     | 18     | 7      | 0     | ~300h      |
+| Phase 3: 社区生态   | 30+      | 8      | 16     | 6      | 0     | ~280h      |
+| Phase 4: 规模化     | 25+      | 5      | 14     | 6      | 0     | ~350h      |
+| **总计**            | **210+** | **68** | **98** | **39** | **5** | **~1730h** |
 
 ---
 
 ### 6.6 里程碑检查点
 
-| 里程碑 | 目标时间 | 关键交付物 | 验收标准 |
-|---|---|---|---|
-| M1: 基础框架 | W2 | 前后端项目搭建完成 | 可运行、CI 通过 |
-| M2: 编辑器可用 | W4 | 可视化编辑器 MVP | 可拖拽节点、连线 |
-| M3: 执行引擎 | W8 | 工作流可执行 | 端到端执行成功 |
-| M4: MVP 发布 | W12 | Phase 1 完成 | 可注册、创建、执行工作流 |
-| M5: SDK 发布 | P2-W3 | 节点 SDK | 开发者可创建自定义节点 |
-| M6: 商店上线 | P3-W3 | Agent 商店 | 用户可发布/下载 Agent |
-| M7: 企业版 | P4-W4 | 企业功能 | 私有部署、SSO |
+| 里程碑         | 目标时间 | 关键交付物         | 验收标准                 |
+| -------------- | -------- | ------------------ | ------------------------ |
+| M1: 基础框架   | W2       | 前后端项目搭建完成 | 可运行、CI 通过          |
+| M2: 编辑器可用 | W4       | 可视化编辑器 MVP   | 可拖拽节点、连线         |
+| M3: 执行引擎   | W8       | 工作流可执行       | 端到端执行成功           |
+| M4: MVP 发布   | W12      | Phase 1 完成       | 可注册、创建、执行工作流 |
+| M5: SDK 发布   | P2-W3    | 节点 SDK           | 开发者可创建自定义节点   |
+| M6: 商店上线   | P3-W3    | Agent 商店         | 用户可发布/下载 Agent    |
+| M7: 企业版     | P4-W4    | 企业功能           | 私有部署、SSO            |
 
 ---
 
@@ -2212,26 +2270,26 @@ CREATE TABLE users (
     display_name    VARCHAR(100),
     avatar_url      VARCHAR(500),
     bio             TEXT,
-    
+
     -- 认证相关
     password_hash   VARCHAR(255),
     email_verified  BOOLEAN DEFAULT FALSE,
-    
+
     -- OAuth 关联
     github_id       VARCHAR(50),
     google_id       VARCHAR(50),
-    
+
     -- 配置
     settings        JSONB DEFAULT '{}',
-    
+
     -- 统计
     workflow_count  INTEGER DEFAULT 0,
     agent_count     INTEGER DEFAULT 0,
-    
+
     -- 订阅
     plan            VARCHAR(20) DEFAULT 'free',
     plan_expires_at TIMESTAMPTZ,
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW(),
@@ -2248,37 +2306,37 @@ CREATE INDEX idx_users_username ON users(username);
 CREATE TABLE workflows (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+
     -- 基础信息
     name            VARCHAR(200) NOT NULL,
     description     TEXT,
     icon            VARCHAR(50) DEFAULT '📋',
-    
+
     -- 工作流定义 (JSON)
     definition      JSONB NOT NULL,
     variables       JSONB DEFAULT '{}',
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'draft',
     is_public       BOOLEAN DEFAULT FALSE,
-    
+
     -- 执行配置
     trigger_type    VARCHAR(50) DEFAULT 'manual',
     trigger_config  JSONB DEFAULT '{}',
-    
+
     -- 统计
     run_count       INTEGER DEFAULT 0,
     star_count      INTEGER DEFAULT 0,
     fork_count      INTEGER DEFAULT 0,
-    
+
     -- 版本
     version         INTEGER DEFAULT 1,
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW(),
     published_at    TIMESTAMPTZ,
-    
+
     -- 文件夹
     folder_id       UUID
 );
@@ -2294,31 +2352,31 @@ CREATE TABLE executions (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workflow_id     UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
     user_id         UUID NOT NULL REFERENCES users(id),
-    
+
     -- 执行状态
     status          VARCHAR(20) NOT NULL DEFAULT 'pending',
-    
+
     -- 触发信息
     trigger_type    VARCHAR(50) NOT NULL,
     trigger_data    JSONB DEFAULT '{}',
-    
+
     -- 执行数据
     inputs          JSONB DEFAULT '{}',
     outputs         JSONB DEFAULT '{}',
     context         JSONB DEFAULT '{}',
-    
+
     -- 性能指标
     started_at      TIMESTAMPTZ,
     completed_at    TIMESTAMPTZ,
     duration_ms     INTEGER,
-    
+
     -- 错误信息
     error_message   TEXT,
     error_node_id   VARCHAR(100),
-    
+
     -- 资源消耗
     token_usage     JSONB DEFAULT '{}',
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
@@ -2337,23 +2395,23 @@ CREATE TABLE node_logs (
     execution_id    UUID NOT NULL REFERENCES executions(id) ON DELETE CASCADE,
     node_id         VARCHAR(100) NOT NULL,
     node_type       VARCHAR(50) NOT NULL,
-    
+
     -- 执行数据
     status          VARCHAR(20) NOT NULL,
     inputs          JSONB DEFAULT '{}',
     outputs         JSONB DEFAULT '{}',
-    
+
     -- 时间
     started_at      TIMESTAMPTZ,
     completed_at    TIMESTAMPTZ,
     duration_ms     INTEGER,
-    
+
     -- 错误
     error_message   TEXT,
-    
+
     -- 日志
     logs            JSONB DEFAULT '[]',
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -2367,15 +2425,15 @@ CREATE INDEX idx_node_logs_node ON node_logs(node_id);
 CREATE TABLE api_keys (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+
     provider        VARCHAR(50) NOT NULL,  -- openai, anthropic, etc.
     name            VARCHAR(100) NOT NULL,
     key_encrypted   TEXT NOT NULL,         -- 加密存储
     key_preview     VARCHAR(20),           -- sk-...xxxx
-    
+
     is_active       BOOLEAN DEFAULT TRUE,
     last_used_at    TIMESTAMPTZ,
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
@@ -2390,7 +2448,7 @@ CREATE TABLE agents (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES users(id),
     workflow_id     UUID NOT NULL REFERENCES workflows(id),
-    
+
     -- 基础信息
     name            VARCHAR(200) NOT NULL,
     slug            VARCHAR(100) UNIQUE NOT NULL,
@@ -2398,23 +2456,23 @@ CREATE TABLE agents (
     long_description TEXT,
     icon            VARCHAR(50),
     cover_image     VARCHAR(500),
-    
+
     -- 分类
     category        VARCHAR(50),
     tags            TEXT[] DEFAULT '{}',
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'draft',
-    
+
     -- 定价
     pricing_type    VARCHAR(20) DEFAULT 'free',
     price           DECIMAL(10, 2),
-    
+
     -- 统计
     use_count       INTEGER DEFAULT 0,
     star_count      INTEGER DEFAULT 0,
     avg_rating      DECIMAL(3, 2) DEFAULT 0,
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW(),
@@ -2740,14 +2798,14 @@ Server -> Client:
 
 ```tsx
 // components/shared/
-- LoadingSpinner.tsx
-- EmptyState.tsx
-- ErrorBoundary.tsx
-- ConfirmDialog.tsx
-- SearchInput.tsx
-- Pagination.tsx
-- Badge.tsx
-- Avatar.tsx
+;-LoadingSpinner.tsx -
+  EmptyState.tsx -
+  ErrorBoundary.tsx -
+  ConfirmDialog.tsx -
+  SearchInput.tsx -
+  Pagination.tsx -
+  Badge.tsx -
+  Avatar.tsx
 ```
 
 ### 9.4 状态管理
@@ -2756,40 +2814,40 @@ Server -> Client:
 // stores/workflowStore.ts
 interface WorkflowStore {
   // 当前工作流
-  workflow: Workflow | null;
-  nodes: Node[];
-  edges: Edge[];
-  
+  workflow: Workflow | null
+  nodes: Node[]
+  edges: Edge[]
+
   // 操作
-  setWorkflow: (workflow: Workflow) => void;
-  addNode: (node: Node) => void;
-  updateNode: (id: string, data: Partial<Node>) => void;
-  removeNode: (id: string) => void;
-  addEdge: (edge: Edge) => void;
-  removeEdge: (id: string) => void;
-  
+  setWorkflow: (workflow: Workflow) => void
+  addNode: (node: Node) => void
+  updateNode: (id: string, data: Partial<Node>) => void
+  removeNode: (id: string) => void
+  addEdge: (edge: Edge) => void
+  removeEdge: (id: string) => void
+
   // 历史记录
-  history: HistoryEntry[];
-  undo: () => void;
-  redo: () => void;
+  history: HistoryEntry[]
+  undo: () => void
+  redo: () => void
 }
 
 // stores/userStore.ts
 interface UserStore {
-  user: User | null;
-  isAuthenticated: boolean;
-  
-  setUser: (user: User) => void;
-  logout: () => void;
+  user: User | null
+  isAuthenticated: boolean
+
+  setUser: (user: User) => void
+  logout: () => void
 }
 
 // stores/executionStore.ts
 interface ExecutionStore {
-  currentExecution: Execution | null;
-  nodeLogs: Record<string, NodeLog>;
-  
-  setExecution: (execution: Execution) => void;
-  updateNodeLog: (nodeId: string, log: NodeLog) => void;
+  currentExecution: Execution | null
+  nodeLogs: Record<string, NodeLog>
+
+  setExecution: (execution: Execution) => void
+  updateNodeLog: (nodeId: string, log: NodeLog) => void
 }
 ```
 
@@ -2943,12 +3001,12 @@ E2E 测试 (Playwright):
 
 ### 11.3 测试覆盖率目标
 
-| 类型 | 目标覆盖率 |
-|------|-----------|
-| 前端核心组件 | > 80% |
-| 后端 Service 层 | > 80% |
-| 后端 API 接口 | > 90% |
-| E2E 核心流程 | 100% |
+| 类型            | 目标覆盖率 |
+| --------------- | ---------- |
+| 前端核心组件    | > 80%      |
+| 后端 Service 层 | > 80%      |
+| 后端 API 接口   | > 90%      |
+| E2E 核心流程    | 100%       |
 
 ---
 
@@ -2962,7 +3020,7 @@ services:
   postgres:
     image: postgres:16
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -2971,7 +3029,7 @@ services:
   redis:
     image: redis:7
     ports:
-      - "6379:6379"
+      - '6379:6379'
 ```
 
 ### 12.2 生产环境
@@ -3080,82 +3138,82 @@ jobs:
  */
 export interface NodeDefinition<
   TInputs extends Record<string, InputDefinition> = Record<string, InputDefinition>,
-  TOutputs extends Record<string, OutputDefinition> = Record<string, OutputDefinition>
+  TOutputs extends Record<string, OutputDefinition> = Record<string, OutputDefinition>,
 > {
   // ===== 基础元数据 =====
   /** 唯一标识符，格式: vendor/node-name 或 node-name */
-  id: string;
+  id: string
   /** 显示名称 */
-  name: string;
+  name: string
   /** 节点描述 */
-  description: string;
+  description: string
   /** 图标 (emoji 或 图片URL) */
-  icon: string;
+  icon: string
   /** 分类 */
-  category: NodeCategory;
+  category: NodeCategory
   /** 版本号 (semver) */
-  version: string;
+  version: string
   /** 作者 */
-  author: string;
+  author: string
   /** 关键词，用于搜索 */
-  keywords?: string[];
+  keywords?: string[]
   /** 文档链接 */
-  documentation?: string;
-  
+  documentation?: string
+
   // ===== 输入输出定义 =====
   /** 输入端口定义 */
-  inputs: TInputs;
+  inputs: TInputs
   /** 输出端口定义 */
-  outputs: TOutputs;
-  
+  outputs: TOutputs
+
   // ===== 生命周期钩子 =====
   /** 输入验证 */
-  validate?: (params: ValidateParams<TInputs>) => void | Promise<void>;
+  validate?: (params: ValidateParams<TInputs>) => void | Promise<void>
   /** 节点初始化 */
-  setup?: (context: NodeContext) => void | Promise<void>;
+  setup?: (context: NodeContext) => void | Promise<void>
   /** 核心执行逻辑 */
-  execute: (params: ExecuteParams<TInputs>) => Promise<OutputValues<TOutputs>>;
+  execute: (params: ExecuteParams<TInputs>) => Promise<OutputValues<TOutputs>>
   /** 清理资源 */
-  teardown?: (context: NodeContext) => void | Promise<void>;
-  
+  teardown?: (context: NodeContext) => void | Promise<void>
+
   // ===== 可选配置 =====
   /** 执行超时 (毫秒) */
-  timeout?: number;
+  timeout?: number
   /** 重试配置 */
-  retry?: RetryConfig;
+  retry?: RetryConfig
   /** 所需权限 */
-  permissions?: Permission[];
+  permissions?: Permission[]
   /** 测试用例 */
-  tests?: TestCase<TInputs, TOutputs>[];
+  tests?: TestCase<TInputs, TOutputs>[]
 }
 
 /**
  * 节点分类
  */
 export type NodeCategory =
-  | 'ai'           // AI/LLM 相关
-  | 'integration'  // 第三方集成
-  | 'logic'        // 逻辑控制
-  | 'data'         // 数据处理
-  | 'text'         // 文本处理
-  | 'code'         // 代码执行
-  | 'io'           // 输入输出
-  | 'utility'      // 工具类
-  | 'custom';      // 自定义
+  | 'ai' // AI/LLM 相关
+  | 'integration' // 第三方集成
+  | 'logic' // 逻辑控制
+  | 'data' // 数据处理
+  | 'text' // 文本处理
+  | 'code' // 代码执行
+  | 'io' // 输入输出
+  | 'utility' // 工具类
+  | 'custom' // 自定义
 
 /**
  * 权限声明
  */
 export type Permission =
-  | 'llm:call'        // 调用 LLM
-  | 'http:request'    // 发送 HTTP 请求
-  | 'http:internal'   // 访问内网
-  | 'fs:read'         // 读取文件
-  | 'fs:write'        // 写入文件
-  | 'env:read'        // 读取环境变量
-  | 'secrets:read'    // 读取用户密钥
-  | 'cache:read'      // 读取缓存
-  | 'cache:write';    // 写入缓存
+  | 'llm:call' // 调用 LLM
+  | 'http:request' // 发送 HTTP 请求
+  | 'http:internal' // 访问内网
+  | 'fs:read' // 读取文件
+  | 'fs:write' // 写入文件
+  | 'env:read' // 读取环境变量
+  | 'secrets:read' // 读取用户密钥
+  | 'cache:read' // 读取缓存
+  | 'cache:write' // 写入缓存
 ```
 
 ### 11.3 输入输出类型系统
@@ -3174,7 +3232,7 @@ export const Input = {
     return {
       type: 'text',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3184,7 +3242,7 @@ export const Input = {
     return {
       type: 'textarea',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3194,7 +3252,7 @@ export const Input = {
     return {
       type: 'number',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3204,7 +3262,7 @@ export const Input = {
     return {
       type: 'boolean',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3214,17 +3272,19 @@ export const Input = {
     return {
       type: 'select',
       ...options,
-    };
+    }
   },
 
   /**
    * 多选
    */
-  multiSelect<T extends string>(options: MultiSelectInputOptions<T>): MultiSelectInputDefinition<T> {
+  multiSelect<T extends string>(
+    options: MultiSelectInputOptions<T>
+  ): MultiSelectInputDefinition<T> {
     return {
       type: 'multiSelect',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3234,7 +3294,7 @@ export const Input = {
     return {
       type: 'json',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3244,7 +3304,7 @@ export const Input = {
     return {
       type: 'array',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3254,7 +3314,7 @@ export const Input = {
     return {
       type: 'file',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3265,7 +3325,7 @@ export const Input = {
       type: 'code',
       language: options.language || 'javascript',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3275,7 +3335,7 @@ export const Input = {
     return {
       type: 'secret',
       ...options,
-    };
+    }
   },
 
   /**
@@ -3285,87 +3345,87 @@ export const Input = {
     return {
       type: 'dynamic',
       ...options,
-    };
+    }
   },
-};
+}
 
 /**
  * 输出类型构建器
  */
 export const Output = {
   text(options: OutputOptions): TextOutputDefinition {
-    return { type: 'text', ...options };
+    return { type: 'text', ...options }
   },
 
   number(options: OutputOptions): NumberOutputDefinition {
-    return { type: 'number', ...options };
+    return { type: 'number', ...options }
   },
 
   boolean(options: OutputOptions): BooleanOutputDefinition {
-    return { type: 'boolean', ...options };
+    return { type: 'boolean', ...options }
   },
 
   json<T = unknown>(options: JsonOutputOptions<T>): JsonOutputDefinition<T> {
-    return { type: 'json', ...options };
+    return { type: 'json', ...options }
   },
 
   array<T>(options: ArrayOutputOptions<T>): ArrayOutputDefinition<T> {
-    return { type: 'array', ...options };
+    return { type: 'array', ...options }
   },
 
   file(options: FileOutputOptions): FileOutputDefinition {
-    return { type: 'file', ...options };
+    return { type: 'file', ...options }
   },
 
   stream(options: StreamOutputOptions): StreamOutputDefinition {
-    return { type: 'stream', ...options };
+    return { type: 'stream', ...options }
   },
-};
+}
 
 // ===== 输入选项类型定义 =====
 
 interface BaseInputOptions {
   /** 显示标签 */
-  label: string;
+  label: string
   /** 是否必填 */
-  required?: boolean;
+  required?: boolean
   /** 描述说明 */
-  description?: string;
+  description?: string
   /** 占位符 */
-  placeholder?: string;
+  placeholder?: string
   /** 默认值 */
-  default?: unknown;
+  default?: unknown
   /** 是否支持变量引用 */
-  allowVariable?: boolean;
+  allowVariable?: boolean
   /** 条件显示 */
-  showIf?: (inputs: Record<string, unknown>) => boolean;
+  showIf?: (inputs: Record<string, unknown>) => boolean
 }
 
 interface TextInputOptions extends BaseInputOptions {
-  default?: string;
-  minLength?: number;
-  maxLength?: number;
-  pattern?: string;
-  patternError?: string;
+  default?: string
+  minLength?: number
+  maxLength?: number
+  pattern?: string
+  patternError?: string
 }
 
 interface NumberInputOptions extends BaseInputOptions {
-  default?: number;
-  min?: number;
-  max?: number;
-  step?: number;
-  unit?: string;
+  default?: number
+  min?: number
+  max?: number
+  step?: number
+  unit?: string
 }
 
 interface SelectInputOptions<T extends string> extends BaseInputOptions {
-  options: Array<{ value: T; label: string; description?: string }>;
-  default?: T;
+  options: Array<{ value: T; label: string; description?: string }>
+  default?: T
 }
 
 interface CodeInputOptions extends BaseInputOptions {
-  language: 'javascript' | 'typescript' | 'python' | 'json' | 'yaml' | 'sql';
-  default?: string;
-  height?: number;
+  language: 'javascript' | 'typescript' | 'python' | 'json' | 'yaml' | 'sql'
+  default?: string
+  height?: number
 }
 ```
 
@@ -3380,204 +3440,204 @@ interface CodeInputOptions extends BaseInputOptions {
 export interface NodeContext {
   // ===== 执行信息 =====
   /** 当前执行ID */
-  executionId: string;
+  executionId: string
   /** 当前节点ID */
-  nodeId: string;
+  nodeId: string
   /** 工作流ID */
-  workflowId: string;
+  workflowId: string
   /** 用户ID */
-  userId: string;
+  userId: string
 
   // ===== LLM 服务 =====
   llm: {
     /**
      * 对话式调用
      */
-    chat(options: LLMChatOptions): Promise<LLMChatResponse>;
-    
+    chat(options: LLMChatOptions): Promise<LLMChatResponse>
+
     /**
      * 流式对话
      */
-    chatStream(options: LLMChatOptions): AsyncIterable<LLMStreamChunk>;
-    
+    chatStream(options: LLMChatOptions): AsyncIterable<LLMStreamChunk>
+
     /**
      * 文本嵌入
      */
-    embed(options: EmbedOptions): Promise<EmbedResponse>;
-    
+    embed(options: EmbedOptions): Promise<EmbedResponse>
+
     /**
      * 获取可用模型列表
      */
-    listModels(): Promise<ModelInfo[]>;
-  };
+    listModels(): Promise<ModelInfo[]>
+  }
 
   // ===== HTTP 客户端 =====
   http: {
     /**
      * 发送 HTTP 请求
      */
-    request<T = unknown>(options: HttpRequestOptions): Promise<HttpResponse<T>>;
-    
+    request<T = unknown>(options: HttpRequestOptions): Promise<HttpResponse<T>>
+
     /**
      * GET 请求
      */
-    get<T = unknown>(url: string, options?: HttpOptions): Promise<HttpResponse<T>>;
-    
+    get<T = unknown>(url: string, options?: HttpOptions): Promise<HttpResponse<T>>
+
     /**
      * POST 请求
      */
-    post<T = unknown>(url: string, data?: unknown, options?: HttpOptions): Promise<HttpResponse<T>>;
-  };
+    post<T = unknown>(url: string, data?: unknown, options?: HttpOptions): Promise<HttpResponse<T>>
+  }
 
   // ===== 缓存服务 =====
   cache: {
     /**
      * 获取缓存
      */
-    get<T = unknown>(key: string): Promise<T | null>;
-    
+    get<T = unknown>(key: string): Promise<T | null>
+
     /**
      * 设置缓存
      */
-    set<T = unknown>(key: string, value: T, ttl?: number): Promise<void>;
-    
+    set<T = unknown>(key: string, value: T, ttl?: number): Promise<void>
+
     /**
      * 删除缓存
      */
-    delete(key: string): Promise<void>;
-    
+    delete(key: string): Promise<void>
+
     /**
      * 检查缓存是否存在
      */
-    has(key: string): Promise<boolean>;
-  };
+    has(key: string): Promise<boolean>
+  }
 
   // ===== 密钥管理 =====
   secrets: {
     /**
      * 获取用户配置的密钥
      */
-    get(provider: string): Promise<string | null>;
-    
+    get(provider: string): Promise<string | null>
+
     /**
      * 列出已配置的密钥提供商
      */
-    list(): Promise<string[]>;
-  };
+    list(): Promise<string[]>
+  }
 
   // ===== 文件操作 (沙箱内) =====
   fs: {
     /**
      * 读取文件
      */
-    read(path: string): Promise<Buffer>;
-    
+    read(path: string): Promise<Buffer>
+
     /**
      * 读取文本文件
      */
-    readText(path: string, encoding?: string): Promise<string>;
-    
+    readText(path: string, encoding?: string): Promise<string>
+
     /**
      * 写入文件
      */
-    write(path: string, data: Buffer | string): Promise<void>;
-    
+    write(path: string, data: Buffer | string): Promise<void>
+
     /**
      * 列出目录
      */
-    list(path: string): Promise<FileInfo[]>;
-    
+    list(path: string): Promise<FileInfo[]>
+
     /**
      * 临时文件
      */
-    temp(prefix?: string): Promise<string>;
-  };
+    temp(prefix?: string): Promise<string>
+  }
 
   // ===== 日志服务 =====
   log: {
-    debug(message: string, data?: Record<string, unknown>): void;
-    info(message: string, data?: Record<string, unknown>): void;
-    warn(message: string, data?: Record<string, unknown>): void;
-    error(message: string, error?: Error, data?: Record<string, unknown>): void;
-  };
+    debug(message: string, data?: Record<string, unknown>): void
+    info(message: string, data?: Record<string, unknown>): void
+    warn(message: string, data?: Record<string, unknown>): void
+    error(message: string, error?: Error, data?: Record<string, unknown>): void
+  }
 
   // ===== 进度上报 =====
   progress: {
     /**
      * 更新进度 (0-100)
      */
-    update(percent: number, message?: string): void;
-    
+    update(percent: number, message?: string): void
+
     /**
      * 增加进度
      */
-    increment(delta: number, message?: string): void;
-  };
+    increment(delta: number, message?: string): void
+  }
 
   // ===== 事件系统 =====
   events: {
     /**
      * 发送自定义事件
      */
-    emit(event: string, data?: unknown): void;
-  };
+    emit(event: string, data?: unknown): void
+  }
 
   // ===== 配置访问 =====
   config: {
     /** 默认模型 */
-    defaultModel: string;
+    defaultModel: string
     /** 执行模式 */
-    executionMode: 'cloud' | 'local' | 'hybrid';
+    executionMode: 'cloud' | 'local' | 'hybrid'
     /** 用户偏好 */
-    preferences: Record<string, unknown>;
-  };
+    preferences: Record<string, unknown>
+  }
 
   // ===== 工具方法 =====
   utils: {
     /**
      * 生成唯一ID
      */
-    uuid(): string;
-    
+    uuid(): string
+
     /**
      * 延时
      */
-    sleep(ms: number): Promise<void>;
-    
+    sleep(ms: number): Promise<void>
+
     /**
      * 重试
      */
-    retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>;
-  };
+    retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>
+  }
 }
 
 // ===== LLM 相关类型 =====
 
 interface LLMChatOptions {
-  model?: string;
+  model?: string
   messages: Array<{
-    role: 'system' | 'user' | 'assistant';
-    content: string;
-  }>;
-  temperature?: number;
-  maxTokens?: number;
-  topP?: number;
-  stop?: string[];
+    role: 'system' | 'user' | 'assistant'
+    content: string
+  }>
+  temperature?: number
+  maxTokens?: number
+  topP?: number
+  stop?: string[]
   responseFormat?: {
-    type: 'text' | 'json';
-    schema?: Record<string, unknown>;
-  };
+    type: 'text' | 'json'
+    schema?: Record<string, unknown>
+  }
 }
 
 interface LLMChatResponse {
-  content: string;
-  model: string;
+  content: string
+  model: string
   usage: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
-  finishReason: 'stop' | 'length' | 'content_filter';
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+  finishReason: 'stop' | 'length' | 'content_filter'
 }
 ```
 
@@ -3585,13 +3645,7 @@ interface LLMChatResponse {
 
 ```typescript
 // examples/translator-node.ts
-import {
-  defineNode,
-  Input,
-  Output,
-  NodeContext,
-  ValidationError,
-} from '@agentflow/sdk';
+import { defineNode, Input, Output, NodeContext, ValidationError } from '@agentflow/sdk'
 
 /**
  * 多语言翻译节点
@@ -3716,45 +3770,44 @@ export default defineNode({
   // ===== 输入验证 =====
   validate({ inputs }) {
     if (!inputs.text?.trim()) {
-      throw new ValidationError('text', '翻译文本不能为空');
+      throw new ValidationError('text', '翻译文本不能为空')
     }
 
     if (inputs.text.length > 10000) {
-      throw new ValidationError('text', '文本长度不能超过 10000 字符');
+      throw new ValidationError('text', '文本长度不能超过 10000 字符')
     }
 
     if (inputs.sourceLang !== 'auto' && inputs.sourceLang === inputs.targetLang) {
-      throw new ValidationError('targetLang', '目标语言不能与源语言相同');
+      throw new ValidationError('targetLang', '目标语言不能与源语言相同')
     }
 
     // 验证术语表格式
     if (inputs.glossary) {
       try {
-        const glossary = typeof inputs.glossary === 'string' 
-          ? JSON.parse(inputs.glossary) 
-          : inputs.glossary;
-        
+        const glossary =
+          typeof inputs.glossary === 'string' ? JSON.parse(inputs.glossary) : inputs.glossary
+
         if (typeof glossary !== 'object' || Array.isArray(glossary)) {
-          throw new Error();
+          throw new Error()
         }
       } catch {
-        throw new ValidationError('glossary', '术语表格式无效，请使用 JSON 对象格式');
+        throw new ValidationError('glossary', '术语表格式无效，请使用 JSON 对象格式')
       }
     }
   },
 
   // ===== 核心执行逻辑 =====
   async execute({ inputs, context }) {
-    const { text, sourceLang, targetLang, style, preserveFormatting, glossary } = inputs;
+    const { text, sourceLang, targetLang, style, preserveFormatting, glossary } = inputs
 
-    context.log.info('开始翻译', { 
-      sourceLang, 
-      targetLang, 
-      textLength: text.length 
-    });
+    context.log.info('开始翻译', {
+      sourceLang,
+      targetLang,
+      textLength: text.length,
+    })
 
     // 更新进度
-    context.progress.update(10, '准备翻译...');
+    context.progress.update(10, '准备翻译...')
 
     // 构建系统提示词
     const styleGuides: Record<string, string> = {
@@ -3762,42 +3815,42 @@ export default defineNode({
       casual: '使用口语化、自然的表达方式',
       technical: '保留技术术语，使用准确的专业表达',
       creative: '追求自然流畅，可以适当意译以提升可读性',
-    };
+    }
 
     let systemPrompt = `你是一位专业的翻译专家。请将用户提供的文本翻译成${getLanguageName(targetLang)}。
 
 翻译要求：
 1. ${styleGuides[style]}
 2. ${preserveFormatting ? '保留原文的换行和段落格式' : '可以调整格式以提升可读性'}
-3. 确保翻译准确、通顺`;
+3. 确保翻译准确、通顺`
 
     // 添加术语表
     if (glossary && Object.keys(glossary).length > 0) {
       const glossaryText = Object.entries(glossary)
         .map(([k, v]) => `"${k}" → "${v}"`)
-        .join('\n');
-      systemPrompt += `\n\n专业术语映射（请严格遵循）：\n${glossaryText}`;
+        .join('\n')
+      systemPrompt += `\n\n专业术语映射（请严格遵循）：\n${glossaryText}`
     }
 
     if (sourceLang === 'auto') {
-      systemPrompt += '\n\n请首先检测源文本的语言。';
+      systemPrompt += '\n\n请首先检测源文本的语言。'
     }
 
-    context.progress.update(30, '调用翻译模型...');
+    context.progress.update(30, '调用翻译模型...')
 
     // 调用 LLM
     const response = await context.llm.chat({
       model: context.config.defaultModel,
       messages: [
         { role: 'system', content: systemPrompt },
-        { 
-          role: 'user', 
+        {
+          role: 'user',
           content: `请翻译以下文本：\n\n${text}\n\n请以 JSON 格式返回：
 {
   "translatedText": "翻译结果",
   "detectedLang": "检测到的源语言代码",
   "confidence": 0.95
-}` 
+}`,
         },
       ],
       temperature: 0.3,
@@ -3813,34 +3866,34 @@ export default defineNode({
           required: ['translatedText', 'detectedLang', 'confidence'],
         },
       },
-    });
+    })
 
-    context.progress.update(90, '处理结果...');
+    context.progress.update(90, '处理结果...')
 
     // 解析响应
-    const result = JSON.parse(response.content);
+    const result = JSON.parse(response.content)
 
     // 计算字数
     const wordCount = {
       source: countWords(text, result.detectedLang),
       target: countWords(result.translatedText, targetLang),
-    };
+    }
 
     context.log.info('翻译完成', {
       detectedLang: result.detectedLang,
       confidence: result.confidence,
       wordCount,
       tokensUsed: response.usage.totalTokens,
-    });
+    })
 
-    context.progress.update(100, '完成');
+    context.progress.update(100, '完成')
 
     return {
       translatedText: result.translatedText,
       detectedLang: result.detectedLang,
       confidence: result.confidence,
       wordCount,
-    };
+    }
   },
 
   // ===== 测试用例 =====
@@ -3858,7 +3911,7 @@ export default defineNode({
         detectedLang: 'zh',
       },
       validate(outputs) {
-        return outputs.translatedText.toLowerCase().includes('hello');
+        return outputs.translatedText.toLowerCase().includes('hello')
       },
     },
     {
@@ -3868,14 +3921,14 @@ export default defineNode({
         sourceLang: 'zh',
         targetLang: 'en',
         style: 'technical',
-        glossary: { 'API': 'Application Programming Interface' },
+        glossary: { API: 'Application Programming Interface' },
       },
       validate(outputs) {
-        return outputs.translatedText.includes('Application Programming Interface');
+        return outputs.translatedText.includes('Application Programming Interface')
       },
     },
   ],
-});
+})
 
 // ===== 辅助函数 =====
 
@@ -3888,17 +3941,17 @@ function getLanguageName(code: string): string {
     fr: '法文',
     de: '德文',
     es: '西班牙文',
-  };
-  return names[code] || code;
+  }
+  return names[code] || code
 }
 
 function countWords(text: string, lang: string): number {
   if (['zh', 'ja', 'ko'].includes(lang)) {
     // CJK 语言按字符计数
-    return text.replace(/\s/g, '').length;
+    return text.replace(/\s/g, '').length
   }
   // 其他语言按空格分词
-  return text.trim().split(/\s+/).length;
+  return text.trim().split(/\s+/).length
 }
 ```
 
@@ -4091,11 +4144,11 @@ Hello, {{ name }}!
   {% if item.skip %}
     {% continue %}
   {% endif %}
-  
+
   {% if item.stop %}
     {% break %}
   {% endif %}
-  
+
   {{ item.name }}
 {% endfor %}
 
@@ -4227,24 +4280,24 @@ Hello, {{ name }}!
  * 模板引擎主类
  */
 export class PromptTemplate {
-  private ast: ASTNode[];
-  private filters: Map<string, FilterFunction>;
-  private macros: Map<string, MacroDefinition>;
+  private ast: ASTNode[]
+  private filters: Map<string, FilterFunction>
+  private macros: Map<string, MacroDefinition>
 
   constructor(template: string, options?: TemplateOptions) {
     // 解析模板为 AST
-    const lexer = new Lexer(template);
-    const tokens = lexer.tokenize();
-    const parser = new Parser(tokens);
-    this.ast = parser.parse();
+    const lexer = new Lexer(template)
+    const tokens = lexer.tokenize()
+    const parser = new Parser(tokens)
+    this.ast = parser.parse()
 
     // 注册默认过滤器
-    this.filters = new Map(Object.entries(defaultFilters));
-    
+    this.filters = new Map(Object.entries(defaultFilters))
+
     // 注册自定义过滤器
     if (options?.filters) {
       for (const [name, fn] of Object.entries(options.filters)) {
-        this.filters.set(name, fn);
+        this.filters.set(name, fn)
       }
     }
   }
@@ -4257,9 +4310,9 @@ export class PromptTemplate {
       context,
       filters: this.filters,
       macros: this.macros,
-    });
+    })
 
-    return runtime.execute(this.ast);
+    return runtime.execute(this.ast)
   }
 
   /**
@@ -4271,9 +4324,9 @@ export class PromptTemplate {
       filters: this.filters,
       macros: this.macros,
       async: true,
-    });
+    })
 
-    return runtime.executeAsync(this.ast);
+    return runtime.executeAsync(this.ast)
   }
 
   /**
@@ -4281,16 +4334,16 @@ export class PromptTemplate {
    */
   static validate(template: string): ValidationResult {
     try {
-      const lexer = new Lexer(template);
-      const tokens = lexer.tokenize();
-      const parser = new Parser(tokens);
-      parser.parse();
-      return { valid: true, errors: [] };
+      const lexer = new Lexer(template)
+      const tokens = lexer.tokenize()
+      const parser = new Parser(tokens)
+      parser.parse()
+      return { valid: true, errors: [] }
     } catch (error) {
       return {
         valid: false,
         errors: [{ message: error.message, line: error.line, column: error.column }],
-      };
+      }
     }
   }
 
@@ -4298,13 +4351,13 @@ export class PromptTemplate {
    * 提取模板中使用的变量
    */
   getVariables(): string[] {
-    const variables = new Set<string>();
+    const variables = new Set<string>()
     this.walkAST(this.ast, (node) => {
       if (node.type === 'Variable') {
-        variables.add(node.name);
+        variables.add(node.name)
       }
-    });
-    return Array.from(variables);
+    })
+    return Array.from(variables)
   }
 }
 
@@ -4312,14 +4365,14 @@ export class PromptTemplate {
  * 快捷渲染函数
  */
 export function render(template: string, context: Record<string, unknown>): string {
-  return new PromptTemplate(template).render(context);
+  return new PromptTemplate(template).render(context)
 }
 
 /**
  * 预编译模板 (提高重复渲染性能)
  */
 export function compile(template: string, options?: TemplateOptions): CompiledTemplate {
-  return new PromptTemplate(template, options);
+  return new PromptTemplate(template, options)
 }
 ```
 
@@ -4333,74 +4386,77 @@ export const aiFilters = {
    * 计算文本的 token 数量
    */
   tokenCount: (text: string, model: string = 'gpt-4'): number => {
-    const encoder = getEncoder(model);
-    return encoder.encode(text).length;
+    const encoder = getEncoder(model)
+    return encoder.encode(text).length
   },
 
   /**
    * 截断到指定 token 数量
    */
   truncateTokens: (text: string, maxTokens: number, model: string = 'gpt-4'): string => {
-    const encoder = getEncoder(model);
-    const tokens = encoder.encode(text);
-    if (tokens.length <= maxTokens) return text;
-    return encoder.decode(tokens.slice(0, maxTokens)) + '...';
+    const encoder = getEncoder(model)
+    const tokens = encoder.encode(text)
+    if (tokens.length <= maxTokens) return text
+    return encoder.decode(tokens.slice(0, maxTokens)) + '...'
   },
 
   /**
    * 转换为 bullet 列表
    */
   bulletPoints: (items: unknown[]): string => {
-    return items.map(item => `• ${item}`).join('\n');
+    return items.map((item) => `• ${item}`).join('\n')
   },
 
   /**
    * 转换为编号列表
    */
   numberedList: (items: unknown[]): string => {
-    return items.map((item, i) => `${i + 1}. ${item}`).join('\n');
+    return items.map((item, i) => `${i + 1}. ${item}`).join('\n')
   },
 
   /**
    * XML 标签包装
    */
   xmlTag: (content: string, tag: string): string => {
-    return `<${tag}>\n${content}\n</${tag}>`;
+    return `<${tag}>\n${content}\n</${tag}>`
   },
 
   /**
    * 代码块包装
    */
   codeBlock: (code: string, language: string = ''): string => {
-    return `\`\`\`${language}\n${code}\n\`\`\``;
+    return `\`\`\`${language}\n${code}\n\`\`\``
   },
 
   /**
    * 压缩空白字符
    */
   compressWhitespace: (text: string): string => {
-    return text.replace(/\s+/g, ' ').trim();
+    return text.replace(/\s+/g, ' ').trim()
   },
 
   /**
    * 移除空行
    */
   removeEmptyLines: (text: string): string => {
-    return text.split('\n').filter(line => line.trim()).join('\n');
+    return text
+      .split('\n')
+      .filter((line) => line.trim())
+      .join('\n')
   },
 
   /**
    * 角色标签包装 (用于 chat 格式)
    */
   role: (content: string, role: 'system' | 'user' | 'assistant'): string => {
-    return `<|${role}|>\n${content}\n<|end|>`;
+    return `<|${role}|>\n${content}\n<|end|>`
   },
-};
+}
 ```
 
 ### 12.5 模板示例
 
-```jinja2
+````jinja2
 {# templates/translation.prompt #}
 
 {# 系统提示词 #}
@@ -4445,8 +4501,10 @@ export const aiFilters = {
   "confidence": 0.95,
   "notes": "翻译说明（可选）"
 }
-```
+````
+
 {% endblock %}
+
 ```
 
 ### 12.6 模板引擎 TodoList
@@ -4472,54 +4530,56 @@ export const aiFilters = {
 ### 13.1 沙箱架构
 
 ```
+
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       沙箱执行环境架构                                   │
+│ 沙箱执行环境架构 │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                       隔离层                                     │   │
-│  │                                                                 │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │   │
-│  │  │ 进程隔离    │  │ 网络隔离    │  │ 文件系统隔离            │ │   │
-│  │  │ (Worker)   │  │ (白名单)    │  │ (虚拟 FS)              │ │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────────────────┘ │   │
-│  │                                                                 │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │   │
-│  │  │ 内存限制    │  │ CPU 限制    │  │ 执行时间限制            │ │   │
-│  │  │ (堆大小)    │  │ (时间片)    │  │ (超时终止)              │ │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────────────────┘ │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                              ↓                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                       安全策略层                                 │   │
-│  │                                                                 │   │
-│  │  ┌─────────────────────────────────────────────────────────┐   │   │
-│  │  │ 权限检查                                                 │   │   │
-│  │  │ • API 调用权限验证                                       │   │   │
-│  │  │ • 危险操作拦截                                           │   │   │
-│  │  │ • 敏感数据访问控制                                       │   │   │
-│  │  └─────────────────────────────────────────────────────────┘   │   │
-│  │                                                                 │   │
-│  │  ┌─────────────────────────────────────────────────────────┐   │   │
-│  │  │ 代码分析                                                 │   │   │
-│  │  │ • 静态分析 (AST 检查)                                    │   │   │
-│  │  │ • 危险模式检测                                           │   │   │
-│  │  │ • 依赖白名单验证                                         │   │   │
-│  │  └─────────────────────────────────────────────────────────┘   │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                              ↓                                          │
-│  ┌─────────────────────────────────────────────────────────────────┐   │
-│  │                       执行引擎层                                 │   │
-│  │                                                                 │   │
-│  │  ┌─────────────────────┐  ┌─────────────────────────────────┐  │   │
-│  │  │ JavaScript (V8)    │  │ Python (Pyodide / 容器)         │  │   │
-│  │  │ • isolated-vm      │  │ • WASM 沙箱                      │  │   │
-│  │  │ • QuickJS          │  │ • Docker 容器                    │  │   │
-│  │  └─────────────────────┘  └─────────────────────────────────┘  │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                         │
+│ │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 隔离层 │ │
+│ │ │ │
+│ │ ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │ │
+│ │ │ 进程隔离 │ │ 网络隔离 │ │ 文件系统隔离 │ │ │
+│ │ │ (Worker) │ │ (白名单) │ │ (虚拟 FS) │ │ │
+│ │ └─────────────┘ └─────────────┘ └─────────────────────────┘ │ │
+│ │ │ │
+│ │ ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐ │ │
+│ │ │ 内存限制 │ │ CPU 限制 │ │ 执行时间限制 │ │ │
+│ │ │ (堆大小) │ │ (时间片) │ │ (超时终止) │ │ │
+│ │ └─────────────┘ └─────────────┘ └─────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│ ↓ │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 安全策略层 │ │
+│ │ │ │
+│ │ ┌─────────────────────────────────────────────────────────┐ │ │
+│ │ │ 权限检查 │ │ │
+│ │ │ • API 调用权限验证 │ │ │
+│ │ │ • 危险操作拦截 │ │ │
+│ │ │ • 敏感数据访问控制 │ │ │
+│ │ └─────────────────────────────────────────────────────────┘ │ │
+│ │ │ │
+│ │ ┌─────────────────────────────────────────────────────────┐ │ │
+│ │ │ 代码分析 │ │ │
+│ │ │ • 静态分析 (AST 检查) │ │ │
+│ │ │ • 危险模式检测 │ │ │
+│ │ │ • 依赖白名单验证 │ │ │
+│ │ └─────────────────────────────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│ ↓ │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ 执行引擎层 │ │
+│ │ │ │
+│ │ ┌─────────────────────┐ ┌─────────────────────────────────┐ │ │
+│ │ │ JavaScript (V8) │ │ Python (Pyodide / 容器) │ │ │
+│ │ │ • isolated-vm │ │ • WASM 沙箱 │ │ │
+│ │ │ • QuickJS │ │ • Docker 容器 │ │ │
+│ │ └─────────────────────┘ └─────────────────────────────────┘ │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│ │
 └─────────────────────────────────────────────────────────────────────────┘
-```
+
+````
 
 ### 13.2 JavaScript 沙箱实现
 
@@ -4576,7 +4636,7 @@ export class JavaScriptSandbox {
    */
   private setupGlobals(): void {
     const jail = this.context.global;
-    
+
     // 设置安全的全局对象
     jail.setSync('global', jail.derefInto());
 
@@ -4703,7 +4763,7 @@ export class SandboxError extends Error {
     this.name = 'SandboxError';
   }
 }
-```
+````
 
 ### 13.3 Python 沙箱实现 (容器方案)
 
@@ -4717,7 +4777,7 @@ import (
     "encoding/json"
     "fmt"
     "time"
-    
+
     "github.com/docker/docker/api/types/container"
     "github.com/docker/docker/client"
 )
@@ -4797,7 +4857,7 @@ func (s *PythonSandbox) Execute(ctx context.Context, code string, inputs map[str
     defer cancel()
 
     statusCh, errCh := s.dockerClient.ContainerWait(timeoutCtx, containerID, container.WaitConditionNotRunning)
-    
+
     select {
     case err := <-errCh:
         if err != nil {
@@ -4874,16 +4934,16 @@ sandbox:
   javascript:
     # 内存限制
     memory_limit: 128MB
-    
+
     # 执行超时
     timeout: 30s
-    
+
     # 堆大小限制
     max_heap_size: 64MB
-    
+
     # 栈大小限制
     stack_size: 1MB
-    
+
     # 允许的全局对象
     allowed_globals:
       - console
@@ -4899,7 +4959,7 @@ sandbox:
       - Map
       - Set
       - RegExp
-    
+
     # 禁止的模式
     forbidden_patterns:
       - eval
@@ -4915,19 +4975,19 @@ sandbox:
   python:
     # 内存限制
     memory_limit: 256MB
-    
+
     # CPU 配额
-    cpu_quota: 50000  # 50% of one CPU
-    
+    cpu_quota: 50000 # 50% of one CPU
+
     # 执行超时
     timeout: 60s
-    
+
     # 进程数限制
     pids_limit: 100
-    
+
     # 网络模式
-    network_mode: none  # none | bridge | host
-    
+    network_mode: none # none | bridge | host
+
     # 允许的 Python 包
     allowed_packages:
       - json
@@ -4939,10 +4999,10 @@ sandbox:
       - functools
       - typing
       - dataclasses
-      - requests  # 仅在 network_mode=bridge 时
+      - requests # 仅在 network_mode=bridge 时
       - pandas
       - numpy
-    
+
     # 禁止的模块
     forbidden_modules:
       - os
@@ -5019,60 +5079,60 @@ sandbox:
 interface PluginManifest {
   // ===== 基础信息 =====
   /** 插件 ID (唯一标识) */
-  id: string;
+  id: string
   /** 插件名称 */
-  name: string;
+  name: string
   /** 版本号 (semver) */
-  version: string;
+  version: string
   /** 描述 */
-  description: string;
+  description: string
   /** 作者 */
   author: {
-    name: string;
-    email?: string;
-    url?: string;
-  };
+    name: string
+    email?: string
+    url?: string
+  }
   /** 许可证 */
-  license: string;
+  license: string
   /** 仓库地址 */
-  repository?: string;
+  repository?: string
   /** 主页 */
-  homepage?: string;
+  homepage?: string
   /** 关键词 */
-  keywords?: string[];
+  keywords?: string[]
 
   // ===== 插件配置 =====
   /** 插件类型 */
-  type: 'node' | 'theme' | 'integration' | 'trigger' | 'feature';
+  type: 'node' | 'theme' | 'integration' | 'trigger' | 'feature'
   /** 入口文件 */
-  main: string;
+  main: string
   /** 浏览器入口 (前端插件) */
-  browser?: string;
+  browser?: string
   /** 图标 */
-  icon?: string;
+  icon?: string
   /** 分类 */
-  category?: string;
+  category?: string
 
   // ===== 兼容性 =====
   /** 引擎兼容性 */
   engines: {
-    agentflow: string;  // 如 "^1.0.0"
-    node?: string;      // 如 ">=18"
-  };
+    agentflow: string // 如 "^1.0.0"
+    node?: string // 如 ">=18"
+  }
   /** 平台兼容性 */
-  platforms?: ('web' | 'desktop' | 'all')[];
+  platforms?: ('web' | 'desktop' | 'all')[]
 
   // ===== 权限声明 =====
   permissions: {
     /** 网络访问 */
     network?: {
-      domains: string[];  // 允许访问的域名
-    };
+      domains: string[] // 允许访问的域名
+    }
     /** 文件系统 */
     filesystem?: {
-      read?: string[];    // 可读路径
-      write?: string[];   // 可写路径
-    };
+      read?: string[] // 可读路径
+      write?: string[] // 可写路径
+    }
     /** API 权限 */
     api?: (
       | 'llm:call'
@@ -5083,57 +5143,53 @@ interface PluginManifest {
       | 'user:read'
       | 'workflow:read'
       | 'workflow:write'
-    )[];
+    )[]
     /** 系统权限 */
-    system?: (
-      | 'clipboard'
-      | 'notifications'
-      | 'shell'
-    )[];
-  };
+    system?: ('clipboard' | 'notifications' | 'shell')[]
+  }
 
   // ===== 依赖 =====
-  dependencies?: Record<string, string>;
-  
+  dependencies?: Record<string, string>
+
   // ===== 配置项 =====
   configuration?: {
-    title: string;
-    properties: Record<string, ConfigurationProperty>;
-  };
+    title: string
+    properties: Record<string, ConfigurationProperty>
+  }
 
   // ===== 贡献点 =====
   contributes?: {
     /** 自定义节点 */
-    nodes?: NodeContribution[];
+    nodes?: NodeContribution[]
     /** 菜单项 */
-    menus?: MenuContribution[];
+    menus?: MenuContribution[]
     /** 命令 */
-    commands?: CommandContribution[];
+    commands?: CommandContribution[]
     /** 主题 */
-    themes?: ThemeContribution[];
+    themes?: ThemeContribution[]
     /** 语言支持 */
-    languages?: LanguageContribution[];
-  };
+    languages?: LanguageContribution[]
+  }
 }
 
 // 配置属性定义
 interface ConfigurationProperty {
-  type: 'string' | 'number' | 'boolean' | 'array' | 'object';
-  default?: unknown;
-  description?: string;
-  enum?: unknown[];
-  minimum?: number;
-  maximum?: number;
+  type: 'string' | 'number' | 'boolean' | 'array' | 'object'
+  default?: unknown
+  description?: string
+  enum?: unknown[]
+  minimum?: number
+  maximum?: number
 }
 
 // 节点贡献
 interface NodeContribution {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  file: string;
+  id: string
+  name: string
+  description: string
+  icon: string
+  category: string
+  file: string
 }
 ```
 
@@ -5149,12 +5205,12 @@ export interface PluginActivator {
   /**
    * 插件激活时调用
    */
-  activate(context: PluginContext): void | Promise<void>;
-  
+  activate(context: PluginContext): void | Promise<void>
+
   /**
    * 插件停用时调用
    */
-  deactivate?(): void | Promise<void>;
+  deactivate?(): void | Promise<void>
 }
 
 /**
@@ -5163,90 +5219,93 @@ export interface PluginActivator {
 export interface PluginContext {
   // ===== 基础信息 =====
   /** 插件 ID */
-  pluginId: string;
+  pluginId: string
   /** 插件版本 */
-  version: string;
+  version: string
   /** 插件存储路径 */
-  storagePath: string;
+  storagePath: string
 
   // ===== 注册 API =====
   /** 注册自定义节点 */
-  registerNode(nodeDefinition: NodeDefinition): Disposable;
-  
+  registerNode(nodeDefinition: NodeDefinition): Disposable
+
   /** 注册命令 */
-  registerCommand(command: string, handler: CommandHandler): Disposable;
-  
+  registerCommand(command: string, handler: CommandHandler): Disposable
+
   /** 注册菜单项 */
-  registerMenuItem(menu: MenuItem): Disposable;
-  
+  registerMenuItem(menu: MenuItem): Disposable
+
   /** 注册配置变更监听 */
-  onConfigurationChanged(listener: ConfigurationChangeListener): Disposable;
+  onConfigurationChanged(listener: ConfigurationChangeListener): Disposable
 
   // ===== 服务访问 =====
   /** LLM 服务 */
-  llm: LLMService;
-  
+  llm: LLMService
+
   /** HTTP 客户端 */
-  http: HttpClient;
-  
+  http: HttpClient
+
   /** 缓存服务 */
-  cache: CacheService;
-  
+  cache: CacheService
+
   /** 密钥服务 */
-  secrets: SecretsService;
-  
+  secrets: SecretsService
+
   /** 日志服务 */
-  logger: Logger;
+  logger: Logger
 
   // ===== 配置访问 =====
   /** 获取插件配置 */
-  getConfiguration<T>(key: string): T | undefined;
-  
+  getConfiguration<T>(key: string): T | undefined
+
   /** 更新插件配置 */
-  updateConfiguration<T>(key: string, value: T): Promise<void>;
+  updateConfiguration<T>(key: string, value: T): Promise<void>
 
   // ===== 存储 API =====
   /** 全局状态 (跨工作区) */
-  globalState: StateStorage;
-  
+  globalState: StateStorage
+
   /** 工作区状态 */
-  workspaceState: StateStorage;
+  workspaceState: StateStorage
 
   // ===== UI API =====
   /** 显示信息消息 */
-  showInformationMessage(message: string, ...actions: string[]): Promise<string | undefined>;
-  
+  showInformationMessage(message: string, ...actions: string[]): Promise<string | undefined>
+
   /** 显示警告消息 */
-  showWarningMessage(message: string, ...actions: string[]): Promise<string | undefined>;
-  
+  showWarningMessage(message: string, ...actions: string[]): Promise<string | undefined>
+
   /** 显示错误消息 */
-  showErrorMessage(message: string, ...actions: string[]): Promise<string | undefined>;
-  
+  showErrorMessage(message: string, ...actions: string[]): Promise<string | undefined>
+
   /** 显示输入框 */
-  showInputBox(options?: InputBoxOptions): Promise<string | undefined>;
-  
+  showInputBox(options?: InputBoxOptions): Promise<string | undefined>
+
   /** 显示快速选择 */
-  showQuickPick<T extends QuickPickItem>(items: T[], options?: QuickPickOptions): Promise<T | undefined>;
-  
+  showQuickPick<T extends QuickPickItem>(
+    items: T[],
+    options?: QuickPickOptions
+  ): Promise<T | undefined>
+
   /** 创建状态栏项 */
-  createStatusBarItem(alignment?: 'left' | 'right', priority?: number): StatusBarItem;
+  createStatusBarItem(alignment?: 'left' | 'right', priority?: number): StatusBarItem
 }
 
 /**
  * 可释放资源
  */
 export interface Disposable {
-  dispose(): void;
+  dispose(): void
 }
 
 /**
  * 状态存储
  */
 export interface StateStorage {
-  get<T>(key: string, defaultValue?: T): T | undefined;
-  set<T>(key: string, value: T): Promise<void>;
-  delete(key: string): Promise<void>;
-  keys(): string[];
+  get<T>(key: string, defaultValue?: T): T | undefined
+  set<T>(key: string, value: T): Promise<void>
+  delete(key: string): Promise<void>
+  keys(): string[]
 }
 ```
 
@@ -5259,13 +5318,13 @@ export interface StateStorage {
  * 插件加载器
  */
 export class PluginLoader {
-  private plugins: Map<string, LoadedPlugin> = new Map();
-  private registry: PluginRegistry;
-  private sandbox: PluginSandbox;
+  private plugins: Map<string, LoadedPlugin> = new Map()
+  private registry: PluginRegistry
+  private sandbox: PluginSandbox
 
   constructor(options: PluginLoaderOptions) {
-    this.registry = new PluginRegistry(options.registryUrl);
-    this.sandbox = new PluginSandbox(options.sandboxConfig);
+    this.registry = new PluginRegistry(options.registryUrl)
+    this.sandbox = new PluginSandbox(options.sandboxConfig)
   }
 
   /**
@@ -5273,36 +5332,36 @@ export class PluginLoader {
    */
   async loadFromPath(pluginPath: string): Promise<LoadedPlugin> {
     // 读取 manifest
-    const manifestPath = path.join(pluginPath, 'plugin.manifest.json');
-    const manifest = await this.readManifest(manifestPath);
+    const manifestPath = path.join(pluginPath, 'plugin.manifest.json')
+    const manifest = await this.readManifest(manifestPath)
 
     // 验证 manifest
-    this.validateManifest(manifest);
+    this.validateManifest(manifest)
 
     // 检查兼容性
-    this.checkCompatibility(manifest);
+    this.checkCompatibility(manifest)
 
     // 验证签名
     if (manifest.signature) {
-      await this.verifySignature(pluginPath, manifest.signature);
+      await this.verifySignature(pluginPath, manifest.signature)
     }
 
     // 检查权限
-    const grantedPermissions = await this.requestPermissions(manifest.permissions);
+    const grantedPermissions = await this.requestPermissions(manifest.permissions)
 
     // 创建插件沙箱
-    const pluginSandbox = this.sandbox.createForPlugin(manifest.id, grantedPermissions);
+    const pluginSandbox = this.sandbox.createForPlugin(manifest.id, grantedPermissions)
 
     // 加载入口文件
-    const entryPath = path.join(pluginPath, manifest.main);
-    const pluginModule = await pluginSandbox.import(entryPath);
+    const entryPath = path.join(pluginPath, manifest.main)
+    const pluginModule = await pluginSandbox.import(entryPath)
 
     // 创建插件上下文
-    const context = this.createPluginContext(manifest, pluginSandbox);
+    const context = this.createPluginContext(manifest, pluginSandbox)
 
     // 激活插件
     if (typeof pluginModule.activate === 'function') {
-      await pluginModule.activate(context);
+      await pluginModule.activate(context)
     }
 
     const loadedPlugin: LoadedPlugin = {
@@ -5311,11 +5370,11 @@ export class PluginLoader {
       module: pluginModule,
       sandbox: pluginSandbox,
       status: 'active',
-    };
+    }
 
-    this.plugins.set(manifest.id, loadedPlugin);
+    this.plugins.set(manifest.id, loadedPlugin)
 
-    return loadedPlugin;
+    return loadedPlugin
   }
 
   /**
@@ -5323,41 +5382,41 @@ export class PluginLoader {
    */
   async installFromRegistry(pluginId: string, version?: string): Promise<LoadedPlugin> {
     // 获取插件信息
-    const pluginInfo = await this.registry.getPlugin(pluginId, version);
+    const pluginInfo = await this.registry.getPlugin(pluginId, version)
 
     // 下载插件包
-    const packagePath = await this.downloadPackage(pluginInfo.downloadUrl);
+    const packagePath = await this.downloadPackage(pluginInfo.downloadUrl)
 
     // 验证完整性
-    await this.verifyPackageIntegrity(packagePath, pluginInfo.checksum);
+    await this.verifyPackageIntegrity(packagePath, pluginInfo.checksum)
 
     // 解压到插件目录
-    const pluginPath = await this.extractPackage(packagePath, pluginId);
+    const pluginPath = await this.extractPackage(packagePath, pluginId)
 
     // 加载插件
-    return this.loadFromPath(pluginPath);
+    return this.loadFromPath(pluginPath)
   }
 
   /**
    * 卸载插件
    */
   async unload(pluginId: string): Promise<void> {
-    const plugin = this.plugins.get(pluginId);
-    if (!plugin) return;
+    const plugin = this.plugins.get(pluginId)
+    if (!plugin) return
 
     // 调用停用钩子
     if (typeof plugin.module.deactivate === 'function') {
-      await plugin.module.deactivate();
+      await plugin.module.deactivate()
     }
 
     // 释放所有注册的资源
-    plugin.context.dispose();
+    plugin.context.dispose()
 
     // 销毁沙箱
-    plugin.sandbox.destroy();
+    plugin.sandbox.destroy()
 
     // 移除插件
-    this.plugins.delete(pluginId);
+    this.plugins.delete(pluginId)
   }
 
   /**
@@ -5370,21 +5429,18 @@ export class PluginLoader {
       storagePath: this.getPluginStoragePath(manifest.id),
       permissions: manifest.permissions,
       sandbox,
-    });
+    })
   }
 
   /**
    * 验证 Manifest
    */
   private validateManifest(manifest: PluginManifest): void {
-    const schema = getManifestSchema();
-    const result = schema.validate(manifest);
-    
+    const schema = getManifestSchema()
+    const result = schema.validate(manifest)
+
     if (!result.valid) {
-      throw new PluginError(
-        'INVALID_MANIFEST',
-        `Manifest 验证失败: ${result.errors.join(', ')}`
-      );
+      throw new PluginError('INVALID_MANIFEST', `Manifest 验证失败: ${result.errors.join(', ')}`)
     }
   }
 
@@ -5392,13 +5448,13 @@ export class PluginLoader {
    * 检查兼容性
    */
   private checkCompatibility(manifest: PluginManifest): void {
-    const currentVersion = getAgentFlowVersion();
-    
+    const currentVersion = getAgentFlowVersion()
+
     if (!semver.satisfies(currentVersion, manifest.engines.agentflow)) {
       throw new PluginError(
         'INCOMPATIBLE',
         `插件要求 AgentFlow ${manifest.engines.agentflow}，当前版本 ${currentVersion}`
-      );
+      )
     }
   }
 
@@ -5409,13 +5465,13 @@ export class PluginLoader {
     permissions: PluginManifest['permissions']
   ): Promise<GrantedPermissions> {
     // 显示权限确认对话框
-    const granted = await showPermissionDialog(permissions);
-    
+    const granted = await showPermissionDialog(permissions)
+
     if (!granted) {
-      throw new PluginError('PERMISSION_DENIED', '用户拒绝授权');
+      throw new PluginError('PERMISSION_DENIED', '用户拒绝授权')
     }
 
-    return permissions;
+    return permissions
   }
 }
 ```
@@ -5544,7 +5600,7 @@ CREATE TABLE agents (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES users(id),
     workflow_id     UUID NOT NULL REFERENCES workflows(id),
-    
+
     -- 基础信息
     name            VARCHAR(200) NOT NULL,
     slug            VARCHAR(100) UNIQUE NOT NULL,
@@ -5555,27 +5611,27 @@ CREATE TABLE agents (
     cover_image     VARCHAR(500),
     screenshots     TEXT[] DEFAULT '{}',
     demo_video      VARCHAR(500),
-    
+
     -- 分类标签
     category_id     UUID REFERENCES agent_categories(id),
     tags            TEXT[] DEFAULT '{}',
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'draft',
     visibility      VARCHAR(20) DEFAULT 'public',
-    
+
     -- 定价
     pricing_type    VARCHAR(20) DEFAULT 'free',
     price           DECIMAL(10, 2),
     currency        VARCHAR(10) DEFAULT 'CNY',
-    
+
     -- 试用设置
     trial_enabled   BOOLEAN DEFAULT TRUE,
     trial_limit     INTEGER DEFAULT 3,
-    
+
     -- 版本
     current_version VARCHAR(20) DEFAULT '1.0.0',
-    
+
     -- 统计
     use_count       INTEGER DEFAULT 0,
     star_count      INTEGER DEFAULT 0,
@@ -5583,11 +5639,11 @@ CREATE TABLE agents (
     review_count    INTEGER DEFAULT 0,
     avg_rating      DECIMAL(3, 2) DEFAULT 0,
     total_revenue   DECIMAL(12, 2) DEFAULT 0,
-    
+
     -- SEO
     seo_title       VARCHAR(200),
     seo_description VARCHAR(500),
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW(),
@@ -5599,22 +5655,22 @@ CREATE TABLE agents (
 CREATE TABLE agent_versions (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     agent_id        UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-    
+
     version         VARCHAR(20) NOT NULL,
     workflow_snapshot JSONB NOT NULL,
     changelog       TEXT,
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'pending',
-    
+
     -- 审核
     reviewed_by     UUID REFERENCES users(id),
     reviewed_at     TIMESTAMPTZ,
     review_notes    TEXT,
-    
+
     -- 时间戳
     created_at      TIMESTAMPTZ DEFAULT NOW(),
-    
+
     UNIQUE(agent_id, version)
 );
 
@@ -5628,7 +5684,7 @@ CREATE TABLE agent_categories (
     parent_id       UUID REFERENCES agent_categories(id),
     sort_order      INTEGER DEFAULT 0,
     agent_count     INTEGER DEFAULT 0,
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -5637,24 +5693,24 @@ CREATE TABLE agent_reviews (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     agent_id        UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
     user_id         UUID NOT NULL REFERENCES users(id),
-    
+
     rating          INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     title           VARCHAR(200),
     content         TEXT,
-    
+
     -- 有用性投票
     helpful_count   INTEGER DEFAULT 0,
-    
+
     -- 创作者回复
     reply           TEXT,
     replied_at      TIMESTAMPTZ,
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'visible',
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW(),
-    
+
     UNIQUE(agent_id, user_id)
 );
 
@@ -5663,7 +5719,7 @@ CREATE TABLE agent_stars (
     user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     agent_id        UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
     created_at      TIMESTAMPTZ DEFAULT NOW(),
-    
+
     PRIMARY KEY(user_id, agent_id)
 );
 
@@ -5673,10 +5729,10 @@ CREATE TABLE agent_usages (
     agent_id        UUID NOT NULL REFERENCES agents(id),
     user_id         UUID NOT NULL REFERENCES users(id),
     execution_id    UUID REFERENCES executions(id),
-    
+
     -- 使用类型
     usage_type      VARCHAR(20) NOT NULL,  -- trial, purchased, subscription
-    
+
     -- 时间
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
@@ -5862,34 +5918,34 @@ enum AgentReviewStatus {
 interface ReviewChecklist {
   // 基础检查
   basicInfo: {
-    hasValidName: boolean;
-    hasDescription: boolean;
-    hasIcon: boolean;
-    hasCategory: boolean;
-  };
-  
+    hasValidName: boolean
+    hasDescription: boolean
+    hasIcon: boolean
+    hasCategory: boolean
+  }
+
   // 内容合规
   contentCompliance: {
-    noProhibitedContent: boolean;
-    noMaliciousCode: boolean;
-    noPrivacyViolation: boolean;
-    noCopyrightIssue: boolean;
-  };
-  
+    noProhibitedContent: boolean
+    noMaliciousCode: boolean
+    noPrivacyViolation: boolean
+    noCopyrightIssue: boolean
+  }
+
   // 功能测试
   functionalTest: {
-    workflowExecutable: boolean;
-    noRuntimeErrors: boolean;
-    reasonablePerformance: boolean;
-    expectedOutput: boolean;
-  };
-  
+    workflowExecutable: boolean
+    noRuntimeErrors: boolean
+    reasonablePerformance: boolean
+    expectedOutput: boolean
+  }
+
   // 安全检查
   securityCheck: {
-    noDataLeakage: boolean;
-    safeApiUsage: boolean;
-    noMaliciousPatterns: boolean;
-  };
+    noDataLeakage: boolean
+    safeApiUsage: boolean
+    noMaliciousPatterns: boolean
+  }
 }
 
 /**
@@ -5902,14 +5958,14 @@ const autoReviewRules = {
     maxLength: 50,
     prohibitedWords: ['违禁词列表...'],
   },
-  
+
   // 描述检查
   description: {
     minLength: 20,
     maxLength: 5000,
     requireFeatureList: true,
   },
-  
+
   // 代码检查
   workflow: {
     maxNodes: 100,
@@ -5917,14 +5973,14 @@ const autoReviewRules = {
     prohibitedNodeTypes: [],
     requiredNodeTypes: ['start', 'end'],
   },
-  
+
   // 资源限制
   resources: {
-    maxExecutionTime: 300000,  // 5分钟
+    maxExecutionTime: 300000, // 5分钟
     maxApiCalls: 50,
-    maxOutputSize: 10 * 1024 * 1024,  // 10MB
+    maxOutputSize: 10 * 1024 * 1024, // 10MB
   },
-};
+}
 ```
 
 ### 15.5 商店 TodoList
@@ -5984,21 +6040,21 @@ Agent 组合器允许用户将多个 Agent 串联成更强大的"超级 Agent"�
  * Agent 组合定义
  */
 interface AgentComposition {
-  id: string;
-  name: string;
-  description: string;
-  
+  id: string
+  name: string
+  description: string
+
   // 组合模式
-  mode: CompositionMode;
-  
+  mode: CompositionMode
+
   // Agent 节点
-  agents: AgentNode[];
-  
+  agents: AgentNode[]
+
   // 连接关系
-  connections: AgentConnection[];
-  
+  connections: AgentConnection[]
+
   // 全局配置
-  config: CompositionConfig;
+  config: CompositionConfig
 }
 
 /**
@@ -6007,16 +6063,16 @@ interface AgentComposition {
 enum CompositionMode {
   // 顺序执行
   SEQUENTIAL = 'sequential',
-  
+
   // 并行执行
   PARALLEL = 'parallel',
-  
+
   // 条件分支
   CONDITIONAL = 'conditional',
-  
+
   // 循环执行
   LOOP = 'loop',
-  
+
   // 自定义 DAG
   CUSTOM = 'custom',
 }
@@ -6025,23 +6081,23 @@ enum CompositionMode {
  * Agent 节点
  */
 interface AgentNode {
-  id: string;
-  agentId: string;        // 引用的 Agent ID
-  agentVersion?: string;  // 指定版本
-  
+  id: string
+  agentId: string // 引用的 Agent ID
+  agentVersion?: string // 指定版本
+
   // 输入映射
-  inputMapping: InputMapping[];
-  
+  inputMapping: InputMapping[]
+
   // 输出映射
-  outputMapping: OutputMapping[];
-  
+  outputMapping: OutputMapping[]
+
   // 节点配置
   config: {
-    timeout?: number;
-    retryCount?: number;
-    continueOnError?: boolean;
-    condition?: string;   // 条件表达式
-  };
+    timeout?: number
+    retryCount?: number
+    continueOnError?: boolean
+    condition?: string // 条件表达式
+  }
 }
 
 /**
@@ -6049,29 +6105,29 @@ interface AgentNode {
  */
 interface InputMapping {
   // 目标输入字段
-  targetField: string;
-  
+  targetField: string
+
   // 数据来源
-  source: 
+  source:
     | { type: 'static'; value: unknown }
     | { type: 'global_input'; field: string }
     | { type: 'agent_output'; agentNodeId: string; field: string }
-    | { type: 'expression'; expression: string };
+    | { type: 'expression'; expression: string }
 }
 
 /**
  * Agent 连接
  */
 interface AgentConnection {
-  id: string;
-  sourceAgentId: string;
-  targetAgentId: string;
-  
+  id: string
+  sourceAgentId: string
+  targetAgentId: string
+
   // 条件 (可选)
   condition?: {
-    type: 'always' | 'if' | 'else';
-    expression?: string;
-  };
+    type: 'always' | 'if' | 'else'
+    expression?: string
+  }
 }
 ```
 
@@ -6087,7 +6143,7 @@ interface AgentConnection {
 export function AgentComposer({ compositionId }: Props) {
   const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
-  
+
   // Agent 节点类型
   const nodeTypes = useMemo(() => ({
     agentNode: AgentNodeComponent,
@@ -6096,11 +6152,11 @@ export function AgentComposer({ compositionId }: Props) {
     conditionNode: ConditionNodeComponent,
     loopNode: LoopNodeComponent,
   }), []);
-  
+
   // 从 Agent 商店拖拽添加
   const onDrop = useCallback((event: DragEvent) => {
     const agentData = JSON.parse(event.dataTransfer.getData('agent'));
-    
+
     const newNode: Node = {
       id: nanoid(),
       type: 'agentNode',
@@ -6113,34 +6169,34 @@ export function AgentComposer({ compositionId }: Props) {
         outputs: agentData.outputs,
       },
     };
-    
+
     setNodes((nds) => [...nds, newNode]);
   }, []);
-  
+
   // 连接验证
   const isValidConnection = useCallback((connection: Connection) => {
     const sourceNode = nodes.find(n => n.id === connection.source);
     const targetNode = nodes.find(n => n.id === connection.target);
-    
+
     // 验证输出/输入类型兼容性
     const sourceOutput = sourceNode?.data.outputs[connection.sourceHandle];
     const targetInput = targetNode?.data.inputs[connection.targetHandle];
-    
+
     return isTypeCompatible(sourceOutput?.type, targetInput?.type);
   }, [nodes]);
-  
+
   // 执行组合
   const executeComposition = async () => {
     const composition = buildComposition(nodes, edges);
     const result = await api.post('/compositions/execute', composition);
     // ...
   };
-  
+
   return (
     <div className="h-full flex">
       {/* 左侧 Agent 面板 */}
       <AgentPalette onDragStart={handleDragStart} />
-      
+
       {/* 中间画布 */}
       <ReactFlow
         nodes={nodes}
@@ -6156,7 +6212,7 @@ export function AgentComposer({ compositionId }: Props) {
         <Controls />
         <MiniMap />
       </ReactFlow>
-      
+
       {/* 右侧配置面板 */}
       <ConfigPanel selectedNode={selectedNode} />
     </div>
@@ -6174,45 +6230,45 @@ export function AgentComposer({ compositionId }: Props) {
  */
 interface AgentMessage {
   // 消息ID
-  id: string;
-  
+  id: string
+
   // 时间戳
-  timestamp: string;
-  
+  timestamp: string
+
   // 来源 Agent
   source: {
-    agentId: string;
-    nodeId: string;
-    executionId: string;
-  };
-  
+    agentId: string
+    nodeId: string
+    executionId: string
+  }
+
   // 目标 Agent
   target: {
-    agentId: string;
-    nodeId: string;
-  };
-  
+    agentId: string
+    nodeId: string
+  }
+
   // 消息类型
-  type: 'data' | 'control' | 'error' | 'progress';
-  
+  type: 'data' | 'control' | 'error' | 'progress'
+
   // 消息内容
-  payload: unknown;
-  
+  payload: unknown
+
   // 元数据
   metadata: {
     // 数据类型
-    contentType: string;
-    
+    contentType: string
+
     // 数据大小
-    size: number;
-    
+    size: number
+
     // 是否压缩
-    compressed: boolean;
-    
+    compressed: boolean
+
     // 追踪信息
-    traceId: string;
-    spanId: string;
-  };
+    traceId: string
+    spanId: string
+  }
 }
 
 /**
@@ -6224,8 +6280,8 @@ class DataTypeAdapter {
    */
   static convert(data: unknown, fromType: DataType, toType: DataType): unknown {
     // 相同类型直接返回
-    if (fromType === toType) return data;
-    
+    if (fromType === toType) return data
+
     // 类型转换映射
     const converters: Record<string, (data: unknown) => unknown> = {
       'text->json': (d) => JSON.parse(d as string),
@@ -6233,16 +6289,16 @@ class DataTypeAdapter {
       'array->text': (d) => (d as unknown[]).join('\n'),
       'text->array': (d) => (d as string).split('\n'),
       // ... 更多转换
-    };
-    
-    const key = `${fromType}->${toType}`;
-    const converter = converters[key];
-    
-    if (!converter) {
-      throw new Error(`Cannot convert from ${fromType} to ${toType}`);
     }
-    
-    return converter(data);
+
+    const key = `${fromType}->${toType}`
+    const converter = converters[key]
+
+    if (!converter) {
+      throw new Error(`Cannot convert from ${fromType} to ${toType}`)
+    }
+
+    return converter(data)
   }
 }
 ```
@@ -6316,33 +6372,33 @@ CREATE TABLE agent_feedbacks (
     agent_id        UUID NOT NULL REFERENCES agents(id),
     user_id         UUID NOT NULL REFERENCES users(id),
     execution_id    UUID REFERENCES executions(id),
-    
+
     -- 反馈类型
     feedback_type   VARCHAR(20) NOT NULL,  -- thumbs_up, thumbs_down, report, suggestion
-    
+
     -- 反馈内容
     rating          INTEGER,               -- 1-5 (可选)
     content         TEXT,
-    
+
     -- 问题分类
     issue_category  VARCHAR(50),           -- output_quality, speed, accuracy, usability
-    
+
     -- 期望输出 (用于对比)
     expected_output TEXT,
-    
+
     -- 元数据
     metadata        JSONB DEFAULT '{}',
-    
+
     -- 处理状态
     status          VARCHAR(20) DEFAULT 'pending',
     resolved_at     TIMESTAMPTZ,
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 反馈聚合视图
 CREATE MATERIALIZED VIEW agent_feedback_summary AS
-SELECT 
+SELECT
     agent_id,
     COUNT(*) AS total_feedbacks,
     COUNT(*) FILTER (WHERE feedback_type = 'thumbs_up') AS thumbs_up_count,
@@ -6363,86 +6419,86 @@ GROUP BY agent_id;
  * A/B 测试实验
  */
 interface Experiment {
-  id: string;
-  agentId: string;
-  name: string;
-  description: string;
-  
+  id: string
+  agentId: string
+  name: string
+  description: string
+
   // 实验状态
-  status: 'draft' | 'running' | 'paused' | 'completed';
-  
+  status: 'draft' | 'running' | 'paused' | 'completed'
+
   // 变体配置
-  variants: Variant[];
-  
+  variants: Variant[]
+
   // 流量分配
   trafficAllocation: {
-    [variantId: string]: number;  // 百分比
-  };
-  
+    [variantId: string]: number // 百分比
+  }
+
   // 目标指标
-  primaryMetric: MetricConfig;
-  secondaryMetrics?: MetricConfig[];
-  
+  primaryMetric: MetricConfig
+  secondaryMetrics?: MetricConfig[]
+
   // 实验条件
-  targetingRules?: TargetingRule[];
-  
+  targetingRules?: TargetingRule[]
+
   // 统计配置
   statisticalConfig: {
-    confidenceLevel: number;      // 置信度 (如 0.95)
-    minimumSampleSize: number;
-    maximumDuration: number;      // 最长运行天数
-  };
-  
+    confidenceLevel: number // 置信度 (如 0.95)
+    minimumSampleSize: number
+    maximumDuration: number // 最长运行天数
+  }
+
   // 时间
-  startedAt?: Date;
-  endedAt?: Date;
-  createdAt: Date;
+  startedAt?: Date
+  endedAt?: Date
+  createdAt: Date
 }
 
 /**
  * 实验变体
  */
 interface Variant {
-  id: string;
-  name: string;
-  description: string;
-  
+  id: string
+  name: string
+  description: string
+
   // 变体类型
-  type: 'control' | 'treatment';
-  
+  type: 'control' | 'treatment'
+
   // 修改内容
-  changes: VariantChange[];
+  changes: VariantChange[]
 }
 
 /**
  * 变体修改
  */
 interface VariantChange {
-  type: 'prompt' | 'parameter' | 'node' | 'flow';
-  path: string;
-  originalValue: unknown;
-  newValue: unknown;
+  type: 'prompt' | 'parameter' | 'node' | 'flow'
+  path: string
+  originalValue: unknown
+  newValue: unknown
 }
 
 /**
  * 目标指标配置
  */
 interface MetricConfig {
-  name: string;
-  type: 'conversion' | 'continuous' | 'ratio';
-  
+  name: string
+  type: 'conversion' | 'continuous' | 'ratio'
+
   // 数据来源
-  source: 'execution' | 'feedback' | 'custom';
-  
+  source: 'execution' | 'feedback' | 'custom'
+
   // 计算方式
   calculation: {
-    event?: string;
-    field?: string;
-    aggregation?: 'count' | 'sum' | 'avg' | 'p50' | 'p95';
-  };
-  
+    event?: string
+    field?: string
+    aggregation?: 'count' | 'sum' | 'avg' | 'p50' | 'p95'
+  }
+
   // 期望方向
-  direction: 'increase' | 'decrease';
+  direction: 'increase' | 'decrease'
 }
 
 /**
@@ -6452,40 +6508,37 @@ class ABTestingService {
   /**
    * 分配用户到变体
    */
-  async assignVariant(
-    experimentId: string,
-    userId: string
-  ): Promise<Variant> {
+  async assignVariant(experimentId: string, userId: string): Promise<Variant> {
     // 检查是否已分配
-    const existing = await this.getAssignment(experimentId, userId);
-    if (existing) return existing;
-    
+    const existing = await this.getAssignment(experimentId, userId)
+    if (existing) return existing
+
     // 获取实验配置
-    const experiment = await this.getExperiment(experimentId);
-    
+    const experiment = await this.getExperiment(experimentId)
+
     // 检查定向规则
     if (!this.matchTargetingRules(experiment.targetingRules, userId)) {
-      return experiment.variants.find(v => v.type === 'control')!;
+      return experiment.variants.find((v) => v.type === 'control')!
     }
-    
+
     // 基于用户 ID 的确定性分配 (保证一致性)
-    const hash = this.hashUserId(userId, experimentId);
-    const bucket = hash % 100;
-    
-    let cumulative = 0;
+    const hash = this.hashUserId(userId, experimentId)
+    const bucket = hash % 100
+
+    let cumulative = 0
     for (const [variantId, allocation] of Object.entries(experiment.trafficAllocation)) {
-      cumulative += allocation;
+      cumulative += allocation
       if (bucket < cumulative) {
-        const variant = experiment.variants.find(v => v.id === variantId)!;
-        await this.saveAssignment(experimentId, userId, variant.id);
-        return variant;
+        const variant = experiment.variants.find((v) => v.id === variantId)!
+        await this.saveAssignment(experimentId, userId, variant.id)
+        return variant
       }
     }
-    
+
     // 默认返回对照组
-    return experiment.variants.find(v => v.type === 'control')!;
+    return experiment.variants.find((v) => v.type === 'control')!
   }
-  
+
   /**
    * 记录指标事件
    */
@@ -6496,9 +6549,9 @@ class ABTestingService {
     value: number,
     metadata?: Record<string, unknown>
   ): Promise<void> {
-    const assignment = await this.getAssignment(experimentId, userId);
-    if (!assignment) return;
-    
+    const assignment = await this.getAssignment(experimentId, userId)
+    if (!assignment) return
+
     await this.db.insert('experiment_metrics', {
       experimentId,
       variantId: assignment.variantId,
@@ -6507,62 +6560,65 @@ class ABTestingService {
       value,
       metadata,
       timestamp: new Date(),
-    });
+    })
   }
-  
+
   /**
    * 计算实验结果
    */
   async calculateResults(experimentId: string): Promise<ExperimentResults> {
-    const experiment = await this.getExperiment(experimentId);
-    const metrics = await this.getExperimentMetrics(experimentId);
-    
-    const results: VariantResult[] = [];
-    
+    const experiment = await this.getExperiment(experimentId)
+    const metrics = await this.getExperimentMetrics(experimentId)
+
+    const results: VariantResult[] = []
+
     for (const variant of experiment.variants) {
-      const variantMetrics = metrics.filter(m => m.variantId === variant.id);
-      
+      const variantMetrics = metrics.filter((m) => m.variantId === variant.id)
+
       const result: VariantResult = {
         variantId: variant.id,
         sampleSize: variantMetrics.length,
         metrics: {},
-      };
-      
+      }
+
       // 计算主要指标
       const primaryValues = variantMetrics
-        .filter(m => m.metricName === experiment.primaryMetric.name)
-        .map(m => m.value);
-      
+        .filter((m) => m.metricName === experiment.primaryMetric.name)
+        .map((m) => m.value)
+
       result.metrics[experiment.primaryMetric.name] = {
         mean: this.mean(primaryValues),
         stdDev: this.stdDev(primaryValues),
-        confidence: this.confidenceInterval(primaryValues, experiment.statisticalConfig.confidenceLevel),
-      };
-      
-      results.push(result);
+        confidence: this.confidenceInterval(
+          primaryValues,
+          experiment.statisticalConfig.confidenceLevel
+        ),
+      }
+
+      results.push(result)
     }
-    
+
     // 计算统计显著性
-    const controlResult = results.find(r => 
-      experiment.variants.find(v => v.id === r.variantId)?.type === 'control'
-    )!;
-    
+    const controlResult = results.find(
+      (r) => experiment.variants.find((v) => v.id === r.variantId)?.type === 'control'
+    )!
+
     for (const result of results) {
-      if (result.variantId === controlResult.variantId) continue;
-      
+      if (result.variantId === controlResult.variantId) continue
+
       result.statisticalSignificance = this.calculateSignificance(
         controlResult.metrics[experiment.primaryMetric.name],
         result.metrics[experiment.primaryMetric.name],
         experiment.statisticalConfig.confidenceLevel
-      );
+      )
     }
-    
+
     return {
       experimentId,
       status: experiment.status,
       variants: results,
       recommendation: this.generateRecommendation(results, experiment),
-    };
+    }
   }
 }
 ```
@@ -6576,32 +6632,32 @@ class ABTestingService {
  * 自动优化建议
  */
 interface OptimizationSuggestion {
-  id: string;
-  agentId: string;
-  
+  id: string
+  agentId: string
+
   // 建议类型
-  type: 'prompt' | 'parameter' | 'flow' | 'performance';
-  
+  type: 'prompt' | 'parameter' | 'flow' | 'performance'
+
   // 问题描述
   problem: {
-    description: string;
-    severity: 'low' | 'medium' | 'high';
-    affectedMetric: string;
-    evidence: Evidence[];
-  };
-  
+    description: string
+    severity: 'low' | 'medium' | 'high'
+    affectedMetric: string
+    evidence: Evidence[]
+  }
+
   // 建议方案
   suggestion: {
-    description: string;
-    expectedImprovement: string;
-    changes: Change[];
-    risk: 'low' | 'medium' | 'high';
-  };
-  
+    description: string
+    expectedImprovement: string
+    changes: Change[]
+    risk: 'low' | 'medium' | 'high'
+  }
+
   // 状态
-  status: 'pending' | 'applied' | 'rejected' | 'testing';
-  
-  createdAt: Date;
+  status: 'pending' | 'applied' | 'rejected' | 'testing'
+
+  createdAt: Date
 }
 
 /**
@@ -6612,72 +6668,71 @@ class OptimizationAnalyzer {
    * 分析 Agent 并生成优化建议
    */
   async analyze(agentId: string): Promise<OptimizationSuggestion[]> {
-    const suggestions: OptimizationSuggestion[] = [];
-    
+    const suggestions: OptimizationSuggestion[] = []
+
     // 获取历史数据
-    const executions = await this.getRecentExecutions(agentId, 1000);
-    const feedbacks = await this.getRecentFeedbacks(agentId, 500);
-    const agent = await this.getAgent(agentId);
-    
+    const executions = await this.getRecentExecutions(agentId, 1000)
+    const feedbacks = await this.getRecentFeedbacks(agentId, 500)
+    const agent = await this.getAgent(agentId)
+
     // 1. 分析失败模式
-    const failurePatterns = await this.analyzeFailurePatterns(executions);
-    suggestions.push(...this.generateFailureFixSuggestions(failurePatterns));
-    
+    const failurePatterns = await this.analyzeFailurePatterns(executions)
+    suggestions.push(...this.generateFailureFixSuggestions(failurePatterns))
+
     // 2. 分析性能瓶颈
-    const performanceIssues = await this.analyzePerformance(executions);
-    suggestions.push(...this.generatePerformanceSuggestions(performanceIssues));
-    
+    const performanceIssues = await this.analyzePerformance(executions)
+    suggestions.push(...this.generatePerformanceSuggestions(performanceIssues))
+
     // 3. 分析用户反馈
-    const feedbackInsights = await this.analyzeFeedback(feedbacks);
-    suggestions.push(...this.generateFeedbackBasedSuggestions(feedbackInsights));
-    
+    const feedbackInsights = await this.analyzeFeedback(feedbacks)
+    suggestions.push(...this.generateFeedbackBasedSuggestions(feedbackInsights))
+
     // 4. Prompt 优化建议 (使用 LLM)
-    const promptSuggestions = await this.analyzePrompts(agent);
-    suggestions.push(...promptSuggestions);
-    
-    return suggestions;
+    const promptSuggestions = await this.analyzePrompts(agent)
+    suggestions.push(...promptSuggestions)
+
+    return suggestions
   }
-  
+
   /**
    * 分析失败模式
    */
-  private async analyzeFailurePatterns(
-    executions: Execution[]
-  ): Promise<FailurePattern[]> {
-    const failedExecutions = executions.filter(e => e.status === 'failed');
-    
+  private async analyzeFailurePatterns(executions: Execution[]): Promise<FailurePattern[]> {
+    const failedExecutions = executions.filter((e) => e.status === 'failed')
+
     // 按错误类型聚类
-    const errorClusters = this.clusterErrors(failedExecutions);
-    
+    const errorClusters = this.clusterErrors(failedExecutions)
+
     // 识别常见模式
-    const patterns: FailurePattern[] = [];
-    
+    const patterns: FailurePattern[] = []
+
     for (const cluster of errorClusters) {
-      if (cluster.count >= 5) {  // 至少出现5次
+      if (cluster.count >= 5) {
+        // 至少出现5次
         patterns.push({
           errorType: cluster.type,
           frequency: cluster.count / failedExecutions.length,
           commonInputPatterns: this.extractInputPatterns(cluster.executions),
           nodeId: this.findFailingNode(cluster.executions),
-        });
+        })
       }
     }
-    
-    return patterns;
+
+    return patterns
   }
-  
+
   /**
    * 使用 LLM 分析 Prompt 优化建议
    */
   private async analyzePrompts(agent: Agent): Promise<OptimizationSuggestion[]> {
-    const workflow = agent.workflow;
-    const llmNodes = workflow.nodes.filter(n => n.type === 'llm');
-    
-    const suggestions: OptimizationSuggestion[] = [];
-    
+    const workflow = agent.workflow
+    const llmNodes = workflow.nodes.filter((n) => n.type === 'llm')
+
+    const suggestions: OptimizationSuggestion[] = []
+
     for (const node of llmNodes) {
-      const prompt = node.data.config.systemPrompt + '\n' + node.data.config.userPrompt;
-      
+      const prompt = node.data.config.systemPrompt + '\n' + node.data.config.userPrompt
+
       const analysis = await this.llmService.chat({
         model: 'gpt-4',
         messages: [
@@ -6689,18 +6744,18 @@ class OptimizationAnalyzer {
 2. 输出格式控制
 3. 潜在的歧义或错误
 4. 效率优化（减少 token 使用）
-5. 可维护性`
+5. 可维护性`,
           },
           {
             role: 'user',
-            content: `请分析这个 Prompt:\n\n${prompt}`
-          }
+            content: `请分析这个 Prompt:\n\n${prompt}`,
+          },
         ],
-        responseFormat: { type: 'json' }
-      });
-      
-      const result = JSON.parse(analysis.content);
-      
+        responseFormat: { type: 'json' },
+      })
+
+      const result = JSON.parse(analysis.content)
+
       if (result.suggestions?.length > 0) {
         suggestions.push({
           id: nanoid(),
@@ -6715,22 +6770,24 @@ class OptimizationAnalyzer {
           suggestion: {
             description: result.suggestions.join('; '),
             expectedImprovement: result.expectedImprovement,
-            changes: [{
-              type: 'prompt',
-              nodeId: node.id,
-              field: 'systemPrompt',
-              oldValue: node.data.config.systemPrompt,
-              newValue: result.optimizedPrompt,
-            }],
+            changes: [
+              {
+                type: 'prompt',
+                nodeId: node.id,
+                field: 'systemPrompt',
+                oldValue: node.data.config.systemPrompt,
+                newValue: result.optimizedPrompt,
+              },
+            ],
             risk: 'low',
           },
           status: 'pending',
           createdAt: new Date(),
-        });
+        })
       }
     }
-    
-    return suggestions;
+
+    return suggestions
   }
 }
 ```
@@ -6792,34 +6849,34 @@ class OptimizationAnalyzer {
 CREATE TABLE orders (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_no        VARCHAR(50) UNIQUE NOT NULL,
-    
+
     -- 买家信息
     user_id         UUID NOT NULL REFERENCES users(id),
-    
+
     -- 商品信息
     item_type       VARCHAR(20) NOT NULL,  -- agent, plugin, subscription
     item_id         UUID NOT NULL,
     item_name       VARCHAR(200) NOT NULL,
-    
+
     -- 卖家信息
     seller_id       UUID NOT NULL REFERENCES users(id),
-    
+
     -- 金额
     amount          DECIMAL(10, 2) NOT NULL,
     currency        VARCHAR(10) DEFAULT 'CNY',
-    
+
     -- 分成
     platform_fee    DECIMAL(10, 2) NOT NULL,
     seller_amount   DECIMAL(10, 2) NOT NULL,
-    
+
     -- 支付信息
     payment_method  VARCHAR(50),
     payment_channel VARCHAR(50),
     transaction_id  VARCHAR(100),
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'pending',
-    
+
     -- 时间
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     paid_at         TIMESTAMPTZ,
@@ -6831,31 +6888,31 @@ CREATE TABLE orders (
 CREATE TABLE creator_accounts (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID UNIQUE NOT NULL REFERENCES users(id),
-    
+
     -- 账户信息
     account_status  VARCHAR(20) DEFAULT 'active',
-    
+
     -- 等级
     creator_level   INTEGER DEFAULT 1,
-    
+
     -- 分成比例 (可根据等级调整)
     revenue_share   DECIMAL(4, 2) DEFAULT 0.70,
-    
+
     -- 余额
     balance         DECIMAL(12, 2) DEFAULT 0,
     pending_balance DECIMAL(12, 2) DEFAULT 0,
-    
+
     -- 累计收入
     total_earnings  DECIMAL(12, 2) DEFAULT 0,
     total_withdrawn DECIMAL(12, 2) DEFAULT 0,
-    
+
     -- 结算信息
     settlement_type VARCHAR(20),  -- alipay, wechat, bank
     settlement_account JSONB,
-    
+
     -- 税务信息
     tax_info        JSONB,
-    
+
     -- 时间
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW()
@@ -6865,22 +6922,22 @@ CREATE TABLE creator_accounts (
 CREATE TABLE earnings (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     creator_id      UUID NOT NULL REFERENCES creator_accounts(id),
-    
+
     -- 来源
     source_type     VARCHAR(20) NOT NULL,  -- sale, subscription, usage, tip
     source_id       UUID,
-    
+
     -- 金额
     amount          DECIMAL(10, 2) NOT NULL,
     currency        VARCHAR(10) DEFAULT 'CNY',
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'pending',
-    
+
     -- 结算
     settlement_id   UUID,
     settled_at      TIMESTAMPTZ,
-    
+
     -- 时间
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
@@ -6889,27 +6946,27 @@ CREATE TABLE earnings (
 CREATE TABLE withdrawals (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     creator_id      UUID NOT NULL REFERENCES creator_accounts(id),
-    
+
     -- 金额
     amount          DECIMAL(10, 2) NOT NULL,
     currency        VARCHAR(10) DEFAULT 'CNY',
-    
+
     -- 手续费
     fee             DECIMAL(10, 2) DEFAULT 0,
     actual_amount   DECIMAL(10, 2) NOT NULL,
-    
+
     -- 到账方式
     method          VARCHAR(20) NOT NULL,
     account_info    JSONB NOT NULL,
-    
+
     -- 状态
     status          VARCHAR(20) DEFAULT 'pending',
-    
+
     -- 处理信息
     processed_at    TIMESTAMPTZ,
     transaction_id  VARCHAR(100),
     failure_reason  TEXT,
-    
+
     -- 时间
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
@@ -6921,7 +6978,7 @@ CREATE TABLE creator_levels (
     min_earnings    DECIMAL(12, 2) NOT NULL,
     revenue_share   DECIMAL(4, 2) NOT NULL,
     benefits        JSONB DEFAULT '{}',
-    
+
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -6946,47 +7003,47 @@ interface PaymentService {
   /**
    * 创建支付订单
    */
-  createPayment(options: CreatePaymentOptions): Promise<PaymentResult>;
-  
+  createPayment(options: CreatePaymentOptions): Promise<PaymentResult>
+
   /**
    * 查询支付状态
    */
-  queryPayment(transactionId: string): Promise<PaymentStatus>;
-  
+  queryPayment(transactionId: string): Promise<PaymentStatus>
+
   /**
    * 发起退款
    */
-  refund(options: RefundOptions): Promise<RefundResult>;
-  
+  refund(options: RefundOptions): Promise<RefundResult>
+
   /**
    * 提现到用户账户
    */
-  withdraw(options: WithdrawOptions): Promise<WithdrawResult>;
+  withdraw(options: WithdrawOptions): Promise<WithdrawResult>
 }
 
 /**
  * 支付聚合服务
  */
 class PaymentAggregator implements PaymentService {
-  private providers: Map<string, PaymentProvider>;
-  
+  private providers: Map<string, PaymentProvider>
+
   constructor() {
     this.providers = new Map([
       ['alipay', new AlipayProvider()],
       ['wechat', new WechatPayProvider()],
       ['stripe', new StripeProvider()],
-    ]);
+    ])
   }
-  
+
   async createPayment(options: CreatePaymentOptions): Promise<PaymentResult> {
-    const provider = this.providers.get(options.method);
+    const provider = this.providers.get(options.method)
     if (!provider) {
-      throw new PaymentError('INVALID_METHOD', `不支持的支付方式: ${options.method}`);
+      throw new PaymentError('INVALID_METHOD', `不支持的支付方式: ${options.method}`)
     }
-    
+
     // 创建内部订单
-    const order = await this.createOrder(options);
-    
+    const order = await this.createOrder(options)
+
     // 调用支付渠道
     const paymentResult = await provider.createPayment({
       orderId: order.orderNo,
@@ -6995,77 +7052,74 @@ class PaymentAggregator implements PaymentService {
       description: options.description,
       returnUrl: options.returnUrl,
       notifyUrl: `${config.apiUrl}/webhooks/payment/${options.method}`,
-    });
-    
+    })
+
     // 更新订单
     await this.updateOrder(order.id, {
       transactionId: paymentResult.transactionId,
       paymentChannel: options.method,
-    });
-    
+    })
+
     return {
       orderId: order.id,
       orderNo: order.orderNo,
       paymentUrl: paymentResult.paymentUrl,
       qrCode: paymentResult.qrCode,
-    };
+    }
   }
-  
+
   /**
    * 处理支付回调
    */
-  async handlePaymentNotification(
-    provider: string,
-    notification: unknown
-  ): Promise<void> {
-    const paymentProvider = this.providers.get(provider);
-    if (!paymentProvider) return;
-    
+  async handlePaymentNotification(provider: string, notification: unknown): Promise<void> {
+    const paymentProvider = this.providers.get(provider)
+    if (!paymentProvider) return
+
     // 验证签名
-    const isValid = await paymentProvider.verifyNotification(notification);
+    const isValid = await paymentProvider.verifyNotification(notification)
     if (!isValid) {
-      throw new PaymentError('INVALID_SIGNATURE', '签名验证失败');
+      throw new PaymentError('INVALID_SIGNATURE', '签名验证失败')
     }
-    
+
     // 解析通知
-    const paymentInfo = await paymentProvider.parseNotification(notification);
-    
+    const paymentInfo = await paymentProvider.parseNotification(notification)
+
     // 更新订单状态
-    const order = await this.getOrderByNo(paymentInfo.orderId);
-    if (!order) return;
-    
+    const order = await this.getOrderByNo(paymentInfo.orderId)
+    if (!order) return
+
     if (paymentInfo.status === 'success') {
-      await this.completeOrder(order.id, paymentInfo);
-      
+      await this.completeOrder(order.id, paymentInfo)
+
       // 分账处理
-      await this.processRevenueSplit(order);
-      
+      await this.processRevenueSplit(order)
+
       // 发送通知
-      await this.notifyPaymentSuccess(order);
+      await this.notifyPaymentSuccess(order)
     } else if (paymentInfo.status === 'failed') {
-      await this.failOrder(order.id, paymentInfo.failureReason);
+      await this.failOrder(order.id, paymentInfo.failureReason)
     }
   }
-  
+
   /**
    * 处理收入分成
    */
   private async processRevenueSplit(order: Order): Promise<void> {
-    const creatorAccount = await this.getCreatorAccount(order.sellerId);
-    
+    const creatorAccount = await this.getCreatorAccount(order.sellerId)
+
     // 计算分成比例
-    const revenueShare = creatorAccount.revenueShare;
-    const platformFee = order.amount * (1 - revenueShare);
-    const sellerAmount = order.amount - platformFee;
-    
+    const revenueShare = creatorAccount.revenueShare
+    const platformFee = order.amount * (1 - revenueShare)
+    const sellerAmount = order.amount - platformFee
+
     // 更新订单分成信息
     await this.updateOrder(order.id, {
       platformFee,
       sellerAmount,
       status: 'completed',
       completedAt: new Date(),
-    });
-    
+    })
+
     // 创建收入记录
     await this.createEarning({
       creatorId: creatorAccount.id,
@@ -7073,12 +7127,12 @@ class PaymentAggregator implements PaymentService {
       sourceId: order.id,
       amount: sellerAmount,
       status: 'pending',
-    });
-    
+    })
+
     // 更新创作者待结算余额
     await this.updateCreatorBalance(creatorAccount.id, {
       pendingBalance: creatorAccount.pendingBalance + sellerAmount,
-    });
+    })
   }
 }
 ```
@@ -7244,76 +7298,76 @@ Response:
  * 运行时配置
  */
 interface RuntimeConfig {
-  mode: 'local' | 'cloud' | 'hybrid';
-  
+  mode: 'local' | 'cloud' | 'hybrid'
+
   local?: {
-    dbPath: string;
-    llmEndpoint?: string;
-    storagePath: string;
-  };
-  
+    dbPath: string
+    llmEndpoint?: string
+    storagePath: string
+  }
+
   cloud?: {
-    apiUrl: string;
-    wsUrl: string;
-  };
-  
+    apiUrl: string
+    wsUrl: string
+  }
+
   hybrid?: {
-    syncEnabled: boolean;
-    syncInterval: number;
-    offlineSupport: boolean;
-    sensitiveDataLocal: boolean;
-  };
+    syncEnabled: boolean
+    syncInterval: number
+    offlineSupport: boolean
+    sensitiveDataLocal: boolean
+  }
 }
 
 /**
  * 统一运行时提供者
  */
 class RuntimeProvider {
-  private config: RuntimeConfig;
-  private storageProvider: StorageProvider;
-  private llmProvider: LLMProvider;
-  private executionProvider: ExecutionProvider;
-  private syncProvider?: SyncProvider;
+  private config: RuntimeConfig
+  private storageProvider: StorageProvider
+  private llmProvider: LLMProvider
+  private executionProvider: ExecutionProvider
+  private syncProvider?: SyncProvider
 
   constructor(config: RuntimeConfig) {
-    this.config = config;
-    this.initializeProviders();
+    this.config = config
+    this.initializeProviders()
   }
 
   private initializeProviders(): void {
     switch (this.config.mode) {
       case 'local':
-        this.storageProvider = new SQLiteStorageProvider(this.config.local!.dbPath);
-        this.llmProvider = new LocalLLMProvider(this.config.local!.llmEndpoint);
-        this.executionProvider = new LocalExecutionProvider();
-        break;
-        
+        this.storageProvider = new SQLiteStorageProvider(this.config.local!.dbPath)
+        this.llmProvider = new LocalLLMProvider(this.config.local!.llmEndpoint)
+        this.executionProvider = new LocalExecutionProvider()
+        break
+
       case 'cloud':
-        this.storageProvider = new CloudStorageProvider(this.config.cloud!.apiUrl);
-        this.llmProvider = new CloudLLMProvider(this.config.cloud!.apiUrl);
-        this.executionProvider = new CloudExecutionProvider(this.config.cloud!);
-        break;
-        
+        this.storageProvider = new CloudStorageProvider(this.config.cloud!.apiUrl)
+        this.llmProvider = new CloudLLMProvider(this.config.cloud!.apiUrl)
+        this.executionProvider = new CloudExecutionProvider(this.config.cloud!)
+        break
+
       case 'hybrid':
         this.storageProvider = new HybridStorageProvider({
           local: new SQLiteStorageProvider(this.config.local!.dbPath),
           cloud: new CloudStorageProvider(this.config.cloud!.apiUrl),
           sensitiveLocal: this.config.hybrid!.sensitiveDataLocal,
-        });
+        })
         this.llmProvider = new HybridLLMProvider({
           local: new LocalLLMProvider(this.config.local!.llmEndpoint),
           cloud: new CloudLLMProvider(this.config.cloud!.apiUrl),
-        });
+        })
         this.executionProvider = new HybridExecutionProvider({
           local: new LocalExecutionProvider(),
           cloud: new CloudExecutionProvider(this.config.cloud!),
-        });
+        })
         this.syncProvider = new SyncProvider({
           local: this.storageProvider.local,
           cloud: this.storageProvider.cloud,
           interval: this.config.hybrid!.syncInterval,
-        });
-        break;
+        })
+        break
     }
   }
 
@@ -7321,28 +7375,28 @@ class RuntimeProvider {
    * 获取存储提供者
    */
   getStorage(): StorageProvider {
-    return this.storageProvider;
+    return this.storageProvider
   }
 
   /**
    * 获取 LLM 提供者
    */
   getLLM(): LLMProvider {
-    return this.llmProvider;
+    return this.llmProvider
   }
 
   /**
    * 获取执行提供者
    */
   getExecution(): ExecutionProvider {
-    return this.executionProvider;
+    return this.executionProvider
   }
 
   /**
    * 获取同步提供者
    */
   getSync(): SyncProvider | undefined {
-    return this.syncProvider;
+    return this.syncProvider
   }
 
   /**
@@ -7350,17 +7404,17 @@ class RuntimeProvider {
    */
   async checkConnectivity(): Promise<ConnectivityStatus> {
     if (this.config.mode === 'local') {
-      return { online: false, mode: 'local' };
+      return { online: false, mode: 'local' }
     }
 
     try {
       const response = await fetch(`${this.config.cloud!.apiUrl}/health`, {
         method: 'HEAD',
         timeout: 5000,
-      });
-      return { online: response.ok, mode: this.config.mode };
+      })
+      return { online: response.ok, mode: this.config.mode }
     } catch {
-      return { online: false, mode: 'offline' };
+      return { online: false, mode: 'offline' }
     }
   }
 }
@@ -7370,46 +7424,46 @@ class RuntimeProvider {
  */
 interface StorageProvider {
   // 工作流
-  getWorkflow(id: string): Promise<Workflow | null>;
-  saveWorkflow(workflow: Workflow): Promise<void>;
-  deleteWorkflow(id: string): Promise<void>;
-  listWorkflows(params: ListParams): Promise<PagedResult<Workflow>>;
+  getWorkflow(id: string): Promise<Workflow | null>
+  saveWorkflow(workflow: Workflow): Promise<void>
+  deleteWorkflow(id: string): Promise<void>
+  listWorkflows(params: ListParams): Promise<PagedResult<Workflow>>
 
   // 执行记录
-  getExecution(id: string): Promise<Execution | null>;
-  saveExecution(execution: Execution): Promise<void>;
-  listExecutions(params: ListParams): Promise<PagedResult<Execution>>;
+  getExecution(id: string): Promise<Execution | null>
+  saveExecution(execution: Execution): Promise<void>
+  listExecutions(params: ListParams): Promise<PagedResult<Execution>>
 
   // 用户数据
-  getUserData<T>(key: string): Promise<T | null>;
-  setUserData<T>(key: string, value: T): Promise<void>;
+  getUserData<T>(key: string): Promise<T | null>
+  setUserData<T>(key: string, value: T): Promise<void>
 
   // 同步相关
-  getLastSyncTime(): Promise<Date | null>;
-  setLastSyncTime(time: Date): Promise<void>;
-  getPendingChanges(): Promise<Change[]>;
-  markSynced(changeIds: string[]): Promise<void>;
+  getLastSyncTime(): Promise<Date | null>
+  setLastSyncTime(time: Date): Promise<void>
+  getPendingChanges(): Promise<Change[]>
+  markSynced(changeIds: string[]): Promise<void>
 }
 
 /**
  * LLM 提供者接口
  */
 interface LLMProvider {
-  chat(options: ChatOptions): Promise<ChatResponse>;
-  chatStream(options: ChatOptions): AsyncIterable<StreamChunk>;
-  embed(text: string): Promise<number[]>;
-  listModels(): Promise<ModelInfo[]>;
-  isAvailable(): Promise<boolean>;
+  chat(options: ChatOptions): Promise<ChatResponse>
+  chatStream(options: ChatOptions): AsyncIterable<StreamChunk>
+  embed(text: string): Promise<number[]>
+  listModels(): Promise<ModelInfo[]>
+  isAvailable(): Promise<boolean>
 }
 
 /**
  * 执行提供者接口
  */
 interface ExecutionProvider {
-  execute(workflow: Workflow, inputs: Record<string, unknown>): Promise<Execution>;
-  cancel(executionId: string): Promise<void>;
-  getStatus(executionId: string): Promise<ExecutionStatus>;
-  subscribeToUpdates(executionId: string): AsyncIterable<ExecutionUpdate>;
+  execute(workflow: Workflow, inputs: Record<string, unknown>): Promise<Execution>
+  cancel(executionId: string): Promise<void>
+  getStatus(executionId: string): Promise<ExecutionStatus>
+  subscribeToUpdates(executionId: string): AsyncIterable<ExecutionUpdate>
 }
 ```
 
@@ -7442,7 +7496,7 @@ async fn execute_workflow(
 ) -> Result<Execution, String> {
     let db = state.db.lock().map_err(|e| e.to_string())?;
     let workflow = db.get_workflow(&workflow_id).map_err(|e| e.to_string())?;
-    
+
     // 使用本地执行引擎
     let executor = LocalExecutor::new(&state);
     executor.execute(workflow, inputs).await.map_err(|e| e.to_string())
@@ -7455,7 +7509,7 @@ async fn chat_with_local_llm(
     model: Option<String>,
 ) -> Result<ChatResponse, String> {
     let llm_client = state.llm_client.lock().map_err(|e| e.to_string())?;
-    
+
     if let Some(client) = llm_client.as_ref() {
         client.chat(messages, model).await.map_err(|e| e.to_string())
     } else {
@@ -7469,17 +7523,17 @@ async fn sync_with_cloud(
     app_handle: tauri::AppHandle,
 ) -> Result<SyncResult, String> {
     let config = state.config.lock().map_err(|e| e.to_string())?;
-    
+
     if !config.sync_enabled {
         return Err("同步未启用".to_string());
     }
-    
+
     let sync_service = SyncService::new(&config);
     let result = sync_service.sync().await.map_err(|e| e.to_string())?;
-    
+
     // 发送同步完成事件
     app_handle.emit_all("sync-completed", &result).ok();
-    
+
     Ok(result)
 }
 
@@ -7491,19 +7545,19 @@ fn main() {
             let db_path = app_dir.join("agentflow.db");
             let db = SqliteConnection::open(&db_path)?;
             db.run_migrations()?;
-            
+
             // 初始化本地 LLM 客户端
             let llm_client = OllamaClient::try_new("http://localhost:11434").ok();
-            
+
             // 加载配置
             let config = AppConfig::load(&app_dir)?;
-            
+
             app.manage(AppState {
                 db: Mutex::new(db),
                 llm_client: Mutex::new(llm_client),
                 config: Mutex::new(config),
             });
-            
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -7526,80 +7580,80 @@ fn main() {
  * 运行模式切换器
  */
 class ModeSwitcher {
-  private currentMode: RuntimeMode;
-  private runtime: RuntimeProvider;
-  private listeners: Set<ModeChangeListener>;
+  private currentMode: RuntimeMode
+  private runtime: RuntimeProvider
+  private listeners: Set<ModeChangeListener>
 
   constructor(initialConfig: RuntimeConfig) {
-    this.currentMode = initialConfig.mode;
-    this.runtime = new RuntimeProvider(initialConfig);
-    this.listeners = new Set();
-    
+    this.currentMode = initialConfig.mode
+    this.runtime = new RuntimeProvider(initialConfig)
+    this.listeners = new Set()
+
     // 监听网络状态变化
-    this.setupNetworkListener();
+    this.setupNetworkListener()
   }
 
   /**
    * 切换到本地模式
    */
   async switchToLocal(): Promise<void> {
-    if (this.currentMode === 'local') return;
-    
+    if (this.currentMode === 'local') return
+
     // 保存未同步的数据
     if (this.currentMode === 'hybrid') {
-      await this.runtime.getSync()?.forceSyncPending();
+      await this.runtime.getSync()?.forceSyncPending()
     }
-    
+
     // 重新初始化运行时
     this.runtime = new RuntimeProvider({
       mode: 'local',
       local: await this.getLocalConfig(),
-    });
-    
-    this.currentMode = 'local';
-    this.notifyListeners('local');
+    })
+
+    this.currentMode = 'local'
+    this.notifyListeners('local')
   }
 
   /**
    * 切换到云端模式
    */
   async switchToCloud(): Promise<void> {
-    if (this.currentMode === 'cloud') return;
-    
+    if (this.currentMode === 'cloud') return
+
     // 检查网络
-    const connectivity = await this.runtime.checkConnectivity();
+    const connectivity = await this.runtime.checkConnectivity()
     if (!connectivity.online) {
-      throw new Error('无法连接到云端服务');
+      throw new Error('无法连接到云端服务')
     }
-    
+
     // 重新初始化运行时
     this.runtime = new RuntimeProvider({
       mode: 'cloud',
       cloud: await this.getCloudConfig(),
-    });
-    
-    this.currentMode = 'cloud';
-    this.notifyListeners('cloud');
+    })
+
+    this.currentMode = 'cloud'
+    this.notifyListeners('cloud')
   }
 
   /**
    * 切换到混合模式
    */
   async switchToHybrid(): Promise<void> {
-    if (this.currentMode === 'hybrid') return;
-    
+    if (this.currentMode === 'hybrid') return
+
     this.runtime = new RuntimeProvider({
       mode: 'hybrid',
       local: await this.getLocalConfig(),
       cloud: await this.getCloudConfig(),
       hybrid: await this.getHybridConfig(),
-    });
-    
-    this.currentMode = 'hybrid';
-    this.notifyListeners('hybrid');
-    
+    })
+
+    this.currentMode = 'hybrid'
+    this.notifyListeners('hybrid')
+
     // 启动同步
-    this.runtime.getSync()?.startAutoSync();
+    this.runtime.getSync()?.startAutoSync()
   }
 
   /**
@@ -7607,33 +7661,33 @@ class ModeSwitcher {
    */
   private setupNetworkListener(): void {
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.handleOnline());
-      window.addEventListener('offline', () => this.handleOffline());
+      window.addEventListener('online', () => this.handleOnline())
+      window.addEventListener('offline', () => this.handleOffline())
     }
   }
 
   private async handleOffline(): Promise<void> {
     if (this.currentMode === 'cloud') {
       // 云端模式下离线，尝试切换到本地
-      console.warn('网络断开，尝试切换到本地模式');
+      console.warn('网络断开，尝试切换到本地模式')
       try {
-        await this.switchToLocal();
+        await this.switchToLocal()
       } catch (error) {
-        console.error('切换本地模式失败', error);
+        console.error('切换本地模式失败', error)
       }
     } else if (this.currentMode === 'hybrid') {
       // 混合模式下离线，暂停同步
-      this.runtime.getSync()?.pauseSync();
-      this.notifyListeners('offline');
+      this.runtime.getSync()?.pauseSync()
+      this.notifyListeners('offline')
     }
   }
 
   private async handleOnline(): Promise<void> {
     if (this.currentMode === 'hybrid') {
       // 混合模式下恢复在线，恢复同步
-      this.runtime.getSync()?.resumeSync();
-      await this.runtime.getSync()?.syncNow();
-      this.notifyListeners('online');
+      this.runtime.getSync()?.resumeSync()
+      await this.runtime.getSync()?.syncNow()
+      this.notifyListeners('online')
     }
   }
 }
@@ -7701,25 +7755,25 @@ class ModeSwitcher {
  * Ollama 配置
  */
 interface OllamaConfig {
-  baseUrl: string;        // 默认 http://localhost:11434
-  timeout: number;        // 请求超时
-  maxRetries: number;     // 最大重试次数
+  baseUrl: string // 默认 http://localhost:11434
+  timeout: number // 请求超时
+  maxRetries: number // 最大重试次数
 }
 
 /**
  * Ollama LLM 提供者
  */
 class OllamaProvider implements LocalLLMProvider {
-  private config: OllamaConfig;
-  private abortControllers: Map<string, AbortController>;
+  private config: OllamaConfig
+  private abortControllers: Map<string, AbortController>
 
   constructor(config: Partial<OllamaConfig> = {}) {
     this.config = {
       baseUrl: config.baseUrl || 'http://localhost:11434',
       timeout: config.timeout || 120000,
       maxRetries: config.maxRetries || 3,
-    };
-    this.abortControllers = new Map();
+    }
+    this.abortControllers = new Map()
   }
 
   /**
@@ -7730,10 +7784,10 @@ class OllamaProvider implements LocalLLMProvider {
       const response = await fetch(`${this.config.baseUrl}/api/tags`, {
         method: 'GET',
         signal: AbortSignal.timeout(5000),
-      });
-      return response.ok;
+      })
+      return response.ok
     } catch {
-      return false;
+      return false
     }
   }
 
@@ -7741,9 +7795,9 @@ class OllamaProvider implements LocalLLMProvider {
    * 列出可用模型
    */
   async listModels(): Promise<LocalModelInfo[]> {
-    const response = await fetch(`${this.config.baseUrl}/api/tags`);
-    const data = await response.json();
-    
+    const response = await fetch(`${this.config.baseUrl}/api/tags`)
+    const data = await response.json()
+
     return data.models.map((model: any) => ({
       name: model.name,
       size: model.size,
@@ -7753,40 +7807,37 @@ class OllamaProvider implements LocalLLMProvider {
         parameterSize: model.details?.parameter_size,
         quantizationLevel: model.details?.quantization_level,
       },
-    }));
+    }))
   }
 
   /**
    * 下载模型
    */
-  async pullModel(
-    modelName: string,
-    onProgress?: (progress: PullProgress) => void
-  ): Promise<void> {
+  async pullModel(modelName: string, onProgress?: (progress: PullProgress) => void): Promise<void> {
     const response = await fetch(`${this.config.baseUrl}/api/pull`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: modelName, stream: true }),
-    });
+    })
 
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('无法读取响应');
+    const reader = response.body?.getReader()
+    if (!reader) throw new Error('无法读取响应')
 
-    const decoder = new TextDecoder();
-    
+    const decoder = new TextDecoder()
+
     while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      
-      const lines = decoder.decode(value).split('\n').filter(Boolean);
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const lines = decoder.decode(value).split('\n').filter(Boolean)
       for (const line of lines) {
-        const progress = JSON.parse(line);
+        const progress = JSON.parse(line)
         onProgress?.({
           status: progress.status,
           completed: progress.completed,
           total: progress.total,
           digest: progress.digest,
-        });
+        })
       }
     }
   }
@@ -7799,16 +7850,16 @@ class OllamaProvider implements LocalLLMProvider {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: modelName }),
-    });
+    })
   }
 
   /**
    * 对话
    */
   async chat(options: ChatOptions): Promise<ChatResponse> {
-    const requestId = crypto.randomUUID();
-    const abortController = new AbortController();
-    this.abortControllers.set(requestId, abortController);
+    const requestId = crypto.randomUUID()
+    const abortController = new AbortController()
+    this.abortControllers.set(requestId, abortController)
 
     try {
       const response = await fetch(`${this.config.baseUrl}/api/chat`, {
@@ -7826,9 +7877,9 @@ class OllamaProvider implements LocalLLMProvider {
           },
         }),
         signal: abortController.signal,
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       return {
         content: data.message.content,
@@ -7839,9 +7890,9 @@ class OllamaProvider implements LocalLLMProvider {
           totalTokens: (data.prompt_eval_count || 0) + (data.eval_count || 0),
         },
         finishReason: data.done_reason || 'stop',
-      };
+      }
     } finally {
-      this.abortControllers.delete(requestId);
+      this.abortControllers.delete(requestId)
     }
   }
 
@@ -7849,9 +7900,9 @@ class OllamaProvider implements LocalLLMProvider {
    * 流式对话
    */
   async *chatStream(options: ChatOptions): AsyncIterable<StreamChunk> {
-    const requestId = crypto.randomUUID();
-    const abortController = new AbortController();
-    this.abortControllers.set(requestId, abortController);
+    const requestId = crypto.randomUUID()
+    const abortController = new AbortController()
+    this.abortControllers.set(requestId, abortController)
 
     try {
       const response = await fetch(`${this.config.baseUrl}/api/chat`, {
@@ -7867,30 +7918,30 @@ class OllamaProvider implements LocalLLMProvider {
           },
         }),
         signal: abortController.signal,
-      });
+      })
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('无法读取响应');
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error('无法读取响应')
 
-      const decoder = new TextDecoder();
+      const decoder = new TextDecoder()
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done, value } = await reader.read()
+        if (done) break
 
-        const lines = decoder.decode(value).split('\n').filter(Boolean);
+        const lines = decoder.decode(value).split('\n').filter(Boolean)
         for (const line of lines) {
-          const data = JSON.parse(line);
-          
+          const data = JSON.parse(line)
+
           yield {
             content: data.message?.content || '',
             done: data.done,
             model: data.model,
-          };
+          }
         }
       }
     } finally {
-      this.abortControllers.delete(requestId);
+      this.abortControllers.delete(requestId)
     }
   }
 
@@ -7905,19 +7956,19 @@ class OllamaProvider implements LocalLLMProvider {
         model: model || 'nomic-embed-text',
         prompt: text,
       }),
-    });
+    })
 
-    const data = await response.json();
-    return data.embedding;
+    const data = await response.json()
+    return data.embedding
   }
 
   /**
    * 取消请求
    */
   cancel(requestId: string): void {
-    const controller = this.abortControllers.get(requestId);
-    controller?.abort();
-    this.abortControllers.delete(requestId);
+    const controller = this.abortControllers.get(requestId)
+    controller?.abort()
+    this.abortControllers.delete(requestId)
   }
 }
 ```
@@ -7934,7 +7985,7 @@ export function LocalLLMSettings() {
   const [status, setStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [models, setModels] = useState<LocalModelInfo[]>([]);
   const [downloadProgress, setDownloadProgress] = useState<PullProgress | null>(null);
-  
+
   const llmProvider = useLocalLLM();
 
   useEffect(() => {
@@ -7945,7 +7996,7 @@ export function LocalLLMSettings() {
     setStatus('checking');
     const available = await llmProvider.isAvailable();
     setStatus(available ? 'available' : 'unavailable');
-    
+
     if (available) {
       const modelList = await llmProvider.listModels();
       setModels(modelList);
@@ -7967,7 +8018,7 @@ export function LocalLLMSettings() {
 
   async function handleDeleteModel(modelName: string) {
     if (!confirm(`确定要删除模型 ${modelName} 吗？`)) return;
-    
+
     try {
       await llmProvider.deleteModel(modelName);
       await checkStatus();
@@ -8023,8 +8074,8 @@ export function LocalLLMSettings() {
                     <Button variant="outline" size="sm" onClick={() => testModel(model.name)}>
                       测试
                     </Button>
-                    <Button 
-                      variant="destructive" 
+                    <Button
+                      variant="destructive"
                       size="sm"
                       onClick={() => handleDeleteModel(model.name)}
                     >
@@ -8033,7 +8084,7 @@ export function LocalLLMSettings() {
                   </div>
                 </div>
               ))}
-              
+
               {models.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
                   暂无已安装模型
@@ -8054,7 +8105,7 @@ export function LocalLLMSettings() {
             <div className="space-y-3">
               {RECOMMENDED_MODELS.map((model) => {
                 const installed = models.some(m => m.name === model.name);
-                
+
                 return (
                   <div key={model.name} className="flex items-center justify-between p-3 border rounded">
                     <div>
@@ -8089,8 +8140,8 @@ export function LocalLLMSettings() {
                   {formatBytes(downloadProgress.completed)} / {formatBytes(downloadProgress.total)}
                 </span>
               </div>
-              <Progress 
-                value={(downloadProgress.completed / downloadProgress.total) * 100} 
+              <Progress
+                value={(downloadProgress.completed / downloadProgress.total) * 100}
               />
             </div>
           </CardContent>
@@ -8193,70 +8244,66 @@ const RECOMMENDED_MODELS = [
  * 同步配置
  */
 interface SyncConfig {
-  interval: number;               // 自动同步间隔 (毫秒)
-  conflictResolution: 'local' | 'cloud' | 'latest' | 'manual';
-  excludePatterns: string[];      // 排除的数据类型
-  encryptBeforeSync: boolean;     // 同步前加密
-  maxRetries: number;
-  batchSize: number;
+  interval: number // 自动同步间隔 (毫秒)
+  conflictResolution: 'local' | 'cloud' | 'latest' | 'manual'
+  excludePatterns: string[] // 排除的数据类型
+  encryptBeforeSync: boolean // 同步前加密
+  maxRetries: number
+  batchSize: number
 }
 
 /**
  * 变更记录
  */
 interface ChangeRecord {
-  id: string;
-  entityType: string;
-  entityId: string;
-  operation: 'create' | 'update' | 'delete';
-  data: unknown;
-  timestamp: Date;
-  syncStatus: 'pending' | 'syncing' | 'synced' | 'failed';
-  version: number;
+  id: string
+  entityType: string
+  entityId: string
+  operation: 'create' | 'update' | 'delete'
+  data: unknown
+  timestamp: Date
+  syncStatus: 'pending' | 'syncing' | 'synced' | 'failed'
+  version: number
 }
 
 /**
  * 同步引擎
  */
 class SyncEngine {
-  private config: SyncConfig;
-  private localDb: LocalDatabase;
-  private cloudApi: CloudApiClient;
-  private syncInterval: NodeJS.Timer | null = null;
-  private isSyncing: boolean = false;
-  private eventEmitter: EventEmitter;
+  private config: SyncConfig
+  private localDb: LocalDatabase
+  private cloudApi: CloudApiClient
+  private syncInterval: NodeJS.Timer | null = null
+  private isSyncing: boolean = false
+  private eventEmitter: EventEmitter
 
-  constructor(
-    localDb: LocalDatabase,
-    cloudApi: CloudApiClient,
-    config: Partial<SyncConfig> = {}
-  ) {
-    this.localDb = localDb;
-    this.cloudApi = cloudApi;
+  constructor(localDb: LocalDatabase, cloudApi: CloudApiClient, config: Partial<SyncConfig> = {}) {
+    this.localDb = localDb
+    this.cloudApi = cloudApi
     this.config = {
-      interval: 60000,           // 1分钟
+      interval: 60000, // 1分钟
       conflictResolution: 'latest',
       excludePatterns: ['api_keys', 'secrets'],
       encryptBeforeSync: true,
       maxRetries: 3,
       batchSize: 50,
       ...config,
-    };
-    this.eventEmitter = new EventEmitter();
+    }
+    this.eventEmitter = new EventEmitter()
   }
 
   /**
    * 启动自动同步
    */
   startAutoSync(): void {
-    if (this.syncInterval) return;
-    
+    if (this.syncInterval) return
+
     this.syncInterval = setInterval(() => {
-      this.sync().catch(console.error);
-    }, this.config.interval);
-    
+      this.sync().catch(console.error)
+    }, this.config.interval)
+
     // 立即执行一次同步
-    this.sync().catch(console.error);
+    this.sync().catch(console.error)
   }
 
   /**
@@ -8264,8 +8311,8 @@ class SyncEngine {
    */
   stopAutoSync(): void {
     if (this.syncInterval) {
-      clearInterval(this.syncInterval);
-      this.syncInterval = null;
+      clearInterval(this.syncInterval)
+      this.syncInterval = null
     }
   }
 
@@ -8274,66 +8321,61 @@ class SyncEngine {
    */
   async sync(): Promise<SyncResult> {
     if (this.isSyncing) {
-      return { status: 'skipped', reason: 'Sync already in progress' };
+      return { status: 'skipped', reason: 'Sync already in progress' }
     }
 
-    this.isSyncing = true;
-    this.eventEmitter.emit('sync:start');
+    this.isSyncing = true
+    this.eventEmitter.emit('sync:start')
 
     try {
       // 1. 获取本地未同步的变更
-      const localChanges = await this.getLocalPendingChanges();
-      
+      const localChanges = await this.getLocalPendingChanges()
+
       // 2. 获取云端的变更
-      const lastSyncTime = await this.getLastSyncTime();
-      const cloudChanges = await this.cloudApi.getChangesSince(lastSyncTime);
-      
+      const lastSyncTime = await this.getLastSyncTime()
+      const cloudChanges = await this.cloudApi.getChangesSince(lastSyncTime)
+
       // 3. 检测冲突
-      const { conflicts, localOnly, cloudOnly } = this.detectConflicts(
-        localChanges,
-        cloudChanges
-      );
-      
+      const { conflicts, localOnly, cloudOnly } = this.detectConflicts(localChanges, cloudChanges)
+
       // 4. 解决冲突
-      const resolvedConflicts = await this.resolveConflicts(conflicts);
-      
+      const resolvedConflicts = await this.resolveConflicts(conflicts)
+
       // 5. 上传本地变更
       const uploadResults = await this.uploadChanges([
         ...localOnly,
-        ...resolvedConflicts.filter(c => c.resolution === 'local').map(c => c.local),
-      ]);
-      
+        ...resolvedConflicts.filter((c) => c.resolution === 'local').map((c) => c.local),
+      ])
+
       // 6. 下载云端变更
       const downloadResults = await this.downloadChanges([
         ...cloudOnly,
-        ...resolvedConflicts.filter(c => c.resolution === 'cloud').map(c => c.cloud),
-      ]);
-      
+        ...resolvedConflicts.filter((c) => c.resolution === 'cloud').map((c) => c.cloud),
+      ])
+
       // 7. 更新同步状态
-      await this.updateSyncTime(new Date());
-      await this.markChangesSynced(uploadResults.successful);
-      
+      await this.updateSyncTime(new Date())
+      await this.markChangesSynced(uploadResults.successful)
+
       const result: SyncResult = {
         status: 'success',
         uploaded: uploadResults.successful.length,
         downloaded: downloadResults.successful.length,
         conflicts: conflicts.length,
         errors: [...uploadResults.failed, ...downloadResults.failed],
-      };
-      
-      this.eventEmitter.emit('sync:complete', result);
-      return result;
-      
+      }
+
+      this.eventEmitter.emit('sync:complete', result)
+      return result
     } catch (error) {
       const result: SyncResult = {
         status: 'failed',
         error: error.message,
-      };
-      this.eventEmitter.emit('sync:error', error);
-      return result;
-      
+      }
+      this.eventEmitter.emit('sync:error', error)
+      return result
     } finally {
-      this.isSyncing = false;
+      this.isSyncing = false
     }
   }
 
@@ -8344,132 +8386,130 @@ class SyncEngine {
     localChanges: ChangeRecord[],
     cloudChanges: ChangeRecord[]
   ): ConflictDetectionResult {
-    const conflicts: Conflict[] = [];
-    const localOnly: ChangeRecord[] = [];
-    const cloudOnly: ChangeRecord[] = [];
-    
-    const cloudMap = new Map(cloudChanges.map(c => [`${c.entityType}:${c.entityId}`, c]));
-    const localMap = new Map(localChanges.map(c => [`${c.entityType}:${c.entityId}`, c]));
-    
+    const conflicts: Conflict[] = []
+    const localOnly: ChangeRecord[] = []
+    const cloudOnly: ChangeRecord[] = []
+
+    const cloudMap = new Map(cloudChanges.map((c) => [`${c.entityType}:${c.entityId}`, c]))
+    const localMap = new Map(localChanges.map((c) => [`${c.entityType}:${c.entityId}`, c]))
+
     // 检查本地变更
     for (const local of localChanges) {
-      const key = `${local.entityType}:${local.entityId}`;
-      const cloud = cloudMap.get(key);
-      
+      const key = `${local.entityType}:${local.entityId}`
+      const cloud = cloudMap.get(key)
+
       if (cloud) {
         // 同一实体在两端都有变更 -> 冲突
-        conflicts.push({ local, cloud });
-        cloudMap.delete(key);
+        conflicts.push({ local, cloud })
+        cloudMap.delete(key)
       } else {
-        localOnly.push(local);
+        localOnly.push(local)
       }
     }
-    
+
     // 剩余的云端变更
-    cloudOnly.push(...cloudMap.values());
-    
-    return { conflicts, localOnly, cloudOnly };
+    cloudOnly.push(...cloudMap.values())
+
+    return { conflicts, localOnly, cloudOnly }
   }
 
   /**
    * 解决冲突
    */
   private async resolveConflicts(conflicts: Conflict[]): Promise<ResolvedConflict[]> {
-    const resolved: ResolvedConflict[] = [];
-    
+    const resolved: ResolvedConflict[] = []
+
     for (const conflict of conflicts) {
-      let resolution: 'local' | 'cloud';
-      
+      let resolution: 'local' | 'cloud'
+
       switch (this.config.conflictResolution) {
         case 'local':
-          resolution = 'local';
-          break;
+          resolution = 'local'
+          break
         case 'cloud':
-          resolution = 'cloud';
-          break;
+          resolution = 'cloud'
+          break
         case 'latest':
-          resolution = conflict.local.timestamp > conflict.cloud.timestamp ? 'local' : 'cloud';
-          break;
+          resolution = conflict.local.timestamp > conflict.cloud.timestamp ? 'local' : 'cloud'
+          break
         case 'manual':
-          resolution = await this.promptUserForResolution(conflict);
-          break;
+          resolution = await this.promptUserForResolution(conflict)
+          break
       }
-      
-      resolved.push({ ...conflict, resolution });
+
+      resolved.push({ ...conflict, resolution })
     }
-    
-    return resolved;
+
+    return resolved
   }
 
   /**
    * 上传本地变更
    */
   private async uploadChanges(changes: ChangeRecord[]): Promise<UploadResult> {
-    const successful: string[] = [];
-    const failed: SyncError[] = [];
-    
+    const successful: string[] = []
+    const failed: SyncError[] = []
+
     // 分批上传
     for (let i = 0; i < changes.length; i += this.config.batchSize) {
-      const batch = changes.slice(i, i + this.config.batchSize);
-      
+      const batch = changes.slice(i, i + this.config.batchSize)
+
       try {
         // 加密敏感数据
         const encryptedBatch = this.config.encryptBeforeSync
           ? await this.encryptBatch(batch)
-          : batch;
-        
-        await this.cloudApi.pushChanges(encryptedBatch);
-        successful.push(...batch.map(c => c.id));
-        
+          : batch
+
+        await this.cloudApi.pushChanges(encryptedBatch)
+        successful.push(...batch.map((c) => c.id))
       } catch (error) {
         failed.push({
-          changeIds: batch.map(c => c.id),
+          changeIds: batch.map((c) => c.id),
           error: error.message,
-        });
+        })
       }
     }
-    
-    return { successful, failed };
+
+    return { successful, failed }
   }
 
   /**
    * 下载云端变更
    */
   private async downloadChanges(changes: ChangeRecord[]): Promise<DownloadResult> {
-    const successful: string[] = [];
-    const failed: SyncError[] = [];
-    
+    const successful: string[] = []
+    const failed: SyncError[] = []
+
     for (const change of changes) {
       try {
         // 解密数据
         const decryptedData = this.config.encryptBeforeSync
           ? await this.decrypt(change.data)
-          : change.data;
-        
+          : change.data
+
         // 应用到本地数据库
         await this.applyChange({
           ...change,
           data: decryptedData,
-        });
-        
-        successful.push(change.id);
-        
+        })
+
+        successful.push(change.id)
       } catch (error) {
         failed.push({
           changeIds: [change.id],
           error: error.message,
-        });
+        })
       }
     }
-    
-    return { successful, failed };
+
+    return { successful, failed }
   }
 
   /**
    * 监听同步事件
    */
   on(event: 'sync:start' | 'sync:complete' | 'sync:error', handler: Function): void {
-    this.eventEmitter.on(event, handler);
+    this.eventEmitter.on(event, handler)
   }
 }
 ```
@@ -8483,8 +8523,8 @@ class SyncEngine {
  * 端到端加密服务
  */
 class E2EEncryption {
-  private masterKey: CryptoKey | null = null;
-  
+  private masterKey: CryptoKey | null = null
+
   /**
    * 初始化加密密钥
    */
@@ -8496,11 +8536,11 @@ class E2EEncryption {
       'PBKDF2',
       false,
       ['deriveKey']
-    );
-    
+    )
+
     // 如果没有 salt，生成新的
-    const usedSalt = salt || crypto.getRandomValues(new Uint8Array(16));
-    
+    const usedSalt = salt || crypto.getRandomValues(new Uint8Array(16))
+
     // 派生主密钥
     this.masterKey = await crypto.subtle.deriveKey(
       {
@@ -8513,7 +8553,7 @@ class E2EEncryption {
       { name: 'AES-GCM', length: 256 },
       false,
       ['encrypt', 'decrypt']
-    );
+    )
   }
 
   /**
@@ -8521,23 +8561,23 @@ class E2EEncryption {
    */
   async encrypt(data: unknown): Promise<EncryptedData> {
     if (!this.masterKey) {
-      throw new Error('加密密钥未初始化');
+      throw new Error('加密密钥未初始化')
     }
-    
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const plaintext = new TextEncoder().encode(JSON.stringify(data));
-    
+
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+    const plaintext = new TextEncoder().encode(JSON.stringify(data))
+
     const ciphertext = await crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       this.masterKey,
       plaintext
-    );
-    
+    )
+
     return {
       iv: this.arrayBufferToBase64(iv),
       ciphertext: this.arrayBufferToBase64(ciphertext),
       algorithm: 'AES-GCM-256',
-    };
+    }
   }
 
   /**
@@ -8545,32 +8585,32 @@ class E2EEncryption {
    */
   async decrypt(encrypted: EncryptedData): Promise<unknown> {
     if (!this.masterKey) {
-      throw new Error('加密密钥未初始化');
+      throw new Error('加密密钥未初始化')
     }
-    
-    const iv = this.base64ToArrayBuffer(encrypted.iv);
-    const ciphertext = this.base64ToArrayBuffer(encrypted.ciphertext);
-    
+
+    const iv = this.base64ToArrayBuffer(encrypted.iv)
+    const ciphertext = this.base64ToArrayBuffer(encrypted.ciphertext)
+
     const plaintext = await crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       this.masterKey,
       ciphertext
-    );
-    
-    return JSON.parse(new TextDecoder().decode(plaintext));
+    )
+
+    return JSON.parse(new TextDecoder().decode(plaintext))
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
   }
 
   private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
+    const binary = atob(base64)
+    const bytes = new Uint8Array(binary.length)
     for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
+      bytes[i] = binary.charCodeAt(i)
     }
-    return bytes.buffer;
+    return bytes.buffer
   }
 }
 ```
@@ -8629,10 +8669,10 @@ class E2EEncryption {
 ```typescript
 // public/sw.js
 
-const CACHE_VERSION = 'v1';
-const STATIC_CACHE = `agentflow-static-${CACHE_VERSION}`;
-const DYNAMIC_CACHE = `agentflow-dynamic-${CACHE_VERSION}`;
-const API_CACHE = `agentflow-api-${CACHE_VERSION}`;
+const CACHE_VERSION = 'v1'
+const STATIC_CACHE = `agentflow-static-${CACHE_VERSION}`
+const DYNAMIC_CACHE = `agentflow-dynamic-${CACHE_VERSION}`
+const API_CACHE = `agentflow-api-${CACHE_VERSION}`
 
 // 需要预缓存的静态资源
 const STATIC_ASSETS = [
@@ -8641,24 +8681,20 @@ const STATIC_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-];
+]
 
 // 需要缓存的 API 路由
-const CACHEABLE_API_ROUTES = [
-  '/api/v1/workflows',
-  '/api/v1/agents',
-  '/api/v1/users/me',
-];
+const CACHEABLE_API_ROUTES = ['/api/v1/workflows', '/api/v1/agents', '/api/v1/users/me']
 
 // 安装事件 - 预缓存静态资源
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      return cache.addAll(STATIC_ASSETS)
     })
-  );
-  self.skipWaiting();
-});
+  )
+  self.skipWaiting()
+})
 
 // 激活事件 - 清理旧缓存
 self.addEventListener('activate', (event) => {
@@ -8668,111 +8704,108 @@ self.addEventListener('activate', (event) => {
         cacheNames
           .filter((name) => name.startsWith('agentflow-') && name !== STATIC_CACHE)
           .map((name) => caches.delete(name))
-      );
+      )
     })
-  );
-  self.clients.claim();
-});
+  )
+  self.clients.claim()
+})
 
 // 请求拦截
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
+  const { request } = event
+  const url = new URL(request.url)
 
   // 静态资源 - Cache First
   if (isStaticAsset(url)) {
-    event.respondWith(cacheFirst(request, STATIC_CACHE));
-    return;
+    event.respondWith(cacheFirst(request, STATIC_CACHE))
+    return
   }
 
   // API 请求 - Network First with Cache Fallback
   if (isApiRequest(url)) {
-    event.respondWith(networkFirstWithCache(request, API_CACHE));
-    return;
+    event.respondWith(networkFirstWithCache(request, API_CACHE))
+    return
   }
 
   // 页面请求 - Network First
   if (request.mode === 'navigate') {
     event.respondWith(
       networkFirst(request).catch(() => {
-        return caches.match('/offline');
+        return caches.match('/offline')
       })
-    );
-    return;
+    )
+    return
   }
 
   // 其他请求 - Network Only
-  event.respondWith(fetch(request));
-});
+  event.respondWith(fetch(request))
+})
 
 // 缓存策略: Cache First
 async function cacheFirst(request, cacheName) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
+  const cached = await caches.match(request)
+  if (cached) return cached
 
-  const response = await fetch(request);
+  const response = await fetch(request)
   if (response.ok) {
-    const cache = await caches.open(cacheName);
-    cache.put(request, response.clone());
+    const cache = await caches.open(cacheName)
+    cache.put(request, response.clone())
   }
-  return response;
+  return response
 }
 
 // 缓存策略: Network First with Cache Fallback
 async function networkFirstWithCache(request, cacheName) {
   try {
-    const response = await fetch(request);
-    
+    const response = await fetch(request)
+
     if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      const cache = await caches.open(cacheName)
+      cache.put(request, response.clone())
     }
-    
-    return response;
+
+    return response
   } catch (error) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    
+    const cached = await caches.match(request)
+    if (cached) return cached
+
     // 返回离线响应
-    return new Response(
-      JSON.stringify({ error: 'offline', message: '当前处于离线状态' }),
-      {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: 'offline', message: '当前处于离线状态' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }
 
 // 后台同步
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-pending-changes') {
-    event.waitUntil(syncPendingChanges());
+    event.waitUntil(syncPendingChanges())
   }
-});
+})
 
 async function syncPendingChanges() {
-  const db = await openIndexedDB();
-  const pendingChanges = await db.getAll('pending_changes');
-  
+  const db = await openIndexedDB()
+  const pendingChanges = await db.getAll('pending_changes')
+
   for (const change of pendingChanges) {
     try {
       await fetch(change.url, {
         method: change.method,
         headers: change.headers,
         body: change.body,
-      });
-      await db.delete('pending_changes', change.id);
+      })
+      await db.delete('pending_changes', change.id)
     } catch (error) {
-      console.error('Failed to sync change:', change.id, error);
+      console.error('Failed to sync change:', change.id, error)
     }
   }
 }
 
 // 推送通知
 self.addEventListener('push', (event) => {
-  const data = event.data?.json();
-  
+  const data = event.data?.json()
+
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -8780,19 +8813,19 @@ self.addEventListener('push', (event) => {
       badge: '/icons/badge.png',
       data: data.data,
     })
-  );
-});
+  )
+})
 
 // 工具函数
 function isStaticAsset(url) {
   return (
     url.pathname.startsWith('/_next/static/') ||
     url.pathname.match(/\.(js|css|png|jpg|svg|woff2?)$/)
-  );
+  )
 }
 
 function isApiRequest(url) {
-  return url.pathname.startsWith('/api/');
+  return url.pathname.startsWith('/api/')
 }
 ```
 
@@ -8805,84 +8838,84 @@ function isApiRequest(url) {
  * IndexedDB 存储管理
  */
 class OfflineStorage {
-  private db: IDBDatabase | null = null;
-  private readonly DB_NAME = 'agentflow-offline';
-  private readonly DB_VERSION = 1;
+  private db: IDBDatabase | null = null
+  private readonly DB_NAME = 'agentflow-offline'
+  private readonly DB_VERSION = 1
 
   async initialize(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION)
 
-      request.onerror = () => reject(request.error);
+      request.onerror = () => reject(request.error)
       request.onsuccess = () => {
-        this.db = request.result;
-        resolve();
-      };
+        this.db = request.result
+        resolve()
+      }
 
       request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+        const db = (event.target as IDBOpenDBRequest).result
 
         // 工作流存储
         if (!db.objectStoreNames.contains('workflows')) {
-          const store = db.createObjectStore('workflows', { keyPath: 'id' });
-          store.createIndex('userId', 'userId', { unique: false });
-          store.createIndex('updatedAt', 'updatedAt', { unique: false });
+          const store = db.createObjectStore('workflows', { keyPath: 'id' })
+          store.createIndex('userId', 'userId', { unique: false })
+          store.createIndex('updatedAt', 'updatedAt', { unique: false })
         }
 
         // 执行记录存储
         if (!db.objectStoreNames.contains('executions')) {
-          const store = db.createObjectStore('executions', { keyPath: 'id' });
-          store.createIndex('workflowId', 'workflowId', { unique: false });
-          store.createIndex('createdAt', 'createdAt', { unique: false });
+          const store = db.createObjectStore('executions', { keyPath: 'id' })
+          store.createIndex('workflowId', 'workflowId', { unique: false })
+          store.createIndex('createdAt', 'createdAt', { unique: false })
         }
 
         // 待同步变更
         if (!db.objectStoreNames.contains('pending_changes')) {
-          const store = db.createObjectStore('pending_changes', { keyPath: 'id' });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
+          const store = db.createObjectStore('pending_changes', { keyPath: 'id' })
+          store.createIndex('timestamp', 'timestamp', { unique: false })
         }
 
         // 缓存的 Agent
         if (!db.objectStoreNames.contains('cached_agents')) {
-          const store = db.createObjectStore('cached_agents', { keyPath: 'id' });
-          store.createIndex('cachedAt', 'cachedAt', { unique: false });
+          const store = db.createObjectStore('cached_agents', { keyPath: 'id' })
+          store.createIndex('cachedAt', 'cachedAt', { unique: false })
         }
 
         // 用户设置
         if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings', { keyPath: 'key' });
+          db.createObjectStore('settings', { keyPath: 'key' })
         }
-      };
-    });
+      }
+    })
   }
 
   /**
    * 保存工作流 (支持离线)
    */
   async saveWorkflow(workflow: Workflow): Promise<void> {
-    await this.put('workflows', workflow);
-    
+    await this.put('workflows', workflow)
+
     // 记录变更用于同步
     await this.recordChange({
       entityType: 'workflow',
       entityId: workflow.id,
       operation: 'update',
       data: workflow,
-    });
+    })
   }
 
   /**
    * 获取所有工作流
    */
   async getWorkflows(): Promise<Workflow[]> {
-    return this.getAll('workflows');
+    return this.getAll('workflows')
   }
 
   /**
    * 保存执行记录
    */
   async saveExecution(execution: Execution): Promise<void> {
-    await this.put('executions', execution);
+    await this.put('executions', execution)
   }
 
   /**
@@ -8893,13 +8926,13 @@ class OfflineStorage {
       ...change,
       id: crypto.randomUUID(),
       timestamp: new Date(),
-    };
-    await this.put('pending_changes', record);
-    
+    }
+    await this.put('pending_changes', record)
+
     // 请求后台同步
     if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register('sync-pending-changes');
+      const registration = await navigator.serviceWorker.ready
+      await registration.sync.register('sync-pending-changes')
     }
   }
 
@@ -8907,45 +8940,45 @@ class OfflineStorage {
    * 获取待同步变更
    */
   async getPendingChanges(): Promise<PendingChange[]> {
-    return this.getAll('pending_changes');
+    return this.getAll('pending_changes')
   }
 
   /**
    * 清除已同步的变更
    */
   async clearSyncedChanges(ids: string[]): Promise<void> {
-    const tx = this.db!.transaction('pending_changes', 'readwrite');
-    const store = tx.objectStore('pending_changes');
-    
+    const tx = this.db!.transaction('pending_changes', 'readwrite')
+    const store = tx.objectStore('pending_changes')
+
     for (const id of ids) {
-      store.delete(id);
+      store.delete(id)
     }
-    
+
     await new Promise((resolve, reject) => {
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
+      tx.oncomplete = resolve
+      tx.onerror = () => reject(tx.error)
+    })
   }
 
   // 通用方法
   private async put(storeName: string, data: unknown): Promise<void> {
     return new Promise((resolve, reject) => {
-      const tx = this.db!.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      store.put(data);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
+      const tx = this.db!.transaction(storeName, 'readwrite')
+      const store = tx.objectStore(storeName)
+      store.put(data)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
   }
 
   private async getAll<T>(storeName: string): Promise<T[]> {
     return new Promise((resolve, reject) => {
-      const tx = this.db!.transaction(storeName, 'readonly');
-      const store = tx.objectStore(storeName);
-      const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
+      const tx = this.db!.transaction(storeName, 'readonly')
+      const store = tx.objectStore(storeName)
+      const request = store.getAll()
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
   }
 }
 ```
@@ -8962,10 +8995,10 @@ export function OfflineIndicator() {
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     // 监听待同步变更
     const checkPending = async () => {
       const changes = await offlineStorage.getPendingChanges();
@@ -8973,7 +9006,7 @@ export function OfflineIndicator() {
     };
     checkPending();
     const interval = setInterval(checkPending, 10000);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);

@@ -21,7 +21,7 @@
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background: #09090B;
+  background: #09090b;
 }
 
 .dashboard-main {
@@ -44,12 +44,12 @@
 .dashboard-title {
   font-size: 24px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
 .dashboard-subtitle {
   font-size: 14px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   margin-top: 4px;
 }
 ```
@@ -58,8 +58,8 @@
 
 ```css
 .workflow-card {
-  background: #18181B;
-  border: 1px solid #27272A;
+  background: #18181b;
+  border: 1px solid #27272a;
   border-radius: 12px;
   padding: 20px;
   transition: all 200ms ease;
@@ -70,7 +70,7 @@
 }
 
 .workflow-card:hover {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
   transform: translateY(-2px);
 }
@@ -90,19 +90,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #A78BFA;
+  color: #a78bfa;
 }
 
 .workflow-title {
   font-size: 16px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
   margin-top: 12px;
 }
 
 .workflow-description {
   font-size: 14px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -115,7 +115,7 @@
   align-items: center;
   gap: 16px;
   font-size: 12px;
-  color: #71717A;
+  color: #71717a;
 }
 
 .workflow-status {
@@ -130,13 +130,13 @@
 
 .workflow-status.active {
   background: rgba(34, 197, 94, 0.15);
-  color: #4ADE80;
+  color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .workflow-status.draft {
   background: rgba(161, 161, 170, 0.15);
-  color: #A1A1AA;
+  color: #a1a1aa;
   border: 1px solid rgba(161, 161, 170, 0.3);
 }
 ```
@@ -146,7 +146,7 @@
 ```css
 .create-workflow-card {
   background: transparent;
-  border: 2px dashed #3F3F46;
+  border: 2px dashed #3f3f46;
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -160,25 +160,25 @@
 }
 
 .create-workflow-card:hover {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   background: rgba(139, 92, 246, 0.05);
 }
 
 .create-icon {
   width: 48px;
   height: 48px;
-  background: #27272A;
+  background: #27272a;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .create-text {
   font-size: 14px;
   font-weight: 500;
-  color: #A1A1AA;
+  color: #a1a1aa;
 }
 ```
 
@@ -204,19 +204,19 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 24px;
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .empty-state-title {
   font-size: 18px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
   margin-bottom: 8px;
 }
 
 .empty-state-description {
   font-size: 14px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   max-width: 400px;
   margin-bottom: 24px;
 }
@@ -229,33 +229,33 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #18181B;
-  border: 1px solid #3F3F46;
+  background: #18181b;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   padding: 8px 16px;
   max-width: 320px;
 }
 
 .search-bar:focus-within {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .search-input {
   background: transparent;
   border: none;
-  color: #FAFAFA;
+  color: #fafafa;
   font-size: 14px;
   flex: 1;
   outline: none;
 }
 
 .filter-btn {
-  background: #18181B;
-  border: 1px solid #3F3F46;
+  background: #18181b;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   padding: 8px 16px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -265,8 +265,8 @@
 }
 
 .filter-btn:hover {
-  background: #27272A;
-  color: #FAFAFA;
+  background: #27272a;
+  color: #fafafa;
 }
 ```
 
@@ -319,9 +319,17 @@ Dashboard Page
   animation-fill-mode: both;
 }
 
-.workflow-card:nth-child(1) { animation-delay: 0ms; }
-.workflow-card:nth-child(2) { animation-delay: 50ms; }
-.workflow-card:nth-child(3) { animation-delay: 100ms; }
-.workflow-card:nth-child(4) { animation-delay: 150ms; }
+.workflow-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.workflow-card:nth-child(2) {
+  animation-delay: 50ms;
+}
+.workflow-card:nth-child(3) {
+  animation-delay: 100ms;
+}
+.workflow-card:nth-child(4) {
+  animation-delay: 150ms;
+}
 /* ... continue for more cards */
 ```

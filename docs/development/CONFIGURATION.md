@@ -5,12 +5,14 @@
 ## 1. 配置来源与优先级
 
 服务端配置加载顺序（从低到高）：
+
 1. 代码默认值（`apps/server/internal/config/config.go#setDefaults`）。
 2. `apps/server/config/config.yaml` 基础配置。
 3. `apps/server/config/config.{env}.yaml` 环境覆盖（`env=development|test|production`）。
 4. 环境变量覆盖（服务端使用 `AGENTFLOW_` 前缀）。
 
 说明：
+
 - `env` 的来源为 `AGENTFLOW_ENV` 或 `config.yaml` 顶层 `env` 字段。
 - 推荐在 CI/CD 或生产环境使用环境变量覆盖敏感字段。
 
@@ -45,6 +47,7 @@
 - `retention`: `enabled` / `cleanup_interval` / `execution_log_retention_days` / `anonymous_session_retention_days` / `workspace_deletion_grace_days` / `workspace_cold_storage_days`
 
 说明：
+
 - `deployment.regions` 可使用 `AGENTFLOW_DEPLOYMENT_REGIONS`（逗号分隔）覆盖。
 
 > 维护规范：新增配置字段时，必须同步更新 `config.example.yaml` 与本清单。
@@ -66,10 +69,10 @@
 ## 4. SDK/CLI 环境变量清单
 
 用于 `packages/sdk` CLI 发布命令：
+
 - `AGENTFLOW_MARKETPLACE_URL`: 市场 API 地址
 - `AGENTFLOW_PUBLISH_URL`: 发布地址（优先于 marketplace）
 - `AGENTFLOW_API_BASE`: API 基础地址（兜底）
 - `AGENTFLOW_PUBLISH_TOKEN`: 发布令牌
 - `AGENTFLOW_API_TOKEN`: API 访问令牌
 - `AGENTFLOW_TOKEN`: 访问令牌（兜底）
-

@@ -9,4 +9,4 @@ export {
   ProgressRing,
   Sparkline,
   ComparisonBar,
-} from "./simple-charts";
+} from './simple-charts'

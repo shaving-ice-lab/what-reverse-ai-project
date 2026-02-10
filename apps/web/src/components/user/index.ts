@@ -8,4 +8,4 @@ export {
   AvatarGroup,
   UserActivityCard,
   UserRankCard,
-} from "./profile-cards";
+} from './profile-cards'

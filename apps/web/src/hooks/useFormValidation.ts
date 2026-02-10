@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { useState, useCallback, useEffect } from "react";
-import { validateNodeConfig, type ValidationResult } from "@/lib/validations/nodeConfig";
+import { useState, useCallback, useEffect } from 'react'
+import { validateNodeConfig, type ValidationResult } from '@/lib/validations/nodeConfig'
 
 /**
  * FormVerify Hook
@@ -9,147 +9,150 @@ import { validateNodeConfig, type ValidationResult } from "@/lib/validations/nod
  */
 
 interface UseFormValidationOptions {
- nodeType: string;
- config: unknown;
- validateOnChange?: boolean;
- validateOnBlur?: boolean;
- debounceMs?: number;
+  nodeType: string
+  config: unknown
+  validateOnChange?: boolean
+  validateOnBlur?: boolean
+  debounceMs?: number
 }
 
 interface FormValidationState {
- errors: Record<string, string>;
- isValid: boolean;
- isValidating: boolean;
- touchedFields: Set<string>;
+  errors: Record<string, string>
+  isValid: boolean
+  isValidating: boolean
+  touchedFields: Set<string>
 }
 
 export function useFormValidation({
- nodeType,
- config,
- validateOnChange = true,
- validateOnBlur = true,
- debounceMs = 300,
+  nodeType,
+  config,
+  validateOnChange = true,
+  validateOnBlur = true,
+  debounceMs = 300,
 }: UseFormValidationOptions) {
- const [state, setState] = useState<FormValidationState>({
- errors: {},
- isValid: true,
- isValidating: false,
- touchedFields: new Set(),
- });
+  const [state, setState] = useState<FormValidationState>({
+    errors: {},
+    isValid: true,
+    isValidating: false,
+    touchedFields: new Set(),
+  })
 
- // Verifycount
- const validate = useCallback((): ValidationResult => {
- setState((prev) => ({ ...prev, isValidating: true }));
+  // Verifycount
+  const validate = useCallback((): ValidationResult => {
+    setState((prev) => ({ ...prev, isValidating: true }))
 
- const result = validateNodeConfig(nodeType, config);
+    const result = validateNodeConfig(nodeType, config)
 
- setState((prev) => ({
- ...prev,
- errors: result.errors,
- isValid: result.success,
- isValidating: false,
- }));
+    setState((prev) => ({
+      ...prev,
+      errors: result.errors,
+      isValid: result.success,
+      isValidating: false,
+    }))
 
- return result;
- }, [nodeType, config]);
+    return result
+  }, [nodeType, config])
 
- // VerifyField
- const validateField = useCallback(
- (fieldPath: string): string | undefined => {
- const result = validateNodeConfig(nodeType, config);
- const error = result.errors[fieldPath];
- 
- setState((prev) => ({
- ...prev,
- errors: {
- ...prev.errors,
- [fieldPath]: error || "",
- },
- }));
+  // VerifyField
+  const validateField = useCallback(
+    (fieldPath: string): string | undefined => {
+      const result = validateNodeConfig(nodeType, config)
+      const error = result.errors[fieldPath]
 
- return error;
- },
- [nodeType, config]
- );
+      setState((prev) => ({
+        ...prev,
+        errors: {
+          ...prev.errors,
+          [fieldPath]: error || '',
+        },
+      }))
 
- // MarkFieldasalreadyTouch
- const touchField = useCallback((fieldPath: string) => {
- setState((prev) => ({
- ...prev,
- touchedFields: new Set(prev.touchedFields).add(fieldPath),
- }));
+      return error
+    },
+    [nodeType, config]
+  )
 
- if (validateOnBlur) {
- validateField(fieldPath);
- }
- }, [validateOnBlur, validateField]);
+  // MarkFieldasalreadyTouch
+  const touchField = useCallback(
+    (fieldPath: string) => {
+      setState((prev) => ({
+        ...prev,
+        touchedFields: new Set(prev.touchedFields).add(fieldPath),
+      }))
 
- // Get field error (display error for already touched fields)
- const getFieldError = useCallback(
- (fieldPath: string): string | undefined => {
- if (!state.touchedFields.has(fieldPath)) return undefined;
- return state.errors[fieldPath];
- },
- [state.errors, state.touchedFields]
- );
+      if (validateOnBlur) {
+        validateField(fieldPath)
+      }
+    },
+    [validateOnBlur, validateField]
+  )
 
- // ClearError
- const clearErrors = useCallback(() => {
- setState((prev) => ({
- ...prev,
- errors: {},
- isValid: true,
- }));
- }, []);
+  // Get field error (display error for already touched fields)
+  const getFieldError = useCallback(
+    (fieldPath: string): string | undefined => {
+      if (!state.touchedFields.has(fieldPath)) return undefined
+      return state.errors[fieldPath]
+    },
+    [state.errors, state.touchedFields]
+  )
 
- // ClearSpecificFieldError
- const clearFieldError = useCallback((fieldPath: string) => {
- setState((prev) => {
- const newErrors = { ...prev.errors };
- delete newErrors[fieldPath];
- return {
- ...prev,
- errors: newErrors,
- isValid: Object.keys(newErrors).length === 0,
- };
- });
- }, []);
+  // ClearError
+  const clearErrors = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      errors: {},
+      isValid: true,
+    }))
+  }, [])
 
- // ResetStatus
- const reset = useCallback(() => {
- setState({
- errors: {},
- isValid: true,
- isValidating: false,
- touchedFields: new Set(),
- });
- }, []);
+  // ClearSpecificFieldError
+  const clearFieldError = useCallback((fieldPath: string) => {
+    setState((prev) => {
+      const newErrors = { ...prev.errors }
+      delete newErrors[fieldPath]
+      return {
+        ...prev,
+        errors: newErrors,
+        isValid: Object.keys(newErrors).length === 0,
+      }
+    })
+  }, [])
 
- // Auto validate on config change (debounced)
- useEffect(() => {
- if (!validateOnChange) return;
+  // ResetStatus
+  const reset = useCallback(() => {
+    setState({
+      errors: {},
+      isValid: true,
+      isValidating: false,
+      touchedFields: new Set(),
+    })
+  }, [])
 
- const timeoutId = setTimeout(() => {
- // Validate already touched fields
- if (state.touchedFields.size > 0) {
- validate();
- }
- }, debounceMs);
+  // Auto validate on config change (debounced)
+  useEffect(() => {
+    if (!validateOnChange) return
 
- return () => clearTimeout(timeoutId);
- }, [config, validateOnChange, debounceMs, validate, state.touchedFields.size]);
+    const timeoutId = setTimeout(() => {
+      // Validate already touched fields
+      if (state.touchedFields.size > 0) {
+        validate()
+      }
+    }, debounceMs)
 
- return {
- errors: state.errors,
- isValid: state.isValid,
- isValidating: state.isValidating,
- touchedFields: state.touchedFields,
- validate,
- validateField,
- touchField,
- getFieldError,
- clearErrors,
- clearFieldError,
- reset,
- };
+    return () => clearTimeout(timeoutId)
+  }, [config, validateOnChange, debounceMs, validate, state.touchedFields.size])
+
+  return {
+    errors: state.errors,
+    isValid: state.isValid,
+    isValidating: state.isValidating,
+    touchedFields: state.touchedFields,
+    validate,
+    validateField,
+    touchField,
+    getFieldError,
+    clearErrors,
+    clearFieldError,
+    reset,
+  }
 }

@@ -44,26 +44,26 @@ npm install
 
 ## 输入参数
 
-| 参数 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| model | select | 否 | gpt-4-turbo | LLM 模型 |
-| systemPrompt | textarea | 否 | - | 系统提示词 |
-| userPrompt | textarea | 是 | - | 用户提示词 |
-| temperature | number | 否 | 0.7 | 温度 (0-2) |
-| maxTokens | number | 否 | 2048 | 最大 Token |
-| topP | number | 否 | 1 | Top P (0-1) |
-| stream | boolean | 否 | true | 流式输出 |
+| 参数         | 类型     | 必填 | 默认值      | 说明        |
+| ------------ | -------- | ---- | ----------- | ----------- |
+| model        | select   | 否   | gpt-4-turbo | LLM 模型    |
+| systemPrompt | textarea | 否   | -           | 系统提示词  |
+| userPrompt   | textarea | 是   | -           | 用户提示词  |
+| temperature  | number   | 否   | 0.7         | 温度 (0-2)  |
+| maxTokens    | number   | 否   | 2048        | 最大 Token  |
+| topP         | number   | 否   | 1           | Top P (0-1) |
+| stream       | boolean  | 否   | true        | 流式输出    |
 
 ## 输出
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| content | string | 生成的内容 |
-| model | string | 使用的模型 |
-| promptTokens | number | 输入 Token |
+| 字段             | 类型   | 说明       |
+| ---------------- | ------ | ---------- |
+| content          | string | 生成的内容 |
+| model            | string | 使用的模型 |
+| promptTokens     | number | 输入 Token |
 | completionTokens | number | 生成 Token |
-| totalTokens | number | 总 Token |
-| finishReason | string | 结束原因 |
+| totalTokens      | number | 总 Token   |
+| finishReason     | string | 结束原因   |
 
 ## 许可证
 

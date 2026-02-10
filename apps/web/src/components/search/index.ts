@@ -12,4 +12,4 @@ export {
   QuickActions,
   type SearchResult,
   type SearchResultType,
-} from "./search-results";
+} from './search-results'

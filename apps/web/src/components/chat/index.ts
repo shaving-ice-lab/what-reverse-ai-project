@@ -8,10 +8,6 @@ export {
   WelcomeMessage,
   DateDivider,
   type ChatMessage,
-} from "./chat-messages";
+} from './chat-messages'
 
-export {
-  ChatInput,
-  QuickReplies,
-  TypingIndicator,
-} from "./chat-input";
+export { ChatInput, QuickReplies, TypingIndicator } from './chat-input'

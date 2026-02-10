@@ -1,786 +1,599 @@
-"use client";
+'use client'
 
 /**
  * Command Palette - Manus Style
  * Supports quick search, command execution, and navigation
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import {
- Search,
-
- X,
-
- Zap,
-
- MessageSquare,
-
- Settings,
-
- FileText,
-
- Users,
-
- Store,
-
- Palette,
-
- LayoutGrid,
-
- HelpCircle,
-
- Plus,
-
- ArrowRight,
-
- Command,
-
- Clock,
-
- Star,
-
- Folder,
-
- Bot,
-
- Code,
-
- Image as ImageIcon,
-
- Terminal,
-
- Mail,
-
- Github,
-
- Database,
-
- Globe,
-
- ChevronRight,
-
- Sparkles,
-
- History,
-
- Bookmark,
-
- Hash,
-} from "lucide-react";
+  Search,
+  X,
+  Zap,
+  MessageSquare,
+  Settings,
+  FileText,
+  Users,
+  Store,
+  Palette,
+  LayoutGrid,
+  HelpCircle,
+  Plus,
+  ArrowRight,
+  Command,
+  Clock,
+  Star,
+  Folder,
+  Bot,
+  Code,
+  Image as ImageIcon,
+  Terminal,
+  Mail,
+  Github,
+  Database,
+  Globe,
+  ChevronRight,
+  Sparkles,
+  History,
+  Bookmark,
+  Hash,
+} from 'lucide-react'
 
 // CommandType
 
-type CommandType = "navigation" | "action" | "recent" | "workflow" | "agent";
+type CommandType = 'navigation' | 'action' | 'recent' | 'workflow' | 'agent'
 
 interface CommandItem {
- id: string;
+  id: string
 
- type: CommandType;
+  type: CommandType
 
- title: string;
+  title: string
 
- description?: string;
+  description?: string
 
- icon: React.ElementType;
+  icon: React.ElementType
 
- shortcut?: string;
+  shortcut?: string
 
- href?: string;
+  href?: string
 
- action?: () => void;
+  action?: () => void
 
- keywords?: string[];
+  keywords?: string[]
 }
 
 // CommandGroup
 
 const commandGroups: { title: string; items: CommandItem[] }[] = [
+  {
+    title: 'Quick Actions',
 
- {
- title: "Quick Actions",
+    items: [
+      {
+        id: 'new-conversation',
 
- items: [
+        type: 'action',
 
- {
- id: "new-conversation",
+        title: 'New Conversation',
 
- type: "action",
+        description: 'Start a new AI conversation',
 
- title: "New Conversation",
+        icon: MessageSquare,
 
- description: "Start a new AI conversation",
+        shortcut: '⌘N',
 
- icon: MessageSquare,
+        href: '/dashboard/conversations',
+      },
 
- shortcut: "⌘N",
+      {
+        id: 'new-workflow',
 
- href: "/dashboard/conversations",
+        type: 'action',
 
- },
+        title: 'New Workflow',
 
- {
- id: "new-workflow",
+        description: 'Create a new automation workflow',
 
- type: "action",
+        icon: Zap,
 
- title: "New Workflow",
+        shortcut: '⌘W',
 
- description: "Create a new automation workflow",
+        href: '/dashboard/workflows/new',
+      },
 
- icon: Zap,
+      {
+        id: 'new-agent',
 
- shortcut: "⌘W",
+        type: 'action',
 
- href: "/dashboard/workflows/new",
+        title: 'Create Agent',
 
- },
+        description: 'Create a custom AI agent',
 
- {
- id: "new-agent",
+        icon: Bot,
 
- type: "action",
+        href: '/dashboard/my-agents/new',
+      },
 
- title: "Create Agent",
+      {
+        id: 'generate-code',
 
- description: "Create a custom AI agent",
+        type: 'action',
 
- icon: Bot,
+        title: 'Generate Code',
 
- href: "/dashboard/my-agents/new",
+        description: 'Use AI to generate code',
 
- },
+        icon: Code,
 
- {
- id: "generate-code",
+        shortcut: '⌘K',
+      },
 
- type: "action",
+      {
+        id: 'generate-image',
 
- title: "Generate Code",
+        type: 'action',
 
- description: "Use AI to generate code",
+        title: 'Generate Image',
 
- icon: Code,
+        description: 'Use AI to generate images',
 
- shortcut: "⌘K",
+        icon: ImageIcon,
 
- },
+        shortcut: '⌘I',
+      },
+    ],
+  },
 
- {
- id: "generate-image",
+  {
+    title: 'Navigation',
 
- type: "action",
+    items: [
+      {
+        id: 'nav-workflows',
 
- title: "Generate Image",
+        type: 'navigation',
 
- description: "Use AI to generate images",
+        title: 'Workflows',
 
- icon: ImageIcon,
+        icon: Zap,
 
- shortcut: "⌘I",
+        href: '/dashboard/workflows',
 
- },
+        keywords: ['workflow', 'automation', 'Automation'],
+      },
 
- ],
+      {
+        id: 'nav-creative',
 
- },
+        type: 'navigation',
 
- {
- title: "Navigation",
+        title: 'Creative Workshop',
 
- items: [
+        icon: Palette,
 
- {
- id: "nav-workflows",
+        href: '/dashboard/creative',
 
- type: "navigation",
+        keywords: ['creative', 'design', 'Creative', 'Design'],
+      },
 
- title: "Workflows",
+      {
+        id: 'nav-templates',
 
- icon: Zap,
+        type: 'navigation',
 
- href: "/dashboard/workflows",
+        title: 'Template Gallery',
 
- keywords: ["workflow", "automation", "Automation"],
+        icon: LayoutGrid,
 
- },
+        href: '/dashboard/template-gallery',
 
- {
- id: "nav-creative",
+        keywords: ['template', 'Template'],
+      },
 
- type: "navigation",
+      {
+        id: 'nav-store',
 
- title: "Creative Workshop",
+        type: 'navigation',
 
- icon: Palette,
+        title: 'App Store',
 
- href: "/dashboard/creative",
+        icon: Store,
 
- keywords: ["creative", "design", "Creative", "Design"],
+        href: '/dashboard/store',
 
- },
+        keywords: ['store', 'app', 'App', 'Store'],
+      },
 
- {
- id: "nav-templates",
+      {
+        id: 'nav-agents',
 
- type: "navigation",
+        type: 'navigation',
 
- title: "Template Gallery",
+        title: 'My Agents',
 
- icon: LayoutGrid,
+        icon: Users,
 
- href: "/dashboard/template-gallery",
+        href: '/dashboard/my-agents',
 
- keywords: ["template", "Template"],
+        keywords: ['agent', 'bot'],
+      },
 
- },
+      {
+        id: 'nav-settings',
 
- {
- id: "nav-store",
+        type: 'navigation',
 
- type: "navigation",
+        title: 'Settings',
 
- title: "App Store",
+        icon: Settings,
 
- icon: Store,
+        href: '/dashboard/settings',
 
- href: "/dashboard/store",
+        keywords: ['settings', 'Settings', 'Config'],
+      },
 
- keywords: ["store", "app", "App", "Store"],
+      {
+        id: 'nav-docs',
 
- },
+        type: 'navigation',
 
- {
- id: "nav-agents",
+        title: 'Documentation',
 
- type: "navigation",
+        icon: FileText,
 
- title: "My Agents",
+        href: '/docs',
 
- icon: Users,
+        keywords: ['docs', 'documentation', 'Document', 'Help'],
+      },
+    ],
+  },
 
- href: "/dashboard/my-agents",
+  {
+    title: 'Recently Used',
 
- keywords: ["agent", "bot"],
+    items: [
+      {
+        id: 'recent-1',
 
- },
+        type: 'recent',
 
- {
- id: "nav-settings",
+        title: 'Customer Feedback Auto-Processing',
 
- type: "navigation",
+        description: 'Workflow edited 2 hours ago',
 
- title: "Settings",
+        icon: Zap,
 
- icon: Settings,
+        href: '/dashboard/workflows/wf-1',
+      },
 
- href: "/dashboard/settings",
+      {
+        id: 'recent-2',
 
- keywords: ["settings", "Settings", "Config"],
+        type: 'recent',
 
- },
+        title: 'Email Assistant Agent',
 
- {
- id: "nav-docs",
+        description: 'Agent edited yesterday',
 
- type: "navigation",
+        icon: Bot,
 
- title: "Documentation",
+        href: '/dashboard/my-agents/agent-1',
+      },
 
- icon: FileText,
+      {
+        id: 'recent-3',
 
- href: "/docs",
+        type: 'recent',
 
- keywords: ["docs", "documentation", "Document", "Help"],
+        title: 'Data Analytics Report',
 
- },
+        description: 'Conversation from 3 days ago',
 
- ],
+        icon: MessageSquare,
 
- },
-
- {
- title: "Recently Used",
-
- items: [
-
- {
- id: "recent-1",
-
- type: "recent",
-
- title: "Customer Feedback Auto-Processing",
-
- description: "Workflow edited 2 hours ago",
-
- icon: Zap,
-
- href: "/dashboard/workflows/wf-1",
-
- },
-
- {
- id: "recent-2",
-
- type: "recent",
-
- title: "Email Assistant Agent",
-
- description: "Agent edited yesterday",
-
- icon: Bot,
-
- href: "/dashboard/my-agents/agent-1",
-
- },
-
- {
- id: "recent-3",
-
- type: "recent",
-
- title: "Data Analytics Report",
-
- description: "Conversation from 3 days ago",
-
- icon: MessageSquare,
-
- href: "/dashboard/conversations",
-
- },
-
- ],
-
- },
-
-];
+        href: '/dashboard/conversations',
+      },
+    ],
+  },
+]
 
 interface CommandPaletteProps {
- isOpen: boolean;
+  isOpen: boolean
 
- onClose: () => void;
+  onClose: () => void
 }
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
- const router = useRouter();
+  const router = useRouter()
 
- const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('')
 
- const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
- const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
- const listRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null)
 
- // Filter commands
+  // Filter commands
 
- const filteredGroups = commandGroups
+  const filteredGroups = commandGroups
 
- .map((group) => ({
- ...group,
+    .map((group) => ({
+      ...group,
 
- items: group.items.filter((item) => {
- const searchLower = query.toLowerCase();
+      items: group.items.filter((item) => {
+        const searchLower = query.toLowerCase()
 
- return (
- item.title.toLowerCase().includes(searchLower) ||
+        return (
+          item.title.toLowerCase().includes(searchLower) ||
+          item.description?.toLowerCase().includes(searchLower) ||
+          item.keywords?.some((k) => k.toLowerCase().includes(searchLower))
+        )
+      }),
+    }))
 
- item.description?.toLowerCase().includes(searchLower) ||
+    .filter((group) => group.items.length > 0)
 
- item.keywords?.some((k) => k.toLowerCase().includes(searchLower))
+  // Flattened command list
 
- );
+  const flatItems = filteredGroups.flatMap((group) => group.items)
 
- }),
+  // Execute command
 
- }))
+  const executeCommand = useCallback(
+    (item: CommandItem) => {
+      if (item.action) {
+        item.action()
+      } else if (item.href) {
+        router.push(item.href)
+      }
 
- .filter((group) => group.items.length > 0);
+      onClose()
+    },
 
- // Flattened command list
+    [router, onClose]
+  )
 
- const flatItems = filteredGroups.flatMap((group) => group.items);
+  // Keyboard navigation
 
- // Execute command
+  useEffect(() => {
+    if (!isOpen) return
 
- const executeCommand = useCallback(
- (item: CommandItem) => {
- if (item.action) {
- item.action();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
 
- } else if (item.href) {
- router.push(item.href);
+          setSelectedIndex((prev) => (prev < flatItems.length - 1 ? prev + 1 : 0))
 
- }
+          break
 
- onClose();
+        case 'ArrowUp':
+          e.preventDefault()
 
- },
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : flatItems.length - 1))
 
- [router, onClose]
+          break
 
- );
+        case 'Enter':
+          e.preventDefault()
 
- // Keyboard navigation
+          if (flatItems[selectedIndex]) {
+            executeCommand(flatItems[selectedIndex])
+          }
 
- useEffect(() => {
- if (!isOpen) return;
+          break
 
- const handleKeyDown = (e: KeyboardEvent) => {
- switch (e.key) {
- case "ArrowDown":
+        case 'Escape':
+          e.preventDefault()
 
- e.preventDefault();
+          onClose()
 
- setSelectedIndex((prev) =>
+          break
+      }
+    }
 
- prev < flatItems.length - 1 ? prev + 1 : 0
+    window.addEventListener('keydown', handleKeyDown)
 
- );
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, selectedIndex, flatItems, executeCommand, onClose])
 
- break;
+  // Reset selection
 
- case "ArrowUp":
+  useEffect(() => {
+    setSelectedIndex(0)
+  }, [query])
 
- e.preventDefault();
+  // Auto focus
 
- setSelectedIndex((prev) =>
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus()
 
- prev > 0 ? prev - 1 : flatItems.length - 1
+      setQuery('')
 
- );
+      setSelectedIndex(0)
+    }
+  }, [isOpen])
 
- break;
+  // Scroll to selected
+
+  useEffect(() => {
+    if (listRef.current && flatItems[selectedIndex]) {
+      const item = listRef.current.querySelector(`[data-index="${selectedIndex}"]`)
+
+      item?.scrollIntoView({ block: 'nearest' })
+    }
+  }, [selectedIndex, flatItems])
+
+  if (!isOpen) return null
 
- case "Enter":
-
- e.preventDefault();
-
- if (flatItems[selectedIndex]) {
- executeCommand(flatItems[selectedIndex]);
-
- }
-
- break;
-
- case "Escape":
-
- e.preventDefault();
-
- onClose();
-
- break;
-
- }
-
- };
-
- window.addEventListener("keydown", handleKeyDown);
-
- return () => window.removeEventListener("keydown", handleKeyDown);
-
- }, [isOpen, selectedIndex, flatItems, executeCommand, onClose]);
-
- // Reset selection
-
- useEffect(() => {
- setSelectedIndex(0);
-
- }, [query]);
-
- // Auto focus
-
- useEffect(() => {
- if (isOpen) {
- inputRef.current?.focus();
-
- setQuery("");
-
- setSelectedIndex(0);
-
- }
-
- }, [isOpen]);
-
- // Scroll to selected
-
- useEffect(() => {
- if (listRef.current && flatItems[selectedIndex]) {
- const item = listRef.current.querySelector(
- `[data-index="${selectedIndex}"]`
-
- );
-
- item?.scrollIntoView({ block: "nearest" });
-
- }
-
- }, [selectedIndex, flatItems]);
-
- if (!isOpen) return null;
-
- // Calculate flat index
-
- let flatIndex = -1;
-
- return (
- <>
-
- {/* Background Overlay */}
-
- <div
-
- className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-
- onClick={onClose}
-
- />
-
- {/* Command Panel */}
-
- <div className="fixed left-1/2 top-[20%] -translate-x-1/2 w-full max-w-[600px] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
-
- {/* Search Input */}
-
- <div className="flex items-center gap-3 p-4 border-b border-border">
-
- <Search className="w-5 h-5 text-foreground-light" />
-
- <input
-
- ref={inputRef}
-
- type="text"
-
- value={query}
-
- onChange={(e) => setQuery(e.target.value)}
-
- placeholder="Search commands, pages, or features..."
-
- className="flex-1 bg-transparent text-foreground text-sm placeholder:text-foreground-light focus:outline-none"
-
- />
-
- {query && (
- <button
-
- onClick={() => setQuery("")}
-
- className="p-1 rounded-lg hover:bg-surface-200 text-foreground-light hover:text-foreground/70 transition-colors"
-
- >
-
- <X className="w-4 h-4" />
-
- </button>
-
- )}
-
- <kbd className="px-2 py-1 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
-
- ESC
-
- </kbd>
-
- </div>
-
- {/* Command List */}
-
- <div
-
- ref={listRef}
-
- className="max-h-[400px] overflow-y-auto py-2"
-
- >
-
- {filteredGroups.length === 0 ? (
- <div className="flex flex-col items-center justify-center py-12 text-center">
-
- <Search className="w-10 h-10 text-foreground-light/30 mb-3" />
-
- <p className="text-sm text-foreground-light">No matching commands found</p>
-
- <p className="text-xs text-foreground-light/70 mt-1">Try different keywords</p>
-
- </div>
-
- ) : (
- filteredGroups.map((group) => (
- <div key={group.title} className="mb-2">
-
- <div className="px-4 py-2 text-[11px] font-medium text-foreground-light uppercase tracking-wider">
-
- {group.title}
-
- </div>
-
- {group.items.map((item) => {
- flatIndex++;
-
- const currentIndex = flatIndex;
-
- const isSelected = selectedIndex === currentIndex;
-
- return (
- <button
-
- key={item.id}
-
- data-index={currentIndex}
-
- onClick={() => executeCommand(item)}
-
- onMouseEnter={() => setSelectedIndex(currentIndex)}
-
- className={cn(
- "w-full flex items-center gap-3 px-4 py-3 transition-all",
-
- isSelected
-
- ? "bg-surface-200"
-
- : "hover:bg-muted/50"
-
- )}
-
- >
-
- {/* Icon */}
-
- <div
-
- className={cn(
- "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors",
-
- isSelected
-
- ? "bg-primary/20 text-primary"
-
- : "bg-surface-200 text-foreground-light"
-
- )}
-
- >
-
- <item.icon className="w-4 h-4" />
-
- </div>
-
- {/* Content */}
-
- <div className="flex-1 min-w-0 text-left">
-
- <p
-
- className={cn(
- "text-sm font-medium truncate",
-
- isSelected ? "text-foreground" : "text-foreground/80"
-
- )}
-
- >
-
- {item.title}
-
- </p>
-
- {item.description && (
- <p className="text-xs text-foreground-light truncate mt-0.5">
-
- {item.description}
-
- </p>
-
- )}
-
- </div>
-
- {/* Shortcut */}
-
- {item.shortcut && (
- <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
-
- {item.shortcut}
-
- </kbd>
-
- )}
-
- {/* Arrow */}
-
- <ChevronRight
-
- className={cn(
- "w-4 h-4 shrink-0 transition-all",
-
- isSelected
-
- ? "text-foreground/70 translate-x-0.5"
-
- : "text-foreground-light/50"
-
- )}
-
- />
-
- </button>
-
- );
-
- })}
-
- </div>
-
- ))
-
- )}
-
- </div>
-
- {/* Footer Tips */}
-
- <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
-
- <div className="flex items-center gap-4 text-[11px] text-foreground-light">
-
- <span className="flex items-center gap-1">
-
- <kbd className="px-1 py-0.5 rounded bg-surface-200">↑</kbd>
-
- <kbd className="px-1 py-0.5 rounded bg-surface-200">↓</kbd>
-
- Navigation
-
- </span>
-
- <span className="flex items-center gap-1">
-
- <kbd className="px-1.5 py-0.5 rounded bg-surface-200">↵</kbd>
-
- Execute
-
- </span>
-
- </div>
-
- <div className="flex items-center gap-2 text-[11px] text-foreground-light">
-
- <Sparkles className="w-3 h-3 text-primary" />
-
- <span>AgentFlow</span>
-
- </div>
-
- </div>
-
- </div>
-
- </>
-
- );
+  // Calculate flat index
+
+  let flatIndex = -1
+
+  return (
+    <>
+      {/* Background Overlay */}
+
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={onClose} />
+
+      {/* Command Panel */}
+
+      <div className="fixed left-1/2 top-[20%] -translate-x-1/2 w-full max-w-[600px] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
+        {/* Search Input */}
+
+        <div className="flex items-center gap-3 p-4 border-b border-border">
+          <Search className="w-5 h-5 text-foreground-light" />
+
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search commands, pages, or features..."
+            className="flex-1 bg-transparent text-foreground text-sm placeholder:text-foreground-light focus:outline-none"
+          />
+
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              className="p-1 rounded-lg hover:bg-surface-200 text-foreground-light hover:text-foreground/70 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+
+          <kbd className="px-2 py-1 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
+            ESC
+          </kbd>
+        </div>
+
+        {/* Command List */}
+
+        <div ref={listRef} className="max-h-[400px] overflow-y-auto py-2">
+          {filteredGroups.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Search className="w-10 h-10 text-foreground-light/30 mb-3" />
+
+              <p className="text-sm text-foreground-light">No matching commands found</p>
+
+              <p className="text-xs text-foreground-light/70 mt-1">Try different keywords</p>
+            </div>
+          ) : (
+            filteredGroups.map((group) => (
+              <div key={group.title} className="mb-2">
+                <div className="px-4 py-2 text-[11px] font-medium text-foreground-light uppercase tracking-wider">
+                  {group.title}
+                </div>
+
+                {group.items.map((item) => {
+                  flatIndex++
+
+                  const currentIndex = flatIndex
+
+                  const isSelected = selectedIndex === currentIndex
+
+                  return (
+                    <button
+                      key={item.id}
+                      data-index={currentIndex}
+                      onClick={() => executeCommand(item)}
+                      onMouseEnter={() => setSelectedIndex(currentIndex)}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-4 py-3 transition-all',
+
+                        isSelected ? 'bg-surface-200' : 'hover:bg-muted/50'
+                      )}
+                    >
+                      {/* Icon */}
+
+                      <div
+                        className={cn(
+                          'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors',
+
+                          isSelected
+                            ? 'bg-primary/20 text-primary'
+                            : 'bg-surface-200 text-foreground-light'
+                        )}
+                      >
+                        <item.icon className="w-4 h-4" />
+                      </div>
+
+                      {/* Content */}
+
+                      <div className="flex-1 min-w-0 text-left">
+                        <p
+                          className={cn(
+                            'text-sm font-medium truncate',
+
+                            isSelected ? 'text-foreground' : 'text-foreground/80'
+                          )}
+                        >
+                          {item.title}
+                        </p>
+
+                        {item.description && (
+                          <p className="text-xs text-foreground-light truncate mt-0.5">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Shortcut */}
+
+                      {item.shortcut && (
+                        <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-surface-200 text-foreground-light">
+                          {item.shortcut}
+                        </kbd>
+                      )}
+
+                      {/* Arrow */}
+
+                      <ChevronRight
+                        className={cn(
+                          'w-4 h-4 shrink-0 transition-all',
+
+                          isSelected
+                            ? 'text-foreground/70 translate-x-0.5'
+                            : 'text-foreground-light/50'
+                        )}
+                      />
+                    </button>
+                  )
+                })}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Footer Tips */}
+
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex items-center gap-4 text-[11px] text-foreground-light">
+            <span className="flex items-center gap-1">
+              <kbd className="px-1 py-0.5 rounded bg-surface-200">↑</kbd>
+              <kbd className="px-1 py-0.5 rounded bg-surface-200">↓</kbd>
+              Navigation
+            </span>
+
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-surface-200">↵</kbd>
+              Execute
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-foreground-light">
+            <Sparkles className="w-3 h-3 text-primary" />
+
+            <span>AgentFlow</span>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
-

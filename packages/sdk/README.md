@@ -17,7 +17,7 @@ yarn add @agentflow/sdk
 ### 1. 创建基础节点
 
 ```typescript
-import { defineNode, input, output } from '@agentflow/sdk';
+import { defineNode, input, output } from '@agentflow/sdk'
 
 export default defineNode({
   id: 'text-transform',
@@ -29,10 +29,13 @@ export default defineNode({
 
   inputs: {
     text: input.string('输入文本').required().build(),
-    mode: input.select('转换模式', [
-      { label: '大写', value: 'upper' },
-      { label: '小写', value: 'lower' },
-    ]).default('upper').build(),
+    mode: input
+      .select('转换模式', [
+        { label: '大写', value: 'upper' },
+        { label: '小写', value: 'lower' },
+      ])
+      .default('upper')
+      .build(),
   },
 
   outputs: {
@@ -40,14 +43,14 @@ export default defineNode({
   },
 
   async execute(ctx) {
-    const { text, mode } = ctx.inputs;
-    ctx.log.info('开始转换', { text, mode });
-    
-    const result = mode === 'upper' ? text.toUpperCase() : text.toLowerCase();
-    
-    return { result };
+    const { text, mode } = ctx.inputs
+    ctx.log.info('开始转换', { text, mode })
+
+    const result = mode === 'upper' ? text.toUpperCase() : text.toLowerCase()
+
+    return { result }
   },
-});
+})
 ```
 
 ### 2. 使用输入构建器
@@ -55,56 +58,46 @@ export default defineNode({
 SDK 提供了流畅的 API 来定义输入字段：
 
 ```typescript
-import { input } from '@agentflow/sdk';
+import { input } from '@agentflow/sdk'
 
 // 字符串输入
-input.string('姓名')
-  .required()
-  .minLength(2)
-  .maxLength(50)
-  .placeholder('请输入姓名')
-  .build()
+input.string('姓名').required().minLength(2).maxLength(50).placeholder('请输入姓名').build()
 
 // 数字输入
-input.number('年龄')
-  .min(0)
-  .max(150)
-  .default(18)
-  .build()
+input.number('年龄').min(0).max(150).default(18).build()
 
 // 布尔输入
-input.boolean('启用')
+input
+  .boolean('启用')
   .default(false)
-  .switch()  // 使用开关组件
+  .switch() // 使用开关组件
   .build()
 
 // 选择输入
-input.select('类型', [
-  { label: '选项 A', value: 'a' },
-  { label: '选项 B', value: 'b' },
-]).build()
+input
+  .select('类型', [
+    { label: '选项 A', value: 'a' },
+    { label: '选项 B', value: 'b' },
+  ])
+  .build()
 
 // 对象输入
-input.object('配置')
-  .json()  // 使用 JSON 编辑器
+input
+  .object('配置')
+  .json() // 使用 JSON 编辑器
   .build()
 
 // 数组输入
-input.array('列表')
-  .default([])
-  .build()
+input.array('列表').default([]).build()
 
 // 代码输入
-input.string('代码')
-  .code()
-  .multiline()
-  .build()
+input.string('代码').code().multiline().build()
 ```
 
 ### 3. 使用输出构建器
 
 ```typescript
-import { output } from '@agentflow/sdk';
+import { output } from '@agentflow/sdk'
 
 // 字符串输出
 output.string('结果').build()
@@ -119,36 +112,33 @@ output.string('错误信息').optional().build()
 ### 4. 验证规则
 
 ```typescript
-import { input, validators } from '@agentflow/sdk';
+import { input, validators } from '@agentflow/sdk'
 
 // 内置验证
-input.string('邮箱')
-  .email()  // 邮箱格式验证
+input
+  .string('邮箱')
+  .email() // 邮箱格式验证
   .build()
 
-input.string('网址')
-  .url()  // URL 格式验证
+input
+  .string('网址')
+  .url() // URL 格式验证
   .build()
 
 // 使用预置验证器
-input.string('手机号')
-  .validate(validators.phone())
-  .build()
+input.string('手机号').validate(validators.phone()).build()
 
-input.string('UUID')
-  .validate(validators.uuid())
-  .build()
+input.string('UUID').validate(validators.uuid()).build()
 
 // 自定义验证
-input.string('用户名')
-  .custom(
-    (value) => /^[a-z0-9_]+$/.test(value),
-    '只能包含小写字母、数字和下划线'
-  )
+input
+  .string('用户名')
+  .custom((value) => /^[a-z0-9_]+$/.test(value), '只能包含小写字母、数字和下划线')
   .build()
 
 // 枚举验证
-input.string('状态')
+input
+  .string('状态')
   .validate(validators.oneOf(['active', 'inactive', 'pending']))
   .build()
 ```
@@ -156,11 +146,12 @@ input.string('状态')
 ### 5. 条件显示
 
 ```typescript
-input.string('API 密钥')
+input
+  .string('API 密钥')
   .showIf({
     field: 'useCustomApi',
     operator: 'equals',
-    value: true
+    value: true,
   })
   .build()
 ```
@@ -173,35 +164,35 @@ input.string('API 密钥')
 async execute(ctx) {
   // 获取输入值
   const { text, count } = ctx.inputs;
-  
+
   // 日志记录
   ctx.log.debug('调试信息', { data });
   ctx.log.info('一般信息');
   ctx.log.warn('警告信息');
   ctx.log.error('错误信息');
-  
+
   // 报告进度
   ctx.reportProgress(50, '处理中...');
-  
+
   // 获取环境变量
   const apiUrl = ctx.getEnv('API_URL');
-  
+
   // 获取密钥
   const apiKey = await ctx.getSecret('OPENAI_API_KEY');
-  
+
   // HTTP 请求
   const response = await ctx.http.get('https://api.example.com/data');
   const result = await ctx.http.post('https://api.example.com/submit', { data });
-  
+
   // 存储操作
   await ctx.storage.set('key', value);
   const cached = await ctx.storage.get('key');
-  
+
   // 检查取消信号
   if (ctx.signal.aborted) {
     throw new Error('执行已取消');
   }
-  
+
   return { result };
 }
 ```
@@ -211,21 +202,21 @@ async execute(ctx) {
 SDK 提供完整的测试框架：
 
 ```typescript
-import { createNodeTester, assert, runTestSuite } from '@agentflow/sdk';
-import myNode from './my-node';
+import { createNodeTester, assert, runTestSuite } from '@agentflow/sdk'
+import myNode from './my-node'
 
 // 方式 1: 使用测试器
-const tester = createNodeTester(myNode);
+const tester = createNodeTester(myNode)
 
 const result = await tester
   .withEnv({ API_URL: 'https://test.api.com' })
   .withSecrets({ API_KEY: 'test-key' })
-  .execute({ text: 'hello', count: 3 });
+  .execute({ text: 'hello', count: 3 })
 
 // 断言
-assert.success(result);
-assert.outputEquals(result, { result: 'hellohellohello' });
-assert.hasLog(result, 'info', '处理中');
+assert.success(result)
+assert.outputEquals(result, { result: 'hellohellohello' })
+assert.hasLog(result, 'info', '处理中')
 
 // 方式 2: 运行测试套件
 const suiteResult = await runTestSuite(myNode, [
@@ -239,24 +230,24 @@ const suiteResult = await runTestSuite(myNode, [
     inputs: { text: '', mode: 'upper' },
     shouldFail: true,
   },
-]);
+])
 
-console.log(`通过: ${suiteResult.passed}, 失败: ${suiteResult.failed}`);
+console.log(`通过: ${suiteResult.passed}, 失败: ${suiteResult.failed}`)
 ```
 
 ## 验证
 
 ```typescript
-import { validateAllInputs, validateNodeDefinition } from '@agentflow/sdk';
+import { validateAllInputs, validateNodeDefinition } from '@agentflow/sdk'
 
 // 验证输入值
 const result = validateAllInputs(node.inputs, {
   text: 'hello',
   count: 5,
-});
+})
 
 if (!result.valid) {
-  console.log('验证错误:', result.errors);
+  console.log('验证错误:', result.errors)
 }
 
 // 验证节点定义
@@ -264,7 +255,7 @@ const defResult = validateNodeDefinition({
   id: 'my-node',
   name: '我的节点',
   // ...
-});
+})
 ```
 
 ## 错误处理
@@ -277,13 +268,13 @@ async execute(ctx) {
   if (!ctx.inputs.text) {
     throw new ExecutionError('文本不能为空', { field: 'text' });
   }
-  
+
   // 抛出配置错误
   const apiKey = await ctx.getSecret('API_KEY');
   if (!apiKey) {
     throw new ConfigurationError('未配置 API 密钥');
   }
-  
+
   // ...
 }
 ```
@@ -293,7 +284,7 @@ async execute(ctx) {
 SDK 提供完整的 TypeScript 支持：
 
 ```typescript
-import { defineNode, input, output, NodeExecutionContext } from '@agentflow/sdk';
+import { defineNode, input, output, NodeExecutionContext } from '@agentflow/sdk'
 
 // 输入输出类型会自动推断
 const node = defineNode({
@@ -309,9 +300,9 @@ const node = defineNode({
     // ctx.inputs.text 类型为 string
     // ctx.inputs.count 类型为 number
     // 返回值必须包含 result: string
-    return { result: ctx.inputs.text.repeat(ctx.inputs.count) };
+    return { result: ctx.inputs.text.repeat(ctx.inputs.count) }
   },
-});
+})
 ```
 
 ## API 参考
@@ -321,6 +312,7 @@ const node = defineNode({
 定义一个新节点。
 
 **参数:**
+
 - `config.id` - 节点唯一标识符
 - `config.name` - 节点显示名称
 - `config.description` - 节点描述
@@ -336,6 +328,7 @@ const node = defineNode({
 输入字段构建器工厂。
 
 **方法:**
+
 - `input.string(label)` - 字符串输入
 - `input.number(label)` - 数字输入
 - `input.boolean(label)` - 布尔输入
@@ -352,6 +345,7 @@ const node = defineNode({
 输出字段构建器工厂。
 
 **方法:**
+
 - `output.string(label)` - 字符串输出
 - `output.number(label)` - 数字输出
 - `output.boolean(label)` - 布尔输出
@@ -363,6 +357,7 @@ const node = defineNode({
 预置验证器。
 
 **验证器:**
+
 - `validators.email()` - 邮箱格式
 - `validators.url()` - URL 格式
 - `validators.uuid()` - UUID 格式

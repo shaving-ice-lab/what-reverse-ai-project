@@ -1,17 +1,19 @@
-"use client";
+'use client'
 
-import { useParams } from "next/navigation";
-import { useWorkspaceContext } from "@/components/permissions/workspace-guard";
-import { AppOverviewPageContent } from "./overview-content";
+import { useParams } from 'next/navigation'
+import { useWorkspaceContext } from '@/components/permissions/workspace-guard'
+import { AppOverviewPageContent } from './overview-content'
 
 export default function AppOverviewPage() {
-  const params = useParams();
-  const appId = Array.isArray(params?.appId) ? params.appId[0] : (params?.appId as string | undefined);
-  const { workspaceId } = useWorkspaceContext();
+  const params = useParams()
+  const appId = Array.isArray(params?.appId)
+    ? params.appId[0]
+    : (params?.appId as string | undefined)
+  const { workspaceId } = useWorkspaceContext()
 
   if (!workspaceId || !appId) {
-    return null;
+    return null
   }
 
-  return <AppOverviewPageContent workspaceId={workspaceId} appId={appId} />;
+  return <AppOverviewPageContent workspaceId={workspaceId} appId={appId} />
 }

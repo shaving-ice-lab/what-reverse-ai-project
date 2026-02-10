@@ -1,31 +1,26 @@
-"use client";
+'use client'
 
 /**
  * FormField wrapper with label, hint, and error states.
  */
 
-import { forwardRef, useId } from "react";
-import type {
-  ChangeEvent,
-  ComponentPropsWithoutRef,
-  HTMLAttributes,
-  ReactNode,
-} from "react";
-import { AlertCircle, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Label } from "./label";
-import { Input } from "./input";
-import { Textarea } from "./textarea";
+import { forwardRef, useId } from 'react'
+import type { ChangeEvent, ComponentPropsWithoutRef, HTMLAttributes, ReactNode } from 'react'
+import { AlertCircle, Info } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Label } from './label'
+import { Input } from './input'
+import { Textarea } from './textarea'
 
 interface FormFieldProps {
-  label: string;
-  hint?: string;
-  error?: string;
-  required?: boolean;
-  optional?: boolean;
-  controlId?: string;
-  className?: string;
-  children: ReactNode;
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  optional?: boolean
+  controlId?: string
+  className?: string
+  children: ReactNode
 }
 
 export function FormField({
@@ -38,52 +33,48 @@ export function FormField({
   className,
   children,
 }: FormFieldProps) {
-  const labelVariant = required ? "required" : optional ? "optional" : "default";
+  const labelVariant = required ? 'required' : optional ? 'optional' : 'default'
 
   return (
-    <div className={cn("space-y-1.5", className)}>
+    <div className={cn('space-y-1.5', className)}>
       <Label
         htmlFor={controlId}
         variant={labelVariant}
-        className={cn("text-sm", error && "text-destructive")}
+        className={cn('text-sm', error && 'text-destructive')}
       >
         {label}
       </Label>
       {children}
-      {error ? (
-        <FormError>{error}</FormError>
-      ) : hint ? (
-        <FormHint>{hint}</FormHint>
-      ) : null}
+      {error ? <FormError>{error}</FormError> : hint ? <FormHint>{hint}</FormHint> : null}
     </div>
-  );
+  )
 }
 
 interface FormHintProps extends HTMLAttributes<HTMLParagraphElement> {
-  icon?: ReactNode;
+  icon?: ReactNode
 }
 
 export function FormHint({ children, icon, className, ...props }: FormHintProps) {
   return (
     <p
-      className={cn("flex items-center gap-1 text-xs text-foreground-muted", className)}
+      className={cn('flex items-center gap-1 text-xs text-foreground-muted', className)}
       {...props}
     >
       {icon ?? <Info className="h-3 w-3 shrink-0" />}
       {children}
     </p>
-  );
+  )
 }
 
 interface FormErrorProps extends HTMLAttributes<HTMLDivElement> {
-  icon?: ReactNode;
+  icon?: ReactNode
 }
 
 export function FormError({ children, icon, className, ...props }: FormErrorProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-1.5 text-xs text-destructive p-2 rounded-md bg-destructive-200",
+        'flex items-center gap-1.5 text-xs text-destructive p-2 rounded-md bg-destructive-200',
         className
       )}
       {...props}
@@ -91,41 +82,27 @@ export function FormError({ children, icon, className, ...props }: FormErrorProp
       {icon ?? <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
       {children}
     </div>
-  );
+  )
 }
 
-interface ValidatedInputProps
-  extends Omit<ComponentPropsWithoutRef<typeof Input>, "error"> {
-  label: string;
-  hint?: string;
-  error?: string;
-  required?: boolean;
-  optional?: boolean;
-  onValueChange?: (value: string) => void;
+interface ValidatedInputProps extends Omit<ComponentPropsWithoutRef<typeof Input>, 'error'> {
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  optional?: boolean
+  onValueChange?: (value: string) => void
 }
 
 export const ValidatedInput = forwardRef<HTMLInputElement, ValidatedInputProps>(
-  (
-    {
-      label,
-      hint,
-      error,
-      required,
-      optional,
-      onValueChange,
-      onChange,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const generatedId = useId();
-    const controlId = id ?? generatedId;
+  ({ label, hint, error, required, optional, onValueChange, onChange, id, ...props }, ref) => {
+    const generatedId = useId()
+    const controlId = id ?? generatedId
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      onChange?.(event);
-      onValueChange?.(event.target.value);
-    };
+      onChange?.(event)
+      onValueChange?.(event.target.value)
+    }
 
     return (
       <FormField
@@ -136,51 +113,34 @@ export const ValidatedInput = forwardRef<HTMLInputElement, ValidatedInputProps>(
         optional={optional}
         controlId={controlId}
       >
-        <Input
-          ref={ref}
-          id={controlId}
-          error={Boolean(error)}
-          onChange={handleChange}
-          {...props}
-        />
+        <Input ref={ref} id={controlId} error={Boolean(error)} onChange={handleChange} {...props} />
       </FormField>
-    );
+    )
   }
-);
-ValidatedInput.displayName = "ValidatedInput";
+)
+ValidatedInput.displayName = 'ValidatedInput'
 
 interface ValidatedTextareaProps extends ComponentPropsWithoutRef<typeof Textarea> {
-  label: string;
-  hint?: string;
-  error?: string;
-  required?: boolean;
-  optional?: boolean;
-  onValueChange?: (value: string) => void;
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  optional?: boolean
+  onValueChange?: (value: string) => void
 }
 
 export const ValidatedTextarea = forwardRef<HTMLTextAreaElement, ValidatedTextareaProps>(
   (
-    {
-      label,
-      hint,
-      error,
-      required,
-      optional,
-      onValueChange,
-      onChange,
-      id,
-      className,
-      ...props
-    },
+    { label, hint, error, required, optional, onValueChange, onChange, id, className, ...props },
     ref
   ) => {
-    const generatedId = useId();
-    const controlId = id ?? generatedId;
+    const generatedId = useId()
+    const controlId = id ?? generatedId
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-      onChange?.(event);
-      onValueChange?.(event.target.value);
-    };
+      onChange?.(event)
+      onValueChange?.(event.target.value)
+    }
 
     return (
       <FormField
@@ -196,59 +156,48 @@ export const ValidatedTextarea = forwardRef<HTMLTextAreaElement, ValidatedTextar
           id={controlId}
           className={cn(
             error &&
-              "border-destructive-400/60 focus-visible:ring-destructive/30 focus-visible:border-destructive-400",
+              'border-destructive-400/60 focus-visible:ring-destructive/30 focus-visible:border-destructive-400',
             className
           )}
           onChange={handleChange}
           {...props}
         />
       </FormField>
-    );
+    )
   }
-);
-ValidatedTextarea.displayName = "ValidatedTextarea";
+)
+ValidatedTextarea.displayName = 'ValidatedTextarea'
 
-interface ValidatedNumberInputProps
-  extends Omit<ComponentPropsWithoutRef<typeof Input>, "type" | "error" | "onChange"> {
-  label: string;
-  hint?: string;
-  error?: string;
-  required?: boolean;
-  optional?: boolean;
-  value: number;
-  onValueChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
+interface ValidatedNumberInputProps extends Omit<
+  ComponentPropsWithoutRef<typeof Input>,
+  'type' | 'error' | 'onChange'
+> {
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  optional?: boolean
+  value: number
+  onValueChange: (value: number) => void
+  min?: number
+  max?: number
+  step?: number
 }
 
 export const ValidatedNumberInput = forwardRef<HTMLInputElement, ValidatedNumberInputProps>(
   (
-    {
-      label,
-      hint,
-      error,
-      required,
-      optional,
-      value,
-      onValueChange,
-      min,
-      max,
-      step,
-      id,
-      ...props
-    },
+    { label, hint, error, required, optional, value, onValueChange, min, max, step, id, ...props },
     ref
   ) => {
-    const generatedId = useId();
-    const controlId = id ?? generatedId;
+    const generatedId = useId()
+    const controlId = id ?? generatedId
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      const nextValue = parseFloat(event.target.value);
+      const nextValue = parseFloat(event.target.value)
       if (!Number.isNaN(nextValue)) {
-        onValueChange(nextValue);
+        onValueChange(nextValue)
       }
-    };
+    }
 
     return (
       <FormField
@@ -272,7 +221,7 @@ export const ValidatedNumberInput = forwardRef<HTMLInputElement, ValidatedNumber
           {...props}
         />
       </FormField>
-    );
+    )
   }
-);
-ValidatedNumberInput.displayName = "ValidatedNumberInput";
+)
+ValidatedNumberInput.displayName = 'ValidatedNumberInput'

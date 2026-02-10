@@ -1,28 +1,28 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import Link from 'next/link'
+import type { LucideIcon } from 'lucide-react'
+import { Button, type ButtonProps } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   hasAnyWorkspacePermission,
   type WorkspacePermission,
   type WorkspacePermissionMap,
-} from "@/lib/permissions";
-import { cn } from "@/lib/utils";
+} from '@/lib/permissions'
+import { cn } from '@/lib/utils'
 
 interface PermissionActionProps {
-  permissions?: Partial<WorkspacePermissionMap>;
-  required: WorkspacePermission[];
-  requireAll?: boolean;
-  label: string;
-  icon?: LucideIcon;
-  onClick?: () => void;
-  href?: string;
-  tooltip?: string;
-  variant?: ButtonProps["variant"];
-  size?: ButtonProps["size"];
-  className?: string;
+  permissions?: Partial<WorkspacePermissionMap>
+  required: WorkspacePermission[]
+  requireAll?: boolean
+  label: string
+  icon?: LucideIcon
+  onClick?: () => void
+  href?: string
+  tooltip?: string
+  variant?: ButtonProps['variant']
+  size?: ButtonProps['size']
+  className?: string
 }
 
 export function PermissionAction({
@@ -33,21 +33,21 @@ export function PermissionAction({
   icon: Icon,
   onClick,
   href,
- tooltip = "Insufficient permissions",
+  tooltip = 'Insufficient permissions',
   variant,
   size,
   className,
 }: PermissionActionProps) {
   const allowed = requireAll
     ? required.every((permission) => Boolean(permissions?.[permission]))
-    : hasAnyWorkspacePermission(permissions, ...required);
+    : hasAnyWorkspacePermission(permissions, ...required)
 
   const labelContent = (
     <>
-      {Icon && <Icon className={cn("w-4 h-4", label ? "mr-1.5" : "")} />}
+      {Icon && <Icon className={cn('w-4 h-4', label ? 'mr-1.5' : '')} />}
       {label}
     </>
-  );
+  )
 
   if (allowed) {
     if (href) {
@@ -55,13 +55,13 @@ export function PermissionAction({
         <Button variant={variant} size={size} className={className} asChild>
           <Link href={href}>{labelContent}</Link>
         </Button>
-      );
+      )
     }
     return (
       <Button variant={variant} size={size} className={className} onClick={onClick}>
         {labelContent}
       </Button>
-    );
+    )
   }
 
   return (
@@ -77,5 +77,5 @@ export function PermissionAction({
         <span className="text-[11px]">{tooltip}</span>
       </TooltipContent>
     </Tooltip>
-  );
+  )
 }

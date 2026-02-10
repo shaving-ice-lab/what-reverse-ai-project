@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 // Detect if building for Tauri desktop app
-const isTauriBuild = process.env.TAURI_ENV_PLATFORM !== undefined;
+const isTauriBuild = process.env.TAURI_ENV_PLATFORM !== undefined
 
 // Tauri module noop stub mappings for Web mode (using relative paths)
 const tauriNoopAliases = !isTauriBuild
@@ -16,19 +16,19 @@ const tauriNoopAliases = !isTauriBuild
       '@tauri-apps/plugin-http': './src/lib/tauri/noop-plugin.ts',
       '@tauri-apps/plugin-store': './src/lib/tauri/noop-plugin.ts',
     }
-  : {};
+  : {}
 
 const nextConfig: NextConfig = {
   // Ignore ESLint errors during build (for testing, production should fix all errors)
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
+
   // Ignore TypeScript errors during build
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
   // Tauri desktop app requires static export
   ...(isTauriBuild && {
     output: 'export',
@@ -39,18 +39,18 @@ const nextConfig: NextConfig = {
     // Static export does not support trailing slash
     trailingSlash: false,
   }),
-  
+
   // Turbopack config - map Tauri modules to noop stubs in Web mode
   turbopack: {
     resolveAlias: tauriNoopAliases,
   },
-  
+
   // Enable experimental features
   experimental: {
     // React compiler optimization (optional)
     // reactCompiler: true,
   },
-  
+
   // Image domain whitelist (Web mode)
   ...(!isTauriBuild && {
     images: {
@@ -70,19 +70,19 @@ const nextConfig: NextConfig = {
       ],
     },
   }),
-  
+
   // Redirect rules (Web mode only)
   async redirects() {
     // Static export does not support redirects
-    if (isTauriBuild) return [];
-    
-    return [];
+    if (isTauriBuild) return []
+
+    return []
   },
-  
+
   // Environment variables
   env: {
     NEXT_PUBLIC_IS_TAURI: isTauriBuild ? 'true' : 'false',
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

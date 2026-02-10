@@ -17,22 +17,22 @@
 
 ### Color Palette (Dark Theme)
 
-| Role | Hex | CSS Variable | Tailwind |
-|------|-----|--------------|----------|
-| Primary | `#8B5CF6` | `--color-primary` | `violet-500` |
-| Primary Hover | `#A78BFA` | `--color-primary-hover` | `violet-400` |
-| Secondary | `#6366F1` | `--color-secondary` | `indigo-500` |
-| CTA/Accent | `#22D3EE` | `--color-cta` | `cyan-400` |
-| Background | `#09090B` | `--color-background` | `zinc-950` |
-| Surface | `#18181B` | `--color-surface` | `zinc-900` |
-| Surface Elevated | `#27272A` | `--color-surface-elevated` | `zinc-800` |
-| Border | `#3F3F46` | `--color-border` | `zinc-700` |
-| Text Primary | `#FAFAFA` | `--color-text` | `zinc-50` |
-| Text Secondary | `#A1A1AA` | `--color-text-secondary` | `zinc-400` |
-| Text Muted | `#71717A` | `--color-text-muted` | `zinc-500` |
-| Success | `#22C55E` | `--color-success` | `green-500` |
-| Error | `#EF4444` | `--color-error` | `red-500` |
-| Warning | `#F59E0B` | `--color-warning` | `amber-500` |
+| Role             | Hex       | CSS Variable               | Tailwind     |
+| ---------------- | --------- | -------------------------- | ------------ |
+| Primary          | `#8B5CF6` | `--color-primary`          | `violet-500` |
+| Primary Hover    | `#A78BFA` | `--color-primary-hover`    | `violet-400` |
+| Secondary        | `#6366F1` | `--color-secondary`        | `indigo-500` |
+| CTA/Accent       | `#22D3EE` | `--color-cta`              | `cyan-400`   |
+| Background       | `#09090B` | `--color-background`       | `zinc-950`   |
+| Surface          | `#18181B` | `--color-surface`          | `zinc-900`   |
+| Surface Elevated | `#27272A` | `--color-surface-elevated` | `zinc-800`   |
+| Border           | `#3F3F46` | `--color-border`           | `zinc-700`   |
+| Text Primary     | `#FAFAFA` | `--color-text`             | `zinc-50`    |
+| Text Secondary   | `#A1A1AA` | `--color-text-secondary`   | `zinc-400`   |
+| Text Muted       | `#71717A` | `--color-text-muted`       | `zinc-500`   |
+| Success          | `#22C55E` | `--color-success`          | `green-500`  |
+| Error            | `#EF4444` | `--color-error`            | `red-500`    |
+| Warning          | `#F59E0B` | `--color-warning`          | `amber-500`  |
 
 **Color Notes:** Deep dark background with violet primary and cyan accents - Manus-inspired AI aesthetic
 
@@ -41,7 +41,7 @@
 ```css
 /* Primary Gradient - for buttons, highlights */
 .gradient-primary {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
 }
 
 /* Glow Effect - for hover states */
@@ -51,15 +51,15 @@
 
 /* Card Gradient Border */
 .gradient-border {
-  background: linear-gradient(135deg, #8B5CF6 0%, #22D3EE 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
   padding: 1px;
   border-radius: 12px;
 }
 
 /* Mesh Background - for hero sections */
 .mesh-background {
-  background-color: #09090B;
-  background-image: 
+  background-color: #09090b;
+  background-image:
     radial-gradient(at 40% 20%, hsla(268, 90%, 55%, 0.15) 0px, transparent 50%),
     radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.1) 0px, transparent 50%),
     radial-gradient(at 0% 50%, hsla(268, 90%, 55%, 0.1) 0px, transparent 50%);
@@ -74,6 +74,7 @@
 - **Mood:** Modern, professional, tech, clean, AI-native
 
 **Google Fonts:**
+
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 ```
@@ -92,34 +93,34 @@
 
 ### Spacing Variables
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+| Token         | Value             | Usage                     |
+| ------------- | ----------------- | ------------------------- |
+| `--space-xs`  | `4px` / `0.25rem` | Tight gaps                |
+| `--space-sm`  | `8px` / `0.5rem`  | Icon gaps, inline spacing |
+| `--space-md`  | `16px` / `1rem`   | Standard padding          |
+| `--space-lg`  | `24px` / `1.5rem` | Section padding           |
+| `--space-xl`  | `32px` / `2rem`   | Large gaps                |
+| `--space-2xl` | `48px` / `3rem`   | Section margins           |
+| `--space-3xl` | `64px` / `4rem`   | Hero padding              |
 
 ### Border Radius
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `rounded-sm` | `4px` | Small elements |
-| `rounded-md` | `6px` | Buttons, inputs |
-| `rounded-lg` | `8px` | Cards, panels |
-| `rounded-xl` | `12px` | Large cards |
+| Token         | Value  | Usage           |
+| ------------- | ------ | --------------- |
+| `rounded-sm`  | `4px`  | Small elements  |
+| `rounded-md`  | `6px`  | Buttons, inputs |
+| `rounded-lg`  | `8px`  | Cards, panels   |
+| `rounded-xl`  | `12px` | Large cards     |
 | `rounded-2xl` | `16px` | Modals, dialogs |
 
 ### Shadow Depths (Dark Mode)
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.3)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.4)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.5)` | Modals, dropdowns |
-| `--shadow-glow` | `0 0 20px rgba(139,92,246,0.3)` | Glow effect |
+| Level           | Value                           | Usage             |
+| --------------- | ------------------------------- | ----------------- |
+| `--shadow-sm`   | `0 1px 2px rgba(0,0,0,0.3)`     | Subtle lift       |
+| `--shadow-md`   | `0 4px 6px rgba(0,0,0,0.4)`     | Cards, buttons    |
+| `--shadow-lg`   | `0 10px 15px rgba(0,0,0,0.5)`   | Modals, dropdowns |
+| `--shadow-glow` | `0 0 20px rgba(139,92,246,0.3)` | Glow effect       |
 
 ---
 
@@ -130,7 +131,7 @@
 ```css
 /* Primary Button - Gradient */
 .btn-primary {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -149,8 +150,8 @@
 /* Secondary Button - Ghost */
 .btn-secondary {
   background: transparent;
-  color: #FAFAFA;
-  border: 1px solid #3F3F46;
+  color: #fafafa;
+  border: 1px solid #3f3f46;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
@@ -160,14 +161,14 @@
 }
 
 .btn-secondary:hover {
-  background: #27272A;
-  border-color: #52525B;
+  background: #27272a;
+  border-color: #52525b;
 }
 
 /* CTA Button - Cyan Accent */
 .btn-cta {
-  background: #22D3EE;
-  color: #09090B;
+  background: #22d3ee;
+  color: #09090b;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -178,7 +179,7 @@
 }
 
 .btn-cta:hover {
-  background: #06B6D4;
+  background: #06b6d4;
   box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
 }
 ```
@@ -188,22 +189,22 @@
 ```css
 /* Base Card */
 .card {
-  background: #18181B;
-  border: 1px solid #27272A;
+  background: #18181b;
+  border: 1px solid #27272a;
   border-radius: 12px;
   padding: 24px;
   transition: all 200ms ease;
 }
 
 .card:hover {
-  border-color: #3F3F46;
-  background: #1F1F23;
+  border-color: #3f3f46;
+  background: #1f1f23;
 }
 
 /* Interactive Card */
 .card-interactive {
-  background: #18181B;
-  border: 1px solid #27272A;
+  background: #18181b;
+  border: 1px solid #27272a;
   border-radius: 12px;
   padding: 24px;
   transition: all 200ms ease;
@@ -211,7 +212,7 @@
 }
 
 .card-interactive:hover {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
   transform: translateY(-2px);
 }
@@ -230,27 +231,27 @@
 
 ```css
 .input {
-  background: #18181B;
-  color: #FAFAFA;
+  background: #18181b;
+  color: #fafafa;
   padding: 10px 14px;
-  border: 1px solid #3F3F46;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   font-size: 14px;
   transition: all 200ms ease;
 }
 
 .input::placeholder {
-  color: #71717A;
+  color: #71717a;
 }
 
 .input:focus {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   outline: none;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .input:hover:not(:focus) {
-  border-color: #52525B;
+  border-color: #52525b;
 }
 ```
 
@@ -263,8 +264,8 @@
 }
 
 .modal {
-  background: #18181B;
-  border: 1px solid #27272A;
+  background: #18181b;
+  border: 1px solid #27272a;
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
@@ -275,7 +276,7 @@
 .modal-header {
   font-size: 18px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
   margin-bottom: 16px;
 }
 ```
@@ -286,12 +287,12 @@
 .nav {
   background: rgba(9, 9, 11, 0.8);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid #27272A;
+  border-bottom: 1px solid #27272a;
   padding: 12px 24px;
 }
 
 .nav-item {
-  color: #A1A1AA;
+  color: #a1a1aa;
   font-size: 14px;
   font-weight: 500;
   padding: 8px 12px;
@@ -301,13 +302,13 @@
 }
 
 .nav-item:hover {
-  color: #FAFAFA;
-  background: #27272A;
+  color: #fafafa;
+  background: #27272a;
 }
 
 .nav-item.active {
-  color: #FAFAFA;
-  background: #27272A;
+  color: #fafafa;
+  background: #27272a;
 }
 ```
 
@@ -315,8 +316,8 @@
 
 ```css
 .sidebar {
-  background: #0F0F12;
-  border-right: 1px solid #27272A;
+  background: #0f0f12;
+  border-right: 1px solid #27272a;
   width: 260px;
   padding: 16px;
 }
@@ -327,20 +328,20 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: 8px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   font-size: 14px;
   transition: all 150ms ease;
   cursor: pointer;
 }
 
 .sidebar-item:hover {
-  background: #18181B;
-  color: #FAFAFA;
+  background: #18181b;
+  color: #fafafa;
 }
 
 .sidebar-item.active {
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
-  color: #FAFAFA;
+  color: #fafafa;
   border: 1px solid rgba(139, 92, 246, 0.3);
 }
 ```
@@ -359,25 +360,25 @@
 
 .badge-primary {
   background: rgba(139, 92, 246, 0.15);
-  color: #A78BFA;
+  color: #a78bfa;
   border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .badge-success {
   background: rgba(34, 197, 94, 0.15);
-  color: #4ADE80;
+  color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .badge-warning {
   background: rgba(245, 158, 11, 0.15);
-  color: #FBBF24;
+  color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge-error {
   background: rgba(239, 68, 68, 0.15);
-  color: #F87171;
+  color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 ```
@@ -429,8 +430,13 @@
 ```css
 /* Pulse animation for loading */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .loading-pulse {
@@ -439,15 +445,19 @@
 
 /* Skeleton loader */
 .skeleton {
-  background: linear-gradient(90deg, #27272A 0%, #3F3F46 50%, #27272A 100%);
+  background: linear-gradient(90deg, #27272a 0%, #3f3f46 50%, #27272a 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 8px;
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* AI Typing indicator */
@@ -459,17 +469,29 @@
 .typing-dot {
   width: 8px;
   height: 8px;
-  background: #8B5CF6;
+  background: #8b5cf6;
   border-radius: 50%;
   animation: typing-bounce 1.4s infinite ease-in-out both;
 }
 
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes typing-bounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 ```
 
@@ -483,7 +505,8 @@
 
 **Best For:** AI platforms, agent builders, developer tools, SaaS dashboards, workflow editors
 
-**Key Effects:** 
+**Key Effects:**
+
 - Gradient buttons with glow on hover
 - Glass morphism cards
 - Subtle purple glow effects
@@ -523,7 +546,7 @@ Before delivering any UI code, verify:
 - [ ] Responsive: 375px, 768px, 1024px, 1440px
 - [ ] No horizontal scroll on mobile
 - [ ] Loading states for async operations
-- [ ] Empty states designed beautifully---## Tailwind CSS Config Extension```js
+- [ ] Empty states designed beautifully---## Tailwind CSS Config Extension`js
 // tailwind.config.js
 module.exports = {
   theme: {
@@ -554,30 +577,31 @@ module.exports = {
     },
   },
 }
-```---## CSS Variables for globals.css```css
-:root {
-  /* Colors */
-  --background: 9 9 11;         /* #09090B */
-  --foreground: 250 250 250;    /* #FAFAFA */
-  --card: 24 24 27;             /* #18181B */
-  --card-foreground: 250 250 250;
-  --popover: 24 24 27;
-  --popover-foreground: 250 250 250;
-  --primary: 139 92 246;        /* #8B5CF6 */
-  --primary-foreground: 250 250 250;
-  --secondary: 39 39 42;        /* #27272A */
-  --secondary-foreground: 250 250 250;
-  --muted: 39 39 42;
-  --muted-foreground: 161 161 170; /* #A1A1AA */
-  --accent: 34 211 238;         /* #22D3EE */
-  --accent-foreground: 9 9 11;
-  --destructive: 239 68 68;     /* #EF4444 */
-  --destructive-foreground: 250 250 250;
-  --border: 63 63 70;           /* #3F3F46 */
-  --input: 63 63 70;
-  --ring: 139 92 246;           /* #8B5CF6 */
-  --radius: 0.5rem;
-}
+`---## CSS Variables for globals.css```css
+      :root {
+      /_ Colors _/
+      --background: 9 9 11; /_ #09090B _/
+      --foreground: 250 250 250; /_ #FAFAFA _/
+      --card: 24 24 27; /_ #18181B _/
+      --card-foreground: 250 250 250;
+      --popover: 24 24 27;
+      --popover-foreground: 250 250 250;
+      --primary: 139 92 246; /_ #8B5CF6 _/
+      --primary-foreground: 250 250 250;
+      --secondary: 39 39 42; /_ #27272A _/
+      --secondary-foreground: 250 250 250;
+      --muted: 39 39 42;
+      --muted-foreground: 161 161 170; /_ #A1A1AA _/
+      --accent: 34 211 238; /_ #22D3EE _/
+      --accent-foreground: 9 9 11;
+      --destructive: 239 68 68; /_ #EF4444 _/
+      --destructive-foreground: 250 250 250;
+      --border: 63 63 70; /_ #3F3F46 _/
+      --input: 63 63 70;
+      --ring: 139 92 246; /_ #8B5CF6 _/
+      --radius: 0.5rem;
+      }
+
 ```
 
 ---
@@ -670,3 +694,4 @@ module.exports = {
 | warning | `bg-yellow-500/15` | `border-yellow-500/30` | `text-yellow-400` |
 | error | `bg-red-500/15` | `border-red-500/30` | `text-red-400` |
 | secondary | `bg-zinc-500/15` | `border-zinc-500/30` | `text-zinc-400` |
+```

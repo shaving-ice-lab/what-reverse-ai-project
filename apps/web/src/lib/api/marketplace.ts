@@ -2,114 +2,123 @@
  * AppMarketplace API Service
  */
 
-import { request } from "./shared";
+import { request } from './shared'
 
 export interface MarketplaceWorkspace {
-  id: string;
-  name: string;
-  slug: string;
-  icon?: string | null;
+  id: string
+  name: string
+  slug: string
+  icon?: string | null
 }
 
 export interface MarketplaceApp {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string;
-  description?: string | null;
-  pricing_type: string;
-  price?: number | null;
-  published_at?: string | null;
-  access_mode: string;
-  workspace: MarketplaceWorkspace;
-  rating_avg: number;
-  rating_count: number;
+  id: string
+  name: string
+  slug: string
+  icon: string
+  description?: string | null
+  pricing_type: string
+  price?: number | null
+  published_at?: string | null
+  access_mode: string
+  workspace: MarketplaceWorkspace
+  rating_avg: number
+  rating_count: number
 }
 
 export interface MarketplaceAppListParams {
-  search?: string;
-  pricing?: "free" | "paid" | string;
-  sort?: "popular" | "rating" | "newest" | string;
-  page?: number;
-  page_size?: number;
+  search?: string
+  pricing?: 'free' | 'paid' | string
+  sort?: 'popular' | 'rating' | 'newest' | string
+  page?: number
+  page_size?: number
 }
 
 export interface MarketplaceAppListResponse {
   data: {
-    apps: MarketplaceApp[];
-  };
+    apps: MarketplaceApp[]
+  }
   meta?: {
-    total?: number;
-    page?: number;
-    page_size?: number;
-  };
+    total?: number
+    page?: number
+    page_size?: number
+  }
 }
 
 export interface MarketplaceRatingUser {
-  id: string;
-  username?: string;
-  display_name?: string | null;
-  avatar_url?: string | null;
+  id: string
+  username?: string
+  display_name?: string | null
+  avatar_url?: string | null
 }
 
 export interface MarketplaceRating {
-  id: string;
-  workspace_id: string;
-  user_id: string;
-  rating: number;
-  comment?: string | null;
-  created_at: string;
-  user?: MarketplaceRatingUser;
+  id: string
+  workspace_id: string
+  user_id: string
+  rating: number
+  comment?: string | null
+  created_at: string
+  user?: MarketplaceRatingUser
 }
 
 export interface MarketplaceRatingListResponse {
   data: {
-    ratings: MarketplaceRating[];
-  };
+    ratings: MarketplaceRating[]
+  }
   meta?: {
-    total?: number;
-    page?: number;
-    page_size?: number;
-  };
+    total?: number
+    page?: number
+    page_size?: number
+  }
 }
 
 export interface SubmitMarketplaceRatingResponse {
   data: {
-    rating: MarketplaceRating;
-  };
+    rating: MarketplaceRating
+  }
 }
 
 export const marketplaceApi = {
   async listApps(params: MarketplaceAppListParams = {}): Promise<MarketplaceAppListResponse> {
-    const searchParams = new URLSearchParams();
-    if (params.search) searchParams.set("search", params.search);
-    if (params.pricing) searchParams.set("pricing", params.pricing);
-    if (params.sort) searchParams.set("sort", params.sort);
-    if (params.page) searchParams.set("page", String(params.page));
-    if (params.page_size) searchParams.set("page_size", String(params.page_size));
-    const query = searchParams.toString();
-    return request<MarketplaceAppListResponse>(`/marketplace/workspaces${query ? `?${query}` : ""}`);
+    const searchParams = new URLSearchParams()
+    if (params.search) searchParams.set('search', params.search)
+    if (params.pricing) searchParams.set('pricing', params.pricing)
+    if (params.sort) searchParams.set('sort', params.sort)
+    if (params.page) searchParams.set('page', String(params.page))
+    if (params.page_size) searchParams.set('page_size', String(params.page_size))
+    const query = searchParams.toString()
+    return request<MarketplaceAppListResponse>(`/marketplace/workspaces${query ? `?${query}` : ''}`)
   },
 
   async getApp(id: string): Promise<{ data: { app: MarketplaceApp } }> {
-    return request<{ data: { app: MarketplaceApp } }>(`/marketplace/workspaces/${id}`);
+    return request<{ data: { app: MarketplaceApp } }>(`/marketplace/workspaces/${id}`)
   },
 
-  async listRatings(workspaceId: string, params?: { page?: number; page_size?: number; sort?: string }): Promise<MarketplaceRatingListResponse> {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set("page", String(params.page));
-    if (params?.page_size) searchParams.set("page_size", String(params.page_size));
-    if (params?.sort) searchParams.set("sort", params.sort);
-    const query = searchParams.toString();
+  async listRatings(
+    workspaceId: string,
+    params?: { page?: number; page_size?: number; sort?: string }
+  ): Promise<MarketplaceRatingListResponse> {
+    const searchParams = new URLSearchParams()
+    if (params?.page) searchParams.set('page', String(params.page))
+    if (params?.page_size) searchParams.set('page_size', String(params.page_size))
+    if (params?.sort) searchParams.set('sort', params.sort)
+    const query = searchParams.toString()
     return request<MarketplaceRatingListResponse>(
-      `/marketplace/workspaces/${workspaceId}/ratings${query ? `?${query}` : ""}`
-    );
+      `/marketplace/workspaces/${workspaceId}/ratings${query ? `?${query}` : ''}`
+    )
   },
 
-  async submitRating(workspaceId: string, payload: { rating: number; comment?: string | null }): Promise<SubmitMarketplaceRatingResponse> {
-    return request<SubmitMarketplaceRatingResponse>(`/marketplace/workspaces/${workspaceId}/ratings`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+  async submitRating(
+    workspaceId: string,
+    payload: { rating: number; comment?: string | null }
+  ): Promise<SubmitMarketplaceRatingResponse> {
+    return request<SubmitMarketplaceRatingResponse>(
+      `/marketplace/workspaces/${workspaceId}/ratings`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    )
   },
-};
+}

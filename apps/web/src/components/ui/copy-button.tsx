@@ -1,67 +1,59 @@
-"use client"
+'use client'
 
 /**
  * Copy Button Component
- * 
- * Support: 
+ *
+ * Support:
  * - Copy text/value
  * - Success/failure status feedback
  * - Multiple style variants
  */
 
-import * as React from "react"
-import { Check, Copy, ClipboardCopy, Link, AlertCircle } from "lucide-react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { Check, Copy, ClipboardCopy, Link, AlertCircle } from 'lucide-react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 
 // CopyButton Variant
 const copyButtonVariants = cva(
- [
- "inline-flex items-center justify-center gap-2",
- "font-medium transition-all duration-200",
- "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
- "disabled:opacity-50 disabled:cursor-not-allowed",
- ],
- {
- variants: {
- variant: {
- default: [
- "bg-muted text-muted-foreground",
- "hover:bg-muted/80 hover:text-foreground",
- ],
- ghost: [
- "text-muted-foreground",
- "hover:bg-muted hover:text-foreground",
- ],
- outline: [
- "border border-border text-muted-foreground",
- "hover:bg-muted hover:text-foreground",
- ],
- primary: [
- "bg-primary text-primary-foreground",
- "hover:bg-primary/90",
- ],
- },
- size: {
- xs: "h-6 w-6 rounded",
- sm: "h-8 w-8 rounded-md",
- default: "h-9 px-3 rounded-lg text-sm",
- lg: "h-10 px-4 rounded-lg",
- icon: "h-9 w-9 rounded-lg",
- },
- },
- defaultVariants: {
- variant: "ghost",
- size: "icon",
- },
- }
+  [
+    'inline-flex items-center justify-center gap-2',
+    'font-medium transition-all duration-200',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+  ],
+  {
+    variants: {
+      variant: {
+        default: ['bg-muted text-muted-foreground', 'hover:bg-muted/80 hover:text-foreground'],
+        ghost: ['text-muted-foreground', 'hover:bg-muted hover:text-foreground'],
+        outline: [
+          'border border-border text-muted-foreground',
+          'hover:bg-muted hover:text-foreground',
+        ],
+        primary: ['bg-primary text-primary-foreground', 'hover:bg-primary/90'],
+      },
+      size: {
+        xs: 'h-6 w-6 rounded',
+        sm: 'h-8 w-8 rounded-md',
+        default: 'h-9 px-3 rounded-lg text-sm',
+        lg: 'h-10 px-4 rounded-lg',
+        icon: 'h-9 w-9 rounded-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'ghost',
+      size: 'icon',
+    },
+  }
 )
 
-type CopyState = "idle" | "copying" | "copied" | "error"
+type CopyState = 'idle' | 'copying' | 'copied' | 'error'
 
 export interface CopyButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children">,
-  VariantProps<typeof copyButtonVariants> {
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
+    VariantProps<typeof copyButtonVariants> {
   /** Value to copy */
   value: string
   /** Display time after successful copy (ms) */
@@ -75,285 +67,258 @@ export interface CopyButtonProps
 }
 
 function CopyButton({
- className,
- variant,
- size,
- value,
- timeout = 2000,
- showLabel = false,
- onCopySuccess,
- onCopyError,
- ...props
+  className,
+  variant,
+  size,
+  value,
+  timeout = 2000,
+  showLabel = false,
+  onCopySuccess,
+  onCopyError,
+  ...props
 }: CopyButtonProps) {
- const [state, setState] = React.useState<CopyState>("idle")
+  const [state, setState] = React.useState<CopyState>('idle')
 
- const handleCopy = async () => {
- if (state === "copying") return
+  const handleCopy = async () => {
+    if (state === 'copying') return
 
- setState("copying")
- 
- try {
- await navigator.clipboard.writeText(value)
- setState("copied")
- onCopySuccess?.()
- 
- setTimeout(() => {
- setState("idle")
- }, timeout)
- } catch (error) {
- setState("error")
- onCopyError?.(error as Error)
- 
- setTimeout(() => {
- setState("idle")
- }, timeout)
- }
- }
+    setState('copying')
 
- const getIcon = () => {
- switch (state) {
- case "copying":
- return <Copy className="w-4 h-4 animate-pulse" />
- case "copied":
- return <Check className="w-4 h-4 text-primary" />
- case "error":
- return <AlertCircle className="w-4 h-4 text-destructive" />
- default:
- return <Copy className="w-4 h-4" />
- }
- }
+    try {
+      await navigator.clipboard.writeText(value)
+      setState('copied')
+      onCopySuccess?.()
 
- const getLabel = () => {
- switch (state) {
- case "copying":
- return "Copy..."
- case "copied":
-    return "Copied"
- case "error":
-    return "Failed to Copy"
- default:
- return "Copy"
- }
- }
+      setTimeout(() => {
+        setState('idle')
+      }, timeout)
+    } catch (error) {
+      setState('error')
+      onCopyError?.(error as Error)
 
- return (
- <button
- type="button"
- onClick={handleCopy}
- disabled={state === "copying"}
- className={cn(
- copyButtonVariants({ variant, size }),
- state === "copied" && "text-primary",
- state === "error" && "text-destructive",
- className
- )}
- {...props}
- >
- {getIcon()}
- {showLabel && <span>{getLabel()}</span>}
- </button>
- )
+      setTimeout(() => {
+        setState('idle')
+      }, timeout)
+    }
+  }
+
+  const getIcon = () => {
+    switch (state) {
+      case 'copying':
+        return <Copy className="w-4 h-4 animate-pulse" />
+      case 'copied':
+        return <Check className="w-4 h-4 text-primary" />
+      case 'error':
+        return <AlertCircle className="w-4 h-4 text-destructive" />
+      default:
+        return <Copy className="w-4 h-4" />
+    }
+  }
+
+  const getLabel = () => {
+    switch (state) {
+      case 'copying':
+        return 'Copy...'
+      case 'copied':
+        return 'Copied'
+      case 'error':
+        return 'Failed to Copy'
+      default:
+        return 'Copy'
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      disabled={state === 'copying'}
+      className={cn(
+        copyButtonVariants({ variant, size }),
+        state === 'copied' && 'text-primary',
+        state === 'error' && 'text-destructive',
+        className
+      )}
+      {...props}
+    >
+      {getIcon()}
+      {showLabel && <span>{getLabel()}</span>}
+    </button>
+  )
 }
 
 /**
  * CopyField - Field with Copy Button
  */
 interface CopyFieldProps {
- value: string
- label?: string
- className?: string
+  value: string
+  label?: string
+  className?: string
 }
 
 function CopyField({ value, label, className }: CopyFieldProps) {
- return (
- <div className={cn("space-y-1.5", className)}>
- {label && (
- <label className="text-sm font-medium text-foreground">{label}</label>
- )}
- <div className="flex items-center gap-2">
- <div className="flex-1 px-3 py-2 bg-muted rounded-lg text-sm text-muted-foreground font-mono truncate">
- {value}
- </div>
- <CopyButton value={value} variant="outline" size="sm" />
- </div>
- </div>
- )
+  return (
+    <div className={cn('space-y-1.5', className)}>
+      {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 px-3 py-2 bg-muted rounded-lg text-sm text-muted-foreground font-mono truncate">
+          {value}
+        </div>
+        <CopyButton value={value} variant="outline" size="sm" />
+      </div>
+    </div>
+  )
 }
 
 /**
  * CopyLink - Copy Link Component
  */
 interface CopyLinkProps {
- url: string
- label?: string
- showFullUrl?: boolean
- className?: string
+  url: string
+  label?: string
+  showFullUrl?: boolean
+  className?: string
 }
 
-function CopyLink({ 
- url, 
-  label = "Copy Link", 
- showFullUrl = false,
- className,
-}: CopyLinkProps) {
- const [copied, setCopied] = React.useState(false)
+function CopyLink({ url, label = 'Copy Link', showFullUrl = false, className }: CopyLinkProps) {
+  const [copied, setCopied] = React.useState(false)
 
- const handleCopy = async () => {
- try {
- await navigator.clipboard.writeText(url)
- setCopied(true)
- setTimeout(() => setCopied(false), 2000)
- } catch (error) {
- console.error("Failed to copy:", error)
- }
- }
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy:', error)
+    }
+  }
 
- // Parse URL Display
- const displayUrl = React.useMemo(() => {
- if (showFullUrl) return url
- try {
- const parsed = new URL(url)
- return parsed.hostname + (parsed.pathname !== "/" ? parsed.pathname : "")
- } catch {
- return url
- }
- }, [url, showFullUrl])
+  // Parse URL Display
+  const displayUrl = React.useMemo(() => {
+    if (showFullUrl) return url
+    try {
+      const parsed = new URL(url)
+      return parsed.hostname + (parsed.pathname !== '/' ? parsed.pathname : '')
+    } catch {
+      return url
+    }
+  }, [url, showFullUrl])
 
- return (
- <button
- onClick={handleCopy}
- className={cn(
- "inline-flex items-center gap-2 px-3 py-2 rounded-lg",
- "bg-muted/50 border border-border",
- "text-sm text-muted-foreground",
- "hover:bg-muted hover:text-foreground",
- "transition-all duration-200",
- "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
- className
- )}
- >
- <Link className="w-4 h-4 shrink-0" />
- <span className="truncate max-w-[200px]">{displayUrl}</span>
- <span className="shrink-0 ml-1">
- {copied ? (
- <Check className="w-4 h-4 text-primary" />
- ) : (
- <ClipboardCopy className="w-4 h-4" />
- )}
- </span>
- </button>
- )
+  return (
+    <button
+      onClick={handleCopy}
+      className={cn(
+        'inline-flex items-center gap-2 px-3 py-2 rounded-lg',
+        'bg-muted/50 border border-border',
+        'text-sm text-muted-foreground',
+        'hover:bg-muted hover:text-foreground',
+        'transition-all duration-200',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+        className
+      )}
+    >
+      <Link className="w-4 h-4 shrink-0" />
+      <span className="truncate max-w-[200px]">{displayUrl}</span>
+      <span className="shrink-0 ml-1">
+        {copied ? (
+          <Check className="w-4 h-4 text-primary" />
+        ) : (
+          <ClipboardCopy className="w-4 h-4" />
+        )}
+      </span>
+    </button>
+  )
 }
 
 /**
  * CopyCode - Copy Code Block
  */
 interface CopyCodeProps {
- code: string
- language?: string
- className?: string
+  code: string
+  language?: string
+  className?: string
 }
 
 function CopyCode({ code, language, className }: CopyCodeProps) {
- return (
- <div className={cn("relative group", className)}>
- {/* Codeblock */}
- <pre className="p-4 bg-muted rounded-lg overflow-x-auto">
- <code className="text-sm font-mono text-foreground">{code}</code>
- </pre>
+  return (
+    <div className={cn('relative group', className)}>
+      {/* Codeblock */}
+      <pre className="p-4 bg-muted rounded-lg overflow-x-auto">
+        <code className="text-sm font-mono text-foreground">{code}</code>
+      </pre>
 
-    {/* Language Tag */}
- {language && (
- <span className="absolute top-2 left-3 text-xs text-muted-foreground">
- {language}
- </span>
- )}
+      {/* Language Tag */}
+      {language && (
+        <span className="absolute top-2 left-3 text-xs text-muted-foreground">{language}</span>
+      )}
 
-    {/* Copy Button */}
- <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
- <CopyButton value={code} variant="default" size="xs" />
- </div>
- </div>
- )
+      {/* Copy Button */}
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <CopyButton value={code} variant="default" size="xs" />
+      </div>
+    </div>
+  )
 }
 
 /**
  * CopyInput - Copyable Input Field
  */
-interface CopyInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "value"> {
- value: string
- label?: string
- onCopy?: () => void
+interface CopyInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value'> {
+  value: string
+  label?: string
+  onCopy?: () => void
 }
 
 const CopyInput = React.forwardRef<HTMLInputElement, CopyInputProps>(
- ({ value, label, onCopy, className, ...props }, ref) => {
- const [copied, setCopied] = React.useState(false)
+  ({ value, label, onCopy, className, ...props }, ref) => {
+    const [copied, setCopied] = React.useState(false)
 
- const handleCopy = async () => {
- try {
- await navigator.clipboard.writeText(value)
- setCopied(true)
- onCopy?.()
- setTimeout(() => setCopied(false), 2000)
- } catch (error) {
- console.error("Failed to copy:", error)
- }
- }
+    const handleCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(value)
+        setCopied(true)
+        onCopy?.()
+        setTimeout(() => setCopied(false), 2000)
+      } catch (error) {
+        console.error('Failed to copy:', error)
+      }
+    }
 
- return (
- <div className={cn("space-y-1.5", className)}>
- {label && (
- <label className="text-sm font-medium text-foreground">{label}</label>
- )}
- <div className="relative">
- <input
- ref={ref}
- type="text"
- value={value}
- readOnly
- className={cn(
- "w-full h-10 px-3 pr-10 rounded-lg",
- "bg-background border border-border",
- "text-sm font-mono text-foreground",
- "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
- )}
- {...props}
- />
- <button
- type="button"
- onClick={handleCopy}
- className={cn(
- "absolute right-1 top-1/2 -translate-y-1/2",
- "p-2 rounded-md",
- "text-muted-foreground hover:text-foreground hover:bg-muted",
- "transition-colors"
- )}
- >
- {copied ? (
- <Check className="w-4 h-4 text-primary" />
- ) : (
- <Copy className="w-4 h-4" />
- )}
- </button>
- </div>
- </div>
- )
- }
+    return (
+      <div className={cn('space-y-1.5', className)}>
+        {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+        <div className="relative">
+          <input
+            ref={ref}
+            type="text"
+            value={value}
+            readOnly
+            className={cn(
+              'w-full h-10 px-3 pr-10 rounded-lg',
+              'bg-background border border-border',
+              'text-sm font-mono text-foreground',
+              'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
+            )}
+            {...props}
+          />
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={cn(
+              'absolute right-1 top-1/2 -translate-y-1/2',
+              'p-2 rounded-md',
+              'text-muted-foreground hover:text-foreground hover:bg-muted',
+              'transition-colors'
+            )}
+          >
+            {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+    )
+  }
 )
-CopyInput.displayName = "CopyInput"
+CopyInput.displayName = 'CopyInput'
 
-export {
- CopyButton,
- CopyField,
- CopyLink,
- CopyCode,
- CopyInput,
- copyButtonVariants,
-}
-export type {
- CopyFieldProps,
- CopyLinkProps,
- CopyCodeProps,
- CopyInputProps,
-}
+export { CopyButton, CopyField, CopyLink, CopyCode, CopyInput, copyButtonVariants }
+export type { CopyFieldProps, CopyLinkProps, CopyCodeProps, CopyInputProps }

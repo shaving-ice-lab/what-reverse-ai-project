@@ -24,14 +24,14 @@
 
 ## CLI 命令规划（现状 + 规范）
 
-| 命令 | 说明 | 关键参数 |
-| --- | --- | --- |
-| `init [name]` | 初始化节点项目 | `--template`、`--directory`、`--typescript` |
-| `dev` | 启动开发模式 | `--port`、`--file`、`--no-watch`、`--no-interactive` |
-| `build` | 构建节点项目 | `--watch`、`--output`、`--minify` |
-| `test` | 运行节点测试 | `--watch`、`--coverage`、`--filter` |
-| `validate` | 校验节点定义 | `--file`、`--strict` |
-| `publish` | 发布到市场 | `--registry`、`--token`、`--manifest`、`--skip-build` |
+| 命令          | 说明           | 关键参数                                              |
+| ------------- | -------------- | ----------------------------------------------------- |
+| `init [name]` | 初始化节点项目 | `--template`、`--directory`、`--typescript`           |
+| `dev`         | 启动开发模式   | `--port`、`--file`、`--no-watch`、`--no-interactive`  |
+| `build`       | 构建节点项目   | `--watch`、`--output`、`--minify`                     |
+| `test`        | 运行节点测试   | `--watch`、`--coverage`、`--filter`                   |
+| `validate`    | 校验节点定义   | `--file`、`--strict`                                  |
+| `publish`     | 发布到市场     | `--registry`、`--token`、`--manifest`、`--skip-build` |
 
 > CLI 入口由 `packages/sdk/package.json` 的 `bin.agentflow` 暴露。
 
@@ -47,13 +47,13 @@
 模板由 `agentflow init --template <name>` 使用，建议落位于：
 `packages/sdk/src/cli/templates/<name>/`
 
-| 模板 | 目标场景 | 必含文件 |
-| --- | --- | --- |
-| `basic` | 最小可运行节点 | `manifest.json`、`src/index.ts`、`package.json` |
-| `http-request` | HTTP 集成节点 | `src/nodes/http.ts`、`README.md` |
-| `llm` | LLM 调用节点 | `src/nodes/llm.ts`、`README.md` |
-| `transform` | 数据转换节点 | `src/nodes/transform.ts` |
-| `plugin` | 插件型项目 | `manifest.json`、`src/index.ts`、`assets/` |
+| 模板           | 目标场景       | 必含文件                                        |
+| -------------- | -------------- | ----------------------------------------------- |
+| `basic`        | 最小可运行节点 | `manifest.json`、`src/index.ts`、`package.json` |
+| `http-request` | HTTP 集成节点  | `src/nodes/http.ts`、`README.md`                |
+| `llm`          | LLM 调用节点   | `src/nodes/llm.ts`、`README.md`                 |
+| `transform`    | 数据转换节点   | `src/nodes/transform.ts`                        |
+| `plugin`       | 插件型项目     | `manifest.json`、`src/index.ts`、`assets/`      |
 
 ## 发布与版本策略
 

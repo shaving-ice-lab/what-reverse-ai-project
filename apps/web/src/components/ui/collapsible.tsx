@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
 /**
  * Collapsible CollapseComponent - Minimalist Style
  */
 
-import * as React from "react"
-import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
+import { cn } from '@/lib/utils'
 
 const Collapsible = CollapsiblePrimitive.Root
 
@@ -17,9 +17,9 @@ const CollapsibleTrigger = React.forwardRef<
   <CollapsiblePrimitive.CollapsibleTrigger
     ref={ref}
     className={cn(
-      "flex items-center justify-between w-full",
-      "transition-all duration-200",
-      "[&[data-state=open]>svg]:rotate-180",
+      'flex items-center justify-between w-full',
+      'transition-all duration-200',
+      '[&[data-state=open]>svg]:rotate-180',
       className
     )}
     {...props}
@@ -34,9 +34,9 @@ const CollapsibleContent = React.forwardRef<
   <CollapsiblePrimitive.CollapsibleContent
     ref={ref}
     className={cn(
-      "overflow-hidden",
-      "data-[state=closed]:animate-collapsible-up",
-      "data-[state=open]:animate-collapsible-down",
+      'overflow-hidden',
+      'data-[state=closed]:animate-collapsible-up',
+      'data-[state=open]:animate-collapsible-down',
       className
     )}
     {...props}

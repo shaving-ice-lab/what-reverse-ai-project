@@ -12,39 +12,39 @@
 - `{{runtime_base_url}}` 默认 `/runtime`；域名绑定场景使用根路径 `/`
 - 认证头：`Authorization: Bearer {{jwt_token}}`
 
-| 变量 | 说明 | 示例 |
-| --- | --- | --- |
-| `{{server_base_url}}` | 服务基础地址 | `http://localhost:8080` |
-| `{{workspace_id}}` | Workspace ID | `b0b1...` |
-| `{{workspace_slug}}` | Workspace Slug | `demo-workspace` |
-| `{{workspace_id}}` | App ID | `a1a2...` |
-| `{{app_slug}}` | App Slug | `demo-app` |
-| `{{app_version_id}}` | App Version ID | `v-id...` |
-| `{{domain}}` | 绑定域名 | `app.example.com` |
-| `{{domain_id}}` | 域名记录 ID | `d0d1...` |
-| `{{member_user_id}}` | 成员用户 ID | `u0u1...` |
-| `{{jwt_token}}` | 登录 Token | `eyJ...` |
-| `{{captcha_token}}` | 验证码 Token | `token...` |
-| `{{backup_id}}` | 备份 ID | `bk_...` |
+| 变量                  | 说明           | 示例                    |
+| --------------------- | -------------- | ----------------------- |
+| `{{server_base_url}}` | 服务基础地址   | `http://localhost:8080` |
+| `{{workspace_id}}`    | Workspace ID   | `b0b1...`               |
+| `{{workspace_slug}}`  | Workspace Slug | `demo-workspace`        |
+| `{{workspace_id}}`    | App ID         | `a1a2...`               |
+| `{{app_slug}}`        | App Slug       | `demo-app`              |
+| `{{app_version_id}}`  | App Version ID | `v-id...`               |
+| `{{domain}}`          | 绑定域名       | `app.example.com`       |
+| `{{domain_id}}`       | 域名记录 ID    | `d0d1...`               |
+| `{{member_user_id}}`  | 成员用户 ID    | `u0u1...`               |
+| `{{jwt_token}}`       | 登录 Token     | `eyJ...`                |
+| `{{captcha_token}}`   | 验证码 Token   | `token...`              |
+| `{{backup_id}}`       | 备份 ID        | `bk_...`                |
 
 ### 自动化测试环境变量
 
-| 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `TEST_SERVER_BASE_URL` | 服务基础地址 | `http://localhost:8080` |
-| `TEST_API_BASE_URL` | API 地址 | `http://localhost:8080/api/v1` |
-| `TEST_RUNTIME_BASE_URL` | Runtime 地址 | `http://localhost:8080/runtime` |
-| `TEST_JWT_TOKEN` | 登录 Token | 无 |
-| `TEST_WORKSPACE_ID` | Workspace ID | 无 |
-| `TEST_WORKSPACE_SLUG` | Workspace Slug | 无 |
-| `TEST_APP_ID` | App ID | 无 |
-| `TEST_APP_SLUG` | App Slug | 无 |
-| `TEST_APP_VERSION_ID` | App Version ID | 无 |
-| `TEST_APP_DOMAIN` | 绑定域名 | 无 |
-| `TEST_APP_DOMAIN_ID` | 域名记录 ID | 无 |
-| `TEST_MEMBER_USER_ID` | 成员用户 ID | 无 |
-| `TEST_CAPTCHA_TOKEN` | 验证码 Token | 无 |
-| `TEST_BACKUP_ID` | 备份 ID | 无 |
+| 变量                    | 说明           | 默认值                          |
+| ----------------------- | -------------- | ------------------------------- |
+| `TEST_SERVER_BASE_URL`  | 服务基础地址   | `http://localhost:8080`         |
+| `TEST_API_BASE_URL`     | API 地址       | `http://localhost:8080/api/v1`  |
+| `TEST_RUNTIME_BASE_URL` | Runtime 地址   | `http://localhost:8080/runtime` |
+| `TEST_JWT_TOKEN`        | 登录 Token     | 无                              |
+| `TEST_WORKSPACE_ID`     | Workspace ID   | 无                              |
+| `TEST_WORKSPACE_SLUG`   | Workspace Slug | 无                              |
+| `TEST_APP_ID`           | App ID         | 无                              |
+| `TEST_APP_SLUG`         | App Slug       | 无                              |
+| `TEST_APP_VERSION_ID`   | App Version ID | 无                              |
+| `TEST_APP_DOMAIN`       | 绑定域名       | 无                              |
+| `TEST_APP_DOMAIN_ID`    | 域名记录 ID    | 无                              |
+| `TEST_MEMBER_USER_ID`   | 成员用户 ID    | 无                              |
+| `TEST_CAPTCHA_TOKEN`    | 验证码 Token   | 无                              |
+| `TEST_BACKUP_ID`        | 备份 ID        | 无                              |
 
 ---
 
@@ -79,24 +79,24 @@
 
 ### 1.5 测试数据
 
-| 字段 | 示例值 |
-| --- | --- |
-| `name` | `Workspace QA` |
-| `slug` | `workspace-qa` |
-| `icon` | `🚀` |
+| 字段      | 示例值               |
+| --------- | -------------------- |
+| `name`    | `Workspace QA`       |
+| `slug`    | `workspace-qa`       |
+| `icon`    | `🚀`                 |
 | `user_id` | `{{member_user_id}}` |
 
 ### 1.6 测试步骤
 
-| 编号 | 操作 | 请求/路径 | 预期 |
-| --- | --- | --- | --- |
-| WS-01 | 创建 Workspace | `POST /api/v1/workspaces` | `code=OK`，返回 `workspace.id` |
-| WS-02 | 列表查询 | `GET /api/v1/workspaces` | 列表包含新建 workspace |
-| WS-03 | 获取详情 | `GET /api/v1/workspaces/{{workspace_id}}` | 返回 workspace 基础信息与权限 |
-| WS-04 | 更新信息 | `PATCH /api/v1/workspaces/{{workspace_id}}` | 名称/slug 更新成功 |
-| WS-05 | 读取成员列表 | `GET /api/v1/workspaces/{{workspace_id}}/members` | 返回成员列表 |
-| WS-06 | 添加成员 | `POST /api/v1/workspaces/{{workspace_id}}/members` | 成员状态正确，角色可变更 |
-| WS-07 | 权限校验 | 非成员访问 WS-03 | 返回 `FORBIDDEN` |
+| 编号  | 操作           | 请求/路径                                          | 预期                           |
+| ----- | -------------- | -------------------------------------------------- | ------------------------------ |
+| WS-01 | 创建 Workspace | `POST /api/v1/workspaces`                          | `code=OK`，返回 `workspace.id` |
+| WS-02 | 列表查询       | `GET /api/v1/workspaces`                           | 列表包含新建 workspace         |
+| WS-03 | 获取详情       | `GET /api/v1/workspaces/{{workspace_id}}`          | 返回 workspace 基础信息与权限  |
+| WS-04 | 更新信息       | `PATCH /api/v1/workspaces/{{workspace_id}}`        | 名称/slug 更新成功             |
+| WS-05 | 读取成员列表   | `GET /api/v1/workspaces/{{workspace_id}}/members`  | 返回成员列表                   |
+| WS-06 | 添加成员       | `POST /api/v1/workspaces/{{workspace_id}}/members` | 成员状态正确，角色可变更       |
+| WS-07 | 权限校验       | 非成员访问 WS-03                                   | 返回 `FORBIDDEN`               |
 
 ### 1.7 curl 请求示例
 
@@ -175,16 +175,16 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/members" \
 
 ### 2.5 测试步骤
 
-| 编号 | 操作 | 请求/路径 | 预期 |
-| --- | --- | --- | --- |
-| AP-01 | 创建 Workspace | `POST /api/v1/workspaces` | 返回 `workspace.id` |
-| AP-02 | 创建版本 | `POST /api/v1/workspaces/{{workspace_id}}/versions` | 返回 `version.id` |
-| AP-03 | 发布 Workspace | `POST /api/v1/workspaces/{{workspace_id}}/publish` | `status=published` |
-| AP-04 | 设置访问策略 | `PATCH /api/v1/workspaces/{{workspace_id}}/access-policy` | `access_mode=public_anonymous` |
-| AP-05 | 获取 Runtime 入口 | `GET /runtime/{{workspace_slug}}/{{app_slug}}` | 返回 app/workspace/access_policy |
-| AP-06 | 获取 Runtime Schema | `GET /runtime/{{workspace_slug}}/{{app_slug}}/schema` | 返回 UI/DB/Config Schema |
-| AP-07 | 执行 Runtime | `POST /runtime/{{workspace_slug}}/{{app_slug}}` | 返回执行结果 |
-| AP-08 | 验证验证码 | 开启 `require_captcha` 且未传 token | 返回 `CAPTCHA_REQUIRED` |
+| 编号  | 操作                | 请求/路径                                                 | 预期                             |
+| ----- | ------------------- | --------------------------------------------------------- | -------------------------------- |
+| AP-01 | 创建 Workspace      | `POST /api/v1/workspaces`                                 | 返回 `workspace.id`              |
+| AP-02 | 创建版本            | `POST /api/v1/workspaces/{{workspace_id}}/versions`       | 返回 `version.id`                |
+| AP-03 | 发布 Workspace      | `POST /api/v1/workspaces/{{workspace_id}}/publish`        | `status=published`               |
+| AP-04 | 设置访问策略        | `PATCH /api/v1/workspaces/{{workspace_id}}/access-policy` | `access_mode=public_anonymous`   |
+| AP-05 | 获取 Runtime 入口   | `GET /runtime/{{workspace_slug}}/{{app_slug}}`            | 返回 app/workspace/access_policy |
+| AP-06 | 获取 Runtime Schema | `GET /runtime/{{workspace_slug}}/{{app_slug}}/schema`     | 返回 UI/DB/Config Schema         |
+| AP-07 | 执行 Runtime        | `POST /runtime/{{workspace_slug}}/{{app_slug}}`           | 返回执行结果                     |
+| AP-08 | 验证验证码          | 开启 `require_captcha` 且未传 token                       | 返回 `CAPTCHA_REQUIRED`          |
 
 ### 2.6 curl 请求示例
 
@@ -255,13 +255,13 @@ curl "{{runtime_base_url}}/{{workspace_slug}}/{{app_slug}}" \
 
 ### 3.4 测试步骤
 
-| 编号 | 操作 | 请求/路径 | 预期 |
-| --- | --- | --- | --- |
-| DB-01 | 创建数据库 | `POST /api/v1/workspaces/{{workspace_id}}/database` | 返回 `database.status` |
-| DB-02 | 查询数据库 | `GET /api/v1/workspaces/{{workspace_id}}/database` | 返回数据库信息 |
-| DB-03 | 轮换密钥 | `POST /api/v1/workspaces/{{workspace_id}}/database/rotate-secret` | 若就绪返回成功 |
-| DB-04 | 备份 | `POST /api/v1/workspaces/{{workspace_id}}/database/backup` | 返回 `backup_id` |
-| DB-05 | 恢复 | `POST /api/v1/workspaces/{{workspace_id}}/database/restore` | 恢复成功 |
+| 编号  | 操作       | 请求/路径                                                         | 预期                   |
+| ----- | ---------- | ----------------------------------------------------------------- | ---------------------- |
+| DB-01 | 创建数据库 | `POST /api/v1/workspaces/{{workspace_id}}/database`               | 返回 `database.status` |
+| DB-02 | 查询数据库 | `GET /api/v1/workspaces/{{workspace_id}}/database`                | 返回数据库信息         |
+| DB-03 | 轮换密钥   | `POST /api/v1/workspaces/{{workspace_id}}/database/rotate-secret` | 若就绪返回成功         |
+| DB-04 | 备份       | `POST /api/v1/workspaces/{{workspace_id}}/database/backup`        | 返回 `backup_id`       |
+| DB-05 | 恢复       | `POST /api/v1/workspaces/{{workspace_id}}/database/restore`       | 恢复成功               |
 
 ### 3.5 curl 请求示例
 
@@ -331,14 +331,14 @@ curl -X POST "{{api_base_url}}/workspaces/{{workspace_id}}/database/restore" \
 
 ### 4.4 测试步骤
 
-| 编号 | 操作 | 请求/路径 | 预期 |
-| --- | --- | --- | --- |
-| DM-01 | 创建域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains` | 返回 `domain.id` 与验证信息 |
-| DM-02 | 验证域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/verify` | `verified=true` |
-| DM-03 | 签发证书 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/cert/issue` | `ssl_status` 更新 |
-| DM-04 | 路由生效 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/activate` | 状态为 active |
-| DM-05 | 域名访问 | `GET /` + Host=`{{domain}}` | 返回 Runtime 入口 |
-| DM-06 | 回滚 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/rollback` | 状态回退 |
+| 编号  | 操作     | 请求/路径                                                                   | 预期                        |
+| ----- | -------- | --------------------------------------------------------------------------- | --------------------------- |
+| DM-01 | 创建域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains`                          | 返回 `domain.id` 与验证信息 |
+| DM-02 | 验证域名 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/verify`     | `verified=true`             |
+| DM-03 | 签发证书 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/cert/issue` | `ssl_status` 更新           |
+| DM-04 | 路由生效 | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/activate`   | 状态为 active               |
+| DM-05 | 域名访问 | `GET /` + Host=`{{domain}}`                                                 | 返回 Runtime 入口           |
+| DM-06 | 回滚     | `POST /api/v1/workspaces/{{workspace_id}}/domains/{{domain_id}}/rollback`   | 状态回退                    |
 
 ### 4.5 curl 请求示例
 
@@ -396,16 +396,16 @@ curl "{{server_base_url}}/" \
 
 ### 5.3 基准清单
 
-| 分类 | 测试点 | 操作/接口 | 期望 |
-| --- | --- | --- | --- |
-| 认证 | 未登录访问受保护接口 | `GET /api/v1/workspaces` | `UNAUTHORIZED` |
-| 授权 | 非成员访问 Workspace | `GET /api/v1/workspaces/{{workspace_id}}` | `FORBIDDEN` |
-| 公开访问 | public_auth 未登录 | `GET /runtime/{{workspace_slug}}/{{app_slug}}` | `UNAUTHORIZED` |
-| 数据分级 | 获取分级配置 | `GET /api/v1/security/data-classification` | 返回配置 |
-| 合规检查 | Workspace 合规 | `GET /api/v1/security/compliance/{{workspace_id}}` | 返回检查项 |
-| 审计 | 关键操作记录 | `GET /api/v1/workspaces/{{workspace_id}}/audit-logs` | 行为可追溯 |
-| 密钥轮换 | DB 轮换 | `POST /api/v1/workspaces/{{workspace_id}}/database/rotate-secret` | 就绪时成功 |
-| 验证码 | public_anonymous + require_captcha | Runtime 入口不带 token | `CAPTCHA_REQUIRED` |
+| 分类     | 测试点                             | 操作/接口                                                         | 期望               |
+| -------- | ---------------------------------- | ----------------------------------------------------------------- | ------------------ |
+| 认证     | 未登录访问受保护接口               | `GET /api/v1/workspaces`                                          | `UNAUTHORIZED`     |
+| 授权     | 非成员访问 Workspace               | `GET /api/v1/workspaces/{{workspace_id}}`                         | `FORBIDDEN`        |
+| 公开访问 | public_auth 未登录                 | `GET /runtime/{{workspace_slug}}/{{app_slug}}`                    | `UNAUTHORIZED`     |
+| 数据分级 | 获取分级配置                       | `GET /api/v1/security/data-classification`                        | 返回配置           |
+| 合规检查 | Workspace 合规                     | `GET /api/v1/security/compliance/{{workspace_id}}`                | 返回检查项         |
+| 审计     | 关键操作记录                       | `GET /api/v1/workspaces/{{workspace_id}}/audit-logs`              | 行为可追溯         |
+| 密钥轮换 | DB 轮换                            | `POST /api/v1/workspaces/{{workspace_id}}/database/rotate-secret` | 就绪时成功         |
+| 验证码   | public_anonymous + require_captcha | Runtime 入口不带 token                                            | `CAPTCHA_REQUIRED` |
 
 ### 5.4 curl 请求示例
 

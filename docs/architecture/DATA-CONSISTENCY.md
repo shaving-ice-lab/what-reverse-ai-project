@@ -10,13 +10,13 @@
 
 ### 1.1 幂等性要求
 
-| 操作 | 幂等性要求 | 实现方式 |
-|-----|----------|---------|
-| 创建 App | 必须 | Idempotency-Key |
-| 发布 App | 必须 | 状态检查 + 锁 |
-| DB Provision | 必须 | 状态机 |
-| 执行触发 | 可选 | Request-ID |
-| 支付 | 必须 | 交易 ID |
+| 操作         | 幂等性要求 | 实现方式        |
+| ------------ | ---------- | --------------- |
+| 创建 App     | 必须       | Idempotency-Key |
+| 发布 App     | 必须       | 状态检查 + 锁   |
+| DB Provision | 必须       | 状态机          |
+| 执行触发     | 可选       | Request-ID      |
+| 支付         | 必须       | 交易 ID         |
 
 ### 1.2 Idempotency-Key 实现
 
@@ -28,7 +28,7 @@ func IdempotencyMiddleware() gin.HandlerFunc {
         if key == "" {
             key = c.GetHeader("X-Request-Id")
         }
-        
+
         if key != "" {
             // 检查是否已处理
             result, exists := cache.Get("idem:" + key)
@@ -39,10 +39,10 @@ func IdempotencyMiddleware() gin.HandlerFunc {
                 return
             }
         }
-        
+
         c.Set("idempotency_key", key)
         c.Next()
-        
+
         // 缓存响应（仅成功请求）
         if key != "" && c.Writer.Status() < 400 {
             cache.Set("idem:"+key, &IdempotencyResult{
@@ -68,25 +68,25 @@ const (
 func (s *AppService) Publish(ctx context.Context, appID string) error {
     // 乐观锁 + 状态检查
     result := s.db.Exec(`
-        UPDATE what_reverse_apps 
+        UPDATE what_reverse_apps
         SET status = ?, updated_at = NOW()
         WHERE id = ? AND status = ?
     `, AppStatusPublishing, appID, AppStatusDraft)
-    
+
     if result.RowsAffected == 0 {
         return ErrInvalidStateTransition
     }
-    
+
     // 执行发布逻辑
     if err := s.doPublish(ctx, appID); err != nil {
         // 回滚状态
-        s.db.Exec(`UPDATE what_reverse_apps SET status = ? WHERE id = ?`, 
+        s.db.Exec(`UPDATE what_reverse_apps SET status = ? WHERE id = ?`,
             AppStatusDraft, appID)
         return err
     }
-    
+
     // 完成发布
-    s.db.Exec(`UPDATE what_reverse_apps SET status = ? WHERE id = ?`, 
+    s.db.Exec(`UPDATE what_reverse_apps SET status = ? WHERE id = ?`,
         AppStatusPublished, appID)
     return nil
 }
@@ -98,12 +98,12 @@ func (s *AppService) Publish(ctx context.Context, appID string) error {
 
 ### 2.1 事务边界
 
-| 操作 | 事务范围 | 隔离级别 |
-|-----|---------|---------|
-| 创建 App | App + Version | READ COMMITTED |
-| 发布 App | App + Policy | SERIALIZABLE |
+| 操作       | 事务范围         | 隔离级别       |
+| ---------- | ---------------- | -------------- |
+| 创建 App   | App + Version    | READ COMMITTED |
+| 发布 App   | App + Policy     | SERIALIZABLE   |
 | 执行工作流 | Execution + Logs | READ COMMITTED |
-| 计费扣减 | Quota + Event | SERIALIZABLE |
+| 计费扣减   | Quota + Event    | SERIALIZABLE   |
 
 ### 2.2 跨服务一致性
 
@@ -124,11 +124,11 @@ func (s *AppService) Publish(ctx context.Context, appID string) error {
 
 ### 2.3 一致性层级定义
 
-| 层级 | 说明 | 适用场景 |
-|-----|------|---------|
-| 强一致 | 写入后立即可读 | 核心业务数据 |
+| 层级     | 说明           | 适用场景     |
+| -------- | -------------- | ------------ |
+| 强一致   | 写入后立即可读 | 核心业务数据 |
 | 会话一致 | 同一会话内一致 | 用户操作反馈 |
-| 最终一致 | 延迟后一致 | 统计、日志 |
+| 最终一致 | 延迟后一致     | 统计、日志   |
 
 ---
 
@@ -136,12 +136,12 @@ func (s *AppService) Publish(ctx context.Context, appID string) error {
 
 ### 3.1 异步场景
 
-| 场景 | 异步方式 | 一致性保证 |
-|-----|---------|----------|
-| 执行日志 | 批量写入 | 1s 内最终一致 |
-| 用量统计 | 定时聚合 | 1m 内最终一致 |
+| 场景     | 异步方式 | 一致性保证     |
+| -------- | -------- | -------------- |
+| 执行日志 | 批量写入 | 1s 内最终一致  |
+| 用量统计 | 定时聚合 | 1m 内最终一致  |
 | 缓存刷新 | 事件驱动 | 30s 内最终一致 |
-| 搜索索引 | 异步同步 | 5s 内最终一致 |
+| 搜索索引 | 异步同步 | 5s 内最终一致  |
 
 ### 3.2 最终一致性处理
 
@@ -165,7 +165,7 @@ func (c *CacheInvalidator) Subscribe(ctx context.Context) {
     for msg := range pubsub.Channel() {
         var event map[string]string
         json.Unmarshal([]byte(msg.Payload), &event)
-        
+
         // 删除缓存
         c.redis.Del(ctx, fmt.Sprintf("%s:%s", event["type"], event["id"]))
     }
@@ -178,12 +178,12 @@ func (c *CacheInvalidator) Subscribe(ctx context.Context) {
 
 ### 4.1 校验任务清单
 
-| 任务 | 频率 | 检查内容 |
-|-----|------|---------|
-| 孤儿数据检查 | 每日 | App 没有 Workspace |
-| 状态一致性 | 每小时 | Execution 状态异常 |
-| 配额校验 | 每日 | 用量与记录一致 |
-| 关系完整性 | 每周 | 外键关系完整 |
+| 任务         | 频率   | 检查内容           |
+| ------------ | ------ | ------------------ |
+| 孤儿数据检查 | 每日   | App 没有 Workspace |
+| 状态一致性   | 每小时 | Execution 状态异常 |
+| 配额校验     | 每日   | 用量与记录一致     |
+| 关系完整性   | 每周   | 外键关系完整       |
 
 ### 4.2 检查脚本
 
@@ -201,7 +201,7 @@ WHERE status = 'running'
   AND started_at < NOW() - INTERVAL 1 HOUR;
 
 -- 配额校验
-SELECT w.id, 
+SELECT w.id,
        w.quota_used_requests,
        COUNT(*) as actual_requests
 FROM what_reverse_workspaces w
@@ -218,7 +218,7 @@ HAVING w.quota_used_requests != COUNT(*);
 UPDATE what_reverse_apps a
 SET deleted_at = NOW()
 WHERE NOT EXISTS (
-    SELECT 1 FROM what_reverse_workspaces w 
+    SELECT 1 FROM what_reverse_workspaces w
     WHERE w.id = a.workspace_id
 );
 
@@ -259,13 +259,13 @@ func (s *ConsistencyChecker) Check(ctx context.Context) error {
     // 读取新旧路径数据
     oldData, _ := s.oldRepo.List(ctx)
     newData, _ := s.newRepo.List(ctx)
-    
+
     // 建立索引
     oldMap := make(map[string]*Data)
     for _, d := range oldData {
         oldMap[d.ID] = d
     }
-    
+
     // 比对
     var inconsistencies []Inconsistency
     for _, d := range newData {
@@ -277,7 +277,7 @@ func (s *ConsistencyChecker) Check(ctx context.Context) error {
             })
             continue
         }
-        
+
         if !reflect.DeepEqual(old, d) {
             inconsistencies = append(inconsistencies, Inconsistency{
                 ID:   d.ID,
@@ -287,12 +287,12 @@ func (s *ConsistencyChecker) Check(ctx context.Context) error {
             })
         }
     }
-    
+
     // 记录不一致
     if len(inconsistencies) > 0 {
         s.reportInconsistencies(inconsistencies)
     }
-    
+
     return nil
 }
 ```
@@ -309,6 +309,6 @@ func (s *ConsistencyChecker) Check(ctx context.Context) error {
 
 ## 变更记录
 
-| 日期 | 版本 | 变更内容 | 作者 |
-|------|------|---------|------|
+| 日期       | 版本 | 变更内容 | 作者           |
+| ---------- | ---- | -------- | -------------- |
 | 2026-02-03 | v1.0 | 初始版本 | AgentFlow Team |

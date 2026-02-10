@@ -2,520 +2,509 @@
  * Workflow Execution Engine
  */
 
-import { generateId } from "@/lib/utils";
-import { getNodeExecutor } from "@/lib/nodes";
-import type { NodeContext, NodeResult, LogEntry } from "@/lib/nodes/types";
-import type { WorkflowNode } from "@/types/workflow";
-import {
- analyzeDAG,
- getExecutableNodes,
-} from "./dag";
+import { generateId } from '@/lib/utils'
+import { getNodeExecutor } from '@/lib/nodes'
+import type { NodeContext, NodeResult, LogEntry } from '@/lib/nodes/types'
+import type { WorkflowNode } from '@/types/workflow'
+import { analyzeDAG, getExecutableNodes } from './dag'
 import type {
- ExecutionConfig,
- ExecutionInput,
- ExecutionResult,
- ExecutionStatus,
- WorkflowExecutionState,
- NodeExecutionState,
- ExecutionEvent,
- ExecutionEventListener,
- DAGAnalysis,
-} from "./types";
+  ExecutionConfig,
+  ExecutionInput,
+  ExecutionResult,
+  ExecutionStatus,
+  WorkflowExecutionState,
+  NodeExecutionState,
+  ExecutionEvent,
+  ExecutionEventListener,
+  DAGAnalysis,
+} from './types'
 
 /**
  * Default execution configuration
  */
 const DEFAULT_CONFIG: Required<ExecutionConfig> = {
- timeout: 600000, // 10 min
- nodeTimeout: 60000, // 1 min
- retryCount: 0,
- retryDelay: 1000,
- maxConcurrency: 5,
- debug: false,
- breakpoints: [],
- onNodeStart: () => {},
- onNodeComplete: () => {},
- onNodeError: () => {},
- onLog: () => {},
- onStateChange: () => {},
-};
+  timeout: 600000, // 10 min
+  nodeTimeout: 60000, // 1 min
+  retryCount: 0,
+  retryDelay: 1000,
+  maxConcurrency: 5,
+  debug: false,
+  breakpoints: [],
+  onNodeStart: () => {},
+  onNodeComplete: () => {},
+  onNodeError: () => {},
+  onLog: () => {},
+  onStateChange: () => {},
+}
 
 /**
  * Workflow Execution Engine
  */
 export class WorkflowExecutor {
- private state: WorkflowExecutionState;
- private config: Required<ExecutionConfig>;
- private dag: DAGAnalysis;
- private nodeMap: Map<string, WorkflowNode>;
- private abortController: AbortController;
- private listeners: Set<ExecutionEventListener>;
- private runningPromises: Map<string, Promise<void>>;
+  private state: WorkflowExecutionState
+  private config: Required<ExecutionConfig>
+  private dag: DAGAnalysis
+  private nodeMap: Map<string, WorkflowNode>
+  private abortController: AbortController
+  private listeners: Set<ExecutionEventListener>
+  private runningPromises: Map<string, Promise<void>>
 
- constructor(input: ExecutionInput) {
- const { workflow, inputs = {}, config = {} } = input;
+  constructor(input: ExecutionInput) {
+    const { workflow, inputs = {}, config = {} } = input
 
- // Merge configuration
- this.config = { ...DEFAULT_CONFIG, ...config };
+    // Merge configuration
+    this.config = { ...DEFAULT_CONFIG, ...config }
 
- // Analyze DAG
- this.dag = analyzeDAG(workflow.nodes, workflow.edges);
+    // Analyze DAG
+    this.dag = analyzeDAG(workflow.nodes, workflow.edges)
 
- // Build node mapping
- this.nodeMap = new Map();
- for (const node of workflow.nodes) {
- this.nodeMap.set(node.id, node);
- }
+    // Build node mapping
+    this.nodeMap = new Map()
+    for (const node of workflow.nodes) {
+      this.nodeMap.set(node.id, node)
+    }
 
- // Initialize state
- const executionId = generateId();
- this.state = {
- executionId,
- workflowId: workflow.id,
- status: "pending",
- startTime: new Date().toISOString(),
- nodeStates: {},
- variables: { ...workflow.variables, ...inputs },
- currentNodeIds: [],
- completedNodeIds: [],
- failedNodeIds: [],
- logs: [],
- };
+    // Initialize state
+    const executionId = generateId()
+    this.state = {
+      executionId,
+      workflowId: workflow.id,
+      status: 'pending',
+      startTime: new Date().toISOString(),
+      nodeStates: {},
+      variables: { ...workflow.variables, ...inputs },
+      currentNodeIds: [],
+      completedNodeIds: [],
+      failedNodeIds: [],
+      logs: [],
+    }
 
- // Initialize node states
- for (const node of workflow.nodes) {
- this.state.nodeStates[node.id] = {
- nodeId: node.id,
- status: "pending",
- };
- }
+    // Initialize node states
+    for (const node of workflow.nodes) {
+      this.state.nodeStates[node.id] = {
+        nodeId: node.id,
+        status: 'pending',
+      }
+    }
 
- this.abortController = new AbortController();
- this.listeners = new Set();
- this.runningPromises = new Map();
- }
+    this.abortController = new AbortController()
+    this.listeners = new Set()
+    this.runningPromises = new Map()
+  }
 
- /**
- * Add event listener
- */
- addEventListener(listener: ExecutionEventListener): () => void {
- this.listeners.add(listener);
- return () => this.listeners.delete(listener);
- }
+  /**
+   * Add event listener
+   */
+  addEventListener(listener: ExecutionEventListener): () => void {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
+  }
 
- /**
- * Trigger event
- */
- private emit(event: ExecutionEvent): void {
- for (const listener of this.listeners) {
- try {
- listener(event);
- } catch (e) {
- console.error("Event listener error:", e);
- }
- }
- }
+  /**
+   * Trigger event
+   */
+  private emit(event: ExecutionEvent): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event)
+      } catch (e) {
+        console.error('Event listener error:', e)
+      }
+    }
+  }
 
- /**
- * Add log entry
- */
- private log(level: LogEntry["level"], message: string, data?: unknown): void {
- const log: LogEntry = {
- level,
- message,
- timestamp: new Date().toISOString(),
- data,
- };
- this.state.logs.push(log);
- this.config.onLog(log);
- this.emit({ type: "log", log });
- }
+  /**
+   * Add log entry
+   */
+  private log(level: LogEntry['level'], message: string, data?: unknown): void {
+    const log: LogEntry = {
+      level,
+      message,
+      timestamp: new Date().toISOString(),
+      data,
+    }
+    this.state.logs.push(log)
+    this.config.onLog(log)
+    this.emit({ type: 'log', log })
+  }
 
- /**
- * Update state
- */
- private updateState(partial: Partial<WorkflowExecutionState>): void {
- this.state = { ...this.state, ...partial };
- this.config.onStateChange(this.state);
- }
+  /**
+   * Update state
+   */
+  private updateState(partial: Partial<WorkflowExecutionState>): void {
+    this.state = { ...this.state, ...partial }
+    this.config.onStateChange(this.state)
+  }
 
- /**
- * Update node state
- */
- private updateNodeState(
- nodeId: string,
- partial: Partial<NodeExecutionState>
- ): void {
- this.state.nodeStates[nodeId] = {
- ...this.state.nodeStates[nodeId],
- ...partial,
- };
- this.config.onStateChange(this.state);
- }
+  /**
+   * Update node state
+   */
+  private updateNodeState(nodeId: string, partial: Partial<NodeExecutionState>): void {
+    this.state.nodeStates[nodeId] = {
+      ...this.state.nodeStates[nodeId],
+      ...partial,
+    }
+    this.config.onStateChange(this.state)
+  }
 
- /**
- * Execute workflow
- */
- async execute(): Promise<ExecutionResult> {
- // Check for circular dependencies
- if (this.dag.hasCircle) {
- const error = {
- code: "CIRCULAR_DEPENDENCY",
- message: "Workflow contains circular dependencies",
- };
- this.updateState({ status: "failed", error });
- return this.buildResult("failed", error);
- }
+  /**
+   * Execute workflow
+   */
+  async execute(): Promise<ExecutionResult> {
+    // Check for circular dependencies
+    if (this.dag.hasCircle) {
+      const error = {
+        code: 'CIRCULAR_DEPENDENCY',
+        message: 'Workflow contains circular dependencies',
+      }
+      this.updateState({ status: 'failed', error })
+      return this.buildResult('failed', error)
+    }
 
- // Check if there are any start nodes
- if (this.dag.startNodes.length === 0) {
- const error = {
- code: "NO_START_NODE",
- message: "Workflow has no start nodes",
- };
- this.updateState({ status: "failed", error });
- return this.buildResult("failed", error);
- }
+    // Check if there are any start nodes
+    if (this.dag.startNodes.length === 0) {
+      const error = {
+        code: 'NO_START_NODE',
+        message: 'Workflow has no start nodes',
+      }
+      this.updateState({ status: 'failed', error })
+      return this.buildResult('failed', error)
+    }
 
- // Start execution
- this.updateState({ status: "running", startTime: new Date().toISOString() });
- this.emit({ type: "start", executionId: this.state.executionId, timestamp: new Date().toISOString() });
- this.log("info", "Workflow execution started");
+    // Start execution
+    this.updateState({ status: 'running', startTime: new Date().toISOString() })
+    this.emit({
+      type: 'start',
+      executionId: this.state.executionId,
+      timestamp: new Date().toISOString(),
+    })
+    this.log('info', 'Workflow execution started')
 
- try {
- // Main execution loop
- await this.executeLoop();
+    try {
+      // Main execution loop
+      await this.executeLoop()
 
- // Check execution result
- const allCompleted = Object.values(this.state.nodeStates).every(
- (ns) => ns.status === "completed" || ns.status === "cancelled"
- );
+      // Check execution result
+      const allCompleted = Object.values(this.state.nodeStates).every(
+        (ns) => ns.status === 'completed' || ns.status === 'cancelled'
+      )
 
- if (this.state.status === "cancelled") {
- return this.buildResult("cancelled");
- }
+      if (this.state.status === 'cancelled') {
+        return this.buildResult('cancelled')
+      }
 
- if (this.state.failedNodeIds.length > 0) {
- const failedNode = this.state.nodeStates[this.state.failedNodeIds[0]];
- const error = {
- code: "NODE_EXECUTION_FAILED",
-    message: failedNode?.error?.message || "Failed to execute node",
- nodeId: this.state.failedNodeIds[0],
- };
- this.updateState({ status: "failed", error });
- return this.buildResult("failed", error);
- }
+      if (this.state.failedNodeIds.length > 0) {
+        const failedNode = this.state.nodeStates[this.state.failedNodeIds[0]]
+        const error = {
+          code: 'NODE_EXECUTION_FAILED',
+          message: failedNode?.error?.message || 'Failed to execute node',
+          nodeId: this.state.failedNodeIds[0],
+        }
+        this.updateState({ status: 'failed', error })
+        return this.buildResult('failed', error)
+      }
 
- if (allCompleted) {
- this.updateState({ status: "completed" });
- this.log("info", "Workflow execution completed successfully");
- return this.buildResult("completed");
- }
+      if (allCompleted) {
+        this.updateState({ status: 'completed' })
+        this.log('info', 'Workflow execution completed successfully')
+        return this.buildResult('completed')
+      }
 
- // Unexpected state
- const error = {
- code: "UNEXPECTED_STATE",
- message: "Workflow ended in unexpected state",
- };
- this.updateState({ status: "failed", error });
- return this.buildResult("failed", error);
- } catch (error) {
- const errorObj = {
- code: "EXECUTION_ERROR",
- message: error instanceof Error ? error.message : "Unknown error",
- };
- this.updateState({ status: "failed", error: errorObj });
- this.log("error", errorObj.message);
- return this.buildResult("failed", errorObj);
- }
- }
+      // Unexpected state
+      const error = {
+        code: 'UNEXPECTED_STATE',
+        message: 'Workflow ended in unexpected state',
+      }
+      this.updateState({ status: 'failed', error })
+      return this.buildResult('failed', error)
+    } catch (error) {
+      const errorObj = {
+        code: 'EXECUTION_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }
+      this.updateState({ status: 'failed', error: errorObj })
+      this.log('error', errorObj.message)
+      return this.buildResult('failed', errorObj)
+    }
+  }
 
- /**
- * Execution loop
- */
- private async executeLoop(): Promise<void> {
- const completedNodes = new Set(this.state.completedNodeIds);
- const runningNodes = new Set(this.state.currentNodeIds);
+  /**
+   * Execution loop
+   */
+  private async executeLoop(): Promise<void> {
+    const completedNodes = new Set(this.state.completedNodeIds)
+    const runningNodes = new Set(this.state.currentNodeIds)
 
- while (true) {
- // Check for cancellation
- if (this.abortController.signal.aborted) {
- break;
- }
+    while (true) {
+      // Check for cancellation
+      if (this.abortController.signal.aborted) {
+        break
+      }
 
- // Get executable nodes
- const executableNodes = getExecutableNodes(
- this.dag.nodes,
- completedNodes,
- runningNodes
- );
+      // Get executable nodes
+      const executableNodes = getExecutableNodes(this.dag.nodes, completedNodes, runningNodes)
 
- // No executable nodes remaining
- if (executableNodes.length === 0 && runningNodes.size === 0) {
- break;
- }
+      // No executable nodes remaining
+      if (executableNodes.length === 0 && runningNodes.size === 0) {
+        break
+      }
 
- // Limit concurrency
- const availableSlots = this.config.maxConcurrency - runningNodes.size;
- const nodesToExecute = executableNodes.slice(0, availableSlots);
+      // Limit concurrency
+      const availableSlots = this.config.maxConcurrency - runningNodes.size
+      const nodesToExecute = executableNodes.slice(0, availableSlots)
 
- // Launch node execution
- for (const nodeId of nodesToExecute) {
- runningNodes.add(nodeId);
- this.state.currentNodeIds.push(nodeId);
+      // Launch node execution
+      for (const nodeId of nodesToExecute) {
+        runningNodes.add(nodeId)
+        this.state.currentNodeIds.push(nodeId)
 
- const promise = this.executeNode(nodeId)
- .then(() => {
- completedNodes.add(nodeId);
- this.state.completedNodeIds.push(nodeId);
- })
- .catch((error) => {
- this.state.failedNodeIds.push(nodeId);
- this.log("error", `Node ${nodeId} failed: ${error.message}`);
- })
- .finally(() => {
- runningNodes.delete(nodeId);
- this.state.currentNodeIds = this.state.currentNodeIds.filter(
- (id) => id !== nodeId
- );
- this.runningPromises.delete(nodeId);
- });
+        const promise = this.executeNode(nodeId)
+          .then(() => {
+            completedNodes.add(nodeId)
+            this.state.completedNodeIds.push(nodeId)
+          })
+          .catch((error) => {
+            this.state.failedNodeIds.push(nodeId)
+            this.log('error', `Node ${nodeId} failed: ${error.message}`)
+          })
+          .finally(() => {
+            runningNodes.delete(nodeId)
+            this.state.currentNodeIds = this.state.currentNodeIds.filter((id) => id !== nodeId)
+            this.runningPromises.delete(nodeId)
+          })
 
- this.runningPromises.set(nodeId, promise);
- }
+        this.runningPromises.set(nodeId, promise)
+      }
 
- // Wait for at least one node to complete
- if (this.runningPromises.size > 0) {
- await Promise.race(this.runningPromises.values());
- }
+      // Wait for at least one node to complete
+      if (this.runningPromises.size > 0) {
+        await Promise.race(this.runningPromises.values())
+      }
 
- // Check if any nodes have failed
- if (this.state.failedNodeIds.length > 0) {
- // Wait for all currently running nodes to complete
- await Promise.all(this.runningPromises.values());
- break;
- }
- }
- }
+      // Check if any nodes have failed
+      if (this.state.failedNodeIds.length > 0) {
+        // Wait for all currently running nodes to complete
+        await Promise.all(this.runningPromises.values())
+        break
+      }
+    }
+  }
 
- /**
- * Execute a single node
- */
- private async executeNode(nodeId: string): Promise<void> {
- const node = this.nodeMap.get(nodeId);
- if (!node) {
- throw new Error(`Node ${nodeId} not found`);
- }
+  /**
+   * Execute a single node
+   */
+  private async executeNode(nodeId: string): Promise<void> {
+    const node = this.nodeMap.get(nodeId)
+    if (!node) {
+      throw new Error(`Node ${nodeId} not found`)
+    }
 
- // Get node type and executor
- const nodeType = node.type || "unknown";
- const executor = getNodeExecutor(nodeType);
+    // Get node type and executor
+    const nodeType = node.type || 'unknown'
+    const executor = getNodeExecutor(nodeType)
 
- // Update status
- this.updateNodeState(nodeId, {
- status: "running",
- startTime: new Date().toISOString(),
- });
- this.emit({ type: "node_start", nodeId, timestamp: new Date().toISOString() });
- this.config.onNodeStart(nodeId);
- this.log("info", `Executing node: ${nodeId} (${nodeType})`);
+    // Update status
+    this.updateNodeState(nodeId, {
+      status: 'running',
+      startTime: new Date().toISOString(),
+    })
+    this.emit({ type: 'node_start', nodeId, timestamp: new Date().toISOString() })
+    this.config.onNodeStart(nodeId)
+    this.log('info', `Executing node: ${nodeId} (${nodeType})`)
 
- // Collect inputs
- const inputs = this.collectNodeInputs(nodeId);
+    // Collect inputs
+    const inputs = this.collectNodeInputs(nodeId)
 
- // Build execution context
- const context: NodeContext = {
- nodeId,
- nodeType,
- nodeConfig: node.data?.config || {},
- variables: this.state.variables,
- inputs,
- abortSignal: this.abortController.signal,
- };
+    // Build execution context
+    const context: NodeContext = {
+      nodeId,
+      nodeType,
+      nodeConfig: node.data?.config || {},
+      variables: this.state.variables,
+      inputs,
+      abortSignal: this.abortController.signal,
+    }
 
- let result: NodeResult;
+    let result: NodeResult
 
- if (!executor) {
- // No executor found, mark as done
- this.log("warn", `No executor for node type: ${nodeType}`);
- result = {
- success: true,
- outputs: inputs,
- logs: [
- {
- level: "warn",
- message: `No executor for type ${nodeType}, passing through`,
- timestamp: new Date().toISOString(),
- },
- ],
- };
- } else {
- // Execute node
- try {
- result = await executor.execute(context);
- } catch (error) {
- result = {
- success: false,
- outputs: {},
- error: {
- code: "EXECUTOR_ERROR",
- message: error instanceof Error ? error.message : "Unknown error",
- details: error,
- retryable: false,
- },
- };
- }
- }
+    if (!executor) {
+      // No executor found, mark as done
+      this.log('warn', `No executor for node type: ${nodeType}`)
+      result = {
+        success: true,
+        outputs: inputs,
+        logs: [
+          {
+            level: 'warn',
+            message: `No executor for type ${nodeType}, passing through`,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      }
+    } else {
+      // Execute node
+      try {
+        result = await executor.execute(context)
+      } catch (error) {
+        result = {
+          success: false,
+          outputs: {},
+          error: {
+            code: 'EXECUTOR_ERROR',
+            message: error instanceof Error ? error.message : 'Unknown error',
+            details: error,
+            retryable: false,
+          },
+        }
+      }
+    }
 
- // Process result
- const endTime = new Date().toISOString();
- const startTime = this.state.nodeStates[nodeId].startTime || endTime;
- const duration = new Date(endTime).getTime() - new Date(startTime).getTime();
+    // Process result
+    const endTime = new Date().toISOString()
+    const startTime = this.state.nodeStates[nodeId].startTime || endTime
+    const duration = new Date(endTime).getTime() - new Date(startTime).getTime()
 
- if (result.success) {
- // Success
- this.updateNodeState(nodeId, {
- status: "completed",
- endTime,
- duration,
- outputs: result.outputs,
- logs: result.logs,
- });
+    if (result.success) {
+      // Success
+      this.updateNodeState(nodeId, {
+        status: 'completed',
+        endTime,
+        duration,
+        outputs: result.outputs,
+        logs: result.logs,
+      })
 
- // Update variables
- if (result.outputs) {
- this.state.variables = {
- ...this.state.variables,
- [`${nodeId}`]: result.outputs,
- };
- }
+      // Update variables
+      if (result.outputs) {
+        this.state.variables = {
+          ...this.state.variables,
+          [`${nodeId}`]: result.outputs,
+        }
+      }
 
- this.emit({
- type: "node_complete",
- nodeId,
- result,
- timestamp: endTime,
- });
- this.config.onNodeComplete(nodeId, result);
- this.log("info", `Node ${nodeId} completed in ${duration}ms`);
- } else {
- // Failed
- this.updateNodeState(nodeId, {
- status: "failed",
- endTime,
- duration,
- error: result.error,
- logs: result.logs,
- });
+      this.emit({
+        type: 'node_complete',
+        nodeId,
+        result,
+        timestamp: endTime,
+      })
+      this.config.onNodeComplete(nodeId, result)
+      this.log('info', `Node ${nodeId} completed in ${duration}ms`)
+    } else {
+      // Failed
+      this.updateNodeState(nodeId, {
+        status: 'failed',
+        endTime,
+        duration,
+        error: result.error,
+        logs: result.logs,
+      })
 
- this.emit({
- type: "node_error",
- nodeId,
- error: result.error,
- timestamp: endTime,
- });
- this.config.onNodeError(nodeId, result.error);
+      this.emit({
+        type: 'node_error',
+        nodeId,
+        error: result.error,
+        timestamp: endTime,
+      })
+      this.config.onNodeError(nodeId, result.error)
 
-    throw new Error(result.error?.message || "Failed to execute node");
- }
- }
+      throw new Error(result.error?.message || 'Failed to execute node')
+    }
+  }
 
- /**
- * Collect node inputs
- */
- private collectNodeInputs(nodeId: string): Record<string, unknown> {
- const inputs: Record<string, unknown> = {};
- const dagNode = this.dag.nodes[nodeId];
+  /**
+   * Collect node inputs
+   */
+  private collectNodeInputs(nodeId: string): Record<string, unknown> {
+    const inputs: Record<string, unknown> = {}
+    const dagNode = this.dag.nodes[nodeId]
 
- if (!dagNode) return inputs;
+    if (!dagNode) return inputs
 
- // Collect outputs from dependency nodes
- for (const depId of dagNode.dependencies) {
- const depState = this.state.nodeStates[depId];
- if (depState?.outputs) {
- Object.assign(inputs, depState.outputs);
- }
- }
+    // Collect outputs from dependency nodes
+    for (const depId of dagNode.dependencies) {
+      const depState = this.state.nodeStates[depId]
+      if (depState?.outputs) {
+        Object.assign(inputs, depState.outputs)
+      }
+    }
 
- return inputs;
- }
+    return inputs
+  }
 
- /**
- * Build execution result
- */
- private buildResult(
- status: ExecutionStatus,
- error?: { code: string; message: string; nodeId?: string }
- ): ExecutionResult {
- const endTime = new Date().toISOString();
- const duration =
- new Date(endTime).getTime() - new Date(this.state.startTime).getTime();
+  /**
+   * Build execution result
+   */
+  private buildResult(
+    status: ExecutionStatus,
+    error?: { code: string; message: string; nodeId?: string }
+  ): ExecutionResult {
+    const endTime = new Date().toISOString()
+    const duration = new Date(endTime).getTime() - new Date(this.state.startTime).getTime()
 
- this.updateState({ endTime, duration });
+    this.updateState({ endTime, duration })
 
- // Collect all node outputs
- const outputs: Record<string, unknown> = {};
- const nodeResults: Record<string, NodeResult> = {};
+    // Collect all node outputs
+    const outputs: Record<string, unknown> = {}
+    const nodeResults: Record<string, NodeResult> = {}
 
- for (const [nodeId, nodeState] of Object.entries(this.state.nodeStates)) {
- if (nodeState.outputs) {
- outputs[nodeId] = nodeState.outputs;
- }
- nodeResults[nodeId] = {
- success: nodeState.status === "completed",
- outputs: nodeState.outputs || {},
- error: nodeState.error,
- logs: nodeState.logs,
- duration: nodeState.duration,
- };
- }
+    for (const [nodeId, nodeState] of Object.entries(this.state.nodeStates)) {
+      if (nodeState.outputs) {
+        outputs[nodeId] = nodeState.outputs
+      }
+      nodeResults[nodeId] = {
+        success: nodeState.status === 'completed',
+        outputs: nodeState.outputs || {},
+        error: nodeState.error,
+        logs: nodeState.logs,
+        duration: nodeState.duration,
+      }
+    }
 
- const result: ExecutionResult = {
- executionId: this.state.executionId,
- status,
- outputs,
- duration,
- nodeResults,
- logs: this.state.logs,
- error,
- };
+    const result: ExecutionResult = {
+      executionId: this.state.executionId,
+      status,
+      outputs,
+      duration,
+      nodeResults,
+      logs: this.state.logs,
+      error,
+    }
 
- this.emit({ type: "complete", result, timestamp: endTime });
+    this.emit({ type: 'complete', result, timestamp: endTime })
 
- return result;
- }
+    return result
+  }
 
- /**
- * Cancel execution
- */
- cancel(): void {
- this.abortController.abort();
- this.updateState({ status: "cancelled" });
- this.emit({ type: "cancel", timestamp: new Date().toISOString() });
- this.log("info", "Workflow execution cancelled");
- }
+  /**
+   * Cancel execution
+   */
+  cancel(): void {
+    this.abortController.abort()
+    this.updateState({ status: 'cancelled' })
+    this.emit({ type: 'cancel', timestamp: new Date().toISOString() })
+    this.log('info', 'Workflow execution cancelled')
+  }
 
- /**
- * Get current state
- */
- getState(): WorkflowExecutionState {
- return { ...this.state };
- }
+  /**
+   * Get current state
+   */
+  getState(): WorkflowExecutionState {
+    return { ...this.state }
+  }
 
- /**
- * Get execution ID
- */
- getExecutionId(): string {
- return this.state.executionId;
- }
+  /**
+   * Get execution ID
+   */
+  getExecutionId(): string {
+    return this.state.executionId
+  }
 }
 
 /**
  * Execute workflow helper function
  */
-export async function executeWorkflow(
- input: ExecutionInput
-): Promise<ExecutionResult> {
- const executor = new WorkflowExecutor(input);
- return executor.execute();
+export async function executeWorkflow(input: ExecutionInput): Promise<ExecutionResult> {
+  const executor = new WorkflowExecutor(input)
+  return executor.execute()
 }

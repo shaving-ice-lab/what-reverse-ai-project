@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ============================================
    LobeHub-Inspired Design System
@@ -95,22 +95,26 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+      'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     letter-spacing: -0.01em;
   }
 
   /* ===== LobeHub 全局背景层 - 模拟深邃太空感 ===== */
   body::before {
-    content: "";
+    content: '';
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    background: 
+    background:
       radial-gradient(ellipse 120% 60% at 50% 0%, rgba(40, 50, 120, 0.08) 0%, transparent 60%),
       radial-gradient(ellipse 80% 50% at 80% 20%, rgba(100, 50, 150, 0.04) 0%, transparent 50%),
       radial-gradient(ellipse 80% 50% at 20% 80%, rgba(30, 60, 120, 0.03) 0%, transparent 50%);
@@ -120,39 +124,39 @@
     background: rgba(78, 143, 255, 0.25);
     color: #ffffff;
   }
-  
+
   /* ===== 滚动条样式 - LobeHub 风格 ===== */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background: #1e1e30;
     border-radius: 3px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background: #2e2e45;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 2px;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.15);
   }
@@ -206,7 +210,8 @@
 
   /* ===== 动画 - 闪烁 (光标) ===== */
   @keyframes blink {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -219,7 +224,8 @@
 
   /* ===== 动画 - 柔和脉冲 ===== */
   @keyframes pulse-soft {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -264,14 +270,30 @@
   .animate-stagger-in {
     animation: staggerFadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .animate-stagger-in:nth-child(1) { animation-delay: 0ms; }
-  .animate-stagger-in:nth-child(2) { animation-delay: 80ms; }
-  .animate-stagger-in:nth-child(3) { animation-delay: 160ms; }
-  .animate-stagger-in:nth-child(4) { animation-delay: 240ms; }
-  .animate-stagger-in:nth-child(5) { animation-delay: 320ms; }
-  .animate-stagger-in:nth-child(6) { animation-delay: 400ms; }
-  .animate-stagger-in:nth-child(7) { animation-delay: 480ms; }
-  .animate-stagger-in:nth-child(8) { animation-delay: 560ms; }
+  .animate-stagger-in:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .animate-stagger-in:nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .animate-stagger-in:nth-child(3) {
+    animation-delay: 160ms;
+  }
+  .animate-stagger-in:nth-child(4) {
+    animation-delay: 240ms;
+  }
+  .animate-stagger-in:nth-child(5) {
+    animation-delay: 320ms;
+  }
+  .animate-stagger-in:nth-child(6) {
+    animation-delay: 400ms;
+  }
+  .animate-stagger-in:nth-child(7) {
+    animation-delay: 480ms;
+  }
+  .animate-stagger-in:nth-child(8) {
+    animation-delay: 560ms;
+  }
 
   /* ===== 动画 - 闪光 (加载) ===== */
   @keyframes shimmer {
@@ -340,7 +362,8 @@
 
   /* ===== 渐变文字 - LobeHub 风格 ===== */
   @keyframes gradientFlow {
-    0%, 100% {
+    0%,
+    100% {
       background-position: 0% 50%;
     }
     50% {
@@ -348,12 +371,7 @@
     }
   }
   .animate-gradient-text {
-    background: linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #a1a1a1 50%,
-      #ffffff 100%
-    );
+    background: linear-gradient(135deg, #ffffff 0%, #a1a1a1 50%, #ffffff 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
@@ -399,7 +417,9 @@
   /* ===== 聚焦环 ===== */
   .focus-ring-brand:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #01010a, 0 0 0 4px #4e8fff;
+    box-shadow:
+      0 0 0 2px #01010a,
+      0 0 0 4px #4e8fff;
   }
 
   /* ===== LobeHub 玻璃拟态效果 ===== */
@@ -418,33 +438,52 @@
 
   /* ===== LobeHub 渐变背景 - 多层深度感 ===== */
   .bg-gradient-radial {
-    background: 
+    background:
       radial-gradient(ellipse 100% 80% at 50% 0%, rgba(60, 80, 180, 0.1) 0%, transparent 55%),
       radial-gradient(ellipse 60% 40% at 70% 10%, rgba(130, 60, 200, 0.05) 0%, transparent 45%);
   }
 
   .bg-gradient-hero {
-    background: 
-      radial-gradient(ellipse 140% 70% at 50% -30%, rgba(55, 80, 200, 0.18) 0%, rgba(130, 60, 200, 0.06) 35%, transparent 65%),
+    background:
+      radial-gradient(
+        ellipse 140% 70% at 50% -30%,
+        rgba(55, 80, 200, 0.18) 0%,
+        rgba(130, 60, 200, 0.06) 35%,
+        transparent 65%
+      ),
       radial-gradient(ellipse 60% 50% at 80% 10%, rgba(100, 40, 180, 0.05) 0%, transparent 50%),
       radial-gradient(ellipse 60% 50% at 20% 20%, rgba(40, 70, 200, 0.04) 0%, transparent 50%);
   }
 
   .bg-gradient-section {
-    background: 
-      linear-gradient(180deg, rgba(20, 25, 50, 0.15) 0%, rgba(10, 10, 20, 0.05) 40%, transparent 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(20, 25, 50, 0.15) 0%,
+      rgba(10, 10, 20, 0.05) 40%,
+      transparent 100%
+    );
   }
 
   /* ===== LobeHub 区域间渐变分隔 ===== */
   .bg-gradient-section-alt {
-    background: 
-      linear-gradient(180deg, transparent 0%, rgba(15, 15, 30, 0.2) 30%, rgba(15, 15, 30, 0.2) 70%, transparent 100%);
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(15, 15, 30, 0.2) 30%,
+      rgba(15, 15, 30, 0.2) 70%,
+      transparent 100%
+    );
   }
 
   /* ===== LobeHub CTA 区域渐变 ===== */
   .bg-gradient-cta {
-    background: 
-      radial-gradient(ellipse 120% 80% at 50% 50%, rgba(55, 80, 200, 0.12) 0%, rgba(130, 60, 200, 0.04) 40%, transparent 65%),
+    background:
+      radial-gradient(
+        ellipse 120% 80% at 50% 50%,
+        rgba(55, 80, 200, 0.12) 0%,
+        rgba(130, 60, 200, 0.04) 40%,
+        transparent 65%
+      ),
       radial-gradient(ellipse 80% 60% at 30% 60%, rgba(40, 60, 150, 0.05) 0%, transparent 50%),
       radial-gradient(ellipse 80% 60% at 70% 40%, rgba(80, 40, 180, 0.04) 0%, transparent 50%);
   }
@@ -457,13 +496,15 @@
   }
 
   .border-gradient::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: -1px;
     border-radius: inherit;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
     z-index: -1;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
     padding: 1px;
@@ -473,61 +514,61 @@
 /* ===== 亮色主题 (可选) ===== */
 @layer base {
   .light {
-    --color-background: #fafbff;
-    --color-background-200: #f5f6fa;
-    --color-background-studio: #f0f1f8;
-    --color-background-alternative: #fafbff;
-    
-    --color-surface-75: #f5f6fa;
-    --color-surface-100: #eff0f6;
-    --color-surface-200: #e8e9f0;
-    --color-surface-300: #dddee8;
-    --color-surface-400: #d0d1dd;
-    
+    --color-background: #f8f8f8;
+    --color-background-200: #f2f2f2;
+    --color-background-studio: #ededed;
+    --color-background-alternative: #f8f8f8;
+
+    --color-surface-75: #f2f2f2;
+    --color-surface-100: #ececec;
+    --color-surface-200: #e5e5e5;
+    --color-surface-300: #dcdcdc;
+    --color-surface-400: #d0d0d0;
+
     --color-foreground: #0a0a14;
     --color-foreground-light: #4a4a5e;
     --color-foreground-lighter: #6b6b80;
     --color-foreground-muted: #9b9bb0;
-    
-    --color-border: #e0e1ec;
-    --color-border-muted: #eaebf2;
-    --color-border-strong: #d0d1dd;
-    --color-border-stronger: #a0a0b8;
-    
+
+    --color-border: #e0e0e0;
+    --color-border-muted: #eaeaea;
+    --color-border-strong: #d0d0d0;
+    --color-border-stronger: #a0a0a0;
+
     --color-card: #ffffff;
     --color-card-foreground: #0a0a14;
-    
+
     --color-popover: #ffffff;
     --color-popover-foreground: #0a0a14;
-    
-    --color-muted: #eff0f6;
-    --color-muted-foreground: #6b6b80;
-    
-    --color-secondary: #eff0f6;
+
+    --color-muted: #ececec;
+    --color-muted-foreground: #6b6b6b;
+
+    --color-secondary: #ececec;
     --color-secondary-foreground: #0a0a14;
-    
-    --color-accent: #eff0f6;
+
+    --color-accent: #ececec;
     --color-accent-foreground: #0a0a14;
-    
-    --color-input: #e8e9f0;
-    
+
+    --color-input: #e5e5e5;
+
     --color-primary: #0a0a14;
     --color-primary-foreground: #ffffff;
   }
-  
+
   /* 亮色模式滚动条 */
   .light ::-webkit-scrollbar-thumb {
     background: #d4d4d4;
   }
-  
+
   .light ::-webkit-scrollbar-thumb:hover {
     background: #a3a3a3;
   }
-  
+
   .light .scrollbar-thin::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
   }
-  
+
   .light .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.2);
   }
@@ -625,15 +666,15 @@
     @apply w-full min-h-full;
   }
 
-  .dashboard-shell[data-layout="standard"] .dashboard-content {
+  .dashboard-shell[data-layout='standard'] .dashboard-content {
     @apply mx-auto w-full max-w-[1280px] px-6 py-5 overflow-y-auto h-full;
   }
 
-  .dashboard-shell[data-layout="full"] .dashboard-content {
+  .dashboard-shell[data-layout='full'] .dashboard-content {
     @apply w-full h-full p-0;
   }
 
-  .dashboard-shell[data-layout="full"] .dashboard-page {
+  .dashboard-shell[data-layout='full'] .dashboard-page {
     @apply h-full;
   }
 
@@ -641,7 +682,7 @@
     @apply min-h-full text-foreground;
   }
 
-  .dashboard-shell[data-layout="standard"] .dashboard-page {
+  .dashboard-shell[data-layout='standard'] .dashboard-page {
     @apply space-y-5;
   }
 
@@ -705,19 +746,19 @@
   }
 
   /* ===== Dashboard Typography ===== */
-  .dashboard-page h1:not([class*="text-"]) {
+  .dashboard-page h1:not([class*='text-']) {
     @apply text-xl font-semibold tracking-tight text-foreground;
   }
 
-  .dashboard-page h2:not([class*="text-"]) {
+  .dashboard-page h2:not([class*='text-']) {
     @apply text-lg font-semibold tracking-tight text-foreground;
   }
 
-  .dashboard-page h3:not([class*="text-"]) {
+  .dashboard-page h3:not([class*='text-']) {
     @apply text-base font-semibold text-foreground;
   }
 
-  .dashboard-page p:not([class*="text-"]) {
+  .dashboard-page p:not([class*='text-']) {
     @apply text-sm leading-relaxed text-foreground-light;
   }
 
@@ -753,7 +794,7 @@
   }
 
   /* ===== LobeHub 公共页面通用组件 ===== */
-  
+
   /* Hero 区域 */
   .lobe-hero {
     @apply relative overflow-hidden py-24 sm:py-32 lg:py-40;
@@ -762,7 +803,12 @@
   .lobe-hero-bg {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% -20%, rgba(78, 143, 255, 0.1) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%);
+    background: radial-gradient(
+      ellipse at 50% -20%,
+      rgba(78, 143, 255, 0.1) 0%,
+      rgba(168, 85, 247, 0.04) 40%,
+      transparent 70%
+    );
     pointer-events: none;
   }
 

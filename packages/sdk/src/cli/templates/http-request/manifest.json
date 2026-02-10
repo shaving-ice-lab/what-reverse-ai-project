@@ -12,11 +12,5 @@
     "icon": "globe",
     "minSdkVersion": "0.1.0"
   },
-  "keywords": [
-    "agentflow",
-    "node",
-    "http",
-    "api",
-    "integration"
-  ]
+  "keywords": ["agentflow", "node", "http", "api", "integration"]
 }

@@ -12,12 +12,7 @@
   "keywords": ["http", "api", "testing", "request"],
   "license": "MIT",
   "main": "dist/index.js",
-  "permissions": [
-    "network",
-    "storage",
-    "notifications",
-    "ui:panel"
-  ],
+  "permissions": ["network", "storage", "notifications", "ui:panel"],
   "nodes": [
     {
       "id": "http-request",
@@ -78,8 +73,5 @@
       }
     ]
   },
-  "activationEvents": [
-    "onCommand:http-tools.testRequest",
-    "onNode:http-request"
-  ]
+  "activationEvents": ["onCommand:http-tools.testRequest", "onNode:http-request"]
 }

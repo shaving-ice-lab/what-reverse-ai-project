@@ -20,13 +20,13 @@
 .settings-layout {
   display: flex;
   min-height: 100vh;
-  background: #09090B;
+  background: #09090b;
 }
 
 .settings-sidebar {
   width: 240px;
-  background: #0F0F12;
-  border-right: 1px solid #27272A;
+  background: #0f0f12;
+  border-right: 1px solid #27272a;
   padding: 24px 16px;
 }
 
@@ -45,7 +45,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #71717A;
+  color: #71717a;
   padding: 8px 12px;
   margin-top: 16px;
 }
@@ -57,19 +57,19 @@
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 14px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   cursor: pointer;
   transition: all 150ms ease;
 }
 
 .settings-nav-item:hover {
-  background: #18181B;
-  color: #FAFAFA;
+  background: #18181b;
+  color: #fafafa;
 }
 
 .settings-nav-item.active {
   background: rgba(139, 92, 246, 0.15);
-  color: #FAFAFA;
+  color: #fafafa;
   border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
@@ -90,12 +90,12 @@
 .settings-title {
   font-size: 24px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
 .settings-description {
   font-size: 14px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   margin-top: 8px;
 }
 ```
@@ -104,8 +104,8 @@
 
 ```css
 .settings-section {
-  background: #18181B;
-  border: 1px solid #27272A;
+  background: #18181b;
+  border: 1px solid #27272a;
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
@@ -121,12 +121,12 @@
 .settings-section-title {
   font-size: 16px;
   font-weight: 600;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
 .settings-section-description {
   font-size: 13px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   margin-top: 4px;
 }
 ```
@@ -146,30 +146,30 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #FAFAFA;
+  color: #fafafa;
   margin-bottom: 8px;
 }
 
 .settings-label-description {
   font-size: 13px;
-  color: #71717A;
+  color: #71717a;
   font-weight: 400;
   margin-top: 2px;
 }
 
 .settings-input {
   width: 100%;
-  background: #0F0F12;
-  border: 1px solid #3F3F46;
+  background: #0f0f12;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   padding: 10px 14px;
-  color: #FAFAFA;
+  color: #fafafa;
   font-size: 14px;
   transition: all 200ms ease;
 }
 
 .settings-input:focus {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
   outline: none;
 }
@@ -181,7 +181,7 @@
 
 .settings-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,..."); /* chevron icon */
+  background-image: url('data:image/svg+xml,...'); /* chevron icon */
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 40px;
@@ -196,7 +196,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 1px solid #27272A;
+  border-bottom: 1px solid #27272a;
 }
 
 .settings-toggle-row:last-child {
@@ -210,19 +210,19 @@
 .settings-toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
 .settings-toggle-description {
   font-size: 13px;
-  color: #71717A;
+  color: #71717a;
   margin-top: 2px;
 }
 
 .settings-switch {
   width: 44px;
   height: 24px;
-  background: #3F3F46;
+  background: #3f3f46;
   border-radius: 12px;
   position: relative;
   cursor: pointer;
@@ -230,7 +230,7 @@
 }
 
 .settings-switch.active {
-  background: #8B5CF6;
+  background: #8b5cf6;
 }
 
 .settings-switch::after {
@@ -238,7 +238,7 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background: #FAFAFA;
+  background: #fafafa;
   border-radius: 50%;
   top: 2px;
   left: 2px;
@@ -263,8 +263,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #0F0F12;
-  border: 1px solid #27272A;
+  background: #0f0f12;
+  border: 1px solid #27272a;
   border-radius: 8px;
   padding: 12px 16px;
 }
@@ -278,24 +278,24 @@
 .api-key-icon {
   width: 36px;
   height: 36px;
-  background: #18181B;
+  background: #18181b;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #A1A1AA;
+  color: #a1a1aa;
 }
 
 .api-key-name {
   font-size: 14px;
   font-weight: 500;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 
 .api-key-value {
   font-size: 13px;
   font-family: 'JetBrains Mono', monospace;
-  color: #71717A;
+  color: #71717a;
 }
 
 .api-key-actions {
@@ -306,7 +306,7 @@
 .api-key-btn {
   background: transparent;
   border: none;
-  color: #A1A1AA;
+  color: #a1a1aa;
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
@@ -314,13 +314,13 @@
 }
 
 .api-key-btn:hover {
-  background: #27272A;
-  color: #FAFAFA;
+  background: #27272a;
+  color: #fafafa;
 }
 
 .api-key-btn.delete:hover {
   background: rgba(239, 68, 68, 0.15);
-  color: #F87171;
+  color: #f87171;
 }
 ```
 
@@ -332,9 +332,9 @@
   align-items: center;
   gap: 8px;
   padding: 12px;
-  border: 2px dashed #3F3F46;
+  border: 2px dashed #3f3f46;
   border-radius: 8px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   font-size: 14px;
   cursor: pointer;
   transition: all 200ms ease;
@@ -343,8 +343,8 @@
 }
 
 .add-key-trigger:hover {
-  border-color: #8B5CF6;
-  color: #FAFAFA;
+  border-color: #8b5cf6;
+  color: #fafafa;
   background: rgba(139, 92, 246, 0.05);
 }
 ```
@@ -362,20 +362,20 @@
 .danger-zone-title {
   font-size: 16px;
   font-weight: 600;
-  color: #F87171;
+  color: #f87171;
   margin-bottom: 8px;
 }
 
 .danger-zone-description {
   font-size: 13px;
-  color: #A1A1AA;
+  color: #a1a1aa;
   margin-bottom: 16px;
 }
 
 .danger-btn {
   background: transparent;
-  border: 1px solid #EF4444;
-  color: #EF4444;
+  border: 1px solid #ef4444;
+  color: #ef4444;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
@@ -385,8 +385,8 @@
 }
 
 .danger-btn:hover {
-  background: #EF4444;
-  color: #FAFAFA;
+  background: #ef4444;
+  color: #fafafa;
 }
 ```
 
@@ -418,13 +418,13 @@ Settings Page
 
 ## Settings Navigation Items
 
-| Item | Icon | Path |
-|------|------|------|
-| Profile | `User` | `/settings/profile` |
-| Preferences | `Settings` | `/settings` |
-| API Keys | `Key` | `/settings/api-keys` |
-| Local LLM | `Cpu` | `/settings/local-llm` |
-| Billing | `CreditCard` | `/settings/billing` |
+| Item        | Icon         | Path                  |
+| ----------- | ------------ | --------------------- |
+| Profile     | `User`       | `/settings/profile`   |
+| Preferences | `Settings`   | `/settings`           |
+| API Keys    | `Key`        | `/settings/api-keys`  |
+| Local LLM   | `Cpu`        | `/settings/local-llm` |
+| Billing     | `CreditCard` | `/settings/billing`   |
 
 ---
 
@@ -436,12 +436,12 @@ Settings Page
   justify-content: flex-end;
   gap: 12px;
   padding-top: 24px;
-  border-top: 1px solid #27272A;
+  border-top: 1px solid #27272a;
   margin-top: 24px;
 }
 
 .settings-save-btn {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
   padding: 10px 24px;
   border-radius: 8px;
@@ -458,8 +458,8 @@ Settings Page
 
 .settings-cancel-btn {
   background: transparent;
-  border: 1px solid #3F3F46;
-  color: #FAFAFA;
+  border: 1px solid #3f3f46;
+  color: #fafafa;
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 500;
@@ -469,6 +469,6 @@ Settings Page
 }
 
 .settings-cancel-btn:hover {
-  background: #27272A;
+  background: #27272a;
 }
 ```

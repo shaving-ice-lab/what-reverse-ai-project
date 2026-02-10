@@ -37,9 +37,7 @@ npm install
 
 ```json
 {
-  "data": [
-    { "firstName": "John", "lastName": "Doe" }
-  ],
+  "data": [{ "firstName": "John", "lastName": "Doe" }],
   "operation": "map",
   "mapping": {
     "fullName": "firstName",
@@ -65,23 +63,23 @@ npm install
 
 ## 输入参数
 
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| data | json | 是 | 输入数据 |
-| operation | select | 是 | 操作类型 |
-| path | string | 否 | JSON 路径 |
-| mapping | json | 否 | 映射规则 |
-| filterExpression | string | 否 | 过滤表达式 |
-| sortField | string | 否 | 排序字段 |
-| sortOrder | select | 否 | 排序顺序 |
-| groupField | string | 否 | 分组字段 |
+| 参数             | 类型   | 必填 | 说明       |
+| ---------------- | ------ | ---- | ---------- |
+| data             | json   | 是   | 输入数据   |
+| operation        | select | 是   | 操作类型   |
+| path             | string | 否   | JSON 路径  |
+| mapping          | json   | 否   | 映射规则   |
+| filterExpression | string | 否   | 过滤表达式 |
+| sortField        | string | 否   | 排序字段   |
+| sortOrder        | select | 否   | 排序顺序   |
+| groupField       | string | 否   | 分组字段   |
 
 ## 输出
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| result | json | 转换结果 |
-| count | number | 数据量 |
+| 字段    | 类型    | 说明     |
+| ------- | ------- | -------- |
+| result  | json    | 转换结果 |
+| count   | number  | 数据量   |
 | success | boolean | 是否成功 |
 
 ## 许可证

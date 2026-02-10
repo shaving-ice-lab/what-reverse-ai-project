@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react'
 import {
   hasAnyWorkspacePermission,
   type WorkspacePermission,
   type WorkspacePermissionMap,
-} from "@/lib/permissions";
+} from '@/lib/permissions'
 
 interface PermissionGateProps {
-  permissions?: Partial<WorkspacePermissionMap>;
-  required: WorkspacePermission[];
-  requireAll?: boolean;
-  fallback?: ReactNode;
-  children: ReactNode;
+  permissions?: Partial<WorkspacePermissionMap>
+  required: WorkspacePermission[]
+  requireAll?: boolean
+  fallback?: ReactNode
+  children: ReactNode
 }
 
 export function PermissionGate({
@@ -22,11 +22,11 @@ export function PermissionGate({
 }: PermissionGateProps) {
   const allowed = requireAll
     ? required.every((permission) => Boolean(permissions?.[permission]))
-    : hasAnyWorkspacePermission(permissions, ...required);
+    : hasAnyWorkspacePermission(permissions, ...required)
 
   if (!allowed) {
-    return <>{fallback}</>;
+    return <>{fallback}</>
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 }

@@ -19,8 +19,8 @@
 
 ```css
 .auth-background {
-  background-color: #09090B;
-  background-image: 
+  background-color: #09090b;
+  background-image:
     radial-gradient(at 0% 0%, hsla(268, 90%, 55%, 0.2) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
     radial-gradient(at 50% 50%, hsla(268, 90%, 55%, 0.1) 0px, transparent 50%);
@@ -34,7 +34,7 @@
 .auth-card {
   background: rgba(24, 24, 27, 0.9);
   backdrop-filter: blur(16px);
-  border: 1px solid #27272A;
+  border: 1px solid #27272a;
   border-radius: 16px;
   padding: 32px;
   width: 100%;
@@ -52,24 +52,24 @@
 
 ```css
 .auth-input {
-  background: #0F0F12;
-  border: 1px solid #3F3F46;
+  background: #0f0f12;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   padding: 12px 16px;
-  color: #FAFAFA;
+  color: #fafafa;
   font-size: 14px;
   width: 100%;
 }
 
 .auth-input:focus {
-  border-color: #8B5CF6;
+  border-color: #8b5cf6;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .auth-label {
   font-size: 14px;
   font-weight: 500;
-  color: #FAFAFA;
+  color: #fafafa;
   margin-bottom: 8px;
 }
 ```
@@ -78,7 +78,7 @@
 
 ```css
 .auth-submit {
-  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
   width: 100%;
   padding: 12px 24px;
@@ -106,15 +106,15 @@
 
 ```css
 .social-btn {
-  background: #18181B;
-  border: 1px solid #3F3F46;
+  background: #18181b;
+  border: 1px solid #3f3f46;
   border-radius: 8px;
   padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #FAFAFA;
+  color: #fafafa;
   font-size: 14px;
   font-weight: 500;
   transition: all 200ms ease;
@@ -122,8 +122,8 @@
 }
 
 .social-btn:hover {
-  background: #27272A;
-  border-color: #52525B;
+  background: #27272a;
+  border-color: #52525b;
 }
 ```
 
@@ -134,7 +134,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  color: #71717A;
+  color: #71717a;
   font-size: 12px;
 }
 
@@ -143,7 +143,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #3F3F46;
+  background: #3f3f46;
 }
 ```
 
@@ -151,14 +151,14 @@
 
 ```css
 .auth-link {
-  color: #8B5CF6;
+  color: #8b5cf6;
   font-size: 14px;
   text-decoration: none;
   transition: color 150ms ease;
 }
 
 .auth-link:hover {
-  color: #A78BFA;
+  color: #a78bfa;
 }
 ```
 

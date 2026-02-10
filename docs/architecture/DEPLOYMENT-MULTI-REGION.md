@@ -43,17 +43,18 @@ This document defines the minimum viable multi-region strategy and the path to s
 
 ```yaml
 deployment:
-  region: "us-east-1"
-  primary_region: "us-east-1"
+  region: 'us-east-1'
+  primary_region: 'us-east-1'
   regions:
-    - "us-east-1"
-    - "eu-west-1"
+    - 'us-east-1'
+    - 'eu-west-1'
   region_base_urls:
-    us-east-1: "https://us-east-1.api.agentflow.ai"
-    eu-west-1: "https://eu-west-1.api.agentflow.ai"
+    us-east-1: 'https://us-east-1.api.agentflow.ai'
+    eu-west-1: 'https://eu-west-1.api.agentflow.ai'
 ```
 
 Notes:
+
 - `deployment.region` is the current running region.
 - `deployment.regions` is the list of supported regions.
 - `deployment.region_base_urls` is used for routing discovery.
@@ -66,4 +67,3 @@ Notes:
 - Configure region-specific environment variables.
 - Register the new region in DNS or edge router.
 - Validate `/api/v1/system/deployment` and `/api/v1/system/health`.
-

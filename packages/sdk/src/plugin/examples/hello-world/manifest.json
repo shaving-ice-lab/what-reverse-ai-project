@@ -13,10 +13,7 @@
   "keywords": ["example", "hello", "demo"],
   "license": "MIT",
   "main": "dist/index.js",
-  "permissions": [
-    "storage",
-    "notifications"
-  ],
+  "permissions": ["storage", "notifications"],
   "settings": [
     {
       "key": "greeting",
@@ -47,7 +44,5 @@
       }
     ]
   },
-  "activationEvents": [
-    "onCommand:hello-world.sayHello"
-  ]
+  "activationEvents": ["onCommand:hello-world.sayHello"]
 }

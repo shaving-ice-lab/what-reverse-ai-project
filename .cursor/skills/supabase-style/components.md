@@ -19,7 +19,7 @@ export function TopNav() {
             </svg>
             <span className="font-semibold text-foreground">App Name</span>
           </a>
-          
+
           {/* Breadcrumb / Project Selector */}
           <div className="hidden md:flex items-center gap-2 text-sm">
             <span className="text-foreground-muted">/</span>
@@ -62,7 +62,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  
+
   return (
     <aside className="w-56 border-r border-border bg-background-studio min-h-screen">
       <nav className="p-2 space-y-1">
@@ -73,19 +73,19 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
                 isActive
-                  ? "bg-surface-200 text-foreground"
-                  : "text-foreground-light hover:text-foreground hover:bg-surface-100"
+                  ? 'bg-surface-200 text-foreground'
+                  : 'text-foreground-light hover:text-foreground hover:bg-surface-100'
               )}
             >
-              <item.icon className={cn("w-4 h-4", isActive && "text-brand-500")} />
+              <item.icon className={cn('w-4 h-4', isActive && 'text-brand-500')} />
               {item.label}
             </a>
           )
         })}
       </nav>
-      
+
       {/* Bottom section */}
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
         <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-foreground-light hover:text-foreground hover:bg-surface-100 rounded-md">
@@ -112,28 +112,20 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export function Input({ label, description, error, className, ...props }: InputProps) {
   return (
     <div className="space-y-2">
-      {label && (
-        <label className="text-sm font-medium text-foreground-light">
-          {label}
-        </label>
-      )}
+      {label && <label className="text-sm font-medium text-foreground-light">{label}</label>}
       <input
         className={cn(
-          "flex h-10 w-full rounded-md border bg-surface-200 px-3 py-2 text-sm text-foreground",
-          "placeholder:text-foreground-muted",
-          "focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-0 focus:border-brand-500",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          error ? "border-destructive-400" : "border-border",
+          'flex h-10 w-full rounded-md border bg-surface-200 px-3 py-2 text-sm text-foreground',
+          'placeholder:text-foreground-muted',
+          'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-0 focus:border-brand-500',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          error ? 'border-destructive-400' : 'border-border',
           className
         )}
         {...props}
       />
-      {description && !error && (
-        <p className="text-xs text-foreground-muted">{description}</p>
-      )}
-      {error && (
-        <p className="text-xs text-destructive-400">{error}</p>
-      )}
+      {description && !error && <p className="text-xs text-foreground-muted">{description}</p>}
+      {error && <p className="text-xs text-destructive-400">{error}</p>}
     </div>
   )
 }
@@ -145,9 +137,7 @@ export function Input({ label, description, error, className, ...props }: InputP
 export function Select({ label, options, ...props }) {
   return (
     <div className="space-y-2">
-      {label && (
-        <label className="text-sm font-medium text-foreground-light">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-foreground-light">{label}</label>}
       <div className="relative">
         <select
           className="flex h-10 w-full appearance-none rounded-md border border-border bg-surface-200 px-3 py-2 pr-10 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
@@ -172,9 +162,7 @@ export function Select({ label, options, ...props }) {
 export function Textarea({ label, ...props }) {
   return (
     <div className="space-y-2">
-      {label && (
-        <label className="text-sm font-medium text-foreground-light">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-foreground-light">{label}</label>}
       <textarea
         className="flex min-h-[120px] w-full rounded-md border border-border bg-surface-200 px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none"
         {...props}
@@ -195,14 +183,14 @@ export function Toggle({ checked, onChange, label }) {
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors",
-          checked ? "bg-brand-500" : "bg-surface-300"
+          'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors',
+          checked ? 'bg-brand-500' : 'bg-surface-300'
         )}
       >
         <span
           className={cn(
-            "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transition-transform",
-            checked ? "translate-x-5" : "translate-x-0"
+            'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transition-transform',
+            checked ? 'translate-x-5' : 'translate-x-0'
           )}
         />
       </button>
@@ -223,10 +211,10 @@ export function Checkbox({ checked, onChange, label }) {
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={cn(
-          "flex h-4 w-4 items-center justify-center rounded border transition-colors",
+          'flex h-4 w-4 items-center justify-center rounded border transition-colors',
           checked
-            ? "bg-brand-500 border-brand-500"
-            : "border-border-strong bg-surface-200 hover:border-foreground-muted"
+            ? 'bg-brand-500 border-brand-500'
+            : 'border-border-strong bg-surface-200 hover:border-foreground-muted'
         )}
       >
         {checked && <Check className="h-3 w-3 text-background" />}
@@ -244,7 +232,7 @@ export function Checkbox({ checked, onChange, label }) {
 ```tsx
 export function StatsCard({ title, value, change, icon: Icon }) {
   const isPositive = change >= 0
-  
+
   return (
     <div className="bg-surface-100 border border-border rounded-lg p-6">
       <div className="flex items-center justify-between">
@@ -253,11 +241,14 @@ export function StatsCard({ title, value, change, icon: Icon }) {
       </div>
       <div className="mt-2 flex items-baseline gap-2">
         <p className="text-2xl font-semibold text-foreground">{value}</p>
-        <span className={cn(
-          "text-sm font-medium",
-          isPositive ? "text-brand-500" : "text-destructive-400"
-        )}>
-          {isPositive ? '+' : ''}{change}%
+        <span
+          className={cn(
+            'text-sm font-medium',
+            isPositive ? 'text-brand-500' : 'text-destructive-400'
+          )}
+        >
+          {isPositive ? '+' : ''}
+          {change}%
         </span>
       </div>
     </div>
@@ -286,15 +277,9 @@ export function DataTable({ columns, data }) {
         </thead>
         <tbody className="divide-y divide-border">
           {data.map((row, i) => (
-            <tr
-              key={i}
-              className="bg-background-200 hover:bg-surface-100 transition-colors"
-            >
+            <tr key={i} className="bg-background-200 hover:bg-surface-100 transition-colors">
               {columns.map((col) => (
-                <td
-                  key={col.key}
-                  className="px-4 py-3 text-sm text-foreground"
-                >
+                <td key={col.key} className="px-4 py-3 text-sm text-foreground">
                   {col.render ? col.render(row[col.key], row) : row[col.key]}
                 </td>
               ))}
@@ -352,17 +337,12 @@ export function Toast({ type = 'info', title, message, onClose }) {
     <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-surface-100 border border-border shadow-lg animate-slide-in">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <Icon className={cn("h-5 w-5 mt-0.5", colors[type])} />
+          <Icon className={cn('h-5 w-5 mt-0.5', colors[type])} />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground">{title}</p>
-            {message && (
-              <p className="mt-1 text-sm text-foreground-light">{message}</p>
-            )}
+            {message && <p className="mt-1 text-sm text-foreground-light">{message}</p>}
           </div>
-          <button
-            onClick={onClose}
-            className="text-foreground-muted hover:text-foreground"
-          >
+          <button onClick={onClose} className="text-foreground-muted hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -383,11 +363,7 @@ export function Alert({ type = 'info', children }) {
     error: 'bg-destructive-200 border-destructive-400 text-destructive-400',
   }
 
-  return (
-    <div className={cn("rounded-md border p-4 text-sm", styles[type])}>
-      {children}
-    </div>
-  )
+  return <div className={cn('rounded-md border p-4 text-sm', styles[type])}>{children}</div>
 }
 ```
 
@@ -403,19 +379,12 @@ export function Spinner({ size = 'md' }) {
 
   return (
     <svg
-      className={cn("animate-spin text-brand-500", sizes[size])}
+      className={cn('animate-spin text-brand-500', sizes[size])}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -439,10 +408,12 @@ export function Badge({ variant = 'default', children }) {
   }
 
   return (
-    <span className={cn(
-      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-      variants[variant]
-    )}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+        variants[variant]
+      )}
+    >
       {children}
     </span>
   )
@@ -460,29 +431,21 @@ export function Modal({ open, onClose, title, children, footer }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80"
-        onClick={onClose}
-      />
-      
+      <div className="absolute inset-0 bg-black/80" onClick={onClose} />
+
       {/* Content */}
       <div className="relative bg-surface-100 border border-border rounded-lg w-full max-w-lg shadow-2xl animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-lg font-medium text-foreground">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-foreground-muted hover:text-foreground"
-          >
+          <button onClick={onClose} className="text-foreground-muted hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         {/* Body */}
-        <div className="px-6 py-4">
-          {children}
-        </div>
-        
+        <div className="px-6 py-4">{children}</div>
+
         {/* Footer */}
         {footer && (
           <div className="flex justify-end gap-3 px-6 py-4 border-t border-border bg-surface-75">
@@ -503,18 +466,13 @@ export function DropdownMenu({ trigger, items }) {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)}>
-        {trigger}
-      </button>
-      
+      <button onClick={() => setOpen(!open)}>{trigger}</button>
+
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 mt-2 w-56 z-50 bg-surface-100 border border-border rounded-md shadow-lg py-1 animate-fade-in">
-            {items.map((item, i) => (
+            {items.map((item, i) =>
               item.separator ? (
                 <div key={i} className="my-1 border-t border-border" />
               ) : (
@@ -525,15 +483,15 @@ export function DropdownMenu({ trigger, items }) {
                     setOpen(false)
                   }}
                   className={cn(
-                    "w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground-light hover:text-foreground hover:bg-surface-200",
-                    item.destructive && "text-destructive-400 hover:text-destructive"
+                    'w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground-light hover:text-foreground hover:bg-surface-200',
+                    item.destructive && 'text-destructive-400 hover:text-destructive'
                   )}
                 >
                   {item.icon && <item.icon className="w-4 h-4" />}
                   {item.label}
                 </button>
               )
-            ))}
+            )}
           </div>
         </>
       )}

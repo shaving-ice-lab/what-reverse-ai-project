@@ -1,43 +1,43 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from '@playwright/test'
 
 const user = {
-  id: "user_1",
-  email: "test@example.com",
-  username: "tester",
-  role: "admin",
+  id: 'user_1',
+  email: 'test@example.com',
+  username: 'tester',
+  role: 'admin',
   emailVerified: true,
-  createdAt: "2026-02-01T10:00:00Z",
-  updatedAt: "2026-02-02T10:00:00Z",
-};
+  createdAt: '2026-02-01T10:00:00Z',
+  updatedAt: '2026-02-02T10:00:00Z',
+}
 
 const respondOk = (data: unknown) => ({
   status: 200,
-  contentType: "application/json",
-  body: JSON.stringify({ code: "OK", message: "OK", data }),
-});
+  contentType: 'application/json',
+  body: JSON.stringify({ code: 'OK', message: 'OK', data }),
+})
 
 async function mockApiRoutes(page: Page) {
-  await page.route("**/api/v1/**", async (route) => {
-    const request = route.request();
-    const url = new URL(request.url());
-    const path = url.pathname;
-    const method = request.method();
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request()
+    const url = new URL(request.url())
+    const path = url.pathname
+    const method = request.method()
 
-    if (path === "/api/v1/auth/login" && method === "POST") {
+    if (path === '/api/v1/auth/login' && method === 'POST') {
       return route.fulfill(
         respondOk({
-          access_token: "test-token",
-          refresh_token: "test-refresh",
+          access_token: 'test-token',
+          refresh_token: 'test-refresh',
           user,
         })
-      );
+      )
     }
 
-    if (path === "/api/v1/users/me") {
-      return route.fulfill(respondOk(user));
+    if (path === '/api/v1/users/me') {
+      return route.fulfill(respondOk(user))
     }
 
-    if (path === "/api/v1/workspaces" && method === "GET") {
+    if (path === '/api/v1/workspaces' && method === 'GET') {
       return route.fulfill(
         respondOk({
           items: [],
@@ -45,22 +45,22 @@ async function mockApiRoutes(page: Page) {
           page: 1,
           page_size: 20,
         })
-      );
+      )
     }
 
-    return route.fulfill(respondOk({}));
-  });
+    return route.fulfill(respondOk({}))
+  })
 }
 
-test("login redirects to requested page", async ({ page }) => {
-  await mockApiRoutes(page);
+test('login redirects to requested page', async ({ page }) => {
+  await mockApiRoutes(page)
 
-  await page.goto("/login?redirect=/workspaces");
-  await page.getByPlaceholder("Please enteryouelectricchildemailAddress").fill("test@example.com");
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByPlaceholder("InputPassword").fill("password123");
-  await page.getByRole("button", { name: "Sign In" }).click();
+  await page.goto('/login?redirect=/workspaces')
+  await page.getByPlaceholder('Please enteryouelectricchildemailAddress').fill('test@example.com')
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByPlaceholder('InputPassword').fill('password123')
+  await page.getByRole('button', { name: 'Sign In' }).click()
 
-  await expect(page).toHaveURL(/\/workspaces$/);
-  await expect(page.getByRole("button", { name: "CreateWorkspace" })).toBeVisible();
-});
+  await expect(page).toHaveURL(/\/workspaces$/)
+  await expect(page.getByRole('button', { name: 'CreateWorkspace' })).toBeVisible()
+})

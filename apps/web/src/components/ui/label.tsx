@@ -1,48 +1,49 @@
-"use client"
+'use client'
 
 /**
  * Label TagsComponent - Minimalist Style
  */
 
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import * as LabelPrimitive from '@radix-ui/react-label'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 
 const labelVariants = cva(
   cn(
-    "text-[13px] font-medium leading-none",
-    "text-foreground",
-    "peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+    'text-[13px] font-medium leading-none',
+    'text-foreground',
+    'peer-disabled:cursor-not-allowed peer-disabled:opacity-50'
   ),
   {
     variants: {
       variant: {
-        default: "",
+        default: '',
         required: "after:content-['*'] after:ml-0.5 after:text-destructive",
- optional: "after:content-['(Optional)'] after:ml-1 after:text-[11px] after:text-foreground-muted after:font-normal",
+        optional:
+          "after:content-['(Optional)'] after:ml-1 after:text-[11px] after:text-foreground-muted after:font-normal",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: 'default',
     },
   }
 )
 
 export interface LabelProps
-  extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>,
+  extends
+    React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>,
     VariantProps<typeof labelVariants> {}
 
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  LabelProps
->(({ className, variant, ...props }, ref) => (
-  <LabelPrimitive.Root
-    ref={ref}
-    className={cn(labelVariants({ variant }), className)}
-    {...props}
-  />
-))
+const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
+  ({ className, variant, ...props }, ref) => (
+    <LabelPrimitive.Root
+      ref={ref}
+      className={cn(labelVariants({ variant }), className)}
+      {...props}
+    />
+  )
+)
 Label.displayName = LabelPrimitive.Root.displayName
 
 export { Label, labelVariants }

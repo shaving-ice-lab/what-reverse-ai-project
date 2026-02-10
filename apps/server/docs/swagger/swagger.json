@@ -236,7 +236,13 @@
         "tags": ["Workflows"],
         "summary": "获取工作流详情",
         "parameters": [
-          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true }
+          {
+            "type": "string",
+            "description": "工作流 ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
         ],
         "responses": {
           "200": {
@@ -255,7 +261,13 @@
         "tags": ["Workflows"],
         "summary": "更新工作流",
         "parameters": [
-          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true },
+          {
+            "type": "string",
+            "description": "工作流 ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
           {
             "description": "工作流信息",
             "name": "request",
@@ -282,7 +294,13 @@
         "tags": ["Workflows"],
         "summary": "删除工作流",
         "parameters": [
-          { "type": "string", "description": "工作流 ID", "name": "id", "in": "path", "required": true }
+          {
+            "type": "string",
+            "description": "工作流 ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
         ],
         "responses": {
           "200": {
@@ -336,7 +354,13 @@
         "tags": ["Agents"],
         "summary": "获取 Agent 详情",
         "parameters": [
-          { "type": "string", "description": "Agent Slug", "name": "slug", "in": "path", "required": true }
+          {
+            "type": "string",
+            "description": "Agent Slug",
+            "name": "slug",
+            "in": "path",
+            "required": true
+          }
         ],
         "responses": {
           "200": {

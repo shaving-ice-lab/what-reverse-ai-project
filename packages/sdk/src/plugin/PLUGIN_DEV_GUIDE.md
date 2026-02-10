@@ -71,28 +71,28 @@ npm install @agentflow/sdk typescript tsup --save-dev
 创建 `src/index.ts`:
 
 ```typescript
-import type { PluginContext, PluginAPI, PluginModule } from '@agentflow/sdk/plugin';
+import type { PluginContext, PluginAPI, PluginModule } from '@agentflow/sdk/plugin'
 
 export async function activate(context: PluginContext, api: PluginAPI): Promise<void> {
-  context.log.info('插件已激活');
-  
+  context.log.info('插件已激活')
+
   // 注册命令
   const disposable = api.commands.registerCommand('my-plugin.hello', async () => {
     api.ui.showNotification({
       message: 'Hello from My Plugin!',
-      type: 'success'
-    });
-  });
-  
-  context.subscriptions.push(disposable);
+      type: 'success',
+    })
+  })
+
+  context.subscriptions.push(disposable)
 }
 
 export async function deactivate(): Promise<void> {
-  console.log('插件已停用');
+  console.log('插件已停用')
 }
 
-const plugin: PluginModule = { activate, deactivate };
-export default plugin;
+const plugin: PluginModule = { activate, deactivate }
+export default plugin
 ```
 
 ### 5. 构建并测试
@@ -130,31 +130,31 @@ my-plugin/
 
 ### 必填字段
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `manifestVersion` | number | 清单版本，当前为 `1` |
-| `id` | string | 唯一标识符，小写字母、数字、连字符 |
-| `name` | string | 显示名称 |
-| `version` | string | 语义化版本号 (x.y.z) |
-| `description` | string | 简短描述 |
-| `author` | object | 作者信息 |
-| `category` | string | 分类 |
-| `main` | string | 入口文件路径 |
+| 字段              | 类型   | 说明                               |
+| ----------------- | ------ | ---------------------------------- |
+| `manifestVersion` | number | 清单版本，当前为 `1`               |
+| `id`              | string | 唯一标识符，小写字母、数字、连字符 |
+| `name`            | string | 显示名称                           |
+| `version`         | string | 语义化版本号 (x.y.z)               |
+| `description`     | string | 简短描述                           |
+| `author`          | object | 作者信息                           |
+| `category`        | string | 分类                               |
+| `main`            | string | 入口文件路径                       |
 
 ### 可选字段
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `icon` | string | 图标名称或路径 |
-| `keywords` | string[] | 搜索关键词 |
-| `license` | string | 许可证 |
-| `repository` | string | 仓库地址 |
-| `permissions` | string[] | 所需权限 |
-| `nodes` | array | 自定义节点 |
-| `settings` | array | 插件设置 |
-| `contributes` | object | 贡献点 |
-| `activationEvents` | string[] | 激活事件 |
-| `dependencies` | array | 依赖的其他插件 |
+| 字段               | 类型     | 说明           |
+| ------------------ | -------- | -------------- |
+| `icon`             | string   | 图标名称或路径 |
+| `keywords`         | string[] | 搜索关键词     |
+| `license`          | string   | 许可证         |
+| `repository`       | string   | 仓库地址       |
+| `permissions`      | string[] | 所需权限       |
+| `nodes`            | array    | 自定义节点     |
+| `settings`         | array    | 插件设置       |
+| `contributes`      | object   | 贡献点         |
+| `activationEvents` | string[] | 激活事件       |
+| `dependencies`     | array    | 依赖的其他插件 |
 
 ### 分类列表
 
@@ -188,11 +188,7 @@ my-plugin/
   "license": "MIT",
   "repository": "https://github.com/agentflow/advanced-http",
   "main": "dist/index.js",
-  "permissions": [
-    "network",
-    "storage",
-    "notifications"
-  ],
+  "permissions": ["network", "storage", "notifications"],
   "nodes": [
     {
       "id": "http-request-advanced",
@@ -229,10 +225,7 @@ my-plugin/
       }
     ]
   },
-  "activationEvents": [
-    "onCommand:advanced-http.testEndpoint",
-    "onNode:http-request-advanced"
-  ],
+  "activationEvents": ["onCommand:advanced-http.testEndpoint", "onNode:http-request-advanced"],
   "minAppVersion": "1.0.0"
 }
 ```
@@ -247,11 +240,11 @@ my-plugin/
 
 ```typescript
 interface PluginContext {
-  pluginId: string;           // 插件 ID
-  version: string;            // 插件版本
-  extensionPath: string;      // 插件安装路径
-  log: PluginLogger;          // 日志器
-  subscriptions: Disposable[]; // 订阅列表（自动清理）
+  pluginId: string // 插件 ID
+  version: string // 插件版本
+  extensionPath: string // 插件安装路径
+  log: PluginLogger // 日志器
+  subscriptions: Disposable[] // 订阅列表（自动清理）
 }
 ```
 
@@ -261,32 +254,32 @@ interface PluginContext {
 // 注册命令
 const disposable = api.commands.registerCommand('my-plugin.doSomething', async (args) => {
   // 命令逻辑
-});
+})
 
 // 执行命令
-await api.commands.executeCommand('other-plugin.action', { data: 123 });
+await api.commands.executeCommand('other-plugin.action', { data: 123 })
 
 // 获取所有命令
-const commands = api.commands.getCommands();
+const commands = api.commands.getCommands()
 ```
 
 ### Storage API
 
 ```typescript
 // 存储数据
-await api.storage.set('myKey', { count: 1 });
+await api.storage.set('myKey', { count: 1 })
 
 // 读取数据
-const data = await api.storage.get<{ count: number }>('myKey');
+const data = await api.storage.get<{ count: number }>('myKey')
 
 // 删除数据
-await api.storage.delete('myKey');
+await api.storage.delete('myKey')
 
 // 清空存储
-await api.storage.clear();
+await api.storage.clear()
 
 // 获取所有键
-const keys = await api.storage.keys();
+const keys = await api.storage.keys()
 ```
 
 ### UI API
@@ -295,62 +288,65 @@ const keys = await api.storage.keys();
 // 显示通知
 api.ui.showNotification({
   message: '操作成功',
-  type: 'success',  // 'info' | 'success' | 'warning' | 'error'
-  duration: 3000
-});
+  type: 'success', // 'info' | 'success' | 'warning' | 'error'
+  duration: 3000,
+})
 
 // 显示消息
-api.ui.showMessage('这是一条消息', 'info');
+api.ui.showMessage('这是一条消息', 'info')
 
 // 快速选择
-const selected = await api.ui.showQuickPick([
-  { label: '选项1', description: '描述1' },
-  { label: '选项2', description: '描述2' }
-], {
-  title: '请选择',
-  placeholder: '搜索...'
-});
+const selected = await api.ui.showQuickPick(
+  [
+    { label: '选项1', description: '描述1' },
+    { label: '选项2', description: '描述2' },
+  ],
+  {
+    title: '请选择',
+    placeholder: '搜索...',
+  }
+)
 
 // 输入框
 const input = await api.ui.showInputBox({
   title: '输入名称',
   placeholder: '请输入...',
   validateInput: (value) => {
-    if (value.length < 3) return '至少3个字符';
-    return undefined;
-  }
-});
+    if (value.length < 3) return '至少3个字符'
+    return undefined
+  },
+})
 
 // 状态栏项
 const statusBar = api.ui.createStatusBarItem({
   text: '$(sync~spin) 处理中...',
-  tooltip: '正在处理数据'
-});
-statusBar.show();
+  tooltip: '正在处理数据',
+})
+statusBar.show()
 // 完成后
-statusBar.hide();
-statusBar.dispose();
+statusBar.hide()
+statusBar.dispose()
 ```
 
 ### Workflows API
 
 ```typescript
 // 获取工作流列表
-const workflows = await api.workflows.list();
+const workflows = await api.workflows.list()
 
 // 获取单个工作流
-const workflow = await api.workflows.get('workflow-id');
+const workflow = await api.workflows.get('workflow-id')
 
 // 创建工作流
 const newWorkflow = await api.workflows.create({
   name: '新工作流',
-  description: '由插件创建'
-});
+  description: '由插件创建',
+})
 
 // 执行工作流
 const execution = await api.workflows.execute('workflow-id', {
-  input: { data: 'value' }
-});
+  input: { data: 'value' },
+})
 ```
 
 ### Events API
@@ -358,16 +354,16 @@ const execution = await api.workflows.execute('workflow-id', {
 ```typescript
 // 订阅事件
 const disposable = api.events.on('workflow:executed', (data) => {
-  console.log('工作流执行完成:', data);
-});
+  console.log('工作流执行完成:', data)
+})
 
 // 发送事件
-api.events.emit('my-plugin:customEvent', { payload: 'data' });
+api.events.emit('my-plugin:customEvent', { payload: 'data' })
 
 // 一次性监听
 api.events.once('app:ready', () => {
-  console.log('应用已就绪');
-});
+  console.log('应用已就绪')
+})
 ```
 
 ---
@@ -376,23 +372,23 @@ api.events.once('app:ready', () => {
 
 ### 权限列表
 
-| 权限 | 级别 | 说明 |
-|------|------|------|
-| `storage` | 安全 | 本地存储访问 |
-| `notifications` | 安全 | 发送通知 |
-| `ui:sidebar` | 安全 | 侧边栏 UI |
-| `ui:toolbar` | 安全 | 工具栏按钮 |
-| `ui:panel` | 安全 | 创建面板 |
-| `ui:modal` | 安全 | 显示对话框 |
-| `network` | 敏感 | HTTP 请求 |
-| `clipboard` | 敏感 | 剪贴板访问 |
-| `env` | 敏感 | 环境变量 |
-| `api:workflows` | 敏感 | 工作流 API |
-| `api:executions` | 敏感 | 执行 API |
-| `api:users` | 敏感 | 用户 API |
-| `secrets` | 危险 | 密钥访问 |
-| `filesystem` | 危险 | 文件系统 |
-| `shell` | 危险 | Shell 命令 |
+| 权限             | 级别 | 说明         |
+| ---------------- | ---- | ------------ |
+| `storage`        | 安全 | 本地存储访问 |
+| `notifications`  | 安全 | 发送通知     |
+| `ui:sidebar`     | 安全 | 侧边栏 UI    |
+| `ui:toolbar`     | 安全 | 工具栏按钮   |
+| `ui:panel`       | 安全 | 创建面板     |
+| `ui:modal`       | 安全 | 显示对话框   |
+| `network`        | 敏感 | HTTP 请求    |
+| `clipboard`      | 敏感 | 剪贴板访问   |
+| `env`            | 敏感 | 环境变量     |
+| `api:workflows`  | 敏感 | 工作流 API   |
+| `api:executions` | 敏感 | 执行 API     |
+| `api:users`      | 敏感 | 用户 API     |
+| `secrets`        | 危险 | 密钥访问     |
+| `filesystem`     | 危险 | 文件系统     |
+| `shell`          | 危险 | Shell 命令   |
 
 ### 权限请求
 
@@ -405,6 +401,7 @@ api.events.once('app:ready', () => {
 ```
 
 **注意**：
+
 - 安全级别权限自动授予
 - 敏感级别权限需要用户确认
 - 危险级别权限需要特殊审批
@@ -416,7 +413,7 @@ api.events.once('app:ready', () => {
 ### 节点定义
 
 ```typescript
-import { defineNode, input, output } from '@agentflow/sdk';
+import { defineNode, input, output } from '@agentflow/sdk'
 
 export const myNode = defineNode({
   id: 'my-plugin.transform',
@@ -424,40 +421,42 @@ export const myNode = defineNode({
   description: '转换输入数据',
   category: 'data',
   version: '1.0.0',
-  
+
   inputs: {
     data: input.string().required().description('输入数据'),
-    format: input.select({
-      options: [
-        { value: 'json', label: 'JSON' },
-        { value: 'xml', label: 'XML' }
-      ]
-    }).default('json')
+    format: input
+      .select({
+        options: [
+          { value: 'json', label: 'JSON' },
+          { value: 'xml', label: 'XML' },
+        ],
+      })
+      .default('json'),
   },
-  
+
   outputs: {
     result: output.object().description('转换结果'),
-    error: output.string().optional()
+    error: output.string().optional(),
   },
-  
+
   async execute(inputs, context) {
-    context.log.info('开始转换数据');
-    context.reportProgress(0, '解析中...');
-    
+    context.log.info('开始转换数据')
+    context.reportProgress(0, '解析中...')
+
     try {
       // 转换逻辑
-      const result = transform(inputs.data, inputs.format);
-      
-      context.reportProgress(100, '完成');
-      return { result };
+      const result = transform(inputs.data, inputs.format)
+
+      context.reportProgress(100, '完成')
+      return { result }
     } catch (error) {
-      return { 
-        result: null, 
-        error: error.message 
-      };
+      return {
+        result: null,
+        error: error.message,
+      }
     }
-  }
-});
+  },
+})
 ```
 
 ### 在 Manifest 中注册
@@ -550,23 +549,23 @@ export const myNode = defineNode({
 ### 单元测试
 
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { createTestContext, NodeTester, assert } from '@agentflow/sdk/testing';
-import { myNode } from './nodes/transform';
+import { describe, it, expect } from 'vitest'
+import { createTestContext, NodeTester, assert } from '@agentflow/sdk/testing'
+import { myNode } from './nodes/transform'
 
 describe('Transform Node', () => {
   it('should transform JSON data', async () => {
-    const tester = new NodeTester(myNode);
-    
+    const tester = new NodeTester(myNode)
+
     const result = await tester.execute({
       data: '{"name": "test"}',
-      format: 'json'
-    });
-    
-    assert.success(result);
-    assert.outputEquals(result, 'result', { name: 'test' });
-  });
-});
+      format: 'json',
+    })
+
+    assert.success(result)
+    assert.outputEquals(result, 'result', { name: 'test' })
+  })
+})
 ```
 
 ### 本地调试
@@ -617,13 +616,13 @@ agentflow plugin publish
 
 ```typescript
 try {
-  await riskyOperation();
+  await riskyOperation()
 } catch (error) {
-  context.log.error('操作失败', error);
+  context.log.error('操作失败', error)
   api.ui.showNotification({
     message: '操作失败，请重试',
-    type: 'error'
-  });
+    type: 'error',
+  })
 }
 ```
 
@@ -635,7 +634,7 @@ export async function activate(context: PluginContext, api: PluginAPI) {
   context.subscriptions.push(
     api.commands.registerCommand('...', () => {}),
     api.events.on('...', () => {})
-  );
+  )
 }
 
 // deactivate 时自动清理

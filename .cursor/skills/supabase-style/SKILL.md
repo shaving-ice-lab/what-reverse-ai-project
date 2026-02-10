@@ -10,6 +10,7 @@ description: Transform web pages to match Supabase's design system. Applies Supa
 ## 核心设计理念
 
 Supabase 的设计语言特点：
+
 - **深色优先**：以深绿灰色为基调的暗色主题
 - **层次分明**：通过 surface 层级创造视觉深度
 - **品牌绿色点缀**：`#3ECF8E` 作为主要强调色
@@ -51,9 +52,9 @@ const config: Config = {
         },
         // Background Surfaces
         background: {
-          DEFAULT: '#171717',     // bg
-          200: '#1c1c1c',         // bg-200
-          studio: '#0f0f0f',      // bg-studio (dashboard)
+          DEFAULT: '#171717', // bg
+          200: '#1c1c1c', // bg-200
+          studio: '#0f0f0f', // bg-studio (dashboard)
           alternative: '#0a0a0a', // bg-alternative
         },
         surface: {
@@ -65,10 +66,10 @@ const config: Config = {
         },
         // Text Colors
         foreground: {
-          DEFAULT: '#ededed',     // text
-          light: '#a3a3a3',       // text-light
-          lighter: '#6b6b6b',     // text-lighter
-          muted: '#525252',       // text-muted
+          DEFAULT: '#ededed', // text
+          light: '#a3a3a3', // text-light
+          lighter: '#6b6b6b', // text-lighter
+          muted: '#525252', // text-muted
         },
         // Borders
         border: {
@@ -141,7 +142,9 @@ export default config
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 ```
@@ -253,9 +256,7 @@ export default config
     <h2 className="text-lg font-medium text-foreground mb-4">Dialog Title</h2>
     <p className="text-foreground-light mb-6">Dialog content goes here.</p>
     <div className="flex justify-end gap-3">
-      <button className="px-4 py-2 text-foreground-light hover:text-foreground">
-        Cancel
-      </button>
+      <button className="px-4 py-2 text-foreground-light hover:text-foreground">Cancel</button>
       <button className="bg-brand-500 hover:bg-brand-600 text-background px-4 py-2 rounded-md">
         Confirm
       </button>
@@ -274,18 +275,16 @@ export default config
   <header className="h-14 border-b border-border bg-background-studio flex items-center px-4">
     <Logo />
   </header>
-  
+
   <div className="flex">
     {/* Sidebar */}
     <aside className="w-64 border-r border-border min-h-[calc(100vh-3.5rem)]">
       {/* nav items */}
     </aside>
-    
+
     {/* Main Content */}
     <main className="flex-1 p-6">
-      <div className="max-w-5xl mx-auto">
-        {/* page content */}
-      </div>
+      <div className="max-w-5xl mx-auto">{/* page content */}</div>
     </main>
   </div>
 </div>
@@ -294,37 +293,37 @@ export default config
 ### 内容面板
 
 ```tsx
-{/* 分层面板 */}
-<div className="bg-surface-75 border border-border-muted rounded-lg">
+{
+  /* 分层面板 */
+}
+;<div className="bg-surface-75 border border-border-muted rounded-lg">
   <div className="px-6 py-4 border-b border-border">
     <h3 className="font-medium text-foreground">Panel Title</h3>
   </div>
-  <div className="p-6">
-    {/* Panel content */}
-  </div>
+  <div className="p-6">{/* Panel content */}</div>
 </div>
 ```
 
 ## 常用间距规范
 
-| 用途 | 值 |
-|------|-----|
-| 组件内部 padding | `p-4` / `p-6` |
-| 元素间距 | `gap-2` / `gap-4` |
-| 段落间距 | `space-y-4` |
-| 页面边距 | `px-6 py-8` |
-| 卡片间距 | `gap-6` |
+| 用途             | 值                |
+| ---------------- | ----------------- |
+| 组件内部 padding | `p-4` / `p-6`     |
+| 元素间距         | `gap-2` / `gap-4` |
+| 段落间距         | `space-y-4`       |
+| 页面边距         | `px-6 py-8`       |
+| 卡片间距         | `gap-6`           |
 
 ## 文字规范
 
-| 类型 | 样式 |
-|------|------|
-| 页面标题 | `text-2xl font-semibold text-foreground` |
-| 区块标题 | `text-lg font-medium text-foreground` |
-| 正文 | `text-sm text-foreground-light` |
-| 辅助文字 | `text-xs text-foreground-muted` |
-| 代码 | `font-mono text-sm bg-surface-200 px-1.5 py-0.5 rounded` |
-| 链接 | `text-brand-500 hover:text-brand-600 underline-offset-4` |
+| 类型     | 样式                                                     |
+| -------- | -------------------------------------------------------- |
+| 页面标题 | `text-2xl font-semibold text-foreground`                 |
+| 区块标题 | `text-lg font-medium text-foreground`                    |
+| 正文     | `text-sm text-foreground-light`                          |
+| 辅助文字 | `text-xs text-foreground-muted`                          |
+| 代码     | `font-mono text-sm bg-surface-200 px-1.5 py-0.5 rounded` |
+| 链接     | `text-brand-500 hover:text-brand-600 underline-offset-4` |
 
 ## 动画效果
 
@@ -341,8 +340,14 @@ export default config
 
 /* 淡入效果 */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {

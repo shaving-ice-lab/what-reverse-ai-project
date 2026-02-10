@@ -3,454 +3,442 @@
  * @description Tests workflow execution engine performance
  */
 
-import { describe, it, expect } from 'vitest';
-import { benchmark, createPerformanceSuite, formatPerformanceReport } from './utils';
+import { describe, it, expect } from 'vitest'
+import { benchmark, createPerformanceSuite, formatPerformanceReport } from './utils'
 
 /**
  * Mock node execution
  */
 async function simulateNodeExecution(
- type: string,
- delayMs: number = 0
+  type: string,
+  delayMs: number = 0
 ): Promise<{ output: unknown; duration: number }> {
- const start = performance.now();
- 
- // Mock different node type processing times
- if (delayMs > 0) {
- await new Promise(resolve => setTimeout(resolve, delayMs));
- }
+  const start = performance.now()
 
- // Mock computation
- let result: unknown;
- switch (type) {
- case 'transform':
- result = Array.from({ length: 1000 }, (_, i) => i * 2);
- break;
- case 'filter':
- result = Array.from({ length: 1000 }, (_, i) => i).filter(x => x % 2 === 0);
- break;
- case 'aggregate':
- result = Array.from({ length: 1000 }, (_, i) => i).reduce((a, b) => a + b, 0);
- break;
- default:
- result = { type, timestamp: Date.now() };
- }
+  // Mock different node type processing times
+  if (delayMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs))
+  }
 
- return {
- output: result,
- duration: performance.now() - start,
- };
+  // Mock computation
+  let result: unknown
+  switch (type) {
+    case 'transform':
+      result = Array.from({ length: 1000 }, (_, i) => i * 2)
+      break
+    case 'filter':
+      result = Array.from({ length: 1000 }, (_, i) => i).filter((x) => x % 2 === 0)
+      break
+    case 'aggregate':
+      result = Array.from({ length: 1000 }, (_, i) => i).reduce((a, b) => a + b, 0)
+      break
+    default:
+      result = { type, timestamp: Date.now() }
+  }
+
+  return {
+    output: result,
+    duration: performance.now() - start,
+  }
 }
 
 /**
  * DAG Topological Sort
  */
 function topologicalSort(
- nodes: { id: string }[],
- edges: { source: string; target: string }[]
+  nodes: { id: string }[],
+  edges: { source: string; target: string }[]
 ): string[] {
- const inDegree = new Map<string, number>();
- const adjacency = new Map<string, string[]>();
+  const inDegree = new Map<string, number>()
+  const adjacency = new Map<string, string[]>()
 
- // Initial
- for (const node of nodes) {
- inDegree.set(node.id, 0);
- adjacency.set(node.id, []);
- }
+  // Initial
+  for (const node of nodes) {
+    inDegree.set(node.id, 0)
+    adjacency.set(node.id, [])
+  }
 
- // Build
- for (const edge of edges) {
- adjacency.get(edge.source)?.push(edge.target);
- inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
- }
+  // Build
+  for (const edge of edges) {
+    adjacency.get(edge.source)?.push(edge.target)
+    inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1)
+  }
 
- // Kahn Algorithm
- const queue: string[] = [];
- const result: string[] = [];
+  // Kahn Algorithm
+  const queue: string[] = []
+  const result: string[] = []
 
- for (const [nodeId, degree] of inDegree) {
- if (degree === 0) queue.push(nodeId);
- }
+  for (const [nodeId, degree] of inDegree) {
+    if (degree === 0) queue.push(nodeId)
+  }
 
- while (queue.length > 0) {
- const current = queue.shift()!;
- result.push(current);
+  while (queue.length > 0) {
+    const current = queue.shift()!
+    result.push(current)
 
- for (const neighbor of adjacency.get(current) || []) {
- const newDegree = (inDegree.get(neighbor) || 0) - 1;
- inDegree.set(neighbor, newDegree);
- if (newDegree === 0) queue.push(neighbor);
- }
- }
+    for (const neighbor of adjacency.get(current) || []) {
+      const newDegree = (inDegree.get(neighbor) || 0) - 1
+      inDegree.set(neighbor, newDegree)
+      if (newDegree === 0) queue.push(neighbor)
+    }
+  }
 
- return result;
+  return result
 }
 
 /**
  * Mock DAG Execution Engine
  */
 async function executeDAG(
- nodes: { id: string; type: string }[],
- edges: { source: string; target: string }[],
- options: { parallel?: boolean } = {}
+  nodes: { id: string; type: string }[],
+  edges: { source: string; target: string }[],
+  options: { parallel?: boolean } = {}
 ): Promise<{
- results: Map<string, unknown>;
- totalDuration: number;
- executionOrder: string[];
+  results: Map<string, unknown>
+  totalDuration: number
+  executionOrder: string[]
 }> {
- const start = performance.now();
- const results = new Map<string, unknown>();
- const executionOrder = topologicalSort(nodes, edges);
+  const start = performance.now()
+  const results = new Map<string, unknown>()
+  const executionOrder = topologicalSort(nodes, edges)
 
- if (options.parallel) {
- // Parallel execution (by level)
- const levels = new Map<string, number>();
- const inDegree = new Map<string, number>();
+  if (options.parallel) {
+    // Parallel execution (by level)
+    const levels = new Map<string, number>()
+    const inDegree = new Map<string, number>()
 
- for (const node of nodes) {
- inDegree.set(node.id, 0);
- }
+    for (const node of nodes) {
+      inDegree.set(node.id, 0)
+    }
 
- for (const edge of edges) {
- inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
- }
+    for (const edge of edges) {
+      inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1)
+    }
 
- // Calculate levels
- for (const nodeId of executionOrder) {
- const node = nodes.find(n => n.id === nodeId)!;
- const parentEdges = edges.filter(e => e.target === nodeId);
- const maxParentLevel = parentEdges.length > 0
- ? Math.max(...parentEdges.map(e => levels.get(e.source) || 0))
- : -1;
- levels.set(nodeId, maxParentLevel + 1);
- }
+    // Calculate levels
+    for (const nodeId of executionOrder) {
+      const node = nodes.find((n) => n.id === nodeId)!
+      const parentEdges = edges.filter((e) => e.target === nodeId)
+      const maxParentLevel =
+        parentEdges.length > 0 ? Math.max(...parentEdges.map((e) => levels.get(e.source) || 0)) : -1
+      levels.set(nodeId, maxParentLevel + 1)
+    }
 
- // Group by level
- const levelGroups = new Map<number, string[]>();
- for (const [nodeId, level] of levels) {
- if (!levelGroups.has(level)) levelGroups.set(level, []);
- levelGroups.get(level)!.push(nodeId);
- }
+    // Group by level
+    const levelGroups = new Map<number, string[]>()
+    for (const [nodeId, level] of levels) {
+      if (!levelGroups.has(level)) levelGroups.set(level, [])
+      levelGroups.get(level)!.push(nodeId)
+    }
 
- // Execute in parallel by level
- for (const level of [...levelGroups.keys()].sort((a, b) => a - b)) {
- const levelNodes = levelGroups.get(level)!;
- const promises = levelNodes.map(async nodeId => {
- const node = nodes.find(n => n.id === nodeId)!;
- const { output } = await simulateNodeExecution(node.type);
- results.set(nodeId, output);
- });
- await Promise.all(promises);
- }
- } else {
- // Sequential execution
- for (const nodeId of executionOrder) {
- const node = nodes.find(n => n.id === nodeId)!;
- const { output } = await simulateNodeExecution(node.type);
- results.set(nodeId, output);
- }
- }
+    // Execute in parallel by level
+    for (const level of [...levelGroups.keys()].sort((a, b) => a - b)) {
+      const levelNodes = levelGroups.get(level)!
+      const promises = levelNodes.map(async (nodeId) => {
+        const node = nodes.find((n) => n.id === nodeId)!
+        const { output } = await simulateNodeExecution(node.type)
+        results.set(nodeId, output)
+      })
+      await Promise.all(promises)
+    }
+  } else {
+    // Sequential execution
+    for (const nodeId of executionOrder) {
+      const node = nodes.find((n) => n.id === nodeId)!
+      const { output } = await simulateNodeExecution(node.type)
+      results.set(nodeId, output)
+    }
+  }
 
- return {
- results,
- totalDuration: performance.now() - start,
- executionOrder,
- };
+  return {
+    results,
+    totalDuration: performance.now() - start,
+    executionOrder,
+  }
 }
 
 /**
  * Generate linear workflow
  */
 function generateLinearWorkflow(size: number) {
- const nodes = Array.from({ length: size }, (_, i) => ({
- id: `node-${i}`,
- type: ['transform', 'filter', 'aggregate'][i % 3],
- }));
+  const nodes = Array.from({ length: size }, (_, i) => ({
+    id: `node-${i}`,
+    type: ['transform', 'filter', 'aggregate'][i % 3],
+  }))
 
- const edges = Array.from({ length: size - 1 }, (_, i) => ({
- source: `node-${i}`,
- target: `node-${i + 1}`,
- }));
+  const edges = Array.from({ length: size - 1 }, (_, i) => ({
+    source: `node-${i}`,
+    target: `node-${i + 1}`,
+  }))
 
- return { nodes, edges };
+  return { nodes, edges }
 }
 
 /**
  * Generate branched workflow
  */
 function generateBranchWorkflow(branches: number, depth: number) {
- const nodes: { id: string; type: string }[] = [
- { id: 'start', type: 'start' },
- ];
- const edges: { source: string; target: string }[] = [];
+  const nodes: { id: string; type: string }[] = [{ id: 'start', type: 'start' }]
+  const edges: { source: string; target: string }[] = []
 
- for (let b = 0; b < branches; b++) {
- for (let d = 0; d < depth; d++) {
- const nodeId = `branch-${b}-node-${d}`;
- nodes.push({ id: nodeId, type: 'transform' });
+  for (let b = 0; b < branches; b++) {
+    for (let d = 0; d < depth; d++) {
+      const nodeId = `branch-${b}-node-${d}`
+      nodes.push({ id: nodeId, type: 'transform' })
 
- if (d === 0) {
- edges.push({ source: 'start', target: nodeId });
- } else {
- edges.push({ source: `branch-${b}-node-${d - 1}`, target: nodeId });
- }
- }
- }
+      if (d === 0) {
+        edges.push({ source: 'start', target: nodeId })
+      } else {
+        edges.push({ source: `branch-${b}-node-${d - 1}`, target: nodeId })
+      }
+    }
+  }
 
- // End node
- nodes.push({ id: 'end', type: 'end' });
- for (let b = 0; b < branches; b++) {
- edges.push({ source: `branch-${b}-node-${depth - 1}`, target: 'end' });
- }
+  // End node
+  nodes.push({ id: 'end', type: 'end' })
+  for (let b = 0; b < branches; b++) {
+    edges.push({ source: `branch-${b}-node-${depth - 1}`, target: 'end' })
+  }
 
- return { nodes, edges };
+  return { nodes, edges }
 }
 
 describe('Execution Engine Performance Tests', () => {
- describe('Topological Sort Performance', () => {
- it('should sort 100-node linear graph in under 2ms', async () => {
- const { nodes, edges } = generateLinearWorkflow(100);
+  describe('Topological Sort Performance', () => {
+    it('should sort 100-node linear graph in under 2ms', async () => {
+      const { nodes, edges } = generateLinearWorkflow(100)
 
- const result = await benchmark(
- 'Topology sort 100 nodes',
- () => topologicalSort(nodes, edges),
- { iterations: 100 }
- );
+      const result = await benchmark(
+        'Topology sort 100 nodes',
+        () => topologicalSort(nodes, edges),
+        { iterations: 100 }
+      )
 
- console.log(`Topology sort 100 nodes: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(2);
- });
+      console.log(`Topology sort 100 nodes: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(2)
+    })
 
- it('should sort 500-node linear graph in under 10ms', async () => {
- const { nodes, edges } = generateLinearWorkflow(500);
+    it('should sort 500-node linear graph in under 10ms', async () => {
+      const { nodes, edges } = generateLinearWorkflow(500)
 
- const result = await benchmark(
- 'Topology sort 500 nodes',
- () => topologicalSort(nodes, edges),
- { iterations: 50 }
- );
+      const result = await benchmark(
+        'Topology sort 500 nodes',
+        () => topologicalSort(nodes, edges),
+        { iterations: 50 }
+      )
 
- console.log(`Topology sort 500 nodes: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(10);
- });
+      console.log(`Topology sort 500 nodes: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(10)
+    })
 
- it('should sort 1000-node linear graph in under 20ms', async () => {
- const { nodes, edges } = generateLinearWorkflow(1000);
+    it('should sort 1000-node linear graph in under 20ms', async () => {
+      const { nodes, edges } = generateLinearWorkflow(1000)
 
- const result = await benchmark(
- 'Topology sort 1000 nodes',
- () => topologicalSort(nodes, edges),
- { iterations: 20 }
- );
+      const result = await benchmark(
+        'Topology sort 1000 nodes',
+        () => topologicalSort(nodes, edges),
+        { iterations: 20 }
+      )
 
- console.log(`Topology sort 1000 nodes: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(20);
- });
+      console.log(`Topology sort 1000 nodes: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(20)
+    })
 
- it('should sort complex branches in under 5ms', async () => {
- const { nodes, edges } = generateBranchWorkflow(10, 10);
+    it('should sort complex branches in under 5ms', async () => {
+      const { nodes, edges } = generateBranchWorkflow(10, 10)
 
- const result = await benchmark(
- 'Topology sort branches',
- () => topologicalSort(nodes, edges),
- { iterations: 100 }
- );
+      const result = await benchmark(
+        'Topology sort branches',
+        () => topologicalSort(nodes, edges),
+        { iterations: 100 }
+      )
 
- console.log(`Topology sort branches (${nodes.length} Node): ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(5);
- });
- });
+      console.log(
+        `Topology sort branches (${nodes.length} Node): ${result.averageTime.toFixed(3)}ms`
+      )
+      expect(result.averageTime).toBeLessThan(5)
+    })
+  })
 
- describe('Node Execution Performance', () => {
- it('should execute a node in under 2ms', async () => {
- const result = await benchmark(
- 'Node execution',
- () => simulateNodeExecution('transform'),
- { iterations: 100 }
- );
+  describe('Node Execution Performance', () => {
+    it('should execute a node in under 2ms', async () => {
+      const result = await benchmark('Node execution', () => simulateNodeExecution('transform'), {
+        iterations: 100,
+      })
 
- console.log(`Node execution: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(2);
- });
+      console.log(`Node execution: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(2)
+    })
 
- it('should execute transform node in under 2ms', async () => {
- const result = await benchmark(
- 'Transform Node',
- () => simulateNodeExecution('transform'),
- { iterations: 100 }
- );
+    it('should execute transform node in under 2ms', async () => {
+      const result = await benchmark('Transform Node', () => simulateNodeExecution('transform'), {
+        iterations: 100,
+      })
 
- console.log(`Transform Node: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(2);
- });
+      console.log(`Transform Node: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(2)
+    })
 
- it('should execute filter node in under 2ms', async () => {
- const result = await benchmark(
- 'Filter Node',
- () => simulateNodeExecution('filter'),
- { iterations: 100 }
- );
+    it('should execute filter node in under 2ms', async () => {
+      const result = await benchmark('Filter Node', () => simulateNodeExecution('filter'), {
+        iterations: 100,
+      })
 
- console.log(`Filter Node: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(2);
- });
+      console.log(`Filter Node: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(2)
+    })
 
- it('should execute aggregate node in under 2ms', async () => {
- const result = await benchmark(
- 'Aggregate Node',
- () => simulateNodeExecution('aggregate'),
- { iterations: 100 }
- );
+    it('should execute aggregate node in under 2ms', async () => {
+      const result = await benchmark('Aggregate Node', () => simulateNodeExecution('aggregate'), {
+        iterations: 100,
+      })
 
- console.log(`Aggregate Node: ${result.averageTime.toFixed(3)}ms`);
- expect(result.averageTime).toBeLessThan(2);
- });
- });
+      console.log(`Aggregate Node: ${result.averageTime.toFixed(3)}ms`)
+      expect(result.averageTime).toBeLessThan(2)
+    })
+  })
 
- describe('DAG Execution Performance', () => {
- it('should execute 10-node linear workflow in under 10ms', async () => {
- const { nodes, edges } = generateLinearWorkflow(10);
+  describe('DAG Execution Performance', () => {
+    it('should execute 10-node linear workflow in under 10ms', async () => {
+      const { nodes, edges } = generateLinearWorkflow(10)
 
- const result = await benchmark(
- 'Execute 10-node linear workflow',
- () => executeDAG(nodes, edges),
- { iterations: 50 }
- );
+      const result = await benchmark(
+        'Execute 10-node linear workflow',
+        () => executeDAG(nodes, edges),
+        { iterations: 50 }
+      )
 
- console.log(`Execute 10 nodes: ${result.averageTime.toFixed(2)}ms`);
- expect(result.averageTime).toBeLessThan(10);
- });
+      console.log(`Execute 10 nodes: ${result.averageTime.toFixed(2)}ms`)
+      expect(result.averageTime).toBeLessThan(10)
+    })
 
- it('should execute 50-node linear workflow in under 50ms', async () => {
- const { nodes, edges } = generateLinearWorkflow(50);
+    it('should execute 50-node linear workflow in under 50ms', async () => {
+      const { nodes, edges } = generateLinearWorkflow(50)
 
- const result = await benchmark(
- 'Execute 50-node linear workflow',
- () => executeDAG(nodes, edges),
- { iterations: 20 }
- );
+      const result = await benchmark(
+        'Execute 50-node linear workflow',
+        () => executeDAG(nodes, edges),
+        { iterations: 20 }
+      )
 
- console.log(`Execute 50 nodes: ${result.averageTime.toFixed(2)}ms`);
- expect(result.averageTime).toBeLessThan(50);
- });
+      console.log(`Execute 50 nodes: ${result.averageTime.toFixed(2)}ms`)
+      expect(result.averageTime).toBeLessThan(50)
+    })
 
- it('should execute branched workflow faster in parallel than sequential', async () => {
- const { nodes, edges } = generateBranchWorkflow(5, 5);
+    it('should execute branched workflow faster in parallel than sequential', async () => {
+      const { nodes, edges } = generateBranchWorkflow(5, 5)
 
- const sequentialResult = await benchmark(
- 'Sequential branch workflow',
- () => executeDAG(nodes, edges, { parallel: false }),
- { iterations: 10 }
- );
+      const sequentialResult = await benchmark(
+        'Sequential branch workflow',
+        () => executeDAG(nodes, edges, { parallel: false }),
+        { iterations: 10 }
+      )
 
- const parallelResult = await benchmark(
- 'Parallel branch workflow',
- () => executeDAG(nodes, edges, { parallel: true }),
- { iterations: 10 }
- );
+      const parallelResult = await benchmark(
+        'Parallel branch workflow',
+        () => executeDAG(nodes, edges, { parallel: true }),
+        { iterations: 10 }
+      )
 
- console.log(`Sequential: ${sequentialResult.averageTime.toFixed(2)}ms`);
- console.log(`Parallel: ${parallelResult.averageTime.toFixed(2)}ms`);
- 
- // Parallel should not be significantly slower than sequential (within tolerance)
- expect(parallelResult.averageTime).toBeLessThan(sequentialResult.averageTime * 1.5);
- });
- });
+      console.log(`Sequential: ${sequentialResult.averageTime.toFixed(2)}ms`)
+      console.log(`Parallel: ${parallelResult.averageTime.toFixed(2)}ms`)
 
- describe('Concurrent Execution Performance', () => {
- it('should process 10 concurrent requests in under 100ms', async () => {
- const processRequest = async () => {
- const results = await Promise.all(
- Array.from({ length: 10 }, () => simulateNodeExecution('transform'))
- );
- return results;
- };
+      // Parallel should not be significantly slower than sequential (within tolerance)
+      expect(parallelResult.averageTime).toBeLessThan(sequentialResult.averageTime * 1.5)
+    })
+  })
 
- const result = await benchmark(
- 'Concurrent 10 requests',
- processRequest,
- { iterations: 20 }
- );
+  describe('Concurrent Execution Performance', () => {
+    it('should process 10 concurrent requests in under 100ms', async () => {
+      const processRequest = async () => {
+        const results = await Promise.all(
+          Array.from({ length: 10 }, () => simulateNodeExecution('transform'))
+        )
+        return results
+      }
 
- console.log(`Concurrent 10 requests: ${result.averageTime.toFixed(2)}ms`);
- expect(result.averageTime).toBeLessThan(100);
- });
+      const result = await benchmark('Concurrent 10 requests', processRequest, { iterations: 20 })
 
- it('should process 50 concurrent requests in under 200ms', async () => {
- const processRequest = async () => {
- const results = await Promise.all(
- Array.from({ length: 50 }, () => simulateNodeExecution('transform'))
- );
- return results;
- };
+      console.log(`Concurrent 10 requests: ${result.averageTime.toFixed(2)}ms`)
+      expect(result.averageTime).toBeLessThan(100)
+    })
 
- const result = await benchmark(
- 'Concurrent 50 requests',
- processRequest,
- { iterations: 10 }
- );
+    it('should process 50 concurrent requests in under 200ms', async () => {
+      const processRequest = async () => {
+        const results = await Promise.all(
+          Array.from({ length: 50 }, () => simulateNodeExecution('transform'))
+        )
+        return results
+      }
 
- console.log(`Concurrent 50 requests: ${result.averageTime.toFixed(2)}ms`);
- expect(result.averageTime).toBeLessThan(200);
- });
- });
+      const result = await benchmark('Concurrent 50 requests', processRequest, { iterations: 10 })
 
- describe('Performance Threshold Validation', () => {
- it('should satisfy all performance thresholds', async () => {
- const suite = createPerformanceSuite('Execution Engine Performance Suite');
+      console.log(`Concurrent 50 requests: ${result.averageTime.toFixed(2)}ms`)
+      expect(result.averageTime).toBeLessThan(200)
+    })
+  })
 
- await suite.add('Topology sort', () => {
- const { nodes, edges } = generateLinearWorkflow(100);
- return topologicalSort(nodes, edges);
- });
+  describe('Performance Threshold Validation', () => {
+    it('should satisfy all performance thresholds', async () => {
+      const suite = createPerformanceSuite('Execution Engine Performance Suite')
 
- await suite.add('Node execution', () => simulateNodeExecution('transform'));
+      await suite.add('Topology sort', () => {
+        const { nodes, edges } = generateLinearWorkflow(100)
+        return topologicalSort(nodes, edges)
+      })
 
- await suite.add('DAG execution', () => {
- const { nodes, edges } = generateLinearWorkflow(10);
- return executeDAG(nodes, edges);
- });
+      await suite.add('Node execution', () => simulateNodeExecution('transform'))
 
- const validation = suite.validateAll({
- maxAverageTime: 50,
- maxP99: 100,
- minOpsPerSecond: 10,
- });
+      await suite.add('DAG execution', () => {
+        const { nodes, edges } = generateLinearWorkflow(10)
+        return executeDAG(nodes, edges)
+      })
 
- suite.printReport();
+      const validation = suite.validateAll({
+        maxAverageTime: 50,
+        maxP99: 100,
+        minOpsPerSecond: 10,
+      })
 
- expect(validation.allPassed).toBe(true);
- if (!validation.allPassed) {
-       console.log('Failed tests:', validation.validations.filter(v => !v.passed));
- }
- });
- });
-});
+      suite.printReport()
+
+      expect(validation.allPassed).toBe(true)
+      if (!validation.allPassed) {
+        console.log(
+          'Failed tests:',
+          validation.validations.filter((v) => !v.passed)
+        )
+      }
+    })
+  })
+})
 
 describe('Large Scale Workflow Tests', () => {
- it('should handle workflows with 500+ nodes', async () => {
- const { nodes, edges } = generateLinearWorkflow(500);
- 
- const start = performance.now();
- const order = topologicalSort(nodes, edges);
- const sortDuration = performance.now() - start;
+  it('should handle workflows with 500+ nodes', async () => {
+    const { nodes, edges } = generateLinearWorkflow(500)
 
- console.log(`500 node topology sort: ${sortDuration.toFixed(2)}ms`);
- 
- expect(order.length).toBe(500);
- expect(sortDuration).toBeLessThan(50);
- });
+    const start = performance.now()
+    const order = topologicalSort(nodes, edges)
+    const sortDuration = performance.now() - start
 
- it('should handle deeply branched workflows', async () => {
- const { nodes, edges } = generateBranchWorkflow(20, 10);
- 
- const start = performance.now();
- const order = topologicalSort(nodes, edges);
- const sortDuration = performance.now() - start;
+    console.log(`500 node topology sort: ${sortDuration.toFixed(2)}ms`)
 
- console.log(`Branch workflow (${nodes.length} nodes) topology sort: ${sortDuration.toFixed(2)}ms`);
- 
- expect(order.length).toBe(nodes.length);
- expect(sortDuration).toBeLessThan(20);
- });
-});
+    expect(order.length).toBe(500)
+    expect(sortDuration).toBeLessThan(50)
+  })
+
+  it('should handle deeply branched workflows', async () => {
+    const { nodes, edges } = generateBranchWorkflow(20, 10)
+
+    const start = performance.now()
+    const order = topologicalSort(nodes, edges)
+    const sortDuration = performance.now() - start
+
+    console.log(
+      `Branch workflow (${nodes.length} nodes) topology sort: ${sortDuration.toFixed(2)}ms`
+    )
+
+    expect(order.length).toBe(nodes.length)
+    expect(sortDuration).toBeLessThan(20)
+  })
+})

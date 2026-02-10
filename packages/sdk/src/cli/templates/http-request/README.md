@@ -50,25 +50,25 @@ npm install
 
 ## 输入参数
 
-| 参数 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| url | string | 是 | - | 完整的请求 URL |
-| method | select | 否 | GET | HTTP 方法 |
-| headers | json | 否 | {} | 请求头 |
-| body | json | 否 | - | 请求体 |
-| timeout | number | 否 | 30000 | 超时时间(ms) |
-| retries | number | 否 | 0 | 重试次数 |
+| 参数    | 类型   | 必填 | 默认值 | 说明           |
+| ------- | ------ | ---- | ------ | -------------- |
+| url     | string | 是   | -      | 完整的请求 URL |
+| method  | select | 否   | GET    | HTTP 方法      |
+| headers | json   | 否   | {}     | 请求头         |
+| body    | json   | 否   | -      | 请求体         |
+| timeout | number | 否   | 30000  | 超时时间(ms)   |
+| retries | number | 否   | 0      | 重试次数       |
 
 ## 输出
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| status | number | HTTP 状态码 |
-| headers | json | 响应头 |
-| body | json | 解析后的响应体 |
-| rawBody | string | 原始响应文本 |
-| duration | number | 请求耗时(ms) |
-| success | boolean | 是否成功(2xx) |
+| 字段     | 类型    | 说明           |
+| -------- | ------- | -------------- |
+| status   | number  | HTTP 状态码    |
+| headers  | json    | 响应头         |
+| body     | json    | 解析后的响应体 |
+| rawBody  | string  | 原始响应文本   |
+| duration | number  | 请求耗时(ms)   |
+| success  | boolean | 是否成功(2xx)  |
 
 ## 许可证
 
