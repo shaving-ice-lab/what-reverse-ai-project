@@ -219,8 +219,9 @@ export interface LogArchiveReplayResult {
 
 export interface CreateWorkspaceRequest {
  name: string;
- slug: string;
+ slug?: string;
  icon?: string;
+ plan?: "free" | "pro" | "enterprise";
  region?: string;
 }
 
