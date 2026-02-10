@@ -22,6 +22,7 @@ import {
  Star,
  Clock,
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,13 +45,6 @@ import {
  DialogTitle,
 } from "@/components/ui/dialog";
 import {
- DropdownMenu,
- DropdownMenuContent,
- DropdownMenuItem,
- DropdownMenuTrigger,
- DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
  Select,
  SelectContent,
  SelectItem,
@@ -58,20 +52,12 @@ import {
  SelectValue,
 } from "@/components/ui/select";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
-import { useAuthStore } from "@/stores/useAuthStore";
 
 // PlanConfig
 const planConfig: Record<string, { label: string; color: string; bgColor: string }> = {
  free: { label: "FREE", color: "text-foreground-muted", bgColor: "bg-surface-200" },
  pro: { label: "PRO", color: "text-brand-500", bgColor: "bg-brand-200" },
  enterprise: { label: "ENTERPRISE", color: "text-warning", bgColor: "bg-warning-200" },
-};
-
-// StatusConfig
-const statusConfig: Record<string, { label: string; color: string }> = {
- active: { label: "Active", color: "text-brand-500" },
- suspended: { label: "Paused", color: "text-warning" },
- deleted: { label: "Deleted", color: "text-destructive" },
 };
 
 const regionOptions = [
@@ -89,9 +75,78 @@ const workspaceSidebarLinks = [
 
 const WORKSPACE_STORAGE_KEY = "last_workspace_id";
 
+function CreateWorkspaceFormFields({
+ createForm,
+ onNameChange,
+ onSlugChange,
+ onRegionChange,
+}: {
+ createForm: { name: string; slug: string; region: string };
+ onNameChange: (name: string) => void;
+ onSlugChange: (slug: string) => void;
+ onRegionChange: (region: string) => void;
+}) {
+ return (
+ <>
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ Workspace Name <span className="text-destructive">*</span>
+ </label>
+ <Input
+ placeholder="e.g., My Team"
+ value={createForm.name}
+ onChange={(e) => onNameChange(e.target.value)}
+ maxLength={100}
+ className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ />
+ </div>
+
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ URL Identifier <span className="text-destructive">*</span>
+ </label>
+ <div className="flex items-center gap-2">
+ <span className="text-[12px] text-foreground-muted shrink-0">
+ agentflow.app/
+ </span>
+ <Input
+ placeholder="my-team"
+ value={createForm.slug}
+ onChange={(e) => onSlugChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+ className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ />
+ </div>
+ <p className="text-[11px] text-foreground-muted mt-1.5">
+ Can contain lowercase letters, numbers, and hyphens
+ </p>
+ </div>
+
+ <div>
+ <label className="block text-[12px] font-medium text-foreground mb-2">
+ Deploy Region <span className="text-destructive">*</span>
+ </label>
+ <Select
+ value={createForm.region}
+ onValueChange={onRegionChange}
+ >
+ <SelectTrigger className="h-9 bg-surface-75 border-border">
+ <SelectValue placeholder="Select region" />
+ </SelectTrigger>
+ <SelectContent className="bg-surface-100 border-border">
+ {regionOptions.map((option) => (
+ <SelectItem key={option.value} value={option.value}>
+ {option.label}
+ </SelectItem>
+ ))}
+ </SelectContent>
+ </Select>
+ </div>
+ </>
+ );
+}
+
 export default function WorkspacesPage() {
  const router = useRouter();
- const { user } = useAuthStore();
  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
  const [isLoading, setIsLoading] = useState(true);
  const [loadError, setLoadError] = useState<string | null>(null);
@@ -104,7 +159,6 @@ export default function WorkspacesPage() {
  name: "",
  slug: "",
  region: regionOptions[0]?.value || "",
- plan: "free",
  });
  const [isCreating, setIsCreating] = useState(false);
 
@@ -140,7 +194,8 @@ export default function WorkspacesPage() {
  name,
  slug: name
  .toLowerCase()
- .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+ .replace(/[^a-z0-9-]+/g, "-")
+ .replace(/-+/g, "-")
  .replace(/^-|-$/g, ""),
  }));
  };
@@ -161,23 +216,23 @@ export default function WorkspacesPage() {
  name: "",
  slug: "",
  region: regionOptions[0]?.value || "",
- plan: "free",
  });
  rememberWorkspace(workspace.id);
  router.push("/dashboard/apps");
- } catch (error) {
- console.error("Failed to create workspace:", error);
+ } catch (error: any) {
+ const message = error?.message || "Failed to create workspace";
+ toast.error(message);
  } finally {
  setIsCreating(false);
  }
  };
 
  const handleCancelCreate = () => {
+ setShowCreateDialog(false);
  setCreateForm({
  name: "",
  slug: "",
  region: regionOptions[0]?.value || "",
- plan: "free",
  });
  };
 
@@ -463,62 +518,12 @@ export default function WorkspacesPage() {
  compact
  >
  <div className="space-y-4">
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- Workspace Name <span className="text-destructive">*</span>
- </label>
- <Input
- placeholder="e.g., My Team"
- value={createForm.name}
- onChange={(e) => handleNameChange(e.target.value)}
- className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ <CreateWorkspaceFormFields
+ createForm={createForm}
+ onNameChange={handleNameChange}
+ onSlugChange={(slug) => setCreateForm((prev) => ({ ...prev, slug }))}
+ onRegionChange={(region) => setCreateForm((prev) => ({ ...prev, region }))}
  />
- </div>
-
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- URL Identifier <span className="text-destructive">*</span>
- </label>
- <div className="flex items-center gap-2">
- <span className="text-[12px] text-foreground-muted shrink-0">
- agentflow.app/
- </span>
- <Input
- placeholder="my-team"
- value={createForm.slug}
- onChange={(e) =>
- setCreateForm((prev) => ({ ...prev, slug: e.target.value }))
- }
- className="h-9 bg-surface-75 border-border focus:border-brand-500"
- />
- </div>
- <p className="text-[11px] text-foreground-muted mt-1.5">
- Can contain lowercase letters, numbers, and hyphens
- </p>
- </div>
-
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- Deploy Region <span className="text-destructive">*</span>
- </label>
- <Select
- value={createForm.region}
- onValueChange={(value) =>
- setCreateForm((prev) => ({ ...prev, region: value }))
- }
- >
- <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="Select region" />
- </SelectTrigger>
- <SelectContent className="bg-surface-100 border-border">
- {regionOptions.map((option) => (
- <SelectItem key={option.value} value={option.value}>
- {option.label}
- </SelectItem>
- ))}
- </SelectContent>
- </Select>
- </div>
 
  <div className="rounded-md border border-border bg-surface-75 px-3 py-3 text-[12px] text-foreground-light">
  <div className="flex items-center justify-between">
@@ -712,62 +717,12 @@ export default function WorkspacesPage() {
  </DialogHeader>
 
  <div className="space-y-4 py-4">
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- Workspace Name <span className="text-destructive">*</span>
- </label>
- <Input
- placeholder="e.g., My Team"
- value={createForm.name}
- onChange={(e) => handleNameChange(e.target.value)}
- className="h-9 bg-surface-75 border-border focus:border-brand-500"
+ <CreateWorkspaceFormFields
+ createForm={createForm}
+ onNameChange={handleNameChange}
+ onSlugChange={(slug) => setCreateForm((prev) => ({ ...prev, slug }))}
+ onRegionChange={(region) => setCreateForm((prev) => ({ ...prev, region }))}
  />
- </div>
-
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- URL Identifier <span className="text-destructive">*</span>
- </label>
- <div className="flex items-center gap-2">
- <span className="text-[12px] text-foreground-muted shrink-0">
- agentflow.app/
- </span>
- <Input
- placeholder="my-team"
- value={createForm.slug}
- onChange={(e) =>
- setCreateForm({ ...createForm, slug: e.target.value })
- }
- className="h-9 bg-surface-75 border-border focus:border-brand-500"
- />
- </div>
- <p className="text-[11px] text-foreground-muted mt-1.5">
- Can contain lowercase letters, numbers, and hyphens
- </p>
- </div>
-
- <div>
- <label className="block text-[12px] font-medium text-foreground mb-2">
- Deploy Region <span className="text-destructive">*</span>
- </label>
- <Select
- value={createForm.region}
- onValueChange={(value) =>
- setCreateForm((prev) => ({ ...prev, region: value }))
- }
- >
- <SelectTrigger className="h-9 bg-surface-75 border-border">
- <SelectValue placeholder="Select region" />
- </SelectTrigger>
- <SelectContent className="bg-surface-100 border-border">
- {regionOptions.map((option) => (
- <SelectItem key={option.value} value={option.value}>
- {option.label}
- </SelectItem>
- ))}
- </SelectContent>
- </Select>
- </div>
 
  <div className="p-3 rounded-md bg-surface-75 text-[12px] text-foreground-light">
  <p className="flex items-center gap-2">
