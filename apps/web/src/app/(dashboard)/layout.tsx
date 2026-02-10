@@ -61,23 +61,23 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 // mainNavigationMenu
 const mainNavItems = [
   { title: 'Overview', href: '/dashboard', icon: Activity },
-  { title: 'Workspace', href: '/dashboard/workspaces', icon: LayoutGrid },
-  { title: 'Planning', href: '/dashboard/plans', icon: ListTodo },
-  { title: 'Ticket Management', href: '/dashboard/support-tickets', icon: LifeBuoy },
-  { title: 'Support Settings', href: '/dashboard/support-settings', icon: Settings },
   { title: 'Conversation', href: '/dashboard/conversations', icon: MessageSquare },
-  { title: 'Workflow (legacy)', href: '/dashboard/workflows', icon: Zap },
   { title: 'Workbench', href: '/dashboard/apps', icon: LayoutGrid },
   { title: 'Creative Workshop', href: '/dashboard/creative', icon: Palette },
+  { title: 'Workflow (legacy)', href: '/dashboard/workflows', icon: Zap },
   { title: 'Template Gallery', href: '/dashboard/template-gallery', icon: LayoutGrid },
   { title: 'Store', href: '/dashboard/store', icon: Store },
+  { title: 'Planning', href: '/dashboard/plans', icon: ListTodo },
+  { title: 'Workspace', href: '/dashboard/workspaces', icon: LayoutGrid },
+  { title: 'Ticket Management', href: '/dashboard/support-tickets', icon: LifeBuoy },
+  { title: 'Support Settings', href: '/dashboard/support-settings', icon: Settings },
 ]
 
 // personMenu
 const personalNavItems = [
-  { title: 'My Agents (Legacy)', href: '/dashboard/my-agents', icon: Bot },
   { title: 'My Files', href: '/dashboard/files', icon: FolderOpen },
   { title: 'Data Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { title: 'My Agents (Legacy)', href: '/dashboard/my-agents', icon: Bot },
 ]
 
 // allPage(PageControlLayoutandScroll)
@@ -379,11 +379,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (limit <= 0) return { label, value: 'Unlimited' }
       return { label, value: `${used}/${limit}${unit}` }
     }
+    const q = (field: { used: number; limit: number } | undefined) => field ?? { used: 0, limit: 0 }
     return [
-      buildItem('Request', workspaceQuota.requests.used, workspaceQuota.requests.limit, ''),
-      buildItem('Token', workspaceQuota.tokens.used, workspaceQuota.tokens.limit, ''),
-      buildItem('Storage', workspaceQuota.storage.used, workspaceQuota.storage.limit, 'GB'),
-      buildItem('App', workspaceQuota.apps.used, workspaceQuota.apps.limit, ''),
+      buildItem('Request', q(workspaceQuota.requests).used, q(workspaceQuota.requests).limit, ''),
+      buildItem('Token', q(workspaceQuota.tokens).used, q(workspaceQuota.tokens).limit, ''),
+      buildItem('Storage', q(workspaceQuota.storage).used, q(workspaceQuota.storage).limit, 'GB'),
+      buildItem('App', q(workspaceQuota.apps).used, q(workspaceQuota.apps).limit, ''),
     ]
   }, [workspaceQuota])
 
@@ -395,7 +396,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       workspaceQuota.storage,
       workspaceQuota.apps,
     ]
-      .filter((item) => item.limit > 0)
+      .filter((item): item is { used: number; limit: number } => !!item && item.limit > 0)
       .map((item) => item.used / item.limit)
     if (ratios.length === 0) return null
     return Math.max(...ratios)
@@ -865,10 +866,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border">
                   <div className="px-3 py-2 border-b border-border">
-                    <p className="text-[12px] font-medium text-foreground">
+                    <p className="text-sm font-semibold text-foreground truncate">
                       {user?.displayName || user?.username}
                     </p>
-                    <p className="text-[11px] text-foreground-light">{user?.email}</p>
+                    <p className="text-xs text-foreground-light truncate">{user?.email}</p>
                   </div>
                   <div className="py-1">
                     <DropdownMenuItem asChild>
@@ -902,10 +903,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <DropdownMenuSeparator className="bg-border" />
                   <div className="py-1">
                     <DropdownMenuItem
+                      icon={<LogOut className="w-3.5 h-3.5" />}
+                      destructive
                       onClick={() => logout()}
-                      className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-destructive-400 hover:bg-destructive-200 cursor-pointer"
+                      className="px-3 py-1.5 cursor-pointer"
                     >
-                      <LogOut className="w-3.5 h-3.5" />
                       Sign Out
                     </DropdownMenuItem>
                   </div>
@@ -925,40 +927,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               )}
             >
               <div className="relative z-10 flex h-full flex-col">
-                {/* CreateButton */}
-                <div
-                  className={cn(
-                    'shrink-0',
-                    sidebarCollapsed ? 'px-1.5 pt-3 pb-2' : 'px-2 pt-3 pb-2'
-                  )}
-                >
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link href="/dashboard/conversations">
-                        <button
-                          className={cn(
-                            'w-full flex items-center gap-2 rounded-md text-[12px] font-medium transition-colors',
-                            sidebarCollapsed ? 'h-8 justify-center' : 'h-8 px-2',
-                            'text-foreground-light hover:text-foreground hover:bg-surface-100/60'
-                          )}
-                        >
-                          {sidebarCollapsed && <Plus className="w-4 h-4" strokeWidth={2.5} />}
-                          {!sidebarCollapsed && <span>Create conversation</span>}
-                        </button>
-                      </Link>
-                    </TooltipTrigger>
-                    {sidebarCollapsed && (
-                      <TooltipContent
-                        side="right"
-                        sideOffset={8}
-                        className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground"
-                      >
-                        <p className="text-xs">Create conversation</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </div>
-
                 {/* Scrollable Navigation Region */}
                 <div
                   className={cn(
