@@ -1,18 +1,17 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google'
+import { Inter, Source_Code_Pro } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-// Body font: Space Grotesk - Modern typeface
-const spaceGrotesk = Space_Grotesk({
+// Body font: Inter – Supabase's primary typeface
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
 })
 
-// Code font: IBM Plex Mono - Clear monospace typeface
-const ibmPlexMono = IBM_Plex_Mono({
+// Code font: Source Code Pro – Supabase's monospace typeface
+const sourceCodePro = Source_Code_Pro({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
@@ -34,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-mono antialiased terminal-strong`}
+        className={`${inter.variable} ${sourceCodePro.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
       </body>
