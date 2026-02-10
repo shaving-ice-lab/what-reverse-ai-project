@@ -1,88 +1,88 @@
 @import 'tailwindcss';
 
 /* ============================================
-   LobeHub-Inspired Design System
-   现代、简约、深色主题
+   Manus-Inspired Design System
+   Warm, Clean, Minimal — Dark & Light
+   Brand anchor: #34322D (warm black)
    ============================================ */
 
 @theme {
-  /* ===== 背景色 (Background) - LobeHub 深色风格 ===== */
-  /* LobeHub 使用带微妙蓝紫色调的深色背景，不是纯黑 */
-  --color-background: #01010a;
-  --color-background-200: #08080f;
-  --color-background-studio: #040408;
-  --color-background-alternative: #01010a;
-  --color-background-overlay: rgba(1, 1, 10, 0.85);
+  /* ===== 背景色 (Background) - Manus 暖色深色 ===== */
+  --color-background: #1a1917;
+  --color-background-200: #1e1d1b;
+  --color-background-studio: #161513;
+  --color-background-alternative: #1a1917;
+  --color-background-overlay: rgba(26, 25, 23, 0.85);
 
-  /* ===== Surface 层级 - LobeHub 卡片/表面 ===== */
-  --color-surface-75: #0c0c14;
-  --color-surface-100: #101018;
-  --color-surface-200: #16161f;
-  --color-surface-300: #1e1e28;
-  --color-surface-400: #262630;
+  /* ===== Surface 层级 - Manus 暖色深灰 ===== */
+  --color-surface-75: #201f1d;
+  --color-surface-100: #252422;
+  --color-surface-200: #2c2b28;
+  --color-surface-300: #343330;
+  --color-surface-400: #3e3d39;
 
-  /* ===== 文字色 (Foreground) - LobeHub 文字 ===== */
-  --color-foreground: #ffffffee;
-  --color-foreground-light: #a8a8b8;
-  --color-foreground-lighter: #6b6b7b;
-  --color-foreground-muted: #44445a;
+  /* ===== 文字色 (Foreground) - Manus 暖白 ===== */
+  --color-foreground: #ededec;
+  --color-foreground-light: #a8a59e;
+  --color-foreground-lighter: #78756e;
+  --color-foreground-muted: #504e48;
 
-  /* ===== 边框色 (Border) - LobeHub 边框 ===== */
-  --color-border: #1a1a28;
-  --color-border-muted: #131320;
-  --color-border-strong: #26263a;
-  --color-border-stronger: #333348;
+  /* ===== 边框色 (Border) - Manus 暖色 ===== */
+  --color-border: #2c2b28;
+  --color-border-muted: #232220;
+  --color-border-strong: #3e3d39;
+  --color-border-stronger: #504e48;
 
-  /* ===== 品牌色 (Brand) - LobeHub 风格 ===== */
-  --color-brand-200: #0a1628;
-  --color-brand-300: #0f2440;
-  --color-brand-400: #1a3a6a;
-  --color-brand-500: #4e8fff;
-  --color-brand-600: #6ba3ff;
-  --color-brand: #4e8fff;
+  /* ===== 品牌色 (Brand) - Manus 风格 ===== */
+  --color-brand-200: #1a2e1f;
+  --color-brand-300: #1f3d26;
+  --color-brand-400: #2d7d46;
+  --color-brand-500: #3e9b5b;
+  --color-brand-600: #5ab873;
+  --color-brand: #3e9b5b;
 
   /* ===== 主色 (Primary) ===== */
-  --color-primary: #ffffffee;
-  --color-primary-foreground: #01010a;
+  --color-primary: #ededec;
+  --color-primary-foreground: #1a1917;
 
   /* ===== 次要色 (Secondary) ===== */
-  --color-secondary: #101018;
-  --color-secondary-foreground: #ffffffee;
+  --color-secondary: #252422;
+  --color-secondary-foreground: #ededec;
 
   /* ===== 静音色 (Muted) ===== */
-  --color-muted: #101018;
-  --color-muted-foreground: #8888a0;
+  --color-muted: #252422;
+  --color-muted-foreground: #a8a59e;
 
   /* ===== 强调色 (Accent) ===== */
-  --color-accent: #101018;
-  --color-accent-foreground: #ffffffee;
+  --color-accent: #252422;
+  --color-accent-foreground: #ededec;
 
   /* ===== 卡片 (Card) ===== */
-  --color-card: #08080f;
-  --color-card-foreground: #ffffffee;
+  --color-card: #1e1d1b;
+  --color-card-foreground: #ededec;
 
   /* ===== 弹窗 (Popover) ===== */
-  --color-popover: #0c0c14;
-  --color-popover-foreground: #ffffffee;
+  --color-popover: #201f1d;
+  --color-popover-foreground: #ededec;
 
   /* ===== 破坏性 (Destructive) ===== */
-  --color-destructive: #ef4444;
-  --color-destructive-200: #3b1818;
-  --color-destructive-400: #dc2626;
+  --color-destructive: #dc4a3f;
+  --color-destructive-200: #3b1c1a;
+  --color-destructive-400: #c4362b;
   --color-destructive-foreground: #ffffff;
 
   /* ===== 警告 (Warning) ===== */
-  --color-warning: #f59e0b;
-  --color-warning-200: #3b2e0a;
-  --color-warning-400: #d97706;
+  --color-warning: #d97b06;
+  --color-warning-200: #3b2e12;
+  --color-warning-400: #b56308;
 
   /* ===== 成功 (Success) ===== */
-  --color-success: #22c55e;
-  --color-success-200: #0a3a1a;
+  --color-success: #3e9b5b;
+  --color-success-200: #1a2e1f;
 
   /* ===== 输入框 (Input) ===== */
-  --color-input: #16161f;
-  --color-ring: #4e8fff;
+  --color-input: #2c2b28;
+  --color-ring: #ededec;
 
   /* ===== 圆角 (Radius) ===== */
   --radius-sm: 0.375rem;
@@ -98,16 +98,18 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans), ui-sans-serif, -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC',
+      'Microsoft YaHei', sans-serif;
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-      'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    letter-spacing: -0.01em;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: -0.011em;
   }
 
-  /* ===== LobeHub 全局背景层 - 模拟深邃太空感 ===== */
+  /* ===== Manus 暗色模式微妙背景层 ===== */
   body::before {
     content: '';
     position: fixed;
@@ -115,17 +117,16 @@
     pointer-events: none;
     z-index: -1;
     background:
-      radial-gradient(ellipse 120% 60% at 50% 0%, rgba(40, 50, 120, 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 50% at 80% 20%, rgba(100, 50, 150, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 50% at 20% 80%, rgba(30, 60, 120, 0.03) 0%, transparent 50%);
+      radial-gradient(ellipse 120% 60% at 50% 0%, rgba(62, 155, 91, 0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 50% at 80% 20%, rgba(52, 50, 45, 0.04) 0%, transparent 50%);
   }
 
   ::selection {
-    background: rgba(78, 143, 255, 0.25);
-    color: #ffffff;
+    background: rgba(62, 155, 91, 0.25);
+    color: #ededec;
   }
 
-  /* ===== 滚动条样式 - LobeHub 风格 ===== */
+  /* ===== 滚动条样式 - Manus 暖色 ===== */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -136,12 +137,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1e1e30;
+    background: #3e3d39;
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #2e2e45;
+    background: #504e48;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -153,12 +154,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(237, 237, 236, 0.08);
     border-radius: 2px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(237, 237, 236, 0.15);
   }
 
   /* ===== 动画 - 淡入向上 ===== */
@@ -360,7 +361,7 @@
     animation: slideInLeft 500ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* ===== 渐变文字 - LobeHub 风格 ===== */
+  /* ===== 渐变文字 - Manus 风格 ===== */
   @keyframes gradientFlow {
     0%,
     100% {
@@ -371,7 +372,7 @@
     }
   }
   .animate-gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #a1a1a1 50%, #ffffff 100%);
+    background: linear-gradient(135deg, #ededec 0%, #a8a59e 50%, #ededec 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
@@ -379,116 +380,113 @@
     animation: gradientFlow 4s ease infinite;
   }
 
-  /* ===== LobeHub 蓝色渐变文字 ===== */
+  /* ===== Manus 品牌渐变文字 ===== */
   .gradient-text-blue {
-    background: linear-gradient(135deg, #4e8fff, #a855f7, #ec4899);
+    background: linear-gradient(135deg, #5ab873, #3e9b5b, #2d7d46);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  /* ===== LobeHub 品牌渐变文字 ===== */
+  /* ===== Manus 暖色渐变文字 ===== */
   .gradient-text-brand {
-    background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
+    background: linear-gradient(135deg, #ededec 0%, #78756e 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  /* ===== 发光效果 - LobeHub 风格 ===== */
+  /* ===== 发光效果 - Manus 暖色 ===== */
   .glow-brand {
-    box-shadow: 0 0 40px rgba(78, 143, 255, 0.15);
+    box-shadow: 0 0 40px rgba(62, 155, 91, 0.1);
   }
   .glow-brand-hover:hover {
-    box-shadow: 0 0 60px rgba(78, 143, 255, 0.25);
+    box-shadow: 0 0 60px rgba(62, 155, 91, 0.18);
   }
   .glow-primary {
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 40px rgba(237, 237, 236, 0.04);
   }
   .glow-primary-hover:hover {
-    box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 60px rgba(237, 237, 236, 0.08);
   }
 
-  /* ===== LobeHub 标准过渡 ===== */
+  /* ===== Manus 标准过渡 ===== */
   .transition-supabase {
     transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* ===== 聚焦环 ===== */
+  /* ===== 聚焦环 - Manus 暖色 ===== */
   .focus-ring-brand:focus {
     outline: none;
     box-shadow:
-      0 0 0 2px #01010a,
-      0 0 0 4px #4e8fff;
+      0 0 0 2px #1a1917,
+      0 0 0 4px #ededec;
   }
 
-  /* ===== LobeHub 玻璃拟态效果 ===== */
+  /* ===== Manus 玻璃拟态效果 ===== */
   .glass {
-    background: rgba(4, 4, 14, 0.75);
+    background: rgba(26, 25, 23, 0.8);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
   }
 
   .glass-card {
-    background: rgba(12, 12, 24, 0.6);
+    background: rgba(32, 31, 29, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(237, 237, 236, 0.04);
   }
 
-  /* ===== LobeHub 渐变背景 - 多层深度感 ===== */
+  /* ===== Manus 渐变背景 - 微妙暖色 ===== */
   .bg-gradient-radial {
     background:
-      radial-gradient(ellipse 100% 80% at 50% 0%, rgba(60, 80, 180, 0.1) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 40% at 70% 10%, rgba(130, 60, 200, 0.05) 0%, transparent 45%);
+      radial-gradient(ellipse 100% 80% at 50% 0%, rgba(62, 155, 91, 0.04) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 70% 10%, rgba(52, 50, 45, 0.06) 0%, transparent 45%);
   }
 
   .bg-gradient-hero {
     background:
       radial-gradient(
         ellipse 140% 70% at 50% -30%,
-        rgba(55, 80, 200, 0.18) 0%,
-        rgba(130, 60, 200, 0.06) 35%,
+        rgba(62, 155, 91, 0.06) 0%,
+        rgba(52, 50, 45, 0.04) 35%,
         transparent 65%
       ),
-      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(100, 40, 180, 0.05) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(40, 70, 200, 0.04) 0%, transparent 50%);
+      radial-gradient(ellipse 60% 50% at 80% 10%, rgba(62, 155, 91, 0.03) 0%, transparent 50%);
   }
 
   .bg-gradient-section {
     background: linear-gradient(
       180deg,
-      rgba(20, 25, 50, 0.15) 0%,
-      rgba(10, 10, 20, 0.05) 40%,
+      rgba(37, 36, 34, 0.3) 0%,
+      rgba(26, 25, 23, 0.1) 40%,
       transparent 100%
     );
   }
 
-  /* ===== LobeHub 区域间渐变分隔 ===== */
+  /* ===== Manus 区域间渐变分隔 ===== */
   .bg-gradient-section-alt {
     background: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(15, 15, 30, 0.2) 30%,
-      rgba(15, 15, 30, 0.2) 70%,
+      rgba(37, 36, 34, 0.2) 30%,
+      rgba(37, 36, 34, 0.2) 70%,
       transparent 100%
     );
   }
 
-  /* ===== LobeHub CTA 区域渐变 ===== */
+  /* ===== Manus CTA 区域渐变 ===== */
   .bg-gradient-cta {
     background:
       radial-gradient(
         ellipse 120% 80% at 50% 50%,
-        rgba(55, 80, 200, 0.12) 0%,
-        rgba(130, 60, 200, 0.04) 40%,
+        rgba(62, 155, 91, 0.05) 0%,
+        rgba(52, 50, 45, 0.03) 40%,
         transparent 65%
-      ),
-      radial-gradient(ellipse 80% 60% at 30% 60%, rgba(40, 60, 150, 0.05) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(80, 40, 180, 0.04) 0%, transparent 50%);
+      );
   }
 
-  /* ===== LobeHub 边框渐变效果 ===== */
+  /* ===== Manus 边框渐变效果 ===== */
   .border-gradient {
     border: 1px solid transparent;
     background-clip: padding-box;
@@ -500,7 +498,7 @@
     position: absolute;
     inset: -1px;
     border-radius: inherit;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(135deg, rgba(237, 237, 236, 0.08), rgba(237, 237, 236, 0.02));
     z-index: -1;
     mask:
       linear-gradient(#fff 0 0) content-box,
@@ -511,93 +509,258 @@
   }
 }
 
-/* ===== 亮色主题 (可选) ===== */
+/* ===== 亮色主题 - Manus Style (Warm, Clean, Minimal) ===== */
 @layer base {
   .light {
-    --color-background: #f8f8f8;
-    --color-background-200: #f2f2f2;
-    --color-background-studio: #ededed;
-    --color-background-alternative: #f8f8f8;
+    /* 背景 - Manus 纯净白 + 温暖灰 */
+    --color-background: #ffffff;
+    --color-background-200: #f8f8f6;
+    --color-background-studio: #f8f8f6;
+    --color-background-alternative: #ffffff;
+    --color-background-overlay: rgba(255, 255, 255, 0.85);
 
-    --color-surface-75: #f2f2f2;
-    --color-surface-100: #ececec;
-    --color-surface-200: #e5e5e5;
-    --color-surface-300: #dcdcdc;
-    --color-surface-400: #d0d0d0;
+    /* Surface 层级 - Manus 温暖灰阶 */
+    --color-surface-75: #fafaf9;
+    --color-surface-100: #f5f5f3;
+    --color-surface-200: #efeeed;
+    --color-surface-300: #e7e5e3;
+    --color-surface-400: #d6d3d0;
 
-    --color-foreground: #0a0a14;
-    --color-foreground-light: #4a4a5e;
-    --color-foreground-lighter: #6b6b80;
-    --color-foreground-muted: #9b9bb0;
+    /* 文字色 - 基于 Manus 品牌黑 #34322D */
+    --color-foreground: #34322d;
+    --color-foreground-light: #78756e;
+    --color-foreground-lighter: #a8a5a0;
+    --color-foreground-muted: #c4c1bc;
 
-    --color-border: #e0e0e0;
-    --color-border-muted: #eaeaea;
-    --color-border-strong: #d0d0d0;
-    --color-border-stronger: #a0a0a0;
+    /* 边框 - Manus 温暖、微妙 */
+    --color-border: #e8e6e3;
+    --color-border-muted: #f0eeec;
+    --color-border-strong: #d6d3d0;
+    --color-border-stronger: #a8a5a0;
 
-    --color-card: #ffffff;
-    --color-card-foreground: #0a0a14;
+    /* 品牌色 - Manus 风格（保持品牌绿/蓝但降低饱和度适配暖色调） */
+    --color-brand-200: #eef6f0;
+    --color-brand-300: #d4ead8;
+    --color-brand-400: #7bbf8a;
+    --color-brand-500: #3e9b5b;
+    --color-brand-600: #2d7d46;
+    --color-brand: #3e9b5b;
 
-    --color-popover: #ffffff;
-    --color-popover-foreground: #0a0a14;
-
-    --color-muted: #ececec;
-    --color-muted-foreground: #6b6b6b;
-
-    --color-secondary: #ececec;
-    --color-secondary-foreground: #0a0a14;
-
-    --color-accent: #ececec;
-    --color-accent-foreground: #0a0a14;
-
-    --color-input: #e5e5e5;
-
-    --color-primary: #0a0a14;
+    /* 主色 - Manus 深色按钮 */
+    --color-primary: #34322d;
     --color-primary-foreground: #ffffff;
+
+    /* 次要色 */
+    --color-secondary: #f5f5f3;
+    --color-secondary-foreground: #34322d;
+
+    /* 静音色 */
+    --color-muted: #f5f5f3;
+    --color-muted-foreground: #78756e;
+
+    /* 强调色 */
+    --color-accent: #f5f5f3;
+    --color-accent-foreground: #34322d;
+
+    /* 卡片 */
+    --color-card: #ffffff;
+    --color-card-foreground: #34322d;
+
+    /* 弹窗 */
+    --color-popover: #ffffff;
+    --color-popover-foreground: #34322d;
+
+    /* 破坏性 */
+    --color-destructive: #dc4a3f;
+    --color-destructive-200: #fef2f1;
+    --color-destructive-400: #c4362b;
+    --color-destructive-foreground: #ffffff;
+
+    /* 警告 */
+    --color-warning: #d97b06;
+    --color-warning-200: #fef8ec;
+    --color-warning-400: #b56308;
+
+    /* 成功 */
+    --color-success: #3e9b5b;
+    --color-success-200: #eef6f0;
+
+    /* 输入框 */
+    --color-input: #efeeed;
+    --color-ring: #34322d;
   }
 
-  /* 亮色模式滚动条 */
+  /* 亮色模式滚动条 - Manus 温暖灰 */
   .light ::-webkit-scrollbar-thumb {
-    background: #d4d4d4;
+    background: #d6d3d0;
   }
 
   .light ::-webkit-scrollbar-thumb:hover {
-    background: #a3a3a3;
+    background: #a8a5a0;
   }
 
   .light .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(52, 50, 45, 0.1);
   }
 
   .light .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(52, 50, 45, 0.2);
+  }
+
+  /* 亮色模式选区 */
+  .light ::selection {
+    background: rgba(62, 155, 91, 0.15);
+    color: #34322d;
+  }
+
+  /* 亮色模式去除深色背景层 */
+  .light body::before {
+    background: none;
+  }
+
+  /* 亮色模式 - 渐变文字适配 Manus 暖色 */
+  .light .animate-gradient-text {
+    background: linear-gradient(135deg, #34322d 0%, #78756e 50%, #34322d 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .light .gradient-text-blue {
+    background: linear-gradient(135deg, #3e9b5b, #2d7d46, #34322d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .light .gradient-text-brand {
+    background: linear-gradient(135deg, #34322d 0%, #78756e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 亮色模式 - 发光/阴影适配 */
+  .light .glow-brand {
+    box-shadow: 0 0 40px rgba(62, 155, 91, 0.08);
+  }
+  .light .glow-brand-hover:hover {
+    box-shadow: 0 0 60px rgba(62, 155, 91, 0.12);
+  }
+  .light .glow-primary {
+    box-shadow: 0 2px 8px rgba(52, 50, 45, 0.06);
+  }
+  .light .glow-primary-hover:hover {
+    box-shadow: 0 4px 16px rgba(52, 50, 45, 0.1);
+  }
+
+  /* 亮色模式 - 聚焦环 */
+  .light .focus-ring-brand:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 0 4px #34322d;
+  }
+
+  /* 亮色模式 - 玻璃拟态 */
+  .light .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .light .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(52, 50, 45, 0.06);
+  }
+
+  /* 亮色模式 - 渐变背景 */
+  .light .bg-gradient-radial {
+    background: none;
+  }
+  .light .bg-gradient-hero {
+    background: radial-gradient(
+      ellipse 140% 70% at 50% -30%,
+      rgba(62, 155, 91, 0.04) 0%,
+      rgba(52, 50, 45, 0.02) 35%,
+      transparent 65%
+    );
+  }
+  .light .bg-gradient-section {
+    background: linear-gradient(
+      180deg,
+      rgba(248, 248, 246, 0.5) 0%,
+      transparent 100%
+    );
+  }
+  .light .bg-gradient-section-alt {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(245, 245, 243, 0.4) 30%,
+      rgba(245, 245, 243, 0.4) 70%,
+      transparent 100%
+    );
+  }
+  .light .bg-gradient-cta {
+    background: radial-gradient(
+      ellipse 120% 80% at 50% 50%,
+      rgba(62, 155, 91, 0.04) 0%,
+      rgba(52, 50, 45, 0.02) 40%,
+      transparent 65%
+    );
+  }
+
+  /* 亮色模式 - 边框渐变 */
+  .light .border-gradient::before {
+    background: linear-gradient(135deg, rgba(52, 50, 45, 0.08), rgba(52, 50, 45, 0.02));
+  }
+
+  /* 亮色模式 - Hero 背景 */
+  .light .lobe-hero-bg {
+    background: radial-gradient(
+      ellipse at 50% -20%,
+      rgba(62, 155, 91, 0.05) 0%,
+      rgba(52, 50, 45, 0.02) 40%,
+      transparent 70%
+    );
+  }
+
+  /* 亮色模式 - 按钮阴影 */
+  .light .lobe-btn-primary {
+    box-shadow: 0 1px 3px rgba(52, 50, 45, 0.12);
   }
 }
 
 @layer utilities {
-  /* ===== LobeHub 排版系统 ===== */
+  /* ===== Manus 排版系统 ===== */
 
-  /* 页面标题 - 大号 */
+  /* ===== Supabase Typography Scale ===== */
+
+  /* 页面标题 - h1 */
   .text-page-title {
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.017em;
   }
 
-  /* 章节标题 */
+  /* 章节标题 - h2 */
   .text-section-title {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.014em;
   }
 
   /* 卡片标题 */
   .text-card-title {
-    font-size: 1rem;
-    line-height: 1.5rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
   }
 
   /* 分类标签 */
@@ -614,16 +777,16 @@
   .text-table-header {
     font-size: 0.75rem;
     line-height: 1rem;
-    font-weight: 500;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     color: var(--color-foreground-light);
   }
 
   /* 描述文本 */
   .text-description {
-    font-size: 0.875rem;
-    line-height: 1.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
     color: var(--color-foreground-light);
   }
 
@@ -643,16 +806,16 @@
   .text-stat-number {
     font-size: 1.5rem;
     line-height: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
 
   /* 大统计数字 */
   .text-stat-large {
-    font-size: 2.5rem;
-    line-height: 3rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
+    font-size: 2.25rem;
+    line-height: 2.75rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
   }
 }
 
@@ -691,7 +854,7 @@
     padding: 0 !important;
   }
 
-  /* ===== LobeHub Panel 样式 ===== */
+  /* ===== Manus Panel 样式 ===== */
   .page-panel {
     @apply bg-surface-100 border border-border rounded-xl;
   }
@@ -701,11 +864,15 @@
   }
 
   .page-panel-title {
-    @apply text-sm font-medium text-foreground;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-foreground);
   }
 
   .page-panel-description {
-    @apply text-xs text-foreground-light;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-foreground-light);
   }
 
   .page-section {
@@ -730,11 +897,18 @@
   }
 
   .page-title {
-    @apply text-xl font-semibold tracking-tight text-foreground;
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.017em;
+    color: var(--color-foreground);
   }
 
   .page-description {
-    @apply mt-1.5 text-sm leading-relaxed text-foreground-light;
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.375rem;
+    color: var(--color-foreground-light);
   }
 
   .page-toolbar {
@@ -745,46 +919,59 @@
     @apply h-px bg-border;
   }
 
-  /* ===== Dashboard Typography ===== */
+  /* ===== Dashboard Typography – Supabase Style ===== */
   .dashboard-page h1:not([class*='text-']) {
-    @apply text-xl font-semibold tracking-tight text-foreground;
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.017em;
+    color: var(--color-foreground);
   }
 
   .dashboard-page h2:not([class*='text-']) {
-    @apply text-lg font-semibold tracking-tight text-foreground;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.011em;
+    color: var(--color-foreground);
   }
 
   .dashboard-page h3:not([class*='text-']) {
-    @apply text-base font-semibold text-foreground;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--color-foreground);
   }
 
   .dashboard-page p:not([class*='text-']) {
-    @apply text-sm leading-relaxed text-foreground-light;
+    font-size: 0.8125rem;
+    line-height: 1.375rem;
+    color: var(--color-foreground-light);
   }
 
   .dashboard-page h1.text-2xl,
   .dashboard-page h1.text-3xl,
   .dashboard-page h1.text-4xl {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
     line-height: 1.75rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 400;
+    letter-spacing: -0.017em;
   }
 
   .dashboard-page h2.text-xl,
   .dashboard-page h2.text-2xl,
   .dashboard-page h3.text-xl {
-    font-size: 1.125rem;
+    font-size: 1rem;
     line-height: 1.5rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-weight: 400;
+    letter-spacing: -0.011em;
   }
 
   .dashboard-page h3.text-lg,
   .dashboard-page h4.text-lg {
-    font-size: 1rem;
-    line-height: 1.5rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
   }
 
   .dashboard-page p.text-sm,
@@ -793,7 +980,7 @@
     line-height: 1.25rem;
   }
 
-  /* ===== LobeHub 公共页面通用组件 ===== */
+  /* ===== Manus 公共页面通用组件 ===== */
 
   /* Hero 区域 */
   .lobe-hero {
@@ -805,8 +992,8 @@
     inset: 0;
     background: radial-gradient(
       ellipse at 50% -20%,
-      rgba(78, 143, 255, 0.1) 0%,
-      rgba(168, 85, 247, 0.04) 40%,
+      rgba(62, 155, 91, 0.06) 0%,
+      rgba(52, 50, 45, 0.03) 40%,
       transparent 70%
     );
     pointer-events: none;
@@ -863,10 +1050,10 @@
   }
 
   .lobe-section-header h2 {
-    @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight mb-4;
   }
 
   .lobe-section-header p {
-    @apply text-lg text-foreground-light leading-relaxed;
+    @apply text-base text-foreground-light leading-relaxed;
   }
 }
