@@ -25,6 +25,13 @@ import type {
 
 import { request, API_BASE_URL } from './shared'
 
+/** API envelope returned by the backend */
+interface ApiResponse<T> {
+  code: string
+  message: string
+  data: T
+}
+
 /**
  * Conversation API
  */
@@ -46,18 +53,18 @@ export const conversationApi = {
     }
 
     const query = searchParams.toString()
-    const response = await request<ConversationListResponse>(
+    const response = await request<ApiResponse<ConversationListResponse>>(
       `${API_BASE_URL}/conversations${query ? `?${query}` : ''}`
     )
 
-    return response
+    return response.data
   },
 
   /**
    * CreateConversation
    */
   async create(data: CreateConversationRequest): Promise<Conversation> {
-    const response = await request<{ conversation: Conversation }>(
+    const response = await request<ApiResponse<{ conversation: Conversation }>>(
       `${API_BASE_URL}/conversations`,
       {
         method: 'POST',
@@ -73,7 +80,7 @@ export const conversationApi = {
       }
     )
 
-    return response.conversation
+    return response.data.conversation
   },
 
   /**
@@ -91,18 +98,18 @@ export const conversationApi = {
       searchParams.set('workspace_id', options.workspaceId)
     }
     const params = searchParams.toString()
-    const response = await request<{ conversation: Conversation }>(
+    const response = await request<ApiResponse<{ conversation: Conversation }>>(
       `${API_BASE_URL}/conversations/${id}${params ? `?${params}` : ''}`
     )
 
-    return response.conversation
+    return response.data.conversation
   },
 
   /**
    * UpdateConversation
    */
   async update(id: string, data: UpdateConversationRequest): Promise<Conversation> {
-    const response = await request<{ conversation: Conversation }>(
+    const response = await request<ApiResponse<{ conversation: Conversation }>>(
       `${API_BASE_URL}/conversations/${id}`,
       {
         method: 'PUT',
@@ -116,33 +123,33 @@ export const conversationApi = {
       }
     )
 
-    return response.conversation
+    return response.data.conversation
   },
 
   /**
    * DeleteConversation
    */
   async delete(id: string): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversations/${id}`, { method: 'DELETE' })
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversations/${id}`, { method: 'DELETE' })
   },
 
   /**
    * CopyConversation
    */
   async duplicate(id: string): Promise<Conversation> {
-    const response = await request<{ conversation: Conversation }>(
+    const response = await request<ApiResponse<{ conversation: Conversation }>>(
       `${API_BASE_URL}/conversations/${id}/duplicate`,
       { method: 'POST' }
     )
 
-    return response.conversation
+    return response.data.conversation
   },
 
   /**
    * SettingsFavoriteStatus
    */
   async setStarred(id: string, starred: boolean): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversations/${id}/starred`, {
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversations/${id}/starred`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: starred }),
@@ -153,7 +160,7 @@ export const conversationApi = {
    * SettingsPinStatus
    */
   async setPinned(id: string, pinned: boolean): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversations/${id}/pinned`, {
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversations/${id}/pinned`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: pinned }),
@@ -164,7 +171,7 @@ export const conversationApi = {
    * SettingsArchiveStatus
    */
   async setArchived(id: string, archived: boolean): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversations/${id}/archived`, {
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversations/${id}/archived`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: archived }),
@@ -175,7 +182,7 @@ export const conversationApi = {
    * SettingsTags
    */
   async setTags(id: string, tags: string[]): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversations/${id}/tags`, {
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversations/${id}/tags`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tags }),
@@ -186,40 +193,43 @@ export const conversationApi = {
    * BatchFavorite
    */
   async batchStar(data: BatchStarRequest): Promise<BatchOperationResponse> {
-    return request<BatchOperationResponse>(`${API_BASE_URL}/conversations/batch/star`, {
+    const response = await request<ApiResponse<BatchOperationResponse>>(`${API_BASE_URL}/conversations/batch/star`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
+    return response.data
   },
 
   /**
    * BatchArchive
    */
   async batchArchive(data: BatchArchiveRequest): Promise<BatchOperationResponse> {
-    return request<BatchOperationResponse>(`${API_BASE_URL}/conversations/batch/archive`, {
+    const response = await request<ApiResponse<BatchOperationResponse>>(`${API_BASE_URL}/conversations/batch/archive`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
+    return response.data
   },
 
   /**
    * BatchDelete
    */
   async batchDelete(data: BatchOperationRequest): Promise<BatchOperationResponse> {
-    return request<BatchOperationResponse>(`${API_BASE_URL}/conversations/batch/delete`, {
+    const response = await request<ApiResponse<BatchOperationResponse>>(`${API_BASE_URL}/conversations/batch/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
+    return response.data
   },
 
   /**
    * BatchMovetoFolder
    */
   async batchMove(data: BatchMoveRequest): Promise<BatchOperationResponse> {
-    return request<BatchOperationResponse>(`${API_BASE_URL}/conversations/batch/move`, {
+    const response = await request<ApiResponse<BatchOperationResponse>>(`${API_BASE_URL}/conversations/batch/move`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -227,6 +237,7 @@ export const conversationApi = {
         folder_id: data.folderId,
       }),
     })
+    return response.data
   },
 
   /**
@@ -248,16 +259,17 @@ export const conversationApi = {
     }
 
     const query = searchParams.toString()
-    return request<MessageListResponse>(
+    const response = await request<ApiResponse<MessageListResponse>>(
       `${API_BASE_URL}/conversations/${conversationId}/messages${query ? `?${query}` : ''}`
     )
+    return response.data
   },
 
   /**
    * AddMessage
    */
   async addMessage(conversationId: string, data: AddMessageRequest): Promise<Message> {
-    const response = await request<{ message: Message }>(
+    const response = await request<ApiResponse<{ message: Message }>>(
       `${API_BASE_URL}/conversations/${conversationId}/messages`,
       {
         method: 'POST',
@@ -274,7 +286,7 @@ export const conversationApi = {
       }
     )
 
-    return response.message
+    return response.data.message
   },
 
   /**
@@ -285,7 +297,7 @@ export const conversationApi = {
     messageId: string,
     content: string
   ): Promise<Message> {
-    const response = await request<{ success: boolean; message: Message }>(
+    const response = await request<ApiResponse<{ success: boolean; message: Message }>>(
       `${API_BASE_URL}/conversations/${conversationId}/messages/${messageId}`,
       {
         method: 'PUT',
@@ -293,7 +305,7 @@ export const conversationApi = {
         body: JSON.stringify({ content }),
       }
     )
-    return response.message
+    return response.data.message
   },
 
   /**
@@ -304,7 +316,7 @@ export const conversationApi = {
     messageId: string,
     feedback: { liked?: boolean; disliked?: boolean; bookmarked?: boolean }
   ): Promise<Message> {
-    const response = await request<{ success: boolean; message: Message }>(
+    const response = await request<ApiResponse<{ success: boolean; message: Message }>>(
       `${API_BASE_URL}/conversations/${conversationId}/messages/${messageId}/feedback`,
       {
         method: 'PUT',
@@ -312,14 +324,14 @@ export const conversationApi = {
         body: JSON.stringify(feedback),
       }
     )
-    return response.message
+    return response.data.message
   },
 
   /**
    * DeleteMessage
    */
   async deleteMessage(conversationId: string, messageId: string): Promise<void> {
-    await request<{ success: boolean }>(
+    await request<ApiResponse<{ success: boolean }>>(
       `${API_BASE_URL}/conversations/${conversationId}/messages/${messageId}`,
       { method: 'DELETE' }
     )
@@ -338,11 +350,11 @@ export const conversationApi = {
     suggestions?: string[]
   }> {
     const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : ''
-    const response = await request<{
+    const envelope = await request<ApiResponse<{
       user_message: { id: string; content: string; created_at: string }
       ai_message: { message_id: string; content: string; model: string }
       suggestions?: string[]
-    }>(`${API_BASE_URL}/conversations/${conversationId}/chat${query}`, {
+    }>>(`${API_BASE_URL}/conversations/${conversationId}/chat${query}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -351,6 +363,8 @@ export const conversationApi = {
         system_prompt: options?.systemPrompt,
       }),
     })
+
+    const response = envelope.data
 
     return {
       userMessage: {
@@ -418,12 +432,12 @@ export const conversationApi = {
     expiresAt?: string
     isPublic: boolean
   }> {
-    const response = await request<{
+    const envelope = await request<ApiResponse<{
       share_url: string
       share_token: string
       expires_at?: string
       is_public: boolean
-    }>(`${API_BASE_URL}/conversations/${conversationId}/share`, {
+    }>>(`${API_BASE_URL}/conversations/${conversationId}/share`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -431,6 +445,8 @@ export const conversationApi = {
         is_public: options?.isPublic ?? true,
       }),
     })
+
+    const response = envelope.data
 
     return {
       shareUrl: response.share_url,
@@ -444,7 +460,8 @@ export const conversationApi = {
    * FetchConversationStatistics
    */
   async getStatistics(): Promise<ConversationStatistics> {
-    return request<ConversationStatistics>(`${API_BASE_URL}/conversations/statistics`)
+    const response = await request<ApiResponse<ConversationStatistics>>(`${API_BASE_URL}/conversations/statistics`)
+    return response.data
   },
 
   /**
@@ -456,12 +473,12 @@ export const conversationApi = {
     importedCount: number
     totalMessages: number
   }> {
-    const response = await request<{
+    const envelope = await request<ApiResponse<{
       success: boolean
       conversation: Conversation
       imported_count: number
       total_messages: number
-    }>(`${API_BASE_URL}/conversations/import`, {
+    }>>(`${API_BASE_URL}/conversations/import`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -478,6 +495,8 @@ export const conversationApi = {
         })),
       }),
     })
+
+    const response = envelope.data
 
     return {
       success: response.success,
@@ -523,14 +542,15 @@ export const conversationFolderApi = {
    * FetchFolderList
    */
   async list(): Promise<ConversationFolderListResponse> {
-    return request<ConversationFolderListResponse>(`${API_BASE_URL}/conversation-folders`)
+    const response = await request<ApiResponse<ConversationFolderListResponse>>(`${API_BASE_URL}/conversation-folders`)
+    return response.data
   },
 
   /**
    * CreateFolder
    */
   async create(data: CreateConversationFolderRequest): Promise<ConversationFolder> {
-    const response = await request<{ folder: ConversationFolder }>(
+    const response = await request<ApiResponse<{ folder: ConversationFolder }>>(
       `${API_BASE_URL}/conversation-folders`,
       {
         method: 'POST',
@@ -544,25 +564,25 @@ export const conversationFolderApi = {
       }
     )
 
-    return response.folder
+    return response.data.folder
   },
 
   /**
    * FetchFolderDetails
    */
   async get(id: string): Promise<ConversationFolder> {
-    const response = await request<{ folder: ConversationFolder }>(
+    const response = await request<ApiResponse<{ folder: ConversationFolder }>>(
       `${API_BASE_URL}/conversation-folders/${id}`
     )
 
-    return response.folder
+    return response.data.folder
   },
 
   /**
    * UpdateFolder
    */
   async update(id: string, data: UpdateConversationFolderRequest): Promise<ConversationFolder> {
-    const response = await request<{ folder: ConversationFolder }>(
+    const response = await request<ApiResponse<{ folder: ConversationFolder }>>(
       `${API_BASE_URL}/conversation-folders/${id}`,
       {
         method: 'PUT',
@@ -576,14 +596,14 @@ export const conversationFolderApi = {
       }
     )
 
-    return response.folder
+    return response.data.folder
   },
 
   /**
    * DeleteFolder
    */
   async delete(id: string): Promise<void> {
-    await request<{ success: boolean }>(`${API_BASE_URL}/conversation-folders/${id}`, {
+    await request<ApiResponse<{ success: boolean }>>(`${API_BASE_URL}/conversation-folders/${id}`, {
       method: 'DELETE',
     })
   },

@@ -186,7 +186,7 @@ function unwrapData<T>(payload: ApiResponse<T> | T): T {
   return payload as T
 }
 
-async function refreshAccessToken(): Promise<boolean> {
+export async function refreshAccessToken(): Promise<boolean> {
   const currentRefreshToken = getRefreshToken()
   if (!currentRefreshToken) return false
 

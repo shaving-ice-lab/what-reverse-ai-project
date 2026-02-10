@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react'
-import { API_BASE_URL, getStoredTokens } from '@/lib/api/shared'
+import { API_BASE_URL, getAccessToken, refreshAccessToken, clearTokens } from '@/lib/api/shared'
 
 export interface StreamingChatOptions {
   model?: string
@@ -40,18 +40,15 @@ export function useStreamingChat() {
       let fullContent = ''
 
       try {
-        const tokens = getStoredTokens()
-
         const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : ''
-        const response = await fetch(
-          `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`,
-          {
+        const url = `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`
+        const buildFetchOptions = (): RequestInit => {
+          const token = getAccessToken()
+          return {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...(tokens?.accessToken && {
-                Authorization: `Bearer ${tokens.accessToken}`,
-              }),
+              ...(token && { Authorization: `Bearer ${token}` }),
             },
             body: JSON.stringify({
               message,
@@ -60,7 +57,19 @@ export function useStreamingChat() {
             }),
             signal: abortController.signal,
           }
-        )
+        }
+
+        let response = await fetch(url, buildFetchOptions())
+
+        // Handle 401 with token refresh (matching API client behavior)
+        if (response.status === 401) {
+          const refreshed = await refreshAccessToken()
+          if (!refreshed) {
+            clearTokens()
+            throw new Error('Session expired, please sign in again')
+          }
+          response = await fetch(url, buildFetchOptions())
+        }
 
         if (!response.ok) {
           throw new Error(`Chat failed: ${response.statusText}`)
@@ -162,18 +171,15 @@ export async function* streamChatGenerator(
     signal?: AbortSignal
   }
 ): AsyncGenerator<string, string, unknown> {
-  const tokens = getStoredTokens()
-
   const query = options?.workspaceId ? `?workspace_id=${options.workspaceId}` : ''
-  const response = await fetch(
-    `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`,
-    {
+  const url = `${API_BASE_URL}/conversations/${conversationId}/chat/stream${query}`
+  const buildFetchOptions = (): RequestInit => {
+    const token = getAccessToken()
+    return {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(tokens?.accessToken && {
-          Authorization: `Bearer ${tokens.accessToken}`,
-        }),
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
       body: JSON.stringify({
         message,
@@ -182,7 +188,18 @@ export async function* streamChatGenerator(
       }),
       signal: options?.signal,
     }
-  )
+  }
+
+  let response = await fetch(url, buildFetchOptions())
+
+  if (response.status === 401) {
+    const refreshed = await refreshAccessToken()
+    if (!refreshed) {
+      clearTokens()
+      throw new Error('Session expired, please sign in again')
+    }
+    response = await fetch(url, buildFetchOptions())
+  }
 
   if (!response.ok) {
     throw new Error(`Chat failed: ${response.statusText}`)
