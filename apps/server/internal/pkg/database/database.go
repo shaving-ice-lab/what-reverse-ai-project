@@ -166,5 +166,39 @@ func Migrate(db *gorm.DB) error {
 		&entity.AgentUsage{},
 		&entity.AgentUsageStat{},
 		&entity.AgentReport{},
+
+		// 计费相关
+		&entity.BillingPlan{},
+		&entity.WorkspaceQuota{},
+		&entity.BillingUsageEvent{},
+		&entity.BillingInvoicePayment{},
+
+		// 对话相关
+		&entity.ConversationFolder{},
+		&entity.Conversation{},
+		&entity.ConversationTag{},
+		&entity.Message{},
+		&entity.ConversationTemplate{},
+
+		// Workspace 统计
+		&entity.WorkspaceUsageStats{},
+
+		// 分享相关
+		&entity.ShareView{},
+
+		// 规划相关
+		&entity.PlanModule{},
+		&entity.PlanTask{},
+		&entity.PlanVersion{},
+
+		// 收益相关（补充）
+		&entity.CommissionTier{},
+		&entity.CreatorAccount{},
+		&entity.Withdrawal{},
+		&entity.Settlement{},
+
+		// 供应链安全
+		&entity.SBOMRecord{},
+		&entity.ArtifactSignature{},
 	)
 }

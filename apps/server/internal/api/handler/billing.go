@@ -115,6 +115,7 @@ func (h *BillingHandler) GetWorkspaceQuota(c echo.Context) error {
 		"tokens":     formattedQuota["tokens"],
 		"storage":    formattedQuota["storage"],
 		"bandwidth":  formattedQuota["bandwidth"],
+		"apps":       formattedQuota["apps"],
 		"dimensions": h.billingService.ListDimensions(c.Request().Context()),
 	})
 }
@@ -127,6 +128,7 @@ func formatQuotaForFrontendEntity(quota *entity.WorkspaceQuota, plan *entity.Bil
 			"tokens":    {Used: 0, Limit: 0},
 			"storage":   {Used: 0, Limit: 0},
 			"bandwidth": {Used: 0, Limit: 0},
+			"apps":      {Used: 0, Limit: 0},
 		}
 	}
 
@@ -175,6 +177,10 @@ func formatQuotaForFrontendEntity(quota *entity.WorkspaceQuota, plan *entity.Bil
 		"bandwidth": {
 			Used:  getUsage("bandwidth"),
 			Limit: getLimit("bandwidth"),
+		},
+		"apps": {
+			Used:  getUsage("apps"),
+			Limit: getLimit("apps"),
 		},
 	}
 }
