@@ -128,19 +128,17 @@ export function UserProfileCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit3 className="w-4 h-4 mr-2" />
+              <DropdownMenuItem icon={<Edit3 className="w-4 h-4" />} onClick={onEdit}>
                 Edit Profile
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">
-                  <Settings className="w-4 h-4 mr-2" />
+                <Link href="/dashboard/settings" className="flex items-center gap-2">
+                  <Settings className="w-4 h-4" />
                   Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-500" onClick={onLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
+              <DropdownMenuItem icon={<LogOut className="w-4 h-4" />} destructive onClick={onLogout}>
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>

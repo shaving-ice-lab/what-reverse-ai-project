@@ -201,21 +201,21 @@ export function ChatInput({
                   onClick={() => handleFileSelect('image')}
                   className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                 >
-                  <ImageIcon className="w-4 h-4 mr-2 text-brand-500" />
+                  <ImageIcon className="w-4 h-4 text-brand-500" />
                   Upload Image
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleFileSelect('file')}
                   className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                 >
-                  <FileText className="w-4 h-4 mr-2 text-foreground-muted" />
+                  <FileText className="w-4 h-4 text-foreground-muted" />
                   Upload File
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleFileSelect('code')}
                   className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                 >
-                  <Code className="w-4 h-4 mr-2 text-foreground-muted" />
+                  <Code className="w-4 h-4 text-foreground-muted" />
                   Upload Code
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -310,7 +310,7 @@ export function ChatInput({
                       onClick={() => onModelChange?.(model.id)}
                       className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                     >
-                      <Sparkles className="w-4 h-4 mr-2 text-brand-500" />
+                      <Sparkles className="w-4 h-4 text-brand-500" />
                       {model.name}
                     </DropdownMenuItem>
                   ))}

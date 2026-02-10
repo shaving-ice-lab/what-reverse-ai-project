@@ -331,18 +331,18 @@ export function MessageBubble({
                   onClick={onReply}
                   className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                 >
-                  <Reply className="w-4 h-4 mr-2" />
+                  <Reply className="w-4 h-4" />
                   Reply
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={onBookmark}
                   className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                 >
-                  <Bookmark className="w-4 h-4 mr-2" />
+                  <Bookmark className="w-4 h-4" />
                   {message.bookmarked ? 'Remove Bookmark' : 'Bookmark'}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  <Share2 className="w-4 h-4 mr-2" />
+                  <Share2 className="w-4 h-4" />
                   Share
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -351,12 +351,12 @@ export function MessageBubble({
                 >
                   {isSpeaking ? (
                     <>
-                      <VolumeX className="w-4 h-4 mr-2" />
+                      <VolumeX className="w-4 h-4" />
                       Stop Reading
                     </>
                   ) : (
                     <>
-                      <Volume2 className="w-4 h-4 mr-2" />
+                      <Volume2 className="w-4 h-4" />
                       Read Aloud
                     </>
                   )}
@@ -368,7 +368,7 @@ export function MessageBubble({
                       onClick={onEdit}
                       className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                     >
-                      <Edit3 className="w-4 h-4 mr-2" />
+                      <Edit3 className="w-4 h-4" />
                       Edit
                     </DropdownMenuItem>
                   </>
@@ -378,7 +378,7 @@ export function MessageBubble({
                   onClick={onDelete}
                   className="text-destructive-400 hover:bg-destructive-200"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

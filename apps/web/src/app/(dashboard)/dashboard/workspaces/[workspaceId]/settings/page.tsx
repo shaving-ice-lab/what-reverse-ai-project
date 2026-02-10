@@ -2057,13 +2057,13 @@ export default function WorkspaceSettingsPage() {
                               className="w-40 bg-surface-100 border-border"
                             >
                               <DropdownMenuItem className="text-[12px]">
-                                <UserCog className="w-4 h-4 mr-2" />
+                                <UserCog className="w-4 h-4" />
                                 Change Role
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className="bg-border" />
                               {member.role_name !== 'owner' && (
                                 <DropdownMenuItem className="text-[12px] text-destructive">
-                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  <Trash2 className="w-4 h-4" />
                                   Remove Member
                                 </DropdownMenuItem>
                               )}
@@ -2216,7 +2216,7 @@ export default function WorkspaceSettingsPage() {
                                 setShowRotateKeyDialog(true)
                               }}
                             >
-                              <RefreshCw className="w-4 h-4 mr-2" />
+                              <RefreshCw className="w-4 h-4" />
                               Rotate Key
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -2225,7 +2225,7 @@ export default function WorkspaceSettingsPage() {
                                 onClick={() => handleRevokeApiKey(key.id)}
                                 className="text-warning"
                               >
-                                <Lock className="w-4 h-4 mr-2" />
+                                <Lock className="w-4 h-4" />
                                 Disable
                               </DropdownMenuItem>
                             ) : (
@@ -2233,7 +2233,7 @@ export default function WorkspaceSettingsPage() {
                                 onClick={() => handleDeleteApiKey(key.id)}
                                 className="text-destructive"
                               >
-                                <Trash2 className="w-4 h-4 mr-2" />
+                                <Trash2 className="w-4 h-4" />
                                 Delete
                               </DropdownMenuItem>
                             )}

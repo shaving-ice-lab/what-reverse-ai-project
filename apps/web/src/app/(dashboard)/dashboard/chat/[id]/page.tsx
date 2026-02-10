@@ -749,11 +749,11 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
                       onClick={() => setIsEditing(true)}
                       className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                     >
-                      <Edit3 className="w-4 h-4 mr-2" />
+                      <Edit3 className="w-4 h-4" />
                       Rename
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                      <Share2 className="w-4 h-4 mr-2" />
+                      <Share2 className="w-4 h-4" />
                       Share
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-border" />
@@ -761,14 +761,14 @@ export function ChatPageContent({ conversationId, workspaceId }: ChatPageProps) 
                       onClick={handleArchive}
                       className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                     >
-                      <Archive className="w-4 h-4 mr-2" />
+                      <Archive className="w-4 h-4" />
                       Archive
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive hover:bg-destructive-200"
                       onClick={handleDelete}
                     >
-                      <Trash2 className="w-4 h-4 mr-2" />
+                      <Trash2 className="w-4 h-4" />
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

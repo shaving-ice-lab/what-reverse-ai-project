@@ -821,15 +821,15 @@ export default function HistoryPage() {
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Copy className="w-4 h-4 mr-2" />
+                              <Copy className="w-4 h-4" />
                               Copy Link
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Share2 className="w-4 h-4 mr-2" />
+                              <Share2 className="w-4 h-4" />
                               Share
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Download className="w-4 h-4 mr-2" />
+                              <Download className="w-4 h-4" />
                               Export
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
@@ -837,14 +837,14 @@ export default function HistoryPage() {
                               onClick={() => archiveConversation(conv.id)}
                               className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
                             >
-                              <Archive className="w-4 h-4 mr-2" />
+                              <Archive className="w-4 h-4" />
                               {conv.archived ? 'Unarchive' : 'Archive'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-[13px] text-destructive-400 focus:text-destructive focus:bg-destructive-200"
                               onClick={() => deleteConversation(conv.id)}
                             >
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <Trash2 className="w-4 h-4" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

@@ -622,12 +622,12 @@ export default function FavoritesPage() {
                                 className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
                               >
                                 <Link href={fav.href}>
-                                  <ExternalLink className="w-4 h-4 mr-2" />
+                                  <ExternalLink className="w-4 h-4" />
                                   Open
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                                <Copy className="w-4 h-4 mr-2" />
+                                <Copy className="w-4 h-4" />
                                 Copy Link
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className="bg-border" />
@@ -635,7 +635,7 @@ export default function FavoritesPage() {
                                 className="text-[13px] text-destructive-400 focus:text-destructive focus:bg-destructive-200"
                                 onClick={() => removeFavorite(fav.id)}
                               >
-                                <StarOff className="w-4 h-4 mr-2" />
+                                <StarOff className="w-4 h-4" />
                                 Unfavorite
                               </DropdownMenuItem>
                             </DropdownMenuContent>

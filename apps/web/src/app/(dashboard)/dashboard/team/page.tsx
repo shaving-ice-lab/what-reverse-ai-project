@@ -780,18 +780,18 @@ export default function TeamPage() {
                           >
                             <PermissionGate permissions={permissions} required={['members_manage']}>
                               <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                                <UserCog className="w-4 h-4 mr-2" />
+                                <UserCog className="w-4 h-4" />
                                 Change Role
                               </DropdownMenuItem>
                             </PermissionGate>
                             <PermissionGate permissions={permissions} required={['members_manage']}>
                               <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                                <Key className="w-4 h-4 mr-2" />
+                                <Key className="w-4 h-4" />
                                 Manage Permissions
                               </DropdownMenuItem>
                             </PermissionGate>
                             <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                              <Mail className="w-4 h-4 mr-2" />
+                              <Mail className="w-4 h-4" />
                               Send Message
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
@@ -802,9 +802,9 @@ export default function TeamPage() {
                                   onClick={() => handleToggleFreeze(member.id)}
                                 >
                                   {isFrozen ? (
-                                    <Eye className="w-4 h-4 mr-2" />
+                                    <Eye className="w-4 h-4" />
                                   ) : (
-                                    <EyeOff className="w-4 h-4 mr-2" />
+                                    <EyeOff className="w-4 h-4" />
                                   )}
                                   {isFrozen ? 'Unfreeze' : 'Freeze Member'}
                                 </DropdownMenuItem>
@@ -816,7 +816,7 @@ export default function TeamPage() {
                                   className="text-destructive hover:bg-destructive-200"
                                   onClick={() => handleRemoveMember(member.id)}
                                 >
-                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  <Trash2 className="w-4 h-4" />
                                   Remove Member
                                 </DropdownMenuItem>
                               )}
@@ -931,7 +931,7 @@ export default function TeamPage() {
                 </Button>
 
                 <Button className="bg-brand-500 hover:bg-brand-600 text-background">
-                  <Send className="w-4 h-4 mr-2" />
+                  <Send className="w-4 h-4" />
                   Send Invite
                 </Button>
               </div>

@@ -710,26 +710,26 @@ export default function WorkflowsPage() {
                             className="w-36 bg-surface-100 border border-border rounded-md"
                           >
                             {workflow.status === 'active' ? (
-                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                              <DropdownMenuItem className="px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
                                 <Pause className="w-3.5 h-3.5" />
                                 Pause
                               </DropdownMenuItem>
                             ) : workflow.status !== 'draft' ? (
-                              <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                              <DropdownMenuItem className="px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
                                 <Play className="w-3.5 h-3.5" />
                                 Enable
                               </DropdownMenuItem>
                             ) : null}
-                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                            <DropdownMenuItem className="px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
                               <Copy className="w-3.5 h-3.5" />
                               Copy
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
+                            <DropdownMenuItem className="px-3 py-1.5 text-[12px] text-foreground-light hover:bg-surface-200 hover:text-foreground rounded-md mx-1 cursor-pointer">
                               <Star className="w-3.5 h-3.5" />
                               {workflow.starred ? 'Unfavorite' : 'Favorite'}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border mx-2" />
-                            <DropdownMenuItem className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-destructive hover:bg-destructive-200 hover:text-destructive rounded-md mx-1 cursor-pointer">
+                            <DropdownMenuItem className="px-3 py-1.5 text-[12px] text-destructive hover:bg-destructive-200 hover:text-destructive rounded-md mx-1 cursor-pointer">
                               <Trash2 className="w-3.5 h-3.5" />
                               Delete
                             </DropdownMenuItem>

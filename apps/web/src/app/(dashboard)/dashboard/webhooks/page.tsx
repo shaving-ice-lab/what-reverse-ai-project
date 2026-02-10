@@ -331,29 +331,29 @@ export default function WebhooksPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
-                            <Settings className="w-4 h-4 mr-2" />
+                            <Settings className="w-4 h-4" />
                             Edit Config
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Play className="w-4 h-4 mr-2" />
+                            <Play className="w-4 h-4" />
                             Test Send
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             {webhook.status === 'active' ? (
                               <>
-                                <Pause className="w-4 h-4 mr-2" />
+                                <Pause className="w-4 h-4" />
                                 Pause
                               </>
                             ) : (
                               <>
-                                <Play className="w-4 h-4 mr-2" />
+                                <Play className="w-4 h-4" />
                                 Enable
                               </>
                             )}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
+                            <Trash2 className="w-4 h-4" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>

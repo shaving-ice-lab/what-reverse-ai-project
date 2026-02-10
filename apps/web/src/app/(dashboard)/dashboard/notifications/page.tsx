@@ -935,7 +935,7 @@ export default function NotificationsPage() {
                                         onClick={() => markAsRead(notification.id)}
                                         className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                                       >
-                                        <Check className="w-4 h-4 mr-2" />
+                                        <Check className="w-4 h-4" />
                                         Mark as Read
                                       </DropdownMenuItem>
                                     )}
@@ -943,7 +943,7 @@ export default function NotificationsPage() {
                                       onClick={() => toggleStar(notification.id)}
                                       className="text-foreground-light hover:text-foreground hover:bg-surface-200"
                                     >
-                                      <Star className="w-4 h-4 mr-2" />
+                                      <Star className="w-4 h-4" />
                                       {notification.starred ? 'Unfavorite' : 'Favorite'}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator className="bg-border-muted" />
@@ -951,7 +951,7 @@ export default function NotificationsPage() {
                                       className="text-destructive hover:bg-destructive-200"
                                       onClick={() => deleteNotification(notification.id)}
                                     >
-                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      <Trash2 className="w-4 h-4" />
                                       Delete
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>

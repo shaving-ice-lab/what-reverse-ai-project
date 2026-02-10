@@ -398,11 +398,11 @@ export default function ApiKeysPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-surface-100 border-border">
                 <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  <Settings className="w-4 h-4 mr-2" />
+                  <Settings className="w-4 h-4" />
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <RefreshCw className="w-4 h-4" />
                   Regenerate
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border-muted" />
@@ -411,7 +411,7 @@ export default function ApiKeysPage() {
                     className="text-foreground-light hover:bg-surface-200"
                     onClick={() => revokeKey(apiKey.id)}
                   >
-                    <Shield className="w-4 h-4 mr-2" />
+                    <Shield className="w-4 h-4" />
                     Revoke Key
                   </DropdownMenuItem>
                 )}
@@ -419,7 +419,7 @@ export default function ApiKeysPage() {
                   className="text-destructive hover:bg-destructive-200"
                   onClick={() => deleteKey(apiKey.id)}
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -860,7 +860,7 @@ export default function ApiKeysPage() {
                       disabled={!newKeyName || newKeyPermissions.length === 0}
                       className="bg-brand-500 hover:bg-brand-600 text-background"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus className="w-4 h-4" />
                       Create Key
                     </Button>
                   </div>

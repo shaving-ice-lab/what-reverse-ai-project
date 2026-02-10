@@ -774,11 +774,11 @@ export default function TasksPage() {
                             className="w-48 rounded-lg bg-surface-100 border-border shadow-2xl"
                           >
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Edit className="w-4 h-4 mr-2" />
+                              <Edit className="w-4 h-4" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Copy className="w-4 h-4 mr-2" />
+                              <Copy className="w-4 h-4" />
                               Copy
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
@@ -787,7 +787,7 @@ export default function TasksPage() {
                                 className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
                                 onClick={() => updateTaskStatus(task.id, 'completed')}
                               >
-                                <CheckCircle2 className="w-4 h-4 mr-2" />
+                                <CheckCircle2 className="w-4 h-4" />
                                 Mark Done
                               </DropdownMenuItem>
                             )}
@@ -796,7 +796,7 @@ export default function TasksPage() {
                                 className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
                                 onClick={() => updateTaskStatus(task.id, 'in_progress')}
                               >
-                                <Play className="w-4 h-4 mr-2" />
+                                <Play className="w-4 h-4" />
                                 Start
                               </DropdownMenuItem>
                             )}
@@ -805,7 +805,7 @@ export default function TasksPage() {
                                 className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200"
                                 onClick={() => updateTaskStatus(task.id, 'paused')}
                               >
-                                <Pause className="w-4 h-4 mr-2" />
+                                <Pause className="w-4 h-4" />
                                 Pause
                               </DropdownMenuItem>
                             )}
@@ -814,7 +814,7 @@ export default function TasksPage() {
                               className="text-[13px] text-destructive-400 focus:text-destructive focus:bg-destructive-200"
                               onClick={() => deleteTask(task.id)}
                             >
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <Trash2 className="w-4 h-4" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

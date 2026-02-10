@@ -356,12 +356,12 @@ export default function ProfilePage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <ExternalLink className="w-4 h-4 mr-2" />
+                          <ExternalLink className="w-4 h-4" />
                           View Public Profile
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                          <Settings className="w-4 h-4 mr-2" />
+                          <Settings className="w-4 h-4" />
                           Account Settings
                         </DropdownMenuItem>
                       </DropdownMenuContent>

@@ -638,14 +638,14 @@ export default function WorkspaceMembersPage() {
                                       setShowRoleDialog(true)
                                     }}
                                   >
-                                    <UserCog className="w-4 h-4 mr-2" />
+                                    <UserCog className="w-4 h-4" />
                                     Change Role
                                   </DropdownMenuItem>
                                 )}
                               </PermissionGate>
 
                               <DropdownMenuItem className="text-foreground-light hover:text-foreground hover:bg-surface-200">
-                                <Mail className="w-4 h-4 mr-2" />
+                                <Mail className="w-4 h-4" />
                                 Send Message
                               </DropdownMenuItem>
 
@@ -662,12 +662,12 @@ export default function WorkspaceMembersPage() {
                                     >
                                       {member.status === 'suspended' ? (
                                         <>
-                                          <Play className="w-4 h-4 mr-2" />
+                                          <Play className="w-4 h-4" />
                                           Activate Member
                                         </>
                                       ) : (
                                         <>
-                                          <Snowflake className="w-4 h-4 mr-2" />
+                                          <Snowflake className="w-4 h-4" />
                                           Suspend Member
                                         </>
                                       )}
@@ -676,7 +676,7 @@ export default function WorkspaceMembersPage() {
                                       className="text-destructive hover:bg-destructive-200"
                                       onClick={() => handleRemoveMember(member)}
                                     >
-                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      <Trash2 className="w-4 h-4" />
                                       Remove Member
                                     </DropdownMenuItem>
                                   </>

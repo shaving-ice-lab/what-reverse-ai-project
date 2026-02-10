@@ -866,7 +866,7 @@ export default function AppsPage() {
                             onClick={() => handleDeprecate(app.id)}
                             className="text-[12px] text-warning"
                           >
-                            <Pause className="w-4 h-4 mr-2" />
+                            <Pause className="w-4 h-4" />
                             Deprecate App
                           </DropdownMenuItem>
                         )}
@@ -875,7 +875,7 @@ export default function AppsPage() {
                           onClick={() => handleArchive(app.id)}
                           className="text-[12px] text-destructive"
                         >
-                          <Archive className="w-4 h-4 mr-2" />
+                          <Archive className="w-4 h-4" />
                           Archive App
                         </DropdownMenuItem>
                       </DropdownMenuContent>

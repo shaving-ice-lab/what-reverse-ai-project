@@ -294,15 +294,15 @@ export function EarningsTable({ earnings }: EarningsTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
                       <DropdownMenuItem className="text-sm cursor-pointer">
-                        <Eye className="h-4 w-4 mr-2" />
+                        <Eye className="h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-sm cursor-pointer">
-                        <Copy className="h-4 w-4 mr-2" />
+                        <Copy className="h-4 w-4" />
                         Copy Order
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-sm cursor-pointer">
-                        <ExternalLink className="h-4 w-4 mr-2" />
+                        <ExternalLink className="h-4 w-4" />
                         View Agent
                       </DropdownMenuItem>
                     </DropdownMenuContent>

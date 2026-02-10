@@ -266,7 +266,7 @@ function VersionItem({
                 }}
                 className="text-foreground focus:bg-surface-200"
               >
-                <Eye className="w-4 h-4 mr-2" />
+                <Eye className="w-4 h-4" />
                 Preview
               </DropdownMenuItem>
               {!version.isCurrent && (
@@ -277,7 +277,7 @@ function VersionItem({
                   }}
                   className="text-foreground focus:bg-surface-200"
                 >
-                  <RotateCcw className="w-4 h-4 mr-2" />
+                  <RotateCcw className="w-4 h-4" />
                   Restore
                 </DropdownMenuItem>
               )}
@@ -288,7 +288,7 @@ function VersionItem({
                 }}
                 className="text-foreground focus:bg-surface-200"
               >
-                <Tag className="w-4 h-4 mr-2" />
+                <Tag className="w-4 h-4" />
                 Add Tag
               </DropdownMenuItem>
               {!version.isCurrent && (
@@ -299,7 +299,7 @@ function VersionItem({
                   }}
                   className="text-destructive focus:bg-surface-200"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </DropdownMenuItem>
               )}

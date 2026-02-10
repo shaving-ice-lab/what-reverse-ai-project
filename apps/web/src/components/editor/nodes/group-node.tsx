@@ -358,7 +358,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
                 onClick={() => setIsEditing(true)}
                 className="text-foreground focus:bg-surface-200 focus:text-foreground"
               >
-                <Pencil className="w-4 h-4 mr-2" />
+                <Pencil className="w-4 h-4" />
                 Rename
               </DropdownMenuItem>
 
@@ -368,12 +368,12 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
               >
                 {collapsed ? (
                   <>
-                    <ChevronDown className="w-4 h-4 mr-2" />
+                    <ChevronDown className="w-4 h-4" />
                     Expand Group
                   </>
                 ) : (
                   <>
-                    <ChevronRight className="w-4 h-4 mr-2" />
+                    <ChevronRight className="w-4 h-4" />
                     Collapse Group
                   </>
                 )}
@@ -406,7 +406,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
                 onClick={handleDuplicate}
                 className="text-foreground focus:bg-surface-200 focus:text-foreground"
               >
-                <Copy className="w-4 h-4 mr-2" />
+                <Copy className="w-4 h-4" />
                 Copy Group
               </DropdownMenuItem>
 
@@ -414,7 +414,7 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps<GroupNodeData>)
                 onClick={handleDelete}
                 className="text-destructive focus:bg-destructive-200 focus:text-destructive"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4" />
                 Delete Group
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -786,16 +786,16 @@ export default function ExecutionsPage() {
                             className="w-48 rounded-lg bg-surface-100 border-border shadow-2xl"
                           >
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Eye className="w-4 h-4 mr-2" />
+                              <Eye className="w-4 h-4" />
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                              <Copy className="w-4 h-4 mr-2" />
+                              <Copy className="w-4 h-4" />
                               Copy ID
                             </DropdownMenuItem>
                             {exec.status === 'failed' && (
                               <DropdownMenuItem className="text-[13px] text-foreground-light focus:text-foreground focus:bg-surface-200">
-                                <RotateCcw className="w-4 h-4 mr-2" />
+                                <RotateCcw className="w-4 h-4" />
                                 Rerun
                               </DropdownMenuItem>
                             )}
@@ -804,7 +804,7 @@ export default function ExecutionsPage() {
                               className="text-[13px] text-destructive-400 focus:text-destructive focus:bg-destructive-200"
                               onClick={() => deleteExecution(exec.id)}
                             >
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <Trash2 className="w-4 h-4" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

@@ -367,14 +367,14 @@ export function EditorToolbar({
               onClick={applyHorizontalLayout}
               className="text-foreground hover:text-foreground hover:bg-surface-200/70"
             >
-              <ArrowRight className="h-4 w-4 mr-2" />
+              <ArrowRight className="h-4 w-4" />
               Horizontal Layout (Left → Right)
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={applyVerticalLayout}
               className="text-foreground hover:text-foreground hover:bg-surface-200/70"
             >
-              <ArrowDown className="h-4 w-4 mr-2" />
+              <ArrowDown className="h-4 w-4" />
               Vertical Layout (Top → Down)
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -414,21 +414,21 @@ export function EditorToolbar({
               onClick={handleExport}
               className="text-foreground hover:text-foreground hover:bg-surface-200/70"
             >
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4" />
               Export Workflow
             </DropdownMenuItem>
             <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4" />
               Import Workflow
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border/70" />
             <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="h-4 w-4" />
               Copy Workflow
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border/70" />
             <DropdownMenuItem className="text-foreground hover:text-foreground hover:bg-surface-200/70">
-              <Settings className="h-4 w-4 mr-2" />
+              <Settings className="h-4 w-4" />
               Workflow Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border/70" />
@@ -436,7 +436,7 @@ export function EditorToolbar({
               onClick={shortcutsDialog.open}
               className="text-foreground hover:text-foreground hover:bg-surface-200/70"
             >
-              <Keyboard className="h-4 w-4 mr-2" />
+              <Keyboard className="h-4 w-4" />
               Keyboard Shortcuts
               <span className="ml-auto text-xs text-foreground-muted">?</span>
             </DropdownMenuItem>

@@ -283,21 +283,21 @@ function ConversationCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
                 <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
-                  <Edit3 className="w-3.5 h-3.5 mr-2" />
+                  <Edit3 className="w-3.5 h-3.5" />
                   Rename
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDuplicate(conversation.id)}
                   className="text-[12px]"
                 >
-                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  <Copy className="w-3.5 h-3.5" />
                   Copy
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onMoveToFolder(conversation.id, conversation.folderId)}
                   className="text-[12px]"
                 >
-                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  <FolderOpen className="w-3.5 h-3.5" />
                   Move to Folder
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border" />
@@ -305,7 +305,7 @@ function ConversationCard({
                   onClick={() => onExport(conversation.id, 'json')}
                   className="text-[12px]"
                 >
-                  <Download className="w-3.5 h-3.5 mr-2" />
+                  <Download className="w-3.5 h-3.5" />
                   Export
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border" />
@@ -313,14 +313,14 @@ function ConversationCard({
                   onClick={() => onArchive(conversation.id)}
                   className="text-[12px]"
                 >
-                  <Archive className="w-3.5 h-3.5 mr-2" />
+                  <Archive className="w-3.5 h-3.5" />
                   Archive
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-[12px] text-destructive"
                   onClick={() => onDelete(conversation.id)}
                 >
-                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -425,25 +425,25 @@ function ConversationCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44 bg-surface-100 border-border">
                 <DropdownMenuItem onClick={() => onRename(conversation)} className="text-[12px]">
-                  <Edit3 className="w-3.5 h-3.5 mr-2" />
+                  <Edit3 className="w-3.5 h-3.5" />
                   Rename
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDuplicate(conversation.id)}
                   className="text-[12px]"
                 >
-                  <Copy className="w-3.5 h-3.5 mr-2" />
+                  <Copy className="w-3.5 h-3.5" />
                   Copy
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onMoveToFolder(conversation.id, conversation.folderId)}
                   className="text-[12px]"
                 >
-                  <FolderOpen className="w-3.5 h-3.5 mr-2" />
+                  <FolderOpen className="w-3.5 h-3.5" />
                   Move to Folder
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onShare(conversation.id)} className="text-[12px]">
-                  <Share2 className="w-3.5 h-3.5 mr-2" />
+                  <Share2 className="w-3.5 h-3.5" />
                   Share
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border" />
@@ -451,14 +451,14 @@ function ConversationCard({
                   onClick={() => onExport(conversation.id, 'json')}
                   className="text-[12px]"
                 >
-                  <Download className="w-3.5 h-3.5 mr-2" />
+                  <Download className="w-3.5 h-3.5" />
                   Export JSON
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onExport(conversation.id, 'markdown')}
                   className="text-[12px]"
                 >
-                  <Download className="w-3.5 h-3.5 mr-2" />
+                  <Download className="w-3.5 h-3.5" />
                   Export Markdown
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border" />
@@ -466,14 +466,14 @@ function ConversationCard({
                   onClick={() => onArchive(conversation.id)}
                   className="text-[12px]"
                 >
-                  <Archive className="w-3.5 h-3.5 mr-2" />
+                  <Archive className="w-3.5 h-3.5" />
                   Archive
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-[12px] text-destructive"
                   onClick={() => onDelete(conversation.id)}
                 >
-                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -1185,11 +1185,11 @@ export function ConversationsPageContent({ workspaceId }: ConversationsPageProps
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40 bg-surface-100 border-border">
             <DropdownMenuItem onClick={() => setIsSelectionMode(true)} className="text-[12px]">
-              <Check className="w-3.5 h-3.5 mr-2" />
+              <Check className="w-3.5 h-3.5" />
               Batch Select
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => fetchConversations()} className="text-[12px]">
-              <RefreshCw className="w-3.5 h-3.5 mr-2" />
+              <RefreshCw className="w-3.5 h-3.5" />
               Refresh List
             </DropdownMenuItem>
           </DropdownMenuContent>

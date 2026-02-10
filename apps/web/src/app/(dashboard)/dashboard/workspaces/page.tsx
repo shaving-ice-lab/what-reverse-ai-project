@@ -513,6 +513,7 @@ export default function WorkspacesPage() {
             </div>
           </section>
 
+          {workspaces.length === 0 && !isLoading && (
           <section id="create" className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
             <SettingsSection
               title="Create Workspace"
@@ -606,6 +607,7 @@ export default function WorkspacesPage() {
               </SettingsSection>
             </div>
           </section>
+          )}
 
           <section id="list" className="space-y-3">
             <div>
