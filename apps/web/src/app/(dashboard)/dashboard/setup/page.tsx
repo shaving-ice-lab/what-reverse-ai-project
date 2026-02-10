@@ -1,19 +1,17 @@
 "use client";
 
 /**
- * Initial Settings Page: Name Workspace + Create First App
+ * Initial Settings Page: Name Workspace
  */
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Rocket, Loader2, CheckCircle2 } from "lucide-react";
 import { workspaceApi, type Workspace } from "@/lib/api/workspace";
-import { appApi } from "@/lib/api/workspace";
 import { PageContainer, PageHeader, SettingsSection, FormRow } from "@/components/dashboard/page-layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 const DEFAULT_WORKSPACE_NAME = "Default Workspace";
 const SETUP_STORAGE_KEY = "agentflow-setup-completed";
@@ -32,19 +30,12 @@ export default function DashboardSetupPage() {
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
  const [workspace, setWorkspace] = useState<Workspace | null>(null);
- const [appsCount, setAppsCount] = useState(0);
 
  const [workspaceName, setWorkspaceName] = useState("");
  const [workspaceSlug, setWorkspaceSlug] = useState("");
- const [appName, setAppName] = useState("");
- const [appSlug, setAppSlug] = useState("");
- const [appDescription, setAppDescription] = useState("");
 
  const [workspaceSlugTouched, setWorkspaceSlugTouched] = useState(false);
- const [appSlugTouched, setAppSlugTouched] = useState(false);
- const [appNameTouched, setAppNameTouched] = useState(false);
 
- const hasApps = appsCount > 0;
  const isDefaultWorkspace = workspace?.name?.trim() === DEFAULT_WORKSPACE_NAME;
 
  useEffect(() => {
@@ -64,18 +55,6 @@ export default function DashboardSetupPage() {
  if (active) {
  setWorkspaceName(active.name || "");
  setWorkspaceSlug(active.slug || "");
- const apps = await appApi.list({
- workspace_id: active.id,
- page: 1,
- pageSize: 1,
- });
- if (!mounted) return;
- setAppsCount(apps.items?.length ?? 0);
- if (apps.items?.length === 0) {
-        const suggestedAppName = `${active.name || "My"} App`;
- setAppName(suggestedAppName);
- setAppSlug(slugify(suggestedAppName));
- }
  }
  } catch (err) {
  console.error("Failed to load setup context:", err);
@@ -96,22 +75,13 @@ export default function DashboardSetupPage() {
  if (!workspaceSlugTouched) {
  setWorkspaceSlug(slugify(workspaceName));
  }
- if (!appNameTouched && !hasApps) {
- const nextAppName = `${workspaceName} App`;
- setAppName(nextAppName);
- if (!appSlugTouched) {
- setAppSlug(slugify(nextAppName));
- }
- }
- }, [workspaceName, workspaceSlugTouched, appNameTouched, appSlugTouched, hasApps]);
+ }, [workspaceName, workspaceSlugTouched]);
 
  const canSubmit = useMemo(() => {
  if (!workspaceName.trim()) return false;
  if (!workspaceSlug.trim()) return false;
- if (!hasApps && !appName.trim()) return false;
- if (!hasApps && !appSlug.trim()) return false;
  return true;
- }, [workspaceName, workspaceSlug, appName, appSlug, hasApps]);
+ }, [workspaceName, workspaceSlug]);
 
  const handleSubmit = async () => {
  if (!canSubmit) return;
@@ -140,29 +110,12 @@ export default function DashboardSetupPage() {
  }
  }
 
- let createdAppId: string | null = null;
- if (!hasApps) {
- const trimmedAppName = appName.trim();
- const normalizedAppSlug = appSlug.trim() || slugify(trimmedAppName);
- const app = await appApi.create({
- workspace_id: targetWorkspace.id,
- name: trimmedAppName,
- slug: normalizedAppSlug,
- description: appDescription.trim() || undefined,
- });
- createdAppId = app.id;
- }
-
  if (typeof window !== "undefined") {
  localStorage.setItem(SETUP_STORAGE_KEY, "true");
  localStorage.setItem(WORKSPACE_STORAGE_KEY, targetWorkspace.id);
  }
 
- if (createdAppId) {
- router.replace(`/dashboard/app/${createdAppId}/builder`);
- } else {
- router.replace("/dashboard/apps");
- }
+ window.location.href = "/dashboard";
  } catch (err) {
  console.error("Failed to finish setup:", err);
       setError(err instanceof Error ? err.message: "Failed to set up. Please try again later.");
@@ -173,20 +126,26 @@ export default function DashboardSetupPage() {
 
  if (isLoading) {
  return (
- <PageContainer>
+ <div className="min-h-full flex items-center justify-center p-8 md:p-12 lg:p-16">
+  <div className="w-full max-w-2xl">
+   <PageContainer>
  <div className="page-panel p-10 flex items-center justify-center">
  <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
  </div>
- </PageContainer>
+   </PageContainer>
+  </div>
+ </div>
  );
  }
 
  return (
- <PageContainer>
+ <div className="min-h-full p-8 md:p-12 lg:p-16">
+  <div className="w-full max-w-2xl mx-auto">
+   <PageContainer>
  <PageHeader
  eyebrow="Setup"
       title="Initialize Your Workspace"
-      description="Set your workspace name and create your first app."
+      description="Set your workspace name to get started."
  icon={<Rocket className="w-4 h-4" />}
  badge={
  isDefaultWorkspace ? (
@@ -256,49 +215,9 @@ export default function DashboardSetupPage() {
  </FormRow>
  </div>
  </SettingsSection>
-
-      <SettingsSection
-        title="Create Your First App"
-        description={hasApps ? "We detected you already have an app. You can continue directly.": "Create an app to get started with your first project."}
- >
- <div className={cn("space-y-4", hasApps && "opacity-60")}>
- <FormRow label="App Name" required={!hasApps}>
- <Input
- value={appName}
- onChange={(e) => {
- setAppNameTouched(true);
- setAppName(e.target.value);
- if (!appSlugTouched) {
- setAppSlug(slugify(e.target.value));
- }
- }}
-          placeholder="e.g., Support Automation"
- disabled={hasApps}
- />
- </FormRow>
-        <FormRow label="App Slug" required={!hasApps} description="Used for links and identifiers (auto-generated)">
- <Input
- value={appSlug}
- onChange={(e) => {
- setAppSlugTouched(true);
- setAppSlug(e.target.value);
- }}
-          placeholder="e.g., support-bot"
- disabled={hasApps}
- />
- </FormRow>
-        <FormRow label="App Description" description="Optional. Describe your app's purpose.">
- <Input
- value={appDescription}
- onChange={(e) => setAppDescription(e.target.value)}
-          placeholder="e.g., Auto-reply FAQ"
- disabled={hasApps}
- />
- </FormRow>
  </div>
- </SettingsSection>
+   </PageContainer>
+  </div>
  </div>
- </PageContainer>
  );
 }
-
