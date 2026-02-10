@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 /**
  * NumberInput countcharInputComponent
@@ -16,62 +16,65 @@
  * - Precision control
  */
 
-import * as React from "react"
-import { Minus, Plus, ChevronUp, ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { Minus, Plus, ChevronUp, ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange" | "size"> {
- /** Currentvalue */
+interface NumberInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'value' | 'onChange' | 'size'
+> {
+  /** Currentvalue */
 
- value?: number
+  value?: number
 
- /** Defaultvalue */
+  /** Defaultvalue */
 
- defaultValue?: number
+  defaultValue?: number
 
- /** valueCallback */
+  /** valueCallback */
 
- onChange?: (value: number | undefined) => void
+  onChange?: (value: number | undefined) => void
 
- /** Minimumvalue */
+  /** Minimumvalue */
 
- min?: number
+  min?: number
 
- /** Maximumvalue */
+  /** Maximumvalue */
 
- max?: number
+  max?: number
 
- /** Stepper value */
+  /** Stepper value */
 
- step?: number
+  step?: number
 
- /** Decimal precision */
+  /** Decimal precision */
 
- precision?: number
+  precision?: number
 
- /** Dimension */
+  /** Dimension */
 
-  size?: "sm" | "default" | "lg"
+  size?: 'sm' | 'default' | 'lg'
 
   /** Whether to display stepper */
 
   showStepper?: boolean
 
- /** Stepper position */
+  /** Stepper position */
 
- stepperPosition?: "right" | "sides"
+  stepperPosition?: 'right' | 'sides'
 
- /** Prefix */
+  /** Prefix */
 
- prefix?: React.ReactNode
+  prefix?: React.ReactNode
 
- /** Suffix */
+  /** Suffix */
 
- suffix?: React.ReactNode
+  suffix?: React.ReactNode
 
- /** Format display */
+  /** Format display */
 
- formatter?: (value: number | undefined) => string
+  formatter?: (value: number | undefined) => string
 
   /** Parse input */
 
@@ -81,583 +84,466 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 
   allowEmpty?: boolean
 
- /** ErrorStatus */
+  /** ErrorStatus */
 
- error?: boolean
+  error?: boolean
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
- ({
- className", value: controlledValue,
+  (
+    {
+      className,
+      value: controlledValue,
 
- defaultValue,
+      defaultValue,
 
- onChange,
+      onChange,
 
- min,
+      min,
 
- max,
+      max,
 
- step = 1,
+      step = 1,
 
- precision,
+      precision,
 
- size = "default",
+      size = 'default',
 
- showStepper = true,
+      showStepper = true,
 
- stepperPosition = "right",
+      stepperPosition = 'right',
 
- prefix,
+      prefix,
 
- suffix,
+      suffix,
 
- formatter,
+      formatter,
 
- parser,
+      parser,
 
- allowEmpty = true,
+      allowEmpty = true,
 
- error = false,
+      error = false,
 
- disabled,
+      disabled,
 
- ...props
+      ...props
+    },
+    ref
+  ) => {
+    const [internalValue, setInternalValue] = React.useState<number | undefined>(defaultValue)
 
- }, ref) => {
- const [internalValue, setInternalValue] = React.useState<number | undefined>(defaultValue)
+    const [inputValue, setInputValue] = React.useState<string>('')
 
- const [inputValue, setInputValue] = React.useState<string>("")
+    const [isFocused, setIsFocused] = React.useState(false)
 
- const [isFocused, setIsFocused] = React.useState(false)
+    const inputRef = React.useRef<HTMLInputElement>(null)
 
- const inputRef = React.useRef<HTMLInputElement>(null)
+    // and ref
 
- // and ref
+    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
- React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
+    const value = controlledValue !== undefined ? controlledValue : internalValue
 
- const value = controlledValue !== undefined ? controlledValue : internalValue
+    // Formatcountvalue
 
- // Formatcountvalue
+    const formatValue = React.useCallback(
+      (val: number | undefined): string => {
+        if (val === undefined) return ''
 
- const formatValue = React.useCallback((val: number | undefined): string => {
- if (val === undefined) return ""
+        if (formatter) return formatter(val)
 
- if (formatter) return formatter(val)
+        if (precision !== undefined) return val.toFixed(precision)
 
- if (precision !== undefined) return val.toFixed(precision)
+        return String(val)
+      },
+      [formatter, precision]
+    )
 
- return String(val)
+    // Parse input
 
- }, [formatter, precision])
+    const parseValue = React.useCallback(
+      (str: string): number | undefined => {
+        if (!str || str === '-') return undefined
 
- // Parse input
+        if (parser) return parser(str)
 
- const parseValue = React.useCallback((str: string): number | undefined => {
- if (!str || str === "-") return undefined
+        const num = parseFloat(str)
 
- if (parser) return parser(str)
+        return isNaN(num) ? undefined : num
+      },
+      [parser]
+    )
 
- const num = parseFloat(str)
+    // LimitRange
 
- return isNaN(num) ? undefined : num
+    const clampValue = React.useCallback(
+      (val: number | undefined): number | undefined => {
+        if (val === undefined) return undefined
 
- }, [parser])
+        let clamped = val
 
- // LimitRange
+        if (min !== undefined) clamped = Math.max(min, clamped)
 
- const clampValue = React.useCallback((val: number | undefined): number | undefined => {
- if (val === undefined) return undefined
+        if (max !== undefined) clamped = Math.min(max, clamped)
 
- let clamped = val
+        if (precision !== undefined) {
+          clamped = parseFloat(clamped.toFixed(precision))
+        }
 
- if (min !== undefined) clamped = Math.max(min, clamped)
+        return clamped
+      },
+      [min, max, precision]
+    )
 
- if (max !== undefined) clamped = Math.min(max, clamped)
+    // UpdateDisplayvalue
 
- if (precision !== undefined) {
- clamped = parseFloat(clamped.toFixed(precision))
+    React.useEffect(() => {
+      if (!isFocused) {
+        setInputValue(formatValue(value))
+      }
+    }, [value, isFocused, formatValue])
 
- }
+    // Updatevalue
 
- return clamped
+    const updateValue = (newValue: number | undefined) => {
+      const clamped = clampValue(newValue)
 
- }, [min, max, precision])
+      if (controlledValue === undefined) {
+        setInternalValue(clamped)
+      }
 
- // UpdateDisplayvalue
+      onChange?.(clamped)
+    }
 
- React.useEffect(() => {
- if (!isFocused) {
- setInputValue(formatValue(value))
+    // Increase
 
- }
+    const increment = () => {
+      const current = value ?? min ?? 0
 
- }, [value, isFocused, formatValue])
+      updateValue(current + step)
+    }
 
- // Updatevalue
+    // few
 
- const updateValue = (newValue: number | undefined) => {
- const clamped = clampValue(newValue)
+    const decrement = () => {
+      const current = value ?? max ?? 0
 
- if (controlledValue === undefined) {
- setInternalValue(clamped)
+      updateValue(current - step)
+    }
 
- }
+    // ProcessInput
 
- onChange?.(clamped)
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const str = e.target.value
 
- }
+      setInputValue(str)
 
- // Increase
+      if (str === '' && allowEmpty) {
+        updateValue(undefined)
 
- const increment = () => {
- const current = value ?? (min ?? 0)
+        return
+      }
 
- updateValue(current + step)
+      const parsed = parseValue(str)
 
- }
+      if (parsed !== undefined) {
+        updateValue(parsed)
+      }
+    }
 
- // few
+    // Process
 
- const decrement = () => {
- const current = value ?? (max ?? 0)
+    const handleBlur = () => {
+      setIsFocused(false)
 
- updateValue(current - step)
+      setInputValue(formatValue(value))
+    }
 
- }
+    // Processkey
 
- // ProcessInput
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
 
- const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
- const str = e.target.value
+        increment()
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault()
 
- setInputValue(str)
+        decrement()
+      }
+    }
 
- if (str === "" && allowEmpty) {
- updateValue(undefined)
+    // Dimensionstyle
 
- return
+    const sizeStyles = {
+      sm: 'h-8 text-sm',
 
- }
+      default: 'h-10',
 
- const parsed = parseValue(str)
+      lg: 'h-12 text-lg',
+    }
 
- if (parsed !== undefined) {
- updateValue(parsed)
+    const buttonSizeStyles = {
+      sm: 'w-6 h-6',
 
- }
+      default: 'w-8 h-8',
 
- }
+      lg: 'w-10 h-10',
+    }
 
- // Process
+    const canIncrement = max === undefined || (value ?? 0) < max
 
- const handleBlur = () => {
- setIsFocused(false)
+    const canDecrement = min === undefined || (value ?? 0) > min
 
- setInputValue(formatValue(value))
+    return (
+      <div
+        className={cn(
+          'relative flex items-center',
 
- }
+          'bg-background border rounded-lg',
 
- // Processkey
+          'transition-all duration-200',
 
- const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
- if (e.key === "ArrowUp") {
- e.preventDefault()
+          error
+            ? 'border-destructive focus-within:ring-2 focus-within:ring-destructive/20'
+            : 'border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-brand-500/20',
 
- increment()
+          disabled && 'opacity-50 cursor-not-allowed',
 
- } else if (e.key === "ArrowDown") {
- e.preventDefault()
+          sizeStyles[size],
 
- decrement()
+          className
+        )}
+      >
+        {/* Left sideStepper */}
 
- }
+        {showStepper && stepperPosition === 'sides' && (
+          <button
+            type="button"
+            onClick={decrement}
+            disabled={disabled || !canDecrement}
+            className={cn(
+              'flex items-center justify-center shrink-0',
 
- }
+              'text-foreground-light hover:text-foreground',
 
- // Dimensionstyle
+              'disabled:opacity-30 disabled:cursor-not-allowed',
 
- const sizeStyles = {
- sm: "h-8 text-sm",
+              'transition-colors',
 
- default: "h-10",
+              buttonSizeStyles[size]
+            )}
+            tabIndex={-1}
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        )}
 
- lg: "h-12 text-lg",
+        {/* Prefix */}
 
- }
+        {prefix && <span className="pl-3 text-foreground-light shrink-0">{prefix}</span>}
 
- const buttonSizeStyles = {
- sm: "w-6 h-6",
+        {/* Input */}
 
- default: "w-8 h-8",
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="decimal"
+          value={inputValue}
+          onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          className={cn(
+            'flex-1 w-full min-w-0 bg-transparent',
 
- lg: "w-10 h-10",
+            'text-center tabular-nums',
 
- }
+            'focus:outline-none',
 
- const canIncrement = max === undefined || (value ?? 0) < max
+            'disabled:cursor-not-allowed',
 
- const canDecrement = min === undefined || (value ?? 0) > min
+            !prefix && 'pl-3',
 
- return (
- <div
+            !suffix && !showStepper && 'pr-3'
+          )}
+          {...props}
+        />
 
- className={cn(
- "relative flex items-center",
+        {/* Suffix */}
 
- "bg-background border rounded-lg",
+        {suffix && <span className="pr-3 text-foreground-light shrink-0">{suffix}</span>}
 
- "transition-all duration-200",
+        {/* Right sideStepper */}
 
- error 
+        {showStepper && stepperPosition === 'right' && (
+          <div className="flex flex-col border-l border-border shrink-0">
+            <button
+              type="button"
+              onClick={increment}
+              disabled={disabled || !canIncrement}
+              className={cn(
+                'flex items-center justify-center px-2 flex-1',
 
- ? "border-destructive focus-within:ring-2 focus-within:ring-destructive/20" 
+                'text-foreground-light hover:text-foreground hover:bg-surface-200',
 
- : "border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-brand-500/20",
+                'disabled:opacity-30 disabled:cursor-not-allowed',
 
- disabled && "opacity-50 cursor-not-allowed",
+                'transition-colors border-b border-border'
+              )}
+              tabIndex={-1}
+            >
+              <ChevronUp className="w-3 h-3" />
+            </button>
 
- sizeStyles[size],
+            <button
+              type="button"
+              onClick={decrement}
+              disabled={disabled || !canDecrement}
+              className={cn(
+                'flex items-center justify-center px-2 flex-1',
 
- className
+                'text-foreground-light hover:text-foreground hover:bg-surface-200',
 
- )}
+                'disabled:opacity-30 disabled:cursor-not-allowed',
 
- >
+                'transition-colors'
+              )}
+              tabIndex={-1}
+            >
+              <ChevronDown className="w-3 h-3" />
+            </button>
+          </div>
+        )}
 
- {/* Left sideStepper */}
+        {/* EdgeStepper - Right side */}
 
- {showStepper && stepperPosition === "sides" && (
- <button
+        {showStepper && stepperPosition === 'sides' && (
+          <button
+            type="button"
+            onClick={increment}
+            disabled={disabled || !canIncrement}
+            className={cn(
+              'flex items-center justify-center shrink-0',
 
- type="button"
+              'text-foreground-light hover:text-foreground',
 
- onClick={decrement}
+              'disabled:opacity-30 disabled:cursor-not-allowed',
 
- disabled={disabled || !canDecrement}
+              'transition-colors',
 
- className={cn(
- "flex items-center justify-center shrink-0",
-
- "text-foreground-light hover:text-foreground",
-
- "disabled:opacity-30 disabled:cursor-not-allowed",
-
- "transition-colors",
-
- buttonSizeStyles[size]
-
- )}
-
- tabIndex={-1}
-
- >
-
- <Minus className="w-4 h-4" />
-
- </button>
-
-  )}
-
- {/* Prefix */}
-
- {prefix && (
- <span className="pl-3 text-foreground-light shrink-0">{prefix}</span>
-
- )}
-
- {/* Input */}
-
- <input
-
- ref={inputRef}
-
- type="text"
-
- inputMode="decimal"
-
- value={inputValue}
-
- onChange={handleChange}
-
- onFocus={() => setIsFocused(true)}
-
- onBlur={handleBlur}
-
- onKeyDown={handleKeyDown}
-
- disabled={disabled}
-
- className={cn(
- "flex-1 w-full min-w-0 bg-transparent",
-
- "text-center tabular-nums",
-
- "focus:outline-none",
-
- "disabled:cursor-not-allowed",
-
- !prefix && "pl-3",
-
- !suffix && !showStepper && "pr-3",
-
- )}
-
- {...props}
-
-  />
-
- {/* Suffix */}
-
- {suffix && (
- <span className="pr-3 text-foreground-light shrink-0">{suffix}</span>
-
- )}
-
- {/* Right sideStepper */}
-
- {showStepper && stepperPosition === "right" && (
- <div className="flex flex-col border-l border-border shrink-0">
-
- <button
-
- type="button"
-
- onClick={increment}
-
- disabled={disabled || !canIncrement}
-
- className={cn(
- "flex items-center justify-center px-2 flex-1",
-
- "text-foreground-light hover:text-foreground hover:bg-surface-200",
-
- "disabled:opacity-30 disabled:cursor-not-allowed",
-
- "transition-colors border-b border-border",
-
- )}
-
- tabIndex={-1}
-
- >
-
- <ChevronUp className="w-3 h-3" />
-
- </button>
-
- <button
-
- type="button"
-
- onClick={decrement}
-
- disabled={disabled || !canDecrement}
-
- className={cn(
- "flex items-center justify-center px-2 flex-1",
-
- "text-foreground-light hover:text-foreground hover:bg-surface-200",
-
- "disabled:opacity-30 disabled:cursor-not-allowed",
-
- "transition-colors",
-
- )}
-
- tabIndex={-1}
-
- >
-
- <ChevronDown className="w-3 h-3" />
-
- </button>
-
- </div>
-
- )}
-
- {/* EdgeStepper - Right side */}
-
- {showStepper && stepperPosition === "sides" && (
- <button
-
- type="button"
-
- onClick={increment}
-
- disabled={disabled || !canIncrement}
-
- className={cn(
- "flex items-center justify-center shrink-0",
-
- "text-foreground-light hover:text-foreground",
-
- "disabled:opacity-30 disabled:cursor-not-allowed",
-
- "transition-colors",
-
- buttonSizeStyles[size]
-
- )}
-
- tabIndex={-1}
-
- >
-
- <Plus className="w-4 h-4" />
-
- </button>
-
- )}
-
- </div>
-
- )
-
- }
+              buttonSizeStyles[size]
+            )}
+            tabIndex={-1}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    )
+  }
 )
 
-NumberInput.displayName = "NumberInput"
+NumberInput.displayName = 'NumberInput'
 
 /**
  * CurrencyInput - CurrencyInput
  */
 
-interface CurrencyInputProps extends Omit<NumberInputProps, "prefix" | "formatter" | "parser" | "precision"> {
- /** CurrencySymbol */
+interface CurrencyInputProps extends Omit<
+  NumberInputProps,
+  'prefix' | 'formatter' | 'parser' | 'precision'
+> {
+  /** CurrencySymbol */
 
- currency?: string
+  currency?: string
 
- /** Currency */
+  /** Currency */
 
- currencyPosition?: "prefix" | "suffix"
+  currencyPosition?: 'prefix' | 'suffix'
 
- /** smallcountcount */
+  /** smallcountcount */
 
- decimals?: number
+  decimals?: number
 }
 
 function CurrencyInput({
- currency = "",
+  currency = '',
 
- currencyPosition = "prefix",
+  currencyPosition = 'prefix',
 
- decimals = 2,
+  decimals = 2,
 
- ...props
+  ...props
 }: CurrencyInputProps) {
- return (
- <NumberInput
-
- precision={decimals}
-
- prefix={currencyPosition === "prefix" ? currency : undefined}
-
- suffix={currencyPosition === "suffix" ? currency : undefined}
-
- formatter={(val) => val !== undefined ? val.toFixed(decimals) : ""}
-
- {...props}
-
- />
-
- )
+  return (
+    <NumberInput
+      precision={decimals}
+      prefix={currencyPosition === 'prefix' ? currency : undefined}
+      suffix={currencyPosition === 'suffix' ? currency : undefined}
+      formatter={(val) => (val !== undefined ? val.toFixed(decimals) : '')}
+      {...props}
+    />
+  )
 }
 
 /**
  * PercentInput - PercentageInput
  */
 
-interface PercentInputProps extends Omit<NumberInputProps, "suffix" | "formatter" | "parser" | "min" | "max"> {
- /** smallcountcount */
+interface PercentInputProps extends Omit<
+  NumberInputProps,
+  'suffix' | 'formatter' | 'parser' | 'min' | 'max'
+> {
+  /** smallcountcount */
 
- decimals?: number
+  decimals?: number
 }
 
 function PercentInput({
- decimals = 0,
+  decimals = 0,
 
- ...props
+  ...props
 }: PercentInputProps) {
- return (
- <NumberInput
-
- min={0}
-
- max={100}
-
- precision={decimals}
-
- suffix="%"
-
- {...props}
-
- />
-
- )
+  return <NumberInput min={0} max={100} precision={decimals} suffix="%" {...props} />
 }
 
 /**
  * QuantityInput - CountInput(count)
  */
 
-interface QuantityInputProps extends Omit<NumberInputProps, "precision" | "step"> {
+interface QuantityInputProps extends Omit<NumberInputProps, 'precision' | 'step'> {
   /** Whether to use compact mode */
 
   compact?: boolean
 }
 
 function QuantityInput({
- compact = false,
+  compact = false,
 
- min = 0,
+  min = 0,
 
- showStepper = true,
+  showStepper = true,
 
- stepperPosition = "sides",
+  stepperPosition = 'sides',
 
- ...props
+  ...props
 }: QuantityInputProps) {
- return (
- <NumberInput
-
- precision={0}
-
- step={1}
-
- min={min}
-
- showStepper={showStepper}
-
- stepperPosition={stepperPosition}
-
- className={compact ? "w-32" : undefined}
-
- {...props}
-
- />
-
- )
+  return (
+    <NumberInput
+      precision={0}
+      step={1}
+      min={min}
+      showStepper={showStepper}
+      stepperPosition={stepperPosition}
+      className={compact ? 'w-32' : undefined}
+      {...props}
+    />
+  )
 }
 
-export {
- NumberInput,
+export { NumberInput, CurrencyInput, PercentInput, QuantityInput }
 
- CurrencyInput,
-
- PercentInput,
-
- QuantityInput,
-}
-
-export type {
- NumberInputProps,
-
- CurrencyInputProps,
-
- PercentInputProps,
-
- QuantityInputProps,
-}
+export type { NumberInputProps, CurrencyInputProps, PercentInputProps, QuantityInputProps }
