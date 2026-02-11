@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation'
 export default function UnauthLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
-  // Runtime pages use an independent layout without navigation
-  if (pathname.startsWith('/runtime')) {
+  // Runtime and App pages use an independent layout without navigation
+  if (pathname.startsWith('/runtime') || pathname.startsWith('/app')) {
     return <>{children}</>
   }
 

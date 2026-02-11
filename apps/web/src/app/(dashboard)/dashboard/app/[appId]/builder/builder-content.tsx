@@ -5,7 +5,7 @@
  * 3-Panel Layout: AI Chat / Workflow Canvas / UI Schema Config
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Edge } from '@xyflow/react'
@@ -38,6 +38,11 @@ import {
   Lock,
   ExternalLink,
   Trash2,
+  Database,
+  Monitor,
+  Smartphone,
+  Tablet,
+  XCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -80,6 +85,9 @@ import {
 } from '@/lib/api/workspace'
 import { workflowApi } from '@/lib/api'
 import { request } from '@/lib/api/shared'
+import { chatStream, agentChatApi, type AgentEvent } from '@/lib/api/agent-chat'
+import { VersionDiffViewer } from '@/components/builder/version-diff-viewer'
+import { workspaceDatabaseApi, type DatabaseTable } from '@/lib/api/workspace-database'
 import { workspaceApi, type Workspace } from '@/lib/api/workspace'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useWorkflowStore, type WorkflowNode } from '@/stores/useWorkflowStore'
@@ -87,6 +95,12 @@ import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from '@/lib/p
 import { AppAccessGate } from '@/components/permissions/app-access-gate'
 import { PermissionAction } from '@/components/permissions/permission-action'
 import { LazyWorkflowEditor } from '@/components/editor'
+import {
+  Panel,
+  Group as PanelGroup,
+  Separator as PanelResizeHandle,
+  usePanelRef,
+} from 'react-resizable-panels'
 
 // PanelConfig
 type PanelId = 'chat' | 'workflow' | 'schema'
@@ -97,10 +111,10 @@ type UISchemaField = {
   id: string
   label: string
   inputKey: string
-  type: 'input' | 'select'
+  type: 'input' | 'select' | 'textarea' | 'number' | 'checkbox' | 'date'
   required: boolean
   placeholder: string
-  options: string
+  options: string | string[]
 }
 
 type WorkflowSnapshot = {
@@ -117,13 +131,6 @@ type APIResponse<T> = {
   data: T
 }
 
-type GenerateWorkflowPayload = {
-  workflow_json: string
-  ui_schema?: Record<string, unknown>
-  db_schema?: Record<string, unknown>
-  explanation?: string
-  suggestions?: string[]
-}
 
 const chatQuickActions = [
   {
@@ -203,17 +210,38 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   // PanelStatus
   const [leftPanelOpen, setLeftPanelOpen] = useState(true)
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const leftPanelRef = usePanelRef()
+  const rightPanelRef = usePanelRef()
   const [activeRightPanel, setActiveRightPanel] = useState<'schema' | 'preview'>('schema')
+  const [activeCenterTab, setActiveCenterTab] = useState<'workflow' | 'preview' | 'database'>('workflow')
+  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   // AI Chat Status
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState<
     Array<{
-      role: 'user' | 'assistant'
+      role: 'user' | 'assistant' | 'agent_thinking' | 'tool_call' | 'tool_result' | 'confirmation'
       content: string
+      toolName?: string
+      toolResult?: { success: boolean; output?: string; error?: string }
+      affectedResource?: string
     }>
   >([])
   const [isChatting, setIsChatting] = useState(false)
+  const [agentSessionId, setAgentSessionId] = useState<string | undefined>(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('agent_session_id') || undefined
+    return undefined
+  })
+  const chatAbortRef = useRef<AbortController | null>(null)
+  const [pendingAction, setPendingAction] = useState<{
+    actionId: string
+    toolName: string
+    resolved: boolean
+  } | null>(null)
+
+  // Database Tab State
+  const [dbTables, setDbTables] = useState<DatabaseTable[]>([])
+  const [dbTablesLoading, setDbTablesLoading] = useState(false)
 
   const workflowInitialData = useMemo(() => {
     if (!workflowSnapshot) return undefined
@@ -439,6 +467,18 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
     }
   }, [isDirty, uiSchemaDirty, saveStatus])
 
+  // Auto-save draft every 30 seconds
+  useEffect(() => {
+    if (!appId) return
+    const interval = setInterval(() => {
+      if ((isDirty || uiSchemaDirty) && !isSaving) {
+        handleSave()
+      }
+    }, 30_000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appId, isDirty, uiSchemaDirty, isSaving])
+
   useEffect(() => {
     if (!app) return
     const workflowId = app.current_version?.workflow_id || null
@@ -584,147 +624,177 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   const handleApplyChatSuggestion = (prompt: string) => {
     if (isChatting) return
     setLeftPanelOpen(true)
+    leftPanelRef.current?.expand()
     setChatInput(prompt)
     setTimeout(() => chatInputRef.current?.focus(), 120)
   }
 
-  // Send Chat Message
+  // Send Chat Message (SSE Agent Stream)
   const handleSendChat = async (overrideMessage?: string) => {
     const message = (overrideMessage ?? chatInput).trim()
     if (!message || isChatting) return
 
-    const history = [...chatMessages, { role: 'user', content: message }].slice(-6)
     setChatInput('')
     setChatMessages((prev) => [...prev, { role: 'user', content: message }])
     setIsChatting(true)
 
-    try {
-      const response = await request<APIResponse<GenerateWorkflowPayload>>(
-        '/ai/generate-workflow',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            description: message,
-            conversation_history: history,
-          }),
-        }
-      )
-
-      const payload = response.data
-      const workflowDefinition = parseWorkflowDefinition(payload.workflow_json)
-      if (!workflowDefinition) {
-        throw new Error('Invalid workflow format in AI output')
-      }
-      const workflowFallbackName = app?.name || workflowSnapshot?.name || 'Untitled Workflow'
-      const nextSnapshot = extractWorkflowSnapshot(workflowDefinition, workflowFallbackName)
-
-      const hasWorkflow = Boolean(app?.current_version?.workflow_id)
-      let workflowId = app?.current_version?.workflow_id || null
-      if (hasWorkflow && workflowId) {
-        await request<APIResponse<Record<string, unknown>>>(`/workflows/${workflowId}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ definition: workflowDefinition }),
-        })
-      } else {
-        const workflowName =
-          typeof (workflowDefinition as { name?: string }).name === 'string'
-            ? (workflowDefinition as { name?: string }).name?.trim()
-            : ''
-        const created = await request<APIResponse<Record<string, unknown>>>('/workflows', {
-          method: 'POST',
-          body: JSON.stringify({
-            name: workflowName || `${app?.name || 'AI'} Workflow`,
-            description: message,
-            definition: workflowDefinition,
-            variables: {},
-          }),
-        })
-        workflowId = extractWorkflowId(created.data)
-      }
-
-      if (!workflowId) {
-        throw new Error('Failed to create workflow. Please try again.')
-      }
-
-      const uiSchema = payload.ui_schema
-      const dbSchema = payload.db_schema
-      let updatedVersion: AppVersion | null = null
-
-      if (hasWorkflow && app?.current_version_id) {
-        if (uiSchema) {
-          const uiResponse = await request<APIResponse<unknown>>(`/workspaces/${appId}/ui-schema`, {
-            method: 'PATCH',
-            body: JSON.stringify({ ui_schema: uiSchema }),
-          })
-          updatedVersion = normalizeVersionPayload(uiResponse.data)
-        }
-      } else if (workflowId) {
-        const versionResponse = await request<APIResponse<unknown>>(
-          `/workspaces/${appId}/versions`,
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              workflow_id: workflowId,
-              ui_schema: uiSchema || {},
-              db_schema: dbSchema || {},
-              changelog: 'AI Generate',
-            }),
+    const controller = chatStream(
+      appId,
+      message,
+      agentSessionId,
+      (event: AgentEvent) => {
+        if (event.session_id && event.session_id !== agentSessionId) {
+          setAgentSessionId(event.session_id)
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('agent_session_id', event.session_id)
           }
-        )
-        updatedVersion = normalizeVersionPayload(versionResponse.data)
-      }
+        }
 
-      if (updatedVersion) {
-        setApp((prev) =>
-          prev
-            ? {
-                ...prev,
-                current_version_id: updatedVersion.id,
-                current_version: updatedVersion,
+        switch (event.type) {
+          case 'thought':
+            setChatMessages((prev) => {
+              const last = prev[prev.length - 1]
+              if (last?.role === 'agent_thinking') {
+                return [...prev.slice(0, -1), { ...last, content: event.content || '' }]
               }
-            : prev
-        )
-        setUiSchemaFields(
-          extractUISchemaFields(updatedVersion.ui_schema as Record<string, unknown> | null)
-        )
-      } else if (uiSchema) {
-        setUiSchemaFields(extractUISchemaFields(uiSchema))
+              return [...prev, { role: 'agent_thinking', content: event.content || '' }]
+            })
+            break
+
+          case 'tool_call':
+            setChatMessages((prev) => [
+              ...prev,
+              {
+                role: 'tool_call',
+                content: `Calling ${event.tool_name}...`,
+                toolName: event.tool_name,
+              },
+            ])
+            break
+
+          case 'tool_result':
+            setChatMessages((prev) => [
+              ...prev,
+              {
+                role: 'tool_result',
+                content: event.tool_result?.output || event.tool_result?.error || '',
+                toolName: event.tool_name,
+                toolResult: event.tool_result ?? undefined,
+                affectedResource: event.affected_resource,
+              },
+            ])
+            // Auto-refresh affected resource tabs
+            if (event.affected_resource === 'workflow') {
+              loadData()
+            } else if (event.affected_resource === 'database') {
+              loadDbTables()
+              if (activeCenterTab !== 'database') setActiveCenterTab('database')
+            } else if (event.affected_resource === 'ui_schema') {
+              loadData()
+            }
+            break
+
+          case 'confirmation_required':
+            setPendingAction({
+              actionId: event.action_id || '',
+              toolName: event.tool_name || '',
+              resolved: false,
+            })
+            setChatMessages((prev) => [
+              ...prev,
+              {
+                role: 'confirmation',
+                content: event.content || `The agent wants to execute "${event.tool_name}". Do you approve?`,
+                toolName: event.tool_name,
+              },
+            ])
+            break
+
+          case 'message':
+            setChatMessages((prev) => [...prev, { role: 'assistant', content: event.content || '' }])
+            break
+
+          case 'done':
+            setIsChatting(false)
+            loadData()
+            loadVersions()
+            break
+
+          case 'error':
+            setChatMessages((prev) => [
+              ...prev,
+              { role: 'assistant', content: `Error: ${event.error || 'Unknown error'}` },
+            ])
+            setIsChatting(false)
+            break
+        }
+      },
+      (error) => {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: `Connection error: ${error}` },
+        ])
+        setIsChatting(false)
+      },
+      () => {
+        setIsChatting(false)
       }
+    )
 
-      setWorkflowSnapshot({
-        ...nextSnapshot,
-        id: workflowId ?? undefined,
-      })
-      setWorkflowError(null)
-      markSaved()
-      setLastSavedAt(new Date())
-      setSaveStatus('saved')
-      setUiSchemaDirty(false)
-      setUiSchemaError(null)
-      setHasChanges(false)
-      await loadVersions()
-
-      const suggestionText =
-        payload.suggestions && payload.suggestions.length > 0
-          ? `\nSuggestion: ${payload.suggestions.join('; ')}`
-          : ''
-      const assistantContent =
-        payload.explanation && payload.explanation.trim()
-          ? `${payload.explanation}${suggestionText}`
-          : `Workflow and UI Schema generated and synced to the current version.${suggestionText}`
-      setChatMessages((prev) => [...prev, { role: 'assistant', content: assistantContent }])
-    } catch (error) {
-      console.error('Failed to generate workflow:', error)
-      const message =
-        error instanceof Error ? error.message : 'Failed to generate with AI. Please try again.'
-      setChatMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: `Generation failed: ${message}` },
-      ])
-    } finally {
-      setIsChatting(false)
-    }
+    chatAbortRef.current = controller
   }
+
+  // Handle Agent confirmation (Approve/Reject)
+  const handleConfirmAction = useCallback(
+    async (approved: boolean) => {
+      if (!pendingAction || pendingAction.resolved || !agentSessionId) return
+      try {
+        await agentChatApi.confirmAction(appId, agentSessionId, pendingAction.actionId, approved)
+        setPendingAction((prev) => (prev ? { ...prev, resolved: true } : null))
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: approved
+              ? `✅ Action "${pendingAction.toolName}" approved and executed.`
+              : `❌ Action "${pendingAction.toolName}" was rejected.`,
+          },
+        ])
+        if (approved) {
+          loadData()
+          loadVersions()
+        }
+      } catch (error) {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: `Failed to ${approved ? 'approve' : 'reject'} action: ${error}` },
+        ])
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pendingAction, agentSessionId, appId]
+  )
+
+  // Load Database tables for the Database tab
+  const loadDbTables = useCallback(async () => {
+    if (!appId) return
+    setDbTablesLoading(true)
+    try {
+      const tables = await workspaceDatabaseApi.listTables(appId)
+      setDbTables(tables)
+    } catch {
+      setDbTables([])
+    } finally {
+      setDbTablesLoading(false)
+    }
+  }, [appId])
+
+  // Load DB tables when switching to Database tab
+  useEffect(() => {
+    if (activeCenterTab === 'database') {
+      loadDbTables()
+    }
+  }, [activeCenterTab, loadDbTables])
 
   // Save
   const handleSave = async () => {
@@ -845,13 +915,35 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
   const handleFocusChat = () => {
     setLeftPanelOpen(true)
+    leftPanelRef.current?.expand()
     setTimeout(() => chatInputRef.current?.focus(), 120)
   }
 
   const handleFocusSchema = () => {
     setRightPanelOpen(true)
+    rightPanelRef.current?.expand()
     setActiveRightPanel('schema')
   }
+
+  const toggleLeftPanel = useCallback(() => {
+    if (leftPanelRef.current?.isCollapsed()) {
+      leftPanelRef.current.expand()
+      setLeftPanelOpen(true)
+    } else {
+      leftPanelRef.current?.collapse()
+      setLeftPanelOpen(false)
+    }
+  }, [])
+
+  const toggleRightPanel = useCallback(() => {
+    if (rightPanelRef.current?.isCollapsed()) {
+      rightPanelRef.current.expand()
+      setRightPanelOpen(true)
+    } else {
+      rightPanelRef.current?.collapse()
+      setRightPanelOpen(false)
+    }
+  }, [])
 
   const formatPreviewTimestamp = (value?: Date | null) => {
     if (!value) return '-'
@@ -905,9 +997,9 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
         props.placeholder = placeholder
       }
       if (field.type === 'select') {
-        const options = field.options
-          .split(',')
-          .map((option) => option.trim())
+        const rawOpts = field.options
+        const options = (Array.isArray(rawOpts) ? rawOpts : typeof rawOpts === 'string' ? rawOpts.split(',') : [])
+          .map((option: string) => option.trim())
           .filter(Boolean)
         if (options.length > 0) {
           props.options = options
@@ -1093,7 +1185,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                 variant="secondary"
                 className="text-[10px] bg-surface-200 text-foreground-muted"
               >
-                {app?.status === 'published' ? 'Published' : 'Draft'}
+                {app?.current_version_id ? 'Published' : 'Draft'}
               </Badge>
               {hasChanges && (
                 <Badge variant="secondary" className="text-[10px] bg-warning-200 text-warning">
@@ -1124,7 +1216,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => setLeftPanelOpen(!leftPanelOpen)}
+                    onClick={toggleLeftPanel}
                   >
                     <PanelLeftClose className={cn('w-4 h-4', !leftPanelOpen && 'rotate-180')} />
                   </Button>
@@ -1140,7 +1232,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                    onClick={toggleRightPanel}
                   >
                     <PanelRightClose className={cn('w-4 h-4', !rightPanelOpen && 'rotate-180')} />
                   </Button>
@@ -1313,10 +1405,17 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
           </AlertDialog>
 
           {/* mainRegion - 3Layout */}
-          <div className="flex-1 flex overflow-hidden">
+          <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
             {/* Left sidePanel - AI Chat */}
-            {leftPanelOpen && (
-              <div className="w-[320px] shrink-0 border-r border-border bg-surface-75 flex flex-col">
+            <Panel
+              panelRef={leftPanelRef}
+              collapsible
+              defaultSize={20}
+              minSize={15}
+              maxSize={35}
+              onResize={() => setLeftPanelOpen(!leftPanelRef.current?.isCollapsed())}
+            >
+              <div className="h-full border-r border-border bg-surface-75 flex flex-col">
                 {/* Chat Header */}
                 <div className="h-10 shrink-0 border-b border-border px-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-brand-500" />
@@ -1365,12 +1464,75 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                         key={index}
                         className={cn(
                           'p-3 rounded-md text-[12px]',
-                          message.role === 'user'
-                            ? 'bg-brand-200 text-foreground ml-6'
-                            : 'bg-surface-100 text-foreground mr-6'
+                          message.role === 'user' && 'bg-brand-200 text-foreground ml-6',
+                          message.role === 'assistant' && 'bg-surface-100 text-foreground mr-6',
+                          message.role === 'agent_thinking' && 'bg-surface-200/50 text-foreground-muted mr-6 italic border border-border/50',
+                          message.role === 'tool_call' && 'bg-amber-500/10 text-amber-300 mr-6 border border-amber-500/20',
+                          message.role === 'tool_result' && (
+                            message.toolResult?.success
+                              ? 'bg-brand-500/10 text-brand-400 mr-6 border border-brand-500/20'
+                              : 'bg-destructive/10 text-destructive mr-6 border border-destructive/20'
+                          ),
+                          message.role === 'confirmation' && 'bg-amber-500/10 text-amber-200 mr-6 border-2 border-amber-500/30'
                         )}
                       >
-                        {message.content}
+                        {message.role === 'confirmation' && (
+                          <div>
+                            <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-medium uppercase tracking-wider opacity-70">
+                              <AlertTriangle className="w-3 h-3" />
+                              Confirmation Required
+                            </div>
+                            <span className="whitespace-pre-wrap text-[12px]">{message.content}</span>
+                            {pendingAction && !pendingAction.resolved && (
+                              <div className="mt-2 flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  className="h-7 text-[11px] bg-brand-500 hover:bg-brand-600"
+                                  onClick={() => handleConfirmAction(true)}
+                                >
+                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="h-7 text-[11px]"
+                                  onClick={() => handleConfirmAction(false)}
+                                >
+                                  <XCircle className="w-3 h-3 mr-1" />
+                                  Reject
+                                </Button>
+                              </div>
+                            )}
+                            {pendingAction?.resolved && (
+                              <div className="mt-1.5 text-[10px] text-foreground-muted italic">Action resolved</div>
+                            )}
+                          </div>
+                        )}
+                        {message.role === 'tool_call' && (
+                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
+                            <Zap className="w-3 h-3" />
+                            Tool Call
+                          </div>
+                        )}
+                        {message.role === 'tool_result' && (
+                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
+                            {message.toolResult?.success ? (
+                              <CheckCircle2 className="w-3 h-3" />
+                            ) : (
+                              <AlertTriangle className="w-3 h-3" />
+                            )}
+                            {message.toolName || 'Result'}
+                          </div>
+                        )}
+                        {message.role === 'agent_thinking' && (
+                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
+                            <Sparkles className="w-3 h-3" />
+                            Thinking
+                          </div>
+                        )}
+                        <span className="whitespace-pre-wrap">{message.content}</span>
                       </div>
                     ))
                   )}
@@ -1403,23 +1565,193 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                     <span className="text-[10px] text-foreground-muted">
                       Enter to send and generate UI/Workflow, Shift+Enter for new line
                     </span>
-                    <Button
-                      size="sm"
-                      onClick={() => handleSendChat()}
-                      disabled={!chatInput.trim() || isChatting}
-                      className="h-7 px-2"
-                    >
-                      <Send className="w-3.5 h-3.5 mr-1" />
-                      Generate
-                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      {isChatting && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            chatAbortRef.current?.abort()
+                            setIsChatting(false)
+                            setChatMessages((prev) => [...prev, { role: 'assistant', content: 'Stopped by user.' }])
+                          }}
+                          className="h-7 px-2"
+                        >
+                          Stop
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        onClick={() => handleSendChat()}
+                        disabled={!chatInput.trim() || isChatting}
+                        className="h-7 px-2"
+                      >
+                        <Send className="w-3.5 h-3.5 mr-1" />
+                        Generate
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
+            </Panel>
 
-            {/* betweenPanel - Workflow Canvas */}
-            <div className="flex-1 flex flex-col bg-background-studio">
-              {shouldShowGuide ? (
+            <PanelResizeHandle className="w-1.5 bg-transparent hover:bg-brand-500/20 active:bg-brand-500/30 transition-colors cursor-col-resize" />
+
+            {/* betweenPanel - Tabbed: Workflow / Preview / Database */}
+            <Panel defaultSize={60} minSize={30}>
+              <div className="h-full flex flex-col bg-background-studio">
+              {/* Center Panel Tabs */}
+              <div className="h-10 shrink-0 border-b border-border px-2 flex items-center gap-1">
+                {([
+                  { id: 'workflow' as const, label: 'Workflow', icon: Zap },
+                  { id: 'preview' as const, label: 'Preview', icon: Eye },
+                  { id: 'database' as const, label: 'Database', icon: Database },
+                ]).map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveCenterTab(tab.id)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 h-8 rounded-md text-[12px] font-medium transition-colors',
+                      activeCenterTab === tab.id
+                        ? 'bg-surface-100 text-foreground'
+                        : 'text-foreground-muted hover:text-foreground'
+                    )}
+                  >
+                    <tab.icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                ))}
+                {activeCenterTab === 'preview' && (
+                  <div className="ml-auto flex items-center gap-0.5">
+                    {([
+                      { id: 'desktop' as const, icon: Monitor, w: '100%' },
+                      { id: 'tablet' as const, icon: Tablet, w: '768px' },
+                      { id: 'mobile' as const, icon: Smartphone, w: '375px' },
+                    ]).map((vp) => (
+                      <button
+                        key={vp.id}
+                        onClick={() => setPreviewViewport(vp.id)}
+                        className={cn(
+                          'w-7 h-7 rounded flex items-center justify-center transition-colors',
+                          previewViewport === vp.id
+                            ? 'bg-surface-100 text-foreground'
+                            : 'text-foreground-muted hover:text-foreground'
+                        )}
+                        title={`${vp.id} (${vp.w})`}
+                      >
+                        <vp.icon className="w-3.5 h-3.5" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Tab Content */}
+              {activeCenterTab === 'preview' ? (
+                <div className="flex-1 flex items-center justify-center bg-surface-200/20 overflow-auto p-4">
+                  <div
+                    className="bg-background border border-border rounded-lg overflow-hidden h-full transition-all"
+                    style={{
+                      width: previewViewport === 'desktop' ? '100%' : previewViewport === 'tablet' ? '768px' : '375px',
+                      maxWidth: '100%',
+                    }}
+                  >
+                    {uiSchemaFields.length > 0 ? (
+                      <div className="h-full overflow-auto p-4">
+                        <div className="text-[12px] font-medium text-foreground mb-3">App Preview — {uiSchemaFields.length} field(s)</div>
+                        <div className="space-y-3">
+                          {uiSchemaFields.map((field, idx) => {
+                            const key = (field.inputKey || field.id || `field_${idx + 1}`).trim()
+                            return (
+                              <div key={`${key}-${idx}`} className="space-y-1">
+                                <label className="text-[11px] font-medium text-foreground">
+                                  {field.label || 'Untitled'} {field.required && <span className="text-destructive">*</span>}
+                                </label>
+                                {field.type === 'textarea' ? (
+                                  <Textarea className="text-xs" placeholder={field.placeholder || key} disabled />
+                                ) : field.type === 'select' ? (
+                                  <Select disabled>
+                                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={field.placeholder || 'Select...'} /></SelectTrigger>
+                                    <SelectContent>{(Array.isArray(field.options) ? field.options : typeof field.options === 'string' ? field.options.split(',').map((s: string) => s.trim()).filter(Boolean) : []).map((o: string) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input className="h-8 text-xs" type={field.type === 'number' ? 'number' : 'text'} placeholder={field.placeholder || key} disabled />
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-full flex items-center justify-center p-8">
+                        <div className="text-center space-y-2">
+                          <Eye className="w-8 h-8 text-foreground-muted mx-auto" />
+                          <p className="text-sm font-medium text-foreground">App Preview</p>
+                          <p className="text-xs text-foreground-muted max-w-xs">
+                            Use the AI Agent to generate a UI Schema, then preview your app here.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : activeCenterTab === 'database' ? (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+                    <span className="text-[12px] font-medium text-foreground">
+                      Tables {dbTables.length > 0 && `(${dbTables.length})`}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="ghost" className="h-7 text-[11px]" onClick={loadDbTables}>
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Refresh
+                      </Button>
+                      <Link
+                        href="/dashboard/database/tables"
+                        className="inline-flex items-center gap-1 text-[11px] text-brand-500 hover:text-brand-400"
+                      >
+                        Full Editor
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    {dbTablesLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
+                      </div>
+                    ) : dbTables.length === 0 ? (
+                      <div className="text-center py-8 space-y-2">
+                        <Database className="w-8 h-8 text-foreground-muted mx-auto" />
+                        <p className="text-sm font-medium text-foreground">No Tables Yet</p>
+                        <p className="text-xs text-foreground-muted max-w-xs mx-auto">
+                          Ask the AI Agent to create tables, or visit the Database page to create them manually.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {dbTables.map((table) => (
+                          <Link
+                            key={table.name}
+                            href={`/dashboard/database/tables?table=${encodeURIComponent(table.name)}`}
+                            className="flex items-center justify-between px-3 py-2.5 rounded-md border border-border bg-surface-100/60 hover:bg-surface-200/60 transition-colors group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Database className="w-3.5 h-3.5 text-foreground-muted" />
+                              <span className="text-[12px] font-medium text-foreground">{table.name}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-[10px] text-foreground-muted">
+                              <span>{table.column_count} cols</span>
+                              <span>~{table.row_count_est} rows</span>
+                              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : shouldShowGuide ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full px-6">
                     <div className="relative overflow-hidden rounded-2xl border border-brand-500/30 bg-[radial-gradient(circle_at_top,rgba(62,207,142,0.18),rgba(17,17,17,0.1)_55%,transparent_70%)] p-6">
@@ -1551,11 +1883,21 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                   />
                 </div>
               )}
-            </div>
+              </div>
+            </Panel>
+
+            <PanelResizeHandle className="w-1.5 bg-transparent hover:bg-brand-500/20 active:bg-brand-500/30 transition-colors cursor-col-resize" />
 
             {/* Right sidePanel - Schema Config / Preview */}
-            {rightPanelOpen && (
-              <div className="w-[320px] shrink-0 border-l border-border bg-surface-75 flex flex-col">
+            <Panel
+              panelRef={rightPanelRef}
+              collapsible
+              defaultSize={20}
+              minSize={15}
+              maxSize={35}
+              onResize={() => setRightPanelOpen(!rightPanelRef.current?.isCollapsed())}
+            >
+              <div className="h-full border-l border-border bg-surface-75 flex flex-col">
                 {/* PanelSwitch */}
                 <div className="h-10 shrink-0 border-b border-border px-1 flex items-center gap-1">
                   <button
@@ -1595,7 +1937,7 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                       After publishing, you can configure access policies and custom domains. Public
                       access requires careful rate limiting and risk control settings.
                     </p>
-                    {app?.status === 'published' && runtimeEntryUrl ? (
+                    {app?.current_version_id && runtimeEntryUrl ? (
                       <Link
                         href={runtimeEntryUrl}
                         className="mt-2 inline-flex items-center gap-1 text-[11px] text-brand-500 hover:text-brand-400"
@@ -1817,21 +2159,8 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                             </div>
 
                             {versionDiff ? (
-                              <div className="mt-3 rounded-md border border-border bg-surface-200/60 px-3 py-2">
-                                <div className="text-[11px] text-foreground-muted">
-                                  {versionDiff.from.version} → {versionDiff.to.version}
-                                </div>
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                  {versionDiff.changed_fields.length === 0 ? (
-                                    <Badge variant="secondary">No Differences</Badge>
-                                  ) : (
-                                    versionDiff.changed_fields.map((field) => (
-                                      <Badge key={field} variant="secondary">
-                                        {field}
-                                      </Badge>
-                                    ))
-                                  )}
-                                </div>
+                              <div className="mt-3">
+                                <VersionDiffViewer diff={versionDiff} />
                               </div>
                             ) : null}
                           </>
@@ -1894,11 +2223,10 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                                           <SelectValue placeholder="Please select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          {field.options
-                                            .split(',')
-                                            .map((option) => option.trim())
+                                          {(Array.isArray(field.options) ? field.options : typeof field.options === 'string' ? field.options.split(',') : [])
+                                            .map((o: string) => o.trim())
                                             .filter(Boolean)
-                                            .map((option) => (
+                                            .map((option: string) => (
                                               <SelectItem key={option} value={option}>
                                                 {option}
                                               </SelectItem>
@@ -2031,8 +2359,8 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                   )}
                 </div>
               </div>
-            )}
-          </div>
+            </Panel>
+          </PanelGroup>
         </div>
       </TooltipProvider>
     </AppAccessGate>

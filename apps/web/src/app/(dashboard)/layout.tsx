@@ -41,6 +41,7 @@ import {
   ListTodo,
   Loader2,
   Shield,
+  Database,
 } from 'lucide-react'
 import { RequireAuth } from '@/components/auth/auth-guard'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -60,24 +61,18 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 // mainNavigationMenu
 const mainNavItems = [
-  { title: 'Overview', href: '/dashboard', icon: Activity },
-  { title: 'Conversation', href: '/dashboard/conversations', icon: MessageSquare },
-  { title: 'Workbench', href: '/dashboard/apps', icon: LayoutGrid },
-  { title: 'Creative Workshop', href: '/dashboard/creative', icon: Palette },
-  { title: 'Workflow (legacy)', href: '/dashboard/workflows', icon: Zap },
-  { title: 'Template Gallery', href: '/dashboard/template-gallery', icon: LayoutGrid },
-  { title: 'Store', href: '/dashboard/store', icon: Store },
-  { title: 'Planning', href: '/dashboard/plans', icon: ListTodo },
-  { title: 'Workspace', href: '/dashboard/workspaces', icon: LayoutGrid },
-  { title: 'Ticket Management', href: '/dashboard/support-tickets', icon: LifeBuoy },
-  { title: 'Support Settings', href: '/dashboard/support-settings', icon: Settings },
+  { title: 'Home', href: '/dashboard', icon: Activity },
+  { title: 'AI Agent', href: '/dashboard/agent', icon: Bot },
+  { title: 'My Apps', href: '/dashboard/apps', icon: LayoutGrid },
+  { title: 'Database', href: '/dashboard/database', icon: Database },
+  { title: 'Agent Flow', href: '/dashboard/workflows', icon: Zap },
+  { title: 'Skills', href: '/dashboard/skills', icon: Sparkles },
 ]
 
 // personMenu
 const personalNavItems = [
   { title: 'My Files', href: '/dashboard/files', icon: FolderOpen },
-  { title: 'Data Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { title: 'My Agents (Legacy)', href: '/dashboard/my-agents', icon: Bot },
+  { title: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
 ]
 
 // allPage(PageControlLayoutandScroll)
@@ -98,6 +93,9 @@ const fullBleedRoutes = [
   '/dashboard/plans',
   '/dashboard/support-tickets',
   '/dashboard/apps',
+  '/dashboard/database',
+  '/dashboard/agent',
+  '/dashboard/skills',
 ]
 
 const WORKSPACE_STORAGE_KEY = 'last_workspace_id'
@@ -360,9 +358,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setActiveWorkspaceId(workspaceId)
     if (typeof window !== 'undefined') {
       localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
+      // Clear Agent session context (workspace-scoped)
+      sessionStorage.removeItem('agent_session_id')
+      // Trigger DB stats refresh for new workspace
+      window.dispatchEvent(new CustomEvent('workspace-switched', { detail: { workspaceId } }))
     }
     updateRecentWorkspaces(workspaceId)
-    router.push('/dashboard/apps')
+    router.push('/dashboard')
   }
 
   const activePlan = resolvePlanConfig(activeWorkspace?.plan)
@@ -624,6 +626,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         )}
                       >
                         <div className="flex items-center gap-2">
+                          <div className={cn('w-1.5 h-1.5 rounded-full shrink-0', workspace.status === 'active' ? 'bg-emerald-500' : 'bg-foreground-muted/30')} title={workspace.status === 'active' ? 'DB Ready' : 'Not Configured'} />
                           <span className="font-medium">{workspace.name}</span>
                           <span className="text-[10px] text-foreground-muted">
                             /{workspace.slug}
