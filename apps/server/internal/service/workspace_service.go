@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -913,6 +914,30 @@ func (s *workspaceService) CreateVersion(ctx context.Context, id uuid.UUID, owne
 	if err != nil {
 		return nil, err
 	}
+
+	// Validate pages config: check that referenced workflow_ids exist
+	if req.ConfigJSON != nil {
+		if pages, ok := req.ConfigJSON["pages"].([]interface{}); ok {
+			for i, p := range pages {
+				page, ok := p.(map[string]interface{})
+				if !ok {
+					continue
+				}
+				wfIDStr, _ := page["workflow_id"].(string)
+				if wfIDStr == "" {
+					continue
+				}
+				wfID, err := uuid.Parse(wfIDStr)
+				if err != nil {
+					return nil, fmt.Errorf("pages[%d].workflow_id is not a valid UUID: %s", i, wfIDStr)
+				}
+				if _, err := s.workflowRepo.GetByID(ctx, wfID); err != nil {
+					return nil, fmt.Errorf("pages[%d].workflow_id %s not found", i, wfIDStr)
+				}
+			}
+		}
+	}
+
 	version := &entity.WorkspaceVersion{
 		ID:          uuid.New(),
 		WorkspaceID: ws.ID,
@@ -921,6 +946,15 @@ func (s *workspaceService) CreateVersion(ctx context.Context, id uuid.UUID, owne
 		WorkflowID:  req.WorkflowID,
 		CreatedBy:   &ownerID,
 		CreatedAt:   time.Now(),
+	}
+	if req.UISchema != nil {
+		version.UISchema = entity.JSON(req.UISchema)
+	}
+	if req.DBSchema != nil {
+		version.DBSchema = entity.JSON(req.DBSchema)
+	}
+	if req.ConfigJSON != nil {
+		version.ConfigJSON = entity.JSON(req.ConfigJSON)
 	}
 	if err := s.workspaceRepo.CreateVersion(ctx, version); err != nil {
 		return nil, fmt.Errorf("failed to create version: %w", err)
@@ -956,15 +990,62 @@ func (s *workspaceService) CompareVersions(ctx context.Context, id uuid.UUID, fr
 	if fromVer.WorkspaceID != id || toVer.WorkspaceID != id {
 		return nil, errors.New("version does not belong to this workspace")
 	}
+
+	changes := make(map[string]interface{})
+
+	// Compare changelog
+	fromChangelog := ""
+	toChangelog := ""
+	if fromVer.Changelog != nil {
+		fromChangelog = *fromVer.Changelog
+	}
+	if toVer.Changelog != nil {
+		toChangelog = *toVer.Changelog
+	}
+	if fromChangelog != toChangelog {
+		changes["changelog"] = map[string]interface{}{"from": fromChangelog, "to": toChangelog}
+	}
+
+	// Compare workflow_id
+	fromWfID := ""
+	toWfID := ""
+	if fromVer.WorkflowID != nil {
+		fromWfID = fromVer.WorkflowID.String()
+	}
+	if toVer.WorkflowID != nil {
+		toWfID = toVer.WorkflowID.String()
+	}
+	if fromWfID != toWfID {
+		changes["workflow_id"] = map[string]interface{}{"from": fromWfID, "to": toWfID}
+	}
+
+	// Compare JSON fields (entity.JSON = map[string]interface{})
+	compareJSONField := func(fieldName string, fromVal, toVal map[string]interface{}) {
+		fromBytes, _ := json.Marshal(fromVal)
+		toBytes, _ := json.Marshal(toVal)
+		fromStr := string(fromBytes)
+		toStr := string(toBytes)
+		if fromStr == "null" {
+			fromStr = "{}"
+		}
+		if toStr == "null" {
+			toStr = "{}"
+		}
+		if fromStr != toStr {
+			changes[fieldName] = map[string]interface{}{"from": fromVal, "to": toVal}
+		}
+	}
+
+	compareJSONField("ui_schema", fromVer.UISchema, toVer.UISchema)
+	compareJSONField("db_schema", fromVer.DBSchema, toVer.DBSchema)
+	compareJSONField("config_json", fromVer.ConfigJSON, toVer.ConfigJSON)
+
 	diff := map[string]interface{}{
 		"from_version": fromVer.Version,
 		"to_version":   toVer.Version,
 		"from_id":      fromVer.ID.String(),
 		"to_id":        toVer.ID.String(),
-		"changes": map[string]interface{}{
-			"version":   fromVer.Version != toVer.Version,
-			"changelog": fromVer.Changelog != toVer.Changelog,
-		},
+		"changes":      changes,
 	}
 	return diff, nil
 }

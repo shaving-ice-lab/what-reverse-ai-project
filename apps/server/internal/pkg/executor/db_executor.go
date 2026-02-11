@@ -294,14 +294,85 @@ func buildSelectSQL(config map[string]interface{}, inputs map[string]interface{}
 		return "", nil, err
 	}
 
-	where := strings.TrimSpace(getString(config, "where"))
-	if where != "" {
-		where = interpolateVariables(where, inputs, execCtx)
+	// Column selection (visual builder)
+	columnsPart := "*"
+	if cols, ok := config["columns"].([]interface{}); ok && len(cols) > 0 {
+		quotedCols := make([]string, 0, len(cols))
+		for _, c := range cols {
+			colStr := fmt.Sprintf("%v", c)
+			// Support aggregate expressions like "COUNT(id)" or aliases "name AS n"
+			if strings.ContainsAny(colStr, "()") || strings.Contains(strings.ToUpper(colStr), " AS ") {
+				quotedCols = append(quotedCols, colStr)
+			} else {
+				qc, err := quoteIdentifier(colStr)
+				if err != nil {
+					return "", nil, err
+				}
+				quotedCols = append(quotedCols, qc)
+			}
+		}
+		columnsPart = strings.Join(quotedCols, ", ")
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s", quotedTable)
-	if where != "" {
-		query += " WHERE " + where
+	var args []interface{}
+
+	// Build WHERE from structured conditions or raw string
+	wherePart := ""
+	if conditions, ok := config["conditions"].([]interface{}); ok && len(conditions) > 0 {
+		wherePart, args, err = buildConditions(conditions, inputs, execCtx)
+		if err != nil {
+			return "", nil, err
+		}
+	} else {
+		where := strings.TrimSpace(getString(config, "where"))
+		if where != "" {
+			wherePart = interpolateVariables(where, inputs, execCtx)
+		}
+	}
+
+	query := fmt.Sprintf("SELECT %s FROM %s", columnsPart, quotedTable)
+	if wherePart != "" {
+		query += " WHERE " + wherePart
+	}
+
+	// GROUP BY
+	if groupBy, ok := config["group_by"].([]interface{}); ok && len(groupBy) > 0 {
+		gbParts := make([]string, 0, len(groupBy))
+		for _, g := range groupBy {
+			qc, err := quoteIdentifier(fmt.Sprintf("%v", g))
+			if err != nil {
+				return "", nil, err
+			}
+			gbParts = append(gbParts, qc)
+		}
+		query += " GROUP BY " + strings.Join(gbParts, ", ")
+	}
+
+	// HAVING
+	if having := strings.TrimSpace(getString(config, "having")); having != "" {
+		query += " HAVING " + interpolateVariables(having, inputs, execCtx)
+	}
+
+	// ORDER BY
+	if orderBy, ok := config["order_by"].([]interface{}); ok && len(orderBy) > 0 {
+		obParts := make([]string, 0, len(orderBy))
+		for _, o := range orderBy {
+			if obMap, ok := o.(map[string]interface{}); ok {
+				col := getString(obMap, "column")
+				dir := strings.ToUpper(getString(obMap, "direction"))
+				if dir != "DESC" {
+					dir = "ASC"
+				}
+				qc, err := quoteIdentifier(col)
+				if err != nil {
+					return "", nil, err
+				}
+				obParts = append(obParts, qc+" "+dir)
+			}
+		}
+		if len(obParts) > 0 {
+			query += " ORDER BY " + strings.Join(obParts, ", ")
+		}
 	}
 
 	limit := getInt(config, "limit", 0)
@@ -309,7 +380,94 @@ func buildSelectSQL(config map[string]interface{}, inputs map[string]interface{}
 		query += fmt.Sprintf(" LIMIT %d", limit)
 	}
 
-	return query, nil, nil
+	offset := getInt(config, "offset", 0)
+	if offset > 0 {
+		query += fmt.Sprintf(" OFFSET %d", offset)
+	}
+
+	return query, args, nil
+}
+
+// buildConditions builds WHERE clause from structured conditions array
+// Each condition: {"column": "name", "operator": "=", "value": "foo", "logic": "AND"}
+func buildConditions(conditions []interface{}, inputs map[string]interface{}, execCtx *ExecutionContext) (string, []interface{}, error) {
+	var parts []string
+	var args []interface{}
+
+	allowedOps := map[string]bool{
+		"=": true, "!=": true, "<": true, ">": true, "<=": true, ">=": true,
+		"LIKE": true, "NOT LIKE": true, "IN": true, "NOT IN": true,
+		"IS NULL": true, "IS NOT NULL": true, "BETWEEN": true,
+	}
+
+	for i, c := range conditions {
+		cond, ok := c.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		col := getString(cond, "column")
+		op := strings.ToUpper(getString(cond, "operator"))
+		value := cond["value"]
+		logic := strings.ToUpper(getString(cond, "logic"))
+		if logic == "" {
+			logic = "AND"
+		}
+
+		if !allowedOps[op] {
+			return "", nil, fmt.Errorf("unsupported operator: %s", op)
+		}
+
+		qc, err := quoteIdentifier(col)
+		if err != nil {
+			return "", nil, err
+		}
+
+		var clause string
+		switch op {
+		case "IS NULL", "IS NOT NULL":
+			clause = fmt.Sprintf("%s %s", qc, op)
+		case "IN", "NOT IN":
+			vals, ok := value.([]interface{})
+			if !ok {
+				return "", nil, fmt.Errorf("IN operator requires array value")
+			}
+			placeholders := make([]string, len(vals))
+			for j, v := range vals {
+				placeholders[j] = "?"
+				args = append(args, resolveCondValue(v, inputs, execCtx))
+			}
+			clause = fmt.Sprintf("%s %s (%s)", qc, op, strings.Join(placeholders, ", "))
+		case "BETWEEN":
+			vals, ok := value.([]interface{})
+			if !ok || len(vals) != 2 {
+				return "", nil, fmt.Errorf("BETWEEN requires array of 2 values")
+			}
+			clause = fmt.Sprintf("%s BETWEEN ? AND ?", qc)
+			args = append(args, resolveCondValue(vals[0], inputs, execCtx), resolveCondValue(vals[1], inputs, execCtx))
+		default:
+			clause = fmt.Sprintf("%s %s ?", qc, op)
+			args = append(args, resolveCondValue(value, inputs, execCtx))
+		}
+
+		if i > 0 {
+			parts = append(parts, logic+" "+clause)
+		} else {
+			parts = append(parts, clause)
+		}
+	}
+
+	return strings.Join(parts, " "), args, nil
+}
+
+func resolveCondValue(value interface{}, inputs map[string]interface{}, execCtx *ExecutionContext) interface{} {
+	if strVal, ok := value.(string); ok {
+		resolved := interpolateVariables(strVal, inputs, execCtx)
+		if resolved != strVal {
+			return resolved
+		}
+	}
+	return value
 }
 
 func buildInsertSQL(config map[string]interface{}, inputs map[string]interface{}, execCtx *ExecutionContext) (string, []interface{}, error) {

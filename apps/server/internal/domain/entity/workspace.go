@@ -197,6 +197,9 @@ type WorkspaceSession struct {
 	WorkspaceID   uuid.UUID  `gorm:"type:char(36);not null;index" json:"workspace_id"`
 	SessionType   string     `gorm:"size:20;default:'anon';index" json:"session_type"`
 	UserID        *uuid.UUID `gorm:"type:char(36);index" json:"user_id"`
+	AppUserID     *uuid.UUID `gorm:"type:char(36);index:idx_ws_sessions_app_user" json:"app_user_id"`
+	TokenHash     *string    `gorm:"size:255;index:idx_ws_sessions_token" json:"token_hash,omitempty"`
+	AuthMethod    *string    `gorm:"size:20;default:'password'" json:"auth_method,omitempty"`
 	IPHash        *string    `gorm:"size:100" json:"ip_hash"`
 	UserAgentHash *string    `gorm:"size:200" json:"user_agent_hash"`
 	CreatedAt     time.Time  `json:"created_at"`
@@ -206,6 +209,7 @@ type WorkspaceSession struct {
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 	User      *User      `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	AppUser   *AppUser   `gorm:"foreignKey:AppUserID" json:"app_user,omitempty"`
 }
 
 // TableName 表名
