@@ -27,11 +27,25 @@ import {
   type WorkflowSummary,
   formatQuickStats,
 } from '@/lib/api/dashboard'
+import { workspaceDatabaseApi, type DatabaseStats } from '@/lib/api/workspace-database'
+import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
+import { useWorkspace } from '@/hooks/useWorkspace'
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
+}
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
+  const { workspaceId, workspace } = useWorkspace()
   const [isLoading, setIsLoading] = useState(true)
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [dbStats, setDbStats] = useState<DatabaseStats | null>(null)
+  const [agentSessions, setAgentSessions] = useState<AgentSessionSummary[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +63,32 @@ export default function DashboardPage() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (!workspaceId) return
+    const loadDbStats = async () => {
+      try {
+        const stats = await workspaceDatabaseApi.getStats(workspaceId)
+        setDbStats(stats)
+      } catch {
+        // DB stats unavailable
+      }
+    }
+    loadDbStats()
+  }, [workspaceId])
+
+  useEffect(() => {
+    if (!workspaceId) return
+    const loadSessions = async () => {
+      try {
+        const data = await agentChatApi.listSessions(workspaceId)
+        setAgentSessions(data || [])
+      } catch {
+        // Agent sessions unavailable
+      }
+    }
+    loadSessions()
+  }, [workspaceId])
 
   const getGreeting = () => {
     const hour = new Date().getHours()
@@ -84,18 +124,18 @@ export default function DashboardPage() {
             color="brand"
           />
           <QuickActionCard
+            href={workspaceId ? `/dashboard/app/${workspaceId}/builder` : '/dashboard/apps'}
+            icon={LayoutGrid}
+            title="Builder"
+            description="Design your app UI & logic"
+            color="blue"
+          />
+          <QuickActionCard
             href="/dashboard/database"
             icon={Database}
             title="Database"
             description="Manage tables and data"
             color="emerald"
-          />
-          <QuickActionCard
-            href="/dashboard/apps"
-            icon={LayoutGrid}
-            title="My Apps"
-            description="View your applications"
-            color="blue"
           />
           <QuickActionCard
             href="/dashboard/workflows"
@@ -105,6 +145,23 @@ export default function DashboardPage() {
             color="amber"
           />
         </div>
+
+        {/* Preview App Banner */}
+        {workspace?.slug && workspace?.app_status === 'published' && (
+          <Link
+            href={`/runtime/${workspace.slug}/${workspace.slug}`}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg border border-brand-500/20 bg-brand-500/5 hover:border-brand-500/40 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-brand-500/10 flex items-center justify-center">
+              <ArrowRight className="w-4 h-4 text-brand-500" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-foreground">Preview Your App</div>
+              <div className="text-[11px] text-foreground-muted">/{workspace.slug} — Published</div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-foreground-muted group-hover:text-foreground transition-colors" />
+          </Link>
+        )}
 
         {/* Two-column: Recent Apps + DB Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -147,9 +204,9 @@ export default function DashboardPage() {
                 <LoadingSkeleton count={3} />
               ) : (
                 <>
-                  <DBStatRow icon={Table2} label="Tables" value={String(formattedStats?.totalWorkflows ?? 0)} />
-                  <DBStatRow icon={HardDrive} label="Total Size" value="—" />
-                  <DBStatRow icon={Database} label="Quota" value="—" />
+                  <DBStatRow icon={Table2} label="Tables" value={String(dbStats?.table_count ?? 0)} />
+                  <DBStatRow icon={HardDrive} label="Total Size" value={dbStats ? formatBytes(dbStats.total_size_bytes) : '—'} />
+                  <DBStatRow icon={Database} label="Total Rows" value={dbStats ? dbStats.total_rows.toLocaleString() : '—'} />
                   <Link
                     href="/dashboard/database"
                     className="flex items-center gap-1.5 text-xs text-brand-500 hover:text-brand-600 transition-colors pt-1"
@@ -176,6 +233,14 @@ export default function DashboardPage() {
           </div>
           <div className="divide-y divide-border">
             <AgentSessionRow title="Start a new conversation" description="Chat with AI Agent to create apps, manage databases, and build workflows" isPlaceholder />
+            {agentSessions.slice(0, 3).map((session) => (
+              <AgentSessionRow
+                key={session.id}
+                title={`Session ${session.id.slice(0, 8)}`}
+                description={`${session.message_count} messages · ${session.status}`}
+                sessionId={session.id}
+              />
+            ))}
           </div>
         </div>
 
@@ -269,10 +334,10 @@ function DBStatRow({ icon: Icon, label, value }: { icon: React.ElementType; labe
   )
 }
 
-function AgentSessionRow({ title, description, isPlaceholder }: { title: string; description: string; isPlaceholder?: boolean }) {
+function AgentSessionRow({ title, description, isPlaceholder, sessionId }: { title: string; description: string; isPlaceholder?: boolean; sessionId?: string }) {
   return (
     <Link
-      href="/dashboard/agent"
+      href={sessionId ? `/dashboard/agent?session=${sessionId}` : '/dashboard/agent'}
       className="flex items-center gap-3 px-4 py-3 hover:bg-surface-200/30 transition-colors"
     >
       <div className={cn(

@@ -29,17 +29,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { request } from '@/lib/api/shared'
 import { cn } from '@/lib/utils'
-
-function useActiveWorkspaceId(): string | null {
-  const [id, setId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('activeWorkspaceId')
-      if (stored) setId(stored)
-    } catch {}
-  }, [])
-  return id
-}
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 interface Migration {
   id: string
@@ -69,7 +59,7 @@ const statusConfig: Record<string, { icon: React.ReactNode; color: string; label
 }
 
 export default function MigrationsPage() {
-  const workspaceId = useActiveWorkspaceId()
+  const { workspaceId } = useWorkspace()
   const [migrations, setMigrations] = useState<Migration[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

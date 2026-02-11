@@ -9,10 +9,9 @@ import { ExceptionState } from '@/components/ui/empty-state'
 import { ApiError } from '@/lib/api'
 import { appApi, type App } from '@/lib/api/workspace'
 import type { WorkspacePermission } from '@/lib/permissions'
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 type GuardStatus = 'loading' | 'ready' | 'not_found' | 'forbidden' | 'error'
-
-const LAST_WORKSPACE_STORAGE_KEY = 'last_workspace_id'
 
 const resolveRequiredPermissions = (pathname: string): WorkspacePermission[] => {
   if (pathname.includes('/publish')) return ['workspace_publish']
@@ -29,6 +28,7 @@ const resolveAppWorkspaceId = (app?: App | null) => app?.id || null
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const pathname = usePathname()
+  const { workspaceId: activeWorkspaceId, workspace: activeWorkspace, switchWorkspace } = useWorkspace()
   const appId = Array.isArray(params?.appId)
     ? params.appId[0]
     : (params?.appId as string | undefined)
@@ -41,6 +41,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!appId) {
       setStatus('not_found')
       setWorkspaceId(null)
+      return
+    }
+
+    // If appId matches the active workspace, use it directly (no extra API call)
+    if (activeWorkspaceId === appId && activeWorkspace) {
+      setWorkspaceId(appId)
+      setStatus('ready')
       return
     }
 
@@ -58,6 +65,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
         setWorkspaceId(nextWorkspaceId)
         setStatus('ready')
+        // Sync global workspace context to this app's workspace
+        if (nextWorkspaceId !== activeWorkspaceId) {
+          switchWorkspace(nextWorkspaceId)
+        }
       } catch (error) {
         if (cancelled) return
         if (error instanceof ApiError) {
@@ -78,12 +89,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [appId])
-
-  useEffect(() => {
-    if (!appId || typeof window === 'undefined') return
-    localStorage.setItem(LAST_WORKSPACE_STORAGE_KEY, appId)
-  }, [appId])
+  }, [appId, activeWorkspaceId, activeWorkspace, switchWorkspace])
 
   if (status === 'loading') {
     return (

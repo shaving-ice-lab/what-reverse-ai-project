@@ -6,7 +6,6 @@ const DASHBOARD_PREFIX = '/dashboard'
 // Old authenticated routes that used to live at "/xxx"
 // Now they are all under "/dashboard/xxx"
 const LEGACY_DASHBOARD_PREFIXES = [
-  '/achievements',
   '/activity',
   '/admin',
   '/analytics',
@@ -15,14 +14,11 @@ const LEGACY_DASHBOARD_PREFIXES = [
   '/billing',
   '/chat',
   '/conversations',
-  '/creative',
-  '/creator',
   '/data',
   '/editor',
   '/export',
   '/feedback',
   '/files',
-  '/getting-started',
   '/history',
   '/integrations',
   '/logs',
@@ -32,7 +28,6 @@ const LEGACY_DASHBOARD_PREFIXES = [
   '/plans',
   '/profile',
   '/quick-actions',
-  '/referral',
   '/review',
   '/search',
   '/settings',

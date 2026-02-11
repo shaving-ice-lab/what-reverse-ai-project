@@ -23,20 +23,10 @@ import { TableGrid } from '@/components/database/table-grid'
 import { RowDetailPanel } from '@/components/database/row-detail-panel'
 import { ColumnManagerDialog } from '@/components/database/column-manager-dialog'
 import { cn } from '@/lib/utils'
-
-function useActiveWorkspaceId(): string | null {
-  const [id, setId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('activeWorkspaceId')
-      if (stored) setId(stored)
-    } catch {}
-  }, [])
-  return id
-}
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 export default function TablesPage() {
-  const workspaceId = useActiveWorkspaceId()
+  const { workspaceId } = useWorkspace()
   const searchParams = useSearchParams()
   const initialTable = searchParams.get('table')
 

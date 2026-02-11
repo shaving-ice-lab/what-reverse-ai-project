@@ -6,7 +6,7 @@
  * Reference STYLE-TERMINAL-PIXEL.md Minimal Text Style Standard
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import {
   Activity,
@@ -48,118 +48,69 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { workflowApi } from '@/lib/api'
+import type { WorkflowMeta } from '@/types/workflow-api'
 
 // WorkflowStatus
 type WorkflowStatus = 'active' | 'paused' | 'error' | 'draft'
 type SortBy = 'updated' | 'name' | 'runs' | 'success'
 
-// WorkflowData
-const workflows = [
-  {
-    id: 'wf-1',
-    name: 'Customer Feedback Auto-Processing',
-    description:
-      'Automatically collect and analyze customer feedback, generate reports and notify related teams',
-    status: 'active' as WorkflowStatus,
-    trigger: 'Webhook',
-    createdAt: '2026-01-15',
-    updatedAt: '2 hours ago',
-    lastRun: '5 min ago',
-    totalRuns: 1256,
-    successRate: 98.5,
-    folder: 'Customer Service',
-    starred: true,
-    tags: ['Automation', 'Customer Service', 'Report'],
-  },
-  {
-    id: 'wf-2',
-    name: 'Daily Sales Data Summary',
-    description:
-      'Automatically summarize daily sales data, generate visual reports and send emails',
-    status: 'active' as WorkflowStatus,
-    trigger: 'Scheduled (daily 09:00)',
-    createdAt: '2026-01-10',
-    updatedAt: '1 day ago',
-    lastRun: 'Today 09:00',
-    totalRuns: 45,
-    successRate: 100,
-    folder: 'Data Analytics',
-    starred: true,
-    tags: ['Data', 'Report', 'Scheduled'],
-  },
-  {
-    id: 'wf-3',
-    name: 'GitHub Issue Auto-Category',
-    description: 'Use AI to automatically analyze new issues, add tags and assign owners',
-    status: 'active' as WorkflowStatus,
-    trigger: 'GitHub Webhook',
-    createdAt: '2026-01-08',
-    updatedAt: '3 hours ago',
-    lastRun: '1 hour ago',
-    totalRuns: 234,
-    successRate: 95.7,
-    folder: 'Development',
-    starred: false,
-    tags: ['GitHub', 'AI', 'Automation'],
-  },
-  {
-    id: 'wf-4',
-    name: 'New Employee Onboarding Flow',
-    description:
-      'Automate new employee onboarding, including account creation, permission assignment and notifications',
-    status: 'paused' as WorkflowStatus,
-    trigger: 'Manual Trigger',
-    createdAt: '2026-01-05',
-    updatedAt: '1 week ago',
-    lastRun: '2 weeks ago',
-    totalRuns: 23,
-    successRate: 100,
-    folder: 'Human Resources',
-    starred: false,
-    tags: ['HR', 'Onboarding', 'Automation'],
-  },
-  {
-    id: 'wf-5',
-    name: 'Social Media Content Publishing',
-    description: 'Schedule and publish social media content to multiple platforms',
-    status: 'error' as WorkflowStatus,
-    trigger: 'Scheduled Trigger',
-    createdAt: '2026-01-03',
-    updatedAt: '6 hours ago',
-    lastRun: '6 hours ago',
-    totalRuns: 89,
-    successRate: 87.6,
-    folder: 'Marketing',
-    starred: false,
-    tags: ['Social Media', 'Marketing', 'Scheduled'],
-  },
-  {
-    id: 'wf-6',
-    name: 'Order Processing Automation',
-    description: 'Automatically verify new orders, process, and send confirmation emails',
-    status: 'draft' as WorkflowStatus,
-    trigger: 'Webhook',
-    createdAt: '2026-01-20',
-    updatedAt: 'Just now',
-    lastRun: 'Not yet run',
-    totalRuns: 0,
-    successRate: 0,
-    folder: 'E-commerce',
-    starred: false,
-    tags: ['E-commerce', 'Order', 'Automation'],
-  },
-]
+interface WorkflowItem {
+  id: string
+  name: string
+  description: string
+  status: WorkflowStatus
+  trigger: string
+  createdAt: string
+  updatedAt: string
+  lastRun: string
+  totalRuns: number
+  successRate: number
+  folder: string
+  starred: boolean
+  tags: string[]
+}
 
-// FolderList
-const folders = [
-  { name: 'All', count: workflows.length },
-  { name: 'Customer Service', count: 1 },
-  { name: 'Data Analytics', count: 1 },
-  { name: 'Development', count: 1 },
-  { name: 'Human Resources', count: 1 },
-  { name: 'Marketing', count: 1 },
-  { name: 'E-commerce', count: 1 },
-]
+function formatTimeAgo(isoDate: string): string {
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return isoDate
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'Just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHrs = Math.floor(diffMin / 60)
+  if (diffHrs < 24) return `${diffHrs} hours ago`
+  const diffDays = Math.floor(diffHrs / 24)
+  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`
+  const diffWeeks = Math.floor(diffDays / 7)
+  if (diffWeeks < 4) return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`
+  return date.toLocaleDateString()
+}
+
+function toWorkflowItem(wf: WorkflowMeta): WorkflowItem {
+  const statusMap: Record<string, WorkflowStatus> = {
+    published: 'active',
+    draft: 'draft',
+    archived: 'paused',
+  }
+  const successRate = wf.runCount > 0 ? (wf.successCount / wf.runCount) * 100 : 0
+  return {
+    id: wf.id,
+    name: wf.name,
+    description: wf.description || '',
+    status: statusMap[wf.status] || 'draft',
+    trigger: 'Manual',
+    createdAt: wf.createdAt,
+    updatedAt: formatTimeAgo(wf.updatedAt),
+    lastRun: wf.lastRunAt ? formatTimeAgo(wf.lastRunAt) : 'Not yet run',
+    totalRuns: wf.runCount,
+    successRate,
+    folder: wf.folderId || 'Uncategorized',
+    starred: false,
+    tags: wf.tags,
+  }
+}
 
 // FetchStatusInfo
 const getStatusInfo = (status: WorkflowStatus) => {
@@ -220,6 +171,7 @@ function WorkflowSidebar({
   selectedFolder,
   setSelectedFolder,
   stats,
+  folders,
 }: {
   statusFilter: WorkflowStatus | 'all'
   setStatusFilter: (status: WorkflowStatus | 'all') => void
@@ -232,6 +184,7 @@ function WorkflowSidebar({
     error: number
     draft: number
   }
+  folders: { name: string; count: number }[]
 }) {
   return (
     <div className="space-y-1">
@@ -343,14 +296,46 @@ function WorkflowSidebar({
 }
 
 export default function WorkflowsPage() {
+  const [workflows, setWorkflows] = useState<WorkflowItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>('all')
   const [selectedFolder, setSelectedFolder] = useState('All')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
   const [sortBy, setSortBy] = useState<SortBy>('updated')
 
+  useEffect(() => {
+    let mounted = true
+    const load = async () => {
+      setLoading(true)
+      try {
+        const response = await workflowApi.list({ page: 1, pageSize: 200 })
+        if (!mounted) return
+        setWorkflows((response.data || []).map(toWorkflowItem))
+      } catch {
+        if (!mounted) return
+        setWorkflows([])
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    load()
+    return () => { mounted = false }
+  }, [])
+
+  const folders = useMemo(() => {
+    const folderCounts: Record<string, number> = {}
+    for (const wf of workflows) {
+      folderCounts[wf.folder] = (folderCounts[wf.folder] || 0) + 1
+    }
+    return [
+      { name: 'All', count: workflows.length },
+      ...Object.entries(folderCounts).map(([name, count]) => ({ name, count })),
+    ]
+  }, [workflows])
+
   // FilterWorkflow
-  const filteredWorkflows = workflows.filter((wf) => {
+  const filteredWorkflows = workflows.filter((wf: WorkflowItem) => {
     const matchesSearch =
       wf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       wf.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -360,15 +345,15 @@ export default function WorkflowsPage() {
   })
 
   // StatisticsData
-  const totalRuns = workflows.reduce((sum, w) => sum + w.totalRuns, 0)
-  const weightedSuccess = workflows.reduce((sum, w) => sum + w.totalRuns * w.successRate, 0)
+  const totalRuns = workflows.reduce((sum: number, w: WorkflowItem) => sum + w.totalRuns, 0)
+  const weightedSuccess = workflows.reduce((sum: number, w: WorkflowItem) => sum + w.totalRuns * w.successRate, 0)
   const stats = {
     total: workflows.length,
-    active: workflows.filter((w) => w.status === 'active').length,
-    paused: workflows.filter((w) => w.status === 'paused').length,
-    error: workflows.filter((w) => w.status === 'error').length,
-    draft: workflows.filter((w) => w.status === 'draft').length,
-    starred: workflows.filter((w) => w.starred).length,
+    active: workflows.filter((w: WorkflowItem) => w.status === 'active').length,
+    paused: workflows.filter((w: WorkflowItem) => w.status === 'paused').length,
+    error: workflows.filter((w: WorkflowItem) => w.status === 'error').length,
+    draft: workflows.filter((w: WorkflowItem) => w.status === 'draft').length,
+    starred: workflows.filter((w: WorkflowItem) => w.starred).length,
     totalRuns,
     avgSuccessRate: totalRuns ? weightedSuccess / totalRuns : 0,
   }
@@ -410,6 +395,7 @@ export default function WorkflowsPage() {
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
           stats={stats}
+          folders={folders}
         />
       }
     >

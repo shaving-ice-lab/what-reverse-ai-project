@@ -50,6 +50,7 @@ import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { workspaceApi, type Workspace, type WorkspaceQuota } from '@/lib/api/workspace'
+import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,40 +59,31 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { WorkspaceContext } from '@/hooks/useWorkspace'
 
-// mainNavigationMenu
-const mainNavItems = [
-  { title: 'Home', href: '/dashboard', icon: Activity },
-  { title: 'AI Agent', href: '/dashboard/agent', icon: Bot },
-  { title: 'My Apps', href: '/dashboard/apps', icon: LayoutGrid },
-  { title: 'Database', href: '/dashboard/database', icon: Database },
-  { title: 'Agent Flow', href: '/dashboard/workflows', icon: Zap },
-  { title: 'Skills', href: '/dashboard/skills', icon: Sparkles },
-]
+// mainNavigationMenu — workspace-scoped
+function getMainNavItems(workspaceId: string | null) {
+  return [
+    { title: 'Home', href: '/dashboard', icon: Activity },
+    { title: 'AI Agent', href: '/dashboard/agent', icon: Bot },
+    { title: 'Builder', href: workspaceId ? `/dashboard/app/${workspaceId}/builder` : '/dashboard/apps', icon: LayoutGrid },
+    { title: 'Database', href: '/dashboard/database', icon: Database },
+    { title: 'Workflows', href: '/dashboard/workflows', icon: Zap },
+    { title: 'Skills', href: '/dashboard/skills', icon: Sparkles },
+    { title: 'Settings', href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/workspaces', icon: Settings },
+  ]
+}
 
 // personMenu
-const personalNavItems = [
-  { title: 'My Files', href: '/dashboard/files', icon: FolderOpen },
-  { title: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-]
+const personalNavItems: { title: string; href: string; icon: React.ElementType }[] = []
 
 // allPage(PageControlLayoutandScroll)
 const fullBleedRoutes = [
   '/dashboard',
   '/dashboard/editor',
   '/dashboard/apps/editor',
-  '/dashboard/chat',
-  '/dashboard/conversations',
-  '/dashboard/creative',
-  '/dashboard/store',
-  '/dashboard/review',
   '/dashboard/workflows',
-  '/dashboard/my-agents',
-  '/dashboard/files',
-  '/dashboard/analytics',
   '/dashboard/workspaces',
-  '/dashboard/plans',
-  '/dashboard/support-tickets',
   '/dashboard/apps',
   '/dashboard/database',
   '/dashboard/agent',
@@ -131,14 +123,21 @@ const workspaceStatusConfig: Record<string, { label: string; color: string }> = 
   deleted: { label: 'Deleted', color: 'text-destructive' },
 }
 
-// MockConversationHistory
-const recentConversations = [
-  { id: '1', title: 'Create automation email workflow', time: '2 min ago' },
-  { id: '2', title: 'Webhook trigger config', time: '1 hour ago' },
-  { id: '3', title: 'Sales data analytics report', time: 'Yesterday' },
-  { id: '4', title: 'GitHub issue auto category', time: 'Yesterday' },
-  { id: '5', title: 'Customer feedback sentiment analytics', time: '3 days ago' },
-]
+function formatSessionTimeAgo(isoDate: string): string {
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return isoDate
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'Just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHrs = Math.floor(diffMin / 60)
+  if (diffHrs < 24) return `${diffHrs} hour${diffHrs > 1 ? 's' : ''} ago`
+  const diffDays = Math.floor(diffHrs / 24)
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 7) return `${diffDays} days ago`
+  return date.toLocaleDateString()
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -159,19 +158,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [recentWorkspaceIds, setRecentWorkspaceIds] = useState<string[]>([])
   const [needsSetup, setNeedsSetup] = useState(false)
   const [setupChecked, setSetupChecked] = useState(false)
+  const [recentConversations, setRecentConversations] = useState<{ id: string; title: string; time: string }[]>([])
   const resolvedMainNavItems = useMemo(
-    () =>
-      user?.role === 'admin'
+    () => {
+      const items = getMainNavItems(activeWorkspaceId)
+      return user?.role === 'admin'
         ? [
-            ...mainNavItems,
+            ...items,
             {
               title: 'Admin Panel',
               href: '/dashboard/admin',
               icon: Shield,
             },
           ]
-        : mainNavItems,
-    [user?.role]
+        : items
+    },
+    [user?.role, activeWorkspaceId]
   )
 
   const workspaceIdFromPath = pathname.startsWith('/dashboard/workspaces/')
@@ -321,6 +323,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [activeWorkspaceId])
 
+  useEffect(() => {
+    if (!activeWorkspaceId) {
+      setRecentConversations([])
+      return
+    }
+    let isActive = true
+    const loadSessions = async () => {
+      try {
+        const sessions = await agentChatApi.listSessions(activeWorkspaceId)
+        if (!isActive) return
+        const items = (sessions || []).slice(0, 5).map((s) => ({
+          id: s.id,
+          title: s.status === 'active' ? `Session ${s.id.slice(0, 8)}` : `Session ${s.id.slice(0, 8)}`,
+          time: s.updated_at ? formatSessionTimeAgo(s.updated_at) : (s.created_at ? formatSessionTimeAgo(s.created_at) : ''),
+        }))
+        setRecentConversations(items)
+      } catch {
+        if (isActive) setRecentConversations([])
+      }
+    }
+    loadSessions()
+    return () => { isActive = false }
+  }, [activeWorkspaceId])
+
   // SwitchTheme
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
@@ -347,7 +373,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return workspacePlanConfig[plan] || workspacePlanConfig.free
   }
 
-  const handleWorkspaceSwitch = (workspaceId: string) => {
+  // Silent workspace switch — no confirm dialog, no redirect. Used by child components
+  // (e.g. App Layout) to sync context when navigating to a workspace-scoped route.
+  const switchWorkspaceSilent = useCallback((workspaceId: string) => {
+    if (workspaceId === activeWorkspaceId) return
+    setActiveWorkspaceId(workspaceId)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
+      sessionStorage.removeItem('agent_session_id')
+      window.dispatchEvent(new CustomEvent('workspace-switched', { detail: { workspaceId } }))
+    }
+    updateRecentWorkspaces(workspaceId)
+  }, [activeWorkspaceId, updateRecentWorkspaces])
+
+  const handleWorkspaceSwitch = useCallback((workspaceId: string) => {
     if (workspaceId === activeWorkspaceId) return
     if (typeof window !== 'undefined' && activeWorkspaceId) {
       const confirmed = window.confirm(
@@ -355,17 +394,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )
       if (!confirmed) return
     }
-    setActiveWorkspaceId(workspaceId)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
-      // Clear Agent session context (workspace-scoped)
-      sessionStorage.removeItem('agent_session_id')
-      // Trigger DB stats refresh for new workspace
-      window.dispatchEvent(new CustomEvent('workspace-switched', { detail: { workspaceId } }))
-    }
-    updateRecentWorkspaces(workspaceId)
+    switchWorkspaceSilent(workspaceId)
     router.push('/dashboard')
-  }
+  }, [activeWorkspaceId, switchWorkspaceSilent, router])
 
   const activePlan = resolvePlanConfig(activeWorkspace?.plan)
   const recentWorkspaces = useMemo(() => {
@@ -410,14 +441,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     () => workspaces.some((workspace) => workspace.status !== 'active'),
     [workspaces]
   )
+
+  const workspaceContextValue = useMemo(
+    () => ({
+      workspaceId: activeWorkspaceId,
+      workspace: activeWorkspace,
+      workspaces,
+      isLoading: workspaceLoading,
+      switchWorkspace: switchWorkspaceSilent,
+    }),
+    [activeWorkspaceId, activeWorkspace, workspaces, workspaceLoading, switchWorkspaceSilent]
+  )
+
   const workspaceQuickLinks = activeWorkspace
     ? [
-        { label: 'Create App', href: '/dashboard/apps' },
+        { label: 'Create App', href: '/dashboard/agent' },
         {
           label: 'Member Management',
           href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`,
         },
-        { label: 'Usage and Billing', href: '/dashboard/billing' },
+        { label: 'Usage and Billing', href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing` },
         { label: 'Settings', href: `/dashboard/workspaces/${activeWorkspace.id}/settings` },
       ]
     : []
@@ -431,7 +474,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
         e.preventDefault()
-        router.push('/dashboard/conversations')
+        router.push('/dashboard/workflows')
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
         e.preventDefault()
@@ -491,6 +534,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <RequireAuth>
+      <WorkspaceContext.Provider value={workspaceContextValue}>
       <TooltipProvider delayDuration={100}>
         <div className="flex flex-col h-screen overflow-hidden transition-colors duration-200 bg-background-studio text-foreground">
           {/* ===== Supabase StyleTopNavbar ===== */}
@@ -570,7 +614,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     ) : (
                       <div className="text-[10px] text-foreground-muted">No quota data</div>
                     )}
-                    <Link href="/dashboard/billing" className="text-brand-500 hover:underline">
+                    <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="text-brand-500 hover:underline">
                       View Usage Details
                     </Link>
                     <div className="grid grid-cols-2 gap-2 pt-1">
@@ -747,7 +791,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   Quota {quotaUsageLabel}
                 </span>
                 <span className="h-3 w-px bg-border" />
-                <Link href="/dashboard/apps" className="hover:text-foreground transition-colors">
+                <Link href="/dashboard/agent" className="hover:text-foreground transition-colors">
                   Create App
                 </Link>
                 <Link
@@ -756,7 +800,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   Members
                 </Link>
-                <Link href="/dashboard/billing" className="hover:text-foreground transition-colors">
+                <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="hover:text-foreground transition-colors">
                   Usage
                 </Link>
                 <Link
@@ -781,17 +825,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Right sideToolbar */}
             <div className="ml-auto flex items-center gap-1.5">
-              <Link href="/dashboard/integrations">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2.5 text-[11px] border-border text-foreground-light hover:text-foreground"
-                >
-                  <PlugZap className="w-3.5 h-3.5 mr-1.5" />
-                  Connect
-                </Button>
-              </Link>
-
               <button
                 onClick={() => commandPalette.toggle()}
                 className="hidden md:flex items-center gap-2 px-3 py-1 rounded-md bg-surface-100 border border-border text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong transition-colors"
@@ -895,7 +928,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/dashboard/billing"
+                        href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
                         className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
@@ -1054,7 +1087,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             {recentConversations.map((conv) => (
                               <button
                                 key={conv.id}
-                                onClick={() => setActiveConversation(conv.id)}
+                                onClick={() => {
+                                  setActiveConversation(conv.id)
+                                  router.push(`/dashboard/agent?session=${conv.id}`)
+                                }}
                                 className={cn(
                                   'w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative',
                                   activeConversation === conv.id
@@ -1087,11 +1123,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <div className="flex items-center gap-1.5">
                             <Crown className="w-3.5 h-3.5 text-brand-500" />
                             <span className="text-[11px] font-medium text-foreground-light">
-                              Free Plan
+                              {activePlan.label} Plan
                             </span>
                           </div>
                           <Link
-                            href="/dashboard/billing"
+                            href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
                             className="text-[10px] text-brand-500 hover:underline"
                           >
                             Upgrade
@@ -1100,11 +1136,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div className="h-1 rounded-full overflow-hidden bg-surface-300">
                           <div
                             className="h-full rounded-full bg-brand-500"
-                            style={{ width: '85%' }}
+                            style={{ width: `${quotaUsagePercent !== null ? Math.min(Math.round(quotaUsagePercent * 100), 100) : 0}%` }}
                           />
                         </div>
                         <div className="flex items-center justify-between text-[10px] mt-1 text-foreground-muted">
-                          <span>850 / 1000 Credits</span>
+                          <span>Usage {quotaUsageLabel}</span>
                         </div>
                       </div>
                     </div>
@@ -1178,6 +1214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
         </div>
       </TooltipProvider>
+      </WorkspaceContext.Provider>
     </RequireAuth>
   )
 }

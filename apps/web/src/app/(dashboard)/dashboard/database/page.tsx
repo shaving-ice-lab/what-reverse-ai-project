@@ -20,17 +20,7 @@ import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
 import type { DatabaseTable, DatabaseStats, QueryHistoryItem } from '@/lib/api/workspace-database'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-
-function useActiveWorkspaceId(): string | null {
-  const [id, setId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('activeWorkspaceId')
-      if (stored) setId(stored)
-    } catch {}
-  }, [])
-  return id
-}
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B'
@@ -55,7 +45,7 @@ function formatTimeAgo(dateStr: string): string {
 }
 
 export default function DatabaseOverviewPage() {
-  const workspaceId = useActiveWorkspaceId()
+  const { workspaceId } = useWorkspace()
   const [tables, setTables] = useState<DatabaseTable[]>([])
   const [stats, setStats] = useState<DatabaseStats | null>(null)
   const [history, setHistory] = useState<QueryHistoryItem[]>([])

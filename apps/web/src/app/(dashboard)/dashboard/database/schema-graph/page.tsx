@@ -20,17 +20,7 @@ import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
 import type { SchemaGraphData, SchemaGraphNode, TableColumn } from '@/lib/api/workspace-database'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-
-function useActiveWorkspaceId(): string | null {
-  const [id, setId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('activeWorkspaceId')
-      if (stored) setId(stored)
-    } catch {}
-  }, [])
-  return id
-}
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 const NODE_WIDTH = 260
 const NODE_HEIGHT_BASE = 44
@@ -137,7 +127,7 @@ const nodeTypes = {
 }
 
 export default function SchemaGraphPage() {
-  const workspaceId = useActiveWorkspaceId()
+  const { workspaceId } = useWorkspace()
   const [graphData, setGraphData] = useState<SchemaGraphData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

@@ -8,9 +8,7 @@ import { ToastProvider, useToast, setGlobalToast, toast } from '@/components/ui/
 import { ErrorBoundary, getErrorMessage } from '@/components/ui/error-boundary'
 import { ApiError } from '@/lib/api'
 import { CACHE_TIMES } from '@/lib/cache'
-import { ClientTelemetry } from '@/components/observability/client-telemetry'
 import { reportError } from '@/lib/telemetry'
-import { isFeatureEnabled } from '@/lib/feature-flags'
 
 interface ProvidersProps {
   children: ReactNode
@@ -97,7 +95,6 @@ export function Providers({ children }: ProvidersProps) {
           </ErrorBoundary>
           <GlobalToastSetter />
         </ToastProvider>
-        {isFeatureEnabled('analytics') && <ClientTelemetry />}
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ThemeProvider>

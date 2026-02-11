@@ -488,7 +488,7 @@ export default function WorkspacesPage() {
                     call quotas.
                   </p>
                   <Link
-                    href="/dashboard/billing"
+                    href="/dashboard/workspaces"
                     className="text-[11px] text-brand-500 hover:underline"
                   >
                     View quotas & upgrade
@@ -583,7 +583,7 @@ export default function WorkspacesPage() {
                       The Free plan allows up to 3 apps, suitable for personal use and small teams.
                     </p>
                     <Link
-                      href="/dashboard/billing"
+                      href="/dashboard/workspaces"
                       className="text-brand-500 hover:underline text-[11px]"
                     >
                       View quota details

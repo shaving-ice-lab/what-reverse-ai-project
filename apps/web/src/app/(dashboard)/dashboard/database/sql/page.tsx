@@ -18,20 +18,10 @@ import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
 import type { QueryResult, QueryHistoryItem, DatabaseTable } from '@/lib/api/workspace-database'
 import { SQLResultTable } from '@/components/database/sql-result-table'
 import { cn } from '@/lib/utils'
-
-function useActiveWorkspaceId(): string | null {
-  const [id, setId] = useState<string | null>(null)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('activeWorkspaceId')
-      if (stored) setId(stored)
-    } catch {}
-  }, [])
-  return id
-}
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 export default function SQLEditorPage() {
-  const workspaceId = useActiveWorkspaceId()
+  const { workspaceId } = useWorkspace()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const [sql, setSql] = useState('')

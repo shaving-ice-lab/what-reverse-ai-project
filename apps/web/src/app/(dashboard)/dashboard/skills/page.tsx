@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Database,
   Layout,
@@ -10,8 +10,18 @@ import {
   ChevronDown,
   ChevronRight,
   Sparkles,
+  Plus,
+  Trash2,
+  Pencil,
+  Loader2,
+  X,
+  AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { request } from '@/lib/api/shared'
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 interface SkillMeta {
   id: string
@@ -40,7 +50,7 @@ const categoryLabels: Record<string, string> = {
   integration: 'Integration',
 }
 
-// Built-in skill data (would come from API in production)
+// Fallback skill data when API is unavailable
 const BUILTIN_SKILLS: SkillMeta[] = [
   {
     id: 'builtin_data_modeling',
@@ -78,13 +88,98 @@ const BUILTIN_SKILLS: SkillMeta[] = [
 ]
 
 export default function SkillsPage() {
+  const { workspaceId } = useWorkspace()
   const [skills, setSkills] = useState<SkillMeta[]>(BUILTIN_SKILLS)
+  const [loading, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [editingSkill, setEditingSkill] = useState<SkillMeta | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  const toggleEnabled = (skillId: string) => {
+  const loadSkills = useCallback(async () => {
+    if (!workspaceId) return
+    setLoading(true)
+    try {
+      const res = await request<{ data: SkillMeta[] } | SkillMeta[]>(
+        `/workspaces/${workspaceId}/agent/skills`
+      )
+      const items = Array.isArray(res) ? res : Array.isArray((res as any)?.data) ? (res as any).data : null
+      if (items && items.length > 0) {
+        setSkills(items)
+      }
+    } catch {
+      // Keep fallback BUILTIN_SKILLS
+    } finally {
+      setLoading(false)
+    }
+  }, [workspaceId])
+
+  useEffect(() => {
+    loadSkills()
+  }, [loadSkills])
+
+  const toggleEnabled = async (skillId: string) => {
+    const skill = skills.find((s) => s.id === skillId)
+    if (!skill) return
+    const newEnabled = !skill.enabled
     setSkills((prev) =>
-      prev.map((s) => (s.id === skillId ? { ...s, enabled: !s.enabled } : s))
+      prev.map((s) => (s.id === skillId ? { ...s, enabled: newEnabled } : s))
     )
+    if (workspaceId) {
+      try {
+        await request(`/workspaces/${workspaceId}/agent/skills/${skillId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ enabled: newEnabled }),
+        })
+      } catch {
+        setSkills((prev) =>
+          prev.map((s) => (s.id === skillId ? { ...s, enabled: !newEnabled } : s))
+        )
+      }
+    }
+  }
+
+  const handleDeleteSkill = async (skillId: string) => {
+    if (!workspaceId) return
+    if (!confirm('Delete this custom skill?')) return
+    setDeleting(skillId)
+    try {
+      await request(`/workspaces/${workspaceId}/agent/skills/${skillId}`, { method: 'DELETE' })
+      setSkills((prev) => prev.filter((s) => s.id !== skillId))
+      if (expandedId === skillId) setExpandedId(null)
+    } catch {
+      // ignore
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  const handleCreateOrUpdate = async (data: {
+    name: string
+    description: string
+    category: string
+    icon: string
+    system_prompt: string
+  }) => {
+    if (!workspaceId) return
+    try {
+      if (editingSkill) {
+        await request(`/workspaces/${workspaceId}/agent/skills/${editingSkill.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        })
+      } else {
+        await request(`/workspaces/${workspaceId}/agent/skills`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+        })
+      }
+      setShowCreateDialog(false)
+      setEditingSkill(null)
+      await loadSkills()
+    } catch {
+      // ignore
+    }
   }
 
   const allTools = skills
@@ -96,14 +191,24 @@ export default function SkillsPage() {
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-brand-500" />
-            AI Skills
-          </h1>
-          <p className="text-sm text-foreground-muted mt-1">
-            Manage the capabilities available to your AI Agent. Each skill provides a set of tools and prompts.
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-brand-500" />
+              AI Skills
+            </h1>
+            <p className="text-sm text-foreground-muted mt-1">
+              Manage the capabilities available to your AI Agent. Each skill provides a set of tools and prompts.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => { setEditingSkill(null); setShowCreateDialog(true) }}
+            className="h-8 text-xs shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Create Skill
+          </Button>
         </div>
 
         {/* Agent Capabilities Overview */}
@@ -169,6 +274,31 @@ export default function SkillsPage() {
                     </div>
                     <p className="text-xs text-foreground-muted mt-0.5 truncate">{skill.description}</p>
                   </div>
+
+                  {/* Custom skill actions */}
+                  {!skill.builtin && (
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <button
+                        onClick={() => { setEditingSkill(skill); setShowCreateDialog(true) }}
+                        className="p-1.5 text-foreground-muted hover:text-foreground transition-colors rounded"
+                        title="Edit skill"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSkill(skill.id)}
+                        className="p-1.5 text-foreground-muted hover:text-destructive transition-colors rounded"
+                        title="Delete skill"
+                        disabled={deleting === skill.id}
+                      >
+                        {deleting === skill.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  )}
 
                   {/* Toggle */}
                   <button
@@ -239,6 +369,145 @@ export default function SkillsPage() {
             )
           })}
         </div>
+
+        {/* Create/Edit Skill Dialog */}
+        {showCreateDialog && (
+          <SkillFormDialog
+            initial={editingSkill}
+            onSubmit={handleCreateOrUpdate}
+            onClose={() => { setShowCreateDialog(false); setEditingSkill(null) }}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SkillFormDialog({
+  initial,
+  onSubmit,
+  onClose,
+}: {
+  initial: SkillMeta | null
+  onSubmit: (data: { name: string; description: string; category: string; icon: string; system_prompt: string }) => Promise<void>
+  onClose: () => void
+}) {
+  const [name, setName] = useState(initial?.name || '')
+  const [description, setDescription] = useState(initial?.description || '')
+  const [category, setCategory] = useState(initial?.category || 'integration')
+  const [icon, setIcon] = useState(initial?.icon || 'Sparkles')
+  const [systemPrompt, setSystemPrompt] = useState(initial?.system_prompt_addition || '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !systemPrompt.trim()) return
+    setSaving(true)
+    try {
+      await onSubmit({
+        name: name.trim(),
+        description: description.trim(),
+        category,
+        icon,
+        system_prompt: systemPrompt.trim(),
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-background border border-border rounded-xl shadow-lg w-full max-w-lg mx-4">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">
+            {initial ? 'Edit Skill' : 'Create Custom Skill'}
+          </h3>
+          <button onClick={onClose} className="text-foreground-muted hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">Name *</label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. E-commerce Expert"
+              className="h-9 text-sm"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">Description</label>
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What does this skill help with?"
+              className="h-9 text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-foreground-light mb-1 block">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-9 rounded border border-border bg-background px-3 text-sm"
+              >
+                <option value="data_modeling">Data Modeling</option>
+                <option value="ui_generation">UI Generation</option>
+                <option value="business_logic">Business Logic</option>
+                <option value="integration">Integration</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-foreground-light mb-1 block">Icon</label>
+              <select
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                className="w-full h-9 rounded border border-border bg-background px-3 text-sm"
+              >
+                <option value="Sparkles">Sparkles</option>
+                <option value="Database">Database</option>
+                <option value="Layout">Layout</option>
+                <option value="GitBranch">GitBranch</option>
+                <option value="Plug">Plug</option>
+                <option value="Wrench">Wrench</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">
+              System Prompt *
+            </label>
+            <p className="text-[10px] text-foreground-muted mb-1.5">
+              This prompt will be appended to the AI Agent&apos;s system instructions when this skill is enabled.
+            </p>
+            <textarea
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+              placeholder={'You are an expert in...'}
+              required
+              rows={6}
+              className="w-full rounded border border-border bg-background px-3 py-2 text-sm resize-y min-h-[120px] font-mono"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-8 text-xs">
+              Cancel
+            </Button>
+            <Button type="submit" size="sm" disabled={saving || !name.trim() || !systemPrompt.trim()} className="h-8 text-xs">
+              {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+              {initial ? 'Save Changes' : 'Create Skill'}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   )

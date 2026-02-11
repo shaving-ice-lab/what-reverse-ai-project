@@ -105,7 +105,15 @@ import {
   type WorkspaceIntegration,
 } from '@/lib/api/workspace'
 import { configApi } from '@/lib/api/config'
-import { billingApi, type BudgetSettings } from '@/lib/api/billing'
+
+// BudgetSettings stub — billing module removed, will be re-implemented later
+type BudgetSettings = {
+  monthly_budget: number
+  thresholds: number[]
+  spend_limit: number
+  spend_limit_enabled: boolean
+  currency: string
+}
 import { useAuthStore } from '@/stores/useAuthStore'
 import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from '@/lib/permissions'
 import { PermissionGate } from '@/components/permissions/permission-gate'
@@ -569,13 +577,7 @@ export default function WorkspaceSettingsPage() {
         // Quota API may not be implemented yet
       }
 
-      try {
-        const settings = await billingApi.getBudgetSettings(workspaceId)
-        setBudget(settings)
-        syncBudgetForm(settings)
-      } catch {
-        // Budget API may not be implemented yet or insufficient permissions
-      }
+      // Budget API removed — will be re-implemented later
     } catch (error) {
       console.error('Failed to load workspace:', error)
     } finally {
@@ -1864,9 +1866,8 @@ export default function WorkspaceSettingsPage() {
         spend_limit: budgetForm.spendLimit ? Number(budgetForm.spendLimit) : 0,
         spend_limit_enabled: budgetForm.spendLimitEnabled,
       }
-      const updated = await billingApi.updateBudgetSettings(workspaceId, payload)
-      setBudget(updated)
-      syncBudgetForm(updated)
+      // billingApi removed — will be re-implemented later
+      console.warn('Budget settings save skipped: billing module not available')
     } catch (error) {
       console.error('Failed to update budget:', error)
     } finally {
