@@ -71,6 +71,7 @@ export interface AgentSessionSummary {
   user_id: string
   status: string
   message_count: number
+  title?: string
   created_at: string
   updated_at: string
 }

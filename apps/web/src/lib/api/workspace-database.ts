@@ -148,6 +148,22 @@ export interface SchemaGraphData {
   edges: SchemaGraphEdge[]
 }
 
+// ===== Database Role Types =====
+
+export interface DatabaseRole {
+  id: string
+  workspace_id: string
+  role_type: 'read' | 'write' | 'admin'
+  db_username: string
+  status: 'active' | 'revoked' | 'expired'
+  expires_at?: string
+  revoked_at?: string
+  revoked_reason?: string
+  last_used_at?: string
+  created_at: string
+  updated_at: string
+}
+
 // ===== API Response wrapper =====
 
 interface ApiResponse<T> {
@@ -380,5 +396,68 @@ export const workspaceDatabaseApi = {
       `/workspaces/${workspaceId}/database/schema-graph`
     )
     return (response.data as any)?.graph ?? { nodes: [], edges: [] }
+  },
+
+  /**
+   * List database roles
+   */
+  async listRoles(workspaceId: string): Promise<DatabaseRole[]> {
+    const response = await request<ApiResponse<{ roles: DatabaseRole[] } | DatabaseRole[]>>(
+      `/workspaces/${workspaceId}/database/roles`
+    )
+    const payload = response.data as any
+    return Array.isArray(payload?.roles) ? payload.roles : Array.isArray(payload) ? payload : []
+  },
+
+  /**
+   * Create a database role
+   */
+  async createRole(
+    workspaceId: string,
+    roleType: 'read' | 'write' | 'admin',
+    expiresAt?: string
+  ): Promise<{ role: DatabaseRole; password: string }> {
+    const response = await request<ApiResponse<{ role: DatabaseRole; password: string }>>(
+      `/workspaces/${workspaceId}/database/roles`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ role_type: roleType, expires_at: expiresAt }),
+      }
+    )
+    const payload = response.data as any
+    return { role: payload?.role, password: payload?.password || '' }
+  },
+
+  /**
+   * Rotate a database role's password
+   */
+  async rotateRole(
+    workspaceId: string,
+    roleId: string
+  ): Promise<{ role: DatabaseRole; password: string }> {
+    const response = await request<ApiResponse<{ role: DatabaseRole; password: string }>>(
+      `/workspaces/${workspaceId}/database/roles/${roleId}/rotate`,
+      { method: 'POST' }
+    )
+    const payload = response.data as any
+    return { role: payload?.role, password: payload?.password || '' }
+  },
+
+  /**
+   * Revoke a database role
+   */
+  async revokeRole(
+    workspaceId: string,
+    roleId: string,
+    reason?: string
+  ): Promise<DatabaseRole> {
+    const response = await request<ApiResponse<{ role: DatabaseRole }>>(
+      `/workspaces/${workspaceId}/database/roles/${roleId}/revoke`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      }
+    )
+    return (response.data as any)?.role
   },
 }

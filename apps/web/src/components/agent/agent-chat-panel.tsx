@@ -16,6 +16,9 @@ import {
   ChevronRight,
   Check,
   X,
+  Rocket,
+  Eye,
+  LayoutGrid,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,9 +38,34 @@ interface ChatEntry {
   timestamp: Date
 }
 
+interface QuickSuggestion {
+  label: string
+  prompt: string
+}
+
+const defaultSuggestions: QuickSuggestion[] = [
+  { label: '🚗 Fleet Management', prompt: 'Build me a fleet management system with vehicles, drivers, and trip tracking. Include a dashboard with stats, and CRUD pages for each entity.' },
+  { label: '📋 Task Tracker', prompt: 'Create a project task tracker with projects, tasks, and team members. Include a dashboard with task stats and charts.' },
+  { label: '🛒 Order Management', prompt: 'Build an order management system with customers, products, and orders. Include a dashboard with sales stats and recent orders.' },
+  { label: '📊 Survey App', prompt: 'Create a survey/feedback collection app with surveys, questions, and responses. Include analytics charts for responses.' },
+]
+
+export interface AgentCompletionInfo {
+  affectedResources: Set<string>
+  hasUISchema: boolean
+  hasDatabase: boolean
+  hasWorkflow: boolean
+  toolCallCount: number
+}
+
 interface AgentChatPanelProps {
   workspaceId: string
   className?: string
+  onEvent?: (event: AgentEvent) => void
+  onComplete?: (info: AgentCompletionInfo) => void
+  suggestions?: QuickSuggestion[]
+  previewUrl?: string
+  builderUrl?: string
 }
 
 let entryIdCounter = 0
@@ -45,7 +73,8 @@ function nextEntryId() {
   return `entry_${++entryIdCounter}_${Date.now()}`
 }
 
-export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) {
+export function AgentChatPanel({ workspaceId, className, onEvent, onComplete, suggestions, previewUrl, builderUrl }: AgentChatPanelProps) {
+  const quickSuggestions = suggestions || defaultSuggestions
   const [entries, setEntries] = useState<ChatEntry[]>([])
   const [input, setInput] = useState('')
   const [running, setRunning] = useState(false)
@@ -53,6 +82,9 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
   const controllerRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null)
+  const [completionInfo, setCompletionInfo] = useState<AgentCompletionInfo | null>(null)
+  const affectedRef = useRef<Set<string>>(new Set())
+  const toolCallCountRef = useRef(0)
 
   useEffect(() => {
     agentChatApi.getStatus(workspaceId).then(setAgentStatus).catch(() => {})
@@ -84,8 +116,15 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
       message,
       sid,
       (event: AgentEvent) => {
+        onEvent?.(event)
+
         if (event.session_id && !sessionId) {
           setSessionId(event.session_id)
+        }
+
+        // Track affected resources
+        if (event.affected_resource) {
+          affectedRef.current.add(event.affected_resource)
         }
 
         switch (event.type) {
@@ -93,6 +132,7 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
             addEntry({ type: 'thought', content: event.content || '', step: event.step })
             break
           case 'tool_call':
+            toolCallCountRef.current++
             addEntry({
               type: 'tool_call',
               content: `Calling tool: ${event.tool_name}`,
@@ -102,6 +142,18 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
             })
             break
           case 'tool_result':
+            // Track specific resource types from tool names
+            if (event.tool_result?.success) {
+              if (event.tool_name === 'generate_ui_schema' || event.tool_name === 'modify_ui_schema') {
+                affectedRef.current.add('ui_schema')
+              }
+              if (event.tool_name === 'create_table' || event.tool_name === 'alter_table' || event.tool_name === 'insert_data') {
+                affectedRef.current.add('database')
+              }
+              if (event.tool_name === 'create_workflow' || event.tool_name === 'modify_workflow') {
+                affectedRef.current.add('workflow')
+              }
+            }
             addEntry({
               type: 'tool_result',
               content: event.tool_result?.output || '',
@@ -132,9 +184,21 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
             addEntry({ type: 'error', content: event.error || 'Unknown error' })
             setRunning(false)
             break
-          case 'done':
+          case 'done': {
             setRunning(false)
+            const info: AgentCompletionInfo = {
+              affectedResources: new Set(affectedRef.current),
+              hasUISchema: affectedRef.current.has('ui_schema'),
+              hasDatabase: affectedRef.current.has('database'),
+              hasWorkflow: affectedRef.current.has('workflow'),
+              toolCallCount: toolCallCountRef.current,
+            }
+            if (info.toolCallCount > 0) {
+              setCompletionInfo(info)
+              onComplete?.(info)
+            }
             break
+          }
         }
       },
       (error) => {
@@ -212,12 +276,28 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
         {entries.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-foreground-muted text-sm">
+          <div className="flex flex-col items-center justify-center h-full text-foreground-muted text-sm px-4">
             <Bot className="w-8 h-8 mb-3 opacity-30" />
-            <p>Ask the Agent to help build your application.</p>
-            <p className="text-xs mt-1">e.g. &quot;Build a fleet management system&quot; or &quot;Create a customer feedback app&quot;</p>
+            <p className="font-medium text-foreground">What do you want to build?</p>
+            <p className="text-xs mt-1 text-center max-w-md">
+              Describe your app and the AI Agent will create database tables, generate UI pages, and build a complete working application.
+            </p>
+            {quickSuggestions.length > 0 && (
+              <div className="mt-4 grid gap-2 w-full max-w-md">
+                {quickSuggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setInput(s.prompt); }}
+                    className="text-left px-3 py-2.5 rounded-lg border border-border/60 bg-surface-100/50 hover:bg-surface-200/60 hover:border-border transition-colors group"
+                  >
+                    <span className="text-xs font-medium text-foreground">{s.label}</span>
+                    <p className="text-[11px] text-foreground-muted mt-0.5 line-clamp-1 group-hover:text-foreground-light transition-colors">{s.prompt}</p>
+                  </button>
+                ))}
+              </div>
+            )}
             {agentStatus?.provider === 'heuristic' && (
-              <p className="text-[10px] mt-2 text-amber-500">
+              <p className="text-[10px] mt-3 text-amber-500">
                 Tip: Set OPENAI_API_KEY or OLLAMA_HOST for full AI capabilities
               </p>
             )}
@@ -236,6 +316,47 @@ export function AgentChatPanel({ workspaceId, className }: AgentChatPanelProps) 
           <div className="flex items-center gap-2 text-xs text-foreground-muted pl-8">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
             Agent is working...
+          </div>
+        )}
+
+        {/* App Ready Banner — shown after agent completes with UI schema */}
+        {completionInfo && completionInfo.hasUISchema && !running && (previewUrl || builderUrl) && (
+          <div className="mx-2 mt-2 bg-brand-500/5 border border-brand-500/20 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-brand-500/10 flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-brand-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Your app is ready!</p>
+                <p className="text-[11px] text-foreground-muted">
+                  {completionInfo.hasDatabase && 'Database created · '}
+                  UI generated
+                  {completionInfo.hasWorkflow && ' · Workflows configured'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mt-3">
+              {previewUrl && (
+                <a
+                  href={previewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand-500 text-white text-xs font-medium hover:bg-brand-600 transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  Preview App
+                </a>
+              )}
+              {builderUrl && (
+                <a
+                  href={builderUrl}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-foreground text-xs font-medium hover:bg-surface-200/50 transition-colors"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  Open Builder
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>

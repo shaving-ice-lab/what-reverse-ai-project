@@ -9,6 +9,7 @@ import {
   GitBranch,
   Shield,
   Network,
+  FunctionSquare,
 } from 'lucide-react'
 import {
   PageWithSidebar,
@@ -22,6 +23,7 @@ const databaseNavItems = [
   { href: '/dashboard/database/sql', label: 'SQL Editor', icon: Terminal },
   { href: '/dashboard/database/schema-graph', label: 'Schema Graph', icon: Network },
   { href: '/dashboard/database/migrations', label: 'Migrations', icon: GitBranch },
+  { href: '/dashboard/database/functions', label: 'Functions', icon: FunctionSquare },
   { href: '/dashboard/database/roles', label: 'Roles', icon: Shield },
 ]
 

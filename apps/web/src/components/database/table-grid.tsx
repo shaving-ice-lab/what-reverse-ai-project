@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState } from 'react'
 import {
   ChevronUp,
   ChevronDown,
@@ -9,12 +9,9 @@ import {
   ChevronRight,
   Plus,
   Trash2,
-  Filter,
   RefreshCw,
   Download,
-  Columns3,
   Key,
-  Link2,
   AlertCircle,
   Loader2,
 } from 'lucide-react'
@@ -29,6 +26,8 @@ import {
 } from '@/components/ui/select'
 import type { TableColumn, QueryFilter } from '@/lib/api/workspace-database'
 import { cn } from '@/lib/utils'
+import { TableFilter, type FilterCombinator } from './table-filter'
+import { CellEditor } from './cell-editor'
 
 export interface TableGridProps {
   columns: TableColumn[]
@@ -50,6 +49,8 @@ export interface TableGridProps {
   onUpdateCell?: (rowId: unknown, column: string, newValue: unknown) => void
   filters: QueryFilter[]
   primaryKey: string[]
+  combinator?: FilterCombinator
+  onCombinatorChange?: (combinator: FilterCombinator) => void
 }
 
 export function TableGrid({
@@ -72,12 +73,11 @@ export function TableGrid({
   onUpdateCell,
   filters,
   primaryKey,
+  combinator = 'AND',
+  onCombinatorChange,
 }: TableGridProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [showFilters, setShowFilters] = useState(filters.length > 0)
   const [editingCell, setEditingCell] = useState<{ rowKey: string; column: string } | null>(null)
-  const [editValue, setEditValue] = useState<string>('')
-  const editCancelledRef = useRef(false)
 
   const totalPages = Math.ceil(totalCount / pageSize) || 1
 
@@ -130,12 +130,6 @@ export function TableGrid({
     setSelectedRows(new Set())
   }
 
-  const removeFilter = (index: number) => {
-    const next = [...filters]
-    next.splice(index, 1)
-    onFilterChange(next)
-  }
-
   const exportCSV = () => {
     if (rows.length === 0 || columns.length === 0) return
     const colNames = columns.map((c) => c.name)
@@ -181,20 +175,15 @@ export function TableGrid({
               Delete ({selectedRows.size})
             </Button>
           )}
-          <Button
-            size="sm"
-            variant={showFilters ? 'secondary' : 'ghost'}
-            onClick={() => setShowFilters(!showFilters)}
-            className="h-7 text-xs"
-          >
-            <Filter className="w-3.5 h-3.5 mr-1" />
-            Filter
-            {filters.length > 0 && (
-              <span className="ml-1 px-1 py-0.5 text-[10px] rounded bg-brand-500 text-white">
-                {filters.length}
-              </span>
-            )}
-          </Button>
+          <TableFilter
+            columns={columns}
+            filters={filters}
+            combinator={combinator}
+            onChange={(newFilters, newCombinator) => {
+              onFilterChange(newFilters)
+              onCombinatorChange?.(newCombinator)
+            }}
+          />
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="ghost" onClick={exportCSV} className="h-7 text-xs">
@@ -206,28 +195,6 @@ export function TableGrid({
           </Button>
         </div>
       </div>
-
-      {/* Active Filters */}
-      {showFilters && filters.length > 0 && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-surface-100/50 flex-wrap">
-          {filters.map((f, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-200 text-xs text-foreground"
-            >
-              <span className="font-medium">{f.column}</span>
-              <span className="text-foreground-muted">{f.operator}</span>
-              <span>{f.value}</span>
-              <button
-                onClick={() => removeFilter(i)}
-                className="ml-1 text-foreground-muted hover:text-destructive"
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Table */}
       <div className="flex-1 overflow-auto relative">
@@ -317,38 +284,22 @@ export function TableGrid({
                             if (!onUpdateCell || col.is_primary_key) return
                             e.stopPropagation()
                             setEditingCell({ rowKey: key, column: col.name })
-                            setEditValue(row[col.name] === null || row[col.name] === undefined ? '' : String(row[col.name]))
                           }}
                         >
                           {isEditing ? (
-                            <input
-                              autoFocus
-                              className="w-full bg-background border border-brand-500 rounded px-1.5 py-0.5 text-[13px] outline-none"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  const rowId = primaryKey.length > 0 ? row[primaryKey[0]] : undefined
-                                  if (rowId !== undefined && onUpdateCell) {
-                                    onUpdateCell(rowId, col.name, editValue)
-                                  }
-                                  setEditingCell(null)
-                                } else if (e.key === 'Escape') {
-                                  editCancelledRef.current = true
-                                  setEditingCell(null)
-                                }
-                              }}
-                              onBlur={() => {
-                                if (editCancelledRef.current) {
-                                  editCancelledRef.current = false
-                                  return
-                                }
+                            <CellEditor
+                              value={row[col.name]}
+                              columnName={col.name}
+                              columnType={col.type}
+                              nullable={col.nullable}
+                              onSave={(newValue) => {
                                 const rowId = primaryKey.length > 0 ? row[primaryKey[0]] : undefined
                                 if (rowId !== undefined && onUpdateCell) {
-                                  onUpdateCell(rowId, col.name, editValue)
+                                  onUpdateCell(rowId, col.name, newValue)
                                 }
                                 setEditingCell(null)
                               }}
+                              onCancel={() => setEditingCell(null)}
                             />
                           ) : (
                             <CellValue value={row[col.name]} type={col.type} />
