@@ -53,6 +53,7 @@ apps/desktop/src-tauri/target/
 # Go
 apps/server/bin/
 apps/server/tmp/
+*.exe
 
 # Resources (external references)
 resources/
