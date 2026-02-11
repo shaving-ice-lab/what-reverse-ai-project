@@ -169,9 +169,6 @@ func ParseOrRepairAIOutputProtocol(raw string, description string) (*AIOutputPro
 		lastErr = err
 	}
 
-	if lastErr == nil {
-		lastErr = fmt.Errorf("AI 输出协议解析失败")
-	}
 	return nil, false, lastErr
 }
 

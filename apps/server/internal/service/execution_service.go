@@ -332,10 +332,8 @@ func (s *executionService) executeWorkflow(ctx context.Context, execution *entit
 
 	// 转换输入
 	inputsMap := make(map[string]interface{})
-	if inputs != nil {
-		for k, v := range inputs {
-			inputsMap[k] = v
-		}
+	for k, v := range inputs {
+		inputsMap[k] = v
 	}
 
 	// 执行工作流

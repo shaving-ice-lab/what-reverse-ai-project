@@ -865,10 +865,17 @@ export interface AppAccessPolicy {
 export type WorkspaceAccessPolicy = AppAccessPolicy
 
 // Version comparison result
+export interface AppVersionDiffChange {
+  from: unknown
+  to: unknown
+}
+
 export interface AppVersionDiff {
   from_version: string
   to_version: string
-  changes: Record<string, unknown>
+  from_id?: string
+  to_id?: string
+  changes: Record<string, AppVersionDiffChange>
   summary?: string
 }
 
@@ -1008,11 +1015,11 @@ export const appApi = {
     id: string,
     fromVersionId: string,
     toVersionId: string
-  ): Promise<Record<string, unknown>> {
-    const response = await request<ApiResponse<any>>(
+  ): Promise<AppVersionDiff> {
+    const response = await request<ApiResponse<AppVersionDiff>>(
       `/workspaces/${id}/versions/compare?from=${fromVersionId}&to=${toVersionId}`
     )
-    return response.data
+    return response.data as AppVersionDiff
   },
 
   /**

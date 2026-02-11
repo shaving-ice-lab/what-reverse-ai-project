@@ -3,7 +3,7 @@
  */
 
 // Export API client
-export { api, ApiError, type ApiResponse, type RequestConfig } from '../api'
+export { api, ApiError, type ApiResponse, type RequestConfig } from './client'
 
 // ExportModule API
 export * from './auth'
@@ -88,3 +88,39 @@ export type {
   AppMetrics,
   AppExecution,
 } from './workspace'
+
+// Agent Chat API
+export { agentChatApi, chatStream } from './agent-chat'
+export type {
+  AgentEventType,
+  AgentToolResult,
+  AffectedResource,
+  AgentEvent,
+  AgentSession,
+  AgentMessage,
+  AgentToolCall,
+  AgentSessionSummary,
+} from './agent-chat'
+
+// Workspace Database API
+export { workspaceDatabaseApi } from './workspace-database'
+export type {
+  DatabaseTable,
+  TableColumn,
+  TableIndex,
+  ForeignKey,
+  TableSchema,
+  CreateColumnDef,
+  CreateIndexDef,
+  CreateTableRequest,
+  AlterColumnDef,
+  AlterTableRequest,
+  QueryFilter,
+  QueryRowsParams,
+  QueryResult,
+  QueryHistoryItem,
+  DatabaseStats,
+  SchemaGraphNode,
+  SchemaGraphEdge,
+  SchemaGraphData,
+} from './workspace-database'

@@ -721,7 +721,7 @@ export interface GoalResponse {
   data: Goal
 }
 
-export interface SystemHealthResponse {
+export interface DashboardSystemHealthResponse {
   success: boolean
   data: SystemHealth
 }
@@ -1045,8 +1045,8 @@ export const dashboardApi = {
    * Fetch System Health Status
    * @returns System Health Status
    */
-  async getSystemHealth(): Promise<SystemHealthResponse> {
-    return request<SystemHealthResponse>('/dashboard/system-health')
+  async getSystemHealth(): Promise<DashboardSystemHealthResponse> {
+    return request<DashboardSystemHealthResponse>('/dashboard/system-health')
   },
 
   /**

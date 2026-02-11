@@ -14,6 +14,8 @@ import (
 	"github.com/agentflow/server/internal/pkg/websocket"
 	"github.com/agentflow/server/internal/repository"
 	"github.com/agentflow/server/internal/service"
+	"github.com/agentflow/server/internal/service/agent_tools"
+	"github.com/agentflow/server/internal/service/skills"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -299,6 +301,7 @@ func (s *Server) setupRoutes() {
 		s.log.Error("Failed to initialize workspace DB runtime", "error", err)
 		workspaceDBRuntime, _ = service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, s.config.Database, "change-this-to-a-32-byte-secret!")
 	}
+	workspaceDBQueryService := service.NewWorkspaceDBQueryService(workspaceDBRuntime)
 	workflowService := service.NewWorkflowService(workflowRepo, workspaceService)
 	folderService := service.NewFolderService(folderRepo, workflowRepo)
 	versionService := service.NewWorkflowVersionService(versionRepo, workflowRepo)
@@ -479,6 +482,7 @@ func (s *Server) setupRoutes() {
 	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, workspaceDomainService, auditLogService, workspaceExportService)
 	logArchiveHandler := handler.NewLogArchiveHandler(logArchiveService)
 	workspaceDatabaseHandler := handler.NewWorkspaceDatabaseHandler(workspaceDatabaseService, workspaceDBRoleService, auditLogService, s.taskQueue)
+	workspaceDBQueryHandler := handler.NewWorkspaceDBQueryHandler(workspaceDBQueryService, workspaceDBRuntime, auditLogService)
 	auditLogHandler := handler.NewAuditLogHandler(auditLogService, workspaceService)
 	securityComplianceHandler := handler.NewSecurityComplianceHandler(securityComplianceService, workspaceService)
 	supplyChainHandler := handler.NewSupplyChainHandler(supplyChainService, workspaceService)
@@ -581,6 +585,26 @@ func (s *Server) setupRoutes() {
 	// AI 助手处理器
 	aiAssistantHandler := handler.NewAIAssistantHandler(aiAssistantService)
 
+	// Skills 系统初始化
+	skillRegistry := service.NewSkillRegistry()
+	_ = skillRegistry.Register(skills.NewDataModelingSkill(workspaceDBQueryService))
+	_ = skillRegistry.Register(skills.NewUIGenerationSkill())
+	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(workflowService, workspaceDBQueryService))
+
+	// Agent 推理引擎初始化
+	agentToolRegistry := service.NewAgentToolRegistry()
+	// 通过 Skills 加载工具（替代逐个注册）
+	skillRegistry.LoadToolsIntoRegistry(agentToolRegistry)
+	// 额外注册不属于 Skill 的独立工具（跳过已存在的）
+	_ = agentToolRegistry.Register(agent_tools.NewGetUISchemaTool(workspaceService))
+	_ = agentToolRegistry.Register(agent_tools.NewGenerateUISchemaTool(workspaceService))
+	_ = agentToolRegistry.Register(agent_tools.NewPublishAppTool(workspaceService))
+	agentSessionManager := service.NewAgentSessionManager()
+	agentSessionRepo := repository.NewAgentSessionRepository(s.db)
+	agentSessionManager.SetPersister(service.NewAgentSessionPersisterAdapter(agentSessionRepo))
+	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, service.DefaultAgentEngineConfig(), skillRegistry.BuildSystemPrompt())
+	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager)
+
 	// 对话聊天处理器（集成 AI 和对话管理）
 	conversationChatHandler := handler.NewConversationChatHandler(conversationService, aiAssistantService)
 
@@ -594,12 +618,28 @@ func (s *Server) setupRoutes() {
 	wsHandler := handler.NewWebSocketHandler(s.wsHub, &s.config.JWT)
 	s.echo.GET("/ws", wsHandler.HandleConnection)
 
+	// 应用运行时认证服务
+	appUserRepo := repository.NewAppUserRepository(s.db)
+	runtimeAuthService := service.NewRuntimeAuthServiceWithDB(appUserRepo, workspaceRepo, sessionRepo, s.db)
+	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService)
+	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, workspaceDBQueryService, executionService)
+
 	// Runtime 公开访问入口（现在直接用 workspaceSlug）
 	runtime := s.echo.Group("/runtime", middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 	{
 		runtime.POST("/:workspaceSlug", runtimeHandler.Execute)
 		runtime.GET("/:workspaceSlug", runtimeHandler.GetEntry)
 		runtime.GET("/:workspaceSlug/schema", runtimeHandler.GetSchema)
+		runtime.POST("/:workspaceSlug/auth/register", runtimeAuthHandler.Register)
+		runtime.POST("/:workspaceSlug/auth/login", runtimeAuthHandler.Login)
+		runtime.POST("/:workspaceSlug/auth/logout", runtimeAuthHandler.Logout)
+		// Runtime Data API — 公开访问已发布 App 的数据库
+		runtime.GET("/:workspaceSlug/data/:table", runtimeDataHandler.QueryRows)
+		runtime.POST("/:workspaceSlug/data/:table", runtimeDataHandler.InsertRow)
+		runtime.PATCH("/:workspaceSlug/data/:table", runtimeDataHandler.UpdateRow)
+		runtime.DELETE("/:workspaceSlug/data/:table", runtimeDataHandler.DeleteRows)
+		// Runtime Workflow Execute — 公开执行指定 workflow（表单触发）
+		runtime.POST("/:workspaceSlug/workflows/:workflowId/execute", runtimeDataHandler.ExecuteWorkflow)
 	}
 	s.echo.GET("/", runtimeHandler.GetDomainEntry, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 	s.echo.GET("/schema", runtimeHandler.GetDomainSchema, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
@@ -818,8 +858,30 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/database/roles", workspaceDatabaseHandler.ListRoles)
 			workspaces.POST("/:id/database/roles/:roleId/rotate", workspaceDatabaseHandler.RotateRole)
 			workspaces.POST("/:id/database/roles/:roleId/revoke", workspaceDatabaseHandler.RevokeRole)
+			workspaces.GET("/:id/database/tables", workspaceDBQueryHandler.ListTables)
+			workspaces.GET("/:id/database/tables/:table/schema", workspaceDBQueryHandler.GetTableSchema)
+			workspaces.POST("/:id/database/tables", workspaceDBQueryHandler.CreateTable)
+			workspaces.PATCH("/:id/database/tables/:table", workspaceDBQueryHandler.AlterTable)
+			workspaces.DELETE("/:id/database/tables/:table", workspaceDBQueryHandler.DropTable)
+			workspaces.GET("/:id/database/tables/:table/rows", workspaceDBQueryHandler.QueryRows)
+			workspaces.POST("/:id/database/tables/:table/rows", workspaceDBQueryHandler.InsertRow)
+			workspaces.PATCH("/:id/database/tables/:table/rows", workspaceDBQueryHandler.UpdateRow)
+			workspaces.DELETE("/:id/database/tables/:table/rows", workspaceDBQueryHandler.DeleteRows)
+			workspaces.POST("/:id/database/query", workspaceDBQueryHandler.ExecuteSQL)
+			workspaces.GET("/:id/database/query/history", workspaceDBQueryHandler.GetQueryHistory)
+			workspaces.GET("/:id/database/stats", workspaceDBQueryHandler.GetStats)
+			workspaces.GET("/:id/database/schema-graph", workspaceDBQueryHandler.GetSchemaGraph)
+			workspaces.POST("/:id/agent/chat", agentChatHandler.Chat)
+			workspaces.GET("/:id/agent/status", agentChatHandler.Status)
+			workspaces.POST("/:id/agent/confirm", agentChatHandler.Confirm)
+			workspaces.POST("/:id/agent/cancel", agentChatHandler.Cancel)
+			workspaces.GET("/:id/agent/sessions", agentChatHandler.ListSessions)
+			workspaces.GET("/:id/agent/sessions/:sessionId", agentChatHandler.GetSession)
+			workspaces.DELETE("/:id/agent/sessions/:sessionId", agentChatHandler.DeleteSession)
 			workspaces.GET("/:id/audit-logs", auditLogHandler.List)
 			workspaces.POST("/:id/audit-logs/client", auditLogHandler.RecordClient)
+			workspaces.GET("/:id/app-users", runtimeAuthHandler.ListUsers)
+			workspaces.POST("/:id/app-users/:userId/block", runtimeAuthHandler.BlockUser)
 			workspaces.GET("/:id/members", workspaceHandler.ListMembers)
 			workspaces.POST("/:id/members", workspaceHandler.AddMember)
 			workspaces.PATCH("/:id/members/:memberId", workspaceHandler.UpdateMemberRole)
