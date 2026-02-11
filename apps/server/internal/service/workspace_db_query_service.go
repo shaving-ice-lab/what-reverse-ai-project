@@ -89,10 +89,10 @@ type TableSchema struct {
 
 // CreateTableRequest 创建表请求
 type CreateTableRequest struct {
-	Name       string              `json:"name"`
-	Columns    []CreateColumnDef   `json:"columns"`
-	PrimaryKey []string            `json:"primary_key"`
-	Indexes    []CreateIndexDef    `json:"indexes"`
+	Name       string            `json:"name"`
+	Columns    []CreateColumnDef `json:"columns"`
+	PrimaryKey []string          `json:"primary_key"`
+	Indexes    []CreateIndexDef  `json:"indexes"`
 }
 
 // CreateColumnDef 创建列定义
@@ -114,10 +114,10 @@ type CreateIndexDef struct {
 
 // AlterTableRequest 修改表请求
 type AlterTableRequest struct {
-	AddColumns   []CreateColumnDef  `json:"add_columns,omitempty"`
-	AlterColumns []AlterColumnDef   `json:"alter_columns,omitempty"`
-	DropColumns  []string           `json:"drop_columns,omitempty"`
-	Rename       string             `json:"rename,omitempty"`
+	AddColumns   []CreateColumnDef `json:"add_columns,omitempty"`
+	AlterColumns []AlterColumnDef  `json:"alter_columns,omitempty"`
+	DropColumns  []string          `json:"drop_columns,omitempty"`
+	Rename       string            `json:"rename,omitempty"`
 }
 
 // AlterColumnDef 修改列定义
@@ -132,11 +132,12 @@ type AlterColumnDef struct {
 
 // QueryRowsParams 查询行参数
 type QueryRowsParams struct {
-	Page     int            `json:"page"`
-	PageSize int            `json:"page_size"`
-	OrderBy  string         `json:"order_by"`
-	OrderDir string         `json:"order_dir"`
-	Filters  []QueryFilter  `json:"filters"`
+	Page             int           `json:"page"`
+	PageSize         int           `json:"page_size"`
+	OrderBy          string        `json:"order_by"`
+	OrderDir         string        `json:"order_dir"`
+	Filters          []QueryFilter `json:"filters"`
+	FilterCombinator string        `json:"filter_combinator"`
 }
 
 // QueryFilter 查询过滤条件
@@ -187,12 +188,12 @@ type SchemaGraphNode struct {
 
 // SchemaGraphEdge 图边（外键）
 type SchemaGraphEdge struct {
-	ID               string `json:"id"`
-	Source           string `json:"source"`
-	Target           string `json:"target"`
-	SourceColumn     string `json:"source_column"`
-	TargetColumn     string `json:"target_column"`
-	ConstraintName   string `json:"constraint_name"`
+	ID             string `json:"id"`
+	Source         string `json:"source"`
+	Target         string `json:"target"`
+	SourceColumn   string `json:"source_column"`
+	TargetColumn   string `json:"target_column"`
+	ConstraintName string `json:"constraint_name"`
 }
 
 // WorkspaceDBQueryService 工作空间数据库查询服务接口
@@ -601,7 +602,7 @@ func (s *workspaceDBQueryService) QueryRows(ctx context.Context, workspaceID, ta
 	defer cancel()
 
 	// Build WHERE clause
-	whereClause, whereArgs := buildWhereClause(params.Filters)
+	whereClause, whereArgs := buildWhereClause(params.Filters, params.FilterCombinator)
 
 	// Count total
 	countSQL := fmt.Sprintf("SELECT COUNT(*) FROM %s%s", quoteIdentifier(tableName), whereClause)
@@ -1059,7 +1060,7 @@ func validateSQL(sqlStr string) error {
 	return nil
 }
 
-func buildWhereClause(filters []QueryFilter) (string, []interface{}) {
+func buildWhereClause(filters []QueryFilter, combinator ...string) (string, []interface{}) {
 	if len(filters) == 0 {
 		return "", nil
 	}
@@ -1102,7 +1103,11 @@ func buildWhereClause(filters []QueryFilter) (string, []interface{}) {
 		return "", nil
 	}
 
-	return " WHERE " + strings.Join(clauses, " AND "), args
+	join := " AND "
+	if len(combinator) > 0 && strings.ToUpper(combinator[0]) == "OR" {
+		join = " OR "
+	}
+	return " WHERE " + strings.Join(clauses, join), args
 }
 
 func scanRows(rows *sql.Rows) (*QueryResult, error) {

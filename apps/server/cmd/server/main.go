@@ -17,6 +17,7 @@ import (
 	"github.com/agentflow/server/internal/pkg/redis"
 	"github.com/agentflow/server/internal/repository"
 	"github.com/agentflow/server/internal/service"
+	"github.com/joho/godotenv"
 )
 
 // @title AgentFlow API
@@ -40,6 +41,10 @@ import (
 // @description JWT Bearer token
 
 func main() {
+	// 加载 .env 环境变量文件（如果存在）
+	_ = godotenv.Load()             // .env in current dir
+	_ = godotenv.Load("../../.env") // from cmd/server -> project root
+
 	// 加载配置
 	cfg, err := config.Load()
 	if err != nil {
@@ -105,8 +110,7 @@ func main() {
 	executionRepo := repository.NewExecutionRepository(db)
 	workspaceRepo := repository.NewWorkspaceRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
-	exportRepo := repository.NewWorkspaceExportRepository(db)
-	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, workspaceRepo, exportRepo, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
+	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, workspaceRepo, nil, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
 	retentionCtx, retentionCancel := context.WithCancel(context.Background())
 	go retentionService.Run(retentionCtx)
 
@@ -129,21 +133,6 @@ func main() {
 
 	// 创建 Echo 服务器
 	server := api.NewServer(cfg, db, rdb, log)
-	exportService := server.GetWorkspaceExportService()
-	exportCtx, exportCancel := context.WithCancel(context.Background())
-	if exportService != nil {
-		go exportService.RunWorker(exportCtx)
-	}
-	domainLifecycleService := server.GetDomainLifecycleService()
-	domainLifecycleCtx, domainLifecycleCancel := context.WithCancel(context.Background())
-	if domainLifecycleService != nil {
-		go domainLifecycleService.Run(domainLifecycleCtx)
-	}
-	connectorHealthService := server.GetConnectorHealthService()
-	connectorHealthCtx, connectorHealthCancel := context.WithCancel(context.Background())
-	if connectorHealthService != nil {
-		go connectorHealthService.Run(connectorHealthCtx)
-	}
 
 	// 启动服务器
 	go func() {
@@ -162,9 +151,6 @@ func main() {
 
 	log.Info("Shutting down server...")
 
-	exportCancel()
-	domainLifecycleCancel()
-	connectorHealthCancel()
 	retentionCancel()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

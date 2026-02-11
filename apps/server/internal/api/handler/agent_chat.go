@@ -14,16 +14,21 @@ import (
 
 // AgentChatHandler AI Agent 对话处理器
 type AgentChatHandler struct {
-	engine   service.AgentEngine
-	sessions *service.AgentSessionManager
+	engine        service.AgentEngine
+	sessions      *service.AgentSessionManager
+	skillRegistry *service.SkillRegistry
 }
 
 // NewAgentChatHandler 创建 Agent 对话处理器
-func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager) *AgentChatHandler {
-	return &AgentChatHandler{
+func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager, skillRegistry ...*service.SkillRegistry) *AgentChatHandler {
+	h := &AgentChatHandler{
 		engine:   engine,
 		sessions: sessions,
 	}
+	if len(skillRegistry) > 0 {
+		h.skillRegistry = skillRegistry[0]
+	}
+	return h
 }
 
 // Chat SSE 流式对话
@@ -151,12 +156,23 @@ func (h *AgentChatHandler) ListSessions(c echo.Context) error {
 	sessions := h.sessions.List(workspaceID)
 	result := make([]map[string]interface{}, 0, len(sessions))
 	for _, s := range sessions {
+		title := ""
+		for _, msg := range s.Messages {
+			if msg.Role == "user" && msg.Content != "" {
+				title = msg.Content
+				if len(title) > 60 {
+					title = title[:60] + "..."
+				}
+				break
+			}
+		}
 		result = append(result, map[string]interface{}{
 			"id":            s.ID,
 			"workspace_id":  s.WorkspaceID,
 			"user_id":       s.UserID,
 			"status":        s.Status,
 			"message_count": len(s.Messages),
+			"title":         title,
 			"created_at":    s.CreatedAt,
 			"updated_at":    s.UpdatedAt,
 		})
@@ -186,4 +202,135 @@ func (h *AgentChatHandler) DeleteSession(c echo.Context) error {
 	}
 
 	return successResponse(c, map[string]string{"message": "Session deleted"})
+}
+
+// ListSkills 列出已注册的 AI Skills
+func (h *AgentChatHandler) ListSkills(c echo.Context) error {
+	if h.skillRegistry == nil {
+		return successResponse(c, []interface{}{})
+	}
+	return successResponse(c, h.skillRegistry.ListAll())
+}
+
+// ToggleSkill 切换 Skill 启用/禁用状态
+func (h *AgentChatHandler) ToggleSkill(c echo.Context) error {
+	skillID := c.Param("skillId")
+	if skillID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_SKILL_ID", "Skill ID is required")
+	}
+	if h.skillRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Skill registry not available")
+	}
+
+	var req struct {
+		Enabled bool `json:"enabled"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+	}
+
+	if err := h.skillRegistry.SetEnabled(skillID, req.Enabled); err != nil {
+		return errorResponse(c, http.StatusNotFound, "SKILL_NOT_FOUND", err.Error())
+	}
+
+	return successResponse(c, map[string]interface{}{
+		"id":      skillID,
+		"enabled": req.Enabled,
+	})
+}
+
+// CreateSkill 创建自定义 Skill
+func (h *AgentChatHandler) CreateSkill(c echo.Context) error {
+	if h.skillRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Skill registry not available")
+	}
+
+	var req struct {
+		ID           string `json:"id"`
+		Name         string `json:"name"`
+		Description  string `json:"description"`
+		Category     string `json:"category"`
+		Icon         string `json:"icon"`
+		SystemPrompt string `json:"system_prompt"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+	}
+	if req.Name == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_NAME", "Skill name is required")
+	}
+	if req.SystemPrompt == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_PROMPT", "System prompt is required")
+	}
+
+	// Generate ID if not provided
+	skillID := req.ID
+	if skillID == "" {
+		skillID = "custom_" + uuid.New().String()[:8]
+	}
+
+	if err := h.skillRegistry.RegisterCustom(skillID, req.Name, req.Description, req.Category, req.Icon, req.SystemPrompt); err != nil {
+		return errorResponse(c, http.StatusConflict, "SKILL_EXISTS", err.Error())
+	}
+
+	skill, _ := h.skillRegistry.Get(skillID)
+	if skill == nil {
+		return errorResponse(c, http.StatusInternalServerError, "CREATE_FAILED", "Failed to create skill")
+	}
+
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"code":    "OK",
+		"message": "Skill created",
+		"data":    skill.ToMeta(),
+	})
+}
+
+// UpdateSkill 更新自定义 Skill
+func (h *AgentChatHandler) UpdateSkill(c echo.Context) error {
+	skillID := c.Param("skillId")
+	if skillID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_SKILL_ID", "Skill ID is required")
+	}
+	if h.skillRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Skill registry not available")
+	}
+
+	var req struct {
+		Name         string `json:"name"`
+		Description  string `json:"description"`
+		Category     string `json:"category"`
+		Icon         string `json:"icon"`
+		SystemPrompt string `json:"system_prompt"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+	}
+
+	if err := h.skillRegistry.UpdateCustom(skillID, req.Name, req.Description, req.Category, req.Icon, req.SystemPrompt); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "UPDATE_FAILED", err.Error())
+	}
+
+	skill, _ := h.skillRegistry.Get(skillID)
+	if skill == nil {
+		return errorResponse(c, http.StatusNotFound, "SKILL_NOT_FOUND", "Skill not found")
+	}
+
+	return successResponse(c, skill.ToMeta())
+}
+
+// DeleteSkill 删除自定义 Skill
+func (h *AgentChatHandler) DeleteSkill(c echo.Context) error {
+	skillID := c.Param("skillId")
+	if skillID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_SKILL_ID", "Skill ID is required")
+	}
+	if h.skillRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Skill registry not available")
+	}
+
+	if err := h.skillRegistry.Delete(skillID); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "DELETE_FAILED", err.Error())
+	}
+
+	return successResponse(c, map[string]string{"message": "Skill deleted"})
 }

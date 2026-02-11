@@ -95,10 +95,10 @@ func (h *WorkspaceDBQueryHandler) GetTableSchema(c echo.Context) error {
 
 // CreateTableRequest 创建表请求体
 type CreateTableRequestBody struct {
-	Name       string                      `json:"name"`
-	Columns    []CreateColumnDefBody       `json:"columns"`
-	PrimaryKey []string                    `json:"primary_key"`
-	Indexes    []CreateIndexDefBody        `json:"indexes"`
+	Name       string                `json:"name"`
+	Columns    []CreateColumnDefBody `json:"columns"`
+	PrimaryKey []string              `json:"primary_key"`
+	Indexes    []CreateIndexDefBody  `json:"indexes"`
 }
 
 // CreateColumnDefBody 列定义请求体
@@ -319,12 +319,15 @@ func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
 		})
 	}
 
+	filterCombinator := c.QueryParam("filter_combinator")
+
 	result, err := h.queryService.QueryRows(c.Request().Context(), workspaceID, tableName, service.QueryRowsParams{
-		Page:     page,
-		PageSize: pageSize,
-		OrderBy:  orderBy,
-		OrderDir: orderDir,
-		Filters:  filters,
+		Page:             page,
+		PageSize:         pageSize,
+		OrderBy:          orderBy,
+		OrderDir:         orderDir,
+		Filters:          filters,
+		FilterCombinator: filterCombinator,
 	})
 	if err != nil {
 		return handleDBQueryError(c, err)

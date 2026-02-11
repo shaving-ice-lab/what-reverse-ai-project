@@ -106,12 +106,15 @@ func (h *RuntimeDataHandler) QueryRows(c echo.Context) error {
 		})
 	}
 
+	filterCombinator := c.QueryParam("filter_combinator")
+
 	result, err := h.queryService.QueryRows(c.Request().Context(), workspaceID, tableName, service.QueryRowsParams{
-		Page:     page,
-		PageSize: pageSize,
-		OrderBy:  orderBy,
-		OrderDir: orderDir,
-		Filters:  filters,
+		Page:             page,
+		PageSize:         pageSize,
+		OrderBy:          orderBy,
+		OrderDir:         orderDir,
+		Filters:          filters,
+		FilterCombinator: filterCombinator,
 	})
 	if err != nil {
 		return handleDBQueryError(c, err)

@@ -35,6 +35,7 @@ func (t *GenerateUISchemaTool) Parameters() json.RawMessage {
 				"description": "The UI Schema object containing pages, navigation, and component definitions",
 				"properties": {
 					"app_schema_version": {"type": "string", "description": "Schema version, e.g. 2.0.0"},
+					"app_name": {"type": "string", "description": "Display name for the application"},
 					"pages": {
 						"type": "array",
 						"items": {

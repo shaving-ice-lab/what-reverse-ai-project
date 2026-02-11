@@ -13,7 +13,6 @@ import (
 	"github.com/agentflow/server/internal/pkg/executor"
 	"github.com/agentflow/server/internal/pkg/logger"
 	"github.com/agentflow/server/internal/pkg/queue"
-	"github.com/agentflow/server/internal/pkg/redis"
 	"github.com/agentflow/server/internal/repository"
 	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
@@ -44,12 +43,6 @@ func main() {
 	}
 	log.Info("Database connected")
 
-	cacheRedis, err := redis.New(&cfg.Redis)
-	if err != nil {
-		log.Warn("Failed to initialize cache redis", "error", err)
-		cacheRedis = nil
-	}
-
 	// 初始化仓储
 	executionRepo := repository.NewExecutionRepository(db)
 	workflowRepo := repository.NewWorkflowRepository(db)
@@ -59,13 +52,8 @@ func main() {
 	workspaceSlugAliasRepo := repository.NewWorkspaceSlugAliasRepository(db)
 	workspaceRoleRepo := repository.NewWorkspaceRoleRepository(db)
 	workspaceMemberRepo := repository.NewWorkspaceMemberRepository(db)
-	modelUsageRepo := repository.NewModelUsageRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
-	workspaceQuotaRepo := repository.NewWorkspaceQuotaRepository(db)
-	billingPlanRepo := repository.NewBillingPlanRepository(db)
-	billingUsageRepo := repository.NewBillingUsageEventRepository(db)
-	invoicePaymentRepo := repository.NewBillingInvoicePaymentRepository(db)
 	reviewQueueRepo := repository.NewReviewQueueRepository(db)
 	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(db)
 	idempotencyRepo := repository.NewIdempotencyKeyRepository(db)
@@ -81,22 +69,12 @@ func main() {
 		workflowRepo,
 		cfg.Retention,
 	)
-	modelUsageService := service.NewModelUsageService(modelUsageRepo, workspaceService)
 	auditLogService := service.NewAuditLogService(auditLogRepo, workspaceService, cfg.Security.PIISanitizationEnabled)
 	auditRecorder := service.NewExecutionAuditRecorder(auditLogService)
-
-	billingService := service.NewBillingService(
-		billingPlanRepo,
-		workspaceQuotaRepo,
-		billingUsageRepo,
-		invoicePaymentRepo,
-		workspaceRepo,
-		workspaceService,
-	)
 	workspaceDatabaseService, err := service.NewWorkspaceDatabaseService(
 		workspaceDatabaseRepo,
 		workspaceService,
-		billingService,
+		nil, // billingService removed
 		eventRecorder,
 		reviewQueueRepo,
 		workspaceDBSchemaMigrationRepo,
@@ -109,7 +87,7 @@ func main() {
 		workspaceDatabaseService, _ = service.NewWorkspaceDatabaseService(
 			workspaceDatabaseRepo,
 			workspaceService,
-			billingService,
+			nil, // billingService removed
 			eventRecorder,
 			reviewQueueRepo,
 			workspaceDBSchemaMigrationRepo,
@@ -118,17 +96,6 @@ func main() {
 			"change-this-to-a-32-byte-secret!",
 		)
 	}
-	domainRoutingExecutor := service.NewDomainRoutingExecutor(&cfg.DomainRouting, log)
-	certificateIssuer := service.NewCertificateIssuerExecutor(&cfg.CertificateIssuer, log)
-	workspaceDomainService := service.NewWorkspaceDomainService(
-		workspaceRepo,
-		eventRecorder,
-		cfg.Server.BaseURL,
-		cfg.Deployment.RegionBaseURLs,
-		domainRoutingExecutor,
-		certificateIssuer,
-	)
-	metricsService := service.NewMetricsService(workspaceRepo, executionRepo, runtimeEventRepo, workspaceService, workspaceQuotaRepo, cacheRedis)
 
 	// Workspace DB runtime (db provider + authorizer)
 	workspaceDBRuntime, runtimeErr := service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, cfg.Database, cfg.Encryption.Key)
@@ -163,16 +130,7 @@ func main() {
 	if workspaceDatabaseService != nil {
 		dbProvisioner = dbProvisionerAdapter{svc: workspaceDatabaseService}
 	}
-	var domainVerifier queue.DomainVerifier
-	if workspaceDomainService != nil {
-		domainVerifier = domainVerifierAdapter{svc: workspaceDomainService}
-	}
-	var metricsAggregator queue.MetricsAggregator
-	if metricsService != nil {
-		metricsAggregator = metricsAggregatorAdapter{svc: metricsService}
-	}
-
-	worker, err := queue.NewWorker(workerCfg, executionRepo, workflowRepo, nil, log, dbProvider, dbAuthorizer, modelUsageService, auditRecorder, dbProvisioner, domainVerifier, metricsAggregator)
+	worker, err := queue.NewWorker(workerCfg, executionRepo, workflowRepo, nil, log, dbProvider, dbAuthorizer, nil, auditRecorder, dbProvisioner, nil, nil)
 	if err != nil {
 		log.Fatal("Failed to create worker", "error", err)
 	}
@@ -210,36 +168,5 @@ func (a dbProvisionerAdapter) Provision(ctx context.Context, workspaceID, ownerI
 	if errors.Is(err, service.ErrWorkspaceDatabaseExists) {
 		return queue.ErrTaskNoop
 	}
-	return err
-}
-
-type domainVerifierAdapter struct {
-	svc service.WorkspaceDomainService
-}
-
-func (a domainVerifierAdapter) VerifyByID(ctx context.Context, ownerID, domainID uuid.UUID) error {
-	if a.svc == nil {
-		return queue.ErrTaskNoop
-	}
-	_, err := a.svc.VerifyDomainByID(ctx, ownerID, domainID)
-	if err == nil {
-		return nil
-	}
-	var verifyErr *service.DomainVerifyError
-	if errors.As(err, &verifyErr) && verifyErr.NextRetryAt != nil {
-		return &queue.RetryLaterError{NextRun: *verifyErr.NextRetryAt, Cause: err}
-	}
-	return err
-}
-
-type metricsAggregatorAdapter struct {
-	svc service.MetricsService
-}
-
-func (a metricsAggregatorAdapter) AggregateWorkspaceUsage(ctx context.Context, ownerID, workspaceID uuid.UUID) error {
-	if a.svc == nil {
-		return queue.ErrTaskNoop
-	}
-	_, err := a.svc.GetWorkspaceUsage(ctx, ownerID, workspaceID)
 	return err
 }

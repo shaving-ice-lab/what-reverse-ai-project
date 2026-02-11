@@ -181,6 +181,79 @@ func (r *SkillRegistry) BuildSystemPrompt() string {
 	return prompt
 }
 
+// RegisterCustom 注册用户自定义 Skill（仅包含 SystemPrompt，无内置 Tools）
+func (r *SkillRegistry) RegisterCustom(id, name, description, category, icon, systemPrompt string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, exists := r.skills[id]; exists {
+		return fmt.Errorf("skill %q already registered", id)
+	}
+	cat := SkillCategory(category)
+	if cat == "" {
+		cat = SkillCategoryIntegration
+	}
+	if icon == "" {
+		icon = "Sparkles"
+	}
+	r.skills[id] = &Skill{
+		ID:                   id,
+		Name:                 name,
+		Description:          description,
+		Category:             cat,
+		Icon:                 icon,
+		Builtin:              false,
+		Enabled:              true,
+		Tools:                nil,
+		ToolNames:            []string{},
+		SystemPromptAddition: systemPrompt,
+	}
+	return nil
+}
+
+// UpdateCustom 更新自定义 Skill
+func (r *SkillRegistry) UpdateCustom(id, name, description, category, icon, systemPrompt string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.skills[id]
+	if !ok {
+		return fmt.Errorf("skill %q not found", id)
+	}
+	if s.Builtin {
+		return fmt.Errorf("cannot modify built-in skill %q", id)
+	}
+	if name != "" {
+		s.Name = name
+	}
+	if description != "" {
+		s.Description = description
+	}
+	if category != "" {
+		s.Category = SkillCategory(category)
+	}
+	if icon != "" {
+		s.Icon = icon
+	}
+	if systemPrompt != "" {
+		s.SystemPromptAddition = systemPrompt
+	}
+	return nil
+}
+
+// Delete 删除自定义 Skill（不允许删除 Built-in）
+func (r *SkillRegistry) Delete(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.skills[id]
+	if !ok {
+		return fmt.Errorf("skill %q not found", id)
+	}
+	if s.Builtin {
+		return fmt.Errorf("cannot delete built-in skill %q", id)
+	}
+	delete(r.skills, id)
+	return nil
+}
+
 // Count 返回已注册 Skill 数量
 func (r *SkillRegistry) Count() int {
 	r.mu.RLock()

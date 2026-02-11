@@ -130,7 +130,7 @@ func (s *retentionService) RunOnce(ctx context.Context) (*RetentionReport, error
 
 		if s.runtimeEventRepo != nil {
 			deleted, err := s.deleteRuntimeEvents(ctx, cutoff)
-			if err != nil && firstErr == nil {
+			if err != nil {
 				firstErr = err
 			}
 			report.RuntimeEventsDeleted = deleted
@@ -348,7 +348,7 @@ func (s *retentionService) scheduleLogArchives(ctx context.Context, now time.Tim
 	if s.cfg.ExecutionLogRetentionDays > 0 && s.executionRepo != nil {
 		cutoff := now.AddDate(0, 0, -s.cfg.ExecutionLogRetentionDays)
 		scheduled, err := s.scheduleLogArchiveForExecutions(ctx, cutoff, now)
-		if err != nil && firstErr == nil {
+		if err != nil {
 			firstErr = err
 		}
 		executionScheduled = scheduled
