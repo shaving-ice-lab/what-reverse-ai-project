@@ -12,7 +12,7 @@ interface FormBlockProps {
 }
 
 export function FormBlock({ config, onSubmit }: FormBlockProps) {
-  const { insertRow, executeWorkflow } = useDataProvider()
+  const { insertRow, executeWorkflow, notifyTableChange } = useDataProvider()
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {}
     for (const field of config.fields) {
@@ -28,17 +28,57 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
     e.preventDefault()
     setError('')
     setSuccess(false)
+
+    // Client-side required validation
+    for (const field of config.fields) {
+      if (field.required) {
+        const v = values[field.name]
+        if (v === '' || v === null || v === undefined) {
+          setError(`${field.label || field.name} is required`)
+          return
+        }
+      }
+    }
+
     setSubmitting(true)
     try {
+      // Coerce types before sending
+      const payload: Record<string, unknown> = {}
+      for (const field of config.fields) {
+        const v = values[field.name]
+        if (field.type === 'number' && v !== '' && v !== null && v !== undefined) {
+          payload[field.name] = Number(v)
+        } else if (field.type === 'checkbox') {
+          payload[field.name] = Boolean(v)
+        } else {
+          payload[field.name] = v
+        }
+      }
+
+      let dataSaved = false
       if (config.table_name) {
-        await insertRow(config.table_name, values)
+        await insertRow(config.table_name, payload)
+        notifyTableChange(config.table_name)
+        dataSaved = true
       }
       if (config.workflow_id) {
-        await executeWorkflow(config.workflow_id, values)
+        try {
+          await executeWorkflow(config.workflow_id, payload)
+        } catch (wfErr: any) {
+          if (dataSaved) {
+            // Data was saved but workflow failed — reset form but show warning
+            const reset: Record<string, unknown> = {}
+            for (const field of config.fields) { reset[field.name] = field.default_value ?? '' }
+            setValues(reset)
+            setError(`Data saved but workflow failed: ${wfErr?.message || 'Unknown error'}`)
+            setSubmitting(false)
+            return
+          }
+          throw wfErr
+        }
       }
-      onSubmit?.(values)
+      onSubmit?.(payload)
       setSuccess(true)
-      // Reset form
       const reset: Record<string, unknown> = {}
       for (const field of config.fields) {
         reset[field.name] = field.default_value ?? ''
@@ -54,10 +94,17 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
 
   const updateField = (name: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [name]: value }))
+    if (error) setError('')
   }
 
   return (
     <form onSubmit={handleSubmit} className="border border-border rounded-lg p-4 space-y-3">
+      {(config.title || config.description) && (
+        <div className="mb-1">
+          {config.title && <h3 className="text-sm font-semibold text-foreground">{config.title}</h3>}
+          {config.description && <p className="text-xs text-foreground-muted mt-0.5">{config.description}</p>}
+        </div>
+      )}
       {config.fields.map((field) => (
         <div key={field.name}>
           <label className="text-xs font-medium text-foreground-light mb-1 block">
@@ -98,7 +145,7 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
             <Input
               type={field.type === 'number' ? 'number' : field.type === 'email' ? 'email' : field.type === 'date' ? 'date' : 'text'}
               value={String(values[field.name] ?? '')}
-              onChange={(e) => updateField(field.name, field.type === 'number' ? Number(e.target.value) : e.target.value)}
+              onChange={(e) => updateField(field.name, e.target.value)}
               placeholder={field.placeholder}
               required={field.required}
               className="h-9 text-sm"
@@ -110,9 +157,26 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
       {error && <div className="text-xs text-destructive">{error}</div>}
       {success && <div className="text-xs text-emerald-600">Submitted successfully!</div>}
 
-      <Button type="submit" size="sm" disabled={submitting} className="w-full h-9">
-        {submitting ? 'Submitting...' : (config.submit_label || 'Submit')}
-      </Button>
+      <div className="flex gap-2">
+        <Button type="submit" size="sm" disabled={submitting} className="flex-1 h-9">
+          {submitting ? 'Submitting...' : (config.submit_label || 'Submit')}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-9"
+          onClick={() => {
+            const reset: Record<string, unknown> = {}
+            for (const field of config.fields) { reset[field.name] = field.default_value ?? '' }
+            setValues(reset)
+            setError('')
+            setSuccess(false)
+          }}
+        >
+          Reset
+        </Button>
+      </div>
     </form>
   )
 }

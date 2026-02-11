@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { DataProviderContext } from './data-provider'
 import { getRuntimeBaseUrl } from '@/lib/env'
 import { getStoredTokens } from '@/lib/api/shared'
@@ -48,15 +48,49 @@ async function runtimeFetch<T>(path: string, options: RequestInit = {}): Promise
  * but routes requests through /runtime/:slug/data/:table (public access).
  * This allows all existing AppRenderer blocks to work without changes.
  */
+type TableChangeListener = (table: string) => void
+
 export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProviderProps) {
   const basePath = `/runtime/${encodeURIComponent(workspaceSlug)}/data`
+  const listenersRef = useRef<Set<TableChangeListener>>(new Set())
+
+  const notifyTableChange = useCallback((table: string) => {
+    listenersRef.current.forEach((fn) => fn(table))
+  }, [])
+
+  const onTableChange = useCallback((listener: TableChangeListener) => {
+    listenersRef.current.add(listener)
+    return () => { listenersRef.current.delete(listener) }
+  }, [])
 
   const queryRows = useCallback(
-    async (table: string, params?: { columns?: string[]; where?: string; order_by?: { column: string; direction: string }[]; limit?: number; offset?: number }) => {
+    async (table: string, params?: {
+      columns?: string[]
+      filters?: { column: string; operator: string; value: unknown }[]
+      filter_combinator?: 'AND' | 'OR'
+      order_by?: { column: string; direction: string }[]
+      limit?: number
+      offset?: number
+    }) => {
       const searchParams = new URLSearchParams()
       if (params?.limit) searchParams.set('page_size', String(params.limit))
       if (params?.offset && params.limit) {
         searchParams.set('page', String(Math.floor(params.offset / params.limit) + 1))
+      }
+      if (params?.filters?.length) {
+        params.filters.forEach((f, i) => {
+          searchParams.set(`filters[${i}][column]`, f.column)
+          searchParams.set(`filters[${i}][operator]`, f.operator)
+          searchParams.set(`filters[${i}][value]`, String(f.value ?? ''))
+        })
+      }
+      if (params?.order_by?.length) {
+        const ob = params.order_by[0]
+        searchParams.set('order_by', ob.column)
+        searchParams.set('order_dir', ob.direction || 'ASC')
+      }
+      if (params?.filter_combinator) {
+        searchParams.set('filter_combinator', params.filter_combinator)
       }
       const qs = searchParams.toString()
       const url = `${basePath}/${encodeURIComponent(table)}${qs ? `?${qs}` : ''}`
@@ -87,14 +121,17 @@ export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProv
   )
 
   const deleteRows = useCallback(
-    async (table: string, where: string) => {
-      // Parse "id = 'xxx'" style where clause to extract IDs for the runtime API
-      const idMatch = where.match(/id\s*=\s*'([^']+)'/)
-      const ids = idMatch ? [idMatch[1]] : []
-      if (ids.length === 0) return
+    async (table: string, where: string, ids?: unknown[]) => {
+      // Prefer structured ids when available; fall back to parsing WHERE clause
+      let resolvedIds = ids?.length ? ids : []
+      if (resolvedIds.length === 0 && where) {
+        const idMatch = where.match(/id\s*=\s*'([^']+)'/)
+        resolvedIds = idMatch ? [idMatch[1]] : []
+      }
+      if (resolvedIds.length === 0) return
       await runtimeFetch(`${basePath}/${encodeURIComponent(table)}`, {
         method: 'DELETE',
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify({ ids: resolvedIds }),
       })
     },
     [basePath]
@@ -111,7 +148,7 @@ export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProv
   )
 
   return (
-    <DataProviderContext.Provider value={{ workspaceId: workspaceSlug, queryRows, insertRow, updateRow, deleteRows, executeWorkflow }}>
+    <DataProviderContext.Provider value={{ workspaceId: workspaceSlug, queryRows, insertRow, updateRow, deleteRows, executeWorkflow, notifyTableChange, onTableChange }}>
       {children}
     </DataProviderContext.Provider>
   )

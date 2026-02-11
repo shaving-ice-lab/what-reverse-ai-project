@@ -1,23 +1,79 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useDataProvider } from '../data-provider'
 import type { ChartConfig } from '../types'
+import type { DataSource } from '../types'
 
 interface ChartBlockProps {
   config: ChartConfig
   data?: Record<string, unknown>[]
+  dataSource?: DataSource
 }
 
-export function ChartBlock({ config, data }: ChartBlockProps) {
-  const rows = data || []
+export function ChartBlock({ config, data: externalData, dataSource }: ChartBlockProps) {
+  const { queryRows, onTableChange } = useDataProvider()
+  const [fetchedRows, setFetchedRows] = useState<Record<string, unknown>[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (externalData || !dataSource?.table) return
+    let cancelled = false
+    const load = async () => {
+      setLoading(true)
+      try {
+        const result = await queryRows(dataSource.table, {
+          limit: dataSource.limit || 30,
+          order_by: dataSource.order_by?.map((o) => ({ column: o.column, direction: o.direction })),
+        })
+        if (!cancelled) setFetchedRows(result.rows)
+      } catch { /* ignore */ }
+      if (!cancelled) setLoading(false)
+    }
+    load()
+    return () => { cancelled = true }
+  }, [externalData, dataSource, queryRows])
+
+  useEffect(() => {
+    if (!dataSource?.table) return
+    return onTableChange((table) => {
+      if (table !== dataSource.table) return
+      queryRows(dataSource.table, {
+        limit: dataSource.limit || 30,
+        order_by: dataSource.order_by?.map((o) => ({ column: o.column, direction: o.direction })),
+      })
+        .then((result) => setFetchedRows(result.rows))
+        .catch(() => {})
+    })
+  }, [onTableChange, dataSource, queryRows])
+
+  const rows = externalData || fetchedRows
   const height = config.height || 200
   const color = config.color || '#6366f1'
 
+  if (loading && rows.length === 0) {
+    return (
+      <div className="border border-border rounded-lg p-4">
+        {config.title && <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>}
+        <div className="animate-pulse" style={{ height }}>
+          <div className="flex items-end gap-2 h-full justify-center">
+            {[45, 72, 38, 60, 80, 52].map((h, i) => (
+              <div key={i} className="bg-foreground/10 rounded-t" style={{ width: 24, height: `${h}%` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (rows.length === 0) {
     return (
-      <div className="border border-border rounded-lg p-4 flex items-center justify-center" style={{ height }}>
-        <span className="text-xs text-foreground-muted">No chart data</span>
+      <div className="border border-border rounded-lg p-4">
+        {config.title && <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>}
+        <div className="flex items-center justify-center text-xs text-foreground-muted" style={{ height }}>
+          No data available
+        </div>
       </div>
     )
   }
@@ -54,24 +110,42 @@ export function ChartBlock({ config, data }: ChartBlockProps) {
 
 function BarChart({ values, labels, maxVal, height, color }: { values: number[]; labels: string[]; maxVal: number; height: number; color: string }) {
   const barWidth = Math.max(12, Math.min(40, 300 / values.length))
+  const chartH = height - 24
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(maxVal * f))
 
   return (
-    <div className="flex items-end gap-1 justify-center" style={{ height }}>
-      {values.map((v, i) => {
-        const barH = (v / maxVal) * (height - 24)
-        return (
-          <div key={i} className="flex flex-col items-center gap-1">
-            <div
-              className="rounded-t transition-all hover:opacity-80"
-              style={{ width: barWidth, height: barH, backgroundColor: color }}
-              title={`${labels[i]}: ${v}`}
-            />
-            <span className="text-[9px] text-foreground-muted truncate" style={{ maxWidth: barWidth + 8 }}>
-              {labels[i]}
-            </span>
-          </div>
-        )
-      })}
+    <div style={{ height }}>
+      <div className="relative" style={{ height: chartH }}>
+        {ticks.map((tick, i) => {
+          const bottom = (tick / maxVal) * 100
+          return (
+            <div key={i} className="absolute left-0 right-0 flex items-center" style={{ bottom: `${bottom}%` }}>
+              <span className="text-[8px] text-foreground-muted w-8 text-right pr-1 shrink-0">{tick}</span>
+              <div className="flex-1 border-t border-border/30" />
+            </div>
+          )
+        })}
+        <div className="absolute left-8 right-0 bottom-0 top-0 flex items-end gap-1 justify-center">
+          {values.map((v, i) => {
+            const barH = (v / maxVal) * chartH
+            return (
+              <div key={i} className="flex flex-col items-center gap-0.5">
+                <span className="text-[8px] text-foreground-muted">{v}</span>
+                <div
+                  className="rounded-t transition-all hover:opacity-80"
+                  style={{ width: barWidth, height: barH, backgroundColor: color }}
+                  title={`${labels[i]}: ${v}`}
+                />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+      <div className="flex gap-1 justify-center ml-8 mt-1">
+        {labels.map((l, i) => (
+          <span key={i} className="text-[9px] text-foreground-muted truncate text-center" style={{ width: barWidth + 4 }}>{l}</span>
+        ))}
+      </div>
     </div>
   )
 }
@@ -148,7 +222,7 @@ function PieChart({ values, labels, color }: { values: number[]; labels: string[
           <div key={i} className="flex items-center gap-1.5 text-xs">
             <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
             <span className="text-foreground-light">{l}</span>
-            <span className="text-foreground-muted ml-auto">{values[i]}</span>
+            <span className="text-foreground-muted ml-auto">{values[i]} <span className="opacity-60">({((values[i] / total) * 100).toFixed(0)}%)</span></span>
           </div>
         ))}
       </div>

@@ -2,6 +2,7 @@
 
 export interface AppSchema {
   app_schema_version: '2.0.0'
+  app_name?: string
   pages: AppPage[]
   navigation: AppNavigation
   default_page: string
@@ -43,6 +44,11 @@ export type AppBlockType =
   | 'chart'
   | 'detail_view'
   | 'markdown'
+  | 'image'
+  | 'hero'
+  | 'tabs_container'
+  | 'list'
+  | 'divider'
 
 export interface AppBlock {
   id: string
@@ -78,9 +84,10 @@ export interface StatsCardConfig {
 export interface DataTableConfig {
   table_name: string
   columns: DataTableColumn[]
-  actions?: ('edit' | 'delete' | 'view')[]
+  actions?: ('edit' | 'delete' | 'view' | 'create')[]
   filters_enabled?: boolean
   search_enabled?: boolean
+  search_key?: string
   pagination?: boolean
   page_size?: number
 }
@@ -107,6 +114,8 @@ export interface ChartConfig {
 // ========== Form ==========
 
 export interface FormConfig {
+  title?: string
+  description?: string
   fields: FormField[]
   submit_label?: string
   table_name?: string
@@ -131,6 +140,68 @@ export interface DetailViewConfig {
   fields: { key: string; label: string; type?: string }[]
   table_name?: string
   record_id_key?: string
+}
+
+// ========== Image ==========
+
+export interface ImageConfig {
+  src: string
+  alt?: string
+  width?: string
+  height?: string
+  object_fit?: 'cover' | 'contain' | 'fill' | 'none'
+  border_radius?: string
+  caption?: string
+  link?: string
+}
+
+// ========== Hero ==========
+
+export interface HeroConfig {
+  title: string
+  subtitle?: string
+  description?: string
+  background_color?: string
+  background_image?: string
+  text_color?: string
+  align?: 'left' | 'center' | 'right'
+  actions?: { label: string; href?: string; variant?: 'primary' | 'secondary' }[]
+  size?: 'sm' | 'md' | 'lg'
+}
+
+// ========== Tabs Container ==========
+
+export interface TabsContainerConfig {
+  tabs: {
+    id: string
+    label: string
+    icon?: string
+    blocks: AppBlock[]
+  }[]
+  default_tab?: string
+}
+
+// ========== List ==========
+
+export interface ListConfig {
+  table_name: string
+  title_key: string
+  subtitle_key?: string
+  description_key?: string
+  image_key?: string
+  badge_key?: string
+  layout?: 'list' | 'grid'
+  columns?: number
+  clickable?: boolean
+  empty_message?: string
+}
+
+// ========== Divider ==========
+
+export interface DividerConfig {
+  label?: string
+  style?: 'solid' | 'dashed' | 'dotted'
+  spacing?: 'sm' | 'md' | 'lg'
 }
 
 // ========== Actions ==========
