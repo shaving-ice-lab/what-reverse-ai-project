@@ -502,10 +502,10 @@ export interface QuickAction {
 export const quickActions: QuickAction[] = [
   {
     id: 'qa-1',
-    title: 'Create Conversation',
-    description: 'Started a new AI conversation',
+    title: 'Talk to Agent',
+    description: 'Start an AI agent conversation',
     icon: 'MessageSquare',
-    href: '/dashboard/conversations',
+    href: '/dashboard/agent',
     shortcut: '⌘ N',
     category: 'Create',
   },
@@ -520,10 +520,10 @@ export const quickActions: QuickAction[] = [
   },
   {
     id: 'qa-3',
-    title: 'Create Agent',
-    description: 'Create a custom AI assistant',
-    icon: 'Bot',
-    href: '/dashboard/my-agents/new',
+    title: 'New App',
+    description: 'Create a new workspace app',
+    icon: 'LayoutGrid',
+    href: '/dashboard/apps',
     category: 'Create',
   },
   {
@@ -539,7 +539,7 @@ export const quickActions: QuickAction[] = [
     title: 'Template Gallery',
     description: 'Browse workflow templates',
     icon: 'LayoutGrid',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
     category: 'Browse',
   },
   {
@@ -877,7 +877,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'beginner',
     tags: ['Intent Recognition', 'FAQ', 'Multi-turn Conversation'],
     updatedAt: '2026-01-30T09:30:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   {
     id: 'sa-2',
@@ -890,7 +890,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'intermediate',
     tags: ['Quote', 'Plan Generation', 'Comparison'],
     updatedAt: '2026-01-28T14:10:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   {
     id: 'sa-3',
@@ -903,7 +903,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'intermediate',
     tags: ['Trends', 'Insights', 'Visualization'],
     updatedAt: '2026-01-27T16:45:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   {
     id: 'sa-4',
@@ -916,7 +916,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'advanced',
     tags: ['Compliance', 'Risk', 'Review'],
     updatedAt: '2026-01-26T11:20:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   {
     id: 'sa-5',
@@ -929,7 +929,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'beginner',
     tags: ['Knowledge Base', 'Citations', 'Search Enhanced'],
     updatedAt: '2026-01-25T10:00:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   {
     id: 'sa-6',
@@ -942,7 +942,7 @@ export const sampleApps: SampleApp[] = [
     complexity: 'beginner',
     tags: ['Daily Report', 'Metrics', 'Automation'],
     updatedAt: '2026-01-24T08:25:00Z',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
 ]
 
@@ -1145,7 +1145,7 @@ export const demoFlowScript: DemoFlowScript = {
       deliverable: 'A ready-to-run demo workflow',
       links: [
         { label: 'Demo Kit', href: '/dashboard/apps' },
-        { label: 'Template Gallery', href: '/dashboard/template-gallery' },
+        { label: 'Template Gallery', href: '/dashboard/workflows' },
       ],
     },
     {

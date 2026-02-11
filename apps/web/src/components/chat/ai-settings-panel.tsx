@@ -22,7 +22,14 @@ import { Slider } from '@/components/ui/slider'
 import { Input } from '@/components/ui/input'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import type { AIParameters } from '@/types/conversation'
+export interface AIParameters {
+  temperature?: number
+  maxTokens?: number
+  topP?: number
+  topK?: number
+  frequencyPenalty?: number
+  presencePenalty?: number
+}
 
 // Default parameter values
 const DEFAULT_PARAMS: Required<AIParameters> = {

@@ -4,4 +4,4 @@
  * Usage Zod ProceedRuntimeDataVerify
  */
 
-export * from './creative-template.schema'
+// Schema exports (creative removed)
