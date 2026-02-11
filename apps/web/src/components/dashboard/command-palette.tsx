@@ -73,22 +73,6 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
     items: [
       {
-        id: 'new-conversation',
-
-        type: 'action',
-
-        title: 'New Conversation',
-
-        description: 'Start a new AI conversation',
-
-        icon: MessageSquare,
-
-        shortcut: '⌘N',
-
-        href: '/dashboard/conversations',
-      },
-
-      {
         id: 'new-workflow',
 
         type: 'action',
@@ -102,20 +86,6 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
         shortcut: '⌘W',
 
         href: '/dashboard/workflows/new',
-      },
-
-      {
-        id: 'new-agent',
-
-        type: 'action',
-
-        title: 'Create Agent',
-
-        description: 'Create a custom AI agent',
-
-        icon: Bot,
-
-        href: '/dashboard/my-agents/new',
       },
 
       {
@@ -167,59 +137,59 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
       },
 
       {
-        id: 'nav-creative',
+        id: 'nav-agent',
 
         type: 'navigation',
 
-        title: 'Creative Workshop',
+        title: 'AI Agent',
 
-        icon: Palette,
+        icon: Bot,
 
-        href: '/dashboard/creative',
+        href: '/dashboard/agent',
 
-        keywords: ['creative', 'design', 'Creative', 'Design'],
+        keywords: ['agent', 'bot', 'AI'],
       },
 
       {
-        id: 'nav-templates',
+        id: 'nav-apps',
 
         type: 'navigation',
 
-        title: 'Template Gallery',
+        title: 'My Apps',
 
         icon: LayoutGrid,
 
-        href: '/dashboard/template-gallery',
+        href: '/dashboard/apps',
 
-        keywords: ['template', 'Template'],
+        keywords: ['app', 'application'],
       },
 
       {
-        id: 'nav-store',
+        id: 'nav-database',
 
         type: 'navigation',
 
-        title: 'App Store',
+        title: 'Database',
 
-        icon: Store,
+        icon: Database,
 
-        href: '/dashboard/store',
+        href: '/dashboard/database',
 
-        keywords: ['store', 'app', 'App', 'Store'],
+        keywords: ['database', 'db', 'table', 'sql'],
       },
 
       {
-        id: 'nav-agents',
+        id: 'nav-skills',
 
         type: 'navigation',
 
-        title: 'My Agents',
+        title: 'Skills',
 
-        icon: Users,
+        icon: Sparkles,
 
-        href: '/dashboard/my-agents',
+        href: '/dashboard/skills',
 
-        keywords: ['agent', 'bot'],
+        keywords: ['skill', 'ability'],
       },
 
       {
@@ -275,27 +245,13 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'recent',
 
-        title: 'Email Assistant Agent',
+        title: 'Database Schema',
 
-        description: 'Agent edited yesterday',
+        description: 'Table edited yesterday',
 
-        icon: Bot,
+        icon: Database,
 
-        href: '/dashboard/my-agents/agent-1',
-      },
-
-      {
-        id: 'recent-3',
-
-        type: 'recent',
-
-        title: 'Data Analytics Report',
-
-        description: 'Conversation from 3 days ago',
-
-        icon: MessageSquare,
-
-        href: '/dashboard/conversations',
+        href: '/dashboard/database',
       },
     ],
   },

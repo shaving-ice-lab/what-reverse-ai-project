@@ -27,7 +27,20 @@ import {
   type AdminUser,
   type AdminWorkspace,
 } from '@/lib/api/admin'
-import type { SupportTicket } from '@/lib/api/support'
+interface SupportTicket {
+  id: string
+  subject: string
+  status: string
+  priority: string
+  channel: string
+  reference?: string
+  requester_email?: string
+  status_note?: string
+  sla_response_due_at?: string
+  created_at: string
+  updated_at: string
+  metadata?: { status_history?: unknown[] }
+}
 import { useAuthStore } from '@/stores/useAuthStore'
 
 type ActionTarget =

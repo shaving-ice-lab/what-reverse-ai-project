@@ -20,7 +20,7 @@ vi.mock('@/components/ui/terms-prompt', () => ({
   TermsPrompt: () => <div data-testid="terms-prompt" />,
 }))
 
-vi.mock('@/components/creative/markdown-preview', () => ({
+vi.mock('@/components/ui/markdown-preview', () => ({
   MarkdownPreview: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview">{content}</div>
   ),

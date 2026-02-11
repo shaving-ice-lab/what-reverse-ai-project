@@ -15,10 +15,13 @@ import {
 } from 'lucide-react'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Badge } from '@/components/ui/badge'
-import { MarkdownPreview } from '@/components/creative/markdown-preview'
+import { MarkdownPreview } from '@/components/ui/markdown-preview'
 import { Button, ButtonGroup } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { AppRenderer } from '@/components/app-renderer/app-renderer'
+import { RuntimeDataProvider } from '@/components/app-renderer/runtime-data-provider'
+import type { AppSchema } from '@/components/app-renderer/types'
 import {
   Select,
   SelectContent,
@@ -439,7 +442,7 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
 
   const executionOutput = useMemo(() => {
     if (!executeResult) return null
-    const payload = executeResult as Record<string, unknown>
+    const payload = executeResult as unknown as Record<string, unknown>
     return payload.outputs ?? payload.output ?? payload.result ?? payload.data ?? null
   }, [executeResult])
 
@@ -547,6 +550,19 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
     }
   }
 
+  const appSchema = useMemo<AppSchema | null>(() => {
+    const rawUiSchema = schema?.schema?.ui_schema as Record<string, unknown> | null
+    if (
+      rawUiSchema &&
+      rawUiSchema.app_schema_version === '2.0.0' &&
+      Array.isArray(rawUiSchema.pages) &&
+      (rawUiSchema.pages as unknown[]).length > 0
+    ) {
+      return rawUiSchema as unknown as AppSchema
+    }
+    return null
+  }, [schema?.schema?.ui_schema])
+
   const disabled = !termsAccepted || isLoading || isExecuting
   const exampleDisabled = isLoading || isExecuting
 
@@ -584,6 +600,35 @@ export function PublicRuntimeView({ workspaceSlug, appSlug, isEmbed }: PublicRun
     )
   }
 
+  // AppSchema v2.0: Render full multi-page app with AppRenderer
+  if (appSchema && !isLoading) {
+    return (
+      <div className={cn('h-screen flex flex-col bg-background', isEmbed && 'bg-transparent')}>
+        {!isEmbed && <SiteHeader />}
+        <div className="flex-1 overflow-hidden">
+          <RuntimeDataProvider workspaceSlug={resolvedWorkspaceSlug}>
+            <AppRenderer
+              schema={appSchema}
+              workspaceId={resolvedWorkspaceSlug}
+              className="h-full"
+              skipDataProvider
+            />
+          </RuntimeDataProvider>
+        </div>
+      </div>
+    )
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-foreground-muted" />
+      </div>
+    )
+  }
+
+  // Legacy form-based runtime view
   return (
     <div className={cn('min-h-screen bg-background', isEmbed && 'bg-transparent')}>
       {!isEmbed && <SiteHeader />}

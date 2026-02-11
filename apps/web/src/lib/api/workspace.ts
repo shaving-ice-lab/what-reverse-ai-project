@@ -1104,6 +1104,24 @@ export const appApi = {
   },
 
   /**
+   * Update config_json (pages config) by creating a new version
+   */
+  async updateConfigJSON(
+    id: string,
+    data: { config_json: Record<string, unknown> }
+  ): Promise<WorkspaceVersion> {
+    const response = await request<ApiResponse<any>>(`/workspaces/${id}/versions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        config_json: data.config_json,
+        changelog: 'Pages config update',
+      }),
+    })
+    const payload = response.data as any
+    return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)
+  },
+
+  /**
    * Get execution list
    */
   async getExecutions(

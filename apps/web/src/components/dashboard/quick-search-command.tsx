@@ -85,7 +85,7 @@ const quickActions: SearchResult[] = [
     name: 'Browse Templates',
     icon: '',
     type: 'action',
-    href: '/dashboard/template-gallery',
+    href: '/dashboard/workflows',
   },
   { id: 'docs', name: 'View Documentation', icon: '', type: 'action', href: '/docs' },
   { id: 'settings', name: 'Settings', icon: '', type: 'action', href: '/dashboard/settings' },

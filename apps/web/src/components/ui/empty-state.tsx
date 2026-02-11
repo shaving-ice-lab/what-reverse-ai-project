@@ -431,10 +431,10 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
     <EmptyState
       icon={MessageSquare}
       title="Start a New Conversation"
-      description="Chat with the AI assistant for help and inspiration"
+      description="Chat with the AI agent for help and inspiration"
       action={{
-        label: 'New Conversation',
-        href: '/dashboard/conversations',
+        label: 'Talk to Agent',
+        href: '/dashboard/agent',
         icon: MessageSquare,
       }}
       className={className}
@@ -454,8 +454,8 @@ export function AgentEmptyState({ className }: AgentEmptyStateProps) {
       title="No Agents Yet"
       description="Create your first AI agent to help automate your tasks"
       action={{
-        label: 'Create Agent',
-        href: '/dashboard/my-agents/new',
+        label: 'Go to Agent',
+        href: '/dashboard/agent',
       }}
       className={className}
     />
@@ -566,7 +566,7 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
             }
           : {
               label: 'Create Document',
-              href: '/dashboard/creative/generate',
+              href: '/dashboard/apps',
             }
       }
       className={className}

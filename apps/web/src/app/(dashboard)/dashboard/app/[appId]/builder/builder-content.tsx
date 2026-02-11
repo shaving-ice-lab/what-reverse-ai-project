@@ -43,6 +43,7 @@ import {
   Smartphone,
   Tablet,
   XCircle,
+  LayoutDashboard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -85,7 +86,7 @@ import {
 } from '@/lib/api/workspace'
 import { workflowApi } from '@/lib/api'
 import { request } from '@/lib/api/shared'
-import { chatStream, agentChatApi, type AgentEvent } from '@/lib/api/agent-chat'
+import { type AgentEvent } from '@/lib/api/agent-chat'
 import { VersionDiffViewer } from '@/components/builder/version-diff-viewer'
 import { workspaceDatabaseApi, type DatabaseTable } from '@/lib/api/workspace-database'
 import { workspaceApi, type Workspace } from '@/lib/api/workspace'
@@ -95,6 +96,10 @@ import { buildWorkspacePermissions, resolveWorkspaceRoleFromUser } from '@/lib/p
 import { AppAccessGate } from '@/components/permissions/app-access-gate'
 import { PermissionAction } from '@/components/permissions/permission-action'
 import { LazyWorkflowEditor } from '@/components/editor'
+import { AppRenderer } from '@/components/app-renderer/app-renderer'
+import type { AppSchema } from '@/components/app-renderer/types'
+import { PageManagerPanel, type PagesConfig } from '@/components/builder/page-manager-panel'
+import { AgentChatPanel } from '@/components/agent/agent-chat-panel'
 import {
   Panel,
   Group as PanelGroup,
@@ -131,24 +136,6 @@ type APIResponse<T> = {
   data: T
 }
 
-
-const chatQuickActions = [
-  {
-    label: 'Generate a Support FAQ Assistant',
-    prompt:
-      'Create a Support FAQ Assistant. Input: user issue. Output: answer and follow-up suggestions.',
-  },
-  {
-    label: 'Build a Marketing Copy Generator',
-    prompt:
-      'Generate a Marketing Copy Generator. Input: product highlights and target audience. Output: multiple title versions and body copy.',
-  },
-  {
-    label: 'Organize Meeting Notes',
-    prompt:
-      'Build a meeting notes tool. Input: meeting transcript text. Output: summary, to-do items, and owner checklist.',
-  },
-]
 
 type BuilderPageProps = {
   workspaceId: string
@@ -212,32 +199,21 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
   const leftPanelRef = usePanelRef()
   const rightPanelRef = usePanelRef()
-  const [activeRightPanel, setActiveRightPanel] = useState<'schema' | 'preview'>('schema')
+  const [activeRightPanel, setActiveRightPanel] = useState<'schema' | 'preview' | 'pages'>('schema')
   const [activeCenterTab, setActiveCenterTab] = useState<'workflow' | 'preview' | 'database'>('workflow')
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
-  // AI Chat Status
-  const [chatInput, setChatInput] = useState('')
-  const [chatMessages, setChatMessages] = useState<
-    Array<{
-      role: 'user' | 'assistant' | 'agent_thinking' | 'tool_call' | 'tool_result' | 'confirmation'
-      content: string
-      toolName?: string
-      toolResult?: { success: boolean; output?: string; error?: string }
-      affectedResource?: string
-    }>
-  >([])
-  const [isChatting, setIsChatting] = useState(false)
-  const [agentSessionId, setAgentSessionId] = useState<string | undefined>(() => {
-    if (typeof window !== 'undefined') return sessionStorage.getItem('agent_session_id') || undefined
-    return undefined
+  // AppSchema v2.0 for Preview Tab (parsed from ui_schema)
+  const [appSchema, setAppSchema] = useState<AppSchema | null>(null)
+
+  // Pages config for PageManagerPanel
+  const [pagesConfig, setPagesConfig] = useState<PagesConfig>({
+    pages: [],
+    navigation: { type: 'sidebar' },
+    default_page: '',
   })
-  const chatAbortRef = useRef<AbortController | null>(null)
-  const [pendingAction, setPendingAction] = useState<{
-    actionId: string
-    toolName: string
-    resolved: boolean
-  } | null>(null)
+  const [pagesConfigDirty, setPagesConfigDirty] = useState(false)
+  const [availableWorkflows, setAvailableWorkflows] = useState<{ id: string; name: string }[]>([])
 
   // Database Tab State
   const [dbTables, setDbTables] = useState<DatabaseTable[]>([])
@@ -255,7 +231,6 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   const hasWorkflowContent = Boolean(workflowSnapshot?.nodes?.length)
   const shouldShowGuide =
     showGuide &&
-    chatMessages.length === 0 &&
     !hasChanges &&
     !hasWorkflowContent &&
     !app?.current_version?.workflow_id
@@ -457,15 +432,15 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
 
   useEffect(() => {
     const hasWorkflowChanges = isDirty
-    setHasChanges(isDirty || uiSchemaDirty)
-    if (hasWorkflowChanges) {
+    setHasChanges(isDirty || uiSchemaDirty || pagesConfigDirty)
+    if (hasWorkflowChanges || pagesConfigDirty) {
       if (saveStatus !== 'saving') {
         setSaveStatus('unsaved')
       }
     } else if (saveStatus === 'unsaved') {
       setSaveStatus('saved')
     }
-  }, [isDirty, uiSchemaDirty, saveStatus])
+  }, [isDirty, uiSchemaDirty, pagesConfigDirty, saveStatus])
 
   // Auto-save draft every 30 seconds
   useEffect(() => {
@@ -474,10 +449,13 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
       if ((isDirty || uiSchemaDirty) && !isSaving) {
         handleSave()
       }
+      if (pagesConfigDirty && !isSaving) {
+        handleSavePagesConfig()
+      }
     }, 30_000)
     return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appId, isDirty, uiSchemaDirty, isSaving])
+  }, [appId, isDirty, uiSchemaDirty, pagesConfigDirty, isSaving])
 
   useEffect(() => {
     if (!app) return
@@ -531,12 +509,44 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
   }, [app?.current_version?.workflow_id, app?.name, clearWorkflow])
 
   useEffect(() => {
-    const fields = extractUISchemaFields(
-      app?.current_version?.ui_schema as Record<string, unknown> | null
-    )
+    const rawSchema = app?.current_version?.ui_schema as Record<string, unknown> | null
+    // Check if it's AppSchema v2.0 with pages[]
+    if (
+      rawSchema &&
+      rawSchema.app_schema_version === '2.0.0' &&
+      Array.isArray(rawSchema.pages) &&
+      (rawSchema.pages as unknown[]).length > 0
+    ) {
+      setAppSchema(rawSchema as unknown as AppSchema)
+    } else {
+      setAppSchema(null)
+    }
+    const fields = extractUISchemaFields(rawSchema)
     setUiSchemaFields(fields)
     setUiSchemaDirty(false)
   }, [app?.current_version?.ui_schema])
+
+  // Sync pagesConfig from app config_json
+  useEffect(() => {
+    const configJson = app?.current_version?.config_json as Record<string, unknown> | null
+    if (configJson && Array.isArray(configJson.pages)) {
+      setPagesConfig({
+        pages: configJson.pages as PagesConfig['pages'],
+        navigation: (configJson.navigation as PagesConfig['navigation']) || { type: 'sidebar' },
+        default_page: (configJson.default_page as string) || ((configJson.pages as any[])[0]?.id || ''),
+      })
+    }
+    setPagesConfigDirty(false)
+  }, [app?.current_version?.config_json])
+
+  // Load available workflows for PageManagerPanel
+  useEffect(() => {
+    if (!workspaceId) return
+    workflowApi.list().then((data) => {
+      const items = Array.isArray(data) ? data : []
+      setAvailableWorkflows(items.map((w: any) => ({ id: w.id, name: w.name || 'Untitled' })))
+    }).catch(() => setAvailableWorkflows([]))
+  }, [workspaceId])
 
   useEffect(() => {
     const defaults =
@@ -620,160 +630,6 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
       setAccessPolicyLoading(false)
     }
   }
-
-  const handleApplyChatSuggestion = (prompt: string) => {
-    if (isChatting) return
-    setLeftPanelOpen(true)
-    leftPanelRef.current?.expand()
-    setChatInput(prompt)
-    setTimeout(() => chatInputRef.current?.focus(), 120)
-  }
-
-  // Send Chat Message (SSE Agent Stream)
-  const handleSendChat = async (overrideMessage?: string) => {
-    const message = (overrideMessage ?? chatInput).trim()
-    if (!message || isChatting) return
-
-    setChatInput('')
-    setChatMessages((prev) => [...prev, { role: 'user', content: message }])
-    setIsChatting(true)
-
-    const controller = chatStream(
-      appId,
-      message,
-      agentSessionId,
-      (event: AgentEvent) => {
-        if (event.session_id && event.session_id !== agentSessionId) {
-          setAgentSessionId(event.session_id)
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('agent_session_id', event.session_id)
-          }
-        }
-
-        switch (event.type) {
-          case 'thought':
-            setChatMessages((prev) => {
-              const last = prev[prev.length - 1]
-              if (last?.role === 'agent_thinking') {
-                return [...prev.slice(0, -1), { ...last, content: event.content || '' }]
-              }
-              return [...prev, { role: 'agent_thinking', content: event.content || '' }]
-            })
-            break
-
-          case 'tool_call':
-            setChatMessages((prev) => [
-              ...prev,
-              {
-                role: 'tool_call',
-                content: `Calling ${event.tool_name}...`,
-                toolName: event.tool_name,
-              },
-            ])
-            break
-
-          case 'tool_result':
-            setChatMessages((prev) => [
-              ...prev,
-              {
-                role: 'tool_result',
-                content: event.tool_result?.output || event.tool_result?.error || '',
-                toolName: event.tool_name,
-                toolResult: event.tool_result ?? undefined,
-                affectedResource: event.affected_resource,
-              },
-            ])
-            // Auto-refresh affected resource tabs
-            if (event.affected_resource === 'workflow') {
-              loadData()
-            } else if (event.affected_resource === 'database') {
-              loadDbTables()
-              if (activeCenterTab !== 'database') setActiveCenterTab('database')
-            } else if (event.affected_resource === 'ui_schema') {
-              loadData()
-            }
-            break
-
-          case 'confirmation_required':
-            setPendingAction({
-              actionId: event.action_id || '',
-              toolName: event.tool_name || '',
-              resolved: false,
-            })
-            setChatMessages((prev) => [
-              ...prev,
-              {
-                role: 'confirmation',
-                content: event.content || `The agent wants to execute "${event.tool_name}". Do you approve?`,
-                toolName: event.tool_name,
-              },
-            ])
-            break
-
-          case 'message':
-            setChatMessages((prev) => [...prev, { role: 'assistant', content: event.content || '' }])
-            break
-
-          case 'done':
-            setIsChatting(false)
-            loadData()
-            loadVersions()
-            break
-
-          case 'error':
-            setChatMessages((prev) => [
-              ...prev,
-              { role: 'assistant', content: `Error: ${event.error || 'Unknown error'}` },
-            ])
-            setIsChatting(false)
-            break
-        }
-      },
-      (error) => {
-        setChatMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: `Connection error: ${error}` },
-        ])
-        setIsChatting(false)
-      },
-      () => {
-        setIsChatting(false)
-      }
-    )
-
-    chatAbortRef.current = controller
-  }
-
-  // Handle Agent confirmation (Approve/Reject)
-  const handleConfirmAction = useCallback(
-    async (approved: boolean) => {
-      if (!pendingAction || pendingAction.resolved || !agentSessionId) return
-      try {
-        await agentChatApi.confirmAction(appId, agentSessionId, pendingAction.actionId, approved)
-        setPendingAction((prev) => (prev ? { ...prev, resolved: true } : null))
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: approved
-              ? `✅ Action "${pendingAction.toolName}" approved and executed.`
-              : `❌ Action "${pendingAction.toolName}" was rejected.`,
-          },
-        ])
-        if (approved) {
-          loadData()
-          loadVersions()
-        }
-      } catch (error) {
-        setChatMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: `Failed to ${approved ? 'approve' : 'reject'} action: ${error}` },
-        ])
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pendingAction, agentSessionId, appId]
-  )
 
   // Load Database tables for the Database tab
   const loadDbTables = useCallback(async () => {
@@ -1098,6 +954,35 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
     }
   }
 
+  const handleSavePagesConfig = async () => {
+    if (!appId || !pagesConfigDirty) return
+    try {
+      const configPayload: Record<string, unknown> = {
+        ...(app?.current_version?.config_json as Record<string, unknown> || {}),
+        pages: pagesConfig.pages,
+        navigation: pagesConfig.navigation,
+        default_page: pagesConfig.default_page,
+      }
+      const updatedVersion = await appApi.updateConfigJSON(appId, {
+        config_json: configPayload,
+      })
+      setApp((prev) =>
+        prev
+          ? {
+              ...prev,
+              current_version_id: updatedVersion.id,
+              current_version: updatedVersion,
+            }
+          : prev
+      )
+      setPagesConfigDirty(false)
+      setHasChanges(false)
+      await loadVersions()
+    } catch (error) {
+      console.error('Failed to save pages config:', error)
+    }
+  }
+
   const handlePreviewInputChange = (key: string, value: string) => {
     setPreviewInputs((prev) => ({ ...prev, [key]: value }))
   }
@@ -1415,184 +1300,37 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
               maxSize={35}
               onResize={() => setLeftPanelOpen(!leftPanelRef.current?.isCollapsed())}
             >
-              <div className="h-full border-r border-border bg-surface-75 flex flex-col">
-                {/* Chat Header */}
-                <div className="h-10 shrink-0 border-b border-border px-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-brand-500" />
-                  <span className="text-[12px] font-medium text-foreground">AI Assistant</span>
-                </div>
-
-                {/* Chat MessageList */}
-                <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                  {chatMessages.length === 0 ? (
-                    <div className="py-8 space-y-6">
-                      <div className="text-center">
-                        <Sparkles className="w-8 h-8 text-foreground-muted mx-auto mb-3" />
-                        <p className="text-[13px] font-medium text-foreground mb-1">
-                          AI Build Assistant
-                        </p>
-                        <p className="text-[12px] text-foreground-muted">
-                          Describe the app you want to build, and AI will generate a workflow for
-                          you
-                        </p>
-                      </div>
-                      <div className="rounded-md border border-border bg-surface-100/70 p-3">
-                        <div className="text-[10px] uppercase tracking-[0.2em] text-foreground-muted">
-                          Suggested Actions
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {chatQuickActions.map((action) => (
-                            <button
-                              key={action.label}
-                              type="button"
-                              onClick={() => handleApplyChatSuggestion(action.prompt)}
-                              className="rounded-md border border-border bg-surface-200/60 px-2.5 py-1.5 text-[11px] text-foreground-light transition-colors hover:text-foreground hover:border-brand-500/40"
-                            >
-                              {action.label}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="mt-2 text-[11px] text-foreground-muted">
-                          After selecting a suggestion you can adjust the description, then click
-                          &quot;Generate&quot; again.
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    chatMessages.map((message, index) => (
-                      <div
-                        key={index}
-                        className={cn(
-                          'p-3 rounded-md text-[12px]',
-                          message.role === 'user' && 'bg-brand-200 text-foreground ml-6',
-                          message.role === 'assistant' && 'bg-surface-100 text-foreground mr-6',
-                          message.role === 'agent_thinking' && 'bg-surface-200/50 text-foreground-muted mr-6 italic border border-border/50',
-                          message.role === 'tool_call' && 'bg-amber-500/10 text-amber-300 mr-6 border border-amber-500/20',
-                          message.role === 'tool_result' && (
-                            message.toolResult?.success
-                              ? 'bg-brand-500/10 text-brand-400 mr-6 border border-brand-500/20'
-                              : 'bg-destructive/10 text-destructive mr-6 border border-destructive/20'
-                          ),
-                          message.role === 'confirmation' && 'bg-amber-500/10 text-amber-200 mr-6 border-2 border-amber-500/30'
-                        )}
-                      >
-                        {message.role === 'confirmation' && (
-                          <div>
-                            <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-medium uppercase tracking-wider opacity-70">
-                              <AlertTriangle className="w-3 h-3" />
-                              Confirmation Required
-                            </div>
-                            <span className="whitespace-pre-wrap text-[12px]">{message.content}</span>
-                            {pendingAction && !pendingAction.resolved && (
-                              <div className="mt-2 flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="default"
-                                  className="h-7 text-[11px] bg-brand-500 hover:bg-brand-600"
-                                  onClick={() => handleConfirmAction(true)}
-                                >
-                                  <CheckCircle2 className="w-3 h-3 mr-1" />
-                                  Approve
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  className="h-7 text-[11px]"
-                                  onClick={() => handleConfirmAction(false)}
-                                >
-                                  <XCircle className="w-3 h-3 mr-1" />
-                                  Reject
-                                </Button>
-                              </div>
-                            )}
-                            {pendingAction?.resolved && (
-                              <div className="mt-1.5 text-[10px] text-foreground-muted italic">Action resolved</div>
-                            )}
-                          </div>
-                        )}
-                        {message.role === 'tool_call' && (
-                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
-                            <Zap className="w-3 h-3" />
-                            Tool Call
-                          </div>
-                        )}
-                        {message.role === 'tool_result' && (
-                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
-                            {message.toolResult?.success ? (
-                              <CheckCircle2 className="w-3 h-3" />
-                            ) : (
-                              <AlertTriangle className="w-3 h-3" />
-                            )}
-                            {message.toolName || 'Result'}
-                          </div>
-                        )}
-                        {message.role === 'agent_thinking' && (
-                          <div className="flex items-center gap-1.5 mb-1 text-[10px] font-medium uppercase tracking-wider opacity-70">
-                            <Sparkles className="w-3 h-3" />
-                            Thinking
-                          </div>
-                        )}
-                        <span className="whitespace-pre-wrap">{message.content}</span>
-                      </div>
-                    ))
-                  )}
-                  {isChatting && (
-                    <div className="flex items-center gap-2 text-[12px] text-foreground-muted">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      AI is thinking...
-                    </div>
-                  )}
-                </div>
-
-                {/* Chat Input */}
-                <div className="shrink-0 p-3 border-t border-border">
-                  <div className="flex gap-2">
-                    <Textarea
-                      placeholder="Describe the features you need..."
-                      value={chatInput}
-                      ref={chatInputRef}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault()
-                          handleSendChat()
-                        }
-                      }}
-                      className="min-h-[60px] max-h-[120px] bg-surface-100 border-border focus:border-brand-500 text-[12px] resize-none"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-foreground-muted">
-                      Enter to send and generate UI/Workflow, Shift+Enter for new line
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      {isChatting && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            chatAbortRef.current?.abort()
-                            setIsChatting(false)
-                            setChatMessages((prev) => [...prev, { role: 'assistant', content: 'Stopped by user.' }])
-                          }}
-                          className="h-7 px-2"
-                        >
-                          Stop
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        onClick={() => handleSendChat()}
-                        disabled={!chatInput.trim() || isChatting}
-                        className="h-7 px-2"
-                      >
-                        <Send className="w-3.5 h-3.5 mr-1" />
-                        Generate
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <AgentChatPanel
+                workspaceId={appId}
+                className="h-full border-r border-border"
+                previewUrl={workspace?.slug ? `/runtime/${workspace.slug}/${workspace.slug}` : undefined}
+                builderUrl={`/dashboard/app/${appId}/builder`}
+                onEvent={(event) => {
+                  if (event.type === 'tool_result') {
+                    if (event.affected_resource === 'workflow') {
+                      loadData()
+                    } else if (event.affected_resource === 'database') {
+                      loadDbTables()
+                      if (activeCenterTab !== 'database') setActiveCenterTab('database')
+                    } else if (event.affected_resource === 'ui_schema') {
+                      loadData()
+                      setActiveCenterTab('preview')
+                    }
+                  }
+                  if (event.type === 'done') {
+                    loadData()
+                    loadVersions()
+                    loadDbTables()
+                  }
+                }}
+                onComplete={(info) => {
+                  if (info.hasUISchema) {
+                    setActiveCenterTab('preview')
+                  }
+                  loadData()
+                  loadVersions()
+                }}
+              />
             </Panel>
 
             <PanelResizeHandle className="w-1.5 bg-transparent hover:bg-brand-500/20 active:bg-brand-500/30 transition-colors cursor-col-resize" />
@@ -1656,7 +1394,13 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                       maxWidth: '100%',
                     }}
                   >
-                    {uiSchemaFields.length > 0 ? (
+                    {appSchema ? (
+                      <AppRenderer
+                        schema={appSchema}
+                        workspaceId={workspaceId}
+                        className="h-full"
+                      />
+                    ) : uiSchemaFields.length > 0 ? (
                       <div className="h-full overflow-auto p-4">
                         <div className="text-[12px] font-medium text-foreground mb-3">App Preview — {uiSchemaFields.length} field(s)</div>
                         <div className="space-y-3">
@@ -1789,25 +1533,25 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                           {[
                             {
                               key: '01',
-                              title: 'Describe Your App',
+                              title: 'Tell AI What to Build',
                               detail:
-                                'Describe the users, inputs, outputs, and constraints in the AI assistant.',
+                                'Describe your app in the AI chat panel on the left. For example: "Build me a fleet management system with vehicles, drivers, and trips."',
                             },
                             {
                               key: '02',
-                              title: 'Edit Workflow',
-                              detail: 'Add nodes on the canvas and ensure the logic is complete.',
+                              title: 'AI Creates Everything',
+                              detail: 'The Agent will automatically create database tables, insert sample data, and generate the complete multi-page UI for your app.',
                             },
                             {
                               key: '03',
-                              title: 'Configure Form & Output',
+                              title: 'Preview & Refine',
                               detail:
-                                'Define input fields and display style in the right-side UI config panel.',
+                                'The Preview tab will show your running app. Ask the AI to adjust pages, add charts, or modify the database.',
                             },
                             {
                               key: '04',
-                              title: 'Test & Publish',
-                              detail: 'Run to verify output, then publish for users to access.',
+                              title: 'Publish & Share',
+                              detail: 'When satisfied, publish your app. Users can access it via a public URL with your custom domain.',
                             },
                           ].map((step) => (
                             <div
@@ -1900,30 +1644,25 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
               <div className="h-full border-l border-border bg-surface-75 flex flex-col">
                 {/* PanelSwitch */}
                 <div className="h-10 shrink-0 border-b border-border px-1 flex items-center gap-1">
-                  <button
-                    onClick={() => setActiveRightPanel('schema')}
-                    className={cn(
-                      'flex-1 h-8 rounded-md flex items-center justify-center gap-1.5 text-[12px] font-medium transition-colors',
-                      activeRightPanel === 'schema'
-                        ? 'bg-surface-100 text-foreground'
-                        : 'text-foreground-muted hover:text-foreground'
-                    )}
-                  >
-                    <Code className="w-3.5 h-3.5" />
-                    UI Config
-                  </button>
-                  <button
-                    onClick={() => setActiveRightPanel('preview')}
-                    className={cn(
-                      'flex-1 h-8 rounded-md flex items-center justify-center gap-1.5 text-[12px] font-medium transition-colors',
-                      activeRightPanel === 'preview'
-                        ? 'bg-surface-100 text-foreground'
-                        : 'text-foreground-muted hover:text-foreground'
-                    )}
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    Preview
-                  </button>
+                  {([
+                    { id: 'schema' as const, label: 'UI Config', icon: Code },
+                    { id: 'pages' as const, label: 'Pages', icon: LayoutDashboard },
+                    { id: 'preview' as const, label: 'Preview', icon: Eye },
+                  ]).map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveRightPanel(tab.id)}
+                      className={cn(
+                        'flex-1 h-8 rounded-md flex items-center justify-center gap-1.5 text-[12px] font-medium transition-colors',
+                        activeRightPanel === tab.id
+                          ? 'bg-surface-100 text-foreground'
+                          : 'text-foreground-muted hover:text-foreground'
+                      )}
+                    >
+                      <tab.icon className="w-3.5 h-3.5" />
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
 
                 {/* PanelContent */}
@@ -1951,7 +1690,27 @@ export function BuilderPageContent({ workspaceId, appId }: BuilderPageProps) {
                       </p>
                     )}
                   </div>
-                  {activeRightPanel === 'schema' ? (
+                  {activeRightPanel === 'pages' ? (
+                    <div className="flex flex-col h-full">
+                      {pagesConfigDirty && (
+                        <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface-200/30">
+                          <span className="text-[11px] text-foreground-muted">Unsaved changes</span>
+                          <Button size="sm" onClick={handleSavePagesConfig} className="h-6 text-xs">
+                            Save Pages
+                          </Button>
+                        </div>
+                      )}
+                      <PageManagerPanel
+                        config={pagesConfig}
+                        workflows={availableWorkflows}
+                        onChange={(newConfig) => {
+                          setPagesConfig(newConfig)
+                          setPagesConfigDirty(true)
+                          setHasChanges(true)
+                        }}
+                      />
+                    </div>
+                  ) : activeRightPanel === 'schema' ? (
                     <div className="space-y-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
