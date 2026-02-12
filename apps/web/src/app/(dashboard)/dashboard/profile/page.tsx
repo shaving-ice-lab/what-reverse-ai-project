@@ -64,7 +64,13 @@ import { PageContainer } from '@/components/dashboard/page-layout'
 // User Statistics Data - Supabase Style
 
 const userStats = [
-  { label: 'Workflow', value: 23, icon: Zap, color: 'text-brand-500', bgColor: 'bg-brand-200/60' },
+  {
+    label: 'Apps Built',
+    value: 23,
+    icon: Zap,
+    color: 'text-brand-500',
+    bgColor: 'bg-brand-200/60',
+  },
   {
     label: 'Conversation',
     value: 156,
@@ -103,8 +109,8 @@ const achievements = [
 
   {
     id: '2',
-    name: 'Workflow power user',
-    description: 'Create 20+ workflows',
+    name: 'App Creator',
+    description: 'Build 20+ apps',
     icon: Zap,
     color: 'text-brand-500',
     bgColor: 'bg-brand-200',
@@ -157,8 +163,8 @@ const achievements = [
 const recentActivities = [
   {
     id: '1',
-    type: 'workflow',
-    title: 'Created Workflow: Customer Feedback Process',
+    type: 'agent',
+    title: 'Built App: Customer Feedback System',
     time: '2 hours ago',
     icon: Zap,
   },
@@ -191,8 +197,8 @@ const recentActivities = [
 
   {
     id: '6',
-    type: 'workflow',
-    title: 'Ran Workflow: Daily Summary',
+    type: 'agent',
+    title: 'Built App: Daily Summary Dashboard',
     time: '1 week ago',
     icon: Zap,
   },
@@ -203,11 +209,11 @@ const recentActivities = [
 const savedItems = [
   { id: '1', title: 'Automation email reply template', type: 'template', icon: Layers, uses: 1234 },
 
-  { id: '2', title: 'Data visualization workflow', type: 'workflow', icon: BarChart3, uses: 567 },
+  { id: '2', title: 'Data visualization dashboard', type: 'app', icon: BarChart3, uses: 567 },
 
   { id: '3', title: 'Content creative assistant', type: 'agent', icon: Bot, uses: 890 },
 
-  { id: '4', title: 'Social Media', type: 'workflow', icon: Calendar, uses: 456 },
+  { id: '4', title: 'Social Media Tracker', type: 'app', icon: Calendar, uses: 456 },
 ]
 
 // Skill Tags
@@ -217,7 +223,7 @@ const skillTags = [
   'Data analytics',
   'AI conversation',
   'Content creative',
-  'Workflow design',
+  'App Design',
   'API integration',
   'Email process',
   'Customer service',
@@ -280,9 +286,9 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="relative -mt-20 md:-mt-24">
                 <Avatar className="w-28 h-28 md:w-32 md:h-32 border-4 border-surface-100">
-                  <AvatarImage src={user?.avatar} />
+                  <AvatarImage src={user?.avatar_url} />
                   <AvatarFallback className="bg-brand-500 text-background text-2xl font-semibold">
-                    {user?.displayName?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                    {user?.display_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <button className="absolute bottom-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-100 text-foreground-light shadow-sm transition-colors hover:bg-surface-200 hover:text-foreground">
@@ -299,7 +305,7 @@ export default function ProfilePage() {
                     <p className="page-caption">Profile</p>
                     <div className="flex flex-wrap items-center gap-3 mt-1">
                       <h1 className="text-2xl font-semibold text-foreground">
-                        {user?.displayName || user?.username || 'User'}
+                        {user?.display_name || user?.username || 'User'}
                       </h1>
                       <span className="inline-flex items-center rounded-full border border-brand-500/40 bg-brand-200/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-500">
                         Pro
@@ -391,7 +397,7 @@ export default function ProfilePage() {
                       href="#"
                       className="text-brand-500 hover:text-brand-600 hover:underline underline-offset-4"
                     >
-                      agentflow.ai/u/demo
+                      reverseai.app/u/demo
                     </a>
                   </span>
                 </div>

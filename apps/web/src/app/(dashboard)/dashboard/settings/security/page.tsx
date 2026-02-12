@@ -25,13 +25,10 @@ import {
   MapPin,
   Globe,
   Trash2,
-  ChevronRight,
   RefreshCw,
   Download,
-  X,
   QrCode,
   Copy,
-  Info,
 } from 'lucide-react'
 
 // Signed-in Devices

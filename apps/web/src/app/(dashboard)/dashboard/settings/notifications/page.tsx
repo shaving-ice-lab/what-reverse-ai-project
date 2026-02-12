@@ -9,10 +9,8 @@ import { useState } from 'react'
 import {
   Bell,
   Mail,
-  MessageSquare,
   Smartphone,
   Zap,
-  AlertTriangle,
   CheckCircle,
   Clock,
   Users,
@@ -24,44 +22,34 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { PageContainer, PageHeader } from '@/components/dashboard/page-layout'
 
-// Notification Type
-interface NotificationSetting {
-  id: string
-  title: string
-  description: string
-  email: boolean
-  push: boolean
-  inApp: boolean
-}
-
 // Notification Categories
 const notificationCategories = [
   {
-    id: 'workflow',
-    title: 'Workflow notifications',
+    id: 'app',
+    title: 'App notifications',
     icon: Zap,
-    description: 'Notifications related to workflow execution',
+    description: 'Notifications related to app building and publishing',
     settings: [
       {
-        id: 'workflow_complete',
-        title: 'Workflow done',
-        description: 'Notify when a workflow completes',
+        id: 'app_published',
+        title: 'App published',
+        description: 'Notify when an app is published',
         email: true,
         push: true,
         inApp: true,
       },
       {
-        id: 'workflow_failed',
-        title: 'Workflow Failed',
-        description: 'Notify when a workflow fails',
+        id: 'app_error',
+        title: 'App Error',
+        description: 'Notify when an app build or publish fails',
         email: true,
         push: true,
         inApp: true,
       },
       {
-        id: 'workflow_scheduled',
-        title: 'Scheduled task reminder',
-        description: 'Remind before scheduled workflow runs',
+        id: 'database_change',
+        title: 'Database change',
+        description: 'Notify when database schema changes are applied',
         email: false,
         push: true,
         inApp: true,
@@ -91,9 +79,9 @@ const notificationCategories = [
         inApp: true,
       },
       {
-        id: 'workflow_shared',
-        title: 'Workflow shared',
-        description: 'Notify when someone shares a workflow with you',
+        id: 'workspace_shared',
+        title: 'Workspace shared',
+        description: 'Notify when someone shares a workspace with you',
         email: false,
         push: true,
         inApp: true,
@@ -348,9 +336,7 @@ export default function NotificationsSettingsPage() {
                 </div>
                 <span className="text-[13px] font-medium text-foreground">In-App</span>
               </div>
-              <p className="text-xs text-foreground-muted">
-                Display notifications within AgentFlow
-              </p>
+              <p className="text-xs text-foreground-muted">Display notifications within the app</p>
             </div>
           </div>
         </div>

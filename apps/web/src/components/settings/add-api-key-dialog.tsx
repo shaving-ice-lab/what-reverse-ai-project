@@ -272,7 +272,7 @@ export function AddApiKeyDialog({ trigger, onSuccess }: AddApiKeyDialogProps) {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Keys are stored securely and only decrypted when executing workflows
+              Keys are stored securely and only decrypted when the AI Agent executes tasks
             </p>
           </div>
 

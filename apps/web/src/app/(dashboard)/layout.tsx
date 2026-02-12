@@ -13,8 +13,6 @@ import dynamic from 'next/dynamic'
 import { useTheme } from 'next-themes'
 import {
   Sparkles,
-  MessageSquare,
-  Zap,
   Settings,
   Plus,
   Search,
@@ -22,8 +20,6 @@ import {
   LogOut,
   CreditCard,
   LayoutGrid,
-  Store,
-  Palette,
   FolderOpen,
   Bell,
   Sun,
@@ -31,26 +27,22 @@ import {
   ChevronDown,
   Bot,
   HelpCircle,
-  LifeBuoy,
   Crown,
   Activity,
   PanelLeftClose,
   PanelLeft,
-  BarChart3,
-  PlugZap,
-  ListTodo,
   Loader2,
   Shield,
   Database,
+  Globe,
 } from 'lucide-react'
 import { RequireAuth } from '@/components/auth/auth-guard'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useCommandPalette } from '@/components/dashboard/use-command-palette'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { workspaceApi, type Workspace, type WorkspaceQuota } from '@/lib/api/workspace'
-import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
+import { agentChatApi } from '@/lib/api/agent-chat'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,34 +58,31 @@ function getMainNavItems(workspaceId: string | null) {
   return [
     { title: 'Home', href: '/dashboard', icon: Activity },
     { title: 'AI Agent', href: '/dashboard/agent', icon: Bot },
-    { title: 'Builder', href: workspaceId ? `/dashboard/app/${workspaceId}/builder` : '/dashboard/apps', icon: LayoutGrid },
     { title: 'Database', href: '/dashboard/database', icon: Database },
-    { title: 'Workflows', href: '/dashboard/workflows', icon: Zap },
     { title: 'Skills', href: '/dashboard/skills', icon: Sparkles },
-    { title: 'Settings', href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/workspaces', icon: Settings },
+    { title: 'Apps', href: '/dashboard/workspaces', icon: Globe },
+    {
+      title: 'Settings',
+      href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/workspaces',
+      icon: Settings,
+    },
   ]
 }
-
-// personMenu
-const personalNavItems: { title: string; href: string; icon: React.ElementType }[] = []
 
 // allPage(PageControlLayoutandScroll)
 const fullBleedRoutes = [
   '/dashboard',
-  '/dashboard/editor',
-  '/dashboard/apps/editor',
-  '/dashboard/workflows',
   '/dashboard/workspaces',
-  '/dashboard/apps',
   '/dashboard/database',
   '/dashboard/agent',
   '/dashboard/skills',
+  '/dashboard/setup',
 ]
 
 const WORKSPACE_STORAGE_KEY = 'last_workspace_id'
 const RECENT_WORKSPACE_STORAGE_KEY = 'recent_workspace_ids'
 const RECENT_WORKSPACE_LIMIT = 4
-const SETUP_STORAGE_KEY = 'agentflow-setup-completed'
+const SETUP_STORAGE_KEY = 'reverseai-setup-completed'
 
 const NotificationPanel = dynamic(
   () =>
@@ -147,7 +136,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [showHistory, setShowHistory] = useState(true)
   const [activeConversation, setActiveConversation] = useState<string | null>(null)
   const [showNotifications, setShowNotifications] = useState(false)
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const commandPalette = useCommandPalette()
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
@@ -158,23 +147,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [recentWorkspaceIds, setRecentWorkspaceIds] = useState<string[]>([])
   const [needsSetup, setNeedsSetup] = useState(false)
   const [setupChecked, setSetupChecked] = useState(false)
-  const [recentConversations, setRecentConversations] = useState<{ id: string; title: string; time: string }[]>([])
-  const resolvedMainNavItems = useMemo(
-    () => {
-      const items = getMainNavItems(activeWorkspaceId)
-      return user?.role === 'admin'
-        ? [
-            ...items,
-            {
-              title: 'Admin Panel',
-              href: '/dashboard/admin',
-              icon: Shield,
-            },
-          ]
-        : items
-    },
-    [user?.role, activeWorkspaceId]
-  )
+  const [recentConversations, setRecentConversations] = useState<
+    { id: string; title: string; time: string }[]
+  >([])
+  const resolvedMainNavItems = useMemo(() => {
+    const items = getMainNavItems(activeWorkspaceId)
+    return user?.role === 'admin'
+      ? [
+          ...items,
+          {
+            title: 'Admin Panel',
+            href: '/dashboard/admin',
+            icon: Shield,
+          },
+        ]
+      : items
+  }, [user?.role, activeWorkspaceId])
 
   const workspaceIdFromPath = pathname.startsWith('/dashboard/workspaces/')
     ? pathname.split('/')[3] || null
@@ -280,7 +268,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (pathname?.startsWith('/dashboard/setup')) return
     // Re-check localStorage in case setup was just completed
     const justCompleted =
-      typeof window !== 'undefined' && localStorage.getItem('agentflow-setup-completed') === 'true'
+      typeof window !== 'undefined' && localStorage.getItem('reverseai-setup-completed') === 'true'
     if (justCompleted) {
       setNeedsSetup(false)
       setSetupChecked(true)
@@ -335,8 +323,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (!isActive) return
         const items = (sessions || []).slice(0, 5).map((s) => ({
           id: s.id,
-          title: s.status === 'active' ? `Session ${s.id.slice(0, 8)}` : `Session ${s.id.slice(0, 8)}`,
-          time: s.updated_at ? formatSessionTimeAgo(s.updated_at) : (s.created_at ? formatSessionTimeAgo(s.created_at) : ''),
+          title: s.title || `Session ${s.id.slice(0, 8)}`,
+          time: s.updated_at
+            ? formatSessionTimeAgo(s.updated_at)
+            : s.created_at
+              ? formatSessionTimeAgo(s.created_at)
+              : '',
         }))
         setRecentConversations(items)
       } catch {
@@ -344,7 +336,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
     loadSessions()
-    return () => { isActive = false }
+    return () => {
+      isActive = false
+    }
   }, [activeWorkspaceId])
 
   // SwitchTheme
@@ -375,28 +369,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Silent workspace switch — no confirm dialog, no redirect. Used by child components
   // (e.g. App Layout) to sync context when navigating to a workspace-scoped route.
-  const switchWorkspaceSilent = useCallback((workspaceId: string) => {
-    if (workspaceId === activeWorkspaceId) return
-    setActiveWorkspaceId(workspaceId)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
-      sessionStorage.removeItem('agent_session_id')
-      window.dispatchEvent(new CustomEvent('workspace-switched', { detail: { workspaceId } }))
-    }
-    updateRecentWorkspaces(workspaceId)
-  }, [activeWorkspaceId, updateRecentWorkspaces])
+  const switchWorkspaceSilent = useCallback(
+    (workspaceId: string) => {
+      if (workspaceId === activeWorkspaceId) return
+      setActiveWorkspaceId(workspaceId)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
+        sessionStorage.removeItem('agent_session_id')
+        window.dispatchEvent(new CustomEvent('workspace-switched', { detail: { workspaceId } }))
+      }
+      updateRecentWorkspaces(workspaceId)
+    },
+    [activeWorkspaceId, updateRecentWorkspaces]
+  )
 
-  const handleWorkspaceSwitch = useCallback((workspaceId: string) => {
-    if (workspaceId === activeWorkspaceId) return
-    if (typeof window !== 'undefined' && activeWorkspaceId) {
-      const confirmed = window.confirm(
-        'Switching workspace will leave the current context. Continue?'
-      )
-      if (!confirmed) return
-    }
-    switchWorkspaceSilent(workspaceId)
-    router.push('/dashboard')
-  }, [activeWorkspaceId, switchWorkspaceSilent, router])
+  const handleWorkspaceSwitch = useCallback(
+    (workspaceId: string) => {
+      if (workspaceId === activeWorkspaceId) return
+      if (typeof window !== 'undefined' && activeWorkspaceId) {
+        const confirmed = window.confirm(
+          'Switching workspace will leave the current context. Continue?'
+        )
+        if (!confirmed) return
+      }
+      switchWorkspaceSilent(workspaceId)
+      router.push('/dashboard')
+    },
+    [activeWorkspaceId, switchWorkspaceSilent, router]
+  )
 
   const activePlan = resolvePlanConfig(activeWorkspace?.plan)
   const recentWorkspaces = useMemo(() => {
@@ -460,7 +460,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           label: 'Member Management',
           href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`,
         },
-        { label: 'Usage and Billing', href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing` },
+        {
+          label: 'Usage and Billing',
+          href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing`,
+        },
         { label: 'Settings', href: `/dashboard/workspaces/${activeWorkspace.id}/settings` },
       ]
     : []
@@ -474,7 +477,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
         e.preventDefault()
-        router.push('/dashboard/workflows')
+        router.push('/dashboard/agent')
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
         e.preventDefault()
@@ -485,224 +488,131 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [router, commandPalette, sidebarCollapsed])
 
-  // IconButtonComponent
-  const IconButton = ({
-    icon: Icon,
-    tooltip,
-    onClick,
-    href,
-    active,
-    badge,
-  }: {
-    icon: React.ElementType
-    tooltip: string
-    onClick?: () => void
-    href?: string
-    active?: boolean
-    badge?: boolean
-  }) => {
-    const content = (
-      <button
-        onClick={onClick}
-        className={cn(
-          'w-7 h-7 rounded-md flex items-center justify-center transition-all relative',
-          active
-            ? 'bg-surface-200 text-foreground'
-            : 'text-foreground-light hover:text-foreground hover:bg-surface-100'
-        )}
-      >
-        <Icon className="w-4 h-4" />
-        {badge && <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-brand-500" />}
-      </button>
-    )
-
-    const wrapped = href ? <Link href={href}>{content}</Link> : content
-
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{wrapped}</TooltipTrigger>
-        <TooltipContent
-          side="top"
-          sideOffset={8}
-          className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground"
-        >
-          <p className="text-xs">{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    )
-  }
-
   return (
     <RequireAuth>
       <WorkspaceContext.Provider value={workspaceContextValue}>
-      <TooltipProvider delayDuration={100}>
-        <div className="flex flex-col h-screen overflow-hidden transition-colors duration-200 bg-background-studio text-foreground">
-          {/* ===== Supabase StyleTopNavbar ===== */}
-          <header className="h-11 shrink-0 border-b border-border bg-background-studio/95 backdrop-blur flex items-center px-4 gap-2">
-            {/* Logo */}
-            <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-              <div className="w-6 h-6 rounded-md flex items-center justify-center bg-brand-500">
-                <Sparkles className="w-3.5 h-3.5 text-background" />
-              </div>
-              <span className="hidden sm:inline text-[12px] font-semibold tracking-tight text-foreground">
-                AgentFlow
-              </span>
-            </Link>
+        <TooltipProvider delayDuration={100}>
+          <div className="flex flex-col h-screen overflow-hidden transition-colors duration-200 bg-background-studio text-foreground">
+            {/* ===== Supabase StyleTopNavbar ===== */}
+            <header className="h-11 shrink-0 border-b border-border bg-background-studio/95 backdrop-blur flex items-center px-4 gap-2">
+              {/* Logo */}
+              <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
+                <div className="w-6 h-6 rounded-md flex items-center justify-center bg-brand-500">
+                  <Sparkles className="w-3.5 h-3.5 text-background" />
+                </div>
+                <span className="hidden sm:inline text-[12px] font-semibold tracking-tight text-foreground">
+                  ReverseAI
+                </span>
+              </Link>
 
-            <span className="text-foreground-muted">/</span>
+              <span className="text-foreground-muted">/</span>
 
-            {/* WorkspaceSwitch */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-2 py-0.5 rounded-md hover:bg-surface-100 transition-colors text-foreground-light hover:text-foreground">
-                  {workspaceLoading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-foreground-muted" />
-                  ) : (
-                    <LayoutGrid className="w-3.5 h-3.5 text-foreground-muted" />
-                  )}
-                  <span className="text-[12px] font-medium">
-                    {workspaceLoading
-                      ? 'Loading workspace...'
-                      : activeWorkspace?.name || 'Select workspace'}
-                  </span>
-                  <span
-                    className={cn(
-                      'px-1.5 py-0.5 text-[10px] font-medium rounded',
-                      activePlan.bgColor,
-                      activePlan.color
-                    )}
-                  >
-                    {workspaceLoading ? '...' : activeWorkspace ? activePlan.label : 'Not selected'}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 bg-surface-100 border-border">
-                <div className="px-3 py-2 text-[11px] text-foreground-muted">Workspace</div>
-                {activeWorkspace && (
-                  <div className="px-3 pb-2 space-y-2 text-[11px] text-foreground-light">
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground-muted">Current plan</span>
-                      <span
-                        className={cn(
-                          'px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                          activePlan.bgColor,
-                          activePlan.color
-                        )}
-                      >
-                        {activePlan.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-foreground-muted">Quota overview</span>
-                      <span className="text-[10px] text-foreground-muted">
-                        {quotaLoading ? 'Syncing...' : `Usage ${quotaUsageLabel}`}
-                      </span>
-                    </div>
-                    {quotaSummaryItems.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        {quotaSummaryItems.map((item) => (
-                          <div
-                            key={item.label}
-                            className="rounded-md border border-border bg-surface-75 px-2 py-1 text-[10px] text-foreground-muted"
-                          >
-                            <span className="text-foreground-light">{item.label}</span>
-                            <span className="ml-1 text-foreground">{item.value}</span>
-                          </div>
-                        ))}
-                      </div>
+              {/* WorkspaceSwitch */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-2 py-0.5 rounded-md hover:bg-surface-100 transition-colors text-foreground-light hover:text-foreground">
+                    {workspaceLoading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-foreground-muted" />
                     ) : (
-                      <div className="text-[10px] text-foreground-muted">No quota data</div>
+                      <LayoutGrid className="w-3.5 h-3.5 text-foreground-muted" />
                     )}
-                    <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="text-brand-500 hover:underline">
-                      View Usage Details
-                    </Link>
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      {workspaceQuickLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="flex items-center justify-center rounded-md border border-border bg-surface-75 px-2 py-1 text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong hover:bg-surface-100 transition-colors"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <DropdownMenuSeparator className="bg-border" />
-                {workspaceLoading ? (
-                  <DropdownMenuItem
-                    disabled
-                    className="text-[12px] text-foreground-muted flex items-center gap-2"
-                  >
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Loading
-                  </DropdownMenuItem>
-                ) : workspaces.length === 0 ? (
-                  <DropdownMenuItem asChild className="text-[12px]">
-                    <Link href="/dashboard/workspaces" className="flex items-center gap-2">
-                      <Plus className="w-3.5 h-3.5" />
-                      Create workspace
-                    </Link>
-                  </DropdownMenuItem>
-                ) : (
-                  workspaces.map((workspace) => {
-                    const plan = resolvePlanConfig(workspace.plan)
-                    const isActiveWorkspace = workspace.id === activeWorkspaceId
-                    const status = workspaceStatusConfig[workspace.status] || {
-                      label: 'Limited',
-                      color: 'text-foreground-muted',
-                    }
-                    const isDisabled = workspace.status !== 'active'
-                    return (
-                      <DropdownMenuItem
-                        key={workspace.id}
-                        disabled={isDisabled}
-                        onClick={() => {
-                          if (isDisabled) return
-                          handleWorkspaceSwitch(workspace.id)
-                        }}
-                        className={cn(
-                          'flex items-center justify-between gap-2 text-[12px]',
-                          isActiveWorkspace && 'bg-surface-200/70 text-foreground',
-                          isDisabled && 'opacity-60 cursor-not-allowed'
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={cn('w-1.5 h-1.5 rounded-full shrink-0', workspace.status === 'active' ? 'bg-emerald-500' : 'bg-foreground-muted/30')} title={workspace.status === 'active' ? 'DB Ready' : 'Not Configured'} />
-                          <span className="font-medium">{workspace.name}</span>
-                          <span className="text-[10px] text-foreground-muted">
-                            /{workspace.slug}
-                          </span>
-                          {isDisabled && (
-                            <span className={cn('text-[10px]', status.color)}>{status.label}</span>
-                          )}
-                        </div>
+                    <span className="text-[12px] font-medium">
+                      {workspaceLoading
+                        ? 'Loading workspace...'
+                        : activeWorkspace?.name || 'Select workspace'}
+                    </span>
+                    <span
+                      className={cn(
+                        'px-1.5 py-0.5 text-[10px] font-medium rounded',
+                        activePlan.bgColor,
+                        activePlan.color
+                      )}
+                    >
+                      {workspaceLoading
+                        ? '...'
+                        : activeWorkspace
+                          ? activePlan.label
+                          : 'Not selected'}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-64 bg-surface-100 border-border">
+                  <div className="px-3 py-2 text-[11px] text-foreground-muted">Workspace</div>
+                  {activeWorkspace && (
+                    <div className="px-3 pb-2 space-y-2 text-[11px] text-foreground-light">
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground-muted">Current plan</span>
                         <span
                           className={cn(
                             'px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                            plan.bgColor,
-                            plan.color
+                            activePlan.bgColor,
+                            activePlan.color
                           )}
                         >
-                          {plan.label}
+                          {activePlan.label}
                         </span>
-                      </DropdownMenuItem>
-                    )
-                  })
-                )}
-                {hasRestrictedWorkspaces && (
-                  <div className="px-3 pb-2 text-[10px] text-foreground-muted">
-                    Workspace paused or permission limited. An admin can restore access.
-                  </div>
-                )}
-                {recentWorkspaces.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <div className="px-3 py-2 text-[11px] text-foreground-muted">Recent access</div>
-                    {recentWorkspaces.map((workspace) => {
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground-muted">Quota overview</span>
+                        <span className="text-[10px] text-foreground-muted">
+                          {quotaLoading ? 'Syncing...' : `Usage ${quotaUsageLabel}`}
+                        </span>
+                      </div>
+                      {quotaSummaryItems.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {quotaSummaryItems.map((item) => (
+                            <div
+                              key={item.label}
+                              className="rounded-md border border-border bg-surface-75 px-2 py-1 text-[10px] text-foreground-muted"
+                            >
+                              <span className="text-foreground-light">{item.label}</span>
+                              <span className="ml-1 text-foreground">{item.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[10px] text-foreground-muted">No quota data</div>
+                      )}
+                      <Link
+                        href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
+                        className="text-brand-500 hover:underline"
+                      >
+                        View Usage Details
+                      </Link>
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        {workspaceQuickLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className="flex items-center justify-center rounded-md border border-border bg-surface-75 px-2 py-1 text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong hover:bg-surface-100 transition-colors"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <DropdownMenuSeparator className="bg-border" />
+                  {workspaceLoading ? (
+                    <DropdownMenuItem
+                      disabled
+                      className="text-[12px] text-foreground-muted flex items-center gap-2"
+                    >
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Loading
+                    </DropdownMenuItem>
+                  ) : workspaces.length === 0 ? (
+                    <DropdownMenuItem asChild className="text-[12px]">
+                      <Link href="/dashboard/workspaces" className="flex items-center gap-2">
+                        <Plus className="w-3.5 h-3.5" />
+                        Create workspace
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    workspaces.map((workspace) => {
                       const plan = resolvePlanConfig(workspace.plan)
+                      const isActiveWorkspace = workspace.id === activeWorkspaceId
                       const status = workspaceStatusConfig[workspace.status] || {
                         label: 'Limited',
                         color: 'text-foreground-muted',
@@ -710,7 +620,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       const isDisabled = workspace.status !== 'active'
                       return (
                         <DropdownMenuItem
-                          key={`recent-${workspace.id}`}
+                          key={workspace.id}
                           disabled={isDisabled}
                           onClick={() => {
                             if (isDisabled) return
@@ -718,10 +628,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           }}
                           className={cn(
                             'flex items-center justify-between gap-2 text-[12px]',
+                            isActiveWorkspace && 'bg-surface-200/70 text-foreground',
                             isDisabled && 'opacity-60 cursor-not-allowed'
                           )}
                         >
                           <div className="flex items-center gap-2">
+                            <div
+                              className={cn(
+                                'w-1.5 h-1.5 rounded-full shrink-0',
+                                workspace.status === 'active'
+                                  ? 'bg-emerald-500'
+                                  : 'bg-foreground-muted/30'
+                              )}
+                              title={workspace.status === 'active' ? 'DB Ready' : 'Not Configured'}
+                            />
                             <span className="font-medium">{workspace.name}</span>
                             <span className="text-[10px] text-foreground-muted">
                               /{workspace.slug}
@@ -743,477 +663,494 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           </span>
                         </DropdownMenuItem>
                       )
-                    })}
-                  </>
-                )}
-                <DropdownMenuSeparator className="bg-border" />
-                <DropdownMenuItem asChild className="text-[12px]">
-                  <Link href="/dashboard/workspaces" className="flex items-center gap-2">
-                    <FolderOpen className="w-3.5 h-3.5" />
-                    Workspace list
-                  </Link>
-                </DropdownMenuItem>
-                {activeWorkspace && (
-                  <DropdownMenuItem asChild className="text-[12px]">
-                    <Link
-                      href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
-                      className="flex items-center gap-2"
-                    >
-                      <Settings className="w-3.5 h-3.5" />
-                      Workspace settings
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <span className="text-foreground-muted">/</span>
-
-            {/* Workspace Context */}
-            {workspaceLoading ? (
-              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-muted">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Loading
-              </div>
-            ) : activeWorkspace ? (
-              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light">
-                <span className="text-foreground-muted">/{activeWorkspace.slug}</span>
-                <span
-                  className={cn(
-                    'px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                    activePlan.bgColor,
-                    activePlan.color
+                    })
                   )}
-                >
-                  {activePlan.label}
-                </span>
-                <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-surface-200 text-foreground-muted">
-                  Quota {quotaUsageLabel}
-                </span>
-                <span className="h-3 w-px bg-border" />
-                <Link href="/dashboard/agent" className="hover:text-foreground transition-colors">
-                  Create App
-                </Link>
-                <Link
-                  href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
-                  className="hover:text-foreground transition-colors"
-                >
-                  Members
-                </Link>
-                <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="hover:text-foreground transition-colors">
-                  Usage
-                </Link>
-                <Link
-                  href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
-                  className="hover:text-foreground transition-colors"
-                >
-                  Settings
-                </Link>
-              </div>
-            ) : (
-              <Link
-                href="/dashboard/workspaces"
-                className="hidden md:inline-flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light hover:text-foreground transition-colors"
-              >
-                Create or select workspace
-              </Link>
-            )}
-
-            <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-full bg-warning/15 text-warning">
-              PRODUCTION
-            </span>
-
-            {/* Right sideToolbar */}
-            <div className="ml-auto flex items-center gap-1.5">
-              <button
-                onClick={() => commandPalette.toggle()}
-                className="hidden md:flex items-center gap-2 px-3 py-1 rounded-md bg-surface-100 border border-border text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong transition-colors"
-              >
-                <Search className="w-3.5 h-3.5" />
-                <span>Search...</span>
-                <kbd className="ml-2 px-1.5 py-0.5 text-[10px] rounded bg-surface-200 text-foreground-muted">
-                  ⌘K
-                </kbd>
-              </button>
-
-              {/* Help */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors">
-                    <HelpCircle className="w-4 h-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  className="bg-surface-100 border-border text-foreground"
-                >
-                  <p className="text-xs">Help</p>
-                </TooltipContent>
-              </Tooltip>
-
-              {/* Notifications */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setShowNotifications(true)}
-                    className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors relative"
-                  >
-                    <Bell className="w-4 h-4" />
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  className="bg-surface-100 border-border text-foreground"
-                >
-                  <p className="text-xs">Notifications</p>
-                </TooltipContent>
-              </Tooltip>
-
-              {/* ThemeSwitch */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={toggleTheme}
-                    className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors"
-                  >
-                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  className="bg-surface-100 border-border text-foreground"
-                >
-                  <p className="text-xs">{isDark ? 'Light Mode' : 'Dark Mode'}</p>
-                </TooltipContent>
-              </Tooltip>
-
-              {/* UserAvatar */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-border hover:ring-brand-500/50 transition-all">
-                    <Avatar className="w-full h-full">
-                      <AvatarImage src={user?.avatar} />
-                      <AvatarFallback className="bg-surface-200 text-foreground-light text-xs">
-                        {user?.displayName?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border">
-                  <div className="px-3 py-2 border-b border-border">
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {user?.displayName || user?.username}
-                    </p>
-                    <p className="text-xs text-foreground-light truncate">{user?.email}</p>
-                  </div>
-                  <div className="py-1">
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/dashboard/profile"
-                        className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                      >
-                        <User className="w-3.5 h-3.5" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/dashboard/settings"
-                        className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                      >
-                        <Settings className="w-3.5 h-3.5" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
-                        className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                      >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        Subscription Plan
-                      </Link>
-                    </DropdownMenuItem>
-                  </div>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <div className="py-1">
-                    <DropdownMenuItem
-                      icon={<LogOut className="w-3.5 h-3.5" />}
-                      destructive
-                      onClick={() => logout()}
-                      className="px-3 py-1.5 cursor-pointer"
-                    >
-                      Sign Out
-                    </DropdownMenuItem>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-
-          {/* ===== mainRegion(Sidebar + Content) ===== */}
-          <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar */}
-            <aside
-              data-collapsed={sidebarCollapsed}
-              className={cn(
-                'flex flex-col transition-all duration-300 ease-out relative shrink-0 bg-background-studio border-r border-border overflow-hidden',
-                isSetupPage ? 'w-0 border-r-0 hidden' : sidebarCollapsed ? 'w-[52px]' : 'w-[188px]'
-              )}
-            >
-              <div className="relative z-10 flex h-full flex-col">
-                {/* Scrollable Navigation Region */}
-                <div
-                  className={cn(
-                    'flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin',
-                    sidebarCollapsed ? 'px-1.5' : 'px-2'
-                  )}
-                >
-                  {/* mainNavigation */}
-                  <div className="py-1">
-                    <nav className="space-y-0">
-                      {resolvedMainNavItems.map((item) => {
-                        const active = isActive(item.href)
-                        return sidebarCollapsed ? (
-                          <Tooltip key={item.href}>
-                            <TooltipTrigger asChild>
-                              <Link href={item.href}>
-                                <button
-                                  className={cn(
-                                    'w-full h-8 rounded-md flex items-center justify-center transition-colors',
-                                    active
-                                      ? 'bg-surface-100/70 text-foreground'
-                                      : 'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
-                                  )}
-                                >
-                                  <item.icon className="w-4 h-4" />
-                                </button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="right"
-                              sideOffset={8}
-                              className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground"
-                            >
-                              <p className="text-xs">{item.title}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <Link key={item.href} href={item.href}>
-                            <button
-                              className={cn(
-                                'w-full h-8 rounded-md flex items-center px-2 transition-colors text-[12px] font-medium',
-                                active
-                                  ? 'bg-surface-100/70 text-foreground'
-                                  : 'text-foreground-light hover:text-foreground hover:bg-surface-100/60'
-                              )}
-                            >
-                              <span className="truncate">{item.title}</span>
-                            </button>
-                          </Link>
-                        )
-                      })}
-                    </nav>
-                  </div>
-
-                  {/* personMenu */}
-                  <div className="py-1">
-                    <nav className="space-y-0">
-                      {personalNavItems.map((item) => {
-                        const active = isActive(item.href)
-                        return sidebarCollapsed ? (
-                          <Tooltip key={item.href}>
-                            <TooltipTrigger asChild>
-                              <Link href={item.href}>
-                                <button
-                                  className={cn(
-                                    'w-full h-8 rounded-md flex items-center justify-center transition-colors',
-                                    active
-                                      ? 'bg-surface-100/70 text-foreground'
-                                      : 'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
-                                  )}
-                                >
-                                  <item.icon className="w-4 h-4" />
-                                </button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent
-                              side="right"
-                              sideOffset={8}
-                              className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground"
-                            >
-                              <p className="text-xs">{item.title}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <Link key={item.href} href={item.href}>
-                            <button
-                              className={cn(
-                                'w-full h-8 rounded-md flex items-center px-2 transition-colors text-[12px] font-medium',
-                                active
-                                  ? 'bg-surface-100/70 text-foreground'
-                                  : 'text-foreground-light hover:text-foreground hover:bg-surface-100/60'
-                              )}
-                            >
-                              <span className="truncate">{item.title}</span>
-                            </button>
-                          </Link>
-                        )
-                      })}
-                    </nav>
-                  </div>
-
-                  {/* ConversationHistory */}
-                  {!sidebarCollapsed && (
-                    <>
-                      <div className="my-1.5 h-px bg-border" />
-                      <div>
-                        <button
-                          onClick={() => setShowHistory(!showHistory)}
-                          className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-foreground-muted transition-colors w-full hover:text-foreground"
-                        >
-                          <ChevronDown
-                            className={cn(
-                              'w-3 h-3 transition-transform',
-                              !showHistory && '-rotate-90'
-                            )}
-                          />
-                          Recent Conversations
-                        </button>
-
-                        {showHistory && (
-                          <div className="py-1 space-y-0.5">
-                            {recentConversations.map((conv) => (
-                              <button
-                                key={conv.id}
-                                onClick={() => {
-                                  setActiveConversation(conv.id)
-                                  router.push(`/dashboard/agent?session=${conv.id}`)
-                                }}
-                                className={cn(
-                                  'w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative',
-                                  activeConversation === conv.id
-                                    ? 'bg-surface-100/70 text-foreground'
-                                    : 'text-foreground-muted hover:bg-surface-100/60 hover:text-foreground'
-                                )}
-                              >
-                                {activeConversation === conv.id && (
-                                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-r-full bg-brand-500" />
-                                )}
-                                <p className="truncate leading-snug">{conv.title}</p>
-                                <p className="text-[10px] mt-0.5 text-foreground-muted">
-                                  {conv.time}
-                                </p>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* FooterRegion */}
-                <div className="mt-auto shrink-0">
-                  {!sidebarCollapsed && (
-                    <div className="px-2 py-2">
-                      <div className="p-2.5 rounded-md bg-surface-100 border border-border">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-1.5">
-                            <Crown className="w-3.5 h-3.5 text-brand-500" />
-                            <span className="text-[11px] font-medium text-foreground-light">
-                              {activePlan.label} Plan
-                            </span>
-                          </div>
-                          <Link
-                            href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
-                            className="text-[10px] text-brand-500 hover:underline"
-                          >
-                            Upgrade
-                          </Link>
-                        </div>
-                        <div className="h-1 rounded-full overflow-hidden bg-surface-300">
-                          <div
-                            className="h-full rounded-full bg-brand-500"
-                            style={{ width: `${quotaUsagePercent !== null ? Math.min(Math.round(quotaUsagePercent * 100), 100) : 0}%` }}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between text-[10px] mt-1 text-foreground-muted">
-                          <span>Usage {quotaUsageLabel}</span>
-                        </div>
-                      </div>
+                  {hasRestrictedWorkspaces && (
+                    <div className="px-3 pb-2 text-[10px] text-foreground-muted">
+                      Workspace paused or permission limited. An admin can restore access.
                     </div>
                   )}
-
-                  <div className="h-px mx-2 my-2 bg-border" />
-
-                  <div className={cn('py-2', sidebarCollapsed ? 'px-1.5' : 'px-2')}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                          className={cn(
-                            'w-full h-8 rounded-md flex items-center transition-colors text-[12px] font-medium',
-                            sidebarCollapsed ? 'justify-center' : 'gap-2 px-2',
-                            'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
-                          )}
-                        >
-                          {sidebarCollapsed ? (
-                            <PanelLeft className="w-4 h-4" />
-                          ) : (
-                            <PanelLeftClose className="w-4 h-4" />
-                          )}
-                          {!sidebarCollapsed && (
-                            <span className="truncate text-[12px] font-medium">
-                              Collapse sidebar
-                            </span>
-                          )}
-                        </button>
-                      </TooltipTrigger>
-                      {sidebarCollapsed && (
-                        <TooltipContent side="right" className="bg-surface-100 border-border">
-                          <p className="text-xs">Expand sidebar</p>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </div>
-                </div>
-              </div>
-            </aside>
-
-            {/* mainContentRegion */}
-            <main className="flex-1 overflow-hidden bg-background-studio">
-              <div className="dashboard-shell" data-layout={isFullBleed ? 'full' : 'standard'}>
-                <div className="dashboard-content">
-                  <div className="dashboard-page">
-                    {!setupChecked && !isSetupPage ? (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="w-6 h-6 border-2 border-foreground-muted border-t-transparent rounded-full animate-spin" />
+                  {recentWorkspaces.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator className="bg-border" />
+                      <div className="px-3 py-2 text-[11px] text-foreground-muted">
+                        Recent access
                       </div>
-                    ) : (
-                      children
+                      {recentWorkspaces.map((workspace) => {
+                        const plan = resolvePlanConfig(workspace.plan)
+                        const status = workspaceStatusConfig[workspace.status] || {
+                          label: 'Limited',
+                          color: 'text-foreground-muted',
+                        }
+                        const isDisabled = workspace.status !== 'active'
+                        return (
+                          <DropdownMenuItem
+                            key={`recent-${workspace.id}`}
+                            disabled={isDisabled}
+                            onClick={() => {
+                              if (isDisabled) return
+                              handleWorkspaceSwitch(workspace.id)
+                            }}
+                            className={cn(
+                              'flex items-center justify-between gap-2 text-[12px]',
+                              isDisabled && 'opacity-60 cursor-not-allowed'
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{workspace.name}</span>
+                              <span className="text-[10px] text-foreground-muted">
+                                /{workspace.slug}
+                              </span>
+                              {isDisabled && (
+                                <span className={cn('text-[10px]', status.color)}>
+                                  {status.label}
+                                </span>
+                              )}
+                            </div>
+                            <span
+                              className={cn(
+                                'px-1.5 py-0.5 text-[10px] font-semibold rounded',
+                                plan.bgColor,
+                                plan.color
+                              )}
+                            >
+                              {plan.label}
+                            </span>
+                          </DropdownMenuItem>
+                        )
+                      })}
+                    </>
+                  )}
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem asChild className="text-[12px]">
+                    <Link href="/dashboard/workspaces" className="flex items-center gap-2">
+                      <FolderOpen className="w-3.5 h-3.5" />
+                      Workspace list
+                    </Link>
+                  </DropdownMenuItem>
+                  {activeWorkspace && (
+                    <DropdownMenuItem asChild className="text-[12px]">
+                      <Link
+                        href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+                        className="flex items-center gap-2"
+                      >
+                        <Settings className="w-3.5 h-3.5" />
+                        Workspace settings
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <span className="text-foreground-muted">/</span>
+
+              {/* Workspace Context */}
+              {workspaceLoading ? (
+                <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-muted">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Loading
+                </div>
+              ) : activeWorkspace ? (
+                <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light">
+                  <span className="text-foreground-muted">/{activeWorkspace.slug}</span>
+                  <span
+                    className={cn(
+                      'px-1.5 py-0.5 text-[10px] font-semibold rounded',
+                      activePlan.bgColor,
+                      activePlan.color
+                    )}
+                  >
+                    {activePlan.label}
+                  </span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-surface-200 text-foreground-muted">
+                    Quota {quotaUsageLabel}
+                  </span>
+                  <span className="h-3 w-px bg-border" />
+                  <Link href="/dashboard/agent" className="hover:text-foreground transition-colors">
+                    Create App
+                  </Link>
+                  <Link
+                    href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Members
+                  </Link>
+                  <Link
+                    href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Usage
+                  </Link>
+                  <Link
+                    href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Settings
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  href="/dashboard/workspaces"
+                  className="hidden md:inline-flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light hover:text-foreground transition-colors"
+                >
+                  Create or select workspace
+                </Link>
+              )}
+
+              <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-full bg-warning/15 text-warning">
+                PRODUCTION
+              </span>
+
+              {/* Right sideToolbar */}
+              <div className="ml-auto flex items-center gap-1.5">
+                <button
+                  onClick={() => commandPalette.toggle()}
+                  className="hidden md:flex items-center gap-2 px-3 py-1 rounded-md bg-surface-100 border border-border text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong transition-colors"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Search...</span>
+                  <kbd className="ml-2 px-1.5 py-0.5 text-[10px] rounded bg-surface-200 text-foreground-muted">
+                    ⌘K
+                  </kbd>
+                </button>
+
+                {/* Help */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors">
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    className="bg-surface-100 border-border text-foreground"
+                  >
+                    <p className="text-xs">Help</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* Notifications */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setShowNotifications(true)}
+                      className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors relative"
+                    >
+                      <Bell className="w-4 h-4" />
+                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    className="bg-surface-100 border-border text-foreground"
+                  >
+                    <p className="text-xs">Notifications</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* ThemeSwitch */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={toggleTheme}
+                      className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors"
+                    >
+                      {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    className="bg-surface-100 border-border text-foreground"
+                  >
+                    <p className="text-xs">{isDark ? 'Light Mode' : 'Dark Mode'}</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* UserAvatar */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-border hover:ring-brand-500/50 transition-all">
+                      <Avatar className="w-full h-full">
+                        <AvatarImage src={user?.avatar_url} />
+                        <AvatarFallback className="bg-surface-200 text-foreground-light text-xs">
+                          {user?.display_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border">
+                    <div className="px-3 py-2 border-b border-border">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {user?.display_name || user?.username}
+                      </p>
+                      <p className="text-xs text-foreground-light truncate">{user?.email}</p>
+                    </div>
+                    <div className="py-1">
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/dashboard/profile"
+                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
+                        >
+                          <User className="w-3.5 h-3.5" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/dashboard/settings"
+                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
+                        >
+                          <Settings className="w-3.5 h-3.5" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
+                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          Subscription Plan
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
+                    <DropdownMenuSeparator className="bg-border" />
+                    <div className="py-1">
+                      <DropdownMenuItem
+                        icon={<LogOut className="w-3.5 h-3.5" />}
+                        destructive
+                        onClick={() => logout()}
+                        className="px-3 py-1.5 cursor-pointer"
+                      >
+                        Sign Out
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </header>
+
+            {/* ===== mainRegion(Sidebar + Content) ===== */}
+            <div className="flex flex-1 overflow-hidden">
+              {/* Sidebar */}
+              <aside
+                data-collapsed={sidebarCollapsed}
+                className={cn(
+                  'flex flex-col transition-all duration-300 ease-out relative shrink-0 bg-background-studio border-r border-border overflow-hidden',
+                  isSetupPage
+                    ? 'w-0 border-r-0 hidden'
+                    : sidebarCollapsed
+                      ? 'w-[52px]'
+                      : 'w-[188px]'
+                )}
+              >
+                <div className="relative z-10 flex h-full flex-col">
+                  {/* Scrollable Navigation Region */}
+                  <div
+                    className={cn(
+                      'flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin',
+                      sidebarCollapsed ? 'px-1.5' : 'px-2'
+                    )}
+                  >
+                    {/* mainNavigation */}
+                    <div className="py-1">
+                      <nav className="space-y-0">
+                        {resolvedMainNavItems.map((item) => {
+                          const active = isActive(item.href)
+                          return sidebarCollapsed ? (
+                            <Tooltip key={item.href}>
+                              <TooltipTrigger asChild>
+                                <Link href={item.href}>
+                                  <button
+                                    className={cn(
+                                      'w-full h-8 rounded-md flex items-center justify-center transition-colors',
+                                      active
+                                        ? 'bg-surface-100/70 text-foreground'
+                                        : 'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
+                                    )}
+                                  >
+                                    <item.icon className="w-4 h-4" />
+                                  </button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent
+                                side="right"
+                                sideOffset={8}
+                                className="rounded-md px-2.5 py-1.5 bg-surface-100 border border-border text-foreground"
+                              >
+                                <p className="text-xs">{item.title}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <Link key={item.href} href={item.href}>
+                              <button
+                                className={cn(
+                                  'w-full h-8 rounded-md flex items-center px-2 transition-colors text-[12px] font-medium',
+                                  active
+                                    ? 'bg-surface-100/70 text-foreground'
+                                    : 'text-foreground-light hover:text-foreground hover:bg-surface-100/60'
+                                )}
+                              >
+                                <span className="truncate">{item.title}</span>
+                              </button>
+                            </Link>
+                          )
+                        })}
+                      </nav>
+                    </div>
+
+                    {/* ConversationHistory */}
+                    {!sidebarCollapsed && (
+                      <>
+                        <div className="my-1.5 h-px bg-border" />
+                        <div>
+                          <button
+                            onClick={() => setShowHistory(!showHistory)}
+                            className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-foreground-muted transition-colors w-full hover:text-foreground"
+                          >
+                            <ChevronDown
+                              className={cn(
+                                'w-3 h-3 transition-transform',
+                                !showHistory && '-rotate-90'
+                              )}
+                            />
+                            Recent Conversations
+                          </button>
+
+                          {showHistory && (
+                            <div className="py-1 space-y-0.5">
+                              {recentConversations.map((conv) => (
+                                <button
+                                  key={conv.id}
+                                  onClick={() => {
+                                    setActiveConversation(conv.id)
+                                    router.push(`/dashboard/agent?session=${conv.id}`)
+                                  }}
+                                  className={cn(
+                                    'w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative',
+                                    activeConversation === conv.id
+                                      ? 'bg-surface-100/70 text-foreground'
+                                      : 'text-foreground-muted hover:bg-surface-100/60 hover:text-foreground'
+                                  )}
+                                >
+                                  {activeConversation === conv.id && (
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-r-full bg-brand-500" />
+                                  )}
+                                  <p className="truncate leading-snug">{conv.title}</p>
+                                  <p className="text-[10px] mt-0.5 text-foreground-muted">
+                                    {conv.time}
+                                  </p>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
+
+                  {/* FooterRegion */}
+                  <div className="mt-auto shrink-0">
+                    {!sidebarCollapsed && (
+                      <div className="px-2 py-2">
+                        <div className="p-2.5 rounded-md bg-surface-100 border border-border">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <Crown className="w-3.5 h-3.5 text-brand-500" />
+                              <span className="text-[11px] font-medium text-foreground-light">
+                                {activePlan.label} Plan
+                              </span>
+                            </div>
+                            <Link
+                              href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
+                              className="text-[10px] text-brand-500 hover:underline"
+                            >
+                              Upgrade
+                            </Link>
+                          </div>
+                          <div className="h-1 rounded-full overflow-hidden bg-surface-300">
+                            <div
+                              className="h-full rounded-full bg-brand-500"
+                              style={{
+                                width: `${quotaUsagePercent !== null ? Math.min(Math.round(quotaUsagePercent * 100), 100) : 0}%`,
+                              }}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between text-[10px] mt-1 text-foreground-muted">
+                            <span>Usage {quotaUsageLabel}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="h-px mx-2 my-2 bg-border" />
+
+                    <div className={cn('py-2', sidebarCollapsed ? 'px-1.5' : 'px-2')}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                            className={cn(
+                              'w-full h-8 rounded-md flex items-center transition-colors text-[12px] font-medium',
+                              sidebarCollapsed ? 'justify-center' : 'gap-2 px-2',
+                              'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
+                            )}
+                          >
+                            {sidebarCollapsed ? (
+                              <PanelLeft className="w-4 h-4" />
+                            ) : (
+                              <PanelLeftClose className="w-4 h-4" />
+                            )}
+                            {!sidebarCollapsed && (
+                              <span className="truncate text-[12px] font-medium">
+                                Collapse sidebar
+                              </span>
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        {sidebarCollapsed && (
+                          <TooltipContent side="right" className="bg-surface-100 border-border">
+                            <p className="text-xs">Expand sidebar</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </main>
+              </aside>
+
+              {/* mainContentRegion */}
+              <main className="flex-1 overflow-hidden bg-background-studio">
+                <div className="dashboard-shell" data-layout={isFullBleed ? 'full' : 'standard'}>
+                  <div className="dashboard-content">
+                    <div className="dashboard-page">
+                      {!setupChecked && !isSetupPage ? (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="w-6 h-6 border-2 border-foreground-muted border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      ) : (
+                        children
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+
+            {/* NotificationsPanel */}
+            {showNotifications && (
+              <NotificationPanel
+                isOpen={showNotifications}
+                onClose={() => setShowNotifications(false)}
+              />
+            )}
+
+            {/* CommandPanel */}
+            {commandPalette.isOpen && (
+              <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
+            )}
           </div>
-
-          {/* NotificationsPanel */}
-          {showNotifications && (
-            <NotificationPanel
-              isOpen={showNotifications}
-              onClose={() => setShowNotifications(false)}
-            />
-          )}
-
-          {/* CommandPanel */}
-          {commandPalette.isOpen && (
-            <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
-          )}
-        </div>
-      </TooltipProvider>
+        </TooltipProvider>
       </WorkspaceContext.Provider>
     </RequireAuth>
   )

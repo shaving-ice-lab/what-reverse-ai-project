@@ -116,6 +116,8 @@ interface SettingsSectionProps {
   description?: string
   /** Content */
   children: React.ReactNode
+  /** Header actions (top-right) */
+  actions?: React.ReactNode
   /** Footer action */
   footer?: React.ReactNode
   /** Whether compact */
@@ -127,6 +129,7 @@ export function SettingsSection({
   title,
   description,
   children,
+  actions,
   footer,
   compact = false,
   className,
@@ -134,13 +137,25 @@ export function SettingsSection({
   return (
     <div className={cn('page-panel overflow-hidden', className)}>
       {/* Header */}
-      <div className={cn('page-panel-header', compact ? 'px-4 py-3' : 'px-5 py-4')}>
-        <h2 className={cn('page-panel-title', compact ? 'text-[12px]' : 'text-[13px]')}>{title}</h2>
-        {description && (
-          <p className={cn('page-panel-description mt-1', compact ? 'text-[11px]' : 'text-[12px]')}>
-            {description}
-          </p>
+      <div
+        className={cn(
+          'page-panel-header flex items-start justify-between',
+          compact ? 'px-4 py-3' : 'px-5 py-4'
         )}
+      >
+        <div>
+          <h2 className={cn('page-panel-title', compact ? 'text-[12px]' : 'text-[13px]')}>
+            {title}
+          </h2>
+          {description && (
+            <p
+              className={cn('page-panel-description mt-1', compact ? 'text-[11px]' : 'text-[12px]')}
+            >
+              {description}
+            </p>
+          )}
+        </div>
+        {actions && <div className="flex-shrink-0">{actions}</div>}
       </div>
 
       {/* Content */}
@@ -257,11 +272,13 @@ interface EmptyStateProps {
   icon?: React.ReactNode
   title: string
   description?: string
-  action?: {
-    label: string
-    onClick?: () => void
-    href?: string
-  }
+  action?:
+    | React.ReactNode
+    | {
+        label: string
+        onClick?: () => void
+        href?: string
+      }
   className?: string
 }
 
@@ -279,13 +296,17 @@ export function EmptyState({ icon, title, description, action, className }: Empt
       {description && <p className="text-[13px] text-foreground-light max-w-sm">{description}</p>}
       {action && (
         <div className="mt-4">
-          {action.href ? (
-            <Link href={action.href}>
-              <Button>{action.label}</Button>
-            </Link>
-          ) : (
-            <Button onClick={action.onClick}>{action.label}</Button>
-          )}
+          {React.isValidElement(action) ? (
+            action
+          ) : typeof action === 'object' && 'label' in action ? (
+            action.href ? (
+              <Link href={action.href}>
+                <Button>{action.label}</Button>
+              </Link>
+            ) : (
+              <Button onClick={action.onClick}>{action.label}</Button>
+            )
+          ) : null}
         </div>
       )}
     </div>

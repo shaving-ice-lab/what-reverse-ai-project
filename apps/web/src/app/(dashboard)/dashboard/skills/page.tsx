@@ -15,7 +15,6 @@ import {
   Pencil,
   Loader2,
   X,
-  AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -55,7 +54,8 @@ const BUILTIN_SKILLS: SkillMeta[] = [
   {
     id: 'builtin_data_modeling',
     name: 'Data Modeling',
-    description: 'Design and manage database schemas. Create tables, modify structures, insert seed data, and query data.',
+    description:
+      'Design and manage database schemas. Create tables, modify structures, insert seed data, and query data.',
     category: 'data_modeling',
     icon: 'Database',
     tool_count: 4,
@@ -66,7 +66,8 @@ const BUILTIN_SKILLS: SkillMeta[] = [
   {
     id: 'builtin_ui_generation',
     name: 'UI Generation',
-    description: 'Generate and modify UI Schema for application pages. Create data tables, forms, charts, and stats cards.',
+    description:
+      'Generate and modify UI Schema for application pages. Create data tables, forms, charts, and stats cards.',
     category: 'ui_generation',
     icon: 'Layout',
     tool_count: 2,
@@ -77,11 +78,12 @@ const BUILTIN_SKILLS: SkillMeta[] = [
   {
     id: 'builtin_business_logic',
     name: 'Business Logic',
-    description: 'Design and manage business workflows. Create workflows, modify flow logic, and get suggestions for automation.',
+    description:
+      'Inspect workspace context — list tables, query schema, and understand the current database state to inform app building decisions.',
     category: 'business_logic',
-    icon: 'GitBranch',
-    tool_count: 4,
-    tool_names: ['create_workflow', 'modify_workflow', 'get_workspace_info', 'suggest_workflow'],
+    icon: 'Database',
+    tool_count: 1,
+    tool_names: ['get_workspace_info'],
     enabled: true,
     builtin: true,
   },
@@ -90,7 +92,7 @@ const BUILTIN_SKILLS: SkillMeta[] = [
 export default function SkillsPage() {
   const { workspaceId } = useWorkspace()
   const [skills, setSkills] = useState<SkillMeta[]>(BUILTIN_SKILLS)
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [editingSkill, setEditingSkill] = useState<SkillMeta | null>(null)
@@ -103,7 +105,11 @@ export default function SkillsPage() {
       const res = await request<{ data: SkillMeta[] } | SkillMeta[]>(
         `/workspaces/${workspaceId}/agent/skills`
       )
-      const items = Array.isArray(res) ? res : Array.isArray((res as any)?.data) ? (res as any).data : null
+      const items = Array.isArray(res)
+        ? res
+        : Array.isArray((res as any)?.data)
+          ? (res as any).data
+          : null
       if (items && items.length > 0) {
         setSkills(items)
       }
@@ -122,9 +128,7 @@ export default function SkillsPage() {
     const skill = skills.find((s) => s.id === skillId)
     if (!skill) return
     const newEnabled = !skill.enabled
-    setSkills((prev) =>
-      prev.map((s) => (s.id === skillId ? { ...s, enabled: newEnabled } : s))
-    )
+    setSkills((prev) => prev.map((s) => (s.id === skillId ? { ...s, enabled: newEnabled } : s)))
     if (workspaceId) {
       try {
         await request(`/workspaces/${workspaceId}/agent/skills/${skillId}`, {
@@ -182,9 +186,7 @@ export default function SkillsPage() {
     }
   }
 
-  const allTools = skills
-    .filter((s) => s.enabled)
-    .flatMap((s) => s.tool_names)
+  const allTools = skills.filter((s) => s.enabled).flatMap((s) => s.tool_names)
   const uniqueTools = [...new Set(allTools)]
 
   return (
@@ -198,12 +200,16 @@ export default function SkillsPage() {
               AI Skills
             </h1>
             <p className="text-sm text-foreground-muted mt-1">
-              Manage the capabilities available to your AI Agent. Each skill provides a set of tools and prompts.
+              Manage the capabilities available to your AI Agent. Each skill provides a set of tools
+              and prompts.
             </p>
           </div>
           <Button
             size="sm"
-            onClick={() => { setEditingSkill(null); setShowCreateDialog(true) }}
+            onClick={() => {
+              setEditingSkill(null)
+              setShowCreateDialog(true)
+            }}
             className="h-8 text-xs shrink-0"
           >
             <Plus className="w-3.5 h-3.5 mr-1" />
@@ -230,7 +236,9 @@ export default function SkillsPage() {
               </span>
             ))}
             {uniqueTools.length === 0 && (
-              <span className="text-xs text-foreground-muted">No tools active. Enable at least one skill.</span>
+              <span className="text-xs text-foreground-muted">
+                No tools active. Enable at least one skill.
+              </span>
             )}
           </div>
         </div>
@@ -246,7 +254,9 @@ export default function SkillsPage() {
                 key={skill.id}
                 className={cn(
                   'border rounded-lg transition-all',
-                  skill.enabled ? 'border-border bg-background' : 'border-border/50 bg-surface-200/20 opacity-70'
+                  skill.enabled
+                    ? 'border-border bg-background'
+                    : 'border-border/50 bg-surface-200/20 opacity-70'
                 )}
               >
                 {/* Skill header */}
@@ -254,7 +264,9 @@ export default function SkillsPage() {
                   <div
                     className={cn(
                       'w-10 h-10 rounded-lg flex items-center justify-center shrink-0',
-                      skill.enabled ? 'bg-brand-500/10 text-brand-500' : 'bg-surface-200 text-foreground-muted'
+                      skill.enabled
+                        ? 'bg-brand-500/10 text-brand-500'
+                        : 'bg-surface-200 text-foreground-muted'
                     )}
                   >
                     <CatIcon className="w-5 h-5" />
@@ -272,14 +284,19 @@ export default function SkillsPage() {
                         {skill.tool_count} tools
                       </span>
                     </div>
-                    <p className="text-xs text-foreground-muted mt-0.5 truncate">{skill.description}</p>
+                    <p className="text-xs text-foreground-muted mt-0.5 truncate">
+                      {skill.description}
+                    </p>
                   </div>
 
                   {/* Custom skill actions */}
                   {!skill.builtin && (
                     <div className="flex items-center gap-0.5 shrink-0">
                       <button
-                        onClick={() => { setEditingSkill(skill); setShowCreateDialog(true) }}
+                        onClick={() => {
+                          setEditingSkill(skill)
+                          setShowCreateDialog(true)
+                        }}
                         className="p-1.5 text-foreground-muted hover:text-foreground transition-colors rounded"
                         title="Edit skill"
                       >
@@ -321,7 +338,11 @@ export default function SkillsPage() {
                     onClick={() => setExpandedId(isExpanded ? null : skill.id)}
                     className="text-foreground-muted hover:text-foreground transition-colors shrink-0"
                   >
-                    {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
 
@@ -375,7 +396,10 @@ export default function SkillsPage() {
           <SkillFormDialog
             initial={editingSkill}
             onSubmit={handleCreateOrUpdate}
-            onClose={() => { setShowCreateDialog(false); setEditingSkill(null) }}
+            onClose={() => {
+              setShowCreateDialog(false)
+              setEditingSkill(null)
+            }}
           />
         )}
       </div>
@@ -389,7 +413,13 @@ function SkillFormDialog({
   onClose,
 }: {
   initial: SkillMeta | null
-  onSubmit: (data: { name: string; description: string; category: string; icon: string; system_prompt: string }) => Promise<void>
+  onSubmit: (data: {
+    name: string
+    description: string
+    category: string
+    icon: string
+    system_prompt: string
+  }) => Promise<void>
   onClose: () => void
 }) {
   const [name, setName] = useState(initial?.name || '')
@@ -441,7 +471,9 @@ function SkillFormDialog({
           </div>
 
           <div>
-            <label className="text-xs font-medium text-foreground-light mb-1 block">Description</label>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">
+              Description
+            </label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -452,7 +484,9 @@ function SkillFormDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-foreground-light mb-1 block">Category</label>
+              <label className="text-xs font-medium text-foreground-light mb-1 block">
+                Category
+              </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -486,7 +520,8 @@ function SkillFormDialog({
               System Prompt *
             </label>
             <p className="text-[10px] text-foreground-muted mb-1.5">
-              This prompt will be appended to the AI Agent&apos;s system instructions when this skill is enabled.
+              This prompt will be appended to the AI Agent&apos;s system instructions when this
+              skill is enabled.
             </p>
             <textarea
               value={systemPrompt}
@@ -499,10 +534,21 @@ function SkillFormDialog({
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-8 text-xs">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 text-xs"
+            >
               Cancel
             </Button>
-            <Button type="submit" size="sm" disabled={saving || !name.trim() || !systemPrompt.trim()} className="h-8 text-xs">
+            <Button
+              type="submit"
+              size="sm"
+              disabled={saving || !name.trim() || !systemPrompt.trim()}
+              className="h-8 text-xs"
+            >
               {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
               {initial ? 'Save Changes' : 'Create Skill'}
             </Button>

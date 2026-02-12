@@ -11,39 +11,20 @@ import { cn } from '@/lib/utils'
 import {
   Search,
   X,
-  Zap,
-  MessageSquare,
   Settings,
   FileText,
-  Users,
-  Store,
-  Palette,
   LayoutGrid,
-  HelpCircle,
-  Plus,
-  ArrowRight,
-  Command,
-  Clock,
-  Star,
-  Folder,
   Bot,
   Code,
   Image as ImageIcon,
-  Terminal,
-  Mail,
-  Github,
   Database,
-  Globe,
   ChevronRight,
   Sparkles,
-  History,
-  Bookmark,
-  Hash,
 } from 'lucide-react'
 
 // CommandType
 
-type CommandType = 'navigation' | 'action' | 'recent' | 'workflow' | 'agent'
+type CommandType = 'navigation' | 'action' | 'recent' | 'agent'
 
 interface CommandItem {
   id: string
@@ -73,19 +54,19 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
     items: [
       {
-        id: 'new-workflow',
+        id: 'new-agent-chat',
 
         type: 'action',
 
-        title: 'New Workflow',
+        title: 'New Agent Chat',
 
-        description: 'Create a new automation workflow',
+        description: 'Chat with AI to build your app',
 
-        icon: Zap,
+        icon: Bot,
 
-        shortcut: '⌘W',
+        shortcut: '⌘N',
 
-        href: '/dashboard/workflows/new',
+        href: '/dashboard/agent',
       },
 
       {
@@ -123,20 +104,6 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
     items: [
       {
-        id: 'nav-workflows',
-
-        type: 'navigation',
-
-        title: 'Workflows',
-
-        icon: Zap,
-
-        href: '/dashboard/workflows',
-
-        keywords: ['workflow', 'automation', 'Automation'],
-      },
-
-      {
         id: 'nav-agent',
 
         type: 'navigation',
@@ -147,21 +114,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         href: '/dashboard/agent',
 
-        keywords: ['agent', 'bot', 'AI'],
-      },
-
-      {
-        id: 'nav-apps',
-
-        type: 'navigation',
-
-        title: 'My Apps',
-
-        icon: LayoutGrid,
-
-        href: '/dashboard/apps',
-
-        keywords: ['app', 'application'],
+        keywords: ['agent', 'bot', 'AI', 'editor', 'design', 'ui'],
       },
 
       {
@@ -179,17 +132,17 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
       },
 
       {
-        id: 'nav-skills',
+        id: 'nav-apps',
 
         type: 'navigation',
 
-        title: 'Skills',
+        title: 'My Apps',
 
-        icon: Sparkles,
+        icon: LayoutGrid,
 
-        href: '/dashboard/skills',
+        href: '/dashboard/workspaces',
 
-        keywords: ['skill', 'ability'],
+        keywords: ['apps', 'workspaces', 'projects'],
       },
 
       {
@@ -231,13 +184,13 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'recent',
 
-        title: 'Customer Feedback Auto-Processing',
+        title: 'AI Agent',
 
-        description: 'Workflow edited 2 hours ago',
+        description: 'Chat with AI Agent',
 
-        icon: Zap,
+        icon: Bot,
 
-        href: '/dashboard/workflows/wf-1',
+        href: '/dashboard/agent',
       },
 
       {
@@ -245,9 +198,9 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'recent',
 
-        title: 'Database Schema',
+        title: 'Database',
 
-        description: 'Table edited yesterday',
+        description: 'Table editor',
 
         icon: Database,
 
@@ -546,7 +499,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           <div className="flex items-center gap-2 text-[11px] text-foreground-light">
             <Sparkles className="w-3 h-3 text-primary" />
 
-            <span>AgentFlow</span>
+            <span>ReverseAI</span>
           </div>
         </div>
       </div>

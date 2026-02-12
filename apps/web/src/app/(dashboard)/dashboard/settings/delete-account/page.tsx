@@ -26,9 +26,9 @@ import Link from 'next/link'
 // Pre-delete checks
 const preDeleteChecks = [
   {
-    id: 'workflows',
-    title: 'Workflow Data',
-    description: 'All your workflows will be permanently deleted',
+    id: 'apps',
+    title: 'App Data',
+    description: 'All your apps and their configurations will be permanently deleted',
     icon: Trash2,
   },
   {
@@ -53,7 +53,7 @@ const preDeleteChecks = [
 
 export default function DeleteAccountPage() {
   const router = useRouter()
-  const { user, logout } = useAuthStore()
+  const { logout } = useAuthStore()
 
   const [step, setStep] = useState(1)
   const [confirmText, setConfirmText] = useState('')
@@ -151,7 +151,7 @@ export default function DeleteAccountPage() {
                       We suggest exporting your data before deleting your account
                     </p>
                     <p className="text-xs text-foreground-muted">
-                      You can export all workflows and configurations on the Settings page
+                      You can export all apps and configurations on the Settings page
                     </p>
                   </div>
                   <Link href="/dashboard/settings#data">

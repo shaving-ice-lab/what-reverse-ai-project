@@ -11,18 +11,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Monitor,
-  BarChart3,
-  Link2,
-  Download,
   Trash2,
   AlertTriangle,
-  Github,
-  Slack,
-  Mail,
-  Database,
-  Key,
-  RefreshCw,
-  X,
   Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -34,9 +24,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { PageContainer, PageHeader } from '@/components/dashboard/page-layout'
 import { useTheme } from 'next-themes'
-import { userApi } from '@/lib/api'
+import { userApi } from '@/lib/api/auth'
 import { useAuthStore } from '@/stores/useAuthStore'
 import type { UserPreferences } from '@/types/auth'
 import { cn } from '@/lib/utils'
@@ -95,37 +95,15 @@ function SettingsSection({
   )
 }
 
-// Usage Statistics Data
-const usageStats = [
-  { label: 'API Call', value: '12,580', limit: '100,000', percentage: 12.5 },
-  { label: 'Storage Space', value: '256 MB', limit: '1 GB', percentage: 25 },
-  { label: 'Workflow Executions', value: '3,847', limit: '50,000', percentage: 7.7 },
-  { label: 'Team Members', value: '3', limit: '5', percentage: 60 },
-]
-
-// Connected services
-const connectedServices = [
-  { id: 'github', name: 'GitHub', icon: Github, connected: true, lastSync: '2 hours ago' },
-  { id: 'slack', name: 'Slack', icon: Slack, connected: true, lastSync: 'Just now' },
-  { id: 'email', name: 'Email (SMTP)', icon: Mail, connected: false, lastSync: null },
-  {
-    id: 'database',
-    name: 'PostgreSQL',
-    icon: Database,
-    connected: true,
-    lastSync: '5 minutes ago',
-  },
-]
-
 export default function PreferencesPage() {
   const { theme, setTheme } = useTheme()
-  const { user, setUser } = useAuthStore()
+  const { setUser } = useAuthStore()
 
   // Preferences Status
   const [language, setLanguage] = useState('zh-CN')
   const [notifications, setNotifications] = useState({
-    workflowComplete: true,
-    workflowError: true,
+    appPublished: true,
+    appError: true,
     systemUpdates: false,
     weeklyDigest: false,
   })
@@ -149,8 +127,8 @@ export default function PreferencesPage() {
       const userData = await userApi.getCurrentUser()
 
       // Update Local Status
-      if (userData.preferences) {
-        const prefs = userData.preferences
+      if (userData.settings) {
+        const prefs = userData.settings
 
         if (prefs.theme) {
           setTheme(prefs.theme)
@@ -199,7 +177,7 @@ export default function PreferencesPage() {
       }
 
       // Save to Service
-      const updatedUser = await userApi.updateProfile({ preferences })
+      const updatedUser = await userApi.updateProfile({ settings: preferences })
 
       // Update store
       setUser(updatedUser)
@@ -346,19 +324,19 @@ export default function PreferencesPage() {
         {/* Notification Settings */}
         <SettingsSection title="Notifications" description="Manage your notification preferences">
           <ToggleRow
-            label="Workflow Complete"
-            description="Send notifications when workflow runs complete"
-            checked={notifications.workflowComplete}
+            label="App Published"
+            description="Send notifications when an app is published"
+            checked={notifications.appPublished}
             onCheckedChange={(checked) =>
-              setNotifications((prev) => ({ ...prev, workflowComplete: checked }))
+              setNotifications((prev) => ({ ...prev, appPublished: checked }))
             }
           />
           <ToggleRow
-            label="Workflow Error"
-            description="Send notifications when workflow errors occur"
-            checked={notifications.workflowError}
+            label="App Error"
+            description="Send notifications when app errors occur"
+            checked={notifications.appError}
             onCheckedChange={(checked) =>
-              setNotifications((prev) => ({ ...prev, workflowError: checked }))
+              setNotifications((prev) => ({ ...prev, appError: checked }))
             }
           />
           <ToggleRow
@@ -383,7 +361,7 @@ export default function PreferencesPage() {
         <SettingsSection title="Performance" description="Optimize app performance and experience">
           <ToggleRow
             label="Auto-save"
-            description="Auto-save your workflow changes"
+            description="Auto-save your app changes"
             checked={performance.autoSave}
             onCheckedChange={(checked) =>
               setPerformance((prev) => ({ ...prev, autoSave: checked }))
@@ -407,279 +385,54 @@ export default function PreferencesPage() {
           />
         </SettingsSection>
 
-        {/* Usage Statistics */}
-        <SettingsSection title="Usage Statistics" description="View your account usage">
-          <div className="page-grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {usageStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="p-4 rounded-md bg-surface-100/60 border border-border"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[13px] text-foreground-light">{stat.label}</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {stat.value} / {stat.limit}
-                  </span>
-                </div>
-                <div className="h-1.5 bg-surface-300 rounded-full overflow-hidden">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all',
-                      stat.percentage > 80 ? 'bg-warning-200' : 'bg-brand-500'
-                    )}
-                    style={{ width: `${stat.percentage}%` }}
-                  />
-                </div>
-                <p className="text-xs text-foreground-muted mt-2">
-                  Used {stat.percentage.toFixed(1)}%
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-foreground-muted" />
-            <span className="text-[13px] text-foreground-light">
-              Data updated at {new Date().toLocaleString()}
-            </span>
-          </div>
-        </SettingsSection>
-
-        {/* Connected services */}
-        <SettingsSection
-          title="Connected Services"
-          description="Manage your third-party service integrations"
-        >
-          <div className="space-y-3">
-            {connectedServices.map((service) => (
-              <div
-                key={service.id}
-                className="flex items-center justify-between p-4 rounded-md bg-surface-100/60 border border-border"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'w-9 h-9 rounded-md flex items-center justify-center',
-                      service.connected ? 'bg-brand-200' : 'bg-surface-200'
-                    )}
-                  >
-                    <service.icon
-                      className={cn(
-                        'w-4 h-4',
-                        service.connected ? 'text-brand-500' : 'text-foreground-muted'
-                      )}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{service.name}</p>
-                    <p className="text-xs text-foreground-muted">
-                      {service.connected ? `Last synced: ${service.lastSync}` : 'Disconnected'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {service.connected ? (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-foreground-light hover:text-foreground"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                        Sync
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-destructive hover:text-destructive"
-                      >
-                        <X className="w-3.5 h-3.5 mr-1.5" />
-                        Disconnect
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 border-border text-foreground-light hover:text-foreground"
-                    >
-                      <Link2 className="w-3.5 h-3.5 mr-1.5" />
-                      Connect
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          <Button
-            variant="outline"
-            className="mt-4 border-border text-foreground-light hover:text-foreground"
-          >
-            <Link2 className="w-4 h-4 mr-2" />
-            Add New Integration
-          </Button>
-        </SettingsSection>
-
-        {/* Data Export */}
-        <SettingsSection title="Data Export" description="Export your data and configurations">
-          <div className="page-grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-md border border-border bg-surface-100/60 hover:border-brand-400 transition-colors cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-md bg-brand-200 flex items-center justify-center">
-                  <Download className="w-5 h-5 text-brand-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Export Workflows</p>
-                  <p className="text-xs text-foreground-muted">JSON Format</p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2 border-border text-foreground-light hover:bg-surface-200 hover:text-foreground"
-              >
-                Download
-              </Button>
-            </div>
-            <div className="p-4 rounded-md border border-border bg-surface-100/60 hover:border-brand-400 transition-colors cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-md bg-surface-200 flex items-center justify-center">
-                  <Database className="w-5 h-5 text-foreground-light" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Export Execution Logs</p>
-                  <p className="text-xs text-foreground-muted">CSV Format</p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2 border-border text-foreground-light hover:bg-surface-200 hover:text-foreground"
-              >
-                Download
-              </Button>
-            </div>
-            <div className="p-4 rounded-md border border-border bg-surface-100/60 hover:border-brand-400 transition-colors cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-md bg-surface-200 flex items-center justify-center">
-                  <Key className="w-5 h-5 text-foreground-light" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Export API Key</p>
-                  <p className="text-xs text-foreground-muted">Encrypted Backup</p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2 border-border text-foreground-light hover:bg-surface-200 hover:text-foreground"
-              >
-                Download
-              </Button>
-            </div>
-            <div className="p-4 rounded-md border border-border bg-surface-100/60 hover:border-brand-400 transition-colors cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-md bg-warning-200 flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-warning" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Export Usage Report</p>
-                  <p className="text-xs text-foreground-muted">PDF Format</p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2 border-border text-foreground-light hover:bg-surface-200 hover:text-foreground"
-              >
-                Download
-              </Button>
-            </div>
-          </div>
-        </SettingsSection>
-
         {/* Danger Zone */}
         <SettingsSection
           title="Danger Zone"
           description="The actions below are irreversible. Please proceed with caution."
         >
-          <div className="space-y-4">
-            <div className="p-4 rounded-md border border-warning/30 bg-warning-200">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Clear All Workflows</p>
-                    <p className="text-xs text-foreground-light mt-1">
-                      Delete all workflows and execution history. This action cannot be undone.
-                    </p>
-                  </div>
+          <div className="p-4 rounded-md border border-destructive/30 bg-destructive-200">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <Trash2 className="w-5 h-5 text-destructive mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Delete Account</p>
+                  <p className="text-xs text-foreground-light mt-1">
+                    Permanently delete your account and all data. This action cannot be undone.
+                  </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-warning border-warning/30 hover:bg-warning-200/20"
-                >
-                  Clear
-                </Button>
               </div>
-            </div>
-
-            <div className="p-4 rounded-md border border-destructive/30 bg-destructive-200">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <Trash2 className="w-5 h-5 text-destructive mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Delete Account</p>
-                    <p className="text-xs text-foreground-light mt-1">
-                      Permanently delete your account and all data. This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-destructive border-destructive/30 hover:bg-destructive-200/20"
-                  onClick={() => setShowDeleteConfirm(true)}
-                >
-                  Delete Account
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive border-destructive/30 hover:bg-destructive-200/20"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Delete Account
+              </Button>
             </div>
           </div>
         </SettingsSection>
 
-        {/* Delete Confirm Modal */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80">
-            <div className="w-full max-w-md bg-surface-100 border border-border rounded-md p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-md bg-destructive-200 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Confirm Account Deletion</h3>
-                  <p className="text-sm text-foreground-light">This action cannot be undone.</p>
-                </div>
-              </div>
-              <p className="text-sm text-foreground-light mb-6">
-                After deleting your account, all workflows, execution history, API keys, and other
-                data will be permanently deleted and cannot be restored.
-              </p>
-              <div className="flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="border-border text-foreground-light hover:bg-surface-200 hover:text-foreground"
-                >
-                  Cancel
-                </Button>
-                <Button className="bg-destructive hover:bg-destructive/90 text-background">
-                  Confirm Delete
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
+                Confirm Account Deletion
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                After deleting your account, all workspaces, databases, API keys, and other data
+                will be permanently deleted and cannot be restored.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction className="bg-destructive hover:bg-destructive/90 text-background">
+                Confirm Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Status Messages */}
         {error && (

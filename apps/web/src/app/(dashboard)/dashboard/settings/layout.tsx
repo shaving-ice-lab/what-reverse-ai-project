@@ -8,23 +8,24 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  User,
-  Key,
-  Cpu,
-  Settings,
-  Bell,
-  AlertTriangle,
-  Shield,
-  Crown,
-  CreditCard,
-  BarChart3,
-  ExternalLink,
-} from 'lucide-react'
+import { User, Key, Settings, Bell, AlertTriangle, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // Settings Navigation Config
-const settingsNavSections = [
+interface SettingsNavItem {
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  badge?: string
+  badgeColor?: string
+}
+
+interface SettingsNavSection {
+  title: string
+  items: SettingsNavItem[]
+}
+
+const settingsNavSections: SettingsNavSection[] = [
   {
     title: 'Account Settings',
     items: [
@@ -59,30 +60,6 @@ const settingsNavSections = [
         icon: Key,
         badge: '3',
       },
-      {
-        label: 'Local LLM',
-        href: '/dashboard/settings/local-llm',
-        icon: Cpu,
-        badge: 'Beta',
-        badgeColor: 'bg-brand-200 text-brand-500',
-      },
-    ],
-  },
-  {
-    title: 'Billing',
-    items: [
-      {
-        label: 'Subscription Plan',
-        href: '/dashboard/upgrade',
-        icon: CreditCard,
-        external: true,
-      },
-      {
-        label: 'Usage',
-        href: '/dashboard/analytics',
-        icon: BarChart3,
-        external: true,
-      },
     ],
   },
 ]
@@ -100,7 +77,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   // Exact match or path starts with href
   const isActive = (href: string) => {
     if (href === '/dashboard/settings') {
-      return pathname === '/dashboard/settings' || pathname === '/dashboard/settings/preferences'
+      return pathname === '/dashboard/settings'
     }
     return pathname.startsWith(href)
   }
@@ -144,21 +121,16 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                         />
                         <span>{item.label}</span>
                       </span>
-                      <span className="flex items-center gap-1.5">
-                        {item.badge && (
-                          <span
-                            className={cn(
-                              'px-1.5 py-0.5 text-[10px] font-medium rounded',
-                              item.badgeColor || 'bg-surface-300 text-foreground-muted'
-                            )}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                        {item.external && (
-                          <ExternalLink className="w-3 h-3 text-foreground-muted" />
-                        )}
-                      </span>
+                      {item.badge && (
+                        <span
+                          className={cn(
+                            'px-1.5 py-0.5 text-[10px] font-medium rounded',
+                            item.badgeColor || 'bg-surface-300 text-foreground-muted'
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   )
                 })}
@@ -183,25 +155,6 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             </Link>
           </div>
         </nav>
-
-        {/* Footer Upgrade Banner */}
-        <div className="p-3 mt-auto border-t border-border">
-          <div className="p-3 rounded-lg bg-surface-100 border border-border">
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-4 h-4 text-warning" />
-              <span className="text-xs font-medium text-foreground">Free Version</span>
-            </div>
-            <p className="text-[11px] text-foreground-muted mb-3">
-              Upgrade to Professional to unlock more features
-            </p>
-            <Link
-              href="/dashboard/upgrade"
-              className="block w-full text-center text-[11px] font-medium py-1.5 rounded-md bg-brand-500 text-background hover:bg-brand-600 transition-colors"
-            >
-              Upgrade to Professional
-            </Link>
-          </div>
-        </div>
       </aside>
 
       {/* Right Content Area */}

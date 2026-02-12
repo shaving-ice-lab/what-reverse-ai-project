@@ -14,9 +14,7 @@ import {
   Plus,
   CheckCircle2,
   AlertCircle,
-  TrendingUp,
   Zap,
-  DollarSign,
   Activity,
   RefreshCw,
   PlayCircle,
@@ -26,10 +24,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 import { AddApiKeyDialog } from '@/components/settings/add-api-key-dialog'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { PageContainer, PageHeader } from '@/components/dashboard/page-layout'
-import { apiKeysApi } from '@/lib/api'
+import { apiKeysApi } from '@/lib/api/api-keys'
 import { PROVIDER_CONFIGS, type ApiKey, type ApiKeyStatus } from '@/types/api-key'
 import { cn } from '@/lib/utils'
 
@@ -86,10 +83,8 @@ export default function ApiKeysPage() {
 
   // Calculate statistics data
   const stats = {
-    totalCalls: apiKeys.reduce((sum, k) => sum + (k.usageCount || 0), 0),
-    totalTokens: apiKeys.reduce((sum, k) => sum + (k.totalTokens || 0), 0),
-    totalCost: apiKeys.reduce((sum, k) => sum + (k.totalCost || 0), 0),
-    avgResponseTime: 1.2, // Default value
+    totalKeys: apiKeys.length,
+    activeKeys: apiKeys.filter((k) => k.status === 'active').length,
   }
 
   // Load key list
@@ -150,7 +145,7 @@ export default function ApiKeysPage() {
   const handleDelete = async (id: string) => {
     const confirmed = await confirm({
       title: 'Delete Key',
-      description: 'After deletion, workflows using this key will not run. This cannot be undone.',
+      description: 'After deletion, apps using this key will stop working. This cannot be undone.',
       confirmText: 'Delete',
       cancelText: 'Cancel',
       variant: 'destructive',
@@ -222,8 +217,8 @@ export default function ApiKeysPage() {
         <div className="flex items-start gap-3 p-4 rounded-md bg-surface-100 border border-border text-[13px]">
           <AlertCircle className="h-4 w-4 text-foreground-muted mt-0.5 shrink-0" />
           <div className="text-foreground-light">
-            API keys are stored with AES-256 encryption and decrypted only when running workflows.
-            Keep your key safe.
+            API keys are stored with AES-256 encryption and decrypted only when the AI Agent
+            executes tasks. Keep your key safe.
           </div>
         </div>
 
@@ -234,15 +229,15 @@ export default function ApiKeysPage() {
           <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-4">
             <div className="space-y-3 text-[12px] text-foreground-light">
               <p>1) Create Key: Create a key for each environment (Development / Production).</p>
-              <p>2) Minimum permission: only model or workflow permission is required.</p>
-              <p>3) Usage: Use the key in LLM / HTTP nodes to make API calls.</p>
+              <p>2) Minimum permission: only model permission is required.</p>
+              <p>3) Usage: Used by the AI Agent and app runtime to make API calls.</p>
             </div>
             <div className="rounded-md border border-border bg-surface-75 p-4">
               <div className="text-[11px] text-foreground-muted uppercase tracking-wider">
                 Recommended Permissions
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                {['Model Call', 'Workflow Execute', 'Webhook Trigger', 'Read Statistics'].map(
+                {['Model Call', 'Agent Execute', 'Webhook Trigger', 'Read Statistics'].map(
                   (item) => (
                     <Badge key={item} variant="secondary" className="text-[10px]">
                       {item}
@@ -265,47 +260,25 @@ export default function ApiKeysPage() {
           </div>
         </SettingsSection>
 
-        {/* Usage statistics */}
-        <div className="page-grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Key statistics */}
+        <div className="page-grid grid-cols-2 gap-4">
           <div className="bg-surface-100 border border-border rounded-md p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center">
                 <Zap className="h-4 w-4 text-brand-500" />
               </div>
             </div>
-            <p className="text-xl font-semibold text-foreground">
-              {stats.totalCalls.toLocaleString()}
-            </p>
-            <p className="text-xs text-foreground-muted mt-1">Calls this week</p>
+            <p className="text-xl font-semibold text-foreground">{stats.totalKeys}</p>
+            <p className="text-xs text-foreground-muted mt-1">Total Keys</p>
           </div>
           <div className="bg-surface-100 border border-border rounded-md p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center">
-                <TrendingUp className="h-4 w-4 text-brand-500" />
+                <Activity className="h-4 w-4 text-brand-500" />
               </div>
             </div>
-            <p className="text-xl font-semibold text-foreground">
-              {(stats.totalTokens / 1000).toFixed(0)}K
-            </p>
-            <p className="text-xs text-foreground-muted mt-1">Token Consumption</p>
-          </div>
-          <div className="bg-surface-100 border border-border rounded-md p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-md bg-brand-200 flex items-center justify-center">
-                <DollarSign className="h-4 w-4 text-brand-500" />
-              </div>
-            </div>
-            <p className="text-xl font-semibold text-foreground">${stats.totalCost.toFixed(2)}</p>
-            <p className="text-xs text-foreground-muted mt-1">Cost this week</p>
-          </div>
-          <div className="bg-surface-100 border border-border rounded-md p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-md bg-surface-200 flex items-center justify-center">
-                <Activity className="h-4 w-4 text-foreground-light" />
-              </div>
-            </div>
-            <p className="text-xl font-semibold text-foreground">{stats.avgResponseTime}s</p>
-            <p className="text-xs text-foreground-muted mt-1">Average response time</p>
+            <p className="text-xl font-semibold text-foreground">{stats.activeKeys}</p>
+            <p className="text-xs text-foreground-muted mt-1">Active Keys</p>
           </div>
         </div>
 
@@ -434,9 +407,6 @@ export default function ApiKeysPage() {
                             <code className="font-mono">
                               {apiKey.keyPrefix}...{apiKey.keySuffix}
                             </code>
-                            {apiKey.usageCount !== undefined && (
-                              <span>{apiKey.usageCount.toLocaleString()} calls</span>
-                            )}
                             {apiKey.lastUsedAt && (
                               <span className="hidden sm:inline">
                                 {formatDistanceToNow(new Date(apiKey.lastUsedAt), {
@@ -449,11 +419,6 @@ export default function ApiKeysPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {apiKey.totalCost !== undefined && (
-                          <span className="text-[13px] font-medium text-foreground mr-2 hidden sm:block">
-                            ${apiKey.totalCost.toFixed(2)}
-                          </span>
-                        )}
                         {/* Test button */}
                         <Button
                           variant="ghost"
@@ -513,22 +478,6 @@ export default function ApiKeysPage() {
                           <AlertCircle className="w-3.5 h-3.5" />
                         )}
                         {testResult.message}
-                      </div>
-                    )}
-
-                    {/* Usage progress bar (active keys only) */}
-                    {apiKey.status === 'active' && apiKey.totalTokens && (
-                      <div className="px-4 py-2 border-t border-border">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-foreground-muted">This month&apos;s usage</span>
-                          <span className="text-foreground font-medium">
-                            {((apiKey.totalTokens || 0) / 1000).toFixed(1)}K / 1,000K tokens
-                          </span>
-                        </div>
-                        <Progress
-                          value={Math.min(((apiKey.totalTokens || 0) / 1000000) * 100, 100)}
-                          className="h-1.5"
-                        />
                       </div>
                     )}
                   </div>

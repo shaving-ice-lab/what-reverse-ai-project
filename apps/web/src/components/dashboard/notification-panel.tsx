@@ -11,21 +11,18 @@ import {
   Bell,
   X,
   Check,
-  CheckCheck,
   Zap,
   MessageSquare,
   AlertTriangle,
   Info,
   Gift,
   Clock,
-  User,
   Settings,
   Trash2,
   MoreHorizontal,
   ExternalLink,
   ChevronRight,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 // Notification Type
-type NotificationType = 'workflow' | 'message' | 'alert' | 'info' | 'reward' | 'system'
+type NotificationType = 'agent' | 'message' | 'alert' | 'info' | 'reward' | 'system'
 
 interface Notification {
   id: string
@@ -51,13 +48,12 @@ interface Notification {
 const mockNotifications: Notification[] = [
   {
     id: '1',
-    type: 'workflow',
-    title: 'Workflow Execution Complete',
-    description:
-      'Customer Feedback Auto Process executed successfully, processed 24 feedback items',
+    type: 'agent',
+    title: 'App Build Complete',
+    description: 'AI Agent has finished building your app. Preview it now.',
     time: '2 min ago',
     read: false,
-    actionUrl: '/dashboard/workflows/wf-1',
+    actionUrl: '/dashboard/agent',
     actionLabel: 'View Details',
   },
   {
@@ -74,8 +70,7 @@ const mockNotifications: Notification[] = [
     id: '3',
     type: 'reward',
     title: 'Achievement Badge Earned',
-    description:
-      'Congratulations! You have created 10 workflows and earned the Automation Expert badge',
+    description: 'Congratulations! You have built 10 apps and earned the Automation Expert badge',
     time: '3 hours ago',
     read: false,
   },
@@ -93,7 +88,7 @@ const mockNotifications: Notification[] = [
     id: '5',
     type: 'system',
     title: 'System Update Notification',
-    description: 'AgentFlow 2.0 is coming soon with new AI Agent features',
+    description: 'New AI Agent features are coming soon',
     time: '2 days ago',
     read: true,
     actionUrl: '/whats-new',
@@ -112,7 +107,7 @@ const mockNotifications: Notification[] = [
 // Get notification icon
 const getNotificationIcon = (type: NotificationType) => {
   switch (type) {
-    case 'workflow':
+    case 'agent':
       return { icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' }
     case 'message':
       return { icon: MessageSquare, color: 'text-blue-400', bg: 'bg-blue-500/10' }

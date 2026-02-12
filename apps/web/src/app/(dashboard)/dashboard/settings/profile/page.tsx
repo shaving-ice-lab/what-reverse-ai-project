@@ -137,7 +137,7 @@ const mockActivities = [
   },
   {
     id: '4',
-    action: 'Create workflow',
+    action: 'Create app',
     time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
     device: 'Safari / iOS',
   },
@@ -191,7 +191,7 @@ export default function ProfilePage() {
 
       // Fill Form
       setUsername(userData.username || '')
-      setDisplayName(userData.displayName || '')
+      setDisplayName(userData.display_name || '')
       setBio(userData.bio || '')
 
       setHasChanges(false)
@@ -211,7 +211,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       setUsername(user.username || '')
-      setDisplayName(user.displayName || '')
+      setDisplayName(user.display_name || '')
       setBio(user.bio || '')
     }
   }, [user])
@@ -230,7 +230,7 @@ export default function ProfilePage() {
     try {
       const updatedUser = await userApi.updateProfile({
         username: username.trim(),
-        displayName: displayName.trim() || undefined,
+        display_name: displayName.trim() || undefined,
         bio: bio.trim() || undefined,
       })
       setUser(updatedUser)
@@ -265,7 +265,7 @@ export default function ProfilePage() {
       const { url } = await userApi.uploadAvatar(file)
       // Update store user data
       if (user) {
-        setUser({ ...user, avatar: url })
+        setUser({ ...user, avatar_url: url })
       }
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
@@ -326,7 +326,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-5">
               <div className="relative group">
                 <Avatar className="h-16 w-16 border border-border">
-                  <AvatarImage src={user?.avatar} />
+                  <AvatarImage src={user?.avatar_url} />
                   <AvatarFallback className="text-xl bg-brand-500 text-background font-semibold">
                     {user?.username?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
@@ -822,8 +822,8 @@ export default function ProfilePage() {
                 <div>
                   <p className="text-[13px] text-foreground-light">Sign Up Date</p>
                   <p className="text-[13px] mt-0.5 text-foreground">
-                    {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                    {user?.created_at
+                      ? new Date(user.created_at).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
@@ -838,10 +838,10 @@ export default function ProfilePage() {
                   <p
                     className={cn(
                       'text-[13px] mt-0.5 flex items-center gap-1.5',
-                      user?.emailVerified ? 'text-brand-500' : 'text-warning'
+                      user?.email_verified ? 'text-brand-500' : 'text-warning'
                     )}
                   >
-                    {user?.emailVerified ? (
+                    {user?.email_verified ? (
                       <>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Verified
@@ -854,7 +854,7 @@ export default function ProfilePage() {
                     )}
                   </p>
                 </div>
-                {!user?.emailVerified && (
+                {!user?.email_verified && (
                   <Button
                     variant="outline"
                     size="sm"

@@ -76,6 +76,7 @@ export function WorkspaceGuard({
 }: {
   workspaceId: string
   children: ReactNode
+  fallback?: ReactNode
 }) {
   return (
     <Suspense
