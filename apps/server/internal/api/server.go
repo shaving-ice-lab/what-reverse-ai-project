@@ -420,6 +420,7 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/members", workspaceHandler.ListMembers)
 			workspaces.POST("/:id/members", workspaceHandler.AddMember)
 			workspaces.PATCH("/:id/members/:memberId", workspaceHandler.UpdateMemberRole)
+			workspaces.DELETE("/:id/members/:memberId", workspaceHandler.RemoveMember)
 
 			// App 功能路由（Workspace = App）
 			workspaces.POST("/:id/publish", workspaceHandler.PublishWorkspace)

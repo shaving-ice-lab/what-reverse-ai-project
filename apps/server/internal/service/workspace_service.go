@@ -32,6 +32,7 @@ type WorkspaceService interface {
 	ListMembers(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID) ([]entity.WorkspaceMember, error)
 	AddMember(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, userID uuid.UUID, roleID *uuid.UUID) (*entity.WorkspaceMember, error)
 	UpdateMemberRole(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID, roleID uuid.UUID) (*entity.WorkspaceMember, error)
+	RemoveMember(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID) error
 	GetWorkspaceAccess(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) (*WorkspaceAccess, error)
 
 	// App 功能（Workspace = App）
@@ -540,6 +541,24 @@ func (s *workspaceService) AddMember(ctx context.Context, workspaceID uuid.UUID,
 	}
 
 	return member, nil
+}
+
+func (s *workspaceService) RemoveMember(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID) error {
+	access, err := s.authorizeWorkspace(ctx, workspaceID, ownerID, PermissionMembersManage)
+	if err != nil {
+		return err
+	}
+	workspace := access.Workspace
+
+	member, err := s.memberRepo.GetByID(ctx, memberID)
+	if err != nil || member.WorkspaceID != workspaceID {
+		return ErrWorkspaceMemberNotFound
+	}
+	if member.UserID == workspace.OwnerUserID {
+		return ErrWorkspaceOwnerRoleLocked
+	}
+
+	return s.memberRepo.Delete(ctx, memberID)
 }
 
 func (s *workspaceService) UpdateMemberRole(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID, roleID uuid.UUID) (*entity.WorkspaceMember, error) {

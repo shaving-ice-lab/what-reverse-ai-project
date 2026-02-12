@@ -579,6 +579,48 @@ func (h *WorkspaceHandler) AddMember(c echo.Context) error {
 	})
 }
 
+// RemoveMember 移除成员
+func (h *WorkspaceHandler) RemoveMember(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+
+	memberID, err := uuid.Parse(c.Param("memberId"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_MEMBER_ID", "成员 ID 无效")
+	}
+
+	if err := h.workspaceService.RemoveMember(c.Request().Context(), workspaceID, uid, memberID); err != nil {
+		switch err {
+		case service.ErrWorkspaceNotFound:
+			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
+		case service.ErrWorkspaceUnauthorized:
+			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限移除成员")
+		case service.ErrWorkspaceMemberNotFound:
+			return errorResponse(c, http.StatusNotFound, "MEMBER_NOT_FOUND", "成员不存在")
+		case service.ErrWorkspaceOwnerRoleLocked:
+			return errorResponse(c, http.StatusBadRequest, "OWNER_CANNOT_BE_REMOVED", "不能移除工作空间拥有者")
+		default:
+			return errorResponse(c, http.StatusInternalServerError, "REMOVE_FAILED", "移除成员失败")
+		}
+	}
+
+	h.recordAudit(c, workspaceID, uid, "workspace.member.remove", "workspace_member", &memberID, entity.JSON{
+		"member_id": memberID.String(),
+	})
+
+	return successResponse(c, map[string]interface{}{
+		"message": "成员已移除",
+	})
+}
+
 // UpdateMemberRole 更新成员角色
 func (h *WorkspaceHandler) UpdateMemberRole(c echo.Context) error {
 	userID := middleware.GetUserID(c)

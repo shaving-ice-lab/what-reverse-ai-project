@@ -12,6 +12,7 @@ import (
 type WorkspaceMemberRepository interface {
 	Create(ctx context.Context, member *entity.WorkspaceMember) error
 	Update(ctx context.Context, member *entity.WorkspaceMember) error
+	Delete(ctx context.Context, id uuid.UUID) error
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.WorkspaceMember, error)
 	GetByWorkspaceAndUser(ctx context.Context, workspaceID, userID uuid.UUID) (*entity.WorkspaceMember, error)
 	ListByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]entity.WorkspaceMember, error)
@@ -33,6 +34,10 @@ func (r *workspaceMemberRepository) Create(ctx context.Context, member *entity.W
 
 func (r *workspaceMemberRepository) Update(ctx context.Context, member *entity.WorkspaceMember) error {
 	return r.db.WithContext(ctx).Save(member).Error
+}
+
+func (r *workspaceMemberRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	return r.db.WithContext(ctx).Delete(&entity.WorkspaceMember{}, "id = ?", id).Error
 }
 
 func (r *workspaceMemberRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.WorkspaceMember, error) {
