@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"strings"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -8,19 +10,18 @@ import (
 // CORS CORS 中间件
 func CORS() echo.MiddlewareFunc {
 	return middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{
-			"http://localhost:3000",
-			"http://localhost:3001",
-			"http://localhost:3002",
-			"http://localhost:3003",
-			"http://localhost:3004",
-			"http://localhost:3005",
-			"http://localhost:3006",
-			"http://localhost:3007",
-			"http://localhost:3008",
-			"http://localhost:3009",
-			"https://reverseai.app",
-			"https://*.reverseai.app",
+		AllowOriginFunc: func(origin string) (bool, error) {
+			// 开发环境: 允许所有 localhost / 127.0.0.1 来源
+			if strings.HasPrefix(origin, "http://localhost:") ||
+				strings.HasPrefix(origin, "http://127.0.0.1:") {
+				return true, nil
+			}
+			// 生产环境域名
+			if origin == "https://reverseai.app" ||
+				strings.HasSuffix(origin, ".reverseai.app") {
+				return true, nil
+			}
+			return false, nil
 		},
 		AllowMethods: []string{
 			echo.GET,
