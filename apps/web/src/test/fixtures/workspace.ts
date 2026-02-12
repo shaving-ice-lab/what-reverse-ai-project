@@ -7,7 +7,7 @@ export const workspaceFixture = {
   status: 'active',
   plan: 'free',
   region: 'ap-east-1',
-  settings_json: {},
+  settings: {},
   // App andField
   description: '',
   app_status: 'draft',

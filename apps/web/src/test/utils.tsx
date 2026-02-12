@@ -2,6 +2,7 @@
  * TestToolcount
  */
 
+import { vi } from 'vitest'
 import { render, type RenderOptions } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
@@ -51,50 +52,6 @@ export { customRender as render }
 
 // ===== Mock count =====
 
-// Create Mock Node
-export function createMockNode(overrides = {}) {
-  return {
-    id: 'node-1',
-    type: 'start',
-    position: { x: 0, y: 0 },
-    data: {
-      label: 'Start',
-      config: {},
-    },
-    ...overrides,
-  }
-}
-
-// Create Mock Edge
-export function createMockEdge(overrides = {}) {
-  return {
-    id: 'edge-1',
-    source: 'node-1',
-    target: 'node-2',
-    sourceHandle: 'output',
-    targetHandle: 'input',
-    ...overrides,
-  }
-}
-
-// Create Mock Workflow
-export function createMockWorkflow(overrides = {}) {
-  return {
-    id: 'workflow-1',
-    name: 'TestWorkflow',
-    description: 'thisis1TestWorkflow',
-    nodes: [
-      createMockNode({ id: 'node-1', type: 'start' }),
-      createMockNode({ id: 'node-2', type: 'end' }),
-    ],
-    edges: [createMockEdge({ id: 'edge-1', source: 'node-1', target: 'node-2' })],
-    status: 'draft',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    ...overrides,
-  }
-}
-
 // Create Mock User
 export function createMockUser(overrides = {}) {
   return {
@@ -103,21 +60,6 @@ export function createMockUser(overrides = {}) {
     username: 'testuser',
     avatar: null,
     createdAt: new Date().toISOString(),
-    ...overrides,
-  }
-}
-
-// Create Mock ExecuteRecord
-export function createMockExecution(overrides = {}) {
-  return {
-    id: 'exec-1',
-    workflowId: 'workflow-1',
-    status: 'completed',
-    startedAt: new Date().toISOString(),
-    finishedAt: new Date().toISOString(),
-    durationMs: 1000,
-    inputs: {},
-    outputs: {},
     ...overrides,
   }
 }

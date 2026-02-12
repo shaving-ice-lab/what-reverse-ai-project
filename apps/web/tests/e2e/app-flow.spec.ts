@@ -67,7 +67,7 @@ async function seedAuth(page: Page) {
   })
 }
 
-async function mockApiRoutes(page: Page, appStore: Array<typeof draftApp>) {
+async function mockApiRoutes(page: Page, appStore: Array<Record<string, unknown>>) {
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request()
     const url = new URL(request.url())

@@ -64,7 +64,9 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 window.scrollTo = vi.fn()
 
 // Mock requestAnimationFrame
-global.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 0))
+global.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) =>
+  setTimeout(cb, 0)
+) as unknown as typeof requestAnimationFrame
 global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id))
 
 // Mock fetch
