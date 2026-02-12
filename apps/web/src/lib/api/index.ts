@@ -7,36 +7,8 @@ export { api, ApiError, type ApiResponse, type RequestConfig } from './client'
 
 // ExportModule API
 export * from './auth'
-export { workflowApi } from './workflow'
 export * from './api-keys'
-export * from './stats'
-export { executionApi } from './execution'
-export { folderApi } from './folder'
-export * from './version'
-export * from './template'
-export * from './marketplace'
-export * from './system'
-export * from './admin'
-export * from './activity'
-export * from './device'
-export * from './tags'
 export * from './dashboard'
-export { configApi } from './config'
-export type { ConfigItem, ConfigItemListParams, UpsertConfigItemRequest } from './config'
-export { aiApi, streamChat } from './ai'
-export type {
-  ChatMessage,
-  ChatAction,
-  ChatResponse,
-  AIChatRequest,
-  AIChatResponse,
-  GenerateWorkflowRequest,
-  GenerateWorkflowResponse,
-  IntentResult,
-  NodeSuggestion,
-  FixSuggestion,
-} from './ai'
-
 // Workspace API(Workspace atthenis App)
 export { workspaceApi, appApi } from './workspace'
 export type {
@@ -58,21 +30,13 @@ export type {
   UpdateWorkspaceRequest,
   InviteMemberRequest,
   UpdateMemberRoleRequest,
-  // App RelatedType(atis Workspace 's1Partial)
+  // App RelatedType (Workspace = App)
   App,
   AppVersion,
-  AppDomain,
   AppAccessPolicy,
   WorkspaceVersion,
-  WorkspaceDomain,
   WorkspaceAccessPolicy,
-  WorkspaceDomainBindingResult,
-  WorkspaceExecution,
-  WorkspaceMetrics,
-  DomainVerificationInfo,
   AppVersionDiff,
-  AppMetrics,
-  AppExecution,
 } from './workspace'
 
 // Agent Chat API

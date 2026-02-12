@@ -26,14 +26,8 @@ export interface ApiKey {
   keySuffix: string // Display suffix, e.g., xxxx
   status: ApiKeyStatus
   lastUsedAt?: string
-  expiresAt?: string
   createdAt: string
   updatedAt: string
-
-  // Usage Statistics
-  usageCount?: number
-  totalTokens?: number
-  totalCost?: number
 }
 
 // Create API Key Request

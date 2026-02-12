@@ -7,14 +7,18 @@ export interface User {
   id: string
   email: string
   username: string
-  displayName?: string
+  display_name?: string
   bio?: string
-  avatar?: string
+  avatar_url?: string
   role: UserRole
-  emailVerified: boolean
-  preferences?: UserPreferences
-  createdAt: string
-  updatedAt: string
+  email_verified: boolean
+  status?: string
+  settings?: UserPreferences
+  plan?: string
+  plan_expires_at?: string
+  created_at: string
+  updated_at: string
+  last_login_at?: string
 }
 
 // UserRole
@@ -90,15 +94,15 @@ export interface ResetPasswordRequest {
 }
 
 // OAuth Provider
-export type OAuthProvider = 'github' | 'google'
+export type OAuthProvider = 'github' | 'google' | 'microsoft'
 
 // UserPreferences
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'system'
   language?: string
   notifications?: {
-    workflowComplete?: boolean
-    workflowError?: boolean
+    appBuildComplete?: boolean
+    appBuildError?: boolean
     systemUpdates?: boolean
     weeklyDigest?: boolean
   }
@@ -112,10 +116,10 @@ export interface UserPreferences {
 // UpdateUserMaterials
 export interface UpdateProfileRequest {
   username?: string
-  displayName?: string
+  display_name?: string
   bio?: string
-  avatar?: string
-  preferences?: UserPreferences
+  avatar_url?: string
+  settings?: UserPreferences
 }
 
 // EditPassword

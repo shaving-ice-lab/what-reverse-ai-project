@@ -44,7 +44,6 @@ export interface RuntimeSchemaPayload {
   output_schema?: Record<string, unknown> | null
   input_mapping?: Record<string, unknown> | null
   version?: string
-  workflow_id?: string | null
   version_id?: string
   created_at?: string
   changelog?: string | null
@@ -55,9 +54,7 @@ export interface RuntimeSchemaData extends RuntimeEntryData {
 }
 
 export interface RuntimeExecuteResponse {
-  execution_id: string
   status: string
-  workflow_id?: string | null
   started_at?: string
   session_id?: string
   message?: string

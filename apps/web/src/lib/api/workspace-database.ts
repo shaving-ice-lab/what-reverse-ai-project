@@ -204,13 +204,10 @@ export const workspaceDatabaseApi = {
    * Create a new table
    */
   async createTable(workspaceId: string, req: CreateTableRequest): Promise<void> {
-    await request<ApiResponse<{ message: string }>>(
-      `/workspaces/${workspaceId}/database/tables`,
-      {
-        method: 'POST',
-        body: JSON.stringify(req),
-      }
-    )
+    await request<ApiResponse<{ message: string }>>(`/workspaces/${workspaceId}/database/tables`, {
+      method: 'POST',
+      body: JSON.stringify(req),
+    })
   },
 
   /**
@@ -262,7 +259,8 @@ export const workspaceDatabaseApi = {
 
     const qs = searchParams.toString()
     const url = `/workspaces/${workspaceId}/database/tables/${encodeURIComponent(tableName)}/rows${qs ? `?${qs}` : ''}`
-    const response = await request<ApiResponse<{ columns: string[]; rows: Record<string, unknown>[] }>>(url)
+    const response =
+      await request<ApiResponse<{ columns: string[]; rows: Record<string, unknown>[] }>>(url)
     const data = response.data as any
     return {
       columns: data?.columns ?? [],
@@ -342,11 +340,7 @@ export const workspaceDatabaseApi = {
   /**
    * Execute raw SQL query
    */
-  async executeSQL(
-    workspaceId: string,
-    sql: string,
-    params?: unknown[]
-  ): Promise<QueryResult> {
+  async executeSQL(workspaceId: string, sql: string, params?: unknown[]): Promise<QueryResult> {
     const response = await request<ApiResponse<QueryResult>>(
       `/workspaces/${workspaceId}/database/query`,
       {
@@ -380,12 +374,14 @@ export const workspaceDatabaseApi = {
     const response = await request<ApiResponse<{ stats: DatabaseStats }>>(
       `/workspaces/${workspaceId}/database/stats`
     )
-    return (response.data as any)?.stats ?? {
-      table_count: 0,
-      total_rows: 0,
-      total_size_bytes: 0,
-      connection_count: 0,
-    }
+    return (
+      (response.data as any)?.stats ?? {
+        table_count: 0,
+        total_rows: 0,
+        total_size_bytes: 0,
+        connection_count: 0,
+      }
+    )
   },
 
   /**
@@ -446,11 +442,7 @@ export const workspaceDatabaseApi = {
   /**
    * Revoke a database role
    */
-  async revokeRole(
-    workspaceId: string,
-    roleId: string,
-    reason?: string
-  ): Promise<DatabaseRole> {
+  async revokeRole(workspaceId: string, roleId: string, reason?: string): Promise<DatabaseRole> {
     const response = await request<ApiResponse<{ role: DatabaseRole }>>(
       `/workspaces/${workspaceId}/database/roles/${roleId}/revoke`,
       {

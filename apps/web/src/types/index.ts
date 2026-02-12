@@ -2,15 +2,7 @@
  * TypeDefinitionExportEntry
  */
 
-export * from './workflow'
-export * from './user'
-export * from './agent'
-export * from './stats'
 export * from './system'
-export * from './activity'
-export * from './device'
-export * from './tag'
-export * from './time-travel'
 
 // ===== useType =====
 
@@ -62,29 +54,4 @@ export interface WebSocketMessage<T = unknown> {
   type: string
   payload: T
   timestamp: string
-}
-
-export type ExecutionEventType =
-  | 'execution.started'
-  | 'execution.completed'
-  | 'execution.failed'
-  | 'execution.node.started'
-  | 'execution.node.completed'
-  | 'execution.node.failed'
-  | 'execution.log'
-
-export interface ExecutionEvent {
-  executionId: string
-  nodeId?: string
-  status?: string
-  outputs?: Record<string, unknown>
-  error?: {
-    message: string
-    stack?: string
-  }
-  log?: {
-    level: 'info' | 'warn' | 'error' | 'debug'
-    message: string
-    data?: unknown
-  }
 }

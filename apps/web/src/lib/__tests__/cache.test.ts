@@ -25,37 +25,11 @@ describe('queryKeys', () => {
     })
   })
 
-  describe('workflows', () => {
-    it('Should generate correct workflow-related keys', () => {
-      expect(queryKeys.workflows.all).toEqual(['workflows'])
-      expect(queryKeys.workflows.lists()).toEqual(['workflows', 'list'])
-      expect(queryKeys.workflows.list({ status: 'active' })).toEqual([
-        'workflows',
-        'list',
-        { status: 'active' },
-      ])
-      expect(queryKeys.workflows.detail('wf-123')).toEqual(['workflows', 'detail', 'wf-123'])
-      expect(queryKeys.workflows.executions('wf-123')).toEqual([
-        'workflows',
-        'executions',
-        'wf-123',
-      ])
-    })
-  })
-
   describe('apiKeys', () => {
     it('Should generate correct API key-related keys', () => {
       expect(queryKeys.apiKeys.all).toEqual(['apiKeys'])
       expect(queryKeys.apiKeys.list()).toEqual(['apiKeys', 'list'])
       expect(queryKeys.apiKeys.providers()).toEqual(['apiKeys', 'providers'])
-    })
-  })
-
-  describe('executions', () => {
-    it('Should generate correct execution-related keys', () => {
-      expect(queryKeys.executions.all).toEqual(['executions'])
-      expect(queryKeys.executions.detail('exec-123')).toEqual(['executions', 'detail', 'exec-123'])
-      expect(queryKeys.executions.logs('exec-123')).toEqual(['executions', 'logs', 'exec-123'])
     })
   })
 
@@ -88,7 +62,7 @@ describe('localCache', () => {
 
   it('Should correctly delete cache', () => {
     localCache.remove('test-key')
-    expect(localStorage.removeItem).toHaveBeenCalledWith('agentflow_cache_test-key')
+    expect(localStorage.removeItem).toHaveBeenCalledWith('whatreverse_cache_test-key')
   })
 })
 

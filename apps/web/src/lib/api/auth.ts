@@ -17,6 +17,7 @@ import type {
 } from '@/types/auth'
 
 import { request, API_BASE_URL } from './shared'
+import { getStoredTokens } from './client'
 
 // Backend response format (snake_case)
 interface BackendAuthResponse {
@@ -95,6 +96,7 @@ export const authApi = {
     })
 
     return {
+      success: true,
       tokens: {
         accessToken: response.data.access_token,
         refreshToken: response.data.refresh_token,

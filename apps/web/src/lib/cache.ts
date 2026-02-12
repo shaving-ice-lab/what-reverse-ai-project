@@ -28,23 +28,10 @@ export const API_CACHE_CONFIG = {
     settings: { staleTime: CACHE_TIMES.LONG, gcTime: CACHE_TIMES.PERSISTENT },
   },
 
-  // Workflow related
-  workflow: {
-    list: { staleTime: CACHE_TIMES.SHORT, gcTime: CACHE_TIMES.MEDIUM },
-    detail: { staleTime: CACHE_TIMES.MEDIUM, gcTime: CACHE_TIMES.LONG },
-    executions: { staleTime: CACHE_TIMES.SHORT, gcTime: CACHE_TIMES.MEDIUM },
-  },
-
   // API Key
   apiKeys: {
     list: { staleTime: CACHE_TIMES.LONG, gcTime: CACHE_TIMES.PERSISTENT },
     providers: { staleTime: CACHE_TIMES.PERSISTENT, gcTime: CACHE_TIMES.FOREVER },
-  },
-
-  // Execution related
-  execution: {
-    status: { staleTime: CACHE_TIMES.INSTANT, gcTime: CACHE_TIMES.SHORT }, // Real-time data
-    logs: { staleTime: CACHE_TIMES.SHORT, gcTime: CACHE_TIMES.MEDIUM },
   },
 
   // Agent Store
@@ -64,32 +51,11 @@ export const queryKeys = {
     settings: () => [...queryKeys.user.all, 'settings'] as const,
   },
 
-  // Workflow
-  workflows: {
-    all: ['workflows'] as const,
-    lists: () => [...queryKeys.workflows.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.workflows.lists(), filters] as const,
-    details: () => [...queryKeys.workflows.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.workflows.details(), id] as const,
-    executions: (workflowId: string) =>
-      [...queryKeys.workflows.all, 'executions', workflowId] as const,
-  },
-
   // API Key
   apiKeys: {
     all: ['apiKeys'] as const,
     list: () => [...queryKeys.apiKeys.all, 'list'] as const,
     providers: () => [...queryKeys.apiKeys.all, 'providers'] as const,
-  },
-
-  // Executions
-  executions: {
-    all: ['executions'] as const,
-    lists: () => [...queryKeys.executions.all, 'list'] as const,
-    list: (params: Record<string, unknown>) => [...queryKeys.executions.lists(), params] as const,
-    details: () => [...queryKeys.executions.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.executions.details(), id] as const,
-    logs: (id: string) => [...queryKeys.executions.all, 'logs', id] as const,
   },
 
   // Store
@@ -157,7 +123,7 @@ export function createOptimisticUpdate<T>({
 }
 
 // ===== Local Storage Cache =====
-const STORAGE_PREFIX = 'agentflow_cache_'
+const STORAGE_PREFIX = 'whatreverse_cache_'
 
 export const localCache = {
   get<T>(key: string): T | null {

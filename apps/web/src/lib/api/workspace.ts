@@ -17,7 +17,7 @@ export interface Workspace {
   status: 'active' | 'suspended' | 'deleted'
   plan: 'free' | 'pro' | 'enterprise'
   region?: string
-  settings_json?: Record<string, unknown>
+  settings?: Record<string, unknown>
   created_at: string
   updated_at: string
   deleted_at?: string
@@ -38,6 +38,9 @@ export interface Workspace {
 
   // Associated data
   current_version?: WorkspaceVersion
+
+  // Computed / legacy compatibility
+  access_policy?: WorkspaceAccessPolicy
 }
 
 // Retain App type as alias for Workspace for compatibility
@@ -49,7 +52,6 @@ export interface WorkspaceVersion {
   workspace_id: string
   version: string
   changelog?: string
-  workflow_id?: string
   ui_schema?: Record<string, unknown>
   db_schema?: Record<string, unknown>
   config_json?: Record<string, unknown>
@@ -60,88 +62,29 @@ export interface WorkspaceVersion {
 // Retain AppVersion type for compatibility
 export type AppVersion = WorkspaceVersion
 
-// Workspace domain (app domain)
-export interface WorkspaceDomain {
-  id: string
-  workspace_id: string
-  domain: string
-  status: 'pending' | 'verifying' | 'verified' | 'active' | 'failed' | 'blocked'
-  blocked_at?: string
-  blocked_reason?: string
-  domain_expires_at?: string
-  domain_expiry_notified_at?: string
-  verification_token?: string
-  verified_at?: string
-  ssl_status?: 'pending' | 'issuing' | 'issued' | 'failed' | 'expired'
-  ssl_issued_at?: string
-  ssl_expires_at?: string
-  ssl_expiry_notified_at?: string
-  created_at: string
-  updated_at: string
-}
-
-// Retain AppDomain type for compatibility
-export type AppDomain = WorkspaceDomain
-
-// Domain verification info
-export interface DomainVerificationInfo {
-  txt_name: string
-  txt_value: string
-  cname_target: string
-}
-
-// Workspace domain binding result
-export interface WorkspaceDomainBindingResult {
-  domain: WorkspaceDomain
-  verification?: DomainVerificationInfo
-  verified?: boolean
-  method?: string
-}
-
-// Workspace execution record
-export interface WorkspaceExecution {
-  id: string
-  workspace_id: string
-  workflow_id: string
-  session_id?: string
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
-  inputs?: Record<string, unknown>
-  outputs?: Record<string, unknown>
-  error_message?: string
-  duration_ms?: number
-  started_at?: string
-  completed_at?: string
-  created_at: string
-}
-
-// Workspace metrics
-export interface WorkspaceMetrics {
-  total_executions: number
-  success_count: number
-  failure_count: number
-  success_rate: number
-  avg_duration_ms: number
-  total_tokens: number
-  executions_by_day: Array<{ date: string; count: number }>
-}
-
 export interface WorkspaceMember {
   id: string
   workspace_id: string
   user_id: string
   role_id: string
-  role_name: string
   status: 'active' | 'pending' | 'suspended'
   invited_by?: string
   joined_at?: string
   created_at: string
   updated_at: string
-  // User info (joined from backend)
+  // Nested objects from GORM Preload
   user?: {
     id: string
     username: string
     email: string
-    avatar?: string
+    avatar_url?: string
+    display_name?: string
+  }
+  role?: {
+    id: string
+    name: string
+    permissions?: Record<string, boolean>
+    is_system?: boolean
   }
 }
 
@@ -149,7 +92,7 @@ export interface WorkspaceRole {
   id: string
   workspace_id: string
   name: string
-  permissions_json: Record<string, boolean>
+  permissions: Record<string, boolean>
   is_system: boolean
   created_at: string
   updated_at: string
@@ -201,7 +144,7 @@ export interface LogArchiveReplayParams {
   limit?: number
   offset?: number
   execution_id?: string
-  workflow_id?: string
+  session_id?: string
   user_id?: string
   node_id?: string
   node_type?: string
@@ -474,6 +417,15 @@ export const workspaceApi = {
   },
 
   /**
+   * Delete workspace
+   */
+  async delete(id: string): Promise<void> {
+    await request<ApiResponse<null>>(`/workspaces/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  /**
    * Get workspace member list
    */
   async getMembers(workspaceId: string): Promise<WorkspaceMember[]> {
@@ -631,7 +583,7 @@ export const workspaceApi = {
     if (params?.limit) search.set('limit', String(params.limit))
     if (params?.offset) search.set('offset', String(params.offset))
     if (params?.execution_id) search.set('execution_id', params.execution_id)
-    if (params?.workflow_id) search.set('workflow_id', params.workflow_id)
+    if (params?.session_id) search.set('session_id', params.session_id)
     if (params?.user_id) search.set('user_id', params.user_id)
     if (params?.node_id) search.set('node_id', params.node_id)
     if (params?.node_type) search.set('node_type', params.node_type)
@@ -879,41 +831,10 @@ export interface AppVersionDiff {
   summary?: string
 }
 
-// App metrics (compatible alias)
-export type AppMetrics = WorkspaceMetrics
-
-// App execution record (compatible alias)
-export type AppExecution = WorkspaceExecution
-
 // ===== appApi Compatibility Layer =====
 // Workspace = App, appApi methods map to workspaceApi or directly call workspace endpoints
 
 export const appApi = {
-  /**
-   * Get app list (now workspace list, optionally filtered by workspace_id)
-   */
-  async list(params?: {
-    workspace_id?: string
-    page?: number
-    pageSize?: number
-  }): Promise<{ items: Workspace[]; total: number }> {
-    const search = new URLSearchParams()
-    if (params?.workspace_id) search.set('workspace_id', params.workspace_id)
-    if (params?.page) search.set('page', String(params.page))
-    if (params?.pageSize) search.set('page_size', String(params.pageSize))
-    const query = search.toString()
-    const response = await request<ApiResponse<any>>(`/workspaces${query ? `?${query}` : ''}`)
-    const payload = response.data as any
-    const items: Workspace[] = Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload?.workspaces)
-        ? payload.workspaces
-        : Array.isArray(payload)
-          ? payload
-          : []
-    return { items, total: payload?.total ?? items.length }
-  },
-
   /**
    * Get app (workspace) details
    */
@@ -922,49 +843,10 @@ export const appApi = {
   },
 
   /**
-   * Create app (now creates workspace)
-   */
-  async create(data: {
-    name: string
-    slug?: string
-    description?: string
-    workspace_id?: string
-  }): Promise<Workspace> {
-    return workspaceApi.create({
-      name: data.name,
-      slug: data.slug || data.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-      icon: undefined,
-      region: undefined,
-    })
-  },
-
-  /**
    * Publish app (workspace)
    */
   async publish(id: string): Promise<Workspace> {
     const response = await request<ApiResponse<any>>(`/workspaces/${id}/publish`, {
-      method: 'POST',
-    })
-    const payload = response.data as any
-    return (payload?.workspace as Workspace) ?? (payload as Workspace)
-  },
-
-  /**
-   * Deprecate app
-   */
-  async deprecate(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/deprecate`, {
-      method: 'POST',
-    })
-    const payload = response.data as any
-    return (payload?.workspace as Workspace) ?? (payload as Workspace)
-  },
-
-  /**
-   * Archive app
-   */
-  async archive(id: string): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/archive`, {
       method: 'POST',
     })
     const payload = response.data as any
@@ -1044,51 +926,6 @@ export const appApi = {
   },
 
   /**
-   * Get domain list
-   */
-  async getDomains(id: string): Promise<WorkspaceDomain[]> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/domains`)
-    const payload = response.data as any
-    return Array.isArray(payload?.domains)
-      ? payload.domains
-      : Array.isArray(payload?.items)
-        ? payload.items
-        : Array.isArray(payload)
-          ? payload
-          : []
-  },
-
-  /**
-   * Bind domain
-   */
-  async bindDomain(id: string, data: { domain: string }): Promise<WorkspaceDomainBindingResult> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/domains`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-    return response.data as WorkspaceDomainBindingResult
-  },
-
-  /**
-   * Verify domain
-   */
-  async verifyDomain(id: string, domainId: string): Promise<WorkspaceDomain> {
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/domains/${domainId}/verify`,
-      { method: 'POST' }
-    )
-    const payload = response.data as any
-    return (payload?.domain as WorkspaceDomain) ?? (payload as WorkspaceDomain)
-  },
-
-  /**
-   * Delete domain
-   */
-  async deleteDomain(id: string, domainId: string): Promise<void> {
-    await request<ApiResponse<null>>(`/workspaces/${id}/domains/${domainId}`, { method: 'DELETE' })
-  },
-
-  /**
    * Update UI schema
    */
   async updateUISchema(
@@ -1119,50 +956,6 @@ export const appApi = {
     })
     const payload = response.data as any
     return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)
-  },
-
-  /**
-   * Get execution list
-   */
-  async getExecutions(
-    id: string,
-    params?: { page?: number; page_size?: number; status?: string }
-  ): Promise<{ items: WorkspaceExecution[]; total: number }> {
-    const search = new URLSearchParams()
-    if (params?.page) search.set('page', String(params.page))
-    if (params?.page_size) search.set('page_size', String(params.page_size))
-    if (params?.status) search.set('status', params.status)
-    const query = search.toString()
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/executions${query ? `?${query}` : ''}`
-    )
-    const payload = response.data as any
-    const items = Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload)
-        ? payload
-        : []
-    return { items, total: payload?.total ?? items.length }
-  },
-
-  /**
-   * Get metrics
-   */
-  async getMetrics(id: string, params?: { days?: number }): Promise<WorkspaceMetrics> {
-    const search = new URLSearchParams()
-    if (params?.days) search.set('days', String(params.days))
-    const query = search.toString()
-    const response = await request<ApiResponse<any>>(
-      `/workspaces/${id}/metrics${query ? `?${query}` : ''}`
-    )
-    return response.data as WorkspaceMetrics
-  },
-
-  /**
-   * Cancel execution
-   */
-  async cancelExecution(executionId: string): Promise<void> {
-    await request<ApiResponse<null>>(`/executions/${executionId}/cancel`, { method: 'POST' })
   },
 
   /**

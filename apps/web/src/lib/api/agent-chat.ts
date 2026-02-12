@@ -18,7 +18,7 @@ export interface AgentToolResult {
   error?: string
 }
 
-export type AffectedResource = 'workflow' | 'database' | 'ui_schema' | ''
+export type AffectedResource = 'database' | 'ui_schema' | ''
 
 export interface AgentEvent {
   type: AgentEventType
@@ -131,11 +131,8 @@ export function chatStream(
         const lines = buffer.split('\n')
         buffer = lines.pop() || ''
 
-        let currentEventType = ''
         for (const line of lines) {
-          if (line.startsWith('event: ')) {
-            currentEventType = line.slice(7).trim()
-          } else if (line.startsWith('data: ')) {
+          if (line.startsWith('data: ')) {
             const dataStr = line.slice(6)
             try {
               const event: AgentEvent = JSON.parse(dataStr)
@@ -166,12 +163,7 @@ export function chatStream(
 // ========== REST API ==========
 
 export const agentChatApi = {
-  async confirmAction(
-    workspaceId: string,
-    sessionId: string,
-    actionId: string,
-    approved: boolean
-  ) {
+  async confirmAction(workspaceId: string, sessionId: string, actionId: string, approved: boolean) {
     return request<{ message: string }>(`/workspaces/${workspaceId}/agent/confirm`, {
       method: 'POST',
       body: JSON.stringify({ session_id: sessionId, action_id: actionId, approved }),
@@ -195,10 +187,9 @@ export const agentChatApi = {
   },
 
   async deleteSession(workspaceId: string, sessionId: string) {
-    return request<{ message: string }>(
-      `/workspaces/${workspaceId}/agent/sessions/${sessionId}`,
-      { method: 'DELETE' }
-    )
+    return request<{ message: string }>(`/workspaces/${workspaceId}/agent/sessions/${sessionId}`, {
+      method: 'DELETE',
+    })
   },
 
   async getStatus(workspaceId: string): Promise<AgentStatus> {
