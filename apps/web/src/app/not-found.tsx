@@ -5,19 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import {
-  Home,
-  Search,
-  ArrowLeft,
-  HelpCircle,
-  FileText,
-  Sparkles,
-  Compass,
-  Map,
-  RefreshCw,
-  Book,
-  MessageSquare,
-} from 'lucide-react'
+import { Home, ArrowLeft, HelpCircle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { SiteHeader } from '@/components/layout/site-header'
@@ -26,15 +14,7 @@ import { cn } from '@/lib/utils'
 
 // Quick Links - Manus Style
 
-const quickLinks = [
-  { name: 'Home', href: '/', icon: Home },
-
-  { name: 'Help', href: '/help', icon: HelpCircle },
-
-  { name: 'Document', href: '/docs', icon: Book },
-
-  { name: 'Contact', href: '/contact', icon: MessageSquare },
-]
+const quickLinks = [{ name: 'Home', href: '/', icon: Home }]
 
 export default function NotFound() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -205,13 +185,13 @@ export default function NotFound() {
                   If you believe this is an error, our support team is always here to help.{' '}
                 </p>
 
-                <Link href="/contact">
+                <Link href="/login">
                   <Button
                     variant="outline"
                     size="sm"
                     className="rounded-full text-xs h-8 px-4 border-border hover:border-primary/30"
                   >
-                    Contact Support
+                    Sign In
                   </Button>
                 </Link>
               </div>

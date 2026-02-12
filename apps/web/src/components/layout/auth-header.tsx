@@ -32,7 +32,7 @@ export function AuthHeader({ className }: AuthHeaderProps) {
             >
               <Sparkles className="h-4 w-4" />
             </div>
-            <span className="text-[15px] font-semibold text-foreground">AgentFlow</span>
+            <span className="text-[15px] font-semibold text-foreground">ReverseAI</span>
           </Link>
 
           {/* ThemeSwitchButton */}

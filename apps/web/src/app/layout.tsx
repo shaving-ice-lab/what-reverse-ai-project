@@ -19,10 +19,11 @@ const sourceCodePro = Source_Code_Pro({
 })
 
 export const metadata: Metadata = {
-  title: 'AgentFlow - AI Workflow Platform',
-  description: 'Local-first, code-customizable, community-driven AI Agent Workflow Platform',
-  keywords: ['AI', 'Agent', 'Workflow', 'Automation', 'Workflow'],
-  authors: [{ name: 'AgentFlow Team' }],
+  title: 'ReverseAI - AI-Powered App Platform',
+  description:
+    'Build full web applications with AI. Describe your app, and the AI Agent creates the database, UI, and delivers a live app.',
+  keywords: ['AI', 'App Platform', 'No-Code', 'Database', 'Web App'],
+  authors: [{ name: 'ReverseAI Team' }],
 }
 
 export default function RootLayout({
@@ -32,9 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${sourceCodePro.variable} font-sans antialiased`}
-      >
+      <body className={`${inter.variable} ${sourceCodePro.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

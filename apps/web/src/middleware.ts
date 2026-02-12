@@ -5,52 +5,33 @@ const DASHBOARD_PREFIX = '/dashboard'
 
 // Old authenticated routes that used to live at "/xxx"
 // Now they are all under "/dashboard/xxx"
-const LEGACY_DASHBOARD_PREFIXES = [
-  '/activity',
-  '/admin',
-  '/analytics',
-  '/api-keys',
-  '/apps',
-  '/billing',
-  '/chat',
-  '/conversations',
-  '/data',
-  '/editor',
-  '/export',
-  '/feedback',
-  '/files',
-  '/history',
-  '/integrations',
-  '/logs',
-  '/models',
-  '/my-agents',
-  '/notifications',
-  '/plans',
-  '/profile',
-  '/quick-actions',
-  '/review',
-  '/search',
-  '/settings',
-  '/shortcuts',
-  '/support-settings',
-  '/support-tickets',
-  '/team',
-  '/template-gallery',
-  '/upgrade',
-  '/webhooks',
-  '/workflows',
-  '/workspaces',
-] as const
+const LEGACY_DASHBOARD_PREFIXES = ['/apps', '/profile', '/settings', '/workspaces'] as const
 
 function resolveLegacyDashboardPath(pathname: string) {
   const segments = pathname.split('/').filter(Boolean)
   if (segments[0] !== 'dashboard') return null
-  if (segments[1] !== 'workspaces') return null
-  if (segments[3] !== 'apps') return null
-  const appId = segments[4]
-  if (!appId) return null
-  const rest = segments.slice(5)
-  return rest.length ? `/dashboard/app/${appId}/${rest.join('/')}` : `/dashboard/app/${appId}`
+
+  // Legacy: /dashboard/workspaces/:id/apps/:appId/... → /dashboard/agent
+  if (segments[1] === 'workspaces' && segments[3] === 'apps') {
+    return '/dashboard/agent'
+  }
+
+  // Legacy: /dashboard/app/:appId/... → /dashboard/agent
+  if (segments[1] === 'app' && segments[2]) {
+    return '/dashboard/agent'
+  }
+
+  // Legacy: /dashboard/apps → /dashboard/agent
+  if (segments[1] === 'apps' && !segments[2]) {
+    return '/dashboard/agent'
+  }
+
+  // Legacy redirect → /dashboard/agent
+  if (segments[1] === 'builder') {
+    return '/dashboard/agent'
+  }
+
+  return null
 }
 
 function matchesPrefix(pathname: string, prefix: string) {
@@ -69,13 +50,6 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
     return NextResponse.next()
-  }
-
-  // Public learning hub canonical path
-  if (pathname === '/learn') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/learn/courses'
-    return NextResponse.redirect(url)
   }
 
   const shouldRedirect = LEGACY_DASHBOARD_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))

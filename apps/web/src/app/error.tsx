@@ -26,11 +26,7 @@ import { SiteFooter } from '@/components/layout/site-footer'
 import { cn } from '@/lib/utils'
 
 // QuickLink - Manus Style
-const quickLinks = [
-  { name: 'Home', href: '/', icon: Home },
-  { name: 'Status', href: '/status', icon: Server },
-  { name: 'Help', href: '/help', icon: HelpCircle },
-]
+const quickLinks = [{ name: 'Home', href: '/', icon: Home }]
 
 // RestoreSuggestion
 const recoverySuggestions = [
@@ -262,13 +258,13 @@ export default function GlobalError({
                   If the issue continues, contact our support team with the error code for faster
                   help.
                 </p>
-                <Link href="/contact">
+                <Link href="/login">
                   <Button
                     variant="outline"
                     size="sm"
                     className="rounded-full text-xs h-8 px-4 border-border hover:border-destructive/30"
                   >
-                    Contact support
+                    Sign In
                   </Button>
                 </Link>
               </div>

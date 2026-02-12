@@ -6,7 +6,7 @@ import { ThemeProvider } from 'next-themes'
 import { useState, useEffect, type ReactNode } from 'react'
 import { ToastProvider, useToast, setGlobalToast, toast } from '@/components/ui/toast'
 import { ErrorBoundary, getErrorMessage } from '@/components/ui/error-boundary'
-import { ApiError } from '@/lib/api'
+import { ApiError } from '@/lib/api/client'
 import { CACHE_TIMES } from '@/lib/cache'
 import { reportError } from '@/lib/telemetry'
 
@@ -39,12 +39,12 @@ function handleGlobalError(error: unknown) {
 
 // Settings all toast (used for component environment)
 function GlobalToastSetter() {
-  const { addToast } = useToast()
+  const toastContext = useToast()
 
   useEffect(() => {
-    setGlobalToast(addToast)
+    setGlobalToast(toastContext)
     return () => setGlobalToast(null)
-  }, [addToast])
+  }, [toastContext])
 
   return null
 }
@@ -87,7 +87,7 @@ export function Providers({ children }: ProvidersProps) {
             onError={(error, errorInfo) =>
               reportError(error, {
                 source: 'error-boundary',
-                componentStack: errorInfo.componentStack,
+                componentStack: errorInfo.componentStack ?? undefined,
               })
             }
           >

@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, EyeOff, Loader2, ArrowRight, ChevronLeft, Workflow } from 'lucide-react'
+import { Eye, EyeOff, Loader2, ArrowRight, ChevronLeft, Sparkles } from 'lucide-react'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { authApi } from '@/lib/api/auth'
 import { cn } from '@/lib/utils'
@@ -89,7 +89,7 @@ export default function LoginPage() {
       <div className="flex justify-center mb-8">
         <Link href="/" className="group">
           <div className="w-16 h-16 flex items-center justify-center">
-            <Workflow className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
+            <Sparkles className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
           </div>
         </Link>
       </div>
@@ -99,7 +99,7 @@ export default function LoginPage() {
         <h1 className="text-[28px] font-semibold text-foreground tracking-tight">
           Sign In or Sign Up
         </h1>
-        <p className="mt-2 text-[15px] text-muted-foreground">Start creating with AgentFlow</p>
+        <p className="mt-2 text-[15px] text-muted-foreground">Start building your app</p>
       </div>
 
       {step === 'email' ? (

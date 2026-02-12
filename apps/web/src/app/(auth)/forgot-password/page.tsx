@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Mail, ArrowRight, ArrowLeft, CheckCircle, Loader2, KeyRound, Workflow } from 'lucide-react'
+import { Mail, ArrowRight, ArrowLeft, CheckCircle, Loader2, KeyRound, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function ForgotPasswordPage() {
@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="w-16 h-16 flex items-center justify-center">
-            <Workflow className="w-12 h-12 text-foreground/90" />
+            <Sparkles className="w-12 h-12 text-foreground/90" />
           </div>
         </div>
 
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
       <div className="flex justify-center mb-8">
         <Link href="/" className="group">
           <div className="w-16 h-16 flex items-center justify-center">
-            <Workflow className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
+            <Sparkles className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
           </div>
         </Link>
       </div>

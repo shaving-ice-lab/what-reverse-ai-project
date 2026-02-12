@@ -17,7 +17,6 @@ import { cn } from '@/lib/utils'
 const quickLinks = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Sign In', href: '/login', icon: LogIn },
-  { name: 'Help', href: '/help', icon: HelpCircle },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -189,13 +188,13 @@ export default function ForbiddenPage() {
                   If you believe this is an error or need access permissions, our support team is
                   always here to help.
                 </p>
-                <Link href="/contact">
+                <Link href="/login">
                   <Button
                     variant="outline"
                     size="sm"
                     className="rounded-full text-xs h-8 px-4 border-border hover:border-warning/30"
                   >
-                    Contact Support
+                    Sign In
                   </Button>
                 </Link>
               </div>

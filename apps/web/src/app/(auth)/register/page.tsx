@@ -7,8 +7,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, EyeOff, Loader2, CheckCircle, ArrowRight, ChevronLeft, Workflow } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Eye, EyeOff, Loader2, CheckCircle, ArrowRight, ChevronLeft, Sparkles } from 'lucide-react'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { authApi } from '@/lib/api/auth'
 import { cn } from '@/lib/utils'
@@ -23,7 +23,6 @@ function getPasswordStrength(password: string): number {
 }
 
 export default function RegisterPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
 
@@ -148,7 +147,7 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="w-16 h-16 flex items-center justify-center">
-            <Workflow className="w-12 h-12 text-foreground/90" />
+            <Sparkles className="w-12 h-12 text-foreground/90" />
           </div>
         </div>
 
@@ -195,7 +194,7 @@ export default function RegisterPage() {
       <div className="flex justify-center mb-8">
         <Link href="/" className="group">
           <div className="w-16 h-16 flex items-center justify-center">
-            <Workflow className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
+            <Sparkles className="w-12 h-12 text-foreground/90 group-hover:text-foreground transition-colors" />
           </div>
         </Link>
       </div>
@@ -211,7 +210,7 @@ export default function RegisterPage() {
         </h1>
         <p className="mt-2 text-[15px] text-muted-foreground">
           {step === 'social'
-            ? 'Start creating with AgentFlow'
+            ? 'Start building your app'
             : step === 'email'
               ? 'Enter Your Email Address'
               : 'Set Up Your Account'}
@@ -298,7 +297,7 @@ export default function RegisterPage() {
             <p className="text-[14px] text-muted-foreground">
               Already have an account?{''}
               <Link
-                href={`/login${redirectTo !== '/workflows' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
+                href={`/login${redirectTo !== '/dashboard' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
                 className="text-foreground hover:text-primary font-medium transition-colors duration-200"
               >
                 Sign In Now
