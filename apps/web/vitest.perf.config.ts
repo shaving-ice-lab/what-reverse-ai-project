@@ -20,12 +20,7 @@ export default defineConfig({
     testTimeout: 60000,
 
     // DisableParallelRunwithgetgetmorestablePerformanceData
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    fileParallelism: false,
 
     // PerformanceTestdedicatedusereport
     reporters: ['verbose'],

@@ -4,7 +4,7 @@ import type { NextConfig } from 'next'
 const isTauriBuild = process.env.TAURI_ENV_PLATFORM !== undefined
 
 // Tauri module noop stub mappings for Web mode (using relative paths)
-const tauriNoopAliases = !isTauriBuild
+const tauriNoopAliases: Record<string, string> = !isTauriBuild
   ? {
       '@tauri-apps/api/core': './src/lib/tauri/noop-core.ts',
       '@tauri-apps/api/event': './src/lib/tauri/noop-event.ts',

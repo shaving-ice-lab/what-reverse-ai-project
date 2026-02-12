@@ -22,14 +22,14 @@ NEXT_PUBLIC_FEATURE_FLAGS=analytics,local_mode
 ## Localdevelop
 
 ```bash
-pnpm --filter @agentflow/web dev
+pnpm --filter @reverseai/web dev
 ```
 
 ## Buildand Publish
 
 ```bash
-pnpm --filter @agentflow/web build
-pnpm --filter @agentflow/web start
+pnpm --filter @reverseai/web build
+pnpm --filter @reverseai/web start
 ```
 
 ## Feature Flags
