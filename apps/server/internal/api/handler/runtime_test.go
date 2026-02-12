@@ -28,7 +28,7 @@ func TestGetDomainHost(t *testing.T) {
 	}{
 		{
 			name: "x-forwarded-host-priority",
-			host: "platform.local:8080",
+			host: "platform.local:3010",
 			headers: map[string]string{
 				"X-Forwarded-Host": "Tenant.Example.com:443, proxy.example.com",
 				"Forwarded":        `for=192.0.2.43;host="forwarded.example.com";proto=https`,
@@ -37,7 +37,7 @@ func TestGetDomainHost(t *testing.T) {
 		},
 		{
 			name: "forwarded-host-fallback",
-			host: "platform.local:8080",
+			host: "platform.local:3010",
 			headers: map[string]string{
 				"Forwarded": `for=192.0.2.43;host="Custom.Example.com:443";proto=https`,
 			},

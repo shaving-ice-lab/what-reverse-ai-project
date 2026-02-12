@@ -22,7 +22,7 @@ type TestConfig struct {
 }
 
 func loadTestConfig() TestConfig {
-	serverBase := strings.TrimRight(getEnv("TEST_SERVER_BASE_URL", "http://localhost:8080"), "/")
+	serverBase := strings.TrimRight(getEnv("TEST_SERVER_BASE_URL", "http://localhost:3010"), "/")
 	apiBaseDefault := serverBase + "/api/v1"
 	runtimeBaseDefault := serverBase + "/runtime"
 
