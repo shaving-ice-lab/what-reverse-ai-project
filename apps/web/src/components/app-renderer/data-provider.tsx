@@ -1,7 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useCallback, useRef } from 'react'
-import { request } from '@/lib/api/shared'
+import { request, getStoredTokens } from '@/lib/api/shared'
+import { getApiBaseUrl } from '@/lib/env'
 
 type TableChangeListener = (table: string) => void
 
@@ -11,7 +12,7 @@ interface DataProviderContextValue {
   insertRow: (table: string, data: Record<string, unknown>) => Promise<void>
   updateRow: (table: string, data: Record<string, unknown>, where: string) => Promise<void>
   deleteRows: (table: string, where: string, ids?: unknown[]) => Promise<void>
-  executeWorkflow: (workflowId: string, inputs: Record<string, unknown>) => Promise<void>
+  uploadFile?: (file: File, prefix?: string) => Promise<string>
   notifyTableChange: (table: string) => void
   onTableChange: (listener: TableChangeListener) => () => void
 }
@@ -53,7 +54,9 @@ export function DataProvider({ workspaceId, children }: DataProviderProps) {
 
   const onTableChange = useCallback((listener: TableChangeListener) => {
     listenersRef.current.add(listener)
-    return () => { listenersRef.current.delete(listener) }
+    return () => {
+      listenersRef.current.delete(listener)
+    }
   }, [])
 
   const queryRows = useCallback(
@@ -80,7 +83,11 @@ export function DataProvider({ workspaceId, children }: DataProviderProps) {
       }
       const qs = searchParams.toString()
       const url = `/workspaces/${workspaceId}/database/tables/${table}/rows${qs ? `?${qs}` : ''}`
-      const res = await request<{ rows: Record<string, unknown>[]; total: number; columns: string[] }>(url)
+      const res = await request<{
+        rows: Record<string, unknown>[]
+        total: number
+        columns: string[]
+      }>(url)
       return res || { rows: [], total: 0, columns: [] }
     },
     [workspaceId]
@@ -122,18 +129,39 @@ export function DataProvider({ workspaceId, children }: DataProviderProps) {
     [workspaceId]
   )
 
-  const executeWorkflow = useCallback(
-    async (workflowId: string, inputs: Record<string, unknown>) => {
-      await request(`/workflows/${workflowId}/execute`, {
+  const uploadFile = useCallback(
+    async (file: File, prefix?: string): Promise<string> => {
+      const formData = new FormData()
+      formData.append('file', file)
+      if (prefix) formData.append('prefix', prefix)
+      const headers: Record<string, string> = {}
+      const tokens = getStoredTokens()
+      if (tokens?.accessToken) headers['Authorization'] = `Bearer ${tokens.accessToken}`
+      const res = await fetch(`${getApiBaseUrl()}/workspaces/${workspaceId}/storage/upload`, {
         method: 'POST',
-        body: JSON.stringify({ inputs, trigger_type: 'form_submit' }),
+        headers,
+        body: formData,
       })
+      const payload = await res.json()
+      if (!res.ok) throw new Error(payload?.message || 'Upload failed')
+      return payload?.data?.public_url || ''
     },
     [workspaceId]
   )
 
   return (
-    <DataProviderContext.Provider value={{ workspaceId, queryRows, insertRow, updateRow, deleteRows, executeWorkflow, notifyTableChange, onTableChange }}>
+    <DataProviderContext.Provider
+      value={{
+        workspaceId,
+        queryRows,
+        insertRow,
+        updateRow,
+        deleteRows,
+        uploadFile,
+        notifyTableChange,
+        onTableChange,
+      }}
+    >
       {children}
     </DataProviderContext.Provider>
   )

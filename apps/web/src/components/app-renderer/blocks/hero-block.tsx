@@ -32,11 +32,7 @@ export function HeroBlock({ config }: HeroBlockProps) {
 
   return (
     <div
-      className={cn(
-        'rounded-lg px-6 flex flex-col',
-        sizeClasses,
-        alignClass,
-      )}
+      className={cn('rounded-lg px-6 flex flex-col', sizeClasses, alignClass)}
       style={{
         backgroundColor: config.background_color || undefined,
         backgroundImage: config.background_image ? `url(${config.background_image})` : undefined,
@@ -50,11 +46,17 @@ export function HeroBlock({ config }: HeroBlockProps) {
           {config.subtitle}
         </p>
       )}
-      <h2 className={cn('font-bold text-foreground', titleSize)} style={{ color: config.text_color || undefined }}>
+      <h2
+        className={cn('font-bold text-foreground', titleSize)}
+        style={{ color: config.text_color || undefined }}
+      >
         {config.title}
       </h2>
       {config.description && (
-        <p className="mt-2 text-sm text-foreground-muted max-w-2xl" style={{ color: config.text_color ? `${config.text_color}cc` : undefined }}>
+        <p
+          className="mt-2 text-sm text-foreground-muted max-w-2xl"
+          style={{ color: config.text_color ? `${config.text_color}cc` : undefined }}
+        >
           {config.description}
         </p>
       )}
@@ -63,7 +65,7 @@ export function HeroBlock({ config }: HeroBlockProps) {
           {config.actions.map((action, i) => {
             const rawHref = action.href || ''
             const isInternal = rawHref.startsWith('/') || rawHref.startsWith('#')
-            const href = isInternal ? `#${rawHref.replace(/^[#/]+/, '')}` : (rawHref || '#')
+            const href = isInternal ? `#${rawHref.replace(/^[#/]+/, '')}` : rawHref || '#'
             return (
               <a
                 key={i}

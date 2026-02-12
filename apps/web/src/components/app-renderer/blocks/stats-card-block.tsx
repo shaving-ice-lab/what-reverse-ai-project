@@ -2,10 +2,26 @@
 
 import React, { useEffect, useState } from 'react'
 import {
-  TrendingUp, TrendingDown,
-  Users, ShoppingCart, Truck, DollarSign, Package, BarChart3,
-  Activity, Clock, CheckCircle, AlertTriangle, Star, Heart,
-  FileText, Database, Globe, Zap, Mail, Calendar,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  ShoppingCart,
+  Truck,
+  DollarSign,
+  Package,
+  BarChart3,
+  Activity,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Star,
+  Heart,
+  FileText,
+  Database,
+  Globe,
+  Zap,
+  Mail,
+  Calendar,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
@@ -13,10 +29,26 @@ import type { StatsCardConfig } from '../types'
 import type { DataSource } from '../types'
 
 const statsIconMap: Record<string, React.ElementType> = {
-  Users, ShoppingCart, Truck, DollarSign, Package, BarChart3,
-  Activity, Clock, CheckCircle, AlertTriangle, Star, Heart,
-  FileText, Database, Globe, Zap, Mail, Calendar,
-  TrendingUp, TrendingDown,
+  Users,
+  ShoppingCart,
+  Truck,
+  DollarSign,
+  Package,
+  BarChart3,
+  Activity,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Star,
+  Heart,
+  FileText,
+  Database,
+  Globe,
+  Zap,
+  Mail,
+  Calendar,
+  TrendingUp,
+  TrendingDown,
 }
 
 interface StatsCardBlockProps {
@@ -46,7 +78,8 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
   const [fetchedData, setFetchedData] = useState<Record<string, unknown> | null>(null)
 
   const aggregation = dataSource?.aggregation?.[0]
-  const needsAllRows = aggregation && (aggregation.function === 'sum' || aggregation.function === 'avg')
+  const needsAllRows =
+    aggregation && (aggregation.function === 'sum' || aggregation.function === 'avg')
 
   const computeAggregation = (result: { rows: Record<string, unknown>[]; total: number }) => {
     if (aggregation) {
@@ -58,7 +91,9 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
         const col = aggregation.column
         const nums = result.rows.map((r) => Number(r[col] ?? 0)).filter((n) => !isNaN(n))
         const sum = nums.reduce((s, v) => s + v, 0)
-        return { [alias]: aggregation.function === 'avg' ? (nums.length ? sum / nums.length : 0) : sum }
+        return {
+          [alias]: aggregation.function === 'avg' ? (nums.length ? sum / nums.length : 0) : sum,
+        }
       }
     }
     if (result.rows.length > 0) return result.rows[0]
@@ -74,10 +109,14 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
           limit: needsAllRows ? 10000 : 1,
         })
         if (!cancelled) setFetchedData(computeAggregation(result))
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [externalData, dataSource, queryRows, config.value_key])
 
   // Auto-refresh when the underlying table changes
@@ -130,13 +169,23 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
           <div className={cn('text-2xl font-semibold', colorMap[color])}>{formattedValue}</div>
         </div>
         {IconComponent && (
-          <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', bgMap[color])}>
+          <div
+            className={cn(
+              'w-9 h-9 rounded-lg flex items-center justify-center shrink-0',
+              bgMap[color]
+            )}
+          >
             <IconComponent className={cn('w-4.5 h-4.5', colorMap[color])} />
           </div>
         )}
       </div>
       {trend !== undefined && (
-        <div className={cn('flex items-center gap-1 mt-1.5 text-xs', trend >= 0 ? 'text-emerald-600' : 'text-red-600')}>
+        <div
+          className={cn(
+            'flex items-center gap-1 mt-1.5 text-xs',
+            trend >= 0 ? 'text-emerald-600' : 'text-red-600'
+          )}
+        >
           {trend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           {Math.abs(trend).toFixed(1)}%
         </div>

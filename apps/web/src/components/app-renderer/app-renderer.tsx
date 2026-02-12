@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, createContext, useContext, useMemo } from 'react'
 import {
   LayoutDashboard,
   FileText,
@@ -48,6 +48,8 @@ import { HeroBlock } from './blocks/hero-block'
 import { TabsContainerBlock } from './blocks/tabs-container-block'
 import { ListBlock } from './blocks/list-block'
 import { DividerBlock } from './blocks/divider-block'
+import { AuthBlock } from './blocks/auth-block'
+import { FileUploadBlock } from './blocks/file-upload-block'
 import type {
   AppSchema,
   AppPage,
@@ -62,15 +64,81 @@ import type {
   TabsContainerConfig,
   ListConfig,
   DividerConfig,
+  AuthBlockConfig,
+  FileUploadConfig,
 } from './types'
 
+// ========== Page Params Context ==========
+
+export interface PageParamsContextValue {
+  params: Record<string, unknown>
+  navigateToPage: (pageId: string, params?: Record<string, unknown>) => void
+}
+
+export const PageParamsContext = createContext<PageParamsContextValue>({
+  params: {},
+  navigateToPage: () => {},
+})
+
+export function usePageParams() {
+  return useContext(PageParamsContext)
+}
+
+function parseHashParams(hash: string): { pageKey: string; params: Record<string, unknown> } {
+  const cleaned = hash.replace(/^#/, '')
+  const qIdx = cleaned.indexOf('?')
+  if (qIdx === -1) return { pageKey: cleaned, params: {} }
+  const pageKey = cleaned.slice(0, qIdx)
+  const qs = cleaned.slice(qIdx + 1)
+  const params: Record<string, unknown> = {}
+  for (const part of qs.split('&')) {
+    const [k, ...rest] = part.split('=')
+    if (k) params[decodeURIComponent(k)] = decodeURIComponent(rest.join('='))
+  }
+  return { pageKey, params }
+}
+
+function encodeHashParams(pageKey: string, params?: Record<string, unknown>): string {
+  if (!params || Object.keys(params).length === 0) return `#${pageKey}`
+  const qs = Object.entries(params)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v ?? ''))}`)
+    .join('&')
+  return `#${pageKey}?${qs}`
+}
+
 const iconMap: Record<string, React.ElementType> = {
-  LayoutDashboard, FileText, Users, ShoppingCart, Truck,
-  BarChart3, Home, Mail, Calendar, Settings, Globe,
-  Package, DollarSign, Activity, Clock, Star, Heart,
-  Database, Zap, CheckCircle, AlertTriangle, MapPin, Phone,
-  Building, Briefcase, Tag, BookOpen, Clipboard, PieChart,
-  ListOrdered, MessageSquare, Menu,
+  LayoutDashboard,
+  FileText,
+  Users,
+  ShoppingCart,
+  Truck,
+  BarChart3,
+  Home,
+  Mail,
+  Calendar,
+  Settings,
+  Globe,
+  Package,
+  DollarSign,
+  Activity,
+  Clock,
+  Star,
+  Heart,
+  Database,
+  Zap,
+  CheckCircle,
+  AlertTriangle,
+  MapPin,
+  Phone,
+  Building,
+  Briefcase,
+  Tag,
+  BookOpen,
+  Clipboard,
+  PieChart,
+  ListOrdered,
+  MessageSquare,
+  Menu,
 }
 
 interface AppRendererProps {
@@ -80,16 +148,26 @@ interface AppRendererProps {
   skipDataProvider?: boolean
 }
 
-export function AppRenderer({ schema, workspaceId, className, skipDataProvider }: AppRendererProps) {
+export function AppRenderer({
+  schema,
+  workspaceId,
+  className,
+  skipDataProvider,
+}: AppRendererProps) {
   const defaultPageId = schema.default_page || schema.pages[0]?.id || ''
   const [currentPageId, setCurrentPageId] = useState(() => {
     if (typeof window === 'undefined') return defaultPageId
-    const hash = window.location.hash.replace('#', '')
-    if (hash && schema.pages.some((p) => p.id === hash || p.route === `/${hash}`)) {
-      const matched = schema.pages.find((p) => p.id === hash || p.route === `/${hash}`)
+    const { pageKey } = parseHashParams(window.location.hash)
+    if (pageKey && schema.pages.some((p) => p.id === pageKey || p.route === `/${pageKey}`)) {
+      const matched = schema.pages.find((p) => p.id === pageKey || p.route === `/${pageKey}`)
       return matched?.id || defaultPageId
     }
     return defaultPageId
+  })
+  const [pageParams, setPageParams] = useState<Record<string, unknown>>(() => {
+    if (typeof window === 'undefined') return {}
+    const { params } = parseHashParams(window.location.hash)
+    return params
   })
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
@@ -108,24 +186,31 @@ export function AppRenderer({ schema, workspaceId, className, skipDataProvider }
   // Sync hash → state on popstate (browser back/forward)
   useEffect(() => {
     const onHashChange = () => {
-      const hash = window.location.hash.replace('#', '')
-      if (!hash) return
-      const matched = schema.pages.find((p) => p.id === hash || p.route === `/${hash}`)
-      if (matched) setCurrentPageId(matched.id)
+      const { pageKey, params } = parseHashParams(window.location.hash)
+      if (!pageKey) return
+      const matched = schema.pages.find((p) => p.id === pageKey || p.route === `/${pageKey}`)
+      if (matched) {
+        setCurrentPageId(matched.id)
+        setPageParams(params)
+      }
     }
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [schema.pages])
 
-  const navigateToPage = useCallback((pageId: string) => {
-    setCurrentPageId(pageId)
-    if (isMobile) setSidebarOpen(false)
-    if (typeof window !== 'undefined') {
-      const page = schema.pages.find((p) => p.id === pageId)
-      const hashValue = page?.route ? page.route.replace(/^\//, '') : pageId
-      window.history.pushState(null, '', `#${hashValue}`)
-    }
-  }, [schema.pages, isMobile])
+  const navigateToPage = useCallback(
+    (pageId: string, params?: Record<string, unknown>) => {
+      setCurrentPageId(pageId)
+      setPageParams(params || {})
+      if (isMobile) setSidebarOpen(false)
+      if (typeof window !== 'undefined') {
+        const page = schema.pages.find((p) => p.id === pageId)
+        const hashValue = page?.route ? page.route.replace(/^\//, '') : pageId
+        window.history.pushState(null, '', encodeHashParams(hashValue, params))
+      }
+    },
+    [schema.pages, isMobile]
+  )
 
   const currentPage = schema.pages.find((p) => p.id === currentPageId) || schema.pages[0]
   const navType = schema.navigation?.type || 'sidebar'
@@ -139,7 +224,16 @@ export function AppRenderer({ schema, workspaceId, className, skipDataProvider }
   }
   const themeStyle = themeVars as React.CSSProperties
 
+  const pageParamsCtx = useMemo<PageParamsContextValue>(
+    () => ({
+      params: pageParams,
+      navigateToPage,
+    }),
+    [pageParams, navigateToPage]
+  )
+
   const content = (
+    <PageParamsContext.Provider value={pageParamsCtx}>
       <div className={cn('flex h-full bg-background', className)} style={themeStyle}>
         <style>{`@keyframes appPageFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         {/* Mobile sidebar backdrop */}
@@ -153,15 +247,27 @@ export function AppRenderer({ schema, workspaceId, className, skipDataProvider }
             className={cn(
               'border-r border-border bg-surface-200/20 flex flex-col shrink-0 transition-all',
               isMobile
-                ? cn('fixed inset-y-0 left-0 z-40 w-56 shadow-lg', sidebarOpen ? 'translate-x-0' : '-translate-x-full')
-                : sidebarOpen ? 'w-52' : 'w-12'
+                ? cn(
+                    'fixed inset-y-0 left-0 z-40 w-56 shadow-lg',
+                    sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                  )
+                : sidebarOpen
+                  ? 'w-52'
+                  : 'w-12'
             )}
           >
             <div className="px-3 py-3 border-b border-border flex items-center gap-2">
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-foreground-muted hover:text-foreground">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="text-foreground-muted hover:text-foreground"
+              >
                 <Menu className="w-4 h-4" />
               </button>
-              {sidebarOpen && <span className="text-sm font-medium text-foreground truncate">{schema.app_name || 'App'}</span>}
+              {sidebarOpen && (
+                <span className="text-sm font-medium text-foreground truncate">
+                  {schema.app_name || 'App'}
+                </span>
+              )}
             </div>
             <nav className="flex-1 py-2 overflow-y-auto">
               {schema.pages.map((page) => {
@@ -194,7 +300,9 @@ export function AppRenderer({ schema, workspaceId, className, skipDataProvider }
           {navType === 'topbar' && (
             <div className="border-b border-border px-4 py-2 flex items-center gap-1 bg-surface-200/20 overflow-x-auto">
               {schema.app_name && (
-                <span className="text-sm font-medium text-foreground mr-3 shrink-0">{schema.app_name}</span>
+                <span className="text-sm font-medium text-foreground mr-3 shrink-0">
+                  {schema.app_name}
+                </span>
               )}
               {schema.pages.map((page) => {
                 const Icon = iconMap[page.icon || ''] || FileText
@@ -260,17 +368,14 @@ export function AppRenderer({ schema, workspaceId, className, skipDataProvider }
           </div>
         </div>
       </div>
+    </PageParamsContext.Provider>
   )
 
   if (skipDataProvider) {
     return content
   }
 
-  return (
-    <DataProvider workspaceId={workspaceId}>
-      {content}
-    </DataProvider>
-  )
+  return <DataProvider workspaceId={workspaceId}>{content}</DataProvider>
 }
 
 function PageContent({ page }: { page: AppPage }) {
@@ -308,9 +413,16 @@ function PageContent({ page }: { page: AppPage }) {
           {groups.map((group, gi) => {
             if (group.type === 'stats_group') {
               return (
-                <div key={`sg-${gi}`} className="col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div
+                  key={`sg-${gi}`}
+                  className="col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                >
                   {group.blocks.map((block) => (
-                    <StatsCardBlock key={block.id} config={block.config as unknown as StatsCardConfig} dataSource={block.data_source} />
+                    <StatsCardBlock
+                      key={block.id}
+                      config={block.config as unknown as StatsCardConfig}
+                      dataSource={block.data_source}
+                    />
                   ))}
                 </div>
               )
@@ -326,7 +438,9 @@ function PageContent({ page }: { page: AppPage }) {
                   gridRow: rowSpan && rowSpan > 1 ? `span ${rowSpan}` : undefined,
                 }}
               >
-                {block.label && <h3 className="text-sm font-medium text-foreground mb-2">{block.label}</h3>}
+                {block.label && (
+                  <h3 className="text-sm font-medium text-foreground mb-2">{block.label}</h3>
+                )}
                 <BlockRenderer block={block} />
               </div>
             )
@@ -337,9 +451,16 @@ function PageContent({ page }: { page: AppPage }) {
           {groups.map((group, gi) => {
             if (group.type === 'stats_group') {
               return (
-                <div key={`sg-${gi}`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div
+                  key={`sg-${gi}`}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                >
                   {group.blocks.map((block) => (
-                    <StatsCardBlock key={block.id} config={block.config as unknown as StatsCardConfig} dataSource={block.data_source} />
+                    <StatsCardBlock
+                      key={block.id}
+                      config={block.config as unknown as StatsCardConfig}
+                      dataSource={block.data_source}
+                    />
                   ))}
                 </div>
               )
@@ -347,7 +468,9 @@ function PageContent({ page }: { page: AppPage }) {
             const block = group.blocks[0]
             return (
               <div key={block.id}>
-                {block.label && <h3 className="text-sm font-medium text-foreground mb-2">{block.label}</h3>}
+                {block.label && (
+                  <h3 className="text-sm font-medium text-foreground mb-2">{block.label}</h3>
+                )}
                 <BlockRenderer block={block} />
               </div>
             )
@@ -361,16 +484,31 @@ function PageContent({ page }: { page: AppPage }) {
 function BlockRenderer({ block }: { block: AppBlock }) {
   switch (block.type) {
     case 'stats_card':
-      return <StatsCardBlock config={block.config as unknown as StatsCardConfig} dataSource={block.data_source} />
+      return (
+        <StatsCardBlock
+          config={block.config as unknown as StatsCardConfig}
+          dataSource={block.data_source}
+        />
+      )
     case 'data_table':
       return <DataTableBlock config={block.config as unknown as DataTableConfig} />
     case 'chart':
-      return <ChartBlock config={block.config as unknown as ChartConfig} dataSource={block.data_source} />
+      return (
+        <ChartBlock
+          config={block.config as unknown as ChartConfig}
+          dataSource={block.data_source}
+        />
+      )
     case 'form':
     case 'form_dialog':
       return <FormBlock config={block.config as unknown as FormConfig} />
     case 'detail_view':
-      return <DetailViewBlock config={block.config as unknown as DetailViewConfig} dataSource={block.data_source} />
+      return (
+        <DetailViewBlock
+          config={block.config as unknown as DetailViewConfig}
+          dataSource={block.data_source}
+        />
+      )
     case 'markdown':
       return <MarkdownBlock content={(block.config as any).content || ''} />
     case 'image':
@@ -378,11 +516,22 @@ function BlockRenderer({ block }: { block: AppBlock }) {
     case 'hero':
       return <HeroBlock config={block.config as unknown as HeroConfig} />
     case 'tabs_container':
-      return <TabsContainerBlock config={block.config as unknown as TabsContainerConfig} renderBlock={(b) => <BlockRenderer block={b} />} />
+      return (
+        <TabsContainerBlock
+          config={block.config as unknown as TabsContainerConfig}
+          renderBlock={(b) => <BlockRenderer block={b} />}
+        />
+      )
     case 'list':
-      return <ListBlock config={block.config as unknown as ListConfig} dataSource={block.data_source} />
+      return (
+        <ListBlock config={block.config as unknown as ListConfig} dataSource={block.data_source} />
+      )
     case 'divider':
       return <DividerBlock config={block.config as unknown as DividerConfig} />
+    case 'auth':
+      return <AuthBlock config={block.config as unknown as AuthBlockConfig} />
+    case 'file_upload':
+      return <FileUploadBlock config={block.config as unknown as FileUploadConfig} />
     default:
       return (
         <div className="border border-dashed border-border rounded-lg p-4 text-center text-xs text-foreground-muted">
@@ -394,9 +543,10 @@ function BlockRenderer({ block }: { block: AppBlock }) {
 
 function PageActionButton({ action }: { action: import('./types').AppAction }) {
   const variant = (action.config?.variant as string) || 'primary'
-  const cls = variant === 'secondary'
-    ? 'border border-border text-foreground hover:bg-surface-200/50'
-    : 'bg-brand-500 text-white hover:bg-brand-600'
+  const cls =
+    variant === 'secondary'
+      ? 'border border-border text-foreground hover:bg-surface-200/50'
+      : 'bg-brand-500 text-white hover:bg-brand-600'
 
   if (action.type === 'navigate' && action.target) {
     const isInternal = action.target.startsWith('/') || action.target.startsWith('#')
@@ -406,7 +556,10 @@ function PageActionButton({ action }: { action: import('./types').AppAction }) {
         href={href}
         target={isInternal ? undefined : '_blank'}
         rel={isInternal ? undefined : 'noopener noreferrer'}
-        className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors', cls)}
+        className={cn(
+          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+          cls
+        )}
       >
         {action.label}
       </a>
@@ -415,7 +568,10 @@ function PageActionButton({ action }: { action: import('./types').AppAction }) {
 
   return (
     <button
-      className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors', cls)}
+      className={cn(
+        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+        cls
+      )}
     >
       {action.label}
     </button>

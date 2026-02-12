@@ -31,7 +31,5 @@ export function DividerBlock({ config }: DividerBlockProps) {
     )
   }
 
-  return (
-    <hr className={cn('border-t border-border', borderStyle, spacing)} />
-  )
+  return <hr className={cn('border-t border-border', borderStyle, spacing)} />
 }

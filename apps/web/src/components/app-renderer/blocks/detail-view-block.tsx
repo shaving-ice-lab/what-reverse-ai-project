@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useDataProvider } from '../data-provider'
+import { usePageParams } from '../app-renderer'
 import type { DetailViewConfig } from '../types'
 import type { DataSource } from '../types'
 
@@ -13,10 +14,15 @@ interface DetailViewBlockProps {
 
 export function DetailViewBlock({ config, data: externalData, dataSource }: DetailViewBlockProps) {
   const { queryRows, onTableChange } = useDataProvider()
+  const { params: pageParams } = usePageParams()
   const [fetchedData, setFetchedData] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(false)
 
   const tableName = dataSource?.table || config.table_name || ''
+
+  // Resolve record_id from page params
+  const recordIdKey = config.record_id_param || config.record_id_key || 'id'
+  const recordId = pageParams[recordIdKey] as string | undefined
 
   useEffect(() => {
     if (externalData || !tableName) return
@@ -24,24 +30,37 @@ export function DetailViewBlock({ config, data: externalData, dataSource }: Deta
     const load = async () => {
       setLoading(true)
       try {
-        const result = await queryRows(tableName, { limit: 1 })
+        const filters = recordId
+          ? [{ column: recordIdKey, operator: '=', value: recordId }]
+          : undefined
+        const result = await queryRows(tableName, { limit: 1, filters })
         if (!cancelled && result.rows.length > 0) setFetchedData(result.rows[0])
-      } catch { /* ignore */ }
+        else if (!cancelled) setFetchedData(null)
+      } catch {
+        /* ignore */
+      }
       if (!cancelled) setLoading(false)
     }
     load()
-    return () => { cancelled = true }
-  }, [externalData, tableName, queryRows])
+    return () => {
+      cancelled = true
+    }
+  }, [externalData, tableName, queryRows, recordId, recordIdKey])
 
   useEffect(() => {
     if (externalData || !tableName) return
     return onTableChange((changedTable) => {
       if (changedTable !== tableName) return
-      queryRows(tableName, { limit: 1 })
-        .then((result) => { if (result.rows.length > 0) setFetchedData(result.rows[0]) })
+      const filters = recordId
+        ? [{ column: recordIdKey, operator: '=', value: recordId }]
+        : undefined
+      queryRows(tableName, { limit: 1, filters })
+        .then((result) => {
+          if (result.rows.length > 0) setFetchedData(result.rows[0])
+        })
         .catch(() => {})
     })
-  }, [externalData, tableName, queryRows, onTableChange])
+  }, [externalData, tableName, queryRows, onTableChange, recordId, recordIdKey])
 
   const data = externalData || fetchedData
 
@@ -70,7 +89,9 @@ export function DetailViewBlock({ config, data: externalData, dataSource }: Deta
     <div className="border border-border rounded-lg divide-y divide-border">
       {config.fields.map((field) => (
         <div key={field.key} className="flex px-4 py-2.5">
-          <span className="text-xs font-medium text-foreground-muted w-36 shrink-0">{field.label}</span>
+          <span className="text-xs font-medium text-foreground-muted w-36 shrink-0">
+            {field.label}
+          </span>
           <span className="text-sm text-foreground flex-1">
             {formatValue(data[field.key], field.type)}
           </span>
@@ -83,27 +104,60 @@ export function DetailViewBlock({ config, data: externalData, dataSource }: Deta
 function formatValue(value: unknown, type?: string): React.ReactNode {
   if (value === null || value === undefined) return <span className="text-foreground-muted">—</span>
   if (type === 'boolean' || typeof value === 'boolean') {
-    return <span className={`text-xs px-1.5 py-0.5 rounded ${value ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}`}>{value ? 'Yes' : 'No'}</span>
+    return (
+      <span
+        className={`text-xs px-1.5 py-0.5 rounded ${value ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}`}
+      >
+        {value ? 'Yes' : 'No'}
+      </span>
+    )
   }
   if (type === 'date') {
     const d = new Date(String(value))
-    if (!isNaN(d.getTime())) return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    if (!isNaN(d.getTime()))
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
   }
   if (type === 'number' || typeof value === 'number') {
     return Number(value).toLocaleString()
   }
   if (typeof value === 'object') {
-    return <code className="text-xs bg-surface-200/50 px-1.5 py-0.5 rounded font-mono break-all">{JSON.stringify(value)}</code>
+    return (
+      <code className="text-xs bg-surface-200/50 px-1.5 py-0.5 rounded font-mono break-all">
+        {JSON.stringify(value)}
+      </code>
+    )
   }
   const str = String(value)
   // Auto-detect ISO date strings
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}(T|\s)/.test(str)) {
     const d = new Date(str)
-    if (!isNaN(d.getTime())) return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    if (!isNaN(d.getTime()))
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
   }
   // Auto-detect URLs
   if (typeof value === 'string' && /^https?:\/\//.test(str)) {
-    return <a href={str} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline break-all">{str}</a>
+    return (
+      <a
+        href={str}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-brand-500 hover:underline break-all"
+      >
+        {str}
+      </a>
+    )
   }
   return str
 }

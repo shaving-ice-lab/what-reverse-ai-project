@@ -39,7 +39,6 @@ export interface PageConfig {
   id: string
   title: string
   route: string
-  workflow_id: string
   icon: string
 }
 
@@ -49,19 +48,13 @@ export interface PagesConfig {
   default_page: string
 }
 
-interface Workflow {
-  id: string
-  name: string
-}
-
 interface PageManagerPanelProps {
   config: PagesConfig
-  workflows: Workflow[]
   onChange: (config: PagesConfig) => void
   className?: string
 }
 
-export function PageManagerPanel({ config, workflows, onChange, className }: PageManagerPanelProps) {
+export function PageManagerPanel({ config, onChange, className }: PageManagerPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const addPage = () => {
@@ -70,7 +63,6 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
       id,
       title: 'New Page',
       route: `/${id}`,
-      workflow_id: '',
       icon: 'FileText',
     }
     onChange({
@@ -82,7 +74,7 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
 
   const removePage = (pageId: string) => {
     const updated = config.pages.filter((p) => p.id !== pageId)
-    const newDefault = config.default_page === pageId ? (updated[0]?.id || '') : config.default_page
+    const newDefault = config.default_page === pageId ? updated[0]?.id || '' : config.default_page
     onChange({
       ...config,
       pages: updated,
@@ -174,7 +166,9 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
               {isEditing && (
                 <div className="px-4 pb-3 space-y-2.5 bg-surface-200/20">
                   <div>
-                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">Title</label>
+                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">
+                      Title
+                    </label>
                     <Input
                       value={page.title}
                       onChange={(e) => updatePage(page.id, { title: e.target.value })}
@@ -182,7 +176,9 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">Route</label>
+                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">
+                      Route
+                    </label>
                     <Input
                       value={page.route}
                       onChange={(e) => updatePage(page.id, { route: e.target.value })}
@@ -191,22 +187,9 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">Workflow</label>
-                    <select
-                      value={page.workflow_id}
-                      onChange={(e) => updatePage(page.id, { workflow_id: e.target.value })}
-                      className="w-full h-8 text-sm rounded border border-border bg-background px-2 mt-0.5"
-                    >
-                      <option value="">— None —</option>
-                      {workflows.map((wf) => (
-                        <option key={wf.id} value={wf.id}>
-                          {wf.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">Icon</label>
+                    <label className="text-[10px] text-foreground-muted uppercase tracking-wider">
+                      Icon
+                    </label>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {ICON_OPTIONS.map((opt) => {
                         const Icon = opt.icon
@@ -247,7 +230,9 @@ export function PageManagerPanel({ config, workflows, onChange, className }: Pag
 
       {/* Navigation Type */}
       <div className="px-4 py-3 border-t border-border">
-        <label className="text-[10px] text-foreground-muted uppercase tracking-wider">Navigation</label>
+        <label className="text-[10px] text-foreground-muted uppercase tracking-wider">
+          Navigation
+        </label>
         <div className="flex gap-1.5 mt-1">
           {['sidebar', 'topbar', 'tabs'].map((navType) => (
             <button

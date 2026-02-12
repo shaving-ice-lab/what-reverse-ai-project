@@ -12,7 +12,6 @@ interface VersionDiffViewerProps {
 
 const FIELD_LABELS: Record<string, string> = {
   changelog: 'Changelog',
-  workflow_id: 'Workflow',
   ui_schema: 'UI Schema',
   db_schema: 'DB Schema',
   config_json: 'Config',
@@ -34,7 +33,12 @@ function flatDiff(
   to: Record<string, unknown>,
   prefix = ''
 ): Array<{ key: string; from: unknown; to: unknown; type: 'added' | 'removed' | 'changed' }> {
-  const result: Array<{ key: string; from: unknown; to: unknown; type: 'added' | 'removed' | 'changed' }> = []
+  const result: Array<{
+    key: string
+    from: unknown
+    to: unknown
+    type: 'added' | 'removed' | 'changed'
+  }> = []
   const allKeys = new Set([...Object.keys(from), ...Object.keys(to)])
   for (const k of allKeys) {
     const fullKey = prefix ? `${prefix}.${k}` : k
@@ -53,7 +57,13 @@ function flatDiff(
   return result
 }
 
-function DiffFieldSection({ fieldName, change }: { fieldName: string; change: AppVersionDiffChange }) {
+function DiffFieldSection({
+  fieldName,
+  change,
+}: {
+  fieldName: string
+  change: AppVersionDiffChange
+}) {
   const [expanded, setExpanded] = useState(false)
   const label = FIELD_LABELS[fieldName] || fieldName
 

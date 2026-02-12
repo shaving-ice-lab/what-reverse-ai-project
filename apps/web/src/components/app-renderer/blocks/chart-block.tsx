@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
 import type { ChartConfig } from '../types'
 import type { DataSource } from '../types'
@@ -28,11 +27,15 @@ export function ChartBlock({ config, data: externalData, dataSource }: ChartBloc
           order_by: dataSource.order_by?.map((o) => ({ column: o.column, direction: o.direction })),
         })
         if (!cancelled) setFetchedRows(result.rows)
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       if (!cancelled) setLoading(false)
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [externalData, dataSource, queryRows])
 
   useEffect(() => {
@@ -55,11 +58,17 @@ export function ChartBlock({ config, data: externalData, dataSource }: ChartBloc
   if (loading && rows.length === 0) {
     return (
       <div className="border border-border rounded-lg p-4">
-        {config.title && <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>}
+        {config.title && (
+          <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>
+        )}
         <div className="animate-pulse" style={{ height }}>
           <div className="flex items-end gap-2 h-full justify-center">
             {[45, 72, 38, 60, 80, 52].map((h, i) => (
-              <div key={i} className="bg-foreground/10 rounded-t" style={{ width: 24, height: `${h}%` }} />
+              <div
+                key={i}
+                className="bg-foreground/10 rounded-t"
+                style={{ width: 24, height: `${h}%` }}
+              />
             ))}
           </div>
         </div>
@@ -70,8 +79,13 @@ export function ChartBlock({ config, data: externalData, dataSource }: ChartBloc
   if (rows.length === 0) {
     return (
       <div className="border border-border rounded-lg p-4">
-        {config.title && <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>}
-        <div className="flex items-center justify-center text-xs text-foreground-muted" style={{ height }}>
+        {config.title && (
+          <div className="text-sm font-medium text-foreground mb-3">{config.title}</div>
+        )}
+        <div
+          className="flex items-center justify-center text-xs text-foreground-muted"
+          style={{ height }}
+        >
           No data available
         </div>
       </div>
@@ -97,18 +111,35 @@ export function ChartBlock({ config, data: externalData, dataSource }: ChartBloc
         <LineChart values={values} labels={labels} maxVal={maxVal} height={height} color={color} />
       )}
 
-      {config.chart_type === 'pie' && (
-        <PieChart values={values} labels={labels} color={color} />
-      )}
+      {config.chart_type === 'pie' && <PieChart values={values} labels={labels} color={color} />}
 
       {config.chart_type === 'area' && (
-        <LineChart values={values} labels={labels} maxVal={maxVal} height={height} color={color} filled />
+        <LineChart
+          values={values}
+          labels={labels}
+          maxVal={maxVal}
+          height={height}
+          color={color}
+          filled
+        />
       )}
     </div>
   )
 }
 
-function BarChart({ values, labels, maxVal, height, color }: { values: number[]; labels: string[]; maxVal: number; height: number; color: string }) {
+function BarChart({
+  values,
+  labels,
+  maxVal,
+  height,
+  color,
+}: {
+  values: number[]
+  labels: string[]
+  maxVal: number
+  height: number
+  color: string
+}) {
   const barWidth = Math.max(12, Math.min(40, 300 / values.length))
   const chartH = height - 24
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(maxVal * f))
@@ -119,8 +150,14 @@ function BarChart({ values, labels, maxVal, height, color }: { values: number[];
         {ticks.map((tick, i) => {
           const bottom = (tick / maxVal) * 100
           return (
-            <div key={i} className="absolute left-0 right-0 flex items-center" style={{ bottom: `${bottom}%` }}>
-              <span className="text-[8px] text-foreground-muted w-8 text-right pr-1 shrink-0">{tick}</span>
+            <div
+              key={i}
+              className="absolute left-0 right-0 flex items-center"
+              style={{ bottom: `${bottom}%` }}
+            >
+              <span className="text-[8px] text-foreground-muted w-8 text-right pr-1 shrink-0">
+                {tick}
+              </span>
               <div className="flex-1 border-t border-border/30" />
             </div>
           )
@@ -143,14 +180,34 @@ function BarChart({ values, labels, maxVal, height, color }: { values: number[];
       </div>
       <div className="flex gap-1 justify-center ml-8 mt-1">
         {labels.map((l, i) => (
-          <span key={i} className="text-[9px] text-foreground-muted truncate text-center" style={{ width: barWidth + 4 }}>{l}</span>
+          <span
+            key={i}
+            className="text-[9px] text-foreground-muted truncate text-center"
+            style={{ width: barWidth + 4 }}
+          >
+            {l}
+          </span>
         ))}
       </div>
     </div>
   )
 }
 
-function LineChart({ values, labels, maxVal, height, color, filled }: { values: number[]; labels: string[]; maxVal: number; height: number; color: string; filled?: boolean }) {
+function LineChart({
+  values,
+  labels,
+  maxVal,
+  height,
+  color,
+  filled,
+}: {
+  values: number[]
+  labels: string[]
+  maxVal: number
+  height: number
+  color: string
+  filled?: boolean
+}) {
   const chartH = height - 20
   const points = values.map((v, i) => {
     const x = (i / Math.max(values.length - 1, 1)) * 100
@@ -163,11 +220,20 @@ function LineChart({ values, labels, maxVal, height, color, filled }: { values: 
 
   return (
     <div style={{ height }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full" style={{ height: chartH }}>
-        {filled && (
-          <path d={fillPath} fill={color} opacity={0.1} />
-        )}
-        <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="w-full"
+        style={{ height: chartH }}
+      >
+        {filled && <path d={fillPath} fill={color} opacity={0.1} />}
+        <path
+          d={pathD}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          vectorEffect="non-scaling-stroke"
+        />
         {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r="2" fill={color} vectorEffect="non-scaling-stroke">
             <title>{`${labels[i]}: ${values[i]}`}</title>
@@ -182,7 +248,15 @@ function LineChart({ values, labels, maxVal, height, color, filled }: { values: 
   )
 }
 
-function PieChart({ values, labels, color }: { values: number[]; labels: string[]; color: string }) {
+function PieChart({
+  values,
+  labels,
+  color,
+}: {
+  values: number[]
+  labels: string[]
+  color: string
+}) {
   const total = values.reduce((s, v) => s + v, 0)
   if (total === 0) return null
 
@@ -220,9 +294,15 @@ function PieChart({ values, labels, color }: { values: number[]; labels: string[
       <div className="space-y-1">
         {labels.map((l, i) => (
           <div key={i} className="flex items-center gap-1.5 text-xs">
-            <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
+            <div
+              className="w-2.5 h-2.5 rounded-sm shrink-0"
+              style={{ backgroundColor: colors[i % colors.length] }}
+            />
             <span className="text-foreground-light">{l}</span>
-            <span className="text-foreground-muted ml-auto">{values[i]} <span className="opacity-60">({((values[i] / total) * 100).toFixed(0)}%)</span></span>
+            <span className="text-foreground-muted ml-auto">
+              {values[i]}{' '}
+              <span className="opacity-60">({((values[i] / total) * 100).toFixed(0)}%)</span>
+            </span>
           </div>
         ))}
       </div>

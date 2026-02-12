@@ -16,6 +16,7 @@ export interface AppPage {
   icon?: string
   blocks: AppBlock[]
   actions?: AppAction[]
+  require_auth?: boolean
 }
 
 export interface AppNavigation {
@@ -49,6 +50,8 @@ export type AppBlockType =
   | 'tabs_container'
   | 'list'
   | 'divider'
+  | 'auth'
+  | 'file_upload'
 
 export interface AppBlock {
   id: string
@@ -90,6 +93,11 @@ export interface DataTableConfig {
   search_key?: string
   pagination?: boolean
   page_size?: number
+  row_click_action?: {
+    type: 'navigate'
+    target_page: string
+    param_key?: string
+  }
 }
 
 export interface DataTableColumn {
@@ -120,8 +128,8 @@ export interface FormConfig {
   submit_label?: string
   table_name?: string
   mode?: 'create' | 'edit'
-  workflow_id?: string
   on_submit_action?: AppAction
+  record_id_param?: string
 }
 
 export interface FormField {
@@ -140,6 +148,7 @@ export interface DetailViewConfig {
   fields: { key: string; label: string; type?: string }[]
   table_name?: string
   record_id_key?: string
+  record_id_param?: string
 }
 
 // ========== Image ==========
@@ -194,6 +203,11 @@ export interface ListConfig {
   columns?: number
   clickable?: boolean
   empty_message?: string
+  click_action?: {
+    type: 'navigate'
+    target_page: string
+    param_key?: string
+  }
 }
 
 // ========== Divider ==========
@@ -204,12 +218,37 @@ export interface DividerConfig {
   spacing?: 'sm' | 'md' | 'lg'
 }
 
+// ========== Auth ==========
+
+export interface AuthBlockConfig {
+  mode?: 'login' | 'register' | 'login_register'
+  title?: string
+  description?: string
+  login_label?: string
+  register_label?: string
+  logout_label?: string
+  auto_login_after_register?: boolean
+}
+
+// ========== File Upload ==========
+
+export interface FileUploadConfig {
+  label?: string
+  description?: string
+  accept?: string
+  max_size_mb?: number
+  multiple?: boolean
+  table_name?: string
+  column_name?: string
+  prefix?: string
+}
+
 // ========== Actions ==========
 
 export interface AppAction {
   id: string
   label: string
-  type: 'navigate' | 'api_call' | 'dialog' | 'workflow'
+  type: 'navigate' | 'api_call' | 'dialog'
   target?: string
   config?: Record<string, unknown>
 }

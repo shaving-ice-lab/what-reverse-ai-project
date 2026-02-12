@@ -8,6 +8,7 @@ import { getStoredTokens } from '@/lib/api/shared'
 interface RuntimeDataProviderProps {
   workspaceSlug: string
   children: React.ReactNode
+  appAuthToken?: string | null
 }
 
 function buildRuntimeUrl(path: string): string {
@@ -20,7 +21,11 @@ function buildRuntimeUrl(path: string): string {
   return normalized
 }
 
-async function runtimeFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function runtimeFetch<T>(
+  path: string,
+  options: RequestInit = {},
+  appAuthToken?: string | null
+): Promise<T> {
   const url = buildRuntimeUrl(path)
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -30,6 +35,9 @@ async function runtimeFetch<T>(path: string, options: RequestInit = {}): Promise
   const tokens = getStoredTokens()
   if (tokens?.accessToken) {
     headers['Authorization'] = `Bearer ${tokens.accessToken}`
+  }
+  if (appAuthToken) {
+    headers['X-App-Token'] = appAuthToken
   }
 
   const response = await fetch(url, { ...options, headers })
@@ -50,7 +58,11 @@ async function runtimeFetch<T>(path: string, options: RequestInit = {}): Promise
  */
 type TableChangeListener = (table: string) => void
 
-export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProviderProps) {
+export function RuntimeDataProvider({
+  workspaceSlug,
+  children,
+  appAuthToken,
+}: RuntimeDataProviderProps) {
   const basePath = `/runtime/${encodeURIComponent(workspaceSlug)}/data`
   const listenersRef = useRef<Set<TableChangeListener>>(new Set())
 
@@ -60,18 +72,23 @@ export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProv
 
   const onTableChange = useCallback((listener: TableChangeListener) => {
     listenersRef.current.add(listener)
-    return () => { listenersRef.current.delete(listener) }
+    return () => {
+      listenersRef.current.delete(listener)
+    }
   }, [])
 
   const queryRows = useCallback(
-    async (table: string, params?: {
-      columns?: string[]
-      filters?: { column: string; operator: string; value: unknown }[]
-      filter_combinator?: 'AND' | 'OR'
-      order_by?: { column: string; direction: string }[]
-      limit?: number
-      offset?: number
-    }) => {
+    async (
+      table: string,
+      params?: {
+        columns?: string[]
+        filters?: { column: string; operator: string; value: unknown }[]
+        filter_combinator?: 'AND' | 'OR'
+        order_by?: { column: string; direction: string }[]
+        limit?: number
+        offset?: number
+      }
+    ) => {
       const searchParams = new URLSearchParams()
       if (params?.limit) searchParams.set('page_size', String(params.limit))
       if (params?.offset && params.limit) {
@@ -94,30 +111,42 @@ export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProv
       }
       const qs = searchParams.toString()
       const url = `${basePath}/${encodeURIComponent(table)}${qs ? `?${qs}` : ''}`
-      const res = await runtimeFetch<{ rows: Record<string, unknown>[]; total: number; columns: string[] }>(url)
+      const res = await runtimeFetch<{
+        rows: Record<string, unknown>[]
+        total: number
+        columns: string[]
+      }>(url, {}, appAuthToken)
       return res || { rows: [], total: 0, columns: [] }
     },
-    [basePath]
+    [basePath, appAuthToken]
   )
 
   const insertRow = useCallback(
     async (table: string, data: Record<string, unknown>) => {
-      await runtimeFetch(`${basePath}/${encodeURIComponent(table)}`, {
-        method: 'POST',
-        body: JSON.stringify({ data }),
-      })
+      await runtimeFetch(
+        `${basePath}/${encodeURIComponent(table)}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ data }),
+        },
+        appAuthToken
+      )
     },
-    [basePath]
+    [basePath, appAuthToken]
   )
 
   const updateRow = useCallback(
     async (table: string, data: Record<string, unknown>, _where: string) => {
-      await runtimeFetch(`${basePath}/${encodeURIComponent(table)}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ data }),
-      })
+      await runtimeFetch(
+        `${basePath}/${encodeURIComponent(table)}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ data }),
+        },
+        appAuthToken
+      )
     },
-    [basePath]
+    [basePath, appAuthToken]
   )
 
   const deleteRows = useCallback(
@@ -129,26 +158,49 @@ export function RuntimeDataProvider({ workspaceSlug, children }: RuntimeDataProv
         resolvedIds = idMatch ? [idMatch[1]] : []
       }
       if (resolvedIds.length === 0) return
-      await runtimeFetch(`${basePath}/${encodeURIComponent(table)}`, {
-        method: 'DELETE',
-        body: JSON.stringify({ ids: resolvedIds }),
-      })
+      await runtimeFetch(
+        `${basePath}/${encodeURIComponent(table)}`,
+        {
+          method: 'DELETE',
+          body: JSON.stringify({ ids: resolvedIds }),
+        },
+        appAuthToken
+      )
     },
-    [basePath]
+    [basePath, appAuthToken]
   )
 
-  const executeWorkflow = useCallback(
-    async (workflowId: string, inputs: Record<string, unknown>) => {
-      await runtimeFetch(`/runtime/${encodeURIComponent(workspaceSlug)}/workflows/${encodeURIComponent(workflowId)}/execute`, {
-        method: 'POST',
-        body: JSON.stringify({ inputs, trigger_type: 'form_submit' }),
-      })
+  const uploadFile = useCallback(
+    async (file: File, prefix?: string): Promise<string> => {
+      const formData = new FormData()
+      formData.append('file', file)
+      if (prefix) formData.append('prefix', prefix)
+      const url = buildRuntimeUrl(`/runtime/${encodeURIComponent(workspaceSlug)}/storage/upload`)
+      const headers: Record<string, string> = {}
+      const tokens = getStoredTokens()
+      if (tokens?.accessToken) headers['Authorization'] = `Bearer ${tokens.accessToken}`
+      if (appAuthToken) headers['X-App-Token'] = appAuthToken
+      const res = await fetch(url, { method: 'POST', headers, body: formData })
+      const payload = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error((payload as any)?.message || 'Upload failed')
+      return (payload as any)?.data?.public_url || ''
     },
-    [workspaceSlug]
+    [workspaceSlug, appAuthToken]
   )
 
   return (
-    <DataProviderContext.Provider value={{ workspaceId: workspaceSlug, queryRows, insertRow, updateRow, deleteRows, executeWorkflow, notifyTableChange, onTableChange }}>
+    <DataProviderContext.Provider
+      value={{
+        workspaceId: workspaceSlug,
+        queryRows,
+        insertRow,
+        updateRow,
+        deleteRows,
+        uploadFile,
+        notifyTableChange,
+        onTableChange,
+      }}
+    >
       {children}
     </DataProviderContext.Provider>
   )

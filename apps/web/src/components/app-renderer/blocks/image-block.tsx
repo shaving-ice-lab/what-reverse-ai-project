@@ -48,7 +48,12 @@ export function ImageBlock({ config }: ImageBlockProps) {
   return (
     <figure className="space-y-1.5">
       {config.link ? (
-        <a href={config.link} target="_blank" rel="noopener noreferrer" className="block hover:opacity-90 transition-opacity">
+        <a
+          href={config.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block hover:opacity-90 transition-opacity"
+        >
           {img}
         </a>
       ) : (

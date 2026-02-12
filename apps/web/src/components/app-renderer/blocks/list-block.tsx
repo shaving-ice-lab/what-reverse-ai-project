@@ -4,15 +4,22 @@ import React, { useState, useEffect } from 'react'
 import { ChevronDown, ImageOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
+import { usePageParams } from '../app-renderer'
 import type { ListConfig } from '../types'
 
 interface ListBlockProps {
   config: ListConfig
-  dataSource?: { table: string; where?: string; order_by?: { column: string; direction: string }[]; limit?: number }
+  dataSource?: {
+    table: string
+    where?: string
+    order_by?: { column: string; direction: string }[]
+    limit?: number
+  }
 }
 
 export function ListBlock({ config, dataSource }: ListBlockProps) {
   const { queryRows, onTableChange } = useDataProvider()
+  const { navigateToPage } = usePageParams()
   const [rows, setRows] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
@@ -42,7 +49,10 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
       if (table === tableName) load()
     })
 
-    return () => { cancelled = true; unsub() }
+    return () => {
+      cancelled = true
+      unsub()
+    }
   }, [tableName, dataSource?.order_by, dataSource?.limit, queryRows, onTableChange])
 
   const layout = config.layout || 'list'
@@ -54,7 +64,9 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="border border-border rounded-lg p-3 animate-pulse">
             <div className="flex gap-3">
-              {config.image_key && <div className="w-12 h-12 rounded-md bg-foreground/10 shrink-0" />}
+              {config.image_key && (
+                <div className="w-12 h-12 rounded-md bg-foreground/10 shrink-0" />
+              )}
               <div className="flex-1 space-y-1.5">
                 <div className="h-3.5 w-32 bg-foreground/10 rounded" />
                 <div className="h-3 w-48 bg-foreground/10 rounded" />
@@ -76,7 +88,8 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
 
   const getBadgeColor = (val: string) => {
     const v = val.toLowerCase()
-    if (/active|enabled|online|approved|published/.test(v)) return 'bg-emerald-500/10 text-emerald-600'
+    if (/active|enabled|online|approved|published/.test(v))
+      return 'bg-emerald-500/10 text-emerald-600'
     if (/inactive|disabled|offline|archived/.test(v)) return 'bg-gray-500/10 text-gray-500'
     if (/pending|review|waiting|draft/.test(v)) return 'bg-amber-500/10 text-amber-600'
     if (/failed|error|rejected|blocked/.test(v)) return 'bg-red-500/10 text-red-600'
@@ -102,12 +115,12 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
 
   return (
     <div
-      className={cn(
+      className={cn(layout === 'grid' ? 'grid gap-3' : 'space-y-2')}
+      style={
         layout === 'grid'
-          ? 'grid gap-3'
-          : 'space-y-2'
-      )}
-      style={layout === 'grid' ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
+          ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
+          : undefined
+      }
     >
       {rows.map((row, i) => {
         const title = String(row[config.title_key] ?? '')
@@ -123,9 +136,18 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
             key={i}
             className={cn(
               'border border-border rounded-lg p-3',
-              config.clickable && 'cursor-pointer hover:bg-surface-200/30 transition-colors'
+              (config.clickable || config.click_action) &&
+                'cursor-pointer hover:bg-surface-200/30 transition-colors'
             )}
-            onClick={config.clickable ? () => setExpandedIdx(isExpanded ? null : i) : undefined}
+            onClick={() => {
+              if (config.click_action?.type === 'navigate') {
+                const paramKey = config.click_action.param_key || 'id'
+                const pkValue = row[paramKey] ?? row['id']
+                navigateToPage(config.click_action.target_page, { [paramKey]: pkValue })
+                return
+              }
+              if (config.clickable) setExpandedIdx(isExpanded ? null : i)
+            }}
           >
             <div className="flex gap-3">
               {image && <ListItemImage src={image} />}
@@ -133,15 +155,22 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground truncate">{title}</span>
                   {badge && (
-                    <span className={cn(
-                      'text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0',
-                      getBadgeColor(badge)
-                    )}>
+                    <span
+                      className={cn(
+                        'text-[10px] px-1.5 py-0.5 rounded-full font-medium shrink-0',
+                        getBadgeColor(badge)
+                      )}
+                    >
                       {badge}
                     </span>
                   )}
                   {config.clickable && (
-                    <ChevronDown className={cn('w-3.5 h-3.5 text-foreground-muted ml-auto shrink-0 transition-transform', isExpanded && 'rotate-180')} />
+                    <ChevronDown
+                      className={cn(
+                        'w-3.5 h-3.5 text-foreground-muted ml-auto shrink-0 transition-transform',
+                        isExpanded && 'rotate-180'
+                      )}
+                    />
                   )}
                 </div>
                 {subtitle && (
@@ -157,7 +186,9 @@ export function ListBlock({ config, dataSource }: ListBlockProps) {
                 {Object.entries(row).map(([key, val]) => (
                   <div key={key}>
                     <span className="text-[10px] text-foreground-muted">{key}</span>
-                    <div className="text-xs text-foreground-light truncate">{val === null || val === undefined ? '—' : String(val)}</div>
+                    <div className="text-xs text-foreground-light truncate">
+                      {val === null || val === undefined ? '—' : String(val)}
+                    </div>
                   </div>
                 ))}
               </div>

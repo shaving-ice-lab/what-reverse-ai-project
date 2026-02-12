@@ -46,9 +46,7 @@ export function TabsContainerBlock({ config, renderBlock }: TabsContainerBlockPr
       </div>
       <div className="p-4 space-y-4">
         {activeTab?.blocks?.map((block) => (
-          <React.Fragment key={block.id}>
-            {renderBlock(block)}
-          </React.Fragment>
+          <React.Fragment key={block.id}>{renderBlock(block)}</React.Fragment>
         ))}
       </div>
     </div>
