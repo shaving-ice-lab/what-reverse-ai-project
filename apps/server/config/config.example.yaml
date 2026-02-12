@@ -3,9 +3,9 @@ env: development
 
 server:
   host: "0.0.0.0"
-  port: 8080
+  port: 3010
   mode: "development"  # development | production
-  base_url: "http://localhost:8080"
+  base_url: "http://localhost:3010"
 
 deployment:
   region: "local"

@@ -298,9 +298,9 @@ func setDefaults() {
 
 	// 服务器
 	viper.SetDefault("server.host", "0.0.0.0")
-	viper.SetDefault("server.port", 8080)
+	viper.SetDefault("server.port", 3010)
 	viper.SetDefault("server.mode", "development")
-	viper.SetDefault("server.base_url", "http://localhost:8080")
+	viper.SetDefault("server.base_url", "http://localhost:3010")
 
 	// 多地域部署
 	viper.SetDefault("deployment.region", "local")
