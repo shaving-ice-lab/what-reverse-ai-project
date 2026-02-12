@@ -38,6 +38,8 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { userApi } from '@/lib/api/auth'
+import { workspaceStorageApi } from '@/lib/api/workspace-storage'
+import { useWorkspace } from '@/hooks/useWorkspace'
 import { cn } from '@/lib/utils'
 import { ChangePasswordDialog } from '@/components/settings/change-password-dialog'
 import { PageContainer, PageHeader } from '@/components/dashboard/page-layout'
@@ -151,6 +153,7 @@ const mockActivities = [
 
 export default function ProfilePage() {
   const { user, setUser } = useAuthStore()
+  const { workspaceId } = useWorkspace()
 
   // Basic Info
   const [username, setUsername] = useState('')
@@ -262,10 +265,16 @@ export default function ProfilePage() {
     setError(null)
 
     try {
-      const { url } = await userApi.uploadAvatar(file)
-      // Update store user data
+      if (!workspaceId) {
+        setError('No active workspace for file upload.')
+        setIsLoading(false)
+        return
+      }
+      const storageObj = await workspaceStorageApi.upload(workspaceId, file, 'avatars')
+      const avatarUrl = storageObj.public_url || `/storage/files/${storageObj.id}`
+      await userApi.updateProfile({ avatar_url: avatarUrl })
       if (user) {
-        setUser({ ...user, avatar_url: url })
+        setUser({ ...user, avatar_url: avatarUrl })
       }
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
