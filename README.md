@@ -1,7 +1,7 @@
-# AgentFlow
+# ReverseAI
 
 <p align="center">
-  <strong>🚀 本地优先、代码级自定义、社区驱动的 AI Agent 工作流平台</strong>
+  <strong>🚀 AI-Powered App Builder Platform — Describe it, we build it.</strong>
 </p>
 
 <p align="center">
@@ -17,30 +17,18 @@
 
 ## 项目概述
 
-AgentFlow 是一个功能强大的 AI 工作流平台，让用户能够通过可视化方式快速构建自动化流程，同时提供代码级的自定义能力。支持 Web 端和桌面端（Tauri），实现真正的本地优先体验。
+ReverseAI 是一个 AI 驱动的应用构建平台。用户通过与 AI Agent 对话描述需求（例如"帮我建一个车队管理系统"），系统自动创建数据库、生成 UI、部署运行。整个 Web 应用完整地运行在 Workspace 中，数据库管理采用 Supabase 风格。
 
 ### 核心特性
 
-| 特性                | 描述                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| 🏠 **本地优先**     | 支持完全本地运行，数据不出本机，隐私安全有保障。桌面端集成 Ollama，实现完全离线的 AI 工作流 |
-| 🔧 **代码级自定义** | 通过 SDK 编写自定义节点，突破低代码工具的限制，满足专业开发者需求                           |
-| 🌐 **社区生态**     | Agent 商店 + 创作者经济，分享和发现优质工作流，构建增长飞轮                                 |
-| ✨ **可视化编辑**   | 拖拽式编辑器，5 分钟上手，支持 20+ 节点类型，快速构建复杂工作流                             |
-| 🤖 **AI 创意助手**  | 一句话输入，完整方案输出。自动生成商业计划、内容策略、执行方案                              |
-| ⏱️ **时间旅行调试** | 回溯查看任意执行步骤，精准定位问题，高效调试工作流                                          |
-
-### 差异化优势
-
-| 对比维度    | Dify | n8n      | Coze     | Manus | **AgentFlow**   |
-| ----------- | ---- | -------- | -------- | ----- | --------------- |
-| 本地部署    | 有限 | ✅       | ❌       | ❌    | ✅ 原生支持     |
-| 本地 LLM    | 有限 | ✅       | ❌       | ❌    | ✅ Ollama 原生  |
-| 桌面应用    | ❌   | ❌       | ❌       | ❌    | ✅ Tauri        |
-| 自定义节点  | 中   | 高       | 低       | 无    | ✅ 极高 (SDK)   |
-| 社区生态    | 弱   | 社区模板 | Bot 商店 | 无    | ✅ Agent 商店   |
-| AI 辅助构建 | 无   | 无       | 有限     | 自动  | ✅ 对话式构建   |
-| 调试体验    | 一般 | 好       | 差       | 黑盒  | ✅ 时间旅行调试 |
+| 特性                       | 描述                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| 🤖 **AI Agent 构建**       | 通过自然语言对话，AI Agent 自动创建数据库表、生成多页面 UI、部署应用             |
+| 🗄️ **Supabase 风格数据库** | 完整的数据库管理：表编辑器、SQL Editor、Schema Graph、Migrations、RLS、Storage   |
+| 🏗️ **App Builder**         | UI 配置、页面管理、实时预览，14 种 Block 类型（数据表、表单、图表、统计卡片等）  |
+| 🌐 **应用运行时**          | 构建的应用通过 `/runtime/[slug]` 公开访问，支持应用用户认证、数据 CRUD、文件存储 |
+| ✨ **AI Skills 系统**      | 内置数据建模、UI 生成、业务逻辑技能，支持自定义技能扩展 Agent 能力               |
+| 🔐 **行级安全 (RLS)**      | 为运行时应用配置行级安全策略，基于用户身份控制数据访问                           |
 
 ## 技术栈
 
@@ -49,7 +37,6 @@ AgentFlow 是一个功能强大的 AI 工作流平台，让用户能够通过可
 - **框架**: Next.js 15 (App Router) + React 19
 - **语言**: TypeScript 5.x
 - **样式**: Tailwind CSS 4.x + shadcn/ui
-- **画布**: React Flow (工作流可视化)
 - **状态**: Zustand + TanStack Query
 - **构建**: Turbo (Monorepo)
 
@@ -61,13 +48,6 @@ AgentFlow 是一个功能强大的 AI 工作流平台，让用户能够通过可
 - **ORM**: GORM
 - **队列**: Redis Streams
 
-### 桌面端 (Desktop)
-
-- **框架**: Tauri 2.0
-- **后端**: Rust
-- **数据库**: SQLite
-- **本地 LLM**: Ollama 集成
-
 ### 基础设施
 
 - **容器**: Docker + Docker Compose
@@ -78,48 +58,37 @@ AgentFlow 是一个功能强大的 AI 工作流平台，让用户能够通过可
 ## 项目结构
 
 ```
-agentflow/
+reverseai/
 ├── apps/
 │   ├── web/                  # Next.js 前端应用
 │   │   ├── src/
 │   │   │   ├── app/          # App Router 页面
-│   │   │   ├── components/   # React 组件
+│   │   │   │   ├── (dashboard)/  # Dashboard (Agent, Builder, Database, Skills)
+│   │   │   │   └── (unauth)/     # Runtime 公开访问页面
+│   │   │   ├── components/
+│   │   │   │   ├── agent/        # AI Agent 对话面板
+│   │   │   │   ├── app-renderer/ # 应用渲染引擎 (14 种 Block)
+│   │   │   │   ├── builder/      # Builder 页面管理
+│   │   │   │   └── database/     # 数据库组件 (表格、过滤器、编辑器)
 │   │   │   ├── hooks/        # 自定义 Hooks
 │   │   │   ├── stores/       # Zustand 状态管理
-│   │   │   ├── lib/          # 工具库
-│   │   │   └── types/        # TypeScript 类型
+│   │   │   └── lib/          # API 客户端、工具库
 │   │   └── package.json
 │   │
-│   ├── server/               # Go 后端服务
-│   │   ├── cmd/              # 入口
-│   │   ├── internal/         # 内部模块
-│   │   │   ├── handler/      # HTTP 处理器
-│   │   │   ├── service/      # 业务逻辑
-│   │   │   ├── repository/   # 数据访问
-│   │   │   └── executor/     # 工作流执行引擎
-│   │   └── pkg/              # 公共包
-│   │
-│   └── desktop/              # Tauri 桌面应用
-│       ├── src/              # 前端代码 (复用 web)
-│       └── src-tauri/        # Rust 后端
-│           ├── src/
-│           │   ├── commands/ # IPC 命令
-│           │   ├── database.rs
-│           │   └── ollama.rs # Ollama 客户端
-│           └── migrations/   # SQLite 迁移
+│   └── server/               # Go 后端服务
+│       ├── cmd/              # 入口
+│       └── internal/
+│           ├── api/          # HTTP 路由 + Handler
+│           ├── service/      # 业务逻辑 (Agent Engine, DB, Runtime)
+│           └── repository/   # 数据访问层
 │
 ├── packages/
-│   └── sdk/                  # 节点 SDK
+│   └── sdk/                  # SDK
 │
 ├── docs/                     # 文档
-│   ├── ARCHITECTURE.md       # 技术架构
-│   ├── DEVELOPMENT.md        # 开发指南
-│   ├── ROADMAP.md            # 产品路线图
-│   └── requirements/         # 需求文档
-│
 ├── design-system/            # 设计系统
-├── pnpm-workspace.yaml       # pnpm 工作空间
-├── turbo.json                # Turbo 配置
+├── pnpm-workspace.yaml
+├── turbo.json
 └── package.json
 ```
 
@@ -187,35 +156,18 @@ pnpm dev
 
 | 命令                  | 描述                    |
 | --------------------- | ----------------------- |
-| `pnpm dev`            | 启动 Web 前端开发服务器 |
+| `pnpm dev`            | 启动全部开发服务器      |
 | `pnpm dev:web`        | 启动 Web 前端开发服务器 |
-| `pnpm dev:desktop`    | 启动桌面端开发          |
 | `pnpm dev:server`     | 启动 Go 后端服务        |
 | `pnpm dev:server:hot` | 启动后端 (热重载)       |
 | `pnpm build`          | 构建 Web 前端           |
-| `pnpm build:desktop`  | 构建桌面应用            |
-| `pnpm lint`           | 运行前端代码检查        |
-| `pnpm test`           | 运行前端测试            |
+| `pnpm build:server`   | 构建后端二进制          |
+| `pnpm lint`           | 运行代码检查            |
+| `pnpm test`           | 运行测试                |
 
 ## 开发指南
 
 详细的开发指南请参阅 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
-
-### 代码风格
-
-**前端**
-
-- 使用函数组件 + Hooks
-- 组件文件使用 PascalCase: `WorkflowCanvas.tsx`
-- Hook 文件使用 camelCase: `useWorkflow.ts`
-- 状态管理使用 Zustand + immer
-
-**后端**
-
-- 遵循 Go 标准项目布局
-- Handler 层只做参数解析和响应
-- 业务逻辑放在 Service 层
-- 数据访问放在 Repository 层
 
 ### 提交规范
 
@@ -223,54 +175,57 @@ pnpm dev
 <type>(<scope>): <subject>
 
 类型: feat, fix, docs, style, refactor, test, chore
-示例: feat(editor): 添加节点分组功能
+示例: feat(agent): 添加自定义技能支持
 ```
 
 ## 已实现功能
 
-### 编辑器
+### AI Agent
 
-- [x] 无限画布 (25%-400% 缩放)
-- [x] 节点拖拽 (24px 网格吸附)
-- [x] 智能连线 (类型检查)
-- [x] 节点配置面板
-- [x] 撤销/重做 (Ctrl+Z/Y)
-- [x] 复制/粘贴 (Ctrl+C/V)
-- [x] 快捷键系统
-- [x] 小地图导航
-- [x] 自动布局
+- [x] 自然语言对话构建应用
+- [x] SSE 流式响应
+- [x] LLM 集成（OpenAI 兼容 API）
+- [x] 会话管理（创建/恢复/删除）
+- [x] 自动发布应用
 
-### 节点类型 (20+)
+### AI Skills
 
-| 分类 | 节点                           |
-| ---- | ------------------------------ |
-| AI   | LLM、Embedding (规划中)        |
-| 逻辑 | 条件分支、循环、延迟、异常处理 |
-| 数据 | 变量、合并、过滤、转换         |
-| 集成 | HTTP 请求、Webhook             |
-| 流程 | 开始、结束                     |
-| 文本 | 模板、分割、正则               |
-| 代码 | JavaScript、表达式             |
-| I/O  | 输入、输出                     |
+- [x] 内置技能：数据建模、UI 生成、业务逻辑
+- [x] 自定义技能创建/编辑/删除
+- [x] 动态技能提示加载
 
-## 路线图
+### Database (Supabase 风格)
 
-| 阶段          | 时间    | 目标                                     | 状态      |
-| ------------- | ------- | ---------------------------------------- | --------- |
-| **Phase 1**   | Q1 2026 | MVP 闭环：执行引擎、LLM 对接、工作流存储 | 🟡 进行中 |
-| **Phase 1.5** | Q1 2026 | AI 创意助手：一键生成完整方案            | 📋 规划中 |
-| **Phase 2**   | Q2 2026 | 差异化：本地模式、Ollama、时间旅行调试   | 📋 规划中 |
-| **Phase 3**   | Q3 2026 | 社区生态：Agent 商店、创作者经济         | 📋 规划中 |
-| **Phase 4**   | Q4 2026 | 规模化：企业版、团队协作                 | 📋 规划中 |
+- [x] 表管理 (CRUD)
+- [x] SQL Editor
+- [x] Schema Graph 可视化
+- [x] Migrations 管理
+- [x] Functions 管理
+- [x] Roles 管理
+- [x] Storage 文件存储
+- [x] RLS 行级安全策略
 
-详见 [docs/ROADMAP.md](docs/ROADMAP.md)
+### App Builder
+
+- [x] UI Schema 配置
+- [x] 页面管理面板
+- [x] 实时应用预览
+- [x] 14 种 Block 类型
+- [x] 多页面导航（Sidebar/Topbar）
+
+### App Runtime
+
+- [x] 公开运行 `/runtime/[slug]`
+- [x] Runtime Data API (CRUD)
+- [x] 应用用户认证 (Login/Register)
+- [x] 文件上传/存储
+- [x] RLS 策略执行
+- [x] 嵌入模式 (iframe)
 
 ## 文档
 
-- [技术架构](docs/ARCHITECTURE.md) - 系统设计和架构决策
-- [开发指南](docs/DEVELOPMENT.md) - 开发环境配置和规范
-- [产品路线图](docs/ROADMAP.md) - 功能规划和里程碑
-- [市场分析](docs/MARKET-ANALYSIS.md) - 竞品分析和定位
+- [技术架构](docs/architecture/) - 系统设计和架构决策
+- [开发指南](docs/development/) - 开发环境配置和规范
 
 ## 贡献指南
 
@@ -289,5 +244,5 @@ MIT License - 详见 [LICENSE](LICENSE) 文件。
 ---
 
 <p align="center">
-  Built with ❤️ by the AgentFlow Team
+  Built with ❤️ by the ReverseAI Team
 </p>
