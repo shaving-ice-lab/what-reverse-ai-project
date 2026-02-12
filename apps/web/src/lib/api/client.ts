@@ -80,6 +80,18 @@ export function getStoredTokens(): { accessToken?: string; refreshToken?: string
 export function setTokens(access: string, refresh: string) {
   cachedAccessToken = access
   cachedRefreshToken = refresh
+  // Persist to localStorage so tokens survive page reload
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('auth-storage')
+      const parsed = raw ? JSON.parse(raw) : { state: {}, version: 0 }
+      parsed.state = parsed.state || {}
+      parsed.state.tokens = { accessToken: access, refreshToken: refresh }
+      localStorage.setItem('auth-storage', JSON.stringify(parsed))
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export function clearTokens() {

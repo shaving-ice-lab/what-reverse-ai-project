@@ -1,4 +1,5 @@
 import { request } from './shared'
+import { getAccessToken } from './client'
 
 // ========== Types ==========
 
@@ -97,7 +98,7 @@ export function chatStream(
   ;(async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1'
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+      const token = getAccessToken()
 
       const res = await fetch(`${baseUrl}/workspaces/${workspaceId}/agent/chat`, {
         method: 'POST',

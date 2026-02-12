@@ -107,59 +107,6 @@ export interface WorkspaceQuota {
   apps: { used: number; limit: number }
 }
 
-export type LogArchiveStatus = 'pending' | 'processing' | 'completed' | 'failed'
-export type LogArchiveType = 'execution_logs' | 'audit_logs'
-
-export interface LogArchiveJob {
-  id: string
-  workspace_id: string
-  status: LogArchiveStatus
-  archive_type: LogArchiveType
-  range_start?: string
-  range_end?: string
-  file_name?: string
-  file_size?: number
-  error?: string
-  created_at: string
-  started_at?: string
-  completed_at?: string
-  expires_at?: string
-  download_url?: string
-}
-
-export interface LogArchiveRequest {
-  archive_type: LogArchiveType
-  range_start?: string
-  range_end?: string
-}
-
-export interface LogArchiveListParams {
-  archive_type?: LogArchiveType
-}
-
-export interface LogArchiveReplayParams {
-  dataset?: string
-  from?: string
-  to?: string
-  limit?: number
-  offset?: number
-  execution_id?: string
-  session_id?: string
-  user_id?: string
-  node_id?: string
-  node_type?: string
-  status?: string
-  action?: string
-  actor_user_id?: string
-  target_type?: string
-  target_id?: string
-}
-
-export interface LogArchiveReplayResult {
-  records: Record<string, unknown>[]
-  next_offset?: number
-}
-
 export interface CreateWorkspaceRequest {
   name: string
   slug?: string
@@ -216,46 +163,6 @@ export interface RotateWorkspaceApiKeyRequest {
   scopes?: string[]
 }
 
-// ===== Workspace Integration Types =====
-
-export type IntegrationStatus = 'connected' | 'disconnected' | 'error' | 'pending'
-export type IntegrationType = 'webhook' | 'oauth' | 'connector'
-
-export interface WorkspaceIntegration {
-  id: string
-  workspace_id: string
-  type: IntegrationType
-  provider: string
-  name: string
-  status: IntegrationStatus
-  config_json?: Record<string, unknown>
-  last_sync_at?: string
-  error_message?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface WebhookConfig {
-  url: string
-  secret?: string
-  events: string[]
-  is_active: boolean
-}
-
-export interface OAuthConnection {
-  provider: string
-  scopes: string[]
-  access_token_preview?: string
-  refresh_token_preview?: string
-  expires_at?: string
-}
-
-export interface ConnectorConfig {
-  connector_type: string
-  endpoint?: string
-  credentials_preview?: string
-}
-
 // ===== API Response Types =====
 
 interface ApiResponse<T> {
@@ -271,7 +178,7 @@ interface ListResponse<T> {
   page_size: number
 }
 
-// ===== Backend Response Types (for already implemented user/webhook APIs) =====
+// ===== Backend Response Types =====
 
 type BackendUserApiKey = {
   id: string
@@ -285,19 +192,6 @@ type BackendUserApiKey = {
   revoked_at?: string | null
   revoked_reason?: string | null
   created_at?: string
-}
-
-type BackendWebhookEndpoint = {
-  id: string
-  name: string
-  url: string
-  events: string[]
-  signing_enabled: boolean
-  secret_preview?: string | null
-  is_active: boolean
-  last_triggered_at?: string | null
-  created_at: string
-  updated_at: string
 }
 
 function toWorkspaceApiKey(workspaceId: string, item: BackendUserApiKey): WorkspaceApiKey {
@@ -318,31 +212,6 @@ function toWorkspaceApiKey(workspaceId: string, item: BackendUserApiKey): Worksp
     revoked_reason: item.revoked_reason ?? undefined,
     created_at: createdAt,
     updated_at: updatedAt,
-  }
-}
-
-function toWebhookIntegration(
-  workspaceId: string,
-  endpoint: BackendWebhookEndpoint
-): WorkspaceIntegration {
-  const lastSync = endpoint.last_triggered_at || endpoint.updated_at
-  return {
-    id: endpoint.id,
-    workspace_id: workspaceId,
-    type: 'webhook',
-    provider: 'webhook',
-    name: endpoint.name,
-    status: endpoint.is_active ? 'connected' : 'disconnected',
-    config_json: {
-      url: endpoint.url,
-      events: endpoint.events,
-      signing_enabled: endpoint.signing_enabled,
-      secret_preview: endpoint.secret_preview ?? undefined,
-      is_active: endpoint.is_active,
-    },
-    last_sync_at: lastSync,
-    created_at: endpoint.created_at,
-    updated_at: endpoint.updated_at,
   }
 }
 
@@ -379,11 +248,13 @@ export const workspaceApi = {
    * Get workspace by slug
    */
   async getBySlug(slug: string): Promise<Workspace> {
-    const response = await request<ApiResponse<{ workspace: Workspace } | Workspace>>(
-      `/workspaces/by-slug/${slug}`
-    )
-    const payload = response.data as any
-    return (payload?.workspace as Workspace) ?? (payload as Workspace)
+    // No dedicated by-slug endpoint — fetch all workspaces and match by slug
+    const workspaces = await workspaceApi.list()
+    const match = workspaces.find((w) => w.slug === slug)
+    if (!match) {
+      throw new Error(`Workspace with slug "${slug}" not found`)
+    }
+    return match
   },
 
   /**
@@ -485,128 +356,20 @@ export const workspaceApi = {
   },
 
   /**
-   * Get workspace role list
-   */
-  async getRoles(workspaceId: string): Promise<WorkspaceRole[]> {
-    const response = await request<ApiResponse<ListResponse<WorkspaceRole>>>(
-      `/workspaces/${workspaceId}/roles`
-    )
-    return response.data?.items || []
-  },
-
-  /**
    * Get workspace quota usage
    */
-  async getQuota(workspaceId: string): Promise<WorkspaceQuota> {
-    const response = await request<ApiResponse<WorkspaceQuota>>(
-      `/billing/workspaces/${workspaceId}/quota`
-    )
-    return response.data
-  },
-
-  /**
-   * Create log archive task
-   */
-  async requestLogArchive(workspaceId: string, data: LogArchiveRequest): Promise<LogArchiveJob> {
-    const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
-      `/workspaces/${workspaceId}/log-archives`,
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }
-    )
-    return response.data.archive
-  },
-
-  /**
-   * Get log archive task list
-   */
-  async listLogArchives(
-    workspaceId: string,
-    params?: LogArchiveListParams
-  ): Promise<LogArchiveJob[]> {
-    const search = new URLSearchParams()
-    if (params?.archive_type) {
-      search.set('archive_type', params.archive_type)
+  async getQuota(_workspaceId: string): Promise<WorkspaceQuota> {
+    // Billing endpoint not implemented yet — return default quota
+    return {
+      plan: 'free',
+      requests: { used: 0, limit: 1000 },
+      tokens: { used: 0, limit: 100000 },
+      storage: { used: 0, limit: 1 },
+      bandwidth: { used: 0, limit: 10 },
+      apps: { used: 0, limit: 3 },
     }
-    const query = search.toString()
-    const response = await request<ApiResponse<{ archives: LogArchiveJob[] }>>(
-      `/workspaces/${workspaceId}/log-archives${query ? `?${query}` : ''}`
-    )
-    return response.data?.archives || []
   },
 
-  /**
-   * Get log archive task details
-   */
-  async getLogArchive(workspaceId: string, archiveId: string): Promise<LogArchiveJob> {
-    const response = await request<ApiResponse<{ archive: LogArchiveJob }>>(
-      `/workspaces/${workspaceId}/log-archives/${archiveId}`
-    )
-    return response.data.archive
-  },
-
-  /**
-   * Download log archive
-   */
-  async downloadLogArchive(workspaceId: string, archiveId: string): Promise<Blob> {
-    const { getStoredTokens } = await import('./shared')
-    const tokens = getStoredTokens()
-    const response = await fetch(
-      `${API_BASE_URL}/workspaces/${workspaceId}/log-archives/${archiveId}/download`,
-      {
-        headers: {
-          ...(tokens?.accessToken && {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          }),
-        },
-      }
-    )
-    if (!response.ok) {
-      throw new Error(`Failed to download archive: ${response.statusText}`)
-    }
-    return response.blob()
-  },
-
-  /**
-   * Replay archive
-   */
-  async replayLogArchive(
-    workspaceId: string,
-    archiveId: string,
-    params?: LogArchiveReplayParams
-  ): Promise<LogArchiveReplayResult> {
-    const search = new URLSearchParams()
-    if (params?.dataset) search.set('dataset', params.dataset)
-    if (params?.from) search.set('from', params.from)
-    if (params?.to) search.set('to', params.to)
-    if (params?.limit) search.set('limit', String(params.limit))
-    if (params?.offset) search.set('offset', String(params.offset))
-    if (params?.execution_id) search.set('execution_id', params.execution_id)
-    if (params?.session_id) search.set('session_id', params.session_id)
-    if (params?.user_id) search.set('user_id', params.user_id)
-    if (params?.node_id) search.set('node_id', params.node_id)
-    if (params?.node_type) search.set('node_type', params.node_type)
-    if (params?.status) search.set('status', params.status)
-    if (params?.action) search.set('action', params.action)
-    if (params?.actor_user_id) search.set('actor_user_id', params.actor_user_id)
-    if (params?.target_type) search.set('target_type', params.target_type)
-    if (params?.target_id) search.set('target_id', params.target_id)
-    const query = search.toString()
-    const response = await request<ApiResponse<LogArchiveReplayResult>>(
-      `/workspaces/${workspaceId}/log-archives/${archiveId}/replay${query ? `?${query}` : ''}`
-    )
-    return response.data
-  },
-
-  /**
-   * Delete log archive
-   */
-  async deleteLogArchive(workspaceId: string, archiveId: string): Promise<void> {
-    await request<ApiResponse<null>>(`/workspaces/${workspaceId}/log-archives/${archiveId}`, {
-      method: 'DELETE',
-    })
-  },
 
   // ===== Workspace API Key Methods =====
 
@@ -706,101 +469,6 @@ export const workspaceApi = {
     })
   },
 
-  // ===== Workspace Integration Methods =====
-
-  /**
-   * Get workspace integration list
-   */
-  async listIntegrations(workspaceId: string): Promise<WorkspaceIntegration[]> {
-    // Currently backend implements webhooks (default workspace): GET /webhooks
-    const response =
-      await request<
-        ApiResponse<BackendWebhookEndpoint[] | { webhooks?: BackendWebhookEndpoint[] }>
-      >(`/webhooks`)
-    const payload: any = response.data as any
-    const endpoints: BackendWebhookEndpoint[] = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload?.webhooks)
-        ? payload.webhooks
-        : []
-    return endpoints.map((endpoint) => toWebhookIntegration(workspaceId, endpoint))
-  },
-
-  /**
-   * Create webhook integration
-   */
-  async createWebhook(
-    workspaceId: string,
-    data: { name: string; config: WebhookConfig }
-  ): Promise<WorkspaceIntegration> {
-    const secret = data.config.secret?.trim()
-    const signingEnabled = Boolean(secret)
-    const response = await request<
-      ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>
-    >(`/webhooks`, {
-      method: 'POST',
-      body: JSON.stringify({
-        name: data.name,
-        url: data.config.url,
-        events: data.config.events,
-        secret: secret || undefined,
-        signing_enabled: signingEnabled,
-        is_active: data.config.is_active,
-      }),
-    })
-    const payload: any = response.data as any
-    const endpoint: BackendWebhookEndpoint =
-      (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint)
-    return toWebhookIntegration(workspaceId, endpoint)
-  },
-
-  /**
-   * Update integration
-   */
-  async updateIntegration(
-    workspaceId: string,
-    integrationId: string,
-    data: Partial<WorkspaceIntegration>
-  ): Promise<WorkspaceIntegration> {
-    // Currently only supports webhook: PATCH /webhooks/:id
-    const config: any = (data?.config_json as any) || {}
-    const body: Record<string, unknown> = {}
-    if (typeof data?.name === 'string') body.name = data.name
-    if (typeof config?.url === 'string') body.url = config.url
-    if (Array.isArray(config?.events)) body.events = config.events
-    if (typeof config?.secret === 'string' && config.secret.trim()) {
-      body.secret = config.secret.trim()
-      body.signing_enabled = true
-    } else if (typeof config?.signing_enabled === 'boolean') {
-      body.signing_enabled = config.signing_enabled
-    }
-    if (typeof config?.is_active === 'boolean') {
-      body.is_active = config.is_active
-    } else if (typeof data?.status === 'string') {
-      if (data.status === 'connected') body.is_active = true
-      if (data.status === 'disconnected') body.is_active = false
-    }
-
-    const response = await request<
-      ApiResponse<{ webhook?: BackendWebhookEndpoint } | BackendWebhookEndpoint>
-    >(`/webhooks/${integrationId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-    })
-    const payload: any = response.data as any
-    const endpoint: BackendWebhookEndpoint =
-      (payload?.webhook as BackendWebhookEndpoint) ?? (payload as BackendWebhookEndpoint)
-    return toWebhookIntegration(workspaceId, endpoint)
-  },
-
-  /**
-   * Delete integration
-   */
-  async deleteIntegration(_workspaceId: string, integrationId: string): Promise<void> {
-    await request<ApiResponse<{ message?: string }>>(`/webhooks/${integrationId}`, {
-      method: 'DELETE',
-    })
-  },
 }
 
 // ===== App Access Policy Types (backward compatible) =====
@@ -932,9 +600,12 @@ export const appApi = {
     id: string,
     data: { ui_schema: Record<string, unknown> }
   ): Promise<WorkspaceVersion> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/ui-schema`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
+    const response = await request<ApiResponse<any>>(`/workspaces/${id}/versions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        ui_schema: data.ui_schema,
+        changelog: 'UI schema update',
+      }),
     })
     const payload = response.data as any
     return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)
@@ -958,20 +629,6 @@ export const appApi = {
     return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)
   },
 
-  /**
-   * Update public page SEO info
-   */
-  async updatePublicSEO(
-    id: string,
-    data: { title?: string; description?: string; keywords?: string[] }
-  ): Promise<Workspace> {
-    const response = await request<ApiResponse<any>>(`/workspaces/${id}/seo`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    })
-    const payload = response.data as any
-    return (payload?.workspace as Workspace) ?? (payload as Workspace)
-  },
 }
 
 export default workspaceApi

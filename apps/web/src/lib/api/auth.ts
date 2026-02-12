@@ -138,8 +138,9 @@ export const authApi = {
    * Verify email
    */
   async verifyEmail(token: string): Promise<{ message: string }> {
-    return request<{ message: string }>(`/auth/verify-email?token=${token}`, {
-      method: 'GET',
+    return request<{ message: string }>('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
     })
   },
 
@@ -177,7 +178,7 @@ export const userApi = {
    */
   async updateProfile(data: UpdateProfileRequest): Promise<User> {
     return request<User>('/users/me', {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(data),
     })
   },
@@ -192,33 +193,4 @@ export const userApi = {
     })
   },
 
-  /**
-   * Upload avatar
-   */
-  async uploadAvatar(file: File): Promise<{ url: string }> {
-    const formData = new FormData()
-    formData.append('avatar', file)
-
-    const url = `${API_BASE_URL}/users/me/avatar`
-    const tokens = getStoredTokens()
-    const headers: Record<string, string> = {}
-
-    if (tokens?.accessToken) {
-      headers['Authorization'] = `Bearer ${tokens.accessToken}`
-    }
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: formData,
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to upload')
-    }
-
-    return data
-  },
 }
