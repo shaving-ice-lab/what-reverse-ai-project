@@ -1,7 +1,6 @@
 'use client'
 
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
 import { useState, useEffect, type ReactNode } from 'react'
 import { ToastProvider, useToast, setGlobalToast, toast } from '@/components/ui/toast'
@@ -95,7 +94,6 @@ export function Providers({ children }: ProvidersProps) {
           </ErrorBoundary>
           <GlobalToastSetter />
         </ToastProvider>
-        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ThemeProvider>
   )
