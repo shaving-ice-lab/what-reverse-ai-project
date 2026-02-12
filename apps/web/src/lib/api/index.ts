@@ -17,14 +17,6 @@ export type {
   WorkspaceMember,
   WorkspaceRole,
   WorkspaceQuota,
-  // LogsArchive
-  LogArchiveJob,
-  LogArchiveStatus,
-  LogArchiveType,
-  LogArchiveRequest,
-  LogArchiveListParams,
-  LogArchiveReplayParams,
-  LogArchiveReplayResult,
   // RequestType
   CreateWorkspaceRequest,
   UpdateWorkspaceRequest,
