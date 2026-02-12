@@ -125,7 +125,7 @@ export default function AgentPage() {
     setSessionsLoading(true)
     try {
       const data = await agentChatApi.listSessions(workspaceId)
-      setSessions(data)
+      setSessions(Array.isArray(data) ? data : [])
     } catch {
       setSessions([])
     } finally {

@@ -77,8 +77,8 @@ export default function DashboardPage() {
     if (!workspaceId) return
     const loadSessions = async () => {
       try {
-        const data = await agentChatApi.listSessions(workspaceId)
-        setAgentSessions(data || [])
+        const res = await agentChatApi.listSessions(workspaceId)
+        setAgentSessions(Array.isArray(res) ? res : [])
       } catch {
         // Agent sessions unavailable
       }

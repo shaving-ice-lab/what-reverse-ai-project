@@ -372,32 +372,61 @@ function InfoCard({
 
 function MembersTab({ workspaceId }: { workspaceId: string }) {
   const [members, setMembers] = useState<WorkspaceMember[]>([])
-  const [roles, setRoles] = useState<WorkspaceRole[]>([])
+  const roles: WorkspaceRole[] = [
+    {
+      id: 'owner',
+      workspace_id: workspaceId,
+      name: 'owner',
+      permissions: {},
+      is_system: true,
+      created_at: '',
+      updated_at: '',
+    },
+    {
+      id: 'admin',
+      workspace_id: workspaceId,
+      name: 'admin',
+      permissions: {},
+      is_system: true,
+      created_at: '',
+      updated_at: '',
+    },
+    {
+      id: 'member',
+      workspace_id: workspaceId,
+      name: 'member',
+      permissions: {},
+      is_system: true,
+      created_at: '',
+      updated_at: '',
+    },
+    {
+      id: 'viewer',
+      workspace_id: workspaceId,
+      name: 'viewer',
+      permissions: {},
+      is_system: true,
+      created_at: '',
+      updated_at: '',
+    },
+  ]
   const [loading, setLoading] = useState(true)
   const [inviteEmail, setInviteEmail] = useState('')
-  const [inviteRole, setInviteRole] = useState('')
+  const [inviteRole, setInviteRole] = useState('member')
   const [inviting, setInviting] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [membersData, rolesData] = await Promise.all([
-        workspaceApi.getMembers(workspaceId),
-        workspaceApi.getRoles(workspaceId),
-      ])
-      setMembers(membersData)
-      setRoles(rolesData)
-      if (rolesData.length > 0 && !inviteRole) {
-        const memberRole = rolesData.find((r) => r.name === 'member') || rolesData[0]
-        setInviteRole(memberRole.id)
-      }
+      const membersData = await workspaceApi.getMembers(workspaceId)
+      setMembers(Array.isArray(membersData) ? membersData : [])
     } catch (err) {
       console.error('Failed to load members:', err)
     } finally {
       setLoading(false)
     }
-  }, [workspaceId, inviteRole])
+  }, [workspaceId])
 
   useEffect(() => {
     loadData()

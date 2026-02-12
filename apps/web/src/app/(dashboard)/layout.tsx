@@ -63,7 +63,7 @@ function getMainNavItems(workspaceId: string | null) {
     { title: 'Apps', href: '/dashboard/workspaces', icon: Globe },
     {
       title: 'Settings',
-      href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/workspaces',
+      href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/settings',
       icon: Settings,
     },
   ]
