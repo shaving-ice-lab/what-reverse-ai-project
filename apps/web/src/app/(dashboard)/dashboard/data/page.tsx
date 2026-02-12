@@ -1,8 +1,0 @@
-﻿'use client'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-export default function DataPage() {
-  const router = useRouter()
-  useEffect(() => { router.replace('/dashboard/database') }, [router])
-  return null
-}

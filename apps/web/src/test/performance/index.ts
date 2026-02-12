@@ -1,5 +1,0 @@
-/**
- * canTestModuleExport
- */
-
-export * from './utils'
