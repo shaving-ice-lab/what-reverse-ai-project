@@ -184,10 +184,15 @@ export const workspaceDatabaseApi = {
    * List all tables in workspace database
    */
   async listTables(workspaceId: string): Promise<DatabaseTable[]> {
-    const response = await request<ApiResponse<{ tables: DatabaseTable[] }>>(
-      `/workspaces/${workspaceId}/database/tables`
-    )
-    return (response.data as any)?.tables ?? []
+    try {
+      const response = await request<ApiResponse<{ tables: DatabaseTable[] }>>(
+        `/workspaces/${workspaceId}/database/tables`
+      )
+      return (response.data as any)?.tables ?? []
+    } catch {
+      // Database not provisioned yet
+      return []
+    }
   },
 
   /**
@@ -371,17 +376,27 @@ export const workspaceDatabaseApi = {
    * Get database statistics
    */
   async getStats(workspaceId: string): Promise<DatabaseStats> {
-    const response = await request<ApiResponse<{ stats: DatabaseStats }>>(
-      `/workspaces/${workspaceId}/database/stats`
-    )
-    return (
-      (response.data as any)?.stats ?? {
+    try {
+      const response = await request<ApiResponse<{ stats: DatabaseStats }>>(
+        `/workspaces/${workspaceId}/database/stats`
+      )
+      return (
+        (response.data as any)?.stats ?? {
+          table_count: 0,
+          total_rows: 0,
+          total_size_bytes: 0,
+          connection_count: 0,
+        }
+      )
+    } catch {
+      // Database not provisioned yet
+      return {
         table_count: 0,
         total_rows: 0,
         total_size_bytes: 0,
         connection_count: 0,
       }
-    )
+    }
   },
 
   /**
