@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Play,
   Trash2,
-  Clock,
   Table2,
   Loader2,
   History,
@@ -38,8 +37,14 @@ export default function SQLEditorPage() {
   // Load tables & history
   useEffect(() => {
     if (!workspaceId) return
-    workspaceDatabaseApi.listTables(workspaceId).then(setTables).catch(() => {})
-    workspaceDatabaseApi.getQueryHistory(workspaceId).then(setHistory).catch(() => {})
+    workspaceDatabaseApi
+      .listTables(workspaceId)
+      .then(setTables)
+      .catch(() => {})
+    workspaceDatabaseApi
+      .getQueryHistory(workspaceId)
+      .then(setHistory)
+      .catch(() => {})
   }, [workspaceId])
 
   const runQuery = useCallback(async () => {
@@ -51,7 +56,10 @@ export default function SQLEditorPage() {
       const res = await workspaceDatabaseApi.executeSQL(workspaceId, sql.trim())
       setResult(res)
       // Refresh history
-      workspaceDatabaseApi.getQueryHistory(workspaceId).then(setHistory).catch(() => {})
+      workspaceDatabaseApi
+        .getQueryHistory(workspaceId)
+        .then(setHistory)
+        .catch(() => {})
     } catch (err: any) {
       setError(err?.message || 'Query failed')
     } finally {
@@ -76,14 +84,79 @@ export default function SQLEditorPage() {
 
   const formatSQL = () => {
     // Basic formatting: uppercase keywords
-    const keywords = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'INSERT', 'INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE', 'CREATE', 'TABLE', 'ALTER', 'DROP', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'OUTER', 'ON', 'GROUP', 'BY', 'ORDER', 'HAVING', 'LIMIT', 'OFFSET', 'AS', 'IN', 'NOT', 'NULL', 'IS', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT', 'COUNT', 'SUM', 'AVG', 'MAX', 'MIN', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'IF', 'UNION', 'ALL']
+    const keywords = [
+      'SELECT',
+      'FROM',
+      'WHERE',
+      'AND',
+      'OR',
+      'INSERT',
+      'INTO',
+      'VALUES',
+      'UPDATE',
+      'SET',
+      'DELETE',
+      'CREATE',
+      'TABLE',
+      'ALTER',
+      'DROP',
+      'JOIN',
+      'LEFT',
+      'RIGHT',
+      'INNER',
+      'OUTER',
+      'ON',
+      'GROUP',
+      'BY',
+      'ORDER',
+      'HAVING',
+      'LIMIT',
+      'OFFSET',
+      'AS',
+      'IN',
+      'NOT',
+      'NULL',
+      'IS',
+      'LIKE',
+      'BETWEEN',
+      'EXISTS',
+      'DISTINCT',
+      'COUNT',
+      'SUM',
+      'AVG',
+      'MAX',
+      'MIN',
+      'CASE',
+      'WHEN',
+      'THEN',
+      'ELSE',
+      'END',
+      'IF',
+      'UNION',
+      'ALL',
+    ]
     let formatted = sql
     keywords.forEach((kw) => {
       const regex = new RegExp(`\\b${kw}\\b`, 'gi')
       formatted = formatted.replace(regex, kw)
     })
     // Add newlines before major clauses
-    const breakBefore = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'UNION']
+    const breakBefore = [
+      'SELECT',
+      'FROM',
+      'WHERE',
+      'AND',
+      'OR',
+      'JOIN',
+      'LEFT JOIN',
+      'RIGHT JOIN',
+      'INNER JOIN',
+      'GROUP BY',
+      'ORDER BY',
+      'HAVING',
+      'LIMIT',
+      'UNION',
+    ]
     breakBefore.forEach((clause) => {
       const regex = new RegExp(`\\s+${clause}\\b`, 'gi')
       formatted = formatted.replace(regex, `\n${clause}`)
@@ -171,32 +244,32 @@ export default function SQLEditorPage() {
                   ))}
                 </div>
               )
+            ) : history.length === 0 ? (
+              <div className="text-center py-6 text-xs text-foreground-muted">No history</div>
             ) : (
-              history.length === 0 ? (
-                <div className="text-center py-6 text-xs text-foreground-muted">No history</div>
-              ) : (
-                <div className="space-y-1">
-                  {history.map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => loadHistoryItem(item)}
-                      className="w-full text-left px-3 py-2 rounded hover:bg-surface-200/50 transition-colors group"
-                    >
-                      <code className="text-[11px] font-mono text-foreground line-clamp-2 block">
-                        {item.sql}
-                      </code>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] text-foreground-muted">
-                        <span className={cn(
+              <div className="space-y-1">
+                {history.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => loadHistoryItem(item)}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-surface-200/50 transition-colors group"
+                  >
+                    <code className="text-[11px] font-mono text-foreground line-clamp-2 block">
+                      {item.sql}
+                    </code>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-foreground-muted">
+                      <span
+                        className={cn(
                           item.status === 'success' ? 'text-brand-500' : 'text-destructive'
-                        )}>
-                          {item.status}
-                        </span>
-                        <span>{item.duration_ms}ms</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )
+                        )}
+                      >
+                        {item.status}
+                      </span>
+                      <span>{item.duration_ms}ms</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -233,12 +306,7 @@ export default function SQLEditorPage() {
                 <AlignLeft className="w-3.5 h-3.5 mr-1" />
                 Format
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={clearEditor}
-                className="h-7 text-xs"
-              >
+              <Button size="sm" variant="ghost" onClick={clearEditor} className="h-7 text-xs">
                 <Trash2 className="w-3.5 h-3.5 mr-1" />
                 Clear
               </Button>
@@ -249,7 +317,11 @@ export default function SQLEditorPage() {
               onClick={() => setShowSide(!showSide)}
               className="h-7 text-xs"
             >
-              {showSide ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+              {showSide ? (
+                <ChevronDown className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5" />
+              )}
               Panel
             </Button>
           </div>
@@ -270,11 +342,7 @@ export default function SQLEditorPage() {
 
         {/* Results area */}
         <div className="flex-1 min-h-0 overflow-auto">
-          <SQLResultTable
-            result={result}
-            error={error}
-            loading={running}
-          />
+          <SQLResultTable result={result} error={error} loading={running} />
         </div>
       </div>
     </div>

@@ -1,12 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import {
-  Plus,
-  Trash2,
-  Filter,
-  X,
-} from 'lucide-react'
+import { Plus, Trash2, Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -56,10 +51,7 @@ export function TableFilter({
 
   const addFilter = () => {
     const firstCol = columns[0]?.name || ''
-    onChange(
-      [...filters, { column: firstCol, operator: '=', value: '' }],
-      combinator
-    )
+    onChange([...filters, { column: firstCol, operator: '=', value: '' }], combinator)
     if (!isOpen) setIsOpen(true)
   }
 
@@ -111,9 +103,7 @@ export function TableFilter({
               >
                 <span className="font-medium">{f.column}</span>
                 <span className="text-foreground-muted">{f.operator}</span>
-                {!NULL_OPERATORS.includes(f.operator) && (
-                  <span>{f.value}</span>
-                )}
+                {!NULL_OPERATORS.includes(f.operator) && <span>{f.value}</span>}
                 <button
                   onClick={() => removeFilter(i)}
                   className="ml-0.5 text-foreground-muted hover:text-destructive"
@@ -164,9 +154,7 @@ export function TableFilter({
                   {combinator}
                 </span>
               )}
-              {index === 0 && filters.length > 1 && (
-                <span className="w-8 shrink-0" />
-              )}
+              {index === 0 && filters.length > 1 && <span className="w-8 shrink-0" />}
 
               {/* Column select */}
               <Select
@@ -181,9 +169,7 @@ export function TableFilter({
                     <SelectItem key={col.name} value={col.name}>
                       <span className="flex items-center gap-1.5">
                         <span>{col.name}</span>
-                        <span className="text-[10px] text-foreground-muted">
-                          {col.type}
-                        </span>
+                        <span className="text-[10px] text-foreground-muted">{col.type}</span>
                       </span>
                     </SelectItem>
                   ))}
@@ -243,12 +229,7 @@ export function TableFilter({
 
           {/* Add + Clear buttons */}
           <div className="flex items-center justify-between pt-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={addFilter}
-              className="h-7 text-xs"
-            >
+            <Button size="sm" variant="ghost" onClick={addFilter} className="h-7 text-xs">
               <Plus className="w-3 h-3 mr-1" />
               Add Condition
             </Button>

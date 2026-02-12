@@ -10,6 +10,8 @@ import {
   Shield,
   Network,
   FunctionSquare,
+  HardDrive,
+  Lock,
 } from 'lucide-react'
 import {
   PageWithSidebar,
@@ -25,13 +27,11 @@ const databaseNavItems = [
   { href: '/dashboard/database/migrations', label: 'Migrations', icon: GitBranch },
   { href: '/dashboard/database/functions', label: 'Functions', icon: FunctionSquare },
   { href: '/dashboard/database/roles', label: 'Roles', icon: Shield },
+  { href: '/dashboard/database/storage', label: 'Storage', icon: HardDrive },
+  { href: '/dashboard/database/rls', label: 'RLS Policies', icon: Lock },
 ]
 
-export default function DatabaseLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DatabaseLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   const isActive = (href: string) => {

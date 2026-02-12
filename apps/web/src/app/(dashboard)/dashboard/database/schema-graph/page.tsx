@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   ReactFlow,
   Background,
@@ -14,11 +14,9 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import dagre from 'dagre'
-import { Loader2, AlertCircle, Maximize2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Loader2, AlertCircle } from 'lucide-react'
 import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
-import type { SchemaGraphData, SchemaGraphNode, TableColumn } from '@/lib/api/workspace-database'
-import { cn } from '@/lib/utils'
+import type { SchemaGraphData, SchemaGraphNode } from '@/lib/api/workspace-database'
 import { useRouter } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 
@@ -26,9 +24,7 @@ const NODE_WIDTH = 260
 const NODE_HEIGHT_BASE = 44
 const NODE_ROW_HEIGHT = 24
 
-function getLayoutedElements(
-  graphData: SchemaGraphData
-): { nodes: Node[]; edges: Edge[] } {
+function getLayoutedElements(graphData: SchemaGraphData): { nodes: Node[]; edges: Edge[] } {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
   g.setGraph({ rankdir: 'LR', nodesep: 60, ranksep: 120 })
@@ -86,12 +82,8 @@ function TableNodeComponent({ data }: { data: { table: SchemaGraphNode } }) {
     >
       {/* Table header */}
       <div className="px-3 py-2 bg-surface-200/50 border-b border-border">
-        <div className="text-[12px] font-semibold text-foreground truncate">
-          {table.name}
-        </div>
-        <div className="text-[10px] text-foreground-muted">
-          {table.columns.length} columns
-        </div>
+        <div className="text-[12px] font-semibold text-foreground truncate">{table.name}</div>
+        <div className="text-[10px] text-foreground-muted">{table.columns.length} columns</div>
       </div>
 
       {/* Columns */}
@@ -112,9 +104,7 @@ function TableNodeComponent({ data }: { data: { table: SchemaGraphNode } }) {
             <span className="text-[10px] text-foreground-muted font-mono shrink-0">
               {col.type.length > 16 ? col.type.slice(0, 14) + '…' : col.type}
             </span>
-            {!col.nullable && (
-              <span className="text-[8px] text-amber-600 font-bold">NN</span>
-            )}
+            {!col.nullable && <span className="text-[8px] text-amber-600 font-bold">NN</span>}
           </div>
         ))}
       </div>

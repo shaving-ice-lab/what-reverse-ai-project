@@ -16,7 +16,6 @@ import {
   RotateCw,
   Ban,
   Clock,
-  User,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -144,7 +143,9 @@ export default function DatabaseRolesPage() {
   if (!workspaceId) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-sm text-foreground-muted">Select a workspace to manage database roles.</p>
+        <p className="text-sm text-foreground-muted">
+          Select a workspace to manage database roles.
+        </p>
       </div>
     )
   }
@@ -194,7 +195,11 @@ export default function DatabaseRolesPage() {
               className="h-8 px-2"
               onClick={() => copyToClipboard(newPassword.password, 'new-pw')}
             >
-              {copiedId === 'new-pw' ? <Check className="w-3.5 h-3.5 text-brand-500" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedId === 'new-pw' ? (
+                <Check className="w-3.5 h-3.5 text-brand-500" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
             </Button>
           </div>
           <Button
@@ -216,21 +221,12 @@ export default function DatabaseRolesPage() {
             const config = roleTypeConfig[type]
             const exists = activeRoles.some((r) => r.role_type === type)
             return (
-              <div
-                key={type}
-                className="border border-border rounded-lg p-4 flex flex-col gap-2"
-              >
+              <div key={type} className="border border-border rounded-lg p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <Badge className={cn('text-[10px]', config.color)}>
-                    {config.label}
-                  </Badge>
-                  {exists && (
-                    <span className="text-[10px] text-foreground-muted">Active</span>
-                  )}
+                  <Badge className={cn('text-[10px]', config.color)}>{config.label}</Badge>
+                  {exists && <span className="text-[10px] text-foreground-muted">Active</span>}
                 </div>
-                <p className="text-xs text-foreground-muted flex-1">
-                  {config.description}
-                </p>
+                <p className="text-xs text-foreground-muted flex-1">{config.description}</p>
                 <Button
                   size="sm"
                   variant="outline"
@@ -276,7 +272,9 @@ export default function DatabaseRolesPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-foreground">{role.db_username}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {role.db_username}
+                          </span>
                           <Badge className={cn('text-[10px]', config.color)}>{config.label}</Badge>
                           <Button
                             size="sm"
@@ -356,13 +354,21 @@ export default function DatabaseRolesPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-foreground-muted line-through">{role.db_username}</span>
-                          <Badge className="text-[10px] bg-surface-200/50 text-foreground-muted">{config.label}</Badge>
-                          <Badge className="text-[10px] bg-surface-200/50 text-foreground-muted capitalize">{role.status}</Badge>
+                          <span className="text-xs text-foreground-muted line-through">
+                            {role.db_username}
+                          </span>
+                          <Badge className="text-[10px] bg-surface-200/50 text-foreground-muted">
+                            {config.label}
+                          </Badge>
+                          <Badge className="text-[10px] bg-surface-200/50 text-foreground-muted capitalize">
+                            {role.status}
+                          </Badge>
                         </div>
                         <div className="text-[10px] text-foreground-muted mt-0.5">
                           {role.revoked_reason && <span>{role.revoked_reason} · </span>}
-                          {role.revoked_at ? `Revoked ${formatTimeAgo(role.revoked_at)}` : `Created ${formatTimeAgo(role.created_at)}`}
+                          {role.revoked_at
+                            ? `Revoked ${formatTimeAgo(role.revoked_at)}`
+                            : `Created ${formatTimeAgo(role.created_at)}`}
                         </div>
                       </div>
                     </div>
@@ -378,7 +384,8 @@ export default function DatabaseRolesPage() {
               <Shield className="w-8 h-8 text-foreground-muted/30 mx-auto mb-3" />
               <p className="text-sm font-medium text-foreground">No database roles</p>
               <p className="text-xs text-foreground-muted mt-1 max-w-sm mx-auto">
-                Create a role to get scoped database credentials for external access or integrations.
+                Create a role to get scoped database credentials for external access or
+                integrations.
               </p>
             </div>
           )}

@@ -6,7 +6,6 @@ import {
   RefreshCw,
   Plus,
   Loader2,
-  Code,
   Clock,
   ChevronDown,
   ChevronRight,
@@ -20,7 +19,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/dashboard/page-layout'
 import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
-import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/hooks/useWorkspace'
 
 interface DatabaseRoutine {
@@ -81,24 +79,30 @@ export default function DatabaseFunctionsPage() {
     loadRoutines()
   }, [loadRoutines])
 
-  const loadRoutineBody = useCallback(async (name: string, type: string) => {
-    if (!workspaceId) return
-    try {
-      const result = await workspaceDatabaseApi.executeSQL(
-        workspaceId,
-        `SHOW CREATE ${type} \`${name}\``
-      )
-      if (result.rows?.[0]) {
-        const row = result.rows[0] as any
-        const body = row['Create Function'] || row['Create Procedure'] || row['create function'] || row['create procedure'] || ''
-        setRoutines((prev) =>
-          prev.map((r) => (r.name === name ? { ...r, body } : r))
+  const loadRoutineBody = useCallback(
+    async (name: string, type: string) => {
+      if (!workspaceId) return
+      try {
+        const result = await workspaceDatabaseApi.executeSQL(
+          workspaceId,
+          `SHOW CREATE ${type} \`${name}\``
         )
+        if (result.rows?.[0]) {
+          const row = result.rows[0] as any
+          const body =
+            row['Create Function'] ||
+            row['Create Procedure'] ||
+            row['create function'] ||
+            row['create procedure'] ||
+            ''
+          setRoutines((prev) => prev.map((r) => (r.name === name ? { ...r, body } : r)))
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
-    }
-  }, [workspaceId])
+    },
+    [workspaceId]
+  )
 
   const handleExpand = (name: string, type: string) => {
     if (expandedName === name) {
@@ -152,7 +156,9 @@ export default function DatabaseFunctionsPage() {
   if (!workspaceId) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-sm text-foreground-muted">Select a workspace to manage database functions.</p>
+        <p className="text-sm text-foreground-muted">
+          Select a workspace to manage database functions.
+        </p>
       </div>
     )
   }
@@ -171,7 +177,14 @@ export default function DatabaseFunctionsPage() {
           <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={loadRoutines}>
             <RefreshCw className="w-3 h-3 mr-1" /> Refresh
           </Button>
-          <Button size="sm" className="h-8 text-xs" onClick={() => { setShowCreateDialog(true); setCreateError(null) }}>
+          <Button
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => {
+              setShowCreateDialog(true)
+              setCreateError(null)
+            }}
+          >
             <Plus className="w-3 h-3 mr-1" /> Create
           </Button>
         </div>
@@ -271,7 +284,9 @@ function RoutineSection({
     <div>
       <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
         {title}
-        <Badge variant="secondary" className="text-[10px]">{count}</Badge>
+        <Badge variant="secondary" className="text-[10px]">
+          {count}
+        </Badge>
       </h3>
       <div className="border border-border rounded-lg divide-y divide-border">
         {routines.map((routine) => {
@@ -283,14 +298,20 @@ function RoutineSection({
                   onClick={() => onExpand(routine.name, routine.type)}
                   className="text-foreground-muted hover:text-foreground transition-colors shrink-0"
                 >
-                  {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
                 </button>
                 <div className="w-8 h-8 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
                   <FunctionSquare className="w-4 h-4 text-brand-500" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground font-mono">{routine.name}</span>
+                    <span className="text-sm font-medium text-foreground font-mono">
+                      {routine.name}
+                    </span>
                     {routine.data_type && routine.type === 'FUNCTION' && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-200/50 text-foreground-muted font-mono">
                         → {routine.data_type}
@@ -375,7 +396,7 @@ function CreateRoutineDialog({
   onClose: () => void
 }) {
   const [sql, setSql] = useState(
-`CREATE FUNCTION my_function(param1 INT)
+    `CREATE FUNCTION my_function(param1 INT)
 RETURNS INT
 DETERMINISTIC
 BEGIN
@@ -394,7 +415,9 @@ END`
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="text-xs font-medium text-foreground-light mb-1 block">SQL Definition</label>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">
+              SQL Definition
+            </label>
             <textarea
               value={sql}
               onChange={(e) => setSql(e.target.value)}
@@ -421,7 +444,11 @@ END`
               onClick={() => onSubmit(sql)}
               className="h-8 text-xs"
             >
-              {creating ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+              {creating ? (
+                <Loader2 className="w-3 h-3 animate-spin mr-1" />
+              ) : (
+                <Play className="w-3 h-3 mr-1" />
+              )}
               Execute
             </Button>
           </div>

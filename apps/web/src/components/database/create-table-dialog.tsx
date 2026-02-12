@@ -1,14 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import {
-  Plus,
-  Trash2,
-  Loader2,
-  GripVertical,
-  Key,
-  Code2,
-} from 'lucide-react'
+import { Plus, Trash2, Loader2, Code2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +11,6 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
@@ -28,8 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import type { CreateTableRequest, CreateColumnDef, CreateIndexDef } from '@/lib/api/workspace-database'
-import { cn } from '@/lib/utils'
+import type { CreateTableRequest, CreateColumnDef } from '@/lib/api/workspace-database'
 
 const MYSQL_TYPES = [
   { label: 'INT', value: 'INT' },
@@ -113,9 +104,7 @@ export function CreateTableDialog({ open, onOpenChange, onSubmit }: CreateTableD
   const [activeTab, setActiveTab] = useState<string>('columns')
 
   const updateColumn = (id: string, patch: Partial<ColumnDraft>) => {
-    setColumns((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...patch } : c))
-    )
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)))
   }
 
   const removeColumn = (id: string) => {
@@ -212,11 +201,13 @@ export function CreateTableDialog({ open, onOpenChange, onSubmit }: CreateTableD
           </div>
 
           {/* Tabs: Columns / Preview SQL */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex-1 flex flex-col min-h-0"
+          >
             <TabsList variant="underline">
-              <TabsTrigger value="columns">
-                Columns ({columns.length})
-              </TabsTrigger>
+              <TabsTrigger value="columns">Columns ({columns.length})</TabsTrigger>
               <TabsTrigger value="sql">
                 <Code2 className="w-3.5 h-3.5 mr-1" />
                 SQL Preview
@@ -243,7 +234,10 @@ export function CreateTableDialog({ open, onOpenChange, onSubmit }: CreateTableD
                   <Checkbox
                     checked={col.isPK}
                     onCheckedChange={(checked) =>
-                      updateColumn(col.id, { isPK: !!checked, nullable: checked ? false : col.nullable })
+                      updateColumn(col.id, {
+                        isPK: !!checked,
+                        nullable: checked ? false : col.nullable,
+                      })
                     }
                   />
                   <Input
@@ -254,10 +248,7 @@ export function CreateTableDialog({ open, onOpenChange, onSubmit }: CreateTableD
                     }
                     className="h-8 text-xs"
                   />
-                  <Select
-                    value={col.type}
-                    onValueChange={(v) => updateColumn(col.id, { type: v })}
-                  >
+                  <Select value={col.type} onValueChange={(v) => updateColumn(col.id, { type: v })}>
                     <SelectTrigger className="h-8 text-xs">
                       <SelectValue />
                     </SelectTrigger>
@@ -285,7 +276,9 @@ export function CreateTableDialog({ open, onOpenChange, onSubmit }: CreateTableD
                   <div className="flex justify-center">
                     <Checkbox
                       checked={col.autoIncrement}
-                      onCheckedChange={(checked) => updateColumn(col.id, { autoIncrement: !!checked })}
+                      onCheckedChange={(checked) =>
+                        updateColumn(col.id, { autoIncrement: !!checked })
+                      }
                     />
                   </div>
                   <Button

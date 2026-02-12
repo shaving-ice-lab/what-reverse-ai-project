@@ -1,19 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  Key,
-  Link2,
-  Hash,
-  Loader2,
-  Copy,
-  Check,
-  AlertCircle,
-} from 'lucide-react'
+import { Key, Link2, Hash, Loader2, Copy, Check, AlertCircle } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
-import type { TableSchema, TableColumn, TableIndex, ForeignKey } from '@/lib/api/workspace-database'
+import type { TableSchema } from '@/lib/api/workspace-database'
 import { cn } from '@/lib/utils'
 
 interface TableSchemaPanelProps {
@@ -42,7 +34,9 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
         if (!cancelled) setLoading(false)
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [workspaceId, tableName])
 
   const copyDDL = async () => {
@@ -62,7 +56,12 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
 
   if (error || !schema) {
     return (
-      <div className={cn('flex items-center justify-center py-12 text-sm text-destructive gap-2', className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center py-12 text-sm text-destructive gap-2',
+          className
+        )}
+      >
         <AlertCircle className="w-4 h-4" />
         {error || 'Schema not found'}
       </div>
@@ -73,15 +72,9 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
     <div className={cn('flex flex-col', className)}>
       <Tabs defaultValue="columns">
         <TabsList variant="underline" className="px-4">
-          <TabsTrigger value="columns">
-            Columns ({schema.columns.length})
-          </TabsTrigger>
-          <TabsTrigger value="indexes">
-            Indexes ({schema.indexes.length})
-          </TabsTrigger>
-          <TabsTrigger value="fkeys">
-            Foreign Keys ({schema.foreign_keys?.length ?? 0})
-          </TabsTrigger>
+          <TabsTrigger value="columns">Columns ({schema.columns.length})</TabsTrigger>
+          <TabsTrigger value="indexes">Indexes ({schema.indexes.length})</TabsTrigger>
+          <TabsTrigger value="fkeys">Foreign Keys ({schema.foreign_keys?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ddl">DDL</TabsTrigger>
         </TabsList>
 
@@ -91,18 +84,35 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-surface-75 border-b border-border">
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">#</th>
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Name</th>
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Type</th>
-                  <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">Nullable</th>
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Default</th>
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Constraints</th>
-                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Extra</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    #
+                  </th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Name
+                  </th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Type
+                  </th>
+                  <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Nullable
+                  </th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Default
+                  </th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Constraints
+                  </th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                    Extra
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {schema.columns.map((col) => (
-                  <tr key={col.name} className="border-b border-border last:border-b-0 hover:bg-surface-200/30">
+                  <tr
+                    key={col.name}
+                    className="border-b border-border last:border-b-0 hover:bg-surface-200/30"
+                  >
                     <td className="px-3 py-2 text-xs text-foreground-muted tabular-nums">
                       {col.ordinal_position}
                     </td>
@@ -110,7 +120,9 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
                       <div className="flex items-center gap-1.5">
                         {col.name}
                         {col.is_primary_key && (
-                          <span title="Primary Key"><Key className="w-3 h-3 text-amber-500" /></span>
+                          <span title="Primary Key">
+                            <Key className="w-3 h-3 text-amber-500" />
+                          </span>
                         )}
                       </div>
                     </td>
@@ -120,31 +132,37 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
                       </span>
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <span className={cn(
-                        'text-[10px] font-medium px-1.5 py-0.5 rounded',
-                        col.nullable
-                          ? 'bg-surface-200 text-foreground-muted'
-                          : 'bg-amber-500/10 text-amber-600'
-                      )}>
+                      <span
+                        className={cn(
+                          'text-[10px] font-medium px-1.5 py-0.5 rounded',
+                          col.nullable
+                            ? 'bg-surface-200 text-foreground-muted'
+                            : 'bg-amber-500/10 text-amber-600'
+                        )}
+                      >
                         {col.nullable ? 'YES' : 'NO'}
                       </span>
                     </td>
                     <td className="px-3 py-2 text-xs text-foreground-light font-mono">
-                      {col.default_value ?? <span className="text-foreground-muted italic">none</span>}
+                      {col.default_value ?? (
+                        <span className="text-foreground-muted italic">none</span>
+                      )}
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1">
                         {col.is_primary_key && (
-                          <span className="text-[9px] font-bold bg-amber-500/10 text-amber-600 px-1 rounded">PK</span>
+                          <span className="text-[9px] font-bold bg-amber-500/10 text-amber-600 px-1 rounded">
+                            PK
+                          </span>
                         )}
                         {col.is_unique && !col.is_primary_key && (
-                          <span className="text-[9px] font-bold bg-blue-500/10 text-blue-500 px-1 rounded">UNI</span>
+                          <span className="text-[9px] font-bold bg-blue-500/10 text-blue-500 px-1 rounded">
+                            UNI
+                          </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-xs text-foreground-muted">
-                      {col.extra || '-'}
-                    </td>
+                    <td className="px-3 py-2 text-xs text-foreground-muted">{col.extra || '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -161,21 +179,36 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-75 border-b border-border">
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Name</th>
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Columns</th>
-                    <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">Type</th>
-                    <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">Unique</th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Name
+                    </th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Columns
+                    </th>
+                    <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Type
+                    </th>
+                    <th className="text-center px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Unique
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {schema.indexes.map((idx) => (
-                    <tr key={idx.name} className="border-b border-border last:border-b-0 hover:bg-surface-200/30">
+                    <tr
+                      key={idx.name}
+                      className="border-b border-border last:border-b-0 hover:bg-surface-200/30"
+                    >
                       <td className="px-3 py-2 text-xs font-medium text-foreground">
                         <div className="flex items-center gap-1.5">
                           {idx.is_primary ? (
-                            <span title="Primary"><Key className="w-3 h-3 text-amber-500" /></span>
+                            <span title="Primary">
+                              <Key className="w-3 h-3 text-amber-500" />
+                            </span>
                           ) : (
-                            <span title="Index"><Hash className="w-3 h-3 text-foreground-muted" /></span>
+                            <span title="Index">
+                              <Hash className="w-3 h-3 text-foreground-muted" />
+                            </span>
                           )}
                           {idx.name}
                         </div>
@@ -183,7 +216,10 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
                       <td className="px-3 py-2 text-xs text-foreground-light">
                         <div className="flex flex-wrap gap-1">
                           {idx.columns.map((c) => (
-                            <span key={c} className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-200">
+                            <span
+                              key={c}
+                              className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-200"
+                            >
                               {c}
                             </span>
                           ))}
@@ -194,7 +230,9 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
                       </td>
                       <td className="px-3 py-2 text-center">
                         {idx.is_unique ? (
-                          <span className="text-[10px] font-medium bg-brand-500/10 text-brand-500 px-1.5 py-0.5 rounded">YES</span>
+                          <span className="text-[10px] font-medium bg-brand-500/10 text-brand-500 px-1.5 py-0.5 rounded">
+                            YES
+                          </span>
                         ) : (
                           <span className="text-[10px] text-foreground-muted">NO</span>
                         )}
@@ -209,30 +247,47 @@ export function TableSchemaPanel({ workspaceId, tableName, className }: TableSch
 
         {/* Foreign Keys Tab */}
         <TabsContent value="fkeys" className="p-4">
-          {(!schema.foreign_keys || schema.foreign_keys.length === 0) ? (
+          {!schema.foreign_keys || schema.foreign_keys.length === 0 ? (
             <div className="text-center py-8 text-sm text-foreground-muted">No foreign keys</div>
           ) : (
             <div className="border border-border rounded-md overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-75 border-b border-border">
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Constraint</th>
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">Column</th>
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">References</th>
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">On Update</th>
-                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">On Delete</th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Constraint
+                    </th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      Column
+                    </th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      References
+                    </th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      On Update
+                    </th>
+                    <th className="text-left px-3 py-2 text-[11px] font-medium text-foreground-muted">
+                      On Delete
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {schema.foreign_keys.map((fk) => (
-                    <tr key={fk.name} className="border-b border-border last:border-b-0 hover:bg-surface-200/30">
+                    <tr
+                      key={fk.name}
+                      className="border-b border-border last:border-b-0 hover:bg-surface-200/30"
+                    >
                       <td className="px-3 py-2 text-xs font-medium text-foreground">
                         <div className="flex items-center gap-1.5">
-                          <span title="Foreign Key"><Link2 className="w-3 h-3 text-blue-500" /></span>
+                          <span title="Foreign Key">
+                            <Link2 className="w-3 h-3 text-blue-500" />
+                          </span>
                           {fk.name}
                         </div>
                       </td>
-                      <td className="px-3 py-2 text-xs font-mono text-foreground-light">{fk.column}</td>
+                      <td className="px-3 py-2 text-xs font-mono text-foreground-light">
+                        {fk.column}
+                      </td>
                       <td className="px-3 py-2 text-xs font-mono text-foreground-light">
                         {fk.referenced_table}.{fk.referenced_column}
                       </td>

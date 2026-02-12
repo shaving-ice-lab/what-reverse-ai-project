@@ -91,12 +91,7 @@ export default function DatabaseOverviewPage() {
         description="Manage your workspace database tables, run queries, and view schema."
         icon={<Database className="w-4 h-4" />}
         actions={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={loadData}
-            disabled={loading}
-          >
+          <Button variant="ghost" size="sm" onClick={loadData} disabled={loading}>
             <RefreshCw className={cn('w-4 h-4 mr-1.5', loading && 'animate-spin')} />
             Refresh
           </Button>

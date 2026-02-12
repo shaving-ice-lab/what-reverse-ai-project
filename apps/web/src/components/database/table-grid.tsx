@@ -123,9 +123,7 @@ export function TableGrid({
 
   const handleDeleteSelected = () => {
     if (selectedRows.size === 0 || primaryKey.length === 0) return
-    const ids = rows
-      .filter((r) => selectedRows.has(getRowKey(r)))
-      .map((r) => r[primaryKey[0]])
+    const ids = rows.filter((r) => selectedRows.has(getRowKey(r))).map((r) => r[primaryKey[0]])
     onDeleteSelected(ids)
     setSelectedRows(new Set())
   }
@@ -135,15 +133,17 @@ export function TableGrid({
     const colNames = columns.map((c) => c.name)
     const header = colNames.join(',')
     const csvRows = rows.map((row) =>
-      colNames.map((col) => {
-        const val = row[col]
-        if (val === null || val === undefined) return ''
-        const str = String(val)
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          return `"${str.replace(/"/g, '""')}"`
-        }
-        return str
-      }).join(',')
+      colNames
+        .map((col) => {
+          const val = row[col]
+          if (val === null || val === undefined) return ''
+          const str = String(val)
+          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return `"${str.replace(/"/g, '""')}"`
+          }
+          return str
+        })
+        .join(',')
     )
     const csv = [header, ...csvRows].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -190,7 +190,13 @@ export function TableGrid({
             <Download className="w-3.5 h-3.5 mr-1" />
             CSV
           </Button>
-          <Button size="sm" variant="ghost" onClick={onRefresh} className="h-7 text-xs" disabled={loading}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onRefresh}
+            className="h-7 text-xs"
+            disabled={loading}
+          >
             <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
           </Button>
         </div>
@@ -255,7 +261,7 @@ export function TableGrid({
                 </td>
               </tr>
             ) : (
-              rows.map((row, idx) => {
+              rows.map((row, _idx) => {
                 const key = getRowKey(row)
                 const selected = selectedRows.has(key)
                 return (
@@ -269,13 +275,11 @@ export function TableGrid({
                     onClick={() => onRowClick?.(row)}
                   >
                     <td className="w-10 px-3 py-1.5" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selected}
-                        onCheckedChange={() => toggleRow(key)}
-                      />
+                      <Checkbox checked={selected} onCheckedChange={() => toggleRow(key)} />
                     </td>
                     {columns.map((col) => {
-                      const isEditing = editingCell?.rowKey === key && editingCell?.column === col.name
+                      const isEditing =
+                        editingCell?.rowKey === key && editingCell?.column === col.name
                       return (
                         <td
                           key={col.name}
@@ -320,13 +324,12 @@ export function TableGrid({
         <div className="flex items-center gap-2">
           <span>{totalCount.toLocaleString()} rows</span>
           <span className="text-foreground-muted">|</span>
-          <span>Page {page} of {totalPages}</span>
+          <span>
+            Page {page} of {totalPages}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            value={String(pageSize)}
-            onValueChange={(v) => onPageSizeChange(Number(v))}
-          >
+          <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
             <SelectTrigger className="h-7 w-20 text-xs">
               <SelectValue />
             </SelectTrigger>
@@ -367,28 +370,36 @@ function ColumnBadges({ col }: { col: TableColumn }) {
   return (
     <span className="flex items-center gap-0.5 shrink-0">
       {col.is_primary_key && (
-        <span title="Primary Key"><Key className="w-3 h-3 text-amber-500" /></span>
+        <span title="Primary Key">
+          <Key className="w-3 h-3 text-amber-500" />
+        </span>
       )}
       {col.is_unique && !col.is_primary_key && (
-        <span className="text-[9px] font-bold text-blue-400" title="Unique">U</span>
+        <span className="text-[9px] font-bold text-blue-400" title="Unique">
+          U
+        </span>
       )}
       {!col.nullable && !col.is_primary_key && (
-        <span title="NOT NULL"><AlertCircle className="w-3 h-3 text-foreground-muted" /></span>
+        <span title="NOT NULL">
+          <AlertCircle className="w-3 h-3 text-foreground-muted" />
+        </span>
       )}
     </span>
   )
 }
 
-function CellValue({ value, type }: { value: unknown; type: string }) {
+function CellValue({ value }: { value: unknown; type: string }) {
   if (value === null || value === undefined) {
     return <span className="text-foreground-muted italic">NULL</span>
   }
   if (typeof value === 'boolean') {
     return (
-      <span className={cn(
-        'px-1.5 py-0.5 rounded text-[11px] font-medium',
-        value ? 'bg-brand-500/10 text-brand-500' : 'bg-surface-200 text-foreground-muted'
-      )}>
+      <span
+        className={cn(
+          'px-1.5 py-0.5 rounded text-[11px] font-medium',
+          value ? 'bg-brand-500/10 text-brand-500' : 'bg-surface-200 text-foreground-muted'
+        )}
+      >
         {String(value)}
       </span>
     )

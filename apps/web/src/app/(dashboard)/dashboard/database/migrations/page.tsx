@@ -14,7 +14,6 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/dashboard/page-layout'
@@ -51,18 +50,38 @@ interface MigrationPlan {
 }
 
 const statusConfig: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
-  pending: { icon: <Clock className="w-3.5 h-3.5" />, color: 'text-amber-500 bg-amber-500/10', label: 'Pending' },
-  approved: { icon: <CheckCircle2 className="w-3.5 h-3.5" />, color: 'text-blue-500 bg-blue-500/10', label: 'Approved' },
-  executed: { icon: <Check className="w-3.5 h-3.5" />, color: 'text-brand-500 bg-brand-500/10', label: 'Executed' },
-  rejected: { icon: <XCircle className="w-3.5 h-3.5" />, color: 'text-destructive bg-destructive/10', label: 'Rejected' },
-  failed: { icon: <AlertCircle className="w-3.5 h-3.5" />, color: 'text-destructive bg-destructive/10', label: 'Failed' },
+  pending: {
+    icon: <Clock className="w-3.5 h-3.5" />,
+    color: 'text-amber-500 bg-amber-500/10',
+    label: 'Pending',
+  },
+  approved: {
+    icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+    color: 'text-blue-500 bg-blue-500/10',
+    label: 'Approved',
+  },
+  executed: {
+    icon: <Check className="w-3.5 h-3.5" />,
+    color: 'text-brand-500 bg-brand-500/10',
+    label: 'Executed',
+  },
+  rejected: {
+    icon: <XCircle className="w-3.5 h-3.5" />,
+    color: 'text-destructive bg-destructive/10',
+    label: 'Rejected',
+  },
+  failed: {
+    icon: <AlertCircle className="w-3.5 h-3.5" />,
+    color: 'text-destructive bg-destructive/10',
+    label: 'Failed',
+  },
 }
 
 export default function MigrationsPage() {
   const { workspaceId } = useWorkspace()
   const [migrations, setMigrations] = useState<Migration[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
 
   // Preview dialog
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -170,7 +189,7 @@ export default function MigrationsPage() {
     <div>
       <PageHeader
         title="Migrations"
-        description="Manage database schema migrations with version control and approval workflow."
+        description="Manage database schema migrations with version control and approval process."
         icon={<GitBranch className="w-4 h-4" />}
         actions={
           <div className="flex items-center gap-2">
@@ -211,11 +230,21 @@ export default function MigrationsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-surface-75/60">
-                <th className="text-left px-4 py-2.5 text-[12px] font-medium text-foreground-light">Version</th>
-                <th className="text-left px-4 py-2.5 text-[12px] font-medium text-foreground-light">Description</th>
-                <th className="text-center px-4 py-2.5 text-[12px] font-medium text-foreground-light">Status</th>
-                <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">Created</th>
-                <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">Actions</th>
+                <th className="text-left px-4 py-2.5 text-[12px] font-medium text-foreground-light">
+                  Version
+                </th>
+                <th className="text-left px-4 py-2.5 text-[12px] font-medium text-foreground-light">
+                  Description
+                </th>
+                <th className="text-center px-4 py-2.5 text-[12px] font-medium text-foreground-light">
+                  Status
+                </th>
+                <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
+                  Created
+                </th>
+                <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -234,7 +263,12 @@ export default function MigrationsPage() {
                       {m.description || '-'}
                     </td>
                     <td className="px-4 py-2.5 text-center">
-                      <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium', status.color)}>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium',
+                          status.color
+                        )}
+                      >
                         {status.icon}
                         {status.label}
                       </span>
@@ -307,32 +341,43 @@ export default function MigrationsPage() {
         <Dialog open={!!selectedMigration} onOpenChange={() => setSelectedMigration(null)}>
           <DialogContent size="lg">
             <DialogHeader>
-              <DialogTitle>Migration: {selectedMigration.version || selectedMigration.id.slice(0, 8)}</DialogTitle>
+              <DialogTitle>
+                Migration: {selectedMigration.version || selectedMigration.id.slice(0, 8)}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
                   <span className="text-foreground-muted">Status:</span>
-                  <span className={cn('ml-2 px-2 py-0.5 rounded font-medium',
-                    (statusConfig[selectedMigration.status] || statusConfig.pending).color
-                  )}>
+                  <span
+                    className={cn(
+                      'ml-2 px-2 py-0.5 rounded font-medium',
+                      (statusConfig[selectedMigration.status] || statusConfig.pending).color
+                    )}
+                  >
                     {(statusConfig[selectedMigration.status] || statusConfig.pending).label}
                   </span>
                 </div>
                 <div>
                   <span className="text-foreground-muted">Created:</span>
-                  <span className="ml-2 text-foreground">{new Date(selectedMigration.created_at).toLocaleString()}</span>
+                  <span className="ml-2 text-foreground">
+                    {new Date(selectedMigration.created_at).toLocaleString()}
+                  </span>
                 </div>
               </div>
               {selectedMigration.description && (
                 <div>
-                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">Description</label>
+                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
+                    Description
+                  </label>
                   <p className="text-sm text-foreground mt-1">{selectedMigration.description}</p>
                 </div>
               )}
               {selectedMigration.sql_up && (
                 <div>
-                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">SQL (Up)</label>
+                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
+                    SQL (Up)
+                  </label>
                   <pre className="mt-1 bg-surface-200/50 border border-border rounded p-3 text-xs font-mono text-foreground whitespace-pre-wrap max-h-[200px] overflow-auto">
                     {selectedMigration.sql_up}
                   </pre>
@@ -340,7 +385,9 @@ export default function MigrationsPage() {
               )}
               {selectedMigration.sql_down && (
                 <div>
-                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">SQL (Down / Rollback)</label>
+                  <label className="text-[11px] font-medium text-foreground-muted uppercase tracking-wider">
+                    SQL (Down / Rollback)
+                  </label>
                   <pre className="mt-1 bg-surface-200/50 border border-border rounded p-3 text-xs font-mono text-foreground whitespace-pre-wrap max-h-[200px] overflow-auto">
                     {selectedMigration.sql_down}
                   </pre>
@@ -403,11 +450,25 @@ export default function MigrationsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" size="sm" onClick={() => setSubmitOpen(false)} className="text-xs">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSubmitOpen(false)}
+              className="text-xs"
+            >
               Cancel
             </Button>
-            <Button size="sm" onClick={handleSubmit} disabled={!submitSQL.trim() || submitting} className="text-xs">
-              {submitting ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Plus className="w-3.5 h-3.5 mr-1" />}
+            <Button
+              size="sm"
+              onClick={handleSubmit}
+              disabled={!submitSQL.trim() || submitting}
+              className="text-xs"
+            >
+              {submitting ? (
+                <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+              ) : (
+                <Plus className="w-3.5 h-3.5 mr-1" />
+              )}
               Submit
             </Button>
           </DialogFooter>

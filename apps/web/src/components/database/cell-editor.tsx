@@ -8,14 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 
-type ColumnDataType =
-  | 'text'
-  | 'number'
-  | 'boolean'
-  | 'date'
-  | 'datetime'
-  | 'json'
-  | 'unknown'
+type ColumnDataType = 'text' | 'number' | 'boolean' | 'date' | 'datetime' | 'json' | 'unknown'
 
 interface CellEditorProps {
   value: unknown
@@ -29,7 +22,8 @@ interface CellEditorProps {
 
 function resolveDataType(pgType: string): ColumnDataType {
   const t = pgType.toLowerCase()
-  if (/^(int|bigint|smallint|serial|bigserial|integer|numeric|decimal|real|double|float)/.test(t)) return 'number'
+  if (/^(int|bigint|smallint|serial|bigserial|integer|numeric|decimal|real|double|float)/.test(t))
+    return 'number'
   if (/^(bool|boolean)/.test(t)) return 'boolean'
   if (/^(date)$/.test(t)) return 'date'
   if (/^(timestamp|timestamptz|datetime)/.test(t)) return 'datetime'
@@ -67,7 +61,11 @@ function parseEditedValue(editStr: string, dataType: ColumnDataType, nullable: b
     case 'boolean':
       return editStr === 'true' || editStr === '1'
     case 'json':
-      try { return JSON.parse(editStr) } catch { return editStr }
+      try {
+        return JSON.parse(editStr)
+      } catch {
+        return editStr
+      }
     default:
       return editStr
   }
@@ -196,12 +194,8 @@ export function CellEditor({
             className="min-h-[100px] max-h-[250px] font-mono text-xs resize-y"
             placeholder='{"key": "value"}'
           />
-          {jsonError && (
-            <div className="text-[10px] text-destructive mt-0.5">{jsonError}</div>
-          )}
-          <div className="text-[10px] text-foreground-muted mt-0.5">
-            Ctrl+Enter to save
-          </div>
+          {jsonError && <div className="text-[10px] text-destructive mt-0.5">{jsonError}</div>}
+          <div className="text-[10px] text-foreground-muted mt-0.5">Ctrl+Enter to save</div>
         </div>
       ) : dataType === 'date' ? (
         <Input
@@ -249,19 +243,10 @@ export function CellEditor({
           Enter to save
         </span>
         <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={onCancel}
-            className="h-6 w-6 p-0"
-          >
+          <Button size="sm" variant="ghost" onClick={onCancel} className="h-6 w-6 p-0">
             <X className="w-3 h-3" />
           </Button>
-          <Button
-            size="sm"
-            onClick={handleSave}
-            className="h-6 w-6 p-0"
-          >
+          <Button size="sm" onClick={handleSave} className="h-6 w-6 p-0">
             <Check className="w-3 h-3" />
           </Button>
         </div>

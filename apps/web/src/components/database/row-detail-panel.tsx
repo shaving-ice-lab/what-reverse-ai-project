@@ -151,23 +151,28 @@ function FieldEditor({
   isPrimaryKey?: boolean
 }) {
   const typeLower = column.type.toLowerCase()
-  const isBoolean = typeLower.includes('tinyint(1)') || typeLower.includes('boolean') || typeLower.includes('bool')
-  const isNumber = typeLower.includes('int') || typeLower.includes('decimal') || typeLower.includes('float') || typeLower.includes('double') || typeLower.includes('numeric')
-  const isText = typeLower.includes('text') || typeLower.includes('json') || typeLower.includes('blob')
+  const isBoolean =
+    typeLower.includes('tinyint(1)') || typeLower.includes('boolean') || typeLower.includes('bool')
+  const isNumber =
+    typeLower.includes('int') ||
+    typeLower.includes('decimal') ||
+    typeLower.includes('float') ||
+    typeLower.includes('double') ||
+    typeLower.includes('numeric')
+  const isText =
+    typeLower.includes('text') || typeLower.includes('json') || typeLower.includes('blob')
   const isNull = value === null || value === undefined
 
   return (
     <div>
       <div className="flex items-center gap-1.5 mb-1.5">
-        <label className="text-[12px] font-medium text-foreground">
-          {column.name}
-        </label>
+        <label className="text-[12px] font-medium text-foreground">{column.name}</label>
         {isPrimaryKey && (
-          <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1 rounded">PK</span>
+          <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1 rounded">
+            PK
+          </span>
         )}
-        {!column.nullable && (
-          <span className="text-[9px] text-destructive">required</span>
-        )}
+        {!column.nullable && <span className="text-[9px] text-destructive">required</span>}
         <span className="text-[10px] text-foreground-muted ml-auto">{column.type}</span>
       </div>
 
@@ -178,9 +183,7 @@ function FieldEditor({
             onCheckedChange={(checked) => onChange(checked ? 1 : 0)}
             disabled={disabled}
           />
-          <span className="text-xs text-foreground-light">
-            {value ? 'true' : 'false'}
-          </span>
+          <span className="text-xs text-foreground-light">{value ? 'true' : 'false'}</span>
           {column.nullable && (
             <Button
               size="sm"
@@ -199,7 +202,10 @@ function FieldEditor({
             onChange={(e) => onChange(e.target.value || null)}
             disabled={disabled}
             placeholder={isNull ? 'NULL' : ''}
-            className={cn('text-xs font-mono min-h-[80px]', isNull && 'text-foreground-muted italic')}
+            className={cn(
+              'text-xs font-mono min-h-[80px]',
+              isNull && 'text-foreground-muted italic'
+            )}
           />
           {column.nullable && !isNull && (
             <Button

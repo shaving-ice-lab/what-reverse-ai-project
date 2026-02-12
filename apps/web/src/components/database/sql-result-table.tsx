@@ -12,7 +12,7 @@ interface SQLResultTableProps {
   className?: string
 }
 
-export function SQLResultTable({ result, error, loading, className }: SQLResultTableProps) {
+export function SQLResultTable({ result, error, className }: SQLResultTableProps) {
   if (error) {
     return (
       <div className={cn('flex items-start gap-2 p-4 text-sm text-destructive', className)}>
@@ -27,13 +27,19 @@ export function SQLResultTable({ result, error, loading, className }: SQLResultT
 
   if (!result) {
     return (
-      <div className={cn('flex items-center justify-center py-12 text-sm text-foreground-muted', className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center py-12 text-sm text-foreground-muted',
+          className
+        )}
+      >
         Run a query to see results
       </div>
     )
   }
 
-  const hasRows = result.columns && result.columns.length > 0 && result.rows && result.rows.length > 0
+  const hasRows =
+    result.columns && result.columns.length > 0 && result.rows && result.rows.length > 0
 
   return (
     <div className={cn('flex flex-col h-full', className)}>
@@ -43,12 +49,8 @@ export function SQLResultTable({ result, error, loading, className }: SQLResultT
           <CheckCircle2 className="w-3.5 h-3.5 text-brand-500" />
           Success
         </span>
-        {result.affected_rows > 0 && (
-          <span>{result.affected_rows} row(s) affected</span>
-        )}
-        {result.rows && result.rows.length > 0 && (
-          <span>{result.rows.length} row(s) returned</span>
-        )}
+        {result.affected_rows > 0 && <span>{result.affected_rows} row(s) affected</span>}
+        {result.rows && result.rows.length > 0 && <span>{result.rows.length} row(s) returned</span>}
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           {result.duration_ms}ms
@@ -61,7 +63,9 @@ export function SQLResultTable({ result, error, loading, className }: SQLResultT
           <table className="w-full text-sm border-collapse">
             <thead className="sticky top-0 z-5">
               <tr className="bg-surface-75 border-b border-border">
-                <th className="w-10 px-3 py-2 text-right text-[11px] font-medium text-foreground-muted">#</th>
+                <th className="w-10 px-3 py-2 text-right text-[11px] font-medium text-foreground-muted">
+                  #
+                </th>
                 {result.columns.map((col) => (
                   <th
                     key={col}
@@ -82,7 +86,10 @@ export function SQLResultTable({ result, error, loading, className }: SQLResultT
                     {idx + 1}
                   </td>
                   {result.columns.map((col) => (
-                    <td key={col} className="px-3 py-1.5 text-[13px] text-foreground max-w-[300px] truncate">
+                    <td
+                      key={col}
+                      className="px-3 py-1.5 text-[13px] text-foreground max-w-[300px] truncate"
+                    >
                       <CellDisplay value={row[col]} />
                     </td>
                   ))}
