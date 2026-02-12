@@ -517,6 +517,16 @@ func (h *WorkspaceDBQueryHandler) GetStats(c echo.Context) error {
 
 	stats, err := h.queryService.GetDatabaseStats(c.Request().Context(), workspaceID)
 	if err != nil {
+		if err == service.ErrWorkspaceDatabaseNotFound || err == service.ErrWorkspaceDBNotReady {
+			return successResponse(c, map[string]interface{}{
+				"stats": map[string]interface{}{
+					"table_count":      0,
+					"total_rows":       0,
+					"total_size_bytes": 0,
+					"connection_count": 0,
+				},
+			})
+		}
 		return handleDBQueryError(c, err)
 	}
 
