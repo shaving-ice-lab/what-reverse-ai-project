@@ -1,14 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  CheckCircle2,
-  Loader2,
-  XCircle,
-  Wrench,
-  Brain,
-  AlertTriangle,
-} from 'lucide-react'
+import { CheckCircle2, Loader2, XCircle, Wrench, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface AgentStep {
@@ -48,18 +41,20 @@ export function AgentTaskProgress({ steps, currentStep, className }: AgentTaskPr
             className={cn(
               'flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors',
               isCurrent && 'bg-brand-500/5 border border-brand-500/20',
-              step.status === 'failed' && 'bg-destructive/5',
+              step.status === 'failed' && 'bg-destructive/5'
             )}
           >
             {statusIcons[step.status]}
             <span className="text-foreground-muted tabular-nums w-5 text-right shrink-0">
               {step.step}.
             </span>
-            <span className={cn(
-              'flex-1 truncate',
-              isCurrent ? 'text-foreground font-medium' : 'text-foreground-light',
-              step.status === 'completed' && 'line-through opacity-60',
-            )}>
+            <span
+              className={cn(
+                'flex-1 truncate',
+                isCurrent ? 'text-foreground font-medium' : 'text-foreground-light',
+                step.status === 'completed' && 'line-through opacity-60'
+              )}
+            >
               {step.description}
             </span>
             {step.toolName && (
