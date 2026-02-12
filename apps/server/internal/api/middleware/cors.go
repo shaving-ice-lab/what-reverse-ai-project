@@ -19,8 +19,8 @@ func CORS() echo.MiddlewareFunc {
 			"http://localhost:3007",
 			"http://localhost:3008",
 			"http://localhost:3009",
-			"https://agentflow.app",
-			"https://*.agentflow.app",
+			"https://reverseai.app",
+			"https://*.reverseai.app",
 		},
 		AllowMethods: []string{
 			echo.GET,

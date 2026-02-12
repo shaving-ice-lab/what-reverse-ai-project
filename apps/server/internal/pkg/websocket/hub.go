@@ -6,17 +6,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/agentflow/server/internal/pkg/logger"
 	"github.com/gorilla/websocket"
+	"github.com/reverseai/server/internal/pkg/logger"
 )
 
 // 延迟监控指标
 type LatencyMetrics struct {
-	TotalMessages   int64         // 总消息数
-	TotalLatencyMs  int64         // 总延迟(毫秒)
-	MaxLatencyMs    int64         // 最大延迟
-	LastLatencyMs   int64         // 最近一次延迟
-	OverThreshold   int64         // 超过阈值次数(>500ms)
+	TotalMessages  int64 // 总消息数
+	TotalLatencyMs int64 // 总延迟(毫秒)
+	MaxLatencyMs   int64 // 最大延迟
+	LastLatencyMs  int64 // 最近一次延迟
+	OverThreshold  int64 // 超过阈值次数(>500ms)
 }
 
 // 延迟阈值 (500ms)
@@ -54,7 +54,6 @@ type Message struct {
 // ExecutionPayload 执行事件载荷
 type ExecutionPayload struct {
 	ExecutionID    string                 `json:"executionId"`
-	WorkflowID     string                 `json:"workflowId,omitempty"`
 	Status         string                 `json:"status,omitempty"`
 	NodeID         string                 `json:"nodeId,omitempty"`
 	NodeType       string                 `json:"nodeType,omitempty"`
@@ -121,8 +120,8 @@ type Hub struct {
 
 // BroadcastMessage 广播消息
 type BroadcastMessage struct {
-	Room      string    // 目标房间 (executionId)，为空则广播给所有人
-	UserID    string    // 目标用户，为空则广播给房间内所有人
+	Room      string // 目标房间 (executionId)，为空则广播给所有人
+	UserID    string // 目标用户，为空则广播给房间内所有人
 	Message   []byte
 	CreatedAt time.Time // 消息创建时间，用于延迟监控
 	Priority  bool      // 是否高优先级(执行事件)
@@ -136,8 +135,8 @@ func NewHub(log logger.Logger) *Hub {
 		rooms:             make(map[string]map[*Client]bool),
 		register:          make(chan *Client),
 		unregister:        make(chan *Client),
-		broadcast:         make(chan *BroadcastMessage, 1024),         // 增大缓冲区减少阻塞
-		priorityBroadcast: make(chan *BroadcastMessage, 512),          // 高优先级通道
+		broadcast:         make(chan *BroadcastMessage, 1024), // 增大缓冲区减少阻塞
+		priorityBroadcast: make(chan *BroadcastMessage, 512),  // 高优先级通道
 		log:               log,
 		metrics:           &LatencyMetrics{},
 	}
@@ -196,12 +195,12 @@ func (h *Hub) broadcastMessageWithLatency(msg *BroadcastMessage) {
 	// 计算广播延迟
 	if !msg.CreatedAt.IsZero() {
 		latencyMs := time.Since(msg.CreatedAt).Milliseconds()
-		
+
 		// 更新指标
 		atomic.AddInt64(&h.metrics.TotalMessages, 1)
 		atomic.AddInt64(&h.metrics.TotalLatencyMs, latencyMs)
 		atomic.StoreInt64(&h.metrics.LastLatencyMs, latencyMs)
-		
+
 		// 更新最大延迟
 		for {
 			current := atomic.LoadInt64(&h.metrics.MaxLatencyMs)
@@ -212,7 +211,7 @@ func (h *Hub) broadcastMessageWithLatency(msg *BroadcastMessage) {
 				break
 			}
 		}
-		
+
 		// 检查是否超过阈值
 		if latencyMs > LatencyThresholdMs {
 			atomic.AddInt64(&h.metrics.OverThreshold, 1)
@@ -222,7 +221,7 @@ func (h *Hub) broadcastMessageWithLatency(msg *BroadcastMessage) {
 				"room", msg.Room)
 		}
 	}
-	
+
 	h.broadcastMessage(msg)
 }
 
@@ -363,7 +362,7 @@ func (h *Hub) Unsubscribe(client *Client, room string) {
 func (h *Hub) SendToRoom(room string, msg *Message) error {
 	// 添加发送时间戳
 	msg.SentAt = time.Now().UnixMilli()
-	
+
 	data, err := json.Marshal(msg)
 	if err != nil {
 		return err
@@ -391,7 +390,7 @@ func (h *Hub) SendToRoom(room string, msg *Message) error {
 func (h *Hub) SendToRoomPriority(room string, msg *Message) error {
 	// 添加发送时间戳
 	msg.SentAt = time.Now().UnixMilli()
-	
+
 	data, err := json.Marshal(msg)
 	if err != nil {
 		return err
@@ -423,7 +422,7 @@ func (h *Hub) SendToRoomPriority(room string, msg *Message) error {
 func (h *Hub) SendToUser(userID string, msg *Message) error {
 	// 添加发送时间戳
 	msg.SentAt = time.Now().UnixMilli()
-	
+
 	data, err := json.Marshal(msg)
 	if err != nil {
 		return err
@@ -492,13 +491,13 @@ func (h *Hub) GetLatencyMetrics() map[string]int64 {
 	if total > 0 {
 		avgLatency = atomic.LoadInt64(&h.metrics.TotalLatencyMs) / total
 	}
-	
+
 	return map[string]int64{
-		"totalMessages":       total,
-		"avgLatencyMs":        avgLatency,
-		"maxLatencyMs":        atomic.LoadInt64(&h.metrics.MaxLatencyMs),
-		"lastLatencyMs":       atomic.LoadInt64(&h.metrics.LastLatencyMs),
-		"overThreshold500ms":  atomic.LoadInt64(&h.metrics.OverThreshold),
+		"totalMessages":      total,
+		"avgLatencyMs":       avgLatency,
+		"maxLatencyMs":       atomic.LoadInt64(&h.metrics.MaxLatencyMs),
+		"lastLatencyMs":      atomic.LoadInt64(&h.metrics.LastLatencyMs),
+		"overThreshold500ms": atomic.LoadInt64(&h.metrics.OverThreshold),
 	}
 }
 

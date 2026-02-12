@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/agentflow/server/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/config"
 )
 
 // JWTClaims JWT 声明

@@ -37,7 +37,6 @@ type User struct {
 	StatusUpdatedAt *time.Time `json:"status_updated_at,omitempty"`
 
 	// 统计
-	WorkflowCount  int `gorm:"default:0" json:"workflow_count"`
 	AgentCount     int `gorm:"default:0" json:"agent_count"`
 	FollowerCount  int `gorm:"default:0" json:"follower_count"`
 	FollowingCount int `gorm:"default:0" json:"following_count"`

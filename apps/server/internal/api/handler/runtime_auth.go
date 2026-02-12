@@ -3,18 +3,40 @@ package handler
 import (
 	"net/http"
 
-	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/service"
 )
 
 // RuntimeAuthHandler 应用运行时认证 Handler
 type RuntimeAuthHandler struct {
-	authService service.RuntimeAuthService
+	authService    service.RuntimeAuthService
+	runtimeService service.RuntimeService
 }
 
-func NewRuntimeAuthHandler(authService service.RuntimeAuthService) *RuntimeAuthHandler {
-	return &RuntimeAuthHandler{authService: authService}
+func NewRuntimeAuthHandler(authService service.RuntimeAuthService, runtimeService ...service.RuntimeService) *RuntimeAuthHandler {
+	h := &RuntimeAuthHandler{authService: authService}
+	if len(runtimeService) > 0 {
+		h.runtimeService = runtimeService[0]
+	}
+	return h
+}
+
+// resolveWorkspaceID resolves workspace ID from slug param (or UUID directly)
+func (h *RuntimeAuthHandler) resolveWorkspaceID(c echo.Context) (uuid.UUID, error) {
+	slug := c.Param("workspaceSlug")
+	// Try direct UUID parse first
+	if id, err := uuid.Parse(slug); err == nil {
+		return id, nil
+	}
+	// Resolve via runtime service (slug → workspace)
+	if h.runtimeService != nil {
+		entry, err := h.runtimeService.GetEntry(c.Request().Context(), slug, nil)
+		if err == nil && entry != nil && entry.Workspace != nil {
+			return entry.Workspace.ID, nil
+		}
+	}
+	return uuid.Nil, echo.NewHTTPError(http.StatusBadRequest, "invalid workspace identifier")
 }
 
 type registerRequest struct {
@@ -25,9 +47,9 @@ type registerRequest struct {
 
 // Register 应用用户注册
 func (h *RuntimeAuthHandler) Register(c echo.Context) error {
-	workspaceID, err := uuid.Parse(c.Param("workspaceSlug"))
+	workspaceID, err := h.resolveWorkspaceID(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace id"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace identifier"})
 	}
 
 	var req registerRequest
@@ -60,9 +82,9 @@ type loginRequest struct {
 
 // Login 应用用户登录
 func (h *RuntimeAuthHandler) Login(c echo.Context) error {
-	workspaceID, err := uuid.Parse(c.Param("workspaceSlug"))
+	workspaceID, err := h.resolveWorkspaceID(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace id"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace identifier"})
 	}
 
 	var req loginRequest
@@ -125,6 +147,25 @@ func (h *RuntimeAuthHandler) ListUsers(c echo.Context) error {
 			"total": total,
 			"page":  page,
 		},
+	})
+}
+
+// Me 验证 token 并返回当前应用用户信息
+func (h *RuntimeAuthHandler) Me(c echo.Context) error {
+	token := c.Request().Header.Get("X-App-Token")
+	if token == "" {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "token is required"})
+	}
+
+	user, err := h.authService.ValidateSession(c.Request().Context(), token)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"code":    "success",
+		"message": "ok",
+		"data":    user,
 	})
 }
 

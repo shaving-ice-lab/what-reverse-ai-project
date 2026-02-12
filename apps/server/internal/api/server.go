@@ -4,20 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/agentflow/server/internal/api/handler"
-	"github.com/agentflow/server/internal/api/middleware"
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/pkg/executor"
-	"github.com/agentflow/server/internal/pkg/logger"
-	"github.com/agentflow/server/internal/pkg/queue"
-	"github.com/agentflow/server/internal/pkg/redis"
-	"github.com/agentflow/server/internal/pkg/websocket"
-	"github.com/agentflow/server/internal/repository"
-	"github.com/agentflow/server/internal/service"
-	"github.com/agentflow/server/internal/service/agent_tools"
-	"github.com/agentflow/server/internal/service/skills"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/reverseai/server/internal/api/handler"
+	"github.com/reverseai/server/internal/api/middleware"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/pkg/logger"
+	"github.com/reverseai/server/internal/pkg/queue"
+	"github.com/reverseai/server/internal/pkg/redis"
+	"github.com/reverseai/server/internal/pkg/websocket"
+	"github.com/reverseai/server/internal/repository"
+	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/service/agent_tools"
+	"github.com/reverseai/server/internal/service/skills"
 	"gorm.io/gorm"
 )
 
@@ -90,7 +89,7 @@ func (s *Server) setupMiddleware() {
 	s.echo.Use(middleware.Logger(s.log, s.config.Security.PIISanitizationEnabled))
 
 	// 分布式追踪（如启用）
-	// s.echo.Use(middleware.Tracing("agentflow-server"))
+	// s.echo.Use(middleware.Tracing("reverseai-server"))
 
 	// 速率限制 (可选)
 	// s.echo.Use(middleware.RateLimit(s.redis))
@@ -108,18 +107,12 @@ func (s *Server) setupRoutes() {
 	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(s.db)
 	idempotencyRepo := repository.NewIdempotencyKeyRepository(s.db)
 	workspaceDBRoleRepo := repository.NewWorkspaceDBRoleRepository(s.db)
-	workflowRepo := repository.NewWorkflowRepository(s.db)
-	executionRepo := repository.NewExecutionRepository(s.db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(s.db)
 	auditLogRepo := repository.NewAuditLogRepository(s.db)
 	reviewQueueRepo := repository.NewReviewQueueRepository(s.db)
 	apiKeyRepo := repository.NewAPIKeyRepository(s.db)
-	folderRepo := repository.NewFolderRepository(s.db)
-	versionRepo := repository.NewWorkflowVersionRepository(s.db)
-	templateRepo := repository.NewTemplateRepository(s.db)
 	activityRepo := repository.NewActivityRepository(s.db)
 	sessionRepo := repository.NewSessionRepository(s.db)
-	tagRepo := repository.NewTagRepository(s.db)
 	notificationRepo := repository.NewNotificationRepository(s.db)
 
 	// 初始化服务层
@@ -132,7 +125,6 @@ func (s *Server) setupRoutes() {
 		workspaceRoleRepo,
 		workspaceMemberRepo,
 		eventRecorder,
-		workflowRepo,
 		s.config.Retention,
 	)
 	auditLogService := service.NewAuditLogService(auditLogRepo, workspaceService, s.config.Security.PIISanitizationEnabled)
@@ -193,53 +185,16 @@ func (s *Server) setupRoutes() {
 		workspaceDBRuntime, _ = service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, s.config.Database, "change-this-to-a-32-byte-secret!")
 	}
 	workspaceDBQueryService := service.NewWorkspaceDBQueryService(workspaceDBRuntime)
-	workflowService := service.NewWorkflowService(workflowRepo, workspaceService)
-	folderService := service.NewFolderService(folderRepo, workflowRepo)
-	versionService := service.NewWorkflowVersionService(versionRepo, workflowRepo)
-	templateService := service.NewTemplateService(templateRepo, workflowRepo, workspaceService)
-	engineCfg := &executor.EngineConfig{
-		MaxConcurrent: s.config.Execution.MaxConcurrent,
-		Timeout:       s.config.Execution.Timeout,
-	}
-	executionService := service.NewExecutionService(
-		executionRepo,
-		workflowRepo,
-		workspaceService,
-		nil, // billingService — 后续再接入
-		nil, // modelUsageRecorder — 后续再接入
-		s.redis,
-		s.log,
-		eventRecorder,
-		auditLogService,
-		s.config.Security.PIISanitizationEnabled,
-		engineCfg,
-		workspaceDBRuntime,
-		s.taskQueue,
-		s.config.Execution.MaxInFlight,
-		service.ExecutionCacheSettings{
-			ResultTTL: s.config.Cache.Execution.ResultTTL,
-		},
-	)
-	// 设置 WebSocket Hub 用于实时推送执行状态
-	if execSvc, ok := executionService.(interface{ SetWebSocketHub(*websocket.Hub) }); ok {
-		execSvc.SetWebSocketHub(s.wsHub)
-	}
-	// 初始化统计服务
-	statsService := service.NewStatsService(executionRepo, workflowRepo)
-
 	// 初始化 Dashboard 服务
-	dashboardService := service.NewDashboardService(workflowRepo, executionRepo, activityRepo, templateRepo)
+	dashboardService := service.NewDashboardService(activityRepo)
 
 	// 初始化基础服务
 	activityService := service.NewActivityService(activityRepo)
 	sessionService := service.NewSessionService(sessionRepo)
-	tagService := service.NewTagService(tagRepo, workflowRepo)
 	systemService := service.NewSystemService(s.db, s.redis)
 	featureFlagsService := service.NewFeatureFlagsService(s.config.Features)
 	notificationService := service.NewNotificationService(notificationRepo, userRepo)
 
-	// AI 助手服务
-	aiAssistantService := service.NewAIAssistantService()
 	runtimeService := service.NewRuntimeService(
 		workspaceRepo,
 		workspaceSlugAliasRepo,
@@ -260,14 +215,8 @@ func (s *Server) setupRoutes() {
 	workspaceDatabaseHandler := handler.NewWorkspaceDatabaseHandler(workspaceDatabaseService, workspaceDBRoleService, auditLogService, s.taskQueue)
 	workspaceDBQueryHandler := handler.NewWorkspaceDBQueryHandler(workspaceDBQueryService, workspaceDBRuntime, auditLogService)
 	auditLogHandler := handler.NewAuditLogHandler(auditLogService, workspaceService)
-	workflowHandler := handler.NewWorkflowHandler(workflowService, executionService, auditLogService, workspaceService)
-	folderHandler := handler.NewFolderHandler(folderService)
-	versionHandler := handler.NewWorkflowVersionHandler(versionService)
-	templateHandler := handler.NewTemplateHandler(templateService)
-	executionHandler := handler.NewExecutionHandler(executionService)
 	runtimeHandler := handler.NewRuntimeHandler(
 		runtimeService,
-		executionService,
 		nil, // billingService — 后续再接入
 		auditLogService,
 		&s.config.JWT,
@@ -277,22 +226,17 @@ func (s *Server) setupRoutes() {
 		s.config.Cache.Runtime.SchemaTTL,
 		s.config.Cache.Runtime.SchemaStaleTTL,
 	)
-	statsHandler := handler.NewStatsHandler(statsService)
 	dashboardHandler := handler.NewDashboardHandler(dashboardService)
 	activityHandler := handler.NewActivityHandler(activityService)
 	sessionHandler := handler.NewSessionHandler(sessionService)
-	tagHandler := handler.NewTagHandler(tagService)
 	systemHandler := handler.NewSystemHandler(systemService, featureFlagsService, &s.config.Deployment)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 
-	// AI 助手处理器
-	aiAssistantHandler := handler.NewAIAssistantHandler(aiAssistantService)
-
 	// Skills 系统初始化
 	skillRegistry := service.NewSkillRegistry()
-	_ = skillRegistry.Register(skills.NewDataModelingSkill(workspaceDBQueryService))
+	_ = skillRegistry.Register(skills.NewDataModelingSkill(workspaceDBQueryService, workspaceDatabaseService))
 	_ = skillRegistry.Register(skills.NewUIGenerationSkill())
-	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(workflowService, workspaceDBQueryService))
+	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(workspaceDBQueryService))
 
 	// Agent 推理引擎初始化
 	agentToolRegistry := service.NewAgentToolRegistry()
@@ -301,6 +245,7 @@ func (s *Server) setupRoutes() {
 	// 额外注册不属于 Skill 的独立工具（跳过已存在的）
 	_ = agentToolRegistry.Register(agent_tools.NewGetUISchemaTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewGenerateUISchemaTool(workspaceService))
+	_ = agentToolRegistry.Register(agent_tools.NewModifyUISchemaTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewPublishAppTool(workspaceService))
 	agentSessionManager := service.NewAgentSessionManager()
 	agentSessionRepo := repository.NewAgentSessionRepository(s.db)
@@ -318,11 +263,23 @@ func (s *Server) setupRoutes() {
 	wsHandler := handler.NewWebSocketHandler(s.wsHub, &s.config.JWT)
 	s.echo.GET("/ws", wsHandler.HandleConnection)
 
+	// 文件存储服务
+	storageObjectRepo := repository.NewStorageObjectRepository(s.db)
+	workspaceStorageService := service.NewWorkspaceStorageService(storageObjectRepo, "data/storage", "/storage/files")
+	workspaceStorageHandler := handler.NewWorkspaceStorageHandler(workspaceStorageService)
+	runtimeStorageHandler := handler.NewRuntimeStorageHandler(workspaceStorageService, runtimeService)
+
+	// RLS 策略服务
+	rlsPolicyRepo := repository.NewRLSPolicyRepository(s.db)
+	workspaceRLSService := service.NewWorkspaceRLSService(rlsPolicyRepo)
+	workspaceRLSHandler := handler.NewWorkspaceRLSHandler(workspaceRLSService)
+
 	// 应用运行时认证服务
 	appUserRepo := repository.NewAppUserRepository(s.db)
 	runtimeAuthService := service.NewRuntimeAuthServiceWithDB(appUserRepo, workspaceRepo, sessionRepo, s.db)
-	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService)
-	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, workspaceDBQueryService, executionService)
+	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService, runtimeService)
+	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, workspaceDBQueryService, workspaceRLSService)
+	runtimeDataHandler.SetRuntimeAuthService(runtimeAuthService)
 
 	// Runtime 公开访问入口（现在直接用 workspaceSlug）
 	runtime := s.echo.Group("/runtime", middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
@@ -333,13 +290,15 @@ func (s *Server) setupRoutes() {
 		runtime.POST("/:workspaceSlug/auth/register", runtimeAuthHandler.Register)
 		runtime.POST("/:workspaceSlug/auth/login", runtimeAuthHandler.Login)
 		runtime.POST("/:workspaceSlug/auth/logout", runtimeAuthHandler.Logout)
+		runtime.GET("/:workspaceSlug/auth/me", runtimeAuthHandler.Me)
 		// Runtime Data API — 公开访问已发布 App 的数据库
 		runtime.GET("/:workspaceSlug/data/:table", runtimeDataHandler.QueryRows)
 		runtime.POST("/:workspaceSlug/data/:table", runtimeDataHandler.InsertRow)
 		runtime.PATCH("/:workspaceSlug/data/:table", runtimeDataHandler.UpdateRow)
 		runtime.DELETE("/:workspaceSlug/data/:table", runtimeDataHandler.DeleteRows)
-		// Runtime Workflow Execute — 公开执行指定 workflow（表单触发）
-		runtime.POST("/:workspaceSlug/workflows/:workflowId/execute", runtimeDataHandler.ExecuteWorkflow)
+		// Runtime Storage — 文件上传和访问
+		runtime.POST("/:workspaceSlug/storage/upload", runtimeStorageHandler.Upload)
+		runtime.GET("/:workspaceSlug/storage/files/:objectId", runtimeStorageHandler.ServeFilePublic)
 	}
 	s.echo.GET("/", runtimeHandler.GetDomainEntry, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 	s.echo.GET("/schema", runtimeHandler.GetDomainSchema, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
@@ -360,15 +319,6 @@ func (s *Server) setupRoutes() {
 		auth.POST("/reset-password", authHandler.ResetPassword)
 		auth.POST("/verify-email", authHandler.VerifyEmail)
 		auth.POST("/resend-verification", authHandler.ResendVerification, middleware.Auth(&s.config.JWT))
-	}
-
-	// 公开模板路由 (无需认证)
-	publicTemplates := v1.Group("/templates")
-	{
-		publicTemplates.GET("", templateHandler.List)
-		publicTemplates.GET("/featured", templateHandler.Featured)
-		publicTemplates.GET("/categories", templateHandler.Categories)
-		publicTemplates.GET("/:id", templateHandler.Get)
 	}
 
 	// 应用市场路由 (无需认证) - Workspace 现在就是 App
@@ -481,121 +431,25 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/versions/compare", workspaceHandler.CompareWorkspaceVersions)
 			workspaces.GET("/:id/access-policy", workspaceHandler.GetWorkspaceAccessPolicy)
 			workspaces.PATCH("/:id/access-policy", workspaceHandler.UpdateWorkspaceAccessPolicy)
+			// Storage — 文件存储
+			workspaces.POST("/:id/storage/upload", workspaceStorageHandler.Upload)
+			workspaces.GET("/:id/storage", workspaceStorageHandler.List)
+			workspaces.GET("/:id/storage/:objectId", workspaceStorageHandler.GetObject)
+			workspaces.DELETE("/:id/storage/:objectId", workspaceStorageHandler.DeleteObject)
+			// RLS — 行级安全策略
+			workspaces.POST("/:id/database/rls-policies", workspaceRLSHandler.CreatePolicy)
+			workspaces.GET("/:id/database/rls-policies", workspaceRLSHandler.ListPolicies)
+			workspaces.PATCH("/:id/database/rls-policies/:policyId", workspaceRLSHandler.UpdatePolicy)
+			workspaces.DELETE("/:id/database/rls-policies/:policyId", workspaceRLSHandler.DeletePolicy)
 		}
 
-		// 工作流
-		workflows := protected.Group("/workflows")
-		{
-			workflows.GET("", workflowHandler.List)
-			workflows.POST("", workflowHandler.Create)
-			workflows.GET("/:id", workflowHandler.Get)
-			workflows.PUT("/:id", workflowHandler.Update)
-			workflows.DELETE("/:id", workflowHandler.Delete)
-			workflows.POST("/:id/execute", workflowHandler.Execute)
-			workflows.POST("/:id/duplicate", workflowHandler.Duplicate)
-			// 导出导入
-			workflows.GET("/:id/export", workflowHandler.Export)
-			workflows.POST("/import", workflowHandler.Import)
-			// 移动工作流到文件夹
-			workflows.PUT("/:id/folder", folderHandler.MoveWorkflow)
-			// 批量操作
-			workflows.POST("/batch/delete", workflowHandler.BatchDelete)
-			workflows.POST("/batch/move", folderHandler.BatchMoveWorkflows)
-			workflows.POST("/batch/archive", workflowHandler.BatchArchive)
-			workflows.POST("/batch/export", workflowHandler.BatchExport)
-			// 版本历史
-			workflows.GET("/:id/versions", versionHandler.List)
-			workflows.GET("/:id/versions/:version", versionHandler.Get)
-			workflows.POST("/:id/versions/:version/restore", versionHandler.Restore)
-			workflows.GET("/:id/versions/compare", versionHandler.Compare)
-			workflows.POST("/:id/versions", versionHandler.CreateSnapshot)
-		}
-
-		// 文件夹
-		folders := protected.Group("/folders")
-		{
-			folders.GET("", folderHandler.List)
-			folders.POST("", folderHandler.Create)
-			folders.GET("/:id", folderHandler.Get)
-			folders.PUT("/:id", folderHandler.Update)
-			folders.DELETE("/:id", folderHandler.Delete)
-		}
-
-		// 模板（使用模板需要认证）
-		templates := protected.Group("/templates")
-		{
-			templates.POST("/:id/use", templateHandler.Use)
-			// 管理员接口
-			templates.POST("", templateHandler.Create)
-			templates.PUT("/:id", templateHandler.Update)
-			templates.DELETE("/:id", templateHandler.Delete)
-		}
-
-		// 执行记录
-		executions := protected.Group("/executions")
-		{
-			executions.GET("", executionHandler.List)
-			executions.GET("/:id", executionHandler.Get)
-			executions.POST("/:id/cancel", executionHandler.Cancel)
-			executions.POST("/:id/retry", executionHandler.Retry)
-		}
-
-		// 统计
-		stats := protected.Group("/stats")
-		{
-			stats.GET("/overview", statsHandler.Overview)
-			stats.GET("/executions", statsHandler.ExecutionTrends)
-			stats.GET("/workflows/:id", statsHandler.WorkflowStats)
-			stats.GET("/workflow-analytics", statsHandler.WorkflowAnalytics)
-		}
-
-		// Dashboard
+		// Dashboard — only core endpoints
 		dashboard := protected.Group("/dashboard")
 		{
 			dashboard.GET("", dashboardHandler.GetDashboardData)
 			dashboard.GET("/stats", dashboardHandler.GetQuickStats)
-			dashboard.GET("/workflows", dashboardHandler.GetRecentWorkflows)
 			dashboard.GET("/activities", dashboardHandler.GetRecentActivities)
-			dashboard.GET("/executions", dashboardHandler.GetRecentExecutions)
-			dashboard.GET("/level", dashboardHandler.GetUserLevel)
-			dashboard.GET("/tokens", dashboardHandler.GetTokenUsage)
-			dashboard.GET("/templates", dashboardHandler.GetFeaturedTemplates)
-			dashboard.GET("/learning", dashboardHandler.GetLearningResources)
-			dashboard.GET("/announcements", dashboardHandler.GetAnnouncements)
-			dashboard.GET("/daily-tasks", dashboardHandler.GetDailyTasks)
-			dashboard.POST("/check-in", dashboardHandler.CheckIn)
-			dashboard.GET("/favorites", dashboardHandler.GetFavorites)
-			dashboard.GET("/quick-runs", dashboardHandler.GetQuickRuns)
-			dashboard.GET("/performance", dashboardHandler.GetPerformanceInsights)
-			dashboard.GET("/errors", dashboardHandler.GetErrorMonitor)
-			dashboard.GET("/api-usage", dashboardHandler.GetAPIUsageStats)
-			dashboard.GET("/notes", dashboardHandler.GetQuickNotes)
-			dashboard.POST("/notes", dashboardHandler.CreateQuickNote)
-			dashboard.DELETE("/notes/:id", dashboardHandler.DeleteQuickNote)
-			dashboard.GET("/integrations", dashboardHandler.GetIntegrationStatus)
-			dashboard.GET("/scheduled-tasks", dashboardHandler.GetScheduledTasks)
-			dashboard.GET("/notifications", dashboardHandler.GetNotifications)
-			dashboard.POST("/notifications/:id/read", dashboardHandler.MarkNotificationRead)
-			dashboard.GET("/ai-suggestions", dashboardHandler.GetAISuggestions)
-			dashboard.GET("/leaderboard", dashboardHandler.GetLeaderboard)
-			dashboard.GET("/goals", dashboardHandler.GetGoals)
-			dashboard.POST("/goals", dashboardHandler.CreateGoal)
-			dashboard.GET("/system-health", dashboardHandler.GetSystemHealth)
-			dashboard.GET("/running-queue", dashboardHandler.GetRunningQueue)
 		}
-
-		// 标签
-		tags := protected.Group("/tags")
-		{
-			tags.GET("", tagHandler.List)
-			tags.POST("", tagHandler.Create)
-			tags.PUT("/:id", tagHandler.Update)
-			tags.DELETE("/:id", tagHandler.Delete)
-		}
-
-		// 工作流标签（在工作流路由组之外）
-		protected.POST("/workflows/:workflow_id/tags/:tag_id", tagHandler.AddToWorkflow)
-		protected.DELETE("/workflows/:workflow_id/tags/:tag_id", tagHandler.RemoveFromWorkflow)
 
 		// 通知系统
 		notifications := protected.Group("/notifications")
@@ -608,17 +462,6 @@ func (s *Server) setupRoutes() {
 			notifications.DELETE("/:id", notificationHandler.Delete)
 			notifications.DELETE("/clear", notificationHandler.ClearAll)
 			notifications.GET("/unread-count", notificationHandler.GetUnreadCount)
-		}
-
-		// AI 助手
-		ai := protected.Group("/ai")
-		{
-			ai.POST("/chat", aiAssistantHandler.Chat)
-			ai.POST("/generate-workflow", aiAssistantHandler.GenerateWorkflow)
-			ai.POST("/parse-intent", aiAssistantHandler.ParseIntent)
-			ai.POST("/suggest-next-node", aiAssistantHandler.SuggestNextNode)
-			ai.POST("/suggest-config", aiAssistantHandler.SuggestConfig)
-			ai.POST("/suggest-fix", aiAssistantHandler.SuggestFix)
 		}
 	}
 

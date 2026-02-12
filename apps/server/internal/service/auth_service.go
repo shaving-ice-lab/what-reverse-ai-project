@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/redis"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/redis"
+	"github.com/reverseai/server/internal/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 

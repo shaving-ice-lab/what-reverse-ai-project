@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/agentflow/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/domain/entity"
 )
 
 const (

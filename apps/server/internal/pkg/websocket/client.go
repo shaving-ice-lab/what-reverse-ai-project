@@ -94,7 +94,7 @@ func (c *Client) WritePump() {
 			if n > maxBatchSize {
 				n = maxBatchSize
 			}
-			
+
 		batchLoop:
 			for i := 0; i < n; i++ {
 				select {

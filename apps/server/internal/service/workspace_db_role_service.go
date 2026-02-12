@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/crypto"
-	"github.com/agentflow/server/internal/repository"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/crypto"
+	"github.com/reverseai/server/internal/repository"
 	"gorm.io/gorm"
 )
 

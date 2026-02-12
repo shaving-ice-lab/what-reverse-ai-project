@@ -1,13 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "AgentFlow API",
-    "description": "AgentFlow - AI Agent 工作流平台 API 文档",
-    "termsOfService": "https://agentflow.app/terms",
+    "title": "ReverseAI API",
+    "description": "ReverseAI - AI Agent 工作流平台 API 文档",
+    "termsOfService": "https://reverseai.app/terms",
     "contact": {
-      "name": "AgentFlow Team",
-      "url": "https://agentflow.app",
-      "email": "support@agentflow.app"
+      "name": "ReverseAI Team",
+      "url": "https://reverseai.app",
+      "email": "support@reverseai.app"
     },
     "license": {
       "name": "MIT",

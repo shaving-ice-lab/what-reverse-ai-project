@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/agentflow/server/internal/pkg/logger"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/pkg/logger"
 )
 
 // =====================
@@ -24,16 +24,16 @@ const (
 	NotifyWithdrawalRejected  NotificationType = "withdrawal_rejected"  // 提现被拒绝
 	NotifyWithdrawalCompleted NotificationType = "withdrawal_completed" // 提现到账
 	NotifyWithdrawalFailed    NotificationType = "withdrawal_failed"    // 提现失败
-	
+
 	// 交易相关
 	NotifyAgentPurchased      NotificationType = "agent_purchased"      // Agent 被购买
 	NotifySubscriptionRenewed NotificationType = "subscription_renewed" // 订阅续费
 	NotifyTipReceived         NotificationType = "tip_received"         // 收到打赏
 	NotifyReferralBonus       NotificationType = "referral_bonus"       // 推荐奖励
-	
+
 	// 系统相关
-	NotifySystemAnnouncement  NotificationType = "system_announcement"  // 系统公告
-	NotifyAccountVerified     NotificationType = "account_verified"     // 账户已验证
+	NotifySystemAnnouncement NotificationType = "system_announcement" // 系统公告
+	NotifyAccountVerified    NotificationType = "account_verified"    // 账户已验证
 )
 
 // NotificationChannel 通知渠道
@@ -52,16 +52,16 @@ const (
 
 // Notification 通知
 type Notification struct {
-	ID          uuid.UUID                 `json:"id"`
-	UserID      uuid.UUID                 `json:"user_id"`
-	Type        NotificationType          `json:"type"`
-	Title       string                    `json:"title"`
-	Content     string                    `json:"content"`
-	Data        map[string]interface{}    `json:"data,omitempty"`
-	Channels    []NotificationChannel     `json:"channels"`
-	IsRead      bool                      `json:"is_read"`
-	ReadAt      *time.Time                `json:"read_at,omitempty"`
-	CreatedAt   time.Time                 `json:"created_at"`
+	ID        uuid.UUID              `json:"id"`
+	UserID    uuid.UUID              `json:"user_id"`
+	Type      NotificationType       `json:"type"`
+	Title     string                 `json:"title"`
+	Content   string                 `json:"content"`
+	Data      map[string]interface{} `json:"data,omitempty"`
+	Channels  []NotificationChannel  `json:"channels"`
+	IsRead    bool                   `json:"is_read"`
+	ReadAt    *time.Time             `json:"read_at,omitempty"`
+	CreatedAt time.Time              `json:"created_at"`
 }
 
 // NotificationRequest 发送通知请求
@@ -82,13 +82,13 @@ type NotificationRequest struct {
 type NotificationService interface {
 	// 发送通知
 	Send(ctx context.Context, req *NotificationRequest) error
-	
+
 	// 批量发送
 	SendBatch(ctx context.Context, reqs []*NotificationRequest) error
-	
+
 	// 发送收入通知
 	SendEarningNotification(ctx context.Context, userID uuid.UUID, amount float64, earningType string, agentName string) error
-	
+
 	// 发送提现通知
 	SendWithdrawalNotification(ctx context.Context, userID uuid.UUID, notifyType NotificationType, amount float64, reason string) error
 }
@@ -98,7 +98,7 @@ type NotificationService interface {
 // =====================
 
 type notificationService struct {
-	log    logger.Logger
+	log logger.Logger
 	// TODO: 添加邮件服务、短信服务、推送服务等
 }
 
@@ -122,13 +122,13 @@ func (s *notificationService) Send(ctx context.Context, req *NotificationRequest
 		IsRead:    false,
 		CreatedAt: time.Now(),
 	}
-	
+
 	s.log.Info("Sending notification",
 		"user_id", req.UserID,
 		"type", req.Type,
 		"title", req.Title,
 	)
-	
+
 	// 根据渠道发送通知
 	for _, channel := range req.Channels {
 		switch channel {
@@ -150,7 +150,7 @@ func (s *notificationService) Send(ctx context.Context, req *NotificationRequest
 			}
 		}
 	}
-	
+
 	return nil
 }
 
@@ -158,7 +158,7 @@ func (s *notificationService) Send(ctx context.Context, req *NotificationRequest
 func (s *notificationService) SendBatch(ctx context.Context, reqs []*NotificationRequest) error {
 	for _, req := range reqs {
 		if err := s.Send(ctx, req); err != nil {
-			s.log.Error("Failed to send notification in batch", 
+			s.log.Error("Failed to send notification in batch",
 				"user_id", req.UserID,
 				"error", err,
 			)
@@ -171,7 +171,7 @@ func (s *notificationService) SendBatch(ctx context.Context, reqs []*Notificatio
 func (s *notificationService) SendEarningNotification(ctx context.Context, userID uuid.UUID, amount float64, earningType string, agentName string) error {
 	var title, content string
 	var notifyType NotificationType
-	
+
 	switch earningType {
 	case "sale":
 		title = "🎉 收到新的销售收入"
@@ -194,12 +194,12 @@ func (s *notificationService) SendEarningNotification(ctx context.Context, userI
 		content = fmt.Sprintf("您获得收入 ¥%.2f", amount)
 		notifyType = NotifyEarningReceived
 	}
-	
+
 	return s.Send(ctx, &NotificationRequest{
-		UserID:   userID,
-		Type:     notifyType,
-		Title:    title,
-		Content:  content,
+		UserID:  userID,
+		Type:    notifyType,
+		Title:   title,
+		Content: content,
 		Data: map[string]interface{}{
 			"amount":       amount,
 			"earning_type": earningType,
@@ -212,7 +212,7 @@ func (s *notificationService) SendEarningNotification(ctx context.Context, userI
 // SendWithdrawalNotification 发送提现通知
 func (s *notificationService) SendWithdrawalNotification(ctx context.Context, userID uuid.UUID, notifyType NotificationType, amount float64, reason string) error {
 	var title, content string
-	
+
 	switch notifyType {
 	case NotifyWithdrawalSubmitted:
 		title = "📤 提现申请已提交"
@@ -232,12 +232,12 @@ func (s *notificationService) SendWithdrawalNotification(ctx context.Context, us
 	default:
 		return nil
 	}
-	
+
 	return s.Send(ctx, &NotificationRequest{
-		UserID:   userID,
-		Type:     notifyType,
-		Title:    title,
-		Content:  content,
+		UserID:  userID,
+		Type:    notifyType,
+		Title:   title,
+		Content: content,
 		Data: map[string]interface{}{
 			"amount": amount,
 			"reason": reason,

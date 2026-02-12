@@ -42,7 +42,7 @@ type TracingConfig struct {
 func DefaultTracingConfig() *TracingConfig {
 	return &TracingConfig{
 		Enabled:        false,
-		ServiceName:    "agentflow-server",
+		ServiceName:    "reverseai-server",
 		ServiceVersion: "1.0.0",
 		Environment:    "development",
 		Endpoint:       "localhost:4317",
@@ -87,7 +87,7 @@ func InitTracing(ctx context.Context, cfg *TracingConfig) (*TracerProvider, erro
 			semconv.ServiceName(cfg.ServiceName),
 			semconv.ServiceVersion(cfg.ServiceVersion),
 			semconv.DeploymentEnvironment(cfg.Environment),
-			attribute.String("service.namespace", "agentflow"),
+			attribute.String("service.namespace", "reverseai"),
 		),
 		resource.WithHost(),
 		resource.WithOS(),
@@ -196,7 +196,6 @@ const (
 	AttrUserID       = "user.id"
 	AttrNodeID       = "node.id"
 	AttrNodeType     = "node.type"
-	AttrWorkflowID   = "workflow.id"
 	AttrTriggerType  = "trigger.type"
 	AttrStatus       = "status"
 	AttrErrorMessage = "error.message"

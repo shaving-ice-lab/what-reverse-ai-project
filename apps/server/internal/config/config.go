@@ -253,13 +253,13 @@ func Load() (*Config, error) {
 	viper.AddConfigPath("./config")
 	viper.AddConfigPath("../../config")    // 从 cmd/server 运行时
 	viper.AddConfigPath("../../../config") // 备用路径
-	viper.AddConfigPath("/etc/agentflow")
+	viper.AddConfigPath("/etc/reverseai")
 
 	// 设置默认值
 	setDefaults()
 
 	// 环境变量
-	viper.SetEnvPrefix("AGENTFLOW")
+	viper.SetEnvPrefix("reverseai")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
@@ -313,7 +313,7 @@ func setDefaults() {
 	viper.SetDefault("database.port", 3306)
 	viper.SetDefault("database.user", "root")
 	viper.SetDefault("database.password", "")
-	viper.SetDefault("database.name", "agentflow")
+	viper.SetDefault("database.name", "reverseai")
 	viper.SetDefault("database.charset", "utf8mb4")
 	viper.SetDefault("database.max_open_conns", 100)
 	viper.SetDefault("database.max_idle_conns", 10)
@@ -337,7 +337,6 @@ func setDefaults() {
 	viper.SetDefault("queue.queues.metrics_aggregation", 1)
 	viper.SetDefault("queue.queues.webhook", 3)
 	viper.SetDefault("queue.queues.scheduled", 1)
-	viper.SetDefault("queue.queues.workflow", 6)
 
 	// JWT
 	viper.SetDefault("jwt.secret", "your-secret-key-change-in-production")
@@ -444,7 +443,7 @@ func normalizeDeploymentConfig(cfg *Config) {
 		return
 	}
 
-	if envRegions := strings.TrimSpace(os.Getenv("AGENTFLOW_DEPLOYMENT_REGIONS")); envRegions != "" {
+	if envRegions := strings.TrimSpace(os.Getenv("reverseai_DEPLOYMENT_REGIONS")); envRegions != "" {
 		cfg.Deployment.Regions = splitCSV(envRegions)
 	}
 
@@ -470,10 +469,10 @@ func normalizeSecurityConfig(cfg *Config) {
 		return
 	}
 
-	if envEmails := strings.TrimSpace(os.Getenv("AGENTFLOW_SECURITY_ADMIN_EMAILS")); envEmails != "" {
+	if envEmails := strings.TrimSpace(os.Getenv("reverseai_SECURITY_ADMIN_EMAILS")); envEmails != "" {
 		cfg.Security.AdminEmails = splitCSV(envEmails)
 	}
-	if envRoles := strings.TrimSpace(os.Getenv("AGENTFLOW_SECURITY_ADMIN_ROLES")); envRoles != "" {
+	if envRoles := strings.TrimSpace(os.Getenv("reverseai_SECURITY_ADMIN_ROLES")); envRoles != "" {
 		cfg.Security.AdminRoles = parseAdminRolePairs(envRoles)
 	}
 

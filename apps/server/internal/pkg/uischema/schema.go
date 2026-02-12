@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/agentflow/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/domain/entity"
 )
 
 const CurrentSchemaVersion = "1.0.0"

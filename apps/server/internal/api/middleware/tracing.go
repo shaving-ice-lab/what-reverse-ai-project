@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/agentflow/server/internal/pkg/observability"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/pkg/observability"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -159,7 +159,7 @@ func TracingWithProvider(tp *observability.TracerProvider) echo.MiddlewareFunc {
 // StartSpan 在当前请求中开始一个子 Span
 func StartSpan(c echo.Context, name string, opts ...trace.SpanStartOption) (echo.Context, trace.Span) {
 	req := c.Request()
-	ctx, span := otel.Tracer("agentflow-server").Start(req.Context(), name, opts...)
+	ctx, span := otel.Tracer("reverseai-server").Start(req.Context(), name, opts...)
 	c.SetRequest(req.WithContext(ctx))
 
 	// 同步更新 TraceContext

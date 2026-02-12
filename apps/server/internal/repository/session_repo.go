@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
 	"gorm.io/gorm"
 )
 

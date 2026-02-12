@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/pkg/crypto"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/pkg/crypto"
+	"github.com/reverseai/server/internal/repository"
 	"gorm.io/gorm"
 )
 

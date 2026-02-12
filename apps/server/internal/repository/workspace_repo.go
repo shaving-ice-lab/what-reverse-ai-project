@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
 	"gorm.io/gorm"
 )
 
@@ -36,6 +36,7 @@ type WorkspaceRepository interface {
 
 	// 版本管理
 	CreateVersion(ctx context.Context, version *entity.WorkspaceVersion) error
+	UpdateVersion(ctx context.Context, version *entity.WorkspaceVersion) error
 	GetVersionByID(ctx context.Context, id uuid.UUID) (*entity.WorkspaceVersion, error)
 	GetVersionByWorkspaceAndVersion(ctx context.Context, workspaceID uuid.UUID, version string) (*entity.WorkspaceVersion, error)
 	ListVersions(ctx context.Context, workspaceID uuid.UUID, params WorkspaceVersionListParams) ([]entity.WorkspaceVersion, int64, error)
@@ -327,10 +328,13 @@ func (r *workspaceRepository) CreateVersion(ctx context.Context, version *entity
 	return r.db.WithContext(ctx).Create(version).Error
 }
 
+func (r *workspaceRepository) UpdateVersion(ctx context.Context, version *entity.WorkspaceVersion) error {
+	return r.db.WithContext(ctx).Save(version).Error
+}
+
 func (r *workspaceRepository) GetVersionByID(ctx context.Context, id uuid.UUID) (*entity.WorkspaceVersion, error) {
 	var version entity.WorkspaceVersion
 	if err := r.db.WithContext(ctx).
-		Preload("Workflow").
 		First(&version, "id = ?", id).Error; err != nil {
 		return nil, err
 	}

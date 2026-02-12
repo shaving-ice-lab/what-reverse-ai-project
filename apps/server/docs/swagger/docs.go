@@ -8,11 +8,11 @@ const docTemplate = `{
     "info": {
         "title": "{{.Title}}",
         "description": "{{.Description}}",
-        "termsOfService": "https://agentflow.app/terms",
+        "termsOfService": "https://reverseai.app/terms",
         "contact": {
-            "name": "AgentFlow Team",
-            "url": "https://agentflow.app",
-            "email": "support@agentflow.app"
+            "name": "reverseai Team",
+            "url": "https://reverseai.app",
+            "email": "support@reverseai.app"
         },
         "license": {
             "name": "MIT",
@@ -38,8 +38,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "AgentFlow API",
-	Description:      "AgentFlow - AI Agent 工作流平台 API 文档",
+	Title:            "reverseai API",
+	Description:      "reverseai - AI Agent 工作流平台 API 文档",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

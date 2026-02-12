@@ -49,11 +49,11 @@ type AuditChecklist struct {
 
 // DependencyScanStatus 依赖扫描状态
 type DependencyScanStatus struct {
-	Enabled      bool      `json:"enabled"`
-	WorkflowPath string    `json:"workflow_path,omitempty"`
-	Schedule     string    `json:"schedule,omitempty"`
-	Checks       []string  `json:"checks,omitempty"`
-	DetectedAt   time.Time `json:"detected_at"`
+	Enabled    bool      `json:"enabled"`
+	ScanPath   string    `json:"scan_path,omitempty"`
+	Schedule   string    `json:"schedule,omitempty"`
+	Checks     []string  `json:"checks,omitempty"`
+	DetectedAt time.Time `json:"detected_at"`
 }
 
 // AuditActionRegistry 审计动作注册表
@@ -166,10 +166,10 @@ var AuditActionRegistry = map[string]AuditAction{
 		Severity:    "medium",
 		Required:    true,
 	},
-	"workflow_executed": {
-		Name:        "workflow_executed",
+	"task_executed": {
+		Name:        "task_executed",
 		Category:    AuditCategoryOperation,
-		Description: "执行工作流",
+		Description: "执行任务",
 		Severity:    "low",
 		Required:    false,
 	},
@@ -194,13 +194,6 @@ var AuditActionRegistry = map[string]AuditAction{
 		Category:    AuditCategoryExport,
 		Description: "导出数据",
 		Severity:    "high",
-		Required:    true,
-	},
-	"workflow_exported": {
-		Name:        "workflow_exported",
-		Category:    AuditCategoryExport,
-		Description: "导出工作流",
-		Severity:    "medium",
 		Required:    true,
 	},
 	"logs_exported": {

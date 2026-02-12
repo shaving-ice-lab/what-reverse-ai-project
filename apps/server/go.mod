@@ -1,4 +1,4 @@
-module github.com/agentflow/server
+module github.com/reverseai/server
 
 go 1.24.0
 

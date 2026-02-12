@@ -3,9 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/service"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/service"
 )
 
 type SystemHandler struct {

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/agentflow/server/internal/api/middleware"
-	"github.com/agentflow/server/internal/service"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
+	"github.com/reverseai/server/internal/service"
 )
 
 type AuthHandler struct {

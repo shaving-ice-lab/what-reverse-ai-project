@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/crypto"
-	"github.com/agentflow/server/internal/pkg/idempotency"
-	"github.com/agentflow/server/internal/pkg/workspace_db"
-	"github.com/agentflow/server/internal/repository"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/crypto"
+	"github.com/reverseai/server/internal/pkg/idempotency"
+	"github.com/reverseai/server/internal/pkg/workspace_db"
+	"github.com/reverseai/server/internal/repository"
 	"gorm.io/gorm"
 )
 
@@ -1041,4 +1041,19 @@ func escapeMySQLString(value string) string {
 	value = strings.ReplaceAll(value, "\\", "\\\\")
 	value = strings.ReplaceAll(value, "'", "\\'")
 	return value
+}
+
+func jsonToFloatMap(m map[string]interface{}) map[string]float64 {
+	result := make(map[string]float64, len(m))
+	for k, v := range m {
+		switch val := v.(type) {
+		case float64:
+			result[k] = val
+		case int:
+			result[k] = float64(val)
+		case int64:
+			result[k] = float64(val)
+		}
+	}
+	return result
 }

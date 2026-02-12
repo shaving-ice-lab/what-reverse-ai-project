@@ -3,12 +3,12 @@ package handler
 import (
 	"net/http"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/pkg/websocket"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	ws "github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/pkg/websocket"
 )
 
 var upgrader = ws.Upgrader{

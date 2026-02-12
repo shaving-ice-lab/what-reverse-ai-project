@@ -1,7 +1,7 @@
 .PHONY: build run test lint clean migrate-up migrate-down swagger
 
 # 变量
-BINARY_NAME=agentflow-server
+BINARY_NAME=reverseai-server
 GO=go
 GOFLAGS=-ldflags="-s -w"
 
@@ -41,11 +41,11 @@ clean:
 
 # 数据库迁移 - 升级
 migrate-up:
-	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/agentflow?sslmode=disable" up
+	migrate -path migrations -database "mysql://root:12345678@tcp(localhost:3306)/what-reverse" up
 
 # 数据库迁移 - 回滚
 migrate-down:
-	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/agentflow?sslmode=disable" down 1
+	migrate -path migrations -database "mysql://root:12345678@tcp(localhost:3306)/what-reverse" down 1
 
 # 数据库迁移 - 创建
 migrate-create:
@@ -64,7 +64,7 @@ deps:
 
 # Docker 构建
 docker-build:
-	docker build -t agentflow-server -f ../docker/Dockerfile.server .
+	docker build -t reverseai-server -f ../docker/Dockerfile.server .
 
 # 帮助
 help:

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -56,9 +56,6 @@ func Migrate(db *gorm.DB) error {
 			"idx_what_reverse_users_email",
 			"idx_what_reverse_users_username",
 		},
-		"what_reverse_agents": {
-			"idx_what_reverse_agents_slug",
-		},
 	}
 
 	// 清理冲突的索引
@@ -77,8 +74,9 @@ func Migrate(db *gorm.DB) error {
 		&entity.User{},
 		&entity.APIKey{},
 		&entity.Secret{},
-		&entity.UserFollow{},
 		&entity.UserSession{},
+		&entity.AgentSession{},
+		&entity.AppUser{},
 		&entity.Workspace{},
 		&entity.WorkspaceVersion{},
 		&entity.WorkspaceDomain{},
@@ -93,112 +91,39 @@ func Migrate(db *gorm.DB) error {
 		&entity.WorkspaceDBSchemaMigration{},
 		&entity.IdempotencyKey{},
 
-		// Webhook 相关
-		&entity.WebhookEndpoint{},
-		&entity.WebhookDelivery{},
-
-		// 配置中心
-		&entity.ConfigItem{},
-
 		// 审计相关
 		&entity.AuditLog{},
-		&entity.SupportTicket{},
-		&entity.SupportChannel{},
-		&entity.SupportAssignmentRule{},
-		&entity.SupportTicketComment{},
-		&entity.SupportTeam{},
-		&entity.SupportTeamMember{},
-		&entity.SupportQueue{},
-		&entity.SupportQueueMember{},
-		&entity.SupportNotificationTemplate{},
-		&entity.WorkspaceExportJob{},
 
-		// 工作流相关
-		&entity.Workflow{},
-		&entity.WorkflowVersion{},
-		&entity.Folder{},
-		&entity.Tag{},
-		&entity.WorkflowTag{},
-		&entity.Template{},
-
-		// 执行相关
+		// 运行时事件
 		&entity.RuntimeEvent{},
-		&entity.Execution{},
-		&entity.NodeLog{},
-		&entity.ModelUsageEvent{},
-		&entity.AnalyticsMetricDefinition{},
-		&entity.AnalyticsMetric{},
-		&entity.AnalyticsExportJob{},
-		&entity.AnalyticsSubscription{},
 
-		// 创意模板相关
-		&entity.CreativeTemplate{},
-		&entity.CreativeTask{},
-		&entity.CreativeDocument{},
-
-		// 自定义节点
-		&entity.CustomNode{},
-
-		// 社区相关
-		&entity.Share{},
-		&entity.Comment{},
-		&entity.CommentLike{},
+		// 通知相关
 		&entity.Notification{},
 
-		// 活动和公告
+		// 活动
 		&entity.UserActivity{},
-		&entity.Announcement{},
-		&entity.AnnouncementRead{},
 
-		// 收益相关
-		&entity.Earning{},
-
-		// 审核相关
-		&entity.Reviewer{},
+		// 审核队列（DB Schema Migration 审批）
 		&entity.ReviewQueue{},
 		&entity.ReviewRecord{},
 		&entity.ReviewComment{},
+		&entity.Reviewer{},
 		&entity.ReviewChecklist{},
 
-		// Agent 相关
-		&entity.Agent{},
-		&entity.Review{},
-		&entity.AgentUsage{},
-		&entity.AgentUsageStat{},
-		&entity.AgentReport{},
+		// 评论（通知服务依赖）
+		&entity.Comment{},
+		&entity.CommentLike{},
 
-		// 计费相关
-		&entity.BillingPlan{},
-		&entity.WorkspaceQuota{},
-		&entity.BillingUsageEvent{},
-		&entity.BillingInvoicePayment{},
-
-		// 对话相关
-		&entity.ConversationFolder{},
-		&entity.Conversation{},
-		&entity.ConversationTag{},
-		&entity.Message{},
-		&entity.ConversationTemplate{},
+		// 导出任务（保留服务依赖）
+		&entity.WorkspaceExportJob{},
 
 		// Workspace 统计
 		&entity.WorkspaceUsageStats{},
 
-		// 分享相关
-		&entity.ShareView{},
+		// 文件存储
+		&entity.StorageObject{},
 
-		// 规划相关
-		&entity.PlanModule{},
-		&entity.PlanTask{},
-		&entity.PlanVersion{},
-
-		// 收益相关（补充）
-		&entity.CommissionTier{},
-		&entity.CreatorAccount{},
-		&entity.Withdrawal{},
-		&entity.Settlement{},
-
-		// 供应链安全
-		&entity.SBOMRecord{},
-		&entity.ArtifactSignature{},
+		// RLS 策略
+		&entity.RLSPolicy{},
 	)
 }

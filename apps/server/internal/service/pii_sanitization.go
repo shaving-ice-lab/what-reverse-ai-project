@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/security"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/security"
 )
 
 type piiSanitizer struct {

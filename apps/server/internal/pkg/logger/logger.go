@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/agentflow/server/internal/pkg/observability"
+	"github.com/reverseai/server/internal/pkg/observability"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

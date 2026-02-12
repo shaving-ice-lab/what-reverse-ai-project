@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/agentflow/server/internal/api/middleware"
-	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
+	"github.com/reverseai/server/internal/service"
 )
 
 type NotificationHandler struct {
@@ -301,20 +301,20 @@ func (h *NotificationHandler) GetUnreadCount(c echo.Context) error {
 // RegisterRoutes 注册路由
 func (h *NotificationHandler) RegisterRoutes(g *echo.Group, authMiddleware echo.MiddlewareFunc) {
 	notifications := g.Group("/notifications", authMiddleware)
-	
+
 	// 通知列表与详情
 	notifications.GET("", h.List)
 	notifications.GET("/:id", h.GetByID)
-	
+
 	// 标记已读
 	notifications.POST("/:id/read", h.MarkAsRead)
 	notifications.POST("/read-all", h.MarkAllAsRead)
 	notifications.POST("/read-multiple", h.MarkMultipleAsRead)
-	
+
 	// 删除
 	notifications.DELETE("/:id", h.Delete)
 	notifications.DELETE("/clear", h.ClearAll)
-	
+
 	// 未读数
 	notifications.GET("/unread-count", h.GetUnreadCount)
 }

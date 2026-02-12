@@ -3,7 +3,7 @@ package service
 import (
 	"sync"
 
-	"github.com/agentflow/server/internal/config"
+	"github.com/reverseai/server/internal/config"
 )
 
 // FeatureFlagsPatch 功能开关更新请求

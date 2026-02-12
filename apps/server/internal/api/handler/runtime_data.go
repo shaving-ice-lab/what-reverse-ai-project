@@ -5,31 +5,88 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/service"
 )
 
 // RuntimeDataHandler 公开访问的 Runtime 数据处理器
 // 用于已发布的 Workspace App 通过 slug 访问数据库数据
 type RuntimeDataHandler struct {
-	runtimeService   service.RuntimeService
-	queryService     service.WorkspaceDBQueryService
-	executionService service.ExecutionService
+	runtimeService     service.RuntimeService
+	queryService       service.WorkspaceDBQueryService
+	rlsService         service.WorkspaceRLSService
+	runtimeAuthService service.RuntimeAuthService
 }
 
 // NewRuntimeDataHandler 创建 Runtime 数据处理器
 func NewRuntimeDataHandler(
 	runtimeService service.RuntimeService,
 	queryService service.WorkspaceDBQueryService,
-	executionService service.ExecutionService,
+	rlsService ...service.WorkspaceRLSService,
 ) *RuntimeDataHandler {
-	return &RuntimeDataHandler{
-		runtimeService:   runtimeService,
-		queryService:     queryService,
-		executionService: executionService,
+	h := &RuntimeDataHandler{
+		runtimeService: runtimeService,
+		queryService:   queryService,
 	}
+	if len(rlsService) > 0 {
+		h.rlsService = rlsService[0]
+	}
+	return h
+}
+
+// SetRuntimeAuthService sets the runtime auth service for RLS user resolution
+func (h *RuntimeDataHandler) SetRuntimeAuthService(authService service.RuntimeAuthService) {
+	h.runtimeAuthService = authService
+}
+
+// getRLSFilters resolves RLS filters for the given table based on X-App-Token
+func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID, tableName string) ([]service.QueryFilter, error) {
+	if h.rlsService == nil {
+		return nil, nil
+	}
+
+	policies, err := h.rlsService.GetActivePoliciesForTable(c.Request().Context(), workspaceID, tableName)
+	if err != nil || len(policies) == 0 {
+		return nil, nil
+	}
+
+	// Resolve current app user from X-App-Token
+	token := c.Request().Header.Get("X-App-Token")
+	if token == "" {
+		// No token but RLS policies exist — deny access by adding impossible filter
+		return []service.QueryFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
+	}
+
+	if h.runtimeAuthService == nil {
+		return nil, nil
+	}
+
+	user, err := h.runtimeAuthService.ValidateSession(c.Request().Context(), token)
+	if err != nil {
+		// Invalid token with RLS — deny
+		return []service.QueryFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
+	}
+
+	var rlsFilters []service.QueryFilter
+	for _, policy := range policies {
+		var matchValue string
+		switch policy.MatchField {
+		case "app_user_id":
+			matchValue = user.ID.String()
+		case "email":
+			matchValue = user.Email
+		default:
+			matchValue = user.ID.String()
+		}
+		rlsFilters = append(rlsFilters, service.QueryFilter{
+			Column:   policy.Column,
+			Operator: "=",
+			Value:    matchValue,
+		})
+	}
+	return rlsFilters, nil
 }
 
 // resolveWorkspaceID 通过 slug 解析已发布的 workspace ID
@@ -105,6 +162,11 @@ func (h *RuntimeDataHandler) QueryRows(c echo.Context) error {
 			Value:    val,
 		})
 	}
+
+	// Inject RLS filters
+	wsUUID, _ := uuid.Parse(workspaceID)
+	rlsFilters, _ := h.getRLSFilters(c, wsUUID, tableName)
+	filters = append(filters, rlsFilters...)
 
 	filterCombinator := c.QueryParam("filter_combinator")
 
@@ -188,63 +250,6 @@ func (h *RuntimeDataHandler) UpdateRow(c echo.Context) error {
 
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,
-	})
-}
-
-// ExecuteWorkflow 执行指定 workflow（公开访问 — 表单触发）
-func (h *RuntimeDataHandler) ExecuteWorkflow(c echo.Context) error {
-	workspace, err := h.resolveWorkspace(c)
-	if err != nil {
-		return nil
-	}
-
-	workflowIDStr := c.Param("workflowId")
-	workflowID, err := uuid.Parse(workflowIDStr)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_WORKFLOW_ID", "Invalid workflow ID")
-	}
-
-	var req struct {
-		Inputs      map[string]interface{} `json:"inputs"`
-		TriggerType string                 `json:"trigger_type"`
-	}
-	if err := c.Bind(&req); err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
-	}
-
-	triggerType := strings.TrimSpace(req.TriggerType)
-	if triggerType == "" {
-		triggerType = "form_submit"
-	}
-
-	inputs := entity.JSON(req.Inputs)
-	triggerData := entity.JSON{
-		"source":       "runtime_app",
-		"workspace_id": workspace.ID.String(),
-	}
-
-	execution, err := h.executionService.Execute(
-		c.Request().Context(),
-		workflowID,
-		workspace.OwnerUserID,
-		inputs,
-		triggerType,
-		triggerData,
-	)
-	if err != nil {
-		switch err {
-		case service.ErrWorkflowNotFound:
-			return errorResponse(c, http.StatusNotFound, "WORKFLOW_NOT_FOUND", "Workflow not found")
-		case service.ErrUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "No permission to execute workflow")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXECUTE_FAILED", "Workflow execution failed")
-		}
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"execution_id": execution.ID,
-		"status":       execution.Status,
 	})
 }
 

@@ -12,7 +12,7 @@ type RuntimeEventType string
 
 // 运行时事件类型枚举
 const (
-	// ===== 工作流/执行相关事件 =====
+	// ===== 任务执行相关事件 =====
 	EventExecutionCreated   RuntimeEventType = "execution.created"
 	EventExecutionStarted   RuntimeEventType = "execution.started"
 	EventExecutionCompleted RuntimeEventType = "execution.completed"
@@ -348,12 +348,12 @@ type EventTypeMeta struct {
 func GetEventTypeMetadata() []EventTypeMeta {
 	return []EventTypeMeta{
 		// 执行事件
-		{EventExecutionCreated, "execution", "工作流执行创建"},
-		{EventExecutionStarted, "execution", "工作流执行开始"},
-		{EventExecutionCompleted, "execution", "工作流执行完成"},
-		{EventExecutionFailed, "execution", "工作流执行失败"},
-		{EventExecutionCancelled, "execution", "工作流执行取消"},
-		{EventExecutionRetried, "execution", "工作流执行重试"},
+		{EventExecutionCreated, "execution", "任务执行创建"},
+		{EventExecutionStarted, "execution", "任务执行开始"},
+		{EventExecutionCompleted, "execution", "任务执行完成"},
+		{EventExecutionFailed, "execution", "任务执行失败"},
+		{EventExecutionCancelled, "execution", "任务执行取消"},
+		{EventExecutionRetried, "execution", "任务执行重试"},
 
 		// 节点事件
 		{EventNodeStarted, "node", "节点开始执行"},

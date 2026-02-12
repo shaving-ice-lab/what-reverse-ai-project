@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/repository"
 )
 
 var (
-	ErrNotificationNotFound    = errors.New("notification not found")
+	ErrNotificationNotFound     = errors.New("notification not found")
 	ErrNotificationAccessDenied = errors.New("access denied to this notification")
 )
 
@@ -118,8 +118,8 @@ type NotificationListResponse struct {
 
 // UnreadCountByType 分类未读数
 type UnreadCountByType struct {
-	Total   int64            `json:"total"`
-	ByType  map[string]int64 `json:"by_type"`
+	Total  int64            `json:"total"`
+	ByType map[string]int64 `json:"by_type"`
 }
 
 type notificationService struct {

@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/agentflow/server/internal/api/middleware"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/service"
 )
 
 // AuditLogHandler 审计日志处理器
@@ -35,7 +35,6 @@ type ClientAuditLogRequest struct {
 }
 
 var allowedClientAuditActions = map[string]string{
-	"workflow.import":         "workflow",
 	"app.schema.import":       "workspace_version",
 	"workspace.schema.import": "workspace_version",
 }
@@ -187,8 +186,6 @@ func sanitizeClientAuditMetadata(metadata map[string]interface{}) entity.JSON {
 	allowedKeys := map[string]int{
 		"error":            500,
 		"file_name":        200,
-		"workflow_name":    200,
-		"workflow_id":      36,
 		"workspace_id":     36,
 		"source":           50,
 		"validation_stage": 50,

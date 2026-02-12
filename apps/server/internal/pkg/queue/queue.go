@@ -7,56 +7,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/agentflow/server/internal/pkg/logger"
 	"github.com/hibiken/asynq"
+	"github.com/reverseai/server/internal/pkg/logger"
 )
 
 // 队列名称
 const (
-	QueueExecution          = "execution"
 	QueueDBProvision        = "db_provision"
 	QueueDomainVerify       = "domain_verify"
 	QueueMetricsAggregation = "metrics_aggregation"
-	QueueWebhook            = "webhook"
-	QueueScheduled          = "scheduled"
-	QueueWorkflowLegacy     = "workflow"
 )
 
 // 任务类型常量
 const (
-	TaskTypeWorkflowExecution  = "workflow:execute"
-	TaskTypeScheduledTrigger   = "workflow:scheduled"
-	TaskTypeWebhookTrigger     = "workflow:webhook"
 	TaskTypeDBProvision        = "workspace:db:provision"
 	TaskTypeDomainVerify       = "app:domain:verify"
 	TaskTypeMetricsAggregation = "metrics:aggregate"
 )
-
-// WorkflowExecutionPayload 工作流执行任务载荷
-type WorkflowExecutionPayload struct {
-	ExecutionID string                 `json:"execution_id"`
-	WorkflowID  string                 `json:"workflow_id"`
-	UserID      string                 `json:"user_id"`
-	Inputs      map[string]interface{} `json:"inputs"`
-	TriggerType string                 `json:"trigger_type"`
-}
-
-// ScheduledTriggerPayload 定时触发载荷
-type ScheduledTriggerPayload struct {
-	WorkflowID  string    `json:"workflow_id"`
-	UserID      string    `json:"user_id"`
-	CronExpr    string    `json:"cron_expr"`
-	NextRunTime time.Time `json:"next_run_time"`
-}
-
-// WebhookTriggerPayload Webhook 触发载荷
-type WebhookTriggerPayload struct {
-	WorkflowID string                 `json:"workflow_id"`
-	NodeID     string                 `json:"node_id"`
-	Method     string                 `json:"method"`
-	Headers    map[string]string      `json:"headers"`
-	Body       map[string]interface{} `json:"body"`
-}
 
 // DBProvisionPayload Workspace DB 创建载荷
 type DBProvisionPayload struct {
@@ -85,17 +52,12 @@ type EnqueueResult struct {
 
 const (
 	defaultTaskRetention       = 24 * time.Hour
-	workflowExecutionTimeout   = 10 * time.Minute
-	webhookExecutionTimeout    = 5 * time.Minute
 	dbProvisionTimeout         = 20 * time.Minute
 	domainVerifyTimeout        = 3 * time.Minute
 	metricsAggregationTimeout  = 3 * time.Minute
 	dedupShortTTL              = 5 * time.Minute
 	dedupMediumTTL             = 15 * time.Minute
 	dedupLongTTL               = 30 * time.Minute
-	maxRetryWorkflowExecution  = 3
-	maxRetryWebhookExecution   = 3
-	maxRetryScheduledTrigger   = 1
 	maxRetryDBProvision        = 5
 	maxRetryDomainVerify       = 5
 	maxRetryMetricsAggregation = 2
@@ -137,88 +99,6 @@ func NewQueue(cfg *QueueConfig, log logger.Logger) (*Queue, error) {
 // Close 关闭队列
 func (q *Queue) Close() error {
 	return q.client.Close()
-}
-
-// EnqueueWorkflowExecution 将工作流执行任务加入队列
-func (q *Queue) EnqueueWorkflowExecution(ctx context.Context, payload *WorkflowExecutionPayload) (*asynq.TaskInfo, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal payload: %w", err)
-	}
-
-	task := asynq.NewTask(TaskTypeWorkflowExecution, data,
-		asynq.MaxRetry(maxRetryWorkflowExecution),
-		asynq.Timeout(workflowExecutionTimeout),
-		asynq.Retention(defaultTaskRetention),
-		asynq.Unique(dedupShortTTL),
-		asynq.Queue(QueueExecution),
-	)
-
-	info, err := q.client.EnqueueContext(ctx, task)
-	if err != nil {
-		return nil, fmt.Errorf("failed to enqueue task: %w", err)
-	}
-
-	q.log.Info("Enqueued workflow execution task",
-		"taskId", info.ID,
-		"executionId", payload.ExecutionID,
-		"workflowId", payload.WorkflowID)
-
-	return info, nil
-}
-
-// EnqueueScheduledTrigger 将定时触发任务加入队列
-func (q *Queue) EnqueueScheduledTrigger(ctx context.Context, payload *ScheduledTriggerPayload, processAt time.Time) (*asynq.TaskInfo, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal payload: %w", err)
-	}
-
-	task := asynq.NewTask(TaskTypeScheduledTrigger, data,
-		asynq.ProcessAt(processAt),
-		asynq.MaxRetry(maxRetryScheduledTrigger),
-		asynq.Retention(defaultTaskRetention),
-		asynq.Queue(QueueScheduled),
-	)
-
-	info, err := q.client.EnqueueContext(ctx, task)
-	if err != nil {
-		return nil, fmt.Errorf("failed to enqueue scheduled task: %w", err)
-	}
-
-	q.log.Info("Enqueued scheduled trigger task",
-		"taskId", info.ID,
-		"workflowId", payload.WorkflowID,
-		"processAt", processAt)
-
-	return info, nil
-}
-
-// EnqueueWebhookTrigger 将 Webhook 触发任务加入队列
-func (q *Queue) EnqueueWebhookTrigger(ctx context.Context, payload *WebhookTriggerPayload) (*asynq.TaskInfo, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal payload: %w", err)
-	}
-
-	task := asynq.NewTask(TaskTypeWebhookTrigger, data,
-		asynq.MaxRetry(maxRetryWebhookExecution),
-		asynq.Timeout(webhookExecutionTimeout),
-		asynq.Retention(defaultTaskRetention),
-		asynq.Unique(dedupShortTTL),
-		asynq.Queue(QueueWebhook),
-	)
-
-	info, err := q.client.EnqueueContext(ctx, task)
-	if err != nil {
-		return nil, fmt.Errorf("failed to enqueue webhook task: %w", err)
-	}
-
-	q.log.Info("Enqueued webhook trigger task",
-		"taskId", info.ID,
-		"workflowId", payload.WorkflowID)
-
-	return info, nil
 }
 
 // CancelTask 取消任务

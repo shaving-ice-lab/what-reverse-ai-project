@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/repository"
 	"gorm.io/gorm"
 )
 
@@ -61,7 +61,6 @@ type workspaceService struct {
 	roleRepo      repository.WorkspaceRoleRepository
 	memberRepo    repository.WorkspaceMemberRepository
 	eventRecorder EventRecorderService
-	workflowRepo  repository.WorkflowRepository
 	retentionCfg  config.RetentionConfig
 }
 
@@ -74,7 +73,6 @@ func NewWorkspaceService(
 	roleRepo repository.WorkspaceRoleRepository,
 	memberRepo repository.WorkspaceMemberRepository,
 	eventRecorder EventRecorderService,
-	workflowRepo repository.WorkflowRepository,
 	retentionCfg config.RetentionConfig,
 ) WorkspaceService {
 	return &workspaceService{
@@ -85,7 +83,6 @@ func NewWorkspaceService(
 		roleRepo:      roleRepo,
 		memberRepo:    memberRepo,
 		eventRecorder: eventRecorder,
-		workflowRepo:  workflowRepo,
 		retentionCfg:  retentionCfg,
 	}
 }
@@ -338,7 +335,6 @@ type WorkspaceDataExport struct {
 	ExportedAt string                   `json:"exported_at"`
 	Workspace  *entity.Workspace        `json:"workspace"`
 	Members    []entity.WorkspaceMember `json:"members"`
-	Workflows  []entity.Workflow        `json:"workflows"`
 }
 
 // WorkspaceDeletionResult 工作空间删除结果
@@ -407,9 +403,6 @@ func (s *workspaceService) Update(ctx context.Context, id uuid.UUID, ownerID uui
 }
 
 func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDataExport, error) {
-	if s.workflowRepo == nil {
-		return nil, ErrWorkspaceExportUnavailable
-	}
 	access, err := s.authorizeWorkspace(ctx, id, ownerID, PermissionWorkspaceAdmin)
 	if err != nil {
 		return nil, err
@@ -419,17 +412,12 @@ func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID
 	if err != nil {
 		return nil, err
 	}
-	workflows, err := s.workflowRepo.ListByWorkspaceID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
 
 	return &WorkspaceDataExport{
 		Version:    "1.0.0",
 		ExportedAt: time.Now().Format(time.RFC3339),
 		Workspace:  access.Workspace,
 		Members:    members,
-		Workflows:  workflows,
 	}, nil
 }
 
@@ -825,7 +813,6 @@ func (s *workspaceService) purgeDeadline(deletedAt time.Time) *time.Time {
 type WorkspaceCreateVersionRequest struct {
 	Version    string                 `json:"version"`
 	Changelog  *string                `json:"changelog"`
-	WorkflowID *uuid.UUID             `json:"workflow_id"`
 	UISchema   map[string]interface{} `json:"ui_schema"`
 	DBSchema   map[string]interface{} `json:"db_schema"`
 	ConfigJSON map[string]interface{} `json:"config_json"`
@@ -915,35 +902,11 @@ func (s *workspaceService) CreateVersion(ctx context.Context, id uuid.UUID, owne
 		return nil, err
 	}
 
-	// Validate pages config: check that referenced workflow_ids exist
-	if req.ConfigJSON != nil {
-		if pages, ok := req.ConfigJSON["pages"].([]interface{}); ok {
-			for i, p := range pages {
-				page, ok := p.(map[string]interface{})
-				if !ok {
-					continue
-				}
-				wfIDStr, _ := page["workflow_id"].(string)
-				if wfIDStr == "" {
-					continue
-				}
-				wfID, err := uuid.Parse(wfIDStr)
-				if err != nil {
-					return nil, fmt.Errorf("pages[%d].workflow_id is not a valid UUID: %s", i, wfIDStr)
-				}
-				if _, err := s.workflowRepo.GetByID(ctx, wfID); err != nil {
-					return nil, fmt.Errorf("pages[%d].workflow_id %s not found", i, wfIDStr)
-				}
-			}
-		}
-	}
-
 	version := &entity.WorkspaceVersion{
 		ID:          uuid.New(),
 		WorkspaceID: ws.ID,
 		Version:     req.Version,
 		Changelog:   req.Changelog,
-		WorkflowID:  req.WorkflowID,
 		CreatedBy:   &ownerID,
 		CreatedAt:   time.Now(),
 	}
@@ -1004,19 +967,6 @@ func (s *workspaceService) CompareVersions(ctx context.Context, id uuid.UUID, fr
 	}
 	if fromChangelog != toChangelog {
 		changes["changelog"] = map[string]interface{}{"from": fromChangelog, "to": toChangelog}
-	}
-
-	// Compare workflow_id
-	fromWfID := ""
-	toWfID := ""
-	if fromVer.WorkflowID != nil {
-		fromWfID = fromVer.WorkflowID.String()
-	}
-	if toVer.WorkflowID != nil {
-		toWfID = toVer.WorkflowID.String()
-	}
-	if fromWfID != toWfID {
-		changes["workflow_id"] = map[string]interface{}{"from": fromWfID, "to": toWfID}
 	}
 
 	// Compare JSON fields (entity.JSON = map[string]interface{})
@@ -1098,8 +1048,10 @@ func (s *workspaceService) UpdateUISchema(ctx context.Context, id uuid.UUID, own
 	if err != nil {
 		return nil, fmt.Errorf("current version not found: %w", err)
 	}
-	// 注意：版本的 UISchema 更新需要在 repository 层支持
-	_ = uiSchema
+	version.UISchema = entity.JSON(uiSchema)
+	if err := s.workspaceRepo.UpdateVersion(ctx, version); err != nil {
+		return nil, fmt.Errorf("failed to update UI schema: %w", err)
+	}
 	return version, nil
 }
 

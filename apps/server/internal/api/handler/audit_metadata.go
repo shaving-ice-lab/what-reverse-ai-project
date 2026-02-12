@@ -3,9 +3,9 @@ package handler
 import (
 	"strings"
 
-	"github.com/agentflow/server/internal/api/middleware"
-	"github.com/agentflow/server/internal/domain/entity"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
+	"github.com/reverseai/server/internal/domain/entity"
 )
 
 func buildAuditMetadata(ctx echo.Context, metadata entity.JSON) entity.JSON {

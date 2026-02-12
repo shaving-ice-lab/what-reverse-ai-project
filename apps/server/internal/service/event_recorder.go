@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/logger"
-	"github.com/agentflow/server/internal/pkg/observability"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/logger"
+	"github.com/reverseai/server/internal/pkg/observability"
+	"github.com/reverseai/server/internal/repository"
 )
 
 // EventRecorderService 事件记录器服务接口
@@ -22,8 +22,6 @@ type EventRecorderService interface {
 	RecordBatch(ctx context.Context, events []*entity.RuntimeEvent) error
 
 	// 便捷记录方法
-	RecordExecutionEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID, workflowID, workspaceID uuid.UUID, message string, metadata entity.JSON) error
-	RecordNodeEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID uuid.UUID, nodeID, nodeType string, durationMs int64, err error) error
 	RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error
 	RecordDBEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, durationMs int64, err error) error
 	RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, domain string, durationMs int64, err error) error
@@ -292,34 +290,6 @@ func (s *eventRecorderService) dispatchNotification(event *entity.RuntimeEvent) 
 }
 
 // ===== 便捷记录方法 =====
-
-func (s *eventRecorderService) RecordExecutionEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID, workflowID, workspaceID uuid.UUID, message string, metadata entity.JSON) error {
-	event := entity.NewRuntimeEvent(eventType).
-		WithExecution(executionID).
-		WithWorkspace(workspaceID).
-		WithMessage(message).
-		Build()
-
-	if metadata != nil {
-		event.Metadata = metadata
-	}
-	event.Metadata["workflow_id"] = workflowID.String()
-
-	return s.Record(ctx, event)
-}
-
-func (s *eventRecorderService) RecordNodeEvent(ctx context.Context, eventType entity.RuntimeEventType, executionID uuid.UUID, nodeID, nodeType string, durationMs int64, err error) error {
-	builder := entity.NewRuntimeEvent(eventType).
-		WithExecution(executionID).
-		WithNode(nodeID, nodeType).
-		WithDuration(durationMs)
-
-	if err != nil {
-		builder.WithError("", err.Error(), "").WithSeverity(entity.SeverityError)
-	}
-
-	return s.Record(ctx, builder.Build())
-}
 
 func (s *eventRecorderService) RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error {
 	builder := entity.NewRuntimeEvent(eventType).

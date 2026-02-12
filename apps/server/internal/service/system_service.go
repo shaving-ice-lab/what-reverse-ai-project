@@ -4,15 +4,22 @@ import (
 	"context"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/redis"
+	"github.com/reverseai/server/internal/pkg/redis"
 	"gorm.io/gorm"
 )
+
+// SystemHealth 系统健康状态
+type SystemHealth struct {
+	Name      string `json:"name"`
+	Status    string `json:"status"`
+	LatencyMs int64  `json:"latency_ms"`
+	Icon      string `json:"icon,omitempty"`
+}
 
 // SystemService 系统服务接口
 type SystemService interface {
 	// GetHealth 获取系统健康状态
-	GetHealth(ctx context.Context) []entity.SystemHealth
+	GetHealth(ctx context.Context) []SystemHealth
 }
 
 type systemService struct {
@@ -28,8 +35,8 @@ func NewSystemService(db *gorm.DB, redis *redis.Client) SystemService {
 	}
 }
 
-func (s *systemService) GetHealth(ctx context.Context) []entity.SystemHealth {
-	healthStatus := []entity.SystemHealth{
+func (s *systemService) GetHealth(ctx context.Context) []SystemHealth {
+	healthStatus := []SystemHealth{
 		{Name: "API 服务", Status: "healthy", LatencyMs: 0, Icon: "server"},
 		{Name: "数据库", Status: "unknown", LatencyMs: 0, Icon: "database"},
 		{Name: "缓存服务", Status: "unknown", LatencyMs: 0, Icon: "zap"},

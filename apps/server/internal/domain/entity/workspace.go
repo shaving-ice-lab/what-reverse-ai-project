@@ -124,7 +124,6 @@ type WorkspaceVersion struct {
 	WorkspaceID uuid.UUID  `gorm:"type:char(36);not null;index;uniqueIndex:uniq_workspace_version" json:"workspace_id"`
 	Version     string     `gorm:"size:50;not null;uniqueIndex:uniq_workspace_version" json:"version"`
 	Changelog   *string    `gorm:"type:text" json:"changelog"`
-	WorkflowID  *uuid.UUID `gorm:"type:char(36);index" json:"workflow_id"`
 	UISchema    JSON       `gorm:"column:ui_schema;type:json" json:"ui_schema"`
 	DBSchema    JSON       `gorm:"column:db_schema;type:json" json:"db_schema"`
 	ConfigJSON  JSON       `gorm:"column:config_json;type:json" json:"config_json"`
@@ -132,7 +131,6 @@ type WorkspaceVersion struct {
 	CreatedAt   time.Time  `json:"created_at"`
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
-	Workflow  *Workflow  `gorm:"foreignKey:WorkflowID" json:"workflow,omitempty"`
 	Creator   *User      `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 }
 

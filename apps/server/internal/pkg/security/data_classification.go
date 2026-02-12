@@ -63,10 +63,9 @@ var DataClassificationRegistry = map[DataCategory]DataClassification{
 	CategoryBusiness: {
 		Category:    CategoryBusiness,
 		Level:       DataLevelInternal,
-		Description: "业务数据 - 工作流、应用、执行结果等核心业务数据",
+		Description: "业务数据 - 应用配置、UI Schema、数据库 Schema 等核心业务数据",
 		Fields: []string{
-			"workflow_definition", "app_config", "execution_result",
-			"ui_schema", "db_schema", "node_config",
+			"app_config", "ui_schema", "db_schema",
 		},
 	},
 	CategoryLog: {

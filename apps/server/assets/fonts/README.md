@@ -8,5 +8,5 @@ Supported filenames (first match wins):
 
 You can also provide custom paths via environment variables:
 
-- AGENTFLOW_INVOICE_FONT_REGULAR
-- AGENTFLOW_INVOICE_FONT_BOLD
+- REVERSEAI_INVOICE_FONT_REGULAR
+- REVERSEAI_INVOICE_FONT_BOLD

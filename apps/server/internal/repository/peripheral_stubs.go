@@ -2,14 +2,13 @@ package repository
 
 // peripheral_stubs.go
 // 此文件保留被移除的周边模块的仓储接口定义，确保依赖它们的核心服务编译通过。
-// 后续重新开发这些模块时，替换为完整实现。
 
 import (
 	"context"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
 )
 
 // WorkspaceExportRepository 导出任务仓储接口（已冻结）
@@ -26,9 +25,16 @@ type WorkspaceExportRepository interface {
 	DeleteByWorkspaceAndType(ctx context.Context, workspaceID uuid.UUID, jobType entity.WorkspaceExportJobType) (int64, error)
 }
 
+// WorkspaceQuota 配额实体存根
+type WorkspaceQuota struct {
+	ID          uuid.UUID   `gorm:"type:char(36);primaryKey" json:"id"`
+	WorkspaceID uuid.UUID   `gorm:"type:char(36);not null" json:"workspace_id"`
+	Usage       entity.JSON `gorm:"type:json" json:"usage"`
+}
+
 // WorkspaceQuotaRepository 配额仓储接口（已冻结）
 type WorkspaceQuotaRepository interface {
-	GetActiveByWorkspace(ctx context.Context, workspaceID uuid.UUID, now time.Time) (*entity.WorkspaceQuota, error)
+	GetActiveByWorkspace(ctx context.Context, workspaceID uuid.UUID, now time.Time) (*WorkspaceQuota, error)
 }
 
 // BillingPlanRepository 计费计划仓储接口（已冻结）

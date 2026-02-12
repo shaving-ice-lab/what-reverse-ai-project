@@ -12,34 +12,32 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/pkg/observability"
-	"github.com/agentflow/server/internal/pkg/uischema"
-	"github.com/agentflow/server/internal/service"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/pkg/observability"
+	"github.com/reverseai/server/internal/pkg/uischema"
+	"github.com/reverseai/server/internal/service"
 )
 
 // RuntimeHandler Workspace Runtime 处理器
 type RuntimeHandler struct {
-	runtimeService   service.RuntimeService
-	executionService service.ExecutionService
-	billingService   service.BillingService
-	auditLogService  service.AuditLogService
-	jwtCfg           *config.JWTConfig
-	captchaVerifier  service.CaptchaVerifier
-	baseHosts        map[string]struct{}
-	metrics          *observability.MetricsCollector
-	schemaCacheTTL   time.Duration
-	schemaStaleTTL   time.Duration
+	runtimeService  service.RuntimeService
+	billingService  service.BillingService
+	auditLogService service.AuditLogService
+	jwtCfg          *config.JWTConfig
+	captchaVerifier service.CaptchaVerifier
+	baseHosts       map[string]struct{}
+	metrics         *observability.MetricsCollector
+	schemaCacheTTL  time.Duration
+	schemaStaleTTL  time.Duration
 }
 
 // NewRuntimeHandler 创建 Runtime 处理器
 func NewRuntimeHandler(
 	runtimeService service.RuntimeService,
-	executionService service.ExecutionService,
 	billingService service.BillingService,
 	auditLogService service.AuditLogService,
 	jwtCfg *config.JWTConfig,
@@ -50,16 +48,15 @@ func NewRuntimeHandler(
 	schemaStaleTTL time.Duration,
 ) *RuntimeHandler {
 	return &RuntimeHandler{
-		runtimeService:   runtimeService,
-		executionService: executionService,
-		billingService:   billingService,
-		auditLogService:  auditLogService,
-		jwtCfg:           jwtCfg,
-		captchaVerifier:  captchaVerifier,
-		baseHosts:        buildRuntimeBaseHosts(baseURL, regionBaseURLs),
-		metrics:          observability.GetMetricsCollector(),
-		schemaCacheTTL:   schemaCacheTTL,
-		schemaStaleTTL:   schemaStaleTTL,
+		runtimeService:  runtimeService,
+		billingService:  billingService,
+		auditLogService: auditLogService,
+		jwtCfg:          jwtCfg,
+		captchaVerifier: captchaVerifier,
+		baseHosts:       buildRuntimeBaseHosts(baseURL, regionBaseURLs),
+		metrics:         observability.GetMetricsCollector(),
+		schemaCacheTTL:  schemaCacheTTL,
+		schemaStaleTTL:  schemaStaleTTL,
 	}
 }
 
@@ -204,7 +201,6 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 		"db_schema":   schema.Version.DBSchema,
 		"config_json": schema.Version.ConfigJSON,
 		"version":     schema.Version.Version,
-		"workflow_id": schema.Version.WorkflowID,
 		"version_id":  schema.Version.ID,
 		"created_at":  schema.Version.CreatedAt,
 		"changelog":   schema.Version.Changelog,
@@ -351,7 +347,6 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 		"db_schema":   schema.Version.DBSchema,
 		"config_json": schema.Version.ConfigJSON,
 		"version":     schema.Version.Version,
-		"workflow_id": schema.Version.WorkflowID,
 		"version_id":  schema.Version.ID,
 		"created_at":  schema.Version.CreatedAt,
 		"changelog":   schema.Version.Changelog,
@@ -383,288 +378,14 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 	})
 }
 
-// ExecuteDomain 执行域名绑定的 Workspace Runtime
+// ExecuteDomain 域名绑定的 Workspace Runtime (deprecated)
 func (h *RuntimeHandler) ExecuteDomain(c echo.Context) error {
-	startedAt := time.Now()
-	workspaceID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
-
-	userID, err := h.getOptionalUserID(c)
-	if err != nil {
-		return errorResponse(c, http.StatusUnauthorized, "INVALID_TOKEN", "无效或过期的 Token")
-	}
-
-	var req RuntimeExecuteRequest
-	if err := c.Bind(&req); err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
-	}
-
-	triggerType := strings.TrimSpace(req.TriggerType)
-	if triggerType == "" {
-		triggerType = "workspace_runtime"
-	}
-
-	domain := h.getDomainHost(c)
-	schema, err := h.runtimeService.GetSchemaByDomain(c.Request().Context(), domain, userID)
-	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "执行失败")
-	}
-	if schema != nil {
-		if schema.Workspace != nil {
-			workspaceID = schema.Workspace.ID.String()
-		}
-	}
-
-	normalizedSchema, err := uischema.Normalize(schema.Version.UISchema)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
-	}
-
-	captchaToken := h.getCaptchaToken(c, req.CaptchaToken)
-	accessResult, err := h.trackAnonymousAccess(c, &schema.RuntimeEntry, "runtime_execute", captchaToken, false)
-	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
-	}
-
-	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
-	if accessResult != nil && accessResult.Decision.RequireCaptcha {
-		requireCaptcha = true
-	}
-	if err := h.ensureCaptcha(c, &schema.RuntimeEntry, captchaToken, requireCaptcha); err != nil {
-		return h.handleCaptchaError(c, err)
-	}
-
-	var session *entity.WorkspaceSession
-	if accessResult != nil {
-		session = accessResult.Session
-	}
-	if session != nil {
-		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
-	}
-
-	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_execute", userID)
-
-	if schema.Version.WorkflowID == nil {
-		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "Workspace 未绑定工作流")
-	}
-
-	inputPayload := req.Inputs
-	if normalizedSchema != nil {
-		mappedInputs, validationErr, err := uischema.MapInputs(normalizedSchema, req.Inputs)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_INPUTS", "输入校验失败")
-		}
-		if validationErr != nil {
-			return errorResponseWithDetails(c, http.StatusBadRequest, "INVALID_INPUTS", "输入校验失败", validationErr.Errors)
-		}
-		inputPayload = mappedInputs
-	}
-
-	if h.billingService != nil {
-		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.Workspace.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
-			Usage: map[string]float64{
-				"requests": 1,
-			},
-		})
-		if err != nil {
-			switch err {
-			case service.ErrBillingInvalidUsage, service.ErrBillingInvalidDimension:
-				return errorResponse(c, http.StatusBadRequest, "INVALID_USAGE", "用量数据无效")
-			case service.ErrWorkspaceNotFound:
-				return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-			case service.ErrWorkspaceUnauthorized:
-				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
-			default:
-				return errorResponse(c, http.StatusInternalServerError, "BILLING_FAILED", "配额扣减失败")
-			}
-		}
-		if consumeResult != nil && !consumeResult.Allowed {
-			return errorResponseWithDetails(c, http.StatusForbidden, "QUOTA_EXCEEDED", "配额已超限", buildQuotaExceededDetails(consumeResult))
-		}
-	}
-
-	inputs := entity.JSON(inputPayload)
-	triggerData := buildRuntimeTriggerData(schema, session)
-	execution, err := h.executionService.Execute(
-		c.Request().Context(),
-		*schema.Version.WorkflowID,
-		schema.Workspace.OwnerUserID,
-		inputs,
-		triggerType,
-		triggerData,
-	)
-	if err != nil {
-		switch err {
-		case service.ErrExecutionOverloaded:
-			return errorResponse(c, http.StatusServiceUnavailable, "OVERLOADED", "系统繁忙，请稍后重试")
-		case service.ErrWorkflowNotFound:
-			return errorResponse(c, http.StatusNotFound, "WORKFLOW_NOT_FOUND", "工作流不存在")
-		case service.ErrUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限执行工作流")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXECUTE_FAILED", "执行失败")
-		}
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"execution_id": execution.ID,
-		"status":       execution.Status,
-		"workflow_id":  execution.WorkflowID,
-		"started_at":   execution.StartedAt,
-		"session_id":   sessionIDOrEmpty(session),
-		"message":      "执行已开始",
-	})
+	return errorResponse(c, http.StatusGone, "ENDPOINT_REMOVED", "This endpoint is no longer supported. Use the Data API instead.")
 }
 
-// Execute 执行 Workspace Runtime
+// Execute Workspace Runtime (deprecated)
 func (h *RuntimeHandler) Execute(c echo.Context) error {
-	startedAt := time.Now()
-	workspaceID := "unknown"
-	defer h.recordRuntimeMetrics(c, startedAt, &workspaceID)
-
-	userID, err := h.getOptionalUserID(c)
-	if err != nil {
-		return errorResponse(c, http.StatusUnauthorized, "INVALID_TOKEN", "无效或过期的 Token")
-	}
-
-	var req RuntimeExecuteRequest
-	if err := c.Bind(&req); err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
-	}
-
-	triggerType := strings.TrimSpace(req.TriggerType)
-	if triggerType == "" {
-		triggerType = "workspace_runtime"
-	}
-
-	schema, err := h.resolveSchema(c, userID)
-	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "执行失败")
-	}
-	if schema != nil {
-		if schema.Workspace != nil {
-			workspaceID = schema.Workspace.ID.String()
-		}
-	}
-
-	captchaToken := h.getCaptchaToken(c, req.CaptchaToken)
-	accessResult, err := h.trackAnonymousAccess(c, &schema.RuntimeEntry, "runtime_execute", captchaToken, false)
-	if err != nil {
-		return runtimeErrorResponse(c, err, "RUNTIME_FAILED", "记录访问失败")
-	}
-
-	requireCaptcha := schema.Workspace != nil && schema.Workspace.RequireCaptcha
-	if accessResult != nil && accessResult.Decision.RequireCaptcha {
-		requireCaptcha = true
-	}
-	if err := h.ensureCaptcha(c, &schema.RuntimeEntry, captchaToken, requireCaptcha); err != nil {
-		return h.handleCaptchaError(c, err)
-	}
-
-	var session *entity.WorkspaceSession
-	if accessResult != nil {
-		session = accessResult.Session
-	}
-
-	normalizedSchema, err := uischema.Normalize(schema.Version.UISchema)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
-	}
-
-	if session != nil {
-		c.Response().Header().Set("X-Workspace-Session-Id", session.ID.String())
-	}
-
-	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_execute", userID)
-
-	if schema.Version.WorkflowID == nil {
-		return errorResponse(c, http.StatusBadRequest, "WORKFLOW_REQUIRED", "Workspace 未绑定工作流")
-	}
-
-	inputPayload := req.Inputs
-	if normalizedSchema != nil {
-		mappedInputs, validationErr, err := uischema.MapInputs(normalizedSchema, req.Inputs)
-		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_INPUTS", "输入校验失败")
-		}
-		if validationErr != nil {
-			return errorResponseWithDetails(c, http.StatusBadRequest, "INVALID_INPUTS", "输入校验失败", validationErr.Errors)
-		}
-		inputPayload = mappedInputs
-	}
-
-	if h.billingService != nil {
-		consumeResult, err := h.billingService.ConsumeUsage(c.Request().Context(), schema.Workspace.OwnerUserID, schema.Workspace.ID, service.ConsumeUsageRequest{
-			Usage: map[string]float64{
-				"requests": 1,
-			},
-		})
-		if err != nil {
-			switch err {
-			case service.ErrBillingInvalidUsage, service.ErrBillingInvalidDimension:
-				return errorResponse(c, http.StatusBadRequest, "INVALID_USAGE", "用量数据无效")
-			case service.ErrWorkspaceNotFound:
-				return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-			case service.ErrWorkspaceUnauthorized:
-				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
-			default:
-				return errorResponse(c, http.StatusInternalServerError, "BILLING_FAILED", "配额扣减失败")
-			}
-		}
-		if consumeResult != nil && !consumeResult.Allowed {
-			return errorResponseWithDetails(c, http.StatusForbidden, "QUOTA_EXCEEDED", "配额已超限", buildQuotaExceededDetails(consumeResult))
-		}
-	}
-
-	inputs := entity.JSON(inputPayload)
-	triggerData := buildRuntimeTriggerData(schema, session)
-	execution, err := h.executionService.Execute(
-		c.Request().Context(),
-		*schema.Version.WorkflowID,
-		schema.Workspace.OwnerUserID,
-		inputs,
-		triggerType,
-		triggerData,
-	)
-	if err != nil {
-		status := http.StatusInternalServerError
-		errorCode := "EXECUTE_FAILED"
-		message := "执行失败"
-		switch err {
-		case service.ErrExecutionOverloaded:
-			status = http.StatusServiceUnavailable
-			errorCode = "OVERLOADED"
-			message = "系统繁忙，请稍后重试"
-		case service.ErrWorkflowNotFound:
-			status = http.StatusNotFound
-			errorCode = "WORKFLOW_NOT_FOUND"
-			message = "工作流不存在"
-		case service.ErrUnauthorized:
-			status = http.StatusForbidden
-			errorCode = "FORBIDDEN"
-			message = "无权限执行工作流"
-		}
-		_ = h.runtimeService.RecordRuntimeEvent(c.Request().Context(), &schema.RuntimeEntry, session, service.RuntimeEventExecuteFailed, entity.JSON{
-			"trigger_type": triggerType,
-			"error_code":   errorCode,
-		})
-		return errorResponse(c, status, errorCode, message)
-	}
-
-	_ = h.runtimeService.RecordRuntimeEvent(c.Request().Context(), &schema.RuntimeEntry, session, service.RuntimeEventExecuteSuccess, entity.JSON{
-		"trigger_type": triggerType,
-		"execution_id": execution.ID,
-		"status":       execution.Status,
-	})
-
-	return successResponse(c, map[string]interface{}{
-		"execution_id": execution.ID,
-		"status":       execution.Status,
-		"workflow_id":  execution.WorkflowID,
-		"started_at":   execution.StartedAt,
-		"session_id":   sessionIDOrEmpty(session),
-		"message":      "执行已开始",
-	})
+	return errorResponse(c, http.StatusGone, "ENDPOINT_REMOVED", "This endpoint is no longer supported. Use the Data API instead.")
 }
 
 func (h *RuntimeHandler) getOptionalUserID(c echo.Context) (*uuid.UUID, error) {
@@ -1132,9 +853,6 @@ func buildRuntimeTriggerData(schema *service.RuntimeSchema, session *entity.Work
 		"source":               "workspace_runtime",
 		"workspace_id":         schema.Workspace.ID.String(),
 		"workspace_version_id": schema.Version.ID.String(),
-	}
-	if schema.Version.WorkflowID != nil {
-		data["workflow_id"] = schema.Version.WorkflowID.String()
 	}
 	if strings.TrimSpace(schema.Workspace.AccessMode) != "" {
 		data["access_mode"] = schema.Workspace.AccessMode

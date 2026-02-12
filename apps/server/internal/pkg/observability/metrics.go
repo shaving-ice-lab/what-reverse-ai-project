@@ -79,7 +79,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== HTTP 请求指标 =====
 		HTTPRequestsTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "http",
 				Name:      "requests_total",
 				Help:      "Total number of HTTP requests",
@@ -88,7 +88,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		HTTPRequestDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "http",
 				Name:      "request_duration_seconds",
 				Help:      "HTTP request latency in seconds",
@@ -98,7 +98,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		HTTPRequestsInFlight: promauto.NewGauge(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "http",
 				Name:      "requests_in_flight",
 				Help:      "Number of HTTP requests currently being processed",
@@ -106,7 +106,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		HTTPResponseSize: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "http",
 				Name:      "response_size_bytes",
 				Help:      "HTTP response size in bytes",
@@ -115,41 +115,41 @@ func NewMetricsCollector() *MetricsCollector {
 			[]string{"method", "path"},
 		),
 
-		// ===== 工作流执行指标 =====
+		// ===== 执行指标 =====
 		ExecutionTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "execution",
 				Name:      "total",
-				Help:      "Total number of workflow executions",
+				Help:      "Total number of task executions",
 			},
 			[]string{"workspace_id", "status", "trigger_type"},
 		),
 		ExecutionDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "execution",
 				Name:      "duration_seconds",
-				Help:      "Workflow execution duration in seconds",
+				Help:      "Task execution duration in seconds",
 				Buckets:   []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300},
 			},
 			[]string{"workspace_id", "status"},
 		),
 		ExecutionSuccessRate: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "execution",
 				Name:      "success_rate",
-				Help:      "Workflow execution success rate (0-1)",
+				Help:      "Task execution success rate (0-1)",
 			},
 			[]string{"workspace_id"},
 		),
 		ExecutionsInProgress: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "execution",
 				Name:      "in_progress",
-				Help:      "Number of workflow executions currently in progress",
+				Help:      "Number of task executions currently in progress",
 			},
 			[]string{"workspace_id"},
 		),
@@ -157,7 +157,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== 节点执行指标 =====
 		NodeExecutionTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "node",
 				Name:      "execution_total",
 				Help:      "Total number of node executions",
@@ -166,7 +166,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		NodeExecutionDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "node",
 				Name:      "execution_duration_seconds",
 				Help:      "Node execution duration in seconds",
@@ -178,7 +178,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== 数据库操作指标 =====
 		DBProvisionTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "db",
 				Name:      "provision_total",
 				Help:      "Total number of database provision operations",
@@ -187,7 +187,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		DBProvisionDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "db",
 				Name:      "provision_duration_seconds",
 				Help:      "Database provision duration in seconds",
@@ -197,7 +197,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		DBQueryDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "db",
 				Name:      "query_duration_seconds",
 				Help:      "Database query duration in seconds",
@@ -207,7 +207,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		DBConnectionsActive: promauto.NewGauge(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "db",
 				Name:      "connections_active",
 				Help:      "Number of active database connections",
@@ -217,7 +217,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== LLM 调用指标 =====
 		LLMRequestsTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "llm",
 				Name:      "requests_total",
 				Help:      "Total number of LLM API requests",
@@ -226,7 +226,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		LLMRequestDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "llm",
 				Name:      "request_duration_seconds",
 				Help:      "LLM API request duration in seconds",
@@ -236,7 +236,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		LLMTokensUsed: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "llm",
 				Name:      "tokens_used_total",
 				Help:      "Total number of LLM tokens used",
@@ -245,7 +245,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		LLMCost: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "llm",
 				Name:      "cost_usd_total",
 				Help:      "Total LLM cost in USD",
@@ -256,7 +256,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== 域名操作指标 =====
 		DomainVerifyTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "domain",
 				Name:      "verify_total",
 				Help:      "Total number of domain verification attempts",
@@ -265,7 +265,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		DomainVerifyDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "domain",
 				Name:      "verify_duration_seconds",
 				Help:      "Domain verification duration in seconds",
@@ -275,7 +275,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		CertIssueTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "domain",
 				Name:      "cert_issue_total",
 				Help:      "Total number of certificate issue attempts",
@@ -284,7 +284,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		CertIssueDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "domain",
 				Name:      "cert_issue_duration_seconds",
 				Help:      "Certificate issue duration in seconds",
@@ -296,7 +296,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== 运行时指标 =====
 		RuntimeRequestsTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "runtime",
 				Name:      "requests_total",
 				Help:      "Total number of runtime (public app) requests",
@@ -305,7 +305,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		RuntimeRequestDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "runtime",
 				Name:      "request_duration_seconds",
 				Help:      "Runtime request duration in seconds",
@@ -315,7 +315,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		SessionsActive: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "runtime",
 				Name:      "sessions_active",
 				Help:      "Number of active runtime sessions",
@@ -326,7 +326,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== WebSocket 指标 =====
 		WebSocketConnections: promauto.NewGauge(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "websocket",
 				Name:      "connections",
 				Help:      "Number of active WebSocket connections",
@@ -334,7 +334,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		WebSocketMessages: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "websocket",
 				Name:      "messages_total",
 				Help:      "Total number of WebSocket messages",
@@ -345,7 +345,7 @@ func NewMetricsCollector() *MetricsCollector {
 		// ===== 系统资源指标 =====
 		GoRoutines: promauto.NewGauge(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "system",
 				Name:      "goroutines",
 				Help:      "Number of goroutines",
@@ -353,7 +353,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		MemoryUsed: promauto.NewGauge(
 			prometheus.GaugeOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "system",
 				Name:      "memory_used_bytes",
 				Help:      "Memory used in bytes",
@@ -361,7 +361,7 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 		OpsAlertTestTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: "agentflow",
+				Namespace: "reverseai",
 				Subsystem: "ops",
 				Name:      "alert_test_total",
 				Help:      "Total number of ops alert tests triggered",
@@ -444,40 +444,40 @@ type MetricsDimension struct {
 func GetMetricsDictionary() []MetricsDimension {
 	return []MetricsDimension{
 		// HTTP
-		{Name: "agentflow_http_requests_total", Description: "HTTP 请求总数", Type: "counter", Labels: []string{"method", "path", "status"}},
-		{Name: "agentflow_http_request_duration_seconds", Description: "HTTP 请求延迟", Type: "histogram", Labels: []string{"method", "path", "status"}, Unit: "seconds", Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}},
-		{Name: "agentflow_http_requests_in_flight", Description: "正在处理的 HTTP 请求数", Type: "gauge", Labels: []string{}},
+		{Name: "reverseai_http_requests_total", Description: "HTTP 请求总数", Type: "counter", Labels: []string{"method", "path", "status"}},
+		{Name: "reverseai_http_request_duration_seconds", Description: "HTTP 请求延迟", Type: "histogram", Labels: []string{"method", "path", "status"}, Unit: "seconds", Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}},
+		{Name: "reverseai_http_requests_in_flight", Description: "正在处理的 HTTP 请求数", Type: "gauge", Labels: []string{}},
 
 		// Execution
-		{Name: "agentflow_execution_total", Description: "工作流执行总数", Type: "counter", Labels: []string{"workspace_id", "status", "trigger_type"}},
-		{Name: "agentflow_execution_duration_seconds", Description: "工作流执行耗时", Type: "histogram", Labels: []string{"workspace_id", "status"}, Unit: "seconds", Buckets: []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300}},
-		{Name: "agentflow_execution_success_rate", Description: "工作流执行成功率", Type: "gauge", Labels: []string{"workspace_id"}},
-		{Name: "agentflow_execution_in_progress", Description: "正在执行的工作流数", Type: "gauge", Labels: []string{"workspace_id"}},
+		{Name: "reverseai_execution_total", Description: "工作流执行总数", Type: "counter", Labels: []string{"workspace_id", "status", "trigger_type"}},
+		{Name: "reverseai_execution_duration_seconds", Description: "工作流执行耗时", Type: "histogram", Labels: []string{"workspace_id", "status"}, Unit: "seconds", Buckets: []float64{.1, .5, 1, 2.5, 5, 10, 30, 60, 120, 300}},
+		{Name: "reverseai_execution_success_rate", Description: "工作流执行成功率", Type: "gauge", Labels: []string{"workspace_id"}},
+		{Name: "reverseai_execution_in_progress", Description: "正在执行的工作流数", Type: "gauge", Labels: []string{"workspace_id"}},
 
 		// Node
-		{Name: "agentflow_node_execution_total", Description: "节点执行总数", Type: "counter", Labels: []string{"node_type", "status"}},
-		{Name: "agentflow_node_execution_duration_seconds", Description: "节点执行耗时", Type: "histogram", Labels: []string{"node_type"}, Unit: "seconds"},
+		{Name: "reverseai_node_execution_total", Description: "节点执行总数", Type: "counter", Labels: []string{"node_type", "status"}},
+		{Name: "reverseai_node_execution_duration_seconds", Description: "节点执行耗时", Type: "histogram", Labels: []string{"node_type"}, Unit: "seconds"},
 
 		// DB
-		{Name: "agentflow_db_provision_total", Description: "数据库创建总数", Type: "counter", Labels: []string{"workspace_id", "status"}},
-		{Name: "agentflow_db_provision_duration_seconds", Description: "数据库创建耗时", Type: "histogram", Labels: []string{"workspace_id"}, Unit: "seconds", Buckets: []float64{1, 5, 10, 30, 60, 120, 300, 600}},
-		{Name: "agentflow_db_query_duration_seconds", Description: "数据库查询耗时", Type: "histogram", Labels: []string{"operation"}, Unit: "seconds"},
+		{Name: "reverseai_db_provision_total", Description: "数据库创建总数", Type: "counter", Labels: []string{"workspace_id", "status"}},
+		{Name: "reverseai_db_provision_duration_seconds", Description: "数据库创建耗时", Type: "histogram", Labels: []string{"workspace_id"}, Unit: "seconds", Buckets: []float64{1, 5, 10, 30, 60, 120, 300, 600}},
+		{Name: "reverseai_db_query_duration_seconds", Description: "数据库查询耗时", Type: "histogram", Labels: []string{"operation"}, Unit: "seconds"},
 
 		// LLM
-		{Name: "agentflow_llm_requests_total", Description: "LLM 请求总数", Type: "counter", Labels: []string{"provider", "model", "status"}},
-		{Name: "agentflow_llm_request_duration_seconds", Description: "LLM 请求耗时", Type: "histogram", Labels: []string{"provider", "model"}, Unit: "seconds"},
-		{Name: "agentflow_llm_tokens_used_total", Description: "LLM Token 使用量", Type: "counter", Labels: []string{"provider", "model", "token_type"}},
+		{Name: "reverseai_llm_requests_total", Description: "LLM 请求总数", Type: "counter", Labels: []string{"provider", "model", "status"}},
+		{Name: "reverseai_llm_request_duration_seconds", Description: "LLM 请求耗时", Type: "histogram", Labels: []string{"provider", "model"}, Unit: "seconds"},
+		{Name: "reverseai_llm_tokens_used_total", Description: "LLM Token 使用量", Type: "counter", Labels: []string{"provider", "model", "token_type"}},
 
 		// Runtime
-		{Name: "agentflow_runtime_requests_total", Description: "运行时请求总数", Type: "counter", Labels: []string{"workspace_id", "status"}},
-		{Name: "agentflow_runtime_request_duration_seconds", Description: "运行时请求耗时", Type: "histogram", Labels: []string{"workspace_id"}, Unit: "seconds"},
-		{Name: "agentflow_runtime_sessions_active", Description: "活跃会话数", Type: "gauge", Labels: []string{"workspace_id"}},
+		{Name: "reverseai_runtime_requests_total", Description: "运行时请求总数", Type: "counter", Labels: []string{"workspace_id", "status"}},
+		{Name: "reverseai_runtime_request_duration_seconds", Description: "运行时请求耗时", Type: "histogram", Labels: []string{"workspace_id"}, Unit: "seconds"},
+		{Name: "reverseai_runtime_sessions_active", Description: "活跃会话数", Type: "gauge", Labels: []string{"workspace_id"}},
 
 		// Domain
-		{Name: "agentflow_domain_verify_total", Description: "域名验证总数", Type: "counter", Labels: []string{"status"}},
-		{Name: "agentflow_domain_cert_issue_total", Description: "证书签发总数", Type: "counter", Labels: []string{"status"}},
+		{Name: "reverseai_domain_verify_total", Description: "域名验证总数", Type: "counter", Labels: []string{"status"}},
+		{Name: "reverseai_domain_cert_issue_total", Description: "证书签发总数", Type: "counter", Labels: []string{"status"}},
 
 		// Ops
-		{Name: "agentflow_ops_alert_test_total", Description: "告警演练触发次数", Type: "counter", Labels: []string{"severity"}},
+		{Name: "reverseai_ops_alert_test_total", Description: "告警演练触发次数", Type: "counter", Labels: []string{"severity"}},
 	}
 }

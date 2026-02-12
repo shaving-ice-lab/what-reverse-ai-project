@@ -9,17 +9,13 @@ import (
 // WorkspaceBackfillResult 回填结果
 type WorkspaceBackfillResult struct {
 	CreatedWorkspaces int64 `json:"created_workspaces"`
-	UpdatedWorkflows  int64 `json:"updated_workflows"`
-	UpdatedExecutions int64 `json:"updated_executions"`
 	UpdatedAPIKeys    int64 `json:"updated_api_keys"`
 }
 
 // WorkspaceConsistencyReport 一致性校验结果
 type WorkspaceConsistencyReport struct {
-	UsersMissingWorkspace      int64 `json:"users_missing_workspace"`
-	WorkflowsMissingWorkspace  int64 `json:"workflows_missing_workspace"`
-	ExecutionsMissingWorkspace int64 `json:"executions_missing_workspace"`
-	APIKeysMissingWorkspace    int64 `json:"api_keys_missing_workspace"`
+	UsersMissingWorkspace   int64 `json:"users_missing_workspace"`
+	APIKeysMissingWorkspace int64 `json:"api_keys_missing_workspace"`
 }
 
 // RunWorkspaceBackfill 回填默认 workspace 与 workspace_id
@@ -31,18 +27,6 @@ func RunWorkspaceBackfill(ctx context.Context, db *gorm.DB) (*WorkspaceBackfillR
 			return err
 		}
 		result.CreatedWorkspaces = createdWorkspaces
-
-		updatedWorkflows, err := execRows(tx, backfillWorkflowWorkspaceSQL)
-		if err != nil {
-			return err
-		}
-		result.UpdatedWorkflows = updatedWorkflows
-
-		updatedExecutions, err := execRows(tx, backfillExecutionWorkspaceSQL)
-		if err != nil {
-			return err
-		}
-		result.UpdatedExecutions = updatedExecutions
 
 		updatedAPIKeys, err := execRows(tx, backfillAPIKeyWorkspaceSQL)
 		if err != nil {
@@ -64,14 +48,6 @@ func CheckWorkspaceConsistency(ctx context.Context, db *gorm.DB) (*WorkspaceCons
 	var err error
 
 	report.UsersMissingWorkspace, err = queryCount(ctx, db, missingWorkspaceByUserSQL)
-	if err != nil {
-		return nil, err
-	}
-	report.WorkflowsMissingWorkspace, err = queryCount(ctx, db, missingWorkspaceByWorkflowSQL)
-	if err != nil {
-		return nil, err
-	}
-	report.ExecutionsMissingWorkspace, err = queryCount(ctx, db, missingWorkspaceByExecutionSQL)
 	if err != nil {
 		return nil, err
 	}
@@ -109,20 +85,6 @@ LEFT JOIN what_reverse_workspaces w ON w.owner_user_id = u.id
 WHERE w.id IS NULL;
 `
 
-const backfillWorkflowWorkspaceSQL = `
-UPDATE what_reverse_workflows wf
-JOIN what_reverse_workspaces ws ON ws.owner_user_id = wf.user_id
-SET wf.workspace_id = ws.id
-WHERE wf.workspace_id IS NULL OR wf.workspace_id = '';
-`
-
-const backfillExecutionWorkspaceSQL = `
-UPDATE what_reverse_executions ex
-JOIN what_reverse_workflows wf ON wf.id = ex.workflow_id
-SET ex.workspace_id = wf.workspace_id
-WHERE ex.workspace_id IS NULL OR ex.workspace_id = '';
-`
-
 const backfillAPIKeyWorkspaceSQL = `
 UPDATE what_reverse_api_keys ak
 JOIN what_reverse_workspaces ws ON ws.owner_user_id = ak.user_id
@@ -135,20 +97,6 @@ SELECT COUNT(*)
 FROM what_reverse_users u
 LEFT JOIN what_reverse_workspaces w ON w.owner_user_id = u.id
 WHERE w.id IS NULL;
-`
-
-const missingWorkspaceByWorkflowSQL = `
-SELECT COUNT(*)
-FROM what_reverse_workflows wf
-LEFT JOIN what_reverse_workspaces ws ON ws.id = wf.workspace_id
-WHERE wf.workspace_id IS NULL OR wf.workspace_id = '' OR ws.id IS NULL;
-`
-
-const missingWorkspaceByExecutionSQL = `
-SELECT COUNT(*)
-FROM what_reverse_executions ex
-LEFT JOIN what_reverse_workspaces ws ON ws.id = ex.workspace_id
-WHERE ex.workspace_id IS NULL OR ex.workspace_id = '' OR ws.id IS NULL;
 `
 
 const missingWorkspaceByAPIKeySQL = `

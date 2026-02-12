@@ -8,14 +8,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/pkg/database"
-	"github.com/agentflow/server/internal/pkg/executor"
-	"github.com/agentflow/server/internal/pkg/logger"
-	"github.com/agentflow/server/internal/pkg/queue"
-	"github.com/agentflow/server/internal/repository"
-	"github.com/agentflow/server/internal/service"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/pkg/database"
+	"github.com/reverseai/server/internal/pkg/logger"
+	"github.com/reverseai/server/internal/pkg/queue"
+	"github.com/reverseai/server/internal/repository"
+	"github.com/reverseai/server/internal/service"
 )
 
 func main() {
@@ -34,7 +33,7 @@ func main() {
 	}
 	defer log.Sync()
 
-	log.Info("Starting AgentFlow Worker...")
+	log.Info("Starting reverseai Worker...")
 
 	// 初始化数据库
 	db, err := database.New(&cfg.Database)
@@ -44,15 +43,12 @@ func main() {
 	log.Info("Database connected")
 
 	// 初始化仓储
-	executionRepo := repository.NewExecutionRepository(db)
-	workflowRepo := repository.NewWorkflowRepository(db)
 	workspaceDatabaseRepo := repository.NewWorkspaceDatabaseRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	workspaceRepo := repository.NewWorkspaceRepository(db)
 	workspaceSlugAliasRepo := repository.NewWorkspaceSlugAliasRepository(db)
 	workspaceRoleRepo := repository.NewWorkspaceRoleRepository(db)
 	workspaceMemberRepo := repository.NewWorkspaceMemberRepository(db)
-	auditLogRepo := repository.NewAuditLogRepository(db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
 	reviewQueueRepo := repository.NewReviewQueueRepository(db)
 	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(db)
@@ -66,11 +62,8 @@ func main() {
 		workspaceRoleRepo,
 		workspaceMemberRepo,
 		eventRecorder,
-		workflowRepo,
 		cfg.Retention,
 	)
-	auditLogService := service.NewAuditLogService(auditLogRepo, workspaceService, cfg.Security.PIISanitizationEnabled)
-	auditRecorder := service.NewExecutionAuditRecorder(auditLogService)
 	workspaceDatabaseService, err := service.NewWorkspaceDatabaseService(
 		workspaceDatabaseRepo,
 		workspaceService,
@@ -97,40 +90,19 @@ func main() {
 		)
 	}
 
-	// Workspace DB runtime (db provider + authorizer)
-	workspaceDBRuntime, runtimeErr := service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, cfg.Database, cfg.Encryption.Key)
-	if runtimeErr != nil {
-		log.Error("Failed to initialize workspace DB runtime", "error", runtimeErr)
-		workspaceDBRuntime, runtimeErr = service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, cfg.Database, "change-this-to-a-32-byte-secret!")
-		if runtimeErr != nil {
-			log.Error("Failed to initialize fallback workspace DB runtime", "error", runtimeErr)
-		}
-	}
-
 	workerCfg := &queue.WorkerConfig{
 		RedisAddr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		RedisPassword: cfg.Redis.Password,
 		RedisDB:       cfg.Redis.DB,
 		Concurrency:   cfg.Queue.WorkerConcurrency,
 		Queues:        cfg.Queue.Queues,
-		EngineConfig: &executor.EngineConfig{
-			MaxConcurrent: cfg.Execution.MaxConcurrent,
-			Timeout:       cfg.Execution.Timeout,
-		},
-	}
-
-	var dbProvider executor.DBProvider
-	var dbAuthorizer executor.DBAuthorizer
-	if workspaceDBRuntime != nil {
-		dbProvider = workspaceDBRuntime
-		dbAuthorizer = workspaceDBRuntime
 	}
 
 	var dbProvisioner queue.DBProvisioner
 	if workspaceDatabaseService != nil {
 		dbProvisioner = dbProvisionerAdapter{svc: workspaceDatabaseService}
 	}
-	worker, err := queue.NewWorker(workerCfg, executionRepo, workflowRepo, nil, log, dbProvider, dbAuthorizer, nil, auditRecorder, dbProvisioner, nil, nil)
+	worker, err := queue.NewWorker(workerCfg, log, dbProvisioner, nil, nil)
 	if err != nil {
 		log.Fatal("Failed to create worker", "error", err)
 	}

@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/repository"
 )
 
 // SessionService 会话服务接口

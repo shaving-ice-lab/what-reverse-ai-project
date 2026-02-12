@@ -9,25 +9,23 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/agentflow/server/internal/api"
-	"github.com/agentflow/server/internal/config"
-	"github.com/agentflow/server/internal/pkg/database"
-	"github.com/agentflow/server/internal/pkg/logger"
-	"github.com/agentflow/server/internal/pkg/migration"
-	"github.com/agentflow/server/internal/pkg/redis"
-	"github.com/agentflow/server/internal/repository"
-	"github.com/agentflow/server/internal/service"
 	"github.com/joho/godotenv"
+	"github.com/reverseai/server/internal/api"
+	"github.com/reverseai/server/internal/config"
+	"github.com/reverseai/server/internal/pkg/database"
+	"github.com/reverseai/server/internal/pkg/logger"
+	"github.com/reverseai/server/internal/pkg/migration"
+	"github.com/reverseai/server/internal/pkg/redis"
 )
 
-// @title AgentFlow API
+// @title ReverseAI API
 // @version 1.0
-// @description AgentFlow - AI 工作流平台 API 文档
-// @termsOfService https://agentflow.app/terms
+// @description ReverseAI - AI-Powered App Platform API
+// @termsOfService https://reverseai.app/terms
 
 // @contact.name API Support
-// @contact.url https://agentflow.app/support
-// @contact.email support@agentflow.app
+// @contact.url https://reverseai.app/support
+// @contact.email support@reverseai.app
 
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
@@ -60,7 +58,7 @@ func main() {
 	}
 	defer log.Sync()
 
-	log.Info("Starting AgentFlow Server...")
+	log.Info("Starting ReverseAI Server...")
 
 	// 初始化数据库
 	db, err := database.New(&cfg.Database)
@@ -85,8 +83,6 @@ func main() {
 			}
 			log.Info("Workspace backfill completed",
 				"created_workspaces", result.CreatedWorkspaces,
-				"updated_workflows", result.UpdatedWorkflows,
-				"updated_executions", result.UpdatedExecutions,
 				"updated_api_keys", result.UpdatedAPIKeys,
 			)
 		}
@@ -97,30 +93,9 @@ func main() {
 			} else {
 				log.Info("Workspace consistency check",
 					"users_missing_workspace", report.UsersMissingWorkspace,
-					"workflows_missing_workspace", report.WorkflowsMissingWorkspace,
-					"executions_missing_workspace", report.ExecutionsMissingWorkspace,
 					"api_keys_missing_workspace", report.APIKeysMissingWorkspace,
 				)
 			}
-		}
-	}
-
-	// 初始化数据保留清理服务
-	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
-	executionRepo := repository.NewExecutionRepository(db)
-	workspaceRepo := repository.NewWorkspaceRepository(db)
-	auditLogRepo := repository.NewAuditLogRepository(db)
-	retentionService := service.NewRetentionService(cfg.Retention, cfg.Archive, runtimeEventRepo, executionRepo, workspaceRepo, nil, auditLogRepo, cfg.Security.AuditLogRetentionDays, log)
-	retentionCtx, retentionCancel := context.WithCancel(context.Background())
-	go retentionService.Run(retentionCtx)
-
-	// 初始化种子数据（预置模板）
-	if cfg.Server.Mode != "production" || os.Getenv("SEED_TEMPLATES") == "true" {
-		templateSeeder := database.NewWorkflowTemplateSeeder(db, log)
-		if err := templateSeeder.SeedOfficialWorkflowTemplates(); err != nil {
-			log.Warn("Failed to seed workflow templates", "error", err)
-		} else {
-			log.Info("Workflow templates seeded")
 		}
 	}
 
@@ -151,7 +126,6 @@ func main() {
 
 	log.Info("Shutting down server...")
 
-	retentionCancel()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
