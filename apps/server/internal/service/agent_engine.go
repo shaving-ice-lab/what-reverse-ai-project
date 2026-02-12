@@ -28,7 +28,6 @@ const (
 type AffectedResource string
 
 const (
-	AffectedResourceWorkflow AffectedResource = "workflow"
 	AffectedResourceDatabase AffectedResource = "database"
 	AffectedResourceUISchema AffectedResource = "ui_schema"
 )
@@ -128,10 +127,6 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 			Content:   message,
 			Timestamp: time.Now(),
 		})
-
-		// Build conversation context for LLM
-		toolDefs := e.registry.ListAll()
-		_ = toolDefs // Will be used when real LLM integration is added
 
 		// ReAct Loop
 		for step := 1; step <= e.config.MaxSteps; step++ {
@@ -383,10 +378,8 @@ func (e *agentEngine) Cancel(ctx context.Context, sessionID string) error {
 // resolveAffectedResource maps tool names to the resource type they affect
 func resolveAffectedResource(toolName string) AffectedResource {
 	switch toolName {
-	case "create_table", "alter_table", "insert_data", "query_data":
+	case "create_table", "alter_table", "delete_table", "insert_data", "update_data", "delete_data":
 		return AffectedResourceDatabase
-	case "create_workflow", "modify_workflow", "suggest_workflow":
-		return AffectedResourceWorkflow
 	case "generate_ui_schema", "modify_ui_schema":
 		return AffectedResourceUISchema
 	default:
@@ -445,7 +438,7 @@ func (e *agentEngine) buildLLMMessages(session *AgentSession, originalMessage st
 		{
 			"role": "system",
 			"content": `You are an AI Agent that helps users build complete web applications inside a Workspace.
-You have access to tools for creating database tables, generating UI schemas, creating workflows, and more.
+You have access to tools for creating database tables, generating UI schemas, and more.
 
 IMPORTANT RULES:
 1. Think step by step. First gather workspace info, then plan your actions.
@@ -499,7 +492,7 @@ Each block has: id, type, label (optional), config, data_source (optional), grid
    config: { "table_name": "<table>", "columns": [{"key":"<col>","label":"<header>","type":"text|number|date|boolean|badge","sortable":true}], "actions": ["create","edit","delete","view"], "filters_enabled": true, "search_enabled": true, "search_key": "<col_to_search>", "pagination": true, "page_size": 20 }
    data_source: { "table": "<table_name>", "order_by": [{"column":"<col>","direction":"DESC"}] }
 
-3. form — Data entry form (inserts into a table or triggers a workflow)
+3. form — Data entry form (inserts into a table)
    config: { "title": "<form heading>", "description": "<helper text>", "fields": [{"name":"<col>","label":"<label>","type":"text|number|email|textarea|select|date|checkbox","required":true,"placeholder":"...","options":[{"label":"..","value":".."}]}], "submit_label": "Submit", "table_name": "<table>", "mode": "create" }
 
 4. chart — Data visualization
@@ -782,7 +775,7 @@ func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []
 	for _, m := range messages {
 		if msgStr(m, "role") == "assistant" {
 			content := msgStr(m, "content")
-			for _, marker := range []string{"get_workspace_info", "create_table", "insert_data", "generate_ui_schema", "create_workflow"} {
+			for _, marker := range []string{"get_workspace_info", "create_table", "insert_data", "generate_ui_schema"} {
 				if strings.Contains(content, marker) {
 					completedTools = append(completedTools, marker)
 				}
@@ -800,11 +793,10 @@ func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []
 	// Step 0: Always gather workspace info first
 	if stepsDone == 0 {
 		argsJSON, _ := json.Marshal(map[string]interface{}{
-			"workspace_id":      wsID,
-			"user_id":           userID,
-			"include_tables":    true,
-			"include_workflows": true,
-			"include_stats":     false,
+			"workspace_id":   wsID,
+			"user_id":        userID,
+			"include_tables": true,
+			"include_stats":  false,
 		})
 		return "Let me check your workspace's current state first.",
 			&toolAction{ToolName: "get_workspace_info", ToolArgs: argsJSON}, nil
@@ -816,7 +808,7 @@ func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []
 	// If no tables detected, provide guidance
 	if len(tables) == 0 {
 		return fmt.Sprintf("I understand you want to build something related to: %q. "+
-			"I can help you create database tables, generate UI, and build workflows. "+
+			"I can help you create database tables and generate UI. "+
 			"Try describing your app more specifically, e.g., 'I want a fleet management system with vehicles, drivers, and trips'. "+
 			"For full AI-powered generation, configure OPENAI_API_KEY or OLLAMA_HOST.", userMsg), nil, nil
 	}
@@ -893,21 +885,6 @@ func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []
 			&toolAction{ToolName: "generate_ui_schema", ToolArgs: argsJSON}, nil
 	}
 
-	// Step N+3: Create a basic CRUD workflow
-	wfStep := len(tables) + 3
-	if stepsDone == wfStep {
-		wfDef := e.generateBasicWorkflow(tables, msgLower)
-		argsJSON, _ := json.Marshal(map[string]interface{}{
-			"workspace_id": wsID,
-			"user_id":      userID,
-			"name":         e.extractAppName(msgLower) + " Workflow",
-			"description":  "Auto-generated workflow for " + e.extractAppName(msgLower),
-			"definition":   wfDef,
-		})
-		return "Creating workflow for your application...",
-			&toolAction{ToolName: "create_workflow", ToolArgs: argsJSON}, nil
-	}
-
 	// Final answer
 	tableNames := make([]string, len(tables))
 	for i, t := range tables {
@@ -916,10 +893,8 @@ func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []
 	return fmt.Sprintf("Your application has been created! Here's what was built:\n"+
 		"- **%d database tables**: %s\n"+
 		"- **Sample data** inserted into %q\n"+
-		"- **UI pages** generated with dashboard and data management views\n"+
-		"- **Workflow** created for business logic\n\n"+
-		"You can view the results in the **Preview** tab, manage data in the **Database** tab, "+
-		"and edit workflows in the **Agent Flow** tab.",
+		"- **UI pages** generated with dashboard and data management views\n\n"+
+		"You can view the results in the **Preview** tab or manage data in the **Database** tab.",
 		len(tables), strings.Join(tableNames, ", "), tables[0].Name), nil, nil
 }
 
@@ -1324,49 +1299,6 @@ func (e *agentEngine) generateUIPages(tables []heuristicTable, msg string) []map
 	}
 
 	return pages
-}
-
-// generateBasicWorkflow creates a basic CRUD workflow definition
-func (e *agentEngine) generateBasicWorkflow(tables []heuristicTable, msg string) map[string]interface{} {
-	nodes := []map[string]interface{}{
-		{"id": "start", "type": "start", "position": map[string]int{"x": 250, "y": 0}, "data": map[string]interface{}{"label": "Start"}},
-	}
-	edges := []map[string]interface{}{}
-
-	prevNodeID := "start"
-	y := 100
-	for i, t := range tables {
-		nodeID := fmt.Sprintf("db_query_%d", i)
-		nodes = append(nodes, map[string]interface{}{
-			"id":       nodeID,
-			"type":     "db_query",
-			"position": map[string]int{"x": 250, "y": y},
-			"data": map[string]interface{}{
-				"label":     "Query " + t.Name,
-				"operation": "select",
-				"table":     t.Name,
-			},
-		})
-		edges = append(edges, map[string]interface{}{
-			"id": fmt.Sprintf("e_%s_%s", prevNodeID, nodeID), "source": prevNodeID, "target": nodeID,
-		})
-		prevNodeID = nodeID
-		y += 100
-	}
-
-	endNodeID := "end"
-	nodes = append(nodes, map[string]interface{}{
-		"id": endNodeID, "type": "end", "position": map[string]int{"x": 250, "y": y},
-		"data": map[string]interface{}{"label": "End"},
-	})
-	edges = append(edges, map[string]interface{}{
-		"id": fmt.Sprintf("e_%s_%s", prevNodeID, endNodeID), "source": prevNodeID, "target": endNodeID,
-	})
-
-	return map[string]interface{}{
-		"nodes": nodes,
-		"edges": edges,
-	}
 }
 
 // extractAppName tries to extract an application name from the user message

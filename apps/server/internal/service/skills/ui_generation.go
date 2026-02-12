@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/agentflow/server/internal/service"
+	"github.com/reverseai/server/internal/service"
 )
 
 // NewUIGenerationSkill 创建 UI Generation Skill

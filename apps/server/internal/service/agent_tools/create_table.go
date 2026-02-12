@@ -4,16 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
-	"github.com/agentflow/server/internal/service"
+	"github.com/google/uuid"
+
+	"github.com/reverseai/server/internal/service"
 )
 
 type CreateTableTool struct {
 	dbQueryService service.WorkspaceDBQueryService
+	dbService      service.WorkspaceDatabaseService
 }
 
-func NewCreateTableTool(dbQueryService service.WorkspaceDBQueryService) *CreateTableTool {
-	return &CreateTableTool{dbQueryService: dbQueryService}
+func NewCreateTableTool(dbQueryService service.WorkspaceDBQueryService, dbService ...service.WorkspaceDatabaseService) *CreateTableTool {
+	t := &CreateTableTool{dbQueryService: dbQueryService}
+	if len(dbService) > 0 {
+		t.dbService = dbService[0]
+	}
+	return t
 }
 
 func (t *CreateTableTool) Name() string { return "create_table" }
@@ -52,10 +60,11 @@ func (t *CreateTableTool) Parameters() json.RawMessage {
 func (t *CreateTableTool) RequiresConfirmation() bool { return true }
 
 type createTableParams struct {
-	WorkspaceID string                       `json:"workspace_id"`
-	Name        string                       `json:"name"`
-	Columns     []service.CreateColumnDef    `json:"columns"`
-	PrimaryKey  []string                     `json:"primary_key"`
+	WorkspaceID string                    `json:"workspace_id"`
+	UserID      string                    `json:"user_id"`
+	Name        string                    `json:"name"`
+	Columns     []service.CreateColumnDef `json:"columns"`
+	PrimaryKey  []string                  `json:"primary_key"`
 }
 
 func (t *CreateTableTool) Execute(ctx context.Context, params json.RawMessage) (*service.AgentToolResult, error) {
@@ -70,7 +79,19 @@ func (t *CreateTableTool) Execute(ctx context.Context, params json.RawMessage) (
 		PrimaryKey: p.PrimaryKey,
 	}
 
-	if err := t.dbQueryService.CreateTable(ctx, p.WorkspaceID, req); err != nil {
+	err := t.dbQueryService.CreateTable(ctx, p.WorkspaceID, req)
+	if err != nil && t.dbService != nil && (strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "not ready")) {
+		// Auto-provision the database
+		wsID, _ := uuid.Parse(p.WorkspaceID)
+		userID, _ := uuid.Parse(p.UserID)
+		if wsID != uuid.Nil && userID != uuid.Nil {
+			if _, provErr := t.dbService.Provision(ctx, wsID, userID); provErr == nil {
+				// Retry creating the table after provisioning
+				err = t.dbQueryService.CreateTable(ctx, p.WorkspaceID, req)
+			}
+		}
+	}
+	if err != nil {
 		return &service.AgentToolResult{
 			Success: false,
 			Error:   fmt.Sprintf("failed to create table %q: %v", p.Name, err),

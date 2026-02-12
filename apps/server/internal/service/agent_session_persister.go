@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
-	"github.com/agentflow/server/internal/repository"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
+	"github.com/reverseai/server/internal/repository"
 )
 
 // agentSessionPersisterAdapter bridges AgentSessionPersister (service layer)

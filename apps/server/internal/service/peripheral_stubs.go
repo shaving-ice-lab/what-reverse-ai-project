@@ -2,24 +2,39 @@ package service
 
 // peripheral_stubs.go
 // 此文件保留被移除的周边模块的接口定义和类型，以确保核心服务编译通过。
-// 这些模块（计费、域名、导出等）的实现已移除，后续需要时再重新开发。
+// 实体已清理，这里使用内联占位类型。
 
 import (
 	"context"
 	"errors"
 	"time"
 
-	"github.com/agentflow/server/internal/domain/entity"
 	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/domain/entity"
 )
 
 // ==================== Billing Stubs ====================
 
+// BillingPlanStub 计费计划占位类型
+type BillingPlanStub struct {
+	ID     uuid.UUID              `json:"id"`
+	Name   string                 `json:"name"`
+	Policy map[string]interface{} `json:"policy"`
+}
+
+// WorkspaceQuotaStub 配额占位类型
+type WorkspaceQuotaStub struct {
+	WorkspaceID uuid.UUID              `json:"workspace_id"`
+	Limits      map[string]interface{} `json:"limits"`
+	Usage       map[string]interface{} `json:"usage"`
+	PeriodEnd   time.Time              `json:"period_end"`
+}
+
 // BillingService 计费与配额服务接口（已冻结，后续再接入）
 type BillingService interface {
 	ListDimensions(ctx context.Context) []BillingDimension
-	ListPlans(ctx context.Context) ([]entity.BillingPlan, error)
-	GetWorkspaceQuota(ctx context.Context, ownerID, workspaceID uuid.UUID) (*entity.WorkspaceQuota, *entity.BillingPlan, error)
+	ListPlans(ctx context.Context) ([]BillingPlanStub, error)
+	GetWorkspaceQuota(ctx context.Context, ownerID, workspaceID uuid.UUID) (*WorkspaceQuotaStub, *BillingPlanStub, error)
 	ConsumeUsage(ctx context.Context, ownerID, workspaceID uuid.UUID, req ConsumeUsageRequest) (*ConsumeUsageResult, error)
 	GetWorkspaceUsageStats(ctx context.Context, ownerID, workspaceID uuid.UUID, periodStart, periodEnd time.Time) (*entity.WorkspaceUsageStats, error)
 }
@@ -40,13 +55,13 @@ type ConsumeUsageRequest struct {
 
 // ConsumeUsageResult 用量扣减结果
 type ConsumeUsageResult struct {
-	Quota      *entity.WorkspaceQuota `json:"quota"`
-	Plan       *entity.BillingPlan    `json:"plan"`
-	Allowed    bool                   `json:"allowed"`
-	Exceeded   []string               `json:"exceeded"`
-	CostAmount float64                `json:"cost_amount"`
-	Currency   string                 `json:"currency"`
-	Budget     *BudgetStatus          `json:"budget,omitempty"`
+	Quota      *WorkspaceQuotaStub `json:"quota"`
+	Plan       *BillingPlanStub    `json:"plan"`
+	Allowed    bool                `json:"allowed"`
+	Exceeded   []string            `json:"exceeded"`
+	CostAmount float64             `json:"cost_amount"`
+	Currency   string              `json:"currency"`
+	Budget     *BudgetStatus       `json:"budget,omitempty"`
 }
 
 // BudgetStatus 预算状态
@@ -159,6 +174,7 @@ func resolveDataClassificationRequirement(classification string) dataClassificat
 // ==================== Misc Error Stubs ====================
 
 var (
+	ErrUnauthorized    = errors.New("unauthorized")
 	ErrSlugExists      = errors.New("slug already exists")
 	ErrInvalidRating   = errors.New("invalid rating")
 	ErrAlreadyReviewed = errors.New("already reviewed")
@@ -169,11 +185,3 @@ var (
 func startOfDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
-
-// ==================== Metrics Stubs ====================
-
-// MetricsService 指标服务接口（已冻结）
-type MetricsService interface{}
-
-// ModelUsageService 模型用量服务接口（已冻结）
-type ModelUsageService interface{}

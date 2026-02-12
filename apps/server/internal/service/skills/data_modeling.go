@@ -1,24 +1,31 @@
 package skills
 
 import (
-	"github.com/agentflow/server/internal/service"
-	"github.com/agentflow/server/internal/service/agent_tools"
+	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/service/agent_tools"
 )
 
 // NewDataModelingSkill 创建 Data Modeling Skill
-func NewDataModelingSkill(dbQueryService service.WorkspaceDBQueryService) *service.Skill {
+func NewDataModelingSkill(dbQueryService service.WorkspaceDBQueryService, dbService ...service.WorkspaceDatabaseService) *service.Skill {
+	var dbs service.WorkspaceDatabaseService
+	if len(dbService) > 0 {
+		dbs = dbService[0]
+	}
 	return &service.Skill{
 		ID:          "builtin_data_modeling",
 		Name:        "Data Modeling",
-		Description: "Design and manage database schemas. Create tables, modify structures, insert seed data, and query data with visual SQL builder support.",
+		Description: "Design and manage database schemas. Create tables, modify structures, insert seed data, and query data.",
 		Category:    service.SkillCategoryDataModeling,
 		Icon:        "Database",
 		Builtin:     true,
 		Enabled:     true,
 		Tools: []service.AgentTool{
-			agent_tools.NewCreateTableTool(dbQueryService),
+			agent_tools.NewCreateTableTool(dbQueryService, dbs),
 			agent_tools.NewAlterTableTool(dbQueryService),
+			agent_tools.NewDeleteTableTool(dbQueryService),
 			agent_tools.NewInsertDataTool(dbQueryService),
+			agent_tools.NewUpdateDataTool(dbQueryService),
+			agent_tools.NewDeleteDataTool(dbQueryService),
 			agent_tools.NewQueryDataTool(dbQueryService),
 		},
 		SystemPromptAddition: `You are an expert database architect. When designing data models:

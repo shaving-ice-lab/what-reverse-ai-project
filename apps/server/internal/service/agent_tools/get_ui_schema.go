@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/agentflow/server/internal/service"
+	"github.com/reverseai/server/internal/service"
 )
 
 type GetUISchemaTool struct {

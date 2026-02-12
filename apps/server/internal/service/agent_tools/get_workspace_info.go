@@ -5,30 +5,25 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/agentflow/server/internal/repository"
-	"github.com/agentflow/server/internal/service"
-	"github.com/google/uuid"
+	"github.com/reverseai/server/internal/service"
 )
 
 type GetWorkspaceInfoTool struct {
-	dbQueryService  service.WorkspaceDBQueryService
-	workflowService service.WorkflowService
+	dbQueryService service.WorkspaceDBQueryService
 }
 
 func NewGetWorkspaceInfoTool(
 	dbQueryService service.WorkspaceDBQueryService,
-	workflowService service.WorkflowService,
 ) *GetWorkspaceInfoTool {
 	return &GetWorkspaceInfoTool{
-		dbQueryService:  dbQueryService,
-		workflowService: workflowService,
+		dbQueryService: dbQueryService,
 	}
 }
 
 func (t *GetWorkspaceInfoTool) Name() string { return "get_workspace_info" }
 
 func (t *GetWorkspaceInfoTool) Description() string {
-	return "Get information about the current workspace: database tables (with columns), workflows, and database stats. Use this to understand the current state before making changes."
+	return "Get information about the current workspace: database tables (with columns) and database stats. Use this to understand the current state before making changes."
 }
 
 func (t *GetWorkspaceInfoTool) Parameters() json.RawMessage {
@@ -36,9 +31,8 @@ func (t *GetWorkspaceInfoTool) Parameters() json.RawMessage {
 		"type": "object",
 		"properties": {
 			"workspace_id": {"type": "string", "description": "Workspace ID"},
-			"user_id": {"type": "string", "description": "User ID (UUID) for listing workflows"},
+			"user_id": {"type": "string", "description": "User ID"},
 			"include_tables": {"type": "boolean", "default": true, "description": "Include database table info"},
-			"include_workflows": {"type": "boolean", "default": true, "description": "Include workflow list"},
 			"include_stats": {"type": "boolean", "default": false, "description": "Include database stats"}
 		},
 		"required": ["workspace_id", "user_id"]
@@ -48,11 +42,10 @@ func (t *GetWorkspaceInfoTool) Parameters() json.RawMessage {
 func (t *GetWorkspaceInfoTool) RequiresConfirmation() bool { return false }
 
 type getWorkspaceInfoParams struct {
-	WorkspaceID      string `json:"workspace_id"`
-	UserID           string `json:"user_id"`
-	IncludeTables    *bool  `json:"include_tables"`
-	IncludeWorkflows *bool  `json:"include_workflows"`
-	IncludeStats     *bool  `json:"include_stats"`
+	WorkspaceID   string `json:"workspace_id"`
+	UserID        string `json:"user_id"`
+	IncludeTables *bool  `json:"include_tables"`
+	IncludeStats  *bool  `json:"include_stats"`
 }
 
 func boolDefault(b *bool, def bool) bool {
@@ -102,33 +95,6 @@ func (t *GetWorkspaceInfoTool) Execute(ctx context.Context, params json.RawMessa
 			}
 			result["tables"] = tableInfos
 			summaryParts = append(summaryParts, fmt.Sprintf("%d tables", len(tables)))
-		}
-	}
-
-	// Workflows
-	if boolDefault(p.IncludeWorkflows, true) {
-		userID, err := uuid.Parse(p.UserID)
-		if err == nil {
-			workflows, _, err := t.workflowService.List(ctx, userID, repository.ListParams{
-				Page:     1,
-				PageSize: 50,
-			})
-			if err != nil {
-				result["workflows_error"] = err.Error()
-			} else {
-				wfInfos := make([]map[string]interface{}, 0, len(workflows))
-				for _, wf := range workflows {
-					wfInfos = append(wfInfos, map[string]interface{}{
-						"id":          wf.ID.String(),
-						"name":        wf.Name,
-						"description": wf.Description,
-						"status":      wf.Status,
-						"updated_at":  wf.UpdatedAt,
-					})
-				}
-				result["workflows"] = wfInfos
-				summaryParts = append(summaryParts, fmt.Sprintf("%d workflows", len(workflows)))
-			}
 		}
 	}
 
