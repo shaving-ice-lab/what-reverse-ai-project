@@ -1,5 +1,5 @@
 /**
- * AgentFlow SDK 核心类型定义
+ * ReverseAI SDK 核心类型定义
  */
 
 // ===== 基础类型 =====

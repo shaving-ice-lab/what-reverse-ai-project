@@ -1,16 +1,16 @@
 {
   "name": "{{projectName}}",
   "version": "1.0.0",
-  "description": "基础 AgentFlow 自定义节点",
+  "description": "基础 ReverseAI 自定义节点",
   "author": "{{author}}",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "agentflow": {
+  "reverseai": {
     "type": "node",
     "category": "custom",
     "icon": "puzzle",
     "minSdkVersion": "0.1.0"
   },
-  "keywords": ["agentflow", "node", "custom"]
+  "keywords": ["reverseai", "node", "custom"]
 }

@@ -37,10 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `runTestSuite()` - 运行测试套件
 
 - **CLI Tools**
-  - `agentflow init` - 初始化节点项目
-  - `agentflow build` - 构建节点
-  - `agentflow test` - 运行测试
-  - `agentflow validate` - 验证节点定义
+  - `reverseai init` - 初始化节点项目
+  - `reverseai build` - 构建节点
+  - `reverseai test` - 运行测试
+  - `reverseai validate` - 验证节点定义
 
 - **Example Nodes**
   - `textTransformNode` - 文本转换示例

@@ -1,11 +1,11 @@
 /**
- * @agentflow/sdk
+ * @reverseai/sdk
  *
- * AgentFlow 自定义节点 SDK
+ * ReverseAI 自定义节点 SDK
  *
  * @example
  * ```typescript
- * import { defineNode, input, output } from '@agentflow/sdk';
+ * import { defineNode, input, output } from '@reverseai/sdk';
  *
  * export default defineNode({
  *   id: 'my-custom-node',

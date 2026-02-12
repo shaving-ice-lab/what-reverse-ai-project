@@ -1,12 +1,12 @@
 {
-  "name": "@agentflow/sdk",
+  "name": "@reverseai/sdk",
   "version": "0.1.0",
-  "description": "AgentFlow 自定义节点 SDK",
+  "description": "ReverseAI 自定义节点 SDK",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "bin": {
-    "agentflow": "./dist/cli/index.js"
+    "reverseai": "./dist/cli/index.js"
   },
   "exports": {
     ".": {
@@ -33,18 +33,18 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
-    "agentflow",
+    "reverseai",
     "sdk",
     "workflow",
     "node",
     "plugin",
     "cli"
   ],
-  "author": "AgentFlow Team",
+  "author": "ReverseAI Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentflow/agentflow.git",
+    "url": "https://github.com/reverseai/reverseai.git",
     "directory": "packages/sdk"
   },
   "dependencies": {

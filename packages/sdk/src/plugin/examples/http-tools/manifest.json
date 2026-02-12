@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "HTTP 工具插件，提供 API 测试和请求记录功能",
   "author": {
-    "name": "AgentFlow Team"
+    "name": "ReverseAI Team"
   },
   "category": "development",
   "icon": "globe",

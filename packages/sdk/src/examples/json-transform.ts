@@ -13,7 +13,7 @@ export const jsonTransformNode = defineNode({
   icon: 'code',
   category: 'data',
   version: '1.0.0',
-  author: 'AgentFlow',
+  author: 'ReverseAI',
   tags: ['JSON', '数据', '转换'],
 
   inputs: {

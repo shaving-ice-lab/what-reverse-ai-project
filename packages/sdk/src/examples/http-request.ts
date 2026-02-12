@@ -13,7 +13,7 @@ export const httpRequestNode = defineNode({
   icon: 'globe',
   category: 'integration',
   version: '1.0.0',
-  author: 'AgentFlow',
+  author: 'ReverseAI',
   tags: ['HTTP', 'API', '网络'],
 
   inputs: {

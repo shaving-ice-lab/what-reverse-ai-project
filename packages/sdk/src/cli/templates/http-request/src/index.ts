@@ -4,7 +4,7 @@
  * 提供灵活的 HTTP 请求功能，支持各种 API 集成场景。
  */
 
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export default defineNode({
   id: '{{nodeId}}',

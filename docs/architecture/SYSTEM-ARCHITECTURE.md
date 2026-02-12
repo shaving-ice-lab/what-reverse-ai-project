@@ -262,7 +262,7 @@
 ```
 Region: ap-east-1
 ├── Load Balancer (ALB)
-│   ├── *.agentflow.ai → Web/API
+│   ├── *.reverseai.ai → Web/API
 │   └── Custom domains → Runtime
 ├── Web Server (ECS/K8s)
 │   └── 2+ replicas
@@ -320,4 +320,4 @@ Global
 
 | 日期       | 版本 | 变更内容 | 作者           |
 | ---------- | ---- | -------- | -------------- |
-| 2026-02-03 | v1.0 | 初始版本 | AgentFlow Team |
+| 2026-02-03 | v1.0 | 初始版本 | ReverseAI Team |

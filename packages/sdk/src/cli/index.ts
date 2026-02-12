@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * AgentFlow SDK CLI
+ * ReverseAI SDK CLI
  *
  * 命令行工具用于创建、构建、测试和发布自定义节点
  */
@@ -16,7 +16,7 @@ import { VERSION } from '../index'
 
 const program = new Command()
 
-program.name('agentflow').description('AgentFlow SDK CLI - 创建和管理自定义节点').version(VERSION)
+program.name('reverseai').description('ReverseAI SDK CLI - 创建和管理自定义节点').version(VERSION)
 
 // 初始化项目
 program
@@ -72,9 +72,9 @@ program
 // 发布节点
 program
   .command('publish')
-  .description('发布节点/插件到 AgentFlow 市场')
-  .option('-r, --registry <url>', '市场 API 地址，也可通过环境变量 AGENTFLOW_MARKETPLACE_URL 配置')
-  .option('-t, --token <token>', '发布令牌，可通过环境变量 AGENTFLOW_PUBLISH_TOKEN 配置')
+  .description('发布节点/插件到 ReverseAI 市场')
+  .option('-r, --registry <url>', '市场 API 地址，也可通过环境变量 REVERSEAI_MARKETPLACE_URL 配置')
+  .option('-t, --token <token>', '发布令牌，可通过环境变量 REVERSEAI_PUBLISH_TOKEN 配置')
   .option('-m, --manifest <path>', '自定义 manifest 路径，默认使用项目根目录的 manifest.json')
   .option('--skip-build', '跳过构建步骤')
   .action((opts) => {

@@ -1,10 +1,10 @@
 /**
  * {{projectName}} - 基础自定义节点
  *
- * 这是一个最小可运行的节点模板，展示了 AgentFlow SDK 的基本用法。
+ * 这是一个最小可运行的节点模板，展示了 ReverseAI SDK 的基本用法。
  */
 
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export default defineNode({
   id: '{{nodeId}}',

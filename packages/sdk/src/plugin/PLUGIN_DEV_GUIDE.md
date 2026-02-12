@@ -1,6 +1,6 @@
-# AgentFlow 插件开发指南
+# ReverseAI 插件开发指南
 
-本指南将帮助您开发 AgentFlow 插件，扩展平台功能。
+本指南将帮助您开发 ReverseAI 插件，扩展平台功能。
 
 ## 目录
 
@@ -24,7 +24,7 @@
 ```bash
 mkdir my-plugin && cd my-plugin
 npm init -y
-npm install @agentflow/sdk typescript tsup --save-dev
+npm install @reverseai/sdk typescript tsup --save-dev
 ```
 
 ### 2. 配置 TypeScript
@@ -71,7 +71,7 @@ npm install @agentflow/sdk typescript tsup --save-dev
 创建 `src/index.ts`:
 
 ```typescript
-import type { PluginContext, PluginAPI, PluginModule } from '@agentflow/sdk/plugin'
+import type { PluginContext, PluginAPI, PluginModule } from '@reverseai/sdk/plugin'
 
 export async function activate(context: PluginContext, api: PluginAPI): Promise<void> {
   context.log.info('插件已激活')
@@ -178,15 +178,15 @@ my-plugin/
   "version": "2.0.0",
   "description": "高级 HTTP 请求工具",
   "author": {
-    "name": "AgentFlow Team",
-    "email": "team@agentflow.dev",
-    "url": "https://agentflow.dev"
+    "name": "ReverseAI Team",
+    "email": "team@reverseai.dev",
+    "url": "https://reverseai.dev"
   },
   "category": "integration",
   "icon": "globe",
   "keywords": ["http", "api", "rest", "request"],
   "license": "MIT",
-  "repository": "https://github.com/agentflow/advanced-http",
+  "repository": "https://github.com/reverseai/advanced-http",
   "main": "dist/index.js",
   "permissions": ["network", "storage", "notifications"],
   "nodes": [
@@ -206,7 +206,7 @@ my-plugin/
       "key": "userAgent",
       "title": "User-Agent",
       "type": "string",
-      "default": "AgentFlow/1.0"
+      "default": "ReverseAI/1.0"
     }
   ],
   "contributes": {
@@ -413,7 +413,7 @@ api.events.once('app:ready', () => {
 ### 节点定义
 
 ```typescript
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export const myNode = defineNode({
   id: 'my-plugin.transform',
@@ -550,7 +550,7 @@ export const myNode = defineNode({
 
 ```typescript
 import { describe, it, expect } from 'vitest'
-import { createTestContext, NodeTester, assert } from '@agentflow/sdk/testing'
+import { createTestContext, NodeTester, assert } from '@reverseai/sdk/testing'
 import { myNode } from './nodes/transform'
 
 describe('Transform Node', () => {
@@ -595,7 +595,7 @@ npm run build
 npm pack
 
 # 使用 CLI 发布
-agentflow plugin publish
+reverseai plugin publish
 ```
 
 ### 版本更新
@@ -605,7 +605,7 @@ agentflow plugin publish
 npm version patch  # 或 minor / major
 
 # 重新发布
-agentflow plugin publish
+reverseai plugin publish
 ```
 
 ---
@@ -687,5 +687,5 @@ export async function activate(context: PluginContext, api: PluginAPI) {
 
 - [API 参考文档](./API_REFERENCE.md)
 - [示例插件](./examples/)
-- [GitHub 讨论区](https://github.com/agentflow/sdk/discussions)
-- [问题反馈](https://github.com/agentflow/sdk/issues)
+- [GitHub 讨论区](https://github.com/reverseai/sdk/discussions)
+- [问题反馈](https://github.com/reverseai/sdk/issues)

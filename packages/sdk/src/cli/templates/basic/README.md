@@ -1,6 +1,6 @@
 # {{projectName}}
 
-AgentFlow 自定义节点 - 基础模板
+ReverseAI 自定义节点 - 基础模板
 
 ## 功能
 
@@ -39,8 +39,8 @@ npm run build
 ## 发布
 
 ```bash
-# 发布到 AgentFlow 市场
-agentflow publish
+# 发布到 ReverseAI 市场
+reverseai publish
 ```
 
 ## 使用示例

@@ -1,15 +1,15 @@
-# @agentflow/sdk
+# @reverseai/sdk
 
-AgentFlow 自定义节点 SDK - 用于创建可在 AgentFlow 平台运行的自定义工作流节点。
+ReverseAI 自定义节点 SDK - 用于创建可在 ReverseAI 平台运行的自定义工作流节点。
 
 ## 安装
 
 ```bash
-npm install @agentflow/sdk
+npm install @reverseai/sdk
 # 或
-pnpm add @agentflow/sdk
+pnpm add @reverseai/sdk
 # 或
-yarn add @agentflow/sdk
+yarn add @reverseai/sdk
 ```
 
 ## 快速开始
@@ -17,7 +17,7 @@ yarn add @agentflow/sdk
 ### 1. 创建基础节点
 
 ```typescript
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export default defineNode({
   id: 'text-transform',
@@ -58,7 +58,7 @@ export default defineNode({
 SDK 提供了流畅的 API 来定义输入字段：
 
 ```typescript
-import { input } from '@agentflow/sdk'
+import { input } from '@reverseai/sdk'
 
 // 字符串输入
 input.string('姓名').required().minLength(2).maxLength(50).placeholder('请输入姓名').build()
@@ -97,7 +97,7 @@ input.string('代码').code().multiline().build()
 ### 3. 使用输出构建器
 
 ```typescript
-import { output } from '@agentflow/sdk'
+import { output } from '@reverseai/sdk'
 
 // 字符串输出
 output.string('结果').build()
@@ -112,7 +112,7 @@ output.string('错误信息').optional().build()
 ### 4. 验证规则
 
 ```typescript
-import { input, validators } from '@agentflow/sdk'
+import { input, validators } from '@reverseai/sdk'
 
 // 内置验证
 input
@@ -202,7 +202,7 @@ async execute(ctx) {
 SDK 提供完整的测试框架：
 
 ```typescript
-import { createNodeTester, assert, runTestSuite } from '@agentflow/sdk'
+import { createNodeTester, assert, runTestSuite } from '@reverseai/sdk'
 import myNode from './my-node'
 
 // 方式 1: 使用测试器
@@ -238,7 +238,7 @@ console.log(`通过: ${suiteResult.passed}, 失败: ${suiteResult.failed}`)
 ## 验证
 
 ```typescript
-import { validateAllInputs, validateNodeDefinition } from '@agentflow/sdk'
+import { validateAllInputs, validateNodeDefinition } from '@reverseai/sdk'
 
 // 验证输入值
 const result = validateAllInputs(node.inputs, {
@@ -261,7 +261,7 @@ const defResult = validateNodeDefinition({
 ## 错误处理
 
 ```typescript
-import { ExecutionError, ConfigurationError } from '@agentflow/sdk';
+import { ExecutionError, ConfigurationError } from '@reverseai/sdk';
 
 async execute(ctx) {
   // 抛出执行错误
@@ -284,7 +284,7 @@ async execute(ctx) {
 SDK 提供完整的 TypeScript 支持：
 
 ```typescript
-import { defineNode, input, output, NodeExecutionContext } from '@agentflow/sdk'
+import { defineNode, input, output, NodeExecutionContext } from '@reverseai/sdk'
 
 // 输入输出类型会自动推断
 const node = defineNode({

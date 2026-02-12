@@ -1,4 +1,4 @@
-# ReverseAI（AgentFlow）文档中心
+# ReverseAI（ReverseAI）文档中心
 
 > **当前方向**：工作流应用平台（Workspace + App + 独立数据库 + 公开访问/域名）  
 > **唯一计划入口**：`docs/development/DEV-PLAN-WORKSPACE-APP-PLATFORM.md`  
@@ -93,5 +93,5 @@ docs/
 
 ## 相关链接
 
-- **设计规范**：`../design-system/agentflow/`
+- **设计规范**：`../design-system/reverseai/`
 - **SDK 包说明**：`../packages/sdk/README.md`

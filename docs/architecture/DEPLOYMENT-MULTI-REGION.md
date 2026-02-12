@@ -49,8 +49,8 @@ deployment:
     - 'us-east-1'
     - 'eu-west-1'
   region_base_urls:
-    us-east-1: 'https://us-east-1.api.agentflow.ai'
-    eu-west-1: 'https://eu-west-1.api.agentflow.ai'
+    us-east-1: 'https://us-east-1.api.reverseai.ai'
+    eu-west-1: 'https://eu-west-1.api.reverseai.ai'
 ```
 
 Notes:
@@ -58,7 +58,7 @@ Notes:
 - `deployment.region` is the current running region.
 - `deployment.regions` is the list of supported regions.
 - `deployment.region_base_urls` is used for routing discovery.
-- `AGENTFLOW_DEPLOYMENT_REGIONS` can override the list (comma-separated).
+- `REVERSEAI_DEPLOYMENT_REGIONS` can override the list (comma-separated).
 
 ## Rollout Checklist
 

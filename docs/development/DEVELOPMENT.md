@@ -1,4 +1,4 @@
-# AgentFlow 开发文档
+# ReverseAI 开发文档
 
 > **文档版本**: v3.26  
 > **创建日期**: 2026-01-26  
@@ -315,7 +315,7 @@
 
 ### 1.1 产品简介
 
-AgentFlow 是一个本地优先、代码级自定义、社区驱动的 AI Agent 工作流平台，核心功能包括：
+ReverseAI 是一个本地优先、代码级自定义、社区驱动的 AI Agent 工作流平台，核心功能包括：
 
 - 可视化 Workflow 编辑器
 - AI Agent 商店
@@ -426,7 +426,7 @@ CI/CD:
 ### 3.1 整体目录结构
 
 ```
-agentflow/
+reverseai/
 ├── frontend/                 # Next.js 前端项目
 │   ├── src/
 │   │   ├── app/              # App Router 页面
@@ -621,8 +621,8 @@ backend/
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/your-org/agentflow.git
-cd agentflow
+git clone https://github.com/your-org/reverseai.git
+cd reverseai
 
 # 2. 安装前端依赖
 cd frontend
@@ -679,7 +679,7 @@ database:
   port: 5432
   user: postgres
   password: postgres
-  name: agentflow
+  name: reverseai
   ssl_mode: disable
 
 redis:
@@ -783,7 +783,7 @@ ai:
 **详细任务说明：**
 
 - [x] **FE-001: 创建 Next.js 16 项目** 🔴 P0 ✅
-  - **命令**: `pnpm create next-app@canary agentflow-web --typescript --app --tailwind`
+  - **命令**: `pnpm create next-app@canary reverseai-web --typescript --app --tailwind`
   - **验收标准**:
     - ✓ 项目可正常启动 `pnpm dev`
     - ✓ 使用 App Router 架构
@@ -952,7 +952,7 @@ ai:
     - ✓ Makefile 编写完成
   - **目录结构**:
     ```
-    agentflow-server/
+    reverseai-server/
     ├── cmd/
     │   ├── server/main.go     # 主服务入口
     │   └── migrate/main.go    # 迁移工具
@@ -1058,7 +1058,7 @@ ai:
     database:
       host: 'localhost'
       port: 5432
-      name: 'agentflow'
+      name: 'reverseai'
       user: 'postgres'
       password: ''
       sslmode: 'disable'
@@ -1113,7 +1113,7 @@ ai:
       postgres:
         image: postgres:16-alpine
         environment:
-          POSTGRES_DB: agentflow
+          POSTGRES_DB: reverseai
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
@@ -1553,7 +1553,7 @@ ai:
     - ✓ 支持 GET/POST 方法
     - ✓ Payload 解析 (JSON, Form)
     - ✓ IP 白名单 (可选)
-  - **Webhook URL 格式**: `https://api.agentflow.ai/webhooks/{workflow_id}/{node_id}`
+  - **Webhook URL 格式**: `https://api.reverseai.ai/webhooks/{workflow_id}/{node_id}`
   - **实现文件**:
     - 前端: `apps/web/src/components/editor/nodes/WebhookNode.tsx`
     - 后端: `apps/server/internal/pkg/executor/webhook_executor.go`
@@ -2016,7 +2016,7 @@ ai:
 | SDK-006 | 编写 SDK 使用文档            | 🟠 P1  | ✅   | SDK-002     | 8h   |
 | SDK-007 | 提供示例节点                 | 🟠 P1  | ✅   | SDK-002     | 8h   |
 | SDK-008 | 实现 CLI 工具                | 🟠 P1  | ✅   | SDK-002     | 12h  |
-| SDK-009 | 发布 npm 包 (@agentflow/sdk) | 🔴 P0  | ✅   | SDK-001~008 | 4h   |
+| SDK-009 | 发布 npm 包 (@reverseai/sdk) | 🔴 P0  | ✅   | SDK-001~008 | 4h   |
 
 **详细任务说明：**
 
@@ -2029,7 +2029,7 @@ ai:
 
     ```typescript
     // 创建节点定义
-    import { defineNode, input, output } from '@agentflow/sdk'
+    import { defineNode, input, output } from '@reverseai/sdk'
 
     export default defineNode({
       id: 'my-custom-node',
@@ -2061,10 +2061,10 @@ ai:
 
 - [x] **SDK-008: 实现 CLI 工具** 🟠 P1
   - **验收标准**:
-    - ✓ `agentflow init` - 初始化节点项目
-    - ✓ `agentflow build` - 构建节点
-    - ✓ `agentflow test` - 运行测试
-    - ✓ `agentflow publish` - 发布节点
+    - ✓ `reverseai init` - 初始化节点项目
+    - ✓ `reverseai build` - 构建节点
+    - ✓ `reverseai test` - 运行测试
+    - ✓ `reverseai publish` - 发布节点
   - **项目模板结构**:
     ```
     my-custom-node/
@@ -2718,7 +2718,7 @@ Response:
 
 ```yaml
 # 连接
-ws://api.agentflow.app/ws?token=<jwt>
+ws://api.reverseai.app/ws?token=<jwt>
 
 # 订阅执行状态
 Client -> Server:
@@ -3024,7 +3024,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: agentflow
+      POSTGRES_DB: reverseai
 
   redis:
     image: redis:7
@@ -3100,7 +3100,7 @@ jobs:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     @agentflow/sdk 架构                                  │
+│                     @reverseai/sdk 架构                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌─────────────────────────────────────────────────────────────────┐   │
@@ -3131,7 +3131,7 @@ jobs:
 ### 11.2 节点定义接口
 
 ```typescript
-// @agentflow/sdk/types.ts
+// @reverseai/sdk/types.ts
 
 /**
  * 节点定义主接口
@@ -3219,7 +3219,7 @@ export type Permission =
 ### 11.3 输入输出类型系统
 
 ```typescript
-// @agentflow/sdk/inputs.ts
+// @reverseai/sdk/inputs.ts
 
 /**
  * 输入类型构建器
@@ -3432,7 +3432,7 @@ interface CodeInputOptions extends BaseInputOptions {
 ### 11.4 执行上下文 (NodeContext)
 
 ```typescript
-// @agentflow/sdk/context.ts
+// @reverseai/sdk/context.ts
 
 /**
  * 节点执行上下文 - 提供运行时能力
@@ -3645,7 +3645,7 @@ interface LLMChatResponse {
 
 ```typescript
 // examples/translator-node.ts
-import { defineNode, Input, Output, NodeContext, ValidationError } from '@agentflow/sdk'
+import { defineNode, Input, Output, NodeContext, ValidationError } from '@reverseai/sdk'
 
 /**
  * 多语言翻译节点
@@ -3653,15 +3653,15 @@ import { defineNode, Input, Output, NodeContext, ValidationError } from '@agentf
  */
 export default defineNode({
   // ===== 元数据 =====
-  id: 'agentflow/translator',
+  id: 'reverseai/translator',
   name: '多语言翻译器',
   description: '使用 AI 将文本翻译成目标语言，支持自动语言检测',
   icon: '🌐',
   category: 'ai',
   version: '1.0.0',
-  author: 'agentflow',
+  author: 'reverseai',
   keywords: ['翻译', 'translate', 'language', '多语言'],
-  documentation: 'https://docs.agentflow.app/nodes/translator',
+  documentation: 'https://docs.reverseai.app/nodes/translator',
 
   // ===== 输入定义 =====
   inputs: {
@@ -3958,7 +3958,7 @@ function countWords(text: string, lang: string): number {
 ### 11.6 SDK 工程结构
 
 ```
-@agentflow/sdk/
+@reverseai/sdk/
 ├── src/
 │   ├── index.ts              # 主入口，导出所有公开 API
 │   ├── define.ts             # defineNode 函数
@@ -4020,7 +4020,7 @@ function countWords(text: string, lang: string): number {
 
 ### 12.1 模板引擎概述
 
-AgentFlow Prompt 模板引擎是一个专为 AI Prompt 设计的 DSL（领域特定语言），支持变量插值、条件逻辑、循环、过滤器和模板继承。
+ReverseAI Prompt 模板引擎是一个专为 AI Prompt 设计的 DSL（领域特定语言），支持变量插值、条件逻辑、循环、过滤器和模板继承。
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -4808,7 +4808,7 @@ func NewPythonSandbox(config PythonSandboxConfig) (*PythonSandbox, error) {
     return &PythonSandbox{
         dockerClient: cli,
         config:       config,
-        imageID:      "agentflow/python-sandbox:latest",
+        imageID:      "reverseai/python-sandbox:latest",
     }, nil
 }
 
@@ -5116,7 +5116,7 @@ interface PluginManifest {
   // ===== 兼容性 =====
   /** 引擎兼容性 */
   engines: {
-    agentflow: string // 如 "^1.0.0"
+    reverseai: string // 如 "^1.0.0"
     node?: string // 如 ">=18"
   }
   /** 平台兼容性 */
@@ -5196,7 +5196,7 @@ interface NodeContribution {
 ### 14.3 插件 API
 
 ```typescript
-// @agentflow/plugin-api
+// @reverseai/plugin-api
 
 /**
  * 插件激活函数
@@ -5448,12 +5448,12 @@ export class PluginLoader {
    * 检查兼容性
    */
   private checkCompatibility(manifest: PluginManifest): void {
-    const currentVersion = getAgentFlowVersion()
+    const currentVersion = getReverseAIVersion()
 
-    if (!semver.satisfies(currentVersion, manifest.engines.agentflow)) {
+    if (!semver.satisfies(currentVersion, manifest.engines.reverseai)) {
       throw new PluginError(
         'INCOMPATIBLE',
-        `插件要求 AgentFlow ${manifest.engines.agentflow}，当前版本 ${currentVersion}`
+        `插件要求 ReverseAI ${manifest.engines.reverseai}，当前版本 ${currentVersion}`
       )
     }
   }
@@ -7542,7 +7542,7 @@ fn main() {
         .setup(|app| {
             // 初始化数据库
             let app_dir = app.path_resolver().app_data_dir().unwrap();
-            let db_path = app_dir.join("agentflow.db");
+            let db_path = app_dir.join("reverseai.db");
             let db = SqliteConnection::open(&db_path)?;
             db.run_migrations()?;
 
@@ -8670,9 +8670,9 @@ class E2EEncryption {
 // public/sw.js
 
 const CACHE_VERSION = 'v1'
-const STATIC_CACHE = `agentflow-static-${CACHE_VERSION}`
-const DYNAMIC_CACHE = `agentflow-dynamic-${CACHE_VERSION}`
-const API_CACHE = `agentflow-api-${CACHE_VERSION}`
+const STATIC_CACHE = `reverseai-static-${CACHE_VERSION}`
+const DYNAMIC_CACHE = `reverseai-dynamic-${CACHE_VERSION}`
+const API_CACHE = `reverseai-api-${CACHE_VERSION}`
 
 // 需要预缓存的静态资源
 const STATIC_ASSETS = [
@@ -8702,7 +8702,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name.startsWith('agentflow-') && name !== STATIC_CACHE)
+          .filter((name) => name.startsWith('reverseai-') && name !== STATIC_CACHE)
           .map((name) => caches.delete(name))
       )
     })
@@ -8839,7 +8839,7 @@ function isApiRequest(url) {
  */
 class OfflineStorage {
   private db: IDBDatabase | null = null
-  private readonly DB_NAME = 'agentflow-offline'
+  private readonly DB_NAME = 'reverseai-offline'
   private readonly DB_VERSION = 1
 
   async initialize(): Promise<void> {

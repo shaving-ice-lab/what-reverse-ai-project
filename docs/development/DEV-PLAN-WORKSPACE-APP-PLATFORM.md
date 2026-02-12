@@ -190,7 +190,7 @@
    - 启用：`POST /api/v1/apps/:id/domains/:domainId/activate`（支持回滚）
 
 2. [x] DNS 验证机制：CNAME/TXT 校验（输出：校验策略；验收：可操作）。
-   - TXT：`_agentflow.<domain>` = `verification_token`
+   - TXT：`_reverseai.<domain>` = `verification_token`
    - CNAME：`<domain>` 指向 `verification.cname_target`（由 base_url 推导）
 
 3. [x] 自动 TLS 证书签发与续期（输出：证书方案；验收：安全可靠）。
@@ -245,7 +245,7 @@
 
 1. [x] 运行时指标：请求数、成功率、耗时、token（输出：指标清单；验收：可监控）。
    - 已落地：运行时入口/Schema/执行请求 Prometheus 指标（runtime.requests_total / runtime.request_duration_seconds），成功率由状态码分布计算
-   - Token 指标来源：execution.token_usage 聚合 + LLM tokens 指标（agentflow_llm_tokens_used_total）
+   - Token 指标来源：execution.token_usage 聚合 + LLM tokens 指标（reverseai_llm_tokens_used_total）
 2. [x] 执行日志链路：App -> Workflow -> Execution（输出：链路规范；验收：可追踪）。
    - 已落地：runtime 执行写入 execution.trigger_data（app_id/app_version_id/workspace_id/workflow_id/session_id），与 execution.workflow_id 形成可追踪链路
 3. [x] 异常告警：DB 创建失败、域名验证失败、执行失败（输出：告警规则；验收：可响应）。
@@ -472,7 +472,7 @@
 1. [x] 绑定入口流程（输出：流程图；验收：可操作）。
    - `POST /api/v1/apps/:id/domains` 提交域名
    - 生成 `verification_token` 并返回 TXT/CNAME 指引
-   - DNS 配置：TXT `_agentflow.<domain>` = token 或 CNAME 指向 `server.base_url` 主机名
+   - DNS 配置：TXT `_reverseai.<domain>` = token 或 CNAME 指向 `server.base_url` 主机名
 
 2. [x] 域名验证与状态流转（输出：状态表；验收：可追踪）。
    - `pending -> verifying -> verified/failed`
@@ -920,7 +920,7 @@ curl -H "Authorization: Bearer <token>" https://<base_url>/api/v1/admin/ops/sops
 ## 48. 兼容性与多环境策略
 
 1. [x] 开发/测试/生产环境隔离（输出：规范；验收：可区分）。
-   - 规范：通过 `AGENTFLOW_ENV` 选择 `config.{env}.yaml` 覆盖基础配置，dev/test/prod 可区分。
+   - 规范：通过 `REVERSEAI_ENV` 选择 `config.{env}.yaml` 覆盖基础配置，dev/test/prod 可区分。
 2. [x] 配置管理与环境变量规范（输出：清单；验收：可维护）。
    - 已新增 `docs/development/CONFIGURATION.md` 与 `apps/server/config/config.example.yaml` 作为清单与模板。
 3. [x] 多地域部署策略（输出：方案；验收：可扩展）。
@@ -1805,7 +1805,7 @@ CREATE TABLE what_reverse_app_versions (
    - app.published / execution.completed / domain.verified
 
 1. [x] Webhook 安全签名（输出：规范；验收：安全）。
-   - 签名：`X-Agentflow-Timestamp` + `X-Agentflow-Signature`（`v1=HMAC_SHA256(secret, timestamp.payload)`）。
+   - 签名：`X-ReverseAI-Timestamp` + `X-ReverseAI-Signature`（`v1=HMAC_SHA256(secret, timestamp.payload)`）。
    - 试投递：`POST /api/v1/webhooks/:id/test`（自动生成签名并回传投递结果）。
 
 1. [x] 常见集成清单（输出：清单；验收：可扩展）。
@@ -2552,7 +2552,7 @@ API 示例（异步入队 / 死信重放）：
 
 1. [x] 系统通知与消息中心（输出：功能清单；验收：可用；已接入通知 API 列表/筛选/已读/删除）。
 1. [x] 关键事件邮件/短信通知（输出：规则；验收：可执行）。
-   - 已实现：关键运行时事件触发邮件/短信通知并写入系统通知（覆盖 execution.failed、db._.failed、domain.verify.failed、cert.issue.failed、quota.exceeded、security.auth*failed、system.error；邮件/短信需配置 `AGENTFLOW_SMTP*_`/`AGENTFLOW*TWILIO*\*`）。
+   - 已实现：关键运行时事件触发邮件/短信通知并写入系统通知（覆盖 execution.failed、db._.failed、domain.verify.failed、cert.issue.failed、quota.exceeded、security.auth*failed、system.error；邮件/短信需配置 `REVERSEAI_SMTP*_`/`REVERSEAI*TWILIO*\*`）。
 1. [x] Webhook 事件重试与投递状态（输出：功能清单；验收：可追踪）。
    - 已实现：记录投递状态与重试，支持列表与手动重试（`GET /api/v1/webhooks/:id/deliveries`、`POST /api/v1/webhooks/:id/deliveries/:deliveryId/retry`）。
 

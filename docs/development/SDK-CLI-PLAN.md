@@ -10,7 +10,7 @@
 ## 现状盘点
 
 - SDK 代码位于 `packages/sdk`，提供 `defineNode`、输入/输出构建器、验证器等能力
-- CLI 入口为 `agentflow`，位于 `packages/sdk/src/cli`
+- CLI 入口为 `reverseai`，位于 `packages/sdk/src/cli`
 - 现有文档：
   - `packages/sdk/README.md`
   - `packages/sdk/src/plugin/PLUGIN_DEV_GUIDE.md`
@@ -33,7 +33,7 @@
 | `validate`    | 校验节点定义   | `--file`、`--strict`                                  |
 | `publish`     | 发布到市场     | `--registry`、`--token`、`--manifest`、`--skip-build` |
 
-> CLI 入口由 `packages/sdk/package.json` 的 `bin.agentflow` 暴露。
+> CLI 入口由 `packages/sdk/package.json` 的 `bin.reverseai` 暴露。
 
 ## SDK 能力规划
 
@@ -44,7 +44,7 @@
 
 ## 模板规划
 
-模板由 `agentflow init --template <name>` 使用，建议落位于：
+模板由 `reverseai init --template <name>` 使用，建议落位于：
 `packages/sdk/src/cli/templates/<name>/`
 
 | 模板           | 目标场景       | 必含文件                                        |
@@ -57,7 +57,7 @@
 
 ## 发布与版本策略
 
-- **发布载体**：NPM 包 `@agentflow/sdk`，内置 `agentflow` CLI
+- **发布载体**：NPM 包 `@reverseai/sdk`，内置 `reverseai` CLI
 - **版本策略**：语义化版本 (SemVer)
 - **发布步骤**：
   1. `pnpm -C packages/sdk build`
@@ -65,8 +65,8 @@
   3. 更新 `CHANGELOG.md`
   4. `pnpm publish`（或 CI 自动发布）
 - **鉴权配置**：
-  - `AGENTFLOW_MARKETPLACE_URL`
-  - `AGENTFLOW_PUBLISH_TOKEN`
+  - `REVERSEAI_MARKETPLACE_URL`
+  - `REVERSEAI_PUBLISH_TOKEN`
 
 ## 文档与示例规划
 
@@ -76,9 +76,9 @@
 
 ## 验收标准（可执行）
 
-1. `agentflow init` 生成的项目可直接 `pnpm install` + `agentflow dev` 跑通
-2. 模板项目 `agentflow validate` 通过，且存在最小测试用例
-3. `agentflow publish` 能基于 token 完成发布请求或模拟请求
+1. `reverseai init` 生成的项目可直接 `pnpm install` + `reverseai dev` 跑通
+2. 模板项目 `reverseai validate` 通过，且存在最小测试用例
+3. `reverseai publish` 能基于 token 完成发布请求或模拟请求
 4. SDK 文档能覆盖创建、调试、测试、发布全链路
 
 ## 风险与回滚

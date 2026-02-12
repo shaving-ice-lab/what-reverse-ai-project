@@ -1,4 +1,4 @@
-# AgentFlow 核心愿景需求开发文档
+# ReverseAI 核心愿景需求开发文档
 
 版本：v2.0
 日期：2026-02-11
@@ -29,22 +29,23 @@
 
 ### 后端已有服务（`apps/server/internal/service/`）
 
-| 服务 | 文件 | 核心能力 |
-|------|------|---------|
-| WorkspaceService | `workspace_service.go` | Workspace CRUD、成员管理、角色权限、版本管理、发布/回滚/归档、访问策略、Marketplace |
-| WorkspaceDatabaseService | `workspace_database_service.go` | 独立 DB Provision（每 workspace 一库）、密钥轮换、迁移、备份/恢复、Schema 迁移审批流程 |
-| WorkspaceDBRuntime | `workspace_db_runtime.go` | 运行时 DB 连接池（`GetConnection`）、访问权限校验（`EnsureAccess`） |
-| WorkspaceDBRoleService | `workspace_db_role_service.go` | DB 角色创建/轮换/撤销 |
-| WorkflowService | `workflow_service.go` | Workflow CRUD、定义（nodes/edges/settings）、变量、触发器 |
-| AIAssistantService | `ai_assistant_service.go` | 意图解析（`ParseIntent`）、Workflow 生成（`GenerateWorkflow`）、对话（`Chat`）、节点建议 |
-| AIOutputProtocol | `ai_output_protocol.go` | AI 输出标准协议（`schema_version` / `workspace_metadata` / `workflow_definition` / `ui_schema` / `db_schema` / `access_policy`）|
-| RuntimeService | `runtime_service.go` | 公开访问执行、匿名会话、降载 |
-| AgentService | `agent_service.go` | Agent 发布/Fork/Use/评价 |
-| ExecutionService | `execution_service.go` | Workflow 执行引擎 |
+| 服务                     | 文件                            | 核心能力                                                                                                                         |
+| ------------------------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| WorkspaceService         | `workspace_service.go`          | Workspace CRUD、成员管理、角色权限、版本管理、发布/回滚/归档、访问策略、Marketplace                                              |
+| WorkspaceDatabaseService | `workspace_database_service.go` | 独立 DB Provision（每 workspace 一库）、密钥轮换、迁移、备份/恢复、Schema 迁移审批流程                                           |
+| WorkspaceDBRuntime       | `workspace_db_runtime.go`       | 运行时 DB 连接池（`GetConnection`）、访问权限校验（`EnsureAccess`）                                                              |
+| WorkspaceDBRoleService   | `workspace_db_role_service.go`  | DB 角色创建/轮换/撤销                                                                                                            |
+| WorkflowService          | `workflow_service.go`           | Workflow CRUD、定义（nodes/edges/settings）、变量、触发器                                                                        |
+| AIAssistantService       | `ai_assistant_service.go`       | 意图解析（`ParseIntent`）、Workflow 生成（`GenerateWorkflow`）、对话（`Chat`）、节点建议                                         |
+| AIOutputProtocol         | `ai_output_protocol.go`         | AI 输出标准协议（`schema_version` / `workspace_metadata` / `workflow_definition` / `ui_schema` / `db_schema` / `access_policy`） |
+| RuntimeService           | `runtime_service.go`            | 公开访问执行、匿名会话、降载                                                                                                     |
+| AgentService             | `agent_service.go`              | Agent 发布/Fork/Use/评价                                                                                                         |
+| ExecutionService         | `execution_service.go`          | Workflow 执行引擎                                                                                                                |
 
 ### 后端已有 API 路由（`apps/server/internal/api/server.go`）
 
 **Workspace Database 已有路由**（挂载在 `/api/v1/workspaces/:id/database/*`）：
+
 - `POST /database` → Provision（支持异步队列）
 - `GET /database` → Get 状态
 - `POST /database/rotate-secret` → 密钥轮换
@@ -64,18 +65,18 @@
 
 ### 前端已有基础设施（`apps/web/src/`）
 
-| 模块 | 路径 | 说明 |
-|------|------|------|
-| Dashboard Layout | `app/(dashboard)/layout.tsx` | Supabase 风格侧边栏 + 顶部导航，Workspace 切换器已实现（`activeWorkspaceId` / `workspaces[]` / `recentWorkspaceIds`） |
-| 页面布局组件 | `components/dashboard/page-layout.tsx` | `PageContainer` / `PageHeader` / `PageWithSidebar` / `SidebarNavItem` / `SidebarNavGroup` / `EmptyState` / `TabNav` |
-| Supabase UI 组件 | `components/dashboard/supabase-ui.tsx` | 已封装的 Supabase 风格 UI 基础组件 |
-| Workspace API Client | `lib/api/workspace.ts` | `Workspace` / `WorkspaceVersion`（含 `ui_schema` / `db_schema`）/ `WorkspaceDomain` / `WorkspaceQuota` 类型定义及 API 方法 |
-| AI API Client | `lib/api/ai.ts` | AI 助手前端 API |
-| Workflow API Client | `lib/api/workflow.ts` | Workflow CRUD / 导入导出 / 发布 |
-| 权限系统 | `lib/permissions.ts` | `workspaceRolePermissions` / `hasWorkspacePermission` |
-| App Builder 页面 | `app/(dashboard)/dashboard/app/[appId]/builder/` | 三栏布局基础框架已存在（`BuilderPageContent`） |
-| Workflow Editor | `app/(dashboard)/dashboard/editor/[id]/` | React Flow 可视化编辑器 |
-| Design System | `.cursor/skills/supabase-style/SKILL.md` | 完整的 Supabase 风格色彩/组件/布局规范 |
+| 模块                 | 路径                                             | 说明                                                                                                                       |
+| -------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard Layout     | `app/(dashboard)/layout.tsx`                     | Supabase 风格侧边栏 + 顶部导航，Workspace 切换器已实现（`activeWorkspaceId` / `workspaces[]` / `recentWorkspaceIds`）      |
+| 页面布局组件         | `components/dashboard/page-layout.tsx`           | `PageContainer` / `PageHeader` / `PageWithSidebar` / `SidebarNavItem` / `SidebarNavGroup` / `EmptyState` / `TabNav`        |
+| Supabase UI 组件     | `components/dashboard/supabase-ui.tsx`           | 已封装的 Supabase 风格 UI 基础组件                                                                                         |
+| Workspace API Client | `lib/api/workspace.ts`                           | `Workspace` / `WorkspaceVersion`（含 `ui_schema` / `db_schema`）/ `WorkspaceDomain` / `WorkspaceQuota` 类型定义及 API 方法 |
+| AI API Client        | `lib/api/ai.ts`                                  | AI 助手前端 API                                                                                                            |
+| Workflow API Client  | `lib/api/workflow.ts`                            | Workflow CRUD / 导入导出 / 发布                                                                                            |
+| 权限系统             | `lib/permissions.ts`                             | `workspaceRolePermissions` / `hasWorkspacePermission`                                                                      |
+| App Builder 页面     | `app/(dashboard)/dashboard/app/[appId]/builder/` | 三栏布局基础框架已存在（`BuilderPageContent`）                                                                             |
+| Workflow Editor      | `app/(dashboard)/dashboard/editor/[id]/`         | React Flow 可视化编辑器                                                                                                    |
+| Design System        | `.cursor/skills/supabase-style/SKILL.md`         | 完整的 Supabase 风格色彩/组件/布局规范                                                                                     |
 
 ### 当前侧边栏导航项（`layout.tsx` L62-74）
 
@@ -501,6 +502,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 ## 技术依赖
 
 ### 已有可直接使用
+
 - Next.js + React + TypeScript + Tailwind CSS + shadcn/ui
 - React Flow（Workflow 画布 + ER 图）
 - Go + Echo v4 + GORM + PostgreSQL + Redis
@@ -512,6 +514,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
   - **Heuristic Fallback**：无 LLM 配置时，基于关键词意图识别自动执行多步操作（支持车队管理/客户反馈/订单/任务管理等场景）
 
 ### 需要新增
+
 - [ ] `@monaco-editor/react` — SQL Editor 增强（可选，当前 Textarea 方案可用）
 - [ ] `@tanstack/react-table` — Table Editor 数据网格增强（可选，当前实现可用）
 - [x] `react-resizable-panels` — Builder 面板拖拽分割（已安装 v4.6.2，使用 `Group` / `Panel` / `Separator`）
@@ -525,6 +528,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 **目标**：用户能在 Workspace 中通过 AI Agent 对话创建一个简单的 CRUD 应用（如车辆管理），数据存储在 Workspace DB 中，并通过 Supabase 风格界面管理数据。
 
 **核心交付**：
+
 - [x] 模块 1.1-1.4（后端表/行 API + 前端 Table Editor + SQL Editor + 概览页）
 - [x] 模块 2.1-2.4（Agent 工具框架 + 多步推理引擎 + SSE 输出 + 前端 Agent 面板）
 - [x] 模块 6.1（侧边栏导航精简）
@@ -535,6 +539,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 **目标**：用户能构建多页面应用，Agent 具备完整的应用构建能力，可在 Builder 中预览。
 
 **核心交付**：
+
 - [x] 模块 3（Agent Flow 增强：节点扩展 + 页面绑定 + 模板）
 - [x] 模块 5（应用渲染引擎：UI Schema 扩展 + AppRenderer + 预览）
 - [x] 模块 7（Builder 工作台增强：面板集成 + 实时协同）
@@ -545,6 +550,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 **目标**：应用可以公开访问，具备完整的运行时能力。
 
 **核心交付**：
+
 - [x] 模块 4（AI Skills 系统）
 - [x] 模块 8（周边功能冻结 + 复用整理）
 - [x] 应用发布流程优化（已有 `WorkspaceService.Publish` + `RuntimeService`，Builder 已整合发布 UI + Pre-publish Checklist）
@@ -593,6 +599,7 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 > "我需要一个客户反馈收集系统，外部用户可以提交反馈，内部团队可以分类处理。"
 
 **Agent 执行流程**：
+
 1. `create_table("feedbacks", [...])` → `create_table("categories", [...])` → `create_table("responses", [...])`
 2. `generate_ui_schema`：公开提交表单页 + 内部管理看板页
 3. `create_workflow`：表单提交 → 写入 DB → 通知
@@ -600,4 +607,4 @@ achievements / activity / admin / analytics / api-keys / app / apps / billing / 
 
 ---
 
-*文档结束。后续进展请在对应 TODO 项目标记 `[x]` 完成状态。*
+_文档结束。后续进展请在对应 TODO 项目标记 `[x]` 完成状态。_

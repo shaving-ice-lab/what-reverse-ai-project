@@ -9,11 +9,11 @@
 1. 代码默认值（`apps/server/internal/config/config.go#setDefaults`）。
 2. `apps/server/config/config.yaml` 基础配置。
 3. `apps/server/config/config.{env}.yaml` 环境覆盖（`env=development|test|production`）。
-4. 环境变量覆盖（服务端使用 `AGENTFLOW_` 前缀）。
+4. 环境变量覆盖（服务端使用 `REVERSEAI_` 前缀）。
 
 说明：
 
-- `env` 的来源为 `AGENTFLOW_ENV` 或 `config.yaml` 顶层 `env` 字段。
+- `env` 的来源为 `REVERSEAI_ENV` 或 `config.yaml` 顶层 `env` 字段。
 - 推荐在 CI/CD 或生产环境使用环境变量覆盖敏感字段。
 
 ## 2. 服务端配置清单（Server）
@@ -21,10 +21,10 @@
 - 配置目录：`apps/server/config/`
 - 完整字段模板：`apps/server/config/config.example.yaml`
 - 环境变量命名规则：
-  - 前缀固定：`AGENTFLOW_`
-  - 规则：`database.host` → `AGENTFLOW_DATABASE_HOST`
-  - 示例：`queue.queues.workflow` → `AGENTFLOW_QUEUE_QUEUES_WORKFLOW`
-  - 示例：`retention.cleanup_interval` → `AGENTFLOW_RETENTION_CLEANUP_INTERVAL`
+  - 前缀固定：`REVERSEAI_`
+  - 规则：`database.host` → `REVERSEAI_DATABASE_HOST`
+  - 示例：`queue.queues.workflow` → `REVERSEAI_QUEUE_QUEUES_WORKFLOW`
+  - 示例：`retention.cleanup_interval` → `REVERSEAI_RETENTION_CLEANUP_INTERVAL`
 
 ### 2.1 核心字段（按分组）
 
@@ -48,7 +48,7 @@
 
 说明：
 
-- `deployment.regions` 可使用 `AGENTFLOW_DEPLOYMENT_REGIONS`（逗号分隔）覆盖。
+- `deployment.regions` 可使用 `REVERSEAI_DEPLOYMENT_REGIONS`（逗号分隔）覆盖。
 
 > 维护规范：新增配置字段时，必须同步更新 `config.example.yaml` 与本清单。
 
@@ -70,9 +70,9 @@
 
 用于 `packages/sdk` CLI 发布命令：
 
-- `AGENTFLOW_MARKETPLACE_URL`: 市场 API 地址
-- `AGENTFLOW_PUBLISH_URL`: 发布地址（优先于 marketplace）
-- `AGENTFLOW_API_BASE`: API 基础地址（兜底）
-- `AGENTFLOW_PUBLISH_TOKEN`: 发布令牌
-- `AGENTFLOW_API_TOKEN`: API 访问令牌
-- `AGENTFLOW_TOKEN`: 访问令牌（兜底）
+- `REVERSEAI_MARKETPLACE_URL`: 市场 API 地址
+- `REVERSEAI_PUBLISH_URL`: 发布地址（优先于 marketplace）
+- `REVERSEAI_API_BASE`: API 基础地址（兜底）
+- `REVERSEAI_PUBLISH_TOKEN`: 发布令牌
+- `REVERSEAI_API_TOKEN`: API 访问令牌
+- `REVERSEAI_TOKEN`: 访问令牌（兜底）

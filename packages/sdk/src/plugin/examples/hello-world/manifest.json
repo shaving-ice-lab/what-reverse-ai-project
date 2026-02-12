@@ -5,8 +5,8 @@
   "version": "1.0.0",
   "description": "一个简单的示例插件，演示插件系统的基本用法",
   "author": {
-    "name": "AgentFlow Team",
-    "email": "team@agentflow.dev"
+    "name": "ReverseAI Team",
+    "email": "team@reverseai.dev"
   },
   "category": "utility",
   "icon": "star",

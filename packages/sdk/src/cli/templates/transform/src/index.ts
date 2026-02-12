@@ -4,7 +4,7 @@
  * 提供灵活的数据转换能力，支持 JSON 路径提取、映射、过滤等操作。
  */
 
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 type TransformOperation = 'extract' | 'map' | 'filter' | 'flatten' | 'group' | 'sort' | 'unique'
 

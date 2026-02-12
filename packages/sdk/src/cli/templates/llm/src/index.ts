@@ -4,7 +4,7 @@
  * 提供灵活的大语言模型调用能力，支持多种模型和自定义提示词。
  */
 
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export default defineNode({
   id: '{{nodeId}}',

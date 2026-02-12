@@ -6,11 +6,11 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "agentflow": {
+  "reverseai": {
     "type": "node",
     "category": "data",
     "icon": "shuffle",
     "minSdkVersion": "0.1.0"
   },
-  "keywords": ["agentflow", "node", "transform", "data", "json"]
+  "keywords": ["reverseai", "node", "transform", "data", "json"]
 }

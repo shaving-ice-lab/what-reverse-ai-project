@@ -9,11 +9,11 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "validate": "agentflow validate",
+    "validate": "reverseai validate",
     "prepublishOnly": "npm run build && npm run validate"
   },
   "keywords": [
-    "agentflow",
+    "reverseai",
     "node",
     "llm",
     "ai"
@@ -21,10 +21,10 @@
   "author": "{{author}}",
   "license": "MIT",
   "peerDependencies": {
-    "@agentflow/sdk": "^0.1.0"
+    "@reverseai/sdk": "^0.1.0"
   },
   "devDependencies": {
-    "@agentflow/sdk": "^0.1.0",
+    "@reverseai/sdk": "^0.1.0",
     "@types/node": "^20.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.3.0",

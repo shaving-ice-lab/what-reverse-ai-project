@@ -1,10 +1,10 @@
 /**
- * {{projectName}} - AgentFlow 插件
+ * {{projectName}} - ReverseAI 插件
  *
  * 插件可以包含多个节点、提供共享功能、并请求特定权限。
  */
 
-import { definePlugin, defineNode, input, output } from '@agentflow/sdk'
+import { definePlugin, defineNode, input, output } from '@reverseai/sdk'
 
 // 定义插件包含的节点
 const node1 = defineNode({
@@ -38,9 +38,9 @@ const node1 = defineNode({
     const { name, language } = ctx.inputs
 
     const greetings: Record<string, string> = {
-      zh: `你好，${name}！欢迎使用 AgentFlow。`,
-      en: `Hello, ${name}! Welcome to AgentFlow.`,
-      ja: `こんにちは、${name}さん！AgentFlow へようこそ。`,
+      zh: `你好，${name}！欢迎使用 ReverseAI。`,
+      en: `Hello, ${name}! Welcome to ReverseAI.`,
+      ja: `こんにちは、${name}さん！ReverseAI へようこそ。`,
     }
 
     return {
@@ -120,7 +120,7 @@ const node2 = defineNode({
 export default definePlugin({
   id: '{{nodeId}}',
   name: '{{projectName}}',
-  description: '包含多个实用节点的 AgentFlow 插件',
+  description: '包含多个实用节点的 ReverseAI 插件',
   version: '1.0.0',
   author: '{{author}}',
 

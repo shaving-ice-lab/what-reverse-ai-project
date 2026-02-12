@@ -27,7 +27,7 @@ interface InitOptions {
 }
 
 export async function initCommand(name: string | undefined, options: InitOptions): Promise<void> {
-  const projectName = name || 'my-agentflow-node'
+  const projectName = name || 'my-reverseai-node'
   const targetDir = options.directory || projectName
   const templateName = (options.template || 'basic') as TemplateName
   const author = options.author || 'Your Name'
@@ -42,7 +42,7 @@ export async function initCommand(name: string | undefined, options: InitOptions
     process.exit(1)
   }
 
-  console.log(`\n🚀 初始化 AgentFlow 项目: ${projectName}`)
+  console.log(`\n🚀 初始化 ReverseAI 项目: ${projectName}`)
   console.log(`📦 使用模板: ${templateName} - ${TEMPLATE_DESCRIPTIONS[templateName]}\n`)
 
   // 检查目录是否存在
@@ -82,7 +82,7 @@ export async function initCommand(name: string | undefined, options: InitOptions
   console.log('  npm test          # 运行测试')
   console.log('  npm run validate  # 验证节点定义')
   console.log('  npm run build     # 构建项目')
-  console.log('  agentflow publish # 发布到市场\n')
+  console.log('  reverseai publish # 发布到市场\n')
 }
 
 interface TemplateVars {
@@ -198,7 +198,7 @@ coverage/
  */
 
 import { describe, it, expect } from "vitest";
-import { createNodeTester, assert } from "@agentflow/sdk";
+import { createNodeTester, assert } from "@reverseai/sdk";
 import node from "../src/index";
 
 describe("${vars.nodeName}", () => {
@@ -241,7 +241,7 @@ async function generateFromBuiltinTemplate(
   const packageJson = {
     name: projectName,
     version: '1.0.0',
-    description: `AgentFlow 自定义节点 - ${templateName} 模板`,
+    description: `ReverseAI 自定义节点 - ${templateName} 模板`,
     main: useTypeScript ? 'dist/index.js' : 'src/index.js',
     types: useTypeScript ? 'dist/index.d.ts' : undefined,
     scripts: {
@@ -251,15 +251,15 @@ async function generateFromBuiltinTemplate(
         : "echo 'No build needed'",
       test: 'vitest run',
       'test:watch': 'vitest',
-      validate: 'agentflow validate',
+      validate: 'reverseai validate',
     },
-    keywords: ['agentflow', 'node', templateName],
+    keywords: ['reverseai', 'node', templateName],
     author,
     peerDependencies: {
-      '@agentflow/sdk': '^0.1.0',
+      '@reverseai/sdk': '^0.1.0',
     },
     devDependencies: {
-      '@agentflow/sdk': '^0.1.0',
+      '@reverseai/sdk': '^0.1.0',
       vitest: '^1.0.0',
       ...(useTypeScript
         ? {
@@ -324,8 +324,8 @@ function getNodeTemplateByType(
 
   // 基础模板（默认）
   const importStatement = useTypeScript
-    ? `import { defineNode, input, output } from "@agentflow/sdk";`
-    : `const { defineNode, input, output } = require("@agentflow/sdk");`
+    ? `import { defineNode, input, output } from "@reverseai/sdk";`
+    : `const { defineNode, input, output } = require("@reverseai/sdk");`
 
   const exportStatement = useTypeScript ? 'export default' : 'module.exports ='
 
@@ -384,7 +384,7 @@ function getTestTemplate(useTypeScript: boolean): string {
  */
 
 import { describe, it, expect } from "vitest";
-import { createNodeTester, assert } from "@agentflow/sdk";
+import { createNodeTester, assert } from "@reverseai/sdk";
 import node from "../src/index";
 
 describe("自定义节点", () => {
@@ -407,7 +407,7 @@ describe("自定义节点", () => {
  */
 
 const { describe, it, expect } = require("vitest");
-const { createNodeTester, assert } = require("@agentflow/sdk");
+const { createNodeTester, assert } = require("@reverseai/sdk");
 const node = require("../src/index");
 
 describe("自定义节点", () => {
@@ -428,7 +428,7 @@ describe("自定义节点", () => {
 function getReadmeTemplate(name: string, templateType: TemplateName): string {
   return `# ${name}
 
-AgentFlow 自定义节点 - ${TEMPLATE_DESCRIPTIONS[templateType]}
+ReverseAI 自定义节点 - ${TEMPLATE_DESCRIPTIONS[templateType]}
 
 ## 安装
 
@@ -458,7 +458,7 @@ npm run build
 ## 发布
 
 \`\`\`bash
-agentflow publish
+reverseai publish
 \`\`\`
 
 ## 许可证

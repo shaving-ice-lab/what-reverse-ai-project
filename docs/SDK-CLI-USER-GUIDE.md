@@ -1,4 +1,4 @@
-# AgentFlow SDK & CLI 用户指南
+# ReverseAI SDK & CLI 用户指南
 
 > 让开发者在 30 分钟内完成自定义节点的创建、调试、测试与发布闭环
 
@@ -18,16 +18,16 @@
 ### 安装 SDK
 
 ```bash
-npm install @agentflow/sdk
+npm install @reverseai/sdk
 # 或
-pnpm add @agentflow/sdk
+pnpm add @reverseai/sdk
 ```
 
 ### 创建第一个节点
 
 ```bash
 # 使用 CLI 初始化项目
-npx agentflow init my-custom-node --template basic
+npx reverseai init my-custom-node --template basic
 
 # 进入项目目录
 cd my-custom-node
@@ -43,32 +43,32 @@ npm run dev
 
 | 步骤            | 命令                 | 耗时    |
 | --------------- | -------------------- | ------- |
-| 1. 初始化项目   | `agentflow init`     | 1 分钟  |
+| 1. 初始化项目   | `reverseai init`     | 1 分钟  |
 | 2. 编写节点逻辑 | 编辑 `src/index.ts`  | 15 分钟 |
 | 3. 运行测试     | `npm test`           | 5 分钟  |
-| 4. 验证定义     | `agentflow validate` | 1 分钟  |
-| 5. 构建发布     | `agentflow publish`  | 8 分钟  |
+| 4. 验证定义     | `reverseai validate` | 1 分钟  |
+| 5. 构建发布     | `reverseai publish`  | 8 分钟  |
 
 ---
 
 ## CLI 命令参考
 
-### `agentflow init [name]`
+### `reverseai init [name]`
 
 初始化节点项目。
 
 ```bash
 # 基础用法
-agentflow init my-node
+reverseai init my-node
 
 # 指定模板
-agentflow init my-http-node --template http-request
+reverseai init my-http-node --template http-request
 
 # 指定目录
-agentflow init my-node --directory ./projects/my-node
+reverseai init my-node --directory ./projects/my-node
 
 # 使用 JavaScript（默认 TypeScript）
-agentflow init my-node --typescript false
+reverseai init my-node --typescript false
 ```
 
 **参数：**
@@ -88,25 +88,25 @@ agentflow init my-node --typescript false
 - `transform` - 数据转换节点
 - `plugin` - 插件型项目（多节点）
 
-### `agentflow dev`
+### `reverseai dev`
 
 启动开发模式，支持热重载。
 
 ```bash
 # 基础用法
-agentflow dev
+reverseai dev
 
 # 指定端口
-agentflow dev --port 3456
+reverseai dev --port 3456
 
 # 指定入口文件
-agentflow dev --file src/custom.ts
+reverseai dev --file src/custom.ts
 
 # 禁用文件监听
-agentflow dev --no-watch
+reverseai dev --no-watch
 
 # 非交互模式
-agentflow dev --no-interactive
+reverseai dev --no-interactive
 ```
 
 **参数：**
@@ -118,22 +118,22 @@ agentflow dev --no-interactive
 | `--no-watch`       | 禁用文件监听   | `false`        |
 | `--no-interactive` | 非交互模式     | `false`        |
 
-### `agentflow build`
+### `reverseai build`
 
 构建节点项目。
 
 ```bash
 # 基础用法
-agentflow build
+reverseai build
 
 # 监听模式
-agentflow build --watch
+reverseai build --watch
 
 # 指定输出目录
-agentflow build --output ./lib
+reverseai build --output ./lib
 
 # 启用压缩
-agentflow build --minify
+reverseai build --minify
 ```
 
 **参数：**
@@ -144,22 +144,22 @@ agentflow build --minify
 | `--output, -o` | 输出目录     | `dist`  |
 | `--minify`     | 压缩代码     | `false` |
 
-### `agentflow test`
+### `reverseai test`
 
 运行节点测试。
 
 ```bash
 # 运行所有测试
-agentflow test
+reverseai test
 
 # 监听模式
-agentflow test --watch
+reverseai test --watch
 
 # 生成覆盖率报告
-agentflow test --coverage
+reverseai test --coverage
 
 # 过滤测试
-agentflow test --filter "should handle"
+reverseai test --filter "should handle"
 ```
 
 **参数：**
@@ -170,19 +170,19 @@ agentflow test --filter "should handle"
 | `--coverage`  | 覆盖率报告 | `false` |
 | `--filter`    | 测试过滤   | -       |
 
-### `agentflow validate`
+### `reverseai validate`
 
 校验节点定义。
 
 ```bash
 # 校验当前目录
-agentflow validate
+reverseai validate
 
 # 校验指定文件
-agentflow validate --file src/custom.ts
+reverseai validate --file src/custom.ts
 
 # 严格模式
-agentflow validate --strict
+reverseai validate --strict
 ```
 
 **参数：**
@@ -192,22 +192,22 @@ agentflow validate --strict
 | `--file, -f` | 入口文件 | `src/index.ts` |
 | `--strict`   | 严格模式 | `false`        |
 
-### `agentflow publish`
+### `reverseai publish`
 
 发布到市场。
 
 ```bash
 # 发布到官方市场
-agentflow publish
+reverseai publish
 
 # 指定注册表
-agentflow publish --registry https://custom-registry.com
+reverseai publish --registry https://custom-registry.com
 
 # 使用特定 Token
-agentflow publish --token $MY_TOKEN
+reverseai publish --token $MY_TOKEN
 
 # 跳过构建
-agentflow publish --skip-build
+reverseai publish --skip-build
 ```
 
 **参数：**
@@ -228,7 +228,7 @@ agentflow publish --skip-build
 定义一个自定义节点。
 
 ```typescript
-import { defineNode, input, output } from '@agentflow/sdk'
+import { defineNode, input, output } from '@reverseai/sdk'
 
 export default defineNode({
   // 必填字段
@@ -266,7 +266,7 @@ export default defineNode({
 ### Input Builders
 
 ```typescript
-import { input } from '@agentflow/sdk'
+import { input } from '@reverseai/sdk'
 
 // 字符串输入
 input
@@ -327,7 +327,7 @@ input
 ### Output Builders
 
 ```typescript
-import { output } from '@agentflow/sdk'
+import { output } from '@reverseai/sdk'
 
 // 字符串输出
 output.string('结果').description('描述').build()
@@ -407,7 +407,7 @@ async execute(ctx) {
 ### 测试工具
 
 ```typescript
-import { createNodeTester, assert } from '@agentflow/sdk'
+import { createNodeTester, assert } from '@reverseai/sdk'
 import node from './index'
 
 const tester = createNodeTester(node)
@@ -562,7 +562,7 @@ async execute(ctx) {
 
 ```bash
 # 使用开发模式
-agentflow dev
+reverseai dev
 
 # 查看日志输出
 # 使用 ctx.log.debug() 记录调试信息
@@ -595,15 +595,15 @@ async execute(ctx) {
 ### Q: 发布时需要什么配置？
 
 1. 确保 `manifest.json` 配置正确
-2. 设置环境变量 `AGENTFLOW_PUBLISH_TOKEN`
-3. 运行 `agentflow validate` 确保无错误
-4. 运行 `agentflow publish`
+2. 设置环境变量 `REVERSEAI_PUBLISH_TOKEN`
+3. 运行 `reverseai validate` 确保无错误
+4. 运行 `reverseai publish`
 
 ### Q: 如何更新已发布的节点？
 
 1. 更新 `manifest.json` 中的版本号
 2. 更新 `package.json` 中的版本号
-3. 运行 `agentflow publish`
+3. 运行 `reverseai publish`
 
 ---
 

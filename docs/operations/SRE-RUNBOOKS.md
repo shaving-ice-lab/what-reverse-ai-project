@@ -18,7 +18,7 @@
 
 ```bash
 # Step 1: 检查服务健康状态
-curl -s https://api.agentflow.ai/health | jq
+curl -s https://api.reverseai.ai/health | jq
 
 # Step 2: 查看错误日志
 # 在日志系统中过滤
@@ -160,7 +160,7 @@ ORDER BY created_at DESC;
 
 # Step 2: DNS 验证检查
 # TXT 记录
-dig TXT _agentflow.<domain>
+dig TXT _reverseai.<domain>
 
 # CNAME 记录
 dig CNAME <domain>
@@ -250,7 +250,7 @@ SELECT table_name,
        ROUND(data_length/1024/1024, 2) AS data_mb,
        ROUND(index_length/1024/1024, 2) AS index_mb
 FROM information_schema.tables
-WHERE table_schema = 'agentflow'
+WHERE table_schema = 'reverseai'
 ORDER BY data_length DESC;
 ```
 
@@ -271,4 +271,4 @@ ORDER BY data_length DESC;
 
 | 日期       | 版本 | 变更内容 | 作者           |
 | ---------- | ---- | -------- | -------------- |
-| 2026-02-03 | v1.0 | 初始版本 | AgentFlow Team |
+| 2026-02-03 | v1.0 | 初始版本 | ReverseAI Team |

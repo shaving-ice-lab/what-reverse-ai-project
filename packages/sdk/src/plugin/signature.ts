@@ -426,7 +426,7 @@ export class SignatureVerifier {
    */
   private determineTrustLevel(trusted: boolean, signerId: string): SignerInfo['trustLevel'] {
     if (!trusted) return 'unknown'
-    if (signerId.startsWith('agentflow-')) return 'official'
+    if (signerId.startsWith('reverseai-')) return 'official'
     if (signerId.startsWith('verified-')) return 'verified'
     return 'community'
   }

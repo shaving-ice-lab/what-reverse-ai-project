@@ -46,7 +46,7 @@ export async function devCommand(options: DevOptions): Promise<void> {
     process.exit(1)
   }
 
-  console.log('\n🔧 AgentFlow 开发模式\n')
+  console.log('\n🔧 ReverseAI 开发模式\n')
   console.log(`📁 项目目录: ${projectDir}`)
   console.log(`📄 入口文件: ${entryFile}`)
   console.log(`👀 文件监听: ${enableWatch ? '已启用' : '已禁用'}`)
@@ -252,7 +252,7 @@ async function startInteractiveMode(state: WatchState, entryFile: string): Promi
   console.log('────────────────────────────────────────────────────\n')
 
   const prompt = () => {
-    rl.question('agentflow> ', async (input) => {
+    rl.question('reverseai> ', async (input) => {
       const trimmed = input.trim()
       if (!trimmed) {
         prompt()
@@ -457,7 +457,7 @@ function printTestHistory(state: WatchState): void {
  */
 function printHelp(): void {
   console.log(`
-📖 AgentFlow Dev 命令帮助
+📖 ReverseAI Dev 命令帮助
 
 命令列表:
   test [json]   执行节点测试

@@ -154,4 +154,4 @@ func RequirePermission(perms ...string) gin.HandlerFunc {
 
 | 日期       | 版本 | 变更内容 | 作者           |
 | ---------- | ---- | -------- | -------------- |
-| 2026-02-03 | v1.0 | 初始版本 | AgentFlow Team |
+| 2026-02-03 | v1.0 | 初始版本 | ReverseAI Team |

@@ -1,5 +1,5 @@
 /**
- * publish 命令 - 发布节点/插件到 AgentFlow 市场
+ * publish 命令 - 发布节点/插件到 ReverseAI 市场
  */
 
 import * as fs from 'fs'
@@ -20,7 +20,7 @@ interface PublishOptions {
  * 发布节点/插件
  */
 export async function publishCommand(options: PublishOptions): Promise<void> {
-  console.log('\n🚀 发布节点到 AgentFlow...\n')
+  console.log('\n🚀 发布节点到 ReverseAI...\n')
 
   const cwd = process.cwd()
   const manifestPath = options.manifest
@@ -128,23 +128,23 @@ export async function publishCommand(options: PublishOptions): Promise<void> {
 
   const registry =
     options.registry ||
-    process.env.AGENTFLOW_MARKETPLACE_URL ||
-    process.env.AGENTFLOW_PUBLISH_URL ||
-    process.env.AGENTFLOW_API_BASE
+    process.env.REVERSEAI_MARKETPLACE_URL ||
+    process.env.REVERSEAI_PUBLISH_URL ||
+    process.env.REVERSEAI_API_BASE
   const token =
     options.token ||
-    process.env.AGENTFLOW_PUBLISH_TOKEN ||
-    process.env.AGENTFLOW_API_TOKEN ||
-    process.env.AGENTFLOW_TOKEN
+    process.env.REVERSEAI_PUBLISH_TOKEN ||
+    process.env.REVERSEAI_API_TOKEN ||
+    process.env.REVERSEAI_TOKEN
 
   if (!registry) {
-    console.error('❌ 未配置发布地址，请使用 --registry 或设置 AGENTFLOW_MARKETPLACE_URL 环境变量')
+    console.error('❌ 未配置发布地址，请使用 --registry 或设置 REVERSEAI_MARKETPLACE_URL 环境变量')
     cleanupTarball(tarballPath)
     process.exit(1)
   }
 
   if (!token) {
-    console.error('❌ 未提供访问令牌，请使用 --token 或设置 AGENTFLOW_PUBLISH_TOKEN 环境变量')
+    console.error('❌ 未提供访问令牌，请使用 --token 或设置 REVERSEAI_PUBLISH_TOKEN 环境变量')
     cleanupTarball(tarballPath)
     process.exit(1)
   }

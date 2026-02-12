@@ -13,7 +13,7 @@ export const textTransformNode = defineNode({
   icon: 'transform',
   category: 'data',
   version: '1.0.0',
-  author: 'AgentFlow',
+  author: 'ReverseAI',
   tags: ['文本', '转换', '字符串'],
 
   inputs: {

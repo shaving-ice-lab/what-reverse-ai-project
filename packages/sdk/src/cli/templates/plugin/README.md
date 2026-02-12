@@ -1,6 +1,6 @@
 # {{projectName}}
 
-AgentFlow 插件模板
+ReverseAI 插件模板
 
 ## 功能
 
@@ -84,7 +84,7 @@ npm run validate
 ## 发布
 
 ```bash
-agentflow publish
+reverseai publish
 ```
 
 ## 许可证

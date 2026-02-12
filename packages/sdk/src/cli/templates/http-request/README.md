@@ -1,6 +1,6 @@
 # {{projectName}}
 
-AgentFlow 自定义节点 - HTTP 请求模板
+ReverseAI 自定义节点 - HTTP 请求模板
 
 ## 功能
 

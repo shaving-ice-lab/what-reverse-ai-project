@@ -20,7 +20,7 @@ import type {
  *
  * @example
  * ```typescript
- * import { defineNode, input, output } from '@agentflow/sdk';
+ * import { defineNode, input, output } from '@reverseai/sdk';
  *
  * export default defineNode({
  *   id: 'my-custom-node',

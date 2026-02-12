@@ -42,7 +42,7 @@ Severity：P1
 ### 步骤（domain_binding_failure）
 
 1. 调用 `GET /api/v1/workspaces/:id/domains`，获取 `status/ssl_status/last_verification_error/next_retry_at`
-2. 校验 DNS 记录（TXT `_agentflow.<domain>` 或 CNAME 指向 base host）
+2. 校验 DNS 记录（TXT `_reverseai.<domain>` 或 CNAME 指向 base host）
 3. 触发验证 `POST /api/v1/workspaces/:id/domains/:domainId/verify`
 4. 证书签发 `POST /api/v1/workspaces/:id/domains/:domainId/cert/issue`
 5. 域名生效 `POST /api/v1/workspaces/:id/domains/:domainId/activate`
