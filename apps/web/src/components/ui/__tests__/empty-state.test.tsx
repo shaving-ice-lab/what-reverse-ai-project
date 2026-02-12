@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@/test/utils'
-import { EmptyState, SearchEmpty, WorkflowEmpty, ApiKeyEmpty, ErrorEmpty } from '../empty-state'
+import { EmptyState, SearchEmpty, ApiKeyEmpty, ErrorEmpty } from '../empty-state'
 
 describe('EmptyState', () => {
   it('Should render title correctly', () => {
@@ -77,22 +77,6 @@ describe('SearchEmpty', () => {
   })
 })
 
-describe('WorkflowEmpty', () => {
-  it('Should render correctly', () => {
-    render(<WorkflowEmpty />)
-    expect(screen.getByText('No Workflows Yet')).toBeInTheDocument()
-  })
-
-  it('Should display create button', () => {
-    const handleCreate = vi.fn()
-    render(<WorkflowEmpty onCreateClick={handleCreate} />)
-
-    const button = screen.getByRole('button', { name: /Create Workflow/ })
-    fireEvent.click(button)
-    expect(handleCreate).toHaveBeenCalledTimes(1)
-  })
-})
-
 describe('ApiKeyEmpty', () => {
   it('Should render correctly', () => {
     render(<ApiKeyEmpty />)
@@ -112,7 +96,7 @@ describe('ApiKeyEmpty', () => {
 describe('ErrorEmpty', () => {
   it('Should display default error message', () => {
     render(<ErrorEmpty />)
-    expect(screen.getByText('Loading Failed')).toBeInTheDocument()
+    expect(screen.getByText('Failed to Load')).toBeInTheDocument()
   })
 
   it('Should display custom error message', () => {

@@ -48,14 +48,7 @@ export function GradientBorder({
   animate = false,
   animationDuration = 3,
   glowOnHover = false,
-  glowIntensity = 'md',
 }: GradientBorderProps) {
-  const glowSizes = {
-    sm: '0 0 10px',
-    md: '0 0 20px',
-    lg: '0 0 30px',
-  }
-
   return (
     <div
       className={cn('relative p-[var(--border-width)] overflow-hidden group', containerClassName)}

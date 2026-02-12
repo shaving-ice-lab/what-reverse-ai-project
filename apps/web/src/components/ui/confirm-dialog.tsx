@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   Trash2,
   LogOut,
-  XCircle,
   CheckCircle,
   Info,
   HelpCircle,
@@ -23,7 +22,7 @@ import { Button } from './button'
 // ConfirmDialog
 // ============================================
 
-type DialogVariant = 'danger' | 'warning' | 'info' | 'success'
+type DialogVariant = 'danger' | 'destructive' | 'warning' | 'info' | 'success'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -81,6 +80,20 @@ export function ConfirmDialog({
           iconBg: 'bg-emerald-500/10',
           iconColor: 'text-emerald-500',
           buttonClass: 'bg-emerald-500 hover:bg-emerald-600 text-white',
+        }
+      case 'destructive':
+        return {
+          icon: AlertTriangle,
+          iconBg: 'bg-red-500/10',
+          iconColor: 'text-red-500',
+          buttonClass: 'bg-red-500 hover:bg-red-600 text-white',
+        }
+      default:
+        return {
+          icon: HelpCircle,
+          iconBg: 'bg-gray-500/10',
+          iconColor: 'text-gray-500',
+          buttonClass: '',
         }
     }
   }
@@ -284,12 +297,16 @@ interface UseConfirmDialogOptions {
   variant?: DialogVariant
 }
 
-export function useConfirmDialog(options: UseConfirmDialogOptions) {
+export function useConfirmDialog(defaultOptions?: Partial<UseConfirmDialogOptions>) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null)
+  const [activeOptions, setActiveOptions] = useState<Partial<UseConfirmDialogOptions>>(
+    defaultOptions ?? {}
+  )
 
-  const confirm = (): Promise<boolean> => {
+  const confirm = (callOptions?: Partial<UseConfirmDialogOptions>): Promise<boolean> => {
+    if (callOptions) setActiveOptions({ ...defaultOptions, ...callOptions })
     setIsOpen(true)
     return new Promise((resolve) => {
       setResolvePromise(() => resolve)
@@ -317,12 +334,17 @@ export function useConfirmDialog(options: UseConfirmDialogOptions) {
       onClose={handleClose}
       onConfirm={handleConfirm}
       isLoading={isLoading}
-      {...options}
+      title={activeOptions?.title ?? 'Confirm'}
+      description={activeOptions?.description}
+      confirmText={activeOptions?.confirmText}
+      cancelText={activeOptions?.cancelText}
+      variant={activeOptions?.variant}
     />
   )
 
   return {
     confirm,
     Dialog: DialogComponent,
+    ConfirmDialog: DialogComponent,
   }
 }

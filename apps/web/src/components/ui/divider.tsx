@@ -261,10 +261,4 @@ function ListDivider({ inset = false, insetSize = 48, className }: ListDividerPr
 }
 
 export { Divider, DividerWithText, DividerWithIcon, SectionDivider, ListDivider, dividerVariants }
-export type {
-  DividerProps,
-  DividerWithTextProps,
-  DividerWithIconProps,
-  SectionDividerProps,
-  ListDividerProps,
-}
+export type { DividerWithTextProps, DividerWithIconProps, SectionDividerProps, ListDividerProps }

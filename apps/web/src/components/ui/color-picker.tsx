@@ -11,7 +11,7 @@
  */
 
 import * as React from 'react'
-import { Check, Pipette, Copy, Plus } from 'lucide-react'
+import { Check, Pipette, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // Preset colors
@@ -78,7 +78,6 @@ function ColorPicker({
   defaultValue = 'hsl(var(--primary))',
   onChange,
   presets = presetColors,
-  showAlpha = false,
   showInput = true,
   allowCustom = true,
   disabled = false,

@@ -306,7 +306,7 @@ function ToastItem({ toast, onDismiss, index, position }: ToastItemProps) {
   const [isLeaving, setIsLeaving] = useState(false)
   const [progress, setProgress] = useState(100)
   const [isPaused, setIsPaused] = useState(false)
-  const progressRef = useRef<NodeJS.Timeout>()
+  const progressRef = useRef<NodeJS.Timeout>(undefined)
   const config = typeConfig[toast.type]
   const Icon = toast.icon ? () => <>{toast.icon}</> : config.icon
 

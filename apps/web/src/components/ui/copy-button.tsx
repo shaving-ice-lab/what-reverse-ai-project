@@ -180,7 +180,7 @@ interface CopyLinkProps {
   className?: string
 }
 
-function CopyLink({ url, label = 'Copy Link', showFullUrl = false, className }: CopyLinkProps) {
+function CopyLink({ url, showFullUrl = false, className }: CopyLinkProps) {
   const [copied, setCopied] = React.useState(false)
 
   const handleCopy = async () => {

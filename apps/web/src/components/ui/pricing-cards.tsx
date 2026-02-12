@@ -5,7 +5,6 @@
  * Used for showcasing subscription plans and pricing info
  */
 
-import { ReactNode } from 'react'
 import { Check, X, Star, Crown, Zap, Sparkles, ArrowRight, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './button'

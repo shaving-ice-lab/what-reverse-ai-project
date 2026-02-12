@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils'
 
 interface NumberInputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'value' | 'onChange' | 'size'
+  'type' | 'value' | 'onChange' | 'size' | 'defaultValue' | 'prefix'
 > {
   /** Currentvalue */
 

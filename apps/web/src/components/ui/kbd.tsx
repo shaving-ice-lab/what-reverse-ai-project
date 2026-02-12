@@ -232,7 +232,6 @@ export {
   formatKey,
 }
 export type {
-  KbdProps,
   KeyboardShortcutProps,
   ShortcutHintProps,
   HotkeyDisplayProps,

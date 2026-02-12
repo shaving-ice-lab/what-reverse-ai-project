@@ -170,7 +170,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const slottedChildren =
       asChild && React.isValidElement(children) && children.type === React.Fragment ? (
-        <span className="contents">{children.props.children}</span>
+        <span className="contents">
+          {(children.props as Record<string, unknown>).children as React.ReactNode}
+        </span>
       ) : (
         children
       )

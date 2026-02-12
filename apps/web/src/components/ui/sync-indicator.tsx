@@ -20,7 +20,6 @@ import {
   Loader2,
   Settings2,
   ChevronDown,
-  Wifi,
   WifiOff,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'

@@ -53,16 +53,13 @@ const quickActions: QuickAction[] = [
 export function FloatingCTA() {
   const [isOpen, setIsOpen] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [hasScrolled, setHasScrolled] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       // Show floating button after scrolling past 300px
       if (window.scrollY > 300) {
-        setHasScrolled(true)
         setIsVisible(true)
       } else {
-        setHasScrolled(false)
         // If the menu is open, keep it visible
         if (!isOpen) {
           setIsVisible(false)

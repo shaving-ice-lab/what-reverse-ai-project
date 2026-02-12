@@ -6,7 +6,7 @@
  */
 
 import { useState, ReactNode, createContext, useContext } from 'react'
-import { Check, ChevronLeft, ChevronRight, Circle, Loader2 } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './button'
 

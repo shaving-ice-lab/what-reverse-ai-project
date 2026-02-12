@@ -364,7 +364,6 @@ export {
   avatarVariants,
 }
 export type {
-  AvatarProps,
   AvatarFallbackProps,
   AvatarWithStatusProps,
   AvatarGroupProps,

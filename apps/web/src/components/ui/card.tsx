@@ -499,7 +499,6 @@ export {
   cardVariants,
 }
 export type {
-  CardProps,
   CardHeaderProps,
   CardTitleProps,
   CardContentProps,

@@ -6,7 +6,6 @@
  */
 
 import { Fragment, useMemo } from 'react'
-import { cn } from '@/lib/utils'
 
 interface HighlightTextProps {
   text: string

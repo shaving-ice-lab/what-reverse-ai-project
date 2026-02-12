@@ -20,8 +20,6 @@ import {
   AlertCircle,
   Loader2,
   Eye,
-  Download,
-  Trash2,
   Plus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -304,7 +302,7 @@ export function FileUploadItem({
 
 interface FileUploaderProps {
   value: UploadFile[]
-  onChange: (files: UploadFile[]) => void
+  onChange: (files: UploadFile[] | ((prev: UploadFile[]) => UploadFile[])) => void
   onUpload?: (file: File) => Promise<string>
   accept?: string
   multiple?: boolean

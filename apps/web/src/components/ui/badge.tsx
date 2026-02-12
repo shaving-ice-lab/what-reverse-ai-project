@@ -177,7 +177,7 @@ interface BadgeGroupProps {
   collapsible?: boolean
 }
 
-function BadgeGroup({ children, className, max, collapsible = false }: BadgeGroupProps) {
+function BadgeGroup({ children, className, max }: BadgeGroupProps) {
   const childArray = React.Children.toArray(children)
   const visibleChildren = max ? childArray.slice(0, max) : childArray
   const hiddenCount = max ? childArray.length - max : 0

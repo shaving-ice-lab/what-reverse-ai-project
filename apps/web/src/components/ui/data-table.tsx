@@ -15,11 +15,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Search,
-  Filter,
-  MoreHorizontal,
-  ArrowUpDown,
-  Check,
-  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './button'
@@ -391,7 +386,6 @@ export function DataTable<T extends { id: string | number }>({
 
   const allSelected =
     paginatedData.length > 0 && paginatedData.every((row) => selectedIds?.has(row.id))
-  const someSelected = paginatedData.some((row) => selectedIds?.has(row.id)) && !allSelected
 
   return (
     <div className={cn('border border-border rounded-xl overflow-hidden', className)}>
@@ -465,7 +459,7 @@ export function DataTable<T extends { id: string | number }>({
                 </td>
               </tr>
             ) : (
-              paginatedData.map((row, rowIndex) => (
+              paginatedData.map((row) => (
                 <tr
                   key={row.id}
                   className={cn(

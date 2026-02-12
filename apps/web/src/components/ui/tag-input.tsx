@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, KeyboardEvent } from 'react'
-import { X, Plus, Tag } from 'lucide-react'
+import { X, Tag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from './badge'
 
@@ -253,7 +253,7 @@ export function SelectableTags({
     <div className={cn('flex flex-wrap gap-2', className)}>
       {options.map((tag) => {
         const isSelected = selected.includes(tag)
-        const isDisabled = !isSelected && maxSelections && selected.length >= maxSelections
+        const isDisabled = !isSelected && !!maxSelections && selected.length >= maxSelections
 
         return (
           <button

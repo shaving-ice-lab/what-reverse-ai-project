@@ -10,7 +10,7 @@
  * - Format support (thousands, percentage, currency, etc.)
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface AnimatedCounterProps {
@@ -92,8 +92,8 @@ export function AnimatedCounter({
 }: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(0)
   const previousValue = useRef(0)
-  const animationRef = useRef<number>()
-  const startTimeRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
+  const startTimeRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const startValue = previousValue.current

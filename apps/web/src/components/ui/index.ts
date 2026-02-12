@@ -1,10 +1,13 @@
 /**
  * shadcn/ui ComponentExportEntry
+ *
+ * Only re-export components that are actively used.
+ * Unused components can still be imported directly from their files.
  */
 
+// Core shadcn/ui primitives
 export * from './accordion'
 export * from './alert'
-export * from './alert-dialog'
 export * from './avatar'
 export * from './badge'
 export * from './breadcrumb'
@@ -26,65 +29,10 @@ export * from './skeleton'
 export * from './switch'
 export * from './tabs'
 export * from './textarea'
-export * from './timeline'
 export * from './tooltip'
 
-// Custom UX Component
-export * from './loading'
+// Custom UX components (actively used)
 export * from './empty-state'
 export * from './toast'
 export * from './error-boundary'
-export * from './onboarding'
-export * from './offline-indicator'
-export * from './sync-indicator'
 export * from './confirm-dialog'
-
-// Decoration/AnimationComponent
-export * from './animated-background'
-
-// Manus StyleComponent
-export * from './feature-card'
-
-// AnimationandShowcaseComponent
-export * from './count-up'
-export * from './code-block'
-export * from './logo-carousel'
-
-// InteractiveComponent
-export * from './magnetic-button'
-export * from './gradient-border'
-export * from './shiny-text'
-export * from './hero-background'
-export * from './animated-counter'
-export * from './stat-card'
-export * from './loading-screen'
-export * from './page-transition'
-export * from './floating-input'
-
-// useComponent
-export * from './kbd'
-export * from './callout'
-export * from './number-input'
-export * from './copy-button'
-export * from './rating'
-export * from './color-picker'
-export * from './stepper'
-
-// DataShowcaseComponent
-export * from './tag'
-export * from './file-upload'
-export * from './pagination'
-export * from './data-table'
-export * from './notification-center'
-
-// Notifications and banner components
-export * from './banner'
-
-// Pricing and skeleton components
-export * from './pricing-cards'
-export * from './skeleton-loaders'
-export * from './tag-input'
-
-// Status and wizard components
-export * from './status-badge'
-export * from './wizard'

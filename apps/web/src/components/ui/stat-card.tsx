@@ -10,15 +10,7 @@
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { AnimatedCounter, CountUpOnView } from './animated-counter'
-import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  ArrowUpRight,
-  ArrowDownRight,
-  LucideIcon,
-  Sparkles,
-} from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, ArrowUpRight, LucideIcon } from 'lucide-react'
 
 interface StatCardProps {
   title: string

@@ -6,18 +6,7 @@
  */
 
 import { useState } from 'react'
-import {
-  Star,
-  ThumbsUp,
-  ThumbsDown,
-  Heart,
-  Smile,
-  Meh,
-  Frown,
-  MessageSquare,
-  Send,
-  Loader2,
-} from 'lucide-react'
+import { Star, ThumbsUp, ThumbsDown, Heart, Smile, Meh, Frown, Send, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './button'
 import { Textarea } from './textarea'
@@ -66,7 +55,6 @@ export function StarRating({
       {Array.from({ length: max }).map((_, index) => {
         const starValue = index + 1
         const isFilled = starValue <= displayValue
-        const isHalf = starValue - 0.5 === displayValue
 
         return (
           <button

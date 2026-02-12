@@ -324,4 +324,4 @@ export {
   FeatureCallout,
   calloutVariants,
 }
-export type { CalloutProps, InlineCalloutProps, BannerCalloutProps, FeatureCalloutProps }
+export type { InlineCalloutProps, BannerCalloutProps, FeatureCalloutProps }

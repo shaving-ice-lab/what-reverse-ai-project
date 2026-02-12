@@ -393,27 +393,27 @@ export function FolderEmptyState({ onUpload, className }: FolderEmptyStateProps)
   )
 }
 
-// No Workflows
-interface WorkflowEmptyStateProps {
+// No Items — directs user to AI Agent
+interface AgentEmptyStateProps {
   onCreateClick?: () => void
   className?: string
 }
 
-export function WorkflowEmptyState({ onCreateClick, className }: WorkflowEmptyStateProps) {
+export function AgentEmptyState({ onCreateClick, className }: AgentEmptyStateProps) {
   return (
     <EmptyState
       icon={Zap}
-      title="No Workflows Yet"
-      description="Create your first workflow to start automating your tasks"
+      title="No Items Yet"
+      description="Use the AI Agent to start building your app"
       action={
         onCreateClick
           ? {
-              label: 'Create Workflow',
+              label: 'Open AI Agent',
               onClick: onCreateClick,
             }
           : {
-              label: 'Create Workflow',
-              href: '/dashboard/workflows/new',
+              label: 'Open AI Agent',
+              href: '/dashboard/agent',
             }
       }
       className={className}
@@ -436,26 +436,6 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
         label: 'Talk to Agent',
         href: '/dashboard/agent',
         icon: MessageSquare,
-      }}
-      className={className}
-    />
-  )
-}
-
-// No Agents
-interface AgentEmptyStateProps {
-  className?: string
-}
-
-export function AgentEmptyState({ className }: AgentEmptyStateProps) {
-  return (
-    <EmptyState
-      icon={Bot}
-      title="No Agents Yet"
-      description="Create your first AI agent to help automate your tasks"
-      action={{
-        label: 'Go to Agent',
-        href: '/dashboard/agent',
       }}
       className={className}
     />
@@ -566,7 +546,7 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
             }
           : {
               label: 'Create Document',
-              href: '/dashboard/apps',
+              href: '/dashboard/agent',
             }
       }
       className={className}
@@ -575,6 +555,5 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
 }
 
 export const SearchEmpty = SearchEmptyState
-export const WorkflowEmpty = WorkflowEmptyState
 export const ErrorEmpty = ErrorEmptyState
 export const ApiKeyEmpty = ApiKeyEmptyState

@@ -5,7 +5,7 @@
  * Used for displaying status indicators
  */
 
-import { ReactNode } from 'react'
+import React from 'react'
 import {
   CheckCircle2,
   XCircle,

@@ -48,7 +48,9 @@ const tagVariants = cva(
 )
 
 export interface TagProps
-  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof tagVariants> {
+  extends
+    Omit<React.HTMLAttributes<HTMLSpanElement>, 'onSelect'>,
+    VariantProps<typeof tagVariants> {
   /** Prefix icon */
   icon?: LucideIcon | React.ReactNode
   /** Avatar URL */
@@ -367,4 +369,4 @@ function AddTag({ onClick, label = 'Add tags', size = 'default', className }: Ad
 }
 
 export { Tag, TagGroup, TagInput, SelectableTags, AddTag, tagVariants }
-export type { TagProps, TagGroupProps, TagInputProps, SelectableTagsProps, AddTagProps }
+export type { TagGroupProps, TagInputProps, SelectableTagsProps, AddTagProps }

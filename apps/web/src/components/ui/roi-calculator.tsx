@@ -3,7 +3,7 @@
 /**
  * ROI Calculator - Return on Investment Calculator Component
  *
- * Helps users estimate AgentFlow usage and cost savings
+ * Helps users estimate WhatReverse usage and cost savings
  */
 
 import { useState, useMemo } from 'react'
@@ -46,13 +46,13 @@ export function ROICalculator() {
 
     const savedCostPerYear = yearlyLaborCost * (inputs.automationRate / 100)
 
-    // Estimated AgentFlow cost (Pro plan)
+    // Estimated WhatReverse cost (Pro plan)
 
-    const agentflowCost = inputs.employees * 49 * 12 // $49/user/month
+    const platformCost = inputs.employees * 49 * 12 // $49/user/month
 
-    const netSavings = savedCostPerYear - agentflowCost
+    const netSavings = savedCostPerYear - platformCost
 
-    const roi = (netSavings / agentflowCost) * 100
+    const roi = (netSavings / platformCost) * 100
 
     return {
       weeklyHours,
@@ -63,7 +63,7 @@ export function ROICalculator() {
 
       savedCostPerYear,
 
-      agentflowCost,
+      platformCost,
 
       netSavings,
 
@@ -100,7 +100,7 @@ export function ROICalculator() {
               <h3 className="font-semibold text-foreground">ROI Calculator</h3>
 
               <p className="text-sm text-muted-foreground">
-                Estimate AgentFlow usage and investment
+                Estimate WhatReverse usage and investment
               </p>
             </div>
           </div>
@@ -299,10 +299,10 @@ export function ROICalculator() {
                 </div>
 
                 <div className="p-4 rounded-xl bg-muted/50 border border-border">
-                  <p className="text-xs text-muted-foreground mb-1">AgentFlow cost</p>
+                  <p className="text-xs text-muted-foreground mb-1">WhatReverse cost</p>
 
                   <p className="text-xl font-bold text-foreground">
-                    ${results.agentflowCost.toLocaleString()}
+                    ${results.platformCost.toLocaleString()}
                   </p>
 
                   <p className="text-xs text-muted-foreground">per year</p>
