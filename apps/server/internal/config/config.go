@@ -31,6 +31,7 @@ type Config struct {
 	Retention         RetentionConfig         `mapstructure:"retention"`
 	Archive           ArchiveConfig           `mapstructure:"archive"`
 	Cache             CacheConfig             `mapstructure:"cache"`
+	VMRuntime         VMRuntimeConfig         `mapstructure:"vm_runtime"`
 }
 
 // ServerConfig 服务器配置
@@ -245,6 +246,18 @@ type ExecutionCacheConfig struct {
 	ResultTTL time.Duration `mapstructure:"result_ttl"`
 }
 
+// VMRuntimeConfig VM 运行时配置
+type VMRuntimeConfig struct {
+	Enabled       bool          `mapstructure:"enabled"`
+	BaseDir       string        `mapstructure:"base_dir"`
+	MaxVMs        int           `mapstructure:"max_vms"`
+	ExecTimeout   time.Duration `mapstructure:"exec_timeout"`
+	LoadTimeout   time.Duration `mapstructure:"load_timeout"`
+	MaxCodeSize   int64         `mapstructure:"max_code_size"`
+	MaxDBSize     int64         `mapstructure:"max_db_size"`
+	EvictInterval time.Duration `mapstructure:"evict_interval"`
+}
+
 // Load 加载配置
 func Load() (*Config, error) {
 	viper.SetConfigName("config")
@@ -425,6 +438,16 @@ func setDefaults() {
 	viper.SetDefault("retention.anonymous_session_retention_days", 7)
 	viper.SetDefault("retention.workspace_deletion_grace_days", 7)
 	viper.SetDefault("retention.workspace_cold_storage_days", 30)
+
+	// VM Runtime
+	viper.SetDefault("vm_runtime.enabled", true)
+	viper.SetDefault("vm_runtime.base_dir", "data/vm")
+	viper.SetDefault("vm_runtime.max_vms", 100)
+	viper.SetDefault("vm_runtime.exec_timeout", "10s")
+	viper.SetDefault("vm_runtime.load_timeout", "5s")
+	viper.SetDefault("vm_runtime.max_code_size", 1048576)
+	viper.SetDefault("vm_runtime.max_db_size", 104857600)
+	viper.SetDefault("vm_runtime.evict_interval", "30m")
 
 	// Archive / Export
 	viper.SetDefault("archive.enabled", true)

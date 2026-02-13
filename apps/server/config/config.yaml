@@ -197,6 +197,17 @@ archive:
   # 归档延迟天数（避免归档当天数据）
   log_archive_delay_days: 1
 
+# VM 运行时配置
+vm_runtime:
+  enabled: true
+  base_dir: "data/vm"
+  max_vms: 100
+  exec_timeout: "10s"
+  load_timeout: "5s"
+  max_code_size: 1048576
+  max_db_size: 104857600
+  evict_interval: "30m"
+
 # 缓存与加速配置
 cache:
   runtime:
