@@ -26,8 +26,6 @@ type MetricsCollector struct {
 	NodeExecutionDuration *prometheus.HistogramVec
 
 	// 数据库操作指标
-	DBProvisionTotal    *prometheus.CounterVec
-	DBProvisionDuration *prometheus.HistogramVec
 	DBQueryDuration     *prometheus.HistogramVec
 	DBConnectionsActive prometheus.Gauge
 
@@ -176,25 +174,6 @@ func NewMetricsCollector() *MetricsCollector {
 		),
 
 		// ===== 数据库操作指标 =====
-		DBProvisionTotal: promauto.NewCounterVec(
-			prometheus.CounterOpts{
-				Namespace: "reverseai",
-				Subsystem: "db",
-				Name:      "provision_total",
-				Help:      "Total number of database provision operations",
-			},
-			[]string{"workspace_id", "status"},
-		),
-		DBProvisionDuration: promauto.NewHistogramVec(
-			prometheus.HistogramOpts{
-				Namespace: "reverseai",
-				Subsystem: "db",
-				Name:      "provision_duration_seconds",
-				Help:      "Database provision duration in seconds",
-				Buckets:   []float64{1, 5, 10, 30, 60, 120, 300, 600},
-			},
-			[]string{"workspace_id"},
-		),
 		DBQueryDuration: promauto.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Namespace: "reverseai",
@@ -391,12 +370,6 @@ func (m *MetricsCollector) RecordExecution(workspaceID, status, triggerType stri
 func (m *MetricsCollector) RecordNodeExecution(nodeType, status string, durationSeconds float64) {
 	m.NodeExecutionTotal.WithLabelValues(nodeType, status).Inc()
 	m.NodeExecutionDuration.WithLabelValues(nodeType).Observe(durationSeconds)
-}
-
-// RecordDBProvision 记录数据库创建指标
-func (m *MetricsCollector) RecordDBProvision(workspaceID, status string, durationSeconds float64) {
-	m.DBProvisionTotal.WithLabelValues(workspaceID, status).Inc()
-	m.DBProvisionDuration.WithLabelValues(workspaceID).Observe(durationSeconds)
 }
 
 // RecordLLMRequest 记录 LLM 请求指标

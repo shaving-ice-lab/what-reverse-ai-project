@@ -6,17 +6,18 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type GetWorkspaceInfoTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
 func NewGetWorkspaceInfoTool(
-	dbQueryService service.WorkspaceDBQueryService,
+	vmStore *vmruntime.VMStore,
 ) *GetWorkspaceInfoTool {
 	return &GetWorkspaceInfoTool{
-		dbQueryService: dbQueryService,
+		vmStore: vmStore,
 	}
 }
 
@@ -66,7 +67,7 @@ func (t *GetWorkspaceInfoTool) Execute(ctx context.Context, params json.RawMessa
 
 	// Tables
 	if boolDefault(p.IncludeTables, true) {
-		tables, err := t.dbQueryService.ListTables(ctx, p.WorkspaceID)
+		tables, err := t.vmStore.ListTables(ctx, p.WorkspaceID)
 		if err != nil {
 			result["tables_error"] = err.Error()
 		} else {
@@ -74,11 +75,11 @@ func (t *GetWorkspaceInfoTool) Execute(ctx context.Context, params json.RawMessa
 			for _, tbl := range tables {
 				info := map[string]interface{}{
 					"name":          tbl.Name,
-					"row_count_est": tbl.RowCountEst,
+					"row_count_est": tbl.RowCount,
 					"column_count":  tbl.ColumnCount,
 				}
 				// Get schema for each table
-				schema, err := t.dbQueryService.GetTableSchema(ctx, p.WorkspaceID, tbl.Name)
+				schema, err := t.vmStore.GetTableSchema(ctx, p.WorkspaceID, tbl.Name)
 				if err == nil {
 					cols := make([]map[string]interface{}, 0, len(schema.Columns))
 					for _, col := range schema.Columns {
@@ -100,7 +101,7 @@ func (t *GetWorkspaceInfoTool) Execute(ctx context.Context, params json.RawMessa
 
 	// Stats
 	if boolDefault(p.IncludeStats, false) {
-		stats, err := t.dbQueryService.GetDatabaseStats(ctx, p.WorkspaceID)
+		stats, err := t.vmStore.GetStats(ctx, p.WorkspaceID)
 		if err != nil {
 			result["stats_error"] = err.Error()
 		} else {

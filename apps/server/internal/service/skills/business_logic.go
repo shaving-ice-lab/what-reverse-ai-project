@@ -3,12 +3,13 @@ package skills
 import (
 	"github.com/reverseai/server/internal/service"
 	"github.com/reverseai/server/internal/service/agent_tools"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 // NewBusinessLogicSkill 创建 Business Logic Skill
 // Provides workspace introspection tools (database schema, table listing, etc.)
 func NewBusinessLogicSkill(
-	dbQueryService service.WorkspaceDBQueryService,
+	vmStore *vmruntime.VMStore,
 ) *service.Skill {
 	return &service.Skill{
 		ID:          "builtin_business_logic",
@@ -19,7 +20,7 @@ func NewBusinessLogicSkill(
 		Builtin:     true,
 		Enabled:     true,
 		Tools: []service.AgentTool{
-			agent_tools.NewGetWorkspaceInfoTool(dbQueryService),
+			agent_tools.NewGetWorkspaceInfoTool(vmStore),
 		},
 		SystemPromptAddition: `When building apps, always start by inspecting the workspace to understand existing tables and schema before creating new resources.`,
 	}

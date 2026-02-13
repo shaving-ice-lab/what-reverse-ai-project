@@ -6,20 +6,21 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type AlterTableTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewAlterTableTool(dbQueryService service.WorkspaceDBQueryService) *AlterTableTool {
-	return &AlterTableTool{dbQueryService: dbQueryService}
+func NewAlterTableTool(vmStore *vmruntime.VMStore) *AlterTableTool {
+	return &AlterTableTool{vmStore: vmStore}
 }
 
 func (t *AlterTableTool) Name() string { return "alter_table" }
 
 func (t *AlterTableTool) Description() string {
-	return "Alter an existing database table: add/modify/drop columns, add/drop indexes."
+	return "Alter an existing database table: add/rename/drop columns."
 }
 
 func (t *AlterTableTool) Parameters() json.RawMessage {
@@ -36,39 +37,23 @@ func (t *AlterTableTool) Parameters() json.RawMessage {
 						"name": {"type": "string"},
 						"type": {"type": "string"},
 						"nullable": {"type": "boolean", "default": true},
-						"default_value": {"type": "string"},
-						"after": {"type": "string", "description": "Place after this column"}
+						"default_value": {"type": "string"}
 					},
 					"required": ["name", "type"]
 				}
 			},
-			"modify_columns": {
+			"alter_columns": {
 				"type": "array",
 				"items": {
 					"type": "object",
 					"properties": {
 						"name": {"type": "string"},
-						"new_name": {"type": "string"},
-						"type": {"type": "string"},
-						"nullable": {"type": "boolean"}
+						"new_name": {"type": "string"}
 					},
 					"required": ["name"]
 				}
 			},
-			"drop_columns": {"type": "array", "items": {"type": "string"}},
-			"add_indexes": {
-				"type": "array",
-				"items": {
-					"type": "object",
-					"properties": {
-						"name": {"type": "string"},
-						"columns": {"type": "array", "items": {"type": "string"}},
-						"unique": {"type": "boolean", "default": false}
-					},
-					"required": ["name", "columns"]
-				}
-			},
-			"drop_indexes": {"type": "array", "items": {"type": "string"}}
+			"drop_columns": {"type": "array", "items": {"type": "string"}}
 		},
 		"required": ["workspace_id", "table_name"]
 	}`)
@@ -77,11 +62,11 @@ func (t *AlterTableTool) Parameters() json.RawMessage {
 func (t *AlterTableTool) RequiresConfirmation() bool { return true }
 
 type alterTableParams struct {
-	WorkspaceID  string                    `json:"workspace_id"`
-	TableName    string                    `json:"table_name"`
-	AddColumns   []service.CreateColumnDef `json:"add_columns"`
-	AlterColumns []service.AlterColumnDef  `json:"alter_columns"`
-	DropColumns  []string                  `json:"drop_columns"`
+	WorkspaceID  string                        `json:"workspace_id"`
+	TableName    string                        `json:"table_name"`
+	AddColumns   []vmruntime.VMCreateColumnDef `json:"add_columns"`
+	AlterColumns []vmruntime.VMAlterColumnDef  `json:"alter_columns"`
+	DropColumns  []string                      `json:"drop_columns"`
 }
 
 func (t *AlterTableTool) Execute(ctx context.Context, params json.RawMessage) (*service.AgentToolResult, error) {
@@ -90,21 +75,20 @@ func (t *AlterTableTool) Execute(ctx context.Context, params json.RawMessage) (*
 		return &service.AgentToolResult{Success: false, Error: "invalid parameters: " + err.Error()}, nil
 	}
 
-	req := service.AlterTableRequest{
+	req := vmruntime.VMAlterTableRequest{
 		AddColumns:   p.AddColumns,
 		AlterColumns: p.AlterColumns,
 		DropColumns:  p.DropColumns,
 	}
 
-	if err := t.dbQueryService.AlterTable(ctx, p.WorkspaceID, p.TableName, req); err != nil {
+	if err := t.vmStore.AlterTable(ctx, p.WorkspaceID, p.TableName, req); err != nil {
 		return &service.AgentToolResult{
 			Success: false,
 			Error:   fmt.Sprintf("failed to alter table %q: %v", p.TableName, err),
 		}, nil
 	}
 
-	changes := 0
-	changes += len(p.AddColumns) + len(p.AlterColumns) + len(p.DropColumns)
+	changes := len(p.AddColumns) + len(p.AlterColumns) + len(p.DropColumns)
 	return &service.AgentToolResult{
 		Success: true,
 		Output:  fmt.Sprintf("Successfully altered table %q with %d changes.", p.TableName, changes),

@@ -9,13 +9,14 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/reverseai/server/internal/domain/entity"
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 // RuntimeDataHandler 公开访问的 Runtime 数据处理器
 // 用于已发布的 Workspace App 通过 slug 访问数据库数据
 type RuntimeDataHandler struct {
 	runtimeService     service.RuntimeService
-	queryService       service.WorkspaceDBQueryService
+	vmStore            *vmruntime.VMStore
 	rlsService         service.WorkspaceRLSService
 	runtimeAuthService service.RuntimeAuthService
 }
@@ -23,12 +24,12 @@ type RuntimeDataHandler struct {
 // NewRuntimeDataHandler 创建 Runtime 数据处理器
 func NewRuntimeDataHandler(
 	runtimeService service.RuntimeService,
-	queryService service.WorkspaceDBQueryService,
+	vmStore *vmruntime.VMStore,
 	rlsService ...service.WorkspaceRLSService,
 ) *RuntimeDataHandler {
 	h := &RuntimeDataHandler{
 		runtimeService: runtimeService,
-		queryService:   queryService,
+		vmStore:        vmStore,
 	}
 	if len(rlsService) > 0 {
 		h.rlsService = rlsService[0]
@@ -41,8 +42,15 @@ func (h *RuntimeDataHandler) SetRuntimeAuthService(authService service.RuntimeAu
 	h.runtimeAuthService = authService
 }
 
+// rlsFilter is a local filter struct used by RLS resolution
+type rlsFilter struct {
+	Column   string
+	Operator string
+	Value    string
+}
+
 // getRLSFilters resolves RLS filters for the given table based on X-App-Token
-func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID, tableName string) ([]service.QueryFilter, error) {
+func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID, tableName string) ([]rlsFilter, error) {
 	if h.rlsService == nil {
 		return nil, nil
 	}
@@ -56,7 +64,7 @@ func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID
 	token := c.Request().Header.Get("X-App-Token")
 	if token == "" {
 		// No token but RLS policies exist — deny access by adding impossible filter
-		return []service.QueryFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
+		return []rlsFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
 	}
 
 	if h.runtimeAuthService == nil {
@@ -66,10 +74,10 @@ func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID
 	user, err := h.runtimeAuthService.ValidateSession(c.Request().Context(), token)
 	if err != nil {
 		// Invalid token with RLS — deny
-		return []service.QueryFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
+		return []rlsFilter{{Column: "1", Operator: "=", Value: "0"}}, nil
 	}
 
-	var rlsFilters []service.QueryFilter
+	var filters []rlsFilter
 	for _, policy := range policies {
 		var matchValue string
 		switch policy.MatchField {
@@ -80,13 +88,13 @@ func (h *RuntimeDataHandler) getRLSFilters(c echo.Context, workspaceID uuid.UUID
 		default:
 			matchValue = user.ID.String()
 		}
-		rlsFilters = append(rlsFilters, service.QueryFilter{
+		filters = append(filters, rlsFilter{
 			Column:   policy.Column,
 			Operator: "=",
 			Value:    matchValue,
 		})
 	}
-	return rlsFilters, nil
+	return filters, nil
 }
 
 // resolveWorkspaceID 通过 slug 解析已发布的 workspace ID
@@ -148,7 +156,7 @@ func (h *RuntimeDataHandler) QueryRows(c echo.Context) error {
 	orderBy := c.QueryParam("order_by")
 	orderDir := c.QueryParam("order_dir")
 
-	var filters []service.QueryFilter
+	var filters []vmruntime.VMQueryFilter
 	for i := 0; i < 20; i++ {
 		col := c.QueryParam("filters[" + strconv.Itoa(i) + "][column]")
 		op := c.QueryParam("filters[" + strconv.Itoa(i) + "][operator]")
@@ -156,21 +164,19 @@ func (h *RuntimeDataHandler) QueryRows(c echo.Context) error {
 		if col == "" {
 			break
 		}
-		filters = append(filters, service.QueryFilter{
-			Column:   col,
-			Operator: op,
-			Value:    val,
-		})
+		filters = append(filters, vmruntime.VMQueryFilter{Column: col, Operator: op, Value: val})
 	}
 
 	// Inject RLS filters
 	wsUUID, _ := uuid.Parse(workspaceID)
 	rlsFilters, _ := h.getRLSFilters(c, wsUUID, tableName)
-	filters = append(filters, rlsFilters...)
+	for _, f := range rlsFilters {
+		filters = append(filters, vmruntime.VMQueryFilter{Column: f.Column, Operator: f.Operator, Value: f.Value})
+	}
 
 	filterCombinator := c.QueryParam("filter_combinator")
 
-	result, err := h.queryService.QueryRows(c.Request().Context(), workspaceID, tableName, service.QueryRowsParams{
+	result, err := h.vmStore.QueryRows(c.Request().Context(), workspaceID, tableName, vmruntime.VMQueryParams{
 		Page:             page,
 		PageSize:         pageSize,
 		OrderBy:          orderBy,
@@ -211,7 +217,7 @@ func (h *RuntimeDataHandler) InsertRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Data cannot be empty")
 	}
 
-	result, err := h.queryService.InsertRow(c.Request().Context(), workspaceID, tableName, req.Data)
+	result, err := h.vmStore.InsertRow(c.Request().Context(), workspaceID, tableName, req.Data)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
@@ -243,7 +249,19 @@ func (h *RuntimeDataHandler) UpdateRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Data cannot be empty")
 	}
 
-	result, err := h.queryService.UpdateRow(c.Request().Context(), workspaceID, tableName, req.Data)
+	pkCols := map[string]interface{}{}
+	dataCols := map[string]interface{}{}
+	for k, v := range req.Data {
+		if k == "id" {
+			pkCols[k] = v
+		} else {
+			dataCols[k] = v
+		}
+	}
+	if len(pkCols) == 0 {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Data must include 'id' field")
+	}
+	result, err := h.vmStore.UpdateRow(c.Request().Context(), workspaceID, tableName, dataCols, pkCols)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
@@ -275,7 +293,7 @@ func (h *RuntimeDataHandler) DeleteRows(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "IDs cannot be empty")
 	}
 
-	result, err := h.queryService.DeleteRows(c.Request().Context(), workspaceID, tableName, req.IDs)
+	result, err := h.vmStore.DeleteRows(c.Request().Context(), workspaceID, tableName, req.IDs)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}

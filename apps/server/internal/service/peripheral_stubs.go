@@ -76,77 +76,6 @@ var (
 	ErrBillingInvalidDimension = errors.New("billing dimension is invalid")
 )
 
-// ==================== Domain Stubs ====================
-
-// WorkspaceDomainService 工作空间域名服务（已冻结，后续再接入）
-type WorkspaceDomainService interface {
-	VerifyDomainByID(ctx context.Context, userID, domainID uuid.UUID) (*WorkspaceDomainVerifyResult, error)
-	RenewCertificate(ctx context.Context, ownerID, workspaceID, domainID uuid.UUID) (*entity.WorkspaceDomain, error)
-}
-
-// WorkspaceDomainVerifyResult 域名验证结果
-type WorkspaceDomainVerifyResult struct {
-	Domain       *entity.WorkspaceDomain `json:"domain"`
-	Verification *DomainVerificationInfo `json:"verification,omitempty"`
-	Verified     bool                    `json:"verified"`
-}
-
-// DomainVerificationInfo 域名验证信息
-type DomainVerificationInfo struct {
-	TxtName     string `json:"txt_name"`
-	TxtValue    string `json:"txt_value"`
-	CnameTarget string `json:"cname_target"`
-}
-
-// DomainVerifyError 域名验证错误（支持重试）
-type DomainVerifyError struct {
-	NextRetryAt *time.Time
-	Cause       error
-}
-
-func (e *DomainVerifyError) Error() string {
-	if e == nil {
-		return ""
-	}
-	if e.Cause != nil {
-		return e.Cause.Error()
-	}
-	return "domain verify failed"
-}
-
-func (e *DomainVerifyError) Unwrap() error {
-	if e == nil {
-		return nil
-	}
-	return e.Cause
-}
-
-// ==================== Export Stubs ====================
-
-// WorkspaceExportService 导出任务服务接口（已冻结，后续再接入）
-type WorkspaceExportService interface {
-	RequestExport(ctx context.Context, workspaceID, userID uuid.UUID) (*entity.WorkspaceExportJob, error)
-	GetJob(ctx context.Context, workspaceID, jobID, userID uuid.UUID) (*entity.WorkspaceExportJob, error)
-	Download(ctx context.Context, workspaceID, jobID, userID uuid.UUID) (*WorkspaceExportDownload, error)
-	RunWorker(ctx context.Context)
-}
-
-// WorkspaceExportDownload 导出下载信息
-type WorkspaceExportDownload struct {
-	FilePath string
-	FileName string
-}
-
-var (
-	ErrWorkspaceExportDisabled           = errors.New("workspace export disabled")
-	ErrWorkspaceExportNotFound           = errors.New("workspace export not found")
-	ErrWorkspaceExportNotReady           = errors.New("workspace export not ready")
-	ErrWorkspaceExportExpired            = errors.New("workspace export expired")
-	ErrWorkspaceDomainNotFound           = errors.New("workspace domain not found")
-	ErrWorkspaceDomainInvalid            = errors.New("workspace domain invalid")
-	ErrWorkspaceDomainVerificationFailed = errors.New("workspace domain verification failed")
-)
-
 // ==================== Data Classification Stubs ====================
 
 const DataClassificationPublic = "public"
@@ -174,14 +103,6 @@ func resolveDataClassificationRequirement(classification string) dataClassificat
 // ==================== Misc Error Stubs ====================
 
 var (
-	ErrUnauthorized    = errors.New("unauthorized")
-	ErrSlugExists      = errors.New("slug already exists")
-	ErrInvalidRating   = errors.New("invalid rating")
-	ErrAlreadyReviewed = errors.New("already reviewed")
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrSlugExists   = errors.New("slug already exists")
 )
-
-// ==================== Utility Stubs ====================
-
-func startOfDay(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
-}

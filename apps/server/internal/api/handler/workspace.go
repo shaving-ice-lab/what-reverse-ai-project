@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -15,23 +14,17 @@ import (
 )
 
 type WorkspaceHandler struct {
-	workspaceService       service.WorkspaceService
-	workspaceDomainService service.WorkspaceDomainService
-	auditLogService        service.AuditLogService
-	exportService          service.WorkspaceExportService
+	workspaceService service.WorkspaceService
+	auditLogService  service.AuditLogService
 }
 
 func NewWorkspaceHandler(
 	workspaceService service.WorkspaceService,
-	workspaceDomainService service.WorkspaceDomainService,
 	auditLogService service.AuditLogService,
-	exportService service.WorkspaceExportService,
 ) *WorkspaceHandler {
 	return &WorkspaceHandler{
-		workspaceService:       workspaceService,
-		workspaceDomainService: workspaceDomainService,
-		auditLogService:        auditLogService,
-		exportService:          exportService,
+		workspaceService: workspaceService,
+		auditLogService:  auditLogService,
 	}
 }
 
@@ -57,22 +50,6 @@ type CreateWorkspaceMemberRequest struct {
 
 type UpdateWorkspaceMemberRoleRequest struct {
 	RoleID string `json:"role_id"`
-}
-
-// WorkspaceExportJobResponse 导出任务响应
-type WorkspaceExportJobResponse struct {
-	ID          string  `json:"id"`
-	WorkspaceID string  `json:"workspace_id"`
-	Status      string  `json:"status"`
-	ExportType  string  `json:"export_type"`
-	FileName    *string `json:"file_name,omitempty"`
-	FileSize    *int64  `json:"file_size,omitempty"`
-	Error       *string `json:"error,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	StartedAt   *string `json:"started_at,omitempty"`
-	CompletedAt *string `json:"completed_at,omitempty"`
-	ExpiresAt   *string `json:"expires_at,omitempty"`
-	DownloadURL *string `json:"download_url,omitempty"`
 }
 
 // List 获取工作空间列表
@@ -250,167 +227,6 @@ func (h *WorkspaceHandler) Update(c echo.Context) error {
 	return successResponse(c, map[string]interface{}{
 		"workspace": workspace,
 	})
-}
-
-// ExportData 导出工作空间数据
-func (h *WorkspaceHandler) ExportData(c echo.Context) error {
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	workspaceID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
-	}
-
-	exportData, err := h.workspaceService.ExportData(c.Request().Context(), workspaceID, uid)
-	if err != nil {
-		switch err {
-		case service.ErrWorkspaceNotFound:
-			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限导出工作空间数据")
-		case service.ErrWorkspaceExportUnavailable:
-			return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXPORT_FAILED", "导出失败")
-		}
-	}
-
-	h.recordAudit(c, workspaceID, uid, "workspace.export", "workspace", &workspaceID, entity.JSON{
-		"exported_at": exportData.ExportedAt,
-	})
-
-	return successResponse(c, map[string]interface{}{
-		"export": exportData,
-	})
-}
-
-// RequestExport 创建导出任务（异步）
-func (h *WorkspaceHandler) RequestExport(c echo.Context) error {
-	if h.exportService == nil {
-		return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-	}
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	workspaceID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
-	}
-
-	job, err := h.exportService.RequestExport(c.Request().Context(), workspaceID, uid)
-	if err != nil {
-		switch err {
-		case service.ErrWorkspaceNotFound:
-			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限导出工作空间数据")
-		case service.ErrWorkspaceExportDisabled:
-			return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_DISABLED", "导出功能已禁用")
-		case service.ErrWorkspaceExportUnavailable:
-			return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXPORT_REQUEST_FAILED", "创建导出任务失败")
-		}
-	}
-
-	h.recordAudit(c, workspaceID, uid, "workspace.export.requested", "workspace", &workspaceID, entity.JSON{
-		"export_id": job.ID.String(),
-	})
-
-	return successResponse(c, map[string]interface{}{
-		"export": h.buildExportJobResponse(job),
-	})
-}
-
-// GetExport 获取导出任务状态
-func (h *WorkspaceHandler) GetExport(c echo.Context) error {
-	if h.exportService == nil {
-		return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-	}
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	workspaceID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
-	}
-	exportID, err := uuid.Parse(c.Param("exportId"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_EXPORT_ID", "导出任务 ID 无效")
-	}
-
-	job, err := h.exportService.GetJob(c.Request().Context(), workspaceID, exportID, uid)
-	if err != nil {
-		switch err {
-		case service.ErrWorkspaceNotFound:
-			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限查看导出任务")
-		case service.ErrWorkspaceExportNotFound:
-			return errorResponse(c, http.StatusNotFound, "EXPORT_NOT_FOUND", "导出任务不存在")
-		case service.ErrWorkspaceExportUnavailable:
-			return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXPORT_FETCH_FAILED", "获取导出任务失败")
-		}
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"export": h.buildExportJobResponse(job),
-	})
-}
-
-// DownloadExport 下载导出包
-func (h *WorkspaceHandler) DownloadExport(c echo.Context) error {
-	if h.exportService == nil {
-		return errorResponse(c, http.StatusServiceUnavailable, "EXPORT_UNAVAILABLE", "导出服务暂不可用")
-	}
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-
-	workspaceID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
-	}
-	exportID, err := uuid.Parse(c.Param("exportId"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_EXPORT_ID", "导出任务 ID 无效")
-	}
-
-	download, err := h.exportService.Download(c.Request().Context(), workspaceID, exportID, uid)
-	if err != nil {
-		switch err {
-		case service.ErrWorkspaceNotFound:
-			return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限下载导出包")
-		case service.ErrWorkspaceExportNotFound:
-			return errorResponse(c, http.StatusNotFound, "EXPORT_NOT_FOUND", "导出任务不存在")
-		case service.ErrWorkspaceExportNotReady:
-			return errorResponse(c, http.StatusConflict, "EXPORT_NOT_READY", "导出任务尚未完成")
-		case service.ErrWorkspaceExportExpired:
-			return errorResponse(c, http.StatusGone, "EXPORT_EXPIRED", "导出包已过期")
-		case service.ErrWorkspaceExportUnavailable:
-			return errorResponse(c, http.StatusNotFound, "EXPORT_UNAVAILABLE", "导出包不可用")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "EXPORT_DOWNLOAD_FAILED", "下载导出包失败")
-		}
-	}
-
-	return c.Attachment(download.FilePath, download.FileName)
 }
 
 // Delete 删除工作空间（软删除）
@@ -679,46 +495,6 @@ func (h *WorkspaceHandler) UpdateMemberRole(c echo.Context) error {
 	})
 }
 
-// VerifyDomainByID 验证工作空间域名
-func (h *WorkspaceHandler) VerifyDomainByID(c echo.Context) error {
-	if h.workspaceDomainService == nil {
-		return errorResponse(c, http.StatusServiceUnavailable, "DOMAIN_SERVICE_UNAVAILABLE", "域名服务不可用")
-	}
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-	domainID, err := uuid.Parse(c.Param("domainId"))
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "域名 ID 无效")
-	}
-
-	result, err := h.workspaceDomainService.VerifyDomainByID(c.Request().Context(), uid, domainID)
-	if err != nil {
-		var verifyErr *service.DomainVerifyError
-		if errors.As(err, &verifyErr) {
-			return errorResponse(c, http.StatusBadRequest, "VERIFICATION_FAILED", "域名验证失败")
-		}
-		switch err {
-		case service.ErrWorkspaceDomainNotFound:
-			return errorResponse(c, http.StatusNotFound, "DOMAIN_NOT_FOUND", "域名不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限操作该域名")
-		case service.ErrWorkspaceDomainVerificationFailed:
-			return errorResponse(c, http.StatusBadRequest, "VERIFICATION_FAILED", "域名验证失败")
-		default:
-			return errorResponse(c, http.StatusInternalServerError, "VERIFY_FAILED", "域名验证失败")
-		}
-	}
-
-	return successResponse(c, map[string]interface{}{
-		"domain":       result.Domain,
-		"verification": result.Verification,
-		"verified":     result.Verified,
-	})
-}
-
 func (h *WorkspaceHandler) recordAudit(ctx echo.Context, workspaceID uuid.UUID, actorID uuid.UUID, action string, targetType string, targetID *uuid.UUID, metadata entity.JSON) {
 	if h.auditLogService == nil {
 		return
@@ -732,38 +508,6 @@ func (h *WorkspaceHandler) recordAudit(ctx echo.Context, workspaceID uuid.UUID, 
 		TargetID:    targetID,
 		Metadata:    metadata,
 	})
-}
-
-func (h *WorkspaceHandler) buildExportJobResponse(job *entity.WorkspaceExportJob) WorkspaceExportJobResponse {
-	resp := WorkspaceExportJobResponse{
-		ID:          job.ID.String(),
-		WorkspaceID: job.WorkspaceID.String(),
-		Status:      string(job.Status),
-		ExportType:  string(job.ExportType),
-		FileName:    job.FileName,
-		FileSize:    job.FileSize,
-		Error:       job.ErrorMessage,
-		CreatedAt:   job.CreatedAt.Format(time.RFC3339),
-	}
-
-	if job.StartedAt != nil {
-		t := job.StartedAt.Format(time.RFC3339)
-		resp.StartedAt = &t
-	}
-	if job.CompletedAt != nil {
-		t := job.CompletedAt.Format(time.RFC3339)
-		resp.CompletedAt = &t
-	}
-	if job.ExpiresAt != nil {
-		t := job.ExpiresAt.Format(time.RFC3339)
-		resp.ExpiresAt = &t
-	}
-	if job.Status == entity.WorkspaceExportStatusCompleted {
-		downloadURL := fmt.Sprintf("/api/v1/workspaces/%s/exports/%s/download", job.WorkspaceID.String(), job.ID.String())
-		resp.DownloadURL = &downloadURL
-	}
-
-	return resp
 }
 
 // ===== Workspace 应用功能 Handler =====
@@ -1001,31 +745,6 @@ func (h *WorkspaceHandler) ListPublicRatings(c echo.Context) error {
 		"code": "OK", "message": "OK",
 		"data": map[string]interface{}{"items": ratings, "total": total, "page": page, "page_size": pageSize},
 	})
-}
-
-// SubmitRating 提交评分
-func (h *WorkspaceHandler) SubmitRating(c echo.Context) error {
-	userID := middleware.GetUserID(c)
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
-	}
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
-	}
-	var req struct {
-		Score   int    `json:"score"`
-		Comment string `json:"comment"`
-	}
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": "invalid request"})
-	}
-	rating, err := h.workspaceService.SubmitRating(c.Request().Context(), id, uid, req.Score, req.Comment)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_REQUEST", "message": err.Error()})
-	}
-	return c.JSON(http.StatusCreated, map[string]interface{}{"code": "OK", "message": "OK", "data": map[string]interface{}{"rating": rating}})
 }
 
 // ===== 工具函数 =====

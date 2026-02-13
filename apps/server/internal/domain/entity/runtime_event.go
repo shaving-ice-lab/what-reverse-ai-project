@@ -36,9 +36,6 @@ const (
 	EventWorkspaceSessionExpired RuntimeEventType = "workspace.session.expired"
 
 	// ===== 数据库操作事件 =====
-	EventDBProvisionStarted   RuntimeEventType = "db.provision.started"
-	EventDBProvisionCompleted RuntimeEventType = "db.provision.completed"
-	EventDBProvisionFailed    RuntimeEventType = "db.provision.failed"
 	EventDBMigrationStarted   RuntimeEventType = "db.migration.started"
 	EventDBMigrationCompleted RuntimeEventType = "db.migration.completed"
 	EventDBMigrationFailed    RuntimeEventType = "db.migration.failed"
@@ -371,9 +368,6 @@ func GetEventTypeMetadata() []EventTypeMeta {
 		{EventWorkspacePublished, "workspace", "Workspace 发布"},
 
 		// 数据库事件
-		{EventDBProvisionStarted, "database", "数据库创建开始"},
-		{EventDBProvisionCompleted, "database", "数据库创建完成"},
-		{EventDBProvisionFailed, "database", "数据库创建失败"},
 		{EventDBMigrationStarted, "database", "数据库迁移开始"},
 		{EventDBMigrationCompleted, "database", "数据库迁移完成"},
 		{EventDBMigrationFailed, "database", "数据库迁移失败"},

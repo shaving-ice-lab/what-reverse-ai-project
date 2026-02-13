@@ -6,14 +6,15 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type DeleteTableTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewDeleteTableTool(dbQueryService service.WorkspaceDBQueryService) *DeleteTableTool {
-	return &DeleteTableTool{dbQueryService: dbQueryService}
+func NewDeleteTableTool(vmStore *vmruntime.VMStore) *DeleteTableTool {
+	return &DeleteTableTool{vmStore: vmStore}
 }
 
 func (t *DeleteTableTool) Name() string { return "delete_table" }
@@ -50,7 +51,7 @@ func (t *DeleteTableTool) Execute(ctx context.Context, params json.RawMessage) (
 		return &service.AgentToolResult{Success: false, Error: "table_name is required"}, nil
 	}
 
-	if err := t.dbQueryService.DropTable(ctx, p.WorkspaceID, p.TableName); err != nil {
+	if err := t.vmStore.DropTable(ctx, p.WorkspaceID, p.TableName); err != nil {
 		return &service.AgentToolResult{
 			Success: false,
 			Error:   fmt.Sprintf("failed to drop table %q: %v", p.TableName, err),

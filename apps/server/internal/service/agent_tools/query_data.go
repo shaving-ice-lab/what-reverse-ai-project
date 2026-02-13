@@ -6,14 +6,15 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type QueryDataTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewQueryDataTool(dbQueryService service.WorkspaceDBQueryService) *QueryDataTool {
-	return &QueryDataTool{dbQueryService: dbQueryService}
+func NewQueryDataTool(vmStore *vmruntime.VMStore) *QueryDataTool {
+	return &QueryDataTool{vmStore: vmStore}
 }
 
 func (t *QueryDataTool) Name() string { return "query_data" }
@@ -48,7 +49,7 @@ func (t *QueryDataTool) Execute(ctx context.Context, params json.RawMessage) (*s
 		return &service.AgentToolResult{Success: false, Error: "invalid parameters: " + err.Error()}, nil
 	}
 
-	result, err := t.dbQueryService.ExecuteSQL(ctx, p.WorkspaceID, p.SQL, p.Params)
+	result, err := t.vmStore.ExecuteSQL(ctx, p.WorkspaceID, p.SQL, p.Params...)
 	if err != nil {
 		return &service.AgentToolResult{
 			Success: false,

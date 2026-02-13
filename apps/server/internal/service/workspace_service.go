@@ -26,7 +26,6 @@ type WorkspaceService interface {
 	ListByUser(ctx context.Context, userID uuid.UUID) ([]entity.Workspace, error)
 	GetByID(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error)
 	Update(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req UpdateWorkspaceRequest) (*entity.Workspace, error)
-	ExportData(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDataExport, error)
 	Delete(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDeletionResult, error)
 	Restore(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDeletionResult, error)
 	ListMembers(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID) ([]entity.WorkspaceMember, error)
@@ -47,11 +46,18 @@ type WorkspaceService interface {
 	UpdateAccessPolicy(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, req UpdateAccessPolicyRequest) (*AccessPolicyResponse, error)
 	UpdateUISchema(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, uiSchema map[string]interface{}) (*entity.WorkspaceVersion, error)
 
+	// VM Runtime Logic Code
+	UpdateLogicCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error)
+	GetLogicCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error)
+
+	// Frontend Component Code
+	UpdateComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error)
+	GetComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error)
+
 	// Marketplace
 	ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error)
 	GetPublic(ctx context.Context, id uuid.UUID) (*entity.Workspace, error)
 	ListRatings(ctx context.Context, workspaceID uuid.UUID, page, pageSize int) ([]entity.WorkspaceRating, int64, error)
-	SubmitRating(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID, score int, comment string) (*entity.WorkspaceRating, error)
 }
 
 type workspaceService struct {
@@ -330,14 +336,6 @@ type UpdateWorkspaceRequest struct {
 	Plan *string `json:"plan"`
 }
 
-// WorkspaceDataExport 工作空间数据导出结构
-type WorkspaceDataExport struct {
-	Version    string                   `json:"version"`
-	ExportedAt string                   `json:"exported_at"`
-	Workspace  *entity.Workspace        `json:"workspace"`
-	Members    []entity.WorkspaceMember `json:"members"`
-}
-
 // WorkspaceDeletionResult 工作空间删除结果
 type WorkspaceDeletionResult struct {
 	WorkspaceID  uuid.UUID  `json:"workspace_id"`
@@ -401,25 +399,6 @@ func (s *workspaceService) Update(ctx context.Context, id uuid.UUID, ownerID uui
 		s.ensureSlugAlias(ctx, workspace.ID, oldSlug)
 	}
 	return workspace, nil
-}
-
-func (s *workspaceService) ExportData(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDataExport, error) {
-	access, err := s.authorizeWorkspace(ctx, id, ownerID, PermissionWorkspaceAdmin)
-	if err != nil {
-		return nil, err
-	}
-
-	members, err := s.memberRepo.ListByWorkspaceID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return &WorkspaceDataExport{
-		Version:    "1.0.0",
-		ExportedAt: time.Now().Format(time.RFC3339),
-		Workspace:  access.Workspace,
-		Members:    members,
-	}, nil
 }
 
 func (s *workspaceService) Delete(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDeletionResult, error) {
@@ -1074,6 +1053,80 @@ func (s *workspaceService) UpdateUISchema(ctx context.Context, id uuid.UUID, own
 	return version, nil
 }
 
+func (s *workspaceService) UpdateLogicCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if ws.CurrentVersionID == nil {
+		return nil, errors.New("no current version to update")
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("current version not found: %w", err)
+	}
+	version.LogicCode = &code
+	if err := s.workspaceRepo.UpdateVersion(ctx, version); err != nil {
+		return nil, fmt.Errorf("failed to update logic code: %w", err)
+	}
+	return version, nil
+}
+
+func (s *workspaceService) GetLogicCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return "", err
+	}
+	if ws.CurrentVersionID == nil {
+		return "", nil
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return "", fmt.Errorf("current version not found: %w", err)
+	}
+	if version.LogicCode == nil {
+		return "", nil
+	}
+	return *version.LogicCode, nil
+}
+
+func (s *workspaceService) UpdateComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if ws.CurrentVersionID == nil {
+		return nil, errors.New("no current version to update")
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("current version not found: %w", err)
+	}
+	version.ComponentCode = &code
+	if err := s.workspaceRepo.UpdateVersion(ctx, version); err != nil {
+		return nil, fmt.Errorf("failed to update component code: %w", err)
+	}
+	return version, nil
+}
+
+func (s *workspaceService) GetComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return "", err
+	}
+	if ws.CurrentVersionID == nil {
+		return "", nil
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return "", fmt.Errorf("current version not found: %w", err)
+	}
+	if version.ComponentCode == nil {
+		return "", nil
+	}
+	return *version.ComponentCode, nil
+}
+
 func (s *workspaceService) ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error) {
 	return s.workspaceRepo.ListPublic(ctx, page, pageSize)
 }
@@ -1094,25 +1147,6 @@ func (s *workspaceService) ListRatings(ctx context.Context, workspaceID uuid.UUI
 		Page:     page,
 		PageSize: pageSize,
 	})
-}
-
-func (s *workspaceService) SubmitRating(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID, score int, comment string) (*entity.WorkspaceRating, error) {
-	if score < 1 || score > 5 {
-		return nil, errors.New("score must be between 1 and 5")
-	}
-	rating := &entity.WorkspaceRating{
-		ID:          uuid.New(),
-		WorkspaceID: workspaceID,
-		UserID:      userID,
-		Rating:      score,
-		Review:      &comment,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-	if err := s.workspaceRepo.CreateOrUpdateRating(ctx, rating); err != nil {
-		return nil, fmt.Errorf("failed to submit rating: %w", err)
-	}
-	return rating, nil
 }
 
 // getAuthorizedWorkspace 获取并验证权限

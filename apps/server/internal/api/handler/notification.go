@@ -297,24 +297,3 @@ func (h *NotificationHandler) GetUnreadCount(c echo.Context) error {
 
 	return successResponse(c, result)
 }
-
-// RegisterRoutes 注册路由
-func (h *NotificationHandler) RegisterRoutes(g *echo.Group, authMiddleware echo.MiddlewareFunc) {
-	notifications := g.Group("/notifications", authMiddleware)
-
-	// 通知列表与详情
-	notifications.GET("", h.List)
-	notifications.GET("/:id", h.GetByID)
-
-	// 标记已读
-	notifications.POST("/:id/read", h.MarkAsRead)
-	notifications.POST("/read-all", h.MarkAllAsRead)
-	notifications.POST("/read-multiple", h.MarkMultipleAsRead)
-
-	// 删除
-	notifications.DELETE("/:id", h.Delete)
-	notifications.DELETE("/clear", h.ClearAll)
-
-	// 未读数
-	notifications.GET("/unread-count", h.GetUnreadCount)
-}

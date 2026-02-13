@@ -1,20 +1,15 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/google/uuid"
 	"github.com/reverseai/server/internal/config"
 	"github.com/reverseai/server/internal/pkg/database"
 	"github.com/reverseai/server/internal/pkg/logger"
 	"github.com/reverseai/server/internal/pkg/queue"
-	"github.com/reverseai/server/internal/repository"
-	"github.com/reverseai/server/internal/service"
 )
 
 func main() {
@@ -36,59 +31,11 @@ func main() {
 	log.Info("Starting reverseai Worker...")
 
 	// 初始化数据库
-	db, err := database.New(&cfg.Database)
+	_, err = database.New(&cfg.Database)
 	if err != nil {
 		log.Fatal("Failed to connect to database", "error", err)
 	}
 	log.Info("Database connected")
-
-	// 初始化仓储
-	workspaceDatabaseRepo := repository.NewWorkspaceDatabaseRepository(db)
-	userRepo := repository.NewUserRepository(db)
-	workspaceRepo := repository.NewWorkspaceRepository(db)
-	workspaceSlugAliasRepo := repository.NewWorkspaceSlugAliasRepository(db)
-	workspaceRoleRepo := repository.NewWorkspaceRoleRepository(db)
-	workspaceMemberRepo := repository.NewWorkspaceMemberRepository(db)
-	runtimeEventRepo := repository.NewRuntimeEventRepository(db)
-	reviewQueueRepo := repository.NewReviewQueueRepository(db)
-	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(db)
-	idempotencyRepo := repository.NewIdempotencyKeyRepository(db)
-	eventRecorder := service.NewEventRecorderService(runtimeEventRepo, log, nil, cfg.Security.PIISanitizationEnabled)
-	workspaceService := service.NewWorkspaceService(
-		db,
-		workspaceRepo,
-		workspaceSlugAliasRepo,
-		userRepo,
-		workspaceRoleRepo,
-		workspaceMemberRepo,
-		eventRecorder,
-		cfg.Retention,
-	)
-	workspaceDatabaseService, err := service.NewWorkspaceDatabaseService(
-		workspaceDatabaseRepo,
-		workspaceService,
-		nil, // billingService removed
-		eventRecorder,
-		reviewQueueRepo,
-		workspaceDBSchemaMigrationRepo,
-		idempotencyRepo,
-		cfg.Database,
-		cfg.Encryption.Key,
-	)
-	if err != nil {
-		log.Error("Failed to initialize workspace database service", "error", err)
-		workspaceDatabaseService, _ = service.NewWorkspaceDatabaseService(
-			workspaceDatabaseRepo,
-			workspaceService,
-			nil, // billingService removed
-			eventRecorder,
-			reviewQueueRepo,
-			workspaceDBSchemaMigrationRepo,
-			idempotencyRepo,
-			cfg.Database,
-			"change-this-to-a-32-byte-secret!",
-		)
-	}
 
 	workerCfg := &queue.WorkerConfig{
 		RedisAddr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
@@ -98,11 +45,7 @@ func main() {
 		Queues:        cfg.Queue.Queues,
 	}
 
-	var dbProvisioner queue.DBProvisioner
-	if workspaceDatabaseService != nil {
-		dbProvisioner = dbProvisionerAdapter{svc: workspaceDatabaseService}
-	}
-	worker, err := queue.NewWorker(workerCfg, log, dbProvisioner, nil, nil)
+	worker, err := queue.NewWorker(workerCfg, log, nil, nil)
 	if err != nil {
 		log.Fatal("Failed to create worker", "error", err)
 	}
@@ -126,19 +69,4 @@ func main() {
 
 	worker.Shutdown()
 	log.Info("Worker exited")
-}
-
-type dbProvisionerAdapter struct {
-	svc service.WorkspaceDatabaseService
-}
-
-func (a dbProvisionerAdapter) Provision(ctx context.Context, workspaceID, ownerID uuid.UUID) error {
-	if a.svc == nil {
-		return queue.ErrTaskNoop
-	}
-	_, err := a.svc.Provision(ctx, workspaceID, ownerID)
-	if errors.Is(err, service.ErrWorkspaceDatabaseExists) {
-		return queue.ErrTaskNoop
-	}
-	return err
 }

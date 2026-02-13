@@ -120,15 +120,17 @@ func (m *WorkspaceMember) BeforeCreate(tx *gorm.DB) error {
 
 // WorkspaceVersion 工作空间版本实体（原 AppVersion）
 type WorkspaceVersion struct {
-	ID          uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
-	WorkspaceID uuid.UUID  `gorm:"type:char(36);not null;index;uniqueIndex:uniq_workspace_version" json:"workspace_id"`
-	Version     string     `gorm:"size:50;not null;uniqueIndex:uniq_workspace_version" json:"version"`
-	Changelog   *string    `gorm:"type:text" json:"changelog"`
-	UISchema    JSON       `gorm:"column:ui_schema;type:json" json:"ui_schema"`
-	DBSchema    JSON       `gorm:"column:db_schema;type:json" json:"db_schema"`
-	ConfigJSON  JSON       `gorm:"column:config_json;type:json" json:"config_json"`
-	CreatedBy   *uuid.UUID `gorm:"type:char(36);index" json:"created_by"`
-	CreatedAt   time.Time  `json:"created_at"`
+	ID            uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
+	WorkspaceID   uuid.UUID  `gorm:"type:char(36);not null;index;uniqueIndex:uniq_workspace_version" json:"workspace_id"`
+	Version       string     `gorm:"size:50;not null;uniqueIndex:uniq_workspace_version" json:"version"`
+	Changelog     *string    `gorm:"type:text" json:"changelog"`
+	UISchema      JSON       `gorm:"column:ui_schema;type:json" json:"ui_schema"`
+	DBSchema      JSON       `gorm:"column:db_schema;type:json" json:"db_schema"`
+	ConfigJSON    JSON       `gorm:"column:config_json;type:json" json:"config_json"`
+	LogicCode     *string    `gorm:"column:logic_code;type:longtext" json:"logic_code"`
+	ComponentCode *string    `gorm:"column:component_code;type:longtext" json:"component_code"`
+	CreatedBy     *uuid.UUID `gorm:"type:char(36);index" json:"created_by"`
+	CreatedAt     time.Time  `json:"created_at"`
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 	Creator   *User      `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`

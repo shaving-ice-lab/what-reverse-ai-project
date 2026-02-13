@@ -6,14 +6,15 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type DeleteDataTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewDeleteDataTool(dbQueryService service.WorkspaceDBQueryService) *DeleteDataTool {
-	return &DeleteDataTool{dbQueryService: dbQueryService}
+func NewDeleteDataTool(vmStore *vmruntime.VMStore) *DeleteDataTool {
+	return &DeleteDataTool{vmStore: vmStore}
 }
 
 func (t *DeleteDataTool) Name() string { return "delete_data" }
@@ -56,7 +57,7 @@ func (t *DeleteDataTool) Execute(ctx context.Context, params json.RawMessage) (*
 		return &service.AgentToolResult{Success: false, Error: "no IDs provided"}, nil
 	}
 
-	result, err := t.dbQueryService.DeleteRows(ctx, p.WorkspaceID, p.TableName, p.IDs)
+	result, err := t.vmStore.DeleteRows(ctx, p.WorkspaceID, p.TableName, p.IDs)
 	if err != nil {
 		return &service.AgentToolResult{
 			Success: false,

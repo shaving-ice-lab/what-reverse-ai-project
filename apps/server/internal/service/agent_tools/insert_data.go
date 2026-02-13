@@ -6,14 +6,15 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type InsertDataTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewInsertDataTool(dbQueryService service.WorkspaceDBQueryService) *InsertDataTool {
-	return &InsertDataTool{dbQueryService: dbQueryService}
+func NewInsertDataTool(vmStore *vmruntime.VMStore) *InsertDataTool {
+	return &InsertDataTool{vmStore: vmStore}
 }
 
 func (t *InsertDataTool) Name() string { return "insert_data" }
@@ -62,7 +63,7 @@ func (t *InsertDataTool) Execute(ctx context.Context, params json.RawMessage) (*
 	successCount := 0
 	var lastErr error
 	for _, row := range p.Rows {
-		if _, err := t.dbQueryService.InsertRow(ctx, p.WorkspaceID, p.TableName, row); err != nil {
+		if _, err := t.vmStore.InsertRow(ctx, p.WorkspaceID, p.TableName, row); err != nil {
 			lastErr = err
 		} else {
 			successCount++

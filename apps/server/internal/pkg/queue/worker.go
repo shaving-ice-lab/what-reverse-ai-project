@@ -20,7 +20,6 @@ type Worker struct {
 	mux               *asynq.ServeMux
 	client            *asynq.Client
 	log               logger.Logger
-	dbProvisioner     DBProvisioner
 	domainVerifier    DomainVerifier
 	metricsAggregator MetricsAggregator
 }
@@ -32,11 +31,6 @@ type WorkerConfig struct {
 	RedisDB       int
 	Concurrency   int
 	Queues        map[string]int
-}
-
-// DBProvisioner 数据库创建执行器
-type DBProvisioner interface {
-	Provision(ctx context.Context, workspaceID, ownerID uuid.UUID) error
 }
 
 // DomainVerifier 域名验证执行器
@@ -53,7 +47,6 @@ type MetricsAggregator interface {
 func NewWorker(
 	cfg *WorkerConfig,
 	log logger.Logger,
-	dbProvisioner DBProvisioner,
 	domainVerifier DomainVerifier,
 	metricsAggregator MetricsAggregator,
 ) (*Worker, error) {
@@ -90,15 +83,11 @@ func NewWorker(
 		mux:               asynq.NewServeMux(),
 		client:            client,
 		log:               log,
-		dbProvisioner:     dbProvisioner,
 		domainVerifier:    domainVerifier,
 		metricsAggregator: metricsAggregator,
 	}
 
 	// 注册任务处理器
-	if worker.dbProvisioner != nil {
-		worker.mux.HandleFunc(TaskTypeDBProvision, worker.handleDBProvision)
-	}
 	if worker.domainVerifier != nil {
 		worker.mux.HandleFunc(TaskTypeDomainVerify, worker.handleDomainVerify)
 	}
@@ -111,7 +100,6 @@ func NewWorker(
 
 func normalizeQueueWeights(overrides map[string]int) map[string]int {
 	defaults := map[string]int{
-		QueueDBProvision:        3,
 		QueueDomainVerify:       2,
 		QueueMetricsAggregation: 1,
 	}
@@ -144,32 +132,6 @@ func (w *Worker) Shutdown() {
 	if w.client != nil {
 		_ = w.client.Close()
 	}
-}
-
-// handleDBProvision 处理 Workspace DB 创建任务
-func (w *Worker) handleDBProvision(ctx context.Context, task *asynq.Task) error {
-	if w.dbProvisioner == nil {
-		return fmt.Errorf("db provisioner not configured")
-	}
-	var payload DBProvisionPayload
-	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
-		return fmt.Errorf("failed to unmarshal payload: %w", err)
-	}
-	workspaceID, err := uuid.Parse(payload.WorkspaceID)
-	if err != nil {
-		return fmt.Errorf("invalid workspace ID: %w", err)
-	}
-	ownerID, err := uuid.Parse(payload.OwnerID)
-	if err != nil {
-		return fmt.Errorf("invalid owner ID: %w", err)
-	}
-	if err := w.dbProvisioner.Provision(ctx, workspaceID, ownerID); err != nil {
-		if errors.Is(err, ErrTaskNoop) {
-			return nil
-		}
-		return err
-	}
-	return nil
 }
 
 // handleDomainVerify 处理域名验证任务

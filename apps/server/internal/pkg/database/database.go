@@ -86,9 +86,6 @@ func Migrate(db *gorm.DB) error {
 		&entity.WorkspaceSlugAlias{},
 		&entity.WorkspaceRole{},
 		&entity.WorkspaceMember{},
-		&entity.WorkspaceDatabase{},
-		&entity.WorkspaceDBRole{},
-		&entity.WorkspaceDBSchemaMigration{},
 		&entity.IdempotencyKey{},
 
 		// 审计相关
@@ -102,13 +99,6 @@ func Migrate(db *gorm.DB) error {
 
 		// 活动
 		&entity.UserActivity{},
-
-		// 审核队列（DB Schema Migration 审批）
-		&entity.ReviewQueue{},
-		&entity.ReviewRecord{},
-		&entity.ReviewComment{},
-		&entity.Reviewer{},
-		&entity.ReviewChecklist{},
 
 		// 评论（通知服务依赖）
 		&entity.Comment{},

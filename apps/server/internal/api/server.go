@@ -17,6 +17,7 @@ import (
 	"github.com/reverseai/server/internal/service"
 	"github.com/reverseai/server/internal/service/agent_tools"
 	"github.com/reverseai/server/internal/service/skills"
+	"github.com/reverseai/server/internal/vmruntime"
 	"gorm.io/gorm"
 )
 
@@ -103,13 +104,8 @@ func (s *Server) setupRoutes() {
 	workspaceSlugAliasRepo := repository.NewWorkspaceSlugAliasRepository(s.db)
 	workspaceRoleRepo := repository.NewWorkspaceRoleRepository(s.db)
 	workspaceMemberRepo := repository.NewWorkspaceMemberRepository(s.db)
-	workspaceDatabaseRepo := repository.NewWorkspaceDatabaseRepository(s.db)
-	workspaceDBSchemaMigrationRepo := repository.NewWorkspaceDBSchemaMigrationRepository(s.db)
-	idempotencyRepo := repository.NewIdempotencyKeyRepository(s.db)
-	workspaceDBRoleRepo := repository.NewWorkspaceDBRoleRepository(s.db)
 	runtimeEventRepo := repository.NewRuntimeEventRepository(s.db)
 	auditLogRepo := repository.NewAuditLogRepository(s.db)
-	reviewQueueRepo := repository.NewReviewQueueRepository(s.db)
 	apiKeyRepo := repository.NewAPIKeyRepository(s.db)
 	activityRepo := repository.NewActivityRepository(s.db)
 	sessionRepo := repository.NewSessionRepository(s.db)
@@ -135,56 +131,11 @@ func (s *Server) setupRoutes() {
 		s.log.Error("Failed to initialize API key service", "error", err)
 		apiKeyService, _ = service.NewAPIKeyService(apiKeyRepo, workspaceService, "change-this-to-a-32-byte-secret!")
 	}
-	workspaceDatabaseService, err := service.NewWorkspaceDatabaseService(
-		workspaceDatabaseRepo,
-		workspaceService,
-		nil, // billingService — 后续再接入
-		eventRecorder,
-		reviewQueueRepo,
-		workspaceDBSchemaMigrationRepo,
-		idempotencyRepo,
-		s.config.Database,
-		s.config.Encryption.Key,
-	)
-	if err != nil {
-		s.log.Error("Failed to initialize workspace database service", "error", err)
-		workspaceDatabaseService, _ = service.NewWorkspaceDatabaseService(
-			workspaceDatabaseRepo,
-			workspaceService,
-			nil,
-			eventRecorder,
-			reviewQueueRepo,
-			workspaceDBSchemaMigrationRepo,
-			idempotencyRepo,
-			s.config.Database,
-			"change-this-to-a-32-byte-secret!",
-		)
-	}
-	workspaceDBRoleService, err := service.NewWorkspaceDBRoleService(
-		workspaceDBRoleRepo,
-		workspaceDatabaseRepo,
-		workspaceService,
-		auditLogService,
-		s.config.Database,
-		s.config.Encryption.Key,
-	)
-	if err != nil {
-		s.log.Error("Failed to initialize workspace DB role service", "error", err)
-		workspaceDBRoleService, _ = service.NewWorkspaceDBRoleService(
-			workspaceDBRoleRepo,
-			workspaceDatabaseRepo,
-			workspaceService,
-			auditLogService,
-			s.config.Database,
-			"change-this-to-a-32-byte-secret!",
-		)
-	}
-	workspaceDBRuntime, err := service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, s.config.Database, s.config.Encryption.Key)
-	if err != nil {
-		s.log.Error("Failed to initialize workspace DB runtime", "error", err)
-		workspaceDBRuntime, _ = service.NewWorkspaceDBRuntime(workspaceDatabaseRepo, workspaceService, s.config.Database, "change-this-to-a-32-byte-secret!")
-	}
-	workspaceDBQueryService := service.NewWorkspaceDBQueryService(workspaceDBRuntime)
+	// VM Runtime 初始化（SQLite store for workspace databases）
+	vmStore := vmruntime.NewVMStore(s.config.VMRuntime.BaseDir)
+	vmCodeLoader := vmruntime.NewGORMCodeLoader(s.db)
+	vmPool := vmruntime.NewVMPool(vmStore, vmCodeLoader, s.config.VMRuntime.MaxVMs)
+
 	// 初始化 Dashboard 服务
 	dashboardService := service.NewDashboardService(activityRepo)
 
@@ -211,9 +162,8 @@ func (s *Server) setupRoutes() {
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService, apiKeyService)
-	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, nil, auditLogService, nil) // domain/export — 后续再接入
-	workspaceDatabaseHandler := handler.NewWorkspaceDatabaseHandler(workspaceDatabaseService, workspaceDBRoleService, auditLogService, s.taskQueue)
-	workspaceDBQueryHandler := handler.NewWorkspaceDBQueryHandler(workspaceDBQueryService, workspaceDBRuntime, auditLogService)
+	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, auditLogService)
+	vmDatabaseHandler := handler.NewVMDatabaseHandler(vmStore, auditLogService)
 	auditLogHandler := handler.NewAuditLogHandler(auditLogService, workspaceService)
 	runtimeHandler := handler.NewRuntimeHandler(
 		runtimeService,
@@ -234,9 +184,10 @@ func (s *Server) setupRoutes() {
 
 	// Skills 系统初始化
 	skillRegistry := service.NewSkillRegistry()
-	_ = skillRegistry.Register(skills.NewDataModelingSkill(workspaceDBQueryService, workspaceDatabaseService))
+	_ = skillRegistry.Register(skills.NewDataModelingSkill(vmStore))
 	_ = skillRegistry.Register(skills.NewUIGenerationSkill())
-	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(workspaceDBQueryService))
+	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(vmStore))
+	_ = skillRegistry.Register(skills.NewVMRuntimeSkill(workspaceService, vmPool, vmStore))
 
 	// Agent 推理引擎初始化
 	agentToolRegistry := service.NewAgentToolRegistry()
@@ -278,8 +229,9 @@ func (s *Server) setupRoutes() {
 	appUserRepo := repository.NewAppUserRepository(s.db)
 	runtimeAuthService := service.NewRuntimeAuthServiceWithDB(appUserRepo, workspaceRepo, sessionRepo, s.db)
 	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService, runtimeService)
-	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, workspaceDBQueryService, workspaceRLSService)
+	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, vmStore, workspaceRLSService)
 	runtimeDataHandler.SetRuntimeAuthService(runtimeAuthService)
+	runtimeVMHandler := handler.NewRuntimeVMHandler(runtimeService, vmPool, runtimeAuthService)
 
 	// Runtime 公开访问入口（现在直接用 workspaceSlug）
 	runtime := s.echo.Group("/runtime", middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
@@ -299,6 +251,8 @@ func (s *Server) setupRoutes() {
 		// Runtime Storage — 文件上传和访问
 		runtime.POST("/:workspaceSlug/storage/upload", runtimeStorageHandler.Upload)
 		runtime.GET("/:workspaceSlug/storage/files/:objectId", runtimeStorageHandler.ServeFilePublic)
+		// VM API — JS VM 路由
+		runtime.Any("/:workspaceSlug/api/*", runtimeVMHandler.HandleAPI)
 	}
 	s.echo.GET("/", runtimeHandler.GetDomainEntry, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
 	s.echo.GET("/schema", runtimeHandler.GetDomainSchema, middleware.RequireFeature(featureFlagsService.IsWorkspaceRuntimeEnabled, "WORKSPACE_RUNTIME_DISABLED", "Workspace Runtime 暂未开放"))
@@ -372,35 +326,20 @@ func (s *Server) setupRoutes() {
 			workspaces.PATCH("/:id", workspaceHandler.Update)
 			workspaces.DELETE("/:id", workspaceHandler.Delete)
 			workspaces.POST("/:id/restore", workspaceHandler.Restore)
-			workspaces.POST("/:id/database", workspaceDatabaseHandler.Provision)
-			workspaces.GET("/:id/database", workspaceDatabaseHandler.Get)
-			workspaces.POST("/:id/database/rotate-secret", workspaceDatabaseHandler.RotateSecret)
-			workspaces.POST("/:id/database/migrate", workspaceDatabaseHandler.Migrate)
-			workspaces.GET("/:id/database/migrations/plan", workspaceDatabaseHandler.PreviewMigrationPlan)
-			workspaces.POST("/:id/database/migrations", workspaceDatabaseHandler.SubmitMigration)
-			workspaces.GET("/:id/database/migrations/:migrationId", workspaceDatabaseHandler.GetMigration)
-			workspaces.POST("/:id/database/migrations/:migrationId/approve", workspaceDatabaseHandler.ApproveMigration)
-			workspaces.POST("/:id/database/migrations/:migrationId/reject", workspaceDatabaseHandler.RejectMigration)
-			workspaces.POST("/:id/database/migrations/:migrationId/execute", workspaceDatabaseHandler.ExecuteMigration)
-			workspaces.POST("/:id/database/backup", workspaceDatabaseHandler.Backup)
-			workspaces.POST("/:id/database/restore", workspaceDatabaseHandler.Restore)
-			workspaces.POST("/:id/database/roles", workspaceDatabaseHandler.CreateRole)
-			workspaces.GET("/:id/database/roles", workspaceDatabaseHandler.ListRoles)
-			workspaces.POST("/:id/database/roles/:roleId/rotate", workspaceDatabaseHandler.RotateRole)
-			workspaces.POST("/:id/database/roles/:roleId/revoke", workspaceDatabaseHandler.RevokeRole)
-			workspaces.GET("/:id/database/tables", workspaceDBQueryHandler.ListTables)
-			workspaces.GET("/:id/database/tables/:table/schema", workspaceDBQueryHandler.GetTableSchema)
-			workspaces.POST("/:id/database/tables", workspaceDBQueryHandler.CreateTable)
-			workspaces.PATCH("/:id/database/tables/:table", workspaceDBQueryHandler.AlterTable)
-			workspaces.DELETE("/:id/database/tables/:table", workspaceDBQueryHandler.DropTable)
-			workspaces.GET("/:id/database/tables/:table/rows", workspaceDBQueryHandler.QueryRows)
-			workspaces.POST("/:id/database/tables/:table/rows", workspaceDBQueryHandler.InsertRow)
-			workspaces.PATCH("/:id/database/tables/:table/rows", workspaceDBQueryHandler.UpdateRow)
-			workspaces.DELETE("/:id/database/tables/:table/rows", workspaceDBQueryHandler.DeleteRows)
-			workspaces.POST("/:id/database/query", workspaceDBQueryHandler.ExecuteSQL)
-			workspaces.GET("/:id/database/query/history", workspaceDBQueryHandler.GetQueryHistory)
-			workspaces.GET("/:id/database/stats", workspaceDBQueryHandler.GetStats)
-			workspaces.GET("/:id/database/schema-graph", workspaceDBQueryHandler.GetSchemaGraph)
+			// Database（SQLite via VMStore）
+			workspaces.GET("/:id/database/tables", vmDatabaseHandler.ListTables)
+			workspaces.GET("/:id/database/tables/:table/schema", vmDatabaseHandler.GetTableSchema)
+			workspaces.POST("/:id/database/tables", vmDatabaseHandler.CreateTable)
+			workspaces.PATCH("/:id/database/tables/:table", vmDatabaseHandler.AlterTable)
+			workspaces.DELETE("/:id/database/tables/:table", vmDatabaseHandler.DropTable)
+			workspaces.GET("/:id/database/tables/:table/rows", vmDatabaseHandler.QueryRows)
+			workspaces.POST("/:id/database/tables/:table/rows", vmDatabaseHandler.InsertRow)
+			workspaces.PATCH("/:id/database/tables/:table/rows", vmDatabaseHandler.UpdateRow)
+			workspaces.DELETE("/:id/database/tables/:table/rows", vmDatabaseHandler.DeleteRows)
+			workspaces.POST("/:id/database/query", vmDatabaseHandler.ExecuteSQL)
+			workspaces.GET("/:id/database/query/history", vmDatabaseHandler.GetQueryHistory)
+			workspaces.GET("/:id/database/stats", vmDatabaseHandler.GetStats)
+			workspaces.GET("/:id/database/schema-graph", vmDatabaseHandler.GetSchemaGraph)
 			workspaces.POST("/:id/agent/chat", agentChatHandler.Chat)
 			workspaces.GET("/:id/agent/status", agentChatHandler.Status)
 			workspaces.GET("/:id/agent/skills", agentChatHandler.ListSkills)

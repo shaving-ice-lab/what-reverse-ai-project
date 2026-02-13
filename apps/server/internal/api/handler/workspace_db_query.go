@@ -10,29 +10,27 @@ import (
 	"github.com/reverseai/server/internal/api/middleware"
 	"github.com/reverseai/server/internal/domain/entity"
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
-// WorkspaceDBQueryHandler 工作空间数据库查询处理器
-type WorkspaceDBQueryHandler struct {
-	queryService    service.WorkspaceDBQueryService
-	dbRuntime       service.WorkspaceDBRuntime
+// VMDatabaseHandler 工作空间数据库处理器（SQLite via VMStore）
+type VMDatabaseHandler struct {
+	vmStore         *vmruntime.VMStore
 	auditLogService service.AuditLogService
 }
 
-// NewWorkspaceDBQueryHandler 创建工作空间数据库查询处理器
-func NewWorkspaceDBQueryHandler(
-	queryService service.WorkspaceDBQueryService,
-	dbRuntime service.WorkspaceDBRuntime,
+// NewVMDatabaseHandler 创建 VMDatabaseHandler
+func NewVMDatabaseHandler(
+	vmStore *vmruntime.VMStore,
 	auditLogService service.AuditLogService,
-) *WorkspaceDBQueryHandler {
-	return &WorkspaceDBQueryHandler{
-		queryService:    queryService,
-		dbRuntime:       dbRuntime,
+) *VMDatabaseHandler {
+	return &VMDatabaseHandler{
+		vmStore:         vmStore,
 		auditLogService: auditLogService,
 	}
 }
 
-func (h *WorkspaceDBQueryHandler) ensureAccess(c echo.Context) (string, string, error) {
+func (h *VMDatabaseHandler) ensureAccess(c echo.Context) (string, string, error) {
 	userID := middleware.GetUserID(c)
 	if _, err := uuid.Parse(userID); err != nil {
 		return "", "", errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
@@ -41,38 +39,28 @@ func (h *WorkspaceDBQueryHandler) ensureAccess(c echo.Context) (string, string, 
 	if _, err := uuid.Parse(workspaceID); err != nil {
 		return "", "", errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
 	}
-	if err := h.dbRuntime.EnsureAccess(c.Request().Context(), workspaceID, userID); err != nil {
-		switch err {
-		case service.ErrWorkspaceNotFound:
-			return "", "", errorResponse(c, http.StatusNotFound, "NOT_FOUND", "工作空间不存在")
-		case service.ErrWorkspaceUnauthorized:
-			return "", "", errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间数据库")
-		default:
-			return "", "", errorResponse(c, http.StatusInternalServerError, "ACCESS_CHECK_FAILED", "权限校验失败")
-		}
-	}
 	return workspaceID, userID, nil
 }
 
 // ListTables 获取表列表
-func (h *WorkspaceDBQueryHandler) ListTables(c echo.Context) error {
+func (h *VMDatabaseHandler) ListTables(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
 	}
 
-	tables, err := h.queryService.ListTables(c.Request().Context(), workspaceID)
+	tables, err := h.vmStore.ListTables(c.Request().Context(), workspaceID)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
-		"tables": tables,
+		"tables":  tables,
+		"vm_mode": true,
 	})
 }
 
 // GetTableSchema 获取表结构
-func (h *WorkspaceDBQueryHandler) GetTableSchema(c echo.Context) error {
+func (h *VMDatabaseHandler) GetTableSchema(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -83,17 +71,17 @@ func (h *WorkspaceDBQueryHandler) GetTableSchema(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_TABLE", "表名不能为空")
 	}
 
-	schema, err := h.queryService.GetTableSchema(c.Request().Context(), workspaceID, tableName)
+	schema, err := h.vmStore.GetTableSchema(c.Request().Context(), workspaceID, tableName)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
-		"schema": schema,
+		"schema":  schema,
+		"vm_mode": true,
 	})
 }
 
-// CreateTableRequest 创建表请求体
+// CreateTableRequestBody 创建表请求体
 type CreateTableRequestBody struct {
 	Name       string                `json:"name"`
 	Columns    []CreateColumnDefBody `json:"columns"`
@@ -108,7 +96,6 @@ type CreateColumnDefBody struct {
 	Nullable     bool    `json:"nullable"`
 	DefaultValue *string `json:"default_value"`
 	Unique       bool    `json:"unique"`
-	Comment      string  `json:"comment,omitempty"`
 }
 
 // CreateIndexDefBody 索引定义请求体
@@ -119,7 +106,7 @@ type CreateIndexDefBody struct {
 }
 
 // CreateTable 创建表
-func (h *WorkspaceDBQueryHandler) CreateTable(c echo.Context) error {
+func (h *VMDatabaseHandler) CreateTable(c echo.Context) error {
 	workspaceID, userID, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -133,27 +120,26 @@ func (h *WorkspaceDBQueryHandler) CreateTable(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "表名和列定义不能为空")
 	}
 
-	columns := make([]service.CreateColumnDef, len(req.Columns))
+	columns := make([]vmruntime.VMCreateColumnDef, len(req.Columns))
 	for i, col := range req.Columns {
-		columns[i] = service.CreateColumnDef{
+		columns[i] = vmruntime.VMCreateColumnDef{
 			Name:         col.Name,
 			Type:         col.Type,
 			Nullable:     col.Nullable,
 			DefaultValue: col.DefaultValue,
 			Unique:       col.Unique,
-			Comment:      col.Comment,
 		}
 	}
-	indexes := make([]service.CreateIndexDef, len(req.Indexes))
+	indexes := make([]vmruntime.VMCreateIndexDef, len(req.Indexes))
 	for i, idx := range req.Indexes {
-		indexes[i] = service.CreateIndexDef{
+		indexes[i] = vmruntime.VMCreateIndexDef{
 			Name:    idx.Name,
 			Columns: idx.Columns,
 			Unique:  idx.Unique,
 		}
 	}
 
-	if err := h.queryService.CreateTable(c.Request().Context(), workspaceID, service.CreateTableRequest{
+	if err := h.vmStore.CreateTable(c.Request().Context(), workspaceID, vmruntime.VMCreateTableRequest{
 		Name:       req.Name,
 		Columns:    columns,
 		PrimaryKey: req.PrimaryKey,
@@ -187,11 +173,10 @@ type AlterColumnDefBody struct {
 	Type         string  `json:"type,omitempty"`
 	Nullable     *bool   `json:"nullable,omitempty"`
 	DefaultValue *string `json:"default_value,omitempty"`
-	Comment      string  `json:"comment,omitempty"`
 }
 
 // AlterTable 修改表结构
-func (h *WorkspaceDBQueryHandler) AlterTable(c echo.Context) error {
+func (h *VMDatabaseHandler) AlterTable(c echo.Context) error {
 	workspaceID, userID, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -207,30 +192,28 @@ func (h *WorkspaceDBQueryHandler) AlterTable(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
 
-	addCols := make([]service.CreateColumnDef, len(req.AddColumns))
+	addCols := make([]vmruntime.VMCreateColumnDef, len(req.AddColumns))
 	for i, col := range req.AddColumns {
-		addCols[i] = service.CreateColumnDef{
+		addCols[i] = vmruntime.VMCreateColumnDef{
 			Name:         col.Name,
 			Type:         col.Type,
 			Nullable:     col.Nullable,
 			DefaultValue: col.DefaultValue,
 			Unique:       col.Unique,
-			Comment:      col.Comment,
 		}
 	}
-	alterCols := make([]service.AlterColumnDef, len(req.AlterColumns))
+	alterCols := make([]vmruntime.VMAlterColumnDef, len(req.AlterColumns))
 	for i, col := range req.AlterColumns {
-		alterCols[i] = service.AlterColumnDef{
+		alterCols[i] = vmruntime.VMAlterColumnDef{
 			Name:         col.Name,
 			NewName:      col.NewName,
 			Type:         col.Type,
 			Nullable:     col.Nullable,
 			DefaultValue: col.DefaultValue,
-			Comment:      col.Comment,
 		}
 	}
 
-	if err := h.queryService.AlterTable(c.Request().Context(), workspaceID, tableName, service.AlterTableRequest{
+	if err := h.vmStore.AlterTable(c.Request().Context(), workspaceID, tableName, vmruntime.VMAlterTableRequest{
 		AddColumns:   addCols,
 		AlterColumns: alterCols,
 		DropColumns:  req.DropColumns,
@@ -254,7 +237,7 @@ type DropTableRequestBody struct {
 }
 
 // DropTable 删除表
-func (h *WorkspaceDBQueryHandler) DropTable(c echo.Context) error {
+func (h *VMDatabaseHandler) DropTable(c echo.Context) error {
 	workspaceID, userID, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -273,7 +256,7 @@ func (h *WorkspaceDBQueryHandler) DropTable(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "CONFIRM_REQUIRED", "需要确认删除操作（confirm: true）")
 	}
 
-	if err := h.queryService.DropTable(c.Request().Context(), workspaceID, tableName); err != nil {
+	if err := h.vmStore.DropTable(c.Request().Context(), workspaceID, tableName); err != nil {
 		return handleDBQueryError(c, err)
 	}
 
@@ -287,7 +270,7 @@ func (h *WorkspaceDBQueryHandler) DropTable(c echo.Context) error {
 }
 
 // QueryRows 查询行
-func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
+func (h *VMDatabaseHandler) QueryRows(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -303,8 +286,7 @@ func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
 	orderBy := c.QueryParam("order_by")
 	orderDir := c.QueryParam("order_dir")
 
-	// Parse filters from query params: filters[0][column]=name&filters[0][operator]==&filters[0][value]=test
-	var filters []service.QueryFilter
+	var filters []vmruntime.VMQueryFilter
 	for i := 0; i < 20; i++ {
 		col := c.QueryParam("filters[" + strconv.Itoa(i) + "][column]")
 		op := c.QueryParam("filters[" + strconv.Itoa(i) + "][operator]")
@@ -312,16 +294,12 @@ func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
 		if col == "" {
 			break
 		}
-		filters = append(filters, service.QueryFilter{
-			Column:   col,
-			Operator: op,
-			Value:    val,
-		})
+		filters = append(filters, vmruntime.VMQueryFilter{Column: col, Operator: op, Value: val})
 	}
 
 	filterCombinator := c.QueryParam("filter_combinator")
 
-	result, err := h.queryService.QueryRows(c.Request().Context(), workspaceID, tableName, service.QueryRowsParams{
+	result, err := h.vmStore.QueryRows(c.Request().Context(), workspaceID, tableName, vmruntime.VMQueryParams{
 		Page:             page,
 		PageSize:         pageSize,
 		OrderBy:          orderBy,
@@ -332,7 +310,6 @@ func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponseWithMeta(c, map[string]interface{}{
 		"columns": result.Columns,
 		"rows":    result.Rows,
@@ -340,6 +317,7 @@ func (h *WorkspaceDBQueryHandler) QueryRows(c echo.Context) error {
 		"total":     result.TotalCount,
 		"page":      page,
 		"page_size": pageSize,
+		"vm_mode":   true,
 	})
 }
 
@@ -349,7 +327,7 @@ type InsertRowRequestBody struct {
 }
 
 // InsertRow 插入行
-func (h *WorkspaceDBQueryHandler) InsertRow(c echo.Context) error {
+func (h *VMDatabaseHandler) InsertRow(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -368,14 +346,12 @@ func (h *WorkspaceDBQueryHandler) InsertRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "数据不能为空")
 	}
 
-	result, err := h.queryService.InsertRow(c.Request().Context(), workspaceID, tableName, req.Data)
+	result, err := h.vmStore.InsertRow(c.Request().Context(), workspaceID, tableName, req.Data)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,
-		"duration_ms":   result.DurationMs,
 	})
 }
 
@@ -385,7 +361,7 @@ type UpdateRowRequestBody struct {
 }
 
 // UpdateRow 更新行
-func (h *WorkspaceDBQueryHandler) UpdateRow(c echo.Context) error {
+func (h *VMDatabaseHandler) UpdateRow(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -404,14 +380,24 @@ func (h *WorkspaceDBQueryHandler) UpdateRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "数据不能为空")
 	}
 
-	result, err := h.queryService.UpdateRow(c.Request().Context(), workspaceID, tableName, req.Data)
+	pkCols := make(map[string]interface{})
+	dataCols := make(map[string]interface{})
+	for k, v := range req.Data {
+		if k == "id" {
+			pkCols[k] = v
+		} else {
+			dataCols[k] = v
+		}
+	}
+	if len(pkCols) == 0 {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "数据必须包含 'id' 字段")
+	}
+	result, err := h.vmStore.UpdateRow(c.Request().Context(), workspaceID, tableName, dataCols, pkCols)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,
-		"duration_ms":   result.DurationMs,
 	})
 }
 
@@ -421,7 +407,7 @@ type DeleteRowsRequestBody struct {
 }
 
 // DeleteRows 删除行
-func (h *WorkspaceDBQueryHandler) DeleteRows(c echo.Context) error {
+func (h *VMDatabaseHandler) DeleteRows(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -440,14 +426,12 @@ func (h *WorkspaceDBQueryHandler) DeleteRows(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "删除 ID 列表不能为空")
 	}
 
-	result, err := h.queryService.DeleteRows(c.Request().Context(), workspaceID, tableName, req.IDs)
+	result, err := h.vmStore.DeleteRows(c.Request().Context(), workspaceID, tableName, req.IDs)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,
-		"duration_ms":   result.DurationMs,
 	})
 }
 
@@ -458,7 +442,7 @@ type ExecuteSQLRequestBody struct {
 }
 
 // ExecuteSQL 执行 SQL
-func (h *WorkspaceDBQueryHandler) ExecuteSQL(c echo.Context) error {
+func (h *VMDatabaseHandler) ExecuteSQL(c echo.Context) error {
 	workspaceID, userID, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
@@ -472,17 +456,15 @@ func (h *WorkspaceDBQueryHandler) ExecuteSQL(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "SQL 不能为空")
 	}
 
-	result, err := h.queryService.ExecuteSQL(c.Request().Context(), workspaceID, req.SQL, req.Params)
+	result, err := h.vmStore.ExecuteSQL(c.Request().Context(), workspaceID, req.SQL, req.Params...)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	h.recordAudit(c, workspaceID, userID, "workspace.db.query.execute", "database_query", nil, entity.JSON{
 		"sql":           req.SQL,
 		"affected_rows": result.AffectedRows,
 		"duration_ms":   result.DurationMs,
 	})
-
 	return successResponse(c, map[string]interface{}{
 		"columns":       result.Columns,
 		"rows":          result.Rows,
@@ -492,67 +474,59 @@ func (h *WorkspaceDBQueryHandler) ExecuteSQL(c echo.Context) error {
 }
 
 // GetQueryHistory 查询历史
-func (h *WorkspaceDBQueryHandler) GetQueryHistory(c echo.Context) error {
+func (h *VMDatabaseHandler) GetQueryHistory(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
 	}
 
-	history, err := h.queryService.GetQueryHistory(c.Request().Context(), workspaceID)
-	if err != nil {
-		return handleDBQueryError(c, err)
-	}
-
+	history := h.vmStore.GetQueryHistory(c.Request().Context(), workspaceID)
 	return successResponse(c, map[string]interface{}{
 		"history": history,
 	})
 }
 
 // GetStats 数据库统计
-func (h *WorkspaceDBQueryHandler) GetStats(c echo.Context) error {
+func (h *VMDatabaseHandler) GetStats(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
 	}
 
-	stats, err := h.queryService.GetDatabaseStats(c.Request().Context(), workspaceID)
+	vmStats, err := h.vmStore.GetStats(c.Request().Context(), workspaceID)
 	if err != nil {
-		if err == service.ErrWorkspaceDatabaseNotFound || err == service.ErrWorkspaceDBNotReady {
-			return successResponse(c, map[string]interface{}{
-				"stats": map[string]interface{}{
-					"table_count":      0,
-					"total_rows":       0,
-					"total_size_bytes": 0,
-					"connection_count": 0,
-				},
-			})
-		}
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
-		"stats": stats,
+		"stats": map[string]interface{}{
+			"table_count":  vmStats.TableCount,
+			"total_rows":   vmStats.TotalRows,
+			"file_size_kb": vmStats.FileSizeKB,
+			"index_count":  vmStats.IndexCount,
+			"journal_mode": vmStats.JournalMode,
+			"vm_mode":      true,
+		},
 	})
 }
 
 // GetSchemaGraph 表关系图
-func (h *WorkspaceDBQueryHandler) GetSchemaGraph(c echo.Context) error {
+func (h *VMDatabaseHandler) GetSchemaGraph(c echo.Context) error {
 	workspaceID, _, err := h.ensureAccess(c)
 	if err != nil {
 		return nil
 	}
 
-	graph, err := h.queryService.GetSchemaGraph(c.Request().Context(), workspaceID)
+	graph, err := h.vmStore.GetSchemaGraph(c.Request().Context(), workspaceID)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-
 	return successResponse(c, map[string]interface{}{
-		"graph": graph,
+		"graph":   graph,
+		"vm_mode": true,
 	})
 }
 
-func (h *WorkspaceDBQueryHandler) recordAudit(ctx echo.Context, workspaceID, userID string, action string, targetType string, targetID *uuid.UUID, metadata entity.JSON) {
+func (h *VMDatabaseHandler) recordAudit(ctx echo.Context, workspaceID, userID string, action string, targetType string, targetID *uuid.UUID, metadata entity.JSON) {
 	if h.auditLogService == nil {
 		return
 	}
@@ -576,26 +550,12 @@ func (h *WorkspaceDBQueryHandler) recordAudit(ctx echo.Context, workspaceID, use
 }
 
 func handleDBQueryError(c echo.Context, err error) error {
-	switch err {
-	case service.ErrWorkspaceDBNotReady:
-		return errorResponse(c, http.StatusConflict, "DB_NOT_READY", "工作空间数据库尚未就绪")
-	case service.ErrWorkspaceDatabaseNotFound:
-		return errorResponse(c, http.StatusNotFound, "DB_NOT_FOUND", "工作空间数据库不存在")
-	case service.ErrWorkspaceDBQueryForbidden:
-		return errorResponse(c, http.StatusForbidden, "SQL_FORBIDDEN", "SQL 包含禁止的操作")
-	case service.ErrWorkspaceDBTableNotFound:
-		return errorResponse(c, http.StatusNotFound, "TABLE_NOT_FOUND", "表不存在")
-	case service.ErrWorkspaceDBTableExists:
-		return errorResponse(c, http.StatusConflict, "TABLE_EXISTS", "表已存在")
-	case service.ErrWorkspaceDBInvalidInput:
-		return errorResponse(c, http.StatusBadRequest, "INVALID_INPUT", "输入参数无效")
-	case service.ErrWorkspaceDBQueryTimeout:
-		return errorResponse(c, http.StatusRequestTimeout, "QUERY_TIMEOUT", "查询超时")
-	default:
-		errMsg := "数据库查询失败"
-		if err != nil {
-			errMsg = err.Error()
-		}
-		return errorResponse(c, http.StatusInternalServerError, "QUERY_FAILED", errMsg)
+	errMsg := "数据库查询失败"
+	if err != nil {
+		errMsg = err.Error()
 	}
+	if strings.Contains(errMsg, "no such table") {
+		return errorResponse(c, http.StatusNotFound, "TABLE_NOT_FOUND", "表不存在")
+	}
+	return errorResponse(c, http.StatusInternalServerError, "QUERY_FAILED", errMsg)
 }

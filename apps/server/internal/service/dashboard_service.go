@@ -50,24 +50,6 @@ type SystemStatus struct {
 	LastCheckedAt  string `json:"last_checked_at"`
 }
 
-// DailyStats is kept for backward compat with dashboard handler
-type DailyStats struct {
-	Date           string `json:"date"`
-	Executions     int    `json:"executions"`
-	SuccessfulRuns int    `json:"successful_runs"`
-	FailedRuns     int    `json:"failed_runs"`
-}
-
-// Recommendation 推荐内容
-type Recommendation struct {
-	Type        string `json:"type"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	ActionURL   string `json:"action_url"`
-	Icon        string `json:"icon,omitempty"`
-	Priority    int    `json:"priority"`
-}
-
 type dashboardService struct {
 	activityRepo repository.ActivityRepository
 }

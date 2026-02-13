@@ -6,14 +6,15 @@ import (
 	"fmt"
 
 	"github.com/reverseai/server/internal/service"
+	"github.com/reverseai/server/internal/vmruntime"
 )
 
 type UpdateDataTool struct {
-	dbQueryService service.WorkspaceDBQueryService
+	vmStore *vmruntime.VMStore
 }
 
-func NewUpdateDataTool(dbQueryService service.WorkspaceDBQueryService) *UpdateDataTool {
-	return &UpdateDataTool{dbQueryService: dbQueryService}
+func NewUpdateDataTool(vmStore *vmruntime.VMStore) *UpdateDataTool {
+	return &UpdateDataTool{vmStore: vmStore}
 }
 
 func (t *UpdateDataTool) Name() string { return "update_data" }
@@ -56,7 +57,20 @@ func (t *UpdateDataTool) Execute(ctx context.Context, params json.RawMessage) (*
 		return &service.AgentToolResult{Success: false, Error: "data must not be empty"}, nil
 	}
 
-	result, err := t.dbQueryService.UpdateRow(ctx, p.WorkspaceID, p.TableName, p.Data)
+	// Split data into set values and where clause (id is the PK)
+	where := map[string]interface{}{}
+	setData := map[string]interface{}{}
+	for k, v := range p.Data {
+		if k == "id" {
+			where[k] = v
+		} else {
+			setData[k] = v
+		}
+	}
+	if len(where) == 0 {
+		return &service.AgentToolResult{Success: false, Error: "data must include 'id' for WHERE clause"}, nil
+	}
+	result, err := t.vmStore.UpdateRow(ctx, p.WorkspaceID, p.TableName, setData, where)
 	if err != nil {
 		return &service.AgentToolResult{
 			Success: false,

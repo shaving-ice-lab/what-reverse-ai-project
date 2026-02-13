@@ -13,23 +13,15 @@ import (
 
 // 队列名称
 const (
-	QueueDBProvision        = "db_provision"
 	QueueDomainVerify       = "domain_verify"
 	QueueMetricsAggregation = "metrics_aggregation"
 )
 
 // 任务类型常量
 const (
-	TaskTypeDBProvision        = "workspace:db:provision"
 	TaskTypeDomainVerify       = "app:domain:verify"
 	TaskTypeMetricsAggregation = "metrics:aggregate"
 )
-
-// DBProvisionPayload Workspace DB 创建载荷
-type DBProvisionPayload struct {
-	WorkspaceID string `json:"workspace_id"`
-	OwnerID     string `json:"owner_id"`
-}
 
 // DomainVerifyPayload 域名验证载荷
 type DomainVerifyPayload struct {
@@ -52,13 +44,10 @@ type EnqueueResult struct {
 
 const (
 	defaultTaskRetention       = 24 * time.Hour
-	dbProvisionTimeout         = 20 * time.Minute
 	domainVerifyTimeout        = 3 * time.Minute
 	metricsAggregationTimeout  = 3 * time.Minute
 	dedupShortTTL              = 5 * time.Minute
 	dedupMediumTTL             = 15 * time.Minute
-	dedupLongTTL               = 30 * time.Minute
-	maxRetryDBProvision        = 5
 	maxRetryDomainVerify       = 5
 	maxRetryMetricsAggregation = 2
 )
@@ -114,32 +103,6 @@ func (q *Queue) GetTaskInfo(queue, taskID string) (*asynq.TaskInfo, error) {
 // GetQueueInfo 获取队列信息
 func (q *Queue) GetQueueInfo(queueName string) (*asynq.QueueInfo, error) {
 	return q.inspector.GetQueueInfo(queueName)
-}
-
-// EnqueueDBProvision 将 Workspace DB 创建任务加入队列
-func (q *Queue) EnqueueDBProvision(ctx context.Context, payload *DBProvisionPayload) (*EnqueueResult, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal payload: %w", err)
-	}
-	task := asynq.NewTask(TaskTypeDBProvision, data,
-		asynq.MaxRetry(maxRetryDBProvision),
-		asynq.Timeout(dbProvisionTimeout),
-		asynq.Retention(defaultTaskRetention),
-		asynq.Unique(dedupLongTTL),
-		asynq.Queue(QueueDBProvision),
-	)
-	info, err := q.client.EnqueueContext(ctx, task)
-	if err != nil {
-		if isDuplicateTask(err) {
-			return &EnqueueResult{Queue: QueueDBProvision, Deduped: true}, nil
-		}
-		return nil, fmt.Errorf("failed to enqueue db provision task: %w", err)
-	}
-	q.log.Info("Enqueued DB provision task",
-		"taskId", info.ID,
-		"workspaceId", payload.WorkspaceID)
-	return &EnqueueResult{TaskID: info.ID, Queue: QueueDBProvision}, nil
 }
 
 // EnqueueDomainVerify 将域名验证任务加入队列（支持延时执行）
