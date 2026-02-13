@@ -13,15 +13,9 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn, formatBytes } from '@/lib/utils'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { workspaceStorageApi, type StorageObject } from '@/lib/api/workspace-storage'
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 function getFileIcon(mimeType: string) {
   if (mimeType.startsWith('image/')) return Image
@@ -197,7 +191,7 @@ export default function StoragePage() {
                     {obj.file_name}
                   </div>
                   <div className="text-[11px] text-foreground-muted">
-                    {formatFileSize(obj.file_size)} · {obj.mime_type} ·{' '}
+                    {formatBytes(obj.file_size)} · {obj.mime_type} ·{' '}
                     {new Date(obj.created_at).toLocaleDateString()}
                   </div>
                 </div>

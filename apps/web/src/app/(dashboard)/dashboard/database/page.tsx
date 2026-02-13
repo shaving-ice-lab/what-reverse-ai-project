@@ -18,36 +18,15 @@ import { Button } from '@/components/ui/button'
 import { PageHeader, StatsCard } from '@/components/dashboard/page-layout'
 import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
 import type { DatabaseTable, DatabaseStats, QueryHistoryItem } from '@/lib/api/workspace-database'
-import { cn } from '@/lib/utils'
+import { cn, formatBytes } from '@/lib/utils'
 import Link from 'next/link'
 import { useWorkspace } from '@/hooks/useWorkspace'
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-}
-
-function formatTimeAgo(dateStr: string): string {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
 
 export default function DatabaseOverviewPage() {
   const { workspaceId } = useWorkspace()
   const [tables, setTables] = useState<DatabaseTable[]>([])
   const [stats, setStats] = useState<DatabaseStats | null>(null)
+  const [vmMode, setVmMode] = useState(false)
   const [history, setHistory] = useState<QueryHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -64,6 +43,7 @@ export default function DatabaseOverviewPage() {
       ])
       setTables(tablesData)
       setStats(statsData)
+      setVmMode(!!(statsData as any)?.vm_mode)
       setHistory(historyData.slice(0, 5))
     } catch (err: any) {
       setError(err?.message || 'Failed to load database info')
@@ -87,8 +67,8 @@ export default function DatabaseOverviewPage() {
   return (
     <div>
       <PageHeader
-        title="Database"
-        description="Manage your workspace database tables, run queries, and view schema."
+        title={vmMode ? 'Database (SQLite VM)' : 'Database'}
+        description={vmMode ? 'Manage your workspace SQLite database — powered by VM runtime.' : 'Manage your workspace database tables, run queries, and view schema.'}
         icon={<Database className="w-4 h-4" />}
         actions={
           <Button variant="ghost" size="sm" onClick={loadData} disabled={loading}>
@@ -126,12 +106,12 @@ export default function DatabaseOverviewPage() {
             <StatsCard
               icon={<HardDrive className="w-4 h-4" />}
               title="Database Size"
-              value={formatBytes(stats?.total_size_bytes ?? 0)}
+              value={formatBytes((stats?.file_size_kb ?? 0) * 1024)}
             />
             <StatsCard
               icon={<Database className="w-4 h-4" />}
-              title="Connections"
-              value={stats?.connection_count ?? 0}
+              title="Indexes"
+              value={stats?.index_count ?? 0}
             />
           </div>
 
@@ -207,13 +187,7 @@ export default function DatabaseOverviewPage() {
                         Rows
                       </th>
                       <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
-                        Size
-                      </th>
-                      <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
                         Columns
-                      </th>
-                      <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
-                        Updated
                       </th>
                     </tr>
                   </thead>
@@ -235,13 +209,7 @@ export default function DatabaseOverviewPage() {
                           {table.row_count_est.toLocaleString()}
                         </td>
                         <td className="text-right px-4 py-2.5 text-foreground-light tabular-nums">
-                          {formatBytes(table.data_size)}
-                        </td>
-                        <td className="text-right px-4 py-2.5 text-foreground-light tabular-nums">
                           {table.column_count}
-                        </td>
-                        <td className="text-right px-4 py-2.5 text-foreground-muted text-xs">
-                          {formatTimeAgo(table.update_time ?? '')}
                         </td>
                       </tr>
                     ))}

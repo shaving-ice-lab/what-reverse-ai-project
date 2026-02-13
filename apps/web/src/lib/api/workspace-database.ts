@@ -3,16 +3,14 @@
  * Table/Row CRUD, SQL execution, schema graph, stats
  */
 
-import { request } from './shared'
+import { request, type ApiResponse } from './shared'
 
 // ===== Type Definitions =====
 
 export interface DatabaseTable {
   name: string
   row_count_est: number
-  data_size: number
   column_count: number
-  update_time?: string
 }
 
 export interface TableColumn {
@@ -124,8 +122,10 @@ export interface QueryHistoryItem {
 export interface DatabaseStats {
   table_count: number
   total_rows: number
-  total_size_bytes: number
-  connection_count: number
+  file_size_kb: number
+  index_count: number
+  journal_mode?: string
+  vm_mode?: boolean
 }
 
 export interface SchemaGraphNode {
@@ -146,35 +146,6 @@ export interface SchemaGraphEdge {
 export interface SchemaGraphData {
   nodes: SchemaGraphNode[]
   edges: SchemaGraphEdge[]
-}
-
-// ===== Database Role Types =====
-
-export interface DatabaseRole {
-  id: string
-  workspace_id: string
-  role_type: 'read' | 'write' | 'admin'
-  db_username: string
-  status: 'active' | 'revoked' | 'expired'
-  expires_at?: string
-  revoked_at?: string
-  revoked_reason?: string
-  last_used_at?: string
-  created_at: string
-  updated_at: string
-}
-
-// ===== API Response wrapper =====
-
-interface ApiResponse<T> {
-  code: string
-  message: string
-  data: T
-  meta?: {
-    total?: number
-    page?: number
-    page_size?: number
-  }
 }
 
 // ===== Workspace Database API =====
@@ -384,17 +355,16 @@ export const workspaceDatabaseApi = {
         (response.data as any)?.stats ?? {
           table_count: 0,
           total_rows: 0,
-          total_size_bytes: 0,
-          connection_count: 0,
+          file_size_kb: 0,
+          index_count: 0,
         }
       )
     } catch {
-      // Database not provisioned yet
       return {
         table_count: 0,
         total_rows: 0,
-        total_size_bytes: 0,
-        connection_count: 0,
+        file_size_kb: 0,
+        index_count: 0,
       }
     }
   },
@@ -409,62 +379,4 @@ export const workspaceDatabaseApi = {
     return (response.data as any)?.graph ?? { nodes: [], edges: [] }
   },
 
-  /**
-   * List database roles
-   */
-  async listRoles(workspaceId: string): Promise<DatabaseRole[]> {
-    const response = await request<ApiResponse<{ roles: DatabaseRole[] } | DatabaseRole[]>>(
-      `/workspaces/${workspaceId}/database/roles`
-    )
-    const payload = response.data as any
-    return Array.isArray(payload?.roles) ? payload.roles : Array.isArray(payload) ? payload : []
-  },
-
-  /**
-   * Create a database role
-   */
-  async createRole(
-    workspaceId: string,
-    roleType: 'read' | 'write' | 'admin',
-    expiresAt?: string
-  ): Promise<{ role: DatabaseRole; password: string }> {
-    const response = await request<ApiResponse<{ role: DatabaseRole; password: string }>>(
-      `/workspaces/${workspaceId}/database/roles`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ role_type: roleType, expires_at: expiresAt }),
-      }
-    )
-    const payload = response.data as any
-    return { role: payload?.role, password: payload?.password || '' }
-  },
-
-  /**
-   * Rotate a database role's password
-   */
-  async rotateRole(
-    workspaceId: string,
-    roleId: string
-  ): Promise<{ role: DatabaseRole; password: string }> {
-    const response = await request<ApiResponse<{ role: DatabaseRole; password: string }>>(
-      `/workspaces/${workspaceId}/database/roles/${roleId}/rotate`,
-      { method: 'POST' }
-    )
-    const payload = response.data as any
-    return { role: payload?.role, password: payload?.password || '' }
-  },
-
-  /**
-   * Revoke a database role
-   */
-  async revokeRole(workspaceId: string, roleId: string, reason?: string): Promise<DatabaseRole> {
-    const response = await request<ApiResponse<{ role: DatabaseRole }>>(
-      `/workspaces/${workspaceId}/database/roles/${roleId}/revoke`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      }
-    )
-    return (response.data as any)?.role
-  },
 }

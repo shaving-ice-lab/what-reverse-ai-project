@@ -214,9 +214,7 @@ export function TableGrid({
             <tr className="bg-surface-75 border-b border-border">
               <th className="w-10 px-3 py-2 text-left">
                 <Checkbox
-                  checked={allSelected}
-                  // @ts-ignore
-                  indeterminate={someSelected}
+                  checked={someSelected ? 'indeterminate' : allSelected}
                   onCheckedChange={toggleAll}
                 />
               </th>
