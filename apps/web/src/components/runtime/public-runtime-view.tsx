@@ -136,7 +136,7 @@ export function PublicRuntimeView({ workspaceSlug, isEmbed }: PublicRuntimeViewP
     return (
       <div className={cn('h-screen flex flex-col bg-background', isEmbed && 'bg-transparent')}>
         {!isEmbed && <SiteHeader />}
-        <div className="flex-1 overflow-hidden">
+        <div className={cn('flex-1 overflow-hidden', !isEmbed && 'pt-16')}>
           <AppAuthProvider workspaceSlug={resolvedWorkspaceSlug}>
             <RuntimeAppWithAuth workspaceSlug={resolvedWorkspaceSlug} appSchema={appSchema} />
           </AppAuthProvider>

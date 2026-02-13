@@ -22,6 +22,14 @@ import {
   Zap,
   Mail,
   Calendar,
+  Settings,
+  Briefcase,
+  MapPin,
+  Building,
+  Phone,
+  Tag,
+  BookOpen,
+  Clipboard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
@@ -49,6 +57,14 @@ const statsIconMap: Record<string, React.ElementType> = {
   Calendar,
   TrendingUp,
   TrendingDown,
+  Settings,
+  Briefcase,
+  MapPin,
+  Building,
+  Phone,
+  Tag,
+  BookOpen,
+  Clipboard,
 }
 
 interface StatsCardBlockProps {
@@ -73,6 +89,26 @@ const bgMap: Record<string, string> = {
   amber: 'bg-amber-500/5',
 }
 
+function parseWhereToFilters(
+  where?: string
+): { column: string; operator: string; value: unknown }[] | undefined {
+  if (!where) return undefined
+  const filters: { column: string; operator: string; value: unknown }[] = []
+  const parts = where.split(/\s+AND\s+/i)
+  for (const part of parts) {
+    const m = part.match(/^\s*(\w+)\s*(=|!=|<>|>=|<=|>|<|LIKE|NOT LIKE)\s*'([^']*)'\s*$/i)
+    if (m) {
+      filters.push({ column: m[1], operator: m[2].toUpperCase(), value: m[3] })
+    } else {
+      const m2 = part.match(/^\s*(\w+)\s*(=|!=|<>|>=|<=|>|<)\s*(\S+)\s*$/i)
+      if (m2) {
+        filters.push({ column: m2[1], operator: m2[2].toUpperCase(), value: m2[3] })
+      }
+    }
+  }
+  return filters.length > 0 ? filters : undefined
+}
+
 export function StatsCardBlock({ config, data: externalData, dataSource }: StatsCardBlockProps) {
   const { queryRows, onTableChange } = useDataProvider()
   const [fetchedData, setFetchedData] = useState<Record<string, unknown> | null>(null)
@@ -80,6 +116,7 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
   const aggregation = dataSource?.aggregation?.[0]
   const needsAllRows =
     aggregation && (aggregation.function === 'sum' || aggregation.function === 'avg')
+  const whereFilters = parseWhereToFilters(dataSource?.where as string | undefined)
 
   const computeAggregation = (result: { rows: Record<string, unknown>[]; total: number }) => {
     if (aggregation) {
@@ -107,6 +144,7 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
       try {
         const result = await queryRows(dataSource.table, {
           limit: needsAllRows ? 10000 : 1,
+          filters: whereFilters,
         })
         if (!cancelled) setFetchedData(computeAggregation(result))
       } catch {
@@ -124,7 +162,7 @@ export function StatsCardBlock({ config, data: externalData, dataSource }: Stats
     if (!dataSource?.table) return
     return onTableChange((table) => {
       if (table !== dataSource.table) return
-      queryRows(dataSource.table, { limit: needsAllRows ? 10000 : 1 })
+      queryRows(dataSource.table, { limit: needsAllRows ? 10000 : 1, filters: whereFilters })
         .then((result) => setFetchedData(computeAggregation(result)))
         .catch(() => {})
     })

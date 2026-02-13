@@ -170,6 +170,20 @@ export function RuntimeDataProvider({
     [basePath, appAuthToken]
   )
 
+  const fetchApiSource = useCallback(
+    async (path: string, options?: { method?: string; body?: Record<string, unknown> }) => {
+      const apiPath = `/runtime/${encodeURIComponent(workspaceSlug)}/api${path.startsWith('/') ? path : `/${path}`}`
+      const fetchOptions: RequestInit = {
+        method: options?.method || 'GET',
+      }
+      if (options?.body) {
+        fetchOptions.body = JSON.stringify(options.body)
+      }
+      return runtimeFetch<unknown>(apiPath, fetchOptions, appAuthToken)
+    },
+    [workspaceSlug, appAuthToken]
+  )
+
   const uploadFile = useCallback(
     async (file: File, prefix?: string): Promise<string> => {
       const formData = new FormData()
@@ -197,6 +211,7 @@ export function RuntimeDataProvider({
         updateRow,
         deleteRows,
         uploadFile,
+        fetchApiSource,
         notifyTableChange,
         onTableChange,
       }}

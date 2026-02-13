@@ -50,6 +50,8 @@ import { ListBlock } from './blocks/list-block'
 import { DividerBlock } from './blocks/divider-block'
 import { AuthBlock } from './blocks/auth-block'
 import { FileUploadBlock } from './blocks/file-upload-block'
+import { CustomCodeBlock } from './blocks/custom-code-block'
+import type { CustomCodeConfig } from './blocks/custom-code-block'
 import type {
   AppSchema,
   AppPage,
@@ -491,7 +493,7 @@ function BlockRenderer({ block }: { block: AppBlock }) {
         />
       )
     case 'data_table':
-      return <DataTableBlock config={block.config as unknown as DataTableConfig} />
+      return <DataTableBlock config={block.config as unknown as DataTableConfig} apiSource={block.api_source} dataSource={block.data_source} />
     case 'chart':
       return (
         <ChartBlock
@@ -532,6 +534,8 @@ function BlockRenderer({ block }: { block: AppBlock }) {
       return <AuthBlock config={block.config as unknown as AuthBlockConfig} />
     case 'file_upload':
       return <FileUploadBlock config={block.config as unknown as FileUploadConfig} />
+    case 'custom_code':
+      return <CustomCodeBlock config={block.config as unknown as CustomCodeConfig} apiSource={block.api_source} />
     default:
       return (
         <div className="border border-dashed border-border rounded-lg p-4 text-center text-xs text-foreground-muted">

@@ -18,10 +18,12 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
 import { usePageParams } from '../app-renderer'
-import type { DataTableConfig } from '../types'
+import type { DataTableConfig, ApiSource, DataSource } from '../types'
 
 interface DataTableBlockProps {
   config: DataTableConfig
+  apiSource?: ApiSource
+  dataSource?: DataSource
 }
 
 function buildSearchFilters(searchTerm: string, config: DataTableConfig) {
@@ -44,8 +46,8 @@ function buildSearchFilters(searchTerm: string, config: DataTableConfig) {
   return { filters, combinator: (filters.length > 1 ? 'OR' : undefined) as 'OR' | undefined }
 }
 
-export function DataTableBlock({ config }: DataTableBlockProps) {
-  const { queryRows, insertRow, updateRow, deleteRows, notifyTableChange, onTableChange } =
+export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlockProps) {
+  const { queryRows, insertRow, updateRow, deleteRows, notifyTableChange, onTableChange, fetchApiSource } =
     useDataProvider()
   const { navigateToPage } = usePageParams()
   const [rows, setRows] = useState<Record<string, unknown>[]>([])
@@ -61,8 +63,9 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
   const [viewRow, setViewRow] = useState<Record<string, unknown> | null>(null)
   const [showCreateRow, setShowCreateRow] = useState(false)
   const [createValues, setCreateValues] = useState<Record<string, unknown>>({})
-  const [sortCol, setSortCol] = useState<string | null>(null)
-  const [sortDir, setSortDir] = useState<'ASC' | 'DESC'>('ASC')
+  const defaultSort = dataSource?.order_by?.[0]
+  const [sortCol, setSortCol] = useState<string | null>(defaultSort?.column ?? null)
+  const [sortDir, setSortDir] = useState<'ASC' | 'DESC'>(defaultSort?.direction ?? 'ASC')
   const pageSize = config.page_size || 20
 
   const handleSort = (colKey: string) => {
@@ -82,16 +85,26 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const { filters, combinator } = buildSearchFilters(debouncedSearch, config)
-      const result = await queryRows(config.table_name, {
-        limit: pageSize,
-        offset: page * pageSize,
-        filters,
-        filter_combinator: combinator,
-        order_by: sortCol ? [{ column: sortCol, direction: sortDir }] : undefined,
-      })
-      setRows(result.rows)
-      setTotal(result.total)
+      if (apiSource && fetchApiSource) {
+        const raw = await fetchApiSource(apiSource.path, {
+          method: apiSource.method || 'GET',
+          body: apiSource.body,
+        })
+        const arr = Array.isArray(raw) ? raw : (raw as any)?.rows || (raw as any)?.data || []
+        setRows(arr as Record<string, unknown>[])
+        setTotal(arr.length)
+      } else {
+        const { filters, combinator } = buildSearchFilters(debouncedSearch, config)
+        const result = await queryRows(config.table_name, {
+          limit: pageSize,
+          offset: page * pageSize,
+          filters,
+          filter_combinator: combinator,
+          order_by: sortCol ? [{ column: sortCol, direction: sortDir }] : undefined,
+        })
+        setRows(result.rows)
+        setTotal(result.total)
+      }
     } catch {
       setRows([])
     } finally {
@@ -99,6 +112,8 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
     }
   }, [
     queryRows,
+    fetchApiSource,
+    apiSource,
     config.table_name,
     config.columns,
     pageSize,
@@ -134,7 +149,7 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
 
   const handleDelete = async (row: Record<string, unknown>) => {
     const pkColumn =
-      config.columns.find((col) => col.key === 'id')?.key || config.columns[0]?.key || 'id'
+      config.columns.find((col) => col.key === 'id')?.key || 'id'
     const pkValue = row[pkColumn]
     if (pkValue === null || pkValue === undefined) return
     if (!window.confirm(`Delete record ${pkColumn}=${pkValue}?`)) return
@@ -178,7 +193,7 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
     setSaving(true)
     try {
       const pkColumn =
-        config.columns.find((col) => col.key === 'id')?.key || config.columns[0]?.key || 'id'
+        config.columns.find((col) => col.key === 'id')?.key || 'id'
       const data: Record<string, unknown> = {}
       for (const col of config.columns) {
         if (col.key === 'created_at' || col.key === 'updated_at' || col.key === 'deleted_at')
@@ -191,6 +206,9 @@ export function DataTableBlock({ config }: DataTableBlockProps) {
         } else {
           data[col.key] = v
         }
+      }
+      if (!(pkColumn in data) && pkColumn in editValues) {
+        data[pkColumn] = editValues[pkColumn]
       }
       await updateRow(config.table_name, data, `${pkColumn} = '${data[pkColumn]}'`)
       notifyTableChange(config.table_name)
@@ -720,17 +738,20 @@ function formatCellValue(value: unknown, type?: string): React.ReactNode {
       return <span title={String(value)}>{formatDateValue(value)}</span>
     case 'badge': {
       const v = String(value).toLowerCase()
-      const badgeColor = /active|enabled|online|approved|published/.test(v)
+      const sv = String(value)
+      const badgeColor = /active|enabled|online|approved|published/.test(v) || /在线|在职|正常|有效|已发布|运营中|已通过/.test(sv)
         ? 'bg-emerald-500/10 text-emerald-600'
-        : /inactive|disabled|offline|archived/.test(v)
+        : /inactive|disabled|offline|archived/.test(v) || /离线|停运|已报废|已过期|离职/.test(sv)
           ? 'bg-gray-500/10 text-gray-500'
-          : /pending|review|waiting|draft/.test(v)
+          : /pending|review|waiting|draft/.test(v) || /待处理|未处理|处理中|审核中|维修中|进行中/.test(sv)
             ? 'bg-amber-500/10 text-amber-600'
-            : /failed|error|rejected|blocked/.test(v)
+            : /failed|error|rejected|blocked/.test(v) || /紧急|超速|严重|违章|未缴/.test(sv)
               ? 'bg-red-500/10 text-red-600'
-              : /completed|done|success|delivered/.test(v)
+              : /completed|done|success|delivered/.test(v) || /已完成|已处理|已缴|已维修|已解决/.test(sv)
                 ? 'bg-blue-500/10 text-blue-600'
-                : 'bg-brand-500/10 text-brand-500'
+                : /ignored/.test(v) || /已忽略/.test(sv)
+                  ? 'bg-slate-500/10 text-slate-500'
+                  : 'bg-brand-500/10 text-brand-500'
       return (
         <span className={cn('text-xs px-1.5 py-0.5 rounded', badgeColor)}>{String(value)}</span>
       )

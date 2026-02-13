@@ -92,9 +92,25 @@ export function ChartBlock({ config, data: externalData, dataSource }: ChartBloc
     )
   }
 
-  // Extract values
-  const values = rows.map((r) => Number(r[config.y_key] || 0))
-  const labels = rows.map((r) => String(r[config.x_key] || ''))
+  // Extract values — support category_key auto-aggregation for pie charts
+  let values: number[]
+  let labels: string[]
+  const catKey = config.category_key || config.x_key
+  const valKey = config.value_key || config.y_key
+
+  if (config.category_key && !config.y_key) {
+    // Auto-aggregate: group rows by category_key and count occurrences
+    const counts = new Map<string, number>()
+    for (const r of rows) {
+      const cat = String(r[catKey] || '未知')
+      counts.set(cat, (counts.get(cat) || 0) + 1)
+    }
+    labels = Array.from(counts.keys())
+    values = Array.from(counts.values())
+  } else {
+    values = rows.map((r) => Number(r[valKey] || 0))
+    labels = rows.map((r) => String(r[catKey] || ''))
+  }
   const maxVal = Math.max(...values, 1)
 
   return (

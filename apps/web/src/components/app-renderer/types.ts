@@ -52,6 +52,7 @@ export type AppBlockType =
   | 'divider'
   | 'auth'
   | 'file_upload'
+  | 'custom_code'
 
 export interface AppBlock {
   id: string
@@ -59,7 +60,15 @@ export interface AppBlock {
   label?: string
   config: Record<string, unknown>
   data_source?: DataSource
+  api_source?: ApiSource
   grid?: { col_span?: number; row_span?: number }
+}
+
+export interface ApiSource {
+  path: string
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  body?: Record<string, unknown>
+  transform?: string
 }
 
 export interface DataSource {
@@ -114,6 +123,8 @@ export interface ChartConfig {
   chart_type: 'bar' | 'line' | 'pie' | 'area'
   x_key: string
   y_key: string
+  category_key?: string
+  value_key?: string
   color?: string
   title?: string
   height?: number

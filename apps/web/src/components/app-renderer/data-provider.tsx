@@ -13,6 +13,7 @@ interface DataProviderContextValue {
   updateRow: (table: string, data: Record<string, unknown>, where: string) => Promise<void>
   deleteRows: (table: string, where: string, ids?: unknown[]) => Promise<void>
   uploadFile?: (file: File, prefix?: string) => Promise<string>
+  fetchApiSource?: (path: string, options?: { method?: string; body?: Record<string, unknown> }) => Promise<unknown>
   notifyTableChange: (table: string) => void
   onTableChange: (listener: TableChangeListener) => () => void
 }
