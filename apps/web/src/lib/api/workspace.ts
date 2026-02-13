@@ -3,7 +3,7 @@
  * Workspace management related interfaces
  */
 
-import { request, API_BASE_URL } from './shared'
+import { request, API_BASE_URL, type ApiResponse } from './shared'
 
 // ===== Type Definitions =====
 
@@ -164,12 +164,6 @@ export interface RotateWorkspaceApiKeyRequest {
 }
 
 // ===== API Response Types =====
-
-interface ApiResponse<T> {
-  code: string
-  message: string
-  data: T
-}
 
 interface ListResponse<T> {
   items: T[]

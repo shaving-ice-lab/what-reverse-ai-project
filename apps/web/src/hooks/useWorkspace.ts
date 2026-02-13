@@ -3,6 +3,11 @@
 import { createContext, useContext } from 'react'
 import type { Workspace } from '@/lib/api/workspace'
 
+export const WORKSPACE_STORAGE_KEY = 'last_workspace_id'
+export const RECENT_WORKSPACE_STORAGE_KEY = 'recent_workspace_ids'
+export const RECENT_WORKSPACE_LIMIT = 4
+export const SETUP_STORAGE_KEY = 'reverseai-setup-completed'
+
 export interface WorkspaceContextValue {
   /** Current active workspace ID (null if none selected) */
   workspaceId: string | null

@@ -39,7 +39,7 @@ import {
 import { RequireAuth } from '@/components/auth/auth-guard'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useCommandPalette } from '@/components/dashboard/use-command-palette'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { workspaceApi, type Workspace, type WorkspaceQuota } from '@/lib/api/workspace'
 import { agentChatApi } from '@/lib/api/agent-chat'
@@ -51,7 +51,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { WorkspaceContext } from '@/hooks/useWorkspace'
+import { WorkspaceContext, WORKSPACE_STORAGE_KEY, RECENT_WORKSPACE_STORAGE_KEY, RECENT_WORKSPACE_LIMIT, SETUP_STORAGE_KEY } from '@/hooks/useWorkspace'
 
 // mainNavigationMenu — workspace-scoped
 function getMainNavItems(workspaceId: string | null) {
@@ -79,11 +79,6 @@ const fullBleedRoutes = [
   '/dashboard/setup',
 ]
 
-const WORKSPACE_STORAGE_KEY = 'last_workspace_id'
-const RECENT_WORKSPACE_STORAGE_KEY = 'recent_workspace_ids'
-const RECENT_WORKSPACE_LIMIT = 4
-const SETUP_STORAGE_KEY = 'reverseai-setup-completed'
-
 const NotificationPanel = dynamic(
   () =>
     import('@/components/dashboard/notification-panel').then((mod) => ({
@@ -110,22 +105,6 @@ const workspaceStatusConfig: Record<string, { label: string; color: string }> = 
   active: { label: 'Available', color: 'text-brand-500' },
   suspended: { label: 'Paused', color: 'text-warning' },
   deleted: { label: 'Deleted', color: 'text-destructive' },
-}
-
-function formatSessionTimeAgo(isoDate: string): string {
-  const date = new Date(isoDate)
-  if (isNaN(date.getTime())) return isoDate
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'Just now'
-  if (diffMin < 60) return `${diffMin} min ago`
-  const diffHrs = Math.floor(diffMin / 60)
-  if (diffHrs < 24) return `${diffHrs} hour${diffHrs > 1 ? 's' : ''} ago`
-  const diffDays = Math.floor(diffHrs / 24)
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  return date.toLocaleDateString()
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -325,9 +304,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           id: s.id,
           title: s.title || `Session ${s.id.slice(0, 8)}`,
           time: s.updated_at
-            ? formatSessionTimeAgo(s.updated_at)
+            ? formatRelativeTime(s.updated_at)
             : s.created_at
-              ? formatSessionTimeAgo(s.created_at)
+              ? formatRelativeTime(s.created_at)
               : '',
         }))
         setRecentConversations(items)

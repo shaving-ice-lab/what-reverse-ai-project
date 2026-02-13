@@ -20,35 +20,11 @@ import {
   ExternalLink,
   Pencil,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime, formatBytes } from '@/lib/utils'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { workspaceDatabaseApi, type DatabaseStats } from '@/lib/api/workspace-database'
 import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
 import { useWorkspace } from '@/hooks/useWorkspace'
-
-function formatRelativeTime(isoDate: string): string {
-  const date = new Date(isoDate)
-  if (isNaN(date.getTime())) return isoDate
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'just now'
-  if (diffMin < 60) return `${diffMin}m ago`
-  const diffHrs = Math.floor(diffMin / 60)
-  if (diffHrs < 24) return `${diffHrs}h ago`
-  const diffDays = Math.floor(diffHrs / 24)
-  if (diffDays === 1) return 'yesterday'
-  if (diffDays < 30) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
-}
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
@@ -285,7 +261,7 @@ export default function DashboardPage() {
                   <DBStatRow
                     icon={HardDrive}
                     label="Total Size"
-                    value={dbStats ? formatBytes(dbStats.total_size_bytes) : '—'}
+                    value={dbStats ? formatBytes((dbStats.file_size_kb ?? 0) * 1024) : '—'}
                   />
                   <DBStatRow
                     icon={Database}

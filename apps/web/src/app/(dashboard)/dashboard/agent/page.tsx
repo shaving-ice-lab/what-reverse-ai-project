@@ -49,22 +49,8 @@ import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
 import { appApi, type App, type AppAccessPolicy } from '@/lib/api/workspace'
 import { workspaceDatabaseApi, type DatabaseTable } from '@/lib/api/workspace-database'
 import type { AppSchema } from '@/components/app-renderer/types'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
 import { useWorkspace } from '@/hooks/useWorkspace'
-
-function formatTimeAgo(dateStr: string): string {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
 
 export default function AgentPage() {
   const { workspaceId, workspace } = useWorkspace()
@@ -536,7 +522,7 @@ export default function AgentPage() {
                       </div>
                       <div className="text-[10px] text-foreground-muted flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" />
-                        {formatTimeAgo(session.created_at)}
+                        {formatRelativeTime(session.created_at)}
                         <span className="text-foreground-muted/60">·</span>
                         {session.message_count} msgs
                       </div>

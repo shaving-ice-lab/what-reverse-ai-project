@@ -40,25 +40,9 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import { userApi } from '@/lib/api/auth'
 import { workspaceStorageApi } from '@/lib/api/workspace-storage'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
 import { ChangePasswordDialog } from '@/components/settings/change-password-dialog'
 import { PageContainer, PageHeader } from '@/components/dashboard/page-layout'
-
-// Format Relative Time
-function formatRelativeTime(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / (1000 * 60))
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} min ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
-  return date.toLocaleDateString('zh-CN')
-}
 
 // Settings Card Component
 function SettingsSection({

@@ -14,10 +14,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useWorkspace } from '@/hooks/useWorkspace'
+import { useWorkspace, SETUP_STORAGE_KEY } from '@/hooks/useWorkspace'
 import { workspaceApi } from '@/lib/api/workspace'
-
-const SETUP_STORAGE_KEY = 'reverseai-setup-completed'
 
 const TEMPLATES = [
   {

@@ -22,7 +22,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -43,7 +43,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { workspaceApi, type Workspace } from '@/lib/api/workspace'
-import { useWorkspace } from '@/hooks/useWorkspace'
+import { useWorkspace, WORKSPACE_STORAGE_KEY } from '@/hooks/useWorkspace'
 
 const planConfig: Record<string, { label: string; color: string; bgColor: string }> = {
   free: { label: 'FREE', color: 'text-foreground-muted', bgColor: 'bg-surface-200' },
@@ -56,24 +56,6 @@ const regionOptions = [
   { value: 'ap-southeast-1', label: 'Asia Pacific (Singapore)' },
   { value: 'us-east-1', label: 'US East' },
 ]
-
-const WORKSPACE_STORAGE_KEY = 'last_workspace_id'
-
-function formatRelativeTime(isoDate: string): string {
-  const date = new Date(isoDate)
-  if (isNaN(date.getTime())) return isoDate
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return 'just now'
-  if (diffMin < 60) return `${diffMin}m ago`
-  const diffHrs = Math.floor(diffMin / 60)
-  if (diffHrs < 24) return `${diffHrs}h ago`
-  const diffDays = Math.floor(diffHrs / 24)
-  if (diffDays === 1) return 'yesterday'
-  if (diffDays < 30) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
 
 export default function WorkspacesPage() {
   const router = useRouter()

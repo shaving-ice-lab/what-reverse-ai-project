@@ -11,6 +11,7 @@ import {
   clearTokens,
   requestRaw,
   type RequestConfig,
+  type ApiResponse,
 } from './client'
 
 export {
@@ -20,6 +21,7 @@ export {
   refreshAccessToken,
   clearTokens,
   type RequestConfig,
+  type ApiResponse,
 }
 
 /**

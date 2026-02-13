@@ -3,17 +3,7 @@
  */
 
 import type { ApiKey, ApiKeyProvider, ApiKeyTestResult, CreateApiKeyRequest } from '@/types/api-key'
-import { request } from './shared'
-
-/**
- * API Key Service (for backend endpoint /api/v1/users/me/api-keys)
- */
-interface ApiResponse<T> {
-  code: string
-  message: string
-  data: T
-  meta?: Record<string, unknown>
-}
+import { request, type ApiResponse } from './shared'
 
 type BackendApiKey = {
   id: string
@@ -115,7 +105,7 @@ export const apiKeysApi = {
         scopes: data.scopes || [],
       }),
     })
-    return toUiApiKey(response.data)
+    return toUiApiKey(response.data!)
   },
 
   /**
@@ -133,7 +123,7 @@ export const apiKeysApi = {
         scopes: data.scopes || [],
       }),
     })
-    return toUiApiKey(response.data)
+    return toUiApiKey(response.data!)
   },
 
   /**
@@ -144,7 +134,7 @@ export const apiKeysApi = {
       method: 'POST',
       body: JSON.stringify({ reason }),
     })
-    return toUiApiKey(response.data)
+    return toUiApiKey(response.data!)
   },
 
   /**
@@ -163,7 +153,7 @@ export const apiKeysApi = {
     const response = await request<ApiResponse<BackendTestResult>>(`${API_KEYS_BASE}/${id}/test`, {
       method: 'POST',
     })
-    return toUiTestResult(response.data)
+    return toUiTestResult(response.data!)
   },
 
   /**
@@ -174,6 +164,6 @@ export const apiKeysApi = {
       method: 'POST',
       body: JSON.stringify({ provider, key }),
     })
-    return toUiTestResult(response.data)
+    return toUiTestResult(response.data!)
   },
 }

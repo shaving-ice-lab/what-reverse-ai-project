@@ -8,7 +8,6 @@ export { api, ApiError, type ApiResponse, type RequestConfig } from './client'
 // ExportModule API
 export * from './auth'
 export * from './api-keys'
-export * from './dashboard'
 // Workspace API(Workspace atthenis App)
 export { workspaceApi, appApi } from './workspace'
 export type {

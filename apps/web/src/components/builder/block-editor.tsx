@@ -52,6 +52,7 @@ const BLOCK_TYPE_META: Record<
   divider: { label: 'Divider', icon: Minus, description: 'Section divider' },
   auth: { label: 'Auth', icon: Shield, description: 'Login/register' },
   file_upload: { label: 'File Upload', icon: Upload, description: 'File upload widget' },
+  custom_code: { label: 'Custom Code', icon: Layers, description: 'Custom JS component in sandbox' },
 }
 
 const ALL_BLOCK_TYPES = Object.keys(BLOCK_TYPE_META) as AppBlockType[]
