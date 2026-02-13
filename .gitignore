@@ -53,6 +53,8 @@ apps/desktop/src-tauri/target/
 # Go
 apps/server/bin/
 apps/server/tmp/
+apps/server/data/
+apps/server/bench_output.txt
 *.exe
 
 # Resources (external references)
