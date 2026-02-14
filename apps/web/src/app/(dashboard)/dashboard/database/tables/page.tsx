@@ -275,60 +275,58 @@ export default function TablesPage() {
   }
 
   return (
-    <div className="flex h-full -mx-6 -my-5">
-      {/* Left sidebar: table list */}
-      <div className="w-[220px] shrink-0 border-r border-border bg-background-studio flex flex-col">
-        <div className="p-3 border-b border-border">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-muted" />
+    <div className="flex h-full">
+      {/* Left sidebar: table list — Supabase style */}
+      <div className="w-[240px] shrink-0 border-r border-border bg-background-studio flex flex-col">
+        <div className="px-3 py-2.5 border-b border-border flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground-lighter" />
             <Input
               placeholder="Search tables..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 pl-8 text-xs"
+              className="h-7 pl-8 text-[11px] bg-surface-100 border-border"
             />
           </div>
+          <button
+            onClick={() => setShowCreateTable(true)}
+            className="w-7 h-7 shrink-0 rounded-md bg-brand-500 hover:bg-brand-400 flex items-center justify-center transition-colors"
+            title="New Table"
+          >
+            <Plus className="w-3.5 h-3.5 text-white" />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+        <div className="flex-1 overflow-y-auto scrollbar-thin py-1">
           {loadingTables ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-4 h-4 animate-spin text-foreground-muted" />
+              <Loader2 className="w-4 h-4 animate-spin text-foreground-lighter" />
             </div>
           ) : filteredTables.length === 0 ? (
-            <div className="text-center py-8 text-xs text-foreground-muted">No tables found</div>
+            <div className="text-center py-8 text-[11px] text-foreground-lighter">No tables found</div>
           ) : (
-            filteredTables.map((table) => (
-              <button
-                key={table.name}
-                onClick={() => selectTable(table.name)}
-                className={cn(
-                  'w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[12px] transition-colors text-left',
-                  selectedTable === table.name
-                    ? 'bg-surface-200 text-foreground font-medium'
-                    : 'text-foreground-light hover:text-foreground hover:bg-surface-200/50'
-                )}
-              >
-                <Table2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="flex-1 truncate">{table.name}</span>
-                <span className="text-[10px] text-foreground-muted tabular-nums">
-                  {table.row_count_est}
-                </span>
-              </button>
-            ))
+            filteredTables.map((table) => {
+              const isSelected = selectedTable === table.name
+              return (
+                <button
+                  key={table.name}
+                  onClick={() => selectTable(table.name)}
+                  className={cn(
+                    'w-full flex items-center gap-2 px-3 py-1.5 text-[12px] transition-colors text-left border-l-2',
+                    isSelected
+                      ? 'border-l-brand-500 bg-surface-100 text-foreground font-medium'
+                      : 'border-l-transparent text-foreground-light hover:text-foreground hover:bg-surface-75'
+                  )}
+                >
+                  <Table2 className={cn('w-3.5 h-3.5 shrink-0', isSelected ? 'text-brand-500' : 'text-foreground-lighter')} />
+                  <span className="flex-1 truncate">{table.name}</span>
+                  <span className="text-[10px] text-foreground-lighter tabular-nums">
+                    {table.row_count_est}
+                  </span>
+                </button>
+              )
+            })
           )}
-        </div>
-
-        <div className="p-2 border-t border-border">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="w-full justify-start h-8 text-xs"
-            onClick={() => setShowCreateTable(true)}
-          >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            New Table
-          </Button>
         </div>
       </div>
 
@@ -336,20 +334,19 @@ export default function TablesPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {selectedTable ? (
           <>
-            {/* Table header */}
-            <div className="px-4 py-2.5 border-b border-border bg-surface-75/30 flex items-center gap-2">
-              <Table2 className="w-4 h-4 text-foreground-light" />
-              <span className="text-sm font-medium text-foreground">{selectedTable}</span>
+            {/* Table header — Supabase style */}
+            <div className="h-10 shrink-0 px-4 border-b border-border flex items-center gap-2">
+              <span className="text-[13px] font-semibold text-foreground">{selectedTable}</span>
               {tableSchema && (
-                <span className="text-xs text-foreground-muted">
-                  {tableSchema.columns.length} columns
+                <span className="text-[11px] text-foreground-lighter">
+                  {tableSchema.columns.length} cols · {totalCount.toLocaleString()} rows
                 </span>
               )}
               <div className="ml-auto">
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-7 text-xs"
+                  className="h-7 text-[11px] text-foreground-lighter hover:text-foreground"
                   onClick={() => setShowColumnManager(true)}
                 >
                   <Columns3 className="w-3.5 h-3.5 mr-1" />

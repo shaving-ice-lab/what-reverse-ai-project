@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -9,17 +10,13 @@ import {
   Network,
   HardDrive,
 } from 'lucide-react'
-import {
-  PageWithSidebar,
-  SidebarNavItem,
-  SidebarNavGroup,
-} from '@/components/dashboard/page-layout'
+import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/dashboard/database', label: 'Overview', icon: LayoutDashboard },
   { href: '/dashboard/database/tables', label: 'Tables', icon: Table2 },
-  { href: '/dashboard/database/sql', label: 'SQL Editor', icon: Terminal },
-  { href: '/dashboard/database/schema-graph', label: 'Schema Graph', icon: Network },
+  { href: '/dashboard/database/sql', label: 'SQL', icon: Terminal },
+  { href: '/dashboard/database/schema-graph', label: 'Schema', icon: Network },
   { href: '/dashboard/database/storage', label: 'Storage', icon: HardDrive },
 ]
 
@@ -33,32 +30,36 @@ export default function DatabaseLayout({ children }: { children: React.ReactNode
     return pathname.startsWith(href)
   }
 
-  const sidebar = (
-    <>
-      <SidebarNavGroup>
-        {navItems.map((item) => (
-          <SidebarNavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={<item.icon className="w-4 h-4" />}
-            active={isActive(item.href)}
-          />
-        ))}
-      </SidebarNavGroup>
-
-      <div className="mt-auto pt-4 px-3 border-t border-border">
-        <div className="flex items-center gap-2 text-[11px] text-foreground-muted">
-          <div className="w-2 h-2 rounded-full bg-brand-500" />
-          <span>SQLite (VM)</span>
-        </div>
-      </div>
-    </>
-  )
-
   return (
-    <PageWithSidebar sidebar={sidebar} sidebarTitle="Database">
-      {children}
-    </PageWithSidebar>
+    <div className="flex flex-col h-full overflow-hidden bg-background-studio">
+      {/* Tab bar — pill style (matches workspace page) */}
+      <header className="h-10 shrink-0 border-b border-border bg-background-studio flex items-center px-3 gap-1">
+        <nav className="flex items-center gap-0.5">
+          {navItems.map((item) => {
+            const active = isActive(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'h-7 px-2.5 rounded-md flex items-center gap-1.5 text-[12px] font-medium transition-colors',
+                  active
+                    ? 'bg-surface-200 text-foreground'
+                    : 'text-foreground-muted hover:text-foreground hover:bg-surface-100/60'
+                )}
+              >
+                <item.icon className="w-3.5 h-3.5" />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      </header>
+
+      {/* Content */}
+      <div className="flex-1 min-h-0 overflow-hidden bg-background">
+        {children}
+      </div>
+    </div>
   )
 }

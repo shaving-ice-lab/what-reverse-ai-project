@@ -2,20 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Database,
   Table2,
-  Terminal,
   Plus,
-  Network,
-  HardDrive,
   Rows3,
+  HardDrive,
+  Database,
   Clock,
   RefreshCw,
   Loader2,
   AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PageHeader, StatsCard } from '@/components/dashboard/page-layout'
 import { workspaceDatabaseApi } from '@/lib/api/workspace-database'
 import type { DatabaseTable, DatabaseStats, QueryHistoryItem } from '@/lib/api/workspace-database'
 import { cn, formatBytes } from '@/lib/utils'
@@ -26,7 +23,6 @@ export default function DatabaseOverviewPage() {
   const { workspaceId } = useWorkspace()
   const [tables, setTables] = useState<DatabaseTable[]>([])
   const [stats, setStats] = useState<DatabaseStats | null>(null)
-  const [vmMode, setVmMode] = useState(false)
   const [history, setHistory] = useState<QueryHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,7 +39,6 @@ export default function DatabaseOverviewPage() {
       ])
       setTables(tablesData)
       setStats(statsData)
-      setVmMode(!!(statsData as any)?.vm_mode)
       setHistory(historyData.slice(0, 5))
     } catch (err: any) {
       setError(err?.message || 'Failed to load database info')
@@ -58,236 +53,162 @@ export default function DatabaseOverviewPage() {
 
   if (!workspaceId) {
     return (
-      <div className="flex items-center justify-center h-64 text-foreground-light text-sm">
+      <div className="flex items-center justify-center h-64 text-foreground-muted text-sm">
         Please select a workspace first.
       </div>
     )
   }
 
-  return (
-    <div>
-      <PageHeader
-        title={vmMode ? 'Database (SQLite VM)' : 'Database'}
-        description={vmMode ? 'Manage your workspace SQLite database — powered by VM runtime.' : 'Manage your workspace database tables, run queries, and view schema.'}
-        icon={<Database className="w-4 h-4" />}
-        actions={
-          <Button variant="ghost" size="sm" onClick={loadData} disabled={loading}>
-            <RefreshCw className={cn('w-4 h-4 mr-1.5', loading && 'animate-spin')} />
-            Refresh
-          </Button>
-        }
-      />
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
+      </div>
+    )
+  }
 
+  return (
+    <div className="h-full overflow-y-auto p-5 space-y-5">
       {error && (
-        <div className="flex items-center gap-2 px-4 py-3 mb-4 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="flex items-center gap-2 px-3 py-2.5 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-[12px]">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           {error}
         </div>
       )}
 
-      {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
+      {/* Stats row — Supabase style metric cards */}
+      <div className="grid grid-cols-4 gap-3">
+        <StatCard icon={Table2} label="Tables" value={String(stats?.table_count ?? 0)} />
+        <StatCard icon={Rows3} label="Total Rows" value={(stats?.total_rows ?? 0).toLocaleString()} />
+        <StatCard icon={HardDrive} label="Size" value={formatBytes((stats?.file_size_kb ?? 0) * 1024)} />
+        <StatCard icon={Database} label="Indexes" value={String(stats?.index_count ?? 0)} />
+      </div>
+
+      {/* Tables */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-[13px] font-medium text-foreground">Tables</h2>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={loadData} disabled={loading} className="h-7 text-[11px] px-2 text-foreground-lighter hover:text-foreground">
+              <RefreshCw className={cn('w-3 h-3', loading && 'animate-spin')} />
+            </Button>
+            <Link href="/dashboard/database/tables">
+              <Button variant="outline" size="sm" className="h-7 text-[11px] px-2.5 border-border text-foreground-light">
+                View all
+              </Button>
+            </Link>
+          </div>
         </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard
-              icon={<Table2 className="w-4 h-4" />}
-              title="Tables"
-              value={stats?.table_count ?? 0}
-            />
-            <StatsCard
-              icon={<Rows3 className="w-4 h-4" />}
-              title="Total Rows"
-              value={stats?.total_rows?.toLocaleString() ?? '0'}
-            />
-            <StatsCard
-              icon={<HardDrive className="w-4 h-4" />}
-              title="Database Size"
-              value={formatBytes((stats?.file_size_kb ?? 0) * 1024)}
-            />
-            <StatsCard
-              icon={<Database className="w-4 h-4" />}
-              title="Indexes"
-              value={stats?.index_count ?? 0}
-            />
-          </div>
 
-          {/* Quick Actions */}
-          <div>
-            <h3 className="text-[12px] font-medium text-foreground-light uppercase tracking-wider mb-3">
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <QuickActionCard
-                href="/dashboard/database/tables"
-                icon={<Table2 className="w-5 h-5" />}
-                label="Table Editor"
-                description="Browse and edit table data"
-              />
-              <QuickActionCard
-                href="/dashboard/database/sql"
-                icon={<Terminal className="w-5 h-5" />}
-                label="SQL Editor"
-                description="Run SQL queries"
-              />
-              <QuickActionCard
-                href="/dashboard/database/tables?action=create"
-                icon={<Plus className="w-5 h-5" />}
-                label="Create Table"
-                description="Define a new table"
-              />
-              <QuickActionCard
-                href="/dashboard/database/schema-graph"
-                icon={<Network className="w-5 h-5" />}
-                label="Schema Graph"
-                description="View ER diagram"
-              />
+        {tables.length === 0 ? (
+          <div className="rounded-md border border-border bg-surface-75 py-16 flex flex-col items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-surface-200 flex items-center justify-center">
+              <Table2 className="w-5 h-5 text-foreground-lighter" />
             </div>
-          </div>
-
-          {/* Tables List */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[12px] font-medium text-foreground-light uppercase tracking-wider">
-                Tables ({tables.length})
-              </h3>
-              <Link href="/dashboard/database/tables">
-                <Button variant="ghost" size="sm" className="text-xs">
-                  View all
-                </Button>
-              </Link>
+            <div className="text-center">
+              <p className="text-[13px] font-medium text-foreground">No tables yet</p>
+              <p className="text-[11px] text-foreground-lighter mt-0.5">Create your first table to get started.</p>
             </div>
-
-            {tables.length === 0 ? (
-              <div className="bg-surface-100 border border-border rounded-lg p-8 text-center">
-                <Table2 className="w-8 h-8 text-foreground-muted mx-auto mb-3" />
-                <p className="text-sm text-foreground-light mb-1">No tables yet</p>
-                <p className="text-xs text-foreground-muted mb-4">
-                  Create your first table to get started.
-                </p>
-                <Link href="/dashboard/database/tables?action=create">
-                  <Button size="sm">
-                    <Plus className="w-3.5 h-3.5 mr-1.5" />
-                    Create Table
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="bg-surface-100 border border-border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-surface-75/60">
-                      <th className="text-left px-4 py-2.5 text-[12px] font-medium text-foreground-light">
-                        Name
-                      </th>
-                      <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
-                        Rows
-                      </th>
-                      <th className="text-right px-4 py-2.5 text-[12px] font-medium text-foreground-light">
-                        Columns
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tables.map((table) => (
-                      <tr
-                        key={table.name}
-                        className="border-b border-border last:border-b-0 hover:bg-surface-200/50 transition-colors"
-                      >
-                        <td className="px-4 py-2.5">
-                          <Link
-                            href={`/dashboard/database/tables?table=${table.name}`}
-                            className="text-foreground hover:text-brand-500 font-medium transition-colors"
-                          >
-                            {table.name}
-                          </Link>
-                        </td>
-                        <td className="text-right px-4 py-2.5 text-foreground-light tabular-nums">
-                          {table.row_count_est.toLocaleString()}
-                        </td>
-                        <td className="text-right px-4 py-2.5 text-foreground-light tabular-nums">
-                          {table.column_count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <Link href="/dashboard/database/tables?action=create">
+              <Button size="sm" className="h-8 text-[12px] mt-1 gap-1.5">
+                <Plus className="w-3.5 h-3.5" />
+                New Table
+              </Button>
+            </Link>
           </div>
-
-          {/* Recent Queries */}
-          {history.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-[12px] font-medium text-foreground-light uppercase tracking-wider">
-                  Recent Queries
-                </h3>
-                <Link href="/dashboard/database/sql">
-                  <Button variant="ghost" size="sm" className="text-xs">
-                    Open SQL Editor
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="bg-surface-100 border border-border rounded-lg divide-y divide-border">
-                {history.map((item, idx) => (
-                  <div key={idx} className="px-4 py-3 flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <code className="text-xs text-foreground font-mono truncate block">
-                        {item.sql}
-                      </code>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span
-                        className={cn(
-                          'text-[11px] font-medium px-1.5 py-0.5 rounded',
-                          item.status === 'success'
-                            ? 'bg-brand-500/10 text-brand-500'
-                            : 'bg-destructive/10 text-destructive'
-                        )}
+        ) : (
+          <div className="rounded-md border border-border overflow-hidden bg-surface-75">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left px-4 py-2.5 text-[11px] font-medium text-foreground-lighter uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="text-right px-4 py-2.5 text-[11px] font-medium text-foreground-lighter uppercase tracking-wider">
+                    Rows
+                  </th>
+                  <th className="text-right px-4 py-2.5 text-[11px] font-medium text-foreground-lighter uppercase tracking-wider">
+                    Columns
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tables.map((table) => (
+                  <tr
+                    key={table.name}
+                    className="border-b border-border/50 last:border-b-0 hover:bg-surface-100 transition-colors"
+                  >
+                    <td className="px-4 py-2.5">
+                      <Link
+                        href={`/dashboard/database/tables?table=${table.name}`}
+                        className="text-[13px] text-brand-500 hover:text-brand-600 font-medium transition-colors"
                       >
-                        {item.status}
-                      </span>
-                      <span className="text-xs text-foreground-muted tabular-nums flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {item.duration_ms}ms
-                      </span>
-                    </div>
-                  </div>
+                        {table.name}
+                      </Link>
+                    </td>
+                    <td className="text-right px-4 py-2.5 text-[12px] text-foreground-light tabular-nums">
+                      {table.row_count_est.toLocaleString()}
+                    </td>
+                    <td className="text-right px-4 py-2.5 text-[12px] text-foreground-light tabular-nums">
+                      {table.column_count}
+                    </td>
+                  </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Queries */}
+      {history.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[13px] font-medium text-foreground">Recent Queries</h2>
+            <Link href="/dashboard/database/sql" className="text-[11px] text-brand-500 hover:text-brand-400 transition-colors">
+              Open SQL Editor →
+            </Link>
+          </div>
+
+          <div className="rounded-md border border-border bg-surface-75 divide-y divide-border/50 overflow-hidden">
+            {history.map((item, idx) => (
+              <div key={idx} className="px-4 py-2.5 flex items-center gap-3 hover:bg-surface-100 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <code className="text-[11px] text-foreground-light font-mono truncate block">
+                    {item.sql}
+                  </code>
+                </div>
+                <span
+                  className={cn(
+                    'text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0',
+                    item.status === 'success'
+                      ? 'bg-brand-500/15 text-brand-500'
+                      : 'bg-destructive/15 text-destructive'
+                  )}
+                >
+                  {item.status}
+                </span>
+                <span className="text-[10px] text-foreground-lighter tabular-nums flex items-center gap-0.5 shrink-0">
+                  <Clock className="w-2.5 h-2.5" />
+                  {item.duration_ms}ms
+                </span>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
 }
 
-function QuickActionCard({
-  href,
-  icon,
-  label,
-  description,
-}: {
-  href: string
-  icon: React.ReactNode
-  label: string
-  description: string
-}) {
+function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
-    <Link href={href}>
-      <div className="bg-surface-100 border border-border rounded-lg p-4 hover:bg-surface-200/50 hover:border-foreground-muted/20 transition-all cursor-pointer group">
-        <div className="text-foreground-light group-hover:text-brand-500 transition-colors mb-2">
-          {icon}
-        </div>
-        <div className="text-sm font-medium text-foreground">{label}</div>
-        <div className="text-xs text-foreground-muted mt-0.5">{description}</div>
+    <div className="rounded-md border border-border bg-surface-75 px-4 py-3">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className="w-3.5 h-3.5 text-foreground-lighter" />
+        <span className="text-[11px] text-foreground-lighter font-medium">{label}</span>
       </div>
-    </Link>
+      <div className="text-[18px] font-semibold text-foreground tabular-nums">{value}</div>
+    </div>
   )
 }
