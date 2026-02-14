@@ -117,7 +117,7 @@ export default function SetupPage() {
     }
     const template = TEMPLATES.find((t) => t.id === templateId)
     if (template && 'prompt' in template && template.prompt) {
-      router.replace(`/dashboard/agent?prompt=${encodeURIComponent(template.prompt)}`)
+      router.replace(`/dashboard/workspace?prompt=${encodeURIComponent(template.prompt)}`)
     } else {
       router.replace('/dashboard')
     }

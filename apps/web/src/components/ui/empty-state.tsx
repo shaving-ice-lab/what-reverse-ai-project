@@ -408,12 +408,12 @@ export function AgentEmptyState({ onCreateClick, className }: AgentEmptyStatePro
       action={
         onCreateClick
           ? {
-              label: 'Open AI Agent',
+              label: 'Open Workspace',
               onClick: onCreateClick,
             }
           : {
-              label: 'Open AI Agent',
-              href: '/dashboard/agent',
+              label: 'Open Workspace',
+              href: '/dashboard/workspace',
             }
       }
       className={className}
@@ -433,8 +433,8 @@ export function ConversationEmptyState({ className }: ConversationEmptyStateProp
       title="Start a New Conversation"
       description="Chat with the AI agent for help and inspiration"
       action={{
-        label: 'Talk to Agent',
-        href: '/dashboard/agent',
+        label: 'Open Workspace',
+        href: '/dashboard/workspace',
         icon: MessageSquare,
       }}
       className={className}
@@ -546,7 +546,7 @@ export function DocumentEmptyState({ onCreate, className }: DocumentEmptyStatePr
             }
           : {
               label: 'Create Document',
-              href: '/dashboard/agent',
+              href: '/dashboard/workspace',
             }
       }
       className={className}

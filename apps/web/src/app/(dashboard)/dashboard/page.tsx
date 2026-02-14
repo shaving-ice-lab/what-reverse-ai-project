@@ -88,7 +88,7 @@ export default function DashboardPage() {
           (dbStats?.table_count ?? 0) === 0 &&
           workspace?.app_status !== 'published' && (
             <Link
-              href="/dashboard/agent"
+              href="/dashboard/workspace"
               className="block rounded-xl border-2 border-dashed border-brand-500/30 bg-brand-500/3 hover:border-brand-500/50 hover:bg-brand-500/6 transition-all p-6 group"
             >
               <div className="flex flex-col items-center text-center gap-3">
@@ -115,10 +115,10 @@ export default function DashboardPage() {
         {/* Quick Action Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickActionCard
-            href="/dashboard/agent"
+            href="/dashboard/workspace"
             icon={Bot}
-            title="AI Agent"
-            description="Chat with AI to build apps"
+            title="Workspace"
+            description="Build and preview your app"
             color="brand"
           />
           <QuickActionCard
@@ -136,7 +136,7 @@ export default function DashboardPage() {
             color="blue"
           />
           <QuickActionCard
-            href="/dashboard/workspaces"
+            href="/dashboard/workspace"
             icon={Globe}
             title="My Apps"
             description="View all your applications"
@@ -180,19 +180,19 @@ export default function DashboardPage() {
                     </Link>
                   )}
                   <Link
-                    href="/dashboard/agent"
+                    href="/dashboard/workspace"
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground-muted hover:text-foreground transition-colors"
                   >
                     <Pencil className="w-3 h-3" />
-                    Edit in AI Agent
+                    Edit in Workspace
                   </Link>
                   {workspace.app_status === 'draft' && (
                     <Link
-                      href="/dashboard/agent"
+                      href="/dashboard/workspace"
                       className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground-muted hover:text-foreground transition-colors ml-auto"
                     >
                       <Bot className="w-3 h-3" />
-                      Continue with AI Agent
+                      Continue in Workspace
                       <ArrowRight className="w-3 h-3" />
                     </Link>
                   )}
@@ -208,13 +208,13 @@ export default function DashboardPage() {
             <div className="px-4 py-3 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Bot className="w-4 h-4 text-brand-500" />
-                <span className="text-sm font-medium text-foreground">Recent Agent Sessions</span>
+                <span className="text-sm font-medium text-foreground">Recent Sessions</span>
               </div>
               <Link
-                href="/dashboard/agent"
+                href="/dashboard/workspace"
                 className="text-[11px] text-foreground-muted hover:text-foreground flex items-center gap-0.5"
               >
-                Open Agent <ChevronRight className="w-3 h-3" />
+                Open Workspace <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
             <div className="divide-y divide-border">
@@ -364,7 +364,7 @@ function AgentSessionRow({
 }) {
   return (
     <Link
-      href={sessionId ? `/dashboard/agent?session=${sessionId}` : '/dashboard/agent'}
+      href={sessionId ? `/dashboard/workspace?session=${sessionId}` : '/dashboard/workspace'}
       className="flex items-center gap-3 px-4 py-3 hover:bg-surface-200/30 transition-colors"
     >
       <div

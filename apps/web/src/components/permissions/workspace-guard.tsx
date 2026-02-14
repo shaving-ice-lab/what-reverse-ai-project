@@ -211,7 +211,7 @@ function WorkspaceGuardInner({
     const action =
       error.variant === 'error'
         ? { label: 'Reload', onClick: loadWorkspace }
-        : { label: 'Back to Workspace', href: '/dashboard/workspaces' }
+        : { label: 'Back to Workspace', href: '/dashboard/workspace' }
     const secondaryAction =
       error.variant === 'permission'
         ? { label: 'Back to Dashboard', href: '/dashboard' }
