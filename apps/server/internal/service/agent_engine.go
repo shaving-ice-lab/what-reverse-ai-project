@@ -602,6 +602,29 @@ Current user_id: ` + session.UserID + e.getSkillPrompt(),
 	return msgs
 }
 
+// LLMConfig holds per-workspace LLM configuration
+type LLMConfig struct {
+	Provider string `json:"provider"` // "openai" or empty
+	APIKey   string `json:"api_key"`
+	BaseURL  string `json:"base_url"`
+	Model    string `json:"model"`
+}
+
+// llmConfigCtxKey is the context key for workspace-level LLM config
+type llmConfigCtxKey struct{}
+
+// WithLLMConfig attaches workspace LLM config to a context
+func WithLLMConfig(ctx context.Context, cfg *LLMConfig) context.Context {
+	return context.WithValue(ctx, llmConfigCtxKey{}, cfg)
+}
+
+func getLLMConfigFromContext(ctx context.Context) *LLMConfig {
+	if v, ok := ctx.Value(llmConfigCtxKey{}).(*LLMConfig); ok {
+		return v
+	}
+	return nil
+}
+
 // llmProvider determines which LLM backend to use
 type llmProvider string
 
@@ -619,13 +642,22 @@ func detectLLMProvider() (llmProvider, string, string) {
 }
 
 // callLLM sends the request to the configured LLM provider and parses the response.
-// Supports: OpenAI-compatible API, heuristic fallback.
+// Checks workspace-level LLM config from context first, then falls back to env vars.
 func (e *agentEngine) callLLM(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}) (string, *toolAction, error) {
+	// Check workspace-level LLM config from context
+	if cfg := getLLMConfigFromContext(ctx); cfg != nil && cfg.APIKey != "" {
+		model := cfg.Model
+		if model == "" {
+			model = "gpt-4o"
+		}
+		return e.callOpenAI(ctx, messages, tools, cfg.APIKey, model, cfg.BaseURL)
+	}
+
 	provider, endpoint, model := detectLLMProvider()
 
 	switch provider {
 	case llmProviderOpenAI:
-		return e.callOpenAI(ctx, messages, tools, endpoint, model)
+		return e.callOpenAI(ctx, messages, tools, endpoint, model, "")
 	default:
 		return e.thinkHeuristic(messages, tools)
 	}
@@ -706,7 +738,7 @@ func parseLLMResponse(result *llmChatResponse) (string, *toolAction, error) {
 
 // callOpenAI sends the request to an OpenAI-compatible API.
 // Supports custom base URL via OPENAI_BASE_URL env var.
-func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}, apiKey, model string) (string, *toolAction, error) {
+func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}, apiKey, model, baseURLOverride string) (string, *toolAction, error) {
 	reqBody := map[string]interface{}{
 		"model":       model,
 		"messages":    messages,
@@ -720,7 +752,10 @@ func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]inte
 
 	bodyBytes, _ := json.Marshal(reqBody)
 
-	baseURL := getLLMBaseURL()
+	baseURL := baseURLOverride
+	if baseURL == "" {
+		baseURL = getLLMBaseURL()
+	}
 	endpointURL := strings.TrimRight(baseURL, "/") + "/chat/completions"
 
 	req, err := http.NewRequestWithContext(ctx, "POST", endpointURL, bytes.NewBuffer(bodyBytes))

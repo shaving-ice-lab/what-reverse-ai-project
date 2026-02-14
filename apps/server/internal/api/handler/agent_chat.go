@@ -14,16 +14,18 @@ import (
 
 // AgentChatHandler AI Agent 对话处理器
 type AgentChatHandler struct {
-	engine        service.AgentEngine
-	sessions      *service.AgentSessionManager
-	skillRegistry *service.SkillRegistry
+	engine           service.AgentEngine
+	sessions         *service.AgentSessionManager
+	skillRegistry    *service.SkillRegistry
+	workspaceService service.WorkspaceService
 }
 
 // NewAgentChatHandler 创建 Agent 对话处理器
-func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager, skillRegistry ...*service.SkillRegistry) *AgentChatHandler {
+func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager, workspaceService service.WorkspaceService, skillRegistry ...*service.SkillRegistry) *AgentChatHandler {
 	h := &AgentChatHandler{
-		engine:   engine,
-		sessions: sessions,
+		engine:           engine,
+		sessions:         sessions,
+		workspaceService: workspaceService,
 	}
 	if len(skillRegistry) > 0 {
 		h.skillRegistry = skillRegistry[0]
@@ -67,6 +69,28 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 
 	ctx, cancel := context.WithCancel(c.Request().Context())
 	defer cancel()
+
+	// Load workspace-level LLM config (default endpoint) and attach to context
+	if h.workspaceService != nil {
+		wsID, _ := uuid.Parse(workspaceID)
+		uID, _ := uuid.Parse(userID)
+		if ws, err := h.workspaceService.GetByID(ctx, wsID, uID); err == nil && ws != nil && ws.Settings != nil {
+			if ep := getDefaultLLMEndpoint(ws.Settings); ep != nil {
+				apiKey, _ := ep["api_key"].(string)
+				if apiKey != "" {
+					baseURL, _ := ep["base_url"].(string)
+					model, _ := ep["model"].(string)
+					provider, _ := ep["provider"].(string)
+					ctx = service.WithLLMConfig(ctx, &service.LLMConfig{
+						Provider: provider,
+						APIKey:   apiKey,
+						BaseURL:  baseURL,
+						Model:    model,
+					})
+				}
+			}
+		}
+	}
 
 	events := h.engine.Run(ctx, workspaceID, userID, req.Message, req.SessionID)
 

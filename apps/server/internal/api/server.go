@@ -202,7 +202,7 @@ func (s *Server) setupRoutes() {
 	agentSessionRepo := repository.NewAgentSessionRepository(s.db)
 	agentSessionManager.SetPersister(service.NewAgentSessionPersisterAdapter(agentSessionRepo))
 	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, service.DefaultAgentEngineConfig(), skillRegistry.BuildSystemPrompt(), skillRegistry)
-	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager, skillRegistry)
+	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager, workspaceService, skillRegistry)
 
 	// 健康检查
 	s.echo.GET("/health", systemHandler.HealthCheck)
@@ -371,6 +371,11 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/versions/compare", workspaceHandler.CompareWorkspaceVersions)
 			workspaces.GET("/:id/access-policy", workspaceHandler.GetWorkspaceAccessPolicy)
 			workspaces.PATCH("/:id/access-policy", workspaceHandler.UpdateWorkspaceAccessPolicy)
+			workspaces.GET("/:id/llm-config", workspaceHandler.ListLLMEndpoints)
+			workspaces.POST("/:id/llm-config", workspaceHandler.AddLLMEndpoint)
+			workspaces.PATCH("/:id/llm-config/:endpointId", workspaceHandler.UpdateLLMEndpoint)
+			workspaces.DELETE("/:id/llm-config/:endpointId", workspaceHandler.DeleteLLMEndpoint)
+			workspaces.POST("/:id/llm-config/:endpointId/default", workspaceHandler.SetDefaultLLMEndpoint)
 			// Storage — 文件存储
 			workspaces.POST("/:id/storage/upload", workspaceStorageHandler.Upload)
 			workspaces.GET("/:id/storage", workspaceStorageHandler.List)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -745,6 +746,353 @@ func (h *WorkspaceHandler) ListPublicRatings(c echo.Context) error {
 		"code": "OK", "message": "OK",
 		"data": map[string]interface{}{"items": ratings, "total": total, "page": page, "page_size": pageSize},
 	})
+}
+
+// ===== LLM Endpoints (multi-endpoint) =====
+
+// ListLLMEndpoints 获取工作空间 LLM 端点列表
+func (h *WorkspaceHandler) ListLLMEndpoints(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	workspace, err := h.workspaceService.GetByID(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+
+	endpoints := getLLMEndpoints(workspace.Settings)
+	// Mask API keys
+	masked := make([]map[string]interface{}, 0, len(endpoints))
+	for _, ep := range endpoints {
+		m := map[string]interface{}{
+			"id":         ep["id"],
+			"name":       ep["name"],
+			"provider":   ep["provider"],
+			"base_url":   ep["base_url"],
+			"model":      ep["model"],
+			"is_default": ep["is_default"],
+			"created_at": ep["created_at"],
+		}
+		if apiKey, ok := ep["api_key"].(string); ok && apiKey != "" {
+			if len(apiKey) > 8 {
+				m["api_key_preview"] = apiKey[:4] + "..." + apiKey[len(apiKey)-4:]
+			} else {
+				m["api_key_preview"] = "***"
+			}
+			m["has_api_key"] = true
+		} else {
+			m["has_api_key"] = false
+			m["api_key_preview"] = ""
+		}
+		masked = append(masked, m)
+	}
+
+	return successResponse(c, map[string]interface{}{
+		"endpoints": masked,
+	})
+}
+
+// AddLLMEndpoint 添加 LLM 端点
+func (h *WorkspaceHandler) AddLLMEndpoint(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+
+	var req struct {
+		Name     string `json:"name"`
+		Provider string `json:"provider"`
+		APIKey   string `json:"api_key"`
+		BaseURL  string `json:"base_url"`
+		Model    string `json:"model"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
+	}
+	if strings.TrimSpace(req.Name) == "" || strings.TrimSpace(req.Model) == "" {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_INPUT", "名称和模型不能为空")
+	}
+
+	workspace, err := h.workspaceService.GetByID(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+
+	endpoints := getLLMEndpoints(workspace.Settings)
+
+	// If this is the first endpoint, make it default
+	isDefault := len(endpoints) == 0
+
+	newEndpoint := map[string]interface{}{
+		"id":         uuid.New().String(),
+		"name":       strings.TrimSpace(req.Name),
+		"provider":   req.Provider,
+		"api_key":    strings.TrimSpace(req.APIKey),
+		"base_url":   strings.TrimSpace(req.BaseURL),
+		"model":      strings.TrimSpace(req.Model),
+		"is_default": isDefault,
+		"created_at": time.Now().UTC().Format(time.RFC3339),
+	}
+	endpoints = append(endpoints, newEndpoint)
+
+	if err := saveLLMEndpoints(h, c, workspace, uid, endpoints); err != nil {
+		return err
+	}
+
+	h.recordAudit(c, workspace.ID, uid, "workspace.llm_endpoint.add", "workspace", &workspace.ID, entity.JSON{"endpoint_id": newEndpoint["id"]})
+
+	return successResponse(c, map[string]interface{}{
+		"endpoint": maskEndpoint(newEndpoint),
+	})
+}
+
+// UpdateLLMEndpoint 更新 LLM 端点
+func (h *WorkspaceHandler) UpdateLLMEndpoint(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	endpointID := c.Param("endpointId")
+
+	var req struct {
+		Name     string `json:"name"`
+		Provider string `json:"provider"`
+		APIKey   string `json:"api_key"`
+		BaseURL  string `json:"base_url"`
+		Model    string `json:"model"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
+	}
+
+	workspace, err := h.workspaceService.GetByID(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+
+	endpoints := getLLMEndpoints(workspace.Settings)
+	found := false
+	for i, ep := range endpoints {
+		if fmt.Sprintf("%v", ep["id"]) == endpointID {
+			found = true
+			if strings.TrimSpace(req.Name) != "" {
+				endpoints[i]["name"] = strings.TrimSpace(req.Name)
+			}
+			if req.Provider != "" {
+				endpoints[i]["provider"] = req.Provider
+			}
+			if strings.TrimSpace(req.APIKey) != "" {
+				endpoints[i]["api_key"] = strings.TrimSpace(req.APIKey)
+			}
+			if req.BaseURL != "" {
+				endpoints[i]["base_url"] = strings.TrimSpace(req.BaseURL)
+			}
+			if strings.TrimSpace(req.Model) != "" {
+				endpoints[i]["model"] = strings.TrimSpace(req.Model)
+			}
+			break
+		}
+	}
+	if !found {
+		return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "LLM 端点不存在")
+	}
+
+	if err := saveLLMEndpoints(h, c, workspace, uid, endpoints); err != nil {
+		return err
+	}
+
+	h.recordAudit(c, workspace.ID, uid, "workspace.llm_endpoint.update", "workspace", &workspace.ID, entity.JSON{"endpoint_id": endpointID})
+
+	return successResponse(c, map[string]interface{}{"message": "updated"})
+}
+
+// DeleteLLMEndpoint 删除 LLM 端点
+func (h *WorkspaceHandler) DeleteLLMEndpoint(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	endpointID := c.Param("endpointId")
+
+	workspace, err := h.workspaceService.GetByID(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+
+	endpoints := getLLMEndpoints(workspace.Settings)
+	wasDefault := false
+	newEndpoints := make([]map[string]interface{}, 0, len(endpoints))
+	for _, ep := range endpoints {
+		if fmt.Sprintf("%v", ep["id"]) == endpointID {
+			if def, ok := ep["is_default"].(bool); ok && def {
+				wasDefault = true
+			}
+			continue
+		}
+		newEndpoints = append(newEndpoints, ep)
+	}
+	if len(newEndpoints) == len(endpoints) {
+		return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "LLM 端点不存在")
+	}
+
+	// If deleted endpoint was default and there are remaining endpoints, make the first one default
+	if wasDefault && len(newEndpoints) > 0 {
+		newEndpoints[0]["is_default"] = true
+	}
+
+	if err := saveLLMEndpoints(h, c, workspace, uid, newEndpoints); err != nil {
+		return err
+	}
+
+	h.recordAudit(c, workspace.ID, uid, "workspace.llm_endpoint.delete", "workspace", &workspace.ID, entity.JSON{"endpoint_id": endpointID})
+
+	return successResponse(c, map[string]interface{}{"message": "deleted"})
+}
+
+// SetDefaultLLMEndpoint 设置默认 LLM 端点
+func (h *WorkspaceHandler) SetDefaultLLMEndpoint(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	endpointID := c.Param("endpointId")
+
+	workspace, err := h.workspaceService.GetByID(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+
+	endpoints := getLLMEndpoints(workspace.Settings)
+	found := false
+	for i := range endpoints {
+		if fmt.Sprintf("%v", endpoints[i]["id"]) == endpointID {
+			endpoints[i]["is_default"] = true
+			found = true
+		} else {
+			endpoints[i]["is_default"] = false
+		}
+	}
+	if !found {
+		return errorResponse(c, http.StatusNotFound, "NOT_FOUND", "LLM 端点不存在")
+	}
+
+	if err := saveLLMEndpoints(h, c, workspace, uid, endpoints); err != nil {
+		return err
+	}
+
+	h.recordAudit(c, workspace.ID, uid, "workspace.llm_endpoint.set_default", "workspace", &workspace.ID, entity.JSON{"endpoint_id": endpointID})
+
+	return successResponse(c, map[string]interface{}{"message": "default set"})
+}
+
+// ===== LLM Endpoint Helpers =====
+
+func getLLMEndpoints(settings entity.JSON) []map[string]interface{} {
+	if settings == nil {
+		return []map[string]interface{}{}
+	}
+	raw, ok := settings["llm_endpoints"]
+	if !ok {
+		return []map[string]interface{}{}
+	}
+	// Handle []interface{} from JSON unmarshaling
+	if arr, ok := raw.([]interface{}); ok {
+		result := make([]map[string]interface{}, 0, len(arr))
+		for _, item := range arr {
+			if m, ok := item.(map[string]interface{}); ok {
+				result = append(result, m)
+			}
+		}
+		return result
+	}
+	// Handle []map[string]interface{} directly
+	if arr, ok := raw.([]map[string]interface{}); ok {
+		return arr
+	}
+	return []map[string]interface{}{}
+}
+
+func getDefaultLLMEndpoint(settings entity.JSON) map[string]interface{} {
+	endpoints := getLLMEndpoints(settings)
+	for _, ep := range endpoints {
+		if def, ok := ep["is_default"].(bool); ok && def {
+			return ep
+		}
+	}
+	if len(endpoints) > 0 {
+		return endpoints[0]
+	}
+	return nil
+}
+
+func saveLLMEndpoints(h *WorkspaceHandler, c echo.Context, workspace *entity.Workspace, uid uuid.UUID, endpoints []map[string]interface{}) error {
+	settings := make(map[string]interface{})
+	if workspace.Settings != nil {
+		for k, v := range workspace.Settings {
+			settings[k] = v
+		}
+	}
+	// Convert to []interface{} for JSON serialization
+	arr := make([]interface{}, len(endpoints))
+	for i, ep := range endpoints {
+		arr[i] = ep
+	}
+	settings["llm_endpoints"] = arr
+	workspace.Settings = entity.JSON(settings)
+	if err := h.workspaceService.UpdateSettings(c.Request().Context(), workspace.ID, uid, workspace.Settings); err != nil {
+		return errorResponse(c, http.StatusInternalServerError, "UPDATE_FAILED", "更新 LLM 配置失败")
+	}
+	return nil
+}
+
+func maskEndpoint(ep map[string]interface{}) map[string]interface{} {
+	m := map[string]interface{}{
+		"id":         ep["id"],
+		"name":       ep["name"],
+		"provider":   ep["provider"],
+		"base_url":   ep["base_url"],
+		"model":      ep["model"],
+		"is_default": ep["is_default"],
+		"created_at": ep["created_at"],
+	}
+	if apiKey, ok := ep["api_key"].(string); ok && apiKey != "" {
+		if len(apiKey) > 8 {
+			m["api_key_preview"] = apiKey[:4] + "..." + apiKey[len(apiKey)-4:]
+		} else {
+			m["api_key_preview"] = "***"
+		}
+		m["has_api_key"] = true
+	} else {
+		m["has_api_key"] = false
+		m["api_key_preview"] = ""
+	}
+	return m
 }
 
 // ===== 工具函数 =====

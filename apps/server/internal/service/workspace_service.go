@@ -54,6 +54,9 @@ type WorkspaceService interface {
 	UpdateComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error)
 	GetComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error)
 
+	// Settings
+	UpdateSettings(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, settings entity.JSON) error
+
 	// Marketplace
 	ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error)
 	GetPublic(ctx context.Context, id uuid.UUID) (*entity.Workspace, error)
@@ -401,6 +404,16 @@ func (s *workspaceService) Update(ctx context.Context, id uuid.UUID, ownerID uui
 	return workspace, nil
 }
 
+func (s *workspaceService) UpdateSettings(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, settings entity.JSON) error {
+	access, err := s.authorizeWorkspace(ctx, id, ownerID, PermissionWorkspaceAdmin)
+	if err != nil {
+		return err
+	}
+	workspace := access.Workspace
+	workspace.Settings = settings
+	return s.workspaceRepo.Update(ctx, workspace)
+}
+
 func (s *workspaceService) Delete(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*WorkspaceDeletionResult, error) {
 	access, err := s.authorizeWorkspace(ctx, id, ownerID, PermissionWorkspaceAdmin)
 	if err != nil {
@@ -664,7 +677,7 @@ func (s *workspaceService) ensureUniqueSlug(ctx context.Context, baseSlug string
 }
 
 func (s *workspaceService) GetWorkspaceAccess(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) (*WorkspaceAccess, error) {
-	workspace, err := s.workspaceRepo.GetByID(ctx, workspaceID)
+	workspace, err := s.workspaceRepo.GetByIDWithVersion(ctx, workspaceID)
 	if err != nil {
 		return nil, ErrWorkspaceNotFound
 	}

@@ -291,6 +291,14 @@ func (r *workspaceRepository) GetByIDWithVersion(ctx context.Context, id uuid.UU
 		First(&workspace, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
+	// Fallback: if GORM Preload didn't resolve the relationship, load manually
+	if workspace.CurrentVersion == nil && workspace.CurrentVersionID != nil {
+		var version entity.WorkspaceVersion
+		if err := r.db.WithContext(ctx).
+			First(&version, "id = ?", *workspace.CurrentVersionID).Error; err == nil {
+			workspace.CurrentVersion = &version
+		}
+	}
 	return &workspace, nil
 }
 
