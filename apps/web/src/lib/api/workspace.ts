@@ -163,6 +163,40 @@ export interface RotateWorkspaceApiKeyRequest {
   scopes?: string[]
 }
 
+// ===== LLM Endpoint Types =====
+
+export interface LLMEndpoint {
+  id: string
+  name: string
+  provider: string
+  base_url: string
+  model: string
+  is_default: boolean
+  has_api_key: boolean
+  api_key_preview?: string
+  created_at: string
+}
+
+export interface AddLLMEndpointRequest {
+  name: string
+  provider: string
+  api_key: string
+  base_url: string
+  model: string
+}
+
+export interface UpdateLLMEndpointRequest {
+  name?: string
+  provider?: string
+  api_key?: string
+  base_url?: string
+  model?: string
+}
+
+// Keep old types as aliases for backward compat
+export type LLMConfigResponse = LLMEndpoint
+export type UpdateLLMConfigRequest = UpdateLLMEndpointRequest
+
 // ===== API Response Types =====
 
 interface ListResponse<T> {
@@ -364,6 +398,66 @@ export const workspaceApi = {
     }
   },
 
+
+  // ===== LLM Endpoint Methods =====
+
+  /**
+   * List all LLM endpoints for a workspace
+   */
+  async listLLMEndpoints(workspaceId: string): Promise<LLMEndpoint[]> {
+    const response = await request<ApiResponse<{ endpoints: LLMEndpoint[] }>>(
+      `/workspaces/${workspaceId}/llm-config`
+    )
+    const payload = response.data as any
+    if (Array.isArray(payload?.endpoints)) return payload.endpoints as LLMEndpoint[]
+    return []
+  },
+
+  /**
+   * Add a new LLM endpoint
+   */
+  async addLLMEndpoint(workspaceId: string, data: AddLLMEndpointRequest): Promise<LLMEndpoint> {
+    const response = await request<ApiResponse<{ endpoint: LLMEndpoint }>>(
+      `/workspaces/${workspaceId}/llm-config`,
+      { method: 'POST', body: JSON.stringify(data) }
+    )
+    const payload = response.data as any
+    return payload?.endpoint as LLMEndpoint
+  },
+
+  /**
+   * Update an LLM endpoint
+   */
+  async updateLLMEndpoint(
+    workspaceId: string,
+    endpointId: string,
+    data: UpdateLLMEndpointRequest
+  ): Promise<void> {
+    await request<ApiResponse<{ message: string }>>(
+      `/workspaces/${workspaceId}/llm-config/${endpointId}`,
+      { method: 'PATCH', body: JSON.stringify(data) }
+    )
+  },
+
+  /**
+   * Delete an LLM endpoint
+   */
+  async deleteLLMEndpoint(workspaceId: string, endpointId: string): Promise<void> {
+    await request<ApiResponse<{ message: string }>>(
+      `/workspaces/${workspaceId}/llm-config/${endpointId}`,
+      { method: 'DELETE' }
+    )
+  },
+
+  /**
+   * Set an LLM endpoint as default
+   */
+  async setDefaultLLMEndpoint(workspaceId: string, endpointId: string): Promise<void> {
+    await request<ApiResponse<{ message: string }>>(
+      `/workspaces/${workspaceId}/llm-config/${endpointId}/default`,
+      { method: 'POST' }
+    )
+  },
 
   // ===== Workspace API Key Methods =====
 
