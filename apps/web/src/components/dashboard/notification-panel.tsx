@@ -1,15 +1,14 @@
 'use client'
 
 /**
- * Notifications Panel Component - Manus Style
- * Display System Notifications, Task Updates, Message Reminders, etc.
+ * Notifications Dropdown — Supabase-style topnav dropdown
  */
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
   Bell,
-  X,
   Check,
   Zap,
   MessageSquare,
@@ -19,18 +18,13 @@ import {
   Clock,
   Settings,
   Trash2,
-  MoreHorizontal,
-  ExternalLink,
-  ChevronRight,
 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-// Notification Type
 type NotificationType = 'agent' | 'message' | 'alert' | 'info' | 'reward' | 'system'
 
 interface Notification {
@@ -41,36 +35,32 @@ interface Notification {
   time: string
   read: boolean
   actionUrl?: string
-  actionLabel?: string
 }
 
-// Mock Notifications Data
 const mockNotifications: Notification[] = [
   {
     id: '1',
     type: 'agent',
     title: 'App Build Complete',
-    description: 'AI Agent has finished building your app. Preview it now.',
+    description: 'AI Agent has finished building your app.',
     time: '2 min ago',
     read: false,
-    actionUrl: '/dashboard/agent',
-    actionLabel: 'View Details',
+    actionUrl: '/dashboard/workspace',
   },
   {
     id: '2',
     type: 'alert',
     title: 'API Call Limit Warning',
-    description: "Your API calls have reached 80% of this month's limit",
+    description: "API calls reached 80% of this month's limit.",
     time: '1 hour ago',
     read: false,
     actionUrl: '/dashboard/settings/api-keys',
-    actionLabel: 'Manage Quota',
   },
   {
     id: '3',
     type: 'reward',
-    title: 'Achievement Badge Earned',
-    description: 'Congratulations! You have built 10 apps and earned the Automation Expert badge',
+    title: 'Achievement Earned',
+    description: 'You built 10 apps — Automation Expert badge unlocked.',
     time: '3 hours ago',
     read: false,
   },
@@ -78,310 +68,163 @@ const mockNotifications: Notification[] = [
     id: '4',
     type: 'message',
     title: 'New Team Message',
-    description: '3 people mentioned you in the Project Collaboration channel',
+    description: '3 people mentioned you in Project Collaboration.',
     time: 'Yesterday',
     read: true,
     actionUrl: '/messages',
-    actionLabel: 'View Message',
   },
   {
     id: '5',
     type: 'system',
-    title: 'System Update Notification',
-    description: 'New AI Agent features are coming soon',
+    title: 'System Update',
+    description: 'New AI Agent features are coming soon.',
     time: '2 days ago',
     read: true,
     actionUrl: '/whats-new',
-    actionLabel: 'Learn More',
-  },
-  {
-    id: '6',
-    type: 'info',
-    title: 'Usage Tips',
-    description: 'Try using the shortcut key ⌘K to quickly search and execute commands',
-    time: '3 days ago',
-    read: true,
   },
 ]
 
-// Get notification icon
-const getNotificationIcon = (type: NotificationType) => {
-  switch (type) {
-    case 'agent':
-      return { icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' }
-    case 'message':
-      return { icon: MessageSquare, color: 'text-blue-400', bg: 'bg-blue-500/10' }
-    case 'alert':
-      return { icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' }
-    case 'info':
-      return { icon: Info, color: 'text-cyan-400', bg: 'bg-cyan-500/10' }
-    case 'reward':
-      return { icon: Gift, color: 'text-purple-400', bg: 'bg-purple-500/10' }
-    case 'system':
-      return { icon: Settings, color: 'text-muted-foreground', bg: 'bg-muted/50' }
-    default:
-      return { icon: Bell, color: 'text-muted-foreground', bg: 'bg-muted/50' }
-  }
+const iconConfig: Record<NotificationType, { icon: typeof Bell; color: string; bg: string }> = {
+  agent: { icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  message: { icon: MessageSquare, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  alert: { icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-500/10' },
+  info: { icon: Info, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  reward: { icon: Gift, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  system: { icon: Settings, color: 'text-foreground-lighter', bg: 'bg-surface-200' },
 }
 
-interface NotificationPanelProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
-export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
+export function NotificationDropdown() {
   const [notifications, setNotifications] = useState(mockNotifications)
-  const [filter, setFilter] = useState<'all' | 'unread'>('all')
 
   const unreadCount = notifications.filter((n) => !n.read).length
-  const filteredNotifications =
-    filter === 'unread' ? notifications.filter((n) => !n.read) : notifications
 
-  // Mark as read
   const markAsRead = (id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
   }
 
-  // Mark all as read
   const markAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
   }
 
-  // Delete notification
-  const deleteNotification = (id: string) => {
+  const deleteNotification = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
     setNotifications((prev) => prev.filter((n) => n.id !== id))
   }
 
-  // Clear all notifications
-  const clearAll = () => {
-    setNotifications([])
-  }
-
-  if (!isOpen) return null
-
   return (
-    <>
-      {/* Background Mask */}
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={onClose} />
-
-      {/* Notifications Panel */}
-      <div className="fixed right-4 top-16 w-[400px] max-h-[calc(100vh-100px)] bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-50 flex flex-col overflow-hidden animate-in slide-in-from-right-4 fade-in duration-200">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors relative">
+          <Bell className="w-4 h-4" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-brand-500" />
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 bg-surface-100 border-border p-0">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
+        <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-semibold text-foreground">Notifications</span>
             {unreadCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary/20 text-primary">
-                {unreadCount} unread
+              <span className="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-brand-500/15 text-brand-500">
+                {unreadCount}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Mark all as read
-              </button>
-            )}
+          {unreadCount > 0 && (
             <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              onClick={markAllAsRead}
+              className="text-[10px] text-brand-500 hover:text-brand-400 transition-colors"
             >
-              <X className="w-4 h-4" />
+              Mark all read
             </button>
-          </div>
+          )}
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2 p-3 border-b border-border">
-          <button
-            onClick={() => setFilter('all')}
-            className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
-              filter === 'all'
-                ? 'bg-muted text-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            )}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('unread')}
-            className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
-              filter === 'unread'
-                ? 'bg-muted text-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            )}
-          >
-            Unread
-          </button>
-        </div>
-
-        {/* Notifications List */}
-        <div className="flex-1 overflow-y-auto">
-          {filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-                <Bell className="w-6 h-6 text-muted-foreground/50" />
-              </div>
-              <p className="text-sm text-muted-foreground">No notifications</p>
-              <p className="text-xs text-muted-foreground/60 mt-1">
-                New notifications will appear here
-              </p>
+        {/* List */}
+        <div className="max-h-[320px] overflow-y-auto scrollbar-thin">
+          {notifications.length === 0 ? (
+            <div className="py-8 flex flex-col items-center gap-1.5">
+              <Bell className="w-5 h-5 text-foreground-lighter" />
+              <span className="text-[11px] text-foreground-lighter">No notifications</span>
             </div>
           ) : (
-            <div className="divide-y divide-border">
-              {filteredNotifications.map((notification) => {
-                const { icon: Icon, color, bg } = getNotificationIcon(notification.type)
-                return (
-                  <div
-                    key={notification.id}
-                    className={cn(
-                      'p-4 hover:bg-muted/50 transition-all group cursor-pointer',
-                      !notification.read && 'bg-primary/[0.02]'
-                    )}
-                    onClick={() => markAsRead(notification.id)}
-                  >
-                    <div className="flex gap-3">
-                      {/* Icon */}
-                      <div
+            notifications.map((n) => {
+              const { icon: Icon, color, bg } = iconConfig[n.type] || iconConfig.system
+              return (
+                <div
+                  key={n.id}
+                  onClick={() => markAsRead(n.id)}
+                  className={cn(
+                    'px-3 py-2.5 flex gap-2.5 cursor-pointer hover:bg-surface-75 transition-colors group',
+                    !n.read && 'bg-brand-500/3'
+                  )}
+                >
+                  <div className={cn('w-7 h-7 rounded-md flex items-center justify-center shrink-0', bg)}>
+                    <Icon className={cn('w-3.5 h-3.5', color)} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span
                         className={cn(
-                          'w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
-                          bg
+                          'text-[12px] font-medium truncate',
+                          n.read ? 'text-foreground-lighter' : 'text-foreground'
                         )}
                       >
-                        <Icon className={cn('w-4 h-4', color)} />
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p
-                                className={cn(
-                                  'text-sm font-medium truncate',
-                                  notification.read ? 'text-muted-foreground' : 'text-foreground'
-                                )}
-                              >
-                                {notification.title}
-                              </p>
-                              {!notification.read && (
-                                <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground/70 mt-1 line-clamp-2">
-                              {notification.description}
-                            </p>
-                          </div>
-
-                          {/* Action Menu */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/60 opacity-0 group-hover:opacity-100 transition-all"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreHorizontal className="w-4 h-4" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-36 bg-card border-border">
-                              {!notification.read && (
-                                <DropdownMenuItem
-                                  className="text-foreground/80 focus:bg-muted focus:text-foreground gap-2"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    markAsRead(notification.id)
-                                  }}
-                                >
-                                  <Check className="w-4 h-4" />
-                                  Mark as read
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem
-                                className="text-red-400 focus:bg-red-500/10 focus:text-red-400 gap-2"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  deleteNotification(notification.id)
-                                }}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-
-                        {/* Time and Action */}
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-[11px] text-muted-foreground/60 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {notification.time}
-                          </span>
-                          {notification.actionUrl && (
-                            <a
-                              href={notification.actionUrl}
-                              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {notification.actionLabel}
-                              <ChevronRight className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
+                        {n.title}
+                      </span>
+                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />}
+                    </div>
+                    <p className="text-[11px] text-foreground-lighter truncate mt-0.5">
+                      {n.description}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] text-foreground-lighter flex items-center gap-0.5">
+                        <Clock className="w-2.5 h-2.5" />
+                        {n.time}
+                      </span>
+                      {n.actionUrl && (
+                        <Link
+                          href={n.actionUrl}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[10px] text-brand-500 hover:text-brand-400 transition-colors"
+                        >
+                          View →
+                        </Link>
+                      )}
                     </div>
                   </div>
-                )
-              })}
-            </div>
+                  <button
+                    onClick={(e) => deleteNotification(n.id, e)}
+                    className="w-5 h-5 rounded flex items-center justify-center text-foreground-lighter hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0 mt-0.5"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              )
+            })
           )}
         </div>
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="p-3 border-t border-border flex items-center justify-between">
+          <div className="px-3 py-2 border-t border-border flex items-center justify-between">
             <button
-              onClick={clearAll}
-              className="text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
+              onClick={() => setNotifications([])}
+              className="text-[10px] text-foreground-lighter hover:text-foreground transition-colors"
             >
               Clear all
             </button>
-            <a
-              href="/dashboard/settings/notifications"
-              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+            <Link
+              href="/dashboard/settings"
+              className="text-[10px] text-foreground-lighter hover:text-foreground transition-colors"
             >
-              Notification Settings
-              <ExternalLink className="w-3 h-3" />
-            </a>
+              Settings
+            </Link>
           </div>
         )}
-      </div>
-    </>
-  )
-}
-
-// Notification Bell Button Component
-interface NotificationBellProps {
-  onClick: () => void
-  unreadCount?: number
-}
-
-export function NotificationBell({ onClick, unreadCount = 0 }: NotificationBellProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
-    >
-      <Bell className="w-5 h-5" />
-      {unreadCount > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-[10px] font-bold text-primary-foreground rounded-full flex items-center justify-center animate-pulse">
-          {unreadCount > 9 ? '9+' : unreadCount}
-        </span>
-      )}
-    </button>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

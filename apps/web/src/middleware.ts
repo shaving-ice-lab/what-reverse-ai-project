@@ -11,24 +11,29 @@ function resolveLegacyDashboardPath(pathname: string) {
   const segments = pathname.split('/').filter(Boolean)
   if (segments[0] !== 'dashboard') return null
 
-  // Legacy: /dashboard/workspaces/:id/apps/:appId/... → /dashboard/agent
+  // Legacy: /dashboard/workspaces/:id/apps/:appId/... → /dashboard/workspace
   if (segments[1] === 'workspaces' && segments[3] === 'apps') {
-    return '/dashboard/agent'
+    return '/dashboard/workspace'
   }
 
-  // Legacy: /dashboard/app/:appId/... → /dashboard/agent
+  // Legacy: /dashboard/app/:appId/... → /dashboard/workspace
   if (segments[1] === 'app' && segments[2]) {
-    return '/dashboard/agent'
+    return '/dashboard/workspace'
   }
 
-  // Legacy: /dashboard/apps → /dashboard/agent
+  // Legacy: /dashboard/apps → /dashboard/workspace
   if (segments[1] === 'apps' && !segments[2]) {
-    return '/dashboard/agent'
+    return '/dashboard/workspace'
   }
 
-  // Legacy redirect → /dashboard/agent
+  // Legacy: /dashboard/builder → /dashboard/workspace
   if (segments[1] === 'builder') {
-    return '/dashboard/agent'
+    return '/dashboard/workspace'
+  }
+
+  // Legacy: /dashboard/agent → /dashboard/workspace
+  if (segments[1] === 'agent') {
+    return '/dashboard/workspace'
   }
 
   return null

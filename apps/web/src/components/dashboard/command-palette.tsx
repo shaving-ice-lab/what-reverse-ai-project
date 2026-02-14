@@ -58,15 +58,15 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'action',
 
-        title: 'New Agent Chat',
+        title: 'New Workspace',
 
-        description: 'Chat with AI to build your app',
+        description: 'Build your app with AI',
 
         icon: Bot,
 
         shortcut: '⌘N',
 
-        href: '/dashboard/agent',
+        href: '/dashboard/workspace',
       },
 
       {
@@ -108,13 +108,13 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'navigation',
 
-        title: 'AI Agent',
+        title: 'Workspace',
 
         icon: Bot,
 
-        href: '/dashboard/agent',
+        href: '/dashboard/workspace',
 
-        keywords: ['agent', 'bot', 'AI', 'editor', 'design', 'ui'],
+        keywords: ['workspace', 'agent', 'bot', 'AI', 'editor', 'design', 'ui'],
       },
 
       {
@@ -140,7 +140,7 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         icon: LayoutGrid,
 
-        href: '/dashboard/workspaces',
+        href: '/dashboard/workspace',
 
         keywords: ['apps', 'workspaces', 'projects'],
       },
@@ -184,13 +184,13 @@ const commandGroups: { title: string; items: CommandItem[] }[] = [
 
         type: 'recent',
 
-        title: 'AI Agent',
+        title: 'Workspace',
 
-        description: 'Chat with AI Agent',
+        description: 'Build and preview your app',
 
         icon: Bot,
 
-        href: '/dashboard/agent',
+        href: '/dashboard/workspace',
       },
 
       {

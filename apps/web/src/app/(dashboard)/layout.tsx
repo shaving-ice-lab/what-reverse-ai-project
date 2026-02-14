@@ -17,11 +17,10 @@ import {
   Plus,
   Search,
   User,
+  Users,
   LogOut,
   CreditCard,
   LayoutGrid,
-  FolderOpen,
-  Bell,
   Sun,
   Moon,
   ChevronDown,
@@ -35,6 +34,7 @@ import {
   Shield,
   Database,
   Globe,
+  Clock,
 } from 'lucide-react'
 import { RequireAuth } from '@/components/auth/auth-guard'
 import { useAuthStore } from '@/stores/useAuthStore'
@@ -57,10 +57,9 @@ import { WorkspaceContext, WORKSPACE_STORAGE_KEY, RECENT_WORKSPACE_STORAGE_KEY, 
 function getMainNavItems(workspaceId: string | null) {
   return [
     { title: 'Home', href: '/dashboard', icon: Activity },
-    { title: 'AI Agent', href: '/dashboard/agent', icon: Bot },
+    { title: 'Workspace', href: '/dashboard/workspace', icon: Bot },
     { title: 'Database', href: '/dashboard/database', icon: Database },
     { title: 'Skills', href: '/dashboard/skills', icon: Sparkles },
-    { title: 'Apps', href: '/dashboard/workspaces', icon: Globe },
     {
       title: 'Settings',
       href: workspaceId ? `/dashboard/workspaces/${workspaceId}/settings` : '/dashboard/settings',
@@ -72,17 +71,16 @@ function getMainNavItems(workspaceId: string | null) {
 // allPage(PageControlLayoutandScroll)
 const fullBleedRoutes = [
   '/dashboard',
-  '/dashboard/workspaces',
   '/dashboard/database',
-  '/dashboard/agent',
+  '/dashboard/workspace',
   '/dashboard/skills',
   '/dashboard/setup',
 ]
 
-const NotificationPanel = dynamic(
+const NotificationDropdown = dynamic(
   () =>
     import('@/components/dashboard/notification-panel').then((mod) => ({
-      default: mod.NotificationPanel,
+      default: mod.NotificationDropdown,
     })),
   { ssr: false }
 )
@@ -114,7 +112,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showHistory, setShowHistory] = useState(true)
   const [activeConversation, setActiveConversation] = useState<string | null>(null)
-  const [showNotifications, setShowNotifications] = useState(false)
   const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const commandPalette = useCommandPalette()
@@ -434,7 +431,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const workspaceQuickLinks = activeWorkspace
     ? [
-        { label: 'Create App', href: '/dashboard/agent' },
+        { label: 'Create App', href: '/dashboard/workspace' },
         {
           label: 'Member Management',
           href: `/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`,
@@ -456,7 +453,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
         e.preventDefault()
-        router.push('/dashboard/agent')
+        router.push('/dashboard/workspace')
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
         e.preventDefault()
@@ -516,15 +513,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64 bg-surface-100 border-border">
-                  <div className="px-3 py-2 text-[11px] text-foreground-muted">Workspace</div>
+                <DropdownMenuContent align="start" className="w-72 bg-surface-100 border-border p-0">
+                  {/* Active workspace info */}
                   {activeWorkspace && (
-                    <div className="px-3 pb-2 space-y-2 text-[11px] text-foreground-light">
-                      <div className="flex items-center justify-between">
-                        <span className="text-foreground-muted">Current plan</span>
+                    <div className="px-3 py-2.5 border-b border-border">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[12px] font-semibold text-foreground truncate mr-2">
+                          {activeWorkspace.name}
+                        </span>
                         <span
                           className={cn(
-                            'px-1.5 py-0.5 text-[10px] font-semibold rounded',
+                            'px-1.5 py-0.5 text-[9px] font-semibold rounded shrink-0',
                             activePlan.bgColor,
                             activePlan.color
                           )}
@@ -532,135 +531,117 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           {activePlan.label}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-foreground-muted">Quota overview</span>
-                        <span className="text-[10px] text-foreground-muted">
-                          {quotaLoading ? 'Syncing...' : `Usage ${quotaUsageLabel}`}
-                        </span>
+                      <div className="flex items-center gap-2 text-[10px] text-foreground-lighter">
+                        <span>/{activeWorkspace.slug}</span>
+                        <span>·</span>
+                        <span>{quotaLoading ? 'Syncing...' : `Usage ${quotaUsageLabel}`}</span>
                       </div>
-                      {quotaSummaryItems.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          {quotaSummaryItems.map((item) => (
-                            <div
-                              key={item.label}
-                              className="rounded-md border border-border bg-surface-75 px-2 py-1 text-[10px] text-foreground-muted"
-                            >
-                              <span className="text-foreground-light">{item.label}</span>
-                              <span className="ml-1 text-foreground">{item.value}</span>
-                            </div>
-                          ))}
+                    </div>
+                  )}
+
+                  {/* Quick actions */}
+                  {activeWorkspace && (
+                    <div className="py-1 border-b border-border">
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href="/dashboard/workspace" className="flex items-center gap-2.5">
+                          <Bot className="w-3.5 h-3.5 text-foreground-lighter" />
+                          Workspace
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`} className="flex items-center gap-2.5">
+                          <Users className="w-3.5 h-3.5 text-foreground-lighter" />
+                          Members
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing`} className="flex items-center gap-2.5">
+                          <CreditCard className="w-3.5 h-3.5 text-foreground-lighter" />
+                          Usage & Billing
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings`} className="flex items-center gap-2.5">
+                          <Settings className="w-3.5 h-3.5 text-foreground-lighter" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
+                  )}
+
+                  {/* Workspace list */}
+                  <div className="py-1">
+                    <div className="px-3 py-1.5 text-[10px] font-medium text-foreground-lighter uppercase tracking-wider">
+                      All workspaces
+                    </div>
+                    <div className="max-h-[200px] overflow-y-auto scrollbar-thin">
+                      {workspaceLoading ? (
+                        <div className="flex items-center gap-2 px-3 py-2 text-[12px] text-foreground-lighter">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Loading...
                         </div>
-                      ) : (
-                        <div className="text-[10px] text-foreground-muted">No quota data</div>
-                      )}
-                      <Link
-                        href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
-                        className="text-brand-500 hover:underline"
-                      >
-                        View Usage Details
-                      </Link>
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        {workspaceQuickLinks.map((link) => (
-                          <Link
-                            key={link.href}
-                            href={link.href}
-                            className="flex items-center justify-center rounded-md border border-border bg-surface-75 px-2 py-1 text-[11px] text-foreground-light hover:text-foreground hover:border-border-strong hover:bg-surface-100 transition-colors"
-                          >
-                            {link.label}
+                      ) : workspaces.length === 0 ? (
+                        <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                          <Link href="/dashboard/workspace" className="flex items-center gap-2.5">
+                            <Plus className="w-3.5 h-3.5 text-foreground-lighter" />
+                            Create workspace
                           </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <DropdownMenuSeparator className="bg-border" />
-                  {workspaceLoading ? (
-                    <DropdownMenuItem
-                      disabled
-                      className="text-[12px] text-foreground-muted flex items-center gap-2"
-                    >
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Loading
-                    </DropdownMenuItem>
-                  ) : workspaces.length === 0 ? (
-                    <DropdownMenuItem asChild className="text-[12px]">
-                      <Link href="/dashboard/workspaces" className="flex items-center gap-2">
-                        <Plus className="w-3.5 h-3.5" />
-                        Create workspace
-                      </Link>
-                    </DropdownMenuItem>
-                  ) : (
-                    workspaces.map((workspace) => {
-                      const plan = resolvePlanConfig(workspace.plan)
-                      const isActiveWorkspace = workspace.id === activeWorkspaceId
-                      const status = workspaceStatusConfig[workspace.status] || {
-                        label: 'Limited',
-                        color: 'text-foreground-muted',
-                      }
-                      const isDisabled = workspace.status !== 'active'
-                      return (
-                        <DropdownMenuItem
-                          key={workspace.id}
-                          disabled={isDisabled}
-                          onClick={() => {
-                            if (isDisabled) return
-                            handleWorkspaceSwitch(workspace.id)
-                          }}
-                          className={cn(
-                            'flex items-center justify-between gap-2 text-[12px]',
-                            isActiveWorkspace && 'bg-surface-200/70 text-foreground',
-                            isDisabled && 'opacity-60 cursor-not-allowed'
-                          )}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div
-                              className={cn(
-                                'w-1.5 h-1.5 rounded-full shrink-0',
-                                workspace.status === 'active'
-                                  ? 'bg-emerald-500'
-                                  : 'bg-foreground-muted/30'
-                              )}
-                              title={workspace.status === 'active' ? 'DB Ready' : 'Not Configured'}
-                            />
-                            <span className="font-medium">{workspace.name}</span>
-                            <span className="text-[10px] text-foreground-muted">
-                              /{workspace.slug}
-                            </span>
-                            {isDisabled && (
-                              <span className={cn('text-[10px]', status.color)}>
-                                {status.label}
-                              </span>
-                            )}
-                          </div>
-                          <span
-                            className={cn(
-                              'px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                              plan.bgColor,
-                              plan.color
-                            )}
-                          >
-                            {plan.label}
-                          </span>
                         </DropdownMenuItem>
-                      )
-                    })
-                  )}
-                  {hasRestrictedWorkspaces && (
-                    <div className="px-3 pb-2 text-[10px] text-foreground-muted">
-                      Workspace paused or permission limited. An admin can restore access.
+                      ) : (
+                        workspaces.map((workspace) => {
+                          const plan = resolvePlanConfig(workspace.plan)
+                          const isActiveWorkspace = workspace.id === activeWorkspaceId
+                          const isDisabled = workspace.status !== 'active'
+                          return (
+                            <DropdownMenuItem
+                              key={workspace.id}
+                              disabled={isDisabled}
+                              onClick={() => {
+                                if (isDisabled) return
+                                handleWorkspaceSwitch(workspace.id)
+                              }}
+                              className={cn(
+                                'flex items-center gap-2.5 px-3 h-8 text-[12px]',
+                                isActiveWorkspace && 'bg-surface-200/60',
+                                isDisabled && 'opacity-50 cursor-not-allowed'
+                              )}
+                            >
+                              <div
+                                className={cn(
+                                  'w-1.5 h-1.5 rounded-full shrink-0',
+                                  workspace.status === 'active' ? 'bg-emerald-500' : 'bg-foreground-muted/30'
+                                )}
+                              />
+                              <span className="truncate flex-1 font-medium">{workspace.name}</span>
+                              <span
+                                className={cn(
+                                  'px-1.5 py-0.5 text-[9px] font-semibold rounded shrink-0',
+                                  plan.bgColor,
+                                  plan.color
+                                )}
+                              >
+                                {plan.label}
+                              </span>
+                            </DropdownMenuItem>
+                          )
+                        })
+                      )}
                     </div>
-                  )}
+                    {hasRestrictedWorkspaces && (
+                      <div className="px-3 py-1.5 text-[10px] text-foreground-lighter">
+                        Some workspaces are paused or restricted.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recent */}
                   {recentWorkspaces.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="bg-border" />
-                      <div className="px-3 py-2 text-[11px] text-foreground-muted">
-                        Recent access
+                    <div className="py-1 border-t border-border">
+                      <div className="px-3 py-1.5 text-[10px] font-medium text-foreground-lighter uppercase tracking-wider">
+                        Recent
                       </div>
                       {recentWorkspaces.map((workspace) => {
                         const plan = resolvePlanConfig(workspace.plan)
-                        const status = workspaceStatusConfig[workspace.status] || {
-                          label: 'Limited',
-                          color: 'text-foreground-muted',
-                        }
                         const isDisabled = workspace.status !== 'active'
                         return (
                           <DropdownMenuItem
@@ -671,24 +652,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                               handleWorkspaceSwitch(workspace.id)
                             }}
                             className={cn(
-                              'flex items-center justify-between gap-2 text-[12px]',
-                              isDisabled && 'opacity-60 cursor-not-allowed'
+                              'flex items-center gap-2.5 px-3 h-8 text-[12px]',
+                              isDisabled && 'opacity-50 cursor-not-allowed'
                             )}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{workspace.name}</span>
-                              <span className="text-[10px] text-foreground-muted">
-                                /{workspace.slug}
-                              </span>
-                              {isDisabled && (
-                                <span className={cn('text-[10px]', status.color)}>
-                                  {status.label}
-                                </span>
-                              )}
-                            </div>
+                            <Clock className="w-3 h-3 text-foreground-lighter shrink-0" />
+                            <span className="truncate flex-1">{workspace.name}</span>
                             <span
                               className={cn(
-                                'px-1.5 py-0.5 text-[10px] font-semibold rounded',
+                                'px-1.5 py-0.5 text-[9px] font-semibold rounded shrink-0',
                                 plan.bgColor,
                                 plan.color
                               )}
@@ -698,82 +670,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           </DropdownMenuItem>
                         )
                       })}
-                    </>
-                  )}
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem asChild className="text-[12px]">
-                    <Link href="/dashboard/workspaces" className="flex items-center gap-2">
-                      <FolderOpen className="w-3.5 h-3.5" />
-                      Workspace list
-                    </Link>
-                  </DropdownMenuItem>
-                  {activeWorkspace && (
-                    <DropdownMenuItem asChild className="text-[12px]">
-                      <Link
-                        href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
-                        className="flex items-center gap-2"
-                      >
-                        <Settings className="w-3.5 h-3.5" />
-                        Workspace settings
-                      </Link>
-                    </DropdownMenuItem>
+                    </div>
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <span className="text-foreground-muted">/</span>
 
-              {/* Workspace Context */}
-              {workspaceLoading ? (
-                <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-muted">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Loading
-                </div>
-              ) : activeWorkspace ? (
-                <div className="hidden md:flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light">
-                  <span className="text-foreground-muted">/{activeWorkspace.slug}</span>
-                  <span
-                    className={cn(
-                      'px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                      activePlan.bgColor,
-                      activePlan.color
-                    )}
-                  >
-                    {activePlan.label}
-                  </span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-surface-200 text-foreground-muted">
-                    Quota {quotaUsageLabel}
-                  </span>
-                  <span className="h-3 w-px bg-border" />
-                  <Link href="/dashboard/agent" className="hover:text-foreground transition-colors">
-                    Create App
-                  </Link>
-                  <Link
-                    href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Members
-                  </Link>
-                  <Link
-                    href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Usage
-                  </Link>
-                  <Link
-                    href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Settings
-                  </Link>
-                </div>
-              ) : (
-                <Link
-                  href="/dashboard/workspaces"
-                  className="hidden md:inline-flex items-center gap-2 px-2 py-0.5 rounded-md border border-border bg-surface-100 text-[11px] text-foreground-light hover:text-foreground transition-colors"
-                >
-                  Create or select workspace
-                </Link>
+              {/* Current page context */}
+              {!workspaceLoading && activeWorkspace && (
+                <span className="hidden md:inline text-[11px] text-foreground-lighter truncate max-w-[120px]">
+                  {activeWorkspace.slug}
+                </span>
               )}
 
               <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider rounded-full bg-warning/15 text-warning">
@@ -809,23 +717,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Tooltip>
 
                 {/* Notifications */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => setShowNotifications(true)}
-                      className="w-7 h-7 rounded-md flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-100 transition-colors relative"
-                    >
-                      <Bell className="w-4 h-4" />
-                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="bottom"
-                    className="bg-surface-100 border-border text-foreground"
-                  >
-                    <p className="text-xs">Notifications</p>
-                  </TooltipContent>
-                </Tooltip>
+                <NotificationDropdown />
 
                 {/* ThemeSwitch */}
                 <Tooltip>
@@ -857,49 +749,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border">
-                    <div className="px-3 py-2 border-b border-border">
-                      <p className="text-sm font-semibold text-foreground truncate">
+                  <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border p-0">
+                    <div className="px-3 py-2.5 border-b border-border">
+                      <p className="text-[12px] font-semibold text-foreground truncate">
                         {user?.display_name || user?.username}
                       </p>
-                      <p className="text-xs text-foreground-light truncate">{user?.email}</p>
+                      <p className="text-[11px] text-foreground-lighter truncate">{user?.email}</p>
                     </div>
                     <div className="py-1">
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/dashboard/profile"
-                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                        >
-                          <User className="w-3.5 h-3.5" />
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href="/dashboard/profile" className="flex items-center gap-2.5">
+                          <User className="w-3.5 h-3.5 text-foreground-lighter" />
                           Profile
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/dashboard/settings"
-                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                        >
-                          <Settings className="w-3.5 h-3.5" />
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href="/dashboard/settings" className="flex items-center gap-2.5">
+                          <Settings className="w-3.5 h-3.5 text-foreground-lighter" />
                           Settings
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
-                          className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground-light hover:text-foreground hover:bg-surface-200 cursor-pointer"
-                        >
-                          <CreditCard className="w-3.5 h-3.5" />
-                          Subscription Plan
+                      <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
+                        <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="flex items-center gap-2.5">
+                          <CreditCard className="w-3.5 h-3.5 text-foreground-lighter" />
+                          Billing
                         </Link>
                       </DropdownMenuItem>
                     </div>
-                    <DropdownMenuSeparator className="bg-border" />
-                    <div className="py-1">
+                    <div className="py-1 border-t border-border">
                       <DropdownMenuItem
                         icon={<LogOut className="w-3.5 h-3.5" />}
                         destructive
                         onClick={() => logout()}
-                        className="px-3 py-1.5 cursor-pointer"
+                        className="h-8 px-3 cursor-pointer"
                       >
                         Sign Out
                       </DropdownMenuItem>
@@ -1003,7 +885,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                   key={conv.id}
                                   onClick={() => {
                                     setActiveConversation(conv.id)
-                                    router.push(`/dashboard/agent?session=${conv.id}`)
+                                    router.push(`/dashboard/workspace?session=${conv.id}`)
                                   }}
                                   className={cn(
                                     'w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative',
@@ -1116,13 +998,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </main>
             </div>
 
-            {/* NotificationsPanel */}
-            {showNotifications && (
-              <NotificationPanel
-                isOpen={showNotifications}
-                onClose={() => setShowNotifications(false)}
-              />
-            )}
 
             {/* CommandPanel */}
             {commandPalette.isOpen && (
