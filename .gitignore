@@ -62,3 +62,6 @@ resources/
 
 # BitFun snapshot data - auto managed
 .bitfun/
+
+# CodeChat - auto managed
+codechat/
