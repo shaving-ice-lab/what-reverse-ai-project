@@ -147,6 +147,8 @@ export default function WorkspacePage() {
   const [compareError, setCompareError] = useState<string | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
   const [rollbackingId, setRollbackingId] = useState<string | null>(null)
+  const [showCompare, setShowCompare] = useState(false)
+  const [expandedVersionId, setExpandedVersionId] = useState<string | null>(null)
 
   const hasChanges = hasPageChanges
 
@@ -208,13 +210,29 @@ export default function WorkspacePage() {
     try {
       const appData = await appApi.get(workspaceId)
       setApp(appData)
-      const rawSchema = appData?.current_version?.ui_schema as Record<string, unknown> | null
-      if (
-        rawSchema &&
-        rawSchema.app_schema_version === '2.0.0' &&
-        Array.isArray(rawSchema.pages) &&
-        (rawSchema.pages as unknown[]).length > 0
-      ) {
+      let rawSchema = appData?.current_version?.ui_schema as Record<string, unknown> | null
+
+      const isValidSchema = (s: Record<string, unknown> | null): boolean =>
+        Boolean(s && s.app_schema_version === '2.0.0' && Array.isArray(s.pages) && (s.pages as unknown[]).length > 0)
+
+      // If current version has no ui_schema, try to recover from recent versions
+      if (!isValidSchema(rawSchema)) {
+        try {
+          const versionsResp = await appApi.getVersions(workspaceId, { page: 1, page_size: 20 })
+          const versions = versionsResp.items || []
+          for (const v of versions) {
+            const vs = v.ui_schema as Record<string, unknown> | null
+            if (isValidSchema(vs)) {
+              rawSchema = vs
+              break
+            }
+          }
+        } catch {
+          // ignore version fetch errors
+        }
+      }
+
+      if (isValidSchema(rawSchema)) {
         setAppSchema(rawSchema as unknown as AppSchema)
       } else {
         setAppSchema(null)
@@ -254,16 +272,41 @@ export default function WorkspacePage() {
     if (schemaRevision > 0) loadAppData()
   }, [schemaRevision, loadAppData])
 
-  // Sync pagesConfig from app (use version ID as stable dependency instead of object ref)
+  // Sync pagesConfig from app — prefer config_json, fall back to ui_schema pages
   const configVersionId = app?.current_version?.id
   useEffect(() => {
     const configJson = app?.current_version?.config_json as Record<string, unknown> | null
-    if (configJson && Array.isArray(configJson.pages)) {
+    const uiSchema = app?.current_version?.ui_schema as Record<string, unknown> | null
+
+    // Source 1: config_json has explicit page configs
+    if (configJson && Array.isArray(configJson.pages) && (configJson.pages as unknown[]).length > 0) {
       setPagesConfig({
         pages: configJson.pages as PagesConfig['pages'],
         navigation: (configJson.navigation as PagesConfig['navigation']) || { type: 'sidebar' },
         default_page:
           (configJson.default_page as string) || (configJson.pages as any[])[0]?.id || '',
+      })
+    }
+    // Source 2: ui_schema has pages (created by AI Agent) — extract page configs from it
+    else if (
+      uiSchema &&
+      uiSchema.app_schema_version === '2.0.0' &&
+      Array.isArray(uiSchema.pages) &&
+      (uiSchema.pages as unknown[]).length > 0
+    ) {
+      const schemaPages = uiSchema.pages as Array<Record<string, unknown>>
+      const extractedPages: PagesConfig['pages'] = schemaPages.map((p) => ({
+        id: (p.id as string) || `page_${Date.now()}`,
+        title: (p.title as string) || 'Untitled',
+        route: (p.route as string) || `/${p.id || 'page'}`,
+        icon: (p.icon as string) || 'FileText',
+      }))
+      const nav = uiSchema.navigation as Record<string, unknown> | undefined
+      setPagesConfig({
+        pages: extractedPages,
+        navigation: { type: (nav?.type as string) || 'sidebar' },
+        default_page:
+          (uiSchema.default_page as string) || extractedPages[0]?.id || '',
       })
     }
     setPagesConfigDirty(false)
@@ -342,9 +385,55 @@ export default function WorkspacePage() {
         navigation: pagesConfig.navigation,
         default_page: pagesConfig.default_page,
       }
+
+      // Preserve and sync ui_schema — reorder pages to match the new config order
+      let uiSchemaPayload: Record<string, unknown> | undefined
+      const currentUISchema = app?.current_version?.ui_schema as Record<string, unknown> | null
+      if (currentUISchema && Array.isArray(currentUISchema.pages)) {
+        const uiPages = currentUISchema.pages as Array<Record<string, unknown>>
+        const uiPageMap: Record<string, Record<string, unknown>> = {}
+        for (const p of uiPages) {
+          if (p.id) uiPageMap[p.id as string] = p
+        }
+        // Reorder ui_schema pages to match config page order, update title/route/icon
+        const reorderedPages: Array<Record<string, unknown>> = []
+        for (const cp of pagesConfig.pages) {
+          const existing = uiPageMap[cp.id]
+          if (existing) {
+            reorderedPages.push({
+              ...existing,
+              title: cp.title,
+              route: cp.route,
+              icon: cp.icon,
+            })
+          } else {
+            // New page added in config but not in ui_schema — add stub
+            reorderedPages.push({
+              id: cp.id,
+              title: cp.title,
+              route: cp.route,
+              icon: cp.icon,
+              blocks: [],
+            })
+          }
+        }
+        uiSchemaPayload = {
+          ...currentUISchema,
+          pages: reorderedPages,
+          navigation: { ...((currentUISchema.navigation as Record<string, unknown>) || {}), type: pagesConfig.navigation.type },
+          default_page: pagesConfig.default_page,
+        }
+      }
+
+      // Preserve db_schema
+      const currentDBSchema = app?.current_version?.db_schema as Record<string, unknown> | null
+
       const updatedVersion = await appApi.updateConfigJSON(workspaceId, {
         config_json: configPayload,
+        ui_schema: uiSchemaPayload || undefined,
+        db_schema: currentDBSchema || undefined,
       })
+
       if (app) {
         setApp({
           ...app,
@@ -352,6 +441,12 @@ export default function WorkspacePage() {
           current_version: updatedVersion,
         })
       }
+
+      // Sync appSchema if we updated ui_schema
+      if (uiSchemaPayload && uiSchemaPayload.app_schema_version === '2.0.0' && Array.isArray(uiSchemaPayload.pages)) {
+        setAppSchema(uiSchemaPayload as unknown as AppSchema)
+      }
+
       setPagesConfigDirty(false)
       setHasPageChanges(false)
       loadVersions()
@@ -977,22 +1072,33 @@ export default function WorkspacePage() {
             {activeTab === 'pages' && (
               <div className="flex-1 overflow-hidden flex flex-col">
                 {pagesConfigDirty && (
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-200/30">
-                    <span className="text-[11px] text-foreground-muted">
-                      Unsaved page changes
-                    </span>
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-amber-500/5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      <span className="text-[11px] text-foreground-light">
+                        Unsaved page changes
+                      </span>
+                    </div>
                     <Button
                       size="sm"
                       onClick={handleSavePagesConfig}
                       disabled={pagesConfigSaving}
-                      className="h-6 text-xs"
+                      className="h-6 text-xs gap-1"
                     >
-                      {pagesConfigSaving ? 'Saving...' : 'Save Pages'}
+                      {pagesConfigSaving ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Pages'
+                      )}
                     </Button>
                   </div>
                 )}
                 <PageManagerPanel
                   config={pagesConfig}
+                  appPages={appSchema?.pages}
                   onChange={(newConfig) => {
                     setPagesConfig(newConfig)
                     setPagesConfigDirty(true)
@@ -1007,8 +1113,24 @@ export default function WorkspacePage() {
               <div className="flex-1 overflow-y-auto">
                 {/* Header */}
                 <div className="px-4 py-2.5 border-b border-border bg-surface-75/30 flex items-center justify-between">
-                  <div className="text-[12px] text-foreground-light font-medium">
-                    {versionList.length} version{versionList.length !== 1 ? 's' : ''}
+                  <div className="flex items-center gap-3">
+                    <div className="text-[12px] text-foreground-light font-medium">
+                      {versionList.length} version{versionList.length !== 1 ? 's' : ''}
+                    </div>
+                    {versionList.length >= 2 && (
+                      <button
+                        onClick={() => setShowCompare(!showCompare)}
+                        className={cn(
+                          'flex items-center gap-1 text-[11px] px-2 py-1 rounded-md transition-colors',
+                          showCompare
+                            ? 'bg-brand-500/10 text-brand-500'
+                            : 'text-foreground-muted hover:text-foreground hover:bg-surface-200/50'
+                        )}
+                      >
+                        <GitCompare className="w-3 h-3" />
+                        Compare
+                      </button>
+                    )}
                   </div>
                   <Button
                     size="sm"
@@ -1022,108 +1144,41 @@ export default function WorkspacePage() {
                   </Button>
                 </div>
 
-                {versionsLoading && versionList.length === 0 ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
-                  </div>
-                ) : versionList.length === 0 ? (
-                  <div className="flex items-center justify-center p-8 h-64">
-                    <div className="text-center space-y-3">
-                      <History className="w-6 h-6 text-foreground-muted mx-auto" />
-                      <p className="text-sm font-medium text-foreground">No Versions Yet</p>
-                      <p className="text-xs text-foreground-muted max-w-[200px] mx-auto">
-                        Versions are created when you publish or save changes.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-border max-w-3xl">
-                    {versionList.map((version) => {
-                      const isCurrent = version.id === app?.current_version_id
-                      const isRollingBack = rollbackingId === version.id
-                      return (
-                        <div
-                          key={version.id}
-                          className={cn(
-                            'px-4 py-3 transition-colors',
-                            isCurrent ? 'bg-brand-500/5' : 'hover:bg-surface-200/30'
-                          )}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[13px] font-medium text-foreground">
-                                  {version.version}
-                                </span>
-                                {isCurrent && (
-                                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-brand-500/10 text-brand-500">
-                                    <CheckCircle2 className="w-2.5 h-2.5" />
-                                    Current
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mt-1 text-[11px] text-foreground-muted">
-                                <span className="flex items-center gap-0.5">
-                                  <Clock className="w-2.5 h-2.5" />
-                                  {version.created_at
-                                    ? new Date(version.created_at).toLocaleString()
-                                    : '-'}
-                                </span>
-                              </div>
-                            </div>
-                            {!isCurrent && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 text-[11px] text-foreground-muted hover:text-foreground shrink-0"
-                                onClick={() => handleRollback(version.id)}
-                                disabled={isRollingBack}
-                              >
-                                {isRollingBack ? (
-                                  <Loader2 className="w-3 h-3 animate-spin" />
-                                ) : (
-                                  <>
-                                    <RotateCcw className="w-3 h-3 mr-1" />
-                                    Rollback
-                                  </>
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-
-                {/* Version Comparison */}
-                {versionList.length >= 2 && (
-                  <div className="border-t border-border p-4 space-y-3 max-w-3xl">
-                    <div className="flex items-center gap-2 text-[12px] font-medium text-foreground">
-                      <GitCompare className="w-3.5 h-3.5 text-foreground-muted" />
-                      Compare Versions
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
+                {/* Version Comparison Panel (collapsible) */}
+                {showCompare && versionList.length >= 2 && (
+                  <div className="border-b border-border bg-surface-200/20 p-4 space-y-3">
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                       <Select value={compareFrom} onValueChange={setCompareFrom}>
                         <SelectTrigger className="h-8 text-[11px]">
-                          <SelectValue placeholder="From" />
+                          <SelectValue placeholder="From version" />
                         </SelectTrigger>
                         <SelectContent>
                           {versionList.map((v) => (
                             <SelectItem key={v.id} value={v.id}>
-                              {v.version}
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-medium">{v.version}</span>
+                                <span className="text-foreground-muted text-[10px]">
+                                  {v.created_at ? formatRelativeTime(v.created_at) : ''}
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <ChevronRight className="w-4 h-4 text-foreground-muted" />
                       <Select value={compareTo} onValueChange={setCompareTo}>
                         <SelectTrigger className="h-8 text-[11px]">
-                          <SelectValue placeholder="To" />
+                          <SelectValue placeholder="To version" />
                         </SelectTrigger>
                         <SelectContent>
                           {versionList.map((v) => (
                             <SelectItem key={v.id} value={v.id}>
-                              {v.version}
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-medium">{v.version}</span>
+                                <span className="text-foreground-muted text-[10px]">
+                                  {v.created_at ? formatRelativeTime(v.created_at) : ''}
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1132,11 +1187,21 @@ export default function WorkspacePage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="h-7 text-xs"
+                        className="h-7 text-xs gap-1"
                         onClick={handleCompareVersions}
                         disabled={compareLoading}
                       >
-                        {compareLoading ? 'Comparing...' : 'Compare'}
+                        {compareLoading ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Comparing...
+                          </>
+                        ) : (
+                          <>
+                            <GitCompare className="w-3 h-3" />
+                            Compare
+                          </>
+                        )}
                       </Button>
                       {compareError && (
                         <span className="text-[10px] text-destructive">{compareError}</span>
@@ -1147,6 +1212,373 @@ export default function WorkspacePage() {
                         <VersionDiffViewer diff={versionDiff} />
                       </div>
                     )}
+                  </div>
+                )}
+
+                {versionsLoading && versionList.length === 0 ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
+                  </div>
+                ) : versionList.length === 0 ? (
+                  <div className="flex items-center justify-center p-8 h-64">
+                    <div className="text-center space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-surface-200/50 flex items-center justify-center mx-auto">
+                        <History className="w-5 h-5 text-foreground-muted" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">No Versions Yet</p>
+                        <p className="text-xs text-foreground-muted max-w-[220px] mx-auto mt-1">
+                          Versions are created automatically when you save pages, update the UI schema, or publish your app.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="max-w-3xl">
+                    {/* Timeline list */}
+                    {versionList.map((version, vIdx) => {
+                      const isCurrent = version.id === app?.current_version_id
+                      const isRollingBack = rollbackingId === version.id
+                      const isExpanded = expandedVersionId === version.id
+                      const isFirst = vIdx === 0
+
+                      // Detect what content this version has
+                      const hasUISchema = Boolean(version.ui_schema && Object.keys(version.ui_schema).length > 0)
+                      const hasConfig = Boolean(version.config_json && Object.keys(version.config_json).length > 0)
+                      const hasDBSchema = Boolean(version.db_schema && Object.keys(version.db_schema).length > 0)
+                      const hasChangelog = Boolean(version.changelog && version.changelog.trim())
+
+                      // Count pages in this version's config
+                      const configPages = (version.config_json as Record<string, unknown>)?.pages
+                      const pageCount = Array.isArray(configPages) ? configPages.length : 0
+
+                      // Count pages in UI schema
+                      const uiPages = (version.ui_schema as Record<string, unknown>)?.pages
+                      const uiPageCount = Array.isArray(uiPages) ? uiPages.length : 0
+
+                      return (
+                        <div key={version.id} className="relative">
+                          {/* Timeline connector */}
+                          <div className="absolute left-6 top-0 bottom-0 w-px bg-border" />
+
+                          <div
+                            className={cn(
+                              'relative flex gap-3 px-4 py-3 transition-colors cursor-pointer group',
+                              isCurrent ? 'bg-brand-500/5' : 'hover:bg-surface-200/20',
+                              isExpanded && 'bg-surface-200/10'
+                            )}
+                            onClick={() => setExpandedVersionId(isExpanded ? null : version.id)}
+                          >
+                            {/* Timeline dot */}
+                            <div className="relative z-10 mt-0.5 shrink-0">
+                              <div
+                                className={cn(
+                                  'w-5 h-5 rounded-full border-2 flex items-center justify-center',
+                                  isCurrent
+                                    ? 'border-brand-500 bg-brand-500'
+                                    : isFirst
+                                      ? 'border-foreground-muted bg-surface-200'
+                                      : 'border-border bg-surface-100'
+                                )}
+                              >
+                                {isCurrent && (
+                                  <CheckCircle2 className="w-3 h-3 text-white" />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Version content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[13px] font-semibold text-foreground">
+                                  {version.version}
+                                </span>
+                                {isCurrent && (
+                                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-brand-500/10 text-brand-500">
+                                    Current
+                                  </span>
+                                )}
+                                {/* Content badges */}
+                                <div className="flex items-center gap-1">
+                                  {hasUISchema && (
+                                    <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] bg-violet-500/10 text-violet-500">
+                                      <Eye className="w-2.5 h-2.5" />
+                                      UI{uiPageCount > 0 ? ` · ${uiPageCount}p` : ''}
+                                    </span>
+                                  )}
+                                  {hasConfig && (
+                                    <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] bg-emerald-500/10 text-emerald-500">
+                                      <LayoutDashboard className="w-2.5 h-2.5" />
+                                      Config{pageCount > 0 ? ` · ${pageCount}p` : ''}
+                                    </span>
+                                  )}
+                                  {hasDBSchema && (
+                                    <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] bg-amber-500/10 text-amber-500">
+                                      <Database className="w-2.5 h-2.5" />
+                                      DB
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Changelog */}
+                              {hasChangelog && (
+                                <p className="text-[11px] text-foreground-light mt-0.5 line-clamp-1">
+                                  {version.changelog}
+                                </p>
+                              )}
+
+                              {/* Timestamp */}
+                              <div className="flex items-center gap-2 mt-1 text-[10px] text-foreground-muted">
+                                <span className="flex items-center gap-0.5">
+                                  <Clock className="w-2.5 h-2.5" />
+                                  {version.created_at
+                                    ? formatRelativeTime(version.created_at)
+                                    : '-'}
+                                </span>
+                                <span className="text-foreground-muted/40">·</span>
+                                <span>
+                                  {version.created_at
+                                    ? new Date(version.created_at).toLocaleString()
+                                    : ''}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex items-center gap-1 shrink-0">
+                              {!isCurrent && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-7 text-[11px] text-foreground-muted hover:text-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleRollback(version.id)
+                                  }}
+                                  disabled={isRollingBack}
+                                >
+                                  {isRollingBack ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <>
+                                      <RotateCcw className="w-3 h-3 mr-1" />
+                                      Rollback
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                              <ChevronDown
+                                className={cn(
+                                  'w-3.5 h-3.5 text-foreground-muted transition-transform',
+                                  isExpanded && 'rotate-180'
+                                )}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Expanded detail */}
+                          {isExpanded && (
+                            <div className="relative ml-[2.15rem] mr-4 mb-3 border border-border rounded-lg overflow-hidden bg-surface-100/50">
+                              {/* Version detail sections */}
+                              <div className="divide-y divide-border">
+                                {/* Changelog section */}
+                                {hasChangelog && (
+                                  <div className="px-4 py-3">
+                                    <div className="text-[10px] text-foreground-muted uppercase tracking-wider font-medium mb-1">
+                                      Changelog
+                                    </div>
+                                    <p className="text-[12px] text-foreground-light leading-relaxed">
+                                      {version.changelog}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* UI Schema summary */}
+                                {hasUISchema && (
+                                  <div className="px-4 py-3">
+                                    <div className="text-[10px] text-foreground-muted uppercase tracking-wider font-medium mb-2">
+                                      UI Schema
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      {(() => {
+                                        const schema = version.ui_schema as Record<string, unknown>
+                                        const appName = schema.app_name as string | undefined
+                                        const schemaVersion = schema.app_schema_version as string | undefined
+                                        const pages = schema.pages as Array<Record<string, unknown>> | undefined
+                                        const nav = schema.navigation as Record<string, unknown> | undefined
+                                        return (
+                                          <>
+                                            {appName && (
+                                              <div className="flex items-center gap-2 text-[11px]">
+                                                <span className="text-foreground-muted w-20 shrink-0">App Name</span>
+                                                <span className="text-foreground-light font-medium">{appName}</span>
+                                              </div>
+                                            )}
+                                            {schemaVersion && (
+                                              <div className="flex items-center gap-2 text-[11px]">
+                                                <span className="text-foreground-muted w-20 shrink-0">Schema</span>
+                                                <span className="text-foreground-light font-mono text-[10px] bg-surface-200 px-1.5 py-0.5 rounded">{schemaVersion}</span>
+                                              </div>
+                                            )}
+                                            {pages && pages.length > 0 && (
+                                              <div className="text-[11px]">
+                                                <span className="text-foreground-muted">Pages: </span>
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                  {pages.map((p, i) => (
+                                                    <span
+                                                      key={i}
+                                                      className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-600"
+                                                    >
+                                                      {(p.title as string) || (p.id as string) || `Page ${i + 1}`}
+                                                      {Array.isArray(p.blocks) && (
+                                                        <span className="text-violet-400">({(p.blocks as unknown[]).length})</span>
+                                                      )}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                            {nav && (
+                                              <div className="flex items-center gap-2 text-[11px]">
+                                                <span className="text-foreground-muted w-20 shrink-0">Navigation</span>
+                                                <span className="text-foreground-light capitalize">{(nav.type as string) || 'sidebar'}</span>
+                                              </div>
+                                            )}
+                                          </>
+                                        )
+                                      })()}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Config JSON summary */}
+                                {hasConfig && (
+                                  <div className="px-4 py-3">
+                                    <div className="text-[10px] text-foreground-muted uppercase tracking-wider font-medium mb-2">
+                                      Config
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      {(() => {
+                                        const cfg = version.config_json as Record<string, unknown>
+                                        const pages = cfg.pages as Array<Record<string, unknown>> | undefined
+                                        const defaultPage = cfg.default_page as string | undefined
+                                        const navType = (cfg.navigation as Record<string, unknown>)?.type as string | undefined
+                                        return (
+                                          <>
+                                            {pages && pages.length > 0 && (
+                                              <div className="text-[11px]">
+                                                <span className="text-foreground-muted">Pages ({pages.length}): </span>
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                  {pages.map((p, i) => (
+                                                    <span
+                                                      key={i}
+                                                      className={cn(
+                                                        'inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded',
+                                                        (p.id as string) === defaultPage
+                                                          ? 'bg-brand-500/10 text-brand-500'
+                                                          : 'bg-emerald-500/10 text-emerald-600'
+                                                      )}
+                                                    >
+                                                      {(p.title as string) || (p.id as string) || `Page ${i + 1}`}
+                                                      {(p.id as string) === defaultPage && (
+                                                        <span className="text-[8px] opacity-70">★</span>
+                                                      )}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                            {navType && (
+                                              <div className="flex items-center gap-2 text-[11px]">
+                                                <span className="text-foreground-muted w-20 shrink-0">Navigation</span>
+                                                <span className="text-foreground-light capitalize">{navType}</span>
+                                              </div>
+                                            )}
+                                          </>
+                                        )
+                                      })()}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* DB Schema summary */}
+                                {hasDBSchema && (
+                                  <div className="px-4 py-3">
+                                    <div className="text-[10px] text-foreground-muted uppercase tracking-wider font-medium mb-2">
+                                      Database Schema
+                                    </div>
+                                    <div className="text-[11px] text-foreground-light">
+                                      {(() => {
+                                        const db = version.db_schema as Record<string, unknown>
+                                        const tableNames = Object.keys(db).filter(k => k !== 'version' && k !== 'timestamp')
+                                        if (tableNames.length === 0) return <span className="text-foreground-muted">Schema snapshot</span>
+                                        return (
+                                          <div className="flex flex-wrap gap-1">
+                                            {tableNames.slice(0, 12).map((name) => (
+                                              <span
+                                                key={name}
+                                                className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 font-mono"
+                                              >
+                                                {name}
+                                              </span>
+                                            ))}
+                                            {tableNames.length > 12 && (
+                                              <span className="text-[10px] text-foreground-muted">
+                                                +{tableNames.length - 12} more
+                                              </span>
+                                            )}
+                                          </div>
+                                        )
+                                      })()}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* No content indicator */}
+                                {!hasUISchema && !hasConfig && !hasDBSchema && !hasChangelog && (
+                                  <div className="px-4 py-3 text-[11px] text-foreground-muted text-center">
+                                    No detailed content available for this version.
+                                  </div>
+                                )}
+
+                                {/* Quick compare with previous */}
+                                {vIdx < versionList.length - 1 && (
+                                  <div className="px-4 py-2 bg-surface-200/20">
+                                    <button
+                                      onClick={async (e) => {
+                                        e.stopPropagation()
+                                        const fromId = version.id
+                                        const toId = versionList[vIdx + 1].id
+                                        setCompareFrom(fromId)
+                                        setCompareTo(toId)
+                                        setShowCompare(true)
+                                        // Call compare directly with the IDs (state not yet updated)
+                                        try {
+                                          setCompareLoading(true)
+                                          setCompareError(null)
+                                          if (!workspaceId) return
+                                          const diff = await appApi.compareVersions(workspaceId, fromId, toId)
+                                          setVersionDiff(diff)
+                                        } catch {
+                                          setCompareError('Comparison failed.')
+                                        } finally {
+                                          setCompareLoading(false)
+                                        }
+                                      }}
+                                      className="text-[10px] text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors"
+                                    >
+                                      <GitCompare className="w-3 h-3" />
+                                      Compare with {versionList[vIdx + 1].version}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
               </div>

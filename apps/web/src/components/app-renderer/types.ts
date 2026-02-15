@@ -43,6 +43,7 @@ export type AppBlockType =
   | 'form'
   | 'form_dialog'
   | 'chart'
+  | 'calendar'
   | 'detail_view'
   | 'markdown'
   | 'image'
@@ -97,6 +98,7 @@ export interface DataTableConfig {
   table_name: string
   columns: DataTableColumn[]
   actions?: ('edit' | 'delete' | 'view' | 'create')[]
+  status_actions?: StatusActionConfig[]
   filters_enabled?: boolean
   search_enabled?: boolean
   search_key?: string
@@ -104,9 +106,21 @@ export interface DataTableConfig {
   page_size?: number
   row_click_action?: {
     type: 'navigate'
-    target_page: string
+    target_page?: string
+    page_id?: string
     param_key?: string
+    params?: Record<string, string>
   }
+}
+
+export interface StatusActionConfig {
+  label: string
+  from_status: string[]
+  to_status: string
+  status_column: string
+  color?: 'default' | 'green' | 'red' | 'blue' | 'amber'
+  confirm?: boolean
+  extra_fields?: { key: string; label: string; required?: boolean }[]
 }
 
 export interface DataTableColumn {
@@ -145,8 +159,9 @@ export interface FormConfig {
 
 export interface FormField {
   name: string
+  key?: string
   label: string
-  type: 'text' | 'number' | 'email' | 'textarea' | 'select' | 'date' | 'checkbox'
+  type: 'text' | 'number' | 'email' | 'textarea' | 'select' | 'date' | 'datetime' | 'checkbox'
   required?: boolean
   placeholder?: string
   options?: { label: string; value: string }[]
@@ -252,6 +267,33 @@ export interface FileUploadConfig {
   table_name?: string
   column_name?: string
   prefix?: string
+}
+
+// ========== Calendar ==========
+
+export interface CalendarConfig {
+  table_name: string
+  title_key: string
+  start_key: string
+  end_key: string
+  status_key?: string
+  color_key?: string
+  detail_fields?: { key: string; label: string }[]
+  click_action?: {
+    type: 'navigate'
+    target_page?: string
+    page_id?: string
+    param_key?: string
+  }
+  status_colors?: Record<string, string>
+  default_view?: 'month' | 'week'
+}
+
+// ========== Custom Code ==========
+
+export interface CustomCodeConfig {
+  code?: string
+  language?: string
 }
 
 // ========== Actions ==========

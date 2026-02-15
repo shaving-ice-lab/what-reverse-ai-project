@@ -700,18 +700,26 @@ export const appApi = {
   },
 
   /**
-   * Update config_json (pages config) by creating a new version
+   * Update config_json (pages config) by creating a new version.
+   * Optionally pass ui_schema and db_schema to preserve them in the new version.
    */
   async updateConfigJSON(
     id: string,
-    data: { config_json: Record<string, unknown> }
+    data: {
+      config_json: Record<string, unknown>
+      ui_schema?: Record<string, unknown>
+      db_schema?: Record<string, unknown>
+    }
   ): Promise<WorkspaceVersion> {
+    const body: Record<string, unknown> = {
+      config_json: data.config_json,
+      changelog: 'Pages config update',
+    }
+    if (data.ui_schema) body.ui_schema = data.ui_schema
+    if (data.db_schema) body.db_schema = data.db_schema
     const response = await request<ApiResponse<any>>(`/workspaces/${id}/versions`, {
       method: 'POST',
-      body: JSON.stringify({
-        config_json: data.config_json,
-        changelog: 'Pages config update',
-      }),
+      body: JSON.stringify(body),
     })
     const payload = response.data as any
     return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)

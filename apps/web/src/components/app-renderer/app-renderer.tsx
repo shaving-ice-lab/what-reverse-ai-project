@@ -41,6 +41,7 @@ import { StatsCardBlock } from './blocks/stats-card-block'
 import { DataTableBlock } from './blocks/data-table-block'
 import { ChartBlock } from './blocks/chart-block'
 import { FormBlock } from './blocks/form-block'
+import { FormDialogBlock } from './blocks/form-dialog-block'
 import { DetailViewBlock } from './blocks/detail-view-block'
 import { MarkdownBlock } from './blocks/markdown-block'
 import { ImageBlock } from './blocks/image-block'
@@ -52,6 +53,7 @@ import { AuthBlock } from './blocks/auth-block'
 import { FileUploadBlock } from './blocks/file-upload-block'
 import { CustomCodeBlock } from './blocks/custom-code-block'
 import type { CustomCodeConfig } from './blocks/custom-code-block'
+import { CalendarBlock } from './blocks/calendar-block'
 import type {
   AppSchema,
   AppPage,
@@ -68,6 +70,7 @@ import type {
   DividerConfig,
   AuthBlockConfig,
   FileUploadConfig,
+  CalendarConfig,
 } from './types'
 
 // ========== Page Params Context ==========
@@ -381,9 +384,13 @@ export function AppRenderer({
 }
 
 function PageContent({ page }: { page: AppPage }) {
+  // Separate form_dialog blocks (render in header) from content blocks
+  const headerDialogBlocks = page.blocks.filter((b) => b.type === 'form_dialog')
+  const contentBlocks = page.blocks.filter((b) => b.type !== 'form_dialog')
+
   // Group consecutive stats_card blocks together for compact grid rendering
   const groups: { type: 'stats_group' | 'block'; blocks: AppBlock[] }[] = []
-  for (const block of page.blocks) {
+  for (const block of contentBlocks) {
     if (block.type === 'stats_card') {
       const last = groups[groups.length - 1]
       if (last?.type === 'stats_group') {
@@ -396,19 +403,20 @@ function PageContent({ page }: { page: AppPage }) {
     }
   }
 
-  const hasGridBlocks = page.blocks.some((b) => b.grid?.col_span && b.grid.col_span < 4)
+  const hasGridBlocks = contentBlocks.some((b) => b.grid?.col_span && b.grid.col_span < 4)
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-foreground">{page.title}</h2>
-        {page.actions && page.actions.length > 0 && (
-          <div className="flex items-center gap-2 shrink-0">
-            {page.actions.map((action) => (
-              <PageActionButton key={action.id} action={action} />
-            ))}
-          </div>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {headerDialogBlocks.map((block) => (
+            <BlockRenderer key={block.id} block={block} />
+          ))}
+          {page.actions?.map((action) => (
+            <PageActionButton key={action.id} action={action} />
+          ))}
+        </div>
       </div>
       {hasGridBlocks ? (
         <div className="grid grid-cols-4 gap-4">
@@ -502,8 +510,9 @@ function BlockRenderer({ block }: { block: AppBlock }) {
         />
       )
     case 'form':
-    case 'form_dialog':
       return <FormBlock config={block.config as unknown as FormConfig} />
+    case 'form_dialog':
+      return <FormDialogBlock config={block.config as unknown as FormConfig} />
     case 'detail_view':
       return (
         <DetailViewBlock
@@ -534,6 +543,13 @@ function BlockRenderer({ block }: { block: AppBlock }) {
       return <AuthBlock config={block.config as unknown as AuthBlockConfig} />
     case 'file_upload':
       return <FileUploadBlock config={block.config as unknown as FileUploadConfig} />
+    case 'calendar':
+      return (
+        <CalendarBlock
+          config={block.config as unknown as CalendarConfig}
+          dataSource={block.data_source}
+        />
+      )
     case 'custom_code':
       return <CustomCodeBlock config={block.config as unknown as CustomCodeConfig} apiSource={block.api_source} />
     default:

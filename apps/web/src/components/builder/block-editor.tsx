@@ -19,6 +19,7 @@ import {
   Layers,
   Sparkles,
   Copy,
+  CalendarDays,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -52,6 +53,7 @@ const BLOCK_TYPE_META: Record<
   divider: { label: 'Divider', icon: Minus, description: 'Section divider' },
   auth: { label: 'Auth', icon: Shield, description: 'Login/register' },
   file_upload: { label: 'File Upload', icon: Upload, description: 'File upload widget' },
+  calendar: { label: 'Calendar', icon: CalendarDays, description: 'Calendar event view' },
   custom_code: { label: 'Custom Code', icon: Layers, description: 'Custom JS component in sandbox' },
 }
 

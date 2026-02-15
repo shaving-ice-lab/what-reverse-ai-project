@@ -913,22 +913,40 @@ func (s *workspaceService) CreateVersion(ctx context.Context, id uuid.UUID, owne
 		return nil, err
 	}
 
+	// Load previous version to carry forward fields not provided in the request
+	var prevVersion *entity.WorkspaceVersion
+	if ws.CurrentVersionID != nil {
+		prevVersion, _ = s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	}
+
+	// Auto-generate version string if not provided
+	versionStr := req.Version
+	if versionStr == "" {
+		versionStr = fmt.Sprintf("v0.0.%d", time.Now().UnixMilli())
+	}
+
 	version := &entity.WorkspaceVersion{
 		ID:          uuid.New(),
 		WorkspaceID: ws.ID,
-		Version:     req.Version,
+		Version:     versionStr,
 		Changelog:   req.Changelog,
 		CreatedBy:   &ownerID,
 		CreatedAt:   time.Now(),
 	}
 	if req.UISchema != nil {
 		version.UISchema = entity.JSON(req.UISchema)
+	} else if prevVersion != nil && prevVersion.UISchema != nil {
+		version.UISchema = prevVersion.UISchema
 	}
 	if req.DBSchema != nil {
 		version.DBSchema = entity.JSON(req.DBSchema)
+	} else if prevVersion != nil && prevVersion.DBSchema != nil {
+		version.DBSchema = prevVersion.DBSchema
 	}
 	if req.ConfigJSON != nil {
 		version.ConfigJSON = entity.JSON(req.ConfigJSON)
+	} else if prevVersion != nil && prevVersion.ConfigJSON != nil {
+		version.ConfigJSON = prevVersion.ConfigJSON
 	}
 	if err := s.workspaceRepo.CreateVersion(ctx, version); err != nil {
 		return nil, fmt.Errorf("failed to create version: %w", err)
@@ -1019,6 +1037,8 @@ func (s *workspaceService) GetAccessPolicy(ctx context.Context, id uuid.UUID, ow
 	return &AccessPolicyResponse{
 		AccessMode:         ws.AccessMode,
 		DataClassification: ws.DataClassification,
+		RateLimitJSON:      ws.RateLimitJSON,
+		AllowedOrigins:     ws.AllowedOrigins,
 		RequireCaptcha:     ws.RequireCaptcha,
 	}, nil
 }
@@ -1034,6 +1054,12 @@ func (s *workspaceService) UpdateAccessPolicy(ctx context.Context, id uuid.UUID,
 	if req.DataClassification != nil {
 		ws.DataClassification = *req.DataClassification
 	}
+	if req.RateLimitJSON != nil {
+		ws.RateLimitJSON = req.RateLimitJSON
+	}
+	if req.AllowedOrigins != nil {
+		ws.AllowedOrigins = req.AllowedOrigins
+	}
 	if req.RequireCaptcha != nil {
 		ws.RequireCaptcha = *req.RequireCaptcha
 	}
@@ -1043,6 +1069,8 @@ func (s *workspaceService) UpdateAccessPolicy(ctx context.Context, id uuid.UUID,
 	return &AccessPolicyResponse{
 		AccessMode:         ws.AccessMode,
 		DataClassification: ws.DataClassification,
+		RateLimitJSON:      ws.RateLimitJSON,
+		AllowedOrigins:     ws.AllowedOrigins,
 		RequireCaptcha:     ws.RequireCaptcha,
 	}, nil
 }

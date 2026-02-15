@@ -376,6 +376,34 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
 	deleted_at TEXT
 )`,
+		`CREATE TABLE IF NOT EXISTS reservations (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	reservation_no TEXT NOT NULL UNIQUE,
+	applicant_name TEXT NOT NULL,
+	applicant_department TEXT,
+	applicant_phone TEXT,
+	vehicle_id INTEGER,
+	driver_id INTEGER,
+	purpose TEXT NOT NULL,
+	passengers INTEGER DEFAULT 1,
+	start_time TEXT NOT NULL,
+	end_time TEXT NOT NULL,
+	start_location TEXT NOT NULL,
+	end_location TEXT NOT NULL,
+	route_id INTEGER,
+	status TEXT NOT NULL DEFAULT '待审批',
+	priority TEXT DEFAULT '普通',
+	approver TEXT,
+	approved_at TEXT,
+	reject_reason TEXT,
+	actual_start_time TEXT,
+	actual_end_time TEXT,
+	actual_mileage REAL,
+	notes TEXT,
+	created_at TEXT NOT NULL DEFAULT (datetime('now')),
+	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+	deleted_at TEXT
+)`,
 		`CREATE TABLE IF NOT EXISTS gps_tracking (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	vehicle_id INTEGER NOT NULL,
@@ -438,6 +466,10 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 		`CREATE INDEX IF NOT EXISTS idx_violations_status ON violations(status)`,
 		`CREATE INDEX IF NOT EXISTS idx_insurance_vehicle ON insurance_policies(vehicle_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_insurance_end_date ON insurance_policies(end_date)`,
+		`CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status)`,
+		`CREATE INDEX IF NOT EXISTS idx_reservations_vehicle ON reservations(vehicle_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_reservations_start_time ON reservations(start_time)`,
+		`CREATE INDEX IF NOT EXISTS idx_reservations_applicant ON reservations(applicant_name)`,
 		`CREATE INDEX IF NOT EXISTS idx_gps_vehicle ON gps_tracking(vehicle_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_gps_recorded_at ON gps_tracking(recorded_at)`,
 		`CREATE INDEX IF NOT EXISTS idx_gps_vehicle_time ON gps_tracking(vehicle_id, recorded_at)`,
@@ -460,6 +492,7 @@ func seedFleetData(ctx context.Context, db *sql.DB) error {
 	cleanTables := []string{
 		"DELETE FROM gps_tracking",
 		"DELETE FROM alerts",
+		"DELETE FROM reservations",
 		"DELETE FROM violations",
 		"DELETE FROM fuel_records",
 		"DELETE FROM trips",
@@ -779,6 +812,76 @@ INSERT INTO insurance_policies (vehicle_id, policy_no, insurance_company, insura
 	}
 	fmt.Println("  🛡️  已插入 20 条保险记录")
 
+	// ---- 8b. 用车预定 (20条) ----
+	reservationSQL := fmt.Sprintf(`
+INSERT INTO reservations (id, reservation_no, applicant_name, applicant_department, applicant_phone, vehicle_id, driver_id, purpose, passengers, start_time, end_time, start_location, end_location, route_id, status, priority, approver, approved_at, reject_reason, actual_start_time, actual_end_time, actual_mileage, notes) VALUES
+(1,  'RES20250201001', '王总',     '总裁办',     '13900000001', 1,  1,  '客户接送',       2, '%s', '%s', '望京SOHO',     '首都机场T3',      1,  '已完成', '普通', '李秘书', '%s', NULL, '%s', '%s', 25.5, NULL),
+(2,  'RES20250201002', '张经理',   '销售部',     '13900000002', 2,  2,  '客户拜访',       3, '%s', '%s', '望京SOHO',     '中关村软件园',    4,  '已完成', '普通', '刘主管', '%s', NULL, '%s', '%s', 15.0, NULL),
+(3,  'RES20250202001', '李工',     '技术部',     '13900000003', 5,  5,  '技术交流',       2, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '赵总监', '%s', NULL, '%s', '%s', 30.0, '携带设备'),
+(4,  'RES20250203001', '陈总监',   '产品部',     '13900000004', 6,  6,  '项目考察',       4, '%s', '%s', '望京SOHO',     '雄安新区启动区',  6,  '已完成', '紧急', '王VP',   '%s', NULL, '%s', '%s', 120.0, '雄安新项目考察'),
+(5,  'RES20250204001', '刘助理',   '行政部',     '13900000005', 3,  3,  '会议接待',       5, '%s', '%s', '首都机场T3',   '望京SOHO',        1,  '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 25.5, '接待外宾'),
+(6,  'RES20250205001', '赵主管',   '物流部',     '13900000006', 7,  7,  '货物配送',       1, '%s', '%s', '空港物流园',   '朝阳CBD',         7,  '已完成', '普通', '孙经理', '%s', NULL, '%s', '%s', 35.0, '大件货物'),
+(7,  'RES20250206001', '黄经理',   '人力资源部', '13900000007', 11, 11, '培训出行',       3, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 30.0, '新员工培训'),
+(8,  'RES20250207001', '马工程师', '研发部',     '13900000008', 15, 15, '供应商拜访',     2, '%s', '%s', '望京SOHO',     '中关村软件园',    4,  '已完成', '普通', '赵总监', '%s', NULL, '%s', '%s', 15.0, NULL),
+(9,  'RES20250208001', '郑主管',   '运营部',     '13900000009', 16, 16, '市场调研',       2, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '刘主管', '%s', NULL, '%s', '%s', 30.0, NULL),
+(10, 'RES20250209001', '朱经理',   '财务部',     '13900000010', 12, 12, '银行办事',       1, '%s', '%s', '望京SOHO',     '金融街',          NULL, '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 18.0, '年度审计材料递交'),
+(11, 'RES20250210001', '王总',     '总裁办',     '13900000001', 1,  1,  '商务宴请',       3, '%s', '%s', '望京SOHO',     '国贸大酒店',      NULL, '已批准', '紧急', '李秘书', '%s', NULL, NULL, NULL, NULL, '重要客户晚宴'),
+(12, 'RES20250210002', '张经理',   '销售部',     '13900000002', 2,  2,  '展会参观',       4, '%s', '%s', '望京SOHO',     '国家会议中心',    NULL, '已批准', '普通', '刘主管', '%s', NULL, NULL, NULL, NULL, '行业展会'),
+(13, 'RES20250211001', '李工',     '技术部',     '13900000003', 5,  5,  '设备采购',       2, '%s', '%s', '望京SOHO',     '中关村电子城',    NULL, '已批准', '普通', '赵总监', '%s', NULL, NULL, NULL, NULL, '采购服务器设备'),
+(14, 'RES20250211002', '刘助理',   '行政部',     '13900000005', 3,  3,  '政务办理',       1, '%s', '%s', '望京SOHO',     '朝阳区政务中心',  NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '办理公司证照变更'),
+(15, 'RES20250212001', '赵主管',   '物流部',     '13900000006', 7,  7,  '紧急配送',       1, '%s', '%s', '空港物流园',   '丰台总部基地',    8,  '待审批', '特急', NULL,     NULL, NULL, NULL, NULL, NULL, '客户紧急订单'),
+(16, 'RES20250212002', '何师傅',   '物流部',     '13900000018', 18, 18, '仓库调拨',       1, '%s', '%s', '空港物流园',   '大兴仓库',        NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '库存调拨'),
+(17, 'RES20250213001', '林经理',   '行政部',     '13900000013', 9,  9,  '员工团建',       30, '%s', '%s', '望京SOHO',    '怀柔雁栖湖',      NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '部门季度团建，需大客车'),
+(18, 'RES20250213002', '陈总监',   '产品部',     '13900000004', NULL, NULL, '天津出差',    3, '%s', '%s', '望京SOHO',     '天津滨海新区',    5,  '已拒绝', '普通', '王VP',   '%s', '当天无可用车辆，建议改乘高铁', NULL, NULL, NULL, NULL),
+(19, 'RES20250214001', '谢主管',   '客服部',     '13900000017', NULL, NULL, '客户走访',    2, '%s', '%s', '望京SOHO',     '朝阳CBD',         NULL, '已取消', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '客户取消会议'),
+(20, 'RES20250215001', '马工程师', '研发部',     '13900000008', 15, 15, '数据中心巡检',   2, '%s', '%s', '望京SOHO',     '亦庄数据中心',    3,  '进行中', '紧急', '赵总监', '%s', NULL, '%s', NULL, NULL, '服务器故障紧急排查');
+`,
+		// Record 1: 已完成
+		ts(now, -14, 8, 0), ts(now, -14, 10, 0), ds(now, -15), ts(now, -14, 8, 5), ts(now, -14, 9, 0),
+		// Record 2: 已完成
+		ts(now, -14, 14, 0), ts(now, -14, 16, 0), ds(now, -15), ts(now, -14, 14, 10), ts(now, -14, 15, 30),
+		// Record 3: 已完成
+		ts(now, -13, 9, 0), ts(now, -13, 12, 0), ds(now, -14), ts(now, -13, 9, 5), ts(now, -13, 11, 30),
+		// Record 4: 已完成
+		ts(now, -12, 7, 0), ts(now, -12, 18, 0), ds(now, -13), ts(now, -12, 7, 10), ts(now, -12, 17, 30),
+		// Record 5: 已完成
+		ts(now, -11, 9, 0), ts(now, -11, 10, 30), ds(now, -12), ts(now, -11, 9, 15), ts(now, -11, 10, 15),
+		// Record 6: 已完成
+		ts(now, -10, 8, 0), ts(now, -10, 12, 0), ds(now, -11), ts(now, -10, 8, 10), ts(now, -10, 11, 30),
+		// Record 7: 已完成
+		ts(now, -9, 9, 0), ts(now, -9, 17, 0), ds(now, -10), ts(now, -9, 9, 10), ts(now, -9, 16, 30),
+		// Record 8: 已完成
+		ts(now, -8, 10, 0), ts(now, -8, 12, 0), ds(now, -9), ts(now, -8, 10, 5), ts(now, -8, 11, 40),
+		// Record 9: 已完成
+		ts(now, -7, 13, 0), ts(now, -7, 17, 0), ds(now, -8), ts(now, -7, 13, 10), ts(now, -7, 16, 40),
+		// Record 10: 已完成
+		ts(now, -6, 9, 0), ts(now, -6, 11, 0), ds(now, -7), ts(now, -6, 9, 10), ts(now, -6, 10, 45),
+		// Record 11: 已批准
+		ts(now, -5, 18, 0), ts(now, -5, 22, 0), ds(now, -6),
+		// Record 12: 已批准
+		ts(now, -5, 9, 0), ts(now, -5, 17, 0), ds(now, -6),
+		// Record 13: 已批准
+		ts(now, -4, 10, 0), ts(now, -4, 15, 0), ds(now, -5),
+		// Record 14: 待审批
+		ts(now, -3, 9, 0), ts(now, -3, 12, 0),
+		// Record 15: 待审批
+		ts(now, -3, 14, 0), ts(now, -3, 18, 0),
+		// Record 16: 待审批
+		ts(now, -2, 8, 0), ts(now, -2, 16, 0),
+		// Record 17: 待审批
+		ts(now, -1, 8, 0), ts(now, -1, 18, 0),
+		// Record 18: 已拒绝
+		ts(now, -2, 7, 0), ts(now, -2, 20, 0), ds(now, -3),
+		// Record 19: 已取消
+		ts(now, -1, 14, 0), ts(now, -1, 16, 0),
+		// Record 20: 进行中
+		ts(now, 0, 8, 0), ts(now, 0, 18, 0), ds(now, -1), ts(now, 0, 8, 10),
+	)
+	if _, err := db.ExecContext(ctx, reservationSQL); err != nil {
+		return fmt.Errorf("插入预定数据: %w", err)
+	}
+	fmt.Println("  📋 已插入 20 条用车预定记录")
+
 	// ---- 9. GPS 定位 (50条) ----
 	gpsSQL := fmt.Sprintf(`
 INSERT INTO gps_tracking (vehicle_id, latitude, longitude, speed, heading, altitude, location_name, status, recorded_at) VALUES
@@ -1059,7 +1162,7 @@ func buildFleetUISchema() map[string]interface{} {
 	return map[string]interface{}{
 		"app_schema_version": "2.0.0",
 		"app_name":           "智慧车队管理系统",
-		"default_page":       "dashboard",
+		"default_page":       "reservations",
 		"navigation": map[string]interface{}{
 			"type": "sidebar",
 		},
@@ -1068,11 +1171,15 @@ func buildFleetUISchema() map[string]interface{} {
 			"border_radius": "0.5rem",
 		},
 		"pages": []interface{}{
-			// ====== 1. 仪表盘 ======
+			// ====== 1. 用车预定（主系统）======
+			buildReservationsPage(),
+			// ====== 1b. 预定详情（隐藏页面，通过行点击导航）======
+			buildReservationDetailPage(),
+			// ====== 2. 仪表盘 ======
 			buildDashboardPage(),
-			// ====== 2. 车辆管理 ======
+			// ====== 3. 车辆管理 ======
 			buildVehiclesPage(),
-			// ====== 3. 驾驶员管理 ======
+			// ====== 4. 驾驶员管理 ======
 			buildDriversPage(),
 			// ====== 4. 行程记录 ======
 			map[string]interface{}{
@@ -1471,6 +1578,17 @@ func buildDashboardPage() map[string]interface{} {
 				},
 			},
 			map[string]interface{}{
+				"id": "stat_pending_reservations_dash", "type": "stats_card",
+				"grid": map[string]interface{}{"col_span": 1},
+				"config": map[string]interface{}{
+					"label": "待审批预定", "value_key": "count", "icon": "CalendarCheck", "color": "amber",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "where": "status = '待审批'",
+					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
+				},
+			},
+			map[string]interface{}{
 				"id": "vehicle_status_chart", "type": "chart",
 				"label": "车辆状态分布",
 				"grid":  map[string]interface{}{"col_span": 2},
@@ -1547,6 +1665,26 @@ func buildDashboardPage() map[string]interface{} {
 					"table": "alerts", "order_by": []interface{}{map[string]interface{}{"column": "alert_time", "direction": "DESC"}}, "limit": 5,
 				},
 			},
+			map[string]interface{}{
+				"id": "recent_reservations", "type": "data_table", "label": "最近预定",
+				"config": map[string]interface{}{
+					"table_name": "reservations",
+					"columns": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text"},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text"},
+						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text"},
+						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text"},
+						map[string]interface{}{"key": "priority", "label": "优先级", "type": "badge"},
+						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
+						map[string]interface{}{"key": "start_time", "label": "用车时间", "type": "date"},
+					},
+					"page_size": 5,
+					"actions":   []interface{}{"view"},
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "order_by": []interface{}{map[string]interface{}{"column": "start_time", "direction": "DESC"}}, "limit": 5,
+				},
+			},
 		},
 	}
 }
@@ -1603,6 +1741,299 @@ func buildDriversPage() map[string]interface{} {
 				},
 				"data_source": map[string]interface{}{
 					"table": "drivers", "order_by": []interface{}{map[string]interface{}{"column": "id", "direction": "ASC"}},
+				},
+			},
+		},
+	}
+}
+
+func buildReservationsPage() map[string]interface{} {
+	return map[string]interface{}{
+		"id": "reservations", "title": "用车预定", "route": "/reservations", "icon": "CalendarCheck",
+		"blocks": []interface{}{
+			// ---- 状态统计卡片 ----
+			map[string]interface{}{
+				"id": "stat_pending_reservations", "type": "stats_card",
+				"grid": map[string]interface{}{"col_span": 1},
+				"config": map[string]interface{}{
+					"label": "待审批", "value_key": "count", "icon": "Clock", "color": "amber",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "where": "status = '待审批'",
+					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
+				},
+			},
+			map[string]interface{}{
+				"id": "stat_approved_reservations", "type": "stats_card",
+				"grid": map[string]interface{}{"col_span": 1},
+				"config": map[string]interface{}{
+					"label": "已批准", "value_key": "count", "icon": "CheckCircle", "color": "blue",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "where": "status = '已批准'",
+					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
+				},
+			},
+			map[string]interface{}{
+				"id": "stat_inprogress_reservations", "type": "stats_card",
+				"grid": map[string]interface{}{"col_span": 1},
+				"config": map[string]interface{}{
+					"label": "进行中", "value_key": "count", "icon": "Navigation", "color": "green",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "where": "status = '进行中'",
+					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
+				},
+			},
+			map[string]interface{}{
+				"id": "stat_completed_reservations", "type": "stats_card",
+				"grid": map[string]interface{}{"col_span": 1},
+				"config": map[string]interface{}{
+					"label": "已完成", "value_key": "count", "icon": "CircleCheck", "color": "default",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations", "where": "status = '已完成'",
+					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
+				},
+			},
+			// ---- 日历视图 ----
+			map[string]interface{}{
+				"id": "reservation_calendar", "type": "calendar",
+				"grid": map[string]interface{}{"col_span": 4},
+				"config": map[string]interface{}{
+					"table_name":   "reservations",
+					"title_key":    "purpose",
+					"start_key":    "start_time",
+					"end_key":      "end_time",
+					"status_key":   "status",
+					"default_view": "month",
+					"detail_fields": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "编号"},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人"},
+						map[string]interface{}{"key": "applicant_department", "label": "部门"},
+						map[string]interface{}{"key": "start_location", "label": "出发地"},
+						map[string]interface{}{"key": "end_location", "label": "目的地"},
+						map[string]interface{}{"key": "passengers", "label": "人数"},
+						map[string]interface{}{"key": "priority", "label": "优先级"},
+					},
+					"status_colors": map[string]interface{}{
+						"待审批": "bg-amber-500/15 text-amber-700 border-amber-400/30",
+						"已批准": "bg-emerald-500/15 text-emerald-700 border-emerald-400/30",
+						"进行中": "bg-blue-500/15 text-blue-700 border-blue-400/30",
+						"已完成": "bg-slate-500/10 text-slate-600 border-slate-400/30",
+						"已拒绝": "bg-red-500/15 text-red-700 border-red-400/30",
+						"已取消": "bg-gray-500/10 text-gray-500 border-gray-400/30",
+					},
+					"click_action": map[string]interface{}{
+						"type":      "navigate",
+						"page_id":   "reservation_detail",
+						"param_key": "record_id",
+					},
+				},
+				"data_source": map[string]interface{}{"table": "reservations"},
+			},
+			// ---- 图表 ----
+			map[string]interface{}{
+				"id": "reservation_status_chart", "type": "chart",
+				"label": "预定状态分布",
+				"grid":  map[string]interface{}{"col_span": 2},
+				"config": map[string]interface{}{
+					"chart_type": "pie", "title": "预定状态分布",
+					"x_key": "status", "category_key": "status",
+				},
+				"data_source": map[string]interface{}{"table": "reservations", "limit": 200},
+			},
+			map[string]interface{}{
+				"id": "reservation_dept_chart", "type": "chart",
+				"label": "各部门用车统计",
+				"grid":  map[string]interface{}{"col_span": 2},
+				"config": map[string]interface{}{
+					"chart_type": "bar", "title": "各部门用车统计",
+					"x_key": "applicant_department", "category_key": "applicant_department",
+				},
+				"data_source": map[string]interface{}{"table": "reservations", "limit": 200},
+			},
+			// ---- 新建预定（Dialog 弹窗）----
+			map[string]interface{}{
+				"id": "reservation_create_dialog", "type": "form_dialog",
+				"config": map[string]interface{}{
+					"table_name":    "reservations",
+					"title":         "新建用车预定",
+					"description":   "请填写用车预定申请信息",
+					"trigger_label": "新建预定",
+					"dialog_size":   "lg",
+					"submit_label":  "提交预定申请",
+					"fields": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "required": true, "placeholder": "如 RES20250215002"},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "required": true},
+						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "select", "required": true, "options": []interface{}{
+							map[string]interface{}{"label": "总经办", "value": "总经办"},
+							map[string]interface{}{"label": "销售部", "value": "销售部"},
+							map[string]interface{}{"label": "技术部", "value": "技术部"},
+							map[string]interface{}{"label": "市场部", "value": "市场部"},
+							map[string]interface{}{"label": "物流部", "value": "物流部"},
+							map[string]interface{}{"label": "财务部", "value": "财务部"},
+							map[string]interface{}{"label": "人事部", "value": "人事部"},
+						}},
+						map[string]interface{}{"key": "applicant_phone", "label": "联系电话", "type": "text", "placeholder": "手机号码"},
+						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text", "required": true, "placeholder": "如：客户拜访、会议出行等"},
+						map[string]interface{}{"key": "passengers", "label": "乘车人数", "type": "number", "default_value": 1},
+						map[string]interface{}{"key": "start_time", "label": "用车开始时间", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "end_time", "label": "用车结束时间", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text", "required": true, "placeholder": "如：公司总部"},
+						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text", "required": true},
+						map[string]interface{}{"key": "priority", "label": "优先级", "type": "select", "default_value": "普通", "options": []interface{}{
+							map[string]interface{}{"label": "普通", "value": "普通"},
+							map[string]interface{}{"label": "紧急", "value": "紧急"},
+							map[string]interface{}{"label": "特急", "value": "特急"},
+						}},
+						map[string]interface{}{"key": "notes", "label": "备注", "type": "textarea"},
+						map[string]interface{}{"key": "status", "label": "", "type": "text", "default_value": "待审批"},
+					},
+				},
+			},
+			// ---- 预定列表 ----
+			map[string]interface{}{
+				"id": "reservations_table", "type": "data_table",
+				"config": map[string]interface{}{
+					"table_name": "reservations",
+					"columns": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "sortable": true},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "sortable": true},
+						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text"},
+						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text"},
+						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text"},
+						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text"},
+						map[string]interface{}{"key": "passengers", "label": "人数", "type": "number"},
+						map[string]interface{}{"key": "priority", "label": "优先级", "type": "badge"},
+						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
+						map[string]interface{}{"key": "start_time", "label": "用车时间", "type": "date", "sortable": true},
+					},
+					"actions": []interface{}{"view", "edit", "delete"},
+					"status_actions": []interface{}{
+						map[string]interface{}{
+							"label": "批准", "from_status": []interface{}{"待审批"}, "to_status": "已批准",
+							"status_column": "status", "color": "green", "confirm": true,
+						},
+						map[string]interface{}{
+							"label": "拒绝", "from_status": []interface{}{"待审批"}, "to_status": "已拒绝",
+							"status_column": "status", "color": "red", "confirm": true,
+							"extra_fields": []interface{}{
+								map[string]interface{}{"key": "reject_reason", "label": "拒绝原因", "required": true},
+							},
+						},
+						map[string]interface{}{
+							"label": "开始出行", "from_status": []interface{}{"已批准"}, "to_status": "进行中",
+							"status_column": "status", "color": "blue", "confirm": true,
+						},
+						map[string]interface{}{
+							"label": "完成", "from_status": []interface{}{"进行中"}, "to_status": "已完成",
+							"status_column": "status", "color": "default", "confirm": true,
+						},
+						map[string]interface{}{
+							"label": "取消", "from_status": []interface{}{"待审批", "已批准"}, "to_status": "已取消",
+							"status_column": "status", "color": "default", "confirm": true,
+						},
+					},
+					"search_enabled":  true,
+					"search_key":      "reservation_no",
+					"filters_enabled": true,
+					"pagination":      true,
+					"page_size":       15,
+					"row_click_action": map[string]interface{}{
+						"type":    "navigate",
+						"page_id": "reservation_detail",
+						"params":  map[string]interface{}{"record_id": "id"},
+					},
+				},
+				"data_source": map[string]interface{}{
+					"table":    "reservations",
+					"order_by": []interface{}{map[string]interface{}{"column": "start_time", "direction": "DESC"}},
+				},
+			},
+		},
+	}
+}
+
+func buildReservationDetailPage() map[string]interface{} {
+	return map[string]interface{}{
+		"id":           "reservation_detail",
+		"title":        "预定详情",
+		"route":        "/reservations/detail",
+		"icon":         "FileText",
+		"hidden":       true,
+		"require_auth": false,
+		"blocks": []interface{}{
+			map[string]interface{}{
+				"id": "reservation_detail_view", "type": "detail_view",
+				"config": map[string]interface{}{
+					"table_name":      "reservations",
+					"record_id_param": "record_id",
+					"fields": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "预定编号"},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人"},
+						map[string]interface{}{"key": "applicant_department", "label": "部门"},
+						map[string]interface{}{"key": "applicant_phone", "label": "联系电话"},
+						map[string]interface{}{"key": "purpose", "label": "用车目的"},
+						map[string]interface{}{"key": "passengers", "label": "乘车人数"},
+						map[string]interface{}{"key": "start_location", "label": "出发地"},
+						map[string]interface{}{"key": "end_location", "label": "目的地"},
+						map[string]interface{}{"key": "start_time", "label": "用车开始时间"},
+						map[string]interface{}{"key": "end_time", "label": "用车结束时间"},
+						map[string]interface{}{"key": "vehicle_id", "label": "指派车辆ID"},
+						map[string]interface{}{"key": "driver_id", "label": "指派驾驶员ID"},
+						map[string]interface{}{"key": "priority", "label": "优先级"},
+						map[string]interface{}{"key": "status", "label": "状态"},
+						map[string]interface{}{"key": "approver", "label": "审批人"},
+						map[string]interface{}{"key": "approved_at", "label": "审批时间"},
+						map[string]interface{}{"key": "reject_reason", "label": "拒绝原因"},
+						map[string]interface{}{"key": "actual_start_time", "label": "实际出发时间"},
+						map[string]interface{}{"key": "actual_end_time", "label": "实际归还时间"},
+						map[string]interface{}{"key": "actual_mileage", "label": "实际里程(km)"},
+						map[string]interface{}{"key": "notes", "label": "备注"},
+						map[string]interface{}{"key": "created_at", "label": "创建时间"},
+					},
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations",
+				},
+			},
+		},
+	}
+}
+
+func buildReservationCreatePage() map[string]interface{} {
+	return map[string]interface{}{
+		"id":     "reservation_create",
+		"title":  "新建预定",
+		"route":  "/reservations/create",
+		"icon":   "PlusCircle",
+		"hidden": true,
+		"blocks": []interface{}{
+			map[string]interface{}{
+				"id": "reservation_form", "type": "form",
+				"config": map[string]interface{}{
+					"table_name":  "reservations",
+					"title":       "新建用车预定",
+					"description": "请填写用车预定申请信息",
+					"fields": []interface{}{
+						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "required": true, "placeholder": "如 RES20250215002"},
+						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "required": true},
+						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text", "required": true},
+						map[string]interface{}{"key": "applicant_phone", "label": "联系电话", "type": "text"},
+						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text", "required": true},
+						map[string]interface{}{"key": "passengers", "label": "乘车人数", "type": "number"},
+						map[string]interface{}{"key": "start_time", "label": "用车开始时间", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "end_time", "label": "用车结束时间", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text", "required": true},
+						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text", "required": true},
+						map[string]interface{}{"key": "priority", "label": "优先级", "type": "text", "placeholder": "普通/紧急/特急"},
+						map[string]interface{}{"key": "notes", "label": "备注", "type": "text"},
+					},
+					"submit_label": "提交预定申请",
+				},
+				"data_source": map[string]interface{}{
+					"table": "reservations",
 				},
 			},
 		},

@@ -138,10 +138,13 @@ export function AgentWorkspacePanel({
   const [compareLoading, setCompareLoading] = useState(false)
   const [rollbackingId, setRollbackingId] = useState<string | null>(null)
 
-  // Sync pagesConfig from app
+  // Sync pagesConfig from app — prefer config_json, fall back to ui_schema pages
   useEffect(() => {
     const configJson = app?.current_version?.config_json as Record<string, unknown> | null
-    if (configJson && Array.isArray(configJson.pages)) {
+    const uiSchema = app?.current_version?.ui_schema as Record<string, unknown> | null
+
+    // Source 1: config_json has explicit page configs
+    if (configJson && Array.isArray(configJson.pages) && (configJson.pages as unknown[]).length > 0) {
       setPagesConfig({
         pages: configJson.pages as PagesConfig['pages'],
         navigation: (configJson.navigation as PagesConfig['navigation']) || { type: 'sidebar' },
@@ -149,8 +152,30 @@ export function AgentWorkspacePanel({
           (configJson.default_page as string) || (configJson.pages as any[])[0]?.id || '',
       })
     }
+    // Source 2: ui_schema has pages (created by AI Agent) — extract page configs from it
+    else if (
+      uiSchema &&
+      uiSchema.app_schema_version === '2.0.0' &&
+      Array.isArray(uiSchema.pages) &&
+      (uiSchema.pages as unknown[]).length > 0
+    ) {
+      const schemaPages = uiSchema.pages as Array<Record<string, unknown>>
+      const extractedPages: PagesConfig['pages'] = schemaPages.map((p) => ({
+        id: (p.id as string) || `page_${Date.now()}`,
+        title: (p.title as string) || 'Untitled',
+        route: (p.route as string) || `/${p.id || 'page'}`,
+        icon: (p.icon as string) || 'FileText',
+      }))
+      const nav = uiSchema.navigation as Record<string, unknown> | undefined
+      setPagesConfig({
+        pages: extractedPages,
+        navigation: { type: (nav?.type as string) || 'sidebar' },
+        default_page:
+          (uiSchema.default_page as string) || extractedPages[0]?.id || '',
+      })
+    }
     setPagesConfigDirty(false)
-  }, [app?.current_version?.config_json])
+  }, [app?.current_version?.config_json, app?.current_version?.ui_schema])
 
   // Load versions
   const loadVersions = useCallback(async () => {
@@ -186,8 +211,40 @@ export function AgentWorkspacePanel({
         navigation: pagesConfig.navigation,
         default_page: pagesConfig.default_page,
       }
+
+      // Preserve and sync ui_schema — reorder pages to match the new config order
+      let uiSchemaPayload: Record<string, unknown> | undefined
+      const currentUISchema = app?.current_version?.ui_schema as Record<string, unknown> | null
+      if (currentUISchema && Array.isArray(currentUISchema.pages)) {
+        const uiPages = currentUISchema.pages as Array<Record<string, unknown>>
+        const uiPageMap: Record<string, Record<string, unknown>> = {}
+        for (const p of uiPages) {
+          if (p.id) uiPageMap[p.id as string] = p
+        }
+        const reorderedPages: Array<Record<string, unknown>> = []
+        for (const cp of pagesConfig.pages) {
+          const existing = uiPageMap[cp.id]
+          if (existing) {
+            reorderedPages.push({ ...existing, title: cp.title, route: cp.route, icon: cp.icon })
+          } else {
+            reorderedPages.push({ id: cp.id, title: cp.title, route: cp.route, icon: cp.icon, blocks: [] })
+          }
+        }
+        uiSchemaPayload = {
+          ...currentUISchema,
+          pages: reorderedPages,
+          navigation: { ...((currentUISchema.navigation as Record<string, unknown>) || {}), type: pagesConfig.navigation.type },
+          default_page: pagesConfig.default_page,
+        }
+      }
+
+      // Preserve db_schema
+      const currentDBSchema = app?.current_version?.db_schema as Record<string, unknown> | null
+
       const updatedVersion = await appApi.updateConfigJSON(workspaceId, {
         config_json: configPayload,
+        ui_schema: uiSchemaPayload || undefined,
+        db_schema: currentDBSchema || undefined,
       })
       if (app) {
         onAppUpdated({
@@ -196,6 +253,12 @@ export function AgentWorkspacePanel({
           current_version: updatedVersion,
         })
       }
+
+      // Sync appSchema if we updated ui_schema
+      if (uiSchemaPayload && uiSchemaPayload.app_schema_version === '2.0.0' && Array.isArray(uiSchemaPayload.pages)) {
+        onSchemaEdited(uiSchemaPayload as unknown as AppSchema)
+      }
+
       setPagesConfigDirty(false)
       onPagesDirtyChange(false)
       loadVersions()
@@ -537,20 +600,31 @@ export function AgentWorkspacePanel({
         {activeTab === 'pages' && (
           <div className="flex-1 overflow-hidden flex flex-col">
             {pagesConfigDirty && (
-              <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface-200/30">
-                <span className="text-[11px] text-foreground-muted">Unsaved page changes</span>
+              <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-amber-500/5">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-[11px] text-foreground-light">Unsaved page changes</span>
+                </div>
                 <Button
                   size="sm"
                   onClick={handleSavePagesConfig}
                   disabled={pagesConfigSaving}
-                  className="h-6 text-xs"
+                  className="h-6 text-xs gap-1"
                 >
-                  {pagesConfigSaving ? 'Saving...' : 'Save Pages'}
+                  {pagesConfigSaving ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Pages'
+                  )}
                 </Button>
               </div>
             )}
             <PageManagerPanel
               config={pagesConfig}
+              appPages={appSchema?.pages}
               onChange={(newConfig) => {
                 setPagesConfig(newConfig)
                 setPagesConfigDirty(true)
@@ -587,7 +661,9 @@ export function AgentWorkspacePanel({
             ) : versionList.length === 0 ? (
               <div className="flex items-center justify-center p-8 h-64">
                 <div className="text-center space-y-3">
-                  <History className="w-6 h-6 text-foreground-muted mx-auto" />
+                  <div className="w-10 h-10 rounded-xl bg-surface-200/50 flex items-center justify-center mx-auto">
+                    <History className="w-4 h-4 text-foreground-muted" />
+                  </div>
                   <p className="text-sm font-medium text-foreground">No Versions Yet</p>
                   <p className="text-xs text-foreground-muted max-w-[200px] mx-auto">
                     Versions are created when you publish or save changes.
@@ -595,58 +671,81 @@ export function AgentWorkspacePanel({
                 </div>
               </div>
             ) : (
-              <div className="divide-y divide-border">
-                {versionList.map((version, idx) => {
+              <div>
+                {versionList.map((version, vIdx) => {
                   const isCurrent = version.id === app?.current_version_id
                   const isRollingBack = rollbackingId === version.id
+                  const hasUISchema = Boolean(version.ui_schema && Object.keys(version.ui_schema).length > 0)
+                  const hasConfig = Boolean(version.config_json && Object.keys(version.config_json).length > 0)
+                  const hasDBSchema = Boolean(version.db_schema && Object.keys(version.db_schema).length > 0)
+                  const hasChangelog = Boolean(version.changelog && version.changelog.trim())
+
                   return (
                     <div
                       key={version.id}
                       className={cn(
-                        'px-3 py-3 transition-colors',
-                        isCurrent ? 'bg-brand-500/5' : 'hover:bg-surface-200/30'
+                        'relative px-3 py-2.5 border-b border-border transition-colors group',
+                        isCurrent ? 'bg-brand-500/5' : 'hover:bg-surface-200/20'
                       )}
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[12px] font-medium text-foreground">
-                              {version.version}
+                      {/* Timeline dot */}
+                      <div className="absolute left-1.5 top-3.5 w-2 h-2 rounded-full border border-border bg-surface-100 z-10" />
+                      {vIdx < versionList.length - 1 && (
+                        <div className="absolute left-1.5 top-5 bottom-0 w-px bg-border" />
+                      )}
+
+                      <div className="ml-3">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[12px] font-semibold text-foreground">
+                            {version.version}
+                          </span>
+                          {isCurrent && (
+                            <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[8px] font-semibold bg-brand-500/10 text-brand-500">
+                              Current
                             </span>
-                            {isCurrent && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-brand-500/10 text-brand-500">
-                                <CheckCircle2 className="w-2.5 h-2.5" />
-                                Current
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1 text-[10px] text-foreground-muted">
-                            <span className="flex items-center gap-0.5">
-                              <Clock className="w-2.5 h-2.5" />
-                              {version.created_at
-                                ? new Date(version.created_at).toLocaleString()
-                                : '-'}
-                            </span>
-                          </div>
+                          )}
+                          {/* Content badges */}
+                          {hasUISchema && (
+                            <span className="px-1 py-0.5 rounded text-[8px] bg-violet-500/10 text-violet-500">UI</span>
+                          )}
+                          {hasConfig && (
+                            <span className="px-1 py-0.5 rounded text-[8px] bg-emerald-500/10 text-emerald-500">Config</span>
+                          )}
+                          {hasDBSchema && (
+                            <span className="px-1 py-0.5 rounded text-[8px] bg-amber-500/10 text-amber-500">DB</span>
+                          )}
                         </div>
-                        {!isCurrent && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 text-[10px] text-foreground-muted hover:text-foreground shrink-0"
-                            onClick={() => handleRollback(version.id)}
-                            disabled={isRollingBack}
-                          >
-                            {isRollingBack ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <>
-                                <RotateCcw className="w-3 h-3 mr-1" />
-                                Rollback
-                              </>
-                            )}
-                          </Button>
+                        {hasChangelog && (
+                          <p className="text-[10px] text-foreground-light mt-0.5 line-clamp-1">
+                            {version.changelog}
+                          </p>
                         )}
+                        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-foreground-muted">
+                          <span className="flex items-center gap-0.5">
+                            <Clock className="w-2.5 h-2.5" />
+                            {version.created_at
+                              ? new Date(version.created_at).toLocaleString()
+                              : '-'}
+                          </span>
+                          {!isCurrent && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-5 text-[10px] text-foreground-muted hover:text-foreground px-1.5 py-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => handleRollback(version.id)}
+                              disabled={isRollingBack}
+                            >
+                              {isRollingBack ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
+                                  Rollback
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )
@@ -690,11 +789,21 @@ export function AgentWorkspacePanel({
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    className="h-7 text-xs"
+                    className="h-7 text-xs gap-1"
                     onClick={handleCompareVersions}
                     disabled={compareLoading}
                   >
-                    {compareLoading ? 'Comparing...' : 'Compare'}
+                    {compareLoading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Comparing...
+                      </>
+                    ) : (
+                      <>
+                        <GitCompare className="w-3 h-3" />
+                        Compare
+                      </>
+                    )}
                   </Button>
                   {compareError && (
                     <span className="text-[10px] text-destructive">{compareError}</span>

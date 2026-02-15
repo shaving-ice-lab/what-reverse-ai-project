@@ -12,13 +12,18 @@ interface FormBlockProps {
   onSubmit?: (data: Record<string, unknown>) => void
 }
 
+// Resolve field identifier: prefer `key` over `name` for backward compat with seed configs
+function fieldId(field: { name?: string; key?: string }): string {
+  return field.key || field.name || ''
+}
+
 export function FormBlock({ config, onSubmit }: FormBlockProps) {
   const { insertRow, updateRow, queryRows, notifyTableChange } = useDataProvider()
   const { params: pageParams } = usePageParams()
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {}
     for (const field of config.fields) {
-      initial[field.name] = field.default_value ?? ''
+      initial[fieldId(field)] = field.default_value ?? ''
     }
     return initial
   })
@@ -47,7 +52,7 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
           const row = result.rows[0]
           const loaded: Record<string, unknown> = {}
           for (const field of config.fields) {
-            loaded[field.name] = row[field.name] ?? field.default_value ?? ''
+            loaded[fieldId(field)] = row[fieldId(field)] ?? field.default_value ?? ''
           }
           setValues(loaded)
         }
@@ -70,9 +75,10 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
     // Client-side required validation
     for (const field of config.fields) {
       if (field.required) {
-        const v = values[field.name]
+        const fid = fieldId(field)
+        const v = values[fid]
         if (v === '' || v === null || v === undefined) {
-          setError(`${field.label || field.name} is required`)
+          setError(`${field.label || fid} is required`)
           return
         }
       }
@@ -83,13 +89,14 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
       // Coerce types before sending
       const payload: Record<string, unknown> = {}
       for (const field of config.fields) {
-        const v = values[field.name]
+        const fid = fieldId(field)
+        const v = values[fid]
         if (field.type === 'number' && v !== '' && v !== null && v !== undefined) {
-          payload[field.name] = Number(v)
+          payload[fid] = Number(v)
         } else if (field.type === 'checkbox') {
-          payload[field.name] = Boolean(v)
+          payload[fid] = Boolean(v)
         } else {
-          payload[field.name] = v
+          payload[fid] = v
         }
       }
 
@@ -106,7 +113,7 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
       setSuccess(true)
       const reset: Record<string, unknown> = {}
       for (const field of config.fields) {
-        reset[field.name] = field.default_value ?? ''
+        reset[fieldId(field)] = field.default_value ?? ''
       }
       setValues(reset)
       setTimeout(() => setSuccess(false), 3000)
@@ -137,66 +144,71 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
       {editLoading && (
         <div className="text-xs text-foreground-muted animate-pulse">Loading record...</div>
       )}
-      {config.fields.map((field) => (
-        <div key={field.name}>
-          <label className="text-xs font-medium text-foreground-light mb-1 block">
-            {field.label}
-            {field.required && <span className="text-destructive ml-0.5">*</span>}
-          </label>
-          {field.type === 'textarea' ? (
-            <textarea
-              value={String(values[field.name] ?? '')}
-              onChange={(e) => updateField(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              required={field.required}
-              className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
-            />
-          ) : field.type === 'select' ? (
-            <select
-              value={String(values[field.name] ?? '')}
-              onChange={(e) => updateField(field.name, e.target.value)}
-              required={field.required}
-              className="w-full h-9 rounded border border-border bg-background px-3 text-sm"
-            >
-              <option value="">— Select —</option>
-              {field.options?.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          ) : field.type === 'checkbox' ? (
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={Boolean(values[field.name])}
-                onChange={(e) => updateField(field.name, e.target.checked)}
-                className="rounded border-border"
-              />
-              <span className="text-sm text-foreground-light">
-                {field.placeholder || field.label}
-              </span>
+      {config.fields.map((field) => {
+        const fid = fieldId(field)
+        return (
+          <div key={fid}>
+            <label className="text-xs font-medium text-foreground-light mb-1 block">
+              {field.label}
+              {field.required && <span className="text-destructive ml-0.5">*</span>}
             </label>
-          ) : (
-            <Input
-              type={
-                field.type === 'number'
-                  ? 'number'
-                  : field.type === 'email'
-                    ? 'email'
-                    : field.type === 'date'
-                      ? 'date'
-                      : 'text'
-              }
-              value={String(values[field.name] ?? '')}
-              onChange={(e) => updateField(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              required={field.required}
-              className="h-9 text-sm"
-            />
-          )}
-        </div>
-      ))}
+            {field.type === 'textarea' ? (
+              <textarea
+                value={String(values[fid] ?? '')}
+                onChange={(e) => updateField(fid, e.target.value)}
+                placeholder={field.placeholder}
+                required={field.required}
+                className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
+              />
+            ) : field.type === 'select' ? (
+              <select
+                value={String(values[fid] ?? '')}
+                onChange={(e) => updateField(fid, e.target.value)}
+                required={field.required}
+                className="w-full h-9 rounded border border-border bg-background px-3 text-sm"
+              >
+                <option value="">— Select —</option>
+                {field.options?.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.type === 'checkbox' ? (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={Boolean(values[fid])}
+                  onChange={(e) => updateField(fid, e.target.checked)}
+                  className="rounded border-border"
+                />
+                <span className="text-sm text-foreground-light">
+                  {field.placeholder || field.label}
+                </span>
+              </label>
+            ) : (
+              <Input
+                type={
+                  field.type === 'number'
+                    ? 'number'
+                    : field.type === 'email'
+                      ? 'email'
+                      : field.type === 'date'
+                        ? 'date'
+                        : field.type === 'datetime'
+                          ? 'datetime-local'
+                          : 'text'
+                }
+                value={String(values[fid] ?? '')}
+                onChange={(e) => updateField(fid, e.target.value)}
+                placeholder={field.placeholder}
+                required={field.required}
+                className="h-9 text-sm"
+              />
+            )}
+          </div>
+        )
+      })}
 
       {error && <div className="text-xs text-destructive">{error}</div>}
       {success && <div className="text-xs text-emerald-600">Submitted successfully!</div>}
@@ -213,7 +225,7 @@ export function FormBlock({ config, onSubmit }: FormBlockProps) {
           onClick={() => {
             const reset: Record<string, unknown> = {}
             for (const field of config.fields) {
-              reset[field.name] = field.default_value ?? ''
+              reset[fieldId(field)] = field.default_value ?? ''
             }
             setValues(reset)
             setError('')

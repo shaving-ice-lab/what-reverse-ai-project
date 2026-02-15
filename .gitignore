@@ -59,3 +59,6 @@ apps/server/bench_output.txt
 
 # Resources (external references)
 resources/
+
+# BitFun snapshot data - auto managed
+.bitfun/

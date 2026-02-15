@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
 import { usePageParams } from '../app-renderer'
-import type { DataTableConfig, ApiSource, DataSource } from '../types'
+import type { DataTableConfig, ApiSource, DataSource, StatusActionConfig } from '../types'
 
 interface DataTableBlockProps {
   config: DataTableConfig
@@ -251,8 +251,53 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     setSaving(false)
   }
 
+  const handleStatusAction = async (
+    row: Record<string, unknown>,
+    action: StatusActionConfig
+  ) => {
+    const pkColumn = config.columns.find((col) => col.key === 'id')?.key || 'id'
+    const pkValue = row[pkColumn]
+    if (pkValue === null || pkValue === undefined) return
+
+    if (action.confirm) {
+      let confirmMsg = `确认将状态从 "${row[action.status_column]}" 变更为 "${action.to_status}"？`
+      if (action.extra_fields?.length) {
+        const inputs: Record<string, string> = {}
+        for (const field of action.extra_fields) {
+          const val = window.prompt(`${field.label}${field.required ? ' (必填)' : ''}:`)
+          if (field.required && !val) return
+          if (val) inputs[field.key] = val
+        }
+        if (!window.confirm(confirmMsg)) return
+        try {
+          const data: Record<string, unknown> = {
+            [pkColumn]: pkValue,
+            [action.status_column]: action.to_status,
+            ...inputs,
+          }
+          await updateRow(config.table_name, data, `${pkColumn} = '${pkValue}'`)
+          notifyTableChange(config.table_name)
+          fetchData()
+        } catch { /* ignore */ }
+        return
+      }
+      if (!window.confirm(confirmMsg)) return
+    }
+
+    try {
+      const data: Record<string, unknown> = {
+        [pkColumn]: pkValue,
+        [action.status_column]: action.to_status,
+      }
+      await updateRow(config.table_name, data, `${pkColumn} = '${pkValue}'`)
+      notifyTableChange(config.table_name)
+      fetchData()
+    } catch { /* ignore */ }
+  }
+
   const totalPages = Math.ceil(total / pageSize)
   const actions = config.actions || []
+  const statusActions = config.status_actions || []
 
   const exportCSV = async () => {
     try {
@@ -537,13 +582,23 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                       if (isEditing || !config.row_click_action) return
                       const action = config.row_click_action
                       if (action.type === 'navigate') {
-                        const paramKey = action.param_key || 'id'
-                        const pkColumn =
-                          config.columns.find((col) => col.key === 'id')?.key ||
-                          config.columns[0]?.key ||
-                          'id'
-                        const pkValue = row[paramKey] ?? row[pkColumn]
-                        navigateToPage(action.target_page, { [paramKey]: pkValue })
+                        const targetPage = action.target_page || action.page_id || ''
+                        // Support both params object mapping and simple param_key
+                        if (action.params) {
+                          const navParams: Record<string, unknown> = {}
+                          for (const [paramName, rowKey] of Object.entries(action.params)) {
+                            navParams[paramName] = row[rowKey as string] ?? row['id']
+                          }
+                          navigateToPage(targetPage, navParams)
+                        } else {
+                          const paramKey = action.param_key || 'id'
+                          const pkColumn =
+                            config.columns.find((col) => col.key === 'id')?.key ||
+                            config.columns[0]?.key ||
+                            'id'
+                          const pkValue = row[paramKey] ?? row[pkColumn]
+                          navigateToPage(targetPage, { [paramKey]: pkValue })
+                        }
                       }
                     }}
                   >
@@ -651,11 +706,36 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                                   size="sm"
                                   variant="ghost"
                                   className="h-6 w-6 p-0 text-destructive"
-                                  onClick={() => handleDelete(row)}
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(row) }}
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </Button>
                               )}
+                              {statusActions
+                                .filter((sa) => {
+                                  const currentStatus = String(row[sa.status_column] || '')
+                                  return sa.from_status.includes(currentStatus)
+                                })
+                                .map((sa, sai) => {
+                                  const colorCls =
+                                    sa.color === 'green' ? 'text-emerald-600 hover:bg-emerald-500/10' :
+                                    sa.color === 'red' ? 'text-red-600 hover:bg-red-500/10' :
+                                    sa.color === 'blue' ? 'text-blue-600 hover:bg-blue-500/10' :
+                                    sa.color === 'amber' ? 'text-amber-600 hover:bg-amber-500/10' :
+                                    'text-foreground-muted hover:bg-surface-200/50'
+                                  return (
+                                    <Button
+                                      key={sai}
+                                      size="sm"
+                                      variant="ghost"
+                                      className={cn('h-6 px-1.5 text-[10px]', colorCls)}
+                                      onClick={(e) => { e.stopPropagation(); handleStatusAction(row, sa) }}
+                                    >
+                                      {sa.label}
+                                    </Button>
+                                  )
+                                })
+                              }
                             </>
                           )}
                         </div>
@@ -739,13 +819,13 @@ function formatCellValue(value: unknown, type?: string): React.ReactNode {
     case 'badge': {
       const v = String(value).toLowerCase()
       const sv = String(value)
-      const badgeColor = /active|enabled|online|approved|published/.test(v) || /在线|在职|正常|有效|已发布|运营中|已通过/.test(sv)
+      const badgeColor = /active|enabled|online|approved|published/.test(v) || /在线|在职|正常|有效|已发布|运营中|已通过|已批准/.test(sv)
         ? 'bg-emerald-500/10 text-emerald-600'
-        : /inactive|disabled|offline|archived/.test(v) || /离线|停运|已报废|已过期|离职/.test(sv)
+        : /inactive|disabled|offline|archived|cancelled/.test(v) || /离线|停运|已报废|已过期|离职|已取消/.test(sv)
           ? 'bg-gray-500/10 text-gray-500'
-          : /pending|review|waiting|draft/.test(v) || /待处理|未处理|处理中|审核中|维修中|进行中/.test(sv)
+          : /pending|review|waiting|draft/.test(v) || /待处理|未处理|处理中|审核中|维修中|进行中|待审批/.test(sv)
             ? 'bg-amber-500/10 text-amber-600'
-            : /failed|error|rejected|blocked/.test(v) || /紧急|超速|严重|违章|未缴/.test(sv)
+            : /failed|error|rejected|blocked|urgent/.test(v) || /紧急|超速|严重|违章|未缴|已拒绝|特急/.test(sv)
               ? 'bg-red-500/10 text-red-600'
               : /completed|done|success|delivered/.test(v) || /已完成|已处理|已缴|已维修|已解决/.test(sv)
                 ? 'bg-blue-500/10 text-blue-600'
