@@ -32,8 +32,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("🚀 智慧车队管理系统 — 数据库初始化与数据填充")
-	fmt.Println("================================================")
+	fmt.Println("🚀 SG Fleet Management System — Database Init & Seed")
+	fmt.Println("===================================================")
 
 	// 1. 连接主数据库
 	db, err := database.New(&cfg.Database)
@@ -45,7 +45,7 @@ func main() {
 		fmt.Printf("❌ 主数据库迁移失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ 主数据库连接成功")
+	fmt.Println("✅ Main database connected")
 
 	// 2. 确保 Demo 用户和 Workspace 存在
 	wsID := uuid.MustParse(workspaceID)
@@ -71,14 +71,14 @@ func main() {
 		fmt.Printf("❌ 创建表失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ 车队管理表结构创建完成")
+	fmt.Println("✅ Fleet management tables created")
 
 	// 5. 填充数据
 	if err := seedFleetData(ctx, wsDB); err != nil {
 		fmt.Printf("❌ 数据填充失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ 车队管理数据填充完成")
+	fmt.Println("✅ Fleet management data seeded")
 
 	// 6. 查询 workspace owner_user_id
 	ownerID, err := getWorkspaceOwner(db, wsID)
@@ -86,40 +86,40 @@ func main() {
 		fmt.Printf("❌ 无法获取工作空间所有者: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("✅ 工作空间所有者: %s\n", ownerID)
+	fmt.Printf("✅ Workspace owner: %s\n", ownerID)
 
 	// 7. 创建 UI Schema (AppSchema v2.0) + 版本 + 发布
 	if err := seedUISchemaAndPublish(db, wsID, ownerID); err != nil {
 		fmt.Printf("❌ UI Schema 创建失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ UI Schema 创建并发布完成")
+	fmt.Println("✅ UI Schema created and published")
 
 	// 8. 创建 Mock Agent Chat 会话
 	if err := seedAgentChatSessions(db, wsID, ownerID); err != nil {
 		fmt.Printf("❌ Agent Chat 会话创建失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ Agent Chat 会话创建完成")
+	fmt.Println("✅ Agent Chat sessions created")
 
 	// 9. 设置 slug 别名 + 公开访问
 	if err := seedSlugAndAccess(db, wsID); err != nil {
 		fmt.Printf("❌ Slug/访问配置失败: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("✅ Slug 别名和访问策略配置完成")
+	fmt.Println("✅ Slug and access policy configured")
 
 	// 10. 获取 workspace slug
 	var wsSlug string
 	db.Table("what_reverse_workspaces").Where("id = ?", wsID.String()).Pluck("slug", &wsSlug)
 
-	fmt.Println("================================================")
-	fmt.Println("🎉 智慧车队管理系统初始化完成！")
-	fmt.Println("  📱 访问 Agent 页面查看对话历史")
-	fmt.Println("  📊 访问 Database 页面查看数据表")
-	fmt.Println("  🖥️  访问 Builder > Preview 查看应用")
+	fmt.Println("===================================================")
+	fmt.Println("🎉 SG Fleet Management System initialized!")
+	fmt.Println("  📱 Visit Agent page to view chat history")
+	fmt.Println("  📊 Visit Database page to view data tables")
+	fmt.Println("  🖥️  Visit Builder > Preview to see the app")
 	fmt.Printf("  🌐 Runtime: http://localhost:3011/runtime/%s\n", wsSlug)
-	fmt.Println("  🌐 Runtime (别名): http://localhost:3011/runtime/fleet")
+	fmt.Println("  🌐 Runtime (alias): http://localhost:3011/runtime/fleet")
 }
 
 // ensureUserAndWorkspace 确保 Demo 用户和 Workspace 存在（seed 自包含）
@@ -181,9 +181,9 @@ func ensureUserAndWorkspace(db *gorm.DB, wsID uuid.UUID) error {
 	if err := db.Table("what_reverse_workspaces").Create(map[string]interface{}{
 		"id":                  wsID.String(),
 		"owner_user_id":       demoUserID.String(),
-		"name":                "智慧车队管理系统",
+		"name":                "SG Fleet Management",
 		"slug":                "fleet-" + wsID.String()[:8],
-		"icon":                "🚛",
+		"icon":                "🚐",
 		"status":              "active",
 		"app_status":          "draft",
 		"access_mode":         "private",
@@ -210,16 +210,16 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	vin TEXT,
 	brand TEXT NOT NULL,
 	model TEXT NOT NULL,
-	vehicle_type TEXT NOT NULL DEFAULT '轿车',
+	vehicle_type TEXT NOT NULL DEFAULT 'Sedan',
 	color TEXT,
 	engine_no TEXT,
 	purchase_date TEXT,
 	purchase_price REAL,
 	mileage INTEGER DEFAULT 0,
-	fuel_type TEXT DEFAULT '汽油',
+	fuel_type TEXT DEFAULT 'Petrol',
 	fuel_tank_capacity REAL,
 	seat_count INTEGER DEFAULT 5,
-	status TEXT NOT NULL DEFAULT '在线',
+	status TEXT NOT NULL DEFAULT 'Online',
 	department TEXT,
 	gps_device_id TEXT,
 	annual_inspection_date TEXT,
@@ -232,7 +232,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS drivers (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
-	gender TEXT DEFAULT '男',
+	gender TEXT DEFAULT 'M',
 	phone TEXT NOT NULL,
 	id_card TEXT,
 	license_no TEXT,
@@ -240,7 +240,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	license_expire_date TEXT,
 	hire_date TEXT,
 	department TEXT,
-	status TEXT NOT NULL DEFAULT '在岗',
+	status TEXT NOT NULL DEFAULT 'Active',
 	assigned_vehicle_id INTEGER,
 	emergency_contact TEXT,
 	emergency_phone TEXT,
@@ -264,8 +264,8 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	waypoints TEXT,
 	distance_km REAL,
 	estimated_duration_min INTEGER,
-	route_type TEXT DEFAULT '市内',
-	status TEXT DEFAULT '启用',
+	route_type TEXT DEFAULT 'City',
+	status TEXT DEFAULT 'Active',
 	notes TEXT,
 	created_at TEXT NOT NULL DEFAULT (datetime('now')),
 	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -286,7 +286,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	distance_km REAL,
 	fuel_consumed REAL,
 	purpose TEXT,
-	status TEXT DEFAULT '进行中',
+	status TEXT DEFAULT 'In Progress',
 	passenger_count INTEGER DEFAULT 0,
 	cargo_weight REAL,
 	max_speed REAL,
@@ -311,7 +311,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	end_date TEXT,
 	next_maintenance_date TEXT,
 	next_maintenance_mileage INTEGER,
-	status TEXT DEFAULT '待处理',
+	status TEXT DEFAULT 'Pending',
 	quality_rating INTEGER,
 	notes TEXT,
 	created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -329,7 +329,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	total_cost REAL NOT NULL,
 	mileage_at_fuel INTEGER,
 	gas_station TEXT,
-	payment_method TEXT DEFAULT '公司卡',
+	payment_method TEXT DEFAULT 'Corp Card',
 	invoice_no TEXT,
 	is_full_tank INTEGER DEFAULT 1,
 	notes TEXT,
@@ -347,7 +347,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	violation_code TEXT,
 	fine_amount REAL DEFAULT 0,
 	deduction_points INTEGER DEFAULT 0,
-	status TEXT DEFAULT '待处理',
+	status TEXT DEFAULT 'Pending',
 	handler TEXT,
 	handled_date TEXT,
 	evidence_url TEXT,
@@ -366,7 +366,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	coverage_amount REAL,
 	start_date TEXT NOT NULL,
 	end_date TEXT NOT NULL,
-	status TEXT DEFAULT '有效',
+	status TEXT DEFAULT 'Active',
 	claim_count INTEGER DEFAULT 0,
 	total_claim_amount REAL DEFAULT 0,
 	agent_name TEXT,
@@ -391,8 +391,8 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	start_location TEXT NOT NULL,
 	end_location TEXT NOT NULL,
 	route_id INTEGER,
-	status TEXT NOT NULL DEFAULT '待审批',
-	priority TEXT DEFAULT '普通',
+	status TEXT NOT NULL DEFAULT 'Pending',
+	priority TEXT DEFAULT 'Normal',
 	approver TEXT,
 	approved_at TEXT,
 	reject_reason TEXT,
@@ -413,7 +413,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	heading REAL,
 	altitude REAL,
 	location_name TEXT,
-	status TEXT DEFAULT '行驶',
+	status TEXT DEFAULT 'Moving',
 	recorded_at TEXT NOT NULL,
 	created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )`,
@@ -422,7 +422,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	vehicle_id INTEGER,
 	driver_id INTEGER,
 	alert_type TEXT NOT NULL,
-	severity TEXT DEFAULT '中',
+	severity TEXT DEFAULT 'Medium',
 	title TEXT NOT NULL,
 	description TEXT,
 	location TEXT,
@@ -431,7 +431,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	speed REAL,
 	threshold_value TEXT,
 	actual_value TEXT,
-	status TEXT DEFAULT '未处理',
+	status TEXT DEFAULT 'Unhandled',
 	handler TEXT,
 	handled_at TEXT,
 	handle_result TEXT,
@@ -439,6 +439,13 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 	created_at TEXT NOT NULL DEFAULT (datetime('now')),
 	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
 	deleted_at TEXT
+)`,
+		`CREATE TABLE IF NOT EXISTS vehicle_capabilities (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	vehicle_id INTEGER NOT NULL,
+	capability TEXT NOT NULL,
+	description TEXT,
+	created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )`,
 	}
 
@@ -476,6 +483,8 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 		`CREATE INDEX IF NOT EXISTS idx_alerts_vehicle ON alerts(vehicle_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status)`,
 		`CREATE INDEX IF NOT EXISTS idx_alerts_alert_time ON alerts(alert_time)`,
+		`CREATE INDEX IF NOT EXISTS idx_vc_vehicle ON vehicle_capabilities(vehicle_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_vc_capability ON vehicle_capabilities(capability)`,
 	}
 
 	for _, idx := range indexes {
@@ -490,6 +499,7 @@ func createFleetTables(ctx context.Context, db *sql.DB) error {
 func seedFleetData(ctx context.Context, db *sql.DB) error {
 	// 先清理已有数据（防止重复插入）
 	cleanTables := []string{
+		"DELETE FROM vehicle_capabilities",
 		"DELETE FROM gps_tracking",
 		"DELETE FROM alerts",
 		"DELETE FROM reservations",
@@ -509,115 +519,158 @@ func seedFleetData(ctx context.Context, db *sql.DB) error {
 	}
 	fmt.Println("  🧹 已清理旧数据")
 
-	// ---- 1. 车辆 (20辆) ----
+	// ---- 1. Vehicles (20) ----
 	vehicleSQL := `
 INSERT INTO vehicles (id, plate_number, vin, brand, model, vehicle_type, color, engine_no, purchase_date, purchase_price, mileage, fuel_type, fuel_tank_capacity, seat_count, status, department, gps_device_id, annual_inspection_date, insurance_expire_date, notes) VALUES
-(1, '京A88001', 'LVHRU5849N5012345', '比亚迪', '汉EV', '新能源', '极光白', NULL, '2023-03-15', 259800.00, 42580, '电动', NULL, 5, '在线', '总裁办', 'GPS-001', '2025-03-15', '2025-03-15', '总裁专车'),
-(2, '京A88002', 'LVHRU5849N5012346', '特斯拉', 'Model Y', '新能源', '珍珠白', NULL, '2023-05-20', 299900.00, 38200, '电动', NULL, 5, '在线', '销售部', 'GPS-002', '2025-05-20', '2025-05-20', '销售总监用车'),
-(3, '京A88003', 'LSVAU2180N2123456', '大众', '帕萨特', '轿车', '星空黑', 'EA888-301', '2022-08-10', 218900.00, 67800, '汽油', 66.00, 5, '在线', '行政部', 'GPS-003', '2024-08-10', '2025-08-10', '商务接待用车'),
-(4, '京A88004', 'LSVAU2180N2123457', '丰田', '凯美瑞', '轿车', '铂金白', '2.5L-A25A', '2022-06-15', 179800.00, 55200, '汽油', 60.00, 5, '离线', '市场部', 'GPS-004', '2024-06-15', '2025-06-15', '外出未归'),
-(5, '京B66005', 'LGWEF4A47NF012345', '哈弗', 'H6', 'SUV', '赤焰红', 'GW4C20', '2022-11-01', 139900.00, 48600, '汽油', 58.00, 5, '在线', '技术部', 'GPS-005', '2024-11-01', '2025-11-01', NULL),
-(6, '京B66006', 'LGWEF4A47NF012346', '理想', 'L7', 'SUV', '银灰色', NULL, '2023-07-10', 339800.00, 28900, '混合动力', 65.00, 6, '在线', '产品部', 'GPS-006', '2025-07-10', '2025-07-10', '增程式混动'),
-(7, '京C55007', 'LFV2A2157N3012345', '福田', '欧马可', '货车', '蓝色', 'ISF3.8', '2021-09-20', 168000.00, 125000, '柴油', 120.00, 3, '在线', '物流部', 'GPS-007', '2024-09-20', '2025-09-20', '4.2米厢式货车'),
-(8, '京C55008', 'LFV2A2157N3012346', '江铃', '顺达', '货车', '白色', 'JX493ZLQ5', '2022-01-15', 128000.00, 98000, '柴油', 100.00, 3, '维修中', '物流部', 'GPS-008', '2024-01-15', '2025-01-15', '变速箱异响维修中'),
-(9, '京D77009', 'LNBSCCAK5ND012345', '宇通', 'ZK6826', '客车', '白色', 'YC4FA130', '2021-05-10', 380000.00, 180000, '柴油', 200.00, 33, '离线', '行政部', 'GPS-009', '2024-05-10', '2025-05-10', '33座通勤班车，周末停运'),
-(10, '京D77010', 'LNBSCCAK5ND012346', '金龙', 'XMQ6127', '客车', '银色', 'ISLe340', '2022-03-01', 520000.00, 145000, '柴油', 300.00, 49, '离线', '行政部', 'GPS-010', '2024-03-01', '2025-03-01', '49座大客车，周末停运'),
-(11, '京A88011', 'LVSHCFAE5NF012345', '比亚迪', '秦PLUS DM-i', '新能源', '时光灰', NULL, '2023-09-01', 139800.00, 22000, '混合动力', 48.00, 5, '维修中', '人力资源部', 'GPS-011', '2025-09-01', '2025-09-01', '电池检测中'),
-(12, '京A88012', 'LVSHCFAE5NF012346', '奔驰', 'E300L', '轿车', '曜岩黑', 'M264-920', '2022-04-20', 498000.00, 62000, '汽油', 66.00, 5, '离线', '财务部', 'GPS-012', '2024-04-20', '2025-04-20', '财务总监出差中'),
-(13, '京B66013', 'LSJA24U37NF012345', 'MG', 'MG ONE', 'SUV', '曜影黑', '15E4E', '2023-01-10', 129900.00, 32000, '汽油', 50.00, 5, '离线', '行政部', 'GPS-013', '2025-01-10', '2025-01-10', 'GPS信号异常'),
-(14, '京C55014', 'LFV2A2157N3012347', '福田', '奥铃CTS', '货车', '蓝色', 'ISF2.8', '2022-07-01', 145000.00, 88000, '柴油', 100.00, 3, '维修中', '物流部', 'GPS-014', '2024-07-01', '2025-07-01', '发动机故障维修中'),
-(15, '京A88015', 'LVHRU5849N5012347', '蔚来', 'ES6', 'SUV', '星云紫', NULL, '2023-11-15', 368000.00, 15000, '电动', NULL, 5, '在线', '研发部', 'GPS-015', '2025-11-15', '2025-11-15', NULL),
-(16, '京A88016', 'LVHRU5849N5012348', '小鹏', 'P7', '新能源', '天辰灰', NULL, '2023-08-20', 249900.00, 20000, '电动', NULL, 5, '在线', '运营部', 'GPS-016', '2025-08-20', '2025-08-20', NULL),
-(17, '京B66017', 'LGWEF4A47NF012347', '长安', 'UNI-V', '轿车', '赤焰红', 'JL476ZQCF', '2023-04-01', 109900.00, 28000, '汽油', 53.00, 5, '停运', '客服部', 'GPS-017', '2025-04-01', '2025-04-01', '暂停使用，待分配'),
-(18, '京C55018', 'LFV2A2157N3012348', '东风', 'EV18', '货车', '白色', NULL, '2023-06-01', 198000.00, 35000, '电动', NULL, 3, '停运', '物流部', 'GPS-018', '2025-06-01', '2025-06-01', '纯电动厢式货车，充电桩维修暂停'),
-(19, '京A88019', 'LSVAU2180N2123458', '本田', '雅阁', '轿车', '极光蓝', 'L15CG', '2022-10-10', 179800.00, 51000, '汽油', 56.00, 5, '已报废', '法务部', 'GPS-019', '2024-10-10', '2025-10-10', '发动机报废'),
-(20, '京A88020', 'LVHRU5849N5012349', '极氪', '001', '新能源', '暮光金', NULL, '2024-01-05', 309000.00, 8000, '电动', NULL, 5, '已报废', '设计部', 'GPS-020', '2026-01-05', '2026-01-05', '碰撞事故报废');
+(1,  'SBA1001A', 'JTDKN3DU5N5012345', 'Mercedes-Benz', 'S450L',      'Sedan',  'Obsidian Black', 'M256-E30', '2023-03-15', 498000.00, 42580, 'Petrol',   66.00,  5,  'Online',         'CEO Office',   'GPS-001', '2025-03-15', '2025-03-15', 'CEO dedicated car'),
+(2,  'SBA2002B', 'JTDKN3DU5N5012346', 'Tesla',          'Model Y',    'EV',     'Pearl White',    NULL,       '2023-05-20', 89990.00,  38200, 'Electric', NULL,   5,  'Online',         'Sales',        'GPS-002', '2025-05-20', '2025-05-20', 'Sales Director'),
+(3,  'SBB3003C', 'LSVAU2180N2123456', 'Toyota',         'Camry 2.5',  'Sedan',  'Midnight Black', 'A25A-FKS', '2022-08-10', 189000.00, 67800, 'Petrol',   60.00,  5,  'Online',         'Admin',        'GPS-003', '2024-08-10', '2025-08-10', 'Business reception'),
+(4,  'SBB4004D', 'LSVAU2180N2123457', 'Honda',          'Civic 1.5T', 'Sedan',  'Platinum White', 'L15C7',    '2022-06-15', 135000.00, 55200, 'Petrol',   47.00,  5,  'Offline',        'Marketing',    'GPS-004', '2024-06-15', '2025-06-15', 'Out for client visit'),
+(5,  'SBC5005E', 'LGWEF4A47NF012345', 'Toyota',         'Fortuner',   'SUV',    'Attitude Black', '2GD-FTV',  '2022-11-01', 198000.00, 48600, 'Diesel',   80.00,  7,  'Online',         'Engineering',  'GPS-005', '2024-11-01', '2025-11-01', NULL),
+(6,  'SBC6006F', 'LGWEF4A47NF012346', 'BMW',            'X5 xDrive',  'SUV',    'Space Grey',     'B58B30',   '2023-07-10', 378000.00, 28900, 'Petrol',   83.00,  5,  'Online',         'Product',      'GPS-006', '2025-07-10', '2025-07-10', 'Executive SUV'),
+(7,  'SBD7007G', 'LFV2A2157N3012345', 'Mitsubishi',     'Fuso Canter', 'Truck', 'Blue',           '4P10-T6',  '2021-09-20', 128000.00, 125000, 'Diesel',  100.00, 3,  'Online',         'Logistics',    'GPS-007', '2024-09-20', '2025-09-20', '14ft box truck'),
+(8,  'SBD8008H', 'LFV2A2157N3012346', 'Isuzu',          'NLR77',      'Truck',  'White',          '4JH1-TC',  '2022-01-15', 98000.00,  98000,  'Diesel',  80.00,  3,  'Maintenance',    'Logistics',    'GPS-008', '2024-01-15', '2025-01-15', 'Gearbox issue under repair'),
+(9,  'SBE9009J', 'LNBSCCAK5ND012345', 'Yutong',         'ZK6826H',   'Bus',    'White',          'YC4FA130', '2021-05-10', 320000.00, 180000, 'Diesel',  200.00, 33, 'Offline',        'Admin',        'GPS-009', '2024-05-10', '2025-05-10', '33-seat shuttle bus, off on weekends'),
+(10, 'SBE1010K', 'LNBSCCAK5ND012346', 'Zhongtong',      'LCK6127H',  'Bus',    'Silver',         'ISLe340',  '2022-03-01', 420000.00, 145000, 'Diesel',  300.00, 49, 'Offline',        'Admin',        'GPS-010', '2024-03-01', '2025-03-01', '49-seat coach, off on weekends'),
+(11, 'SBF1011L', 'LVSHCFAE5NF012345', 'Hyundai',        'Ioniq 5',    'EV',     'Gravity Grey',   NULL,       '2023-09-01', 209000.00, 22000,  'Electric', NULL,  5,  'Maintenance',    'HR',           'GPS-011', '2025-09-01', '2025-09-01', 'Battery health check'),
+(12, 'SBF1012M', 'LVSHCFAE5NF012346', 'Mercedes-Benz',  'E200',       'Sedan',  'Selenite Grey',  'M254-E20', '2022-04-20', 328000.00, 62000,  'Petrol',  66.00,  5,  'Offline',        'Finance',      'GPS-012', '2024-04-20', '2025-04-20', 'CFO on business trip'),
+(13, 'SBG1013N', 'LSJA24U37NF012345', 'Toyota',         'Corolla Cross', 'SUV', 'Celestite Grey', '2ZR-FXE',  '2023-01-10', 169000.00, 32000,  'Hybrid',  43.00,  5,  'Offline',        'Admin',        'GPS-013', '2025-01-10', '2025-01-10', 'GPS signal issue'),
+(14, 'SBG1014P', 'LFV2A2157N3012347', 'Isuzu',          'NPR75',      'Truck',  'Blue',           '4HK1-TC',  '2022-07-01', 115000.00, 88000,  'Diesel',  100.00, 3,  'Maintenance',    'Logistics',    'GPS-014', '2024-07-01', '2025-07-01', 'Engine fault under repair'),
+(15, 'SBH1015Q', 'LVHRU5849N5012347', 'BMW',            'iX3',        'SUV',    'Phytonic Blue',  NULL,       '2023-11-15', 298000.00, 15000,  'Electric', NULL,  5,  'Online',         'R&D',          'GPS-015', '2025-11-15', '2025-11-15', NULL),
+(16, 'SBH1016R', 'LVHRU5849N5012348', 'BYD',            'Atto 3',     'EV',     'Boulder Grey',   NULL,       '2023-08-20', 52000.00,  20000,  'Electric', NULL,  5,  'Online',         'Operations',   'GPS-016', '2025-08-20', '2025-08-20', NULL),
+(17, 'SBJ1017S', 'LGWEF4A47NF012347', 'Toyota',         'Vios',       'Sedan',  'Red Mica',       '2NR-FE',   '2023-04-01', 95000.00,  28000,  'Petrol',  42.00,  5,  'Suspended',      'Customer Svc', 'GPS-017', '2025-04-01', '2025-04-01', 'Suspended, pending reassignment'),
+(18, 'SBJ1018T', 'LFV2A2157N3012348', 'BYD',            'T3',         'Truck',  'White',          NULL,       '2023-06-01', 78000.00,  35000,  'Electric', NULL,  3,  'Suspended',      'Logistics',    'GPS-018', '2025-06-01', '2025-06-01', 'EV van, charger under repair'),
+(19, 'SBK1019U', 'LSVAU2180N2123458', 'Nissan',         'Sylphy',     'Sedan',  'Brilliant Silver','MR20DD',  '2022-10-10', 105000.00, 51000,  'Petrol',  52.00,  5,  'Decommissioned', 'Legal',        'GPS-019', '2024-10-10', '2025-10-10', 'Engine failure, scrapped'),
+(20, 'SBK1020V', 'LVHRU5849N5012349', 'Tesla',          'Model 3',    'EV',     'Midnight Silver', NULL,      '2024-01-05', 72000.00,  8000,   'Electric', NULL,  5,  'Decommissioned', 'Design',       'GPS-020', '2026-01-05', '2026-01-05', 'Collision accident, scrapped');
 `
 	if _, err := db.ExecContext(ctx, vehicleSQL); err != nil {
 		return fmt.Errorf("插入车辆数据: %w", err)
 	}
 	fmt.Println("  🚗 已插入 20 辆车辆")
 
-	// ---- 2. 驾驶员 (18人) ----
+	// ---- 1b. Vehicle Capabilities ----
+	capSQL := `
+INSERT INTO vehicle_capabilities (vehicle_id, capability, description) VALUES
+(1,  'VIP Reception',     'Premium leather seats, rear independent A/C, ideal for VIP reception'),
+(1,  'Long Distance',     'Full tank range 800km+, suitable for long trips'),
+(2,  'VIP Reception',     'Tesla premium EV, great for business reception'),
+(2,  'Long Distance',     'Range 550km+, suitable for long trips'),
+(3,  'Business Use',      'Mid-size sedan, suitable for general business use'),
+(3,  'Long Distance',     'Large fuel tank, range 800km+'),
+(4,  'Business Use',      'Compact sedan, daily business transport'),
+(5,  'Off-Road',          'SUV with high ground clearance, handles unpaved roads'),
+(5,  'Bulky Cargo',       'Large boot space, suitable for transporting bulky items'),
+(6,  'VIP Reception',     'Luxury SUV, suitable for high-end reception'),
+(6,  'Off-Road',          'All-terrain capability for rough roads'),
+(6,  'Long Distance',     'Petrol with large tank, range over 900km'),
+(7,  'Cargo Transport',   '14ft box truck, max payload 4 tonnes'),
+(7,  'Bulky Cargo',       'Cargo box can transport large equipment and materials'),
+(7,  'Heavy Equipment',   'Equipped with hydraulic tailgate for heavy equipment loading'),
+(8,  'Cargo Transport',   'Box truck, max payload 3 tonnes'),
+(8,  'Bulky Cargo',       'Suitable for transporting medium equipment'),
+(9,  'Group Transport',   '33-seat bus, suitable for team outings'),
+(9,  'Shuttle Service',   'Daily morning/evening shuttle service'),
+(10, 'Group Transport',   '49-seat coach, suitable for large groups'),
+(10, 'Shuttle Service',   'Shuttle bus service'),
+(10, 'Long Distance',     'Coach long-distance transport capability'),
+(11, 'Daily Commute',     'Economy EV, suitable for short daily trips'),
+(12, 'VIP Reception',     'Mercedes E-Class, top choice for business reception'),
+(12, 'Long Distance',     'Comfortable sedan for long business trips'),
+(13, 'Daily Commute',     'Compact SUV hybrid, daily commute'),
+(14, 'Cargo Transport',   'Medium truck, suitable for city delivery'),
+(15, 'VIP Reception',     'BMW electric SUV, high-tech appeal'),
+(15, 'Off-Road',          'Electric SUV with good ground clearance'),
+(16, 'Daily Commute',     'Electric car, city commuting'),
+(16, 'Long Distance',     'Range over 400km'),
+(17, 'Daily Commute',     'Compact sedan, daily use'),
+(18, 'Cargo Transport',   'Electric van, green city delivery'),
+(18, 'Bulky Cargo',       'Electric truck, suitable for medium cargo');
+`
+	if _, err := db.ExecContext(ctx, capSQL); err != nil {
+		return fmt.Errorf("insert vehicle capabilities: %w", err)
+	}
+	fmt.Println("  🏷️  Inserted 34 vehicle capability tags")
+
+	// ---- 2. Drivers (18) ----
 	driverSQL := `
 INSERT INTO drivers (id, name, gender, phone, id_card, license_no, license_type, license_expire_date, hire_date, department, status, assigned_vehicle_id, emergency_contact, emergency_phone, address, driving_years, violation_count, accident_count, rating, notes) VALUES
-(1,  '张建国', '男', '13800138001', '110101198501011234', 'D110101198501011234', 'C1', '2026-05-01', '2020-03-01', '总裁办',     '在岗', 1,  '张秀英', '13900139001', '北京市朝阳区望京街道', 15, 0, 0, 5.0, '总裁专职司机'),
-(2,  '李明辉', '男', '13800138002', '110102198802022345', 'D110102198802022345', 'C1', '2025-08-15', '2021-06-15', '销售部',     '在岗', 2,  '李萍',   '13900139002', '北京市海淀区中关村',   12, 1, 0, 4.8, NULL),
-(3,  '王晓东', '男', '13800138003', '110103199003033456', 'D110103199003033456', 'B2', '2026-03-20', '2019-01-10', '行政部',     '在岗', 3,  '王芳',   '13900139003', '北京市西城区金融街',   10, 2, 0, 4.6, '兼职班车驾驶'),
-(4,  '赵丽娟', '女', '13800138004', '110104199204044567', 'D110104199204044567', 'C1', '2025-12-10', '2021-09-01', '市场部',     '在岗', 4,  '赵伟',   '13900139004', '北京市丰台区总部基地', 8,  0, 0, 4.9, NULL),
-(5,  '刘强',   '男', '13800138005', '110105198706055678', 'D110105198706055678', 'B2', '2026-07-01', '2018-04-15', '技术部',     '在岗', 5,  '刘洋',   '13900139005', '北京市大兴区亦庄',     13, 1, 1, 4.5, NULL),
-(6,  '陈伟',   '男', '13800138006', '110106198908066789', 'D110106198908066789', 'C1', '2026-01-20', '2022-02-01', '产品部',     '在岗', 6,  '陈红',   '13900139006', '北京市通州区运河商务区', 11, 0, 0, 4.7, NULL),
-(7,  '杨海军', '男', '13800138007', '110107198509077890', 'D110107198509077890', 'A2', '2025-09-15', '2017-06-01', '物流部',     '在岗', 7,  '杨梅',   '13900139007', '北京市顺义区空港',     15, 3, 1, 4.3, '大型货车专职司机'),
-(8,  '周建明', '男', '13800138008', '110108198710088901', 'D110108198710088901', 'A2', '2026-02-28', '2018-09-01', '物流部',     '在岗', 8,  '周丽',   '13900139008', '北京市昌平区回龙观',   13, 2, 0, 4.4, NULL),
-(9,  '吴国强', '男', '13800138009', '110109198611099012', 'D110109198611099012', 'A1', '2025-11-30', '2016-03-15', '行政部',     '在岗', 9,  '吴秀兰', '13900139009', '北京市房山区良乡',     14, 1, 0, 4.6, '班车驾驶员'),
-(10, '孙志刚', '男', '13800138010', '110110198412100123', 'D110110198412100123', 'A1', '2026-06-15', '2015-08-01', '行政部',     '在岗', 10, '孙丽华', '13900139010', '北京市石景山区鲁谷',   16, 0, 0, 4.8, '大客车驾驶员'),
-(11, '黄婷婷', '女', '13800138011', '110111199305111234', 'D110111199305111234', 'C1', '2027-03-01', '2022-07-01', '人力资源部', '在岗', 11, '黄军',   '13900139011', '北京市朝阳区三里屯',   7,  0, 0, 4.9, NULL),
-(12, '朱鹏飞', '男', '13800138012', '110112199106122345', 'D110112199106122345', 'C1', '2025-06-20', '2020-11-01', '财务部',     '在岗', 12, '朱颖',   '13900139012', '北京市东城区东直门',   9,  1, 0, 4.5, NULL),
-(13, '林峰',   '男', '13800138013', '110113198807133456', 'D110113198807133456', 'C1', '2026-04-10', '2021-03-01', '行政部',     '休假', 13, '林红',   '13900139013', '北京市朝阳区双井',     12, 0, 0, 4.7, '年假中'),
-(14, '徐龙',   '男', '13800138014', '110114198609144567', 'D110114198609144567', 'A2', '2025-10-05', '2019-05-01', '物流部',     '在岗', 14, '徐静',   '13900139014', '北京市丰台区花乡',     14, 4, 2, 4.0, '车辆维修中暂时待命'),
-(15, '马晓峰', '男', '13800138015', '110115199208155678', 'D110115199208155678', 'C1', '2027-01-15', '2023-01-01', '研发部',     '在岗', 15, '马丽',   '13900139015', '北京市海淀区上地',     8,  0, 0, 5.0, NULL),
-(16, '郑宇航', '男', '13800138016', '110116199409166789', 'D110116199409166789', 'C1', '2026-09-30', '2023-03-01', '运营部',     '在岗', 16, '郑萍',   '13900139016', '北京市朝阳区国贸',     6,  0, 0, 4.8, NULL),
-(17, '谢建华', '男', '13800138017', '110117199010177890', 'D110117199010177890', 'C1', '2026-05-20', '2022-05-01', '客服部',     '在岗', 17, '谢芳',   '13900139017', '北京市西城区西直门',   10, 1, 0, 4.6, NULL),
-(18, '何志远', '男', '13800138018', '110118198811188901', 'D110118198811188901', 'B2', '2025-12-25', '2020-08-01', '物流部',     '在岗', 18, '何丽',   '13900139018', '北京市大兴区黄村',     12, 0, 0, 4.7, '电动货车驾驶');
+(1,  'Tan Wei Ming',       'M', '81234501', 'S8501011A', 'DL-S8501011A', 'Class 3',  '2026-05-01', '2020-03-01', 'CEO Office',    'Active',   1,  'Tan Siew Eng',     '91234501', 'Blk 123 Orchard Road #08-01',       15, 0, 0, 5.0, 'CEO dedicated driver'),
+(2,  'Ahmad bin Ismail',   'M', '81234502', 'S8802022B', 'DL-S8802022B', 'Class 3',  '2025-08-15', '2021-06-15', 'Sales',         'Active',   2,  'Fatimah bte Osman','91234502', 'Blk 456 Tampines St 21 #12-05',     12, 1, 0, 4.8, NULL),
+(3,  'Raj Kumar',          'M', '81234503', 'S9003033C', 'DL-S9003033C', 'Class 4',  '2026-03-20', '2019-01-10', 'Admin',         'Active',   3,  'Priya Devi',       '91234503', '15 Bukit Timah Road',               10, 2, 0, 4.6, 'Part-time bus driver'),
+(4,  'Chen Li Hua',        'F', '81234504', 'S9204044D', 'DL-S9204044D', 'Class 3',  '2025-12-10', '2021-09-01', 'Marketing',     'Active',   4,  'Chen Wei',         '91234504', 'Blk 789 Jurong West St 61 #05-03',  8,  0, 0, 4.9, NULL),
+(5,  'Muhammad Rizal',     'M', '81234505', 'S8706055E', 'DL-S8706055E', 'Class 4',  '2026-07-01', '2018-04-15', 'Engineering',   'Active',   5,  'Nur Aisyah',       '91234505', '28 Pasir Ris Drive 4',              13, 1, 1, 4.5, NULL),
+(6,  'Lim Kah Seng',       'M', '81234506', 'S8908066F', 'DL-S8908066F', 'Class 3',  '2026-01-20', '2022-02-01', 'Product',       'Active',   6,  'Lim Mei Ling',     '91234506', '5 Tanjong Pagar Road',              11, 0, 0, 4.7, NULL),
+(7,  'Siva Rajan',         'M', '81234507', 'S8509077G', 'DL-S8509077G', 'Class 4',  '2025-09-15', '2017-06-01', 'Logistics',     'Active',   7,  'Lakshmi',          '91234507', 'Blk 301 Woodlands Ave 1 #09-11',    15, 3, 1, 4.3, 'Heavy vehicle specialist'),
+(8,  'Ong Beng Huat',      'M', '81234508', 'S8710088H', 'DL-S8710088H', 'Class 4',  '2026-02-28', '2018-09-01', 'Logistics',     'Active',   8,  'Ong Siew Lan',     '91234508', 'Blk 520 Ang Mo Kio Ave 10 #03-07',  13, 2, 0, 4.4, NULL),
+(9,  'Abdul Rahman',       'M', '81234509', 'S8611099J', 'DL-S8611099J', 'Class 5',  '2025-11-30', '2016-03-15', 'Admin',         'Active',   9,  'Aminah bte Yusof', '91234509', 'Blk 102 Hougang Ave 1 #06-15',      14, 1, 0, 4.6, 'Bus driver'),
+(10, 'Goh Chee Keong',     'M', '81234510', 'S8412100K', 'DL-S8412100K', 'Class 5',  '2026-06-15', '2015-08-01', 'Admin',         'Active',   10, 'Goh Mei Fong',     '91234510', 'Blk 205 Toa Payoh Lor 8 #11-02',    16, 0, 0, 4.8, 'Coach driver'),
+(11, 'Nurul Huda',         'F', '81234511', 'S9305111L', 'DL-S9305111L', 'Class 3',  '2027-03-01', '2022-07-01', 'HR',            'Active',   11, 'Hakim bin Ali',    '91234511', 'Blk 88 Bedok North Road #07-22',    7,  0, 0, 4.9, NULL),
+(12, 'David Tan',          'M', '81234512', 'S9106122M', 'DL-S9106122M', 'Class 3',  '2025-06-20', '2020-11-01', 'Finance',       'Active',   12, 'Sarah Tan',        '91234512', '10 Holland Road',                   9,  1, 0, 4.5, NULL),
+(13, 'Kevin Wong',         'M', '81234513', 'S8807133N', 'DL-S8807133N', 'Class 3',  '2026-04-10', '2021-03-01', 'Admin',         'On Leave', 13, 'Jenny Wong',       '91234513', 'Blk 150 Bishan St 11 #04-08',       12, 0, 0, 4.7, 'On annual leave'),
+(14, 'Suresh Naidu',       'M', '81234514', 'S8609144P', 'DL-S8609144P', 'Class 4',  '2025-10-05', '2019-05-01', 'Logistics',     'Active',   14, 'Meera',            '91234514', 'Blk 410 Yishun Ring Road #08-03',    14, 4, 2, 4.0, 'Vehicle under repair, on standby'),
+(15, 'Jason Lee',          'M', '81234515', 'S9208155Q', 'DL-S9208155Q', 'Class 3',  '2027-01-15', '2023-01-01', 'R&D',           'Active',   15, 'Michelle Lee',     '91234515', '22 Clementi Road',                  8,  0, 0, 5.0, NULL),
+(16, 'Priscilla Teo',      'F', '81234516', 'S9409166R', 'DL-S9409166R', 'Class 3',  '2026-09-30', '2023-03-01', 'Operations',    'Active',   16, 'Teo Ah Kow',       '91234516', 'Blk 330 Bukit Batok St 33 #02-11',  6,  0, 0, 4.8, NULL),
+(17, 'Alvin Chua',         'M', '81234517', 'S9010177S', 'DL-S9010177S', 'Class 3',  '2026-05-20', '2022-05-01', 'Customer Svc',  'Active',   17, 'Chua Bee Lian',    '91234517', 'Blk 620 Sengkang East Way #10-05',  10, 1, 0, 4.6, NULL),
+(18, 'Hafiz bin Osman',    'M', '81234518', 'S8811188T', 'DL-S8811188T', 'Class 4',  '2025-12-25', '2020-08-01', 'Logistics',     'Active',   18, 'Siti Nor',         '91234518', 'Blk 230 Choa Chu Kang Ave 1 #09-04',12, 0, 0, 4.7, 'EV truck driver');
 `
 	if _, err := db.ExecContext(ctx, driverSQL); err != nil {
-		return fmt.Errorf("插入驾驶员数据: %w", err)
+		return fmt.Errorf("insert driver data: %w", err)
 	}
-	fmt.Println("  👤 已插入 18 名驾驶员")
+	fmt.Println("  👤 Inserted 18 drivers")
 
-	// ---- 3. 路线 (10条) ----
+	// ---- 3. Routes (10) ----
 	routeSQL := `
 INSERT INTO routes (id, name, route_code, start_point, end_point, distance_km, estimated_duration_min, route_type, status, notes) VALUES
-(1, '总部-首都机场',       'R001', '北京市朝阳区望京SOHO',    '首都国际机场T3航站楼', 25.50, 45, '市内', '启用', '机场接送专线'),
-(2, '总部-大兴机场',       'R002', '北京市朝阳区望京SOHO',    '大兴国际机场',         65.00, 80, '市内', '启用', '大兴机场接送'),
-(3, '总部-亦庄园区',       'R003', '北京市朝阳区望京SOHO',    '北京经济技术开发区',   30.00, 50, '市内', '启用', '日常通勤线路'),
-(4, '总部-中关村软件园',   'R004', '北京市朝阳区望京SOHO',    '海淀区中关村软件园',   15.00, 35, '市内', '启用', '技术部通勤'),
-(5, '北京-天津',           'R005', '北京市朝阳区望京SOHO',    '天津市滨海新区',      145.00, 120, '城际', '启用', '天津分公司'),
-(6, '北京-雄安',           'R006', '北京市朝阳区望京SOHO',    '雄安新区启动区',      120.00, 100, '城际', '启用', '雄安项目'),
-(7, '仓库-客户A',          'R007', '顺义区空港物流园',        '朝阳区CBD',           35.00, 55, '市内', '启用', '固定配送线路'),
-(8, '仓库-客户B',          'R008', '顺义区空港物流园',        '丰台区总部基地',       40.00, 60, '市内', '启用', '固定配送线路'),
-(9, '北京-上海',           'R009', '北京市朝阳区望京SOHO',    '上海市浦东新区',     1200.00, 780, '长途', '启用', '长途出差线路'),
-(10, '员工班车-回龙观线',  'R010', '昌平区回龙观',            '朝阳区望京SOHO',       20.00, 40, '专线', '启用', '通勤班车线路');
+(1,  'HQ-Changi Airport',     'R001', 'Raffles Place, CBD',         'Changi Airport T3',           22.00, 30, 'City',    'Active', 'Airport transfer route'),
+(2,  'HQ-Tuas Industrial',    'R002', 'Raffles Place, CBD',         'Tuas Industrial Estate',      35.00, 45, 'City',    'Active', 'Logistics hub route'),
+(3,  'HQ-Jurong Office',      'R003', 'Raffles Place, CBD',         'Jurong East, Westgate Tower', 20.00, 35, 'City',    'Active', 'Branch office commute'),
+(4,  'HQ-One North Tech Park','R004', 'Raffles Place, CBD',         'One North, Fusionopolis',     12.00, 25, 'City',    'Active', 'Engineering commute'),
+(5,  'SG-JB (Malaysia)',      'R005', 'Raffles Place, CBD',         'Johor Bahru, CIQ',            30.00, 90, 'Cross-Border','Active', 'JB branch office'),
+(6,  'HQ-Changi Business Park','R006','Raffles Place, CBD',         'Changi Business Park',        18.00, 30, 'City',    'Active', 'Tech campus route'),
+(7,  'Warehouse-Client A',    'R007', 'Tuas Warehouse',             'Marina Bay Financial Centre', 38.00, 50, 'City',    'Active', 'Fixed delivery route'),
+(8,  'Warehouse-Client B',    'R008', 'Tuas Warehouse',             'Mapletree Business City',     25.00, 35, 'City',    'Active', 'Fixed delivery route'),
+(9,  'HQ-Sentosa',            'R009', 'Raffles Place, CBD',         'Sentosa, Resorts World',      10.00, 20, 'City',    'Active', 'Corporate events'),
+(10, 'Shuttle-Woodlands',     'R010', 'Woodlands MRT',              'Raffles Place, CBD',          25.00, 45, 'Shuttle', 'Active', 'Staff shuttle route');
 `
 	if _, err := db.ExecContext(ctx, routeSQL); err != nil {
-		return fmt.Errorf("插入路线数据: %w", err)
+		return fmt.Errorf("insert route data: %w", err)
 	}
-	fmt.Println("  🗺️  已插入 10 条路线")
+	fmt.Println("  🗺️  Inserted 10 routes")
 
-	// ---- 4. 行程记录 (30条) ----
+	// ---- 4. Trip Records (30) ----
 	now := time.Now()
 	tripSQL := fmt.Sprintf(`
 INSERT INTO trips (id, trip_no, vehicle_id, driver_id, route_id, start_time, end_time, start_location, end_location, start_mileage, end_mileage, distance_km, fuel_consumed, purpose, status, passenger_count, max_speed, avg_speed, notes) VALUES
-(1,  'TR20250201001', 1,  1,  1,  '%s', '%s', '望京SOHO', '首都机场T3', 42100, 42126, 25.50, NULL,  '接送贵宾',     '已完成', 2, 80.00, 35.00, NULL),
-(2,  'TR20250201002', 3,  3,  3,  '%s', '%s', '望京SOHO', '亦庄园区',   67300, 67330, 30.00, 3.80,  '商务会议',     '已完成', 3, 90.00, 42.00, NULL),
-(3,  'TR20250202001', 7,  7,  7,  '%s', '%s', '空港物流园', '朝阳CBD',  124500, 124535, 35.00, 8.50, '货物配送',     '已完成', 0, 70.00, 38.00, '配送3吨货物'),
-(4,  'TR20250202002', 2,  2,  2,  '%s', '%s', '望京SOHO', '大兴机场',   37800, 37865, 65.00, NULL,  '客户接送',     '已完成', 1, 110.00, 55.00, NULL),
-(5,  'TR20250203001', 9,  9,  10, '%s', '%s', '回龙观',    '望京SOHO',  179500, 179520, 20.00, 5.50, '通勤班车',     '已完成', 28, 60.00, 30.00, '早班车'),
-(6,  'TR20250203002', 4,  4,  4,  '%s', '%s', '望京SOHO', '中关村软件园', 54900, 54915, 15.00, 1.80, '客户拜访',    '已完成', 2, 70.00, 28.00, NULL),
-(7,  'TR20250204001', 5,  5,  5,  '%s', '%s', '望京SOHO', '天津滨海',   48200, 48345, 145.00, 12.50, '出差',        '已完成', 3, 120.00, 75.00, '天津分公司出差'),
-(8,  'TR20250204002', 8,  8,  8,  '%s', '%s', '空港物流园', '丰台总部基地', 97600, 97640, 40.00, 9.00, '货物配送',  '已完成', 0, 65.00, 40.00, NULL),
-(9,  'TR20250205001', 6,  6,  6,  '%s', '%s', '望京SOHO', '雄安新区',   28500, 28620, 120.00, 8.00, '项目考察',     '已完成', 4, 130.00, 72.00, NULL),
-(10, 'TR20250205002', 10, 10, 10, '%s', '%s', '回龙观',    '望京SOHO',  144600, 144620, 20.00, 6.00, '通勤班车',   '已完成', 42, 55.00, 30.00, '早班车'),
-(11, 'TR20250206001', 11, 11, 3,  '%s', '%s', '望京SOHO', '亦庄园区',   21700, 21730, 30.00, 2.00, '行政办事',     '已完成', 1, 85.00, 38.00, NULL),
-(12, 'TR20250206002', 12, 12, 1,  '%s', '%s', '望京SOHO', '首都机场T3', 61600, 61626, 25.50, 3.20, '接送领导',     '已完成', 1, 75.00, 34.00, NULL),
-(13, 'TR20250207001', 15, 15, 4,  '%s', '%s', '望京SOHO', '中关村软件园', 14700, 14715, 15.00, NULL, '技术交流',   '已完成', 2, 65.00, 26.00, NULL),
-(14, 'TR20250207002', 16, 16, 3,  '%s', '%s', '望京SOHO', '亦庄园区',   19700, 19730, 30.00, NULL,  '运营协调',    '已完成', 1, 90.00, 40.00, NULL),
-(15, 'TR20250208001', 17, 17, 7,  '%s', '%s', '望京SOHO', '朝阳CBD',    27700, 27735, 35.00, 4.50, '客户走访',    '已完成', 0, 72.00, 35.00, NULL),
-(16, 'TR20250208002', 18, 18, 8,  '%s', '%s', '空港物流园', '丰台总部基地', 34700, 34740, 40.00, NULL, '配送',     '已完成', 0, 60.00, 38.00, '电动货车配送'),
-(17, 'TR20250209001', 1,  1,  2,  '%s', '%s', '望京SOHO', '大兴机场',   42400, 42465, 65.00, NULL,  '贵宾接送',    '已完成', 1, 115.00, 52.00, NULL),
-(18, 'TR20250209002', 7,  7,  7,  '%s', '%s', '空港物流园', '朝阳CBD',  124800, 124835, 35.00, 8.20, '货物配送',   '已完成', 0, 68.00, 36.00, NULL),
-(19, 'TR20250210001', 3,  3,  5,  '%s', '%s', '望京SOHO', '天津滨海',   67600, 67745, 145.00, 14.50, '商务出差',  '已完成', 2, 125.00, 78.00, NULL),
-(20, 'TR20250210002', 9,  9,  10, '%s', '%s', '回龙观',    '望京SOHO',  179800, 179820, 20.00, 5.30, '通勤班车',   '已完成', 30, 58.00, 30.00, '早班车'),
-(21, 'TR20250211001', 2,  2,  1,  '%s', '%s', '望京SOHO', '首都机场T3', 38200, 38226, 25.50, NULL,  '客户接送',    '已完成', 1, 82.00, 36.00, NULL),
-(22, 'TR20250211002', 5,  5,  6,  '%s', '%s', '望京SOHO', '雄安新区',   48600, 48720, 120.00, 10.00, '项目支持',  '已完成', 3, 128.00, 70.00, NULL),
-(23, 'TR20250212001', 4,  4,  3,  '%s', '%s', '望京SOHO', '亦庄园区',   55200, 55230, 30.00, 3.60, '市场调研',    '已完成', 2, 88.00, 40.00, NULL),
-(24, 'TR20250212002', 6,  6,  4,  '%s', '%s', '望京SOHO', '中关村软件园', 28900, 28915, 15.00, 1.20, '合作洽谈', '已完成', 1, 70.00, 28.00, NULL),
-(25, 'TR20250213001', 8,  8,  7,  '%s', '%s', '空港物流园', '朝阳CBD',  97900, 97935, 35.00, 8.80, '货物配送',    '已完成', 0, 66.00, 38.00, NULL),
-(26, 'TR20250213002', 10, 10, 10, '%s', '%s', '回龙观',    '望京SOHO',  144900, 144920, 20.00, 5.80, '通勤班车',  '已完成', 45, 55.00, 30.00, '晚班车'),
-(27, 'TR20250214001', 11, 11, 1,  '%s', '%s', '望京SOHO', '首都机场T3', 22000, 22026, 25.50, 1.80, '接送同事',   '已完成', 1, 78.00, 35.00, NULL),
-(28, 'TR20250214002', 15, 15, 6,  '%s', '%s', '望京SOHO', '雄安新区',   15000, 15120, 120.00, NULL, '技术支持',   '已完成', 2, 135.00, 72.00, NULL),
-(29, 'TR20250215001', 1,  1,  1,  '%s', NULL, '望京SOHO', NULL,         42580, NULL,  NULL,   NULL,  '接送贵宾',   '进行中', 1, NULL,   NULL,  '正在前往机场'),
-(30, 'TR20250215002', 7,  7,  7,  '%s', NULL, '空港物流园', NULL,       125100, NULL,  NULL,   NULL,  '货物配送',   '进行中', 0, NULL,   NULL,  '正在配送途中');
+(1,  'TR20250201001', 1,  1,  1,  '%s', '%s', 'Raffles Place',   'Changi Airport T3',     42100, 42122, 22.00, 2.80,  'VIP pickup',          'Completed', 2, 80.00, 45.00, NULL),
+(2,  'TR20250201002', 3,  3,  3,  '%s', '%s', 'Raffles Place',   'Jurong East',           67300, 67320, 20.00, 2.50,  'Business meeting',    'Completed', 3, 80.00, 38.00, NULL),
+(3,  'TR20250202001', 7,  7,  7,  '%s', '%s', 'Tuas Warehouse',  'Marina Bay FC',        124500, 124538, 38.00, 8.50, 'Cargo delivery',      'Completed', 0, 70.00, 38.00, '3-tonne delivery'),
+(4,  'TR20250202002', 2,  2,  2,  '%s', '%s', 'Raffles Place',   'Tuas Industrial',       37800, 37835, 35.00, NULL,  'Client pickup',       'Completed', 1, 90.00, 48.00, NULL),
+(5,  'TR20250203001', 9,  9,  10, '%s', '%s', 'Woodlands MRT',   'Raffles Place',        179500, 179525, 25.00, 5.50, 'Staff shuttle',       'Completed', 28, 60.00, 35.00, 'Morning shuttle'),
+(6,  'TR20250203002', 4,  4,  4,  '%s', '%s', 'Raffles Place',   'One North',             54900, 54912, 12.00, 1.50, 'Client visit',        'Completed', 2, 70.00, 30.00, NULL),
+(7,  'TR20250204001', 5,  5,  5,  '%s', '%s', 'Raffles Place',   'Johor Bahru CIQ',       48200, 48230, 30.00, 4.80, 'Business trip',       'Completed', 3, 90.00, 40.00, 'JB branch visit'),
+(8,  'TR20250204002', 8,  8,  8,  '%s', '%s', 'Tuas Warehouse',  'Mapletree Biz City',    97600, 97625, 25.00, 5.50, 'Cargo delivery',      'Completed', 0, 65.00, 38.00, NULL),
+(9,  'TR20250205001', 6,  6,  6,  '%s', '%s', 'Raffles Place',   'Changi Biz Park',       28500, 28518, 18.00, 2.20, 'Site inspection',     'Completed', 4, 80.00, 42.00, NULL),
+(10, 'TR20250205002', 10, 10, 10, '%s', '%s', 'Woodlands MRT',   'Raffles Place',        144600, 144625, 25.00, 6.00, 'Staff shuttle',      'Completed', 42, 55.00, 35.00, 'Morning shuttle'),
+(11, 'TR20250206001', 11, 11, 3,  '%s', '%s', 'Raffles Place',   'Jurong East',           21700, 21720, 20.00, NULL,  'Admin errand',        'Completed', 1, 80.00, 38.00, NULL),
+(12, 'TR20250206002', 12, 12, 1,  '%s', '%s', 'Raffles Place',   'Changi Airport T3',     61600, 61622, 22.00, 2.80, 'Executive pickup',    'Completed', 1, 75.00, 42.00, NULL),
+(13, 'TR20250207001', 15, 15, 4,  '%s', '%s', 'Raffles Place',   'One North',             14700, 14712, 12.00, NULL, 'Tech exchange',       'Completed', 2, 65.00, 30.00, NULL),
+(14, 'TR20250207002', 16, 16, 3,  '%s', '%s', 'Raffles Place',   'Jurong East',           19700, 19720, 20.00, NULL,  'Ops coordination',   'Completed', 1, 80.00, 38.00, NULL),
+(15, 'TR20250208001', 17, 17, 7,  '%s', '%s', 'Raffles Place',   'Marina Bay FC',         27700, 27738, 38.00, 4.50, 'Client visit',        'Completed', 0, 72.00, 40.00, NULL),
+(16, 'TR20250208002', 18, 18, 8,  '%s', '%s', 'Tuas Warehouse',  'Mapletree Biz City',    34700, 34725, 25.00, NULL, 'Delivery',            'Completed', 0, 60.00, 35.00, 'EV truck delivery'),
+(17, 'TR20250209001', 1,  1,  1,  '%s', '%s', 'Raffles Place',   'Changi Airport T3',     42400, 42422, 22.00, 2.70, 'VIP pickup',          'Completed', 1, 85.00, 45.00, NULL),
+(18, 'TR20250209002', 7,  7,  7,  '%s', '%s', 'Tuas Warehouse',  'Marina Bay FC',        124800, 124838, 38.00, 8.20, 'Cargo delivery',     'Completed', 0, 68.00, 38.00, NULL),
+(19, 'TR20250210001', 3,  3,  5,  '%s', '%s', 'Raffles Place',   'Johor Bahru CIQ',       67600, 67630, 30.00, 3.80, 'Business trip',       'Completed', 2, 90.00, 40.00, NULL),
+(20, 'TR20250210002', 9,  9,  10, '%s', '%s', 'Woodlands MRT',   'Raffles Place',        179800, 179825, 25.00, 5.30, 'Staff shuttle',      'Completed', 30, 58.00, 35.00, 'Morning shuttle'),
+(21, 'TR20250211001', 2,  2,  1,  '%s', '%s', 'Raffles Place',   'Changi Airport T3',     38200, 38222, 22.00, NULL,  'Client pickup',      'Completed', 1, 82.00, 42.00, NULL),
+(22, 'TR20250211002', 5,  5,  6,  '%s', '%s', 'Raffles Place',   'Changi Biz Park',       48600, 48618, 18.00, 2.80, 'Project support',     'Completed', 3, 80.00, 40.00, NULL),
+(23, 'TR20250212001', 4,  4,  3,  '%s', '%s', 'Raffles Place',   'Jurong East',           55200, 55220, 20.00, 2.40, 'Market research',     'Completed', 2, 80.00, 38.00, NULL),
+(24, 'TR20250212002', 6,  6,  4,  '%s', '%s', 'Raffles Place',   'One North',             28900, 28912, 12.00, 1.50, 'Partnership meeting', 'Completed', 1, 70.00, 30.00, NULL),
+(25, 'TR20250213001', 8,  8,  7,  '%s', '%s', 'Tuas Warehouse',  'Marina Bay FC',         97900, 97938, 38.00, 8.80, 'Cargo delivery',     'Completed', 0, 66.00, 38.00, NULL),
+(26, 'TR20250213002', 10, 10, 10, '%s', '%s', 'Woodlands MRT',   'Raffles Place',        144900, 144925, 25.00, 5.80, 'Staff shuttle',     'Completed', 45, 55.00, 35.00, 'Evening shuttle'),
+(27, 'TR20250214001', 11, 11, 1,  '%s', '%s', 'Raffles Place',   'Changi Airport T3',     22000, 22022, 22.00, NULL, 'Colleague pickup',    'Completed', 1, 78.00, 42.00, NULL),
+(28, 'TR20250214002', 15, 15, 6,  '%s', '%s', 'Raffles Place',   'Changi Biz Park',       15000, 15018, 18.00, NULL, 'Tech support',        'Completed', 2, 80.00, 42.00, NULL),
+(29, 'TR20250215001', 1,  1,  1,  '%s', NULL, 'Raffles Place',   NULL,                    42580, NULL,  NULL,   NULL,  'VIP pickup',         'In Progress', 1, NULL,   NULL,  'Heading to airport'),
+(30, 'TR20250215002', 7,  7,  7,  '%s', NULL, 'Tuas Warehouse',  NULL,                   125100, NULL,  NULL,   NULL,  'Cargo delivery',     'In Progress', 0, NULL,   NULL,  'En route');
 `,
 		// 30 trips with staggered dates
 		ts(now, -14, 8, 0), ts(now, -14, 8, 45),
@@ -656,58 +709,58 @@ INSERT INTO trips (id, trip_no, vehicle_id, driver_id, route_id, start_time, end
 	}
 	fmt.Println("  🚀 已插入 30 条行程记录")
 
-	// ---- 5. 维修保养 (15条) ----
+	// ---- 5. Maintenance Records (15) ----
 	maintenanceSQL := `
 INSERT INTO maintenance_records (id, record_no, vehicle_id, maintenance_type, description, service_provider, mileage_at_service, cost, parts_cost, labor_cost, start_date, end_date, next_maintenance_date, next_maintenance_mileage, status, quality_rating, notes) VALUES
-(1,  'MR20250101001', 3,  '保养', '常规保养：更换机油、机滤、空滤',             '北京大众4S店',     65000, 1580.00, 980.00, 600.00,   '2025-01-10', '2025-01-10', '2025-07-10', 75000, '已完成', 5, NULL),
-(2,  'MR20250101002', 4,  '保养', '二保：更换机油、机滤、检查刹车',             '北京丰田4S店',     50000, 1280.00, 800.00, 480.00,   '2025-01-15', '2025-01-15', '2025-07-15', 60000, '已完成', 4, NULL),
-(3,  'MR20250102001', 7,  '维修', '更换前轮刹车片、刹车盘',                     '顺义卡车修理厂',   120000, 3500.00, 2500.00, 1000.00, '2025-01-20', '2025-01-21', NULL, NULL, '已完成', 4, NULL),
-(4,  'MR20250102002', 12, '保养', '常规保养：更换机油、机滤',                    '北京奔驰4S店',     58000, 3200.00, 2600.00, 600.00,  '2025-01-25', '2025-01-25', '2025-07-25', 68000, '已完成', 5, '奔驰原厂配件'),
-(5,  'MR20250103001', 9,  '保养', '大保养：更换机油、三滤、刹车油、变速箱油',   '宇通特约服务站',   175000, 5800.00, 4200.00, 1600.00, '2025-01-28', '2025-01-29', '2025-04-28', 185000, '已完成', 4, '班车保养'),
-(6,  'MR20250103002', 5,  '轮胎更换', '更换4条轮胎（米其林Primacy 4）',          '京东养车望京店',   45000, 3200.00, 2800.00, 400.00,  '2025-02-01', '2025-02-01', NULL, NULL, '已完成', 5, NULL),
-(7,  'MR20250104001', 14, '维修', '发动机故障灯报警，更换喷油器总成',           '福田特约维修站',   85000, 12000.00, 9500.00, 2500.00, '2025-02-05', NULL, NULL, NULL, '进行中', NULL, '等待配件到货'),
-(8,  'MR20250104002', 1,  '保养', '电动车常规检查：电池健康、制动系统',         '比亚迪服务中心',   40000, 680.00, 200.00, 480.00,   '2025-02-08', '2025-02-08', '2025-08-08', 50000, '已完成', 5, NULL),
-(9,  'MR20250105001', 8,  '维修', '更换离合器片',                               '江铃特约维修站',   95000, 4500.00, 3000.00, 1500.00, '2025-02-10', '2025-02-11', NULL, NULL, '已完成', 4, NULL),
-(10, 'MR20250105002', 2,  '保养', '电动车保养：检查电池、更换空调滤芯',         '特斯拉服务中心',   36000, 980.00, 350.00, 630.00,   '2025-02-12', '2025-02-12', '2025-08-12', 46000, '已完成', 5, NULL),
-(11, 'MR20250106001', 10, '保养', '底盘检查、更换空气悬挂元件',                 '金龙特约服务站',   142000, 8500.00, 6500.00, 2000.00, '2025-02-15', '2025-02-16', '2025-05-15', 152000, '已完成', 3, '悬挂老化'),
-(12, 'MR20250106002', 6,  '保养', '增程器保养：更换火花塞、机油',               '理想汽车服务中心', 26000, 1500.00, 900.00, 600.00,   '2025-02-18', '2025-02-18', '2025-08-18', 36000, '已完成', 5, NULL),
-(13, 'MR20250107001', 19, '保养', '常规保养：更换机油、机滤',                    '北京本田4S店',     48000, 1100.00, 700.00, 400.00,   '2025-02-20', '2025-02-20', '2025-08-20', 58000, '已完成', 4, NULL),
-(14, 'MR20250107002', 15, '保养', '电动车年度检查：电池诊断、更新系统',         '蔚来服务中心',     13000, 500.00, 0, 500.00,          '2025-02-22', '2025-02-22', '2026-02-22', 23000, '已完成', 5, '免费首保'),
-(15, 'MR20250108001', 17, '事故修复', '右前翼子板剐蹭修复、补漆',               '长安特约钣喷中心', 26500, 2800.00, 1200.00, 1600.00, '2025-02-25', '2025-02-27', NULL, NULL, '已完成', 4, '轻微剐蹭');
+(1,  'MR20250101001', 3,  'Service',      'Regular service: oil, oil filter, air filter change',     'Borneo Motors (Toyota)',        65000, 580.00, 380.00, 200.00,   '2025-01-10', '2025-01-10', '2025-07-10', 75000, 'Completed', 5, NULL),
+(2,  'MR20250101002', 4,  'Service',      '2nd service: oil, filter, brake check',                   'Kah Motor (Honda)',             50000, 480.00, 300.00, 180.00,   '2025-01-15', '2025-01-15', '2025-07-15', 60000, 'Completed', 4, NULL),
+(3,  'MR20250102001', 7,  'Repair',       'Replace front brake pads and discs',                      'Cycle & Carriage Heavy Vehicles',120000, 1500.00, 1000.00, 500.00,'2025-01-20', '2025-01-21', NULL, NULL, 'Completed', 4, NULL),
+(4,  'MR20250102002', 12, 'Service',      'Regular service: oil and filter change',                   'Cycle & Carriage (Mercedes)',   58000, 1200.00, 900.00, 300.00,  '2025-01-25', '2025-01-25', '2025-07-25', 68000, 'Completed', 5, 'OEM parts'),
+(5,  'MR20250103001', 9,  'Service',      'Major service: oil, 3 filters, brake fluid, ATF',          'Yutong SG Service Centre',     175000, 2800.00, 2000.00, 800.00, '2025-01-28', '2025-01-29', '2025-04-28', 185000, 'Completed', 4, 'Shuttle bus service'),
+(6,  'MR20250103002', 5,  'Tyre Change',  'Replace 4 tyres (Michelin Primacy 4)',                     'Stamford Tyres Jurong',        45000, 1600.00, 1400.00, 200.00, '2025-02-01', '2025-02-01', NULL, NULL, 'Completed', 5, NULL),
+(7,  'MR20250104001', 14, 'Repair',       'Engine warning light, replace injector assembly',           'Isuzu Service Centre Tuas',    85000, 5000.00, 4000.00, 1000.00,'2025-02-05', NULL, NULL, NULL, 'In Progress', NULL, 'Awaiting parts delivery'),
+(8,  'MR20250104002', 1,  'Service',      'EV routine check: battery health, braking system',          'C&C Star (Mercedes)',          40000, 350.00, 100.00, 250.00,  '2025-02-08', '2025-02-08', '2025-08-08', 50000, 'Completed', 5, NULL),
+(9,  'MR20250105001', 8,  'Repair',       'Replace clutch plate',                                      'Isuzu Service Centre Tuas',    95000, 2200.00, 1500.00, 700.00, '2025-02-10', '2025-02-11', NULL, NULL, 'Completed', 4, NULL),
+(10, 'MR20250105002', 2,  'Service',      'EV service: battery check, cabin filter replacement',        'Tesla Service Centre SG',      36000, 480.00, 150.00, 330.00,  '2025-02-12', '2025-02-12', '2025-08-12', 46000, 'Completed', 5, NULL),
+(11, 'MR20250106001', 10, 'Service',      'Chassis inspection, replace air suspension components',      'Zhongtong SG Service',         142000, 3500.00, 2500.00, 1000.00,'2025-02-15', '2025-02-16', '2025-05-15', 152000, 'Completed', 3, 'Suspension ageing'),
+(12, 'MR20250106002', 6,  'Service',      'Engine service: spark plugs, oil change',                    'Performance Motors (BMW)',      26000, 750.00, 450.00, 300.00,  '2025-02-18', '2025-02-18', '2025-08-18', 36000, 'Completed', 5, NULL),
+(13, 'MR20250107001', 19, 'Service',      'Regular service: oil and filter change',                     'Tan Chong Motor (Nissan)',     48000, 380.00, 250.00, 130.00,  '2025-02-20', '2025-02-20', '2025-08-20', 58000, 'Completed', 4, NULL),
+(14, 'MR20250107002', 15, 'Service',      'EV annual check: battery diagnostics, software update',      'Performance Motors (BMW)',     13000, 250.00, 0, 250.00,        '2025-02-22', '2025-02-22', '2026-02-22', 23000, 'Completed', 5, 'Free 1st service'),
+(15, 'MR20250108001', 17, 'Accident Repair','Right front fender scratch repair and repaint',             'Borneo Motors Body Shop',     26500, 1200.00, 500.00, 700.00,  '2025-02-25', '2025-02-27', NULL, NULL, 'Completed', 4, 'Minor scratch');
 `
 	if _, err := db.ExecContext(ctx, maintenanceSQL); err != nil {
-		return fmt.Errorf("插入维修保养数据: %w", err)
+		return fmt.Errorf("insert maintenance data: %w", err)
 	}
-	fmt.Println("  🔧 已插入 15 条维修保养记录")
+	fmt.Println("  🔧 Inserted 15 maintenance records")
 
-	// ---- 6. 加油记录 (25条) ----
+	// ---- 6. Fuel Records (25) ----
 	fuelSQL := fmt.Sprintf(`
 INSERT INTO fuel_records (vehicle_id, driver_id, fuel_date, fuel_type, quantity, unit_price, total_cost, mileage_at_fuel, gas_station, payment_method, is_full_tank, notes) VALUES
-(3,  3,  '%s', '95号汽油', 55.00, 8.09, 444.95,  66000, '中石化望京加油站',       '公司卡', 1, NULL),
-(4,  4,  '%s', '92号汽油', 48.00, 7.89, 378.72,  53000, '中石油朝阳加油站',       '公司卡', 1, NULL),
-(5,  5,  '%s', '92号汽油', 50.00, 7.89, 394.50,  47000, '中石化亦庄加油站',       '公司卡', 1, NULL),
-(7,  7,  '%s', '0号柴油',  100.00, 7.55, 755.00, 122000, '中石化顺义物流园站',    '加油卡', 1, '满箱'),
-(8,  8,  '%s', '0号柴油',  85.00, 7.55, 641.75,  96000, '中石油昌平加油站',       '加油卡', 1, NULL),
-(9,  9,  '%s', '0号柴油',  160.00, 7.55, 1208.00, 178000, '中石化回龙观加油站',   '加油卡', 1, '班车加油'),
-(10, 10, '%s', '0号柴油',  250.00, 7.55, 1887.50, 143000, '中石化石景山加油站',   '加油卡', 1, '大客车加油'),
-(12, 12, '%s', '95号汽油', 56.00, 8.09, 453.04,  60000, '中石化东直门加油站',     '公司卡', 1, NULL),
-(3,  3,  '%s', '95号汽油', 52.00, 8.15, 423.80,  67200, '中石化望京加油站',       '公司卡', 1, NULL),
-(4,  4,  '%s', '92号汽油', 45.00, 7.92, 356.40,  54200, '中石油朝阳加油站',       '公司卡', 1, NULL),
-(7,  7,  '%s', '0号柴油',  95.00, 7.58, 720.10,  123500, '中石化顺义物流园站',    '加油卡', 1, NULL),
-(5,  5,  '%s', '92号汽油', 48.00, 7.92, 380.16,  48200, '中石化亦庄加油站',       '公司卡', 1, NULL),
-(6,  6,  '%s', '95号汽油', 40.00, 8.09, 323.60,  27500, '中石化通州加油站',       '公司卡', 0, '增程器用油'),
-(8,  8,  '%s', '0号柴油',  90.00, 7.58, 682.20,  97600, '中石油昌平加油站',       '加油卡', 1, NULL),
-(17, 17, '%s', '92号汽油', 42.00, 7.89, 331.38,  27200, '中石化西直门加油站',     '公司卡', 1, NULL),
-(19, 19, '%s', '92号汽油', 45.00, 7.89, 355.05,  50000, '中石油朝阳加油站',       '公司卡', 1, NULL),
-(9,  9,  '%s', '0号柴油',  155.00, 7.55, 1170.25, 179500, '中石化回龙观加油站',   '加油卡', 1, NULL),
-(3,  3,  '%s', '95号汽油', 54.00, 8.12, 438.48,  67800, '中石化望京加油站',       '公司卡', 1, NULL),
-(10, 10, '%s', '0号柴油',  240.00, 7.58, 1819.20, 144600, '中石化石景山加油站',   '加油卡', 1, NULL),
-(12, 12, '%s', '95号汽油', 53.00, 8.12, 430.36,  61600, '中石化东直门加油站',     '公司卡', 1, NULL),
-(7,  7,  '%s', '0号柴油',  98.00, 7.60, 744.80,  124800, '中石化顺义物流园站',    '加油卡', 1, NULL),
-(4,  4,  '%s', '92号汽油', 46.00, 7.95, 365.70,  55200, '中石油朝阳加油站',       '公司卡', 1, NULL),
-(5,  5,  '%s', '92号汽油', 50.00, 7.95, 397.50,  48600, '中石化亦庄加油站',       '公司卡', 1, NULL),
-(17, 17, '%s', '92号汽油', 44.00, 7.92, 348.48,  27700, '中石化西直门加油站',     '公司卡', 1, NULL),
-(6,  6,  '%s', '95号汽油', 42.00, 8.12, 341.04,  28900, '中石化通州加油站',       '公司卡', 0, NULL);
+(3,  3,  '%s', 'RON 95',  50.00, 2.72, 136.00,  66000, 'Shell Raffles Place',      'Corp Card', 1, NULL),
+(4,  4,  '%s', 'RON 95',  40.00, 2.72, 108.80,  53000, 'SPC Jurong East',          'Corp Card', 1, NULL),
+(5,  5,  '%s', 'Diesel',  65.00, 2.55, 165.75,  47000, 'Caltex Tuas',              'Fuel Card', 1, NULL),
+(7,  7,  '%s', 'Diesel',  85.00, 2.55, 216.75, 122000, 'Shell Tuas Industrial',    'Fuel Card', 1, 'Full tank'),
+(8,  8,  '%s', 'Diesel',  70.00, 2.55, 178.50,  96000, 'Esso Woodlands',           'Fuel Card', 1, NULL),
+(9,  9,  '%s', 'Diesel', 160.00, 2.55, 408.00, 178000, 'SPC Woodlands',            'Fuel Card', 1, 'Bus refuel'),
+(10, 10, '%s', 'Diesel', 250.00, 2.55, 637.50, 143000, 'Shell Toa Payoh',          'Fuel Card', 1, 'Coach refuel'),
+(12, 12, '%s', 'RON 98',  55.00, 3.17, 174.35,  60000, 'Shell Holland Road',       'Corp Card', 1, NULL),
+(3,  3,  '%s', 'RON 95',  48.00, 2.75, 132.00,  67200, 'Shell Raffles Place',      'Corp Card', 1, NULL),
+(4,  4,  '%s', 'RON 95',  38.00, 2.75, 104.50,  54200, 'SPC Jurong East',          'Corp Card', 1, NULL),
+(7,  7,  '%s', 'Diesel',  80.00, 2.58, 206.40, 123500, 'Shell Tuas Industrial',    'Fuel Card', 1, NULL),
+(5,  5,  '%s', 'Diesel',  62.00, 2.58, 159.96,  48200, 'Caltex Tuas',              'Fuel Card', 1, NULL),
+(6,  6,  '%s', 'RON 98',  68.00, 3.17, 215.56,  27500, 'Esso Tanjong Pagar',       'Corp Card', 1, NULL),
+(8,  8,  '%s', 'Diesel',  72.00, 2.58, 185.76,  97600, 'Esso Woodlands',           'Fuel Card', 1, NULL),
+(17, 17, '%s', 'RON 95',  35.00, 2.72, 95.20,   27200, 'SPC Sengkang',             'Corp Card', 1, NULL),
+(19, 19, '%s', 'RON 95',  42.00, 2.72, 114.24,  50000, 'Caltex Bedok',             'Corp Card', 1, NULL),
+(9,  9,  '%s', 'Diesel', 155.00, 2.55, 395.25, 179500, 'SPC Woodlands',            'Fuel Card', 1, NULL),
+(3,  3,  '%s', 'RON 95',  50.00, 2.78, 139.00,  67800, 'Shell Raffles Place',      'Corp Card', 1, NULL),
+(10, 10, '%s', 'Diesel', 240.00, 2.58, 619.20, 144600, 'Shell Toa Payoh',          'Fuel Card', 1, NULL),
+(12, 12, '%s', 'RON 98',  52.00, 3.20, 166.40,  61600, 'Shell Holland Road',       'Corp Card', 1, NULL),
+(7,  7,  '%s', 'Diesel',  82.00, 2.60, 213.20, 124800, 'Shell Tuas Industrial',    'Fuel Card', 1, NULL),
+(4,  4,  '%s', 'RON 95',  40.00, 2.78, 111.20,  55200, 'SPC Jurong East',          'Corp Card', 1, NULL),
+(5,  5,  '%s', 'Diesel',  65.00, 2.60, 169.00,  48600, 'Caltex Tuas',              'Fuel Card', 1, NULL),
+(17, 17, '%s', 'RON 95',  36.00, 2.75, 99.00,   27700, 'SPC Sengkang',             'Corp Card', 1, NULL),
+(6,  6,  '%s', 'RON 98',  65.00, 3.20, 208.00,  28900, 'Esso Tanjong Pagar',       'Corp Card', 1, NULL);
 `,
 		ts(now, -30, 8, 0), ts(now, -28, 9, 0), ts(now, -26, 15, 0), ts(now, -25, 7, 0),
 		ts(now, -24, 16, 0), ts(now, -23, 6, 30), ts(now, -22, 6, 30), ts(now, -21, 14, 0),
@@ -722,19 +775,19 @@ INSERT INTO fuel_records (vehicle_id, driver_id, fuel_date, fuel_type, quantity,
 	}
 	fmt.Println("  ⛽ 已插入 25 条加油记录")
 
-	// ---- 6b. 电动车充电记录 (10条) ----
+	// ---- 6b. EV Charging Records (10) ----
 	evChargeSQL := fmt.Sprintf(`
 INSERT INTO fuel_records (vehicle_id, driver_id, fuel_date, fuel_type, quantity, unit_price, total_cost, mileage_at_fuel, gas_station, payment_method, is_full_tank, notes) VALUES
-(1,  1,  '%s', '充电', 65.00,  1.20, 78.00,   41800, '国家电网望京充电站',       '公司卡', 1, 'BYD汉EV快充'),
-(1,  1,  '%s', '充电', 58.00,  1.20, 69.60,   42300, '特来电望京南充电站',       '公司卡', 1, NULL),
-(2,  2,  '%s', '充电', 70.00,  1.80, 126.00,  37500, '特斯拉超充望京站',         '公司卡', 1, 'Model Y超级充电'),
-(2,  2,  '%s', '充电', 62.00,  1.80, 111.60,  38000, '特斯拉超充国贸站',         '公司卡', 1, NULL),
-(15, 15, '%s', '充电', 75.00,  1.50, 112.50,  14200, '蔚来换电站中关村',         '公司卡', 1, 'ES6换电'),
-(15, 15, '%s', '充电', 72.00,  1.50, 108.00,  14800, '蔚来换电站望京站',         '公司卡', 1, NULL),
-(16, 16, '%s', '充电', 60.00,  1.20, 72.00,   19200, '国家电网亦庄充电站',       '公司卡', 1, 'P7慢充'),
-(18, 18, '%s', '充电', 80.00,  1.00, 80.00,   34200, '顺义物流园专用充电桩',     '公司卡', 1, '电动货车夜间充电'),
-(20, NULL, '%s', '充电', 86.00,  1.50, 129.00,  7500,  '国家电网望京充电站',       '公司卡', 1, '极氪001快充（报废前记录）'),
-(11, 11, '%s', '充电', 18.00,  1.20, 21.60,   21500, '特来电朝阳充电站',         '公司卡', 0, '秦PLUS插混补电');
+(1,  1,  '%s', 'Charging', 65.00,  0.55, 35.75,  41800, 'SP Group Charger Raffles',    'Corp Card', 1, 'Mercedes S450L PHEV charge'),
+(2,  2,  '%s', 'Charging', 58.00,  0.55, 31.90,  42300, 'Tesla Supercharger Orchard',   'Corp Card', 1, NULL),
+(2,  2,  '%s', 'Charging', 70.00,  0.68, 47.60,  37500, 'Tesla Supercharger CBD',       'Corp Card', 1, 'Model Y supercharge'),
+(11, 11, '%s', 'Charging', 62.00,  0.55, 34.10,  38000, 'BlueSG Charger Bedok',         'Corp Card', 1, NULL),
+(15, 15, '%s', 'Charging', 75.00,  0.55, 41.25,  14200, 'Shell Recharge One North',     'Corp Card', 1, 'BMW iX3 fast charge'),
+(15, 15, '%s', 'Charging', 72.00,  0.55, 39.60,  14800, 'SP Group Charger Clementi',    'Corp Card', 1, NULL),
+(16, 16, '%s', 'Charging', 50.00,  0.42, 21.00,  19200, 'BlueSG Charger Bukit Batok',   'Corp Card', 1, 'Atto 3 slow charge'),
+(18, 18, '%s', 'Charging', 80.00,  0.42, 33.60,  34200, 'Tuas Warehouse Charger',       'Corp Card', 1, 'EV truck overnight charge'),
+(20, NULL, '%s', 'Charging', 86.00, 0.55, 47.30,   7500, 'Tesla Supercharger Marina',    'Corp Card', 1, 'Model 3 charge (pre-decommission)'),
+(11, 11, '%s', 'Charging', 18.00,  0.42, 7.56,   21500, 'SP Group Charger Ang Mo Kio',  'Corp Card', 0, 'Ioniq 5 top-up');
 `,
 		ts(now, -20, 22, 0), ts(now, -8, 21, 30),
 		ts(now, -18, 20, 0), ts(now, -6, 19, 30),
@@ -749,21 +802,21 @@ INSERT INTO fuel_records (vehicle_id, driver_id, fuel_date, fuel_type, quantity,
 	}
 	fmt.Println("  🔋 已插入 10 条电动车充电记录")
 
-	// ---- 7. 违章记录 (12条) ----
+	// ---- 7. Violation Records (12) ----
 	violationSQL := fmt.Sprintf(`
 INSERT INTO violations (vehicle_id, driver_id, violation_date, violation_location, violation_type, violation_code, fine_amount, deduction_points, status, handler, handled_date, notes) VALUES
-(3,  3,  '%s', '北京市朝阳区东三环中路',   '超速行驶(超速20%%以下)',       '1345', 200.00,  3, '已处理', '王晓东', '%s', NULL),
-(5,  5,  '%s', '北京市丰台区南四环西路',   '违反禁令标志',                 '1344', 200.00,  3, '已处理', '刘强',   '%s', '误入公交专用道'),
-(7,  7,  '%s', '北京市顺义区天竺路',       '超速行驶(超速20%%-50%%)',      '1345', 200.00,  6, '已处理', '杨海军', '%s', '货车限速60'),
-(8,  8,  '%s', '北京市昌平区立汤路',       '闯红灯',                       '1625', 200.00,  6, '待处理', NULL,     NULL, '等待处理'),
-(12, 12, '%s', '北京市东城区东直门内大街', '违反禁止停车标线',             '1039', 200.00,  3, '已处理', '朱鹏飞', '%s', NULL),
-(3,  3,  '%s', '北京市海淀区北四环中路',   '超速行驶(超速20%%以下)',       '1345', 100.00,  3, '已处理', '王晓东', '%s', NULL),
-(17, 17, '%s', '北京市西城区西直门内大街', '不按导向车道行驶',             '1208', 100.00,  2, '待处理', NULL,     NULL, NULL),
-(7,  7,  '%s', '北京市朝阳区机场高速',     '超速行驶(超速20%%以下)',       '1345', 200.00,  3, '已处理', '杨海军', '%s', NULL),
-(14, 14, '%s', '北京市丰台区花乡桥',       '未按规定让行',                 '1315', 200.00,  3, '已处理', '徐龙',   '%s', NULL),
-(14, 14, '%s', '北京市顺义区裕民大街',     '超速行驶(超速20%%-50%%)',      '1345', 200.00,  6, '申诉中', NULL,     NULL, '认为限速标志不清'),
-(5,  5,  '%s', '北京市大兴区亦庄经济开发区', '违反禁令标志',               '1344', 100.00,  1, '待处理', NULL,     NULL, NULL),
-(7,  7,  '%s', '天津市滨海新区津滨高速',   '超速行驶(超速20%%以下)',       '1345', 200.00,  3, '已处理', '杨海军', '%s', NULL);
+(3,  3,  '%s', 'ECP towards Changi',              'Speeding (1-20km/h over)',      'SP01', 150.00,  4, 'Processed', 'Raj Kumar',    '%s', NULL),
+(5,  5,  '%s', 'AYE towards Tuas',                'Illegal lane change',           'LC01', 150.00,  4, 'Processed', 'Muhammad Rizal','%s', 'Crossed double white line'),
+(7,  7,  '%s', 'Tuas Ave 1',                      'Speeding (21-40km/h over)',     'SP02', 300.00,  8, 'Processed', 'Siva Rajan',   '%s', 'Heavy vehicle 60km/h zone'),
+(8,  8,  '%s', 'Woodlands Ave 3',                 'Red light running',             'RL01', 400.00, 12, 'Pending',   NULL,           NULL, 'Awaiting processing'),
+(12, 12, '%s', 'Holland Road',                     'Illegal parking',              'PK01', 120.00,  0, 'Processed', 'David Tan',    '%s', NULL),
+(3,  3,  '%s', 'CTE towards SLE',                 'Speeding (1-20km/h over)',      'SP01', 130.00,  4, 'Processed', 'Raj Kumar',    '%s', NULL),
+(17, 17, '%s', 'Sengkang East Way',               'Failing to signal',             'SG01', 100.00,  4, 'Pending',   NULL,           NULL, NULL),
+(7,  7,  '%s', 'PIE towards Changi',              'Speeding (1-20km/h over)',      'SP01', 150.00,  4, 'Processed', 'Siva Rajan',   '%s', NULL),
+(14, 14, '%s', 'Yishun Ave 2',                    'Failing to give way',           'GW01', 150.00,  6, 'Processed', 'Suresh Naidu', '%s', NULL),
+(14, 14, '%s', 'SLE towards Woodlands',           'Speeding (21-40km/h over)',     'SP02', 300.00,  8, 'Appealing', NULL,           NULL, 'Speed limit sign unclear'),
+(5,  5,  '%s', 'Tuas Industrial Ave 4',           'Illegal U-turn',               'UT01', 130.00,  4, 'Pending',   NULL,           NULL, NULL),
+(7,  7,  '%s', 'Second Link towards JB',          'Speeding (1-20km/h over)',      'SP01', 150.00,  4, 'Processed', 'Siva Rajan',   '%s', NULL);
 `,
 		ts(now, -60, 14, 30), ds(now, -55),
 		ts(now, -52, 10, 15), ds(now, -48),
@@ -783,58 +836,58 @@ INSERT INTO violations (vehicle_id, driver_id, violation_date, violation_locatio
 	}
 	fmt.Println("  🚨 已插入 12 条违章记录")
 
-	// ---- 8. 保险记录 (20条) ----
+	// ---- 8. Insurance Records (20) ----
 	insuranceSQL := `
 INSERT INTO insurance_policies (vehicle_id, policy_no, insurance_company, insurance_type, premium, coverage_amount, start_date, end_date, status, claim_count, total_claim_amount, agent_name, agent_phone, notes) VALUES
-(1,  'POL-2024-0001', '中国人保',     '交强险',         950.00,     122000.00,   '2024-03-15', '2025-03-15', '待续保', 0, 0, '张经理', '13600136001', NULL),
-(1,  'POL-2024-0002', '中国人保',     '商业险',         5800.00,    1000000.00,  '2024-03-15', '2025-03-15', '待续保', 0, 0, '张经理', '13600136001', '含车损+三者+不计免赔'),
-(2,  'POL-2024-0003', '中国平安',     '交强险',         950.00,     122000.00,   '2024-05-20', '2025-05-20', '有效',   0, 0, '李经理', '13600136002', NULL),
-(2,  'POL-2024-0004', '中国平安',     '全险',           8500.00,    2000000.00,  '2024-05-20', '2025-05-20', '有效',   0, 0, '李经理', '13600136002', NULL),
-(3,  'POL-2024-0005', '太平洋保险',   '交强险',         950.00,     122000.00,   '2024-08-10', '2025-08-10', '有效',   0, 0, '王经理', '13600136003', NULL),
-(3,  'POL-2024-0006', '太平洋保险',   '商业险',         4200.00,    1000000.00,  '2024-08-10', '2025-08-10', '有效',   1, 3500.00, '王经理', '13600136003', '有一次小剐蹭出险'),
-(4,  'POL-2024-0007', '中国人寿',     '交强险',         950.00,     122000.00,   '2024-06-15', '2025-06-15', '有效',   0, 0, '赵经理', '13600136004', NULL),
-(4,  'POL-2024-0008', '中国人寿',     '车损险',         3500.00,    179800.00,   '2024-06-15', '2025-06-15', '有效',   0, 0, '赵经理', '13600136004', NULL),
-(5,  'POL-2024-0009', '中国平安',     '交强险',         950.00,     122000.00,   '2024-11-01', '2025-11-01', '有效',   0, 0, '李经理', '13600136002', NULL),
-(5,  'POL-2024-0010', '中国平安',     '第三者责任险',   2800.00,    1500000.00,  '2024-11-01', '2025-11-01', '有效',   0, 0, '李经理', '13600136002', NULL),
-(7,  'POL-2024-0011', '中国人保',     '交强险',         1100.00,    122000.00,   '2024-09-20', '2025-09-20', '有效',   0, 0, '孙经理', '13600136005', '货车交强险'),
-(7,  'POL-2024-0012', '中国人保',     '商业险',         6800.00,    1000000.00,  '2024-09-20', '2025-09-20', '有效',   0, 0, '孙经理', '13600136005', NULL),
-(9,  'POL-2024-0013', '太平洋保险',   '交强险',         1200.00,    122000.00,   '2024-05-10', '2025-05-10', '有效',   0, 0, '周经理', '13600136006', '客车交强险'),
-(9,  'POL-2024-0014', '太平洋保险',   '商业险',         12000.00,   2000000.00,  '2024-05-10', '2025-05-10', '有效',   0, 0, '周经理', '13600136006', '客车商业险'),
-(12, 'POL-2024-0015', '中国人保',     '交强险',         950.00,     122000.00,   '2024-04-20', '2025-04-20', '有效',   0, 0, '张经理', '13600136001', NULL),
-(12, 'POL-2024-0016', '中国人保',     '全险',           12000.00,   3000000.00,  '2024-04-20', '2025-04-20', '有效',   0, 0, '张经理', '13600136001', '奔驰全险'),
-(15, 'POL-2024-0017', '中国平安',     '交强险',         950.00,     122000.00,   '2024-11-15', '2025-11-15', '有效',   0, 0, '李经理', '13600136002', NULL),
-(15, 'POL-2024-0018', '中国平安',     '全险',           9800.00,    2000000.00,  '2024-11-15', '2025-11-15', '有效',   0, 0, '李经理', '13600136002', NULL),
-(20, 'POL-2025-0019', '太平洋保险',   '交强险',         950.00,     122000.00,   '2025-01-05', '2026-01-05', '有效',   0, 0, '王经理', '13600136003', NULL),
-(20, 'POL-2025-0020', '太平洋保险',   '全险',           8200.00,    2000000.00,  '2025-01-05', '2026-01-05', '有效',   0, 0, '王经理', '13600136003', '新车全险');
+(1,  'POL-2024-0001', 'NTUC Income',    'Third Party',     1200.00,   500000.00,  '2024-03-15', '2025-03-15', 'Expiring', 0, 0, 'James Lim',  '96001001', NULL),
+(1,  'POL-2024-0002', 'NTUC Income',    'Comprehensive',   4800.00,  1000000.00,  '2024-03-15', '2025-03-15', 'Expiring', 0, 0, 'James Lim',  '96001001', 'Own damage + TP + NCD protector'),
+(2,  'POL-2024-0003', 'AXA Insurance',  'Third Party',     1100.00,   500000.00,  '2024-05-20', '2025-05-20', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(2,  'POL-2024-0004', 'AXA Insurance',  'Comprehensive',   3800.00,  1000000.00,  '2024-05-20', '2025-05-20', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(3,  'POL-2024-0005', 'Great Eastern',  'Third Party',     1000.00,   500000.00,  '2024-08-10', '2025-08-10', 'Active',   0, 0, 'David Ong',  '96001003', NULL),
+(3,  'POL-2024-0006', 'Great Eastern',  'Comprehensive',   3200.00,   800000.00,  '2024-08-10', '2025-08-10', 'Active',   1, 1500.00, 'David Ong','96001003', 'Minor scratch claim'),
+(4,  'POL-2024-0007', 'AIG Singapore',  'Third Party',      950.00,   500000.00,  '2024-06-15', '2025-06-15', 'Active',   0, 0, 'Rachel Ng',  '96001004', NULL),
+(4,  'POL-2024-0008', 'AIG Singapore',  'Own Damage',      2500.00,   135000.00,  '2024-06-15', '2025-06-15', 'Active',   0, 0, 'Rachel Ng',  '96001004', NULL),
+(5,  'POL-2024-0009', 'AXA Insurance',  'Third Party',     1300.00,   500000.00,  '2024-11-01', '2025-11-01', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(5,  'POL-2024-0010', 'AXA Insurance',  'Comprehensive',   3800.00,  1000000.00,  '2024-11-01', '2025-11-01', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(7,  'POL-2024-0011', 'NTUC Income',    'Third Party',     1800.00,   500000.00,  '2024-09-20', '2025-09-20', 'Active',   0, 0, 'James Lim',  '96001001', 'Heavy vehicle TP'),
+(7,  'POL-2024-0012', 'NTUC Income',    'Comprehensive',   5500.00,  1000000.00,  '2024-09-20', '2025-09-20', 'Active',   0, 0, 'James Lim',  '96001001', NULL),
+(9,  'POL-2024-0013', 'Great Eastern',  'Third Party',     2200.00,   500000.00,  '2024-05-10', '2025-05-10', 'Active',   0, 0, 'Alex Tan',   '96001005', 'Bus TP insurance'),
+(9,  'POL-2024-0014', 'Great Eastern',  'Comprehensive',   8000.00,  2000000.00,  '2024-05-10', '2025-05-10', 'Active',   0, 0, 'Alex Tan',   '96001005', 'Bus comprehensive'),
+(12, 'POL-2024-0015', 'NTUC Income',    'Third Party',     1200.00,   500000.00,  '2024-04-20', '2025-04-20', 'Active',   0, 0, 'James Lim',  '96001001', NULL),
+(12, 'POL-2024-0016', 'NTUC Income',    'Comprehensive',   6500.00,  2000000.00,  '2024-04-20', '2025-04-20', 'Active',   0, 0, 'James Lim',  '96001001', 'Mercedes comprehensive'),
+(15, 'POL-2024-0017', 'AXA Insurance',  'Third Party',     1100.00,   500000.00,  '2024-11-15', '2025-11-15', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(15, 'POL-2024-0018', 'AXA Insurance',  'Comprehensive',   5200.00,  1500000.00,  '2024-11-15', '2025-11-15', 'Active',   0, 0, 'Sarah Chen', '96001002', NULL),
+(20, 'POL-2025-0019', 'Great Eastern',  'Third Party',     1100.00,   500000.00,  '2025-01-05', '2026-01-05', 'Active',   0, 0, 'David Ong',  '96001003', NULL),
+(20, 'POL-2025-0020', 'Great Eastern',  'Comprehensive',   4200.00,  1000000.00,  '2025-01-05', '2026-01-05', 'Active',   0, 0, 'David Ong',  '96001003', 'New car comprehensive');
 `
 	if _, err := db.ExecContext(ctx, insuranceSQL); err != nil {
-		return fmt.Errorf("插入保险数据: %w", err)
+		return fmt.Errorf("insert insurance data: %w", err)
 	}
-	fmt.Println("  🛡️  已插入 20 条保险记录")
+	fmt.Println("  🛡️  Inserted 20 insurance records")
 
-	// ---- 8b. 用车预定 (20条) ----
+	// ---- 8b. Reservations (20) ----
 	reservationSQL := fmt.Sprintf(`
 INSERT INTO reservations (id, reservation_no, applicant_name, applicant_department, applicant_phone, vehicle_id, driver_id, purpose, passengers, start_time, end_time, start_location, end_location, route_id, status, priority, approver, approved_at, reject_reason, actual_start_time, actual_end_time, actual_mileage, notes) VALUES
-(1,  'RES20250201001', '王总',     '总裁办',     '13900000001', 1,  1,  '客户接送',       2, '%s', '%s', '望京SOHO',     '首都机场T3',      1,  '已完成', '普通', '李秘书', '%s', NULL, '%s', '%s', 25.5, NULL),
-(2,  'RES20250201002', '张经理',   '销售部',     '13900000002', 2,  2,  '客户拜访',       3, '%s', '%s', '望京SOHO',     '中关村软件园',    4,  '已完成', '普通', '刘主管', '%s', NULL, '%s', '%s', 15.0, NULL),
-(3,  'RES20250202001', '李工',     '技术部',     '13900000003', 5,  5,  '技术交流',       2, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '赵总监', '%s', NULL, '%s', '%s', 30.0, '携带设备'),
-(4,  'RES20250203001', '陈总监',   '产品部',     '13900000004', 6,  6,  '项目考察',       4, '%s', '%s', '望京SOHO',     '雄安新区启动区',  6,  '已完成', '紧急', '王VP',   '%s', NULL, '%s', '%s', 120.0, '雄安新项目考察'),
-(5,  'RES20250204001', '刘助理',   '行政部',     '13900000005', 3,  3,  '会议接待',       5, '%s', '%s', '首都机场T3',   '望京SOHO',        1,  '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 25.5, '接待外宾'),
-(6,  'RES20250205001', '赵主管',   '物流部',     '13900000006', 7,  7,  '货物配送',       1, '%s', '%s', '空港物流园',   '朝阳CBD',         7,  '已完成', '普通', '孙经理', '%s', NULL, '%s', '%s', 35.0, '大件货物'),
-(7,  'RES20250206001', '黄经理',   '人力资源部', '13900000007', 11, 11, '培训出行',       3, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 30.0, '新员工培训'),
-(8,  'RES20250207001', '马工程师', '研发部',     '13900000008', 15, 15, '供应商拜访',     2, '%s', '%s', '望京SOHO',     '中关村软件园',    4,  '已完成', '普通', '赵总监', '%s', NULL, '%s', '%s', 15.0, NULL),
-(9,  'RES20250208001', '郑主管',   '运营部',     '13900000009', 16, 16, '市场调研',       2, '%s', '%s', '望京SOHO',     '亦庄园区',        3,  '已完成', '普通', '刘主管', '%s', NULL, '%s', '%s', 30.0, NULL),
-(10, 'RES20250209001', '朱经理',   '财务部',     '13900000010', 12, 12, '银行办事',       1, '%s', '%s', '望京SOHO',     '金融街',          NULL, '已完成', '普通', '周部长', '%s', NULL, '%s', '%s', 18.0, '年度审计材料递交'),
-(11, 'RES20250210001', '王总',     '总裁办',     '13900000001', 1,  1,  '商务宴请',       3, '%s', '%s', '望京SOHO',     '国贸大酒店',      NULL, '已批准', '紧急', '李秘书', '%s', NULL, NULL, NULL, NULL, '重要客户晚宴'),
-(12, 'RES20250210002', '张经理',   '销售部',     '13900000002', 2,  2,  '展会参观',       4, '%s', '%s', '望京SOHO',     '国家会议中心',    NULL, '已批准', '普通', '刘主管', '%s', NULL, NULL, NULL, NULL, '行业展会'),
-(13, 'RES20250211001', '李工',     '技术部',     '13900000003', 5,  5,  '设备采购',       2, '%s', '%s', '望京SOHO',     '中关村电子城',    NULL, '已批准', '普通', '赵总监', '%s', NULL, NULL, NULL, NULL, '采购服务器设备'),
-(14, 'RES20250211002', '刘助理',   '行政部',     '13900000005', 3,  3,  '政务办理',       1, '%s', '%s', '望京SOHO',     '朝阳区政务中心',  NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '办理公司证照变更'),
-(15, 'RES20250212001', '赵主管',   '物流部',     '13900000006', 7,  7,  '紧急配送',       1, '%s', '%s', '空港物流园',   '丰台总部基地',    8,  '待审批', '特急', NULL,     NULL, NULL, NULL, NULL, NULL, '客户紧急订单'),
-(16, 'RES20250212002', '何师傅',   '物流部',     '13900000018', 18, 18, '仓库调拨',       1, '%s', '%s', '空港物流园',   '大兴仓库',        NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '库存调拨'),
-(17, 'RES20250213001', '林经理',   '行政部',     '13900000013', 9,  9,  '员工团建',       30, '%s', '%s', '望京SOHO',    '怀柔雁栖湖',      NULL, '待审批', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '部门季度团建，需大客车'),
-(18, 'RES20250213002', '陈总监',   '产品部',     '13900000004', NULL, NULL, '天津出差',    3, '%s', '%s', '望京SOHO',     '天津滨海新区',    5,  '已拒绝', '普通', '王VP',   '%s', '当天无可用车辆，建议改乘高铁', NULL, NULL, NULL, NULL),
-(19, 'RES20250214001', '谢主管',   '客服部',     '13900000017', NULL, NULL, '客户走访',    2, '%s', '%s', '望京SOHO',     '朝阳CBD',         NULL, '已取消', '普通', NULL,     NULL, NULL, NULL, NULL, NULL, '客户取消会议'),
-(20, 'RES20250215001', '马工程师', '研发部',     '13900000008', 15, 15, '数据中心巡检',   2, '%s', '%s', '望京SOHO',     '亦庄数据中心',    3,  '进行中', '紧急', '赵总监', '%s', NULL, '%s', NULL, NULL, '服务器故障紧急排查');
+(1,  'RES20250201001', 'Mr Tan',       'CEO Office',    '91000001', 1,  1,  'Client pickup',       2, '%s', '%s', 'Raffles Place',    'Changi Airport T3',     1,  'Completed',   'Normal', 'PA Lee',       '%s', NULL, '%s', '%s', 22.0, NULL),
+(2,  'RES20250201002', 'Ahmad Mgr',    'Sales',         '91000002', 2,  2,  'Client visit',        3, '%s', '%s', 'Raffles Place',    'One North',             4,  'Completed',   'Normal', 'Sales Dir',    '%s', NULL, '%s', '%s', 12.0, NULL),
+(3,  'RES20250202001', 'Raj Eng',      'Engineering',   '91000003', 5,  5,  'Tech exchange',       2, '%s', '%s', 'Raffles Place',    'Jurong East',           3,  'Completed',   'Normal', 'CTO',          '%s', NULL, '%s', '%s', 20.0, 'Carrying equipment'),
+(4,  'RES20250203001', 'Lim Dir',      'Product',       '91000004', 6,  6,  'Site inspection',     4, '%s', '%s', 'Raffles Place',    'Changi Biz Park',       6,  'Completed',   'Urgent', 'VP Ops',       '%s', NULL, '%s', '%s', 18.0, 'New project site visit'),
+(5,  'RES20250204001', 'Priya Asst',   'Admin',         '91000005', 3,  3,  'Meeting reception',   5, '%s', '%s', 'Changi Airport T3','Raffles Place',          1,  'Completed',   'Normal', 'Admin Mgr',    '%s', NULL, '%s', '%s', 22.0, 'Picking up overseas guests'),
+(6,  'RES20250205001', 'Siva Lead',    'Logistics',     '91000006', 7,  7,  'Cargo delivery',      1, '%s', '%s', 'Tuas Warehouse',   'Marina Bay FC',         7,  'Completed',   'Normal', 'Logistics Mgr','%s', NULL, '%s', '%s', 38.0, 'Bulky cargo'),
+(7,  'RES20250206001', 'Nurul Mgr',    'HR',            '91000007', 11, 11, 'Training outing',     3, '%s', '%s', 'Raffles Place',    'Jurong East',           3,  'Completed',   'Normal', 'Admin Mgr',    '%s', NULL, '%s', '%s', 20.0, 'New hire orientation'),
+(8,  'RES20250207001', 'Jason Eng',    'R&D',           '91000008', 15, 15, 'Vendor visit',        2, '%s', '%s', 'Raffles Place',    'One North',             4,  'Completed',   'Normal', 'CTO',          '%s', NULL, '%s', '%s', 12.0, NULL),
+(9,  'RES20250208001', 'Priscilla Mgr','Operations',    '91000009', 16, 16, 'Market research',     2, '%s', '%s', 'Raffles Place',    'Jurong East',           3,  'Completed',   'Normal', 'Sales Dir',    '%s', NULL, '%s', '%s', 20.0, NULL),
+(10, 'RES20250209001', 'David Mgr',    'Finance',       '91000010', 12, 12, 'Bank errand',         1, '%s', '%s', 'Raffles Place',    'Shenton Way',           NULL, 'Completed',  'Normal', 'Admin Mgr',    '%s', NULL, '%s', '%s', 5.0, 'Annual audit submission'),
+(11, 'RES20250210001', 'Mr Tan',       'CEO Office',    '91000001', 1,  1,  'Business dinner',     3, '%s', '%s', 'Raffles Place',    'Marina Bay Sands',      NULL, 'Approved',   'Urgent', 'PA Lee',       '%s', NULL, NULL, NULL, NULL, 'Important client dinner'),
+(12, 'RES20250210002', 'Ahmad Mgr',    'Sales',         '91000002', 2,  2,  'Trade show',          4, '%s', '%s', 'Raffles Place',    'Suntec Convention',     NULL, 'Approved',   'Normal', 'Sales Dir',    '%s', NULL, NULL, NULL, NULL, 'Industry exhibition'),
+(13, 'RES20250211001', 'Raj Eng',      'Engineering',   '91000003', 5,  5,  'Equipment purchase',  2, '%s', '%s', 'Raffles Place',    'Sim Lim Square',        NULL, 'Approved',   'Normal', 'CTO',          '%s', NULL, NULL, NULL, NULL, 'Server equipment procurement'),
+(14, 'RES20250211002', 'Priya Asst',   'Admin',         '91000005', 3,  3,  'Govt errand',         1, '%s', '%s', 'Raffles Place',    'ACRA @ Revenue House',  NULL, 'Pending',    'Normal', NULL,           NULL, NULL, NULL, NULL, NULL, 'Company registration update'),
+(15, 'RES20250212001', 'Siva Lead',    'Logistics',     '91000006', 7,  7,  'Urgent delivery',     1, '%s', '%s', 'Tuas Warehouse',   'Mapletree Biz City',    8,  'Pending',     'Critical',NULL,           NULL, NULL, NULL, NULL, NULL, 'Urgent client order'),
+(16, 'RES20250212002', 'Hafiz',        'Logistics',     '91000018', 18, 18, 'Stock transfer',      1, '%s', '%s', 'Tuas Warehouse',   'Jurong Warehouse',      NULL, 'Pending',    'Normal', NULL,           NULL, NULL, NULL, NULL, NULL, 'Inventory transfer'),
+(17, 'RES20250213001', 'Kevin Mgr',    'Admin',         '91000013', 9,  9,  'Team building',       30, '%s', '%s', 'Raffles Place',   'Sentosa',               9,  'Pending',     'Normal', NULL,           NULL, NULL, NULL, NULL, NULL, 'Quarterly team building, need coach'),
+(18, 'RES20250213002', 'Lim Dir',      'Product',       '91000004', NULL, NULL, 'JB trip',         3, '%s', '%s', 'Raffles Place',    'Johor Bahru CIQ',       5,  'Rejected',    'Normal', 'VP Ops',       '%s', 'No vehicle available, suggest train', NULL, NULL, NULL, NULL),
+(19, 'RES20250214001', 'Alvin Lead',   'Customer Svc',  '91000017', NULL, NULL, 'Client visit',    2, '%s', '%s', 'Raffles Place',    'Marina Bay FC',         NULL, 'Cancelled',  'Normal', NULL,           NULL, NULL, NULL, NULL, NULL, 'Client cancelled meeting'),
+(20, 'RES20250215001', 'Jason Eng',    'R&D',           '91000008', 15, 15, 'DC inspection',       2, '%s', '%s', 'Raffles Place',    'Changi Biz Park DC',    6,  'In Progress', 'Urgent', 'CTO',          '%s', NULL, '%s', NULL, NULL, 'Server fault urgent check');
 `,
 		// Record 1: 已完成
 		ts(now, -14, 8, 0), ts(now, -14, 10, 0), ds(now, -15), ts(now, -14, 8, 5), ts(now, -14, 9, 0),
@@ -885,56 +938,56 @@ INSERT INTO reservations (id, reservation_no, applicant_name, applicant_departme
 	// ---- 9. GPS 定位 (50条) ----
 	gpsSQL := fmt.Sprintf(`
 INSERT INTO gps_tracking (vehicle_id, latitude, longitude, speed, heading, altitude, location_name, status, recorded_at) VALUES
-(1,  39.9932168, 116.4804650, 45.00, 180.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(1,  39.9800000, 116.4700000, 62.00, 175.00, 47.2, '北京市朝阳区东湖街道',     '行驶', '%s'),
-(1,  39.9500000, 116.4600000, 0.00,  0.00,   46.0, '北京市朝阳区亮马桥',       '停车', '%s'),
-(2,  39.9932168, 116.4804650, 55.00, 220.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(2,  39.9100000, 116.4200000, 88.00, 200.00, 42.0, '北京市朝阳区国贸',         '行驶', '%s'),
-(3,  39.9932168, 116.4804650, 0.00,  0.00,   48.5, '北京市朝阳区望京街道',     '停车', '%s'),
-(3,  39.7800000, 116.5200000, 72.00, 160.00, 35.0, '北京市大兴区亦庄',         '行驶', '%s'),
-(4,  39.9932168, 116.4804650, 38.00, 290.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(4,  39.9700000, 116.3100000, 42.00, 280.00, 50.0, '北京市海淀区中关村',       '行驶', '%s'),
-(5,  39.9932168, 116.4804650, 50.00, 195.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(5,  39.0800000, 117.2000000, 110.00, 120.00, 5.0, '天津市滨海新区',           '行驶', '%s'),
-(6,  39.9932168, 116.4804650, 65.00, 210.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(6,  38.9200000, 115.9700000, 125.00, 180.00, 15.0, '雄安新区启动区',          '行驶', '%s'),
-(7,  40.0700000, 116.5900000, 45.00, 240.00, 30.0, '北京市顺义区空港物流园',   '行驶', '%s'),
-(7,  39.9200000, 116.4400000, 35.00, 210.00, 45.0, '北京市朝阳区三元桥',       '行驶', '%s'),
-(7,  39.9100000, 116.4600000, 0.00,  0.00,   44.0, '北京市朝阳区CBD',          '停车', '%s'),
-(8,  40.0700000, 116.5900000, 40.00, 250.00, 30.0, '北京市顺义区空港物流园',   '行驶', '%s'),
-(8,  39.8600000, 116.2800000, 38.00, 190.00, 40.0, '北京市丰台区总部基地',     '行驶', '%s'),
-(9,  40.0700000, 116.3200000, 35.00, 180.00, 55.0, '北京市昌平区回龙观',       '行驶', '%s'),
-(9,  39.9932168, 116.4804650, 0.00,  0.00,   48.5, '北京市朝阳区望京街道',     '停车', '%s'),
-(10, 39.9500000, 116.1800000, 42.00, 90.00,  50.0, '北京市石景山区鲁谷',       '行驶', '%s'),
-(10, 39.9932168, 116.4804650, 0.00,  0.00,   48.5, '北京市朝阳区望京街道',     '停车', '%s'),
-(11, 39.9932168, 116.4804650, 42.00, 195.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(11, 39.7800000, 116.5200000, 0.00,  0.00,   35.0, '北京市大兴区亦庄',         '停车', '%s'),
-(12, 39.9932168, 116.4804650, 55.00, 160.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(12, 40.0800000, 116.6100000, 0.00,  0.00,   25.0, '首都国际机场T3航站楼',     '停车', '%s'),
-(13, 39.9932168, 116.4804650, 0.00,  0.00,   48.5, '北京市朝阳区望京街道',     '离线', '%s'),
-(14, 39.8600000, 116.2800000, 0.00,  0.00,   40.0, '福田特约维修站',           '停车', '%s'),
-(15, 39.9932168, 116.4804650, 48.00, 280.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(15, 39.9700000, 116.3100000, 0.00,  0.00,   50.0, '北京市海淀区中关村软件园', '停车', '%s'),
-(16, 39.9932168, 116.4804650, 60.00, 195.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(16, 39.7800000, 116.5200000, 52.00, 165.00, 35.0, '北京市大兴区亦庄',         '行驶', '%s'),
-(17, 39.9932168, 116.4804650, 35.00, 240.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(17, 39.9100000, 116.4600000, 28.00, 220.00, 44.0, '北京市朝阳区CBD',          '行驶', '%s'),
-(18, 40.0700000, 116.5900000, 42.00, 250.00, 30.0, '北京市顺义区空港物流园',   '行驶', '%s'),
-(18, 39.8600000, 116.2800000, 0.00,  0.00,   40.0, '北京市丰台区总部基地',     '停车', '%s'),
-(19, 39.9932168, 116.4804650, 0.00,  0.00,   48.5, '北京市朝阳区望京街道',     '停车', '%s'),
-(20, 39.9932168, 116.4804650, 52.00, 175.00, 48.5, '北京市朝阳区望京街道',     '行驶', '%s'),
-(1,  40.0800000, 116.6100000, 75.00, 60.00,  25.0, '机场高速',                 '行驶', '%s'),
-(2,  39.5100000, 116.4200000, 95.00, 190.00, 35.0, '大兴机场高速',             '行驶', '%s'),
-(7,  39.9400000, 116.4800000, 22.00, 200.00, 45.0, '朝阳区呼家楼',             '怠速', '%s'),
-(9,  40.0200000, 116.3800000, 45.00, 175.00, 52.0, '昌平区北苑',               '行驶', '%s'),
-(3,  39.8500000, 116.4900000, 68.00, 170.00, 38.0, '南三环',                   '行驶', '%s'),
-(5,  39.5000000, 116.8000000, 105.00, 125.00, 10.0, '京津高速',                '行驶', '%s'),
-(10, 39.9700000, 116.3600000, 35.00, 85.00,  48.0, '北三环',                   '行驶', '%s'),
-(6,  39.5000000, 116.1000000, 118.00, 185.00, 20.0, '京雄高速',                '行驶', '%s'),
-(12, 39.9600000, 116.5100000, 48.00, 45.00,  43.0, '东四环',                   '行驶', '%s'),
-(15, 39.9800000, 116.3500000, 55.00, 270.00, 50.0, '北四环',                   '行驶', '%s'),
-(16, 39.8800000, 116.4900000, 42.00, 175.00, 40.0, '东三环',                   '行驶', '%s'),
-(11, 39.9400000, 116.4500000, 38.00, 195.00, 46.0, '朝阳区三里屯',             '行驶', '%s');
+(1,  1.2840000, 103.8510000, 45.00, 90.00,  15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(1,  1.3000000, 103.8600000, 62.00, 80.00,  12.0, 'Kallang, ECP',                'Moving',  '%s'),
+(1,  1.3200000, 103.8800000, 0.00,  0.00,   10.0, 'Paya Lebar',                  'Parked',  '%s'),
+(2,  1.2840000, 103.8510000, 55.00, 270.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(2,  1.3100000, 103.7600000, 88.00, 270.00,  8.0, 'Jurong East',                 'Moving',  '%s'),
+(3,  1.2840000, 103.8510000, 0.00,  0.00,   15.0, 'Raffles Place, CBD',          'Parked',  '%s'),
+(3,  1.3300000, 103.7400000, 72.00, 270.00, 10.0, 'Jurong West',                 'Moving',  '%s'),
+(4,  1.2840000, 103.8510000, 38.00, 270.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(4,  1.2990000, 103.7870000, 42.00, 270.00, 12.0, 'One North, Fusionopolis',     'Moving',  '%s'),
+(5,  1.2840000, 103.8510000, 50.00, 180.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(5,  1.3500000, 103.7530000, 80.00, 0.00,    5.0, 'Woodlands Checkpoint',        'Moving',  '%s'),
+(6,  1.2840000, 103.8510000, 65.00, 90.00,  15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(6,  1.3340000, 103.9630000, 70.00, 90.00,   8.0, 'Changi Business Park',        'Moving',  '%s'),
+(7,  1.3200000, 103.6380000, 45.00, 90.00,   5.0, 'Tuas Industrial Estate',      'Moving',  '%s'),
+(7,  1.2900000, 103.7800000, 35.00, 90.00,  10.0, 'Queenstown',                  'Moving',  '%s'),
+(7,  1.2810000, 103.8540000, 0.00,  0.00,   15.0, 'Marina Bay FC',               'Parked',  '%s'),
+(8,  1.3200000, 103.6380000, 40.00, 90.00,   5.0, 'Tuas Industrial Estate',      'Moving',  '%s'),
+(8,  1.3050000, 103.7650000, 38.00, 90.00,  10.0, 'Mapletree Business City',     'Moving',  '%s'),
+(9,  1.4370000, 103.7860000, 35.00, 180.00, 10.0, 'Woodlands MRT',               'Moving',  '%s'),
+(9,  1.2840000, 103.8510000, 0.00,  0.00,   15.0, 'Raffles Place, CBD',          'Parked',  '%s'),
+(10, 1.3100000, 103.8500000, 42.00, 180.00, 12.0, 'Toa Payoh',                   'Moving',  '%s'),
+(10, 1.2840000, 103.8510000, 0.00,  0.00,   15.0, 'Raffles Place, CBD',          'Parked',  '%s'),
+(11, 1.2840000, 103.8510000, 42.00, 270.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(11, 1.3300000, 103.7400000, 0.00,  0.00,   10.0, 'Jurong East',                 'Parked',  '%s'),
+(12, 1.2840000, 103.8510000, 55.00, 90.00,  15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(12, 1.3570000, 103.9890000, 0.00,  0.00,    5.0, 'Changi Airport T3',           'Parked',  '%s'),
+(13, 1.2840000, 103.8510000, 0.00,  0.00,   15.0, 'Raffles Place, CBD',          'Offline', '%s'),
+(14, 1.3200000, 103.6380000, 0.00,  0.00,    5.0, 'Isuzu Service Centre Tuas',   'Parked',  '%s'),
+(15, 1.2840000, 103.8510000, 48.00, 270.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(15, 1.2990000, 103.7870000, 0.00,  0.00,   12.0, 'One North, Fusionopolis',     'Parked',  '%s'),
+(16, 1.2840000, 103.8510000, 60.00, 270.00, 15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(16, 1.3300000, 103.7400000, 52.00, 270.00, 10.0, 'Jurong East',                 'Moving',  '%s'),
+(17, 1.2840000, 103.8510000, 35.00, 90.00,  15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(17, 1.2810000, 103.8540000, 28.00, 90.00,  15.0, 'Marina Bay FC',               'Moving',  '%s'),
+(18, 1.3200000, 103.6380000, 42.00, 90.00,   5.0, 'Tuas Industrial Estate',      'Moving',  '%s'),
+(18, 1.3050000, 103.7650000, 0.00,  0.00,   10.0, 'Mapletree Business City',     'Parked',  '%s'),
+(19, 1.2840000, 103.8510000, 0.00,  0.00,   15.0, 'Raffles Place, CBD',          'Parked',  '%s'),
+(20, 1.2840000, 103.8510000, 52.00, 90.00,  15.0, 'Raffles Place, CBD',          'Moving',  '%s'),
+(1,  1.3400000, 103.9600000, 75.00, 90.00,   8.0, 'ECP towards Changi',          'Moving',  '%s'),
+(2,  1.3200000, 103.6380000, 80.00, 270.00,  5.0, 'AYE towards Tuas',            'Moving',  '%s'),
+(7,  1.2900000, 103.8200000, 22.00, 90.00,  12.0, 'Queenstown, Tanglin',         'Idling',  '%s'),
+(9,  1.3800000, 103.8100000, 45.00, 180.00, 10.0, 'Ang Mo Kio',                  'Moving',  '%s'),
+(3,  1.3000000, 103.8200000, 68.00, 270.00, 12.0, 'CTE towards SLE',             'Moving',  '%s'),
+(5,  1.3500000, 103.7530000, 60.00, 0.00,    5.0, 'BKE towards Woodlands',       'Moving',  '%s'),
+(10, 1.3100000, 103.8500000, 35.00, 180.00, 12.0, 'CTE towards CBD',             'Moving',  '%s'),
+(6,  1.3340000, 103.9630000, 70.00, 90.00,   8.0, 'PIE towards Changi',          'Moving',  '%s'),
+(12, 1.3100000, 103.8800000, 48.00, 90.00,  10.0, 'ECP towards Changi',          'Moving',  '%s'),
+(15, 1.3000000, 103.8000000, 55.00, 270.00, 12.0, 'AYE towards Clementi',        'Moving',  '%s'),
+(16, 1.3100000, 103.8300000, 42.00, 270.00, 12.0, 'CTE towards PIE',             'Moving',  '%s'),
+(11, 1.3200000, 103.8700000, 38.00, 90.00,  10.0, 'Bedok',                       'Moving',  '%s');
 `,
 		// 50 GPS records with varying timestamps
 		ts(now, 0, -2, 0), ts(now, 0, -1, 45), ts(now, 0, -1, 15),
@@ -973,39 +1026,39 @@ INSERT INTO gps_tracking (vehicle_id, latitude, longitude, speed, heading, altit
 	// ---- 9b. GPS 路线轨迹（车辆1: 望京→首都机场 完整轨迹 8点） ----
 	gpsRouteSQL := fmt.Sprintf(`
 INSERT INTO gps_tracking (vehicle_id, latitude, longitude, speed, heading, altitude, location_name, status, recorded_at) VALUES
-(1, 39.9932, 116.4805, 0.00,  0.00,   48.5, '望京SOHO停车场',           '停车', '%s'),
-(1, 39.9950, 116.4820, 25.00, 45.00,  48.0, '望京街道望京东路',         '行驶', '%s'),
-(1, 40.0010, 116.4880, 55.00, 50.00,  46.0, '来广营东路',               '行驶', '%s'),
-(1, 40.0150, 116.5050, 72.00, 55.00,  42.0, '京密路入口',               '行驶', '%s'),
-(1, 40.0320, 116.5250, 88.00, 50.00,  38.0, '机场高速南段',             '行驶', '%s'),
-(1, 40.0500, 116.5500, 95.00, 48.00,  32.0, '机场高速中段',             '行驶', '%s'),
-(1, 40.0680, 116.5800, 80.00, 52.00,  28.0, '机场高速北段',             '行驶', '%s'),
-(1, 40.0800, 116.6100, 15.00, 60.00,  25.0, '首都机场T3航站楼',         '行驶', '%s'),
-(7, 40.0700, 116.5900, 0.00,  0.00,   30.0, '顺义空港物流园仓库',       '停车', '%s'),
-(7, 40.0600, 116.5700, 35.00, 220.00, 32.0, '天竺镇天柱路',             '行驶', '%s'),
-(7, 40.0450, 116.5500, 48.00, 215.00, 35.0, '顺义区李桥镇',             '行驶', '%s'),
-(7, 40.0300, 116.5200, 55.00, 210.00, 38.0, '机场高速辅路',             '行驶', '%s'),
-(7, 40.0100, 116.4900, 42.00, 200.00, 42.0, '来广营地区',               '行驶', '%s'),
-(7, 39.9800, 116.4700, 35.00, 195.00, 44.0, '望京西园',                 '行驶', '%s'),
-(7, 39.9500, 116.4600, 28.00, 190.00, 45.0, '三元桥',                   '行驶', '%s'),
-(7, 39.9300, 116.4550, 18.00, 185.00, 44.0, '国贸桥',                   '怠速', '%s'),
-(7, 39.9200, 116.4500, 0.00,  0.00,   44.0, '朝阳区CBD客户处',          '停车', '%s'),
-(9, 40.0700, 116.3200, 0.00,  0.00,   55.0, '回龙观班车发车点',         '停车', '%s'),
-(9, 40.0550, 116.3400, 32.00, 135.00, 52.0, '回龙观东大街',             '行驶', '%s'),
-(9, 40.0400, 116.3600, 42.00, 140.00, 50.0, '立水桥',                   '行驶', '%s'),
-(9, 40.0200, 116.3900, 38.00, 130.00, 48.0, '北苑路',                   '行驶', '%s'),
-(9, 40.0050, 116.4200, 45.00, 120.00, 48.0, '亚运村',                   '行驶', '%s'),
-(9, 39.9932, 116.4500, 30.00, 110.00, 48.0, '望京西',                   '行驶', '%s'),
-(9, 39.9932, 116.4805, 0.00,  0.00,   48.5, '望京SOHO',                 '停车', '%s'),
-(2, 39.9932, 116.4805, 0.00,  0.00,   48.5, '望京SOHO出发',             '停车', '%s'),
-(2, 39.9800, 116.4700, 42.00, 195.00, 47.0, '望京南',                   '行驶', '%s'),
-(2, 39.9500, 116.4500, 55.00, 200.00, 45.0, '三元桥',                   '行驶', '%s'),
-(2, 39.9200, 116.4300, 65.00, 205.00, 43.0, '国贸',                     '行驶', '%s'),
-(2, 39.8800, 116.4200, 78.00, 200.00, 42.0, '十里河',                   '行驶', '%s'),
-(2, 39.8200, 116.4100, 92.00, 195.00, 40.0, '南四环',                   '行驶', '%s'),
-(2, 39.7200, 116.4100, 105.00, 190.00, 38.0, '大兴机场高速',            '行驶', '%s'),
-(2, 39.5800, 116.4200, 110.00, 188.00, 35.0, '大兴机场高速中段',        '行驶', '%s'),
-(2, 39.5100, 116.4100, 45.00, 185.00, 32.0, '大兴机场到达层',           '行驶', '%s');
+(1, 1.2840, 103.8510, 0.00,  0.00,   15.0, 'Raffles Place Carpark',     'Parked',  '%s'),
+(1, 1.2900, 103.8600, 25.00, 90.00,  12.0, 'Nicoll Highway',            'Moving',  '%s'),
+(1, 1.3050, 103.8800, 55.00, 85.00,  10.0, 'Kallang',                   'Moving',  '%s'),
+(1, 1.3200, 103.9000, 72.00, 80.00,   8.0, 'ECP Tanjong Rhu',           'Moving',  '%s'),
+(1, 1.3300, 103.9300, 88.00, 78.00,   8.0, 'ECP Bedok',                 'Moving',  '%s'),
+(1, 1.3400, 103.9600, 80.00, 75.00,   6.0, 'ECP Tanah Merah',           'Moving',  '%s'),
+(1, 1.3500, 103.9750, 65.00, 70.00,   5.0, 'Changi Airport Approach',   'Moving',  '%s'),
+(1, 1.3570, 103.9890, 15.00, 60.00,   5.0, 'Changi Airport T3',         'Moving',  '%s'),
+(7, 1.3200, 103.6380, 0.00,  0.00,    5.0, 'Tuas Warehouse',            'Parked',  '%s'),
+(7, 1.3150, 103.6600, 35.00, 90.00,   5.0, 'Tuas Ave 2',                'Moving',  '%s'),
+(7, 1.3100, 103.6900, 48.00, 90.00,   8.0, 'Pioneer Road',              'Moving',  '%s'),
+(7, 1.3050, 103.7200, 55.00, 90.00,   8.0, 'AYE Jurong',                'Moving',  '%s'),
+(7, 1.2980, 103.7600, 42.00, 90.00,  10.0, 'AYE Queenstown',            'Moving',  '%s'),
+(7, 1.2900, 103.8000, 35.00, 90.00,  12.0, 'Tanglin Road',              'Moving',  '%s'),
+(7, 1.2860, 103.8300, 28.00, 90.00,  14.0, 'Shenton Way',               'Moving',  '%s'),
+(7, 1.2830, 103.8500, 18.00, 90.00,  15.0, 'Bayfront Ave',              'Idling',  '%s'),
+(7, 1.2810, 103.8540, 0.00,  0.00,   15.0, 'Marina Bay FC',             'Parked',  '%s'),
+(9, 1.4370, 103.7860, 0.00,  0.00,   10.0, 'Woodlands MRT Pickup',      'Parked',  '%s'),
+(9, 1.4200, 103.7900, 32.00, 180.00, 10.0, 'SLE Woodlands',             'Moving',  '%s'),
+(9, 1.3900, 103.8000, 42.00, 180.00, 10.0, 'SLE Ang Mo Kio',            'Moving',  '%s'),
+(9, 1.3600, 103.8100, 38.00, 180.00, 12.0, 'CTE Bishan',                'Moving',  '%s'),
+(9, 1.3300, 103.8300, 45.00, 180.00, 14.0, 'CTE Toa Payoh',             'Moving',  '%s'),
+(9, 1.3000, 103.8450, 30.00, 180.00, 15.0, 'CTE Novena',                'Moving',  '%s'),
+(9, 1.2840, 103.8510, 0.00,  0.00,   15.0, 'Raffles Place',             'Parked',  '%s'),
+(2, 1.2840, 103.8510, 0.00,  0.00,   15.0, 'Raffles Place Departure',   'Parked',  '%s'),
+(2, 1.2900, 103.8400, 42.00, 270.00, 14.0, 'Outram Road',               'Moving',  '%s'),
+(2, 1.3000, 103.8200, 55.00, 270.00, 12.0, 'Tanglin',                   'Moving',  '%s'),
+(2, 1.3100, 103.7900, 65.00, 270.00, 10.0, 'AYE Dover',                 'Moving',  '%s'),
+(2, 1.3200, 103.7500, 78.00, 270.00,  8.0, 'AYE Clementi',              'Moving',  '%s'),
+(2, 1.3250, 103.7100, 80.00, 270.00,  6.0, 'AYE Jurong East',           'Moving',  '%s'),
+(2, 1.3300, 103.6800, 75.00, 270.00,  5.0, 'AYE Jurong West',           'Moving',  '%s'),
+(2, 1.3250, 103.6500, 60.00, 270.00,  5.0, 'AYE Pioneer',               'Moving',  '%s'),
+(2, 1.3200, 103.6380, 25.00, 270.00,  5.0, 'Tuas Industrial Arrival',   'Moving',  '%s');
 `,
 		// Vehicle 1: Wangjing → Airport (8 points, yesterday morning)
 		ts(now, -1, 8, 0), ts(now, -1, 8, 3), ts(now, -1, 8, 8),
@@ -1031,24 +1084,24 @@ INSERT INTO gps_tracking (vehicle_id, latitude, longitude, speed, heading, altit
 	// ---- 10. 告警 (18条) ----
 	alertSQL := fmt.Sprintf(`
 INSERT INTO alerts (vehicle_id, driver_id, alert_type, severity, title, description, location, latitude, longitude, speed, threshold_value, actual_value, status, handler, handled_at, handle_result, alert_time) VALUES
-(7,  7,  '超速',       '高',   '货车超速告警',               '车辆在限速60km/h路段行驶速度达到82km/h',     '北京市顺义区天竺路',       40.0700, 116.5900, 82.00, '60 km/h',  '82 km/h',  '已处理', '调度中心李主管', '%s', '已通知驾驶员降速', '%s'),
-(5,  5,  '超速',       '中',   '小型车超速提醒',             '车辆在限速100km/h路段行驶速度达到118km/h',    '京津高速',                 39.5000, 116.8000, 118.00, '100 km/h', '118 km/h', '已处理', '调度中心李主管', '%s', '电话提醒已确认', '%s'),
-(9,  9,  '疲劳驾驶',   '紧急', '班车驾驶员疲劳驾驶告警',     '连续驾驶超过4小时未休息',                     '北京市昌平区回龙观',       40.0700, 116.3200, 45.00, '4 小时',   '4.5 小时', '已处理', '安全主管张伟',   '%s', '已安排换班休息', '%s'),
-(13, 13, '设备离线',   '中',   'GPS设备离线',                '车辆GPS设备持续离线超过24小时',                '最后位置：望京SOHO',       39.9932, 116.4805, 0.00,  '2 小时',   '48 小时',  '处理中', NULL,            NULL, NULL, '%s'),
-(1,  1,  '保养到期',   '低',   '车辆保养提醒',               '比亚迪汉EV距下次保养还有500km',               NULL,                       NULL,    NULL,     NULL,  '50000 km', '49500 km', '已处理', '车管员小王',    '%s', '已预约保养', '%s'),
-(19, NULL, '年检到期',  '高',   '车辆年检即将到期',           '本田雅阁年检将于30天内到期',                  NULL,                       NULL,    NULL,     NULL,  '30 天',    '25 天',    '未处理', NULL,            NULL, NULL, '%s'),
-(3,  3,  '急刹车',     '中',   '紧急制动告警',               '车辆发生紧急制动，减速度超过阈值',            '北京市朝阳区东三环',       39.9300, 116.4700, 68.00, '0.6g',     '0.75g',    '已忽略', '调度中心李主管', '%s', '正常避让行为', '%s'),
-(6,  6,  '急加速',     '低',   '急加速提醒',                 '车辆急加速，加速度超过阈值',                  '北京市朝阳区望京街道',     39.9932, 116.4805, 15.00, '0.4g',     '0.52g',    '已忽略', '调度中心李主管', '%s', '正常起步加速', '%s'),
-(10, 10, '围栏越界',   '高',   '大客车越出电子围栏',         '车辆驶出预设电子围栏区域',                    '北京市昌平区北六环外',     40.1500, 116.3500, 55.00, '围栏半径30km', '32km', '已处理', '调度中心李主管', '%s', '临时绕路已确认', '%s'),
-(7,  7,  '超速',       '中',   '货车超速告警',               '车辆在限速80km/h路段行驶速度达到95km/h',     '北京市朝阳区机场高速',     40.0500, 116.5500, 95.00, '80 km/h',  '95 km/h',  '已处理', '调度中心李主管', '%s', '已通知驾驶员', '%s'),
-(2,  2,  '超速',       '中',   '电动车超速提醒',             '车辆在限速100km/h路段行驶速度达到112km/h',    '大兴机场高速',             39.5100, 116.4200, 112.00, '100 km/h', '112 km/h', '未处理', NULL,            NULL, NULL, '%s'),
-(14, 14, '异常停留',   '低',   '车辆异常停留',               '车辆在维修站停留超过72小时',                  '福田特约维修站',           39.8600, 116.2800, 0.00,  '24 小时',  '96 小时',  '已处理', '车管员小王',    '%s', '发动机维修中属正常', '%s'),
-(8,  8,  '急刹车',     '中',   '紧急制动告警',               '车辆发生紧急制动',                           '北京市昌平区立汤路',       40.0600, 116.3600, 55.00, '0.6g',     '0.68g',    '未处理', NULL,            NULL, NULL, '%s'),
-(11, 11, '保养到期',   '低',   '保养提醒',                   '比亚迪秦PLUS距下次保养里程即将到达',         NULL,                       NULL,    NULL,     NULL,  '30000 km', '28500 km', '未处理', NULL,            NULL, NULL, '%s'),
-(12, 12, '保险到期',   '高',   '保险即将到期',               '奔驰E300L交强险将于60天内到期',              NULL,                       NULL,    NULL,     NULL,  '60 天',    '55 天',    '未处理', NULL,            NULL, NULL, '%s'),
-(16, 16, '超速',       '低',   '城区超速提醒',               '车辆在限速60km/h路段行驶速度达到68km/h',     '北京市朝阳区东三环',       39.8800, 116.4900, 68.00, '60 km/h',  '68 km/h',  '已忽略', '调度中心',      '%s', '轻微超速已忽略', '%s'),
-(17, 17, '急刹车',     '中',   '紧急制动告警',               '车辆在CBD区域发生紧急制动',                  '北京市朝阳区CBD',          39.9100, 116.4600, 45.00, '0.6g',     '0.72g',    '未处理', NULL,            NULL, NULL, '%s'),
-(18, 18, '设备离线',   '低',   'GPS信号弱',                  '电动货车GPS信号弱，位置精度下降',            '地下车库',                 39.8600, 116.2800, 0.00,  '正常',     '信号弱',   '已忽略', '车管员',        '%s', '地下车库信号遮挡', '%s');
+(7,  7,  'Speeding',       'High',     'Truck speeding alert',            'Vehicle travelling 82km/h in 60km/h zone',     'Tuas Ave 1',               1.3200, 103.6380, 82.00, '60 km/h',  '82 km/h',  'Handled',  'Dispatch Ctr Mgr', '%s', 'Driver notified to slow down', '%s'),
+(5,  5,  'Speeding',       'Medium',   'Vehicle speeding alert',          'Vehicle travelling 95km/h in 80km/h zone',     'AYE towards Tuas',         1.3100, 103.7600, 95.00, '80 km/h',  '95 km/h',  'Handled',  'Dispatch Ctr Mgr', '%s', 'Phone reminder confirmed', '%s'),
+(9,  9,  'Fatigue',        'Critical', 'Bus driver fatigue alert',        'Continuous driving over 4 hours without rest',  'Woodlands MRT',            1.4370, 103.7860, 45.00, '4 hrs',    '4.5 hrs',  'Handled',  'Safety Mgr Ali',   '%s', 'Arranged relief driver', '%s'),
+(13, 13, 'Device Offline', 'Medium',   'GPS device offline',              'Vehicle GPS offline for over 24 hours',         'Last: Raffles Place',      1.2840, 103.8510, 0.00,  '2 hrs',    '48 hrs',   'Handling', NULL,               NULL, NULL, '%s'),
+(1,  1,  'Service Due',    'Low',      'Vehicle service reminder',        'Mercedes S450L next service in 500km',          NULL,                       NULL,   NULL,     NULL,  '50000 km', '49500 km', 'Handled',  'Fleet Admin Amy',  '%s', 'Service booked', '%s'),
+(19, NULL, 'Inspection Due','High',    'Vehicle inspection expiring',     'Nissan Sylphy inspection due in 30 days',       NULL,                       NULL,   NULL,     NULL,  '30 days',  '25 days',  'Unhandled', NULL,              NULL, NULL, '%s'),
+(3,  3,  'Hard Brake',     'Medium',   'Emergency braking alert',         'Emergency braking detected, deceleration exceeded threshold', 'ECP Kallang', 1.3000, 103.8600, 68.00, '0.6g',     '0.75g',    'Ignored',  'Dispatch Ctr Mgr', '%s', 'Normal evasive manoeuvre', '%s'),
+(6,  6,  'Hard Accel',     'Low',      'Harsh acceleration alert',        'Harsh acceleration detected, exceeded threshold','Raffles Place',            1.2840, 103.8510, 15.00, '0.4g',     '0.52g',    'Ignored',  'Dispatch Ctr Mgr', '%s', 'Normal start acceleration', '%s'),
+(10, 10, 'Geofence',       'High',     'Coach left geofence',             'Vehicle left preset geofence area',             'BKE Woodlands',            1.4500, 103.7800, 55.00, '30km radius','32km',    'Handled',  'Dispatch Ctr Mgr', '%s', 'Temporary detour confirmed', '%s'),
+(7,  7,  'Speeding',       'Medium',   'Truck speeding alert',            'Vehicle travelling 88km/h in 70km/h zone',     'AYE Jurong',               1.3050, 103.7200, 88.00, '70 km/h',  '88 km/h',  'Handled',  'Dispatch Ctr Mgr', '%s', 'Driver notified', '%s'),
+(2,  2,  'Speeding',       'Medium',   'EV speeding alert',               'Vehicle travelling 95km/h in 80km/h zone',     'AYE towards Tuas',         1.3200, 103.6380, 95.00, '80 km/h',  '95 km/h',  'Unhandled', NULL,              NULL, NULL, '%s'),
+(14, 14, 'Long Stop',      'Low',      'Abnormal vehicle stop',           'Vehicle stopped at service centre over 72 hours','Isuzu Centre Tuas',       1.3200, 103.6380, 0.00,  '24 hrs',   '96 hrs',   'Handled',  'Fleet Admin Amy',  '%s', 'Engine repair in progress, normal', '%s'),
+(8,  8,  'Hard Brake',     'Medium',   'Emergency braking alert',         'Emergency braking detected',                    'Woodlands Ave 3',          1.4300, 103.7900, 55.00, '0.6g',     '0.68g',    'Unhandled', NULL,              NULL, NULL, '%s'),
+(11, 11, 'Service Due',    'Low',      'Service reminder',                'Hyundai Ioniq 5 approaching next service mileage', NULL,                    NULL,   NULL,     NULL,  '30000 km', '28500 km', 'Unhandled', NULL,              NULL, NULL, '%s'),
+(12, 12, 'Insurance Due',  'High',     'Insurance expiring soon',         'Mercedes E200 TP insurance due in 60 days',     NULL,                       NULL,   NULL,     NULL,  '60 days',  '55 days',  'Unhandled', NULL,              NULL, NULL, '%s'),
+(16, 16, 'Speeding',       'Low',      'Urban speeding alert',            'Vehicle travelling 68km/h in 60km/h zone',      'CTE Novena',               1.3000, 103.8450, 68.00, '60 km/h',  '68 km/h',  'Ignored',  'Dispatch Ctr',    '%s', 'Minor speeding ignored', '%s'),
+(17, 17, 'Hard Brake',     'Medium',   'Emergency braking alert',         'Emergency braking in CBD area',                 'Marina Bay FC',             1.2810, 103.8540, 45.00, '0.6g',     '0.72g',    'Unhandled', NULL,              NULL, NULL, '%s'),
+(18, 18, 'Device Offline', 'Low',      'Weak GPS signal',                 'EV truck GPS signal weak, accuracy degraded',   'Underground carpark',       1.3200, 103.6380, 0.00,  'Normal',   'Weak',     'Ignored',  'Fleet Admin',     '%s', 'Underground carpark signal block', '%s');
 `,
 		// 18 alerts with handlers and times
 		ts(now, -10, 8, 30), ts(now, -10, 8, 20),
@@ -1124,19 +1177,23 @@ func seedUISchemaAndPublish(db *gorm.DB, wsID, ownerID uuid.UUID) error {
 		Where("workspace_id = ?", wsID.String()).
 		Delete(map[string]interface{}{})
 
+	// 构建业务逻辑 JS 代码
+	logicCode := buildFleetLogicCode()
+
 	// 创建新版本
 	if err := db.Table("what_reverse_workspace_versions").Create(map[string]interface{}{
 		"id":           versionID.String(),
 		"workspace_id": wsID.String(),
 		"version":      "1.0.0",
-		"changelog":    "智慧车队管理系统 - 初始版本",
+		"changelog":    "SG Fleet Management System - Initial version with business logic",
 		"ui_schema":    string(schemaJSON),
+		"logic_code":   logicCode,
 		"created_by":   ownerID.String(),
 		"created_at":   now,
 	}).Error; err != nil {
 		return fmt.Errorf("创建版本: %w", err)
 	}
-	fmt.Println("  📦 已创建版本 v1.0.0")
+	fmt.Println("  📦 已创建版本 v1.0.0（含业务逻辑）")
 
 	// 更新 workspace: 设置当前版本、发布状态、名称
 	if err := db.Table("what_reverse_workspaces").
@@ -1145,9 +1202,9 @@ func seedUISchemaAndPublish(db *gorm.DB, wsID, ownerID uuid.UUID) error {
 			"current_version_id": versionID.String(),
 			"app_status":         "published",
 			"published_at":       now,
-			"name":               "智慧车队管理系统",
+			"name":               "SG Fleet Management",
 			"slug":               "fleet",
-			"icon":               "🚛",
+			"icon":               "🚐",
 			"updated_at":         now,
 		}).Error; err != nil {
 		return fmt.Errorf("更新工作空间: %w", err)
@@ -1161,7 +1218,7 @@ func seedUISchemaAndPublish(db *gorm.DB, wsID, ownerID uuid.UUID) error {
 func buildFleetUISchema() map[string]interface{} {
 	return map[string]interface{}{
 		"app_schema_version": "2.0.0",
-		"app_name":           "智慧车队管理系统",
+		"app_name":           "SG Fleet Management",
 		"default_page":       "reservations",
 		"navigation": map[string]interface{}{
 			"type": "sidebar",
@@ -1184,7 +1241,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 4. 行程记录 ======
 			map[string]interface{}{
 				"id":    "trips",
-				"title": "行程记录",
+				"title": "Trips",
 				"route": "/trips",
 				"icon":  "MapPin",
 				"blocks": []interface{}{
@@ -1193,15 +1250,15 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "trips",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "trip_no", "label": "编号", "type": "text", "sortable": true},
-								map[string]interface{}{"key": "vehicle_id", "label": "车辆ID", "type": "number"},
-								map[string]interface{}{"key": "driver_id", "label": "驾驶员ID", "type": "number"},
-								map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text"},
-								map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text"},
-								map[string]interface{}{"key": "distance_km", "label": "距离(km)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "purpose", "label": "目的", "type": "text"},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-								map[string]interface{}{"key": "start_time", "label": "出发时间", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "trip_no", "label": "Code", "type": "text", "sortable": true},
+								map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+								map[string]interface{}{"key": "driver_id", "label": "Driver", "type": "lookup", "lookup_table": "drivers", "lookup_key": "id", "display_key": "name"},
+								map[string]interface{}{"key": "start_location", "label": "From", "type": "text"},
+								map[string]interface{}{"key": "end_location", "label": "To", "type": "text"},
+								map[string]interface{}{"key": "distance_km", "label": "Distance(km)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "purpose", "label": "Purpose", "type": "text"},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+								map[string]interface{}{"key": "start_time", "label": "Departure", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "create", "edit", "delete"},
 							"search_enabled": true, "search_key": "trip_no",
@@ -1217,7 +1274,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 5. 路线管理 ======
 			map[string]interface{}{
 				"id":    "routes",
-				"title": "路线管理",
+				"title": "Routes",
 				"route": "/routes",
 				"icon":  "Globe",
 				"blocks": []interface{}{
@@ -1226,13 +1283,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "routes",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "name", "label": "路线名称", "type": "text", "sortable": true},
-								map[string]interface{}{"key": "route_code", "label": "编号", "type": "text"},
-								map[string]interface{}{"key": "start_point", "label": "起点", "type": "text"},
-								map[string]interface{}{"key": "end_point", "label": "终点", "type": "text"},
-								map[string]interface{}{"key": "distance_km", "label": "距离(km)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "route_type", "label": "类型", "type": "badge"},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
+								map[string]interface{}{"key": "name", "label": "Route Name", "type": "text", "sortable": true},
+								map[string]interface{}{"key": "route_code", "label": "Code", "type": "text"},
+								map[string]interface{}{"key": "start_point", "label": "Start Point", "type": "text"},
+								map[string]interface{}{"key": "end_point", "label": "End Point", "type": "text"},
+								map[string]interface{}{"key": "distance_km", "label": "Distance(km)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "route_type", "label": "Type", "type": "badge"},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
 							},
 							"actions":        []interface{}{"view", "create", "edit", "delete"},
 							"search_enabled": true, "search_key": "name",
@@ -1248,7 +1305,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 6. 维修保养 ======
 			map[string]interface{}{
 				"id":    "maintenance",
-				"title": "维修保养",
+				"title": "Maintenance",
 				"route": "/maintenance",
 				"icon":  "Settings",
 				"blocks": []interface{}{
@@ -1256,10 +1313,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_pending_maintenance", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "待处理工单", "value_key": "count", "icon": "Clock", "color": "amber",
+							"label": "Pending", "value_key": "count", "icon": "Clock", "color": "amber",
 						},
 						"data_source": map[string]interface{}{
-							"table": "maintenance_records", "where": "status = '待处理'",
+							"table": "maintenance_records", "where": "status = 'Pending'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1267,10 +1324,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_in_progress_maintenance", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "进行中", "value_key": "count", "icon": "Settings", "color": "blue",
+							"label": "In Progress", "value_key": "count", "icon": "Settings", "color": "blue",
 						},
 						"data_source": map[string]interface{}{
-							"table": "maintenance_records", "where": "status = '进行中'",
+							"table": "maintenance_records", "where": "status = 'In Progress'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1278,10 +1335,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_completed_maintenance", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "已完成", "value_key": "count", "icon": "CheckCircle", "color": "green",
+							"label": "Completed", "value_key": "count", "icon": "CheckCircle", "color": "green",
 						},
 						"data_source": map[string]interface{}{
-							"table": "maintenance_records", "where": "status = '已完成'",
+							"table": "maintenance_records", "where": "status = 'Completed'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1289,7 +1346,7 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_total_maintenance", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "工单总数", "value_key": "count", "icon": "Briefcase", "color": "default",
+							"label": "Total Orders", "value_key": "count", "icon": "Briefcase", "color": "default",
 						},
 						"data_source": map[string]interface{}{
 							"table":       "maintenance_records",
@@ -1298,10 +1355,10 @@ func buildFleetUISchema() map[string]interface{} {
 					},
 					map[string]interface{}{
 						"id": "maintenance_type_chart", "type": "chart",
-						"label": "维修类型分布",
+						"label": "Maintenance Type Distribution",
 						"grid":  map[string]interface{}{"col_span": 2},
 						"config": map[string]interface{}{
-							"chart_type": "pie", "title": "维修类型分布",
+							"chart_type": "pie", "title": "Maintenance Type Distribution",
 							"x_key": "maintenance_type", "y_key": "count", "category_key": "maintenance_type",
 						},
 						"data_source": map[string]interface{}{"table": "maintenance_records", "limit": 100},
@@ -1311,13 +1368,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "maintenance_records",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "record_no", "label": "工单号", "type": "text", "sortable": true},
-								map[string]interface{}{"key": "vehicle_id", "label": "车辆ID", "type": "number"},
-								map[string]interface{}{"key": "maintenance_type", "label": "类型", "type": "badge"},
-								map[string]interface{}{"key": "service_provider", "label": "服务商", "type": "text"},
-								map[string]interface{}{"key": "cost", "label": "费用(元)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-								map[string]interface{}{"key": "start_date", "label": "开始日期", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "record_no", "label": "Work Order", "type": "text", "sortable": true},
+								map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+								map[string]interface{}{"key": "maintenance_type", "label": "Type", "type": "badge"},
+								map[string]interface{}{"key": "service_provider", "label": "Provider", "type": "text"},
+								map[string]interface{}{"key": "cost", "label": "Cost(SGD)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+								map[string]interface{}{"key": "start_date", "label": "Start Date", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "create", "edit", "delete"},
 							"search_enabled": true, "search_key": "record_no",
@@ -1333,16 +1390,16 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 7. 加油记录 ======
 			map[string]interface{}{
 				"id":    "fuel",
-				"title": "加油记录",
+				"title": "Fuel Records",
 				"route": "/fuel",
 				"icon":  "Zap",
 				"blocks": []interface{}{
 					map[string]interface{}{
 						"id": "fuel_type_chart", "type": "chart",
-						"label": "燃料类型费用分布",
+						"label": "Fuel Cost by Type",
 						"grid":  map[string]interface{}{"col_span": 2},
 						"config": map[string]interface{}{
-							"chart_type": "pie", "title": "燃料类型费用分布",
+							"chart_type": "pie", "title": "Fuel Cost by Type",
 							"x_key": "fuel_type", "y_key": "count", "category_key": "fuel_type",
 						},
 						"data_source": map[string]interface{}{"table": "fuel_records", "limit": 200},
@@ -1352,13 +1409,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "fuel_records",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "vehicle_id", "label": "车辆ID", "type": "number"},
-								map[string]interface{}{"key": "fuel_type", "label": "燃料类型", "type": "badge"},
-								map[string]interface{}{"key": "quantity", "label": "加油量", "type": "number"},
-								map[string]interface{}{"key": "unit_price", "label": "单价(元)", "type": "number"},
-								map[string]interface{}{"key": "total_cost", "label": "总费用(元)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "gas_station", "label": "加油站", "type": "text"},
-								map[string]interface{}{"key": "fuel_date", "label": "日期", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+								map[string]interface{}{"key": "fuel_type", "label": "Fuel Type", "type": "badge"},
+								map[string]interface{}{"key": "quantity", "label": "Quantity", "type": "number"},
+								map[string]interface{}{"key": "unit_price", "label": "Price/L(SGD)", "type": "number"},
+								map[string]interface{}{"key": "total_cost", "label": "Total(SGD)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "gas_station", "label": "Station", "type": "text"},
+								map[string]interface{}{"key": "fuel_date", "label": "Date", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "create", "edit"},
 							"search_enabled": true, "search_key": "gas_station",
@@ -1374,7 +1431,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 8. 违章记录 ======
 			map[string]interface{}{
 				"id":    "violations",
-				"title": "违章记录",
+				"title": "Violations",
 				"route": "/violations",
 				"icon":  "AlertTriangle",
 				"blocks": []interface{}{
@@ -1383,13 +1440,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "violations",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "vehicle_id", "label": "车辆ID", "type": "number"},
-								map[string]interface{}{"key": "driver_id", "label": "驾驶员ID", "type": "number"},
-								map[string]interface{}{"key": "violation_type", "label": "违章类型", "type": "text"},
-								map[string]interface{}{"key": "fine_amount", "label": "罚款(元)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "deduction_points", "label": "扣分", "type": "number"},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-								map[string]interface{}{"key": "violation_date", "label": "违章时间", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+								map[string]interface{}{"key": "driver_id", "label": "Driver", "type": "lookup", "lookup_table": "drivers", "lookup_key": "id", "display_key": "name"},
+								map[string]interface{}{"key": "violation_type", "label": "Offence Type", "type": "text"},
+								map[string]interface{}{"key": "fine_amount", "label": "Fine(SGD)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "deduction_points", "label": "Demerit Pts", "type": "number"},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+								map[string]interface{}{"key": "violation_date", "label": "Offence Date", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "edit"},
 							"search_enabled": true, "search_key": "violation_type",
@@ -1405,7 +1462,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 9. 保险管理 ======
 			map[string]interface{}{
 				"id":    "insurance",
-				"title": "保险管理",
+				"title": "Insurance",
 				"route": "/insurance",
 				"icon":  "Briefcase",
 				"blocks": []interface{}{
@@ -1414,13 +1471,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "insurance_policies",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "vehicle_id", "label": "车辆ID", "type": "number"},
-								map[string]interface{}{"key": "policy_no", "label": "保单号", "type": "text"},
-								map[string]interface{}{"key": "insurance_company", "label": "保险公司", "type": "text"},
-								map[string]interface{}{"key": "insurance_type", "label": "险种", "type": "badge"},
-								map[string]interface{}{"key": "premium", "label": "保费(元)", "type": "number", "sortable": true},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-								map[string]interface{}{"key": "end_date", "label": "到期日", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+								map[string]interface{}{"key": "policy_no", "label": "Policy No.", "type": "text"},
+								map[string]interface{}{"key": "insurance_company", "label": "Insurer", "type": "text"},
+								map[string]interface{}{"key": "insurance_type", "label": "Type", "type": "badge"},
+								map[string]interface{}{"key": "premium", "label": "Premium(SGD)", "type": "number", "sortable": true},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+								map[string]interface{}{"key": "end_date", "label": "Expiry Date", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "create", "edit"},
 							"search_enabled": true, "search_key": "policy_no",
@@ -1436,7 +1493,7 @@ func buildFleetUISchema() map[string]interface{} {
 			// ====== 10. 告警中心 ======
 			map[string]interface{}{
 				"id":    "alerts",
-				"title": "告警中心",
+				"title": "Alert Centre",
 				"route": "/alerts",
 				"icon":  "Activity",
 				"blocks": []interface{}{
@@ -1444,10 +1501,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_unhandled", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "未处理", "value_key": "count", "icon": "AlertTriangle", "color": "red",
+							"label": "Unhandled", "value_key": "count", "icon": "AlertTriangle", "color": "red",
 						},
 						"data_source": map[string]interface{}{
-							"table": "alerts", "where": "status = '未处理'",
+							"table": "alerts", "where": "status = 'Unhandled'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1455,10 +1512,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_handling", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "处理中", "value_key": "count", "icon": "Clock", "color": "amber",
+							"label": "Handling", "value_key": "count", "icon": "Clock", "color": "amber",
 						},
 						"data_source": map[string]interface{}{
-							"table": "alerts", "where": "status = '处理中'",
+							"table": "alerts", "where": "status = 'Handling'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1466,10 +1523,10 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_handled", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "已处理", "value_key": "count", "icon": "CheckCircle", "color": "green",
+							"label": "Handled", "value_key": "count", "icon": "CheckCircle", "color": "green",
 						},
 						"data_source": map[string]interface{}{
-							"table": "alerts", "where": "status = '已处理'",
+							"table": "alerts", "where": "status = 'Handled'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
@@ -1477,20 +1534,20 @@ func buildFleetUISchema() map[string]interface{} {
 						"id": "stat_ignored", "type": "stats_card",
 						"grid": map[string]interface{}{"col_span": 1},
 						"config": map[string]interface{}{
-							"label": "已忽略", "value_key": "count", "icon": "Star", "color": "default",
+							"label": "Ignored", "value_key": "count", "icon": "Star", "color": "default",
 						},
 						"data_source": map[string]interface{}{
-							"table": "alerts", "where": "status = '已忽略'",
+							"table": "alerts", "where": "status = 'Ignored'",
 							"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 						},
 					},
 					map[string]interface{}{
 						"id": "alert_severity_chart", "type": "chart",
-						"label": "告警严重程度分布",
+						"label": "Alert Severity Distribution",
 						"grid":  map[string]interface{}{"col_span": 2},
 						"config": map[string]interface{}{
 							"chart_type":   "pie",
-							"title":        "告警严重程度分布",
+							"title":        "Alert Severity Distribution",
 							"x_key":        "severity",
 							"y_key":        "count",
 							"category_key": "severity",
@@ -1505,13 +1562,13 @@ func buildFleetUISchema() map[string]interface{} {
 						"config": map[string]interface{}{
 							"table_name": "alerts",
 							"columns": []interface{}{
-								map[string]interface{}{"key": "title", "label": "告警标题", "type": "text"},
-								map[string]interface{}{"key": "alert_type", "label": "类型", "type": "badge"},
-								map[string]interface{}{"key": "severity", "label": "等级", "type": "badge"},
-								map[string]interface{}{"key": "location", "label": "位置", "type": "text"},
-								map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-								map[string]interface{}{"key": "handler", "label": "处理人", "type": "text"},
-								map[string]interface{}{"key": "alert_time", "label": "告警时间", "type": "date", "sortable": true},
+								map[string]interface{}{"key": "title", "label": "Title", "type": "text"},
+								map[string]interface{}{"key": "alert_type", "label": "Type", "type": "badge"},
+								map[string]interface{}{"key": "severity", "label": "Severity", "type": "badge"},
+								map[string]interface{}{"key": "location", "label": "Location", "type": "text"},
+								map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+								map[string]interface{}{"key": "handler", "label": "Handler", "type": "text"},
+								map[string]interface{}{"key": "alert_time", "label": "Alert Time", "type": "date", "sortable": true},
 							},
 							"actions":        []interface{}{"view", "edit"},
 							"search_enabled": true, "search_key": "title",
@@ -1531,13 +1588,13 @@ func buildFleetUISchema() map[string]interface{} {
 
 func buildDashboardPage() map[string]interface{} {
 	return map[string]interface{}{
-		"id": "dashboard", "title": "仪表盘", "route": "/dashboard", "icon": "LayoutDashboard",
+		"id": "dashboard", "title": "Dashboard", "route": "/dashboard", "icon": "LayoutDashboard",
 		"blocks": []interface{}{
 			map[string]interface{}{
 				"id": "stat_total_vehicles", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "车辆总数", "value_key": "count", "icon": "Truck", "color": "blue",
+					"label": "Total Vehicles", "value_key": "count", "icon": "Truck", "color": "blue",
 				},
 				"data_source": map[string]interface{}{
 					"table":       "vehicles",
@@ -1548,10 +1605,10 @@ func buildDashboardPage() map[string]interface{} {
 				"id": "stat_online_vehicles", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "在线车辆", "value_key": "count", "icon": "CheckCircle", "color": "green",
+					"label": "Online Vehicles", "value_key": "count", "icon": "CheckCircle", "color": "green",
 				},
 				"data_source": map[string]interface{}{
-					"table": "vehicles", "where": "status = '在线'",
+					"table": "vehicles", "where": "status = 'Online'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1559,7 +1616,7 @@ func buildDashboardPage() map[string]interface{} {
 				"id": "stat_total_drivers", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "驾驶员总数", "value_key": "count", "icon": "Users", "color": "default",
+					"label": "Total Drivers", "value_key": "count", "icon": "Users", "color": "default",
 				},
 				"data_source": map[string]interface{}{
 					"table":       "drivers",
@@ -1570,10 +1627,10 @@ func buildDashboardPage() map[string]interface{} {
 				"id": "stat_active_alerts", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "待处理告警", "value_key": "count", "icon": "AlertTriangle", "color": "red",
+					"label": "Pending Alerts", "value_key": "count", "icon": "AlertTriangle", "color": "red",
 				},
 				"data_source": map[string]interface{}{
-					"table": "alerts", "where": "status = '未处理'",
+					"table": "alerts", "where": "status = 'Unhandled'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1581,64 +1638,64 @@ func buildDashboardPage() map[string]interface{} {
 				"id": "stat_pending_reservations_dash", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "待审批预定", "value_key": "count", "icon": "CalendarCheck", "color": "amber",
+					"label": "Pending Bookings", "value_key": "count", "icon": "CalendarCheck", "color": "amber",
 				},
 				"data_source": map[string]interface{}{
-					"table": "reservations", "where": "status = '待审批'",
+					"table": "reservations", "where": "status = 'Pending'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
 			map[string]interface{}{
 				"id": "vehicle_status_chart", "type": "chart",
-				"label": "车辆状态分布",
+				"label": "Vehicle Status",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "pie", "title": "车辆状态分布",
+					"chart_type": "pie", "title": "Vehicle Status",
 					"x_key": "status", "y_key": "count", "category_key": "status",
 				},
 				"data_source": map[string]interface{}{"table": "vehicles", "limit": 100},
 			},
 			map[string]interface{}{
 				"id": "vehicle_type_chart", "type": "chart",
-				"label": "车辆类型分布",
+				"label": "Vehicle Types",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "pie", "title": "车辆类型分布",
+					"chart_type": "pie", "title": "Vehicle Types",
 					"x_key": "vehicle_type", "y_key": "count", "category_key": "vehicle_type",
 				},
 				"data_source": map[string]interface{}{"table": "vehicles", "limit": 100},
 			},
 			map[string]interface{}{
 				"id": "fuel_consumption_chart", "type": "chart",
-				"label": "燃料消费分布",
+				"label": "Fuel Consumption",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "pie", "title": "燃料消费分布",
+					"chart_type": "pie", "title": "Fuel Consumption",
 					"x_key": "fuel_type", "y_key": "count", "category_key": "fuel_type",
 				},
 				"data_source": map[string]interface{}{"table": "fuel_records", "limit": 200},
 			},
 			map[string]interface{}{
 				"id": "alert_type_chart", "type": "chart",
-				"label": "告警类型分布",
+				"label": "Alert Types",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "pie", "title": "告警类型分布",
+					"chart_type": "pie", "title": "Alert Types",
 					"x_key": "alert_type", "y_key": "count", "category_key": "alert_type",
 				},
 				"data_source": map[string]interface{}{"table": "alerts", "limit": 100},
 			},
 			map[string]interface{}{
-				"id": "recent_trips", "type": "data_table", "label": "最近行程",
+				"id": "recent_trips", "type": "data_table", "label": "Recent Trips",
 				"config": map[string]interface{}{
 					"table_name": "trips",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "trip_no", "label": "行程编号", "type": "text"},
-						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text"},
-						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text"},
-						map[string]interface{}{"key": "distance_km", "label": "距离(km)", "type": "number"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-						map[string]interface{}{"key": "start_time", "label": "出发时间", "type": "date"},
+						map[string]interface{}{"key": "trip_no", "label": "Trip No.", "type": "text"},
+						map[string]interface{}{"key": "start_location", "label": "From", "type": "text"},
+						map[string]interface{}{"key": "end_location", "label": "To", "type": "text"},
+						map[string]interface{}{"key": "distance_km", "label": "Distance(km)", "type": "number"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+						map[string]interface{}{"key": "start_time", "label": "Departure", "type": "date"},
 					},
 					"page_size": 10, "pagination": true, "search_enabled": true, "search_key": "trip_no",
 					"actions": []interface{}{"view"},
@@ -1648,15 +1705,15 @@ func buildDashboardPage() map[string]interface{} {
 				},
 			},
 			map[string]interface{}{
-				"id": "recent_alerts", "type": "data_table", "label": "最新告警",
+				"id": "recent_alerts", "type": "data_table", "label": "Recent Alerts",
 				"config": map[string]interface{}{
 					"table_name": "alerts",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "title", "label": "告警标题", "type": "text"},
-						map[string]interface{}{"key": "alert_type", "label": "类型", "type": "badge"},
-						map[string]interface{}{"key": "severity", "label": "等级", "type": "badge"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-						map[string]interface{}{"key": "alert_time", "label": "告警时间", "type": "date"},
+						map[string]interface{}{"key": "title", "label": "Title", "type": "text"},
+						map[string]interface{}{"key": "alert_type", "label": "Type", "type": "badge"},
+						map[string]interface{}{"key": "severity", "label": "Severity", "type": "badge"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+						map[string]interface{}{"key": "alert_time", "label": "Alert Time", "type": "date"},
 					},
 					"page_size": 5,
 					"actions":   []interface{}{"view"},
@@ -1666,17 +1723,17 @@ func buildDashboardPage() map[string]interface{} {
 				},
 			},
 			map[string]interface{}{
-				"id": "recent_reservations", "type": "data_table", "label": "最近预定",
+				"id": "recent_reservations", "type": "data_table", "label": "Recent Bookings",
 				"config": map[string]interface{}{
 					"table_name": "reservations",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text"},
+						map[string]interface{}{"key": "reservation_no", "label": "Booking No.", "type": "text"},
 						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text"},
-						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text"},
-						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text"},
-						map[string]interface{}{"key": "priority", "label": "优先级", "type": "badge"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-						map[string]interface{}{"key": "start_time", "label": "用车时间", "type": "date"},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept", "type": "text"},
+						map[string]interface{}{"key": "purpose", "label": "Purpose", "type": "text"},
+						map[string]interface{}{"key": "priority", "label": "Priority", "type": "badge"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+						map[string]interface{}{"key": "start_time", "label": "Booking Time", "type": "date"},
 					},
 					"page_size": 5,
 					"actions":   []interface{}{"view"},
@@ -1691,21 +1748,21 @@ func buildDashboardPage() map[string]interface{} {
 
 func buildVehiclesPage() map[string]interface{} {
 	return map[string]interface{}{
-		"id": "vehicles", "title": "车辆管理", "route": "/vehicles", "icon": "Truck",
+		"id": "vehicles", "title": "Vehicles", "route": "/vehicles", "icon": "Truck",
 		"blocks": []interface{}{
 			map[string]interface{}{
 				"id": "vehicles_table", "type": "data_table",
 				"config": map[string]interface{}{
 					"table_name": "vehicles",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "plate_number", "label": "车牌号", "type": "text", "sortable": true},
-						map[string]interface{}{"key": "brand", "label": "品牌", "type": "text"},
-						map[string]interface{}{"key": "model", "label": "型号", "type": "text"},
-						map[string]interface{}{"key": "vehicle_type", "label": "类型", "type": "badge"},
-						map[string]interface{}{"key": "fuel_type", "label": "燃料", "type": "badge"},
-						map[string]interface{}{"key": "mileage", "label": "里程(km)", "type": "number", "sortable": true},
-						map[string]interface{}{"key": "department", "label": "部门", "type": "text"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
+						map[string]interface{}{"key": "plate_number", "label": "Plate No.", "type": "text", "sortable": true},
+						map[string]interface{}{"key": "brand", "label": "Brand", "type": "text"},
+						map[string]interface{}{"key": "model", "label": "Model", "type": "text"},
+						map[string]interface{}{"key": "vehicle_type", "label": "Type", "type": "badge"},
+						map[string]interface{}{"key": "fuel_type", "label": "Fuel", "type": "badge"},
+						map[string]interface{}{"key": "mileage", "label": "Mileage(km)", "type": "number", "sortable": true},
+						map[string]interface{}{"key": "department", "label": "Dept", "type": "text"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
 					},
 					"actions": []interface{}{"view", "create", "edit", "delete"}, "search_enabled": true, "search_key": "plate_number",
 					"pagination": true, "page_size": 15, "filters_enabled": true,
@@ -1720,21 +1777,21 @@ func buildVehiclesPage() map[string]interface{} {
 
 func buildDriversPage() map[string]interface{} {
 	return map[string]interface{}{
-		"id": "drivers", "title": "驾驶员", "route": "/drivers", "icon": "Users",
+		"id": "drivers", "title": "Drivers", "route": "/drivers", "icon": "Users",
 		"blocks": []interface{}{
 			map[string]interface{}{
 				"id": "drivers_table", "type": "data_table",
 				"config": map[string]interface{}{
 					"table_name": "drivers",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "name", "label": "姓名", "type": "text", "sortable": true},
-						map[string]interface{}{"key": "phone", "label": "电话", "type": "text"},
-						map[string]interface{}{"key": "license_type", "label": "驾照类型", "type": "badge"},
-						map[string]interface{}{"key": "department", "label": "部门", "type": "text"},
-						map[string]interface{}{"key": "driving_years", "label": "驾龄(年)", "type": "number"},
-						map[string]interface{}{"key": "rating", "label": "评分", "type": "number"},
-						map[string]interface{}{"key": "violation_count", "label": "违章次数", "type": "number"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
+						map[string]interface{}{"key": "name", "label": "Name", "type": "text", "sortable": true},
+						map[string]interface{}{"key": "phone", "label": "Phone", "type": "text"},
+						map[string]interface{}{"key": "license_type", "label": "Licence Class", "type": "badge"},
+						map[string]interface{}{"key": "department", "label": "Dept", "type": "text"},
+						map[string]interface{}{"key": "driving_years", "label": "Exp(yrs)", "type": "number"},
+						map[string]interface{}{"key": "rating", "label": "Rating", "type": "number"},
+						map[string]interface{}{"key": "violation_count", "label": "Violations", "type": "number"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
 					},
 					"actions": []interface{}{"view", "create", "edit", "delete"}, "search_enabled": true, "search_key": "name",
 					"pagination": true, "page_size": 15,
@@ -1749,17 +1806,17 @@ func buildDriversPage() map[string]interface{} {
 
 func buildReservationsPage() map[string]interface{} {
 	return map[string]interface{}{
-		"id": "reservations", "title": "用车预定", "route": "/reservations", "icon": "CalendarCheck",
+		"id": "reservations", "title": "Reservations", "route": "/reservations", "icon": "CalendarCheck",
 		"blocks": []interface{}{
 			// ---- 状态统计卡片 ----
 			map[string]interface{}{
 				"id": "stat_pending_reservations", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "待审批", "value_key": "count", "icon": "Clock", "color": "amber",
+					"label": "Pending", "value_key": "count", "icon": "Clock", "color": "amber",
 				},
 				"data_source": map[string]interface{}{
-					"table": "reservations", "where": "status = '待审批'",
+					"table": "reservations", "where": "status = 'Pending'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1767,10 +1824,10 @@ func buildReservationsPage() map[string]interface{} {
 				"id": "stat_approved_reservations", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "已批准", "value_key": "count", "icon": "CheckCircle", "color": "blue",
+					"label": "Approved", "value_key": "count", "icon": "CheckCircle", "color": "blue",
 				},
 				"data_source": map[string]interface{}{
-					"table": "reservations", "where": "status = '已批准'",
+					"table": "reservations", "where": "status = 'Approved'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1778,10 +1835,10 @@ func buildReservationsPage() map[string]interface{} {
 				"id": "stat_inprogress_reservations", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "进行中", "value_key": "count", "icon": "Navigation", "color": "green",
+					"label": "In Progress", "value_key": "count", "icon": "Navigation", "color": "green",
 				},
 				"data_source": map[string]interface{}{
-					"table": "reservations", "where": "status = '进行中'",
+					"table": "reservations", "where": "status = 'In Progress'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1789,10 +1846,10 @@ func buildReservationsPage() map[string]interface{} {
 				"id": "stat_completed_reservations", "type": "stats_card",
 				"grid": map[string]interface{}{"col_span": 1},
 				"config": map[string]interface{}{
-					"label": "已完成", "value_key": "count", "icon": "CircleCheck", "color": "default",
+					"label": "Completed", "value_key": "count", "icon": "CircleCheck", "color": "default",
 				},
 				"data_source": map[string]interface{}{
-					"table": "reservations", "where": "status = '已完成'",
+					"table": "reservations", "where": "status = 'Completed'",
 					"aggregation": []interface{}{map[string]interface{}{"function": "count", "column": "id", "alias": "count"}},
 				},
 			},
@@ -1808,21 +1865,21 @@ func buildReservationsPage() map[string]interface{} {
 					"status_key":   "status",
 					"default_view": "month",
 					"detail_fields": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "编号"},
-						map[string]interface{}{"key": "applicant_name", "label": "申请人"},
-						map[string]interface{}{"key": "applicant_department", "label": "部门"},
-						map[string]interface{}{"key": "start_location", "label": "出发地"},
-						map[string]interface{}{"key": "end_location", "label": "目的地"},
-						map[string]interface{}{"key": "passengers", "label": "人数"},
-						map[string]interface{}{"key": "priority", "label": "优先级"},
+						map[string]interface{}{"key": "reservation_no", "label": "Code"},
+						map[string]interface{}{"key": "applicant_name", "label": "Applicant"},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept"},
+						map[string]interface{}{"key": "start_location", "label": "From"},
+						map[string]interface{}{"key": "end_location", "label": "To"},
+						map[string]interface{}{"key": "passengers", "label": "Pax"},
+						map[string]interface{}{"key": "priority", "label": "Priority"},
 					},
 					"status_colors": map[string]interface{}{
-						"待审批": "bg-amber-500/15 text-amber-700 border-amber-400/30",
-						"已批准": "bg-emerald-500/15 text-emerald-700 border-emerald-400/30",
-						"进行中": "bg-blue-500/15 text-blue-700 border-blue-400/30",
-						"已完成": "bg-slate-500/10 text-slate-600 border-slate-400/30",
-						"已拒绝": "bg-red-500/15 text-red-700 border-red-400/30",
-						"已取消": "bg-gray-500/10 text-gray-500 border-gray-400/30",
+						"Pending":     "bg-amber-500/15 text-amber-700 border-amber-400/30",
+						"Approved":    "bg-emerald-500/15 text-emerald-700 border-emerald-400/30",
+						"In Progress": "bg-blue-500/15 text-blue-700 border-blue-400/30",
+						"Completed":   "bg-slate-500/10 text-slate-600 border-slate-400/30",
+						"Rejected":    "bg-red-500/15 text-red-700 border-red-400/30",
+						"Cancelled":   "bg-gray-500/10 text-gray-500 border-gray-400/30",
 					},
 					"click_action": map[string]interface{}{
 						"type":      "navigate",
@@ -1835,20 +1892,20 @@ func buildReservationsPage() map[string]interface{} {
 			// ---- 图表 ----
 			map[string]interface{}{
 				"id": "reservation_status_chart", "type": "chart",
-				"label": "预定状态分布",
+				"label": "Booking Status",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "pie", "title": "预定状态分布",
+					"chart_type": "pie", "title": "Booking Status",
 					"x_key": "status", "category_key": "status",
 				},
 				"data_source": map[string]interface{}{"table": "reservations", "limit": 200},
 			},
 			map[string]interface{}{
 				"id": "reservation_dept_chart", "type": "chart",
-				"label": "各部门用车统计",
+				"label": "Bookings by Dept",
 				"grid":  map[string]interface{}{"col_span": 2},
 				"config": map[string]interface{}{
-					"chart_type": "bar", "title": "各部门用车统计",
+					"chart_type": "bar", "title": "Bookings by Dept",
 					"x_key": "applicant_department", "category_key": "applicant_department",
 				},
 				"data_source": map[string]interface{}{"table": "reservations", "limit": 200},
@@ -1857,38 +1914,55 @@ func buildReservationsPage() map[string]interface{} {
 			map[string]interface{}{
 				"id": "reservation_create_dialog", "type": "form_dialog",
 				"config": map[string]interface{}{
-					"table_name":    "reservations",
-					"title":         "新建用车预定",
-					"description":   "请填写用车预定申请信息",
-					"trigger_label": "新建预定",
-					"dialog_size":   "lg",
-					"submit_label":  "提交预定申请",
+					"table_name":     "reservations",
+					"title":          "New Reservation",
+					"description":    "Fill in reservation details. System will auto-match available vehicles",
+					"trigger_label":  "New Booking",
+					"dialog_size":    "lg",
+					"submit_label":   "Submit Booking",
+					"pre_submit_api": "/api/validate-reservation",
 					"fields": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "required": true, "placeholder": "如 RES20250215002"},
 						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "required": true},
-						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "select", "required": true, "options": []interface{}{
-							map[string]interface{}{"label": "总经办", "value": "总经办"},
-							map[string]interface{}{"label": "销售部", "value": "销售部"},
-							map[string]interface{}{"label": "技术部", "value": "技术部"},
-							map[string]interface{}{"label": "市场部", "value": "市场部"},
-							map[string]interface{}{"label": "物流部", "value": "物流部"},
-							map[string]interface{}{"label": "财务部", "value": "财务部"},
-							map[string]interface{}{"label": "人事部", "value": "人事部"},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept", "type": "select", "required": true, "options": []interface{}{
+							map[string]interface{}{"label": "CEO Office", "value": "CEO Office"},
+							map[string]interface{}{"label": "Sales", "value": "Sales"},
+							map[string]interface{}{"label": "Engineering", "value": "Engineering"},
+							map[string]interface{}{"label": "Marketing", "value": "Marketing"},
+							map[string]interface{}{"label": "Logistics", "value": "Logistics"},
+							map[string]interface{}{"label": "Finance", "value": "Finance"},
+							map[string]interface{}{"label": "HR", "value": "HR"},
 						}},
-						map[string]interface{}{"key": "applicant_phone", "label": "联系电话", "type": "text", "placeholder": "手机号码"},
-						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text", "required": true, "placeholder": "如：客户拜访、会议出行等"},
-						map[string]interface{}{"key": "passengers", "label": "乘车人数", "type": "number", "default_value": 1},
-						map[string]interface{}{"key": "start_time", "label": "用车开始时间", "type": "datetime", "required": true},
-						map[string]interface{}{"key": "end_time", "label": "用车结束时间", "type": "datetime", "required": true},
-						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text", "required": true, "placeholder": "如：公司总部"},
-						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text", "required": true},
-						map[string]interface{}{"key": "priority", "label": "优先级", "type": "select", "default_value": "普通", "options": []interface{}{
-							map[string]interface{}{"label": "普通", "value": "普通"},
-							map[string]interface{}{"label": "紧急", "value": "紧急"},
-							map[string]interface{}{"label": "特急", "value": "特急"},
+						map[string]interface{}{"key": "applicant_phone", "label": "Phone", "type": "text", "placeholder": "+65 8xxx xxxx"},
+						map[string]interface{}{"key": "purpose", "label": "Purpose", "type": "text", "required": true, "placeholder": "e.g. Client visit, Meeting"},
+						map[string]interface{}{"key": "passengers", "label": "Passengers", "type": "number", "default_value": 1},
+						map[string]interface{}{"key": "start_time", "label": "Start Time", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "end_time", "label": "End Time", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "start_location", "label": "From", "type": "text", "required": true, "placeholder": "e.g. Raffles Place"},
+						map[string]interface{}{"key": "end_location", "label": "To", "type": "text", "required": true},
+						// 用车需求 — 选择后自动匹配车辆
+						map[string]interface{}{"key": "requirements", "label": "Requirements", "type": "select", "placeholder": "Select requirements (optional)",
+							"dynamic_options": map[string]interface{}{
+								"api":       "/api/capability-tags",
+								"label_key": "capability",
+								"value_key": "capability",
+							},
+						},
+						// 车辆选择 — 根据需求+时间段动态过滤可用车辆
+						map[string]interface{}{"key": "vehicle_id", "label": "Assign Vehicle", "type": "select", "placeholder": "Auto-matched by requirements",
+							"dynamic_options": map[string]interface{}{
+								"api":        "/api/match-vehicles",
+								"depends_on": []interface{}{"requirements", "start_time", "end_time", "passengers"},
+								"label_key":  "plate_number",
+								"value_key":  "id",
+							},
+						},
+						map[string]interface{}{"key": "priority", "label": "Priority", "type": "select", "default_value": "Normal", "options": []interface{}{
+							map[string]interface{}{"label": "Normal", "value": "Normal"},
+							map[string]interface{}{"label": "Urgent", "value": "Urgent"},
+							map[string]interface{}{"label": "Critical", "value": "Critical"},
 						}},
-						map[string]interface{}{"key": "notes", "label": "备注", "type": "textarea"},
-						map[string]interface{}{"key": "status", "label": "", "type": "text", "default_value": "待审批"},
+						map[string]interface{}{"key": "notes", "label": "Notes", "type": "textarea"},
+						map[string]interface{}{"key": "status", "label": "", "type": "text", "default_value": "Pending"},
 					},
 				},
 			},
@@ -1898,40 +1972,41 @@ func buildReservationsPage() map[string]interface{} {
 				"config": map[string]interface{}{
 					"table_name": "reservations",
 					"columns": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "sortable": true},
+						map[string]interface{}{"key": "reservation_no", "label": "Booking No.", "type": "text", "sortable": true},
 						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "sortable": true},
-						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text"},
-						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text"},
-						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text"},
-						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text"},
-						map[string]interface{}{"key": "passengers", "label": "人数", "type": "number"},
-						map[string]interface{}{"key": "priority", "label": "优先级", "type": "badge"},
-						map[string]interface{}{"key": "status", "label": "状态", "type": "badge"},
-						map[string]interface{}{"key": "start_time", "label": "用车时间", "type": "date", "sortable": true},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept", "type": "text"},
+						map[string]interface{}{"key": "vehicle_id", "label": "Vehicle", "type": "lookup", "lookup_table": "vehicles", "lookup_key": "id", "display_key": "plate_number"},
+						map[string]interface{}{"key": "purpose", "label": "Purpose", "type": "text"},
+						map[string]interface{}{"key": "start_location", "label": "From", "type": "text"},
+						map[string]interface{}{"key": "end_location", "label": "To", "type": "text"},
+						map[string]interface{}{"key": "passengers", "label": "Pax", "type": "number"},
+						map[string]interface{}{"key": "priority", "label": "Priority", "type": "badge"},
+						map[string]interface{}{"key": "status", "label": "Status", "type": "badge"},
+						map[string]interface{}{"key": "start_time", "label": "Booking Time", "type": "date", "sortable": true},
 					},
 					"actions": []interface{}{"view", "edit", "delete"},
 					"status_actions": []interface{}{
 						map[string]interface{}{
-							"label": "批准", "from_status": []interface{}{"待审批"}, "to_status": "已批准",
+							"label": "Approve", "from_status": []interface{}{"Pending"}, "to_status": "Approved",
 							"status_column": "status", "color": "green", "confirm": true,
 						},
 						map[string]interface{}{
-							"label": "拒绝", "from_status": []interface{}{"待审批"}, "to_status": "已拒绝",
+							"label": "Reject", "from_status": []interface{}{"Pending"}, "to_status": "Rejected",
 							"status_column": "status", "color": "red", "confirm": true,
 							"extra_fields": []interface{}{
-								map[string]interface{}{"key": "reject_reason", "label": "拒绝原因", "required": true},
+								map[string]interface{}{"key": "reject_reason", "label": "Reject Reason", "required": true},
 							},
 						},
 						map[string]interface{}{
-							"label": "开始出行", "from_status": []interface{}{"已批准"}, "to_status": "进行中",
+							"label": "Start Trip", "from_status": []interface{}{"Approved"}, "to_status": "In Progress",
 							"status_column": "status", "color": "blue", "confirm": true,
 						},
 						map[string]interface{}{
-							"label": "完成", "from_status": []interface{}{"进行中"}, "to_status": "已完成",
+							"label": "Complete", "from_status": []interface{}{"In Progress"}, "to_status": "Completed",
 							"status_column": "status", "color": "default", "confirm": true,
 						},
 						map[string]interface{}{
-							"label": "取消", "from_status": []interface{}{"待审批", "已批准"}, "to_status": "已取消",
+							"label": "Cancel", "from_status": []interface{}{"Pending", "Approved"}, "to_status": "Cancelled",
 							"status_column": "status", "color": "default", "confirm": true,
 						},
 					},
@@ -1958,7 +2033,7 @@ func buildReservationsPage() map[string]interface{} {
 func buildReservationDetailPage() map[string]interface{} {
 	return map[string]interface{}{
 		"id":           "reservation_detail",
-		"title":        "预定详情",
+		"title":        "Reservation Detail",
 		"route":        "/reservations/detail",
 		"icon":         "FileText",
 		"hidden":       true,
@@ -1970,28 +2045,28 @@ func buildReservationDetailPage() map[string]interface{} {
 					"table_name":      "reservations",
 					"record_id_param": "record_id",
 					"fields": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "预定编号"},
-						map[string]interface{}{"key": "applicant_name", "label": "申请人"},
-						map[string]interface{}{"key": "applicant_department", "label": "部门"},
-						map[string]interface{}{"key": "applicant_phone", "label": "联系电话"},
-						map[string]interface{}{"key": "purpose", "label": "用车目的"},
-						map[string]interface{}{"key": "passengers", "label": "乘车人数"},
-						map[string]interface{}{"key": "start_location", "label": "出发地"},
-						map[string]interface{}{"key": "end_location", "label": "目的地"},
-						map[string]interface{}{"key": "start_time", "label": "用车开始时间"},
-						map[string]interface{}{"key": "end_time", "label": "用车结束时间"},
-						map[string]interface{}{"key": "vehicle_id", "label": "指派车辆ID"},
-						map[string]interface{}{"key": "driver_id", "label": "指派驾驶员ID"},
-						map[string]interface{}{"key": "priority", "label": "优先级"},
-						map[string]interface{}{"key": "status", "label": "状态"},
-						map[string]interface{}{"key": "approver", "label": "审批人"},
-						map[string]interface{}{"key": "approved_at", "label": "审批时间"},
-						map[string]interface{}{"key": "reject_reason", "label": "拒绝原因"},
-						map[string]interface{}{"key": "actual_start_time", "label": "实际出发时间"},
-						map[string]interface{}{"key": "actual_end_time", "label": "实际归还时间"},
-						map[string]interface{}{"key": "actual_mileage", "label": "实际里程(km)"},
-						map[string]interface{}{"key": "notes", "label": "备注"},
-						map[string]interface{}{"key": "created_at", "label": "创建时间"},
+						map[string]interface{}{"key": "reservation_no", "label": "Booking No."},
+						map[string]interface{}{"key": "applicant_name", "label": "Applicant"},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept"},
+						map[string]interface{}{"key": "applicant_phone", "label": "Phone"},
+						map[string]interface{}{"key": "purpose", "label": "Purpose"},
+						map[string]interface{}{"key": "passengers", "label": "Passengers"},
+						map[string]interface{}{"key": "start_location", "label": "From"},
+						map[string]interface{}{"key": "end_location", "label": "To"},
+						map[string]interface{}{"key": "start_time", "label": "Start Time"},
+						map[string]interface{}{"key": "end_time", "label": "End Time"},
+						map[string]interface{}{"key": "vehicle_id", "label": "Assigned Vehicle"},
+						map[string]interface{}{"key": "driver_id", "label": "Assigned Driver"},
+						map[string]interface{}{"key": "priority", "label": "Priority"},
+						map[string]interface{}{"key": "status", "label": "Status"},
+						map[string]interface{}{"key": "approver", "label": "Approver"},
+						map[string]interface{}{"key": "approved_at", "label": "Approved At"},
+						map[string]interface{}{"key": "reject_reason", "label": "Reject Reason"},
+						map[string]interface{}{"key": "actual_start_time", "label": "Actual Start"},
+						map[string]interface{}{"key": "actual_end_time", "label": "Actual End"},
+						map[string]interface{}{"key": "actual_mileage", "label": "Actual Mileage(km)"},
+						map[string]interface{}{"key": "notes", "label": "Notes"},
+						map[string]interface{}{"key": "created_at", "label": "Created At"},
 					},
 				},
 				"data_source": map[string]interface{}{
@@ -2017,18 +2092,18 @@ func buildReservationCreatePage() map[string]interface{} {
 					"title":       "新建用车预定",
 					"description": "请填写用车预定申请信息",
 					"fields": []interface{}{
-						map[string]interface{}{"key": "reservation_no", "label": "预定编号", "type": "text", "required": true, "placeholder": "如 RES20250215002"},
+						map[string]interface{}{"key": "reservation_no", "label": "Booking No.", "type": "text", "required": true, "placeholder": "如 RES20250215002"},
 						map[string]interface{}{"key": "applicant_name", "label": "申请人", "type": "text", "required": true},
-						map[string]interface{}{"key": "applicant_department", "label": "部门", "type": "text", "required": true},
-						map[string]interface{}{"key": "applicant_phone", "label": "联系电话", "type": "text"},
-						map[string]interface{}{"key": "purpose", "label": "用车目的", "type": "text", "required": true},
-						map[string]interface{}{"key": "passengers", "label": "乘车人数", "type": "number"},
-						map[string]interface{}{"key": "start_time", "label": "用车开始时间", "type": "datetime", "required": true},
-						map[string]interface{}{"key": "end_time", "label": "用车结束时间", "type": "datetime", "required": true},
-						map[string]interface{}{"key": "start_location", "label": "出发地", "type": "text", "required": true},
-						map[string]interface{}{"key": "end_location", "label": "目的地", "type": "text", "required": true},
-						map[string]interface{}{"key": "priority", "label": "优先级", "type": "text", "placeholder": "普通/紧急/特急"},
-						map[string]interface{}{"key": "notes", "label": "备注", "type": "text"},
+						map[string]interface{}{"key": "applicant_department", "label": "Dept", "type": "text", "required": true},
+						map[string]interface{}{"key": "applicant_phone", "label": "Phone", "type": "text"},
+						map[string]interface{}{"key": "purpose", "label": "Purpose", "type": "text", "required": true},
+						map[string]interface{}{"key": "passengers", "label": "Passengers", "type": "number"},
+						map[string]interface{}{"key": "start_time", "label": "Start Time", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "end_time", "label": "End Time", "type": "datetime", "required": true},
+						map[string]interface{}{"key": "start_location", "label": "From", "type": "text", "required": true},
+						map[string]interface{}{"key": "end_location", "label": "To", "type": "text", "required": true},
+						map[string]interface{}{"key": "priority", "label": "Priority", "type": "text", "placeholder": "普通/紧急/特急"},
+						map[string]interface{}{"key": "notes", "label": "Notes", "type": "text"},
 					},
 					"submit_label": "提交预定申请",
 				},
@@ -2453,4 +2528,194 @@ func seedSlugAndAccess(db *gorm.DB, wsID uuid.UUID) error {
 	fmt.Println("  🌐 已设置公开访问模式")
 
 	return nil
+}
+
+// buildFleetLogicCode 构建车队管理系统的 JS 业务逻辑代码
+func buildFleetLogicCode() string {
+	return `
+exports.routes = {
+  // 获取所有可用能力标签（用于下拉选择）
+  "GET /capability-tags": function(ctx) {
+    var tags = db.query(
+      "SELECT DISTINCT capability, COUNT(*) as vehicle_count " +
+      "FROM vehicle_capabilities GROUP BY capability ORDER BY vehicle_count DESC"
+    );
+    return tags;
+  },
+
+  // 根据需求匹配可用车辆
+  "POST /match-vehicles": function(ctx) {
+    var requirements = ctx.body.requirements || [];
+    var startTime = ctx.body.start_time || "";
+    var endTime = ctx.body.end_time || "";
+    var passengers = ctx.body.passengers || 1;
+
+    // 基础条件：车辆在线
+    var baseWhere = "v.status = 'Online'";
+
+    // 排除时间段内已被预定的车辆
+    var excludeBooked = "";
+    if (startTime && endTime) {
+      excludeBooked = " AND v.id NOT IN (" +
+        "SELECT vehicle_id FROM reservations " +
+        "WHERE vehicle_id IS NOT NULL " +
+        "AND status IN ('Approved','In Progress') " +
+        "AND start_time < '" + endTime + "' AND end_time > '" + startTime + "'" +
+        ")";
+    }
+
+    // 座位数过滤
+    var seatFilter = "";
+    if (passengers > 1) {
+      seatFilter = " AND v.seat_count >= " + passengers;
+    }
+
+    if (!requirements || requirements.length === 0) {
+      // 无特殊需求 → 返回所有空闲车辆
+      var all = db.query(
+        "SELECT v.id, v.plate_number, v.brand, v.model, v.vehicle_type, " +
+        "v.seat_count, v.status, v.fuel_type, v.department " +
+        "FROM vehicles v WHERE " + baseWhere + excludeBooked + seatFilter +
+        " ORDER BY v.id"
+      );
+      // 附加每辆车的能力标签
+      for (var i = 0; i < all.length; i++) {
+        var caps = db.query(
+          "SELECT capability FROM vehicle_capabilities WHERE vehicle_id = ?",
+          [all[i].id]
+        );
+        all[i].capabilities = caps.map(function(c) { return c.capability; });
+      }
+      return { status: 200, body: { vehicles: all, match_type: "all_available", total: all.length } };
+    }
+
+    // 有特殊需求 → 找同时满足所有需求的车辆
+    var placeholders = requirements.map(function() { return "?"; }).join(",");
+    var params = requirements.slice();
+    if (startTime && endTime) {
+      // 不能在 SQL 里直接拼接已排除的子查询参数，改用子查询
+    }
+
+    var matched = db.query(
+      "SELECT v.id, v.plate_number, v.brand, v.model, v.vehicle_type, " +
+      "v.seat_count, v.status, v.fuel_type, v.department, " +
+      "COUNT(DISTINCT vc.capability) as matched_count " +
+      "FROM vehicles v " +
+      "JOIN vehicle_capabilities vc ON v.id = vc.vehicle_id " +
+      "WHERE vc.capability IN (" + placeholders + ") " +
+      "AND " + baseWhere + excludeBooked + seatFilter +
+      " GROUP BY v.id " +
+      "HAVING matched_count = ?",
+      params.concat([requirements.length])
+    );
+
+    // 附加每辆车的全部能力标签
+    for (var j = 0; j < matched.length; j++) {
+      var caps2 = db.query(
+        "SELECT capability FROM vehicle_capabilities WHERE vehicle_id = ?",
+        [matched[j].id]
+      );
+      matched[j].capabilities = caps2.map(function(c) { return c.capability; });
+    }
+
+    return {
+      status: 200,
+      body: {
+        vehicles: matched,
+        match_type: "capability_matched",
+        required: requirements,
+        total: matched.length
+      }
+    };
+  },
+
+  // 预定校验 API
+  "POST /validate-reservation": function(ctx) {
+    var vehicleId = ctx.body.vehicle_id;
+    var startTime = ctx.body.start_time;
+    var endTime = ctx.body.end_time;
+
+    if (!startTime || !endTime) {
+      return { status: 200, body: { valid: true } };
+    }
+
+    if (!vehicleId) {
+      return { status: 200, body: { valid: true } };
+    }
+
+    // 检查时间冲突
+    var conflicts = db.query(
+      "SELECT reservation_no, purpose, start_time, end_time FROM reservations " +
+      "WHERE vehicle_id = ? AND status IN ('Approved','In Progress') " +
+      "AND start_time < ? AND end_time > ?",
+      [vehicleId, endTime, startTime]
+    );
+
+    if (conflicts.length > 0) {
+      var conflictInfo = conflicts.map(function(c) {
+        return c.reservation_no + "(" + c.purpose + ")";
+      }).join(", ");
+      return {
+        status: 200,
+        body: {
+          valid: false,
+          error: "Vehicle already booked during this period: " + conflictInfo
+        }
+      };
+    }
+
+    // 检查车辆状态
+    var vehicle = db.queryOne(
+      "SELECT status, plate_number FROM vehicles WHERE id = ?",
+      [vehicleId]
+    );
+    if (vehicle && vehicle.status !== 'Online') {
+      return {
+        status: 200,
+        body: {
+          valid: false,
+          error: "Vehicle " + vehicle.plate_number + " is currently '" + vehicle.status + "', cannot be reserved"
+        }
+      };
+    }
+
+    return { status: 200, body: { valid: true } };
+  },
+
+  // 获取车辆的能力列表
+  "GET /vehicles/:id/capabilities": function(ctx) {
+    var caps = db.query(
+      "SELECT capability, description FROM vehicle_capabilities WHERE vehicle_id = ?",
+      [ctx.params.id]
+    );
+    return caps;
+  },
+
+  // before-insert hook：预定自动生成编号
+  "POST /hooks/before-insert/reservations": function(ctx) {
+    var data = ctx.body.data || {};
+
+    // 自动生成预定编号（如果未提供）
+    if (!data.reservation_no || data.reservation_no === "") {
+      var now = new Date();
+      var dateStr = now.getFullYear().toString() +
+        ("0" + (now.getMonth() + 1)).slice(-2) +
+        ("0" + now.getDate()).slice(-2);
+      var countResult = db.queryOne(
+        "SELECT COUNT(*) as cnt FROM reservations WHERE reservation_no LIKE ?",
+        ["RES" + dateStr + "%"]
+      );
+      var seq = (countResult ? countResult.cnt : 0) + 1;
+      data.reservation_no = "RES" + dateStr + ("000" + seq).slice(-3);
+    }
+
+    // 设置默认状态
+    if (!data.status) {
+      data.status = "Pending";
+    }
+
+    return { allow: true, data: data };
+  }
+};
+`
 }
