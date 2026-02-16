@@ -17,15 +17,17 @@ type AgentChatHandler struct {
 	engine           service.AgentEngine
 	sessions         *service.AgentSessionManager
 	skillRegistry    *service.SkillRegistry
+	personaRegistry  *service.PersonaRegistry
 	workspaceService service.WorkspaceService
 }
 
 // NewAgentChatHandler 创建 Agent 对话处理器
-func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager, workspaceService service.WorkspaceService, skillRegistry ...*service.SkillRegistry) *AgentChatHandler {
+func NewAgentChatHandler(engine service.AgentEngine, sessions *service.AgentSessionManager, workspaceService service.WorkspaceService, personaRegistry *service.PersonaRegistry, skillRegistry ...*service.SkillRegistry) *AgentChatHandler {
 	h := &AgentChatHandler{
 		engine:           engine,
 		sessions:         sessions,
 		workspaceService: workspaceService,
+		personaRegistry:  personaRegistry,
 	}
 	if len(skillRegistry) > 0 {
 		h.skillRegistry = skillRegistry[0]
@@ -41,6 +43,7 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 	var req struct {
 		Message   string `json:"message"`
 		SessionID string `json:"session_id"`
+		PersonaID string `json:"persona_id"`
 	}
 	if err := c.Bind(&req); err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request")
@@ -92,7 +95,7 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 		}
 	}
 
-	events := h.engine.Run(ctx, workspaceID, userID, req.Message, req.SessionID)
+	events := h.engine.Run(ctx, workspaceID, userID, req.Message, req.SessionID, req.PersonaID)
 
 	for event := range events {
 		data, err := json.Marshal(event)
@@ -194,6 +197,7 @@ func (h *AgentChatHandler) ListSessions(c echo.Context) error {
 			"id":            s.ID,
 			"workspace_id":  s.WorkspaceID,
 			"user_id":       s.UserID,
+			"persona_id":    s.PersonaID,
 			"status":        s.Status,
 			"message_count": len(s.Messages),
 			"title":         title,
@@ -357,4 +361,127 @@ func (h *AgentChatHandler) DeleteSkill(c echo.Context) error {
 	}
 
 	return successResponse(c, map[string]string{"message": "Skill deleted"})
+}
+
+// ========== Persona Endpoints ==========
+
+// ListPersonas 列出可用的 AI Personas
+func (h *AgentChatHandler) ListPersonas(c echo.Context) error {
+	if h.personaRegistry == nil {
+		return successResponse(c, []interface{}{})
+	}
+	return successResponse(c, h.personaRegistry.ListAll())
+}
+
+// GetPersona 获取单个 Persona 详情
+func (h *AgentChatHandler) GetPersona(c echo.Context) error {
+	personaID := c.Param("personaId")
+	if personaID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_PERSONA_ID", "Persona ID is required")
+	}
+	if h.personaRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Persona registry not available")
+	}
+	p, ok := h.personaRegistry.Get(personaID)
+	if !ok {
+		return errorResponse(c, http.StatusNotFound, "PERSONA_NOT_FOUND", "Persona not found")
+	}
+	return successResponse(c, p.ToMeta())
+}
+
+// CreatePersona 创建自定义 Persona
+func (h *AgentChatHandler) CreatePersona(c echo.Context) error {
+	if h.personaRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Persona registry not available")
+	}
+
+	var req struct {
+		ID           string                      `json:"id"`
+		Name         string                      `json:"name"`
+		Description  string                      `json:"description"`
+		Icon         string                      `json:"icon"`
+		Color        string                      `json:"color"`
+		SystemPrompt string                      `json:"system_prompt"`
+		Suggestions  []service.PersonaSuggestion `json:"suggestions"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+	}
+	if req.Name == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_NAME", "Persona name is required")
+	}
+	if req.SystemPrompt == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_PROMPT", "System prompt is required")
+	}
+
+	personaID := req.ID
+	if personaID == "" {
+		personaID = "custom_" + uuid.New().String()[:8]
+	}
+
+	if err := h.personaRegistry.RegisterCustom(personaID, req.Name, req.Description, req.Icon, req.Color, req.SystemPrompt, req.Suggestions); err != nil {
+		return errorResponse(c, http.StatusConflict, "PERSONA_EXISTS", err.Error())
+	}
+
+	p, _ := h.personaRegistry.Get(personaID)
+	if p == nil {
+		return errorResponse(c, http.StatusInternalServerError, "CREATE_FAILED", "Failed to create persona")
+	}
+
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"code":    "OK",
+		"message": "Persona created",
+		"data":    p.ToMeta(),
+	})
+}
+
+// UpdatePersona 更新自定义 Persona
+func (h *AgentChatHandler) UpdatePersona(c echo.Context) error {
+	personaID := c.Param("personaId")
+	if personaID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_PERSONA_ID", "Persona ID is required")
+	}
+	if h.personaRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Persona registry not available")
+	}
+
+	var req struct {
+		Name         string                      `json:"name"`
+		Description  string                      `json:"description"`
+		Icon         string                      `json:"icon"`
+		Color        string                      `json:"color"`
+		SystemPrompt string                      `json:"system_prompt"`
+		Suggestions  []service.PersonaSuggestion `json:"suggestions"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+	}
+
+	if err := h.personaRegistry.UpdateCustom(personaID, req.Name, req.Description, req.Icon, req.Color, req.SystemPrompt, req.Suggestions); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "UPDATE_FAILED", err.Error())
+	}
+
+	p, _ := h.personaRegistry.Get(personaID)
+	if p == nil {
+		return errorResponse(c, http.StatusNotFound, "PERSONA_NOT_FOUND", "Persona not found")
+	}
+
+	return successResponse(c, p.ToMeta())
+}
+
+// DeletePersona 删除自定义 Persona
+func (h *AgentChatHandler) DeletePersona(c echo.Context) error {
+	personaID := c.Param("personaId")
+	if personaID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_PERSONA_ID", "Persona ID is required")
+	}
+	if h.personaRegistry == nil {
+		return errorResponse(c, http.StatusNotFound, "NO_REGISTRY", "Persona registry not available")
+	}
+
+	if err := h.personaRegistry.Delete(personaID); err != nil {
+		return errorResponse(c, http.StatusBadRequest, "DELETE_FAILED", err.Error())
+	}
+
+	return successResponse(c, map[string]string{"message": "Persona deleted"})
 }

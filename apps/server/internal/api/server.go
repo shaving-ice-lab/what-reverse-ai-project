@@ -189,6 +189,10 @@ func (s *Server) setupRoutes() {
 	_ = skillRegistry.Register(skills.NewBusinessLogicSkill(vmStore))
 	_ = skillRegistry.Register(skills.NewVMRuntimeSkill(workspaceService, vmPool, vmStore))
 
+	// Persona 系统初始化
+	personaRegistry := service.NewPersonaRegistry()
+	service.RegisterBuiltinPersonas(personaRegistry)
+
 	// Agent 推理引擎初始化
 	agentToolRegistry := service.NewAgentToolRegistry()
 	// 通过 Skills 加载工具（替代逐个注册）
@@ -198,11 +202,12 @@ func (s *Server) setupRoutes() {
 	_ = agentToolRegistry.Register(agent_tools.NewGenerateUISchemaTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewModifyUISchemaTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewPublishAppTool(workspaceService))
+	_ = agentToolRegistry.Register(agent_tools.NewCreatePersonaTool(personaRegistry))
 	agentSessionManager := service.NewAgentSessionManager()
 	agentSessionRepo := repository.NewAgentSessionRepository(s.db)
 	agentSessionManager.SetPersister(service.NewAgentSessionPersisterAdapter(agentSessionRepo))
-	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, service.DefaultAgentEngineConfig(), skillRegistry.BuildSystemPrompt(), skillRegistry)
-	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager, workspaceService, skillRegistry)
+	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, service.DefaultAgentEngineConfig(), skillRegistry.BuildSystemPrompt(), personaRegistry, skillRegistry)
+	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager, workspaceService, personaRegistry, skillRegistry)
 
 	// 健康检查
 	s.echo.GET("/health", systemHandler.HealthCheck)
@@ -352,6 +357,11 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/agent/sessions", agentChatHandler.ListSessions)
 			workspaces.GET("/:id/agent/sessions/:sessionId", agentChatHandler.GetSession)
 			workspaces.DELETE("/:id/agent/sessions/:sessionId", agentChatHandler.DeleteSession)
+			workspaces.GET("/:id/agent/personas", agentChatHandler.ListPersonas)
+			workspaces.GET("/:id/agent/personas/:personaId", agentChatHandler.GetPersona)
+			workspaces.POST("/:id/agent/personas", agentChatHandler.CreatePersona)
+			workspaces.PUT("/:id/agent/personas/:personaId", agentChatHandler.UpdatePersona)
+			workspaces.DELETE("/:id/agent/personas/:personaId", agentChatHandler.DeletePersona)
 			workspaces.GET("/:id/audit-logs", auditLogHandler.List)
 			workspaces.POST("/:id/audit-logs/client", auditLogHandler.RecordClient)
 			workspaces.GET("/:id/app-users", runtimeAuthHandler.ListUsers)
