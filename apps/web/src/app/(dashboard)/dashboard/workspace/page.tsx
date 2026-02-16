@@ -11,12 +11,8 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
   Bot,
-  Plus,
-  MessageSquare,
-  Trash2,
   Loader2,
   Clock,
-  Sparkles,
   Database,
   Eye,
   Rocket,
@@ -73,7 +69,6 @@ import { VersionDiffViewer } from '@/components/workspace-editor/version-diff-vi
 import { WorkspaceFilesPanel } from '@/components/workspace-editor/workspace-files-panel'
 import type { AppSchema } from '@/components/app-renderer/types'
 import type { AgentEvent } from '@/lib/api/agent-chat'
-import { agentChatApi, type AgentSessionSummary } from '@/lib/api/agent-chat'
 import {
   appApi,
   type App,
@@ -96,10 +91,6 @@ export default function WorkspacePage() {
 
   // ========== Chat Sidebar State ==========
   const [chatOpen, setChatOpen] = useState(true)
-  const [sessions, setSessions] = useState<AgentSessionSummary[]>([])
-  const [sessionsLoading, setSessionsLoading] = useState(false)
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
-  const [showSessionList, setShowSessionList] = useState(false)
 
   // ========== Data State ==========
   const [dbTables, setDbTables] = useState<DatabaseTable[]>([])
@@ -157,7 +148,6 @@ export default function WorkspacePage() {
   useEffect(() => {
     const sessionFromUrl = searchParams.get('session')
     if (sessionFromUrl) {
-      setActiveSessionId(sessionFromUrl)
       setChatOpen(true)
     }
     const promptFromUrl = searchParams.get('prompt')
@@ -173,23 +163,6 @@ export default function WorkspacePage() {
   }, [searchParams])
 
   // ========== Data Loading ==========
-
-  const loadSessions = useCallback(async () => {
-    if (!workspaceId) return
-    setSessionsLoading(true)
-    try {
-      const data = await agentChatApi.listSessions(workspaceId)
-      setSessions(Array.isArray(data) ? data : [])
-    } catch {
-      setSessions([])
-    } finally {
-      setSessionsLoading(false)
-    }
-  }, [workspaceId])
-
-  useEffect(() => {
-    loadSessions()
-  }, [loadSessions])
 
   const loadDbTables = useCallback(async () => {
     if (!workspaceId) return
@@ -496,24 +469,6 @@ export default function WorkspacePage() {
       setCompareError('Comparison failed.')
     } finally {
       setCompareLoading(false)
-    }
-  }
-
-  // ========== Session Handlers ==========
-  const handleNewSession = () => {
-    setActiveSessionId(null)
-  }
-
-  const handleDeleteSession = async (sessionId: string) => {
-    if (!workspaceId) return
-    try {
-      await agentChatApi.deleteSession(workspaceId, sessionId)
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId))
-      if (activeSessionId === sessionId) {
-        setActiveSessionId(null)
-      }
-    } catch {
-      // ignore
     }
   }
 
@@ -1588,136 +1543,14 @@ export default function WorkspacePage() {
 
         {/* ===== Right Sidebar: AI Chat ===== */}
         {chatOpen && (
-          <div className="w-[340px] shrink-0 border-l border-border flex flex-col bg-background-studio">
-            {/* Session Selector */}
-            <div className="px-3 py-2 border-b border-border flex items-center gap-2">
-              <button
-                onClick={() => setShowSessionList(!showSessionList)}
-                className="flex items-center gap-1.5 text-[11px] font-medium text-foreground-muted hover:text-foreground transition-colors"
-              >
-                <MessageSquare className="w-3 h-3" />
-                <span className="truncate max-w-[140px]">
-                  {activeSessionId
-                    ? sessions.find((s) => s.id === activeSessionId)?.title || 'Session'
-                    : 'New Conversation'}
-                </span>
-                <ChevronDown
-                  className={cn(
-                    'w-3 h-3 transition-transform',
-                    showSessionList && 'rotate-180'
-                  )}
-                />
-              </button>
-              <div className="flex-1" />
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleNewSession}
-                className="h-6 w-6 p-0"
-                title="New conversation"
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-            </div>
-
-            {/* Session List (dropdown) */}
-            {showSessionList && (
-              <div className="border-b border-border max-h-[240px] overflow-y-auto bg-surface-75/50">
-                <button
-                  onClick={() => {
-                    handleNewSession()
-                    setShowSessionList(false)
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-2 px-3 py-2 text-left transition-colors text-[11px]',
-                    !activeSessionId
-                      ? 'bg-brand-500/5 text-foreground'
-                      : 'hover:bg-surface-200/50 text-foreground-light'
-                  )}
-                >
-                  <Sparkles className="w-3 h-3 text-brand-500 shrink-0" />
-                  <span className="truncate">New Conversation</span>
-                </button>
-                {sessionsLoading ? (
-                  <div className="px-3 py-3 flex items-center justify-center">
-                    <Loader2 className="w-3 h-3 animate-spin text-foreground-muted" />
-                  </div>
-                ) : (
-                  sessions.map((session) => (
-                    <div
-                      key={session.id}
-                      className={cn(
-                        'group w-full flex items-center gap-2 px-3 py-2 transition-colors cursor-pointer text-[11px]',
-                        activeSessionId === session.id
-                          ? 'bg-surface-200/60 text-foreground'
-                          : 'hover:bg-surface-200/30 text-foreground-light'
-                      )}
-                      onClick={() => {
-                        setActiveSessionId(session.id)
-                        setShowSessionList(false)
-                      }}
-                    >
-                      <MessageSquare className="w-3 h-3 text-foreground-muted shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="truncate">
-                          {session.title || 'Session'}
-                        </div>
-                        <div className="text-[10px] text-foreground-muted flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5" />
-                          {formatRelativeTime(session.created_at)}
-                          <span className="text-foreground-muted/60">·</span>
-                          {session.message_count} msgs
-                        </div>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteSession(session.id)
-                        }}
-                        className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive transition-all p-0.5"
-                        title="Delete session"
-                      >
-                        <Trash2 className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {/* Chat Panel */}
+          <div className="w-[360px] shrink-0 border-l border-border flex flex-col bg-background-studio">
             <AgentChatPanel
-              key={activeSessionId || 'new'}
               workspaceId={workspaceId}
-              initialSessionId={activeSessionId}
-              initialPrompt={!activeSessionId ? initialPrompt : null}
               className="flex-1"
+              initialPrompt={initialPrompt}
               previewUrl={workspace?.slug ? `/runtime/${workspace.slug}` : undefined}
-              suggestions={[
-                {
-                  label: 'Full App',
-                  prompt:
-                    'Build a complete CRUD application with a dashboard showing stats, data tables for managing records, and forms to add new entries.',
-                },
-                {
-                  label: 'Database + Data',
-                  prompt:
-                    'Create database tables with proper relationships and insert sample data so I can see my app working immediately.',
-                },
-                {
-                  label: 'Dashboard UI',
-                  prompt:
-                    'Design a multi-page UI with stats cards, charts, data tables, and forms. Make it look professional and modern.',
-                },
-                {
-                  label: 'Add Feature',
-                  prompt:
-                    'Add a new table to my existing database and generate a management page with search, pagination, and inline editing.',
-                },
-              ]}
               onEvent={handleAgentEvent}
               onComplete={async (info: AgentCompletionInfo) => {
-                loadSessions()
                 if (info.hasUISchema && workspaceId && workspace?.app_status !== 'published') {
                   try {
                     await appApi.publish(workspaceId)

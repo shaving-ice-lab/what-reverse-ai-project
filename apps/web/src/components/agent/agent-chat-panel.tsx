@@ -17,12 +17,23 @@ import {
   X,
   Rocket,
   Eye,
+  Plus,
+  MessageSquare,
+  Trash2,
+  Clock,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { chatStream, agentChatApi } from '@/lib/api/agent-chat'
-import type { AgentEvent, AgentStatus, AgentMessage, AgentToolCall } from '@/lib/api/agent-chat'
-import { cn } from '@/lib/utils'
+import type {
+  AgentEvent,
+  AgentStatus,
+  AgentSessionSummary,
+  PersonaMeta,
+} from '@/lib/api/agent-chat'
+import { cn, formatRelativeTime } from '@/lib/utils'
+import { PersonaTabBar, PersonaWelcome } from './persona-selector'
 
 interface ChatEntry {
   id: string
@@ -44,34 +55,6 @@ interface ChatEntry {
   timestamp: Date
 }
 
-interface QuickSuggestion {
-  label: string
-  prompt: string
-}
-
-const defaultSuggestions: QuickSuggestion[] = [
-  {
-    label: '🚗 Fleet Management',
-    prompt:
-      'Build me a fleet management system with vehicles, drivers, and trip tracking. Include a dashboard with stats, and CRUD pages for each entity.',
-  },
-  {
-    label: '📋 Task Tracker',
-    prompt:
-      'Create a project task tracker with projects, tasks, and team members. Include a dashboard with task stats and charts.',
-  },
-  {
-    label: '🛒 Order Management',
-    prompt:
-      'Build an order management system with customers, products, and orders. Include a dashboard with sales stats and recent orders.',
-  },
-  {
-    label: '📊 Survey App',
-    prompt:
-      'Create a survey/feedback collection app with surveys, questions, and responses. Include analytics charts for responses.',
-  },
-]
-
 export interface AgentCompletionInfo {
   affectedResources: Set<string>
   hasUISchema: boolean
@@ -82,12 +65,10 @@ export interface AgentCompletionInfo {
 interface AgentChatPanelProps {
   workspaceId: string
   className?: string
-  initialSessionId?: string | null
   initialPrompt?: string | null
+  previewUrl?: string
   onEvent?: (event: AgentEvent) => void
   onComplete?: (info: AgentCompletionInfo) => void
-  suggestions?: QuickSuggestion[]
-  previewUrl?: string
 }
 
 let entryIdCounter = 0
@@ -98,70 +79,151 @@ function nextEntryId() {
 export function AgentChatPanel({
   workspaceId,
   className,
-  initialSessionId,
   initialPrompt,
+  previewUrl,
   onEvent,
   onComplete,
-  suggestions,
-  previewUrl,
 }: AgentChatPanelProps) {
-  const quickSuggestions = suggestions || defaultSuggestions
+  // ========== Persona State ==========
+  const [personas, setPersonas] = useState<PersonaMeta[]>([])
+  const [personasLoading, setPersonasLoading] = useState(false)
+  const [selectedPersona, setSelectedPersona] = useState<PersonaMeta | null>(null)
+
+  // ========== Session State ==========
+  const [sessions, setSessions] = useState<AgentSessionSummary[]>([])
+  const [sessionsLoading, setSessionsLoading] = useState(false)
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
+  const [showSessionList, setShowSessionList] = useState(false)
+
+  // ========== Chat State ==========
   const [entries, setEntries] = useState<ChatEntry[]>([])
   const [input, setInput] = useState('')
   const [running, setRunning] = useState(false)
-  const [sessionId, setSessionIdRaw] = useState<string>(() => {
-    if (initialSessionId) return initialSessionId
-    if (typeof window === 'undefined') return ''
-    try {
-      return sessionStorage.getItem(`agent_session_${workspaceId}`) || ''
-    } catch {
-      return ''
-    }
-  })
-  const setSessionId = useCallback(
-    (sid: string | ((prev: string) => string)) => {
-      setSessionIdRaw((prev) => {
-        const next = typeof sid === 'function' ? sid(prev) : sid
-        if (next && typeof window !== 'undefined') {
-          try {
-            sessionStorage.setItem(`agent_session_${workspaceId}`, next)
-          } catch {}
-        }
-        return next
-      })
-    },
-    [workspaceId]
-  )
-  const controllerRef = useRef<AbortController | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null)
   const [completionInfo, setCompletionInfo] = useState<AgentCompletionInfo | null>(null)
+
+  const controllerRef = useRef<AbortController | null>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const affectedRef = useRef<Set<string>>(new Set())
   const toolCallCountRef = useRef(0)
 
-  // Sync internal sessionId when parent passes a different initialSessionId
+  // ========== Load Personas ==========
   useEffect(() => {
-    const target = initialSessionId || ''
-    if (target !== sessionId) {
-      setSessionIdRaw(target)
+    if (!workspaceId) return
+    setPersonasLoading(true)
+    agentChatApi
+      .listPersonas(workspaceId)
+      .then((list) => {
+        setPersonas(list)
+        // Auto-select first persona
+        if (list.length > 0 && !selectedPersona) {
+          setSelectedPersona(list[0])
+        }
+      })
+      .catch(() => setPersonas([]))
+      .finally(() => setPersonasLoading(false))
+  }, [workspaceId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ========== Load Sessions ==========
+  const loadSessions = useCallback(async () => {
+    if (!workspaceId) return
+    setSessionsLoading(true)
+    try {
+      const data = await agentChatApi.listSessions(workspaceId)
+      setSessions(Array.isArray(data) ? data : [])
+    } catch {
+      setSessions([])
+    } finally {
+      setSessionsLoading(false)
+    }
+  }, [workspaceId])
+
+  useEffect(() => {
+    loadSessions()
+  }, [loadSessions])
+
+  // ========== Load Agent Status ==========
+  useEffect(() => {
+    agentChatApi
+      .getStatus(workspaceId)
+      .then(setAgentStatus)
+      .catch(() => {})
+  }, [workspaceId])
+
+  // ========== Auto-scroll ==========
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [entries])
+
+  // ========== Derived: sessions filtered by active persona ==========
+  const filteredSessions = selectedPersona
+    ? sessions.filter((s) => s.persona_id === selectedPersona.id)
+    : sessions
+
+  // ========== Persona Tab Switch ==========
+  const handlePersonaSwitch = useCallback(
+    (persona: PersonaMeta) => {
+      if (persona.id === selectedPersona?.id) return
+      // Abort any running stream
+      controllerRef.current?.abort()
+      setSelectedPersona(persona)
+      setActiveSessionId(null)
       setEntries([])
+      setInput('')
+      setRunning(false)
       setCompletionInfo(null)
       affectedRef.current = new Set()
       toolCallCountRef.current = 0
-      if (target && typeof window !== 'undefined') {
-        try {
-          sessionStorage.setItem(`agent_session_${workspaceId}`, target)
-        } catch {}
+      setShowSessionList(false)
+    },
+    [selectedPersona]
+  )
+
+  // ========== Session Management ==========
+  const handleNewSession = useCallback(() => {
+    controllerRef.current?.abort()
+    setActiveSessionId(null)
+    setEntries([])
+    setInput('')
+    setRunning(false)
+    setCompletionInfo(null)
+    affectedRef.current = new Set()
+    toolCallCountRef.current = 0
+    setShowSessionList(false)
+  }, [])
+
+  const handleSelectSession = useCallback(
+    (sessionId: string) => {
+      if (sessionId === activeSessionId) {
+        setShowSessionList(false)
+        return
       }
-      // Load history for existing sessions
-      if (target && workspaceId) {
+      controllerRef.current?.abort()
+      setActiveSessionId(sessionId)
+      setEntries([])
+      setRunning(false)
+      setCompletionInfo(null)
+      affectedRef.current = new Set()
+      toolCallCountRef.current = 0
+      setShowSessionList(false)
+
+      // Restore persona from session
+      const session = sessions.find((s) => s.id === sessionId)
+      if (session?.persona_id) {
+        const persona = personas.find((p) => p.id === session.persona_id)
+        if (persona) setSelectedPersona(persona)
+      }
+
+      // Load session history
+      if (workspaceId) {
         agentChatApi
-          .getSession(workspaceId, target)
-          .then((session) => {
+          .getSession(workspaceId, sessionId)
+          .then((sess) => {
             const historyEntries: ChatEntry[] = []
-            // Merge messages and tool_calls by timestamp
-            const messages = session.messages || []
-            const toolCalls = session.tool_calls || []
+            const messages = sess.messages || []
+            const toolCalls = sess.tool_calls || []
             let toolIdx = 0
             for (const msg of messages) {
               if (msg.role === 'user') {
@@ -172,7 +234,6 @@ export function AgentChatPanel({
                   timestamp: new Date(msg.timestamp),
                 })
               } else if (msg.role === 'assistant' && msg.content) {
-                // Insert any tool calls that happened before this message
                 while (
                   toolIdx < toolCalls.length &&
                   new Date(toolCalls[toolIdx].timestamp) <= new Date(msg.timestamp)
@@ -204,7 +265,6 @@ export function AgentChatPanel({
                 })
               }
             }
-            // Append remaining tool calls
             while (toolIdx < toolCalls.length) {
               const tc = toolCalls[toolIdx]
               historyEntries.push({
@@ -227,27 +287,27 @@ export function AgentChatPanel({
             }
             setEntries(historyEntries)
           })
-          .catch(() => {
-            // Session history unavailable — continue with empty chat
-          })
+          .catch(() => {})
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialSessionId])
+    },
+    [activeSessionId, sessions, personas, workspaceId]
+  )
 
-  useEffect(() => {
-    agentChatApi
-      .getStatus(workspaceId)
-      .then(setAgentStatus)
-      .catch(() => {})
-  }, [workspaceId])
+  const handleDeleteSession = useCallback(
+    async (sessionId: string) => {
+      if (!workspaceId) return
+      try {
+        await agentChatApi.deleteSession(workspaceId, sessionId)
+        setSessions((prev) => prev.filter((s) => s.id !== sessionId))
+        if (activeSessionId === sessionId) {
+          handleNewSession()
+        }
+      } catch {}
+    },
+    [workspaceId, activeSessionId, handleNewSession]
+  )
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [entries])
-
+  // ========== Chat Logic ==========
   const addEntry = useCallback((entry: Omit<ChatEntry, 'id' | 'timestamp'>) => {
     setEntries((prev) => [...prev, { ...entry, id: nextEntryId(), timestamp: new Date() }])
   }, [])
@@ -260,21 +320,23 @@ export function AgentChatPanel({
 
       addEntry({ type: 'user', content: message })
 
-      const sid = sessionId || `session_${Date.now()}`
-      if (!sessionId) setSessionId(sid)
+      const sid = activeSessionId || `session_${Date.now()}`
+      if (!activeSessionId) setActiveSessionId(sid)
 
-      const controller = chatStream(
+      const personaIdToSend = selectedPersona?.id || undefined
+
+      const controller = chatStream({
         workspaceId,
         message,
-        sid,
-        (event: AgentEvent) => {
+        sessionId: sid,
+        personaId: personaIdToSend,
+        onEvent: (event: AgentEvent) => {
           onEvent?.(event)
 
-          if (event.session_id && !sessionId) {
-            setSessionId(event.session_id)
+          if (event.session_id && !activeSessionId) {
+            setActiveSessionId(event.session_id)
           }
 
-          // Track affected resources
           if (event.affected_resource) {
             affectedRef.current.add(event.affected_resource)
           }
@@ -294,24 +356,9 @@ export function AgentChatPanel({
               })
               break
             case 'tool_result':
-              // Track specific resource types from tool names
-              if (event.tool_result?.success) {
-                if (
-                  event.tool_name === 'generate_ui_schema' ||
-                  event.tool_name === 'modify_ui_schema'
-                ) {
-                  affectedRef.current.add('ui_schema')
-                }
-                if (
-                  event.tool_name === 'create_table' ||
-                  event.tool_name === 'alter_table' ||
-                  event.tool_name === 'delete_table' ||
-                  event.tool_name === 'insert_data' ||
-                  event.tool_name === 'update_data' ||
-                  event.tool_name === 'delete_data'
-                ) {
-                  affectedRef.current.add('database')
-                }
+              // Refresh persona tab bar when a new persona is created
+              if (event.tool_result?.success && event.tool_name === 'create_persona') {
+                agentChatApi.listPersonas(workspaceId).then(setPersonas).catch(() => {})
               }
               addEntry({
                 type: 'tool_result',
@@ -347,6 +394,7 @@ export function AgentChatPanel({
               break
             case 'done': {
               setRunning(false)
+              loadSessions() // Refresh session list
               const info: AgentCompletionInfo = {
                 affectedResources: new Set(affectedRef.current),
                 hasUISchema: affectedRef.current.has('ui_schema'),
@@ -361,18 +409,18 @@ export function AgentChatPanel({
             }
           }
         },
-        (error) => {
+        onError: (error: string) => {
           addEntry({ type: 'error', content: error })
           setRunning(false)
         },
-        () => {
+        onDone: () => {
           setRunning(false)
-        }
-      )
+        },
+      })
 
       controllerRef.current = controller
     },
-    [running, workspaceId, sessionId, addEntry]
+    [running, workspaceId, activeSessionId, selectedPersona, addEntry, onEvent, onComplete, loadSessions]
   )
 
   const handleSend = useCallback(() => {
@@ -380,7 +428,7 @@ export function AgentChatPanel({
     sendMessage(input.trim())
   }, [input, running, sendMessage])
 
-  // Auto-send initialPrompt on mount (e.g. from setup template)
+  // Auto-send initialPrompt
   const initialPromptSentRef = useRef(false)
   useEffect(() => {
     if (initialPrompt && !initialPromptSentRef.current && !running && entries.length === 0) {
@@ -391,16 +439,16 @@ export function AgentChatPanel({
 
   const handleStop = () => {
     controllerRef.current?.abort()
-    if (sessionId) {
-      agentChatApi.cancelSession(workspaceId, sessionId).catch(() => {})
+    if (activeSessionId) {
+      agentChatApi.cancelSession(workspaceId, activeSessionId).catch(() => {})
     }
     setRunning(false)
   }
 
   const handleConfirm = async (actionId: string, approved: boolean) => {
-    if (!sessionId) return
+    if (!activeSessionId) return
     try {
-      await agentChatApi.confirmAction(workspaceId, sessionId, actionId, approved)
+      await agentChatApi.confirmAction(workspaceId, activeSessionId, actionId, approved)
       addEntry({
         type: 'assistant',
         content: approved ? 'Action approved. Executing...' : 'Action rejected.',
@@ -417,72 +465,120 @@ export function AgentChatPanel({
     }
   }
 
+  // ========== Render ==========
   return (
     <div className={cn('flex flex-col h-full bg-background', className)}>
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-        <Bot className="w-4 h-4 text-brand-500" />
-        <span className="text-sm font-medium text-foreground">AI Agent</span>
-        {agentStatus && (
-          <span
-            className={cn(
-              'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
-              agentStatus.provider === 'openai'
-                ? 'bg-green-500/10 text-green-600'
-                : agentStatus.provider === 'ollama'
-                  ? 'bg-blue-500/10 text-blue-600'
-                  : 'bg-amber-500/10 text-amber-600'
-            )}
-          >
-            {agentStatus.provider === 'openai'
-              ? `OpenAI · ${agentStatus.model}`
-              : agentStatus.provider === 'ollama'
-                ? `Ollama · ${agentStatus.model}`
-                : 'Heuristic'}
+      {/* ── Persona Tab Bar ── */}
+      <PersonaTabBar
+        personas={personas}
+        activeId={selectedPersona?.id || ''}
+        onSelect={handlePersonaSwitch}
+        loading={personasLoading}
+        className="border-b border-border bg-surface-75/50"
+      />
+
+      {/* ── Session Bar ── */}
+      <div className="px-3 py-1.5 border-b border-border flex items-center gap-2 bg-background">
+        <button
+          onClick={() => setShowSessionList(!showSessionList)}
+          className="flex items-center gap-1.5 text-[11px] font-medium text-foreground-muted hover:text-foreground transition-colors min-w-0 flex-1"
+        >
+          <MessageSquare className="w-3 h-3 shrink-0" />
+          <span className="truncate">
+            {activeSessionId
+              ? sessions.find((s) => s.id === activeSessionId)?.title || 'Session'
+              : 'New Conversation'}
           </span>
-        )}
+          <ChevronDown
+            className={cn('w-3 h-3 shrink-0 transition-transform', showSessionList && 'rotate-180')}
+          />
+        </button>
         {running && (
-          <span className="text-[10px] text-foreground-muted flex items-center gap-1 ml-auto">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            Thinking...
-          </span>
+          <Loader2 className="w-3 h-3 animate-spin text-foreground-muted shrink-0" />
         )}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleNewSession}
+          className="h-6 w-6 p-0 shrink-0"
+          title="New conversation"
+        >
+          <Plus className="w-3 h-3" />
+        </Button>
       </div>
 
-      {/* Messages */}
+      {/* ── Session List Dropdown ── */}
+      {showSessionList && (
+        <div className="border-b border-border max-h-[200px] overflow-y-auto bg-surface-75/50">
+          <button
+            onClick={() => {
+              handleNewSession()
+              setShowSessionList(false)
+            }}
+            className={cn(
+              'w-full flex items-center gap-2 px-3 py-2 text-left transition-colors text-[11px]',
+              !activeSessionId
+                ? 'bg-brand-500/5 text-foreground'
+                : 'hover:bg-surface-200/50 text-foreground-light'
+            )}
+          >
+            <Sparkles className="w-3 h-3 text-brand-500 shrink-0" />
+            <span className="truncate">New Conversation</span>
+          </button>
+          {sessionsLoading ? (
+            <div className="px-3 py-3 flex items-center justify-center">
+              <Loader2 className="w-3 h-3 animate-spin text-foreground-muted" />
+            </div>
+          ) : filteredSessions.length === 0 ? (
+            <div className="px-3 py-3 text-center text-[10px] text-foreground-muted">
+              No previous sessions
+            </div>
+          ) : (
+            filteredSessions.map((session) => (
+              <div
+                key={session.id}
+                className={cn(
+                  'group w-full flex items-center gap-2 px-3 py-2 transition-colors cursor-pointer text-[11px]',
+                  activeSessionId === session.id
+                    ? 'bg-surface-200/60 text-foreground'
+                    : 'hover:bg-surface-200/30 text-foreground-light'
+                )}
+                onClick={() => handleSelectSession(session.id)}
+              >
+                <MessageSquare className="w-3 h-3 text-foreground-muted shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="truncate">{session.title || 'Session'}</div>
+                  <div className="text-[10px] text-foreground-muted flex items-center gap-1">
+                    <Clock className="w-2.5 h-2.5" />
+                    {formatRelativeTime(session.created_at)}
+                    <span className="text-foreground-muted/60">·</span>
+                    {session.message_count} msgs
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteSession(session.id)
+                  }}
+                  className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive transition-all p-0.5"
+                  title="Delete session"
+                >
+                  <Trash2 className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ── Chat Area ── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
         {entries.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-foreground-muted text-sm px-4">
-            <Bot className="w-8 h-8 mb-3 opacity-30" />
-            <p className="font-medium text-foreground">What do you want to build?</p>
-            <p className="text-xs mt-1 text-center max-w-md">
-              Describe your app and the AI Agent will create database tables, generate UI pages, and
-              build a complete working application.
-            </p>
-            {quickSuggestions.length > 0 && (
-              <div className="mt-4 grid gap-2 w-full max-w-md">
-                {quickSuggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setInput(s.prompt)
-                    }}
-                    className="text-left px-3 py-2.5 rounded-lg border border-border/60 bg-surface-100/50 hover:bg-surface-200/60 hover:border-border transition-colors group"
-                  >
-                    <span className="text-xs font-medium text-foreground">{s.label}</span>
-                    <p className="text-[11px] text-foreground-muted mt-0.5 line-clamp-1 group-hover:text-foreground-light transition-colors">
-                      {s.prompt}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            )}
-            {agentStatus?.provider === 'heuristic' && (
-              <p className="text-[10px] mt-3 text-amber-500">
-                Tip: Set OPENAI_API_KEY or OLLAMA_HOST for full AI capabilities
-              </p>
-            )}
-          </div>
+          <PersonaWelcome
+            persona={selectedPersona}
+            onSuggestionClick={(prompt) => setInput(prompt)}
+            className="h-full"
+          />
         )}
 
         {entries.map((entry) => (
@@ -496,7 +592,6 @@ export function AgentChatPanel({
           </div>
         )}
 
-        {/* App Ready Banner — shown after agent completes with UI schema */}
         {completionInfo && completionInfo.hasUISchema && !running && previewUrl && (
           <div className="mx-2 mt-2 bg-brand-500/5 border border-brand-500/20 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -512,30 +607,32 @@ export function AgentChatPanel({
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3">
-              {previewUrl && (
-                <a
-                  href={previewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand-500 text-white text-xs font-medium hover:bg-brand-600 transition-colors"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  Preview App
-                </a>
-              )}
+              <a
+                href={previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand-500 text-white text-xs font-medium hover:bg-brand-600 transition-colors"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                Preview App
+              </a>
             </div>
           </div>
         )}
       </div>
 
-      {/* Input */}
-      <div className="px-4 py-3 border-t border-border">
+      {/* ── Input ── */}
+      <div className="px-3 py-2.5 border-t border-border">
         <div className="flex items-center gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask the Agent..."
+            placeholder={
+              selectedPersona
+                ? `Ask ${selectedPersona.name}...`
+                : 'Ask the Agent...'
+            }
             disabled={running}
             className="flex-1 h-9 text-sm"
           />
