@@ -30,6 +30,7 @@ type AffectedResource string
 const (
 	AffectedResourceDatabase AffectedResource = "database"
 	AffectedResourceUISchema AffectedResource = "ui_schema"
+	AffectedResourcePersona  AffectedResource = "persona"
 )
 
 // AgentEvent Agent 流式事件
@@ -63,7 +64,7 @@ func DefaultAgentEngineConfig() AgentEngineConfig {
 // AgentEngine Agent 推理引擎接口
 type AgentEngine interface {
 	// Run 执行 Agent 推理循环，返回事件流
-	Run(ctx context.Context, workspaceID, userID, message, sessionID string) <-chan AgentEvent
+	Run(ctx context.Context, workspaceID, userID, message, sessionID, personaID string) <-chan AgentEvent
 	// Confirm 用户确认待确认操作
 	Confirm(ctx context.Context, sessionID, actionID string, approved bool) error
 	// Cancel 取消当前运行
@@ -72,11 +73,12 @@ type AgentEngine interface {
 
 // agentEngine ReAct 推理引擎实现
 type agentEngine struct {
-	registry      *AgentToolRegistry
-	config        AgentEngineConfig
-	sessions      *AgentSessionManager
-	skillPrompt   string
-	skillRegistry *SkillRegistry
+	registry        *AgentToolRegistry
+	config          AgentEngineConfig
+	sessions        *AgentSessionManager
+	skillPrompt     string
+	skillRegistry   *SkillRegistry
+	personaRegistry *PersonaRegistry
 }
 
 // NewAgentEngine 创建 Agent 引擎
@@ -89,12 +91,13 @@ func NewAgentEngine(registry *AgentToolRegistry, sessions *AgentSessionManager, 
 }
 
 // NewAgentEngineWithSkills 创建 Agent 引擎（含 Skills system prompt 附加内容）
-func NewAgentEngineWithSkills(registry *AgentToolRegistry, sessions *AgentSessionManager, config AgentEngineConfig, skillPrompt string, skillRegistries ...*SkillRegistry) AgentEngine {
+func NewAgentEngineWithSkills(registry *AgentToolRegistry, sessions *AgentSessionManager, config AgentEngineConfig, skillPrompt string, personaRegistry *PersonaRegistry, skillRegistries ...*SkillRegistry) AgentEngine {
 	e := &agentEngine{
-		registry:    registry,
-		config:      config,
-		sessions:    sessions,
-		skillPrompt: skillPrompt,
+		registry:        registry,
+		config:          config,
+		sessions:        sessions,
+		skillPrompt:     skillPrompt,
+		personaRegistry: personaRegistry,
 	}
 	if len(skillRegistries) > 0 {
 		e.skillRegistry = skillRegistries[0]
@@ -110,16 +113,75 @@ func (e *agentEngine) getSkillPrompt() string {
 	return e.skillPrompt
 }
 
-func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, sessionID string) <-chan AgentEvent {
+// resolvePersona 解析 Persona，返回 nil 表示使用默认（Web Creator）
+func (e *agentEngine) resolvePersona(personaID string) *Persona {
+	if personaID == "" || e.personaRegistry == nil {
+		return nil
+	}
+	p, ok := e.personaRegistry.Get(personaID)
+	if !ok || !p.Enabled {
+		return nil
+	}
+	return p
+}
+
+// thinkWithPersona calls the LLM with persona-specific system prompt and tool filter
+func (e *agentEngine) thinkWithPersona(ctx context.Context, session *AgentSession, originalMessage string, step int, persona *Persona) (string, *toolAction) {
+	toolDefs := e.buildToolDefinitionsForPersona(persona)
+	llmMessages := e.buildLLMMessagesForPersona(session, originalMessage, step, persona)
+
+	thought, action, err := e.callLLM(ctx, llmMessages, toolDefs)
+	if err != nil {
+		return fmt.Sprintf("I encountered an error while reasoning: %v. Let me try a simpler approach.", err), nil
+	}
+
+	return thought, action
+}
+
+// buildToolDefinitionsForPersona converts registered tools to OpenAI function calling format, filtered by persona
+func (e *agentEngine) buildToolDefinitionsForPersona(persona *Persona) []map[string]interface{} {
+	tools := e.registry.ListAll()
+	defs := make([]map[string]interface{}, 0, len(tools))
+
+	// Build allowed tools set from persona
+	var allowed map[string]bool
+	if persona != nil && len(persona.ToolFilter) > 0 {
+		allowed = make(map[string]bool, len(persona.ToolFilter))
+		for _, name := range persona.ToolFilter {
+			allowed[name] = true
+		}
+	}
+
+	for _, t := range tools {
+		if allowed != nil && !allowed[t.Name] {
+			continue
+		}
+		def := map[string]interface{}{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        t.Name,
+				"description": t.Description,
+				"parameters":  json.RawMessage(t.Parameters),
+			},
+		}
+		defs = append(defs, def)
+	}
+	return defs
+}
+
+func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, sessionID, personaID string) <-chan AgentEvent {
 	events := make(chan AgentEvent, 32)
 
 	go func() {
 		defer close(events)
 
 		// Get or create session
-		session := e.sessions.GetOrCreate(sessionID, workspaceID, userID)
+		session := e.sessions.GetOrCreate(sessionID, workspaceID, userID, personaID)
 		session.Status = AgentSessionRunning
 		e.sessions.Persist(sessionID)
+
+		// Resolve persona for this session
+		persona := e.resolvePersona(session.PersonaID)
 
 		// Add user message
 		session.AddMessage(AgentMessageEntry{
@@ -143,7 +205,7 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 			// Step 1: Think — send context to LLM, get thought + action or final_answer
 			// Currently using a simplified demo implementation
 			// In production, this calls the LLM with tool definitions and conversation history
-			thought, action := e.think(stepCtx, session, message, step)
+			thought, action := e.thinkWithPersona(stepCtx, session, message, step, persona)
 			cancel()
 
 			// Emit thought
@@ -198,6 +260,34 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 				ToolName:  toolName,
 				ToolArgs:  toolArgs,
 				SessionID: sessionID,
+			}
+
+			// Check persona tool filter — reject tools not in the allowed list
+			if persona != nil && len(persona.ToolFilter) > 0 {
+				allowed := false
+				for _, t := range persona.ToolFilter {
+					if t == toolName {
+						allowed = true
+						break
+					}
+				}
+				if !allowed {
+					errMsg := fmt.Sprintf("Tool %q is not available for the %s persona", toolName, persona.Name)
+					events <- AgentEvent{
+						Type:       AgentEventToolResult,
+						Step:       step,
+						ToolName:   toolName,
+						ToolResult: &AgentToolResult{Success: false, Error: errMsg},
+						SessionID:  sessionID,
+					}
+					session.AddMessage(AgentMessageEntry{
+						Role:      "tool",
+						Content:   errMsg,
+						Timestamp: time.Now(),
+						Metadata:  map[string]interface{}{"tool": toolName, "error": true, "reason": "persona_filter"},
+					})
+					continue
+				}
 			}
 
 			// Check if tool requires confirmation
@@ -382,6 +472,8 @@ func resolveAffectedResource(toolName string) AffectedResource {
 		return AffectedResourceDatabase
 	case "generate_ui_schema", "modify_ui_schema":
 		return AffectedResourceUISchema
+	case "create_persona":
+		return AffectedResourcePersona
 	default:
 		return ""
 	}
@@ -394,50 +486,94 @@ type toolAction struct {
 	ToolArgs json.RawMessage
 }
 
-// think calls the LLM with conversation history + tool definitions (OpenAI function calling)
-// Returns thought string and optional tool action. If action is nil, the thought is the final answer.
-func (e *agentEngine) think(ctx context.Context, session *AgentSession, originalMessage string, step int) (string, *toolAction) {
-	// Build tool definitions for function calling
-	toolDefs := e.buildToolDefinitions()
-
-	// Build conversation messages
-	llmMessages := e.buildLLMMessages(session, originalMessage, step)
-
-	// Call LLM
-	thought, action, err := e.callLLM(ctx, llmMessages, toolDefs)
-	if err != nil {
-		return fmt.Sprintf("I encountered an error while reasoning: %v. Let me try a simpler approach.", err), nil
+// getPersonaSystemPrompt builds the full system prompt for a persona.
+// - Web Creator (empty SystemPrompt by design) → uses defaultWebCreatorFullPrompt with AppSchema v2.0 spec
+// - Other personas with a non-empty SystemPrompt → uses their own prompt
+// - Fallback for unknown/empty → generic assistant prompt (never leaks Web Creator capabilities)
+func (e *agentEngine) getPersonaSystemPrompt(persona *Persona, session *AgentSession) string {
+	var basePrompt string
+	switch {
+	case persona != nil && persona.SystemPrompt != "":
+		basePrompt = persona.SystemPrompt
+	case persona != nil && persona.ID == "web_creator":
+		basePrompt = defaultWebCreatorFullPrompt
+	case persona == nil:
+		// No persona selected at all → default to Web Creator for backward compatibility
+		basePrompt = defaultWebCreatorFullPrompt
+	default:
+		// Custom persona with empty SystemPrompt — use a safe generic prompt
+		basePrompt = "You are an AI assistant named \"" + persona.Name + "\". " + persona.Description + "\nUse the available tools to help the user. Always be helpful and concise."
 	}
-
-	return thought, action
+	// Append workspace context and skill prompt
+	return basePrompt + "\n\nCurrent workspace_id: " + session.WorkspaceID + "\nCurrent user_id: " + session.UserID + e.getSkillPrompt()
 }
 
-// buildToolDefinitions converts registered tools to OpenAI function calling format
-func (e *agentEngine) buildToolDefinitions() []map[string]interface{} {
-	tools := e.registry.ListAll()
-	defs := make([]map[string]interface{}, 0, len(tools))
-	for _, t := range tools {
-		def := map[string]interface{}{
-			"type": "function",
-			"function": map[string]interface{}{
-				"name":        t.Name,
-				"description": t.Description,
-				"parameters":  json.RawMessage(t.Parameters),
-			},
-		}
-		defs = append(defs, def)
-	}
-	return defs
-}
+// buildLLMMessagesForPersona constructs the prompt messages for the LLM with persona-specific system prompt.
+func (e *agentEngine) buildLLMMessagesForPersona(session *AgentSession, originalMessage string, step int, persona *Persona) []map[string]interface{} {
+	systemPrompt := e.getPersonaSystemPrompt(persona, session)
 
-// buildLLMMessages constructs the prompt messages for the LLM.
-// Returns []map[string]interface{} to support OpenAI function calling format
-// (assistant messages with tool_calls, tool result messages with tool_call_id).
-func (e *agentEngine) buildLLMMessages(session *AgentSession, originalMessage string, step int) []map[string]interface{} {
 	msgs := []map[string]interface{}{
 		{
-			"role": "system",
-			"content": `You are an AI Agent that helps users build complete web applications inside a Workspace.
+			"role":    "system",
+			"content": systemPrompt,
+		},
+	}
+
+	// Add conversation history with proper OpenAI function calling format
+	history := session.GetMessages()
+	for _, m := range history {
+		switch m.Role {
+		case "user":
+			msgs = append(msgs, map[string]interface{}{
+				"role":    "user",
+				"content": m.Content,
+			})
+		case "assistant":
+			msg := map[string]interface{}{
+				"role":    "assistant",
+				"content": m.Content,
+			}
+			if m.Metadata != nil {
+				if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
+					tcName, _ := m.Metadata["tool_call_name"].(string)
+					tcArgs, _ := m.Metadata["tool_call_args"].(string)
+					msg["tool_calls"] = []map[string]interface{}{
+						{
+							"id":   tcID,
+							"type": "function",
+							"function": map[string]interface{}{
+								"name":      tcName,
+								"arguments": tcArgs,
+							},
+						},
+					}
+				}
+			}
+			msgs = append(msgs, msg)
+		case "tool":
+			msg := map[string]interface{}{
+				"role":    "tool",
+				"content": m.Content,
+			}
+			if m.Metadata != nil {
+				if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
+					msg["tool_call_id"] = tcID
+				}
+			}
+			msgs = append(msgs, msg)
+		case "system":
+			msgs = append(msgs, map[string]interface{}{
+				"role":    "system",
+				"content": m.Content,
+			})
+		}
+	}
+
+	return msgs
+}
+
+// defaultWebCreatorFullPrompt is the full system prompt for the default Web Creator persona
+const defaultWebCreatorFullPrompt = `You are a **Web Creator** AI assistant that helps users build complete web applications inside a Workspace.
 You have access to tools for creating database tables, generating UI schemas, and more.
 
 IMPORTANT RULES:
@@ -484,123 +620,42 @@ Available icon names: LayoutDashboard, FileText, Users, ShoppingCart, Truck, Bar
 
 Each block has: id, type, label (optional), config, data_source (optional), grid (optional: {col_span, row_span}).
 
-1. stats_card — Display a single metric value
-   config: { "value_key": "<column>", "label": "<title>", "format": "number|currency|percent", "color": "default|green|red|blue|amber", "icon": "<icon>" }
-   data_source: { "table": "<table_name>", "aggregation": [{"function": "count|sum|avg", "column": "<col>", "alias": "<value_key>"}] }
-
-2. data_table — Interactive data table with CRUD
-   config: { "table_name": "<table>", "columns": [{"key":"<col>","label":"<header>","type":"text|number|date|boolean|badge","sortable":true}], "actions": ["create","edit","delete","view"], "filters_enabled": true, "search_enabled": true, "search_key": "<col_to_search>", "pagination": true, "page_size": 20 }
-   data_source: { "table": "<table_name>", "order_by": [{"column":"<col>","direction":"DESC"}] }
-
-3. form — Data entry form (inserts into a table)
-   config: { "title": "<form heading>", "description": "<helper text>", "fields": [{"name":"<col>","label":"<label>","type":"text|number|email|textarea|select|date|checkbox","required":true,"placeholder":"...","options":[{"label":"..","value":".."}]}], "submit_label": "Submit", "table_name": "<table>", "mode": "create" }
-
-4. chart — Data visualization
-   config: { "chart_type": "bar|line|pie|area", "x_key": "<col>", "y_key": "<col>", "title": "<chart title>", "color": "#hex" }
-   data_source: { "table": "<table_name>", "columns": ["<x_col>","<y_col>"], "order_by": [{"column":"<col>","direction":"ASC"}], "limit": 30 }
-
-5. detail_view — Display a single record's fields
-   config: { "fields": [{"key":"<col>","label":"<label>","type":"text|number|date|boolean"}], "table_name": "<table>", "record_id_key": "id" }
-
-6. markdown — Static content
-   config: { "content": "# Title\nMarkdown text here..." }
-
-7. image — Display an image
-   config: { "src": "<url>", "alt": "<description>", "width": "100%", "height": "auto", "object_fit": "cover|contain|fill|none", "caption": "<text>", "link": "<url>" }
-
-8. hero — Hero/banner section with title and call-to-action
-   config: { "title": "<headline>", "subtitle": "<overline>", "description": "<body text>", "align": "left|center|right", "size": "sm|md|lg", "background_color": "#hex", "text_color": "#hex", "actions": [{"label": "<text>", "href": "<url>", "variant": "primary|secondary"}] }
-
-9. tabs_container — Tabbed container holding nested blocks
-   config: { "tabs": [{"id": "<tab_id>", "label": "<Tab Label>", "blocks": [<block objects>]}], "default_tab": "<tab_id>" }
-
-10. list — Card list from database table
-    config: { "table_name": "<table>", "title_key": "<col>", "subtitle_key": "<col>", "description_key": "<col>", "image_key": "<col>", "badge_key": "<col>", "layout": "list|grid", "columns": 2, "clickable": true, "empty_message": "No items" }
-    data_source: { "table": "<table_name>", "order_by": [{"column":"<col>","direction":"DESC"}], "limit": 50 }
-
-11. divider — Visual separator
-    config: { "label": "<optional text>", "style": "solid|dashed|dotted", "spacing": "sm|md|lg" }
-
----------- DataSource Format ----------
-{
-  "table": "<table_name>",
-  "columns": ["col1", "col2"],
-  "where": "status = 'active'",
-  "order_by": [{"column": "created_at", "direction": "DESC"}],
-  "limit": 100,
-  "aggregation": [{"function": "count", "column": "*", "alias": "total"}]
-}
-
----------- Example: Fleet Management System ----------
-Step 1: Create tables — vehicles(id,plate_number,model,status,mileage,last_maintenance), drivers(id,name,license_no,phone,status), trips(id,vehicle_id,driver_id,origin,destination,start_time,end_time,distance,status)
-Step 2: Insert sample data
-Step 3: Generate UI Schema with pages:
-  - Dashboard page: stats_cards (total vehicles, active drivers, trips today) + chart (trips per day)
-  - Vehicles page: data_table with all vehicle columns + form to add vehicle
-  - Drivers page: data_table with driver columns + form to add driver
-  - Trips page: data_table with trip columns + form to create trip
+1. stats_card — config: { "value_key", "label", "format": "number|currency|percent", "color", "icon" } data_source: { "table", "aggregation": [{"function": "count|sum|avg", "column", "alias"}] }
+2. data_table — config: { "table_name", "columns": [{"key","label","type","sortable"}], "actions": ["create","edit","delete","view"], "search_enabled", "search_key", "pagination", "page_size" } data_source: { "table", "order_by" }
+3. form — config: { "title", "description", "fields": [{"name","label","type","required","placeholder","options"}], "submit_label", "table_name", "mode" }
+4. chart — config: { "chart_type": "bar|line|pie|area", "x_key", "y_key", "title", "color" } data_source: { "table", "columns", "order_by", "limit" }
+5. detail_view — config: { "fields": [{"key","label","type"}], "table_name", "record_id_key" }
+6. markdown — config: { "content" }
+7. image — config: { "src", "alt", "width", "height", "object_fit", "caption", "link" }
+8. hero — config: { "title", "subtitle", "description", "align", "size", "background_color", "text_color", "actions" }
+9. tabs_container — config: { "tabs": [{"id", "label", "blocks"}], "default_tab" }
+10. list — config: { "table_name", "title_key", "subtitle_key", "description_key", "image_key", "badge_key", "layout", "columns", "clickable", "empty_message" }
+11. divider — config: { "label", "style": "solid|dashed|dotted", "spacing": "sm|md|lg" }
 
 ========== End of AppSchema v2.0 Specification ==========
 
-Current workspace_id: ` + session.WorkspaceID + `
-Current user_id: ` + session.UserID + e.getSkillPrompt(),
-		},
-	}
+========== AI Staff Creation ==========
 
-	// Add conversation history with proper OpenAI function calling format
-	history := session.GetMessages()
-	for _, m := range history {
-		switch m.Role {
-		case "user":
-			msgs = append(msgs, map[string]interface{}{
-				"role":    "user",
-				"content": m.Content,
-			})
-		case "assistant":
-			msg := map[string]interface{}{
-				"role":    "assistant",
-				"content": m.Content,
-			}
-			// If this assistant message triggered a tool call, include tool_calls array
-			if m.Metadata != nil {
-				if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
-					tcName, _ := m.Metadata["tool_call_name"].(string)
-					tcArgs, _ := m.Metadata["tool_call_args"].(string)
-					msg["tool_calls"] = []map[string]interface{}{
-						{
-							"id":   tcID,
-							"type": "function",
-							"function": map[string]interface{}{
-								"name":      tcName,
-								"arguments": tcArgs,
-							},
-						},
-					}
-				}
-			}
-			msgs = append(msgs, msg)
-		case "tool":
-			// Tool result message with tool_call_id for proper function calling context
-			msg := map[string]interface{}{
-				"role":    "tool",
-				"content": m.Content,
-			}
-			if m.Metadata != nil {
-				if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
-					msg["tool_call_id"] = tcID
-				}
-			}
-			msgs = append(msgs, msg)
-		case "system":
-			msgs = append(msgs, map[string]interface{}{
-				"role":    "system",
-				"content": m.Content,
-			})
-		}
-	}
+You can create custom AI Staff personas using the create_persona tool. When a user asks to create an AI assistant, staff, or agent:
 
-	return msgs
-}
+1. Determine the staff's role and responsibilities from the user's description
+2. Decide which data actions are needed: query (read), insert (add), update (modify), delete (remove)
+3. Write a detailed role_prompt that defines the staff's behavior, personality, and domain knowledge
+4. Create 3-4 helpful suggestions that guide users on how to interact with this staff
+5. Choose an appropriate icon and color
+
+Example: If user says "Create a customer support agent that can look up orders and update ticket status":
+- name: "Customer Support Agent"
+- description: "Handle customer inquiries, look up orders, and manage support tickets"
+- allowed_actions: ["query", "update"]
+- role_prompt: "You are a customer support agent. You help users look up order information, check delivery status, and update support ticket statuses. Always be polite and empathetic. When looking up orders, present the information clearly including order ID, status, items, and dates."
+- icon: "Headphones", color: "blue"
+- suggestions: [{"label": "🔍 Look Up Order", "prompt": "Help me look up an order by customer name or order ID"}, {"label": "✏️ Update Ticket", "prompt": "Help me update the status of a support ticket"}, {"label": "📊 Support Stats", "prompt": "Show me a summary of open vs resolved tickets"}, {"label": "📋 Recent Issues", "prompt": "List the most recent customer issues that need attention"}]
+
+Available icons: UserCog, Headphones, ShieldCheck, ClipboardList, PackageSearch, Heart, Stethoscope, GraduationCap, Megaphone, Wrench
+Available colors: green, blue, amber, violet, red
+
+========== End of AI Staff Creation ==========`
 
 // LLMConfig holds per-workspace LLM configuration
 type LLMConfig struct {
@@ -653,11 +708,11 @@ func (e *agentEngine) callLLM(ctx context.Context, messages []map[string]interfa
 		return e.callOpenAI(ctx, messages, tools, cfg.APIKey, model, cfg.BaseURL)
 	}
 
-	provider, endpoint, model := detectLLMProvider()
+	provider, apiKey, model := detectLLMProvider()
 
 	switch provider {
 	case llmProviderOpenAI:
-		return e.callOpenAI(ctx, messages, tools, endpoint, model, "")
+		return e.callOpenAI(ctx, messages, tools, apiKey, model, "")
 	default:
 		return e.thinkHeuristic(messages, tools)
 	}
