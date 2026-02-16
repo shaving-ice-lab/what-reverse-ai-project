@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"context"
+	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,6 +20,7 @@ import (
 type RuntimeDataHandler struct {
 	runtimeService     service.RuntimeService
 	vmStore            *vmruntime.VMStore
+	vmPool             *vmruntime.VMPool
 	rlsService         service.WorkspaceRLSService
 	runtimeAuthService service.RuntimeAuthService
 }
@@ -40,6 +44,11 @@ func NewRuntimeDataHandler(
 // SetRuntimeAuthService sets the runtime auth service for RLS user resolution
 func (h *RuntimeDataHandler) SetRuntimeAuthService(authService service.RuntimeAuthService) {
 	h.runtimeAuthService = authService
+}
+
+// SetVMPool sets the VM pool for data hook execution
+func (h *RuntimeDataHandler) SetVMPool(pool *vmruntime.VMPool) {
+	h.vmPool = pool
 }
 
 // rlsFilter is a local filter struct used by RLS resolution
@@ -195,6 +204,70 @@ func (h *RuntimeDataHandler) QueryRows(c echo.Context) error {
 	})
 }
 
+// ========== VM Data Hook System ==========
+
+// hookResult represents the response from a VM data hook.
+type hookResult struct {
+	Allow   bool                   `json:"allow"`
+	Data    map[string]interface{} `json:"data"`
+	Error   string                 `json:"error"`
+	Handled bool                   // true if a hook was found and executed
+}
+
+// callVMHook invokes a VM route like "POST /hooks/before-insert/:table" and returns the result.
+// If no VM is loaded or the hook route doesn't exist, it returns a passthrough result (allow=true).
+func (h *RuntimeDataHandler) callVMHook(ctx context.Context, workspaceID, hookType, tableName string, data map[string]interface{}) hookResult {
+	if h.vmPool == nil {
+		return hookResult{Allow: true}
+	}
+
+	vm, err := h.vmPool.GetOrCreate(ctx, workspaceID)
+	if err != nil {
+		// No VM deployed — passthrough
+		return hookResult{Allow: true}
+	}
+
+	req := vmruntime.VMRequest{
+		Method: "POST",
+		Path:   "/hooks/" + hookType + "/" + tableName,
+		Body: map[string]interface{}{
+			"table": tableName,
+			"data":  data,
+		},
+	}
+
+	resp, err := vm.Handle(req)
+	if err != nil {
+		log.Printf("[DataHook] VM hook %s/%s error: %v", hookType, tableName, err)
+		return hookResult{Allow: true}
+	}
+
+	// 404 means no hook registered — passthrough
+	if resp.Status == 404 {
+		return hookResult{Allow: true}
+	}
+
+	// Parse hook response
+	bodyBytes, err := json.Marshal(resp.Body)
+	if err != nil {
+		return hookResult{Allow: true}
+	}
+
+	var hr hookResult
+	if err := json.Unmarshal(bodyBytes, &hr); err != nil {
+		// If the hook returned a non-standard response, treat as passthrough
+		return hookResult{Allow: true}
+	}
+	hr.Handled = true
+
+	// Default to allow if not explicitly set
+	if !hr.Handled {
+		hr.Allow = true
+	}
+
+	return hr
+}
+
 // InsertRow 插入行（公开访问 — 表单提交）
 func (h *RuntimeDataHandler) InsertRow(c echo.Context) error {
 	workspaceID, err := h.resolveWorkspaceID(c)
@@ -217,10 +290,29 @@ func (h *RuntimeDataHandler) InsertRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Data cannot be empty")
 	}
 
+	// Before-insert hook
+	hookRes := h.callVMHook(c.Request().Context(), workspaceID, "before-insert", tableName, req.Data)
+	if hookRes.Handled && !hookRes.Allow {
+		errMsg := hookRes.Error
+		if errMsg == "" {
+			errMsg = "Operation rejected by business rule"
+		}
+		return errorResponse(c, http.StatusBadRequest, "HOOK_REJECTED", errMsg)
+	}
+	// Hook can mutate data (e.g., auto-generate fields)
+	if hookRes.Handled && hookRes.Data != nil {
+		for k, v := range hookRes.Data {
+			req.Data[k] = v
+		}
+	}
+
 	result, err := h.vmStore.InsertRow(c.Request().Context(), workspaceID, tableName, req.Data)
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
+
+	// After-insert hook (fire-and-forget)
+	go h.callVMHook(context.Background(), workspaceID, "after-insert", tableName, req.Data)
 
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,
@@ -249,6 +341,21 @@ func (h *RuntimeDataHandler) UpdateRow(c echo.Context) error {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "Data cannot be empty")
 	}
 
+	// Before-update hook
+	hookRes := h.callVMHook(c.Request().Context(), workspaceID, "before-update", tableName, req.Data)
+	if hookRes.Handled && !hookRes.Allow {
+		errMsg := hookRes.Error
+		if errMsg == "" {
+			errMsg = "Operation rejected by business rule"
+		}
+		return errorResponse(c, http.StatusBadRequest, "HOOK_REJECTED", errMsg)
+	}
+	if hookRes.Handled && hookRes.Data != nil {
+		for k, v := range hookRes.Data {
+			req.Data[k] = v
+		}
+	}
+
 	pkCols := map[string]interface{}{}
 	dataCols := map[string]interface{}{}
 	for k, v := range req.Data {
@@ -265,6 +372,9 @@ func (h *RuntimeDataHandler) UpdateRow(c echo.Context) error {
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
+
+	// After-update hook (fire-and-forget)
+	go h.callVMHook(context.Background(), workspaceID, "after-update", tableName, req.Data)
 
 	return successResponse(c, map[string]interface{}{
 		"affected_rows": result.AffectedRows,

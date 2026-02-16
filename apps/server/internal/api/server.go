@@ -236,6 +236,7 @@ func (s *Server) setupRoutes() {
 	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService, runtimeService)
 	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, vmStore, workspaceRLSService)
 	runtimeDataHandler.SetRuntimeAuthService(runtimeAuthService)
+	runtimeDataHandler.SetVMPool(vmPool)
 	runtimeVMHandler := handler.NewRuntimeVMHandler(runtimeService, vmPool, runtimeAuthService)
 
 	// Runtime 公开访问入口（现在直接用 workspaceSlug）
