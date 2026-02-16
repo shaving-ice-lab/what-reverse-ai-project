@@ -47,6 +47,7 @@ type AgentSession struct {
 	ID            string                `json:"id"`
 	WorkspaceID   string                `json:"workspace_id"`
 	UserID        string                `json:"user_id"`
+	PersonaID     string                `json:"persona_id"`
 	Status        AgentSessionStatus    `json:"status"`
 	Messages      []AgentMessageEntry   `json:"messages"`
 	ToolCalls     []AgentToolCallRecord `json:"tool_calls"`
@@ -131,7 +132,7 @@ func (m *AgentSessionManager) SetPersister(repo AgentSessionPersister) {
 }
 
 // GetOrCreate 获取或创建会话
-func (m *AgentSessionManager) GetOrCreate(sessionID, workspaceID, userID string) *AgentSession {
+func (m *AgentSessionManager) GetOrCreate(sessionID, workspaceID, userID, personaID string) *AgentSession {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -152,6 +153,7 @@ func (m *AgentSessionManager) GetOrCreate(sessionID, workspaceID, userID string)
 		ID:          sessionID,
 		WorkspaceID: workspaceID,
 		UserID:      userID,
+		PersonaID:   personaID,
 		Status:      AgentSessionRunning,
 		Messages:    make([]AgentMessageEntry, 0),
 		ToolCalls:   make([]AgentToolCallRecord, 0),
