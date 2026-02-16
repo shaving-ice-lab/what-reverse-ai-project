@@ -1,5 +1,13 @@
-import { request } from './shared'
+import { request, type ApiResponse } from './shared'
 import { getAccessToken } from './client'
+
+/** Unwrap the { code, data } envelope returned by the backend */
+function unwrap<T>(res: unknown): T {
+  if (res && typeof res === 'object' && 'data' in res) {
+    return (res as ApiResponse<T>).data as T
+  }
+  return res as T
+}
 
 // ========== Types ==========
 
@@ -19,7 +27,7 @@ export interface AgentToolResult {
   error?: string
 }
 
-export type AffectedResource = 'database' | 'ui_schema' | ''
+export type AffectedResource = 'database' | 'ui_schema' | 'persona' | ''
 
 export interface AgentEvent {
   type: AgentEventType
@@ -70,11 +78,29 @@ export interface AgentSessionSummary {
   id: string
   workspace_id: string
   user_id: string
+  persona_id?: string
   status: string
   message_count: number
   title?: string
   created_at: string
   updated_at: string
+}
+
+export interface PersonaSuggestion {
+  label: string
+  prompt: string
+}
+
+export interface PersonaMeta {
+  id: string
+  name: string
+  description: string
+  icon: string
+  color: string
+  category: string
+  suggestions: PersonaSuggestion[]
+  builtin: boolean
+  enabled: boolean
 }
 
 export interface AgentStatus {
@@ -85,14 +111,18 @@ export interface AgentStatus {
 
 // ========== SSE Chat Stream ==========
 
-export function chatStream(
-  workspaceId: string,
-  message: string,
-  sessionId?: string,
-  onEvent?: (event: AgentEvent) => void,
-  onError?: (error: string) => void,
+export interface ChatStreamOptions {
+  workspaceId: string
+  message: string
+  sessionId?: string
+  personaId?: string
+  onEvent?: (event: AgentEvent) => void
+  onError?: (error: string) => void
   onDone?: () => void
-): AbortController {
+}
+
+export function chatStream(opts: ChatStreamOptions): AbortController {
+  const { workspaceId, message, sessionId, personaId, onEvent, onError, onDone } = opts
   const controller = new AbortController()
 
   ;(async () => {
@@ -106,7 +136,7 @@ export function chatStream(
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ message, session_id: sessionId }),
+        body: JSON.stringify({ message, session_id: sessionId, persona_id: personaId }),
         signal: controller.signal,
       })
 
@@ -123,6 +153,7 @@ export function chatStream(
 
       const decoder = new TextDecoder()
       let buffer = ''
+      let receivedDoneOrError = false
 
       while (true) {
         const { done, value } = await reader.read()
@@ -138,10 +169,8 @@ export function chatStream(
             try {
               const event: AgentEvent = JSON.parse(dataStr)
               onEvent?.(event)
-              if (event.type === 'done') {
-                onDone?.()
-              } else if (event.type === 'error') {
-                onError?.(event.error || 'Unknown error')
+              if (event.type === 'done' || event.type === 'error') {
+                receivedDoneOrError = true
               }
             } catch {
               // ignore malformed JSON
@@ -150,7 +179,11 @@ export function chatStream(
         }
       }
 
-      onDone?.()
+      // Only call onDone if the stream ended without a done/error event
+      // (e.g. server closed connection unexpectedly)
+      if (!receivedDoneOrError) {
+        onDone?.()
+      }
     } catch (err: any) {
       if (err?.name !== 'AbortError') {
         onError?.(err?.message || 'Stream failed')
@@ -165,35 +198,97 @@ export function chatStream(
 
 export const agentChatApi = {
   async confirmAction(workspaceId: string, sessionId: string, actionId: string, approved: boolean) {
-    return request<{ message: string }>(`/workspaces/${workspaceId}/agent/confirm`, {
+    const res = await request(`/workspaces/${workspaceId}/agent/confirm`, {
       method: 'POST',
       body: JSON.stringify({ session_id: sessionId, action_id: actionId, approved }),
     })
+    return unwrap<{ message: string }>(res)
   },
 
   async cancelSession(workspaceId: string, sessionId: string) {
-    return request<{ message: string }>(`/workspaces/${workspaceId}/agent/cancel`, {
+    const res = await request(`/workspaces/${workspaceId}/agent/cancel`, {
       method: 'POST',
       body: JSON.stringify({ session_id: sessionId }),
     })
+    return unwrap<{ message: string }>(res)
   },
 
   async listSessions(workspaceId: string): Promise<AgentSessionSummary[]> {
-    const res = await request<AgentSessionSummary[]>(`/workspaces/${workspaceId}/agent/sessions`)
-    return res || []
+    const res = await request(`/workspaces/${workspaceId}/agent/sessions`)
+    const data = unwrap<AgentSessionSummary[]>(res)
+    return Array.isArray(data) ? data : []
   },
 
   async getSession(workspaceId: string, sessionId: string): Promise<AgentSession> {
-    return request<AgentSession>(`/workspaces/${workspaceId}/agent/sessions/${sessionId}`)
+    const res = await request(`/workspaces/${workspaceId}/agent/sessions/${sessionId}`)
+    return unwrap<AgentSession>(res)
   },
 
   async deleteSession(workspaceId: string, sessionId: string) {
-    return request<{ message: string }>(`/workspaces/${workspaceId}/agent/sessions/${sessionId}`, {
+    const res = await request(`/workspaces/${workspaceId}/agent/sessions/${sessionId}`, {
       method: 'DELETE',
     })
+    return unwrap<{ message: string }>(res)
   },
 
   async getStatus(workspaceId: string): Promise<AgentStatus> {
-    return request<AgentStatus>(`/workspaces/${workspaceId}/agent/status`)
+    const res = await request(`/workspaces/${workspaceId}/agent/status`)
+    return unwrap<AgentStatus>(res)
+  },
+
+  // Persona API
+  async listPersonas(workspaceId: string): Promise<PersonaMeta[]> {
+    const res = await request(`/workspaces/${workspaceId}/agent/personas`)
+    const data = unwrap<PersonaMeta[]>(res)
+    return Array.isArray(data) ? data : []
+  },
+
+  async getPersona(workspaceId: string, personaId: string): Promise<PersonaMeta> {
+    const res = await request(`/workspaces/${workspaceId}/agent/personas/${personaId}`)
+    return unwrap<PersonaMeta>(res)
+  },
+
+  async createPersona(
+    workspaceId: string,
+    data: {
+      name: string
+      description?: string
+      icon?: string
+      color?: string
+      system_prompt: string
+      suggestions?: PersonaSuggestion[]
+    }
+  ) {
+    const res = await request(`/workspaces/${workspaceId}/agent/personas`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return unwrap<PersonaMeta>(res)
+  },
+
+  async updatePersona(
+    workspaceId: string,
+    personaId: string,
+    data: {
+      name?: string
+      description?: string
+      icon?: string
+      color?: string
+      system_prompt?: string
+      suggestions?: PersonaSuggestion[]
+    }
+  ) {
+    const res = await request(`/workspaces/${workspaceId}/agent/personas/${personaId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+    return unwrap<PersonaMeta>(res)
+  },
+
+  async deletePersona(workspaceId: string, personaId: string) {
+    const res = await request(`/workspaces/${workspaceId}/agent/personas/${personaId}`, {
+      method: 'DELETE',
+    })
+    return unwrap<{ message: string }>(res)
   },
 }
