@@ -63,6 +63,8 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
   const [viewRow, setViewRow] = useState<Record<string, unknown> | null>(null)
   const [showCreateRow, setShowCreateRow] = useState(false)
   const [createValues, setCreateValues] = useState<Record<string, unknown>>({})
+  // Lookup cache: { "vehicles:id:plate_number" => { 1: "京A12345", 3: "沪B67890" } }
+  const [lookupMap, setLookupMap] = useState<Record<string, Record<string, string>>>({})
   const defaultSort = dataSource?.order_by?.[0]
   const [sortCol, setSortCol] = useState<string | null>(defaultSort?.column ?? null)
   const [sortDir, setSortDir] = useState<'ASC' | 'DESC'>(defaultSort?.direction ?? 'ASC')
@@ -82,17 +84,71 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     setPage(0)
   }
 
+  // Resolve lookup columns by batch-querying their target tables
+  const resolveLookups = useCallback(
+    async (dataRows: Record<string, unknown>[]) => {
+      const lookupCols = config.columns.filter(
+        (col) => col.type === 'lookup' && col.lookup_table && col.display_key
+      )
+      if (lookupCols.length === 0) return
+
+      const newMap: Record<string, Record<string, string>> = { ...lookupMap }
+
+      for (const col of lookupCols) {
+        const table = col.lookup_table!
+        const lookupKey = col.lookup_key || 'id'
+        const displayKey = col.display_key!
+        const cacheKey = `${table}:${lookupKey}:${displayKey}`
+
+        // Collect unique IDs that aren't already cached
+        const existing = newMap[cacheKey] || {}
+        const ids = new Set<string>()
+        for (const row of dataRows) {
+          const v = row[col.key]
+          if (v !== null && v !== undefined && !(String(v) in existing)) {
+            ids.add(String(v))
+          }
+        }
+        if (ids.size === 0) continue
+
+        try {
+          // Query lookup table for these IDs
+          const idArr = Array.from(ids)
+          const result = await queryRows(table, {
+            limit: idArr.length,
+            filters: idArr.map((id) => ({ column: lookupKey, operator: '=', value: id })),
+            filter_combinator: 'OR',
+          })
+          const resolved = { ...existing }
+          for (const lRow of result.rows) {
+            const key = String(lRow[lookupKey] ?? '')
+            const display = String(lRow[displayKey] ?? '')
+            if (key) resolved[key] = display
+          }
+          newMap[cacheKey] = resolved
+        } catch {
+          // lookup failure is non-critical
+        }
+      }
+
+      setLookupMap(newMap)
+    },
+    [config.columns, lookupMap, queryRows]
+  )
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
+      let fetchedRows: Record<string, unknown>[] = []
       if (apiSource && fetchApiSource) {
         const raw = await fetchApiSource(apiSource.path, {
           method: apiSource.method || 'GET',
           body: apiSource.body,
         })
         const arr = Array.isArray(raw) ? raw : (raw as any)?.rows || (raw as any)?.data || []
-        setRows(arr as Record<string, unknown>[])
-        setTotal(arr.length)
+        fetchedRows = arr as Record<string, unknown>[]
+        setRows(fetchedRows)
+        setTotal(fetchedRows.length)
       } else {
         const { filters, combinator } = buildSearchFilters(debouncedSearch, config)
         const result = await queryRows(config.table_name, {
@@ -102,9 +158,12 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
           filter_combinator: combinator,
           order_by: sortCol ? [{ column: sortCol, direction: sortDir }] : undefined,
         })
-        setRows(result.rows)
+        fetchedRows = result.rows
+        setRows(fetchedRows)
         setTotal(result.total)
       }
+      // Resolve lookups after data is loaded
+      resolveLookups(fetchedRows)
     } catch {
       setRows([])
     } finally {
@@ -121,6 +180,7 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     debouncedSearch,
     sortCol,
     sortDir,
+    resolveLookups,
   ])
 
   // Debounce search input — skip if value unchanged to avoid double initial load
@@ -651,6 +711,18 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                               className="h-7 text-xs"
                             />
                           )
+                        ) : col.type === 'lookup' ? (
+                          (() => {
+                            const rawVal = row[col.key]
+                            if (rawVal === null || rawVal === undefined) return <span className="text-foreground-muted">—</span>
+                            const cacheKey = `${col.lookup_table}:${col.lookup_key || 'id'}:${col.display_key}`
+                            const display = lookupMap[cacheKey]?.[String(rawVal)]
+                            return display ? (
+                              <span title={`ID: ${rawVal}`}>{display}</span>
+                            ) : (
+                              <span className="text-foreground-muted">{String(rawVal)}</span>
+                            )
+                          })()
                         ) : (
                           formatCellValue(row[col.key], col.type)
                         )}

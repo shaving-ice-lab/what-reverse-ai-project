@@ -126,9 +126,12 @@ export interface StatusActionConfig {
 export interface DataTableColumn {
   key: string
   label: string
-  type?: 'text' | 'number' | 'date' | 'boolean' | 'badge'
+  type?: 'text' | 'number' | 'date' | 'boolean' | 'badge' | 'lookup'
   sortable?: boolean
   width?: string
+  lookup_table?: string
+  lookup_key?: string
+  display_key?: string
 }
 
 // ========== Chart ==========
@@ -155,6 +158,14 @@ export interface FormConfig {
   mode?: 'create' | 'edit'
   on_submit_action?: AppAction
   record_id_param?: string
+  pre_submit_api?: string
+}
+
+export interface DynamicOptionsConfig {
+  api: string
+  depends_on?: string[]
+  label_key?: string
+  value_key?: string
 }
 
 export interface FormField {
@@ -166,6 +177,7 @@ export interface FormField {
   placeholder?: string
   options?: { label: string; value: string }[]
   default_value?: unknown
+  dynamic_options?: DynamicOptionsConfig
 }
 
 // ========== Detail View ==========

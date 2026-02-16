@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useDataProvider } from '../data-provider'
-import type { FormConfig } from '../types'
+import type { FormConfig, FormField } from '../types'
 
 interface FormDialogBlockProps {
   config: FormConfig & {
@@ -29,12 +29,16 @@ function fieldId(field: { name?: string; key?: string }): string {
 }
 
 export function FormDialogBlock({ config }: FormDialogBlockProps) {
-  const { insertRow, updateRow, notifyTableChange } = useDataProvider()
+  const { insertRow, updateRow, notifyTableChange, fetchApiSource } = useDataProvider()
   const [open, setOpen] = useState(false)
   const [values, setValues] = useState<Record<string, unknown>>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  // Dynamic options cache: { fieldKey => [{ label, value }] }
+  const [dynamicOpts, setDynamicOpts] = useState<Record<string, { label: string; value: string }[]>>({})
+  const [dynamicOptsLoading, setDynamicOptsLoading] = useState<Record<string, boolean>>({})
+  const fetchTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const resetForm = useCallback(() => {
     const initial: Record<string, unknown> = {}
@@ -44,12 +48,74 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
     setValues(initial)
     setError('')
     setSuccess(false)
+    setDynamicOpts({})
   }, [config.fields])
 
   const handleOpen = () => {
     resetForm()
     setOpen(true)
   }
+
+  // Fetch dynamic options for a field from the VM API
+  const fetchDynamicOptions = useCallback(
+    async (field: FormField, currentValues: Record<string, unknown>) => {
+      if (!field.dynamic_options?.api || !fetchApiSource) return
+      const fid = fieldId(field)
+      setDynamicOptsLoading((prev) => ({ ...prev, [fid]: true }))
+      try {
+        const body: Record<string, unknown> = {}
+        if (field.dynamic_options.depends_on) {
+          for (const dep of field.dynamic_options.depends_on) {
+            body[dep] = currentValues[dep]
+          }
+        }
+        const raw = await fetchApiSource(field.dynamic_options.api, { method: 'POST', body })
+        const arr = Array.isArray(raw) ? raw : (raw as any)?.data || (raw as any)?.options || []
+        const labelKey = field.dynamic_options.label_key || 'label'
+        const valueKey = field.dynamic_options.value_key || 'value'
+        const opts = arr.map((item: any) => ({
+          label: String(item[labelKey] ?? item.name ?? ''),
+          value: String(item[valueKey] ?? item.id ?? ''),
+        }))
+        setDynamicOpts((prev) => ({ ...prev, [fid]: opts }))
+      } catch {
+        setDynamicOpts((prev) => ({ ...prev, [fid]: [] }))
+      } finally {
+        setDynamicOptsLoading((prev) => ({ ...prev, [fid]: false }))
+      }
+    },
+    [fetchApiSource]
+  )
+
+  // Watch dependent field changes and re-fetch dynamic options (debounced)
+  useEffect(() => {
+    if (!open) return
+    const dynamicFields = config.fields.filter((f) => f.dynamic_options?.depends_on?.length)
+    for (const field of dynamicFields) {
+      const fid = fieldId(field)
+      // Clear existing timer
+      if (fetchTimerRef.current[fid]) clearTimeout(fetchTimerRef.current[fid])
+      fetchTimerRef.current[fid] = setTimeout(() => {
+        fetchDynamicOptions(field, values)
+      }, 300)
+    }
+    return () => {
+      for (const key of Object.keys(fetchTimerRef.current)) {
+        clearTimeout(fetchTimerRef.current[key])
+      }
+    }
+  }, [open, values, config.fields, fetchDynamicOptions])
+
+  // Fetch dynamic options that have no dependencies on dialog open
+  useEffect(() => {
+    if (!open) return
+    const noDeps = config.fields.filter(
+      (f) => f.dynamic_options?.api && (!f.dynamic_options.depends_on || f.dynamic_options.depends_on.length === 0)
+    )
+    for (const field of noDeps) {
+      fetchDynamicOptions(field, values)
+    }
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateField = (name: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -84,6 +150,19 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
           payload[fid] = Boolean(v)
         } else {
           payload[fid] = v
+        }
+      }
+
+      // Pre-submit validation via VM API
+      if (config.pre_submit_api && fetchApiSource) {
+        const validation = await fetchApiSource(config.pre_submit_api, {
+          method: 'POST',
+          body: payload,
+        }) as any
+        if (validation && validation.valid === false) {
+          setError(validation.error || '校验未通过')
+          setSubmitting(false)
+          return
         }
       }
 
@@ -157,19 +236,29 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
                         className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[72px] resize-y focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
                       />
                     ) : field.type === 'select' ? (
-                      <select
-                        value={String(values[fid] ?? '')}
-                        onChange={(e) => updateField(fid, e.target.value)}
-                        required={field.required}
-                        className="w-full h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
-                      >
-                        <option value="">— 请选择 —</option>
-                        {field.options?.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
+                      <div className="relative">
+                        <select
+                          value={String(values[fid] ?? '')}
+                          onChange={(e) => updateField(fid, e.target.value)}
+                          required={field.required}
+                          disabled={dynamicOptsLoading[fid]}
+                          className="w-full h-9 rounded-md border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 disabled:opacity-50"
+                        >
+                          <option value="">
+                            {dynamicOptsLoading[fid] ? '加载中...' : '— 请选择 —'}
                           </option>
-                        ))}
-                      </select>
+                          {(dynamicOpts[fid] || field.options || []).map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        {field.dynamic_options && dynamicOpts[fid] && (
+                          <span className="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] text-foreground-muted">
+                            {dynamicOpts[fid].length} 项
+                          </span>
+                        )}
+                      </div>
                     ) : field.type === 'checkbox' ? (
                       <label className="flex items-center gap-2 mt-1">
                         <input
