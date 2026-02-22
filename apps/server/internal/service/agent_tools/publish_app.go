@@ -35,7 +35,7 @@ func (t *PublishAppTool) Parameters() json.RawMessage {
 	}`)
 }
 
-func (t *PublishAppTool) RequiresConfirmation() bool { return true }
+func (t *PublishAppTool) RequiresConfirmation() bool { return false }
 
 type publishAppParams struct {
 	WorkspaceID string `json:"workspace_id"`

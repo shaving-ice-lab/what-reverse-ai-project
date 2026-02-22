@@ -20,18 +20,35 @@ func NewDeployComponentTool(workspaceService service.WorkspaceService) *DeployCo
 func (t *DeployComponentTool) Name() string { return "deploy_component" }
 
 func (t *DeployComponentTool) Description() string {
-	return `Deploy frontend component code (JavaScript) to a workspace. The code runs inside an iframe sandbox and has access to ROOT (the root DOM element) and DATA (data from api_source). Example:
-// Simple counter component
-ROOT.innerHTML = '<div id="app"><h2>Counter</h2><button id="btn">Count: 0</button></div>';
-var count = 0;
-document.getElementById('btn').onclick = function() {
-  count++;
-  document.getElementById('btn').textContent = 'Count: ' + count;
-};
+	return `Deploy a custom frontend JavaScript component to the workspace. The code runs inside a secure iframe sandbox with these APIs:
 
-// Using DATA from api_source
-var items = DATA.items || [];
-ROOT.innerHTML = '<ul>' + items.map(function(i) { return '<li>' + i.name + '</li>'; }).join('') + '</ul>';`
+WHEN TO USE (vs built-in blocks):
+- Interactive widgets: drag-and-drop, rich editors, toggles with animations
+- Custom visualizations: maps, timelines, Gantt charts, org charts, kanban boards
+- Complex conditional rendering: multi-step wizards, dynamic forms
+- Any UI that the 11 built-in block types (stats_card, data_table, form, chart, etc.) cannot express
+
+SANDBOX API:
+- ROOT: The root DOM element. Set ROOT.innerHTML or append children.
+- DATA: Object containing data fetched from api_source (configured in the custom_code block).
+- window.parent.postMessage({__sandbox:true, type:'ACTION_REQUEST', action:'navigate', payload:{page:'details'}}, '*') — communicate with parent app.
+- ROOT.addEventListener('sandbox-data-update', function(e) { /* e.detail = new data */ }) — react to data updates.
+
+EXAMPLE — Data-driven dashboard card:
+ROOT.innerHTML = '<div style="padding:16px;font-family:system-ui">' +
+  '<h3>Custom Metrics</h3>' +
+  '<div id="metrics"></div>' +
+'</div>';
+var rows = DATA.rows || [];
+var el = document.getElementById('metrics');
+el.innerHTML = rows.map(function(r) {
+  return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee">' +
+    '<span>' + r.name + '</span>' +
+    '<strong style="color:' + (r.value > 100 ? '#22c55e' : '#ef4444') + '">' + r.value + '</strong>' +
+  '</div>';
+}).join('');
+
+After deploying, reference in UI schema as a custom_code block with the code field or component_id.`
 }
 
 func (t *DeployComponentTool) Parameters() json.RawMessage {
@@ -40,7 +57,9 @@ func (t *DeployComponentTool) Parameters() json.RawMessage {
 		"properties": {
 			"workspace_id": {"type": "string", "description": "Workspace ID"},
 			"user_id": {"type": "string", "description": "User ID (owner)"},
-			"code": {"type": "string", "description": "JavaScript code for the frontend component. Has access to ROOT (DOM element) and DATA (object from api_source)."}
+			"code": {"type": "string", "description": "JavaScript code for the frontend component. Has access to ROOT (DOM element) and DATA (object from api_source)."},
+			"component_id": {"type": "string", "description": "Optional unique ID for this component (e.g., 'kanban_board'). Auto-generated if not provided. Use to update an existing component."},
+			"name": {"type": "string", "description": "Optional human-readable name for the component (e.g., 'Kanban Board'). Defaults to component_id."}
 		},
 		"required": ["workspace_id", "user_id", "code"]
 	}`)
@@ -52,6 +71,8 @@ type deployComponentParams struct {
 	WorkspaceID string `json:"workspace_id"`
 	UserID      string `json:"user_id"`
 	Code        string `json:"code"`
+	ComponentID string `json:"component_id"`
+	Name        string `json:"name"`
 }
 
 func (t *DeployComponentTool) Execute(ctx context.Context, params json.RawMessage) (*service.AgentToolResult, error) {
@@ -72,17 +93,18 @@ func (t *DeployComponentTool) Execute(ctx context.Context, params json.RawMessag
 		return &service.AgentToolResult{Success: false, Error: "code cannot be empty"}, nil
 	}
 
-	version, err := t.workspaceService.UpdateComponentCode(ctx, wsID, userID, p.Code)
+	version, componentID, err := t.workspaceService.DeployComponent(ctx, wsID, userID, p.ComponentID, p.Name, p.Code)
 	if err != nil {
 		return &service.AgentToolResult{Success: false, Error: "failed to save component code: " + err.Error()}, nil
 	}
 
 	return &service.AgentToolResult{
 		Success: true,
-		Output:  fmt.Sprintf("Component code deployed successfully to version %s.", version.Version),
+		Output:  fmt.Sprintf("Component %q deployed successfully to version %s. Reference it in custom_code blocks using component_id: %q.", componentID, version.Version, componentID),
 		Data: map[string]interface{}{
-			"version_id": version.ID.String(),
-			"version":    version.Version,
+			"version_id":   version.ID.String(),
+			"version":      version.Version,
+			"component_id": componentID,
 		},
 	}, nil
 }

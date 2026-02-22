@@ -49,7 +49,7 @@ func (t *CreateTableTool) Parameters() json.RawMessage {
 	}`)
 }
 
-func (t *CreateTableTool) RequiresConfirmation() bool { return true }
+func (t *CreateTableTool) RequiresConfirmation() bool { return false }
 
 type createTableParams struct {
 	WorkspaceID string                        `json:"workspace_id"`

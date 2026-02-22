@@ -59,7 +59,7 @@ func (t *AlterTableTool) Parameters() json.RawMessage {
 	}`)
 }
 
-func (t *AlterTableTool) RequiresConfirmation() bool { return true }
+func (t *AlterTableTool) RequiresConfirmation() bool { return false }
 
 type alterTableParams struct {
 	WorkspaceID  string                        `json:"workspace_id"`
