@@ -161,7 +161,12 @@ export function NotificationDropdown() {
                     !n.read && 'bg-brand-500/3'
                   )}
                 >
-                  <div className={cn('w-7 h-7 rounded-md flex items-center justify-center shrink-0', bg)}>
+                  <div
+                    className={cn(
+                      'w-7 h-7 rounded-md flex items-center justify-center shrink-0',
+                      bg
+                    )}
+                  >
                     <Icon className={cn('w-3.5 h-3.5', color)} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -174,7 +179,9 @@ export function NotificationDropdown() {
                       >
                         {n.title}
                       </span>
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />}
+                      {!n.read && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+                      )}
                     </div>
                     <p className="text-[11px] text-foreground-lighter truncate mt-0.5">
                       {n.description}

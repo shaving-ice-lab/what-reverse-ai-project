@@ -1,3 +1,0 @@
-/**
- * Type Definition Export Entry
- */

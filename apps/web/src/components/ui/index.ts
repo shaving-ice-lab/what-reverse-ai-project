@@ -6,11 +6,9 @@
  */
 
 // Core shadcn/ui primitives
-export * from './accordion'
 export * from './alert'
 export * from './avatar'
 export * from './badge'
-export * from './breadcrumb'
 export * from './button'
 export * from './card'
 export * from './checkbox'
@@ -20,10 +18,8 @@ export * from './dropdown-menu'
 export * from './form-field'
 export * from './input'
 export * from './label'
-export * from './scroll-area'
 export * from './select'
 export * from './separator'
-export * from './slider'
 export * from './progress'
 export * from './skeleton'
 export * from './switch'
