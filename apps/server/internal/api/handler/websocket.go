@@ -94,8 +94,3 @@ func (h *WebSocketHandler) validateToken(tokenString string) (string, error) {
 
 	return userID, nil
 }
-
-// GetHub 获取 Hub 实例
-func (h *WebSocketHandler) GetHub() *websocket.Hub {
-	return h.hub
-}

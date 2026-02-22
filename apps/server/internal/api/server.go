@@ -163,11 +163,10 @@ func (s *Server) setupRoutes() {
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService, apiKeyService)
 	workspaceHandler := handler.NewWorkspaceHandler(workspaceService, auditLogService)
-	vmDatabaseHandler := handler.NewVMDatabaseHandler(vmStore, auditLogService)
+	vmDatabaseHandler := handler.NewVMDatabaseHandler(vmStore, auditLogService, workspaceService)
 	auditLogHandler := handler.NewAuditLogHandler(auditLogService, workspaceService)
 	runtimeHandler := handler.NewRuntimeHandler(
 		runtimeService,
-		nil, // billingService — 后续再接入
 		auditLogService,
 		&s.config.JWT,
 		captchaVerifier,
@@ -203,10 +202,22 @@ func (s *Server) setupRoutes() {
 	_ = agentToolRegistry.Register(agent_tools.NewModifyUISchemaTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewPublishAppTool(workspaceService))
 	_ = agentToolRegistry.Register(agent_tools.NewCreatePersonaTool(personaRegistry))
+	_ = agentToolRegistry.Register(agent_tools.NewGetBlockSpecTool())
+	_ = agentToolRegistry.Register(agent_tools.NewAttemptCompletionTool(workspaceService, vmStore))
+	_ = agentToolRegistry.Register(agent_tools.NewListComponentsTool(workspaceService))
+	_ = agentToolRegistry.Register(agent_tools.NewBatchTool(agentToolRegistry))
 	agentSessionManager := service.NewAgentSessionManager()
 	agentSessionRepo := repository.NewAgentSessionRepository(s.db)
 	agentSessionManager.SetPersister(service.NewAgentSessionPersisterAdapter(agentSessionRepo))
-	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, service.DefaultAgentEngineConfig(), skillRegistry.BuildSystemPrompt(), personaRegistry, skillRegistry)
+	_ = agentToolRegistry.Register(agent_tools.NewCreatePlanTool(agentSessionManager))
+	_ = agentToolRegistry.Register(agent_tools.NewUpdatePlanTool(agentSessionManager))
+	agentEngineCfg := service.DefaultAgentEngineConfig()
+	agentEngineCfg.LLMAPIKey = s.config.AI.OpenAIAPIKey
+	agentEngineCfg.LLMBaseURL = s.config.AI.OpenAIBaseURL
+	agentEngineCfg.LLMModel = s.config.AI.DefaultModel
+	agentEngineInstance := service.NewAgentEngineWithSkills(agentToolRegistry, agentSessionManager, agentEngineCfg, skillRegistry.BuildSystemPrompt(), personaRegistry, skillRegistry)
+	// Task tool registered after engine creation (needs engine reference for sub-agent sessions)
+	_ = agentToolRegistry.Register(agent_tools.NewTaskTool(agentEngineInstance, agentSessionManager, personaRegistry))
 	agentChatHandler := handler.NewAgentChatHandler(agentEngineInstance, agentSessionManager, workspaceService, personaRegistry, skillRegistry)
 
 	// 健康检查
@@ -222,18 +233,21 @@ func (s *Server) setupRoutes() {
 	// 文件存储服务
 	storageObjectRepo := repository.NewStorageObjectRepository(s.db)
 	workspaceStorageService := service.NewWorkspaceStorageService(storageObjectRepo, "data/storage", "/storage/files")
-	workspaceStorageHandler := handler.NewWorkspaceStorageHandler(workspaceStorageService)
+	workspaceStorageHandler := handler.NewWorkspaceStorageHandler(workspaceStorageService, workspaceService)
 	runtimeStorageHandler := handler.NewRuntimeStorageHandler(workspaceStorageService, runtimeService)
+	// 公开静态文件访问（无需鉴权）
+	s.echo.GET("/storage/files/:objectId", workspaceStorageHandler.ServeFile)
 
 	// RLS 策略服务
 	rlsPolicyRepo := repository.NewRLSPolicyRepository(s.db)
 	workspaceRLSService := service.NewWorkspaceRLSService(rlsPolicyRepo)
-	workspaceRLSHandler := handler.NewWorkspaceRLSHandler(workspaceRLSService)
+	workspaceRLSHandler := handler.NewWorkspaceRLSHandler(workspaceRLSService, workspaceService)
 
 	// 应用运行时认证服务
 	appUserRepo := repository.NewAppUserRepository(s.db)
 	runtimeAuthService := service.NewRuntimeAuthServiceWithDB(appUserRepo, workspaceRepo, sessionRepo, s.db)
 	runtimeAuthHandler := handler.NewRuntimeAuthHandler(runtimeAuthService, runtimeService)
+	runtimeAuthHandler.SetWorkspaceService(workspaceService)
 	runtimeDataHandler := handler.NewRuntimeDataHandler(runtimeService, vmStore, workspaceRLSService)
 	runtimeDataHandler.SetRuntimeAuthService(runtimeAuthService)
 	runtimeDataHandler.SetVMPool(vmPool)
@@ -358,6 +372,7 @@ func (s *Server) setupRoutes() {
 			workspaces.GET("/:id/agent/sessions", agentChatHandler.ListSessions)
 			workspaces.GET("/:id/agent/sessions/:sessionId", agentChatHandler.GetSession)
 			workspaces.DELETE("/:id/agent/sessions/:sessionId", agentChatHandler.DeleteSession)
+			workspaces.POST("/:id/agent/sessions/:sessionId/confirm-plan", agentChatHandler.ConfirmPlan)
 			workspaces.GET("/:id/agent/personas", agentChatHandler.ListPersonas)
 			workspaces.GET("/:id/agent/personas/:personaId", agentChatHandler.GetPersona)
 			workspaces.POST("/:id/agent/personas", agentChatHandler.CreatePersona)
@@ -371,6 +386,7 @@ func (s *Server) setupRoutes() {
 			workspaces.POST("/:id/members", workspaceHandler.AddMember)
 			workspaces.PATCH("/:id/members/:memberId", workspaceHandler.UpdateMemberRole)
 			workspaces.DELETE("/:id/members/:memberId", workspaceHandler.RemoveMember)
+			workspaces.GET("/:id/roles", workspaceHandler.ListRoles)
 
 			// App 功能路由（Workspace = App）
 			workspaces.POST("/:id/publish", workspaceHandler.PublishWorkspace)
@@ -387,6 +403,9 @@ func (s *Server) setupRoutes() {
 			workspaces.PATCH("/:id/llm-config/:endpointId", workspaceHandler.UpdateLLMEndpoint)
 			workspaces.DELETE("/:id/llm-config/:endpointId", workspaceHandler.DeleteLLMEndpoint)
 			workspaces.POST("/:id/llm-config/:endpointId/default", workspaceHandler.SetDefaultLLMEndpoint)
+			// Components — 自定义组件
+			workspaces.GET("/:id/components", workspaceHandler.ListComponents)
+			workspaces.GET("/:id/components/:componentId", workspaceHandler.GetComponent)
 			// Storage — 文件存储
 			workspaces.POST("/:id/storage/upload", workspaceStorageHandler.Upload)
 			workspaces.GET("/:id/storage", workspaceStorageHandler.List)

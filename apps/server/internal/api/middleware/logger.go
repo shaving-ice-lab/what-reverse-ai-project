@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -12,13 +11,12 @@ import (
 
 // W3C Trace Context 头名称
 const (
-	TraceparentHeader    = "traceparent"
-	TracestateHeader     = "tracestate"
-	RequestIDHeader      = "X-Request-Id"
-	IdempotencyKeyHeader = "Idempotency-Key"
-	WorkspaceIDHeader    = "X-Workspace-Id"
-	ExecutionIDHeader    = "X-Execution-Id"
-	SessionIDHeader      = "X-Session-Id"
+	TraceparentHeader = "traceparent"
+	TracestateHeader  = "tracestate"
+	RequestIDHeader   = "X-Request-Id"
+	WorkspaceIDHeader = "X-Workspace-Id"
+	ExecutionIDHeader = "X-Execution-Id"
+	SessionIDHeader   = "X-Session-Id"
 )
 
 // Echo context key for TraceContext
@@ -186,43 +184,4 @@ func GetTraceContext(c echo.Context) *observability.TraceContext {
 		return tc
 	}
 	return observability.NewTraceContext()
-}
-
-// GetTraceContextFromContext 从 context.Context 获取追踪上下文
-func GetTraceContextFromContext(ctx context.Context) *observability.TraceContext {
-	return observability.TraceContextFromContext(ctx)
-}
-
-// SetWorkspaceID 设置工作空间 ID 到追踪上下文
-func SetWorkspaceID(c echo.Context, workspaceID string) {
-	if tc := GetTraceContext(c); tc != nil {
-		tc.WorkspaceID = workspaceID
-		c.Set(TraceContextKey, tc)
-		// 同步更新 request context
-		req := c.Request()
-		ctx := observability.ContextWithTraceContext(req.Context(), tc)
-		c.SetRequest(req.WithContext(ctx))
-	}
-}
-
-// SetExecutionID 设置执行 ID 到追踪上下文
-func SetExecutionID(c echo.Context, executionID string) {
-	if tc := GetTraceContext(c); tc != nil {
-		tc.ExecutionID = executionID
-		c.Set(TraceContextKey, tc)
-		req := c.Request()
-		ctx := observability.ContextWithTraceContext(req.Context(), tc)
-		c.SetRequest(req.WithContext(ctx))
-	}
-}
-
-// SetUserID 设置用户 ID 到追踪上下文
-func SetUserID(c echo.Context, userID string) {
-	if tc := GetTraceContext(c); tc != nil {
-		tc.UserID = userID
-		c.Set(TraceContextKey, tc)
-		req := c.Request()
-		ctx := observability.ContextWithTraceContext(req.Context(), tc)
-		c.SetRequest(req.WithContext(ctx))
-	}
 }

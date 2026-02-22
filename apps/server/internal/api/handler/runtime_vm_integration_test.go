@@ -50,15 +50,15 @@ func (l *stubCodeLoader) GetLogicCode(_ context.Context, workspaceID string) (st
 
 // integrationEnv bundles all components needed for integration tests.
 type integrationEnv struct {
-	echo       *echo.Echo
-	vmHandler  *RuntimeVMHandler
+	echo        *echo.Echo
+	vmHandler   *RuntimeVMHandler
 	dataHandler *RuntimeDataHandler
-	store      *vmruntime.VMStore
-	pool       *vmruntime.VMPool
-	loader     *stubCodeLoader
-	runtimeSvc *stubRuntimeService
-	wsID       string
-	slug       string
+	store       *vmruntime.VMStore
+	pool        *vmruntime.VMPool
+	loader      *stubCodeLoader
+	runtimeSvc  *stubRuntimeService
+	wsID        string
+	slug        string
 }
 
 func newIntegrationEnv(t *testing.T) *integrationEnv {

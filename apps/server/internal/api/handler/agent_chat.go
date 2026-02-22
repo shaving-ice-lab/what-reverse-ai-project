@@ -40,6 +40,21 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 	workspaceID := c.Param("id")
 	userID := middleware.GetUserID(c)
 
+	// 验证 workspace 访问权限，访客（非成员、非 owner）不允许使用 AI 助手
+	if h.workspaceService != nil {
+		wsID, err1 := uuid.Parse(workspaceID)
+		uID, err2 := uuid.Parse(userID)
+		if err1 == nil && err2 == nil {
+			access, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), wsID, uID)
+			if err != nil {
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+			}
+			if !access.IsOwner && access.Role == nil {
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "访客无权使用 AI 助手，请联系 workspace 管理员获取成员权限")
+			}
+		}
+	}
+
 	var req struct {
 		Message   string `json:"message"`
 		SessionID string `json:"session_id"`
@@ -58,17 +73,17 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 		req.SessionID = uuid.New().String()
 	}
 
+	flusher, ok := c.Response().Writer.(http.Flusher)
+	if !ok {
+		return errorResponse(c, http.StatusInternalServerError, "SSE_NOT_SUPPORTED", "Server does not support SSE")
+	}
+
 	// Set SSE headers
 	c.Response().Header().Set("Content-Type", "text/event-stream")
 	c.Response().Header().Set("Cache-Control", "no-cache")
 	c.Response().Header().Set("Connection", "keep-alive")
 	c.Response().Header().Set("X-Accel-Buffering", "no")
 	c.Response().WriteHeader(http.StatusOK)
-
-	flusher, ok := c.Response().Writer.(http.Flusher)
-	if !ok {
-		return errorResponse(c, http.StatusInternalServerError, "SSE_NOT_SUPPORTED", "Server does not support SSE")
-	}
 
 	ctx, cancel := context.WithCancel(c.Request().Context())
 	defer cancel()
@@ -80,10 +95,12 @@ func (h *AgentChatHandler) Chat(c echo.Context) error {
 		if ws, err := h.workspaceService.GetByID(ctx, wsID, uID); err == nil && ws != nil && ws.Settings != nil {
 			if ep := getDefaultLLMEndpoint(ws.Settings); ep != nil {
 				apiKey, _ := ep["api_key"].(string)
-				if apiKey != "" {
-					baseURL, _ := ep["base_url"].(string)
-					model, _ := ep["model"].(string)
-					provider, _ := ep["provider"].(string)
+				baseURL, _ := ep["base_url"].(string)
+				model, _ := ep["model"].(string)
+				provider, _ := ep["provider"].(string)
+				// Only attach LLM config when there's actually a usable endpoint (apiKey or baseURL)
+				// This matches the check in callLLM: cfg.APIKey != "" || cfg.BaseURL != ""
+				if apiKey != "" || baseURL != "" {
 					ctx = service.WithLLMConfig(ctx, &service.LLMConfig{
 						Provider: provider,
 						APIKey:   apiKey,
@@ -176,9 +193,48 @@ func (h *AgentChatHandler) Status(c echo.Context) error {
 	})
 }
 
+// ConfirmPlan confirms a draft plan, transitioning the session from planning to confirmed phase.
+// After confirmation, the next Chat call will transition to executing phase and begin tool execution.
+func (h *AgentChatHandler) ConfirmPlan(c echo.Context) error {
+	sessionID := c.Param("sessionId")
+	if sessionID == "" {
+		return errorResponse(c, http.StatusBadRequest, "MISSING_SESSION_ID", "session_id required")
+	}
+
+	session, ok := h.sessions.Get(sessionID)
+	if !ok {
+		return errorResponse(c, http.StatusNotFound, "SESSION_NOT_FOUND", "Session not found")
+	}
+
+	if !session.ConfirmPlan() {
+		return errorResponse(c, http.StatusBadRequest, "PLAN_NOT_DRAFT", "No draft plan to confirm. Plan may already be confirmed or does not exist.")
+	}
+
+	h.sessions.Persist(sessionID)
+
+	plan := session.GetPlan()
+	return successResponse(c, map[string]interface{}{
+		"message":    "Plan confirmed. Send a message to begin execution.",
+		"session_id": sessionID,
+		"phase":      session.GetPhase(),
+		"plan":       plan,
+	})
+}
+
 // ListSessions 列出会话
 func (h *AgentChatHandler) ListSessions(c echo.Context) error {
 	workspaceID := c.Param("id")
+
+	// 验证 workspace 访问权限（读）
+	if h.workspaceService != nil {
+		wsID, err1 := uuid.Parse(workspaceID)
+		uID, err2 := uuid.Parse(middleware.GetUserID(c))
+		if err1 == nil && err2 == nil {
+			if _, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), wsID, uID); err != nil {
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+			}
+		}
+	}
 
 	sessions := h.sessions.List(workspaceID)
 	result := make([]map[string]interface{}, 0, len(sessions))
@@ -223,6 +279,21 @@ func (h *AgentChatHandler) GetSession(c echo.Context) error {
 
 // DeleteSession 删除会话
 func (h *AgentChatHandler) DeleteSession(c echo.Context) error {
+	// 验证 workspace 成员权限（写）
+	if h.workspaceService != nil {
+		wsID, err1 := uuid.Parse(c.Param("id"))
+		uID, err2 := uuid.Parse(middleware.GetUserID(c))
+		if err1 == nil && err2 == nil {
+			access, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), wsID, uID)
+			if err != nil {
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+			}
+			if !access.IsOwner && access.Role == nil {
+				return errorResponse(c, http.StatusForbidden, "FORBIDDEN", "访客无权删除会话")
+			}
+		}
+	}
+
 	sessionID := c.Param("sessionId")
 
 	if !h.sessions.Delete(sessionID) {

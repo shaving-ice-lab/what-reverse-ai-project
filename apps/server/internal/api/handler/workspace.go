@@ -46,7 +46,9 @@ type UpdateWorkspaceRequest struct {
 
 type CreateWorkspaceMemberRequest struct {
 	UserID string  `json:"user_id"`
+	Email  string  `json:"email"`
 	RoleID *string `json:"role_id"`
+	Role   string  `json:"role"`
 }
 
 type UpdateWorkspaceMemberRoleRequest struct {
@@ -333,6 +335,27 @@ func (h *WorkspaceHandler) ListMembers(c echo.Context) error {
 	})
 }
 
+// ListRoles 获取工作空间角色列表
+func (h *WorkspaceHandler) ListRoles(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	roles, err := h.workspaceService.ListRoles(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return successResponse(c, map[string]interface{}{
+		"roles": roles,
+		"total": len(roles),
+	})
+}
+
 // AddMember 邀请成员加入工作空间
 func (h *WorkspaceHandler) AddMember(c echo.Context) error {
 	userID := middleware.GetUserID(c)
@@ -350,22 +373,44 @@ func (h *WorkspaceHandler) AddMember(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_REQUEST", "请求参数无效")
 	}
-	if strings.TrimSpace(req.UserID) == "" {
-		return errorResponse(c, http.StatusBadRequest, "USER_ID_REQUIRED", "成员用户 ID 不能为空")
-	}
 
-	memberUserID, err := uuid.Parse(req.UserID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "成员用户 ID 无效")
-	}
-
-	var roleID *uuid.UUID
-	if req.RoleID != nil && strings.TrimSpace(*req.RoleID) != "" {
-		parsed, err := uuid.Parse(*req.RoleID)
+	// Resolve member user: accept user_id (UUID) or email
+	var memberUserID uuid.UUID
+	if strings.TrimSpace(req.UserID) != "" {
+		memberUserID, err = uuid.Parse(req.UserID)
 		if err != nil {
-			return errorResponse(c, http.StatusBadRequest, "INVALID_ROLE_ID", "角色 ID 无效")
+			return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "成员用户 ID 无效")
 		}
-		roleID = &parsed
+	} else if strings.TrimSpace(req.Email) != "" {
+		u, lookupErr := h.workspaceService.GetUserByEmail(c.Request().Context(), strings.TrimSpace(req.Email))
+		if lookupErr != nil {
+			return errorResponse(c, http.StatusNotFound, "USER_NOT_FOUND", "未找到该邮箱对应的用户")
+		}
+		memberUserID = u.ID
+	} else {
+		return errorResponse(c, http.StatusBadRequest, "USER_ID_REQUIRED", "成员用户 ID 或邮箱不能为空")
+	}
+
+	// Resolve role: accept role_id (UUID) or role name
+	var roleID *uuid.UUID
+	roleStr := ""
+	if req.RoleID != nil {
+		roleStr = strings.TrimSpace(*req.RoleID)
+	}
+	if roleStr == "" && strings.TrimSpace(req.Role) != "" {
+		roleStr = strings.TrimSpace(req.Role)
+	}
+	if roleStr != "" {
+		if parsed, parseErr := uuid.Parse(roleStr); parseErr == nil {
+			roleID = &parsed
+		} else {
+			// treat as role name
+			role, roleErr := h.workspaceService.GetRoleByName(c.Request().Context(), workspaceID, roleStr)
+			if roleErr != nil {
+				return errorResponse(c, http.StatusNotFound, "ROLE_NOT_FOUND", "角色不存在")
+			}
+			roleID = &role.ID
+		}
 	}
 
 	member, err := h.workspaceService.AddMember(c.Request().Context(), workspaceID, uid, memberUserID, roleID)
@@ -463,9 +508,16 @@ func (h *WorkspaceHandler) UpdateMemberRole(c echo.Context) error {
 	if strings.TrimSpace(req.RoleID) == "" {
 		return errorResponse(c, http.StatusBadRequest, "ROLE_ID_REQUIRED", "角色 ID 不能为空")
 	}
-	roleID, err := uuid.Parse(req.RoleID)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_ROLE_ID", "角色 ID 无效")
+	// Accept UUID or role name
+	var roleID uuid.UUID
+	if parsed, parseErr := uuid.Parse(req.RoleID); parseErr == nil {
+		roleID = parsed
+	} else {
+		role, roleErr := h.workspaceService.GetRoleByName(c.Request().Context(), workspaceID, strings.TrimSpace(req.RoleID))
+		if roleErr != nil {
+			return errorResponse(c, http.StatusNotFound, "ROLE_NOT_FOUND", "角色不存在")
+		}
+		roleID = role.ID
 	}
 
 	member, err := h.workspaceService.UpdateMemberRole(c.Request().Context(), workspaceID, uid, memberID, roleID)
@@ -1106,6 +1158,57 @@ func (h *WorkspaceHandler) handleWorkspaceError(c echo.Context, err error) error
 	default:
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"code": "INTERNAL_ERROR", "message": err.Error()})
 	}
+}
+
+// GetComponent returns a single component's code by component_id
+// GET /workspaces/:id/components/:componentId
+func (h *WorkspaceHandler) GetComponent(c echo.Context) error {
+	wsID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	componentID := c.Param("componentId")
+	if componentID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_PARAM", "message": "component_id is required"})
+	}
+	uid, err := uuid.Parse(middleware.GetUserID(c))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	entry, err := h.workspaceService.GetComponent(c.Request().Context(), wsID, uid, componentID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{"code": "NOT_FOUND", "message": err.Error()})
+		}
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"component_id": componentID,
+		"name":         entry.Name,
+		"code":         entry.Code,
+		"created_at":   entry.CreatedAt,
+	})
+}
+
+// ListComponents returns all deployed components
+// GET /workspaces/:id/components
+func (h *WorkspaceHandler) ListComponents(c echo.Context) error {
+	wsID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"code": "INVALID_ID", "message": "invalid workspace id"})
+	}
+	uid, err := uuid.Parse(middleware.GetUserID(c))
+	if err != nil {
+		return errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+	}
+	components, err := h.workspaceService.ListComponents(c.Request().Context(), wsID, uid)
+	if err != nil {
+		return h.handleWorkspaceError(c, err)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"count":      len(components),
+		"components": components,
+	})
 }
 
 func intParam(c echo.Context, name string, defaultVal int) int {

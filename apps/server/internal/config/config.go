@@ -145,6 +145,7 @@ type ConnectorHealthConfig struct {
 // AIConfig AI 服务配置
 type AIConfig struct {
 	OpenAIAPIKey    string `mapstructure:"openai_api_key"`
+	OpenAIBaseURL   string `mapstructure:"openai_base_url"`
 	AnthropicAPIKey string `mapstructure:"anthropic_api_key"`
 	DefaultModel    string `mapstructure:"default_model"`
 }

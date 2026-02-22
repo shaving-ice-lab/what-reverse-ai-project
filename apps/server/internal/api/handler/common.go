@@ -2,12 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/reverseai/server/internal/api/middleware"
-	"github.com/reverseai/server/internal/service"
 )
 
 // APIResponse 统一响应包裹
@@ -74,59 +71,4 @@ func errorResponse(c echo.Context, status int, code, message string) error {
 	resp.ErrorCode = code
 	resp.ErrorMessage = message
 	return c.JSON(status, resp)
-}
-
-// errorResponseWithDetails 返回带详情的错误响应
-func errorResponseWithDetails(c echo.Context, status int, code, message string, details interface{}) error {
-	var payload interface{}
-	if details != nil {
-		payload = map[string]interface{}{
-			"details": details,
-		}
-	}
-	resp := buildResponse(c, code, message, payload, nil)
-	resp.ErrorCode = code
-	resp.ErrorMessage = message
-	resp.Details = details
-	return c.JSON(status, resp)
-}
-
-func buildQuotaExceededDetails(result *service.ConsumeUsageResult) map[string]interface{} {
-	if result == nil {
-		return nil
-	}
-	details := map[string]interface{}{
-		"exceeded":    result.Exceeded,
-		"plan":        result.Plan,
-		"quota":       result.Quota,
-		"cost_amount": result.CostAmount,
-		"currency":    result.Currency,
-		"budget":      result.Budget,
-	}
-	overagePolicy := "block"
-	if result.Plan != nil && result.Plan.Policy != nil {
-		if value, ok := result.Plan.Policy["overage_policy"].(string); ok && value != "" {
-			overagePolicy = value
-		}
-	}
-	details["overage_policy"] = overagePolicy
-	if result.Quota != nil {
-		resetAt := result.Quota.PeriodEnd
-		details["reset_at"] = resetAt
-		retryAfter := int(time.Until(resetAt).Seconds())
-		if retryAfter < 0 {
-			retryAfter = 0
-		}
-		details["retry_after_seconds"] = retryAfter
-	}
-	return details
-}
-
-func isAsyncRequest(c echo.Context) bool {
-	raw := strings.ToLower(strings.TrimSpace(c.QueryParam("async")))
-	if raw == "" {
-		prefer := strings.ToLower(c.Request().Header.Get("Prefer"))
-		return strings.Contains(prefer, "respond-async")
-	}
-	return raw == "1" || raw == "true" || raw == "yes"
 }

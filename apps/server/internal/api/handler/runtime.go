@@ -25,7 +25,6 @@ import (
 // RuntimeHandler Workspace Runtime 处理器
 type RuntimeHandler struct {
 	runtimeService  service.RuntimeService
-	billingService  service.BillingService
 	auditLogService service.AuditLogService
 	jwtCfg          *config.JWTConfig
 	captchaVerifier service.CaptchaVerifier
@@ -38,7 +37,6 @@ type RuntimeHandler struct {
 // NewRuntimeHandler 创建 Runtime 处理器
 func NewRuntimeHandler(
 	runtimeService service.RuntimeService,
-	billingService service.BillingService,
 	auditLogService service.AuditLogService,
 	jwtCfg *config.JWTConfig,
 	captchaVerifier service.CaptchaVerifier,
@@ -49,7 +47,6 @@ func NewRuntimeHandler(
 ) *RuntimeHandler {
 	return &RuntimeHandler{
 		runtimeService:  runtimeService,
-		billingService:  billingService,
 		auditLogService: auditLogService,
 		jwtCfg:          jwtCfg,
 		captchaVerifier: captchaVerifier,
@@ -188,12 +185,15 @@ func (h *RuntimeHandler) GetSchema(c echo.Context) error {
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_schema", userID)
 
-	normalizedUISchema, err := uischema.NormalizeMap(schema.Version.UISchema)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
-	}
-	if normalizedUISchema != nil {
-		schema.Version.UISchema = normalizedUISchema
+	// v2.0 App Schema (app_schema_version) passes through; legacy normalizer only for old schemas.
+	if _, isV2 := schema.Version.UISchema["app_schema_version"]; !isV2 {
+		normalizedUISchema, err := uischema.NormalizeMap(schema.Version.UISchema)
+		if err != nil {
+			return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
+		}
+		if normalizedUISchema != nil {
+			schema.Version.UISchema = normalizedUISchema
+		}
 	}
 
 	schemaPayload := map[string]interface{}{
@@ -334,12 +334,15 @@ func (h *RuntimeHandler) GetDomainSchema(c echo.Context) error {
 
 	h.recordAnonymousAudit(c, &schema.RuntimeEntry, session, "runtime_schema", userID)
 
-	normalizedUISchema, err := uischema.NormalizeMap(schema.Version.UISchema)
-	if err != nil {
-		return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
-	}
-	if normalizedUISchema != nil {
-		schema.Version.UISchema = normalizedUISchema
+	// v2.0 App Schema (app_schema_version) passes through; legacy normalizer only for old schemas.
+	if _, isV2 := schema.Version.UISchema["app_schema_version"]; !isV2 {
+		normalizedUISchema, err := uischema.NormalizeMap(schema.Version.UISchema)
+		if err != nil {
+			return errorResponse(c, http.StatusBadRequest, "INVALID_UI_SCHEMA", "UI Schema 无效")
+		}
+		if normalizedUISchema != nil {
+			schema.Version.UISchema = normalizedUISchema
+		}
 	}
 
 	schemaPayload := map[string]interface{}{
@@ -843,22 +846,4 @@ func runtimeStatusLabel(code int) string {
 	default:
 		return "unknown"
 	}
-}
-
-func buildRuntimeTriggerData(schema *service.RuntimeSchema, session *entity.WorkspaceSession) entity.JSON {
-	if schema == nil || schema.Workspace == nil || schema.Version == nil {
-		return nil
-	}
-	data := entity.JSON{
-		"source":               "workspace_runtime",
-		"workspace_id":         schema.Workspace.ID.String(),
-		"workspace_version_id": schema.Version.ID.String(),
-	}
-	if strings.TrimSpace(schema.Workspace.AccessMode) != "" {
-		data["access_mode"] = schema.Workspace.AccessMode
-	}
-	if session != nil {
-		data["session_id"] = session.ID.String()
-	}
-	return data
 }

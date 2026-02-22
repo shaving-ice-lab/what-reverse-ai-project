@@ -1,17 +1,20 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
 	"github.com/reverseai/server/internal/service"
 )
 
 // RuntimeAuthHandler 应用运行时认证 Handler
 type RuntimeAuthHandler struct {
-	authService    service.RuntimeAuthService
-	runtimeService service.RuntimeService
+	authService      service.RuntimeAuthService
+	runtimeService   service.RuntimeService
+	workspaceService service.WorkspaceService
 }
 
 func NewRuntimeAuthHandler(authService service.RuntimeAuthService, runtimeService ...service.RuntimeService) *RuntimeAuthHandler {
@@ -20,6 +23,32 @@ func NewRuntimeAuthHandler(authService service.RuntimeAuthService, runtimeServic
 		h.runtimeService = runtimeService[0]
 	}
 	return h
+}
+
+func (h *RuntimeAuthHandler) SetWorkspaceService(ws service.WorkspaceService) {
+	h.workspaceService = ws
+}
+
+// requireMemberAccess 验证用户是 workspace 成员或 owner
+func (h *RuntimeAuthHandler) requireMemberAccess(c echo.Context, workspaceID uuid.UUID) error {
+	if h.workspaceService == nil {
+		return nil
+	}
+	uid, err := uuid.Parse(middleware.GetUserID(c))
+	if err != nil {
+		_ = c.JSON(http.StatusForbidden, map[string]string{"error": "用户 ID 无效"})
+		return fmt.Errorf("invalid_user")
+	}
+	access, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		_ = c.JSON(http.StatusForbidden, map[string]string{"error": "无权限访问此工作空间"})
+		return err
+	}
+	if !access.IsOwner && access.Role == nil {
+		_ = c.JSON(http.StatusForbidden, map[string]string{"error": "无权限，仅 workspace 成员可执行此操作"})
+		return fmt.Errorf("write_forbidden")
+	}
+	return nil
 }
 
 // resolveWorkspaceID resolves workspace ID from slug param (or UUID directly)
@@ -124,11 +153,14 @@ func (h *RuntimeAuthHandler) Logout(c echo.Context) error {
 	})
 }
 
-// ListUsers 列出应用用户（需要 workspace owner 权限）
+// ListUsers 列出应用用户（需要 workspace 成员权限）
 func (h *RuntimeAuthHandler) ListUsers(c echo.Context) error {
 	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace id"})
+	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
 	}
 
 	page := 1
@@ -171,6 +203,14 @@ func (h *RuntimeAuthHandler) Me(c echo.Context) error {
 
 // BlockUser 封禁应用用户
 func (h *RuntimeAuthHandler) BlockUser(c echo.Context) error {
+	workspaceID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid workspace id"})
+	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
+	}
+
 	userID, err := uuid.Parse(c.Param("userId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid user id"})

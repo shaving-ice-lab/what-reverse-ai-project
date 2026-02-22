@@ -1,20 +1,45 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
 	"github.com/reverseai/server/internal/service"
 )
 
 // WorkspaceRLSHandler RLS 策略 Handler
 type WorkspaceRLSHandler struct {
-	rlsService service.WorkspaceRLSService
+	rlsService       service.WorkspaceRLSService
+	workspaceService service.WorkspaceService
 }
 
-func NewWorkspaceRLSHandler(rlsService service.WorkspaceRLSService) *WorkspaceRLSHandler {
-	return &WorkspaceRLSHandler{rlsService: rlsService}
+func NewWorkspaceRLSHandler(rlsService service.WorkspaceRLSService, workspaceService service.WorkspaceService) *WorkspaceRLSHandler {
+	return &WorkspaceRLSHandler{rlsService: rlsService, workspaceService: workspaceService}
+}
+
+// requireMemberAccess 验证用户是工作空间成员或 owner（访客无写入权限）
+func (h *WorkspaceRLSHandler) requireMemberAccess(c echo.Context, workspaceID uuid.UUID) error {
+	if h.workspaceService == nil {
+		return nil
+	}
+	userID := middleware.GetUserID(c)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return fmt.Errorf("invalid_user")
+	}
+	access, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+		return err
+	}
+	if !access.IsOwner && access.Role == nil {
+		_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无写入权限，仅 workspace 成员可执行此操作")
+		return fmt.Errorf("write_forbidden")
+	}
+	return nil
 }
 
 type createRLSPolicyRequest struct {
@@ -30,6 +55,9 @@ func (h *WorkspaceRLSHandler) CreatePolicy(c echo.Context) error {
 	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Invalid workspace ID")
+	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
 	}
 
 	var req createRLSPolicyRequest
@@ -85,6 +113,9 @@ func (h *WorkspaceRLSHandler) UpdatePolicy(c echo.Context) error {
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Invalid workspace ID")
 	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
+	}
 
 	policyID, err := uuid.Parse(c.Param("policyId"))
 	if err != nil {
@@ -113,6 +144,9 @@ func (h *WorkspaceRLSHandler) DeletePolicy(c echo.Context) error {
 	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Invalid workspace ID")
+	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
 	}
 
 	policyID, err := uuid.Parse(c.Param("policyId"))

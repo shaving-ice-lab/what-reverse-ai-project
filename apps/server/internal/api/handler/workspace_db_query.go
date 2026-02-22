@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,36 +16,53 @@ import (
 
 // VMDatabaseHandler 工作空间数据库处理器（SQLite via VMStore）
 type VMDatabaseHandler struct {
-	vmStore         *vmruntime.VMStore
-	auditLogService service.AuditLogService
+	vmStore          *vmruntime.VMStore
+	auditLogService  service.AuditLogService
+	workspaceService service.WorkspaceService
 }
 
 // NewVMDatabaseHandler 创建 VMDatabaseHandler
 func NewVMDatabaseHandler(
 	vmStore *vmruntime.VMStore,
 	auditLogService service.AuditLogService,
+	workspaceService service.WorkspaceService,
 ) *VMDatabaseHandler {
 	return &VMDatabaseHandler{
-		vmStore:         vmStore,
-		auditLogService: auditLogService,
+		vmStore:          vmStore,
+		auditLogService:  auditLogService,
+		workspaceService: workspaceService,
 	}
 }
 
-func (h *VMDatabaseHandler) ensureAccess(c echo.Context) (string, string, error) {
+func (h *VMDatabaseHandler) ensureAccess(c echo.Context, writeRequired bool) (string, string, error) {
 	userID := middleware.GetUserID(c)
-	if _, err := uuid.Parse(userID); err != nil {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
 		return "", "", errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
 	}
 	workspaceID := c.Param("id")
-	if _, err := uuid.Parse(workspaceID); err != nil {
+	wsID, err := uuid.Parse(workspaceID)
+	if err != nil {
 		return "", "", errorResponse(c, http.StatusBadRequest, "INVALID_ID", "工作空间 ID 无效")
+	}
+	if h.workspaceService != nil {
+		access, accessErr := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), wsID, uid)
+		if accessErr != nil {
+			_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+			return "", "", accessErr
+		}
+		// 访客（非成员、非 owner）只有只读权限，不允许执行写操作
+		if writeRequired && !access.IsOwner && access.Role == nil {
+			_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无写入权限，仅 workspace 成员可执行此操作")
+			return "", "", fmt.Errorf("write_forbidden")
+		}
 	}
 	return workspaceID, userID, nil
 }
 
 // ListTables 获取表列表
 func (h *VMDatabaseHandler) ListTables(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}
@@ -61,7 +79,7 @@ func (h *VMDatabaseHandler) ListTables(c echo.Context) error {
 
 // GetTableSchema 获取表结构
 func (h *VMDatabaseHandler) GetTableSchema(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}
@@ -107,7 +125,7 @@ type CreateIndexDefBody struct {
 
 // CreateTable 创建表
 func (h *VMDatabaseHandler) CreateTable(c echo.Context) error {
-	workspaceID, userID, err := h.ensureAccess(c)
+	workspaceID, userID, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -177,7 +195,7 @@ type AlterColumnDefBody struct {
 
 // AlterTable 修改表结构
 func (h *VMDatabaseHandler) AlterTable(c echo.Context) error {
-	workspaceID, userID, err := h.ensureAccess(c)
+	workspaceID, userID, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -238,7 +256,7 @@ type DropTableRequestBody struct {
 
 // DropTable 删除表
 func (h *VMDatabaseHandler) DropTable(c echo.Context) error {
-	workspaceID, userID, err := h.ensureAccess(c)
+	workspaceID, userID, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -271,7 +289,7 @@ func (h *VMDatabaseHandler) DropTable(c echo.Context) error {
 
 // QueryRows 查询行
 func (h *VMDatabaseHandler) QueryRows(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}
@@ -310,14 +328,10 @@ func (h *VMDatabaseHandler) QueryRows(c echo.Context) error {
 	if err != nil {
 		return handleDBQueryError(c, err)
 	}
-	return successResponseWithMeta(c, map[string]interface{}{
+	return successResponse(c, map[string]interface{}{
 		"columns": result.Columns,
 		"rows":    result.Rows,
-	}, map[string]interface{}{
-		"total":     result.TotalCount,
-		"page":      page,
-		"page_size": pageSize,
-		"vm_mode":   true,
+		"total":   result.TotalCount,
 	})
 }
 
@@ -328,7 +342,7 @@ type InsertRowRequestBody struct {
 
 // InsertRow 插入行
 func (h *VMDatabaseHandler) InsertRow(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -362,7 +376,7 @@ type UpdateRowRequestBody struct {
 
 // UpdateRow 更新行
 func (h *VMDatabaseHandler) UpdateRow(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -408,7 +422,7 @@ type DeleteRowsRequestBody struct {
 
 // DeleteRows 删除行
 func (h *VMDatabaseHandler) DeleteRows(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -443,7 +457,7 @@ type ExecuteSQLRequestBody struct {
 
 // ExecuteSQL 执行 SQL
 func (h *VMDatabaseHandler) ExecuteSQL(c echo.Context) error {
-	workspaceID, userID, err := h.ensureAccess(c)
+	workspaceID, userID, err := h.ensureAccess(c, true)
 	if err != nil {
 		return nil
 	}
@@ -475,7 +489,7 @@ func (h *VMDatabaseHandler) ExecuteSQL(c echo.Context) error {
 
 // GetQueryHistory 查询历史
 func (h *VMDatabaseHandler) GetQueryHistory(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}
@@ -488,7 +502,7 @@ func (h *VMDatabaseHandler) GetQueryHistory(c echo.Context) error {
 
 // GetStats 数据库统计
 func (h *VMDatabaseHandler) GetStats(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}
@@ -511,7 +525,7 @@ func (h *VMDatabaseHandler) GetStats(c echo.Context) error {
 
 // GetSchemaGraph 表关系图
 func (h *VMDatabaseHandler) GetSchemaGraph(c echo.Context) error {
-	workspaceID, _, err := h.ensureAccess(c)
+	workspaceID, _, err := h.ensureAccess(c, false)
 	if err != nil {
 		return nil
 	}

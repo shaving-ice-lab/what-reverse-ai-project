@@ -18,10 +18,10 @@ import (
 type WorkspaceStorageService interface {
 	Upload(ctx context.Context, workspaceID uuid.UUID, ownerID *uuid.UUID, file io.Reader, fileName string, fileSize int64, prefix string) (*entity.StorageObject, error)
 	GetObject(ctx context.Context, workspaceID uuid.UUID, objectID uuid.UUID) (*entity.StorageObject, error)
+	GetObjectByID(ctx context.Context, objectID uuid.UUID) (*entity.StorageObject, error)
 	ListObjects(ctx context.Context, workspaceID uuid.UUID, prefix string, page, pageSize int) ([]entity.StorageObject, int64, error)
 	DeleteObject(ctx context.Context, workspaceID uuid.UUID, objectID uuid.UUID) error
 	GetPublicURL(objectID uuid.UUID) string
-	GetStoragePath(objectID uuid.UUID) string
 }
 
 type workspaceStorageService struct {
@@ -112,6 +112,10 @@ func (s *workspaceStorageService) GetObject(ctx context.Context, workspaceID uui
 	return obj, nil
 }
 
+func (s *workspaceStorageService) GetObjectByID(ctx context.Context, objectID uuid.UUID) (*entity.StorageObject, error) {
+	return s.repo.GetByID(ctx, objectID)
+}
+
 func (s *workspaceStorageService) ListObjects(ctx context.Context, workspaceID uuid.UUID, prefix string, page, pageSize int) ([]entity.StorageObject, int64, error) {
 	if pageSize <= 0 {
 		pageSize = 50
@@ -144,8 +148,4 @@ func (s *workspaceStorageService) DeleteObject(ctx context.Context, workspaceID 
 
 func (s *workspaceStorageService) GetPublicURL(objectID uuid.UUID) string {
 	return fmt.Sprintf("%s/%s", s.baseURL, objectID.String())
-}
-
-func (s *workspaceStorageService) GetStoragePath(objectID uuid.UUID) string {
-	return filepath.Join(s.basePath, objectID.String())
 }

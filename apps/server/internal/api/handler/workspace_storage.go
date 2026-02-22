@@ -9,16 +9,40 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/reverseai/server/internal/api/middleware"
 	"github.com/reverseai/server/internal/service"
 )
 
 // WorkspaceStorageHandler 文件存储 Handler
 type WorkspaceStorageHandler struct {
-	storageService service.WorkspaceStorageService
+	storageService   service.WorkspaceStorageService
+	workspaceService service.WorkspaceService
 }
 
-func NewWorkspaceStorageHandler(storageService service.WorkspaceStorageService) *WorkspaceStorageHandler {
-	return &WorkspaceStorageHandler{storageService: storageService}
+func NewWorkspaceStorageHandler(storageService service.WorkspaceStorageService, workspaceService service.WorkspaceService) *WorkspaceStorageHandler {
+	return &WorkspaceStorageHandler{storageService: storageService, workspaceService: workspaceService}
+}
+
+// requireMemberAccess 验证用户是工作空间成员或 owner
+func (h *WorkspaceStorageHandler) requireMemberAccess(c echo.Context, workspaceID uuid.UUID) error {
+	if h.workspaceService == nil {
+		return nil
+	}
+	uid, err := uuid.Parse(middleware.GetUserID(c))
+	if err != nil {
+		_ = errorResponse(c, http.StatusBadRequest, "INVALID_USER_ID", "用户 ID 无效")
+		return fmt.Errorf("invalid_user")
+	}
+	access, err := h.workspaceService.GetWorkspaceAccess(c.Request().Context(), workspaceID, uid)
+	if err != nil {
+		_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无权限访问此工作空间")
+		return err
+	}
+	if !access.IsOwner && access.Role == nil {
+		_ = errorResponse(c, http.StatusForbidden, "FORBIDDEN", "无写入权限，仅 workspace 成员可执行此操作")
+		return fmt.Errorf("write_forbidden")
+	}
+	return nil
 }
 
 // Upload 上传文件（multipart/form-data）
@@ -26,6 +50,9 @@ func (h *WorkspaceStorageHandler) Upload(c echo.Context) error {
 	workspaceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Invalid workspace ID")
+	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
 	}
 
 	file, err := c.FormFile("file")
@@ -129,6 +156,9 @@ func (h *WorkspaceStorageHandler) DeleteObject(c echo.Context) error {
 	if err != nil {
 		return errorResponse(c, http.StatusBadRequest, "INVALID_ID", "Invalid workspace ID")
 	}
+	if err := h.requireMemberAccess(c, workspaceID); err != nil {
+		return nil
+	}
 
 	objectID, err := uuid.Parse(c.Param("objectId"))
 	if err != nil {
@@ -145,41 +175,30 @@ func (h *WorkspaceStorageHandler) DeleteObject(c echo.Context) error {
 	})
 }
 
-// ServeFile 公开访问文件内容（static serve）
+// ServeFile 公开访问文件内容（static serve，通过 objectId 直接访问）
 func (h *WorkspaceStorageHandler) ServeFile(c echo.Context) error {
 	objectID, err := uuid.Parse(c.Param("objectId"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "Invalid object ID")
 	}
 
-	// We need to find the object without workspace context for public access
-	// Try all workspaces — the storage path is unique per objectID
-	// For simplicity, we look up the object directly (no workspace restriction for public serve)
-	storagePath := h.storageService.GetStoragePath(objectID)
+	obj, err := h.storageService.GetObjectByID(c.Request().Context(), objectID)
+	if err != nil {
+		return c.String(http.StatusNotFound, "File not found")
+	}
 
-	// The storagePath from GetStoragePath is just basePath/objectID which isn't the actual path.
-	// We need to read from the repo. Let's use a workaround: serve by iterating.
-	// Better approach: use a nil workspace to find by ID only.
-	// Since ServeFile is for public access, get from repo directly.
+	f, err := os.Open(obj.StoragePath)
+	if err != nil {
+		return c.String(http.StatusNotFound, fmt.Sprintf("File not found on disk: %s", obj.FileName))
+	}
+	defer f.Close()
 
-	// Actually let's read the file from the object's stored path
-	// We'll use uuid.Nil as workspace to bypass the check — but service checks workspace match.
-	// For public serving, we should find the object by ID regardless of workspace.
-	// The simplest approach: the handler gets the object from any workspace.
-
-	// For now, try to find the file on disk via convention: data/storage/*/objectID.*
-	// But that's fragile. Let's instead make the repo accessible here.
-	// Actually — let's just check if the file exists at the returned path.
-
-	_ = storagePath // not used directly
-
-	// The proper fix: for ServeFile we need direct repo access.
-	// We'll find the file by scanning the storage directory.
-	// Simpler: embed the file extension in the URL or just use the objectID without workspace.
-
-	// For a clean implementation, we add a GetObjectByID method that doesn't require workspace.
-	// But for now, return 404 and log — this will be enhanced.
-	return c.String(http.StatusNotImplemented, "Use workspace-scoped file access")
+	c.Response().Header().Set("Content-Type", obj.MimeType)
+	c.Response().Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, obj.FileName))
+	c.Response().Header().Set("Cache-Control", "public, max-age=86400")
+	c.Response().WriteHeader(http.StatusOK)
+	io.Copy(c.Response(), f)
+	return nil
 }
 
 // RuntimeUpload 运行时上传（通过 slug 解析 workspace）
