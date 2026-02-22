@@ -46,13 +46,13 @@
 
 ### 1.3 设计原则
 
-| 原则 | 说明 |
-|------|------|
+| 原则         | 说明                                                   |
+| ------------ | ------------------------------------------------------ |
 | **数据隔离** | workspace 数据使用独立 SQLite 文件，不共享主系统 MySQL |
-| **代码沙箱** | JS 代码在 goja VM 中执行，禁用危险 API，超时保护 |
-| **LLM 优先** | 数据结构和业务逻辑都由 LLM 生成，用户通过自然语言驱动 |
-| **渐进迁移** | 新架构与现有 schema 渲染并存，不破坏已有功能 |
-| **管理可见** | 所有数据可通过 `/dashboard/database` 查看和编辑 |
+| **代码沙箱** | JS 代码在 goja VM 中执行，禁用危险 API，超时保护       |
+| **LLM 优先** | 数据结构和业务逻辑都由 LLM 生成，用户通过自然语言驱动  |
+| **渐进迁移** | 新架构与现有 schema 渲染并存，不破坏已有功能           |
+| **管理可见** | 所有数据可通过 `/dashboard/database` 查看和编辑        |
 
 ---
 
@@ -121,7 +121,7 @@
   → LLM 调用 publish_app 工具 (现有)
 ```
 
-#### 运行时访问流程（/runtime/:slug/api/*）
+#### 运行时访问流程（/runtime/:slug/api/\*）
 
 ```
 终端用户请求 GET /runtime/my-app/api/tasks
@@ -139,14 +139,14 @@
 
 ### 2.3 与现有架构的关系
 
-| 组件 | Schema-Driven 模式 | VM-Based 模式 | 当前状态 |
-|------|---------------------|-----------------|---------|
-| 数据存储 | ~~MySQL `ws_xxx` 数据库~~（已移除） | SQLite `data/vm/{id}.db` 文件 | **SQLite-only** |
-| 数据管理 | `/dashboard/database` UI | 同一 UI，后端统一为 `VMDatabaseHandler` | 前端不变 |
-| 业务逻辑 | 无（纯 CRUD Data API） | goja JS VM 执行 LLM 生成的代码 | VM 路由 `/api/*` |
-| UI 渲染 | `AppRenderer` + JSON Schema | 可通过 `api_source` 调用 VM API | 并存 |
-| 公开数据 | `/runtime/:slug/data/:table` | `/runtime/:slug/api/*` | 并存 |
-| Agent 工具 | `create_table`, `generate_ui_schema` | `deploy_logic`, `get_logic` | 全部可用 |
+| 组件       | Schema-Driven 模式                   | VM-Based 模式                           | 当前状态         |
+| ---------- | ------------------------------------ | --------------------------------------- | ---------------- |
+| 数据存储   | ~~MySQL `ws_xxx` 数据库~~（已移除）  | SQLite `data/vm/{id}.db` 文件           | **SQLite-only**  |
+| 数据管理   | `/dashboard/database` UI             | 同一 UI，后端统一为 `VMDatabaseHandler` | 前端不变         |
+| 业务逻辑   | 无（纯 CRUD Data API）               | goja JS VM 执行 LLM 生成的代码          | VM 路由 `/api/*` |
+| UI 渲染    | `AppRenderer` + JSON Schema          | 可通过 `api_source` 调用 VM API         | 并存             |
+| 公开数据   | `/runtime/:slug/data/:table`         | `/runtime/:slug/api/*`                  | 并存             |
+| Agent 工具 | `create_table`, `generate_ui_schema` | `deploy_logic`, `get_logic`             | 全部可用         |
 
 ---
 
@@ -154,30 +154,33 @@
 
 ### 3.1 JS 引擎: goja
 
-| 选项 | 说明 | 选择理由 |
-|------|------|---------|
-| **[goja](https://github.com/dop251/goja)** | 纯 Go 实现的 ECMAScript 5.1+ 引擎 | **选用** — 纯 Go、零 CGO、启动 <1ms、内存 ~2-5MB/实例 |
-| [v8go](https://github.com/nicholasgasior/v8go) | V8 引擎 Go 绑定 | 需要 CGO + V8 二进制，编译复杂 |
-| [goja_nodejs](https://github.com/nicholasgasior/goja_nodejs) | goja + Node.js API | 可选扩展，提供 `require()`, `console`, `setTimeout` |
+| 选项                                                         | 说明                              | 选择理由                                              |
+| ------------------------------------------------------------ | --------------------------------- | ----------------------------------------------------- |
+| **[goja](https://github.com/dop251/goja)**                   | 纯 Go 实现的 ECMAScript 5.1+ 引擎 | **选用** — 纯 Go、零 CGO、启动 <1ms、内存 ~2-5MB/实例 |
+| [v8go](https://github.com/nicholasgasior/v8go)               | V8 引擎 Go 绑定                   | 需要 CGO + V8 二进制，编译复杂                        |
+| [goja_nodejs](https://github.com/nicholasgasior/goja_nodejs) | goja + Node.js API                | 可选扩展，提供 `require()`, `console`, `setTimeout`   |
 
 **Go 依赖**:
+
 ```
 go get github.com/dop251/goja
 ```
 
 ### 3.2 SQLite 驱动
 
-| 选项 | 说明 | 选择理由 |
-|------|------|---------|
-| **[modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite)** | 纯 Go 实现的 SQLite | **选用** — 纯 Go、零 CGO、跨平台编译无障碍 |
-| [github.com/mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) | CGO 绑定原生 SQLite | 性能更好但需要 CGO 工具链 |
+| 选项                                                               | 说明                | 选择理由                                   |
+| ------------------------------------------------------------------ | ------------------- | ------------------------------------------ |
+| **[modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite)**    | 纯 Go 实现的 SQLite | **选用** — 纯 Go、零 CGO、跨平台编译无障碍 |
+| [github.com/mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) | CGO 绑定原生 SQLite | 性能更好但需要 CGO 工具链                  |
 
 **Go 依赖**:
+
 ```
 go get modernc.org/sqlite
 ```
 
 **注册驱动**:
+
 ```go
 import _ "modernc.org/sqlite"
 // 驱动名: "sqlite"
@@ -250,7 +253,7 @@ db.execute(`
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )
-`);
+`)
 ```
 
 ### 4.3 文件存储结构
@@ -274,6 +277,7 @@ data/
 **文件**: `internal/vmruntime/store.go`
 
 **职责**:
+
 - 管理每个 workspace 的 SQLite 连接（懒加载、单例缓存）
 - 提供文件级操作（创建、删除、备份、检测存在）
 - 配置 PRAGMA 参数
@@ -466,19 +470,20 @@ type VMQueryHistoryItem struct {
 
 **SQLite 查询适配**:
 
-| MySQL 原有查询 | SQLite 替代 |
-|---------------|-------------|
-| `INFORMATION_SCHEMA.TABLES` | `SELECT name FROM sqlite_master WHERE type='table'` |
-| `INFORMATION_SCHEMA.COLUMNS` | `PRAGMA table_info({table})` |
-| `INFORMATION_SCHEMA.STATISTICS` | `PRAGMA index_list({table})` + `PRAGMA index_info({index})` |
-| `INFORMATION_SCHEMA.KEY_COLUMN_USAGE` | `PRAGMA foreign_key_list({table})` |
-| `SHOW CREATE TABLE` | `SELECT sql FROM sqlite_master WHERE name=?` |
+| MySQL 原有查询                        | SQLite 替代                                                 |
+| ------------------------------------- | ----------------------------------------------------------- |
+| `INFORMATION_SCHEMA.TABLES`           | `SELECT name FROM sqlite_master WHERE type='table'`         |
+| `INFORMATION_SCHEMA.COLUMNS`          | `PRAGMA table_info({table})`                                |
+| `INFORMATION_SCHEMA.STATISTICS`       | `PRAGMA index_list({table})` + `PRAGMA index_info({index})` |
+| `INFORMATION_SCHEMA.KEY_COLUMN_USAGE` | `PRAGMA foreign_key_list({table})`                          |
+| `SHOW CREATE TABLE`                   | `SELECT sql FROM sqlite_master WHERE name=?`                |
 
 ### 5.2 WorkspaceVM — JS VM 实例
 
 **文件**: `internal/vmruntime/vm.go`
 
 **职责**:
+
 - 加载并执行 LLM 生成的 JS 代码
 - 提取 `exports.routes` 中定义的路由处理器
 - 处理 HTTP 请求 → 匹配路由 → 执行 JS handler → 返回结果
@@ -550,6 +555,7 @@ exports.routes = {
 **文件**: `internal/vmruntime/vm_pool.go`
 
 **职责**:
+
 - 管理每个 workspace 的 VM 实例（懒加载 + 缓存）
 - 检测代码更新（比较 hash），自动重新加载
 - LRU 淘汰策略（限制最大 VM 数量）
@@ -607,20 +613,21 @@ Invalidate(workspaceID)
 **文件**: `internal/vmruntime/vm_db_api.go`
 
 **职责**:
+
 - 向 goja JS VM 注入 `db` 全局对象
 - 提供安全的数据库操作方法
 - 所有方法使用参数化查询防止 SQL 注入
 
 **API 清单**:
 
-| JS API | 说明 | 示例 |
-|--------|------|------|
-| `db.query(sql, params?)` | SELECT 查询，返回行数组 | `db.query("SELECT * FROM tasks WHERE status = ?", ["done"])` |
-| `db.queryOne(sql, params?)` | 单行查询，返回对象或 `null` | `db.queryOne("SELECT COUNT(*) as cnt FROM tasks")` |
-| `db.insert(table, data)` | 插入行 | `db.insert("tasks", { title: "Buy milk", status: "todo" })` |
-| `db.update(table, data, where)` | 更新行 | `db.update("tasks", { status: "done" }, { id: 1 })` |
-| `db.delete(table, where)` | 删除行 | `db.delete("tasks", { id: 1 })` |
-| `db.execute(sql, params?)` | 执行任意 SQL（含 DDL） | `db.execute("CREATE TABLE IF NOT EXISTS ...")` |
+| JS API                          | 说明                        | 示例                                                         |
+| ------------------------------- | --------------------------- | ------------------------------------------------------------ |
+| `db.query(sql, params?)`        | SELECT 查询，返回行数组     | `db.query("SELECT * FROM tasks WHERE status = ?", ["done"])` |
+| `db.queryOne(sql, params?)`     | 单行查询，返回对象或 `null` | `db.queryOne("SELECT COUNT(*) as cnt FROM tasks")`           |
+| `db.insert(table, data)`        | 插入行                      | `db.insert("tasks", { title: "Buy milk", status: "todo" })`  |
+| `db.update(table, data, where)` | 更新行                      | `db.update("tasks", { status: "done" }, { id: 1 })`          |
+| `db.delete(table, where)`       | 删除行                      | `db.delete("tasks", { id: 1 })`                              |
+| `db.execute(sql, params?)`      | 执行任意 SQL（含 DDL）      | `db.execute("CREATE TABLE IF NOT EXISTS ...")`               |
 
 **返回值格式**:
 
@@ -651,6 +658,7 @@ null
 **文件**: `internal/vmruntime/vm_sandbox.go`
 
 **职责**:
+
 - 禁用危险全局对象
 - 执行超时保护
 - 内存限制（通过 goja interrupt 机制）
@@ -691,11 +699,11 @@ const (
 
 ### 6.1 新增工具列表
 
-| 工具名 | 用途 | 需要确认 | 所在 Skill |
-|--------|------|---------|-----------|
-| `deploy_logic` | 部署 JS 业务逻辑代码到 workspace | 否 | VMRuntime |
-| `get_logic` | 获取当前已部署的 JS 代码 | 否 | VMRuntime |
-| `query_vm_data` | 查询 workspace SQLite 数据（LLM 了解数据状况） | 否 | VMRuntime |
+| 工具名          | 用途                                           | 需要确认 | 所在 Skill |
+| --------------- | ---------------------------------------------- | -------- | ---------- |
+| `deploy_logic`  | 部署 JS 业务逻辑代码到 workspace               | 否       | VMRuntime  |
+| `get_logic`     | 获取当前已部署的 JS 代码                       | 否       | VMRuntime  |
+| `query_vm_data` | 查询 workspace SQLite 数据（LLM 了解数据状况） | 否       | VMRuntime  |
 
 ### 6.2 deploy_logic
 
@@ -765,7 +773,11 @@ const (
   "properties": {
     "workspace_id": { "type": "string", "description": "Workspace ID" },
     "sql": { "type": "string", "description": "SQL statement to execute" },
-    "params": { "type": "array", "items": {}, "description": "Optional query parameters for parameterized queries" }
+    "params": {
+      "type": "array",
+      "items": {},
+      "description": "Optional query parameters for parameterized queries"
+    }
   },
   "required": ["workspace_id", "sql"]
 }
@@ -853,10 +865,10 @@ func (h *VMDatabaseHandler) ListTables(c echo.Context) error {
 
 **已移除的子页面**（MySQL 迁移完成后不再需要）:
 
-| 子页面 | 状态 |
-|--------|------|
-| Functions | 已删除（SQLite 不支持存储过程） |
-| Roles | 已删除（SQLite 无用户角色系统） |
+| 子页面     | 状态                              |
+| ---------- | --------------------------------- |
+| Functions  | 已删除（SQLite 不支持存储过程）   |
+| Roles      | 已删除（SQLite 无用户角色系统）   |
 | Migrations | 已删除（LLM 通过代码管理 schema） |
 
 **保留的子页面**: Overview, Tables, SQL Editor, Schema Graph, Storage
@@ -884,15 +896,15 @@ func (h *VMDatabaseHandler) ListTables(c echo.Context) error {
 
 ### 8.1 威胁模型
 
-| 威胁 | 风险 | 缓解措施 |
-|------|------|---------|
-| JS 代码死循环 | VM 挂起，影响其他请求 | 10s 执行超时 + `runtime.Interrupt()` |
-| 内存耗尽 | Go 进程 OOM | goja 无内建内存限制，通过代码大小限制 (1MB) + 定期回收间接控制 |
-| SQL 注入 | 数据泄露/破坏 | `db.query`/`db.insert`/`db.update`/`db.delete` 全部使用参数化查询 |
-| 跨 workspace 访问 | 数据隔离破坏 | 每个 VM 只注入自己 workspace 的 `*sql.DB`，物理文件隔离 |
-| 访问文件系统 | 服务器被攻破 | 禁用 `require`, `process`, `eval`, `Function` |
-| 访问网络 | 内网探测/SSRF | 不注入 `fetch`/`http` API（Phase 1 不提供外部 HTTP 调用） |
-| 恶意 DDL | 破坏数据 | SQLite 文件隔离 + 备份支持；`db.execute` 仅影响当前 workspace |
+| 威胁              | 风险                  | 缓解措施                                                          |
+| ----------------- | --------------------- | ----------------------------------------------------------------- |
+| JS 代码死循环     | VM 挂起，影响其他请求 | 10s 执行超时 + `runtime.Interrupt()`                              |
+| 内存耗尽          | Go 进程 OOM           | goja 无内建内存限制，通过代码大小限制 (1MB) + 定期回收间接控制    |
+| SQL 注入          | 数据泄露/破坏         | `db.query`/`db.insert`/`db.update`/`db.delete` 全部使用参数化查询 |
+| 跨 workspace 访问 | 数据隔离破坏          | 每个 VM 只注入自己 workspace 的 `*sql.DB`，物理文件隔离           |
+| 访问文件系统      | 服务器被攻破          | 禁用 `require`, `process`, `eval`, `Function`                     |
+| 访问网络          | 内网探测/SSRF         | 不注入 `fetch`/`http` API（Phase 1 不提供外部 HTTP 调用）         |
+| 恶意 DDL          | 破坏数据              | SQLite 文件隔离 + 备份支持；`db.execute` 仅影响当前 workspace     |
 
 ### 8.2 资源限制
 
@@ -922,6 +934,7 @@ type VMRuntimeConfig struct {
 ```
 
 **硬编码配置** (`store.go`):
+
 - SQLite `MaxOpenConns(1)` — 单写连接
 - SQLite `busy_timeout = 5000` ms
 - SQLite `journal_mode = WAL`
@@ -930,11 +943,11 @@ type VMRuntimeConfig struct {
 
 通过 `VMDatabaseHandler` (`workspace_db_query.go`) 的 `recordAudit` 方法记录到现有审计日志系统：
 
-| 事件 | 记录内容 |
-|------|--------|
-| `workspace.db.table.create` | workspace_id, user_id, table_name |
-| `workspace.db.table.alter` | workspace_id, user_id, table_name |
-| `workspace.db.table.drop` | workspace_id, user_id, table_name |
+| 事件                         | 记录内容                                               |
+| ---------------------------- | ------------------------------------------------------ |
+| `workspace.db.table.create`  | workspace_id, user_id, table_name                      |
+| `workspace.db.table.alter`   | workspace_id, user_id, table_name                      |
+| `workspace.db.table.drop`    | workspace_id, user_id, table_name                      |
 | `workspace.db.query.execute` | workspace_id, user_id, sql, affected_rows, duration_ms |
 
 > 注意: `RuntimeVMHandler`（VM API handler）目前未记录审计日志。如需跟踪 VM API 请求，可在后续版本中添加。
@@ -1076,7 +1089,7 @@ type VMRuntimeConfig struct {
 
 ### 10.2 集成测试
 
-- [x] 完整流程: Agent deploy_logic → 建表 → 写路由 → /runtime/:slug/api/* 访问（9 tests in runtime_vm_integration_test.go）
+- [x] 完整流程: Agent deploy_logic → 建表 → 写路由 → /runtime/:slug/api/\* 访问（9 tests in runtime_vm_integration_test.go）
 - [x] 完整流程: Agent deploy_logic → /dashboard/database 查看表和数据
 - [x] 代码更新: 部署新代码 → 旧 VM 失效 → 新代码生效
 - [x] 错误恢复: JS 代码语法错误 → 返回友好错误信息（503）
@@ -1146,7 +1159,7 @@ db.execute(`
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )
-`);
+`)
 
 db.execute(`
   CREATE TABLE IF NOT EXISTS comments (
@@ -1156,79 +1169,75 @@ db.execute(`
     author TEXT DEFAULT 'Anonymous',
     created_at TEXT DEFAULT (datetime('now'))
   )
-`);
+`)
 
-db.execute(`CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)`);
-db.execute(`CREATE INDEX IF NOT EXISTS idx_tasks_assignee ON tasks(assignee)`);
-db.execute(`CREATE INDEX IF NOT EXISTS idx_comments_task ON comments(task_id)`);
+db.execute(`CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)`)
+db.execute(`CREATE INDEX IF NOT EXISTS idx_tasks_assignee ON tasks(assignee)`)
+db.execute(`CREATE INDEX IF NOT EXISTS idx_comments_task ON comments(task_id)`)
 
 // === API 路由 ===
 exports.routes = {
-
   // --- 仪表盘统计 ---
   'GET /stats': (ctx) => {
-    const total = db.queryOne('SELECT COUNT(*) as count FROM tasks');
-    const byStatus = db.query(
-      'SELECT status, COUNT(*) as count FROM tasks GROUP BY status'
-    );
+    const total = db.queryOne('SELECT COUNT(*) as count FROM tasks')
+    const byStatus = db.query('SELECT status, COUNT(*) as count FROM tasks GROUP BY status')
     const overdue = db.queryOne(
       "SELECT COUNT(*) as count FROM tasks WHERE due_date < date('now') AND status NOT IN ('done','cancelled')"
-    );
+    )
     const recentDone = db.query(
       "SELECT * FROM tasks WHERE status = 'done' ORDER BY updated_at DESC LIMIT 5"
-    );
+    )
     return {
       total: total.count,
       by_status: byStatus,
       overdue: overdue.count,
-      recent_done: recentDone
-    };
+      recent_done: recentDone,
+    }
   },
 
   // --- 任务列表 ---
   'GET /tasks': (ctx) => {
-    var sql = 'SELECT * FROM tasks';
-    var conditions = [];
-    var params = [];
+    var sql = 'SELECT * FROM tasks'
+    var conditions = []
+    var params = []
 
     if (ctx.query.status) {
-      conditions.push('status = ?');
-      params.push(ctx.query.status);
+      conditions.push('status = ?')
+      params.push(ctx.query.status)
     }
     if (ctx.query.assignee) {
-      conditions.push('assignee = ?');
-      params.push(ctx.query.assignee);
+      conditions.push('assignee = ?')
+      params.push(ctx.query.assignee)
     }
     if (ctx.query.search) {
-      conditions.push('(title LIKE ? OR description LIKE ?)');
-      params.push('%' + ctx.query.search + '%');
-      params.push('%' + ctx.query.search + '%');
+      conditions.push('(title LIKE ? OR description LIKE ?)')
+      params.push('%' + ctx.query.search + '%')
+      params.push('%' + ctx.query.search + '%')
     }
 
     if (conditions.length > 0) {
-      sql += ' WHERE ' + conditions.join(' AND ');
+      sql += ' WHERE ' + conditions.join(' AND ')
     }
-    sql += ' ORDER BY priority DESC, created_at DESC';
+    sql += ' ORDER BY priority DESC, created_at DESC'
 
-    return db.query(sql, params);
+    return db.query(sql, params)
   },
 
   // --- 获取单个任务 ---
   'GET /tasks/:id': (ctx) => {
-    var task = db.queryOne('SELECT * FROM tasks WHERE id = ?', [ctx.params.id]);
-    if (!task) throw new Error('Task not found');
-    var comments = db.query(
-      'SELECT * FROM comments WHERE task_id = ? ORDER BY created_at DESC',
-      [ctx.params.id]
-    );
-    task.comments = comments;
-    return task;
+    var task = db.queryOne('SELECT * FROM tasks WHERE id = ?', [ctx.params.id])
+    if (!task) throw new Error('Task not found')
+    var comments = db.query('SELECT * FROM comments WHERE task_id = ? ORDER BY created_at DESC', [
+      ctx.params.id,
+    ])
+    task.comments = comments
+    return task
   },
 
   // --- 创建任务 ---
   'POST /tasks': (ctx) => {
-    var data = ctx.body;
-    if (!data.title) throw new Error('Title is required');
+    var data = ctx.body
+    if (!data.title) throw new Error('Title is required')
     return db.insert('tasks', {
       title: data.title,
       description: data.description || '',
@@ -1236,48 +1245,48 @@ exports.routes = {
       priority: data.priority || 0,
       assignee: data.assignee || null,
       due_date: data.due_date || null,
-      tags: JSON.stringify(data.tags || [])
-    });
+      tags: JSON.stringify(data.tags || []),
+    })
   },
 
   // --- 更新任务 ---
   'PATCH /tasks/:id': (ctx) => {
-    var existing = db.queryOne('SELECT id FROM tasks WHERE id = ?', [ctx.params.id]);
-    if (!existing) throw new Error('Task not found');
+    var existing = db.queryOne('SELECT id FROM tasks WHERE id = ?', [ctx.params.id])
+    if (!existing) throw new Error('Task not found')
 
-    var updates = {};
-    var allowed = ['title', 'description', 'status', 'priority', 'assignee', 'due_date'];
+    var updates = {}
+    var allowed = ['title', 'description', 'status', 'priority', 'assignee', 'due_date']
     for (var i = 0; i < allowed.length; i++) {
       if (ctx.body[allowed[i]] !== undefined) {
-        updates[allowed[i]] = ctx.body[allowed[i]];
+        updates[allowed[i]] = ctx.body[allowed[i]]
       }
     }
     if (ctx.body.tags) {
-      updates.tags = JSON.stringify(ctx.body.tags);
+      updates.tags = JSON.stringify(ctx.body.tags)
     }
-    updates.updated_at = new Date().toISOString();
+    updates.updated_at = new Date().toISOString()
 
-    return db.update('tasks', updates, { id: parseInt(ctx.params.id) });
+    return db.update('tasks', updates, { id: parseInt(ctx.params.id) })
   },
 
   // --- 删除任务 ---
   'DELETE /tasks/:id': (ctx) => {
-    return db.delete('tasks', { id: parseInt(ctx.params.id) });
+    return db.delete('tasks', { id: parseInt(ctx.params.id) })
   },
 
   // --- 添加评论 ---
   'POST /tasks/:id/comments': (ctx) => {
-    var task = db.queryOne('SELECT id FROM tasks WHERE id = ?', [ctx.params.id]);
-    if (!task) throw new Error('Task not found');
+    var task = db.queryOne('SELECT id FROM tasks WHERE id = ?', [ctx.params.id])
+    if (!task) throw new Error('Task not found')
 
-    var author = ctx.user ? ctx.user.name : 'Anonymous';
+    var author = ctx.user ? ctx.user.name : 'Anonymous'
     return db.insert('comments', {
       task_id: parseInt(ctx.params.id),
       content: ctx.body.content,
-      author: author
-    });
-  }
-};
+      author: author,
+    })
+  },
+}
 ```
 
 ### B. Go 依赖清单
@@ -1293,13 +1302,13 @@ modernc.org/sqlite                # SQLite 驱动 (纯 Go, 零 CGO)
 # config.yaml 新增段
 vm_runtime:
   enabled: true
-  base_dir: "data/vm"            # SQLite 文件存储目录
-  max_vms: 100                   # 最大缓存 VM 实例数
-  exec_timeout: 10s              # 单次请求执行超时
-  load_timeout: 5s               # 代码加载超时
-  max_code_size: 1048576          # 代码最大 1MB
-  max_db_size: 104857600          # SQLite 文件最大 100MB
-  evict_interval: 30m             # LRU 淘汰检查间隔
+  base_dir: 'data/vm' # SQLite 文件存储目录
+  max_vms: 100 # 最大缓存 VM 实例数
+  exec_timeout: 10s # 单次请求执行超时
+  load_timeout: 5s # 代码加载超时
+  max_code_size: 1048576 # 代码最大 1MB
+  max_db_size: 104857600 # SQLite 文件最大 100MB
+  evict_interval: 30m # LRU 淘汰检查间隔
 ```
 
 ---
@@ -1316,7 +1325,7 @@ vm_runtime:
 
 ```
 迁移前:                              迁移后:
-                                    
+
 主系统 MySQL                         主系统 MySQL
 ├── what_reverse_users               ├── what_reverse_users
 ├── what_reverse_workspaces          ├── what_reverse_workspaces
@@ -1339,96 +1348,97 @@ vm_runtime:
 
 #### 12.2.1 需要迁移的数据
 
-| 数据类型 | 来源 | 目标 | 说明 |
-|----------|------|------|------|
-| **workspace 表结构** | MySQL `ws_xxx` 各表 DDL | SQLite `{wsID}.db` 中的表 | MySQL → SQLite 语法转换 |
-| **workspace 表数据** | MySQL `ws_xxx` 各表行数据 | SQLite `{wsID}.db` 对应表中 | 逐表导出导入 |
-| **workspace 索引** | MySQL 索引定义 | SQLite 索引 | 自动转换 |
-| **workspace 外键** | MySQL FK 约束 | SQLite FK 约束 | 需要启用 `PRAGMA foreign_keys=ON` |
+| 数据类型             | 来源                      | 目标                        | 说明                              |
+| -------------------- | ------------------------- | --------------------------- | --------------------------------- |
+| **workspace 表结构** | MySQL `ws_xxx` 各表 DDL   | SQLite `{wsID}.db` 中的表   | MySQL → SQLite 语法转换           |
+| **workspace 表数据** | MySQL `ws_xxx` 各表行数据 | SQLite `{wsID}.db` 对应表中 | 逐表导出导入                      |
+| **workspace 索引**   | MySQL 索引定义            | SQLite 索引                 | 自动转换                          |
+| **workspace 外键**   | MySQL FK 约束             | SQLite FK 约束              | 需要启用 `PRAGMA foreign_keys=ON` |
 
 #### 12.2.2 需要删除/替换的后端代码
 
-| 文件路径 | 类型 | 迁移动作 |
-|----------|------|---------|
-| `entity/workspace_database.go` | Entity | **已删除** — 迁移完成后不再需要，已从 AutoMigrate 移除 |
-| `entity/workspace_db_role.go` | Entity | **删除** — SQLite 无用户角色概念 |
-| `entity/workspace_db_schema_migration.go` | Entity | **删除** — LLM 通过代码管理 schema |
-| `repository/workspace_database_repo.go` | Repository | **已删除** — 迁移完成后不再需要 |
-| `repository/workspace_db_role_repo.go` | Repository | **删除** |
-| `repository/workspace_db_schema_migration_repo.go` | Repository | **删除** |
-| `service/workspace_database_service.go` | Service | **删除** — Provision/Migrate/Backup 等 MySQL 操作全部移除 |
-| `service/workspace_db_runtime.go` | Service | **替换** — 用 VMStore 替代 |
-| `service/workspace_db_query_service.go` | Service | **替换** — 用 VMStore 方法替代 |
-| `service/workspace_db_role_service.go` | Service | **删除** — SQLite 无角色 |
-| `service/workspace_db_schema_migration_service.go` | Service | **删除** — LLM 管理 schema |
-| `handler/workspace_database.go` | Handler | **大幅简化** — 移除 Provision/Migrate/Backup/Roles 等端点 |
-| `handler/workspace_db_query.go` | Handler | **替换** — 改为调用 VMStore |
-| `handler/runtime_data.go` | Handler | **替换** — 改为调用 VMStore |
-| `pkg/workspace_db/migrations.go` | Package | **删除** — MySQL 迁移脚本不再需要 |
-| `pkg/crypto/encryptor.go` | Package | **保留** — API key 加密仍在用，但不再用于 workspace DB 密码 |
+| 文件路径                                           | 类型       | 迁移动作                                                    |
+| -------------------------------------------------- | ---------- | ----------------------------------------------------------- |
+| `entity/workspace_database.go`                     | Entity     | **已删除** — 迁移完成后不再需要，已从 AutoMigrate 移除      |
+| `entity/workspace_db_role.go`                      | Entity     | **删除** — SQLite 无用户角色概念                            |
+| `entity/workspace_db_schema_migration.go`          | Entity     | **删除** — LLM 通过代码管理 schema                          |
+| `repository/workspace_database_repo.go`            | Repository | **已删除** — 迁移完成后不再需要                             |
+| `repository/workspace_db_role_repo.go`             | Repository | **删除**                                                    |
+| `repository/workspace_db_schema_migration_repo.go` | Repository | **删除**                                                    |
+| `service/workspace_database_service.go`            | Service    | **删除** — Provision/Migrate/Backup 等 MySQL 操作全部移除   |
+| `service/workspace_db_runtime.go`                  | Service    | **替换** — 用 VMStore 替代                                  |
+| `service/workspace_db_query_service.go`            | Service    | **替换** — 用 VMStore 方法替代                              |
+| `service/workspace_db_role_service.go`             | Service    | **删除** — SQLite 无角色                                    |
+| `service/workspace_db_schema_migration_service.go` | Service    | **删除** — LLM 管理 schema                                  |
+| `handler/workspace_database.go`                    | Handler    | **大幅简化** — 移除 Provision/Migrate/Backup/Roles 等端点   |
+| `handler/workspace_db_query.go`                    | Handler    | **替换** — 改为调用 VMStore                                 |
+| `handler/runtime_data.go`                          | Handler    | **替换** — 改为调用 VMStore                                 |
+| `pkg/workspace_db/migrations.go`                   | Package    | **删除** — MySQL 迁移脚本不再需要                           |
+| `pkg/crypto/encryptor.go`                          | Package    | **保留** — API key 加密仍在用，但不再用于 workspace DB 密码 |
 
 #### 12.2.3 需要修改的后端代码
 
-| 文件路径 | 修改内容 |
-|----------|---------|
-| `server.go` | 移除 MySQL workspace DB 初始化，替换为 VMStore 初始化 |
-| `server.go` | 移除 `WorkspaceDatabaseService`, `WorkspaceDBRoleService`, `WorkspaceDBRuntime` 创建 |
-| `server.go` | `WorkspaceDBQueryHandler` 改为注入 VMStore |
-| `server.go` | `RuntimeDataHandler` 改为注入 VMStore |
-| `server.go` | 移除 `/database/roles`, `/database/migrate`, `/database/backup` 等路由 |
-| `server.go` | Agent 工具 `create_table` 改为使用 VMStore |
-| `skills/data_modeling.go` | 依赖 `WorkspaceDBQueryService` → 改为 VMStore |
-| `skills/business_logic.go` | 依赖 `WorkspaceDBQueryService` → 改为 VMStore |
-| `agent_tools/create_table.go` | 从 MySQL 建表改为 SQLite 建表 |
-| `database.go` | AutoMigrate 移除 `WorkspaceDBRole`, `WorkspaceDBSchemaMigration` |
+| 文件路径                      | 修改内容                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------ |
+| `server.go`                   | 移除 MySQL workspace DB 初始化，替换为 VMStore 初始化                                |
+| `server.go`                   | 移除 `WorkspaceDatabaseService`, `WorkspaceDBRoleService`, `WorkspaceDBRuntime` 创建 |
+| `server.go`                   | `WorkspaceDBQueryHandler` 改为注入 VMStore                                           |
+| `server.go`                   | `RuntimeDataHandler` 改为注入 VMStore                                                |
+| `server.go`                   | 移除 `/database/roles`, `/database/migrate`, `/database/backup` 等路由               |
+| `server.go`                   | Agent 工具 `create_table` 改为使用 VMStore                                           |
+| `skills/data_modeling.go`     | 依赖 `WorkspaceDBQueryService` → 改为 VMStore                                        |
+| `skills/business_logic.go`    | 依赖 `WorkspaceDBQueryService` → 改为 VMStore                                        |
+| `agent_tools/create_table.go` | 从 MySQL 建表改为 SQLite 建表                                                        |
+| `database.go`                 | AutoMigrate 移除 `WorkspaceDBRole`, `WorkspaceDBSchemaMigration`                     |
 
 #### 12.2.4 需要修改的前端代码
 
-| 文件路径 | 修改内容 |
-|----------|---------|
+| 文件路径                        | 修改内容                                                                          |
+| ------------------------------- | --------------------------------------------------------------------------------- |
 | `lib/api/workspace-database.ts` | 移除 Roles 相关 API 方法（`listRoles`, `createRole`, `rotateRole`, `revokeRole`） |
-| `database/layout.tsx` | 隐藏 Functions、Roles 导航项 |
-| `database/roles/page.tsx` | **删除** 或替换为提示页面 |
-| `database/functions/page.tsx` | **删除** 或替换为提示页面 |
-| `database/migrations/page.tsx` | 简化为版本记录展示（LLM 管理 schema） |
+| `database/layout.tsx`           | 隐藏 Functions、Roles 导航项                                                      |
+| `database/roles/page.tsx`       | **删除** 或替换为提示页面                                                         |
+| `database/functions/page.tsx`   | **删除** 或替换为提示页面                                                         |
+| `database/migrations/page.tsx`  | 简化为版本记录展示（LLM 管理 schema）                                             |
 
 #### 12.2.5 需要迁移的 seed 数据
 
 现有 `cmd/seed/main.go` 中的 workspace 数据需要改为直接写入 SQLite：
 
-| seed 内容 | 现有方式 | 迁移后 |
-|-----------|---------|--------|
-| vehicles 表 + 20 条数据 | `INSERT INTO ws_xxx.vehicles` (MySQL) | `INSERT INTO vehicles` (SQLite `{wsID}.db`) |
-| drivers 表 + 18 条数据 | MySQL | SQLite |
-| trips 表 + 数据 | MySQL | SQLite |
-| fuel_records 表 + 数据 | MySQL | SQLite |
-| maintenance_records 表 + 数据 | MySQL | SQLite |
-| alerts 表 + 数据 | MySQL | SQLite |
-| ev_charging 表 + 数据 | MySQL | SQLite |
-| geofences 表 + 数据 | MySQL | SQLite |
-| app_users 表 | MySQL | 保留在主系统 MySQL（认证数据） |
+| seed 内容                     | 现有方式                              | 迁移后                                      |
+| ----------------------------- | ------------------------------------- | ------------------------------------------- |
+| vehicles 表 + 20 条数据       | `INSERT INTO ws_xxx.vehicles` (MySQL) | `INSERT INTO vehicles` (SQLite `{wsID}.db`) |
+| drivers 表 + 18 条数据        | MySQL                                 | SQLite                                      |
+| trips 表 + 数据               | MySQL                                 | SQLite                                      |
+| fuel_records 表 + 数据        | MySQL                                 | SQLite                                      |
+| maintenance_records 表 + 数据 | MySQL                                 | SQLite                                      |
+| alerts 表 + 数据              | MySQL                                 | SQLite                                      |
+| ev_charging 表 + 数据         | MySQL                                 | SQLite                                      |
+| geofences 表 + 数据           | MySQL                                 | SQLite                                      |
+| app_users 表                  | MySQL                                 | 保留在主系统 MySQL（认证数据）              |
 
 ### 12.3 MySQL → SQLite 数据类型映射
 
-| MySQL 类型 | SQLite 类型 | 说明 |
-|-----------|-------------|------|
-| `INT` / `BIGINT` | `INTEGER` | SQLite 统一整数类型 |
-| `VARCHAR(n)` | `TEXT` | SQLite 无长度限制 |
-| `TEXT` / `LONGTEXT` | `TEXT` | 直接映射 |
-| `FLOAT` / `DOUBLE` / `DECIMAL(m,n)` | `REAL` | SQLite 统一浮点类型 |
-| `DATETIME` / `TIMESTAMP` | `TEXT` | 存为 ISO 8601 字符串 |
-| `DATE` | `TEXT` | 存为 `YYYY-MM-DD` |
-| `BOOLEAN` / `TINYINT(1)` | `INTEGER` | 0/1 |
-| `ENUM(...)` | `TEXT CHECK(col IN (...))` | 用 CHECK 约束替代 |
-| `JSON` | `TEXT` | 存为 JSON 字符串，可用 SQLite JSON 函数查询 |
-| `BLOB` | `BLOB` | 直接映射 |
-| `AUTO_INCREMENT` | `AUTOINCREMENT` | 仅 `INTEGER PRIMARY KEY AUTOINCREMENT` |
+| MySQL 类型                          | SQLite 类型                | 说明                                        |
+| ----------------------------------- | -------------------------- | ------------------------------------------- |
+| `INT` / `BIGINT`                    | `INTEGER`                  | SQLite 统一整数类型                         |
+| `VARCHAR(n)`                        | `TEXT`                     | SQLite 无长度限制                           |
+| `TEXT` / `LONGTEXT`                 | `TEXT`                     | 直接映射                                    |
+| `FLOAT` / `DOUBLE` / `DECIMAL(m,n)` | `REAL`                     | SQLite 统一浮点类型                         |
+| `DATETIME` / `TIMESTAMP`            | `TEXT`                     | 存为 ISO 8601 字符串                        |
+| `DATE`                              | `TEXT`                     | 存为 `YYYY-MM-DD`                           |
+| `BOOLEAN` / `TINYINT(1)`            | `INTEGER`                  | 0/1                                         |
+| `ENUM(...)`                         | `TEXT CHECK(col IN (...))` | 用 CHECK 约束替代                           |
+| `JSON`                              | `TEXT`                     | 存为 JSON 字符串，可用 SQLite JSON 函数查询 |
+| `BLOB`                              | `BLOB`                     | 直接映射                                    |
+| `AUTO_INCREMENT`                    | `AUTOINCREMENT`            | 仅 `INTEGER PRIMARY KEY AUTOINCREMENT`      |
 
 ### 12.4 DDL 转换规则
 
 #### MySQL → SQLite CREATE TABLE 转换示例
 
 **MySQL 原始 DDL:**
+
 ```sql
 CREATE TABLE vehicles (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1446,6 +1456,7 @@ CREATE TABLE vehicles (
 ```
 
 **转换后 SQLite DDL:**
+
 ```sql
 CREATE TABLE vehicles (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1463,6 +1474,7 @@ CREATE TABLE vehicles (
 ```
 
 **关键转换规则:**
+
 1. `AUTO_INCREMENT` → `AUTOINCREMENT`（仅 `INTEGER PRIMARY KEY` 上有效）
 2. `ENUM(...)` → `TEXT CHECK(col IN (...))`
 3. `VARCHAR(n)` → `TEXT`
@@ -1811,15 +1823,15 @@ func ensureWorkspaceDatabase(db *gorm.DB, ws *entity.Workspace, cfg *config.Conf
 
 #### 12.8.3 SQL 语法差异（seed 数据）
 
-| MySQL 语法 | SQLite 语法 | seed 中出现位置 |
-|-----------|-------------|----------------|
-| `NOW()` | `datetime('now')` | created_at/updated_at 默认值 |
-| `DATE_SUB(NOW(), INTERVAL n HOUR)` | `datetime('now', '-n hours')` | ts() 时间辅助函数 |
-| `ENUM(...)` | `TEXT CHECK(...)` | vehicles.status, vehicle_type 等 |
-| `DECIMAL(10,1)` | `REAL` | mileage, fuel_consumed 等 |
-| `TINYINT(1)` | `INTEGER` | boolean 字段 |
-| `ON UPDATE CURRENT_TIMESTAMP` | _(移除)_ | updated_at |
-| `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci` | _(移除)_ | 所有 CREATE TABLE |
+| MySQL 语法                                                         | SQLite 语法                   | seed 中出现位置                  |
+| ------------------------------------------------------------------ | ----------------------------- | -------------------------------- |
+| `NOW()`                                                            | `datetime('now')`             | created_at/updated_at 默认值     |
+| `DATE_SUB(NOW(), INTERVAL n HOUR)`                                 | `datetime('now', '-n hours')` | ts() 时间辅助函数                |
+| `ENUM(...)`                                                        | `TEXT CHECK(...)`             | vehicles.status, vehicle_type 等 |
+| `DECIMAL(10,1)`                                                    | `REAL`                        | mileage, fuel_consumed 等        |
+| `TINYINT(1)`                                                       | `INTEGER`                     | boolean 字段                     |
+| `ON UPDATE CURRENT_TIMESTAMP`                                      | _(移除)_                      | updated_at                       |
+| `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci` | _(移除)_                      | 所有 CREATE TABLE                |
 
 ### 12.9 前端 workspace-database API 迁移
 
@@ -1845,19 +1857,19 @@ export interface DatabaseRole { ... }
 以下方法的前端调用代码完全不变，因为后端 API 路径和响应格式保持一致：
 
 ```typescript
-workspaceDatabaseApi.listTables(workspaceId)           // ✅ 保留
-workspaceDatabaseApi.getTableSchema(workspaceId, name)  // ✅ 保留
-workspaceDatabaseApi.createTable(workspaceId, req)      // ✅ 保留
+workspaceDatabaseApi.listTables(workspaceId) // ✅ 保留
+workspaceDatabaseApi.getTableSchema(workspaceId, name) // ✅ 保留
+workspaceDatabaseApi.createTable(workspaceId, req) // ✅ 保留
 workspaceDatabaseApi.alterTable(workspaceId, name, req) // ✅ 保留
-workspaceDatabaseApi.dropTable(workspaceId, name)       // ✅ 保留
-workspaceDatabaseApi.queryRows(workspaceId, name, p)    // ✅ 保留
+workspaceDatabaseApi.dropTable(workspaceId, name) // ✅ 保留
+workspaceDatabaseApi.queryRows(workspaceId, name, p) // ✅ 保留
 workspaceDatabaseApi.insertRow(workspaceId, name, data) // ✅ 保留
 workspaceDatabaseApi.updateRow(workspaceId, name, data) // ✅ 保留
 workspaceDatabaseApi.deleteRows(workspaceId, name, ids) // ✅ 保留
-workspaceDatabaseApi.executeSQL(workspaceId, sql)       // ✅ 保留
-workspaceDatabaseApi.getQueryHistory(workspaceId)       // ✅ 保留
-workspaceDatabaseApi.getStats(workspaceId)              // ✅ 保留
-workspaceDatabaseApi.getSchemaGraph(workspaceId)        // ✅ 保留
+workspaceDatabaseApi.executeSQL(workspaceId, sql) // ✅ 保留
+workspaceDatabaseApi.getQueryHistory(workspaceId) // ✅ 保留
+workspaceDatabaseApi.getStats(workspaceId) // ✅ 保留
+workspaceDatabaseApi.getSchemaGraph(workspaceId) // ✅ 保留
 ```
 
 #### 12.9.4 database 页面导航修改
