@@ -501,7 +501,13 @@ function BlockRenderer({ block }: { block: AppBlock }) {
         />
       )
     case 'data_table':
-      return <DataTableBlock config={block.config as unknown as DataTableConfig} apiSource={block.api_source} dataSource={block.data_source} />
+      return (
+        <DataTableBlock
+          config={block.config as unknown as DataTableConfig}
+          apiSource={block.api_source}
+          dataSource={block.data_source}
+        />
+      )
     case 'chart':
       return (
         <ChartBlock
@@ -551,7 +557,12 @@ function BlockRenderer({ block }: { block: AppBlock }) {
         />
       )
     case 'custom_code':
-      return <CustomCodeBlock config={block.config as unknown as CustomCodeConfig} apiSource={block.api_source} />
+      return (
+        <CustomCodeBlock
+          config={block.config as unknown as CustomCodeConfig}
+          apiSource={block.api_source}
+        />
+      )
     default:
       return (
         <div className="border border-dashed border-border rounded-lg p-4 text-center text-xs text-foreground-muted">

@@ -96,5 +96,5 @@ export function generateSandboxHTML(theme: 'light' | 'dark' = 'light'): string {
 })();
 </script>
 </body>
-</html>`;
+</html>`
 }

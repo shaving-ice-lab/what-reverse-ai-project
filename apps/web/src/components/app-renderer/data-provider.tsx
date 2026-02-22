@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useCallback, useRef } from 'react'
+import React, { createContext, useContext, useCallback, useMemo, useRef } from 'react'
 import { request, getStoredTokens } from '@/lib/api/shared'
 import { getApiBaseUrl } from '@/lib/env'
 
@@ -13,7 +13,10 @@ interface DataProviderContextValue {
   updateRow: (table: string, data: Record<string, unknown>, where: string) => Promise<void>
   deleteRows: (table: string, where: string, ids?: unknown[]) => Promise<void>
   uploadFile?: (file: File, prefix?: string) => Promise<string>
-  fetchApiSource?: (path: string, options?: { method?: string; body?: Record<string, unknown> }) => Promise<unknown>
+  fetchApiSource?: (
+    path: string,
+    options?: { method?: string; body?: Record<string, unknown> }
+  ) => Promise<unknown>
   notifyTableChange: (table: string) => void
   onTableChange: (listener: TableChangeListener) => () => void
 }
@@ -84,12 +87,9 @@ export function DataProvider({ workspaceId, children }: DataProviderProps) {
       }
       const qs = searchParams.toString()
       const url = `/workspaces/${workspaceId}/database/tables/${table}/rows${qs ? `?${qs}` : ''}`
-      const res = await request<{
-        rows: Record<string, unknown>[]
-        total: number
-        columns: string[]
-      }>(url)
-      return res || { rows: [], total: 0, columns: [] }
+      const res = await request<any>(url)
+      const payload = (res as any)?.data ?? res
+      return payload || { rows: [], total: 0, columns: [] }
     },
     [workspaceId]
   )
@@ -150,20 +150,30 @@ export function DataProvider({ workspaceId, children }: DataProviderProps) {
     [workspaceId]
   )
 
+  const contextValue = useMemo(
+    () => ({
+      workspaceId,
+      queryRows,
+      insertRow,
+      updateRow,
+      deleteRows,
+      uploadFile,
+      notifyTableChange,
+      onTableChange,
+    }),
+    [
+      workspaceId,
+      queryRows,
+      insertRow,
+      updateRow,
+      deleteRows,
+      uploadFile,
+      notifyTableChange,
+      onTableChange,
+    ]
+  )
+
   return (
-    <DataProviderContext.Provider
-      value={{
-        workspaceId,
-        queryRows,
-        insertRow,
-        updateRow,
-        deleteRows,
-        uploadFile,
-        notifyTableChange,
-        onTableChange,
-      }}
-    >
-      {children}
-    </DataProviderContext.Provider>
+    <DataProviderContext.Provider value={contextValue}>{children}</DataProviderContext.Provider>
   )
 }

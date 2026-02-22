@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { DataProviderContext } from './data-provider'
 import { getRuntimeBaseUrl } from '@/lib/env'
 import { getStoredTokens } from '@/lib/api/shared'
@@ -202,21 +202,32 @@ export function RuntimeDataProvider({
     [workspaceSlug, appAuthToken]
   )
 
+  const contextValue = useMemo(
+    () => ({
+      workspaceId: workspaceSlug,
+      queryRows,
+      insertRow,
+      updateRow,
+      deleteRows,
+      uploadFile,
+      fetchApiSource,
+      notifyTableChange,
+      onTableChange,
+    }),
+    [
+      workspaceSlug,
+      queryRows,
+      insertRow,
+      updateRow,
+      deleteRows,
+      uploadFile,
+      fetchApiSource,
+      notifyTableChange,
+      onTableChange,
+    ]
+  )
+
   return (
-    <DataProviderContext.Provider
-      value={{
-        workspaceId: workspaceSlug,
-        queryRows,
-        insertRow,
-        updateRow,
-        deleteRows,
-        uploadFile,
-        fetchApiSource,
-        notifyTableChange,
-        onTableChange,
-      }}
-    >
-      {children}
-    </DataProviderContext.Provider>
+    <DataProviderContext.Provider value={contextValue}>{children}</DataProviderContext.Provider>
   )
 }

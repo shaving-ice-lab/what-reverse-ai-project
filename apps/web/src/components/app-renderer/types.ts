@@ -305,7 +305,15 @@ export interface CalendarConfig {
 
 export interface CustomCodeConfig {
   code?: string
+  component_id?: string
   language?: string
+  api_source?: {
+    path: string
+    method?: 'GET' | 'POST'
+    body?: Record<string, unknown>
+  }
+  min_height?: number
+  max_height?: number
 }
 
 // ========== Actions ==========

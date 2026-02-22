@@ -36,7 +36,9 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   // Dynamic options cache: { fieldKey => [{ label, value }] }
-  const [dynamicOpts, setDynamicOpts] = useState<Record<string, { label: string; value: string }[]>>({})
+  const [dynamicOpts, setDynamicOpts] = useState<
+    Record<string, { label: string; value: string }[]>
+  >({})
   const [dynamicOptsLoading, setDynamicOptsLoading] = useState<Record<string, boolean>>({})
   const fetchTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
@@ -110,7 +112,9 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
   useEffect(() => {
     if (!open) return
     const noDeps = config.fields.filter(
-      (f) => f.dynamic_options?.api && (!f.dynamic_options.depends_on || f.dynamic_options.depends_on.length === 0)
+      (f) =>
+        f.dynamic_options?.api &&
+        (!f.dynamic_options.depends_on || f.dynamic_options.depends_on.length === 0)
     )
     for (const field of noDeps) {
       fetchDynamicOptions(field, values)
@@ -155,10 +159,10 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
 
       // Pre-submit validation via VM API
       if (config.pre_submit_api && fetchApiSource) {
-        const validation = await fetchApiSource(config.pre_submit_api, {
+        const validation = (await fetchApiSource(config.pre_submit_api, {
           method: 'POST',
           body: payload,
-        }) as any
+        })) as any
         if (validation && validation.valid === false) {
           setError(validation.error || '校验未通过')
           setSubmitting(false)
@@ -188,11 +192,7 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
 
   return (
     <>
-      <Button
-        size="sm"
-        className="gap-1.5"
-        onClick={handleOpen}
-      >
+      <Button size="sm" className="gap-1.5" onClick={handleOpen}>
         <Plus className="w-3.5 h-3.5" />
         {triggerLabel}
       </Button>
@@ -200,12 +200,8 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent size={dialogSize} animation="slide">
           <DialogHeader>
-            <DialogTitle size="default">
-              {config.title || '新建记录'}
-            </DialogTitle>
-            {config.description && (
-              <DialogDescription>{config.description}</DialogDescription>
-            )}
+            <DialogTitle size="default">{config.title || '新建记录'}</DialogTitle>
+            {config.description && <DialogDescription>{config.description}</DialogDescription>}
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-3 mt-2">
@@ -215,17 +211,10 @@ export function FormDialogBlock({ config }: FormDialogBlockProps) {
                 // Hidden field: has default_value but no label — skip rendering
                 if (!field.label && field.default_value !== undefined) return null
                 return (
-                  <div
-                    key={fid}
-                    className={cn(
-                      field.type === 'textarea' && 'md:col-span-2'
-                    )}
-                  >
+                  <div key={fid} className={cn(field.type === 'textarea' && 'md:col-span-2')}>
                     <label className="text-xs font-medium text-foreground-light mb-1 block">
                       {field.label}
-                      {field.required && (
-                        <span className="text-destructive ml-0.5">*</span>
-                      )}
+                      {field.required && <span className="text-destructive ml-0.5">*</span>}
                     </label>
                     {field.type === 'textarea' ? (
                       <textarea

@@ -25,18 +25,18 @@ interface CalendarEvent {
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日']
 
 const DEFAULT_STATUS_COLORS: Record<string, string> = {
-  '待审批': 'bg-amber-500/15 text-amber-700 border-amber-400/30',
-  '已批准': 'bg-emerald-500/15 text-emerald-700 border-emerald-400/30',
-  '进行中': 'bg-blue-500/15 text-blue-700 border-blue-400/30',
-  '已完成': 'bg-slate-500/10 text-slate-600 border-slate-400/30',
-  '已拒绝': 'bg-red-500/15 text-red-700 border-red-400/30',
-  '已取消': 'bg-gray-500/10 text-gray-500 border-gray-400/30',
-  'pending': 'bg-amber-500/15 text-amber-700 border-amber-400/30',
-  'approved': 'bg-emerald-500/15 text-emerald-700 border-emerald-400/30',
-  'in_progress': 'bg-blue-500/15 text-blue-700 border-blue-400/30',
-  'completed': 'bg-slate-500/10 text-slate-600 border-slate-400/30',
-  'rejected': 'bg-red-500/15 text-red-700 border-red-400/30',
-  'cancelled': 'bg-gray-500/10 text-gray-500 border-gray-400/30',
+  待审批: 'bg-amber-500/15 text-amber-700 border-amber-400/30',
+  已批准: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/30',
+  进行中: 'bg-blue-500/15 text-blue-700 border-blue-400/30',
+  已完成: 'bg-slate-500/10 text-slate-600 border-slate-400/30',
+  已拒绝: 'bg-red-500/15 text-red-700 border-red-400/30',
+  已取消: 'bg-gray-500/10 text-gray-500 border-gray-400/30',
+  pending: 'bg-amber-500/15 text-amber-700 border-amber-400/30',
+  approved: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/30',
+  in_progress: 'bg-blue-500/15 text-blue-700 border-blue-400/30',
+  completed: 'bg-slate-500/10 text-slate-600 border-slate-400/30',
+  rejected: 'bg-red-500/15 text-red-700 border-red-400/30',
+  cancelled: 'bg-gray-500/10 text-gray-500 border-gray-400/30',
 }
 
 function getStatusColor(status: string | undefined, customColors?: Record<string, string>): string {
@@ -46,7 +46,11 @@ function getStatusColor(status: string | undefined, customColors?: Record<string
 }
 
 function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
 }
 
 function formatTime(d: Date) {
@@ -104,7 +108,9 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
     }
   }, [tableName, queryRows, config.start_key, config.end_key, config.title_key, config.status_key])
 
-  useEffect(() => { fetchEvents() }, [fetchEvents])
+  useEffect(() => {
+    fetchEvents()
+  }, [fetchEvents])
 
   useEffect(() => {
     if (!tableName) return
@@ -205,7 +211,9 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
               onClick={() => setViewMode('month')}
               className={cn(
                 'h-6 px-2 rounded text-[11px] font-medium transition-colors',
-                viewMode === 'month' ? 'bg-background text-foreground shadow-sm' : 'text-foreground-muted hover:text-foreground'
+                viewMode === 'month'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-foreground-muted hover:text-foreground'
               )}
             >
               月
@@ -214,7 +222,9 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
               onClick={() => setViewMode('week')}
               className={cn(
                 'h-6 px-2 rounded text-[11px] font-medium transition-colors',
-                viewMode === 'week' ? 'bg-background text-foreground shadow-sm' : 'text-foreground-muted hover:text-foreground'
+                viewMode === 'week'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-foreground-muted hover:text-foreground'
               )}
             >
               周
@@ -233,7 +243,10 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
           {/* Weekday headers */}
           <div className="grid grid-cols-7 border-b border-border">
             {WEEKDAYS.map((d) => (
-              <div key={d} className="text-center text-[10px] font-medium text-foreground-muted py-1.5 border-r border-border/50 last:border-r-0">
+              <div
+                key={d}
+                className="text-center text-[10px] font-medium text-foreground-muted py-1.5 border-r border-border/50 last:border-r-0"
+              >
                 {d}
               </div>
             ))}
@@ -242,7 +255,10 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
           <div className="grid grid-cols-7">
             {/* Empty cells before first day */}
             {Array.from({ length: firstDay }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[90px] border-r border-b border-border/50 bg-surface-75/30" />
+              <div
+                key={`empty-${i}`}
+                className="min-h-[90px] border-r border-b border-border/50 bg-surface-75/30"
+              />
             ))}
             {/* Day cells */}
             {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -260,25 +276,29 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
                     isToday && 'bg-brand-500/5'
                   )}
                 >
-                  <div className={cn(
-                    'text-[11px] font-medium mb-0.5 w-5 h-5 flex items-center justify-center rounded-full',
-                    isToday ? 'bg-brand-500 text-white' : 'text-foreground-light'
-                  )}>
+                  <div
+                    className={cn(
+                      'text-[11px] font-medium mb-0.5 w-5 h-5 flex items-center justify-center rounded-full',
+                      isToday ? 'bg-brand-500 text-white' : 'text-foreground-light'
+                    )}
+                  >
                     {dayNum}
                   </div>
                   <div className="space-y-0.5">
                     {dayEvents.slice(0, 3).map((evt) => (
                       <button
                         key={String(evt.id)}
-                        onClick={(e) => { e.stopPropagation(); handleEventClick(evt) }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEventClick(evt)
+                        }}
                         className={cn(
                           'w-full text-left text-[9px] leading-tight px-1 py-0.5 rounded border truncate transition-colors hover:opacity-80',
                           getStatusColor(evt.status, config.status_colors)
                         )}
                         title={`${evt.title} (${formatTime(evt.start)}—${formatTime(evt.end)})${evt.status ? ` [${evt.status}]` : ''}`}
                       >
-                        <span className="font-medium">{formatTime(evt.start)}</span>{' '}
-                        {evt.title}
+                        <span className="font-medium">{formatTime(evt.start)}</span> {evt.title}
                       </button>
                     ))}
                     {dayEvents.length > 3 && (
@@ -300,15 +320,20 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
             {weekDays.map((d, i) => {
               const isToday = isSameDay(d, today)
               return (
-                <div key={i} className={cn(
-                  'text-center py-2 border-r border-border/50 last:border-r-0',
-                  isToday && 'bg-brand-500/5'
-                )}>
+                <div
+                  key={i}
+                  className={cn(
+                    'text-center py-2 border-r border-border/50 last:border-r-0',
+                    isToday && 'bg-brand-500/5'
+                  )}
+                >
                   <div className="text-[10px] text-foreground-muted">{WEEKDAYS[i]}</div>
-                  <div className={cn(
-                    'text-sm font-medium mt-0.5',
-                    isToday ? 'text-brand-500' : 'text-foreground'
-                  )}>
+                  <div
+                    className={cn(
+                      'text-sm font-medium mt-0.5',
+                      isToday ? 'text-brand-500' : 'text-foreground'
+                    )}
+                  >
                     {d.getDate()}
                   </div>
                 </div>
@@ -321,10 +346,13 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
               const dayEvents = getEventsForDay(d)
               const isToday = isSameDay(d, today)
               return (
-                <div key={i} className={cn(
-                  'border-r border-border/50 last:border-r-0 p-1 space-y-1',
-                  isToday && 'bg-brand-500/3'
-                )}>
+                <div
+                  key={i}
+                  className={cn(
+                    'border-r border-border/50 last:border-r-0 p-1 space-y-1',
+                    isToday && 'bg-brand-500/3'
+                  )}
+                >
                   {dayEvents.map((evt) => (
                     <button
                       key={String(evt.id)}
@@ -369,15 +397,22 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
             <div>
               <div className="text-sm font-semibold text-foreground">{selectedEvent.title}</div>
               {selectedEvent.status && (
-                <span className={cn(
-                  'inline-block text-[10px] px-1.5 py-0.5 rounded border mt-1',
-                  getStatusColor(selectedEvent.status, config.status_colors)
-                )}>
+                <span
+                  className={cn(
+                    'inline-block text-[10px] px-1.5 py-0.5 rounded border mt-1',
+                    getStatusColor(selectedEvent.status, config.status_colors)
+                  )}
+                >
                   {selectedEvent.status}
                 </span>
               )}
             </div>
-            <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setSelectedEvent(null)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 text-[10px]"
+              onClick={() => setSelectedEvent(null)}
+            >
               关闭
             </Button>
           </div>
@@ -385,7 +420,8 @@ export function CalendarBlock({ config, dataSource }: CalendarBlockProps) {
             <div className="flex items-center gap-1.5 text-foreground-muted">
               <Clock className="w-3 h-3" />
               <span>
-                {selectedEvent.start.toLocaleDateString('zh-CN')} {formatTime(selectedEvent.start)} — {formatTime(selectedEvent.end)}
+                {selectedEvent.start.toLocaleDateString('zh-CN')} {formatTime(selectedEvent.start)}{' '}
+                — {formatTime(selectedEvent.end)}
               </span>
             </div>
             {config.detail_fields?.map((f) => {

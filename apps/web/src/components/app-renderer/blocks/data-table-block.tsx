@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useDataProvider } from '../data-provider'
 import { usePageParams } from '../app-renderer'
 import type { DataTableConfig, ApiSource, DataSource, StatusActionConfig } from '../types'
@@ -47,8 +48,15 @@ function buildSearchFilters(searchTerm: string, config: DataTableConfig) {
 }
 
 export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlockProps) {
-  const { queryRows, insertRow, updateRow, deleteRows, notifyTableChange, onTableChange, fetchApiSource } =
-    useDataProvider()
+  const {
+    queryRows,
+    insertRow,
+    updateRow,
+    deleteRows,
+    notifyTableChange,
+    onTableChange,
+    fetchApiSource,
+  } = useDataProvider()
   const { navigateToPage } = usePageParams()
   const [rows, setRows] = useState<Record<string, unknown>[]>([])
   const [total, setTotal] = useState(0)
@@ -65,6 +73,8 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
   const [createValues, setCreateValues] = useState<Record<string, unknown>>({})
   // Lookup cache: { "vehicles:id:plate_number" => { 1: "京A12345", 3: "沪B67890" } }
   const [lookupMap, setLookupMap] = useState<Record<string, Record<string, string>>>({})
+  const lookupMapRef = useRef(lookupMap)
+  lookupMapRef.current = lookupMap
   const defaultSort = dataSource?.order_by?.[0]
   const [sortCol, setSortCol] = useState<string | null>(defaultSort?.column ?? null)
   const [sortDir, setSortDir] = useState<'ASC' | 'DESC'>(defaultSort?.direction ?? 'ASC')
@@ -92,7 +102,7 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
       )
       if (lookupCols.length === 0) return
 
-      const newMap: Record<string, Record<string, string>> = { ...lookupMap }
+      const newMap: Record<string, Record<string, string>> = { ...lookupMapRef.current }
 
       for (const col of lookupCols) {
         const table = col.lookup_table!
@@ -133,7 +143,7 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
 
       setLookupMap(newMap)
     },
-    [config.columns, lookupMap, queryRows]
+    [config.columns, queryRows]
   )
 
   const fetchData = useCallback(async () => {
@@ -207,12 +217,52 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     })
   }, [onTableChange, config.table_name, fetchData])
 
+  const { confirm: confirmDelete, Dialog: DeleteConfirmDialog } = useConfirmDialog()
+  const { confirm: confirmStatusAct, Dialog: StatusActDialog } = useConfirmDialog()
+
+  const [pendingStatusAction, setPendingStatusAction] = useState<{
+    row: Record<string, unknown>
+    action: StatusActionConfig
+    pkColumn: string
+    pkValue: unknown
+    confirmMsg: string
+  } | null>(null)
+  const [extraInputs, setExtraInputs] = useState<Record<string, string>>({})
+
+  const handleConfirmStatusAction = async () => {
+    if (!pendingStatusAction) return
+    const { action, pkColumn, pkValue } = pendingStatusAction
+    for (const field of action.extra_fields || []) {
+      if (field.required && !extraInputs[field.key]) return
+    }
+    const data: Record<string, unknown> = {
+      [pkColumn]: pkValue,
+      [action.status_column]: action.to_status,
+      ...extraInputs,
+    }
+    setPendingStatusAction(null)
+    setExtraInputs({})
+    try {
+      await updateRow(config.table_name, data, `${pkColumn} = '${pkValue}'`)
+      notifyTableChange(config.table_name)
+      fetchData()
+    } catch {
+      /* ignore */
+    }
+  }
+
   const handleDelete = async (row: Record<string, unknown>) => {
-    const pkColumn =
-      config.columns.find((col) => col.key === 'id')?.key || 'id'
+    const pkColumn = config.columns.find((col) => col.key === 'id')?.key || 'id'
     const pkValue = row[pkColumn]
     if (pkValue === null || pkValue === undefined) return
-    if (!window.confirm(`Delete record ${pkColumn}=${pkValue}?`)) return
+    const confirmed = await confirmDelete({
+      title: 'Delete Record',
+      description: `Delete record ${pkColumn}=${pkValue}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
     try {
       await deleteRows(config.table_name, '', [pkValue])
       notifyTableChange(config.table_name)
@@ -252,8 +302,7 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     if (editingIdx === null) return
     setSaving(true)
     try {
-      const pkColumn =
-        config.columns.find((col) => col.key === 'id')?.key || 'id'
+      const pkColumn = config.columns.find((col) => col.key === 'id')?.key || 'id'
       const data: Record<string, unknown> = {}
       for (const col of config.columns) {
         if (col.key === 'created_at' || col.key === 'updated_at' || col.key === 'deleted_at')
@@ -311,37 +360,25 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
     setSaving(false)
   }
 
-  const handleStatusAction = async (
-    row: Record<string, unknown>,
-    action: StatusActionConfig
-  ) => {
+  const handleStatusAction = async (row: Record<string, unknown>, action: StatusActionConfig) => {
     const pkColumn = config.columns.find((col) => col.key === 'id')?.key || 'id'
     const pkValue = row[pkColumn]
     if (pkValue === null || pkValue === undefined) return
 
     if (action.confirm) {
-      let confirmMsg = `确认将状态从 "${row[action.status_column]}" 变更为 "${action.to_status}"？`
+      const confirmMsg = `确认将状态从 "${row[action.status_column]}" 变更为 "${action.to_status}"？`
       if (action.extra_fields?.length) {
-        const inputs: Record<string, string> = {}
-        for (const field of action.extra_fields) {
-          const val = window.prompt(`${field.label}${field.required ? ' (必填)' : ''}:`)
-          if (field.required && !val) return
-          if (val) inputs[field.key] = val
-        }
-        if (!window.confirm(confirmMsg)) return
-        try {
-          const data: Record<string, unknown> = {
-            [pkColumn]: pkValue,
-            [action.status_column]: action.to_status,
-            ...inputs,
-          }
-          await updateRow(config.table_name, data, `${pkColumn} = '${pkValue}'`)
-          notifyTableChange(config.table_name)
-          fetchData()
-        } catch { /* ignore */ }
+        setExtraInputs({})
+        setPendingStatusAction({ row, action, pkColumn, pkValue, confirmMsg })
         return
       }
-      if (!window.confirm(confirmMsg)) return
+      const confirmed = await confirmStatusAct({
+        title: 'Confirm Action',
+        description: confirmMsg,
+        confirmText: 'Confirm',
+        cancelText: 'Cancel',
+      })
+      if (!confirmed) return
     }
 
     try {
@@ -352,7 +389,9 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
       await updateRow(config.table_name, data, `${pkColumn} = '${pkValue}'`)
       notifyTableChange(config.table_name)
       fetchData()
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   const totalPages = Math.ceil(total / pageSize)
@@ -714,7 +753,8 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                         ) : col.type === 'lookup' ? (
                           (() => {
                             const rawVal = row[col.key]
-                            if (rawVal === null || rawVal === undefined) return <span className="text-foreground-muted">—</span>
+                            if (rawVal === null || rawVal === undefined)
+                              return <span className="text-foreground-muted">—</span>
                             const cacheKey = `${col.lookup_table}:${col.lookup_key || 'id'}:${col.display_key}`
                             const display = lookupMap[cacheKey]?.[String(rawVal)]
                             return display ? (
@@ -778,7 +818,10 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                                   size="sm"
                                   variant="ghost"
                                   className="h-6 w-6 p-0 text-destructive"
-                                  onClick={(e) => { e.stopPropagation(); handleDelete(row) }}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDelete(row)
+                                  }}
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </Button>
@@ -790,24 +833,30 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
                                 })
                                 .map((sa, sai) => {
                                   const colorCls =
-                                    sa.color === 'green' ? 'text-emerald-600 hover:bg-emerald-500/10' :
-                                    sa.color === 'red' ? 'text-red-600 hover:bg-red-500/10' :
-                                    sa.color === 'blue' ? 'text-blue-600 hover:bg-blue-500/10' :
-                                    sa.color === 'amber' ? 'text-amber-600 hover:bg-amber-500/10' :
-                                    'text-foreground-muted hover:bg-surface-200/50'
+                                    sa.color === 'green'
+                                      ? 'text-emerald-600 hover:bg-emerald-500/10'
+                                      : sa.color === 'red'
+                                        ? 'text-red-600 hover:bg-red-500/10'
+                                        : sa.color === 'blue'
+                                          ? 'text-blue-600 hover:bg-blue-500/10'
+                                          : sa.color === 'amber'
+                                            ? 'text-amber-600 hover:bg-amber-500/10'
+                                            : 'text-foreground-muted hover:bg-surface-200/50'
                                   return (
                                     <Button
                                       key={sai}
                                       size="sm"
                                       variant="ghost"
                                       className={cn('h-6 px-1.5 text-[10px]', colorCls)}
-                                      onClick={(e) => { e.stopPropagation(); handleStatusAction(row, sa) }}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleStatusAction(row, sa)
+                                      }}
                                     >
                                       {sa.label}
                                     </Button>
                                   )
-                                })
-                              }
+                                })}
                             </>
                           )}
                         </div>
@@ -849,6 +898,45 @@ export function DataTableBlock({ config, apiSource, dataSource }: DataTableBlock
           </div>
         </div>
       )}
+
+      {/* Extra-fields status action dialog */}
+      {pendingStatusAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-background border border-border rounded-xl shadow-lg w-full max-w-sm mx-4">
+            <div className="px-5 py-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Confirm Action</h3>
+              <p className="text-xs text-foreground-muted mt-1">{pendingStatusAction.confirmMsg}</p>
+            </div>
+            <div className="p-5 space-y-3">
+              {pendingStatusAction.action.extra_fields?.map((field) => (
+                <div key={field.key}>
+                  <label className="text-xs font-medium text-foreground-light mb-1 block">
+                    {field.label}
+                    {field.required ? ' *' : ''}
+                  </label>
+                  <Input
+                    value={extraInputs[field.key] || ''}
+                    onChange={(e) =>
+                      setExtraInputs((prev) => ({ ...prev, [field.key]: e.target.value }))
+                    }
+                    className="h-9 text-sm"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2 px-5 py-4 border-t border-border">
+              <Button size="sm" variant="ghost" onClick={() => setPendingStatusAction(null)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleConfirmStatusAction}>
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      <DeleteConfirmDialog />
+      <StatusActDialog />
     </div>
   )
 }
@@ -891,19 +979,25 @@ function formatCellValue(value: unknown, type?: string): React.ReactNode {
     case 'badge': {
       const v = String(value).toLowerCase()
       const sv = String(value)
-      const badgeColor = /active|enabled|online|approved|published/.test(v) || /在线|在职|正常|有效|已发布|运营中|已通过|已批准/.test(sv)
-        ? 'bg-emerald-500/10 text-emerald-600'
-        : /inactive|disabled|offline|archived|cancelled/.test(v) || /离线|停运|已报废|已过期|离职|已取消/.test(sv)
-          ? 'bg-gray-500/10 text-gray-500'
-          : /pending|review|waiting|draft/.test(v) || /待处理|未处理|处理中|审核中|维修中|进行中|待审批/.test(sv)
-            ? 'bg-amber-500/10 text-amber-600'
-            : /failed|error|rejected|blocked|urgent/.test(v) || /紧急|超速|严重|违章|未缴|已拒绝|特急/.test(sv)
-              ? 'bg-red-500/10 text-red-600'
-              : /completed|done|success|delivered/.test(v) || /已完成|已处理|已缴|已维修|已解决/.test(sv)
-                ? 'bg-blue-500/10 text-blue-600'
-                : /ignored/.test(v) || /已忽略/.test(sv)
-                  ? 'bg-slate-500/10 text-slate-500'
-                  : 'bg-brand-500/10 text-brand-500'
+      const badgeColor =
+        /active|enabled|online|approved|published/.test(v) ||
+        /在线|在职|正常|有效|已发布|运营中|已通过|已批准/.test(sv)
+          ? 'bg-emerald-500/10 text-emerald-600'
+          : /inactive|disabled|offline|archived|cancelled/.test(v) ||
+              /离线|停运|已报废|已过期|离职|已取消/.test(sv)
+            ? 'bg-gray-500/10 text-gray-500'
+            : /pending|review|waiting|draft/.test(v) ||
+                /待处理|未处理|处理中|审核中|维修中|进行中|待审批/.test(sv)
+              ? 'bg-amber-500/10 text-amber-600'
+              : /failed|error|rejected|blocked|urgent/.test(v) ||
+                  /紧急|超速|严重|违章|未缴|已拒绝|特急/.test(sv)
+                ? 'bg-red-500/10 text-red-600'
+                : /completed|done|success|delivered/.test(v) ||
+                    /已完成|已处理|已缴|已维修|已解决/.test(sv)
+                  ? 'bg-blue-500/10 text-blue-600'
+                  : /ignored/.test(v) || /已忽略/.test(sv)
+                    ? 'bg-slate-500/10 text-slate-500'
+                    : 'bg-brand-500/10 text-brand-500'
       return (
         <span className={cn('text-xs px-1.5 py-0.5 rounded', badgeColor)}>{String(value)}</span>
       )

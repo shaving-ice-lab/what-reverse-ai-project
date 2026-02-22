@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { getRuntimeBaseUrl } from '@/lib/env'
 
 export interface AppUser {
@@ -143,19 +143,18 @@ export function AppAuthProvider({ workspaceSlug, children }: AppAuthProviderProp
     clearSession()
   }, [workspaceSlug, token, clearSession])
 
-  return (
-    <AppAuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!user && !!token,
-        loading,
-        login,
-        register,
-        logout,
-      }}
-    >
-      {children}
-    </AppAuthContext.Provider>
+  const contextValue = useMemo<AppAuthContextValue>(
+    () => ({
+      user,
+      token,
+      isAuthenticated: !!user && !!token,
+      loading,
+      login,
+      register,
+      logout,
+    }),
+    [user, token, loading, login, register, logout]
   )
+
+  return <AppAuthContext.Provider value={contextValue}>{children}</AppAuthContext.Provider>
 }
