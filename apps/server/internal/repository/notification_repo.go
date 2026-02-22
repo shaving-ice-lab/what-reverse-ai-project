@@ -13,8 +13,6 @@ import (
 type NotificationRepository interface {
 	// 创建通知
 	Create(ctx context.Context, notification *entity.Notification) error
-	// 批量创建通知
-	BatchCreate(ctx context.Context, notifications []*entity.Notification) error
 
 	// 获取通知
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.Notification, error)
@@ -32,8 +30,6 @@ type NotificationRepository interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	// 批量删除通知
 	DeleteByUserID(ctx context.Context, userID uuid.UUID, notificationType *string) error
-	// 删除旧通知（超过指定天数）
-	DeleteOld(ctx context.Context, days int) error
 
 	// 统计
 	GetUnreadCount(ctx context.Context, userID uuid.UUID) (int64, error)
@@ -51,13 +47,6 @@ func NewNotificationRepository(db *gorm.DB) NotificationRepository {
 
 func (r *notificationRepository) Create(ctx context.Context, notification *entity.Notification) error {
 	return r.db.WithContext(ctx).Create(notification).Error
-}
-
-func (r *notificationRepository) BatchCreate(ctx context.Context, notifications []*entity.Notification) error {
-	if len(notifications) == 0 {
-		return nil
-	}
-	return r.db.WithContext(ctx).Create(notifications).Error
 }
 
 func (r *notificationRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.Notification, error) {
@@ -173,13 +162,6 @@ func (r *notificationRepository) DeleteByUserID(ctx context.Context, userID uuid
 	}
 
 	return query.Delete(&entity.Notification{}).Error
-}
-
-func (r *notificationRepository) DeleteOld(ctx context.Context, days int) error {
-	cutoff := time.Now().AddDate(0, 0, -days)
-	return r.db.WithContext(ctx).
-		Where("created_at < ? AND is_read = ?", cutoff, true).
-		Delete(&entity.Notification{}).Error
 }
 
 func (r *notificationRepository) GetUnreadCount(ctx context.Context, userID uuid.UUID) (int64, error) {

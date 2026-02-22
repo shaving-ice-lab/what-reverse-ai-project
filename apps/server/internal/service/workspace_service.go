@@ -17,6 +17,11 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	slugNonAlphanumRe = regexp.MustCompile("[^a-z0-9-]")
+	slugMultiDashRe   = regexp.MustCompile("-+")
+)
+
 // WorkspaceService 工作空间服务接口
 type WorkspaceService interface {
 	EnsureDefaultWorkspace(ctx context.Context, user *entity.User) (*entity.Workspace, error)
@@ -33,6 +38,9 @@ type WorkspaceService interface {
 	UpdateMemberRole(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID, roleID uuid.UUID) (*entity.WorkspaceMember, error)
 	RemoveMember(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID, memberID uuid.UUID) error
 	GetWorkspaceAccess(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) (*WorkspaceAccess, error)
+	ListRoles(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) ([]entity.WorkspaceRole, error)
+	GetRoleByName(ctx context.Context, workspaceID uuid.UUID, name string) (*entity.WorkspaceRole, error)
+	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 
 	// App 功能（Workspace = App）
 	Publish(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (*entity.Workspace, error)
@@ -54,6 +62,11 @@ type WorkspaceService interface {
 	UpdateComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, code string) (*entity.WorkspaceVersion, error)
 	GetComponentCode(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (string, error)
 
+	// Multi-component storage (components_json: map[component_id] -> ComponentEntry)
+	DeployComponent(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, componentID, name, code string) (*entity.WorkspaceVersion, string, error)
+	ListComponents(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (map[string]ComponentEntry, error)
+	GetComponent(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, componentID string) (*ComponentEntry, error)
+
 	// Settings
 	UpdateSettings(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, settings entity.JSON) error
 
@@ -61,6 +74,13 @@ type WorkspaceService interface {
 	ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error)
 	GetPublic(ctx context.Context, id uuid.UUID) (*entity.Workspace, error)
 	ListRatings(ctx context.Context, workspaceID uuid.UUID, page, pageSize int) ([]entity.WorkspaceRating, int64, error)
+}
+
+// ComponentEntry represents a single component in multi-component storage
+type ComponentEntry struct {
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	CreatedAt string `json:"created_at"`
 }
 
 type workspaceService struct {
@@ -470,6 +490,25 @@ func (s *workspaceService) Restore(ctx context.Context, id uuid.UUID, ownerID uu
 	}, nil
 }
 
+func (s *workspaceService) ListRoles(ctx context.Context, workspaceID uuid.UUID, userID uuid.UUID) ([]entity.WorkspaceRole, error) {
+	if _, err := s.authorizeWorkspace(ctx, workspaceID, userID, PermissionMembersManage); err != nil {
+		return nil, err
+	}
+	// Ensure default roles exist before listing
+	if _, err := s.ensureDefaultRoles(ctx, workspaceID); err != nil {
+		return nil, err
+	}
+	return s.roleRepo.ListByWorkspaceID(ctx, workspaceID)
+}
+
+func (s *workspaceService) GetRoleByName(ctx context.Context, workspaceID uuid.UUID, name string) (*entity.WorkspaceRole, error) {
+	return s.roleRepo.GetByWorkspaceAndName(ctx, workspaceID, name)
+}
+
+func (s *workspaceService) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
+	return s.userRepo.GetByEmail(ctx, email)
+}
+
 func (s *workspaceService) ListMembers(ctx context.Context, workspaceID uuid.UUID, ownerID uuid.UUID) ([]entity.WorkspaceMember, error) {
 	if _, err := s.authorizeWorkspace(ctx, workspaceID, ownerID, PermissionMembersManage); err != nil {
 		return nil, err
@@ -710,6 +749,16 @@ func (s *workspaceService) GetWorkspaceAccess(ctx context.Context, workspaceID u
 	member, err := s.memberRepo.GetByWorkspaceAndUser(ctx, workspaceID, userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Non-member accessing a published public workspace gets read-only visitor access
+			am := strings.TrimSpace(workspace.AccessMode)
+			if workspace.AppStatus == "published" && (am == "public_anonymous" || am == "public_auth") {
+				return &WorkspaceAccess{
+					Workspace:   workspace,
+					Role:        nil,
+					Permissions: entity.JSON{"read": true},
+					IsOwner:     false,
+				}, nil
+			}
 			return nil, ErrWorkspaceUnauthorized
 		}
 		return nil, err
@@ -789,11 +838,13 @@ func (s *workspaceService) ensureSlugAlias(ctx context.Context, workspaceID uuid
 func (s *workspaceService) generateSlug(name string) string {
 	slug := strings.ToLower(name)
 	slug = strings.ReplaceAll(slug, " ", "-")
-	reg := regexp.MustCompile("[^a-z0-9-]")
-	slug = reg.ReplaceAllString(slug, "")
-	reg = regexp.MustCompile("-+")
-	slug = reg.ReplaceAllString(slug, "-")
+	slug = slugNonAlphanumRe.ReplaceAllString(slug, "")
+	slug = slugMultiDashRe.ReplaceAllString(slug, "-")
 	slug = strings.Trim(slug, "-")
+	// Non-ASCII names (e.g. pure Chinese) produce an empty slug — fall back to timestamp
+	if slug == "" {
+		slug = fmt.Sprintf("ws-%d", time.Now().UnixMilli())
+	}
 	return slug
 }
 
@@ -858,6 +909,9 @@ func (s *workspaceService) Publish(ctx context.Context, id uuid.UUID, ownerID uu
 	now := time.Now()
 	ws.AppStatus = "published"
 	ws.PublishedAt = &now
+	if am := strings.TrimSpace(ws.AccessMode); am == "" || am == "private" {
+		ws.AccessMode = "public_anonymous"
+	}
 	if err := s.workspaceRepo.Update(ctx, ws); err != nil {
 		return nil, fmt.Errorf("failed to publish workspace: %w", err)
 	}
@@ -1081,7 +1135,23 @@ func (s *workspaceService) UpdateUISchema(ctx context.Context, id uuid.UUID, own
 		return nil, err
 	}
 	if ws.CurrentVersionID == nil {
-		return nil, errors.New("no current version to update")
+		// Auto-create initial version for workspaces that have never had one
+		initVersion := &entity.WorkspaceVersion{
+			ID:          uuid.New(),
+			WorkspaceID: ws.ID,
+			Version:     fmt.Sprintf("v0.0.%d", time.Now().UnixMilli()),
+			UISchema:    entity.JSON(uiSchema),
+			CreatedBy:   &ownerID,
+			CreatedAt:   time.Now(),
+		}
+		if err := s.workspaceRepo.CreateVersion(ctx, initVersion); err != nil {
+			return nil, fmt.Errorf("failed to create initial version: %w", err)
+		}
+		ws.CurrentVersionID = &initVersion.ID
+		if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+			return nil, fmt.Errorf("failed to set current version: %w", err)
+		}
+		return initVersion, nil
 	}
 	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
 	if err != nil {
@@ -1100,7 +1170,22 @@ func (s *workspaceService) UpdateLogicCode(ctx context.Context, id uuid.UUID, ow
 		return nil, err
 	}
 	if ws.CurrentVersionID == nil {
-		return nil, errors.New("no current version to update")
+		initVersion := &entity.WorkspaceVersion{
+			ID:          uuid.New(),
+			WorkspaceID: ws.ID,
+			Version:     fmt.Sprintf("v0.0.%d", time.Now().UnixMilli()),
+			LogicCode:   &code,
+			CreatedBy:   &ownerID,
+			CreatedAt:   time.Now(),
+		}
+		if err := s.workspaceRepo.CreateVersion(ctx, initVersion); err != nil {
+			return nil, fmt.Errorf("failed to create initial version: %w", err)
+		}
+		ws.CurrentVersionID = &initVersion.ID
+		if err := s.workspaceRepo.Update(ctx, ws); err != nil {
+			return nil, fmt.Errorf("failed to set current version: %w", err)
+		}
+		return initVersion, nil
 	}
 	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
 	if err != nil {
@@ -1168,6 +1253,102 @@ func (s *workspaceService) GetComponentCode(ctx context.Context, id uuid.UUID, o
 	return *version.ComponentCode, nil
 }
 
+// ---- Multi-component storage ----
+
+func (s *workspaceService) DeployComponent(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, componentID, name, code string) (*entity.WorkspaceVersion, string, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, "", err
+	}
+	if ws.CurrentVersionID == nil {
+		return nil, "", errors.New("no current version to update")
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return nil, "", fmt.Errorf("current version not found: %w", err)
+	}
+
+	// Parse existing components from entity.JSON (map[string]interface{})
+	components := parseComponentsJSON(version.ComponentsJSON)
+
+	// Auto-generate component_id if empty
+	if componentID == "" {
+		componentID = fmt.Sprintf("comp_%s", uuid.New().String()[:8])
+	}
+	if name == "" {
+		name = componentID
+	}
+
+	components[componentID] = ComponentEntry{
+		Name:      name,
+		Code:      code,
+		CreatedAt: time.Now().UTC().Format(time.RFC3339),
+	}
+
+	version.ComponentsJSON = componentsToJSON(components)
+
+	// Also update legacy ComponentCode for backward compatibility (last deployed code)
+	version.ComponentCode = &code
+
+	if err := s.workspaceRepo.UpdateVersion(ctx, version); err != nil {
+		return nil, "", fmt.Errorf("failed to update components: %w", err)
+	}
+	return version, componentID, nil
+}
+
+func (s *workspaceService) ListComponents(ctx context.Context, id uuid.UUID, ownerID uuid.UUID) (map[string]ComponentEntry, error) {
+	ws, err := s.getAuthorizedWorkspace(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	if ws.CurrentVersionID == nil {
+		return make(map[string]ComponentEntry), nil
+	}
+	version, err := s.workspaceRepo.GetVersionByID(ctx, *ws.CurrentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("current version not found: %w", err)
+	}
+	return parseComponentsJSON(version.ComponentsJSON), nil
+}
+
+// parseComponentsJSON converts entity.JSON (map[string]interface{}) to typed component map
+func parseComponentsJSON(j entity.JSON) map[string]ComponentEntry {
+	result := make(map[string]ComponentEntry)
+	if len(j) == 0 {
+		return result
+	}
+	// Round-trip through JSON bytes to unmarshal into typed map
+	b, err := json.Marshal(j)
+	if err != nil {
+		return result
+	}
+	_ = json.Unmarshal(b, &result)
+	return result
+}
+
+// componentsToJSON converts typed component map to entity.JSON
+func componentsToJSON(components map[string]ComponentEntry) entity.JSON {
+	b, err := json.Marshal(components)
+	if err != nil {
+		return make(entity.JSON)
+	}
+	var result entity.JSON
+	_ = json.Unmarshal(b, &result)
+	return result
+}
+
+func (s *workspaceService) GetComponent(ctx context.Context, id uuid.UUID, ownerID uuid.UUID, componentID string) (*ComponentEntry, error) {
+	components, err := s.ListComponents(ctx, id, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	entry, ok := components[componentID]
+	if !ok {
+		return nil, fmt.Errorf("component %q not found", componentID)
+	}
+	return &entry, nil
+}
+
 func (s *workspaceService) ListPublic(ctx context.Context, page, pageSize int) ([]entity.Workspace, int64, error) {
 	return s.workspaceRepo.ListPublic(ctx, page, pageSize)
 }
@@ -1217,22 +1398,18 @@ func (s *workspaceService) getAuthorizedWorkspace(ctx context.Context, id uuid.U
 }
 
 var (
-	ErrWorkspaceNotFound                  = errors.New("workspace not found")
-	ErrWorkspaceUnauthorized              = errors.New("unauthorized to access this workspace")
-	ErrWorkspaceSlugExists                = errors.New("workspace slug already exists")
-	ErrWorkspaceInvalidName               = errors.New("workspace name is invalid")
-	ErrWorkspaceInvalidSlug               = errors.New("workspace slug is invalid")
-	ErrWorkspaceInvalidIcon               = errors.New("workspace icon is invalid")
-	ErrWorkspaceInvalidPlan               = errors.New("workspace plan is invalid")
-	ErrWorkspaceRoleNotFound              = errors.New("workspace role not found")
-	ErrWorkspaceMemberNotFound            = errors.New("workspace member not found")
-	ErrWorkspaceMemberExists              = errors.New("workspace member already exists")
-	ErrWorkspaceUserNotFound              = errors.New("workspace user not found")
-	ErrWorkspaceOwnerRoleLocked           = errors.New("workspace owner role locked")
-	ErrWorkspaceExportUnavailable         = errors.New("workspace export unavailable")
-	ErrWorkspaceNotDeleted                = errors.New("workspace is not deleted")
-	ErrWorkspaceRestoreExpired            = errors.New("workspace restore window expired")
-	ErrWorkspaceNotPublished              = errors.New("workspace is not published")
-	ErrWorkspaceInvalidAccessPolicy       = errors.New("workspace access policy is invalid for the given data classification")
-	ErrWorkspaceInvalidDataClassification = errors.New("workspace data classification is invalid")
+	ErrWorkspaceNotFound        = errors.New("workspace not found")
+	ErrWorkspaceUnauthorized    = errors.New("unauthorized to access this workspace")
+	ErrWorkspaceSlugExists      = errors.New("workspace slug already exists")
+	ErrWorkspaceInvalidName     = errors.New("workspace name is invalid")
+	ErrWorkspaceInvalidSlug     = errors.New("workspace slug is invalid")
+	ErrWorkspaceInvalidIcon     = errors.New("workspace icon is invalid")
+	ErrWorkspaceInvalidPlan     = errors.New("workspace plan is invalid")
+	ErrWorkspaceRoleNotFound    = errors.New("workspace role not found")
+	ErrWorkspaceMemberNotFound  = errors.New("workspace member not found")
+	ErrWorkspaceMemberExists    = errors.New("workspace member already exists")
+	ErrWorkspaceUserNotFound    = errors.New("workspace user not found")
+	ErrWorkspaceOwnerRoleLocked = errors.New("workspace owner role locked")
+	ErrWorkspaceNotDeleted      = errors.New("workspace is not deleted")
+	ErrWorkspaceRestoreExpired  = errors.New("workspace restore window expired")
 )

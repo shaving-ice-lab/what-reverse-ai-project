@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/reverseai/server/internal/domain/entity"
@@ -19,8 +18,6 @@ var (
 type NotificationService interface {
 	// 发送通知
 	Send(ctx context.Context, req *SendNotificationRequest) (*entity.Notification, error)
-	// 批量发送通知
-	SendBatch(ctx context.Context, reqs []*SendNotificationRequest) error
 
 	// 获取通知
 	GetByID(ctx context.Context, userID, notificationID uuid.UUID) (*NotificationDetail, error)
@@ -43,25 +40,6 @@ type NotificationService interface {
 	GetUnreadCount(ctx context.Context, userID uuid.UUID) (int64, error)
 	// 获取分类未读数
 	GetUnreadCountByType(ctx context.Context, userID uuid.UUID) (*UnreadCountByType, error)
-
-	// =====================
-	// 业务通知方法
-	// =====================
-
-	// 发送关注通知
-	SendFollowNotification(ctx context.Context, followerID, followingID uuid.UUID) error
-	// 发送评论通知
-	SendCommentNotification(ctx context.Context, comment *entity.Comment, targetOwnerID uuid.UUID, targetTitle string) error
-	// 发送回复通知
-	SendReplyNotification(ctx context.Context, comment *entity.Comment, parentComment *entity.Comment) error
-	// 发送点赞通知
-	SendLikeNotification(ctx context.Context, likerID uuid.UUID, comment *entity.Comment) error
-	// 发送收入通知
-	SendIncomeNotification(ctx context.Context, userID uuid.UUID, amount float64, source string, sourceID uuid.UUID) error
-	// 发送系统通知
-	SendSystemNotification(ctx context.Context, userID uuid.UUID, title, content string) error
-	// 发送批量系统通知（给所有用户或指定用户）
-	SendBroadcastNotification(ctx context.Context, title, content string, userIDs []uuid.UUID) error
 }
 
 // SendNotificationRequest 发送通知请求
@@ -155,23 +133,6 @@ func (s *notificationService) Send(ctx context.Context, req *SendNotificationReq
 	}
 
 	return notification, nil
-}
-
-func (s *notificationService) SendBatch(ctx context.Context, reqs []*SendNotificationRequest) error {
-	notifications := make([]*entity.Notification, len(reqs))
-	for i, req := range reqs {
-		notifications[i] = &entity.Notification{
-			UserID:     req.UserID,
-			Type:       req.Type,
-			Title:      req.Title,
-			Content:    req.Content,
-			ActorID:    req.ActorID,
-			TargetType: req.TargetType,
-			TargetID:   req.TargetID,
-			Metadata:   entity.JSON(req.Metadata),
-		}
-	}
-	return s.notificationRepo.BatchCreate(ctx, notifications)
 }
 
 func (s *notificationService) GetByID(ctx context.Context, userID, notificationID uuid.UUID) (*NotificationDetail, error) {
@@ -280,203 +241,6 @@ func (s *notificationService) GetUnreadCountByType(ctx context.Context, userID u
 }
 
 // =====================
-// 业务通知方法实现
-// =====================
-
-func (s *notificationService) SendFollowNotification(ctx context.Context, followerID, followingID uuid.UUID) error {
-	// 获取关注者信息
-	follower, err := s.userRepo.GetByID(ctx, followerID)
-	if err != nil {
-		return err
-	}
-
-	displayName := follower.Username
-	if follower.DisplayName != nil {
-		displayName = *follower.DisplayName
-	}
-
-	title := displayName + " 关注了你"
-	targetType := "user"
-
-	_, err = s.Send(ctx, &SendNotificationRequest{
-		UserID:     followingID,
-		Type:       string(entity.NotificationTypeFollow),
-		Title:      title,
-		ActorID:    &followerID,
-		TargetType: &targetType,
-		TargetID:   &followerID,
-	})
-
-	return err
-}
-
-func (s *notificationService) SendCommentNotification(ctx context.Context, comment *entity.Comment, targetOwnerID uuid.UUID, targetTitle string) error {
-	// 不给自己发通知
-	if comment.UserID == targetOwnerID {
-		return nil
-	}
-
-	// 获取评论者信息
-	commenter, err := s.userRepo.GetByID(ctx, comment.UserID)
-	if err != nil {
-		return err
-	}
-
-	displayName := commenter.Username
-	if commenter.DisplayName != nil {
-		displayName = *commenter.DisplayName
-	}
-
-	title := displayName + " 评论了「" + targetTitle + "」"
-	content := comment.Content
-	if len(content) > 100 {
-		content = content[:100] + "..."
-	}
-
-	_, err = s.Send(ctx, &SendNotificationRequest{
-		UserID:     targetOwnerID,
-		Type:       string(entity.NotificationTypeComment),
-		Title:      title,
-		Content:    &content,
-		ActorID:    &comment.UserID,
-		TargetType: &comment.TargetType,
-		TargetID:   &comment.TargetID,
-		Metadata: map[string]interface{}{
-			"comment_id": comment.ID.String(),
-		},
-	})
-
-	return err
-}
-
-func (s *notificationService) SendReplyNotification(ctx context.Context, comment *entity.Comment, parentComment *entity.Comment) error {
-	// 不给自己发通知
-	if comment.UserID == parentComment.UserID {
-		return nil
-	}
-
-	// 获取回复者信息
-	replier, err := s.userRepo.GetByID(ctx, comment.UserID)
-	if err != nil {
-		return err
-	}
-
-	displayName := replier.Username
-	if replier.DisplayName != nil {
-		displayName = *replier.DisplayName
-	}
-
-	title := displayName + " 回复了你的评论"
-	content := comment.Content
-	if len(content) > 100 {
-		content = content[:100] + "..."
-	}
-	targetType := "comment"
-
-	_, err = s.Send(ctx, &SendNotificationRequest{
-		UserID:     parentComment.UserID,
-		Type:       string(entity.NotificationTypeReply),
-		Title:      title,
-		Content:    &content,
-		ActorID:    &comment.UserID,
-		TargetType: &targetType,
-		TargetID:   &parentComment.ID,
-		Metadata: map[string]interface{}{
-			"comment_id":        comment.ID.String(),
-			"parent_comment_id": parentComment.ID.String(),
-		},
-	})
-
-	return err
-}
-
-func (s *notificationService) SendLikeNotification(ctx context.Context, likerID uuid.UUID, comment *entity.Comment) error {
-	// 不给自己发通知
-	if likerID == comment.UserID {
-		return nil
-	}
-
-	// 获取点赞者信息
-	liker, err := s.userRepo.GetByID(ctx, likerID)
-	if err != nil {
-		return err
-	}
-
-	displayName := liker.Username
-	if liker.DisplayName != nil {
-		displayName = *liker.DisplayName
-	}
-
-	title := displayName + " 赞了你的评论"
-	content := comment.Content
-	if len(content) > 50 {
-		content = content[:50] + "..."
-	}
-	targetType := "comment"
-
-	_, err = s.Send(ctx, &SendNotificationRequest{
-		UserID:     comment.UserID,
-		Type:       string(entity.NotificationTypeLike),
-		Title:      title,
-		Content:    &content,
-		ActorID:    &likerID,
-		TargetType: &targetType,
-		TargetID:   &comment.ID,
-	})
-
-	return err
-}
-
-func (s *notificationService) SendIncomeNotification(ctx context.Context, userID uuid.UUID, amount float64, source string, sourceID uuid.UUID) error {
-	title := "收到一笔新收入"
-	content := "来自 " + source + " 的收入 ¥" + formatAmount(amount)
-
-	_, err := s.Send(ctx, &SendNotificationRequest{
-		UserID:     userID,
-		Type:       string(entity.NotificationTypeIncome),
-		Title:      title,
-		Content:    &content,
-		TargetType: &source,
-		TargetID:   &sourceID,
-		Metadata: map[string]interface{}{
-			"amount":    amount,
-			"source":    source,
-			"source_id": sourceID.String(),
-		},
-	})
-
-	return err
-}
-
-func (s *notificationService) SendSystemNotification(ctx context.Context, userID uuid.UUID, title, content string) error {
-	_, err := s.Send(ctx, &SendNotificationRequest{
-		UserID:  userID,
-		Type:    string(entity.NotificationTypeSystem),
-		Title:   title,
-		Content: &content,
-	})
-	return err
-}
-
-func (s *notificationService) SendBroadcastNotification(ctx context.Context, title, content string, userIDs []uuid.UUID) error {
-	if len(userIDs) == 0 {
-		return nil
-	}
-
-	reqs := make([]*SendNotificationRequest, len(userIDs))
-	for i, userID := range userIDs {
-		reqs[i] = &SendNotificationRequest{
-			UserID:  userID,
-			Type:    string(entity.NotificationTypeSystem),
-			Title:   title,
-			Content: &content,
-		}
-	}
-
-	return s.SendBatch(ctx, reqs)
-}
-
-// =====================
 // 辅助方法
 // =====================
 
@@ -511,9 +275,4 @@ func (s *notificationService) toNotificationDetail(n *entity.Notification) *Noti
 	}
 
 	return detail
-}
-
-// formatAmount 格式化金额
-func formatAmount(amount float64) string {
-	return fmt.Sprintf("%.2f", amount)
 }

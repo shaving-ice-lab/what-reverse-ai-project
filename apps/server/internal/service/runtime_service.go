@@ -1011,7 +1011,7 @@ func applyGrayPolicy(rule rateLimitRule, policy graylistPolicy) rateLimitRule {
 			adjusted.maxRequests = policy.maxRequests
 		}
 	} else if adjusted.maxRequests > 1 {
-		adjusted.maxRequests = maxInt(1, adjusted.maxRequests/2)
+		adjusted.maxRequests = max(1, adjusted.maxRequests/2)
 	}
 	if policy.window > 0 {
 		adjusted.window = policy.window
@@ -1197,13 +1197,6 @@ func toBool(value interface{}) (bool, bool) {
 	}
 }
 
-func maxInt(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func hashValue(value string) string {
 	trimmed := strings.TrimSpace(value)
 	if trimmed == "" {
@@ -1233,10 +1226,6 @@ func normalizeRuntimeDomain(value string) string {
 		trimmed = host
 	}
 	return strings.TrimSuffix(trimmed, ".")
-}
-
-func runtimeRequestEventTypes() []string {
-	return []string{RuntimeEventEntry, RuntimeEventSchema, RuntimeEventExecute}
 }
 
 func resolveWorkspaceAccessEventType(eventType string) entity.RuntimeEventType {

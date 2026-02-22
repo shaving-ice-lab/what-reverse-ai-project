@@ -297,14 +297,3 @@ func (s *PIISanitizer) sanitizeArray(arr []interface{}) []interface{} {
 
 	return result
 }
-
-// GetSensitiveFieldsConfig 获取敏感字段配置
-func GetSensitiveFieldsConfig() []SensitiveFieldConfig {
-	return DefaultSensitiveFields
-}
-
-// IsSensitiveField 检查字段是否敏感（全局函数）
-func IsSensitiveField(fieldName string) bool {
-	sanitizer := NewPIISanitizer()
-	return sanitizer.isSensitiveField(fieldName)
-}

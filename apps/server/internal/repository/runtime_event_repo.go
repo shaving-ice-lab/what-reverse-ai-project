@@ -2,9 +2,7 @@ package repository
 
 import (
 	"context"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/reverseai/server/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -15,22 +13,12 @@ type RuntimeEventRepository interface {
 	Create(ctx context.Context, event *entity.RuntimeEvent) error
 	// CreateBatch 批量创建事件
 	CreateBatch(ctx context.Context, events []*entity.RuntimeEvent) error
-	// GetByID 根据 ID 获取事件
-	GetByID(ctx context.Context, id uuid.UUID) (*entity.RuntimeEvent, error)
 	// List 查询事件列表
 	List(ctx context.Context, filter entity.RuntimeEventFilter) ([]entity.RuntimeEvent, int64, error)
-	// ListByTraceID 根据 trace_id 查询事件（用于链路追踪）
-	ListByTraceID(ctx context.Context, traceID string) ([]entity.RuntimeEvent, error)
-	// ListByExecution 根据执行 ID 查询事件（用于执行回放）
-	ListByExecution(ctx context.Context, executionID uuid.UUID) ([]entity.RuntimeEvent, error)
 	// GetStats 获取事件统计
 	GetStats(ctx context.Context, filter entity.RuntimeEventFilter) (*entity.RuntimeEventStats, error)
 	// GetLatestSequenceNum 获取最新序列号
 	GetLatestSequenceNum(ctx context.Context) (int64, error)
-	// StreamAfterSequenceNum 流式获取指定序列号之后的事件
-	StreamAfterSequenceNum(ctx context.Context, afterSequenceNum int64, limit int) ([]entity.RuntimeEvent, error)
-	// DeleteOlderThan 删除指定时间之前的事件（用于数据保留策略）
-	DeleteOlderThan(ctx context.Context, before time.Time) (int64, error)
 }
 
 type runtimeEventRepository struct {
@@ -70,14 +58,6 @@ func (r *runtimeEventRepository) CreateBatch(ctx context.Context, events []*enti
 	}
 
 	return r.db.WithContext(ctx).CreateInBatches(events, 100).Error
-}
-
-func (r *runtimeEventRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.RuntimeEvent, error) {
-	var event entity.RuntimeEvent
-	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&event).Error; err != nil {
-		return nil, err
-	}
-	return &event, nil
 }
 
 func (r *runtimeEventRepository) List(ctx context.Context, filter entity.RuntimeEventFilter) ([]entity.RuntimeEvent, int64, error) {
@@ -123,24 +103,6 @@ func (r *runtimeEventRepository) List(ctx context.Context, filter entity.Runtime
 	}
 
 	return events, total, nil
-}
-
-func (r *runtimeEventRepository) ListByTraceID(ctx context.Context, traceID string) ([]entity.RuntimeEvent, error) {
-	var events []entity.RuntimeEvent
-	err := r.db.WithContext(ctx).
-		Where("trace_id = ?", traceID).
-		Order("sequence_num ASC").
-		Find(&events).Error
-	return events, err
-}
-
-func (r *runtimeEventRepository) ListByExecution(ctx context.Context, executionID uuid.UUID) ([]entity.RuntimeEvent, error) {
-	var events []entity.RuntimeEvent
-	err := r.db.WithContext(ctx).
-		Where("execution_id = ?", executionID).
-		Order("sequence_num ASC").
-		Find(&events).Error
-	return events, err
 }
 
 func (r *runtimeEventRepository) GetStats(ctx context.Context, filter entity.RuntimeEventFilter) (*entity.RuntimeEventStats, error) {
@@ -201,30 +163,6 @@ func (r *runtimeEventRepository) GetLatestSequenceNum(ctx context.Context) (int6
 		return 0, nil
 	}
 	return *maxSeq.Max, nil
-}
-
-func (r *runtimeEventRepository) StreamAfterSequenceNum(ctx context.Context, afterSequenceNum int64, limit int) ([]entity.RuntimeEvent, error) {
-	if limit < 1 {
-		limit = 100
-	}
-	if limit > 1000 {
-		limit = 1000
-	}
-
-	var events []entity.RuntimeEvent
-	err := r.db.WithContext(ctx).
-		Where("sequence_num > ?", afterSequenceNum).
-		Order("sequence_num ASC").
-		Limit(limit).
-		Find(&events).Error
-	return events, err
-}
-
-func (r *runtimeEventRepository) DeleteOlderThan(ctx context.Context, before time.Time) (int64, error) {
-	result := r.db.WithContext(ctx).
-		Where("created_at < ?", before).
-		Delete(&entity.RuntimeEvent{})
-	return result.RowsAffected, result.Error
 }
 
 // applyEventFilter 应用事件过滤条件

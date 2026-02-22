@@ -52,13 +52,3 @@ const (
 	NotificationTypeSystem  NotificationType = "system"
 	NotificationTypeIncome  NotificationType = "income"
 )
-
-// IsValidNotificationType 验证通知类型
-func IsValidNotificationType(t string) bool {
-	switch NotificationType(t) {
-	case NotificationTypeFollow, NotificationTypeComment, NotificationTypeReply,
-		NotificationTypeLike, NotificationTypeMention, NotificationTypeSystem, NotificationTypeIncome:
-		return true
-	}
-	return false
-}

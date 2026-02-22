@@ -16,55 +16,20 @@ import (
 type EventRecorderService interface {
 	// Record 记录单个事件
 	Record(ctx context.Context, event *entity.RuntimeEvent) error
-	// RecordAsync 异步记录事件（不阻塞）
-	RecordAsync(event *entity.RuntimeEvent)
-	// RecordBatch 批量记录事件
-	RecordBatch(ctx context.Context, events []*entity.RuntimeEvent) error
 
 	// 便捷记录方法
 	RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error
-	RecordDBEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, durationMs int64, err error) error
-	RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, domain string, durationMs int64, err error) error
-	RecordLLMEvent(ctx context.Context, eventType entity.RuntimeEventType, provider, model string, durationMs, promptTokens, completionTokens int64, err error) error
-	RecordSecurityEvent(ctx context.Context, eventType entity.RuntimeEventType, remoteIP, userAgent, reason string) error
-	RecordSystemEvent(ctx context.Context, eventType entity.RuntimeEventType, message string, err error) error
-
-	// 查询方法
-	GetEventsByExecution(ctx context.Context, executionID uuid.UUID) ([]entity.RuntimeEvent, error)
-	GetEventsByTrace(ctx context.Context, traceID string) ([]entity.RuntimeEvent, error)
-	GetEvents(ctx context.Context, filter entity.RuntimeEventFilter) ([]entity.RuntimeEvent, int64, error)
-	GetEventStats(ctx context.Context, filter entity.RuntimeEventFilter) (*entity.RuntimeEventStats, error)
-
-	// 回放支持
-	StreamEvents(ctx context.Context, afterSequenceNum int64, limit int) ([]entity.RuntimeEvent, error)
 
 	// 生命周期
 	Flush() error
 	Close() error
-
-	// Webhook 分发
-	SetWebhookDispatcher(dispatcher WebhookDispatcher)
-	// 关键事件通知分发
-	SetNotificationDispatcher(dispatcher NotificationDispatcher)
-}
-
-// WebhookDispatcher 运行时事件 Webhook 分发器
-type WebhookDispatcher interface {
-	DispatchRuntimeEvent(ctx context.Context, event *entity.RuntimeEvent)
-}
-
-// NotificationDispatcher 关键事件通知分发器
-type NotificationDispatcher interface {
-	DispatchRuntimeEvent(ctx context.Context, event *entity.RuntimeEvent)
 }
 
 type eventRecorderService struct {
-	repo                   repository.RuntimeEventRepository
-	log                    logger.Logger
-	metrics                *observability.MetricsCollector
-	pii                    *piiSanitizer
-	dispatcher             WebhookDispatcher
-	notificationDispatcher NotificationDispatcher
+	repo    repository.RuntimeEventRepository
+	log     logger.Logger
+	metrics *observability.MetricsCollector
+	pii     *piiSanitizer
 
 	// 异步写入支持
 	eventChan     chan *entity.RuntimeEvent
@@ -186,43 +151,6 @@ func (s *eventRecorderService) Record(ctx context.Context, event *entity.Runtime
 		return err
 	}
 
-	s.dispatchWebhook(event)
-	s.dispatchNotification(event)
-	return nil
-}
-
-func (s *eventRecorderService) RecordAsync(event *entity.RuntimeEvent) {
-	s.sanitizeEvent(event)
-	enqueued := false
-	select {
-	case s.eventChan <- event:
-		enqueued = true
-	default:
-		// 缓冲区满，记录警告
-		s.log.Warn("Event buffer full, dropping event", "type", event.Type)
-	}
-	if enqueued {
-		s.dispatchWebhook(event)
-		s.dispatchNotification(event)
-	}
-}
-
-func (s *eventRecorderService) RecordBatch(ctx context.Context, events []*entity.RuntimeEvent) error {
-	// 从上下文提取追踪信息
-	tc := observability.TraceContextFromContext(ctx)
-	for _, event := range events {
-		enrichEventWithTraceContext(event, tc)
-		s.sanitizeEvent(event)
-	}
-
-	if err := s.repo.CreateBatch(ctx, events); err != nil {
-		return err
-	}
-
-	for _, event := range events {
-		s.dispatchWebhook(event)
-		s.dispatchNotification(event)
-	}
 	return nil
 }
 
@@ -259,36 +187,6 @@ func (s *eventRecorderService) sanitizeEvent(event *entity.RuntimeEvent) {
 	}
 }
 
-func (s *eventRecorderService) SetWebhookDispatcher(dispatcher WebhookDispatcher) {
-	s.dispatcher = dispatcher
-}
-
-func (s *eventRecorderService) SetNotificationDispatcher(dispatcher NotificationDispatcher) {
-	s.notificationDispatcher = dispatcher
-}
-
-func (s *eventRecorderService) dispatchWebhook(event *entity.RuntimeEvent) {
-	if s.dispatcher == nil || event == nil {
-		return
-	}
-	go func(evt *entity.RuntimeEvent) {
-		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-		defer cancel()
-		s.dispatcher.DispatchRuntimeEvent(ctx, evt)
-	}(event)
-}
-
-func (s *eventRecorderService) dispatchNotification(event *entity.RuntimeEvent) {
-	if s.notificationDispatcher == nil || event == nil {
-		return
-	}
-	go func(evt *entity.RuntimeEvent) {
-		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-		defer cancel()
-		s.notificationDispatcher.DispatchRuntimeEvent(ctx, evt)
-	}(event)
-}
-
 // ===== 便捷记录方法 =====
 
 func (s *eventRecorderService) RecordWorkspaceEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, sessionID *uuid.UUID, message string, metadata entity.JSON) error {
@@ -306,89 +204,6 @@ func (s *eventRecorderService) RecordWorkspaceEvent(ctx context.Context, eventTy
 	}
 
 	return s.Record(ctx, event)
-}
-
-func (s *eventRecorderService) RecordDBEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, durationMs int64, err error) error {
-	builder := entity.NewRuntimeEvent(eventType).
-		WithWorkspace(workspaceID).
-		WithDuration(durationMs)
-
-	if err != nil {
-		builder.WithError("", err.Error(), "").WithSeverity(entity.SeverityError)
-	}
-
-	return s.Record(ctx, builder.Build())
-}
-
-func (s *eventRecorderService) RecordDomainEvent(ctx context.Context, eventType entity.RuntimeEventType, workspaceID uuid.UUID, domain string, durationMs int64, err error) error {
-	builder := entity.NewRuntimeEvent(eventType).
-		WithWorkspace(workspaceID).
-		WithDuration(durationMs).
-		WithMetadata("domain", domain)
-
-	if err != nil {
-		builder.WithError("", err.Error(), "").WithSeverity(entity.SeverityError)
-	}
-
-	return s.Record(ctx, builder.Build())
-}
-
-func (s *eventRecorderService) RecordLLMEvent(ctx context.Context, eventType entity.RuntimeEventType, provider, model string, durationMs, promptTokens, completionTokens int64, err error) error {
-	builder := entity.NewRuntimeEvent(eventType).
-		WithDuration(durationMs).
-		WithMetadata("provider", provider).
-		WithMetadata("model", model).
-		WithMetadata("prompt_tokens", promptTokens).
-		WithMetadata("completion_tokens", completionTokens).
-		WithMetadata("total_tokens", promptTokens+completionTokens)
-
-	if err != nil {
-		builder.WithError("", err.Error(), "").WithSeverity(entity.SeverityError)
-	}
-
-	return s.Record(ctx, builder.Build())
-}
-
-func (s *eventRecorderService) RecordSecurityEvent(ctx context.Context, eventType entity.RuntimeEventType, remoteIP, userAgent, reason string) error {
-	event := entity.NewRuntimeEvent(eventType).
-		WithSeverity(entity.SeverityWarning).
-		WithRequestInfo("", remoteIP, userAgent).
-		WithMessage(reason).
-		Build()
-
-	return s.Record(ctx, event)
-}
-
-func (s *eventRecorderService) RecordSystemEvent(ctx context.Context, eventType entity.RuntimeEventType, message string, err error) error {
-	builder := entity.NewRuntimeEvent(eventType).WithMessage(message)
-
-	if err != nil {
-		builder.WithError("", err.Error(), "").WithSeverity(entity.SeverityError)
-	}
-
-	return s.Record(ctx, builder.Build())
-}
-
-// ===== 查询方法 =====
-
-func (s *eventRecorderService) GetEventsByExecution(ctx context.Context, executionID uuid.UUID) ([]entity.RuntimeEvent, error) {
-	return s.repo.ListByExecution(ctx, executionID)
-}
-
-func (s *eventRecorderService) GetEventsByTrace(ctx context.Context, traceID string) ([]entity.RuntimeEvent, error) {
-	return s.repo.ListByTraceID(ctx, traceID)
-}
-
-func (s *eventRecorderService) GetEvents(ctx context.Context, filter entity.RuntimeEventFilter) ([]entity.RuntimeEvent, int64, error) {
-	return s.repo.List(ctx, filter)
-}
-
-func (s *eventRecorderService) GetEventStats(ctx context.Context, filter entity.RuntimeEventFilter) (*entity.RuntimeEventStats, error) {
-	return s.repo.GetStats(ctx, filter)
-}
-
-func (s *eventRecorderService) StreamEvents(ctx context.Context, afterSequenceNum int64, limit int) ([]entity.RuntimeEvent, error) {
-	return s.repo.StreamAfterSequenceNum(ctx, afterSequenceNum, limit)
 }
 
 // ===== 生命周期 =====

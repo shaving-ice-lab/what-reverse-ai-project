@@ -73,7 +73,6 @@ func Migrate(db *gorm.DB) error {
 		// 用户相关
 		&entity.User{},
 		&entity.APIKey{},
-		&entity.Secret{},
 		&entity.UserSession{},
 		&entity.AgentSession{},
 		&entity.AppUser{},
@@ -86,8 +85,6 @@ func Migrate(db *gorm.DB) error {
 		&entity.WorkspaceSlugAlias{},
 		&entity.WorkspaceRole{},
 		&entity.WorkspaceMember{},
-		&entity.IdempotencyKey{},
-
 		// 审计相关
 		&entity.AuditLog{},
 
@@ -99,16 +96,6 @@ func Migrate(db *gorm.DB) error {
 
 		// 活动
 		&entity.UserActivity{},
-
-		// 评论（通知服务依赖）
-		&entity.Comment{},
-		&entity.CommentLike{},
-
-		// 导出任务（保留服务依赖）
-		&entity.WorkspaceExportJob{},
-
-		// Workspace 统计
-		&entity.WorkspaceUsageStats{},
 
 		// 文件存储
 		&entity.StorageObject{},

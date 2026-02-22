@@ -88,12 +88,3 @@ func hasPermission(permissions entity.JSON, key string) bool {
 		return false
 	}
 }
-
-func hasAnyPermission(permissions entity.JSON, keys ...string) bool {
-	for _, key := range keys {
-		if hasPermission(permissions, key) {
-			return true
-		}
-	}
-	return false
-}

@@ -120,17 +120,18 @@ func (m *WorkspaceMember) BeforeCreate(tx *gorm.DB) error {
 
 // WorkspaceVersion 工作空间版本实体（原 AppVersion）
 type WorkspaceVersion struct {
-	ID            uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
-	WorkspaceID   uuid.UUID  `gorm:"type:char(36);not null;index;uniqueIndex:uniq_workspace_version" json:"workspace_id"`
-	Version       string     `gorm:"size:50;not null;uniqueIndex:uniq_workspace_version" json:"version"`
-	Changelog     *string    `gorm:"type:text" json:"changelog"`
-	UISchema      JSON       `gorm:"column:ui_schema;type:json" json:"ui_schema"`
-	DBSchema      JSON       `gorm:"column:db_schema;type:json" json:"db_schema"`
-	ConfigJSON    JSON       `gorm:"column:config_json;type:json" json:"config_json"`
-	LogicCode     *string    `gorm:"column:logic_code;type:longtext" json:"logic_code"`
-	ComponentCode *string    `gorm:"column:component_code;type:longtext" json:"component_code"`
-	CreatedBy     *uuid.UUID `gorm:"type:char(36);index" json:"created_by"`
-	CreatedAt     time.Time  `json:"created_at"`
+	ID             uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
+	WorkspaceID    uuid.UUID  `gorm:"type:char(36);not null;index;uniqueIndex:uniq_workspace_version" json:"workspace_id"`
+	Version        string     `gorm:"size:50;not null;uniqueIndex:uniq_workspace_version" json:"version"`
+	Changelog      *string    `gorm:"type:text" json:"changelog"`
+	UISchema       JSON       `gorm:"column:ui_schema;type:json" json:"ui_schema"`
+	DBSchema       JSON       `gorm:"column:db_schema;type:json" json:"db_schema"`
+	ConfigJSON     JSON       `gorm:"column:config_json;type:json" json:"config_json"`
+	LogicCode      *string    `gorm:"column:logic_code;type:longtext" json:"logic_code"`
+	ComponentCode  *string    `gorm:"column:component_code;type:longtext" json:"component_code"`
+	ComponentsJSON JSON       `gorm:"column:components_json;type:json" json:"components_json"`
+	CreatedBy      *uuid.UUID `gorm:"type:char(36);index" json:"created_by"`
+	CreatedAt      time.Time  `json:"created_at"`
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
 	Creator   *User      `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
@@ -274,35 +275,6 @@ func (WorkspaceRating) TableName() string {
 func (r *WorkspaceRating) BeforeCreate(tx *gorm.DB) error {
 	if r.ID == uuid.Nil {
 		r.ID = uuid.New()
-	}
-	return nil
-}
-
-// WorkspaceUsageStats 工作空间使用统计（原 AppUsageStats）
-type WorkspaceUsageStats struct {
-	ID              uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	WorkspaceID     uuid.UUID `gorm:"type:char(36);not null;index" json:"workspace_id"`
-	Date            time.Time `gorm:"type:date;not null;index" json:"date"`
-	TotalExecutions int       `gorm:"default:0" json:"total_executions"`
-	SuccessCount    int       `gorm:"default:0" json:"success_count"`
-	FailureCount    int       `gorm:"default:0" json:"failure_count"`
-	TotalTokens     int64     `gorm:"default:0" json:"total_tokens"`
-	TotalDurationMs int64     `gorm:"default:0" json:"total_duration_ms"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
-
-	Workspace *Workspace `gorm:"foreignKey:WorkspaceID" json:"workspace,omitempty"`
-}
-
-// TableName 表名
-func (WorkspaceUsageStats) TableName() string {
-	return "what_reverse_workspace_usage_stats"
-}
-
-// BeforeCreate 创建前钩子
-func (s *WorkspaceUsageStats) BeforeCreate(tx *gorm.DB) error {
-	if s.ID == uuid.Nil {
-		s.ID = uuid.New()
 	}
 	return nil
 }
