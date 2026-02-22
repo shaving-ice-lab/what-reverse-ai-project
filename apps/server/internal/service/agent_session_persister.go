@@ -44,6 +44,16 @@ func (a *agentSessionPersisterAdapter) Save(session *AgentSession) error {
 		pendingJSON, _ := json.Marshal(session.PendingAction)
 		_ = json.Unmarshal(pendingJSON, &pendingMap)
 	}
+	var planMap entity.JSON
+	if session.Plan != nil {
+		planJSON, _ := json.Marshal(session.Plan)
+		_ = json.Unmarshal(planJSON, &planMap)
+	}
+	metaMap := entity.JSON{
+		"phase":           string(session.Phase),
+		"persona_id":      session.PersonaID,
+		"complexity_hint": string(session.ComplexityHint),
+	}
 
 	dbSession := &entity.AgentSession{
 		ID:            sessionID,
@@ -53,6 +63,8 @@ func (a *agentSessionPersisterAdapter) Save(session *AgentSession) error {
 		Messages:      messagesMap,
 		ToolCalls:     toolCallsMap,
 		PendingAction: pendingMap,
+		Plan:          planMap,
+		Meta:          metaMap,
 		CreatedAt:     session.CreatedAt,
 		UpdatedAt:     session.UpdatedAt,
 	}
@@ -167,15 +179,45 @@ func (a *agentSessionPersisterAdapter) entityToSession(e *entity.AgentSession) (
 		}
 	}
 
+	// Restore plan
+	var plan *AgentPlan
+	if e.Plan != nil {
+		raw, _ := json.Marshal(e.Plan)
+		var p AgentPlan
+		if err := json.Unmarshal(raw, &p); err == nil && p.Title != "" {
+			plan = &p
+		}
+	}
+
+	// Restore meta (phase, persona_id, complexity_hint)
+	phase := SessionPhase("")
+	personaID := ""
+	complexityHint := RequestComplexity("")
+	if e.Meta != nil {
+		if v, ok := e.Meta["phase"].(string); ok {
+			phase = SessionPhase(v)
+		}
+		if v, ok := e.Meta["persona_id"].(string); ok {
+			personaID = v
+		}
+		if v, ok := e.Meta["complexity_hint"].(string); ok {
+			complexityHint = RequestComplexity(v)
+		}
+	}
+
 	return &AgentSession{
-		ID:            e.ID.String(),
-		WorkspaceID:   e.WorkspaceID.String(),
-		UserID:        e.UserID.String(),
-		Status:        AgentSessionStatus(e.Status),
-		Messages:      messages,
-		ToolCalls:     toolCalls,
-		PendingAction: pending,
-		CreatedAt:     e.CreatedAt,
-		UpdatedAt:     e.UpdatedAt,
+		ID:             e.ID.String(),
+		WorkspaceID:    e.WorkspaceID.String(),
+		UserID:         e.UserID.String(),
+		Status:         AgentSessionStatus(e.Status),
+		Messages:       messages,
+		ToolCalls:      toolCalls,
+		PendingAction:  pending,
+		Plan:           plan,
+		Phase:          phase,
+		PersonaID:      personaID,
+		ComplexityHint: complexityHint,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}, nil
 }

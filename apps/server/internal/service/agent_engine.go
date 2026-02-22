@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -51,12 +52,16 @@ type AgentEvent struct {
 type AgentEngineConfig struct {
 	MaxSteps    int           `json:"max_steps"`
 	StepTimeout time.Duration `json:"step_timeout"`
+	// LLM config from config.yaml (ai section) — overridden by workspace-level settings or env vars
+	LLMAPIKey  string `json:"llm_api_key"`
+	LLMBaseURL string `json:"llm_base_url"`
+	LLMModel   string `json:"llm_model"`
 }
 
 // DefaultAgentEngineConfig 默认配置
 func DefaultAgentEngineConfig() AgentEngineConfig {
 	return AgentEngineConfig{
-		MaxSteps:    20,
+		MaxSteps:    75,
 		StepTimeout: 60 * time.Second,
 	}
 }
@@ -79,15 +84,6 @@ type agentEngine struct {
 	skillPrompt     string
 	skillRegistry   *SkillRegistry
 	personaRegistry *PersonaRegistry
-}
-
-// NewAgentEngine 创建 Agent 引擎
-func NewAgentEngine(registry *AgentToolRegistry, sessions *AgentSessionManager, config AgentEngineConfig) AgentEngine {
-	return &agentEngine{
-		registry: registry,
-		config:   config,
-		sessions: sessions,
-	}
 }
 
 // NewAgentEngineWithSkills 创建 Agent 引擎（含 Skills system prompt 附加内容）
@@ -125,35 +121,54 @@ func (e *agentEngine) resolvePersona(personaID string) *Persona {
 	return p
 }
 
-// thinkWithPersona calls the LLM with persona-specific system prompt and tool filter
-func (e *agentEngine) thinkWithPersona(ctx context.Context, session *AgentSession, originalMessage string, step int, persona *Persona) (string, *toolAction) {
-	toolDefs := e.buildToolDefinitionsForPersona(persona)
+// planningPhaseTools defines the only tools available during the planning phase
+var planningPhaseTools = map[string]bool{
+	"get_workspace_info": true,
+	"get_ui_schema":      true,
+	"create_plan":        true,
+	"query_data":         true,
+}
+
+// thinkWithPersona calls the LLM with persona-specific system prompt and tool filter.
+// Returns thought text and zero or more tool actions (parallel tool calls).
+func (e *agentEngine) thinkWithPersona(ctx context.Context, session *AgentSession, originalMessage string, step int, persona *Persona) (string, []toolAction) {
+	toolDefs := e.buildToolDefinitionsForPersona(persona, session)
 	llmMessages := e.buildLLMMessagesForPersona(session, originalMessage, step, persona)
 
-	thought, action, err := e.callLLM(ctx, llmMessages, toolDefs)
+	thought, actions, err := e.callLLM(ctx, llmMessages, toolDefs)
 	if err != nil {
 		return fmt.Sprintf("I encountered an error while reasoning: %v. Let me try a simpler approach.", err), nil
 	}
 
-	return thought, action
+	return thought, actions
 }
 
-// buildToolDefinitionsForPersona converts registered tools to OpenAI function calling format, filtered by persona
-func (e *agentEngine) buildToolDefinitionsForPersona(persona *Persona) []map[string]interface{} {
+// buildToolDefinitionsForPersona converts registered tools to OpenAI function calling format,
+// filtered by persona AND session phase.
+func (e *agentEngine) buildToolDefinitionsForPersona(persona *Persona, session *AgentSession) []map[string]interface{} {
 	tools := e.registry.ListAll()
 	defs := make([]map[string]interface{}, 0, len(tools))
 
 	// Build allowed tools set from persona
-	var allowed map[string]bool
+	var personaAllowed map[string]bool
 	if persona != nil && len(persona.ToolFilter) > 0 {
-		allowed = make(map[string]bool, len(persona.ToolFilter))
+		personaAllowed = make(map[string]bool, len(persona.ToolFilter))
 		for _, name := range persona.ToolFilter {
-			allowed[name] = true
+			personaAllowed[name] = true
 		}
 	}
 
+	// Phase-based tool restriction
+	var phaseAllowed map[string]bool
+	if session != nil && session.GetPhase() == SessionPhasePlanning {
+		phaseAllowed = planningPhaseTools
+	}
+
 	for _, t := range tools {
-		if allowed != nil && !allowed[t.Name] {
+		if personaAllowed != nil && !personaAllowed[t.Name] {
+			continue
+		}
+		if phaseAllowed != nil && !phaseAllowed[t.Name] {
 			continue
 		}
 		def := map[string]interface{}{
@@ -183,6 +198,24 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 		// Resolve persona for this session
 		persona := e.resolvePersona(session.PersonaID)
 
+		// Classify first message complexity in planning phase (runs only once per session)
+		if session.GetPhase() == SessionPhasePlanning && session.GetComplexityHint() == "" {
+			hint := ClassifyRequestComplexity(message)
+			session.SetComplexityHint(hint)
+			e.sessions.Persist(sessionID)
+		}
+
+		// Handle phase transitions:
+		// If phase is "confirmed" (user just approved the plan), transition to "executing"
+		if session.GetPhase() == SessionPhaseConfirmed {
+			session.SetPhase(SessionPhaseExecuting)
+			if plan := session.GetPlan(); plan != nil {
+				plan.Status = "in_progress"
+				session.SetPlan(plan)
+			}
+			e.sessions.Persist(sessionID)
+		}
+
 		// Add user message
 		session.AddMessage(AgentMessageEntry{
 			Role:      "user",
@@ -190,7 +223,16 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 			Timestamp: time.Now(),
 		})
 
-		// ReAct Loop
+		// Attach TaskContext so tools (e.g. task) can access workspace/user identity
+		ctx = WithTaskContext(ctx, &TaskContext{WorkspaceID: workspaceID, UserID: userID})
+		// Attach SessionContext so tools (e.g. plan) can access current session
+		ctx = WithSessionContext(ctx, &SessionContext{SessionID: sessionID})
+		// Attach PersonaContext so tools (e.g. batch) can enforce ToolFilter
+		if persona != nil && len(persona.ToolFilter) > 0 {
+			ctx = WithPersonaContext(ctx, &PersonaContext{ToolFilter: persona.ToolFilter})
+		}
+
+		// ReAct Loop — supports parallel tool calls
 		for step := 1; step <= e.config.MaxSteps; step++ {
 			select {
 			case <-ctx.Done():
@@ -200,12 +242,13 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 			default:
 			}
 
+			// Compact messages if threshold exceeded (Phase 4.1)
+			e.compactSessionMessages(ctx, session, sessionID)
+
 			stepCtx, cancel := context.WithTimeout(ctx, e.config.StepTimeout)
 
-			// Step 1: Think — send context to LLM, get thought + action or final_answer
-			// Currently using a simplified demo implementation
-			// In production, this calls the LLM with tool definitions and conversation history
-			thought, action := e.thinkWithPersona(stepCtx, session, message, step, persona)
+			// Step 1: Think — send context to LLM, get thought + actions (may be parallel)
+			thought, actions := e.thinkWithPersona(stepCtx, session, message, step, persona)
 			cancel()
 
 			// Emit thought
@@ -218,11 +261,31 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 
 			// Store tool_call metadata for proper multi-turn function calling
 			assistantMeta := map[string]interface{}{"step": step, "type": "thought"}
-			if action != nil {
-				toolCallID := fmt.Sprintf("call_%s_%d", sessionID, step)
-				assistantMeta["tool_call_id"] = toolCallID
-				assistantMeta["tool_call_name"] = action.ToolName
-				assistantMeta["tool_call_args"] = string(action.ToolArgs)
+			if len(actions) > 0 {
+				// Resolve tool call IDs: use real IDs from LLM, or fabricate
+				for i := range actions {
+					if actions[i].ToolCallID == "" {
+						sid := sessionID
+						if len(sid) > 8 {
+							sid = sid[:8]
+						}
+						actions[i].ToolCallID = fmt.Sprintf("call_%s_%d_%d", sid, step, i)
+					}
+				}
+				// Store all tool calls in metadata for OpenAI multi-turn format
+				tcMetas := make([]map[string]interface{}, 0, len(actions))
+				for _, a := range actions {
+					tcMetas = append(tcMetas, map[string]interface{}{
+						"tool_call_id":   a.ToolCallID,
+						"tool_call_name": a.ToolName,
+						"tool_call_args": string(a.ToolArgs),
+					})
+				}
+				assistantMeta["tool_calls"] = tcMetas
+				// Keep first tool_call_id for backward compatibility
+				assistantMeta["tool_call_id"] = tcMetas[0]["tool_call_id"]
+				assistantMeta["tool_call_name"] = tcMetas[0]["tool_call_name"]
+				assistantMeta["tool_call_args"] = tcMetas[0]["tool_call_args"]
 			}
 			session.AddMessage(AgentMessageEntry{
 				Role:      "assistant",
@@ -232,9 +295,8 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 			})
 			e.sessions.Persist(sessionID)
 
-			// Check if this is a final answer (no tool call)
-			if action == nil {
-				// Final answer — the thought IS the response
+			// Check if this is a final answer (no tool calls)
+			if len(actions) == 0 {
 				events <- AgentEvent{
 					Type:      AgentEventMessage,
 					Content:   thought,
@@ -249,30 +311,63 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 				return
 			}
 
-			// Step 2: Act — execute tool
-			toolName := action.ToolName
-			toolArgs := action.ToolArgs
-
-			// Emit tool_call event
-			events <- AgentEvent{
-				Type:      AgentEventToolCall,
-				Step:      step,
-				ToolName:  toolName,
-				ToolArgs:  toolArgs,
-				SessionID: sessionID,
+			// Step 2: Act — execute tool(s)
+			// Pre-validate all actions and emit tool_call events
+			type validatedAction struct {
+				action     toolAction
+				tool       AgentTool
+				skipReason string // non-empty = skip execution
 			}
+			validated := make([]validatedAction, len(actions))
+			hasConfirmation := false
 
-			// Check persona tool filter — reject tools not in the allowed list
-			if persona != nil && len(persona.ToolFilter) > 0 {
-				allowed := false
-				for _, t := range persona.ToolFilter {
-					if t == toolName {
-						allowed = true
-						break
+			for i, action := range actions {
+				toolName := action.ToolName
+				toolCallID := action.ToolCallID
+
+				// Emit tool_call event for every action
+				events <- AgentEvent{
+					Type:      AgentEventToolCall,
+					Step:      step,
+					ToolName:  toolName,
+					ToolArgs:  action.ToolArgs,
+					SessionID: sessionID,
+				}
+
+				// Check persona tool filter
+				if persona != nil && len(persona.ToolFilter) > 0 {
+					allowed := false
+					for _, t := range persona.ToolFilter {
+						if t == toolName {
+							allowed = true
+							break
+						}
+					}
+					if !allowed {
+						errMsg := fmt.Sprintf("Tool %q is not available for the %s persona", toolName, persona.Name)
+						validated[i] = validatedAction{action: action, skipReason: errMsg}
+						events <- AgentEvent{
+							Type:       AgentEventToolResult,
+							Step:       step,
+							ToolName:   toolName,
+							ToolResult: &AgentToolResult{Success: false, Error: errMsg},
+							SessionID:  sessionID,
+						}
+						session.AddMessage(AgentMessageEntry{
+							Role:      "tool",
+							Content:   errMsg,
+							Timestamp: time.Now(),
+							Metadata:  map[string]interface{}{"tool": toolName, "error": true, "reason": "persona_filter", "tool_call_id": toolCallID},
+						})
+						continue
 					}
 				}
-				if !allowed {
-					errMsg := fmt.Sprintf("Tool %q is not available for the %s persona", toolName, persona.Name)
+
+				// Check if tool exists
+				tool, exists := e.registry.Get(toolName)
+				if !exists {
+					errMsg := fmt.Sprintf("Unknown tool: %s", toolName)
+					validated[i] = validatedAction{action: action, skipReason: errMsg}
 					events <- AgentEvent{
 						Type:       AgentEventToolResult,
 						Step:       step,
@@ -284,101 +379,88 @@ func (e *agentEngine) Run(ctx context.Context, workspaceID, userID, message, ses
 						Role:      "tool",
 						Content:   errMsg,
 						Timestamp: time.Now(),
-						Metadata:  map[string]interface{}{"tool": toolName, "error": true, "reason": "persona_filter"},
+						Metadata:  map[string]interface{}{"tool": toolName, "error": true, "tool_call_id": toolCallID},
 					})
 					continue
 				}
-			}
 
-			// Check if tool requires confirmation
-			tool, exists := e.registry.Get(toolName)
-			if !exists {
-				errMsg := fmt.Sprintf("Unknown tool: %s", toolName)
-				events <- AgentEvent{
-					Type:       AgentEventToolResult,
-					Step:       step,
-					ToolName:   toolName,
-					ToolResult: &AgentToolResult{Success: false, Error: errMsg},
-					SessionID:  sessionID,
+				// Check if tool requires confirmation — pause entire step
+				if tool.RequiresConfirmation() && !hasConfirmation {
+					hasConfirmation = true
+					actionID := fmt.Sprintf("action_%s_%d", sessionID, step)
+					session.SetPendingAction(&PendingAction{
+						ActionID: actionID,
+						ToolName: toolName,
+						ToolArgs: action.ToolArgs,
+						Step:     step,
+					})
+					session.Status = AgentSessionPaused
+					e.sessions.Persist(sessionID)
+					events <- AgentEvent{
+						Type:      AgentEventConfirmationRequired,
+						Step:      step,
+						ToolName:  toolName,
+						ToolArgs:  action.ToolArgs,
+						ActionID:  actionID,
+						Content:   fmt.Sprintf("The agent wants to execute %q. Please approve or reject.", toolName),
+						SessionID: sessionID,
+					}
+					return
 				}
-				session.AddMessage(AgentMessageEntry{
-					Role:      "tool",
-					Content:   errMsg,
-					Timestamp: time.Now(),
-					Metadata:  map[string]interface{}{"tool": toolName, "error": true},
-				})
-				continue
+
+				validated[i] = validatedAction{action: action, tool: tool}
 			}
 
-			if tool.RequiresConfirmation() {
-				actionID := fmt.Sprintf("action_%s_%d", sessionID, step)
-				session.SetPendingAction(&PendingAction{
-					ActionID: actionID,
-					ToolName: toolName,
-					ToolArgs: toolArgs,
-					Step:     step,
-				})
-				session.Status = AgentSessionPaused
-				e.sessions.Persist(sessionID)
+			// Execute validated actions — concurrent when multiple, sequential when single
+			type toolExecResult struct {
+				index  int
+				result *AgentToolResult
+			}
 
-				events <- AgentEvent{
-					Type:      AgentEventConfirmationRequired,
-					Step:      step,
-					ToolName:  toolName,
-					ToolArgs:  toolArgs,
-					ActionID:  actionID,
-					Content:   fmt.Sprintf("The agent wants to execute %q. Please approve or reject.", toolName),
-					SessionID: sessionID,
+			if len(validated) == 1 || !e.canRunConcurrently(validated) {
+				// Sequential execution (single action or has dependencies)
+				for _, va := range validated {
+					if va.skipReason != "" {
+						continue
+					}
+					execCtx, execCancel := context.WithTimeout(ctx, e.config.StepTimeout)
+					result, err := e.registry.Execute(execCtx, va.action.ToolName, va.action.ToolArgs)
+					execCancel()
+					if err != nil {
+						result = &AgentToolResult{Success: false, Error: err.Error()}
+					}
+					e.emitToolResult(events, session, sessionID, step, va.action, result)
 				}
-				// Pause — wait for user confirmation via Confirm()
-				return
+			} else {
+				// Concurrent execution with sync.WaitGroup (plan requirement 2.1)
+				results := make([]toolExecResult, len(validated))
+				var wg sync.WaitGroup
+				for i, va := range validated {
+					if va.skipReason != "" {
+						continue
+					}
+					wg.Add(1)
+					go func(idx int, a toolAction) {
+						defer wg.Done()
+						execCtx, execCancel := context.WithTimeout(ctx, e.config.StepTimeout)
+						result, err := e.registry.Execute(execCtx, a.ToolName, a.ToolArgs)
+						execCancel()
+						if err != nil {
+							result = &AgentToolResult{Success: false, Error: err.Error()}
+						}
+						results[idx] = toolExecResult{index: idx, result: result}
+					}(i, va.action)
+				}
+				wg.Wait()
+
+				// Emit results in order (preserves deterministic event stream)
+				for i, va := range validated {
+					if va.skipReason != "" || results[i].result == nil {
+						continue
+					}
+					e.emitToolResult(events, session, sessionID, step, va.action, results[i].result)
+				}
 			}
-
-			// Execute tool
-			execCtx, execCancel := context.WithTimeout(ctx, e.config.StepTimeout)
-			result, err := e.registry.Execute(execCtx, toolName, toolArgs)
-			execCancel()
-
-			if err != nil {
-				result = &AgentToolResult{Success: false, Error: err.Error()}
-			}
-
-			// Emit tool result with affected resource
-			events <- AgentEvent{
-				Type:             AgentEventToolResult,
-				Step:             step,
-				ToolName:         toolName,
-				ToolResult:       result,
-				SessionID:        sessionID,
-				AffectedResource: resolveAffectedResource(toolName),
-			}
-
-			// Add observation to session
-			observation := result.Output
-			if !result.Success {
-				observation = "Error: " + result.Error
-			}
-			toolCallID := fmt.Sprintf("call_%s_%d", sessionID, step)
-			session.AddMessage(AgentMessageEntry{
-				Role:      "tool",
-				Content:   observation,
-				Timestamp: time.Now(),
-				Metadata: map[string]interface{}{
-					"tool":         toolName,
-					"success":      result.Success,
-					"step":         step,
-					"tool_call_id": toolCallID,
-				},
-			})
-
-			// Record tool call
-			session.AddToolCall(AgentToolCallRecord{
-				Step:      step,
-				ToolName:  toolName,
-				Args:      toolArgs,
-				Result:    result,
-				Timestamp: time.Now(),
-			})
 			e.sessions.Persist(sessionID)
 		}
 
@@ -465,12 +547,53 @@ func (e *agentEngine) Cancel(ctx context.Context, sessionID string) error {
 	return nil
 }
 
+// emitToolResult sends tool result event, adds observation to session, and records the tool call
+func (e *agentEngine) emitToolResult(events chan<- AgentEvent, session *AgentSession, sessionID string, step int, action toolAction, result *AgentToolResult) {
+	events <- AgentEvent{
+		Type:             AgentEventToolResult,
+		Step:             step,
+		ToolName:         action.ToolName,
+		ToolResult:       result,
+		SessionID:        sessionID,
+		AffectedResource: resolveAffectedResource(action.ToolName),
+	}
+	observation := result.Output
+	if !result.Success {
+		observation = "Error: " + result.Error
+	}
+	session.AddMessage(AgentMessageEntry{
+		Role:      "tool",
+		Content:   observation,
+		Timestamp: time.Now(),
+		Metadata: map[string]interface{}{
+			"tool":         action.ToolName,
+			"success":      result.Success,
+			"step":         step,
+			"tool_call_id": action.ToolCallID,
+		},
+	})
+	session.AddToolCall(AgentToolCallRecord{
+		Step:      step,
+		ToolName:  action.ToolName,
+		Args:      action.ToolArgs,
+		Result:    result,
+		Timestamp: time.Now(),
+	})
+}
+
+// canRunConcurrently returns true when multiple validated actions can safely run in parallel.
+// Currently always true because the caller already filters single-action and confirmation cases.
+// Future: add dependency analysis (e.g., same table name in create_table + insert_data).
+func (e *agentEngine) canRunConcurrently(_ interface{}) bool {
+	return true
+}
+
 // resolveAffectedResource maps tool names to the resource type they affect
 func resolveAffectedResource(toolName string) AffectedResource {
 	switch toolName {
 	case "create_table", "alter_table", "delete_table", "insert_data", "update_data", "delete_data":
 		return AffectedResourceDatabase
-	case "generate_ui_schema", "modify_ui_schema":
+	case "generate_ui_schema", "modify_ui_schema", "attempt_completion":
 		return AffectedResourceUISchema
 	case "create_persona":
 		return AffectedResourcePersona
@@ -482,12 +605,13 @@ func resolveAffectedResource(toolName string) AffectedResource {
 // ---- LLM Reasoning ----
 
 type toolAction struct {
-	ToolName string
-	ToolArgs json.RawMessage
+	ToolCallID string // ID from LLM response (e.g. "call_abc123"), or fabricated
+	ToolName   string
+	ToolArgs   json.RawMessage
 }
 
 // getPersonaSystemPrompt builds the full system prompt for a persona.
-// - Web Creator (empty SystemPrompt by design) → uses defaultWebCreatorFullPrompt with AppSchema v2.0 spec
+// - Web Creator → uses modular BuildWebCreatorPrompt (dynamic prompt builder)
 // - Other personas with a non-empty SystemPrompt → uses their own prompt
 // - Fallback for unknown/empty → generic assistant prompt (never leaks Web Creator capabilities)
 func (e *agentEngine) getPersonaSystemPrompt(persona *Persona, session *AgentSession) string {
@@ -496,10 +620,13 @@ func (e *agentEngine) getPersonaSystemPrompt(persona *Persona, session *AgentSes
 	case persona != nil && persona.SystemPrompt != "":
 		basePrompt = persona.SystemPrompt
 	case persona != nil && persona.ID == "web_creator":
-		basePrompt = defaultWebCreatorFullPrompt
+		// Dynamic modular prompt built from sections (mirrors Kilocode/Oh-My-OpenCode pattern)
+		toolMetas := BuildToolMetaFromRegistry(e.registry)
+		return BuildWebCreatorPrompt(toolMetas, session) + e.getSkillPrompt()
 	case persona == nil:
 		// No persona selected at all → default to Web Creator for backward compatibility
-		basePrompt = defaultWebCreatorFullPrompt
+		toolMetas := BuildToolMetaFromRegistry(e.registry)
+		return BuildWebCreatorPrompt(toolMetas, session) + e.getSkillPrompt()
 	default:
 		// Custom persona with empty SystemPrompt — use a safe generic prompt
 		basePrompt = "You are an AI assistant named \"" + persona.Name + "\". " + persona.Description + "\nUse the available tools to help the user. Always be helpful and concise."
@@ -534,17 +661,44 @@ func (e *agentEngine) buildLLMMessagesForPersona(session *AgentSession, original
 				"content": m.Content,
 			}
 			if m.Metadata != nil {
-				if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
+				// Reconstruct ALL tool calls for proper OpenAI multi-turn format.
+				// Must handle both in-memory ([]map[string]interface{}) and
+				// JSON-deserialized ([]interface{}) types — they differ after DB round-trip.
+				var toolCalls []map[string]interface{}
+				switch v := m.Metadata["tool_calls"].(type) {
+				case []map[string]interface{}:
+					for _, tc := range v {
+						tcID, _ := tc["tool_call_id"].(string)
+						tcName, _ := tc["tool_call_name"].(string)
+						tcArgs, _ := tc["tool_call_args"].(string)
+						toolCalls = append(toolCalls, map[string]interface{}{
+							"id": tcID, "type": "function",
+							"function": map[string]interface{}{"name": tcName, "arguments": tcArgs},
+						})
+					}
+				case []interface{}:
+					for _, item := range v {
+						if tc, ok := item.(map[string]interface{}); ok {
+							tcID, _ := tc["tool_call_id"].(string)
+							tcName, _ := tc["tool_call_name"].(string)
+							tcArgs, _ := tc["tool_call_args"].(string)
+							toolCalls = append(toolCalls, map[string]interface{}{
+								"id": tcID, "type": "function",
+								"function": map[string]interface{}{"name": tcName, "arguments": tcArgs},
+							})
+						}
+					}
+				}
+				if len(toolCalls) > 0 {
+					msg["tool_calls"] = toolCalls
+				} else if tcID, ok := m.Metadata["tool_call_id"].(string); ok {
+					// Backward compatibility: single tool call stored as flat fields
 					tcName, _ := m.Metadata["tool_call_name"].(string)
 					tcArgs, _ := m.Metadata["tool_call_args"].(string)
 					msg["tool_calls"] = []map[string]interface{}{
 						{
-							"id":   tcID,
-							"type": "function",
-							"function": map[string]interface{}{
-								"name":      tcName,
-								"arguments": tcArgs,
-							},
+							"id": tcID, "type": "function",
+							"function": map[string]interface{}{"name": tcName, "arguments": tcArgs},
 						},
 					}
 				}
@@ -572,90 +726,72 @@ func (e *agentEngine) buildLLMMessagesForPersona(session *AgentSession, original
 	return msgs
 }
 
-// defaultWebCreatorFullPrompt is the full system prompt for the default Web Creator persona
-const defaultWebCreatorFullPrompt = `You are a **Web Creator** AI assistant that helps users build complete web applications inside a Workspace.
-You have access to tools for creating database tables, generating UI schemas, and more.
+// ---- Task Context (for sub-agent delegation) ----
 
-IMPORTANT RULES:
-1. Think step by step. First gather workspace info, then plan your actions.
-2. Create database tables BEFORE generating UI schemas that reference them.
-3. Insert sample/seed data after creating tables when appropriate.
-4. Always use the workspace_id and user_id from context when calling tools.
-5. When you have completed all necessary actions, provide a clear summary as your final answer.
-6. If you need to create multiple related tables, create them in dependency order (parent tables first).
-7. When generating UI schemas, you MUST use the AppSchema v2.0 format described below.
-
-You MUST respond with either:
-- A tool call (function_call) to perform an action
-- A plain text message as your final answer when all work is done
-
-========== AppSchema v2.0 Format Specification ==========
-
-When calling generate_ui_schema, the ui_schema object MUST follow this exact structure:
-
-{
-  "app_schema_version": "2.0.0",
-  "app_name": "<Application Name>",
-  "default_page": "<id of the default page>",
-  "navigation": {
-    "type": "sidebar",
-    "items": [
-      { "page_id": "<page_id>", "label": "<display label>", "icon": "<icon_name>" }
-    ]
-  },
-  "pages": [
-    {
-      "id": "<unique_page_id>",
-      "title": "<Page Title>",
-      "route": "/<route_path>",
-      "icon": "<icon_name>",
-      "blocks": [ <block objects> ]
-    }
-  ]
+// TaskContext carries workspace/user identity through the tool execution context
+type TaskContext struct {
+	WorkspaceID string
+	UserID      string
 }
 
-Available icon names: LayoutDashboard, FileText, Users, ShoppingCart, Truck, BarChart3, Home, Mail, Calendar, Settings, Globe, Package, DollarSign, Activity, Clock, Star, Heart, Database, Zap, CheckCircle, AlertTriangle, MapPin, Phone, Building, Briefcase, Tag, BookOpen, Clipboard, PieChart, ListOrdered, MessageSquare
+type taskCtxKey struct{}
 
----------- Block Types ----------
+// WithTaskContext attaches workspace/user identity to a context for tools that need it
+func WithTaskContext(ctx context.Context, tc *TaskContext) context.Context {
+	return context.WithValue(ctx, taskCtxKey{}, tc)
+}
 
-Each block has: id, type, label (optional), config, data_source (optional), grid (optional: {col_span, row_span}).
+// GetTaskContext retrieves the TaskContext from a context
+func GetTaskContext(ctx context.Context) *TaskContext {
+	if v, ok := ctx.Value(taskCtxKey{}).(*TaskContext); ok {
+		return v
+	}
+	return nil
+}
 
-1. stats_card — config: { "value_key", "label", "format": "number|currency|percent", "color", "icon" } data_source: { "table", "aggregation": [{"function": "count|sum|avg", "column", "alias"}] }
-2. data_table — config: { "table_name", "columns": [{"key","label","type","sortable"}], "actions": ["create","edit","delete","view"], "search_enabled", "search_key", "pagination", "page_size" } data_source: { "table", "order_by" }
-3. form — config: { "title", "description", "fields": [{"name","label","type","required","placeholder","options"}], "submit_label", "table_name", "mode" }
-4. chart — config: { "chart_type": "bar|line|pie|area", "x_key", "y_key", "title", "color" } data_source: { "table", "columns", "order_by", "limit" }
-5. detail_view — config: { "fields": [{"key","label","type"}], "table_name", "record_id_key" }
-6. markdown — config: { "content" }
-7. image — config: { "src", "alt", "width", "height", "object_fit", "caption", "link" }
-8. hero — config: { "title", "subtitle", "description", "align", "size", "background_color", "text_color", "actions" }
-9. tabs_container — config: { "tabs": [{"id", "label", "blocks"}], "default_tab" }
-10. list — config: { "table_name", "title_key", "subtitle_key", "description_key", "image_key", "badge_key", "layout", "columns", "clickable", "empty_message" }
-11. divider — config: { "label", "style": "solid|dashed|dotted", "spacing": "sm|md|lg" }
+// ---- Session Context (for plan tools to access current session) ----
 
-========== End of AppSchema v2.0 Specification ==========
+// SessionContext carries the current session ID through tool execution context
+type SessionContext struct {
+	SessionID string
+}
 
-========== AI Staff Creation ==========
+type sessionCtxKey struct{}
 
-You can create custom AI Staff personas using the create_persona tool. When a user asks to create an AI assistant, staff, or agent:
+// WithSessionContext attaches session ID to a context
+func WithSessionContext(ctx context.Context, sc *SessionContext) context.Context {
+	return context.WithValue(ctx, sessionCtxKey{}, sc)
+}
 
-1. Determine the staff's role and responsibilities from the user's description
-2. Decide which data actions are needed: query (read), insert (add), update (modify), delete (remove)
-3. Write a detailed role_prompt that defines the staff's behavior, personality, and domain knowledge
-4. Create 3-4 helpful suggestions that guide users on how to interact with this staff
-5. Choose an appropriate icon and color
+// GetSessionContext retrieves the SessionContext from a context
+func GetSessionContext(ctx context.Context) *SessionContext {
+	if v, ok := ctx.Value(sessionCtxKey{}).(*SessionContext); ok {
+		return v
+	}
+	return nil
+}
 
-Example: If user says "Create a customer support agent that can look up orders and update ticket status":
-- name: "Customer Support Agent"
-- description: "Handle customer inquiries, look up orders, and manage support tickets"
-- allowed_actions: ["query", "update"]
-- role_prompt: "You are a customer support agent. You help users look up order information, check delivery status, and update support ticket statuses. Always be polite and empathetic. When looking up orders, present the information clearly including order ID, status, items, and dates."
-- icon: "Headphones", color: "blue"
-- suggestions: [{"label": "🔍 Look Up Order", "prompt": "Help me look up an order by customer name or order ID"}, {"label": "✏️ Update Ticket", "prompt": "Help me update the status of a support ticket"}, {"label": "📊 Support Stats", "prompt": "Show me a summary of open vs resolved tickets"}, {"label": "📋 Recent Issues", "prompt": "List the most recent customer issues that need attention"}]
+// ---- Persona Context (for batch tool to enforce ToolFilter) ----
 
-Available icons: UserCog, Headphones, ShieldCheck, ClipboardList, PackageSearch, Heart, Stethoscope, GraduationCap, Megaphone, Wrench
-Available colors: green, blue, amber, violet, red
+// PersonaContext carries the current persona's ToolFilter through tool execution context
+type PersonaContext struct {
+	ToolFilter []string // nil or empty = all tools allowed
+}
 
-========== End of AI Staff Creation ==========`
+type personaCtxKey struct{}
+
+// WithPersonaContext attaches persona ToolFilter to a context
+func WithPersonaContext(ctx context.Context, pc *PersonaContext) context.Context {
+	return context.WithValue(ctx, personaCtxKey{}, pc)
+}
+
+// GetPersonaContext retrieves the PersonaContext from a context
+func GetPersonaContext(ctx context.Context) *PersonaContext {
+	if v, ok := ctx.Value(personaCtxKey{}).(*PersonaContext); ok {
+		return v
+	}
+	return nil
+}
 
 // LLMConfig holds per-workspace LLM configuration
 type LLMConfig struct {
@@ -697,15 +833,25 @@ func detectLLMProvider() (llmProvider, string, string) {
 }
 
 // callLLM sends the request to the configured LLM provider and parses the response.
-// Checks workspace-level LLM config from context first, then falls back to env vars.
-func (e *agentEngine) callLLM(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}) (string, *toolAction, error) {
+// Priority: workspace context config > engine config (config.yaml) > env vars > heuristic.
+func (e *agentEngine) callLLM(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}) (string, []toolAction, error) {
 	// Check workspace-level LLM config from context
-	if cfg := getLLMConfigFromContext(ctx); cfg != nil && cfg.APIKey != "" {
+	if cfg := getLLMConfigFromContext(ctx); cfg != nil && (cfg.BaseURL != "" || cfg.APIKey != "") {
 		model := cfg.Model
 		if model == "" {
 			model = "gpt-4o"
 		}
 		return e.callOpenAI(ctx, messages, tools, cfg.APIKey, model, cfg.BaseURL)
+	}
+
+	// Check engine-level config (from config.yaml ai section)
+	if e.config.LLMAPIKey != "" {
+		model := e.config.LLMModel
+		if model == "" {
+			model = getLLMModel()
+		}
+		baseURL := e.config.LLMBaseURL
+		return e.callOpenAI(ctx, messages, tools, e.config.LLMAPIKey, model, baseURL)
 	}
 
 	provider, apiKey, model := detectLLMProvider()
@@ -714,7 +860,12 @@ func (e *agentEngine) callLLM(ctx context.Context, messages []map[string]interfa
 	case llmProviderOpenAI:
 		return e.callOpenAI(ctx, messages, tools, apiKey, model, "")
 	default:
-		return e.thinkHeuristic(messages, tools)
+		// Heuristic returns single action; wrap for compatibility
+		thought, singleAction, err := e.thinkHeuristic(messages, tools)
+		if singleAction != nil {
+			return thought, []toolAction{*singleAction}, err
+		}
+		return thought, nil, err
 	}
 }
 
@@ -724,6 +875,8 @@ type llmChatResponse struct {
 		Message struct {
 			Content   string `json:"content"`
 			ToolCalls []struct {
+				ID       string `json:"id"`
+				Type     string `json:"type"`
 				Function struct {
 					Name      string `json:"name"`
 					Arguments string `json:"arguments"`
@@ -736,6 +889,8 @@ type llmChatResponse struct {
 	Message *struct {
 		Content   string `json:"content"`
 		ToolCalls []struct {
+			ID       string `json:"id"`
+			Type     string `json:"type"`
 			Function struct {
 				Name      string          `json:"name"`
 				Arguments json.RawMessage `json:"arguments"`
@@ -747,8 +902,8 @@ type llmChatResponse struct {
 	} `json:"error"`
 }
 
-// parseLLMResponse extracts thought and tool action from a unified response
-func parseLLMResponse(result *llmChatResponse) (string, *toolAction, error) {
+// parseLLMResponse extracts thought and tool actions (supports parallel tool calls) from a unified response
+func parseLLMResponse(result *llmChatResponse) (string, []toolAction, error) {
 	if result.Error.Message != "" {
 		return "", nil, fmt.Errorf("LLM API error: %s", result.Error.Message)
 	}
@@ -757,15 +912,31 @@ func parseLLMResponse(result *llmChatResponse) (string, *toolAction, error) {
 	if len(result.Choices) > 0 {
 		choice := result.Choices[0]
 		if len(choice.Message.ToolCalls) > 0 {
-			tc := choice.Message.ToolCalls[0]
 			thought := choice.Message.Content
-			if thought == "" {
-				thought = fmt.Sprintf("I'll call the %s tool to proceed.", tc.Function.Name)
+			actions := make([]toolAction, 0, len(choice.Message.ToolCalls))
+			for _, tc := range choice.Message.ToolCalls {
+				tcID := tc.ID
+				if len(tcID) > 40 {
+					tcID = tcID[:40]
+				}
+				actions = append(actions, toolAction{
+					ToolCallID: tcID,
+					ToolName:   tc.Function.Name,
+					ToolArgs:   json.RawMessage(tc.Function.Arguments),
+				})
 			}
-			return thought, &toolAction{
-				ToolName: tc.Function.Name,
-				ToolArgs: json.RawMessage(tc.Function.Arguments),
-			}, nil
+			if thought == "" {
+				if len(actions) == 1 {
+					thought = fmt.Sprintf("I'll call the %s tool to proceed.", actions[0].ToolName)
+				} else {
+					names := make([]string, len(actions))
+					for i, a := range actions {
+						names[i] = a.ToolName
+					}
+					thought = fmt.Sprintf("I'll call %d tools in parallel: %s", len(actions), strings.Join(names, ", "))
+				}
+			}
+			return thought, actions, nil
 		}
 		return choice.Message.Content, nil, nil
 	}
@@ -773,17 +944,27 @@ func parseLLMResponse(result *llmChatResponse) (string, *toolAction, error) {
 	// Handle Ollama-style response (top-level "message")
 	if result.Message != nil {
 		if len(result.Message.ToolCalls) > 0 {
-			tc := result.Message.ToolCalls[0]
 			thought := result.Message.Content
-			if thought == "" {
-				thought = fmt.Sprintf("I'll call the %s tool to proceed.", tc.Function.Name)
+			actions := make([]toolAction, 0, len(result.Message.ToolCalls))
+			for _, tc := range result.Message.ToolCalls {
+				tcID := tc.ID
+				if len(tcID) > 40 {
+					tcID = tcID[:40]
+				}
+				actions = append(actions, toolAction{
+					ToolCallID: tcID,
+					ToolName:   tc.Function.Name,
+					ToolArgs:   tc.Function.Arguments,
+				})
 			}
-			// Ollama returns arguments as JSON object, not string
-			argsBytes := tc.Function.Arguments
-			return thought, &toolAction{
-				ToolName: tc.Function.Name,
-				ToolArgs: argsBytes,
-			}, nil
+			if thought == "" {
+				if len(actions) == 1 {
+					thought = fmt.Sprintf("I'll call the %s tool to proceed.", actions[0].ToolName)
+				} else {
+					thought = fmt.Sprintf("I'll call %d tools in parallel.", len(actions))
+				}
+			}
+			return thought, actions, nil
 		}
 		return result.Message.Content, nil, nil
 	}
@@ -793,12 +974,12 @@ func parseLLMResponse(result *llmChatResponse) (string, *toolAction, error) {
 
 // callOpenAI sends the request to an OpenAI-compatible API.
 // Supports custom base URL via OPENAI_BASE_URL env var.
-func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}, apiKey, model, baseURLOverride string) (string, *toolAction, error) {
+func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]interface{}, tools []map[string]interface{}, apiKey, model, baseURLOverride string) (string, []toolAction, error) {
 	reqBody := map[string]interface{}{
 		"model":       model,
 		"messages":    messages,
 		"temperature": 0.2,
-		"max_tokens":  4096,
+		"max_tokens":  8192,
 	}
 	if len(tools) > 0 {
 		reqBody["tools"] = tools
@@ -818,7 +999,9 @@ func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]inte
 		return "", nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	if apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+	}
 
 	client := &http.Client{Timeout: 120 * time.Second}
 	resp, err := client.Do(req)
@@ -830,6 +1013,10 @@ func (e *agentEngine) callOpenAI(ctx context.Context, messages []map[string]inte
 	var result llmChatResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return "", nil, fmt.Errorf("failed to decode LLM response: %w", err)
+	}
+
+	if result.Error.Message != "" {
+		return "", nil, fmt.Errorf("LLM API error: %s", result.Error.Message)
 	}
 
 	return parseLLMResponse(&result)
@@ -844,666 +1031,6 @@ func GetAgentLLMStatus() (string, string) {
 	default:
 		return "heuristic", "keyword-based"
 	}
-}
-
-// thinkHeuristic provides multi-step intent-based tool execution when no LLM API key is configured.
-// It parses user intent from keywords and executes a planned sequence of operations,
-// enabling the core demo scenario (e.g., "build a fleet management system") without an external LLM.
-func (e *agentEngine) thinkHeuristic(messages []map[string]interface{}, tools []map[string]interface{}) (string, *toolAction, error) {
-	if len(messages) == 0 {
-		return "I need more information to help you.", nil, nil
-	}
-
-	// Find the latest user message and count completed tool calls
-	userMsg := ""
-	completedTools := []string{}
-	for i := len(messages) - 1; i >= 0; i-- {
-		if msgStr(messages[i], "role") == "user" && userMsg == "" {
-			userMsg = msgStr(messages[i], "content")
-		}
-	}
-	for _, m := range messages {
-		if msgStr(m, "role") == "assistant" {
-			content := msgStr(m, "content")
-			for _, marker := range []string{"get_workspace_info", "create_table", "insert_data", "generate_ui_schema"} {
-				if strings.Contains(content, marker) {
-					completedTools = append(completedTools, marker)
-				}
-			}
-		}
-	}
-
-	wsID := getFieldFromMessages(messages, "workspace_id")
-	userID := getFieldFromMessages(messages, "user_id")
-	msgLower := strings.ToLower(userMsg)
-
-	// Determine the execution plan based on completed steps
-	stepsDone := len(completedTools)
-
-	// Step 0: Always gather workspace info first
-	if stepsDone == 0 {
-		argsJSON, _ := json.Marshal(map[string]interface{}{
-			"workspace_id":   wsID,
-			"user_id":        userID,
-			"include_tables": true,
-			"include_stats":  false,
-		})
-		return "Let me check your workspace's current state first.",
-			&toolAction{ToolName: "get_workspace_info", ToolArgs: argsJSON}, nil
-	}
-
-	// Detect intent from keywords to determine table schemas
-	tables := e.detectTablesFromIntent(msgLower)
-
-	// If no tables detected, provide guidance
-	if len(tables) == 0 {
-		return fmt.Sprintf("I understand you want to build something related to: %q. "+
-			"I can help you create database tables and generate UI. "+
-			"Try describing your app more specifically, e.g., 'I want a fleet management system with vehicles, drivers, and trips'. "+
-			"For full AI-powered generation, configure OPENAI_API_KEY or OLLAMA_HOST.", userMsg), nil, nil
-	}
-
-	// Step 1..N: Create tables one by one
-	if stepsDone <= len(tables) {
-		tableIdx := stepsDone - 1
-		if tableIdx < len(tables) {
-			table := tables[tableIdx]
-			argsJSON, _ := json.Marshal(map[string]interface{}{
-				"workspace_id": wsID,
-				"user_id":      userID,
-				"name":         table.Name,
-				"columns":      table.Columns,
-			})
-			return fmt.Sprintf("Creating table %q with %d columns...", table.Name, len(table.Columns)),
-				&toolAction{ToolName: "create_table", ToolArgs: argsJSON}, nil
-		}
-	}
-
-	// Step N+1: Insert sample data for the first table
-	sampleStep := len(tables) + 1
-	if stepsDone == sampleStep {
-		if len(tables) > 0 {
-			sampleRows := e.generateSampleRows(tables[0])
-			argsJSON, _ := json.Marshal(map[string]interface{}{
-				"workspace_id": wsID,
-				"user_id":      userID,
-				"table":        tables[0].Name,
-				"rows":         sampleRows,
-			})
-			return fmt.Sprintf("Inserting sample data into %q...", tables[0].Name),
-				&toolAction{ToolName: "insert_data", ToolArgs: argsJSON}, nil
-		}
-	}
-
-	// Step N+2: Generate UI Schema
-	uiStep := len(tables) + 2
-	if stepsDone == uiStep {
-		pages := e.generateUIPages(tables, msgLower)
-		appName := e.extractAppName(msgLower)
-		// Build navigation items from pages
-		navItems := make([]map[string]interface{}, 0, len(pages))
-		defaultPage := ""
-		for _, p := range pages {
-			pid, _ := p["id"].(string)
-			title, _ := p["title"].(string)
-			icon, _ := p["icon"].(string)
-			if defaultPage == "" {
-				defaultPage = pid
-			}
-			navItems = append(navItems, map[string]interface{}{
-				"page_id": pid,
-				"label":   title,
-				"icon":    icon,
-			})
-		}
-		uiSchema := map[string]interface{}{
-			"app_schema_version": "2.0.0",
-			"app_name":           appName,
-			"default_page":       defaultPage,
-			"navigation": map[string]interface{}{
-				"type":  "sidebar",
-				"items": navItems,
-			},
-			"pages": pages,
-		}
-		argsJSON, _ := json.Marshal(map[string]interface{}{
-			"workspace_id": wsID,
-			"user_id":      userID,
-			"ui_schema":    uiSchema,
-		})
-		return "Generating UI pages for your application...",
-			&toolAction{ToolName: "generate_ui_schema", ToolArgs: argsJSON}, nil
-	}
-
-	// Final answer
-	tableNames := make([]string, len(tables))
-	for i, t := range tables {
-		tableNames[i] = t.Name
-	}
-	return fmt.Sprintf("Your application has been created! Here's what was built:\n"+
-		"- **%d database tables**: %s\n"+
-		"- **Sample data** inserted into %q\n"+
-		"- **UI pages** generated with dashboard and data management views\n\n"+
-		"You can view the results in the **Preview** tab or manage data in the **Database** tab.",
-		len(tables), strings.Join(tableNames, ", "), tables[0].Name), nil, nil
-}
-
-// heuristicTable represents a table schema for heuristic generation
-type heuristicTable struct {
-	Name    string                   `json:"name"`
-	Columns []map[string]interface{} `json:"columns"`
-}
-
-// detectTablesFromIntent parses user message to determine what tables to create
-func (e *agentEngine) detectTablesFromIntent(msg string) []heuristicTable {
-	// Fleet/vehicle management
-	if containsAnyKeyword(msg, []string{"fleet", "vehicle", "车队", "车辆", "fleet management", "车队管理"}) {
-		return []heuristicTable{
-			{Name: "vehicles", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "plate_number", "type": "VARCHAR(20)", "not_null": true, "unique": true},
-				{"name": "brand", "type": "VARCHAR(50)"},
-				{"name": "model", "type": "VARCHAR(50)"},
-				{"name": "year", "type": "INT"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'active'"},
-				{"name": "mileage", "type": "DECIMAL(10,2)", "default": "0"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "drivers", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "name", "type": "VARCHAR(100)", "not_null": true},
-				{"name": "phone", "type": "VARCHAR(20)"},
-				{"name": "license_number", "type": "VARCHAR(50)", "unique": true},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'available'"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "trips", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "vehicle_id", "type": "BIGINT", "not_null": true},
-				{"name": "driver_id", "type": "BIGINT", "not_null": true},
-				{"name": "origin", "type": "VARCHAR(200)"},
-				{"name": "destination", "type": "VARCHAR(200)"},
-				{"name": "distance_km", "type": "DECIMAL(10,2)"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'planned'"},
-				{"name": "started_at", "type": "TIMESTAMP"},
-				{"name": "completed_at", "type": "TIMESTAMP"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-		}
-	}
-
-	// Customer/feedback management
-	if containsAnyKeyword(msg, []string{"feedback", "customer", "反馈", "客户", "survey", "调查"}) {
-		return []heuristicTable{
-			{Name: "customers", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "name", "type": "VARCHAR(100)", "not_null": true},
-				{"name": "email", "type": "VARCHAR(100)", "unique": true},
-				{"name": "phone", "type": "VARCHAR(20)"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "feedbacks", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "customer_id", "type": "BIGINT"},
-				{"name": "category", "type": "VARCHAR(50)"},
-				{"name": "title", "type": "VARCHAR(200)", "not_null": true},
-				{"name": "content", "type": "TEXT"},
-				{"name": "rating", "type": "INT"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'pending'"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "responses", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "feedback_id", "type": "BIGINT", "not_null": true},
-				{"name": "responder_name", "type": "VARCHAR(100)"},
-				{"name": "content", "type": "TEXT"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-		}
-	}
-
-	// Order/inventory/product management
-	if containsAnyKeyword(msg, []string{"order", "inventory", "product", "订单", "库存", "商品", "ecommerce", "电商", "shop", "商店"}) {
-		return []heuristicTable{
-			{Name: "products", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "name", "type": "VARCHAR(200)", "not_null": true},
-				{"name": "sku", "type": "VARCHAR(50)", "unique": true},
-				{"name": "price", "type": "DECIMAL(10,2)", "not_null": true},
-				{"name": "stock", "type": "INT", "default": "0"},
-				{"name": "category", "type": "VARCHAR(50)"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'active'"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "orders", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "customer_name", "type": "VARCHAR(100)", "not_null": true},
-				{"name": "customer_email", "type": "VARCHAR(100)"},
-				{"name": "total_amount", "type": "DECIMAL(10,2)"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'pending'"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "order_items", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "order_id", "type": "BIGINT", "not_null": true},
-				{"name": "product_id", "type": "BIGINT", "not_null": true},
-				{"name": "quantity", "type": "INT", "not_null": true},
-				{"name": "unit_price", "type": "DECIMAL(10,2)", "not_null": true},
-			}},
-		}
-	}
-
-	// Task/project management
-	if containsAnyKeyword(msg, []string{"task", "project", "todo", "任务", "项目", "待办"}) {
-		return []heuristicTable{
-			{Name: "projects", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "name", "type": "VARCHAR(200)", "not_null": true},
-				{"name": "description", "type": "TEXT"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'active'"},
-				{"name": "start_date", "type": "DATE"},
-				{"name": "end_date", "type": "DATE"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-			{Name: "tasks", Columns: []map[string]interface{}{
-				{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-				{"name": "project_id", "type": "BIGINT", "not_null": true},
-				{"name": "title", "type": "VARCHAR(200)", "not_null": true},
-				{"name": "description", "type": "TEXT"},
-				{"name": "assignee", "type": "VARCHAR(100)"},
-				{"name": "priority", "type": "VARCHAR(20)", "default": "'medium'"},
-				{"name": "status", "type": "VARCHAR(20)", "default": "'todo'"},
-				{"name": "due_date", "type": "DATE"},
-				{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-			}},
-		}
-	}
-
-	// Generic CRUD — try to extract entity name from the message
-	if containsAnyKeyword(msg, []string{"manage", "管理", "system", "系统", "app", "应用", "build", "create", "做", "建"}) {
-		entityName := extractEntityName(msg)
-		if entityName != "" {
-			return []heuristicTable{
-				{Name: entityName + "s", Columns: []map[string]interface{}{
-					{"name": "id", "type": "BIGINT", "primary_key": true, "auto_increment": true},
-					{"name": "name", "type": "VARCHAR(200)", "not_null": true},
-					{"name": "description", "type": "TEXT"},
-					{"name": "status", "type": "VARCHAR(20)", "default": "'active'"},
-					{"name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-					{"name": "updated_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
-				}},
-			}
-		}
-	}
-
-	return nil
-}
-
-// generateSampleRows creates sample data for a table
-func (e *agentEngine) generateSampleRows(table heuristicTable) []map[string]interface{} {
-	switch table.Name {
-	case "vehicles":
-		return []map[string]interface{}{
-			{"plate_number": "京A12345", "brand": "Toyota", "model": "Camry", "year": 2023, "status": "active", "mileage": 15000},
-			{"plate_number": "京B67890", "brand": "Honda", "model": "Civic", "year": 2022, "status": "active", "mileage": 28000},
-			{"plate_number": "京C11111", "brand": "Ford", "model": "Transit", "year": 2024, "status": "maintenance", "mileage": 5000},
-			{"plate_number": "沪A22222", "brand": "BYD", "model": "Tang", "year": 2024, "status": "active", "mileage": 3200},
-			{"plate_number": "粤B33333", "brand": "Tesla", "model": "Model 3", "year": 2023, "status": "active", "mileage": 12000},
-		}
-	case "customers":
-		return []map[string]interface{}{
-			{"name": "Alice Wang", "email": "alice@example.com", "phone": "13800001111"},
-			{"name": "Bob Li", "email": "bob@example.com", "phone": "13800002222"},
-			{"name": "Carol Zhang", "email": "carol@example.com", "phone": "13800003333"},
-		}
-	case "products":
-		return []map[string]interface{}{
-			{"name": "Wireless Mouse", "sku": "WM-001", "price": 29.99, "stock": 150, "category": "Electronics"},
-			{"name": "USB-C Cable", "sku": "UC-002", "price": 9.99, "stock": 500, "category": "Accessories"},
-			{"name": "Mechanical Keyboard", "sku": "MK-003", "price": 89.99, "stock": 75, "category": "Electronics"},
-		}
-	case "projects":
-		return []map[string]interface{}{
-			{"name": "Website Redesign", "description": "Redesign the company website", "status": "active", "start_date": "2026-01-01", "end_date": "2026-03-31"},
-			{"name": "Mobile App MVP", "description": "Build the first version of mobile app", "status": "active", "start_date": "2026-02-01", "end_date": "2026-06-30"},
-		}
-	default:
-		return []map[string]interface{}{
-			{"name": "Sample Item 1", "description": "First sample record", "status": "active"},
-			{"name": "Sample Item 2", "description": "Second sample record", "status": "active"},
-			{"name": "Sample Item 3", "description": "Third sample record", "status": "draft"},
-		}
-	}
-}
-
-// generateUIPages creates UI page definitions based on detected tables
-func (e *agentEngine) generateUIPages(tables []heuristicTable, msg string) []map[string]interface{} {
-	statsColors := []string{"blue", "green", "amber", "red"}
-	statsIcons := []string{"Database", "Users", "Package", "Activity"}
-
-	// Dashboard page with stats cards for each table
-	statsBlocks := make([]map[string]interface{}, 0, len(tables))
-	for i, t := range tables {
-		statsBlocks = append(statsBlocks, map[string]interface{}{
-			"id":   fmt.Sprintf("stat_%s", t.Name),
-			"type": "stats_card",
-			"config": map[string]interface{}{
-				"label":     "Total " + toTitleCase(strings.ReplaceAll(t.Name, "_", " ")),
-				"value_key": "count",
-				"format":    "number",
-				"color":     statsColors[i%len(statsColors)],
-				"icon":      statsIcons[i%len(statsIcons)],
-			},
-			"data_source": map[string]interface{}{
-				"table":       t.Name,
-				"aggregation": []map[string]interface{}{{"function": "count", "column": "*", "alias": "count"}},
-			},
-		})
-	}
-
-	dashBlocks := make([]map[string]interface{}, 0, len(statsBlocks)+2)
-	dashBlocks = append(dashBlocks, statsBlocks...)
-
-	// Add a chart block for the first table with a numeric column
-	for _, t := range tables {
-		var nameCol, numCol string
-		for _, col := range t.Columns {
-			cn, _ := col["name"].(string)
-			if cn == "" || cn == "id" {
-				continue
-			}
-			colType := inferColumnDisplayType(cn, col)
-			if nameCol == "" && (cn == "name" || cn == "title" || cn == "label" || cn == "category") {
-				nameCol = cn
-			}
-			if numCol == "" && colType == "number" {
-				numCol = cn
-			}
-		}
-		if nameCol != "" && numCol != "" {
-			dashBlocks = append(dashBlocks, map[string]interface{}{
-				"id":   fmt.Sprintf("chart_%s", t.Name),
-				"type": "chart",
-				"config": map[string]interface{}{
-					"title":      toTitleCase(strings.ReplaceAll(t.Name, "_", " ")) + " Overview",
-					"chart_type": "bar",
-					"x_key":      nameCol,
-					"y_key":      numCol,
-					"height":     200,
-					"color":      "#6366f1",
-				},
-				"data_source": map[string]interface{}{
-					"table": t.Name,
-					"limit": 10,
-				},
-				"grid": map[string]interface{}{"col_span": 2},
-			})
-			break
-		}
-	}
-
-	// Add a recent items list for the first table
-	if len(tables) > 0 {
-		t := tables[0]
-		var titleKey string
-		for _, col := range t.Columns {
-			cn, _ := col["name"].(string)
-			if cn == "name" || cn == "title" {
-				titleKey = cn
-				break
-			}
-		}
-		if titleKey == "" && len(t.Columns) > 1 {
-			cn, _ := t.Columns[1]["name"].(string)
-			titleKey = cn
-		}
-		if titleKey != "" {
-			dashBlocks = append(dashBlocks, map[string]interface{}{
-				"id":    "recent_items",
-				"type":  "list",
-				"label": "Recent " + toTitleCase(strings.ReplaceAll(t.Name, "_", " ")),
-				"config": map[string]interface{}{
-					"table_name": t.Name,
-					"title_key":  titleKey,
-					"clickable":  true,
-					"layout":     "list",
-				},
-				"data_source": map[string]interface{}{
-					"table": t.Name,
-					"limit": 5,
-				},
-				"grid": map[string]interface{}{"col_span": 2},
-			})
-		}
-	}
-
-	pages := []map[string]interface{}{
-		{
-			"id":     "dashboard",
-			"title":  "Dashboard",
-			"route":  "/dashboard",
-			"icon":   "LayoutDashboard",
-			"blocks": dashBlocks,
-		},
-	}
-
-	// CRUD pages for each table
-	tableIcons := []string{"FileText", "Users", "Package", "Truck", "ShoppingCart", "Star"}
-	for i, t := range tables {
-		// Build column configs from table columns with auto-inferred types
-		columns := make([]map[string]interface{}, 0, len(t.Columns))
-		for _, col := range t.Columns {
-			colName, _ := col["name"].(string)
-			if colName == "" {
-				continue
-			}
-			colType := inferColumnDisplayType(colName, col)
-			entry := map[string]interface{}{
-				"key":   colName,
-				"label": toTitleCase(strings.ReplaceAll(colName, "_", " ")),
-			}
-			if colType != "" {
-				entry["type"] = colType
-			}
-			columns = append(columns, entry)
-		}
-
-		// Build form fields from non-auto columns
-		formFields := make([]map[string]interface{}, 0)
-		for _, col := range t.Columns {
-			colName, _ := col["name"].(string)
-			if colName == "" || colName == "id" || colName == "created_at" || colName == "updated_at" || colName == "deleted_at" {
-				continue
-			}
-			colType := inferColumnDisplayType(colName, col)
-			fieldType := "text"
-			switch colType {
-			case "number":
-				fieldType = "number"
-			case "boolean":
-				fieldType = "checkbox"
-			case "date":
-				fieldType = "date"
-			}
-			formFields = append(formFields, map[string]interface{}{
-				"name":     colName,
-				"label":    toTitleCase(strings.ReplaceAll(colName, "_", " ")),
-				"type":     fieldType,
-				"required": colName == "name" || colName == "title" || colName == "email",
-			})
-		}
-
-		// Determine search key
-		searchKey := ""
-		for _, col := range t.Columns {
-			cn, _ := col["name"].(string)
-			if cn == "name" || cn == "title" || cn == "email" || cn == "label" || cn == "username" {
-				searchKey = cn
-				break
-			}
-		}
-
-		tableConfig := map[string]interface{}{
-			"table_name":      t.Name,
-			"columns":         columns,
-			"actions":         []string{"create", "edit", "delete", "view"},
-			"search_enabled":  true,
-			"pagination":      true,
-			"filters_enabled": true,
-			"page_size":       20,
-		}
-		if searchKey != "" {
-			tableConfig["search_key"] = searchKey
-		}
-
-		blocks := []map[string]interface{}{
-			{
-				"id":     fmt.Sprintf("table_%s", t.Name),
-				"type":   "data_table",
-				"config": tableConfig,
-			},
-		}
-
-		// Add a form block if there are editable fields
-		if len(formFields) > 0 {
-			blocks = append(blocks, map[string]interface{}{
-				"id":    fmt.Sprintf("form_%s", t.Name),
-				"type":  "form",
-				"label": "Add " + toTitleCase(strings.ReplaceAll(t.Name, "_", " ")),
-				"config": map[string]interface{}{
-					"title":        "New " + toTitleCase(strings.ReplaceAll(t.Name, "_", " ")),
-					"table_name":   t.Name,
-					"fields":       formFields,
-					"submit_label": "Create",
-				},
-			})
-		}
-
-		pages = append(pages, map[string]interface{}{
-			"id":     t.Name,
-			"title":  toTitleCase(strings.ReplaceAll(t.Name, "_", " ")),
-			"route":  "/" + t.Name,
-			"icon":   tableIcons[i%len(tableIcons)],
-			"blocks": blocks,
-		})
-	}
-
-	return pages
-}
-
-// extractAppName tries to extract an application name from the user message
-func (e *agentEngine) extractAppName(msg string) string {
-	patterns := map[string]string{
-		"fleet":     "Fleet Management",
-		"车队":        "Fleet Management",
-		"vehicle":   "Vehicle Management",
-		"feedback":  "Feedback System",
-		"反馈":        "Feedback System",
-		"order":     "Order Management",
-		"订单":        "Order Management",
-		"product":   "Product Management",
-		"商品":        "Product Management",
-		"inventory": "Inventory System",
-		"库存":        "Inventory System",
-		"task":      "Task Management",
-		"任务":        "Task Management",
-		"project":   "Project Management",
-		"项目":        "Project Management",
-		"customer":  "Customer Management",
-		"客户":        "Customer Management",
-	}
-	for keyword, name := range patterns {
-		if strings.Contains(msg, keyword) {
-			return name
-		}
-	}
-	return "My Application"
-}
-
-// containsAnyKeyword checks if s contains any of the keywords
-func containsAnyKeyword(s string, keywords []string) bool {
-	for _, k := range keywords {
-		if strings.Contains(s, k) {
-			return true
-		}
-	}
-	return false
-}
-
-// inferColumnDisplayType infers the frontend display type for a data_table column
-func inferColumnDisplayType(colName string, col map[string]interface{}) string {
-	nameLower := strings.ToLower(colName)
-	sqlType := strings.ToUpper(fmt.Sprintf("%v", col["type"]))
-
-	// Date columns
-	if strings.HasSuffix(nameLower, "_at") || strings.HasSuffix(nameLower, "_date") ||
-		nameLower == "created" || nameLower == "updated" || nameLower == "date" ||
-		strings.Contains(sqlType, "TIMESTAMP") || strings.Contains(sqlType, "DATE") {
-		return "date"
-	}
-
-	// Boolean columns
-	if strings.HasPrefix(nameLower, "is_") || strings.HasPrefix(nameLower, "has_") ||
-		nameLower == "active" || nameLower == "enabled" || nameLower == "verified" ||
-		strings.Contains(sqlType, "BOOL") {
-		return "boolean"
-	}
-
-	// Badge/status columns
-	if nameLower == "status" || nameLower == "state" || nameLower == "role" ||
-		nameLower == "priority" || nameLower == "type" || nameLower == "category" {
-		return "badge"
-	}
-
-	// Number columns
-	if strings.Contains(sqlType, "INT") || strings.Contains(sqlType, "DECIMAL") ||
-		strings.Contains(sqlType, "FLOAT") || strings.Contains(sqlType, "DOUBLE") ||
-		strings.Contains(sqlType, "NUMERIC") ||
-		nameLower == "price" || nameLower == "amount" || nameLower == "quantity" ||
-		nameLower == "count" || nameLower == "total" || nameLower == "mileage" ||
-		nameLower == "distance" || nameLower == "weight" || nameLower == "age" ||
-		nameLower == "score" || nameLower == "rating" || nameLower == "cost" ||
-		strings.HasSuffix(nameLower, "_count") || strings.HasSuffix(nameLower, "_total") ||
-		strings.HasSuffix(nameLower, "_amount") || strings.HasSuffix(nameLower, "_price") ||
-		strings.HasSuffix(nameLower, "_qty") || strings.HasSuffix(nameLower, "_size") ||
-		strings.HasSuffix(nameLower, "_score") || strings.HasSuffix(nameLower, "_rate") {
-		return "number"
-	}
-
-	return ""
-}
-
-// toTitleCase capitalizes the first letter of each word (replacement for deprecated strings.Title)
-func toTitleCase(s string) string {
-	words := strings.Fields(s)
-	for i, w := range words {
-		if len(w) > 0 {
-			words[i] = strings.ToUpper(w[:1]) + w[1:]
-		}
-	}
-	return strings.Join(words, " ")
-}
-
-// extractEntityName tries to extract a noun/entity name for generic CRUD
-func extractEntityName(msg string) string {
-	// Remove common verbs and noise words
-	noise := []string{"i want", "i need", "please", "help me", "build", "create", "make",
-		"a", "an", "the", "to", "for", "with", "management", "system", "app",
-		"我想", "我要", "帮我", "做一个", "建一个", "管理", "系统", "应用"}
-	result := msg
-	for _, n := range noise {
-		result = strings.ReplaceAll(result, n, " ")
-	}
-	result = strings.TrimSpace(result)
-	words := strings.Fields(result)
-	if len(words) > 0 {
-		// Take the first meaningful word
-		w := strings.ToLower(words[0])
-		if len(w) > 2 {
-			return w
-		}
-	}
-	return ""
 }
 
 // msgStr safely extracts a string value from a map[string]interface{}

@@ -97,6 +97,13 @@ func (r *PersonaRegistry) Get(id string) (*Persona, bool) {
 	return p, ok
 }
 
+// Unregister removes a persona by ID (used for temporary sub-agent personas)
+func (r *PersonaRegistry) Unregister(id string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.personas, id)
+}
+
 // ListAll 列出所有 Personas（按 category + id 排序，保证顺序确定性）
 func (r *PersonaRegistry) ListAll() []PersonaMeta {
 	r.mu.RLock()

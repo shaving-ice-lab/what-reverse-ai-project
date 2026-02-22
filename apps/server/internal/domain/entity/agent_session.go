@@ -16,6 +16,8 @@ type AgentSession struct {
 	Messages      JSON      `gorm:"column:messages;type:json" json:"messages"`
 	ToolCalls     JSON      `gorm:"column:tool_calls;type:json" json:"tool_calls"`
 	PendingAction JSON      `gorm:"column:pending_action;type:json" json:"pending_action"`
+	Plan          JSON      `gorm:"column:plan;type:json" json:"plan"`
+	Meta          JSON      `gorm:"column:meta;type:json" json:"meta"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

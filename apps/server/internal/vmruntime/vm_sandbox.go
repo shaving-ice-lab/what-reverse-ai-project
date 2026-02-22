@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	VMMaxCodeSize   = 1 << 20          // 1MB code size limit
-	VMExecTimeout   = 10 * time.Second // single request max execution time
-	VMLoadTimeout   = 5 * time.Second  // code loading max time
+	VMMaxCodeSize = 1 << 20          // 1MB code size limit
+	VMExecTimeout = 10 * time.Second // single request max execution time
+	VMLoadTimeout = 5 * time.Second  // code loading max time
 )
 
 // setupSandbox disables dangerous global objects in the goja VM.
