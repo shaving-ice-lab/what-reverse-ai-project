@@ -60,7 +60,10 @@ const ICON_OPTIONS = [
   { name: 'Layers', icon: Layers },
 ]
 
-const BLOCK_TYPE_META: Record<AppBlockType, { label: string; icon: React.ElementType; color: string }> = {
+const BLOCK_TYPE_META: Record<
+  AppBlockType,
+  { label: string; icon: React.ElementType; color: string }
+> = {
   stats_card: { label: 'Stats Card', icon: BarChart3, color: 'text-blue-500' },
   data_table: { label: 'Data Table', icon: Table2, color: 'text-emerald-500' },
   form: { label: 'Form', icon: FormInput, color: 'text-violet-500' },
@@ -199,7 +202,13 @@ export function PageManagerPanel({ config, onChange, appPages, className }: Page
   }
 
   const getBlockMeta = (type: string) => {
-    return BLOCK_TYPE_META[type as AppBlockType] || { label: type, icon: FileText, color: 'text-foreground-muted' }
+    return (
+      BLOCK_TYPE_META[type as AppBlockType] || {
+        label: type,
+        icon: FileText,
+        color: 'text-foreground-muted',
+      }
+    )
   }
 
   // Summarize blocks by type for a given page
@@ -314,22 +323,32 @@ export function PageManagerPanel({ config, onChange, appPages, className }: Page
                   {/* Reorder buttons */}
                   <div className="flex flex-col gap-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={(e) => { e.stopPropagation(); movePage(page.id, 'up') }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        movePage(page.id, 'up')
+                      }}
                       disabled={isFirst}
                       className={cn(
                         'w-4 h-3 flex items-center justify-center rounded-sm transition-colors',
-                        isFirst ? 'text-foreground-muted/20' : 'text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                        isFirst
+                          ? 'text-foreground-muted/20'
+                          : 'text-foreground-muted hover:text-foreground hover:bg-surface-200'
                       )}
                       title="Move up"
                     >
                       <ChevronUp className="w-3 h-3" />
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); movePage(page.id, 'down') }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        movePage(page.id, 'down')
+                      }}
                       disabled={isLast}
                       className={cn(
                         'w-4 h-3 flex items-center justify-center rounded-sm transition-colors',
-                        isLast ? 'text-foreground-muted/20' : 'text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                        isLast
+                          ? 'text-foreground-muted/20'
+                          : 'text-foreground-muted hover:text-foreground hover:bg-surface-200'
                       )}
                       title="Move down"
                     >
@@ -348,7 +367,9 @@ export function PageManagerPanel({ config, onChange, appPages, className }: Page
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-foreground-muted truncate font-mono">{page.route}</span>
+                      <span className="text-[10px] text-foreground-muted truncate font-mono">
+                        {page.route}
+                      </span>
                       {totalBlocks > 0 && (
                         <span className="text-[10px] text-foreground-muted/70 flex items-center gap-0.5 shrink-0">
                           <Layers className="w-2.5 h-2.5" />
@@ -502,7 +523,9 @@ export function PageManagerPanel({ config, onChange, appPages, className }: Page
                               >
                                 <BIcon className={cn('w-2.5 h-2.5', meta.color)} />
                                 {meta.label}
-                                {count > 1 && <span className="text-foreground-muted">×{count}</span>}
+                                {count > 1 && (
+                                  <span className="text-foreground-muted">×{count}</span>
+                                )}
                               </span>
                             )
                           })}

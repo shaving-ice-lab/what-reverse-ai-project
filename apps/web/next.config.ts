@@ -79,6 +79,21 @@ const nextConfig: NextConfig = {
     return []
   },
 
+  // Rewrite rules — proxy storage file serving to backend
+  async rewrites() {
+    if (isTauriBuild) return []
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010/api/v1'
+    const backendBase = apiUrl.replace(/\/api\/v1\/?$/, '')
+
+    return [
+      {
+        source: '/storage/files/:objectId',
+        destination: `${backendBase}/storage/files/:objectId`,
+      },
+    ]
+  },
+
   // Environment variables
   env: {
     NEXT_PUBLIC_IS_TAURI: isTauriBuild ? 'true' : 'false',

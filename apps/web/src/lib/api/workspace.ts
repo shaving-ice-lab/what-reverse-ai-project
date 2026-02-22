@@ -193,10 +193,6 @@ export interface UpdateLLMEndpointRequest {
   model?: string
 }
 
-// Keep old types as aliases for backward compat
-export type LLMConfigResponse = LLMEndpoint
-export type UpdateLLMConfigRequest = UpdateLLMEndpointRequest
-
 // ===== API Response Types =====
 
 interface ListResponse<T> {
@@ -325,6 +321,19 @@ export const workspaceApi = {
   },
 
   /**
+   * List workspace roles (returns roles with real UUID IDs)
+   */
+  async listRoles(workspaceId: string): Promise<WorkspaceRole[]> {
+    const response = await request<ApiResponse<{ roles: WorkspaceRole[] } | WorkspaceRole[]>>(
+      `/workspaces/${workspaceId}/roles`
+    )
+    const payload = response.data as any
+    if (Array.isArray(payload?.roles)) return payload.roles as WorkspaceRole[]
+    if (Array.isArray(payload)) return payload as WorkspaceRole[]
+    return []
+  },
+
+  /**
    * Get workspace member list
    */
   async getMembers(workspaceId: string): Promise<WorkspaceMember[]> {
@@ -397,7 +406,6 @@ export const workspaceApi = {
       apps: { used: 0, limit: 3 },
     }
   },
-
 
   // ===== LLM Endpoint Methods =====
 
@@ -556,7 +564,6 @@ export const workspaceApi = {
       method: 'DELETE',
     })
   },
-
 }
 
 // ===== App Access Policy Types (backward compatible) =====
@@ -724,7 +731,6 @@ export const appApi = {
     const payload = response.data as any
     return (payload?.version as WorkspaceVersion) ?? (payload as WorkspaceVersion)
   },
-
 }
 
 export default workspaceApi

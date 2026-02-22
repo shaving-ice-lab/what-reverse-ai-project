@@ -192,5 +192,4 @@ export const userApi = {
       body: JSON.stringify(data),
     })
   },
-
 }

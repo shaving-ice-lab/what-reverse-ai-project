@@ -79,6 +79,7 @@ import {
 import { workspaceDatabaseApi, type DatabaseTable } from '@/lib/api/workspace-database'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 
 type WorkspaceTab = 'preview' | 'files' | 'database' | 'pages' | 'versions'
 
@@ -177,16 +178,26 @@ export default function WorkspacePage() {
     }
   }, [workspaceId])
 
+  const appSchemaRef = useRef<AppSchema | null>(null)
+  appSchemaRef.current = appSchema
+
   const loadAppData = useCallback(async () => {
     if (!workspaceId) return
-    setAppLoading(true)
+    // Only show loading spinner on initial load — avoid unmounting existing preview
+    const isInitialLoad = !appSchemaRef.current
+    if (isInitialLoad) setAppLoading(true)
     try {
       const appData = await appApi.get(workspaceId)
       setApp(appData)
       let rawSchema = appData?.current_version?.ui_schema as Record<string, unknown> | null
 
       const isValidSchema = (s: Record<string, unknown> | null): boolean =>
-        Boolean(s && s.app_schema_version === '2.0.0' && Array.isArray(s.pages) && (s.pages as unknown[]).length > 0)
+        Boolean(
+          s &&
+          s.app_schema_version === '2.0.0' &&
+          Array.isArray(s.pages) &&
+          (s.pages as unknown[]).length > 0
+        )
 
       // If current version has no ui_schema, try to recover from recent versions
       if (!isValidSchema(rawSchema)) {
@@ -206,8 +217,13 @@ export default function WorkspacePage() {
       }
 
       if (isValidSchema(rawSchema)) {
-        setAppSchema(rawSchema as unknown as AppSchema)
-      } else {
+        // Only update state if schema actually changed to avoid unnecessary re-renders
+        const newSchema = rawSchema as unknown as AppSchema
+        const prev = appSchemaRef.current
+        if (!prev || JSON.stringify(prev) !== JSON.stringify(newSchema)) {
+          setAppSchema(newSchema)
+        }
+      } else if (appSchemaRef.current !== null) {
         setAppSchema(null)
       }
     } catch {
@@ -252,7 +268,11 @@ export default function WorkspacePage() {
     const uiSchema = app?.current_version?.ui_schema as Record<string, unknown> | null
 
     // Source 1: config_json has explicit page configs
-    if (configJson && Array.isArray(configJson.pages) && (configJson.pages as unknown[]).length > 0) {
+    if (
+      configJson &&
+      Array.isArray(configJson.pages) &&
+      (configJson.pages as unknown[]).length > 0
+    ) {
       setPagesConfig({
         pages: configJson.pages as PagesConfig['pages'],
         navigation: (configJson.navigation as PagesConfig['navigation']) || { type: 'sidebar' },
@@ -278,8 +298,7 @@ export default function WorkspacePage() {
       setPagesConfig({
         pages: extractedPages,
         navigation: { type: (nav?.type as string) || 'sidebar' },
-        default_page:
-          (uiSchema.default_page as string) || extractedPages[0]?.id || '',
+        default_page: (uiSchema.default_page as string) || extractedPages[0]?.id || '',
       })
     }
     setPagesConfigDirty(false)
@@ -393,7 +412,10 @@ export default function WorkspacePage() {
         uiSchemaPayload = {
           ...currentUISchema,
           pages: reorderedPages,
-          navigation: { ...((currentUISchema.navigation as Record<string, unknown>) || {}), type: pagesConfig.navigation.type },
+          navigation: {
+            ...((currentUISchema.navigation as Record<string, unknown>) || {}),
+            type: pagesConfig.navigation.type,
+          },
           default_page: pagesConfig.default_page,
         }
       }
@@ -416,7 +438,11 @@ export default function WorkspacePage() {
       }
 
       // Sync appSchema if we updated ui_schema
-      if (uiSchemaPayload && uiSchemaPayload.app_schema_version === '2.0.0' && Array.isArray(uiSchemaPayload.pages)) {
+      if (
+        uiSchemaPayload &&
+        uiSchemaPayload.app_schema_version === '2.0.0' &&
+        Array.isArray(uiSchemaPayload.pages)
+      ) {
         setAppSchema(uiSchemaPayload as unknown as AppSchema)
       }
 
@@ -430,12 +456,18 @@ export default function WorkspacePage() {
     }
   }
 
+  const { confirm: confirmRollback, Dialog: RollbackDialog } = useConfirmDialog()
+
   // ========== Rollback ==========
   const handleRollback = async (versionId: string) => {
     if (!workspaceId || rollbackingId) return
-    const confirmed =
-      typeof window !== 'undefined' &&
-      window.confirm('Rollback to this version? Current changes will be overwritten.')
+    const confirmed = await confirmRollback({
+      title: 'Rollback Version',
+      description: 'Rollback to this version? Current changes will be overwritten.',
+      confirmText: 'Rollback',
+      cancelText: 'Cancel',
+      variant: 'warning',
+    })
     if (!confirmed) return
     try {
       setRollbackingId(versionId)
@@ -473,24 +505,21 @@ export default function WorkspacePage() {
   }
 
   // ========== Agent Event Handling ==========
-  const handleAgentEvent = useCallback(
-    (event: AgentEvent) => {
-      if (event.type === 'tool_result') {
-        if (event.affected_resource === 'database') {
-          setDbRevision((r) => r + 1)
-          setActiveTab('database')
-        } else if (event.affected_resource === 'ui_schema') {
-          setSchemaRevision((r) => r + 1)
-          setActiveTab('preview')
-        }
-      }
-      if (event.type === 'done') {
+  const handleAgentEvent = useCallback((event: AgentEvent) => {
+    if (event.type === 'tool_result') {
+      if (event.affected_resource === 'database') {
         setDbRevision((r) => r + 1)
+        setActiveTab('database')
+      } else if (event.affected_resource === 'ui_schema') {
         setSchemaRevision((r) => r + 1)
+        setActiveTab('preview')
       }
-    },
-    []
-  )
+    }
+    if (event.type === 'done') {
+      setDbRevision((r) => r + 1)
+      setSchemaRevision((r) => r + 1)
+    }
+  }, [])
 
   // ========== Publish ==========
   const accessModeKey = (accessPolicy?.access_mode || 'private') as string
@@ -664,7 +693,12 @@ export default function WorkspacePage() {
             </Link>
           )}
 
-          <Button variant="outline" size="sm" onClick={handlePublish} className="h-7 gap-1 text-[11px] px-2.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePublish}
+            className="h-7 gap-1 text-[11px] px-2.5"
+          >
             <Rocket className="w-3 h-3" />
             Publish
           </Button>
@@ -793,60 +827,50 @@ export default function WorkspacePage() {
                     maxWidth: '100%',
                   }}
                 >
-                    {appLoading ? (
-                      <div className="h-full flex items-center justify-center p-8">
-                        <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
-                      </div>
-                    ) : appSchema && workspace?.slug ? (
-                      <AppAuthProvider workspaceSlug={workspace.slug}>
-                        <PreviewAppWithAuth
-                          workspaceSlug={workspace.slug}
-                          appSchema={appSchema}
-                        />
-                      </AppAuthProvider>
-                    ) : appSchema ? (
-                      <AppRenderer
-                        schema={appSchema}
-                        workspaceId={workspaceId}
-                        className="h-full"
-                      />
-                    ) : (
-                      <div className="h-full flex items-center justify-center p-8">
-                        <div className="text-center space-y-3">
-                          <div className="w-12 h-12 rounded-xl bg-surface-200/50 flex items-center justify-center mx-auto">
-                            <Eye className="w-5 h-5 text-foreground-muted" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">No App UI Yet</p>
-                            <p className="text-xs text-foreground-muted mt-1 max-w-[240px] mx-auto">
-                              Use the AI Chat to describe what you want to build. Once a UI schema
-                              is generated, your app will appear here in real-time.
-                            </p>
-                          </div>
-                          {!chatOpen && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs"
-                              onClick={() => setChatOpen(true)}
-                            >
-                              <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
-                              Open AI Chat
-                            </Button>
-                          )}
+                  {appLoading ? (
+                    <div className="h-full flex items-center justify-center p-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-foreground-muted" />
+                    </div>
+                  ) : appSchema && workspace?.slug ? (
+                    <AppAuthProvider workspaceSlug={workspace.slug}>
+                      <PreviewAppWithAuth workspaceSlug={workspace.slug} appSchema={appSchema} />
+                    </AppAuthProvider>
+                  ) : appSchema ? (
+                    <AppRenderer schema={appSchema} workspaceId={workspaceId} className="h-full" />
+                  ) : (
+                    <div className="h-full flex items-center justify-center p-8">
+                      <div className="text-center space-y-3">
+                        <div className="w-12 h-12 rounded-xl bg-surface-200/50 flex items-center justify-center mx-auto">
+                          <Eye className="w-5 h-5 text-foreground-muted" />
                         </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">No App UI Yet</p>
+                          <p className="text-xs text-foreground-muted mt-1 max-w-[240px] mx-auto">
+                            Use the AI Chat to describe what you want to build. Once a UI schema is
+                            generated, your app will appear here in real-time.
+                          </p>
+                        </div>
+                        {!chatOpen && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            onClick={() => setChatOpen(true)}
+                          >
+                            <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
+                            Open AI Chat
+                          </Button>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* ===== Files Tab ===== */}
             {activeTab === 'files' && workspaceId && (
-              <WorkspaceFilesPanel
-                workspaceId={workspaceId}
-                appSchema={appSchema}
-              />
+              <WorkspaceFilesPanel workspaceId={workspaceId} appSchema={appSchema} />
             )}
 
             {/* ===== Database Tab ===== */}
@@ -894,9 +918,7 @@ export default function WorkspacePage() {
                       <div className="flex items-center gap-1.5 text-[11px] text-foreground-light">
                         <Rows3 className="w-3 h-3 text-foreground-muted" />
                         <span className="font-medium">
-                          {dbTables
-                            .reduce((sum, t) => sum + t.row_count_est, 0)
-                            .toLocaleString()}
+                          {dbTables.reduce((sum, t) => sum + t.row_count_est, 0).toLocaleString()}
                         </span>
                         <span className="text-foreground-muted">rows</span>
                       </div>
@@ -908,9 +930,7 @@ export default function WorkspacePage() {
                           onClick={() => setDbRevision((r) => r + 1)}
                           title="Refresh tables"
                         >
-                          <RefreshCw
-                            className={cn('w-3 h-3', dbTablesLoading && 'animate-spin')}
-                          />
+                          <RefreshCw className={cn('w-3 h-3', dbTablesLoading && 'animate-spin')} />
                         </Button>
                         <Link
                           href="/dashboard/database/tables"
@@ -1183,7 +1203,8 @@ export default function WorkspacePage() {
                       <div>
                         <p className="text-sm font-medium text-foreground">No Versions Yet</p>
                         <p className="text-xs text-foreground-muted max-w-[220px] mx-auto mt-1">
-                          Versions are created automatically when you save pages, update the UI schema, or publish your app.
+                          Versions are created automatically when you save pages, update the UI
+                          schema, or publish your app.
                         </p>
                       </div>
                     </div>
@@ -1198,9 +1219,15 @@ export default function WorkspacePage() {
                       const isFirst = vIdx === 0
 
                       // Detect what content this version has
-                      const hasUISchema = Boolean(version.ui_schema && Object.keys(version.ui_schema).length > 0)
-                      const hasConfig = Boolean(version.config_json && Object.keys(version.config_json).length > 0)
-                      const hasDBSchema = Boolean(version.db_schema && Object.keys(version.db_schema).length > 0)
+                      const hasUISchema = Boolean(
+                        version.ui_schema && Object.keys(version.ui_schema).length > 0
+                      )
+                      const hasConfig = Boolean(
+                        version.config_json && Object.keys(version.config_json).length > 0
+                      )
+                      const hasDBSchema = Boolean(
+                        version.db_schema && Object.keys(version.db_schema).length > 0
+                      )
                       const hasChangelog = Boolean(version.changelog && version.changelog.trim())
 
                       // Count pages in this version's config
@@ -1236,9 +1263,7 @@ export default function WorkspacePage() {
                                       : 'border-border bg-surface-100'
                                 )}
                               >
-                                {isCurrent && (
-                                  <CheckCircle2 className="w-3 h-3 text-white" />
-                                )}
+                                {isCurrent && <CheckCircle2 className="w-3 h-3 text-white" />}
                               </div>
                             </div>
 
@@ -1359,35 +1384,55 @@ export default function WorkspacePage() {
                                       {(() => {
                                         const schema = version.ui_schema as Record<string, unknown>
                                         const appName = schema.app_name as string | undefined
-                                        const schemaVersion = schema.app_schema_version as string | undefined
-                                        const pages = schema.pages as Array<Record<string, unknown>> | undefined
-                                        const nav = schema.navigation as Record<string, unknown> | undefined
+                                        const schemaVersion = schema.app_schema_version as
+                                          | string
+                                          | undefined
+                                        const pages = schema.pages as
+                                          | Array<Record<string, unknown>>
+                                          | undefined
+                                        const nav = schema.navigation as
+                                          | Record<string, unknown>
+                                          | undefined
                                         return (
                                           <>
                                             {appName && (
                                               <div className="flex items-center gap-2 text-[11px]">
-                                                <span className="text-foreground-muted w-20 shrink-0">App Name</span>
-                                                <span className="text-foreground-light font-medium">{appName}</span>
+                                                <span className="text-foreground-muted w-20 shrink-0">
+                                                  App Name
+                                                </span>
+                                                <span className="text-foreground-light font-medium">
+                                                  {appName}
+                                                </span>
                                               </div>
                                             )}
                                             {schemaVersion && (
                                               <div className="flex items-center gap-2 text-[11px]">
-                                                <span className="text-foreground-muted w-20 shrink-0">Schema</span>
-                                                <span className="text-foreground-light font-mono text-[10px] bg-surface-200 px-1.5 py-0.5 rounded">{schemaVersion}</span>
+                                                <span className="text-foreground-muted w-20 shrink-0">
+                                                  Schema
+                                                </span>
+                                                <span className="text-foreground-light font-mono text-[10px] bg-surface-200 px-1.5 py-0.5 rounded">
+                                                  {schemaVersion}
+                                                </span>
                                               </div>
                                             )}
                                             {pages && pages.length > 0 && (
                                               <div className="text-[11px]">
-                                                <span className="text-foreground-muted">Pages: </span>
+                                                <span className="text-foreground-muted">
+                                                  Pages:{' '}
+                                                </span>
                                                 <div className="flex flex-wrap gap-1 mt-1">
                                                   {pages.map((p, i) => (
                                                     <span
                                                       key={i}
                                                       className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-600"
                                                     >
-                                                      {(p.title as string) || (p.id as string) || `Page ${i + 1}`}
+                                                      {(p.title as string) ||
+                                                        (p.id as string) ||
+                                                        `Page ${i + 1}`}
                                                       {Array.isArray(p.blocks) && (
-                                                        <span className="text-violet-400">({(p.blocks as unknown[]).length})</span>
+                                                        <span className="text-violet-400">
+                                                          ({(p.blocks as unknown[]).length})
+                                                        </span>
                                                       )}
                                                     </span>
                                                   ))}
@@ -1396,8 +1441,12 @@ export default function WorkspacePage() {
                                             )}
                                             {nav && (
                                               <div className="flex items-center gap-2 text-[11px]">
-                                                <span className="text-foreground-muted w-20 shrink-0">Navigation</span>
-                                                <span className="text-foreground-light capitalize">{(nav.type as string) || 'sidebar'}</span>
+                                                <span className="text-foreground-muted w-20 shrink-0">
+                                                  Navigation
+                                                </span>
+                                                <span className="text-foreground-light capitalize">
+                                                  {(nav.type as string) || 'sidebar'}
+                                                </span>
                                               </div>
                                             )}
                                           </>
@@ -1416,14 +1465,19 @@ export default function WorkspacePage() {
                                     <div className="space-y-1.5">
                                       {(() => {
                                         const cfg = version.config_json as Record<string, unknown>
-                                        const pages = cfg.pages as Array<Record<string, unknown>> | undefined
+                                        const pages = cfg.pages as
+                                          | Array<Record<string, unknown>>
+                                          | undefined
                                         const defaultPage = cfg.default_page as string | undefined
-                                        const navType = (cfg.navigation as Record<string, unknown>)?.type as string | undefined
+                                        const navType = (cfg.navigation as Record<string, unknown>)
+                                          ?.type as string | undefined
                                         return (
                                           <>
                                             {pages && pages.length > 0 && (
                                               <div className="text-[11px]">
-                                                <span className="text-foreground-muted">Pages ({pages.length}): </span>
+                                                <span className="text-foreground-muted">
+                                                  Pages ({pages.length}):{' '}
+                                                </span>
                                                 <div className="flex flex-wrap gap-1 mt-1">
                                                   {pages.map((p, i) => (
                                                     <span
@@ -1435,9 +1489,13 @@ export default function WorkspacePage() {
                                                           : 'bg-emerald-500/10 text-emerald-600'
                                                       )}
                                                     >
-                                                      {(p.title as string) || (p.id as string) || `Page ${i + 1}`}
+                                                      {(p.title as string) ||
+                                                        (p.id as string) ||
+                                                        `Page ${i + 1}`}
                                                       {(p.id as string) === defaultPage && (
-                                                        <span className="text-[8px] opacity-70">★</span>
+                                                        <span className="text-[8px] opacity-70">
+                                                          ★
+                                                        </span>
                                                       )}
                                                     </span>
                                                   ))}
@@ -1446,8 +1504,12 @@ export default function WorkspacePage() {
                                             )}
                                             {navType && (
                                               <div className="flex items-center gap-2 text-[11px]">
-                                                <span className="text-foreground-muted w-20 shrink-0">Navigation</span>
-                                                <span className="text-foreground-light capitalize">{navType}</span>
+                                                <span className="text-foreground-muted w-20 shrink-0">
+                                                  Navigation
+                                                </span>
+                                                <span className="text-foreground-light capitalize">
+                                                  {navType}
+                                                </span>
                                               </div>
                                             )}
                                           </>
@@ -1466,8 +1528,15 @@ export default function WorkspacePage() {
                                     <div className="text-[11px] text-foreground-light">
                                       {(() => {
                                         const db = version.db_schema as Record<string, unknown>
-                                        const tableNames = Object.keys(db).filter(k => k !== 'version' && k !== 'timestamp')
-                                        if (tableNames.length === 0) return <span className="text-foreground-muted">Schema snapshot</span>
+                                        const tableNames = Object.keys(db).filter(
+                                          (k) => k !== 'version' && k !== 'timestamp'
+                                        )
+                                        if (tableNames.length === 0)
+                                          return (
+                                            <span className="text-foreground-muted">
+                                              Schema snapshot
+                                            </span>
+                                          )
                                         return (
                                           <div className="flex flex-wrap gap-1">
                                             {tableNames.slice(0, 12).map((name) => (
@@ -1513,7 +1582,11 @@ export default function WorkspacePage() {
                                           setCompareLoading(true)
                                           setCompareError(null)
                                           if (!workspaceId) return
-                                          const diff = await appApi.compareVersions(workspaceId, fromId, toId)
+                                          const diff = await appApi.compareVersions(
+                                            workspaceId,
+                                            fromId,
+                                            toId
+                                          )
                                           setVersionDiff(diff)
                                         } catch {
                                           setCompareError('Comparison failed.')
@@ -1565,6 +1638,7 @@ export default function WorkspacePage() {
           </div>
         )}
       </div>
+      <RollbackDialog />
     </div>
   )
 }

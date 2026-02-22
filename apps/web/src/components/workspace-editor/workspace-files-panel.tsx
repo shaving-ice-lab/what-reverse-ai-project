@@ -134,7 +134,10 @@ export function WorkspaceFilesPanel({
         tables.map((t) => workspaceDatabaseApi.getTableSchema(workspaceId, t.name))
       )
       const schemas = results
-        .filter((r): r is PromiseFulfilledResult<TableSchema> => r.status === 'fulfilled' && r.value != null)
+        .filter(
+          (r): r is PromiseFulfilledResult<TableSchema> =>
+            r.status === 'fulfilled' && r.value != null
+        )
         .map((r) => r.value)
       setTableSchemas(schemas)
     } catch {
@@ -189,9 +192,10 @@ export function WorkspaceFilesPanel({
       name: 'schema.sql',
       path: '/database/schema.sql',
       language: 'sql',
-      content: ddlParts.length > 0
-        ? `-- Database Schema\n-- Generated from workspace: ${workspaceId}\n\n${ddlParts.join(';\n\n')};`
-        : '-- No database tables created yet',
+      content:
+        ddlParts.length > 0
+          ? `-- Database Schema\n-- Generated from workspace: ${workspaceId}\n\n${ddlParts.join(';\n\n')};`
+          : '-- No database tables created yet',
       icon: FileCode2,
     })
 
@@ -242,12 +246,14 @@ export function WorkspaceFilesPanel({
     }
 
     // Then root files
-    tree.push(...rootFiles.sort((a, b) => {
-      // README first
-      if (a.name === 'README.md') return -1
-      if (b.name === 'README.md') return 1
-      return a.name.localeCompare(b.name)
-    }))
+    tree.push(
+      ...rootFiles.sort((a, b) => {
+        // README first
+        if (a.name === 'README.md') return -1
+        if (b.name === 'README.md') return 1
+        return a.name.localeCompare(b.name)
+      })
+    )
 
     return tree
   }, [files])
@@ -298,8 +304,7 @@ export function WorkspaceFilesPanel({
             )}
             <span className="text-[12px] text-foreground font-medium truncate">{node.name}</span>
           </button>
-          {isExpanded &&
-            node.children.map((child) => renderTreeNode(child, depth + 1))}
+          {isExpanded && node.children.map((child) => renderTreeNode(child, depth + 1))}
         </div>
       )
     }
@@ -319,7 +324,12 @@ export function WorkspaceFilesPanel({
         )}
         style={{ paddingLeft: `${8 + depth * 12}px` }}
       >
-        <Icon className={cn('w-3.5 h-3.5 shrink-0', isActive ? 'text-brand-500' : getFileIconColor(file.language))} />
+        <Icon
+          className={cn(
+            'w-3.5 h-3.5 shrink-0',
+            isActive ? 'text-brand-500' : getFileIconColor(file.language)
+          )}
+        />
         <span className={cn('text-[12px] truncate', isActive && 'font-medium')}>{file.name}</span>
       </button>
     )

@@ -27,7 +27,6 @@ import {
   Plus,
   Star,
   Pencil,
-  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +39,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   workspaceApi,
   type Workspace,
@@ -49,6 +49,7 @@ import {
   type UpdateWorkspaceRequest,
   type LLMEndpoint,
   type AddLLMEndpointRequest,
+  type UpdateLLMEndpointRequest,
 } from '@/lib/api/workspace'
 
 // ===== Tab Types =====
@@ -145,7 +146,9 @@ export default function WorkspaceSettingsPage() {
       }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [workspaceId])
 
   const handleTabChange = (tab: SettingsTab) => {
@@ -184,21 +187,6 @@ export default function WorkspaceSettingsPage() {
       {/* Breadcrumb Header */}
       <div className="shrink-0 border-b border-border">
         <div className="max-w-5xl mx-auto px-6 py-4">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-[12px] text-foreground-muted mb-3">
-            <Link href="/dashboard/workspace" className="hover:text-foreground transition-colors">
-              Workspace
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link
-              href={`/dashboard/workspaces/${workspaceId}`}
-              className="hover:text-foreground transition-colors"
-            >
-              {workspace.name}
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-foreground font-medium">Settings</span>
-          </div>
           {/* Title */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center border border-brand-500/10">
@@ -275,9 +263,13 @@ function GeneralTab({
 
   const hasChanges = name !== workspace.name || slug !== workspace.slug
 
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
   const handleSave = async () => {
     if (!hasChanges) return
     setSaving(true)
+    setSaveError(null)
     try {
       const data: UpdateWorkspaceRequest = {}
       if (name !== workspace.name) data.name = name
@@ -286,8 +278,9 @@ function GeneralTab({
       onUpdate(updated)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
-    } catch (err) {
-      console.error('Failed to update workspace:', err)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save workspace'
+      setSaveError(msg)
     } finally {
       setSaving(false)
     }
@@ -296,10 +289,13 @@ function GeneralTab({
   const handleDelete = async () => {
     if (deleteConfirm !== workspace.name) return
     setDeleting(true)
+    setDeleteError(null)
     try {
       await workspaceApi.delete(workspace.id)
       router.push('/dashboard/workspace')
-    } catch {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete workspace'
+      setDeleteError(msg)
       setDeleting(false)
     }
   }
@@ -323,6 +319,7 @@ function GeneralTab({
           </Button>
         }
       >
+        {saveError && <p className="text-[12px] text-destructive mb-3">{saveError}</p>}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="text-[11px] text-foreground-muted uppercase tracking-wider font-medium">
@@ -353,7 +350,10 @@ function GeneralTab({
       </SettingsSection>
 
       {/* Info Cards */}
-      <SettingsSection title="Workspace Info" description="Current workspace status and configuration.">
+      <SettingsSection
+        title="Workspace Info"
+        description="Current workspace status and configuration."
+      >
         <div className="grid grid-cols-3 gap-3">
           <InfoCard label="Status" value={workspace.status} />
           <InfoCard label="Plan" value={workspace.plan.toUpperCase()} />
@@ -374,6 +374,7 @@ function GeneralTab({
         description="Permanently remove this workspace and all its data including database tables, app schema, and published runtime. This cannot be undone."
         variant="danger"
       >
+        {deleteError && <p className="text-[12px] text-destructive mb-3">{deleteError}</p>}
         <div className="flex items-end gap-3">
           <div className="flex-1">
             <label className="text-[11px] text-foreground-muted">
@@ -430,57 +431,27 @@ function InfoCard({
 
 function MembersTab({ workspaceId }: { workspaceId: string }) {
   const [members, setMembers] = useState<WorkspaceMember[]>([])
-  const roles: WorkspaceRole[] = [
-    {
-      id: 'owner',
-      workspace_id: workspaceId,
-      name: 'owner',
-      permissions: {},
-      is_system: true,
-      created_at: '',
-      updated_at: '',
-    },
-    {
-      id: 'admin',
-      workspace_id: workspaceId,
-      name: 'admin',
-      permissions: {},
-      is_system: true,
-      created_at: '',
-      updated_at: '',
-    },
-    {
-      id: 'member',
-      workspace_id: workspaceId,
-      name: 'member',
-      permissions: {},
-      is_system: true,
-      created_at: '',
-      updated_at: '',
-    },
-    {
-      id: 'viewer',
-      workspace_id: workspaceId,
-      name: 'viewer',
-      permissions: {},
-      is_system: true,
-      created_at: '',
-      updated_at: '',
-    },
-  ]
+  const [roles, setRoles] = useState<WorkspaceRole[]>([])
   const [loading, setLoading] = useState(true)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('member')
   const [inviting, setInviting] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [removeError, setRemoveError] = useState<string | null>(null)
+  const [roleChangeError, setRoleChangeError] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const membersData = await workspaceApi.getMembers(workspaceId)
+      const [membersData, rolesData] = await Promise.all([
+        workspaceApi.getMembers(workspaceId),
+        workspaceApi.listRoles(workspaceId),
+      ])
       setMembers(Array.isArray(membersData) ? membersData : [])
+      setRoles(Array.isArray(rolesData) ? rolesData : [])
     } catch (err) {
-      console.error('Failed to load members:', err)
+      console.error('Failed to load members/roles:', err)
     } finally {
       setLoading(false)
     }
@@ -490,56 +461,81 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
     loadData()
   }, [loadData])
 
+  useEffect(() => {
+    if (roles.length > 0 && !roles.some((r) => r.id === inviteRole)) {
+      const defaultRole =
+        roles.find((r) => r.name === 'member') || roles.find((r) => r.name !== 'owner')
+      if (defaultRole) setInviteRole(defaultRole.id)
+    }
+  }, [roles])
+
   const handleInvite = async () => {
     if (!inviteEmail.trim() || !inviteRole) return
     setInviting(true)
+    setInviteError(null)
     try {
       await workspaceApi.inviteMember(workspaceId, {
         email: inviteEmail.trim(),
-        role: inviteRole,
+        role: roles.find((r) => r.id === inviteRole)?.name || inviteRole,
       })
       setInviteEmail('')
       setShowInvite(false)
       await loadData()
-    } catch (err) {
-      console.error('Failed to invite member:', err)
+    } catch (err: unknown) {
+      setInviteError(err instanceof Error ? err.message : 'Failed to invite member')
     } finally {
       setInviting(false)
     }
   }
 
+  const { confirm: confirmRemoveMember, Dialog: RemoveMemberDialog } = useConfirmDialog()
+
   const handleRemove = async (memberId: string) => {
-    if (!window.confirm('Remove this member from the workspace?')) return
+    const confirmed = await confirmRemoveMember({
+      title: 'Remove Member',
+      description: 'Remove this member from the workspace?',
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    })
+    if (!confirmed) return
+    setRemoveError(null)
     try {
       await workspaceApi.removeMember(workspaceId, memberId)
       setMembers((prev) => prev.filter((m) => m.id !== memberId))
-    } catch (err) {
-      console.error('Failed to remove member:', err)
+    } catch (err: unknown) {
+      setRemoveError(err instanceof Error ? err.message : 'Failed to remove member')
     }
   }
 
   const handleRoleChange = async (memberId: string, roleId: string) => {
+    setRoleChangeError(null)
     try {
       await workspaceApi.updateMemberRole(workspaceId, memberId, { role_id: roleId })
+      const matched = roles.find((r) => r.id === roleId)
       setMembers((prev) =>
         prev.map((m) =>
           m.id === memberId
-            ? { ...m, role_id: roleId, role: roles.find((r) => r.id === roleId) || m.role }
+            ? {
+                ...m,
+                role_id: roleId,
+                role: matched ? { id: matched.id, name: matched.name } : m.role,
+              }
             : m
         )
       )
-    } catch (err) {
-      console.error('Failed to update member role:', err)
+    } catch (err: unknown) {
+      setRoleChangeError(err instanceof Error ? err.message : 'Failed to update role')
     }
   }
 
   const getRoleName = (member: WorkspaceMember) => {
-    return member.role?.name || roles.find((r) => r.id === member.role_id)?.name || 'member'
+    if (member.role?.name) return member.role.name
+    return roles.find((r) => r.id === member.role_id)?.name || 'member'
   }
 
   return (
     <div className="space-y-6">
-      {/* Invite */}
       <SettingsSection
         title="Team Members"
         description="Manage who has access to this workspace and their permissions."
@@ -550,7 +546,9 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
           </Button>
         }
       >
-        {/* Invite Form */}
+        {inviteError && <p className="text-[12px] text-destructive mb-3">{inviteError}</p>}
+        {removeError && <p className="text-[12px] text-destructive mb-3">{removeError}</p>}
+        {roleChangeError && <p className="text-[12px] text-destructive mb-3">{roleChangeError}</p>}
         {showInvite && (
           <div className="rounded-lg border border-brand-500/20 bg-brand-500/5 p-4 mb-4">
             <div className="flex items-end gap-2">
@@ -575,11 +573,13 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
                     <SelectValue placeholder="Role" />
                   </SelectTrigger>
                   <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.id} value={role.id}>
-                        {role.name}
-                      </SelectItem>
-                    ))}
+                    {roles
+                      .filter((r) => r.name !== 'owner')
+                      .map((role) => (
+                        <SelectItem key={role.id} value={role.id}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -594,8 +594,6 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
             </div>
           </div>
         )}
-
-        {/* Members List */}
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
@@ -609,8 +607,12 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
             <table className="w-full">
               <thead>
                 <tr className="bg-background border-b border-border">
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Member</th>
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Role</th>
+                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                    Member
+                  </th>
+                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                    Role
+                  </th>
                   <th className="text-right px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider w-16" />
                 </tr>
               </thead>
@@ -619,15 +621,25 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
                   const roleName = getRoleName(member)
                   const isOwner = roleName === 'owner'
                   return (
-                    <tr key={member.id} className="border-b border-border last:border-b-0 hover:bg-background/50 transition-colors">
+                    <tr
+                      key={member.id}
+                      className="border-b border-border last:border-b-0 hover:bg-background/50 transition-colors"
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-surface-200 flex items-center justify-center shrink-0">
                             {member.user?.avatar_url ? (
-                              <img src={member.user.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                              <img
+                                src={member.user.avatar_url}
+                                alt=""
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
                             ) : (
                               <span className="text-[11px] font-semibold text-foreground-muted">
-                                {(member.user?.display_name || member.user?.username || member.user?.email || '?')[0].toUpperCase()}
+                                {(member.user?.display_name ||
+                                  member.user?.username ||
+                                  member.user?.email ||
+                                  '?')[0].toUpperCase()}
                               </span>
                             )}
                           </div>
@@ -648,25 +660,34 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
                               )}
                             </div>
                             <div className="text-[11px] text-foreground-muted truncate">
-                              {member.user?.email || '—'}
+                              {member.user?.email || '\u2014'}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         {!isOwner ? (
-                          <Select value={member.role_id} onValueChange={(v) => handleRoleChange(member.id, v)}>
+                          <Select
+                            value={member.role_id || ''}
+                            onValueChange={(v) => handleRoleChange(member.id, v)}
+                          >
                             <SelectTrigger className="h-7 w-28 text-[11px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {roles.filter((r) => r.name !== 'owner').map((role) => (
-                                <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
-                              ))}
+                              {roles
+                                .filter((r) => r.name !== 'owner')
+                                .map((role) => (
+                                  <SelectItem key={role.id} value={role.id}>
+                                    {role.name}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                         ) : (
-                          <span className="text-[11px] text-foreground-muted capitalize">owner</span>
+                          <span className="text-[11px] text-foreground-muted capitalize">
+                            owner
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -687,16 +708,22 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
           </div>
         )}
       </SettingsSection>
-
-      {/* Roles */}
       {roles.length > 0 && (
-        <SettingsSection title="Available Roles" description="System-defined roles and their permissions.">
+        <SettingsSection
+          title="Available Roles"
+          description="System-defined roles and their permissions."
+        >
           <div className="grid grid-cols-2 gap-2">
             {roles.map((role) => (
-              <div key={role.id} className="rounded-lg bg-background border border-border/50 px-3.5 py-2.5">
+              <div
+                key={role.id}
+                className="rounded-lg bg-background border border-border/50 px-3.5 py-2.5"
+              >
                 <div className="flex items-center gap-1.5">
                   <Shield className="w-3 h-3 text-foreground-muted" />
-                  <span className="text-[12px] font-semibold text-foreground capitalize">{role.name}</span>
+                  <span className="text-[12px] font-semibold text-foreground capitalize">
+                    {role.name}
+                  </span>
                   {role.is_system && (
                     <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-surface-200 text-foreground-muted font-medium uppercase tracking-wider">
                       System
@@ -718,6 +745,7 @@ function MembersTab({ workspaceId }: { workspaceId: string }) {
           </div>
         </SettingsSection>
       )}
+      <RemoveMemberDialog />
     </div>
   )
 }
@@ -782,12 +810,10 @@ function BillingTab({ workspaceId, workspace }: { workspaceId: string; workspace
       ],
     },
   }
-
   const currentPlan = planConfig[workspace.plan] || planConfig.free
 
   return (
     <div className="space-y-6">
-      {/* Current Plan */}
       <SettingsSection
         title="Current Plan"
         description="View your current plan and upgrade options."
@@ -811,9 +837,7 @@ function BillingTab({ workspaceId, workspace }: { workspaceId: string; workspace
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base font-semibold text-foreground">
-                  {currentPlan.label}
-                </span>
+                <span className="text-base font-semibold text-foreground">{currentPlan.label}</span>
                 <span
                   className={cn(
                     'px-2 py-0.5 text-[9px] font-bold rounded-full uppercase tracking-wider',
@@ -825,25 +849,47 @@ function BillingTab({ workspaceId, workspace }: { workspaceId: string; workspace
                 </span>
               </div>
               <p className="text-[11px] text-foreground-muted mt-0.5">
-                {currentPlan.features.join(' · ')}
+                {currentPlan.features.join(' \u00b7 ')}
               </p>
             </div>
           </div>
         </div>
       </SettingsSection>
-
-      {/* Usage Metrics */}
-      <SettingsSection title="Resource Usage" description="Monitor your workspace resource consumption.">
+      <SettingsSection
+        title="Resource Usage"
+        description="Monitor your workspace resource consumption."
+      >
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 animate-spin text-foreground-muted" />
           </div>
         ) : quota ? (
           <div className="grid grid-cols-2 gap-3">
-            <UsageCard label="API Requests" icon={BarChart3} used={quota.requests?.used ?? 0} limit={quota.requests?.limit ?? 0} />
-            <UsageCard label="Tokens" icon={Zap} used={quota.tokens?.used ?? 0} limit={quota.tokens?.limit ?? 0} />
-            <UsageCard label="Storage" icon={HardDrive} used={quota.storage?.used ?? 0} limit={quota.storage?.limit ?? 0} unit="GB" />
-            <UsageCard label="Apps" icon={Database} used={quota.apps?.used ?? 0} limit={quota.apps?.limit ?? 0} />
+            <UsageCard
+              label="API Requests"
+              icon={BarChart3}
+              used={quota.requests?.used ?? 0}
+              limit={quota.requests?.limit ?? 0}
+            />
+            <UsageCard
+              label="Tokens"
+              icon={Zap}
+              used={quota.tokens?.used ?? 0}
+              limit={quota.tokens?.limit ?? 0}
+            />
+            <UsageCard
+              label="Storage"
+              icon={HardDrive}
+              used={quota.storage?.used ?? 0}
+              limit={quota.storage?.limit ?? 0}
+              unit="GB"
+            />
+            <UsageCard
+              label="Apps"
+              icon={Database}
+              used={quota.apps?.used ?? 0}
+              limit={quota.apps?.limit ?? 0}
+            />
           </div>
         ) : (
           <div className="text-center py-8 text-[12px] text-foreground-muted rounded-lg border border-dashed border-border">
@@ -872,7 +918,6 @@ function UsageCard({
   const percentage = isUnlimited ? 0 : Math.min((used / limit) * 100, 100)
   const isHigh = percentage > 80
   const isCritical = percentage > 95
-
   return (
     <div className="rounded-lg border border-border/50 bg-background p-3.5 space-y-2">
       <div className="flex items-center justify-between">
@@ -931,6 +976,7 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { confirm: confirmDeleteEndpoint, Dialog: DeleteEndpointDialog } = useConfirmDialog()
 
   // Form state
   const [formName, setFormName] = useState('')
@@ -951,7 +997,9 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
     }
   }, [workspaceId])
 
-  useEffect(() => { loadEndpoints() }, [loadEndpoints])
+  useEffect(() => {
+    loadEndpoints()
+  }, [loadEndpoints])
 
   const resetForm = () => {
     setFormName('')
@@ -989,8 +1037,9 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
       await workspaceApi.addLLMEndpoint(workspaceId, data)
       resetForm()
       await loadEndpoints()
-    } catch {
-      setError('Failed to add endpoint')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to add endpoint'
+      setError(msg)
     } finally {
       setActionLoading(null)
     }
@@ -1010,10 +1059,14 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
 
   const handleUpdate = async () => {
     if (!editingId) return
+    if (!formName.trim() || !formModel.trim()) {
+      setError('Name and Model are required')
+      return
+    }
     setActionLoading('update')
     setError(null)
     try {
-      const data: Record<string, string> = {}
+      const data: UpdateLLMEndpointRequest = {}
       if (formName.trim()) data.name = formName.trim()
       if (formProvider) data.provider = formProvider
       if (formApiKey.trim()) data.api_key = formApiKey.trim()
@@ -1022,20 +1075,32 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
       await workspaceApi.updateLLMEndpoint(workspaceId, editingId, data)
       resetForm()
       await loadEndpoints()
-    } catch {
-      setError('Failed to update endpoint')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update endpoint'
+      setError(msg)
     } finally {
       setActionLoading(null)
     }
   }
 
   const handleDelete = async (id: string) => {
+    const ep = endpoints.find((e) => e.id === id)
+    const confirmed = await confirmDeleteEndpoint({
+      title: 'Delete Endpoint',
+      description: `Delete "${ep?.name || 'this endpoint'}"? This cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    })
+    if (!confirmed) return
     setActionLoading(id)
+    setError(null)
     try {
       await workspaceApi.deleteLLMEndpoint(workspaceId, id)
       await loadEndpoints()
-    } catch {
-      setError('Failed to delete endpoint')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete endpoint'
+      setError(msg)
     } finally {
       setActionLoading(null)
     }
@@ -1043,11 +1108,13 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
 
   const handleSetDefault = async (id: string) => {
     setActionLoading(id)
+    setError(null)
     try {
       await workspaceApi.setDefaultLLMEndpoint(workspaceId, id)
       await loadEndpoints()
-    } catch {
-      setError('Failed to set default')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to set default'
+      setError(msg)
     } finally {
       setActionLoading(null)
     }
@@ -1070,7 +1137,14 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
         description="Manage LLM endpoints for this workspace. The default endpoint is used by the AI Agent and all system features."
         action={
           !showForm ? (
-            <Button size="sm" onClick={() => { resetForm(); setShowForm(true) }} className="h-8 shrink-0">
+            <Button
+              size="sm"
+              onClick={() => {
+                resetForm()
+                setShowForm(true)
+              }}
+              className="h-8 shrink-0"
+            >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add Endpoint
             </Button>
@@ -1124,7 +1198,9 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
                   </SelectTrigger>
                   <SelectContent>
                     {LLM_PROVIDERS.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      <SelectItem key={p.value} value={p.value}>
+                        {p.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -1133,7 +1209,10 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
 
             <div>
               <label className="text-[11px] text-foreground-muted uppercase tracking-wider font-medium">
-                API Key {editingId && <span className="normal-case text-foreground-muted">(leave empty to keep)</span>}
+                API Key{' '}
+                {editingId && (
+                  <span className="normal-case text-foreground-muted">(leave empty to keep)</span>
+                )}
               </label>
               <div className="relative mt-1.5">
                 <Input
@@ -1148,7 +1227,11 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
                   onClick={() => setShowApiKey(!showApiKey)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
                 >
-                  {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  {showApiKey ? (
+                    <EyeOff className="w-3.5 h-3.5" />
+                  ) : (
+                    <Eye className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -1218,94 +1301,124 @@ function LLMTab({ workspaceId }: { workspaceId: string }) {
           <div className="rounded-lg border border-dashed border-border py-12 flex flex-col items-center gap-2">
             <Bot className="w-8 h-8 text-foreground-muted" />
             <p className="text-[12px] text-foreground-muted">No LLM endpoints configured yet.</p>
-            <Button size="sm" variant="outline" onClick={() => { resetForm(); setShowForm(true) }} className="h-8 mt-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                resetForm()
+                setShowForm(true)
+              }}
+              className="h-8 mt-2"
+            >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add your first endpoint
             </Button>
           </div>
-        ) : endpoints.length > 0 && (
-          <div className="rounded-lg border border-border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-background border-b border-border">
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Name</th>
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Model</th>
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Provider</th>
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Key</th>
-                  <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">Status</th>
-                  <th className="text-right px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider w-20" />
-                </tr>
-              </thead>
-              <tbody>
-                {endpoints.map((ep) => (
-                  <tr key={ep.id} className="border-b border-border last:border-b-0 hover:bg-background/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <span className="text-[12px] font-medium text-foreground">{ep.name}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-[11px] font-mono text-foreground-muted">{ep.model}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-[11px] text-foreground-muted capitalize">{ep.provider}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {ep.has_api_key ? (
-                        <span className="text-[10px] font-mono text-foreground-muted">{ep.api_key_preview}</span>
-                      ) : (
-                        <span className="text-[10px] text-destructive">Not set</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {ep.is_default ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-500/10 text-brand-500 border border-brand-500/20">
-                          <Star className="w-3 h-3" />
-                          Default
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => handleSetDefault(ep.id)}
-                          disabled={actionLoading === ep.id}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-foreground-muted border border-border hover:border-brand-500/30 hover:text-brand-500 transition-colors"
-                        >
-                          {actionLoading === ep.id ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <Star className="w-3 h-3" />
-                          )}
-                          Set Default
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => handleEdit(ep)}
-                          className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
-                          title="Edit"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(ep.id)}
-                          disabled={actionLoading === ep.id}
-                          className="p-1.5 rounded-md hover:bg-destructive/10 text-foreground-muted hover:text-destructive transition-colors"
-                          title="Delete"
-                        >
-                          {actionLoading === ep.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </td>
+        ) : (
+          endpoints.length > 0 && (
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-background border-b border-border">
+                    <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                      Model
+                    </th>
+                    <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                      Provider
+                    </th>
+                    <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                      Key
+                    </th>
+                    <th className="text-left px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="text-right px-4 py-2 text-[10px] font-medium text-foreground-muted uppercase tracking-wider w-20" />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {endpoints.map((ep) => (
+                    <tr
+                      key={ep.id}
+                      className="border-b border-border last:border-b-0 hover:bg-background/50 transition-colors"
+                    >
+                      <td className="px-4 py-3">
+                        <span className="text-[12px] font-medium text-foreground">{ep.name}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-[11px] font-mono text-foreground-muted">
+                          {ep.model}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-[11px] text-foreground-muted capitalize">
+                          {ep.provider}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {ep.has_api_key ? (
+                          <span className="text-[10px] font-mono text-foreground-muted">
+                            {ep.api_key_preview}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-destructive">Not set</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {ep.is_default ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-500/10 text-brand-500 border border-brand-500/20">
+                            <Star className="w-3 h-3" />
+                            Default
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleSetDefault(ep.id)}
+                            disabled={actionLoading === ep.id}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-foreground-muted border border-border hover:border-brand-500/30 hover:text-brand-500 transition-colors"
+                          >
+                            {actionLoading === ep.id ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <Star className="w-3 h-3" />
+                            )}
+                            Set Default
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleEdit(ep)}
+                            className="p-1.5 rounded-md hover:bg-surface-200 text-foreground-muted hover:text-foreground transition-colors"
+                            title="Edit"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(ep.id)}
+                            disabled={actionLoading === ep.id}
+                            className="p-1.5 rounded-md hover:bg-destructive/10 text-foreground-muted hover:text-destructive transition-colors"
+                            title="Delete"
+                          >
+                            {actionLoading === ep.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
       </SettingsSection>
+      <DeleteEndpointDialog />
     </div>
   )
 }

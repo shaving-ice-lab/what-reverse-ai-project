@@ -42,7 +42,6 @@ import { useCommandPalette } from '@/components/dashboard/use-command-palette'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { workspaceApi, type Workspace, type WorkspaceQuota } from '@/lib/api/workspace'
-import { agentChatApi } from '@/lib/api/agent-chat'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +50,14 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { WorkspaceContext, WORKSPACE_STORAGE_KEY, RECENT_WORKSPACE_STORAGE_KEY, RECENT_WORKSPACE_LIMIT, SETUP_STORAGE_KEY } from '@/hooks/useWorkspace'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
+import {
+  WorkspaceContext,
+  WORKSPACE_STORAGE_KEY,
+  RECENT_WORKSPACE_STORAGE_KEY,
+  RECENT_WORKSPACE_LIMIT,
+  SETUP_STORAGE_KEY,
+} from '@/hooks/useWorkspace'
 
 // mainNavigationMenu — workspace-scoped
 function getMainNavItems(workspaceId: string | null) {
@@ -110,8 +116,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const { user, logout } = useAuthStore()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [showHistory, setShowHistory] = useState(true)
-  const [activeConversation, setActiveConversation] = useState<string | null>(null)
   const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const commandPalette = useCommandPalette()
@@ -123,9 +127,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [recentWorkspaceIds, setRecentWorkspaceIds] = useState<string[]>([])
   const [needsSetup, setNeedsSetup] = useState(false)
   const [setupChecked, setSetupChecked] = useState(false)
-  const [recentConversations, setRecentConversations] = useState<
-    { id: string; title: string; time: string }[]
-  >([])
   const resolvedMainNavItems = useMemo(() => {
     const items = getMainNavItems(activeWorkspaceId)
     return user?.role === 'admin'
@@ -287,36 +288,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [activeWorkspaceId])
 
-  useEffect(() => {
-    if (!activeWorkspaceId) {
-      setRecentConversations([])
-      return
-    }
-    let isActive = true
-    const loadSessions = async () => {
-      try {
-        const sessions = await agentChatApi.listSessions(activeWorkspaceId)
-        if (!isActive) return
-        const items = (sessions || []).slice(0, 5).map((s) => ({
-          id: s.id,
-          title: s.title || `Session ${s.id.slice(0, 8)}`,
-          time: s.updated_at
-            ? formatRelativeTime(s.updated_at)
-            : s.created_at
-              ? formatRelativeTime(s.created_at)
-              : '',
-        }))
-        setRecentConversations(items)
-      } catch {
-        if (isActive) setRecentConversations([])
-      }
-    }
-    loadSessions()
-    return () => {
-      isActive = false
-    }
-  }, [activeWorkspaceId])
-
   // SwitchTheme
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
@@ -359,19 +330,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     [activeWorkspaceId, updateRecentWorkspaces]
   )
 
+  const { confirm: confirmWorkspaceSwitch, Dialog: SwitchWorkspaceDialog } = useConfirmDialog()
+
   const handleWorkspaceSwitch = useCallback(
-    (workspaceId: string) => {
+    async (workspaceId: string) => {
       if (workspaceId === activeWorkspaceId) return
-      if (typeof window !== 'undefined' && activeWorkspaceId) {
-        const confirmed = window.confirm(
-          'Switching workspace will leave the current context. Continue?'
-        )
+      if (activeWorkspaceId) {
+        const confirmed = await confirmWorkspaceSwitch({
+          title: 'Switch Workspace',
+          description: 'Switching workspace will leave the current context. Continue?',
+          confirmText: 'Switch',
+          cancelText: 'Cancel',
+        })
         if (!confirmed) return
       }
       switchWorkspaceSilent(workspaceId)
       router.push('/dashboard')
     },
-    [activeWorkspaceId, switchWorkspaceSilent, router]
+    [activeWorkspaceId, switchWorkspaceSilent, router, confirmWorkspaceSwitch]
   )
 
   const activePlan = resolvePlanConfig(activeWorkspace?.plan)
@@ -513,7 +489,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-72 bg-surface-100 border-border p-0">
+                <DropdownMenuContent
+                  align="start"
+                  className="w-72 bg-surface-100 border-border p-0"
+                >
                   {/* Active workspace info */}
                   {activeWorkspace && (
                     <div className="px-3 py-2.5 border-b border-border">
@@ -549,19 +528,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
-                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`} className="flex items-center gap-2.5">
+                        <Link
+                          href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=members`}
+                          className="flex items-center gap-2.5"
+                        >
                           <Users className="w-3.5 h-3.5 text-foreground-lighter" />
                           Members
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
-                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing`} className="flex items-center gap-2.5">
+                        <Link
+                          href={`/dashboard/workspaces/${activeWorkspace.id}/settings?tab=billing`}
+                          className="flex items-center gap-2.5"
+                        >
                           <CreditCard className="w-3.5 h-3.5 text-foreground-lighter" />
                           Usage & Billing
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
-                        <Link href={`/dashboard/workspaces/${activeWorkspace.id}/settings`} className="flex items-center gap-2.5">
+                        <Link
+                          href={`/dashboard/workspaces/${activeWorkspace.id}/settings`}
+                          className="flex items-center gap-2.5"
+                        >
                           <Settings className="w-3.5 h-3.5 text-foreground-lighter" />
                           Settings
                         </Link>
@@ -609,7 +597,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                               <div
                                 className={cn(
                                   'w-1.5 h-1.5 rounded-full shrink-0',
-                                  workspace.status === 'active' ? 'bg-emerald-500' : 'bg-foreground-muted/30'
+                                  workspace.status === 'active'
+                                    ? 'bg-emerald-500'
+                                    : 'bg-foreground-muted/30'
                                 )}
                               />
                               <span className="truncate flex-1 font-medium">{workspace.name}</span>
@@ -749,7 +739,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-surface-100 border-border p-0">
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 bg-surface-100 border-border p-0"
+                  >
                     <div className="px-3 py-2.5 border-b border-border">
                       <p className="text-[12px] font-semibold text-foreground truncate">
                         {user?.display_name || user?.username}
@@ -770,7 +763,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="text-[12px] h-8 px-3">
-                        <Link href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`} className="flex items-center gap-2.5">
+                        <Link
+                          href={`/dashboard/workspaces/${activeWorkspace?.id}/settings?tab=billing`}
+                          className="flex items-center gap-2.5"
+                        >
                           <CreditCard className="w-3.5 h-3.5 text-foreground-lighter" />
                           Billing
                         </Link>
@@ -859,55 +855,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         })}
                       </nav>
                     </div>
-
-                    {/* ConversationHistory */}
-                    {!sidebarCollapsed && (
-                      <>
-                        <div className="my-1.5 h-px bg-border" />
-                        <div>
-                          <button
-                            onClick={() => setShowHistory(!showHistory)}
-                            className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-foreground-muted transition-colors w-full hover:text-foreground"
-                          >
-                            <ChevronDown
-                              className={cn(
-                                'w-3 h-3 transition-transform',
-                                !showHistory && '-rotate-90'
-                              )}
-                            />
-                            Recent Conversations
-                          </button>
-
-                          {showHistory && (
-                            <div className="py-1 space-y-0.5">
-                              {recentConversations.map((conv) => (
-                                <button
-                                  key={conv.id}
-                                  onClick={() => {
-                                    setActiveConversation(conv.id)
-                                    router.push(`/dashboard/workspace?session=${conv.id}`)
-                                  }}
-                                  className={cn(
-                                    'w-full text-left px-2 py-1.5 rounded-md text-[11px] transition-colors relative',
-                                    activeConversation === conv.id
-                                      ? 'bg-surface-100/70 text-foreground'
-                                      : 'text-foreground-muted hover:bg-surface-100/60 hover:text-foreground'
-                                  )}
-                                >
-                                  {activeConversation === conv.id && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-r-full bg-brand-500" />
-                                  )}
-                                  <p className="truncate leading-snug">{conv.title}</p>
-                                  <p className="text-[10px] mt-0.5 text-foreground-muted">
-                                    {conv.time}
-                                  </p>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
                   </div>
 
                   {/* FooterRegion */}
@@ -998,6 +945,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </main>
             </div>
 
+            {/* Workspace Switch Confirm Dialog */}
+            <SwitchWorkspaceDialog />
 
             {/* CommandPanel */}
             {commandPalette.isOpen && (

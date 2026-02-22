@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { request } from '@/lib/api/shared'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 
 interface SkillMeta {
   id: string
@@ -143,9 +144,18 @@ export default function SkillsPage() {
     }
   }
 
+  const { confirm: confirmDeleteSkill, Dialog: DeleteSkillDialog } = useConfirmDialog()
+
   const handleDeleteSkill = async (skillId: string) => {
     if (!workspaceId) return
-    if (!confirm('Delete this custom skill?')) return
+    const confirmed = await confirmDeleteSkill({
+      title: 'Delete Skill',
+      description: 'Delete this custom skill? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
     setDeleting(skillId)
     try {
       await request(`/workspaces/${workspaceId}/agent/skills/${skillId}`, { method: 'DELETE' })
@@ -402,6 +412,7 @@ export default function SkillsPage() {
             }}
           />
         )}
+        <DeleteSkillDialog />
       </div>
     </div>
   )
