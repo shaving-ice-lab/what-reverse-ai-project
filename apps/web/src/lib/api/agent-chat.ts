@@ -109,6 +109,29 @@ export interface AgentStatus {
   active_sessions: number
 }
 
+export interface PlanGroup {
+  id: string
+  label: string
+  icon?: string
+}
+
+export interface PlanStep {
+  id: string
+  description: string
+  tool?: string
+  status: 'pending' | 'in_progress' | 'completed' | 'failed'
+  note?: string
+  group_id?: string
+}
+
+export interface AgentPlan {
+  title: string
+  status: 'draft' | 'confirmed' | 'in_progress' | 'completed'
+  summary?: string
+  groups?: PlanGroup[]
+  steps: PlanStep[]
+}
+
 // ========== SSE Chat Stream ==========
 
 export interface ChatStreamOptions {
@@ -229,6 +252,19 @@ export const agentChatApi = {
       method: 'DELETE',
     })
     return unwrap<{ message: string }>(res)
+  },
+
+  async confirmPlan(
+    workspaceId: string,
+    sessionId: string
+  ): Promise<{ message: string; phase: string; plan: AgentPlan }> {
+    const res = await request(
+      `/workspaces/${workspaceId}/agent/sessions/${sessionId}/confirm-plan`,
+      {
+        method: 'POST',
+      }
+    )
+    return unwrap<{ message: string; phase: string; plan: AgentPlan }>(res)
   },
 
   async getStatus(workspaceId: string): Promise<AgentStatus> {

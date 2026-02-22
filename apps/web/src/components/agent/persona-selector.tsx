@@ -116,7 +116,12 @@ export function PersonaTabBar({
   if (personas.length === 0) return null
 
   return (
-    <div className={cn('flex items-center gap-1 px-2 py-1.5 overflow-x-auto scrollbar-none', className)}>
+    <div
+      className={cn(
+        'flex items-center gap-1 px-2 py-1.5 overflow-x-auto scrollbar-none',
+        className
+      )}
+    >
       {personas.map((persona) => {
         const Icon = personaIconMap[persona.icon] || Bot
         const colors = personaColorMap[persona.color] || defaultColor
@@ -164,16 +169,11 @@ export function PersonaWelcome({ persona, onSuggestionClick, className }: Person
       )}
     >
       <div
-        className={cn(
-          'w-12 h-12 rounded-xl flex items-center justify-center mb-3',
-          colors.iconBg
-        )}
+        className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-3', colors.iconBg)}
       >
         <Icon className={cn('w-6 h-6', colors.text)} />
       </div>
-      <p className="font-medium text-foreground text-sm">
-        {persona?.name || 'AI Assistant'}
-      </p>
+      <p className="font-medium text-foreground text-sm">{persona?.name || 'AI Assistant'}</p>
       <p className="text-xs mt-1 text-center max-w-[280px] text-foreground-muted leading-relaxed">
         {persona?.description || 'Select an assistant above to get started.'}
       </p>
