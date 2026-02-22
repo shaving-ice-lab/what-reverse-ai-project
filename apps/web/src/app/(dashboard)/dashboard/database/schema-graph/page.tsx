@@ -61,14 +61,19 @@ const GRID_COLS = 4
 // ===== Column type icon helper =====
 function getColumnTypeIcon(type: string) {
   const t = type.toUpperCase()
-  if (t.includes('INT') || t.includes('REAL') || t.includes('FLOAT') || t.includes('DOUBLE') || t.includes('NUMERIC') || t.includes('DECIMAL'))
+  if (
+    t.includes('INT') ||
+    t.includes('REAL') ||
+    t.includes('FLOAT') ||
+    t.includes('DOUBLE') ||
+    t.includes('NUMERIC') ||
+    t.includes('DECIMAL')
+  )
     return Hash
   if (t.includes('TEXT') || t.includes('VARCHAR') || t.includes('CHAR') || t.includes('STRING'))
     return Type
-  if (t.includes('BOOL'))
-    return ToggleLeft
-  if (t.includes('DATE') || t.includes('TIME') || t.includes('TIMESTAMP'))
-    return Calendar
+  if (t.includes('BOOL')) return ToggleLeft
+  if (t.includes('DATE') || t.includes('TIME') || t.includes('TIMESTAMP')) return Calendar
   return Hash
 }
 
@@ -179,15 +184,27 @@ function TableNodeComponent({ data, selected }: NodeProps) {
       onDoubleClick={() => router.push(`/dashboard/database/tables?table=${table.name}`)}
     >
       {/* Handles for edges */}
-      <Handle type="target" position={Position.Left} className="w-1.5! h-1.5! bg-brand-500! border-brand-400! -left-[4px]!" />
-      <Handle type="source" position={Position.Right} className="w-1.5! h-1.5! bg-brand-500! border-brand-400! -right-[4px]!" />
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-1.5! h-1.5! bg-brand-500! border-brand-400! -left-[4px]!"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-1.5! h-1.5! bg-brand-500! border-brand-400! -right-[4px]!"
+      />
 
       {/* Header — drag handle */}
       <div className="custom-drag-handle px-2.5 py-1.5 bg-surface-200/50 border-b border-border flex items-center gap-1.5 cursor-grab active:cursor-grabbing select-none">
         <GripVertical className="w-3 h-3 text-foreground-lighter/50 shrink-0" />
         <Table2 className="w-3 h-3 text-brand-500 shrink-0" />
-        <span className="text-[11px] font-semibold text-foreground truncate flex-1">{table.name}</span>
-        <span className="text-[9px] text-foreground-lighter shrink-0 tabular-nums">{table.columns.length}</span>
+        <span className="text-[11px] font-semibold text-foreground truncate flex-1">
+          {table.name}
+        </span>
+        <span className="text-[9px] text-foreground-lighter shrink-0 tabular-nums">
+          {table.columns.length}
+        </span>
       </div>
 
       {/* Columns */}
@@ -213,12 +230,14 @@ function TableNodeComponent({ data, selected }: NodeProps) {
               <span className="text-[10px] text-foreground flex-1 truncate font-mono leading-tight">
                 {col.name}
               </span>
-              <span className={cn(
-                'text-[8px] font-mono px-1 py-px rounded shrink-0 leading-tight',
-                col.is_primary_key
-                  ? 'bg-amber-500/10 text-amber-600'
-                  : 'bg-surface-200/60 text-foreground-lighter'
-              )}>
+              <span
+                className={cn(
+                  'text-[8px] font-mono px-1 py-px rounded shrink-0 leading-tight',
+                  col.is_primary_key
+                    ? 'bg-amber-500/10 text-amber-600'
+                    : 'bg-surface-200/60 text-foreground-lighter'
+                )}
+              >
                 {getColumnTypeBadge(col.type)}
               </span>
               {!col.nullable && (
@@ -298,9 +317,19 @@ function SidebarTableList({
                     : 'hover:bg-surface-75 border-l-2 border-transparent'
                 )}
               >
-                <Table2 className={cn('w-3 h-3 mt-0.5 shrink-0', isSelected ? 'text-brand-500' : 'text-foreground-lighter')} />
+                <Table2
+                  className={cn(
+                    'w-3 h-3 mt-0.5 shrink-0',
+                    isSelected ? 'text-brand-500' : 'text-foreground-lighter'
+                  )}
+                />
                 <div className="flex-1 min-w-0">
-                  <div className={cn('text-[11px] font-mono truncate', isSelected ? 'text-brand-500 font-semibold' : 'text-foreground')}>
+                  <div
+                    className={cn(
+                      'text-[11px] font-mono truncate',
+                      isSelected ? 'text-brand-500 font-semibold' : 'text-foreground'
+                    )}
+                  >
                     {t.name}
                   </div>
                   <div className="text-[9px] text-foreground-lighter leading-tight mt-0.5">
@@ -323,13 +352,7 @@ function SidebarTableList({
 }
 
 // ===== Selected node detail =====
-function SelectedNodeDetail({
-  table,
-  onClose,
-}: {
-  table: SchemaGraphNode
-  onClose: () => void
-}) {
+function SelectedNodeDetail({ table, onClose }: { table: SchemaGraphNode; onClose: () => void }) {
   return (
     <div className="absolute bottom-3 right-3 z-10 w-[280px] max-h-[360px] bg-surface-100/95 backdrop-blur border border-border rounded-lg shadow-lg overflow-hidden flex flex-col">
       <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-surface-200/40">
@@ -337,7 +360,10 @@ function SelectedNodeDetail({
           <Table2 className="w-3.5 h-3.5 text-brand-500 shrink-0" />
           <span className="text-[12px] font-semibold text-foreground truncate">{table.name}</span>
         </div>
-        <button onClick={onClose} className="text-foreground-lighter hover:text-foreground p-0.5 rounded hover:bg-surface-200 transition-colors">
+        <button
+          onClick={onClose}
+          className="text-foreground-lighter hover:text-foreground p-0.5 rounded hover:bg-surface-200 transition-colors"
+        >
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -346,19 +372,30 @@ function SelectedNodeDetail({
           <thead>
             <tr className="border-b border-border bg-surface-75">
               <th className="text-left px-2.5 py-1 text-[9px] font-medium text-foreground-lighter uppercase w-5" />
-              <th className="text-left px-2.5 py-1 text-[9px] font-medium text-foreground-lighter uppercase">Column</th>
-              <th className="text-left px-2.5 py-1 text-[9px] font-medium text-foreground-lighter uppercase">Type</th>
-              <th className="text-center px-1 py-1 text-[9px] font-medium text-foreground-lighter uppercase w-6">NN</th>
+              <th className="text-left px-2.5 py-1 text-[9px] font-medium text-foreground-lighter uppercase">
+                Column
+              </th>
+              <th className="text-left px-2.5 py-1 text-[9px] font-medium text-foreground-lighter uppercase">
+                Type
+              </th>
+              <th className="text-center px-1 py-1 text-[9px] font-medium text-foreground-lighter uppercase w-6">
+                NN
+              </th>
             </tr>
           </thead>
           <tbody>
             {table.columns.map((col) => (
-              <tr key={col.name} className="border-b border-border/30 hover:bg-surface-75 transition-colors">
+              <tr
+                key={col.name}
+                className="border-b border-border/30 hover:bg-surface-75 transition-colors"
+              >
                 <td className="px-2.5 py-1">
                   {col.is_primary_key ? <Key className="w-2.5 h-2.5 text-amber-500" /> : null}
                 </td>
                 <td className="px-2.5 py-1 text-[10px] font-mono text-foreground">{col.name}</td>
-                <td className="px-2.5 py-1 text-[10px] font-mono text-foreground-lighter">{col.type}</td>
+                <td className="px-2.5 py-1 text-[10px] font-mono text-foreground-lighter">
+                  {col.type}
+                </td>
                 <td className="px-1 py-1 text-center text-[9px]">
                   {!col.nullable && <span className="text-orange-500 font-bold">✓</span>}
                 </td>
@@ -395,35 +432,43 @@ function SchemaGraphInner() {
     return (graphData.nodes || []).find((n) => n.id === selectedNodeId) || null
   }, [graphData, selectedNodeId])
 
-  const loadGraph = useCallback(async (dir?: 'LR' | 'TB') => {
-    if (!workspaceId) return
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await workspaceDatabaseApi.getSchemaGraph(workspaceId)
-      setGraphData(data)
-      const { nodes: ln, edges: le } = getLayoutedElements(data, dir || direction)
-      setNodes(ln)
-      setEdges(le)
-      setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 100)
-    } catch (err: any) {
-      setError(err?.message || 'Failed to load schema graph')
-    } finally {
-      setLoading(false)
-    }
-  }, [workspaceId, direction, setNodes, setEdges, fitView])
+  const loadGraph = useCallback(
+    async (dir?: 'LR' | 'TB') => {
+      if (!workspaceId) return
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await workspaceDatabaseApi.getSchemaGraph(workspaceId)
+        setGraphData(data)
+        const { nodes: ln, edges: le } = getLayoutedElements(data, dir || direction)
+        setNodes(ln)
+        setEdges(le)
+        setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 100)
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load schema graph')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [workspaceId, direction, setNodes, setEdges, fitView]
+  )
 
-  useEffect(() => { loadGraph() }, [loadGraph])
+  useEffect(() => {
+    loadGraph()
+  }, [loadGraph])
 
-  const reLayout = useCallback((dir: 'LR' | 'TB') => {
-    setDirection(dir)
-    if (graphData) {
-      const { nodes: ln, edges: le } = getLayoutedElements(graphData, dir)
-      setNodes(ln)
-      setEdges(le)
-      setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 50)
-    }
-  }, [graphData, setNodes, setEdges, fitView])
+  const reLayout = useCallback(
+    (dir: 'LR' | 'TB') => {
+      setDirection(dir)
+      if (graphData) {
+        const { nodes: ln, edges: le } = getLayoutedElements(graphData, dir)
+        setNodes(ln)
+        setEdges(le)
+        setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 50)
+      }
+    },
+    [graphData, setNodes, setEdges, fitView]
+  )
 
   const toggleDirection = useCallback(() => {
     reLayout(direction === 'LR' ? 'TB' : 'LR')
@@ -434,20 +479,22 @@ function SchemaGraphInner() {
   }, [direction, reLayout])
 
   // Focus on a specific node
-  const focusNode = useCallback((nodeId: string) => {
-    const node = nodes.find((n) => n.id === nodeId)
-    if (!node) return
-    setSelectedNodeId(nodeId)
-    // Update selection visually
-    setNodes((nds) => nds.map((n) => ({ ...n, selected: n.id === nodeId })))
-    const table = (node.data as any).table as SchemaGraphNode
-    const h = NODE_HEIGHT_BASE + table.columns.length * NODE_ROW_HEIGHT
-    setCenter(
-      node.position.x + NODE_WIDTH / 2,
-      node.position.y + h / 2,
-      { zoom: Math.max(getZoom(), 0.8), duration: 400 }
-    )
-  }, [nodes, setNodes, setCenter, getZoom])
+  const focusNode = useCallback(
+    (nodeId: string) => {
+      const node = nodes.find((n) => n.id === nodeId)
+      if (!node) return
+      setSelectedNodeId(nodeId)
+      // Update selection visually
+      setNodes((nds) => nds.map((n) => ({ ...n, selected: n.id === nodeId })))
+      const table = (node.data as any).table as SchemaGraphNode
+      const h = NODE_HEIGHT_BASE + table.columns.length * NODE_ROW_HEIGHT
+      setCenter(node.position.x + NODE_WIDTH / 2, node.position.y + h / 2, {
+        zoom: Math.max(getZoom(), 0.8),
+        duration: 400,
+      })
+    },
+    [nodes, setNodes, setCenter, getZoom]
+  )
 
   // Handle selection changes from ReactFlow
   const onSelectionChange = useCallback(({ nodes: selectedNodes }: OnSelectionChangeParams) => {
@@ -492,7 +539,12 @@ function SchemaGraphInner() {
       <div className="flex flex-col items-center justify-center h-full gap-3">
         <AlertCircle className="w-5 h-5 text-destructive" />
         <span className="text-[13px] text-destructive">{error}</span>
-        <Button size="sm" variant="outline" onClick={() => loadGraph()} className="h-7 text-[11px] gap-1">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => loadGraph()}
+          className="h-7 text-[11px] gap-1"
+        >
           <RefreshCw className="w-3 h-3" />
           Retry
         </Button>
@@ -508,7 +560,9 @@ function SchemaGraphInner() {
         </div>
         <div className="text-center">
           <p className="text-[13px] font-medium text-foreground">No tables yet</p>
-          <p className="text-[11px] text-foreground-lighter mt-0.5">Create tables first to visualize the schema.</p>
+          <p className="text-[11px] text-foreground-lighter mt-0.5">
+            Create tables first to visualize the schema.
+          </p>
         </div>
         <Link href="/dashboard/database/tables?action=create">
           <Button size="sm" className="h-7 text-[11px] gap-1">
@@ -542,12 +596,17 @@ function SchemaGraphInner() {
         {/* Floating toolbar */}
         <div className="absolute top-3 left-3 z-10 flex items-center gap-1 bg-surface-100/95 backdrop-blur border border-border rounded-md px-1.5 py-1 shadow-sm">
           <Button
-            size="sm" variant="ghost"
+            size="sm"
+            variant="ghost"
             onClick={() => setShowSidebar(!showSidebar)}
             className="h-6 w-6 p-0"
             title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
           >
-            {showSidebar ? <PanelLeftClose className="w-3 h-3" /> : <PanelLeft className="w-3 h-3" />}
+            {showSidebar ? (
+              <PanelLeftClose className="w-3 h-3" />
+            ) : (
+              <PanelLeft className="w-3 h-3" />
+            )}
           </Button>
           <div className="w-px h-4 bg-border" />
           <span className="text-[10px] text-foreground-lighter px-1 tabular-nums">
@@ -555,17 +614,45 @@ function SchemaGraphInner() {
             {edgeCount > 0 && ` · ${edgeCount} FK`}
           </span>
           <div className="w-px h-4 bg-border" />
-          <Button size="sm" variant="ghost" onClick={() => loadGraph()} className="h-6 w-6 p-0" title="Refresh data">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => loadGraph()}
+            className="h-6 w-6 p-0"
+            title="Refresh data"
+          >
             <RefreshCw className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={resetLayout} className="h-6 w-6 p-0" title="Reset layout">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={resetLayout}
+            className="h-6 w-6 p-0"
+            title="Reset layout"
+          >
             <LayoutGrid className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => fitView({ padding: 0.15, duration: 300 })} className="h-6 w-6 p-0" title="Fit to view">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => fitView({ padding: 0.15, duration: 300 })}
+            className="h-6 w-6 p-0"
+            title="Fit to view"
+          >
             <Maximize2 className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={toggleDirection} className="h-6 w-6 p-0" title={`Direction: ${direction === 'LR' ? 'Horizontal' : 'Vertical'}`}>
-            {direction === 'LR' ? <ArrowRightLeft className="w-3 h-3" /> : <ArrowDownUp className="w-3 h-3" />}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={toggleDirection}
+            className="h-6 w-6 p-0"
+            title={`Direction: ${direction === 'LR' ? 'Horizontal' : 'Vertical'}`}
+          >
+            {direction === 'LR' ? (
+              <ArrowRightLeft className="w-3 h-3" />
+            ) : (
+              <ArrowDownUp className="w-3 h-3" />
+            )}
           </Button>
         </div>
 
@@ -594,7 +681,9 @@ function SchemaGraphInner() {
           <Background gap={20} size={1} />
           <MiniMap
             className="bg-surface-100 border border-border rounded-md"
-            nodeColor={(node) => node.selected ? 'var(--color-brand-500)' : 'var(--color-surface-300)'}
+            nodeColor={(node) =>
+              node.selected ? 'var(--color-brand-500)' : 'var(--color-surface-300)'
+            }
             maskColor="rgba(0,0,0,0.06)"
             pannable
             zoomable

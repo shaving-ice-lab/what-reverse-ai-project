@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Save, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
@@ -56,8 +57,17 @@ export function RowDetailPanel({
     }
   }
 
+  const { confirm: confirmDelete, Dialog: DeleteRowDialog } = useConfirmDialog()
+
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this row?')) return
+    const confirmed = await confirmDelete({
+      title: 'Delete Row',
+      description: 'Are you sure you want to delete this row? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
     setDeleting(true)
     try {
       await onDelete(formData)
@@ -133,6 +143,7 @@ export function RowDetailPanel({
           </Button>
         </div>
       </div>
+      <DeleteRowDialog />
     </div>
   )
 }

@@ -243,7 +243,7 @@ export const workspaceDatabaseApi = {
       rows: data?.rows ?? [],
       affected_rows: data?.rows?.length ?? 0,
       duration_ms: 0,
-      total_count: (response as any)?.meta?.total ?? 0,
+      total_count: data?.total ?? 0,
     }
   },
 
@@ -378,5 +378,4 @@ export const workspaceDatabaseApi = {
     )
     return (response.data as any)?.graph ?? { nodes: [], edges: [] }
   },
-
 }

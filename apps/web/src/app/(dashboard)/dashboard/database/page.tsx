@@ -79,8 +79,16 @@ export default function DatabaseOverviewPage() {
       {/* Stats row — Supabase style metric cards */}
       <div className="grid grid-cols-4 gap-3">
         <StatCard icon={Table2} label="Tables" value={String(stats?.table_count ?? 0)} />
-        <StatCard icon={Rows3} label="Total Rows" value={(stats?.total_rows ?? 0).toLocaleString()} />
-        <StatCard icon={HardDrive} label="Size" value={formatBytes((stats?.file_size_kb ?? 0) * 1024)} />
+        <StatCard
+          icon={Rows3}
+          label="Total Rows"
+          value={(stats?.total_rows ?? 0).toLocaleString()}
+        />
+        <StatCard
+          icon={HardDrive}
+          label="Size"
+          value={formatBytes((stats?.file_size_kb ?? 0) * 1024)}
+        />
         <StatCard icon={Database} label="Indexes" value={String(stats?.index_count ?? 0)} />
       </div>
 
@@ -89,11 +97,21 @@ export default function DatabaseOverviewPage() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-[13px] font-medium text-foreground">Tables</h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={loadData} disabled={loading} className="h-7 text-[11px] px-2 text-foreground-lighter hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={loadData}
+              disabled={loading}
+              className="h-7 text-[11px] px-2 text-foreground-lighter hover:text-foreground"
+            >
               <RefreshCw className={cn('w-3 h-3', loading && 'animate-spin')} />
             </Button>
             <Link href="/dashboard/database/tables">
-              <Button variant="outline" size="sm" className="h-7 text-[11px] px-2.5 border-border text-foreground-light">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] px-2.5 border-border text-foreground-light"
+              >
                 View all
               </Button>
             </Link>
@@ -107,7 +125,9 @@ export default function DatabaseOverviewPage() {
             </div>
             <div className="text-center">
               <p className="text-[13px] font-medium text-foreground">No tables yet</p>
-              <p className="text-[11px] text-foreground-lighter mt-0.5">Create your first table to get started.</p>
+              <p className="text-[11px] text-foreground-lighter mt-0.5">
+                Create your first table to get started.
+              </p>
             </div>
             <Link href="/dashboard/database/tables?action=create">
               <Button size="sm" className="h-8 text-[12px] mt-1 gap-1.5">
@@ -165,14 +185,20 @@ export default function DatabaseOverviewPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[13px] font-medium text-foreground">Recent Queries</h2>
-            <Link href="/dashboard/database/sql" className="text-[11px] text-brand-500 hover:text-brand-400 transition-colors">
+            <Link
+              href="/dashboard/database/sql"
+              className="text-[11px] text-brand-500 hover:text-brand-400 transition-colors"
+            >
               Open SQL Editor →
             </Link>
           </div>
 
           <div className="rounded-md border border-border bg-surface-75 divide-y divide-border/50 overflow-hidden">
             {history.map((item, idx) => (
-              <div key={idx} className="px-4 py-2.5 flex items-center gap-3 hover:bg-surface-100 transition-colors">
+              <div
+                key={idx}
+                className="px-4 py-2.5 flex items-center gap-3 hover:bg-surface-100 transition-colors"
+              >
                 <div className="flex-1 min-w-0">
                   <code className="text-[11px] text-foreground-light font-mono truncate block">
                     {item.sql}
@@ -201,7 +227,15 @@ export default function DatabaseOverviewPage() {
   )
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType
+  label: string
+  value: string
+}) {
   return (
     <div className="rounded-md border border-border bg-surface-75 px-4 py-3">
       <div className="flex items-center gap-2 mb-1">

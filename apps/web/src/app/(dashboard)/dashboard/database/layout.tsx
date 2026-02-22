@@ -3,13 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  LayoutDashboard,
-  Table2,
-  Terminal,
-  Network,
-  HardDrive,
-} from 'lucide-react'
+import { LayoutDashboard, Table2, Terminal, Network, HardDrive } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -57,9 +51,7 @@ export default function DatabaseLayout({ children }: { children: React.ReactNode
       </header>
 
       {/* Content */}
-      <div className="flex-1 min-h-0 overflow-hidden bg-background">
-        {children}
-      </div>
+      <div className="flex-1 min-h-0 overflow-hidden bg-background">{children}</div>
     </div>
   )
 }

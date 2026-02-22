@@ -303,7 +303,9 @@ export default function TablesPage() {
               <Loader2 className="w-4 h-4 animate-spin text-foreground-lighter" />
             </div>
           ) : filteredTables.length === 0 ? (
-            <div className="text-center py-8 text-[11px] text-foreground-lighter">No tables found</div>
+            <div className="text-center py-8 text-[11px] text-foreground-lighter">
+              No tables found
+            </div>
           ) : (
             filteredTables.map((table) => {
               const isSelected = selectedTable === table.name
@@ -318,7 +320,12 @@ export default function TablesPage() {
                       : 'border-l-transparent text-foreground-light hover:text-foreground hover:bg-surface-75'
                   )}
                 >
-                  <Table2 className={cn('w-3.5 h-3.5 shrink-0', isSelected ? 'text-brand-500' : 'text-foreground-lighter')} />
+                  <Table2
+                    className={cn(
+                      'w-3.5 h-3.5 shrink-0',
+                      isSelected ? 'text-brand-500' : 'text-foreground-lighter'
+                    )}
+                  />
                   <span className="flex-1 truncate">{table.name}</span>
                   <span className="text-[10px] text-foreground-lighter tabular-nums">
                     {table.row_count_est}

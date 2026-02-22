@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { TableColumn, CreateColumnDef, AlterColumnDef } from '@/lib/api/workspace-database'
 import { cn } from '@/lib/utils'
+import { useConfirmDialog } from '@/components/ui/confirm-dialog'
 
 // Supabase-style categorized column types
 const TYPE_CATEGORIES = [
@@ -314,8 +315,17 @@ export function ColumnManagerDialog({
     }
   }
 
+  const { confirm: confirmDrop, Dialog: DropColumnDialog } = useConfirmDialog()
+
   const handleDrop = async (colName: string) => {
-    if (!window.confirm(`Delete column "${colName}"? This action cannot be undone.`)) return
+    const confirmed = await confirmDrop({
+      title: 'Delete Column',
+      description: `Delete column "${colName}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
     setSaving(true)
     setError('')
     try {
@@ -605,6 +615,7 @@ export function ColumnManagerDialog({
           )}
         </div>
       </div>
+      <DropColumnDialog />
     </div>
   )
 }
